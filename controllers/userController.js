@@ -96,11 +96,11 @@ module.exports = {
           });
           newUser.save(function(err, user) {
             if (err) {
+              console.err(err);
               // Error code when there is a duplicate key, in this case : the email (unique field)
-              // if (err.code === 11000) {
-              //   return response.error(res, 409, translate[language].userEmailExists);
-              // } else 
-              if (err.name === "InvalidEmail") {
+              if (err.code === 11000) {
+                return response.error(res, 409, translate[language].userEmailExists);
+              } else if (err.name === "InvalidEmail") {
                 return response.error(res, 400, translate[language].invalidEmail);
               } else {
                 return response.error(res, 500, translate[language].unexpectedBehavior);
