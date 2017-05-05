@@ -26,14 +26,12 @@ var userSchema = mongoose.Schema({
   employee_id: {
     type: Number,
     unique: true,
-    sparse: true,
-    default: null,
+    sparse: true
   },
   customer_id: {
     type: Number,
     unique: true,
-    sparse: true,
-    default: null
+    sparse: true
   }
 }, {
   timestamps: true
