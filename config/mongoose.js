@@ -7,18 +7,19 @@ mongoose.Promise = require('bluebird');
 mongoose.connect(db.database);
 
 // When successfully connected
-mongoose.connection.on('connected', function() {
-    console.log('Mongoose default connection open :)');
+mongoose.connection.once('connected', function() {
+    return console.log('Successfully connected to ' + db.database);
 });
 
 // If the connection throws an error
 mongoose.connection.on('error', function(err) {
-    console.log('Mongoose default connection error: ' + err);
+    console.error('There was a db connection error');
+    return (err.message);
 });
 
 // When the connection is disconnected
-mongoose.connection.on('disconnected', function() {
-    console.log('Mongoose default connection disconnected');
+mongoose.connection.once('disconnected', function() {
+    return console.log('Successfully disconnected from ' + db.database);
 });
 
 // Models

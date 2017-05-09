@@ -4,6 +4,7 @@ const express       = require('express');
 const path          = require('path');
 const favicon       = require('serve-favicon');
 const logger        = require('morgan');
+const _             = require('lodash');
 const cookieParser  = require('cookie-parser');
 const bodyParser    = require('body-parser');
 const router        = express.Router();
@@ -33,6 +34,9 @@ app.use(cookieParser());
 
 // Allows to use /public folder
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Db connection
+require('./config/mongoose');
 
 // Routing
 app.use(require('./routes/index'));

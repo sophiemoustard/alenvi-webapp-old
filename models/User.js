@@ -11,6 +11,7 @@ const SALT_WORK_FACTOR = 10;
 var userSchema = mongoose.Schema({
   email: {
     type: String,
+    trim: true,
     unique: true,
     required: true
   },
@@ -20,23 +21,21 @@ var userSchema = mongoose.Schema({
   },
   role: {
     type: String,
+    trim: true,
     enum: ['admin', 'coach', 'supervisor', 'auxiliary', 'customer', 'family', 'guest'],
     default: ['guest']
   },
   employee_id: {
     type: Number,
-    unique: true,
-    sparse: true
+    trim: true
   },
   customer_id: {
     type: Number,
-    unique: true,
-    sparse: true
+    trim: true
   }
 }, {
   timestamps: true
 });
-// sparse allows to make some params unique but without considering "null" cases
 // timestamps allows the db to automatically create 'created_at' and 'updated_at' fields
 
 userSchema.pre('save', function(next) {
