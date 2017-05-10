@@ -11,9 +11,11 @@ const SALT_WORK_FACTOR = 10;
 var userSchema = mongoose.Schema({
   email: {
     type: String,
-    trim: true,
+    lowercase: true,
     unique: true,
-    required: true
+    required: true,
+    match: "/\S+@\S+\.\S+/",
+    index: true
   },
   password: {
     type: String,
@@ -33,9 +35,7 @@ var userSchema = mongoose.Schema({
     type: Number,
     trim: true
   }
-}, {
-  timestamps: true
-});
+}, { timestamps: true });
 // timestamps allows the db to automatically create 'created_at' and 'updated_at' fields
 
 userSchema.pre('save', function(next) {

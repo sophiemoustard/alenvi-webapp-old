@@ -9,7 +9,7 @@ const response      = require('../helpers/response');
 const jwt           = require('jsonwebtoken');
 const _             = require('lodash');
 
-// Find an user by Id
+// Find an user by Id in param URL
 function getUserById(req, res, next) {
   User.findOne({ _id: req.params._id }, function(err, user) {
     // In case of error or no users
@@ -24,10 +24,9 @@ function getUserById(req, res, next) {
   });
 }
 
-// Check if user is allowed to access to this route : only himself or admin can validate through this function
+// Check if user is allowed to access to this route : only himself or admin / coach can validate through this function
 function checkOnlyUserAllowed(req, res, next) {
-  console.log(req.decoded);
-  if (!req.decoded.admin && (req.params._id !== req.decoded.id)) {
+  if ((req.decoded.role != 'admin' || req.decoded.role != 'coach') || (req.params._id !== req.decoded.id)) {
     return response.error(res, 403, translate[language].forbidden);
   }
   next();
@@ -39,7 +38,6 @@ module.exports = {
     if (!req.body.email || !req.body.password) {
       return response.error(res, 400, translate[language].missingParameters);
     }
-    console.log(req.body.email);
     User.findOne({ email: req.body.email }, function(err, user) {
       if (err) {
         return response.error(res, 500, translate[language].unexpectedBehavior);
@@ -53,12 +51,8 @@ module.exports = {
           return response.error(res, 401, translate[language].userAuthFailed);
         }
         // create a token
-        var token = jwt.sign({
-          'email': user.email,
-          'id': user.id
-        }, tokenConfig.secret, {
-          expiresIn: tokenConfig.expiresIn
-        });
+        var token = jwt.sign({ 'email': user.email, 'id': user.id, 'role': user.role, 'customer_id': user.customer_id, 'employee_id': user.employee_id }, tokenConfig.secret, { expiresIn: tokenConfig.expiresIn });
+        console.log(req.body.email + ' connected');
         // return the information including token as JSON
         return response.success(res, translate[language].userAuthentified, { user: user, token: token } );
       })
@@ -91,8 +85,8 @@ module.exports = {
       var test = {
         "email": req.body.email,
         "password": req.body.password,
-        "employee_id": req.body.employee_id ? req.body.employee_id : "",
-        "customer_id": req.body.customer_id ? req.body.customer_id : null,
+        "employee_id": req.body.employee_id ? req.body.employee_id : 0,
+        "customer_id": req.body.customer_id ? req.body.customer_id : 0,
         "role": req.body.role ? req.body.role : ""
       };
       var bou = _.pickBy(test);
@@ -120,6 +114,7 @@ module.exports = {
   },
   //Update an user by email (unique field)
   update: function(req, res) {
+    console.log(req);
     checkOnlyUserAllowed(req, res, function() {
       getUserById(req, res, function() {
         // In case of success

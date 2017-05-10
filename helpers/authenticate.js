@@ -14,22 +14,22 @@ module.exports = function(options) {
         const token = req.body.token || req.query.token || req.headers['x-access-token'];
         // if there is no token
         if (!token) {
-          return response.error(res, 401, translate[language].tokenNotFound);
+          return response.error(res, 403, translate[language].tokenNotFound);
         }
-
         // verifies secret and checks expiration then decode token
         jwt.verify(token, options.secret, function(err, decoded) {
-            if (err) {
-                if (err.name === "JsonWebTokenError") {
-                    return response.error(res, 403, translate[language].tokenAuthFailed);
-                } else if (err.name === "TokenExpiredError") {
-                    return response.error(res, 401, translate[language].tokenExpired);
-                }
-            } else {
-                // if everything is good, save to request for use in other routes
-                req.decoded = decoded;
-                next();
+          if (err) {
+            if (err.name === "JsonWebTokenError") {
+              return response.error(res, 403, translate[language].tokenAuthFailed);
             }
+            if (err.name === "TokenExpiredError") {
+              return response.error(res, 401, translate[language].tokenExpired);
+            }
+          } else {
+            // if everything is good, save to request for use in other routes
+            req.decoded = decoded;
+            next();
+          }
         });
     });
 };

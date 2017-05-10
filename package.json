@@ -10,11 +10,13 @@
   },
   "dependencies": {
     "bcrypt": "^1.0.2",
+    "bcrypt-nodejs": "0.0.3",
     "body-parser": "~1.17.1",
     "cookie-parser": "~1.4.3",
     "crypto": "0.0.3",
     "debug": "~2.6.3",
     "express": "~4.15.2",
+    "express-session": "^1.15.2",
     "jade": "~1.11.0",
     "jsonwebtoken": "^7.4.0",
     "lodash": "^4.17.4",

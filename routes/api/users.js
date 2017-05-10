@@ -16,7 +16,7 @@ router.use(auth({ secret: secret }));
 // All these routes need a token because of route protection above
 router.get('/', userController.showAll);
 router.get('/:_id', userController.show);
-router.put('/:_id', auth({ secret: secret }), userController.update);
-router.delete('/:_id', auth({ secret: secret }), userController.delete);
+router.put('/:_id', userController.update);
+router.delete('/:_id', userController.delete);
 
 module.exports = router;
