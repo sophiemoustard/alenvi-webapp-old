@@ -8,23 +8,26 @@ const validator = require('validator');
 const SALT_WORK_FACTOR = 10;
 
 // User schema
-var userSchema = mongoose.Schema({
-  email: {
-    type: String,
-    lowercase: true,
-    unique: true,
-    required: true,
-    match: "/\S+@\S+\.\S+/",
-    index: true
+var UserSchema = mongoose.Schema({
+  local: {
+    email: {
+      type: String,
+      lowercase: true,
+      index: true
+    },
+    password: String
   },
-  password: {
-    type: String,
-    required: true
+  facebook: {
+    facebookId: String,
+    access_token: String,
+    displayName: String,
+    email: String,
+    photo: String
   },
   role: {
     type: String,
     trim: true,
-    enum: ['admin', 'coach', 'supervisor', 'auxiliary', 'customer', 'family', 'guest'],
+    enum: ['admin', 'coach', 'leader', 'auxiliary', 'family', 'guest'],
     default: ['guest']
   },
   employee_id: {
@@ -34,22 +37,34 @@ var userSchema = mongoose.Schema({
   customer_id: {
     type: Number,
     trim: true
-  }
+  },
+  sectors: [{
+    type: String,
+    trim: true
+  }]
 }, { timestamps: true });
 // timestamps allows the db to automatically create 'created_at' and 'updated_at' fields
 
-userSchema.pre('save', function(next) {
+UserSchema.methods.generateHash = function(password) {
+  return bcrypt.hashSync(password, bcrypt.genSaltSync(SALT_WORK_FACTOR), null);
+};
+
+UserSchema.methods.validPassword = function(password) {
+  return bcrypt.compareSync(password, this.local.password);
+}
+
+UserSchema.pre('save', function(next) {
     var user = this;
     // Check email validity
-    if (user.isModified('email')) {
-        if (!validator.isEmail(this.email)) {
+    if (user.isModified('local.email')) {
+        if (!validator.isEmail(this.local.email)) {
             var error = new Error();
             error.name = "InvalidEmail";
             return next(error);
         }
     }
     // Check if password is modified, then encrypt it thanks to bcrypt
-    if (!user.isModified('password')) {
+    if (!user.isModified('local.password')) {
         return next();
     } else {
       bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
@@ -57,11 +72,11 @@ userSchema.pre('save', function(next) {
           return next(err);
         }
         // next();
-        bcrypt.hash(user.password, salt, function(err, hash) {
+        bcrypt.hash(user.local.password, salt, function(err, hash) {
           if (err) {
             return next(err);
           }
-          user.password = hash;
+          user.local.password = hash;
           return next();
         }); // bcrypt.hash
       }); // bcrypt.genSalt
@@ -69,8 +84,8 @@ userSchema.pre('save', function(next) {
 });
 
 // Method to compare password to encrypted one
-userSchema.methods.comparePassword = function(passwordGiven, cb) {
-  bcrypt.compare(passwordGiven, this.password, function (err, isMatch) {
+UserSchema.methods.comparePassword = function(passwordGiven, cb) {
+  bcrypt.compare(passwordGiven, this.local.password, function (err, isMatch) {
     if (err) {
       return cb(err);
     }
@@ -78,4 +93,4 @@ userSchema.methods.comparePassword = function(passwordGiven, cb) {
   });
 };
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = mongoose.model("User", UserSchema);

@@ -1,17 +1,18 @@
 "use strict";
 
-const User          = require('../models/User');
 const db            = require('../config/database');
-const tokenConfig   = require('../config/token');
+const tokenConfig   = require('../config/strategies').token;
 const translate     = require('../helpers/translate');
 const language      = translate.language;
 const response      = require('../helpers/response');
 const jwt           = require('jsonwebtoken');
 const _             = require('lodash');
 
+const User          = require('../models/User');
+
 // Find an user by Id in param URL
 function getUserById(req, res, next) {
-  User.findOne({ _id: req.params._id }, function(err, user) {
+  User.findOne({ '_id': req.params._id }, function(err, user) {
     // In case of error or no users
     if (err || !user) {
       return response.error(res, 404, translate[language].userNotFound);
@@ -26,7 +27,7 @@ function getUserById(req, res, next) {
 
 // Check if user is allowed to access to this route : only himself or admin / coach can validate through this function
 function checkOnlyUserAllowed(req, res, next) {
-  if ((req.decoded.role != 'admin' || req.decoded.role != 'coach') || (req.params._id !== req.decoded.id)) {
+  if (req.decoded.role != 'admin' && req.decoded.role != 'coach' && req.params._id !== req.decoded.id) {
     return response.error(res, 403, translate[language].forbidden);
   }
   next();
@@ -38,7 +39,7 @@ module.exports = {
     if (!req.body.email || !req.body.password) {
       return response.error(res, 400, translate[language].missingParameters);
     }
-    User.findOne({ email: req.body.email }, function(err, user) {
+    User.findOne({ 'local.email': req.body.email }, function(err, user) {
       if (err) {
         return response.error(res, 500, translate[language].unexpectedBehavior);
       }
@@ -51,7 +52,7 @@ module.exports = {
           return response.error(res, 401, translate[language].userAuthFailed);
         }
         // create a token
-        var token = jwt.sign({ 'email': user.email, 'id': user.id, 'role': user.role, 'customer_id': user.customer_id, 'employee_id': user.employee_id }, tokenConfig.secret, { expiresIn: tokenConfig.expiresIn });
+        var token = jwt.sign({ 'local.email': user.local.email, 'local.id': user.local.id, 'role': user.role, 'customer_id': user.customer_id, 'employee_id': user.employee_id }, tokenConfig.secret, { expiresIn: tokenConfig.expiresIn });
         console.log(req.body.email + ' connected');
         // return the information including token as JSON
         return response.success(res, translate[language].userAuthentified, { user: user, token: token } );
@@ -83,8 +84,8 @@ module.exports = {
     // Check if users mandatory fields are existing
     if (req.body.email && req.body.password) {
       var test = {
-        "email": req.body.email,
-        "password": req.body.password,
+        "local.email": req.body.email,
+        "local.password": req.body.password,
         "employee_id": req.body.employee_id ? req.body.employee_id : 0,
         "customer_id": req.body.customer_id ? req.body.customer_id : 0,
         "role": req.body.role ? req.body.role : ""
@@ -120,10 +121,10 @@ module.exports = {
         // In case of success
         // Fields allowed for update
         if (req.body.email) {
-          req.user.email = req.body.email;
+          req.user.local.email = req.body.email;
         }
         if (req.body.password) {
-          req.user.password = req.body.password;
+          req.user.local.password = req.body.password;
         }
         if (req.body.role) {
           req.user.role = req.body.role;

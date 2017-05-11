@@ -2,7 +2,7 @@
 
 const express = require('express');
 const auth = require('../../helpers/authenticate');
-const secret = require('../../config/token').secret;
+const secret = require('../../config/strategies').token.secret;
 const router = express.Router();
 
 const userController = require('../../controllers/userController');
