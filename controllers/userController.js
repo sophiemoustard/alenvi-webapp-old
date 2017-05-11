@@ -11,22 +11,33 @@ const _             = require('lodash');
 const User          = require('../models/User');
 
 // Find an user by Id in param URL
-function getUserById(req, res, next) {
-  User.findOne({ '_id': req.params._id }, function(err, user) {
-    // In case of error or no users
+// function getUserById(req, res, next) {
+//   User.findOne({ '_id': req.params._id }, function(err, user) {
+//     // In case of error or no users
+//     if (err || !user) {
+//       return response.error(res, 404, translate[language].userNotFound);
+//     } else {
+//       // Save in request the user
+//       req.user = user;
+//       // Callback for success
+//       next();
+//     }
+//   });
+// }
+
+var getUserByParamId = function(req, res, next) {
+  User.getByParamId(req.params._id, function(err, user) {
     if (err || !user) {
       return response.error(res, 404, translate[language].userNotFound);
     } else {
-      // Save in request the user
       req.user = user;
-      // Callback for success
       next();
     }
-  });
+  })
 }
 
 // Check if user is allowed to access to this route : only himself or admin / coach can validate through this function
-function checkOnlyUserAllowed(req, res, next) {
+var checkOnlyUserAllowed = function(req, res, next) {
   if (req.decoded.role != 'admin' && req.decoded.role != 'coach' && req.params._id !== req.decoded.id) {
     return response.error(res, 403, translate[language].forbidden);
   }
@@ -39,7 +50,7 @@ module.exports = {
     if (!req.body.email || !req.body.password) {
       return response.error(res, 400, translate[language].missingParameters);
     }
-    User.findOne({ 'local.email': req.body.email }, function(err, user) {
+    User.getByEmail(req.body.email, function(err, user) {
       if (err) {
         return response.error(res, 500, translate[language].unexpectedBehavior);
       }
@@ -62,7 +73,7 @@ module.exports = {
   // Show all user
   showAll: function(req, res) {
     // No security here to restrict access
-    User.find({}, function(err, users) {
+    User.getAll(function(err, users) {
       if (err) {
         return response.error(res, 500, translate[language].unexpectedBehavior);
       }
@@ -74,8 +85,7 @@ module.exports = {
   },
   // Show an user by ID
   show: function(req, res) {
-    getUserById(req, res, function() {
-      // In case of success
+    getUserByParamId(req, res, function() {
       return response.success(res, translate[language].userFound, req.user);
     });
   },
@@ -83,16 +93,17 @@ module.exports = {
   create: function(req, res) {
     // Check if users mandatory fields are existing
     if (req.body.email && req.body.password) {
-      var test = {
+      var payload = {
         "local.email": req.body.email,
         "local.password": req.body.password,
         "employee_id": req.body.employee_id ? req.body.employee_id : 0,
         "customer_id": req.body.customer_id ? req.body.customer_id : 0,
-        "role": req.body.role ? req.body.role : ""
+        "role": req.body.role ? req.body.role : "",
+        "sectors": req.body.sectors ? req.body.sectors : []
       };
-      var bou = _.pickBy(test);
+      var newPayload = _.pickBy(payload);
       var newUser = User(
-        bou
+        newPayload
       );
       newUser.save(function(err, user) {
         if (err) {
@@ -117,7 +128,7 @@ module.exports = {
   update: function(req, res) {
     console.log(req);
     checkOnlyUserAllowed(req, res, function() {
-      getUserById(req, res, function() {
+      getUserByParamId(req, res, function() {
         // In case of success
         // Fields allowed for update
         if (req.body.email) {
@@ -135,6 +146,9 @@ module.exports = {
         if (req.body.customer_id) {
           req.user.customer_id = req.body.customer_id;
         }
+        if (req.body.sectors) {
+          req.user.sectors = req.body.sectors;
+        }
         req.user.save(function(err) {
           if (err) {
             // Error code when there is a duplicate key, in this case : the email (unique field)
@@ -148,10 +162,10 @@ module.exports = {
       });
     });
   },
-  // Remove an user by id (unique field)
+  // Remove an user by param id
   delete: function(req, res) {
     checkOnlyUserAllowed(req, res, function() {
-      getUserById(req, res, function() {
+      getUserByParamId(req, res, function() {
         req.user.remove({}, function(err) {
           if (err) {
             return response.error(res, 500, translate[language].unexpectedBehavior);

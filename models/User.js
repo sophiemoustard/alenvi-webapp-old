@@ -45,13 +45,13 @@ var UserSchema = mongoose.Schema({
 }, { timestamps: true });
 // timestamps allows the db to automatically create 'created_at' and 'updated_at' fields
 
-UserSchema.methods.generateHash = function(password) {
-  return bcrypt.hashSync(password, bcrypt.genSaltSync(SALT_WORK_FACTOR), null);
-};
-
-UserSchema.methods.validPassword = function(password) {
-  return bcrypt.compareSync(password, this.local.password);
-}
+// UserSchema.methods.generateHash = function(password) {
+//   return bcrypt.hashSync(password, bcrypt.genSaltSync(SALT_WORK_FACTOR), null);
+// };
+//
+// UserSchema.methods.validPassword = function(password) {
+//   return bcrypt.compareSync(password, this.local.password);
+// }
 
 UserSchema.pre('save', function(next) {
     var user = this;
@@ -86,11 +86,32 @@ UserSchema.pre('save', function(next) {
 // Method to compare password to encrypted one
 UserSchema.methods.comparePassword = function(passwordGiven, cb) {
   bcrypt.compare(passwordGiven, this.local.password, function (err, isMatch) {
-    if (err) {
-      return cb(err);
-    }
-    cb(null, isMatch);
+    // if (err) {
+    //   return cb(err);
+    // }
+    cb(err, isMatch);
   });
 };
+
+// Find an user by Id in param URL
+UserSchema.statics.getByParamId = function(id, cb) {
+  this.findOne({ '_id': id }, function(err, user) {
+    cb(err, user);
+  });
+}
+
+// Find an user by email
+UserSchema.statics.getByEmail = function(email, cb) {
+  this.findOne({ 'local.email': email }, function(err, user) {
+    cb(err, user);
+  });
+}
+
+// Find all users
+UserSchema.statics.getAll = function(cb) {
+  this.find({}, function(err, users) {
+    cb(err, users);
+  });
+}
 
 module.exports = mongoose.model("User", UserSchema);
