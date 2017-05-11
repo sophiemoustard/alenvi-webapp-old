@@ -1,7 +1,7 @@
 "use strict";
 
 const express = require('express');
-const auth = require('../../helpers/authenticate');
+const verifToken = require('../../helpers/verifToken.js');
 const secret = require('../../config/strategies').token.secret;
 const router = express.Router();
 
@@ -11,7 +11,7 @@ router.post('/authenticate', userController.authenticate);
 router.post('/', userController.create);
 
 // Routes protection by token
-router.use(auth({ secret: secret }));
+router.use(verifToken({ secret: secret }));
 
 // All these routes need a token because of route protection above
 router.get('/', userController.showAll);

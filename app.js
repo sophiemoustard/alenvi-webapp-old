@@ -42,6 +42,7 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Required to use passport
+require('./config/passport');
 app.use(passport.initialize());
 
 // Routing
