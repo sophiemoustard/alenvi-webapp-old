@@ -3,6 +3,7 @@
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook').Strategy;
 const facebookConfig = require('./strategies').facebook;
+const _             = require('lodash');
 
 const User = require('../models/User');
 
@@ -10,19 +11,31 @@ passport.use(new FacebookStrategy(facebookConfig, function(accessToken, refreshT
   console.log("accesToken ", accessToken);
   console.log("refreshToken", refreshToken);
   console.log("profile", profile);
-  console.log("BORDEL DE MERDE");
   process.nextTick(function() {
     User.findOne({'facebook.facebookId': profile.id}, function(err, user) {
       if (err) {
         return done(err);
       }
       if (!user) {
-        // user = new User({
-        //   name: profile.displayName
-        // })
-        // console.log("Not found !");
-        user = {};
-        done(err, user);
+        var payload = {
+          "facebook.facebookId": profile.id,
+          "facebook.email": profile.emails[0].value,
+          "facebook.access_token": accessToken
+        };
+        var newPayload = _.pickBy(payload);
+        var newUser = User(
+          newPayload
+        );
+        newUser.save(function(err, user) {
+          if (err) {
+            console.error(err);
+            if (err)
+              return response.error(res, 500, translate[language].unexpectedBehavior);
+          }
+          // return response.success(res, translate[language].userSaved, user);
+          //user = {};
+          done(err, user);
+        });
       }
       else {
         done(err, user);

@@ -11,30 +11,28 @@ const _             = require('lodash');
 const User          = require('../models/User');
 
 // Find an user by Id in param URL
-// function getUserById(req, res, next) {
-//   User.findOne({ '_id': req.params._id }, function(err, user) {
-//     // In case of error or no users
-//     if (err || !user) {
-//       return response.error(res, 404, translate[language].userNotFound);
-//     } else {
-//       // Save in request the user
-//       req.user = user;
-//       // Callback for success
-//       next();
-//     }
-//   });
-// }
-
 var getUserByParamId = function(req, res, next) {
-  User.getByParamId(req.params._id, function(err, user) {
+  User.findOne({ '_id': req.params._id }, function(err, user) {
     if (err || !user) {
       return response.error(res, 404, translate[language].userNotFound);
     } else {
       req.user = user;
+      // Callback for success
       next();
     }
-  })
+  });
 }
+
+// var getUserByParamId = function(req, res, next) {
+//   User.getByParamId(req.params._id, function(err, user) {
+//     if (err || !user) {
+//       return response.error(res, 404, translate[language].userNotFound);
+//     } else {
+//       req.user = user;
+//       next();
+//     }
+//   })
+// }
 
 // Check if user is allowed to access to this route : only himself or admin / coach can validate through this function
 var checkOnlyUserAllowed = function(req, res, next) {

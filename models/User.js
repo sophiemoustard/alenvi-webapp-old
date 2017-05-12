@@ -20,9 +20,7 @@ var UserSchema = mongoose.Schema({
   facebook: {
     facebookId: String,
     access_token: String,
-    displayName: String,
-    email: String,
-    photo: String
+    email: String
   },
   role: {
     type: String,
@@ -71,16 +69,15 @@ UserSchema.pre('save', function(next) {
         if (err) {
           return next(err);
         }
-        // next();
         bcrypt.hash(user.local.password, salt, function(err, hash) {
           if (err) {
             return next(err);
           }
           user.local.password = hash;
           return next();
-        }); // bcrypt.hash
-      }); // bcrypt.genSalt
-    }; // else {}
+        });
+      });
+    };
 });
 
 // Method to compare password to encrypted one
@@ -94,11 +91,11 @@ UserSchema.methods.comparePassword = function(passwordGiven, cb) {
 };
 
 // Find an user by Id in param URL
-UserSchema.statics.getByParamId = function(id, cb) {
-  this.findOne({ '_id': id }, function(err, user) {
-    cb(err, user);
-  });
-}
+// UserSchema.statics.getByParamId = function(id, cb) {
+//   this.findOne({ '_id': id }, function(err, user) {
+//     cb(err, user);
+//   });
+// }
 
 // Find an user by email
 UserSchema.statics.getByEmail = function(email, cb) {

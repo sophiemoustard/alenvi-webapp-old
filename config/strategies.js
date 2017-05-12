@@ -12,6 +12,6 @@ module.exports = {
     clientSecret: process.env.FACEBOOK_APP_SECRET || '8214581d3dcd75f4caecb06058de585d',
     callbackURL: 'http://localhost:3000/auth/facebook/callback',
     session: false,
-    profileFields: ['id', 'emails', 'name']
+    profileFields: ['id', 'emails', 'name', 'photos']
   }
 }
