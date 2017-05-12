@@ -43,14 +43,6 @@ var UserSchema = mongoose.Schema({
 }, { timestamps: true });
 // timestamps allows the db to automatically create 'created_at' and 'updated_at' fields
 
-// UserSchema.methods.generateHash = function(password) {
-//   return bcrypt.hashSync(password, bcrypt.genSaltSync(SALT_WORK_FACTOR), null);
-// };
-//
-// UserSchema.methods.validPassword = function(password) {
-//   return bcrypt.compareSync(password, this.local.password);
-// }
-
 UserSchema.pre('save', function(next) {
     var user = this;
     // Check email validity

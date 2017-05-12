@@ -1,12 +1,13 @@
 "use strict";
 
 const db            = require('../config/database');
-const tokenConfig   = require('../config/strategies').token;
+// const tokenConfig   = require('../config/strategies').token;
 const translate     = require('../helpers/translate');
 const language      = translate.language;
 const response      = require('../helpers/response');
-const jwt           = require('jsonwebtoken');
+// const jwt           = require('jsonwebtoken');
 const _             = require('lodash');
+const tokenProcess  = require('../helpers/tokenProcess');
 
 const User          = require('../models/User');
 
@@ -60,8 +61,24 @@ module.exports = {
         if (err || !isMatch) {
           return response.error(res, 401, translate[language].userAuthFailed);
         }
+        var payload = {
+          '_id': user.id,
+          'local.email': user.local.email,
+          'role': user.role,
+          'customer_id': user.customer_id,
+          'employee_id': user.employee_id,
+          'sectors': user.sectors
+        }
         // create a token
-        var token = jwt.sign({ 'local.email': user.local.email, 'local.id': user.local.id, 'role': user.role, 'customer_id': user.customer_id, 'employee_id': user.employee_id }, tokenConfig.secret, { expiresIn: tokenConfig.expiresIn });
+        // var token = jwt.sign({
+        //   '_id': user.id,
+        //   'local.email': user.local.email,
+        //   'role': user.role,
+        //   'customer_id': user.customer_id,
+        //   'employee_id': user.employee_id,
+        //   'sectors': user.sectors
+        // }, tokenConfig.secret, { expiresIn: tokenConfig.expiresIn });
+        var token = tokenProcess.encode(payload);
         console.log(req.body.email + ' connected');
         // return the information including token as JSON
         return response.success(res, translate[language].userAuthentified, { user: user, token: token } );

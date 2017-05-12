@@ -13,5 +13,5 @@ module.exports = {
     callbackURL: 'http://localhost:3000/api/users/authenticate/facebook/callback',
     session: false,
     profileFields: ['id', 'emails', 'name', 'photos']
-  }
+  },
 }

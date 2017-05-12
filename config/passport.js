@@ -1,9 +1,9 @@
 "use strict";
 
-const passport = require('passport');
-const FacebookStrategy = require('passport-facebook').Strategy;
-const facebookConfig = require('./strategies').facebook;
-const _             = require('lodash');
+const passport          = require('passport');
+const FacebookStrategy  = require('passport-facebook').Strategy;
+const facebookConfig    = require('./strategies').facebook;
+const _                 = require('lodash');
 
 const User = require('../models/User');
 
@@ -32,6 +32,7 @@ passport.use(new FacebookStrategy(facebookConfig, function(accessToken, refreshT
             if (err)
               return response.error(res, 500, translate[language].unexpectedBehavior);
           }
+          // user.
           // return response.success(res, translate[language].userSaved, user);
           //user = {};
           done(err, user);
@@ -55,6 +56,6 @@ passport.serializeUser(function(user, done) {
   done(null, user);
 })
 
-passport.deserializeUser(function(user, done) {
-  done(null, user);
+passport.deserializeUser(function(obj, done) {
+  done(null, obj);
 })
