@@ -12,7 +12,7 @@ const language        = translate.language;
 const userController  = require('../../controllers/userController');
 
 router.post('/authenticate', userController.authenticate);
-router.get('/authenticate/facebook', passport.authenticate('facebook', {session: false}));
+router.get('/botauth/facebook', passport.authenticate('facebook', {session: false}), function(req, res) {console.log(req); console.log("COUCOU");});
 router.get('/authenticate/facebook/callback', passport.authenticate('facebook', { session: false, failureRedirect: '/login'}), function(req, res) {
   var payload = {
     '_id': req.user.id,
