@@ -8,11 +8,12 @@ const router          = express.Router();
 const passport        = require('passport');
 const tokenProcess    = require('../../helpers/tokenProcess');
 const language        = translate.language;
+const path            = require('path');
 
 const userController  = require('../../controllers/userController');
 
 router.post('/authenticate', userController.authenticate);
-router.get('/botauth/facebook', passport.authenticate('facebook', {session: false}), function(req, res) {console.log(req); console.log("COUCOU");});
+router.get('/authenticate/facebook', passport.authenticate('facebook', {session: false}));
 router.get('/authenticate/facebook/callback', passport.authenticate('facebook', { session: false, failureRedirect: '/login'}), function(req, res) {
   var payload = {
     '_id': req.user.id,
@@ -23,13 +24,12 @@ router.get('/authenticate/facebook/callback', passport.authenticate('facebook', 
     'sectors': req.user.sectors
   }
   var token = tokenProcess.encode(payload);
-  console.log(req.user.facebook);
+  console.log(req.user);
   console.log(req.user.facebook.email + ' connected');
   // return the information including token as JSON
-  return response.success(res, translate[language].userAuthentified, { user: req.user, token: token } );
+  return response.success(res, translate[language].userAuthentified, { user: req.user, token: token });
 });
 // successRedirect: '/bouh',
-
 
 router.post('/', userController.create);
 

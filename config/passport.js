@@ -8,9 +8,9 @@ const _                 = require('lodash');
 const User = require('../models/User');
 
 passport.use(new FacebookStrategy(facebookConfig, function(accessToken, refreshToken, profile, done) {
-  console.log("accesToken ", accessToken);
-  console.log("refreshToken", refreshToken);
-  console.log("profile", profile);
+  // console.log("accesToken ", accessToken);
+  // console.log("refreshToken", refreshToken);
+  // console.log("profile", profile);
   process.nextTick(function() {
     var payload = {
       "facebook.facebookId": profile.id,
