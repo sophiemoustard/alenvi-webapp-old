@@ -44,12 +44,12 @@ var checkOnlyUserAllowed = function(req, res, next) {
 }
 
 module.exports = {
-  // Authenticate the user
+  // Authenticate the user locally
   authenticate: function(req, res) {
     if (!req.body.email || !req.body.password) {
       return response.error(res, 400, translate[language].missingParameters);
     }
-    User.getByEmail(req.body.email, function(err, user) {
+    User.getByLocalEmail(req.body.email, function(err, user) {
       if (err) {
         return response.error(res, 500, translate[language].unexpectedBehavior);
       }
@@ -69,22 +69,79 @@ module.exports = {
           'employee_id': user.employee_id,
           'sectors': user.sectors
         }
-        // create a token
-        // var token = jwt.sign({
-        //   '_id': user.id,
-        //   'local.email': user.local.email,
-        //   'role': user.role,
-        //   'customer_id': user.customer_id,
-        //   'employee_id': user.employee_id,
-        //   'sectors': user.sectors
-        // }, tokenConfig.secret, { expiresIn: tokenConfig.expiresIn });
-        var token = tokenProcess.encode(payload);
+        var newPayload = _.pickBy(payload);
+        var token = tokenProcess.encode(newPayload);
         console.log(req.body.email + ' connected');
         // return the information including token as JSON
         return response.success(res, translate[language].userAuthentified, { user: user, token: token } );
       })
     });
   },
+
+  bothauthFacebook: function(req, res) {
+    if (!req.body.email || !req.body.id) {
+      return response.error(res, 400, translate[language].missingParameters);
+    }
+    User.findOne({'facebook.facebookId': req.body.id}, function(err, user) {
+      if (err) {
+        return response.error(res, 500, translate[language].unexpectedBehavior);
+      }
+      // If there is no facebook ID in Alenvi, check for email
+      if (!user) {
+        User.findOne({
+          $or: [
+            {'facebook.email': req.body.email},
+            {'local.email': req.body.email}
+          ]
+        }, function(err, user) {
+          if (err) {
+            return response.error(res, 500, translate[language].unexpectedBehavior);
+          }
+          if (!user) {
+            console.log('not found !');
+            return response.error(res, 404, translate[language].userAuthNotFound);
+          }
+          // If there is a local Alenvi email which is the same as the facebook one provided, create it
+          if (!user.facebook.email) {
+            user.facebook.email = req.body.email;
+            user.facebook.facebookId = req.body.id;
+            user.save(function(err) {
+              if (err) {
+                return response.error(res, 500, translate[language].unexpectedBehavior);
+              }
+            })
+          }
+          var payload = {
+            '_id': user.id,
+            'local': user.local,
+            'facebook': user.facebook,
+            'role': user.role,
+            'customer_id': user.customer_id,
+            'employee_id': user.employee_id,
+            'sectors': user.sectors
+          }
+          var newPayload = _.pickBy(payload);
+          var token = tokenProcess.encode(newPayload);
+          return response.success(res, translate[language].userAuthentified, { user: user, token: token });
+        })
+      }
+      else {
+        var payload = {
+          '_id': user.id,
+          'local': user.local,
+          'facebook': user.facebook,
+          'role': user.role,
+          'customer_id': user.customer_id,
+          'employee_id': user.employee_id,
+          'sectors': user.sectors
+        }
+        var newPayload = _.pickBy(payload);
+        var token = tokenProcess.encode(newPayload);
+        return response.success(res, translate[language].userAuthentified, { user: user, token: token });
+      }
+    })
+  },
+
   // Show all user
   showAll: function(req, res) {
     // No security here to restrict access
@@ -104,6 +161,7 @@ module.exports = {
       return response.success(res, translate[language].userFound, req.user);
     });
   },
+
   // Create a new user
   create: function(req, res) {
     // Check if users mandatory fields are existing
@@ -139,6 +197,7 @@ module.exports = {
       return response.error(res, 400, "Missing parameters");
     }
   },
+
   //Update an user by email (unique field)
   update: function(req, res) {
     console.log(req);
@@ -146,6 +205,7 @@ module.exports = {
       getUserByParamId(req, res, function() {
         // In case of success
         // Fields allowed for update
+
         if (req.body.email) {
           req.user.local.email = req.body.email;
         }
@@ -177,6 +237,7 @@ module.exports = {
       });
     });
   },
+
   // Remove an user by param id
   delete: function(req, res) {
     checkOnlyUserAllowed(req, res, function() {

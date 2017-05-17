@@ -12,8 +12,7 @@ var UserSchema = mongoose.Schema({
   local: {
     email: {
       type: String,
-      lowercase: true,
-      index: true
+      lowercase: true
     },
     password: String
   },
@@ -90,7 +89,7 @@ UserSchema.methods.comparePassword = function(passwordGiven, cb) {
 // }
 
 // Find an user by email
-UserSchema.statics.getByEmail = function(email, cb) {
+UserSchema.statics.getByLocalEmail = function(email, cb) {
   this.findOne({ 'local.email': email }, function(err, user) {
     cb(err, user);
   });

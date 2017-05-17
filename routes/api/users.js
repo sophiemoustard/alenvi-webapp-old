@@ -9,6 +9,7 @@ const passport        = require('passport');
 const tokenProcess    = require('../../helpers/tokenProcess');
 const language        = translate.language;
 const path            = require('path');
+const _               = require('lodash');
 
 const userController  = require('../../controllers/userController');
 
@@ -23,13 +24,16 @@ router.get('/authenticate/facebook/callback', passport.authenticate('facebook', 
     'employee_id': req.user.employee_id,
     'sectors': req.user.sectors
   }
-  var token = tokenProcess.encode(payload);
+  var newPayload = _.pickBy(payload);
+  var token = tokenProcess.encode(newPayload);
   console.log(req.user);
   console.log(req.user.facebook.email + ' connected');
   // return the information including token as JSON
   return response.success(res, translate[language].userAuthentified, { user: req.user, token: token });
 });
 // successRedirect: '/bouh',
+
+router.post('/botauth/facebook', userController.bothauthFacebook);
 
 router.post('/', userController.create);
 
