@@ -17,7 +17,7 @@ passport.use(new FacebookStrategy(facebookConfig, function(accessToken, refreshT
       "facebook.email": profile.emails[0].value,
       "facebook.access_token": accessToken
     };
-    User.findOneAndUpdate({'facebook.facebookId': profile.id}, payload, {'upsert': true}, function(err, user) {
+    User.findOneAndUpdate({'facebook.facebookId': profile.id}, payload, {'upsert': false}, function(err, user) {
       if(err) {
         return done(err);
       } else {

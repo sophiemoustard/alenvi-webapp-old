@@ -41,8 +41,8 @@
       type: 'POST',
       url: 'http://localhost:3000/api/users/authenticate',
       data: {
-        "email": "test3@test.fr",
-        "password": "test"
+        "email": document.getElementById("email").value,
+        "password": document.getElementById("password").value
       },
       success: function(data) {
         console.log(data);

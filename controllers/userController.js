@@ -1,6 +1,6 @@
 "use strict";
 
-const db            = require('../config/database');
+// const db            = require('../config/database');
 // const tokenConfig   = require('../config/strategies').token;
 const translate     = require('../helpers/translate');
 const language      = translate.language;
@@ -67,7 +67,7 @@ module.exports = {
           'role': user.role,
           'customer_id': user.customer_id,
           'employee_id': user.employee_id,
-          'sectors': user.sectors
+          'sector': user.sector
         }
         var newPayload = _.pickBy(payload);
         var token = tokenProcess.encode(newPayload);
@@ -118,7 +118,7 @@ module.exports = {
             'role': user.role,
             'customer_id': user.customer_id,
             'employee_id': user.employee_id,
-            'sectors': user.sectors
+            'sector': user.sector
           }
           var newPayload = _.pickBy(payload);
           var token = tokenProcess.encode(newPayload);
@@ -133,7 +133,7 @@ module.exports = {
           'role': user.role,
           'customer_id': user.customer_id,
           'employee_id': user.employee_id,
-          'sectors': user.sectors
+          'sector': user.sector
         }
         var newPayload = _.pickBy(payload);
         var token = tokenProcess.encode(newPayload);
@@ -172,7 +172,7 @@ module.exports = {
         "employee_id": req.body.employee_id ? req.body.employee_id : 0,
         "customer_id": req.body.customer_id ? req.body.customer_id : 0,
         "role": req.body.role ? req.body.role : "",
-        "sectors": req.body.sectors ? req.body.sectors : []
+        "sector": req.body.sector ? req.body.sector : ""
       };
       var newPayload = _.pickBy(payload);
       var newUser = User(
@@ -221,8 +221,8 @@ module.exports = {
         if (req.body.customer_id) {
           req.user.customer_id = req.body.customer_id;
         }
-        if (req.body.sectors) {
-          req.user.sectors = req.body.sectors;
+        if (req.body.sector) {
+          req.user.sector = req.body.sector;
         }
         req.user.save(function(err) {
           if (err) {

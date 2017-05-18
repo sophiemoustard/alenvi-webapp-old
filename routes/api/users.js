@@ -22,7 +22,7 @@ router.get('/authenticate/facebook/callback', passport.authenticate('facebook', 
     'role': req.user.role,
     'customer_id': req.user.customer_id,
     'employee_id': req.user.employee_id,
-    'sectors': req.user.sectors
+    'sector': req.user.sector
   }
   var newPayload = _.pickBy(payload);
   var token = tokenProcess.encode(newPayload);
