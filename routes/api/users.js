@@ -17,6 +17,8 @@ router.post('/authenticate', userController.authenticate);
 router.get('/authenticate/facebook', passport.authenticate('facebook', {session: false}));
 router.get('/authenticate/facebook/callback', passport.authenticate('facebook', { session: false, failureRedirect: '/login'}), function(req, res) {
   var payload = {
+    'firstname': req.user.firstname,
+    'lastname': req.user.lastname,
     '_id': req.user.id,
     'facebook': req.user.facebook,
     'role': req.user.role,

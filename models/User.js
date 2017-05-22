@@ -9,6 +9,8 @@ const SALT_WORK_FACTOR = 10;
 
 // User schema
 var UserSchema = mongoose.Schema({
+  firstname: String,
+  lastname: String,
   local: {
     email: {
       type: String,
@@ -19,6 +21,10 @@ var UserSchema = mongoose.Schema({
   facebook: {
     facebookId: String,
     access_token: String,
+    email: String
+  },
+  slack: {
+    slackId: String,
     email: String
   },
   role: {

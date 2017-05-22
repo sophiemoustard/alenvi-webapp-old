@@ -60,6 +60,8 @@ var getEmployees = function(token, pageOption) {
     // console.log(parsedBody.body.array_employee.result);
     _.forEach(parsedBody.body.array_employee.result, function(employeeData) {
       var payload = {
+        'firstname': employeeData.first_name,
+        'lastname': employeeData.last_name,
         'local.email': employeeData.email,
         'employee_id': employeeData.employee_id,
         'sector': employeeData.sector,
@@ -67,7 +69,7 @@ var getEmployees = function(token, pageOption) {
       }
       var newPayload = _.pickBy(payload);
       User.findOneAndUpdate(
-        {'employee_id': employeeData.id_employee},
+        {'local.email': employeeData.email},
         { $set: newPayload }, {'upsert': true, 'new': true},
         function(err, user) {
           if(err) {

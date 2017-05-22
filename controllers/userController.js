@@ -62,6 +62,8 @@ module.exports = {
           return response.error(res, 401, translate[language].userAuthFailed);
         }
         var payload = {
+          'firstname': user.firstname,
+          'lastname': user.lastname,
           '_id': user.id,
           'local.email': user.local.email,
           'role': user.role,
@@ -113,6 +115,8 @@ module.exports = {
           }
           var payload = {
             '_id': user.id,
+            'firstname': user.firstname,
+            'lastname': user.lastname,
             'local': user.local,
             'facebook': user.facebook,
             'role': user.role,
@@ -128,6 +132,8 @@ module.exports = {
       else {
         var payload = {
           '_id': user.id,
+          'firstname': user.firstname,
+          'lastname': user.lastname,
           'local': user.local,
           'facebook': user.facebook,
           'role': user.role,
@@ -135,6 +141,7 @@ module.exports = {
           'employee_id': user.employee_id,
           'sector': user.sector
         }
+        console.log(user);
         var newPayload = _.pickBy(payload);
         var token = tokenProcess.encode(newPayload);
         return response.success(res, translate[language].userAuthentified, { user: user, token: token });
@@ -167,6 +174,8 @@ module.exports = {
     // Check if users mandatory fields are existing
     if (req.body.email && req.body.password) {
       var payload = {
+        'firstname': req.body.firstname ? req.body.firstname : "",
+        'lastname': req.body.lastname ? req.body.lastname : "",
         "local.email": req.body.email,
         "local.password": req.body.password,
         "employee_id": req.body.employee_id ? req.body.employee_id : 0,
@@ -205,7 +214,12 @@ module.exports = {
       getUserByParamId(req, res, function() {
         // In case of success
         // Fields allowed for update
-
+        if (req.body.firstname) {
+          req.user.firstname = req.body.firstname
+        }
+        if (req.body.lastname) {
+          req.user.lastname = req.body.lastname
+        }
         if (req.body.email) {
           req.user.local.email = req.body.email;
         }
