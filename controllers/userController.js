@@ -81,7 +81,7 @@ module.exports = {
   },
 
   bothauthFacebook: function(req, res) {
-    if (!req.body.email || !req.body.id) {
+    if (!req.body.id) {
       return response.error(res, 400, translate[language].missingParameters);
     }
     User.findOne({'facebook.facebookId': req.body.id}, function(err, user) {
@@ -89,7 +89,7 @@ module.exports = {
         return response.error(res, 500, translate[language].unexpectedBehavior);
       }
       // If there is no facebook ID in Alenvi, check for email
-      if (!user) {
+      if (!user && req.body.email) {
         User.findOne({
           $or: [
             {'facebook.email': req.body.email},
@@ -100,7 +100,6 @@ module.exports = {
             return response.error(res, 500, translate[language].unexpectedBehavior);
           }
           if (!user) {
-            console.log('not found !');
             return response.error(res, 404, translate[language].userAuthNotFound);
           }
           // If there is a local Alenvi email which is the same as the facebook one provided, create it
@@ -128,6 +127,9 @@ module.exports = {
           var token = tokenProcess.encode(newPayload);
           return response.success(res, translate[language].userAuthentified, { user: user, token: token });
         })
+      }
+      else if (!user && !req.body.email) {
+        return response.error(res, 404, translate[language].userAuthNotFound);
       }
       else {
         var payload = {
@@ -181,7 +183,11 @@ module.exports = {
         "employee_id": req.body.employee_id ? req.body.employee_id : 0,
         "customer_id": req.body.customer_id ? req.body.customer_id : 0,
         "role": req.body.role ? req.body.role : "",
-        "sector": req.body.sector ? req.body.sector : ""
+        "sector": req.body.sector ? req.body.sector : "",
+        "facebook.facebookId": req.body.facebookId ? req.body.facebookId: "",
+        "facebook.email": req.body.facebookEmail ? req.body.facebookEmail: "",
+        "slack.slackId": req.body.slackId ? req.body.slackId : "",
+        "slack.email": req.body.slackEmail ? req.body.slackEmail: "",
       };
       var newPayload = _.pickBy(payload);
       var newUser = User(
@@ -237,6 +243,18 @@ module.exports = {
         }
         if (req.body.sector) {
           req.user.sector = req.body.sector;
+        }
+        if (req.body.facebookId) {
+          req.user.facebook.facebookId = req.body.facebookId
+        }
+        if (req.body.facebookEmail) {
+          req.user.facebook.email = req.body.facebookEmail
+        }
+        if (req.body.slackId) {
+          req.user.slack.slackId = req.body.slackId
+        }
+        if (req.body.slackEmail) {
+          req.user.slack.email = req.body.slackEmail
         }
         req.user.save(function(err) {
           if (err) {
