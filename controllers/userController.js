@@ -44,6 +44,45 @@ var checkOnlyUserAllowed = function(req, res, next) {
 }
 
 module.exports = {
+  authorize: function(req, res, next) {
+    if (!req.query.email || !req.query.password) {
+      return response.error(res, 400, translate[language].missingParameters);
+    }
+    if (!req.query && !req.query.redirect_uri) {
+      return response.error(res, 400, translate[language].missingParameters);
+    }
+    User.getByLocalEmail(req.query.email, function(err, user) {
+      if (err) {
+        return response.error(res, 500, translate[language].unexpectedBehavior);
+      }
+      if (!user) {
+        return response.error(res, 404, translate[language].userAuthNotFound);
+      }
+      // check if password matches
+      user.comparePassword(req.query.password, function(err, isMatch) {
+        if (err || !isMatch) {
+          return response.error(res, 401, translate[language].userAuthFailed);
+        }
+        var payload = {
+          'firstname': user.firstname,
+          'lastname': user.lastname,
+          '_id': user.id,
+          'local.email': user.local.email,
+          'role': user.role,
+          'customer_id': user.customer_id,
+          'employee_id': user.employee_id,
+          'sector': user.sector
+        }
+        var newPayload = _.pickBy(payload);
+        var token = tokenProcess.encode(newPayload);
+        console.log(req.query.email + ' connected');
+        // return the information including token as JSON
+        var redirect_uri = req.query.redirect_uri + '&authorization_code=' + token;
+        return res.redirect(302, redirect_uri);
+        // return response.success(res, translate[language].userAuthentified, { user: user, token: token } );
+      })
+    });
+  },
   // Authenticate the user locally
   authenticate: function(req, res) {
     if (!req.body.email || !req.body.password) {
@@ -80,77 +119,6 @@ module.exports = {
     });
   },
 
-  bothauthFacebook: function(req, res) {
-    if (!req.body.id) {
-      return response.error(res, 400, translate[language].missingParameters);
-    }
-    User.findOne({'facebook.facebookId': req.body.id}, function(err, user) {
-      if (err) {
-        return response.error(res, 500, translate[language].unexpectedBehavior);
-      }
-      // If there is no facebook ID in Alenvi, check for email
-      if (!user && req.body.email) {
-        User.findOne({
-          $or: [
-            {'facebook.email': req.body.email},
-            {'local.email': req.body.email}
-          ]
-        }, function(err, user) {
-          if (err) {
-            return response.error(res, 500, translate[language].unexpectedBehavior);
-          }
-          if (!user) {
-            return response.error(res, 404, translate[language].userAuthNotFound);
-          }
-          // If there is a local Alenvi email which is the same as the facebook one provided, create it
-          if (!user.facebook.email) {
-            user.facebook.email = req.body.email;
-            user.facebook.facebookId = req.body.id;
-            user.save(function(err) {
-              if (err) {
-                return response.error(res, 500, translate[language].unexpectedBehavior);
-              }
-            })
-          }
-          var payload = {
-            '_id': user.id,
-            'firstname': user.firstname,
-            'lastname': user.lastname,
-            'local': user.local,
-            'facebook': user.facebook,
-            'role': user.role,
-            'customer_id': user.customer_id,
-            'employee_id': user.employee_id,
-            'sector': user.sector
-          }
-          var newPayload = _.pickBy(payload);
-          var token = tokenProcess.encode(newPayload);
-          return response.success(res, translate[language].userAuthentified, { user: user, token: token });
-        })
-      }
-      else if (!user && !req.body.email) {
-        return response.error(res, 404, translate[language].userAuthNotFound);
-      }
-      else {
-        var payload = {
-          '_id': user.id,
-          'firstname': user.firstname,
-          'lastname': user.lastname,
-          'local': user.local,
-          'facebook': user.facebook,
-          'role': user.role,
-          'customer_id': user.customer_id,
-          'employee_id': user.employee_id,
-          'sector': user.sector
-        }
-        console.log(user);
-        var newPayload = _.pickBy(payload);
-        var token = tokenProcess.encode(newPayload);
-        return response.success(res, translate[language].userAuthentified, { user: user, token: token });
-      }
-    })
-  },
-
   // Show all user
   showAll: function(req, res) {
     // No security here to restrict access
@@ -180,8 +148,8 @@ module.exports = {
         'lastname': req.body.lastname ? req.body.lastname : "",
         "local.email": req.body.email,
         "local.password": req.body.password,
-        "employee_id": req.body.employee_id ? req.body.employee_id : 0,
-        "customer_id": req.body.customer_id ? req.body.customer_id : 0,
+        "employee_id": req.body.employee_id ? req.body.employee_id : '',
+        "customer_id": req.body.customer_id ? req.body.customer_id : '',
         "role": req.body.role ? req.body.role : "",
         "sector": req.body.sector ? req.body.sector : "",
         "facebook.facebookId": req.body.facebookId ? req.body.facebookId: "",
@@ -284,3 +252,74 @@ module.exports = {
     });
   }
 };
+
+// bothauthFacebook: function(req, res) {
+//   if (!req.body.id) {
+//     return response.error(res, 400, translate[language].missingParameters);
+//   }
+//   User.findOne({'facebook.facebookId': req.body.id}, function(err, user) {
+//     if (err) {
+//       return response.error(res, 500, translate[language].unexpectedBehavior);
+//     }
+//     // If there is no facebook ID in Alenvi, check for email
+//     if (!user && req.body.email) {
+//       User.findOne({
+//         $or: [
+//           {'facebook.email': req.body.email},
+//           {'local.email': req.body.email}
+//         ]
+//       }, function(err, user) {
+//         if (err) {
+//           return response.error(res, 500, translate[language].unexpectedBehavior);
+//         }
+//         if (!user) {
+//           return response.error(res, 404, translate[language].userAuthNotFound);
+//         }
+//         // If there is a local Alenvi email which is the same as the facebook one provided, create it
+//         if (!user.facebook.email) {
+//           user.facebook.email = req.body.email;
+//           user.facebook.facebookId = req.body.id;
+//           user.save(function(err) {
+//             if (err) {
+//               return response.error(res, 500, translate[language].unexpectedBehavior);
+//             }
+//           })
+//         }
+//         var payload = {
+//           '_id': user.id,
+//           'firstname': user.firstname,
+//           'lastname': user.lastname,
+//           'local': user.local,
+//           'facebook': user.facebook,
+//           'role': user.role,
+//           'customer_id': user.customer_id,
+//           'employee_id': user.employee_id,
+//           'sector': user.sector
+//         }
+//         var newPayload = _.pickBy(payload);
+//         var token = tokenProcess.encode(newPayload);
+//         return response.success(res, translate[language].userAuthentified, { user: user, token: token });
+//       })
+//     }
+//     else if (!user && !req.body.email) {
+//       return response.error(res, 404, translate[language].userAuthNotFound);
+//     }
+//     else {
+//       var payload = {
+//         '_id': user.id,
+//         'firstname': user.firstname,
+//         'lastname': user.lastname,
+//         'local': user.local,
+//         'facebook': user.facebook,
+//         'role': user.role,
+//         'customer_id': user.customer_id,
+//         'employee_id': user.employee_id,
+//         'sector': user.sector
+//       }
+//       console.log(user);
+//       var newPayload = _.pickBy(payload);
+//       var token = tokenProcess.encode(newPayload);
+//       return response.success(res, translate[language].userAuthentified, { user: user, token: token });
+//     }
+//   })
+// },

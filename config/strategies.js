@@ -1,10 +1,11 @@
 "use strict";
 
-const uuid = require('uuid/v4');
+// const uuid = require('uuid/v4');
 
+// 'secret': uuid(),
 module.exports = {
   token: {
-    'secret': uuid(),
+    'secret': process.env.TOKEN_SECRET || 'Alenvi',
     'expiresIn': '24h'
   },
   facebook: {
