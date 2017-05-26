@@ -2,7 +2,6 @@
 
 const moment = require('moment');
 const crypto = require('crypto');
-const request = require('request');
 const rp = require('request-promise');
 
 const API_LINK = "https://my.ogust.com/api/v2/apiogust.php?method=";
