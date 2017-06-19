@@ -57,7 +57,7 @@ var login = function() {
     getEmployees(parsedBody.body.token, { "nbPerPage": 20, "pageNum": 1 });
     getEmployeeByEmployeeId(parsedBody.body.token, 266254102, { "nbPerPage": 1, "pageNum": 1 });
     // getAllServices(parsedBody.body.token, { "slotToSub": 2, "slotToAdd": 2, "intervalType": "month" }, { "nbPerPage": 20, "pageNum": 1 });
-    // getServicesByEmployeeId(parsedBody.body.token, 266254102, { "slotToSub": 2, "slotToAdd": 2, "intervalType": "month" }, { "nbPerPage": 20, "pageNum": 1 });
+    // getServicesByEmployeeIdInRange(parsedBody.body.token, 266254102, { "slotToSub": 2, "slotToAdd": 2, "intervalType": "month" }, { "nbPerPage": 20, "pageNum": 1 });
     // getServicesByCustomerId(parsedBody.body.token, 259863037, { "slotToSub": 2, "slotToAdd": 2, "intervalType": "month" }, { "nbPerPage": 20, "pageNum": 1 });
     // getSalariesByEmployeeId(parsedBody.body.token, 266254102, { "nbPerPage": 20, "pageNum": 1 });
     // getAllSalaries(parsedBody.body.token, { "nbPerPage": 20, "pageNum": 1});
@@ -173,7 +173,7 @@ var getAllServices = function(token, timeOption, pageOption) {
 }
 
 /*
-** Get services by employee id
+** Get services by employee id in range
 ** PARAMS:
 ** - token: token after login
 ** - id: employee id
@@ -186,7 +186,7 @@ var getAllServices = function(token, timeOption, pageOption) {
 ** --- pageNum: Y (number of pages)
 ** METHOD: POST
 */
-var getServicesByEmployeeId = function(token, id, timeOption, pageOption) {
+var getServicesByEmployeeIdInRange = function(token, id, timeOption, pageOption) {
   var interval = getInterval(timeOption);
   var payload = {
     "token": token,
@@ -209,6 +209,45 @@ var getServicesByEmployeeId = function(token, id, timeOption, pageOption) {
     console.log("Duration: " + parsedBody.timings.end);
   }).catch(function(err) {
     console.error(err);
+  })
+}
+
+/*
+** Get services by employee id and date
+** PARAMS:
+** - token: token after login
+** - id: employee id
+** - date: start_date in "YYYYMMDD" format
+** - pageOption:
+** --- nbPerPage: X (number of results returned per pages)
+** --- pageNum: Y (number of pages)
+** METHOD: POST
+*/
+exports.getServicesByEmployeeIdAndDate = function(token, id, date, pageOption, next) {
+  var interval = getInterval(timeOption);
+  var payload = {
+    "token": token,
+    "id_employee": id,
+    "status": "@!=|" + 'N',
+    "start_date": "@between" + '|' + date + "0000" + '|' + date + "2359",
+    "nbperpage": pageOption.nbPerPage,
+    "pagenum": pageOption.pageNum
+  }
+  rp.post({
+    url: Ogust.API_LINK + "searchService",
+    json: true,
+    body: payload,
+    resolveWithFullResponse: true,
+    time: true
+  }).then(function(parsedBody) {
+    console.log("--------------");
+    console.log("GET SERVICES BY EMPLOYEE ID:");
+    console.log(parsedBody.body);
+    console.log("Duration: " + parsedBody.timings.end);
+    next(null, parsedBody.body);
+  }).catch(function(err) {
+    console.error(err);
+    next(err, null);
   })
 }
 
