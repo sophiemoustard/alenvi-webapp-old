@@ -183,7 +183,6 @@ module.exports = {
 
   //Update an user by email (unique field)
   update: function(req, res) {
-    console.log(req);
     checkOnlyUserAllowed(req, res, function() {
       getUserByParamId(req, res, function() {
         // In case of success
