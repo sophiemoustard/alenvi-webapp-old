@@ -1,0 +1,20 @@
+h2 {
+    font-family: Verdana;
+    font-size:18px;
+    color:#8D0E56;
+}
+
+input {
+    border: 2px solid #737373;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #E2007A;
+    color:white;
+    margin-top:10px;
+    padding: 7px 14px;
+    font-size:15px;
+    border:none;
+    border-radius:2px;
+}
