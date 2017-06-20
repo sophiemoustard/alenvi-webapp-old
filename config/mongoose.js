@@ -1,5 +1,3 @@
-"use strict";
-
 const mongoose  = require('mongoose');
 const db        = require('./database');
 
@@ -8,7 +6,7 @@ mongoose.connect(db.database);
 
 // When successfully connected
 mongoose.connection.once('connected', function() {
-  return console.log('Successfully connected to ' + db.database);
+  return console.log('Successfully connected to MongoDB');
 });
 
 // If the connection throws an error
@@ -19,7 +17,7 @@ mongoose.connection.on('error', function(err) {
 
 // When the connection is disconnected
 mongoose.connection.once('disconnected', function() {
-  return console.log('Successfully disconnected from ' + db.database);
+  return console.log('Successfully disconnected from MongoDB');
 });
 
 // Models

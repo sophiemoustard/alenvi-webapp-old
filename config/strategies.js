@@ -6,12 +6,12 @@
 // http://localhost:3000
 module.exports = {
   token: {
-    'secret': process.env.TOKEN_SECRET || 'Alenvi',
+    'secret': process.env.TOKEN_SECRET,
     'expiresIn': '24h'
   },
   facebook: {
-    clientID: process.env.FACEBOOK_APP_ID || '977382919031323',
-    clientSecret: process.env.FACEBOOK_APP_SECRET || '8214581d3dcd75f4caecb06058de585d',
+    clientID: process.env.FACEBOOK_APP_ID,
+    clientSecret: process.env.FACEBOOK_APP_SECRET,
     callbackURL: 'https://alenvi-webapp.herokuapp.com/api/users/authenticate/facebook/callback',
     session: false,
     profileFields: ['id', 'emails', 'name', 'photos']
