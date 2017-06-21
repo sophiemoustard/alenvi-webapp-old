@@ -62,8 +62,8 @@ const updateEmployees = async (employees) => {
       'firstname': employees[k].first_name ? employees[k].first_name : '',
       'lastname': employees[k].last_name,
       'local.email': employees[k].email,
-      'employee_id': employees[k].employee_id ? employees[k].employee_id : '',
-      'customer_id': employees[k].customer_id ? employees[k].customer_id : '',
+      'employee_id': employees[k].id_employee ? employees[k].id_employee : '',
+      'customer_id': employees[k].id_customer ? employees[k].id_customer : '',
       'sector': employees[k].sector,
       'facebook.facebookId': employees[k].skype_id ? employees[k].skype_id : ''
     }
