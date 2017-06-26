@@ -28,7 +28,9 @@ require('./config/mongoose');
 // });
 
 // Logging requests
-app.use(morgan('dev'));
+if (process.env.NODE_ENV('development')) {
+  app.use(morgan('dev'));
+}
 
 // Maybe a future use...
 app.use(cookieParser());
