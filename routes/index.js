@@ -1,11 +1,10 @@
-"use strict";
-
 const express   = require('express');
 const path      = require('path');
 const router    = express.Router();
 
 // Alenvi REST API
 router.use('/api/users', require('./api/users'));
+router.use('/api/bot', require('./api/bot'));
 
 router.get('/bouh', function(req, res, next) {
   res.sendFile(path.join(__dirname + '/../public/index.html'));

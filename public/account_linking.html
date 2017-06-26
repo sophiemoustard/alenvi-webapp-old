@@ -12,7 +12,7 @@
     function continueClicked() {
       var email = document.getElementById('inputEmail').value;
       var password = document.getElementById('inputPassword').value;
-      var newLocation = '/api/users/authorize' + window.location.search;
+      var newLocation = '/api/bot/authorize' + window.location.search;
       if (window.location.search) {
         newLocation += '&';
       } else {
