@@ -50,7 +50,24 @@ module.exports = {
   facebookAccountLinking: (req, res, next) => {
     res.sendFile(path.join(__dirname + '/../public/account_linking.html'));
   },
-  getUserData: () => {
-
+  getUserByParamId: (req, res, next) => {
+    User.findOne({ '_id': req.params._id }, function(err, user) {
+      if (err || !user) {
+        return response.error(res, 404, translate[language].userNotFound);
+      } else {
+        const payload = {
+          'firstname': user.firstname,
+          'lastname': user.lastname,
+          '_id': user.id,
+          'local.email': user.local.email,
+          'role': user.role,
+          'customer_id': user.customer_id,
+          'employee_id': user.employee_id,
+          'sector': user.sector
+        }
+        const newPayload = _.pickBy(payload);
+        return response.success(res, translate[language].userFound, { user: newPayload });
+      }
+    });
   }
 }

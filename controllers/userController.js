@@ -1,5 +1,3 @@
-"use strict";
-
 // const db            = require('../config/database');
 // const tokenConfig   = require('../config/strategies').token;
 const translate     = require('../helpers/translate');
@@ -24,17 +22,6 @@ var getUserByParamId = function(req, res, next) {
   });
 }
 
-// var getUserByParamId = function(req, res, next) {
-//   User.getByParamId(req.params._id, function(err, user) {
-//     if (err || !user) {
-//       return response.error(res, 404, translate[language].userNotFound);
-//     } else {
-//       req.user = user;
-//       next();
-//     }
-//   })
-// }
-
 // Check if user is allowed to access to this route : only himself or admin / coach can validate through this function
 var checkOnlyUserAllowed = function(req, res, next) {
   if (req.decoded.role != 'admin' && req.decoded.role != 'coach' && req.params._id !== req.decoded.id) {
@@ -44,45 +31,6 @@ var checkOnlyUserAllowed = function(req, res, next) {
 }
 
 module.exports = {
-  authorize: function(req, res, next) {
-    if (!req.query.email || !req.query.password) {
-      return response.error(res, 400, translate[language].missingParameters);
-    }
-    if (!req.query && !req.query.redirect_uri) {
-      return response.error(res, 400, translate[language].missingParameters);
-    }
-    User.getByLocalEmail(req.query.email, function(err, user) {
-      if (err) {
-        return response.error(res, 500, translate[language].unexpectedBehavior);
-      }
-      if (!user) {
-        return response.error(res, 404, translate[language].userAuthNotFound);
-      }
-      // check if password matches
-      user.comparePassword(req.query.password, function(err, isMatch) {
-        if (err || !isMatch) {
-          return response.error(res, 401, translate[language].userAuthFailed);
-        }
-        var payload = {
-          'firstname': user.firstname,
-          'lastname': user.lastname,
-          '_id': user.id,
-          'local.email': user.local.email,
-          'role': user.role,
-          'customer_id': user.customer_id,
-          'employee_id': user.employee_id,
-          'sector': user.sector
-        }
-        var newPayload = _.pickBy(payload);
-        var token = tokenProcess.encode(newPayload);
-        console.log(req.query.email + ' connected');
-        // return the information including token as JSON
-        var redirect_uri = req.query.redirect_uri + '&authorization_code=' + token;
-        return res.redirect(302, redirect_uri);
-        // return response.success(res, translate[language].userAuthentified, { user: user, token: token } );
-      })
-    });
-  },
   // Authenticate the user locally
   authenticate: function(req, res) {
     if (!req.body.email || !req.body.password) {
