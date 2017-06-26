@@ -47,7 +47,7 @@ module.exports = {
       })
     });
   },
-  account_linking: (req, res, next) => {
+  facebookAccountLinking: (req, res, next) => {
     res.sendFile(path.join(__dirname + '/../public/account_linking.html'));
   },
   getUserData: () => {
