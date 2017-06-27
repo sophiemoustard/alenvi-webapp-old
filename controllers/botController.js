@@ -10,22 +10,27 @@ const User          = require('../models/User');
 module.exports = {
   authorize: function(req, res, next) {
     if (!req.query.email || !req.query.password) {
-      return response.error(res, 400, translate[language].missingParameters);
+      return res.send("Erreur: " + translate[language].missingParameters);
+      // return response.error(res, 400, translate[language].missingParameters);
     }
     if (!req.query && !req.query.redirect_uri) {
-      return response.error(res, 400, translate[language].missingParameters);
+      return res.send("Erreur: " + translate[language].missingParameters);
+      // return response.error(res, 400, translate[language].missingParameters);
     }
     User.getByLocalEmail(req.query.email, function(err, user) {
       if (err) {
-        return response.error(res, 500, translate[language].unexpectedBehavior);
+        return res.send("Erreur: " + translate[language].unexpectedBehavior);
+        // return response.error(res, 500, translate[language].unexpectedBehavior);
       }
       if (!user) {
-        return response.error(res, 404, translate[language].userAuthNotFound);
+        return res.send("Erreur: " + translate[language].userAuthNotFound);
+        // return response.error(res, 404, translate[language].userAuthNotFound);
       }
       // check if password matches
       user.comparePassword(req.query.password, function(err, isMatch) {
         if (err || !isMatch) {
-          return response.error(res, 401, translate[language].userAuthFailed);
+          return res.send("Erreur: " + translate[language].userAuthFailed);
+          // return response.error(res, 401, translate[language].userAuthFailed);
         }
         var payload = {
           'firstname': user.firstname,
@@ -41,6 +46,8 @@ module.exports = {
         var token = tokenProcess.encode(newPayload);
         console.log(req.query.email + ' connected');
         // return the information including token as JSON
+        console.log("REDIRECT_URI =");
+        console.log(req.query.redirect_uri);
         var redirect_uri = req.query.redirect_uri + '&authorization_code=' + token;
         return res.redirect(302, redirect_uri);
         // return response.success(res, translate[language].userAuthentified, { user: user, token: token } );
