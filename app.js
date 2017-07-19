@@ -1,4 +1,4 @@
-"use strict";
+require('dotenv').config();
 
 const express       = require('express');
 const path          = require('path');
@@ -15,7 +15,6 @@ const app           = express();
 
 // Db connection
 require('./config/mongoose');
-
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -44,8 +43,8 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Required to use passport
-require('./config/passport');
-app.use(passport.initialize());
+// require('./config/passport');
+// app.use(passport.initialize());
 
 // Routing
 app.use(require('./routes/index'));
