@@ -3,12 +3,17 @@
 
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Account Linking</title>
+  <title>Edition bénéficiaire</title>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <link rel="stylesheet" href="/stylesheets/styles.css" >
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+  <script src="./scripts/getUrlParameter.js"></script>
 
   <script>
+    let id_customer = getUrlParameter('id_customer');
+    console.log('ID_CUSTOMER = ' + id_customer);
+    
     function continueClicked() {
       var email = document.getElementById('inputEmail').value;
       var password = document.getElementById('inputPassword').value;
@@ -22,7 +27,7 @@
       return false;
     };
   </script>
-<link rel="stylesheet" href="/stylesheets/styles.css" >
+
 </head>
 
 <body>
