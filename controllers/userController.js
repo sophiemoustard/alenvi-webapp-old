@@ -1,5 +1,6 @@
 // const db            = require('../config/database');
 // const tokenConfig   = require('../config/strategies').token;
+const bcrypt = require('bcrypt');
 const translate     = require('../helpers/translate');
 const language      = translate.language;
 const response      = require('../helpers/response');
@@ -36,7 +37,8 @@ module.exports = {
     if (!req.body.email || !req.body.password) {
       return response.error(res, 400, translate[language].missingParameters);
     }
-    User.getByLocalEmail(req.body.email, function(err, user) {
+    // Get by local email
+    User.findOne({ 'local.email': req.body.email }, function (err, user) {
       if (err) {
         return response.error(res, 500, translate[language].unexpectedBehavior);
       }
@@ -44,7 +46,7 @@ module.exports = {
         return response.error(res, 404, translate[language].userAuthNotFound);
       }
       // check if password matches
-      user.comparePassword(req.body.password, function(err, isMatch) {
+      bcrypt.compare(req.body.password, user.local.password, function (err, isMatch) {
         if (err || !isMatch) {
           return response.error(res, 401, translate[language].userAuthFailed);
         }
@@ -70,7 +72,7 @@ module.exports = {
   // Show all user
   showAll: function(req, res) {
     // No security here to restrict access
-    User.getAll(function(err, users) {
+    User.find({}, (err, users) => {
       if (err) {
         return response.error(res, 500, translate[language].unexpectedBehavior);
       }

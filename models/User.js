@@ -1,6 +1,3 @@
-"use strict";
-
-// Initialization
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const validator = require('validator');
@@ -8,7 +5,7 @@ const validator = require('validator');
 const SALT_WORK_FACTOR = 10;
 
 // User schema
-var UserSchema = mongoose.Schema({
+const UserSchema = mongoose.Schema({
   firstname: String,
   lastname: String,
   local: {
@@ -48,64 +45,29 @@ var UserSchema = mongoose.Schema({
 }, { timestamps: true });
 // timestamps allows the db to automatically create 'created_at' and 'updated_at' fields
 
-UserSchema.pre('save', function(next) {
-    var user = this;
+UserSchema.pre('save', async function (next) {
+  try {
+    const user = this;
     // Check email validity
     if (user.isModified('local.email')) {
-        if (!validator.isEmail(this.local.email)) {
-            var error = new Error();
-            error.name = "InvalidEmail";
-            return next(error);
-        }
+      if (!validator.isEmail(user.local.email)) {
+        const error = new Error();
+        error.name = 'InvalidEmail';
+        return next(error);
+      }
     }
     // Check if password is modified, then encrypt it thanks to bcrypt
-    if (!user.isModified('local.password')) {
-        return next();
-    } else {
-      bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
-        if (err) {
-          return next(err);
-        }
-        bcrypt.hash(user.local.password, salt, function(err, hash) {
-          if (err) {
-            return next(err);
-          }
-          user.local.password = hash;
-          return next();
-        });
-      });
-    };
+    if (!user.isModified('local.password')) return next();
+    // Gen salt
+    const salt = await bcrypt.genSalt(SALT_WORK_FACTOR);
+    // Hash password
+    const hash = await bcrypt.hash(user.local.password, salt);
+    // Store password
+    user.local.password = hash;
+    return next();
+  } catch (e) {
+    return next(e);
+  }
 });
 
-// Method to compare password to encrypted one
-UserSchema.methods.comparePassword = function(passwordGiven, cb) {
-  bcrypt.compare(passwordGiven, this.local.password, function (err, isMatch) {
-    // if (err) {
-    //   return cb(err);
-    // }
-    cb(err, isMatch);
-  });
-};
-
-// Find an user by Id in param URL
-// UserSchema.statics.getByParamId = function(id, cb) {
-//   this.findOne({ '_id': id }, function(err, user) {
-//     cb(err, user);
-//   });
-// }
-
-// Find an user by email
-UserSchema.statics.getByLocalEmail = function(email, cb) {
-  this.findOne({ 'local.email': email }, function(err, user) {
-    cb(err, user);
-  });
-}
-
-// Find all users
-UserSchema.statics.getAll = function(cb) {
-  this.find({}, function(err, users) {
-    cb(err, users);
-  });
-}
-
-module.exports = mongoose.model("User", UserSchema);
+module.exports = mongoose.model('User', UserSchema);

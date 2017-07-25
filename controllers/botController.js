@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const translate     = require('../helpers/translate');
 const language      = translate.language;
 const response      = require('../helpers/response');
@@ -17,7 +18,8 @@ module.exports = {
       return res.send("Erreur: " + translate[language].missingParameters);
       // return response.error(res, 400, translate[language].missingParameters);
     }
-    User.getByLocalEmail(req.query.email, function(err, user) {
+    // Get by local email
+    User.findOne({ 'local.email': req.body.email }, function (err, user) {
       if (err) {
         return res.send("Erreur: " + translate[language].unexpectedBehavior);
         // return response.error(res, 500, translate[language].unexpectedBehavior);
@@ -27,7 +29,7 @@ module.exports = {
         // return response.error(res, 404, translate[language].userAuthNotFound);
       }
       // check if password matches
-      user.comparePassword(req.query.password, function(err, isMatch) {
+      bcrypt.compare(req.query.password, user.local.password, function (err, isMatch) {
         if (err || !isMatch) {
           return res.send("Erreur: " + translate[language].userAuthFailed);
           // return response.error(res, 401, translate[language].userAuthFailed);
