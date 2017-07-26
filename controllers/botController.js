@@ -19,7 +19,7 @@ module.exports = {
       // return response.error(res, 400, translate[language].missingParameters);
     }
     // Get by local email
-    User.findOne({ 'local.email': req.body.email }, function (err, user) {
+    User.findOne({ 'local.email': req.query.email }, function (err, user) {
       if (err) {
         return res.send("Erreur: " + translate[language].unexpectedBehavior);
         // return response.error(res, 500, translate[language].unexpectedBehavior);
