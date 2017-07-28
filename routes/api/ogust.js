@@ -1,8 +1,16 @@
 const express = require('express');
 const router = express.Router();
 
+const { checkOgustToken } = require('../../helpers/checkOgustToken');
+
 const customerController = require('./../../controllers/Ogust/customerController');
 const employeeController = require('./../../controllers/Ogust/employeeController');
+const tokenController = require('./../../controllers/Ogust/tokenController');
+
+router.get('/token', tokenController.get);
+
+// Routes protection by token
+router.use(checkOgustToken);
 
 router.get('/customers', customerController.getAll);
 // router.get('/customers/:id', customerController.getCustomerByCustomerId);

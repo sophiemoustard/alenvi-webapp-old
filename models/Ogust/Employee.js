@@ -17,38 +17,8 @@ exports.getEmployees = async (token, status = 'A', nature = 'S', nbperpage = 50,
     resolveWithFullResponse: true,
     time: true,
   };
-  const res = await rp.post(options);
-  // if (res.body.message == 'Token invalide') {
-  //   const token = await getNewToken();
-  //   getEmployees(token, status, nature, nbperpage, pagenumber);
-  // }
-  if (res.body.status == 'KO') {
-    throw new Error(`Error while getting employees: ${res.body.message}`);
-  }
-  return res;
-};
-
-/*
-** Get an employee by employee id
-** PARAMS:
-** - token: token after login
-** - id: employee id
-** - status: employee status
-** Method: POST
-*/
-exports.getEmployeeById = async (token, id, status = 'A') => {
-  const options = {
-    url: `${Ogust.API_LINK}getEmployee`,
-    json: true,
-    body: { token, id, status },
-    resolveWithFullResponse: true,
-    time: true,
-  };
-  const res = await rp.post(options);
-  if (res.body.status == 'KO') {
-    throw new Error(`Error while getting employee by id: ${res.body.message}`);
-  }
-  return res;
+  const result = await rp.post(options);
+  return result;
 };
 
 /*
@@ -69,9 +39,26 @@ exports.getEmployeesBySector = async (token, sector, status = 'A', nature = 'S',
     resolveWithFullResponse: true,
     time: true,
   };
-  const res = await rp.post(options);
-  if (res.body.status == 'KO') {
-    throw new Error(`Error while getting employees by sector: ${res.body.message}`);
-  }
-  return res;
+  const result = await rp.post(options);
+  return result;
+};
+
+/*
+** Get an employee by employee id
+** PARAMS:
+** - token: token after login
+** - id: employee id
+** - status: employee status
+** Method: POST
+*/
+exports.getEmployeeById = async (token, id, status = 'A') => {
+  const options = {
+    url: `${Ogust.API_LINK}getEmployee`,
+    json: true,
+    body: { token, id_employee: id, status },
+    resolveWithFullResponse: true,
+    time: true,
+  };
+  const result = await rp.post(options);
+  return result;
 };

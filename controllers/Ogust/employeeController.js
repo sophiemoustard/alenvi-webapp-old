@@ -1,50 +1,55 @@
 const translate = require('../../helpers/translate');
-const response = require('../../helpers/response');
 const employees = require('../../models/Ogust/Employee');
 
 const language = translate.language;
 
 const getAll = async (req, res) => {
   try {
-    const users = await employees.getEmployees(req.body.token, req.params.status, req.params.nature, req.params.nbperpage, req.params.pagenum);
-    if (users.length === 0) {
-      return response.success(res, translate[language].userShowAllNotFound);
+    const users = await employees.getEmployees(req.headers['x-ogust-token'], req.params.status, req.params.nature, req.params.nbperpage, req.params.pagenum);
+    if (users.body.status == 'KO') {
+      res.status(400).json({ success: false, message: users.body.message });
+      // throw new Error(`Error while getting employees: ${result.body.message}`);
+    } else if (users.length === 0) {
+      res.status(404).json({ success: false, message: translate[language].userShowAllNotFound });
+    } else {
+      res.status(200).json({ success: true, message: translate[language].userShowAllFound, data: { users: users.body } });
     }
-    return response.success(res, translate[language].userFound, { users: users.body });
   } catch (e) {
     console.error(e);
-    return response.error(res, 500, translate[language].unexpectedBehavior);
+    res.status(500).json({ success: false, message: translate[language].unexpectedBehavior });
   }
 };
 
 const getAllBySector = async (req, res) => {
   try {
-    const user = await employees.getEmployeesBySector(req.body.token, req.params.sector, req.params.nbperpage, req.params.pagenum);
-    if (user.length === 0) {
-      return response.success(res, translate[language].userShowAllNotFound);
+    const users = await employees.getEmployeesBySector(req.headers['x-ogust-token'], req.params.sector, req.params.nbperpage, req.params.pagenum);
+    if (users.body.status == 'KO') {
+      res.status(400).json({ success: false, message: users.body.message });
+    } else if (users.length === 0) {
+      res.status(404).json({ success: false, message: translate[language].userShowAllNotFound });
+    } else {
+      res.status(200).json({ success: true, message: translate[language].userShowAllFound, data: { users: users.body } });
     }
-    return response.success(res, translate[language].userFound, { user: user.body });
   } catch (e) {
     console.error(e);
-    return response.error(res, 500, translate[language].unexpectedBehavior);
+    res.status(500).json({ success: false, message: translate[language].unexpectedBehavior });
   }
 };
 
 const getById = async (req, res) => {
   try {
-    const user = await employees.getEmployeeById(req.body.token, req.params.id, req.params.status);
-    if (user.length === 0) {
-      return response.success(res, translate[language].userShowAllNotFound);
+    const user = await employees.getEmployeeById(req.headers['x-ogust-token'], req.params.id, req.params.status);
+    if (user.body.status == 'KO') {
+      res.status(400).json({ success: false, message: user.body.message });
+    } else if (user.length === 0) {
+      res.status(404).json({ success: false, message: translate[language].userNotFound });
+    } else {
+      res.status(200).json({ success: true, message: translate[language].userFound, data: { user: user.body } });
     }
-    return response.success(res, translate[language].userFound, { user: user.body });
   } catch (e) {
     console.error(e);
-    return response.error(res, 500, translate[language].unexpectedBehavior);
+    res.status(500).json({ success: false, message: translate[language].unexpectedBehavior });
   }
 };
 
-module.exports = {
-  getAll,
-  getById,
-  getAllBySector
-};
+module.exports = { getAll, getById, getAllBySector };
