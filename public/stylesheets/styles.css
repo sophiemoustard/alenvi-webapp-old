@@ -19,6 +19,10 @@ button {
     border-radius:2px;
 }*/
 
+.d-flex {
+	display: flex;
+}
+
 .form-signin
 {
     max-width: 330px;
