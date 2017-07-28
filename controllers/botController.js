@@ -1,7 +1,6 @@
 const bcrypt = require('bcrypt');
 const translate     = require('../helpers/translate');
 const language      = translate.language;
-const response      = require('../helpers/response');
 const _             = require('lodash');
 const tokenProcess  = require('../helpers/tokenProcess');
 const path            = require('path');
@@ -62,7 +61,7 @@ module.exports = {
   getUserByParamId: (req, res, next) => {
     User.findOne({ '_id': req.params._id }, function(err, user) {
       if (err || !user) {
-        return response.error(res, 404, translate[language].userNotFound);
+        res.status(404).json({ success: false, message: translate[language].userNotFound });
       } else {
         const payload = {
           'firstname': user.firstname,
@@ -75,7 +74,7 @@ module.exports = {
           'sector': user.sector
         }
         const newPayload = _.pickBy(payload);
-        return response.success(res, translate[language].userFound, { user: newPayload });
+        res.status(200).json({ success: true, message: translate[language].userFound, data: { user: newPayload } });
       }
     });
   }

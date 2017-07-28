@@ -1,13 +1,7 @@
 const express         = require('express');
-const response        = require('../../helpers/response.js');
-const translate       = require('../../helpers/translate.js');
 const tokenConfig     = require('../../config/strategies').token;
-const router          = express.Router();
-const passport        = require('passport');
 const tokenProcess    = require('../../helpers/tokenProcess');
-const language        = translate.language;
-const path            = require('path');
-const _               = require('lodash');
+const router          = express.Router();
 
 const userController  = require('../../controllers/userController');
 

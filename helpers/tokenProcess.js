@@ -1,10 +1,8 @@
-"use strict";
-
-const jwt         = require('jsonwebtoken');
-const translate   = require('./translate');
-const language    = translate.language;
-const response    = require('./response');
+const jwt = require('jsonwebtoken');
+const translate = require('./translate');
 const tokenConfig = require('../config/strategies').token;
+
+const language = translate.language;
 
 module.exports = {
   encode: function(payload) {
@@ -19,16 +17,16 @@ module.exports = {
       const token = req.body.token || req.query.token || req.headers['x-access-token'];
       // if there is no token
       if (!token) {
-        return response.error(res, 401, translate[language].tokenNotFound);
+        res.status(401).json({ success: false, message: translate[language].tokenNotFound });
       }
       // verifies secret and checks expiration then decode token
       jwt.verify(token, options.secret, function(err, decoded) {
         if (err) {
-          if (err.name === "JsonWebTokenError") {
-            return response.error(res, 401, translate[language].tokenAuthFailed);
+          if (err.name === 'JsonWebTokenError') {
+            res.status(401).json({ success: false, message: translate[language].tokenAuthFailed });
           }
-          if (err.name === "TokenExpiredError") {
-            return response.error(res, 401, translate[language].tokenExpired);
+          if (err.name === 'TokenExpiredError') {
+            res.status(401).json({ success: false, message: translate[language].tokenExpired });
           }
         } else {
           // if everything is good, save to request for use in other routes
@@ -38,4 +36,4 @@ module.exports = {
       });
     });
   }
-}
+};

@@ -3,7 +3,6 @@
 const bcrypt = require('bcrypt');
 const translate     = require('../helpers/translate');
 const language      = translate.language;
-const response      = require('../helpers/response');
 // const jwt           = require('jsonwebtoken');
 const _             = require('lodash');
 const tokenProcess  = require('../helpers/tokenProcess');
@@ -14,7 +13,7 @@ const User          = require('../models/User');
 var getUserByParamId = function(req, res, next) {
   User.findOne({ '_id': req.params._id }, function(err, user) {
     if (err || !user) {
-      return response.error(res, 404, translate[language].userNotFound);
+      res.status(404).json({ success: false, message: translate[language].userNotFound });
     } else {
       req.user = user;
       // Callback for success
@@ -26,7 +25,7 @@ var getUserByParamId = function(req, res, next) {
 // Check if user is allowed to access to this route : only himself or admin / coach can validate through this function
 var checkOnlyUserAllowed = function(req, res, next) {
   if (req.decoded.role != 'admin' && req.decoded.role != 'coach' && req.params._id !== req.decoded.id) {
-    return response.error(res, 403, translate[language].forbidden);
+    res.status(403).json({ success: false, message: translate[language].forbidden });
   }
   next();
 }
@@ -35,20 +34,20 @@ module.exports = {
   // Authenticate the user locally
   authenticate: function(req, res) {
     if (!req.body.email || !req.body.password) {
-      return response.error(res, 400, translate[language].missingParameters);
+      res.status(400).json({ success: false, message: translate[language].missingParameters });
     }
     // Get by local email
     User.findOne({ 'local.email': req.body.email }, function (err, user) {
       if (err) {
-        return response.error(res, 500, translate[language].unexpectedBehavior);
+        res.status(500).json({ success: false, message: translate[language].unexpectedBehavior });
       }
       if (!user) {
-        return response.error(res, 404, translate[language].userAuthNotFound);
+        res.status(404).json({ success: false, message: translate[language].userAuthNotFound });
       }
       // check if password matches
       bcrypt.compare(req.body.password, user.local.password, function (err, isMatch) {
         if (err || !isMatch) {
-          return response.error(res, 401, translate[language].userAuthFailed);
+          res.status(401).json({ success: false, message: translate[language].userAuthFailed });
         }
         var payload = {
           'firstname': user.firstname,
@@ -64,7 +63,7 @@ module.exports = {
         var token = tokenProcess.encode(newPayload);
         console.log(req.body.email + ' connected');
         // return the information including token as JSON
-        return response.success(res, translate[language].userAuthentified, { user: user, token: token } );
+        res.status(200).json({ success: true, message: translate[language].userAuthentified, data: { token, user } });
       })
     });
   },
@@ -74,18 +73,18 @@ module.exports = {
     // No security here to restrict access
     User.find({}, (err, users) => {
       if (err) {
-        return response.error(res, 500, translate[language].unexpectedBehavior);
+        res.status(500).json({ success: false, message: translate[language].unexpectedBehavior });
       }
       if (users.length === 0) {
-        return response.success(res, translate[language].userShowAllNotFound);
+        res.status(404).json({ success: false, message: translate[language].userShowAllNotFound });
       }
-      return response.success(res, translate[language].userShowAllFound, users);
+      res.status(200).json({ success: true, message: translate[language].userShowAllFound, data: { users } });
     });
   },
   // Show an user by ID
   show: function(req, res) {
     getUserByParamId(req, res, function() {
-      return response.success(res, translate[language].userFound, req.user);
+      res.status(200).json({ success: true, message: translate[language].userFound, data: { user: req.user } });
     });
   },
 
@@ -116,18 +115,18 @@ module.exports = {
           console.error(err);
           // Error code when there is a duplicate key, in this case : the email (unique field)
           if (err.code === 11000) {
-            return response.error(res, 409, translate[language].userEmailExists);
+            res.status(409).json({ success: false, message: translate[language].userEmailExists });
           } else if (err.name === "InvalidEmail") {
-            return response.error(res, 400, translate[language].invalidEmail);
+            res.status(400).json({ success: false, message: translate[language].invalidEmail });
           } else {
-            return response.error(res, 500, translate[language].unexpectedBehavior);
+            res.status(500).json({ success: false, message: translate[language].unexpectedBehavior });
           }
         }
-        return response.success(res, translate[language].userSaved, user);
+        res.status(200).json({ success: true, message: translate[language].userSaved, data: { user } });
       });
     } else {
       // Mandatory fields are missing or not found
-      return response.error(res, 400, "Missing parameters");
+      res.status(400).json({ success: false, message: translate[language].missingParameters });
     }
   },
 
@@ -177,11 +176,11 @@ module.exports = {
           if (err) {
             // Error code when there is a duplicate key, in this case : the email (unique field)
             if (err.code === 11000) {
-              return response.error(res, 409, translate[language].userEmailExists);
+              res.status(409).json({ success: false, message: translate[language].userEmailExists });
             }
-            return response.error(res, 500, translate[language].unexpectedBehavior);
+            res.status(500).json({ success: false, message: translate[language].unexpectedBehavior });
           }
-          return response.success(res, translate[language].userUpdated);
+          res.status(200).json({ success: true, message: translate[language].userUpdated, data: { user: req.user } });
         });
       });
     });
@@ -193,9 +192,9 @@ module.exports = {
       getUserByParamId(req, res, function() {
         req.user.remove({}, function(err) {
           if (err) {
-            return response.error(res, 500, translate[language].unexpectedBehavior);
+            res.status(500).json({ success: false, message: translate[language].unexpectedBehavior });
           }
-          return response.success(res, translate[language].userRemoved);
+          res.status(200).json({ success: true, message: translate[language].userRemoved });
         });
       });
     });

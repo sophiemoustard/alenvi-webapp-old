@@ -1,13 +1,24 @@
 const express = require('express');
 const router = express.Router();
 
+const { checkOgustToken } = require('../../helpers/checkOgustToken');
+
 const customerController = require('./../../controllers/Ogust/customerController');
 const employeeController = require('./../../controllers/Ogust/employeeController');
+const tokenController = require('./../../controllers/Ogust/tokenController');
+
+router.get('/token', tokenController.get);
+
+// Routes protection by token
+router.use(checkOgustToken);
 
 router.get('/customers', customerController.getAll);
-router.get('/employees', employeeController.getAll);
 // router.get('/customers/:id', customerController.getCustomerByCustomerId);
 // router.get('/customers/:id/info', customerController.getThirdPartyInformationsByCustomerId);
 // router.patch('customers/:id/info', customerController.editThirdPartyInformationsByCustomerId);
+
+router.get('/employees', employeeController.getAll);
+router.get('/employees/sector/:sector', employeeController.getAllBySector);
+router.get('/employees/:id', employeeController.getById);
 
 module.exports = router;
