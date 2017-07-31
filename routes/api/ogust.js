@@ -14,11 +14,7 @@ const servicesController = require('./../../controllers/Ogust/serviceController'
 router.get('/token', tokenProcess.decode({ secret: tokenConfig.secret }), tokenController.get);
 
 if (process.env.NODE_ENV == 'development') {
-<<<<<<< HEAD
-  router.get('/tests/token/:id', (req, res, next) => {
-=======
   router.get('/tests/token/:id', (req, res) => {
->>>>>>> a242bad59cd41d561ee38eb6f7ccab31b1cf7b6f
     const jwt = require('jsonwebtoken');
     const payload = {
       _id: req.params.id
@@ -26,11 +22,7 @@ if (process.env.NODE_ENV == 'development') {
     const token = jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '24h' });
     res.status(200).json({ success: true, message: 'Token bien encrypté !', data: { token } });
   });
-<<<<<<< HEAD
-};
-=======
 }
->>>>>>> a242bad59cd41d561ee38eb6f7ccab31b1cf7b6f
 
 // Routes protection by token
 router.use(checkOgustToken);
