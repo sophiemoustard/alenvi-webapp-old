@@ -1,7 +1,8 @@
-const express         = require('express');
-const router          = express.Router();
+const express = require('express');
 
-const botController   = require('../../controllers/botController');
+const router = express.Router();
+
+const botController = require('../../controllers/botController');
 
 router.get('/authorize', botController.authorize);
 router.get('/facebook/account_linking', botController.facebookAccountLinking);

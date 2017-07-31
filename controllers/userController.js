@@ -1,17 +1,17 @@
 // const db            = require('../config/database');
 // const tokenConfig   = require('../config/strategies').token;
 const bcrypt = require('bcrypt');
-const translate     = require('../helpers/translate');
-const language      = translate.language;
+const translate = require('../helpers/translate');
+const language = translate.language;
 // const jwt           = require('jsonwebtoken');
-const _             = require('lodash');
-const tokenProcess  = require('../helpers/tokenProcess');
+const _ = require('lodash');
+const tokenProcess = require('../helpers/tokenProcess');
 
-const User          = require('../models/User');
+const User = require('../models/User');
 
 // Find an user by Id in param URL
-var getUserByParamId = function(req, res, next) {
-  User.findOne({ '_id': req.params._id }, function(err, user) {
+const getUserByParamId = function (req, res, next) {
+  User.findOne({ _id: req.params._id }, (err, user) => {
     if (err || !user) {
       res.status(404).json({ success: false, message: translate[language].userNotFound });
     } else {
@@ -20,24 +20,24 @@ var getUserByParamId = function(req, res, next) {
       next();
     }
   });
-}
+};
 
 // Check if user is allowed to access to this route : only himself or admin / coach can validate through this function
-var checkOnlyUserAllowed = function(req, res, next) {
+const checkOnlyUserAllowed = function (req, res, next) {
   if (req.decoded.role != 'admin' && req.decoded.role != 'coach' && req.params._id !== req.decoded.id) {
     res.status(403).json({ success: false, message: translate[language].forbidden });
   }
   next();
-}
+};
 
 module.exports = {
   // Authenticate the user locally
-  authenticate: function(req, res) {
+  authenticate(req, res) {
     if (!req.body.email || !req.body.password) {
       res.status(400).json({ success: false, message: translate[language].missingParameters });
     }
     // Get by local email
-    User.findOne({ 'local.email': req.body.email }, function (err, user) {
+    User.findOne({ 'local.email': req.body.email }, (err, user) => {
       if (err) {
         res.status(500).json({ success: false, message: translate[language].unexpectedBehavior });
       }
@@ -45,31 +45,31 @@ module.exports = {
         res.status(404).json({ success: false, message: translate[language].userAuthNotFound });
       }
       // check if password matches
-      bcrypt.compare(req.body.password, user.local.password, function (err, isMatch) {
-        if (err || !isMatch) {
+      bcrypt.compare(req.body.password, user.local.password, (error, isMatch) => {
+        if (error || !isMatch) {
           res.status(401).json({ success: false, message: translate[language].userAuthFailed });
         }
-        var payload = {
-          'firstname': user.firstname,
-          'lastname': user.lastname,
-          '_id': user.id,
+        const payload = {
+          firstname: user.firstname,
+          lastname: user.lastname,
+          _id: user.id,
           'local.email': user.local.email,
-          'role': user.role,
-          'customer_id': user.customer_id,
-          'employee_id': user.employee_id,
-          'sector': user.sector
-        }
-        var newPayload = _.pickBy(payload);
-        var token = tokenProcess.encode(newPayload);
-        console.log(req.body.email + ' connected');
+          role: user.role,
+          customer_id: user.customer_id,
+          employee_id: user.employee_id,
+          sector: user.sector
+        };
+        const newPayload = _.pickBy(payload);
+        const token = tokenProcess.encode(newPayload);
+        console.log(`${req.body.email} connected`);
         // return the information including token as JSON
         res.status(200).json({ success: true, message: translate[language].userAuthentified, data: { token, user } });
-      })
+      });
     });
   },
 
   // Show all user
-  showAll: function(req, res) {
+  showAll(req, res) {
     // No security here to restrict access
     User.find({}, (err, users) => {
       if (err) {
@@ -82,41 +82,41 @@ module.exports = {
     });
   },
   // Show an user by ID
-  show: function(req, res) {
-    getUserByParamId(req, res, function() {
+  show(req, res) {
+    getUserByParamId(req, res, () => {
       res.status(200).json({ success: true, message: translate[language].userFound, data: { user: req.user } });
     });
   },
 
   // Create a new user
-  create: function(req, res) {
+  create(req, res) {
     // Check if users mandatory fields are existing
     if (req.body.email && req.body.password) {
-      var payload = {
-        'firstname': req.body.firstname ? req.body.firstname : "",
-        'lastname': req.body.lastname ? req.body.lastname : "",
-        "local.email": req.body.email,
-        "local.password": req.body.password,
-        "employee_id": req.body.employee_id ? req.body.employee_id : '',
-        "customer_id": req.body.customer_id ? req.body.customer_id : '',
-        "role": req.body.role ? req.body.role : "",
-        "sector": req.body.sector ? req.body.sector : "",
-        "facebook.facebookId": req.body.facebookId ? req.body.facebookId: "",
-        "facebook.email": req.body.facebookEmail ? req.body.facebookEmail: "",
-        "slack.slackId": req.body.slackId ? req.body.slackId : "",
-        "slack.email": req.body.slackEmail ? req.body.slackEmail: "",
+      const payload = {
+        firstname: req.body.firstname ? req.body.firstname : '',
+        lastname: req.body.lastname ? req.body.lastname : '',
+        'local.email': req.body.email,
+        'local.password': req.body.password,
+        employee_id: req.body.employee_id ? req.body.employee_id : '',
+        customer_id: req.body.customer_id ? req.body.customer_id : '',
+        role: req.body.role ? req.body.role : '',
+        sector: req.body.sector ? req.body.sector : '',
+        'facebook.facebookId': req.body.facebookId ? req.body.facebookId : '',
+        'facebook.email': req.body.facebookEmail ? req.body.facebookEmail : '',
+        'slack.slackId': req.body.slackId ? req.body.slackId : '',
+        'slack.email': req.body.slackEmail ? req.body.slackEmail : '',
       };
-      var newPayload = _.pickBy(payload);
-      var newUser = User(
+      const newPayload = _.pickBy(payload);
+      const newUser = User(
         newPayload
       );
-      newUser.save(function(err, user) {
+      newUser.save((err, user) => {
         if (err) {
           console.error(err);
           // Error code when there is a duplicate key, in this case : the email (unique field)
           if (err.code === 11000) {
             res.status(409).json({ success: false, message: translate[language].userEmailExists });
-          } else if (err.name === "InvalidEmail") {
+          } else if (err.name === 'InvalidEmail') {
             res.status(400).json({ success: false, message: translate[language].invalidEmail });
           } else {
             res.status(500).json({ success: false, message: translate[language].unexpectedBehavior });
@@ -130,17 +130,17 @@ module.exports = {
     }
   },
 
-  //Update an user by email (unique field)
-  update: function(req, res) {
-    checkOnlyUserAllowed(req, res, function() {
-      getUserByParamId(req, res, function() {
+  // Update an user by email (unique field)
+  update(req, res) {
+    checkOnlyUserAllowed(req, res, () => {
+      getUserByParamId(req, res, () => {
         // In case of success
         // Fields allowed for update
         if (req.body.firstname) {
-          req.user.firstname = req.body.firstname
+          req.user.firstname = req.body.firstname;
         }
         if (req.body.lastname) {
-          req.user.lastname = req.body.lastname
+          req.user.lastname = req.body.lastname;
         }
         if (req.body.email) {
           req.user.local.email = req.body.email;
@@ -161,18 +161,18 @@ module.exports = {
           req.user.sector = req.body.sector;
         }
         if (req.body.facebookId) {
-          req.user.facebook.facebookId = req.body.facebookId
+          req.user.facebook.facebookId = req.body.facebookId;
         }
         if (req.body.facebookEmail) {
-          req.user.facebook.email = req.body.facebookEmail
+          req.user.facebook.email = req.body.facebookEmail;
         }
         if (req.body.slackId) {
-          req.user.slack.slackId = req.body.slackId
+          req.user.slack.slackId = req.body.slackId;
         }
         if (req.body.slackEmail) {
-          req.user.slack.email = req.body.slackEmail
+          req.user.slack.email = req.body.slackEmail;
         }
-        req.user.save(function(err) {
+        req.user.save((err) => {
           if (err) {
             // Error code when there is a duplicate key, in this case : the email (unique field)
             if (err.code === 11000) {
@@ -187,10 +187,10 @@ module.exports = {
   },
 
   // Remove an user by param id
-  delete: function(req, res) {
-    checkOnlyUserAllowed(req, res, function() {
-      getUserByParamId(req, res, function() {
-        req.user.remove({}, function(err) {
+  delete(req, res) {
+    checkOnlyUserAllowed(req, res, () => {
+      getUserByParamId(req, res, () => {
+        req.user.remove({}, (err) => {
           if (err) {
             res.status(500).json({ success: false, message: translate[language].unexpectedBehavior });
           }

@@ -1,9 +1,10 @@
-const express         = require('express');
-const tokenConfig     = require('../../config/strategies').token;
-const tokenProcess    = require('../../helpers/tokenProcess');
-const router          = express.Router();
+const express = require('express');
+const tokenConfig = require('../../config/strategies').token;
+const tokenProcess = require('../../helpers/tokenProcess');
 
-const userController  = require('../../controllers/userController');
+const router = express.Router();
+
+const userController = require('../../controllers/userController');
 
 router.post('/', userController.create);
 router.post('/authenticate', userController.authenticate);
@@ -33,7 +34,7 @@ router.post('/authenticate', userController.authenticate);
 
 
 // Routes protection by token
-router.use(tokenProcess.decode({secret: tokenConfig.secret}));
+router.use(tokenProcess.decode({ secret: tokenConfig.secret }));
 
 // All these routes need a token because of route protection above
 router.get('/', userController.showAll);
