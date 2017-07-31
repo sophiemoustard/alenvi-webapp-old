@@ -11,15 +11,16 @@ const employeeController = require('./../../controllers/Ogust/employeeController
 const tokenController = require('./../../controllers/Ogust/tokenController');
 
 router.get('/token', tokenProcess.decode({ secret: tokenConfig.secret }), tokenController.get);
+
 if (process.env.NODE_ENV == 'development') {
-	router.get('/tests/token/:id', (req, res, next) => {
-		const jwt = require('jsonwebtoken');
-		const payload = {
-			_id: req.params.id
-		};
-		const token = jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '24h' });
-		res.status(200).json({ success: true, message: 'Token bien encrypté !', data: { token } });
-	});
+  router.get('/tests/token/:id', (req, res) => {
+    const jwt = require('jsonwebtoken');
+    const payload = {
+      _id: req.params.id
+    };
+    const token = jwt.sign(payload, process.env.TOKEN_SECRET, { expiresIn: '24h' });
+    res.status(200).json({ success: true, message: 'Token bien encrypté !', data: { token } });
+  });
 }
 
 // Routes protection by token

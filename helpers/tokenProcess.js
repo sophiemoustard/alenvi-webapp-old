@@ -23,10 +23,10 @@ module.exports = {
       jwt.verify(token, options.secret, function(err, decoded) {
         if (err) {
           if (err.name === 'JsonWebTokenError') {
-            res.status(401).json({ success: false, message: translate[language].tokenAuthFailed });
+            return res.status(401).json({ success: false, message: translate[language].tokenAuthFailed });
           }
           if (err.name === 'TokenExpiredError') {
-            res.status(401).json({ success: false, message: translate[language].tokenExpired });
+            return res.status(401).json({ success: false, message: translate[language].tokenExpired });
           }
         } else {
           // if everything is good, save to request for use in other routes
