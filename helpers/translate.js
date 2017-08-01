@@ -25,7 +25,9 @@ module.exports = {
     userAuthentified: 'User authenticated successfully.',
     /* Ogust */
     OgustGetTokenOk: 'Ogust Token well retrieved.',
-    OgustGetTokenFailed: 'Ogust Token retrieving failed.'
+    OgustGetTokenFailed: 'Ogust Token retrieving failed.',
+    servicesFound: 'Ogust Services found.',
+    servicesNotFound: 'Ogust Services not found.'
   },
   'fr-FR': {
     /* Global errors */
@@ -51,7 +53,9 @@ module.exports = {
     forbidden: 'Accès non autorisé.',
     userAuthentified: 'Utilisateur authentifié avec succès.',
     /* Ogust */
-    OgustGetTokenOk: 'Token Ogust bien reçu.',
-    OgustGetTokenFailed: 'Problème lors de la récupération du Token Ogust.'
+    OgustGetTokenOk: 'Token Ogust reçu avec succès.',
+    OgustGetTokenFailed: 'Problème lors de la récupération du Token Ogust.',
+    servicesFound: 'Services Ogust reçus avec succès.',
+    servicesNotFound: 'Services Ogust non trouvés.'
   }
 };

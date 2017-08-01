@@ -1,6 +1,8 @@
 const Ogust = require('../../config/config').Ogust;
 const rp = require('request-promise');
 
+const { getIntervalInRange } = require('../../helpers/intervalInRange');
+
 /*
 ** Get all employees
 ** PARAMS:
@@ -9,7 +11,7 @@ const rp = require('request-promise');
 ** - nature: employee nature (employee, customer...)
 ** Method: POST
 */
-exports.getEmployees = async (token, status = 'A', nature = 'S', nbperpage = 50, pagenum = 1) => {
+exports.getEmployees = async (token, status, nature, nbperpage, pagenum) => {
   const options = {
     url: `${Ogust.API_LINK}searchEmployee`,
     json: true,
@@ -30,7 +32,7 @@ exports.getEmployees = async (token, status = 'A', nature = 'S', nbperpage = 50,
 ** - pagenum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getEmployeesBySector = async (token, sector, status = 'A', nature = 'S', nbperpage = '', pagenum = '') => {
+exports.getEmployeesBySector = async (token, sector, status, nature, nbperpage, pagenum) => {
   const options = {
     url: `${Ogust.API_LINK}searchEmployee`,
     json: true,
@@ -51,7 +53,7 @@ exports.getEmployeesBySector = async (token, sector, status = 'A', nature = 'S',
 ** - status: employee status
 ** Method: POST
 */
-exports.getEmployeeById = async (token, id, status = 'A') => {
+exports.getEmployeeById = async (token, id, status) => {
   const options = {
     url: `${Ogust.API_LINK}getEmployee`,
     json: true,
@@ -61,4 +63,51 @@ exports.getEmployeeById = async (token, id, status = 'A') => {
   };
   const result = await rp.post(options);
   return result;
+};
+
+/*
+** Get services by employee id in range or by date
+** PARAMS:
+** - token: token after login
+** - id: employee id
+** - isRange: true / false
+** - isDate: true / false
+** - status: '@!=|N', 'R'...
+** - type: 'I'...
+** - slotToSub (time in number to subtract),
+** - slotToAdd (time in number to add)
+** - intervalType: "day", "week", "year", "hour"...
+** - dateStart: YYYYMMDDHHmm format
+** - dateEnd: YYYYMMDDHHmm format
+** - pageOption:
+** --- nbPerPage: X (number of results returned per pages)
+** --- pageNum: Y (number of pages)
+** METHOD: POST
+*/
+exports.getServices = async (token, id, isRange, isDate, slotToSub, slotToAdd, intervalType, startDate, endDate, status, type, nbPerPage, pageNum) => {
+  let interval = {};
+  if (isRange == 'true') {
+    interval = getIntervalInRange(slotToSub, slotToAdd, intervalType);
+  }
+  if (isDate == 'true') {
+    interval.intervalBwd = parseInt(startDate, 10);
+    interval.intervalFwd = parseInt(endDate, 10);
+  }
+  const options = {
+    url: `${Ogust.API_LINK}searchService`,
+    json: true,
+    body: {
+      token,
+      id_employee: id,
+      status,
+      type, // I = Intervention
+      start_date: `${'@between|'}${interval.intervalBwd}|${interval.intervalFwd}`,
+      nbperpage: nbPerPage,
+      pagenum: pageNum
+    },
+    resolveWithFullResponse: true,
+    time: true
+  };
+  const res = await rp.post(options);
+  return res;
 };

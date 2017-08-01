@@ -9,7 +9,7 @@ const tokenProcess = require('../../helpers/tokenProcess');
 const customerController = require('./../../controllers/Ogust/customerController');
 const employeeController = require('./../../controllers/Ogust/employeeController');
 const tokenController = require('./../../controllers/Ogust/tokenController');
-const servicesController = require('./../../controllers/Ogust/serviceController');
+const serviceController = require('./../../controllers/Ogust/serviceController');
 
 router.get('/token', tokenProcess.decode({ secret: tokenConfig.secret }), tokenController.get);
 
@@ -27,13 +27,17 @@ if (process.env.NODE_ENV == 'development') {
 // Routes protection by token
 router.use(checkOgustToken);
 
+router.get('/employees', employeeController.getAll);
+router.get('/employees/sector/:sector', employeeController.getAllBySector);
+router.get('/employees/:id', employeeController.getById);
+router.get('/employees/:id/services', employeeController.getEmployeeServices);
+
+// router.get('/services', serviceController.getAll);
+
 router.get('/customers', customerController.getAll);
 // router.get('/customers/:id', customerController.getCustomerByCustomerId);
 // router.get('/customers/:id/info', customerController.getThirdPartyInformationsByCustomerId);
 // router.patch('customers/:id/info', customerController.editThirdPartyInformationsByCustomerId);
-
-router.get('/employees', employeeController.getAll);
-router.get('/employees/sector/:sector', employeeController.getAllBySector);
-router.get('/employees/:id', employeeController.getById);
+router.get('/customers/:id/services', customerController.getCustomerServices);
 
 module.exports = router;
