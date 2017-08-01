@@ -19,10 +19,6 @@ button {
     border-radius:2px;
 }*/
 
-.d-flex {
-	display: flex;
-}
-
 .form-signin
 {
     max-width: 330px;
@@ -108,4 +104,13 @@ button {
 .form-button:hover
 {
   background-color: #ff1693;
+}
+
+.aligner
+{
+	min-height: 100%;
+  min-height: 100vh;
+	display: flex;
+  justify-content: center;
+  align-items: center;
 }

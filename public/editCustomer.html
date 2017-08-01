@@ -17,12 +17,10 @@
 
 <body>
 	<div class="container">
-		<div class="row">
-
-			<div class="col-sm-6 col-md-6 col-md-offset-3">
-
+		<div class="row aligner">
+			<div class="col-sm-6 col-md-4">
 				<div class="well bs-component">
-					<form class="form-horizontal">
+					<form>
 						<fieldset>
 							<legend class="text-center">Editer bénéficiaires</legend>
 
@@ -55,7 +53,6 @@
 								<textarea type="text" id="form3" class="form-control"></textarea>
 							</div>
 						</fieldset>
-
 						<div class="text-center">
 							<a class="btn btn-raised btn-primary">Send</a>
 							<div class="ripple-container"></div>
@@ -87,7 +84,7 @@
 			return false;
 		};
 
-		$(function () {
+		$(function() {
 			$.material.init();
 		});
 	</script>
