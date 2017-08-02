@@ -61,14 +61,14 @@ exports.getThirdPartyInformationByCustomerId = async (token, id, third_party, nb
   return res;
 };
 
-exports.editThirdPartyInformationByCustomerId = async (token, id, third_party, arrayValues) => {
+exports.editThirdPartyInformationByCustomerId = async (token, id, thirdParty, arrayValues) => {
   const options = {
     url: `${Ogust.API_LINK}setThirdPartyInformations`,
     json: true,
     body: {
       token,
-      third_party,
       third_party_id: id,
+      third_party: thirdParty,
       array_values: arrayValues
     },
     resolveWithFullResponse: true,
@@ -85,16 +85,15 @@ exports.editThirdPartyInformationByCustomerId = async (token, id, third_party, a
 ** - id: customer id
 ** - isRange: true / false
 ** - isDate: true / false
-** - status: '@!=|N', 'R'...
-** - type: 'I'...
 ** - slotToSub (time in number to subtract),
 ** - slotToAdd (time in number to add)
 ** - intervalType: "day", "week", "year", "hour"...
 ** - dateStart: YYYYMMDDHHmm format
 ** - dateEnd: YYYYMMDDHHmm format
-** - pageOption:
-** --- nbPerPage: X (number of results returned per pages)
-** --- pageNum: Y (number of pages)
+** - status: '@!=|N', 'R'...
+** - type: 'I'...
+** - nbPerPage: X (number of results returned per pages)
+** - pageNum: Y (number of pages)
 ** METHOD: POST
 */
 exports.getServices = async (token, id, isRange, isDate, slotToSub, slotToAdd, intervalType, startDate, endDate, status, type, nbPerPage, pageNum) => {

@@ -33,12 +33,13 @@ router.get('/employees/:id', employeeController.getById);
 router.get('/employees/:id/services', employeeController.getEmployeeServices);
 router.get('/employees/:id/customers', employeeController.getEmployeeCustomers);
 
-// router.get('/services', serviceController.getAll);
-
 router.get('/customers', customerController.getAll);
 router.get('/customers/:id', customerController.getById);
 router.get('/customers/:id/services', customerController.getCustomerServices);
 router.get('/customers/:id/moreInfo', customerController.getThirdPartyInformation);
-// router.patch('customers/:id/info', customerController.editThirdPartyInformationsByCustomerId);
+router.put('/customers/:id/moreInfo', customerController.editThirdPartyInformation);
+
+router.get('/services', serviceController.getAll);
+router.get('/services/:id', serviceController.getById);
 
 module.exports = router;

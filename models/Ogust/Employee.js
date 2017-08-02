@@ -72,16 +72,15 @@ exports.getEmployeeById = async (token, id, status) => {
 ** - id: employee id
 ** - isRange: true / false
 ** - isDate: true / false
-** - status: '@!=|N', 'R'...
-** - type: 'I'...
 ** - slotToSub (time in number to subtract),
 ** - slotToAdd (time in number to add)
 ** - intervalType: "day", "week", "year", "hour"...
 ** - dateStart: YYYYMMDDHHmm format
 ** - dateEnd: YYYYMMDDHHmm format
-** - pageOption:
-** --- nbPerPage: X (number of results returned per pages)
-** --- pageNum: Y (number of pages)
+** - status: '@!=|N', 'R'...
+** - type: 'I'...
+** - nbPerPage: X (number of results returned per pages)
+** - pageNum: Y (number of pages)
 ** METHOD: POST
 */
 exports.getServices = async (token, id, isRange, isDate, slotToSub, slotToAdd, intervalType, startDate, endDate, status, type, nbPerPage, pageNum) => {
@@ -93,7 +92,6 @@ exports.getServices = async (token, id, isRange, isDate, slotToSub, slotToAdd, i
     interval.intervalBwd = parseInt(startDate, 10);
     interval.intervalFwd = parseInt(endDate, 10);
   }
-  console.log(interval);
   const options = {
     url: `${Ogust.API_LINK}searchService`,
     json: true,
