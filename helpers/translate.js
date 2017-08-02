@@ -27,7 +27,9 @@ module.exports = {
     OgustGetTokenOk: 'Ogust Token well retrieved.',
     OgustGetTokenFailed: 'Ogust Token retrieving failed.',
     servicesFound: 'Ogust Services found.',
-    servicesNotFound: 'Ogust Services not found.'
+    servicesNotFound: 'Ogust Services not found.',
+    thirdPartyInfoNotFound: 'Ogust third party information not found.',
+    thirdPartyInfoFound: 'Ogust third party information retrieving failed.'
   },
   'fr-FR': {
     /* Global errors */
@@ -56,6 +58,8 @@ module.exports = {
     OgustGetTokenOk: 'Token Ogust reçu avec succès.',
     OgustGetTokenFailed: 'Problème lors de la récupération du Token Ogust.',
     servicesFound: 'Services Ogust reçus avec succès.',
-    servicesNotFound: 'Services Ogust non trouvés.'
+    servicesNotFound: 'Services Ogust non trouvés.',
+    thirdPartyInfoNotFound: 'La récupération des informations tierse a échoué.',
+    thirdPartyInfoFound: 'Informations tierse récupérées avec succès.'
   }
 };

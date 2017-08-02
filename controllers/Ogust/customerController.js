@@ -5,7 +5,7 @@ const language = translate.language;
 
 const getAll = async (req, res) => {
   try {
-    const users = await customers.getCustomers(req.headers['x-ogust-token'], req.query.status || 'A', req.query.nature || 'S', req.query.nbperpage || 50, req.query.pagenum || 1);
+    const users = await customers.getCustomers(req.headers['x-ogust-token'], req.query.status || 'A', req.query.nbperpage || 50, req.query.pagenum || 1);
     if (users.body.status == 'KO') {
       res.status(400).json({ success: false, message: users.body.message });
       // throw new Error(`Error while getting employees: ${result.body.message}`);
@@ -78,8 +78,28 @@ const getCustomerServices = async (req, res) => {
   }
 };
 
+const getThirdPartyInformation = async (req, res) => {
+  try {
+    if (!req.params.id) {
+      return res.status(400).json({ success: false, message: translate[language].missingParameters });
+    }
+    const thirdPartyInfos = await customers.getThirdPartyInformationByCustomerId(req.headers['x-ogust-token'], req.params.id, req.query.third_party || 'C', req.query.nbperpage || 10, req.query.pagenum || 1);
+    if (thirdPartyInfos.body.status == 'KO') {
+      res.status(400).json({ success: false, message: thirdPartyInfos.body.message });
+    } else if (thirdPartyInfos.length === 0) {
+      res.status(404).json({ success: false, message: translate[language].thirdPartyInfoNotFound });
+    } else {
+      res.status(200).json({ success: true, message: translate[language].thirdPartyInfoFound, data: { user: thirdPartyInfos.body } });
+    }
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ success: false, message: translate[language].unexpectedBehavior });
+  }
+};
+
 module.exports = {
   getAll,
   getById,
-  getCustomerServices
+  getCustomerServices,
+  getThirdPartyInformation
 };

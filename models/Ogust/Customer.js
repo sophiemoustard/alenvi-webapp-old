@@ -11,11 +11,11 @@ const { getIntervalInRange } = require('../../helpers/intervalInRange');
 ** - nature: customer nature
 ** Method: POST
 */
-exports.getCustomers = async (token, status, nature, nbperpage, pagenum) => {
+exports.getCustomers = async (token, status, nbperpage, pagenum) => {
   const options = {
     url: `${Ogust.API_LINK}searchCustomer`,
     json: true,
-    body: { token, status, nature, nbperpage, pagenum },
+    body: { token, status, nbperpage, pagenum },
     resolveWithFullResponse: true,
     time: true,
   };
@@ -35,7 +35,7 @@ exports.getCustomerById = async (token, id, status) => {
   const options = {
     url: `${Ogust.API_LINK}getCustomer`,
     json: true,
-    body: { token, id_employee: id, status },
+    body: { token, id_customer: id, status },
     resolveWithFullResponse: true,
     time: true,
   };
@@ -43,57 +43,31 @@ exports.getCustomerById = async (token, id, status) => {
   return result;
 };
 
-
-/*
-** Get a customer by customer id
-** PARAMS:
-** - token: token after login
-** - id: customer id
-** Method: POST
-*/
-exports.getCustomerByCustomerId = async (token, id) => {
-  const options = {
-    url: `${Ogust.API_LINK}getCustomer`,
-    json: true,
-    body: {
-      token,
-      id_customer: id,
-    },
-    resolveWithFullResponse: true,
-    time: true,
-  };
-  const res = await rp.post(options);
-  return res;
-};
-
-exports.getThirdPartyInformationsByCustomerId = async (token, id, pageOption) => {
+exports.getThirdPartyInformationByCustomerId = async (token, id, third_party, nbperpage, pagenum) => {
   const options = {
     url: `${Ogust.API_LINK}getThirdPartyInformations`,
     json: true,
     body: {
       token,
-      nbperpage: pageOption.nbPerPage,
-      pagenum: pageOption.pageNum,
-      third_party: 'C',
+      nbperpage,
+      pagenum,
+      third_party,
       third_party_id: id,
     },
     resolveWithFullResponse: true,
     time: true,
   };
   const res = await rp.post(options);
-  if (res.body.status == 'KO') {
-    throw new Error(`Error while getting third party info by customer by id: ${res.body.message}`);
-  }
   return res;
 };
 
-exports.getThirdPartyInformationsByCustomerId = async (token, id, arrayValues) => {
+exports.editThirdPartyInformationByCustomerId = async (token, id, third_party, arrayValues) => {
   const options = {
     url: `${Ogust.API_LINK}setThirdPartyInformations`,
     json: true,
     body: {
       token,
-      third_party: 'C',
+      third_party,
       third_party_id: id,
       array_values: arrayValues
     },
@@ -101,9 +75,6 @@ exports.getThirdPartyInformationsByCustomerId = async (token, id, arrayValues) =
     time: true,
   };
   const res = await rp.post(options);
-  if (res.body.status == 'KO') {
-    throw new Error(`Error while editing third party info by customer by id: ${res.body.message}`);
-  }
   return res;
 };
 
