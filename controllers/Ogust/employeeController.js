@@ -148,4 +148,23 @@ const getEmployeeCustomers = async (req, res) => {
   }
 };
 
-module.exports = { getAll, getById, getAllBySector, getEmployeeServices, getEmployeeCustomers };
+const getEmployeeSalaries = async (req, res) => {
+  try {
+    if (!req.params.id) {
+      return res.status(400).json({ success: false, message: translate[language].missingParameters });
+    }
+    const salariesRaw = await employees.getSalaries(req.headers['x-ogust-token'], req.params.id, req.query.nbPerPage || '24', req.query.pageNum || '1');
+    if (salariesRaw.body.status == 'KO') {
+      res.status(400).json({ success: false, message: salariesRaw.body.message });
+    } else if (salariesRaw.length === 0) {
+      res.status(404).json({ success: false, message: translate[language].salariesNotFound });
+    } else {
+      res.status(200).json({ success: true, message: translate[language].salariesFound, data: { salaries: salariesRaw.body } });
+    }
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ success: false, message: translate[language].unexpectedBehavior });
+  }
+};
+
+module.exports = { getAll, getById, getAllBySector, getEmployeeServices, getEmployeeCustomers, getEmployeeSalaries };

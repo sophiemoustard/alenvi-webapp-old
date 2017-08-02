@@ -32,6 +32,7 @@ router.get('/employees/sector/:sector', employeeController.getAllBySector);
 router.get('/employees/:id', employeeController.getById);
 router.get('/employees/:id/services', employeeController.getEmployeeServices);
 router.get('/employees/:id/customers', employeeController.getEmployeeCustomers);
+router.get('/employees/:id/salaries', employeeController.getEmployeeSalaries);
 
 router.get('/customers', customerController.getAll);
 router.get('/customers/:id', customerController.getById);

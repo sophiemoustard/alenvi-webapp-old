@@ -32,7 +32,9 @@ module.exports = {
     serviceNotFound: 'Ogust Service not found.',
     thirdPartyInfoNotFound: 'Ogust third party information not found.',
     thirdPartyInfoFound: 'Ogust third party information retrieving failed.',
-    thirdPartyInfoEdited: 'Ogust third party information edited successully.'
+    thirdPartyInfoEdited: 'Ogust third party information edited successully.',
+    salariesNotFound: 'Ogust employee\'s salaries not found.',
+    salariesFound: 'Ogust employee\'s found.'
   },
   'fr-FR': {
     /* Global errors */
@@ -66,6 +68,8 @@ module.exports = {
     serviceNotFound: 'Service Ogust non trouvé.',
     thirdPartyInfoNotFound: 'La récupération des informations tierse a échoué.',
     thirdPartyInfoFound: 'Informations tierse récupérées avec succès.',
-    thirdPartyInfoEdited: 'Informations tierse éditées avec succès.'
+    thirdPartyInfoEdited: 'Informations tierse éditées avec succès.',
+    salariesNotFound: 'Echec lors de la récupération des bulletins de salaire de l\'employé.',
+    salariesFound: 'Bulletins de salaire de l\'employé trouvés avec succès.'
   }
 };

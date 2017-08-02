@@ -110,3 +110,29 @@ exports.getServices = async (token, id, isRange, isDate, slotToSub, slotToAdd, i
   const res = await rp.post(options);
   return res;
 };
+
+/*
+** Get salaries by employee id
+** PARAMS:
+** - token: token after login
+** - id: employee id
+** - nbPerPage: X (number of results returned per pages)
+** - pageNum: Y (number of pages)
+** METHOD: POST
+*/
+exports.getSalaries = async (token, id, nbperpage, pagenum) => {
+  const options = {
+    url: `${Ogust.API_LINK}searchSalary`,
+    json: true,
+    body: {
+      token,
+      id_employee: id,
+      nbperpage,
+      pagenum,
+    },
+    resolveWithFullResponse: true,
+    time: true,
+  };
+  const res = await rp.post(options);
+  return res;
+};
