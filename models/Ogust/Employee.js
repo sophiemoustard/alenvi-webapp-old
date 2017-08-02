@@ -93,6 +93,7 @@ exports.getServices = async (token, id, isRange, isDate, slotToSub, slotToAdd, i
     interval.intervalBwd = parseInt(startDate, 10);
     interval.intervalFwd = parseInt(endDate, 10);
   }
+  console.log(interval);
   const options = {
     url: `${Ogust.API_LINK}searchService`,
     json: true,

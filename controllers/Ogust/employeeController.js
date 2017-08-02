@@ -1,5 +1,8 @@
 const translate = require('../../helpers/translate');
 const employees = require('../../models/Ogust/Employee');
+const customers = require('../../models/Ogust/Customer');
+
+const _ = require('lodash');
 
 const language = translate.language;
 
@@ -66,8 +69,8 @@ const getEmployeeServices = async (req, res) => {
       servicesRaw = await employees.getServices(
         req.headers['x-ogust-token'],
         req.params.id,
-        req.query.isRange || false,
-        req.query.isDate || false,
+        req.query.isRange || 'false',
+        req.query.isDate || 'false',
         req.query.slotToSub || '',
         req.query.slotToAdd || '',
         req.query.intervalType || '',
@@ -94,4 +97,55 @@ const getEmployeeServices = async (req, res) => {
   }
 };
 
-module.exports = { getAll, getById, getAllBySector, getEmployeeServices };
+const getEmployeeCustomers = async (req, res) => {
+  try {
+    if (!req.params.id) {
+      return res.status(400).json({ success: false, message: translate[language].missingParameters });
+    }
+    console.log(req.params);
+    // First we get services from Ogust by employee Id in a specific range
+    const servicesInFourWeeks = await employees.getServices(
+      req.headers['x-ogust-token'],
+      req.params.id, 'true', 'false', 2, 2, 'week', '', '',
+      req.query.status || '@!=|N',
+      req.query.type || 'I',
+      req.query.nbPerPage || '500',
+      req.query.pageNum || '1'
+    );
+    if (servicesInFourWeeks.body.status == 'KO') {
+      return res.status(400).json({ success: false, message: servicesInFourWeeks.body.message });
+    }
+    // Put it in a variable so it's more readable
+    const servicesRawObj = servicesInFourWeeks.body.array_service.result;
+    if (Object.keys(servicesRawObj).length === 0) {
+      // "Il semble que tu n'qies aucune intervention de prévues d'ici 2 semaines !"
+      return res.status(404).json({ success: false, message: translate[language].servicesNotFound });
+    }
+    // Transform this services object into an array, then pop all duplicates by id_customer
+    const servicesUniqCustomers = _.uniqBy(_.values(servicesRawObj), 'id_customer');
+    // Get only id_customer properties (without '0' id_customer)
+    const uniqCustomers = servicesUniqCustomers.filter(
+      (service) => {
+        if (service.id_customer != 0 && service.id_customer != '271395715'
+        && service.id_customer != '244566438' && service.id_customer != '286871430') {
+          // Not Reunion Alenvi please
+          return service;
+        }
+      }
+    ).map(service => service.id_customer); // Put it in array of id_customer
+    const myRawCustomers = [];
+    for (let i = 0; i < uniqCustomers.length; i++) {
+      const customerRaw = await customers.getCustomerById(req.headers['x-ogust-token'], uniqCustomers[i], req.query.status || 'A');
+      if (customerRaw.body.status == 'KO') {
+        return res.status(400).json({ success: false, message: customerRaw.body.message });
+      }
+      myRawCustomers.push(customerRaw.body.customer);
+    }
+    res.status(200).json({ success: true, message: translate[language].userShowAllFound, data: { customers: myRawCustomers } });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ success: false, message: translate[language].unexpectedBehavior });
+  }
+};
+
+module.exports = { getAll, getById, getAllBySector, getEmployeeServices, getEmployeeCustomers };
