@@ -18,39 +18,39 @@
 <body>
 	<div class="container">
 		<div class="row aligner">
-			<div class="col-sm-6 col-md-4 col-lg-6">
+			<div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
 				<div class="well bs-component">
-					<form>
+					<form id="customerInfo">
 						<fieldset>
 							<legend class="text-center">Editer bénéficiaires</legend>
 
 							<!--Body-->
 							<div class="form-group">
-								<label for="form" class="control-label">Pathologie</label>
-								<select class="form-control" id="form">
-									<option value="-" selected>-</option>
+								<label for="pathology" class="control-label">Pathologie</label>
+								<select class="form-control" id="pathology">
+									<option value="-">-</option>
 									<option value="Alzheimer">Alzheimer</option>
 									<option value="Parkinson">Parkinson</option>
 									<option value="Corps de Lewy">Corps de Lewy</option>
 									<option value="Autres troubles cognitifs">Autres troubles cognitifs</option>
 									<option value="AVC récent">AVC récent</option>
-									<option value="Autres">Autres</option>
+									<option value="Autre">Autre</option>
 								</select>
 							</div>
 
-							<div class="form-group label-floating">
-								<label for="form1" class="control-label">Commentaires</label>
-								<textarea type="text" id="form1" class="form-control"></textarea>
+							<div class="form-group">
+								<label for="comments" class="control-label">Commentaires</label>
+								<textarea rows="7" type="text" id="comments" class="form-control"></textarea>
 							</div>
 
-							<div class="form-group label-floating">
-								<label for="form2" class="control-label">Détails interventions</label>
-								<textarea type="text" id="form2" class="form-control"></textarea>
+							<div class="form-group">
+								<label for="interventionDetails" class="control-label">Détails interventions</label>
+								<textarea rows="7" type="text" id="interventionDetails" class="form-control"></textarea>
 							</div>
 
-							<div class="form-group label-floating">
-								<label for="form3" class="control-label">Autres</label>
-								<textarea type="text" id="form3" class="form-control"></textarea>
+							<div class="form-group">
+								<label for="misc" class="control-label">Autres</label>
+								<textarea type="text" id="misc" class="form-control"></textarea>
 							</div>
 						</fieldset>
 						<div class="text-center">
@@ -67,25 +67,26 @@
 	<script src="/scripts/material.min.js"></script>
 	<script src="/scripts/ripples.min.js"></script>
 	<script src="/scripts/getUrlParameter.js"></script>
+	<script src="/scripts/getCustomerInfo.js"></script>
 	<script>
-		let id_customer = getUrlParameter('id_customer');
-		console.log('ID_CUSTOMER = ' + id_customer);
+		// function continueClicked() {
+		// 	var email = document.getElementById('inputEmail').value;
+		// 	var password = document.getElementById('inputPassword').value;
+		// 	var newLocation = '/api/bot/authorize' + window.location.search;
+		// 	if (window.location.search) {
+		// 		newLocation += '&';
+		// 	} else {
+		// 		newLocation += '?';
+		// 	}
+		// 	window.location = newLocation + 'email=' + email + '&password=' + password;
+		// 	return false;
+		// };
 
-		function continueClicked() {
-			var email = document.getElementById('inputEmail').value;
-			var password = document.getElementById('inputPassword').value;
-			var newLocation = '/api/bot/authorize' + window.location.search;
-			if (window.location.search) {
-				newLocation += '&';
-			} else {
-				newLocation += '?';
-			}
-			window.location = newLocation + 'email=' + email + '&password=' + password;
-			return false;
-		};
-
-		$(function() {
+		// get Customer info from alenvi webapp api
+		$(document).ready(function() {
+			// init bootstrap material design
 			$.material.init();
+			getToken(_id).then(getOgustToken).then(getCustomerInfo).then(fillForm);
 		});
 	</script>
 </body>
