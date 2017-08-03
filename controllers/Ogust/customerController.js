@@ -89,7 +89,7 @@ const getThirdPartyInformation = async (req, res) => {
     } else if (thirdPartyInfos.length === 0) {
       res.status(404).json({ success: false, message: translate[language].thirdPartyInfoNotFound });
     } else {
-      res.status(200).json({ success: true, message: translate[language].thirdPartyInfoFound, data: { user: thirdPartyInfos.body } });
+      res.status(200).json({ success: true, message: translate[language].thirdPartyInfoFound, data: { info: thirdPartyInfos.body } });
     }
   } catch (e) {
     console.error(e);
