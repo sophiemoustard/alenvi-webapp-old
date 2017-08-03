@@ -41,7 +41,7 @@ function getCustomerInfo(rawOgustToken) {
 
 function fillForm(rawData) {
   console.log(rawData);
-  const data = rawData.data.user.thirdPartyInformations.array_values;
+  const data = rawData.data.info.thirdPartyInformations.array_values;
   const correspTable = {
     NIVEAU: 'pathology',
     COMMNIV: 'comments',
