@@ -7,7 +7,7 @@ exports.checkOgustToken = (req, res, next) => {
   const token = req.headers['x-ogust-token'];
   // if there is no token
   if (!token) {
-    res.status(401).json({ success: false, message: translate[language].tokenNotFound });
+    return res.status(401).json({ success: false, message: translate[language].tokenNotFound });
   }
   next();
 };

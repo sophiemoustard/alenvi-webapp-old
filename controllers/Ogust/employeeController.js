@@ -71,15 +71,11 @@ const getEmployeeServices = async (req, res) => {
         req.params.id,
         req.query.isRange || 'false',
         req.query.isDate || 'false',
-        req.query.slotToSub || '',
-        req.query.slotToAdd || '',
-        req.query.intervalType || '',
-        req.query.startDate || '',
-        req.query.endDate || '',
+        req.query.slotToSub || '', req.query.slotToAdd || '', req.query.intervalType || '',
+        req.query.startDate || '', req.query.endDate || '',
         req.query.status || '@!=|N',
         req.query.type || 'I',
-        req.query.nbPerPage || '100',
-        req.query.pageNum || '1'
+        req.query.nbPerPage || '100', req.query.pageNum || '1'
       );
     } else {
       return res.status(400).json({ success: false, message: translate[language].missingParameters });
@@ -102,7 +98,6 @@ const getEmployeeCustomers = async (req, res) => {
     if (!req.params.id) {
       return res.status(400).json({ success: false, message: translate[language].missingParameters });
     }
-    console.log(req.params);
     // First we get services from Ogust by employee Id in a specific range
     const servicesInFourWeeks = await employees.getServices(
       req.headers['x-ogust-token'],
