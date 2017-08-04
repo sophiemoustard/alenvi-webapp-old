@@ -103,9 +103,14 @@ const editThirdPartyInformation = async (req, res) => {
       return res.status(400).json({ success: false, message: translate[language].missingParameters });
     }
     const thirdPartyInfos = await customers.editThirdPartyInformationByCustomerId(req.headers['x-ogust-token'], req.params.id, req.query.third_party || 'C', req.body.arrayValues);
+    console.log(thirdPartyInfos.body);
     if (thirdPartyInfos.body.status == 'KO') {
       res.status(400).json({ success: false, message: thirdPartyInfos.body.message });
     } else {
+      if (req.query.address) {
+        const redirectUri = `${process.env.BOT_HOSTNAME}/editCustomerDone$?address=${req.query.address}`;
+        return res.status(302).redirect(redirectUri);
+      }
       res.status(200).json({ success: true, message: translate[language].thirdPartyInfoEdited, data: { user: thirdPartyInfos.body } });
     }
   } catch (e) {

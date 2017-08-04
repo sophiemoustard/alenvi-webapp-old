@@ -54,7 +54,7 @@
 							</div>
 						</fieldset>
 						<div class="text-center">
-							<a class="btn btn-raised btn-primary">Send</a>
+							<button type="submit" class="btn btn-raised btn-primary">Envoyer</button>
 							<div class="ripple-container"></div>
 						</div>
 					</form>
@@ -69,26 +69,22 @@
 	<script src="/scripts/getUrlParameter.js"></script>
 	<script src="/scripts/getCustomerInfo.js"></script>
 	<script>
-		// function continueClicked() {
-		// 	var email = document.getElementById('inputEmail').value;
-		// 	var password = document.getElementById('inputPassword').value;
-		// 	var newLocation = '/api/bot/authorize' + window.location.search;
-		// 	if (window.location.search) {
-		// 		newLocation += '&';
-		// 	} else {
-		// 		newLocation += '?';
-		// 	}
-		// 	window.location = newLocation + 'email=' + email + '&password=' + password;
-		// 	return false;
-		// };
-
-		// get Customer info from alenvi webapp api
 		$(document).ready(function() {
 			// init bootstrap material design
 			$.material.init();
+
+		// get Customer info from alenvi webapp api
 			getToken(_id).then(getOgustToken).then(getCustomerInfo).then(fillForm);
+
+			// edit customer info
+			$('#customerInfo').submit(function(evt) {
+
+
+			getToken(_id).then(getOgustToken).then(editCustomerInfo);
+				evt.preventDefault();
+				// window.close();
+			});
 		});
 	</script>
 </body>
-
 </html>
