@@ -6,7 +6,7 @@ console.log('_ID = ' + _id);
 console.log('ADDRESS= ' + address);
 
 function getToken(id) {
-  let url = location.protocol + '//' + location.hostname + ':' + location.port + '/api/ogust/tests/token/' + id;
+  let url = location.protocol + '//' + location.hostname + '/api/ogust/tests/token/' + id;
   return $.ajax({
     type: 'GET',
     url: url,
@@ -16,7 +16,7 @@ function getToken(id) {
 
 function getOgustToken(rawToken) {
   const token = rawToken.data.token;
-  let url = location.protocol + '//' + location.hostname + ':' + location.port + '/api/ogust/token';
+  let url = location.protocol + '//' + location.hostname + '/api/ogust/token';
   console.log(url);
   return $.ajax({
     type: 'GET',
@@ -30,7 +30,7 @@ function getOgustToken(rawToken) {
 
 function getCustomerInfo(rawOgustToken) {
   const ogustToken = rawOgustToken.data.token;
-  let url = location.protocol + '//' + location.hostname + ':' + location.port + '/api/ogust/customers/' + id_customer + '/moreInfo';
+  let url = location.protocol + '//' + location.hostname + '/api/ogust/customers/' + id_customer + '/moreInfo';
   return $.ajax({
     type: 'GET',
     url: url,
@@ -54,8 +54,8 @@ function editCustomerInfo(rawOgustToken) {
   for (const k in infoTitles) {
     data.arrayValues[infoTitles[k]] = $('#' + k).val();
   }
-  let url = location.protocol + '//' + location.hostname + ':' + location.port + '/api/ogust/customers/' + id_customer + '/moreInfo';
-  url = address ? url + '&' + address : url;
+  // const encodedAddress = encodeURIComponent(JSON.stringify(address));
+  let url = location.protocol + '//' + location.hostname + '/api/ogust/customers/' + id_customer + '/moreInfo?address=' + address;
   console.log(url);
   return $.ajax({
     type: 'PUT',
