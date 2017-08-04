@@ -107,8 +107,18 @@ const editThirdPartyInformation = async (req, res) => {
       res.status(400).json({ success: false, message: thirdPartyInfos.body.message });
     } else {
       if (req.query.address) {
-        const redirectUri = `${process.env.BOT_HOSTNAME}/editCustomerDone$?address=${req.query.address}`;
-        return res.status(302).redirect(redirectUri);
+        const address = encodeURIComponent(req.query.address);
+        const uri = `${process.env.BOT_HOSTNAME}/editCustomerDone?address=${address}`;
+        const rp = require('request-promise');
+        const request = async (url) => {
+          const options = {
+            url,
+            resolveWithFullResponse: true,
+            time: true,
+          };
+          const result = await rp.get(options);
+        };
+        request(uri);
       }
       res.status(200).json({ success: true, message: translate[language].thirdPartyInfoEdited, data: { user: thirdPartyInfos.body } });
     }
