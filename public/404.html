@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>404</title>
+	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<link rel="stylesheet" href="/stylesheets/bootstrap-material-design.min.css">
+	<link rel="stylesheet" href="/stylesheets/ripples.min.css">
+	<link rel="stylesheet" href="/stylesheets/404.css">
+</head>
+
+<body>
+
+  <div class="nb-error">
+        <div class="error-code">404</div>
+        <h3 class="font-bold">Nous n'avons pas pu trouver la page...</h3>
+
+        <div class="error-desc">
+            Désole, mais la page que vous recherchez n'a pas été trouvé ou n'existe pas.<br />
+            Essayez de rafraichir la page ou cliquez sur le bouton ci-dessous pour retourner sur la page principale.
+            <!-- <div class="input-group">
+              <input type="text" placeholder="Try with a search" class="form-control">
+              <span class="input-group-btn">
+                 <button type="button" class="btn btn-default">
+                    <em class="fa fa-search"></em>
+                 </button>
+              </span>
+           </div> -->
+           <ul class="list-inline text-center text-sm">
+             <!-- <li class="list-inline-item"><a href="http://nextbootstrap.com" class="text-muted">Go to App</a>
+             </li> --><br />
+             <li class="list-inline-item"><a href="https://alenvi-webapp-dev.herokuapp.com/account_linking.html" class="text-muted">Login</a>
+             </li>
+             <!-- <li class="list-inline-item"><a href="http://nextbootstrap.com" class="text-muted">Register</a>
+             </li> -->
+          </ul>
+          <div class="text-center">
+            <span>©</span>
+            <span>2017</span>
+            <span>-</span>
+            <span>Alenvi</span>
+            <br>
+            <span>Pierre HOFMAN</span>
+         </div>
+        </div>
+    </div>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	<script src="/scripts/material.min.js"></script>
+	<script src="/scripts/ripples.min.js"></script>
+	<script>
+		function continueClicked() {
+			var email = document.getElementById('inputEmail').value;
+			var password = document.getElementById('inputPassword').value;
+			var newLocation = '/api/bot/authorize' + window.location.search;
+			if (window.location.search) {
+				newLocation += '&';
+			} else {
+				newLocation += '?';
+			}
+			window.location = newLocation + 'email=' + email + '&password=' + password;
+			return false;
+		};
+		$(function() {
+			$.material.init();
+		});
+	</script>
+</body>
+
+</html>

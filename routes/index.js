@@ -17,7 +17,13 @@ router.get('/login', function(req, res, next) {
 
 /* Allows to couple rendering files routing (Angular, Vue...) routing */
 router.all('*', function(req, res, next) {
-  res.sendFile(path.join(__dirname + '/../public/index.html'));
+  // res.sendFile(path.join(__dirname + '/../public/index.html'));
+  if (req.accepts('html')) {
+    res.status(404);
+    res.sendFile(path.join(__dirname + '/../public/404.html'));
+  } else {
+    res.status(404).send('404 error page not found');
+  }
 });
 
 module.exports = router;
