@@ -82,26 +82,25 @@
 			$('.form-control').attr('disabled', 'disabled');
 			$('#submit').attr('disabled', 'disabled');
 
-		// get Customer info from alenvi webapp api
-		getToken(_id)
-		.then(getOgustToken)
-		.then(getCustomerInfo)
-		.then(fillForm)
-		.done(function() {
-			console.log('Data loaded.');
-			$('.form-control').removeAttr('disabled');
-			$('#submit').removeAttr('disabled');
-		}).fail(handleError);
+			// get Customer info from alenvi webapp api
+			getToken(_id)
+			.then(getOgustToken)
+			.then(getCustomerInfo)
+			.then(fillForm)
+			.done(function() {
+				console.log('Data loaded.');
+				$('.form-control').removeAttr('disabled');
+				$('#submit').removeAttr('disabled');
+			}).fail(handleError);
 
 			// edit customer info
 			$('#customerInfo').submit(function(evt) {
 
-
-				const edit = getToken(_id).then(getOgustToken).then(editCustomerInfo);
-				edit.done(function() {
-
-				})
 				evt.preventDefault();
+
+				getToken(_id)
+				.then(getOgustToken)
+				.then(editCustomerInfo);
 				// window.close();
 			});
 		});
