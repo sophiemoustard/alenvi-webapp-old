@@ -83,8 +83,8 @@
 			$('#submit').attr('disabled', 'disabled');
 
 			// get Customer info from alenvi webapp api
-			getToken(_id)
-			.then(getOgustToken)
+			// getToken(_id)
+			getOgustToken(token)
 			.then(getCustomerInfo)
 			.then(fillForm)
 			.done(function() {
@@ -98,8 +98,8 @@
 
 				evt.preventDefault();
 
-				getToken(_id)
-				.then(getOgustToken)
+				// getToken(_id)
+				getOgustToken(token)
 				.then(editCustomerInfo);
 				// window.close();
 			});

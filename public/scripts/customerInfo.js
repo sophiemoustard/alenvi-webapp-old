@@ -1,18 +1,19 @@
 let id_customer = getUrlParameter('id_customer');
 let _id = getUrlParameter('_id');
 let address = getUrlParameter('address');
+let token = getUrlParameter('access-token');
 
-function getToken(id) {
-  let url = location.protocol + '//' + location.hostname + '/api/ogust/tests/token/' + id;
-  return $.ajax({
-    type: 'GET',
-    url: url,
-    dataType: 'json',
-  });
-}
+// function getToken(id) {
+//   let url = location.protocol + '//' + location.hostname + '/api/ogust/tests/token/' + id;
+//   return $.ajax({
+//     type: 'GET',
+//     url: url,
+//     dataType: 'json',
+//   });
+// }
 
-function getOgustToken(rawToken) {
-  const token = rawToken.data.token;
+function getOgustToken(token) {
+  // const token = rawToken.data.token;
   let url = location.protocol + '//' + location.hostname + '/api/ogust/token';
   return $.ajax({
     type: 'GET',
