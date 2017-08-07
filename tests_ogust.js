@@ -1,12 +1,12 @@
-"use strict";
+require('dotenv').config();
 
 const moment = require('moment');
 const crypto = require('crypto');
 const rp = require('request-promise');
 
 const API_LINK = "https://my.ogust.com/api/v2/apiogust.php?method=";
-const PUBLIC_KEY = "24994193332347792252";
-const PRIVATE_KEY = "70D6D865FF2F7671";
+const PUBLIC_KEY = process.env.OGUST_PUBLIC_KEY;
+const PRIVATE_KEY = process.env.OGUST_PRIVATE_KEY;
 
 /*
 ** Get a date interval using range array and interval type

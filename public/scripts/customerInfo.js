@@ -1,9 +1,6 @@
 let id_customer = getUrlParameter('id_customer');
 let _id = getUrlParameter('_id');
 let address = getUrlParameter('address');
-console.log('ID_CUSTOMER = ' + id_customer);
-console.log('_ID = ' + _id);
-console.log('ADDRESS= ' + address);
 
 function getToken(id) {
   let url = location.protocol + '//' + location.hostname + '/api/ogust/tests/token/' + id;
@@ -17,7 +14,6 @@ function getToken(id) {
 function getOgustToken(rawToken) {
   const token = rawToken.data.token;
   let url = location.protocol + '//' + location.hostname + '/api/ogust/token';
-  console.log(url);
   return $.ajax({
     type: 'GET',
     url: url,
@@ -56,7 +52,6 @@ function editCustomerInfo(rawOgustToken) {
   }
   // const encodedAddress = encodeURIComponent(JSON.stringify(address));
   let url = location.protocol + '//' + location.hostname + '/api/ogust/customers/' + id_customer + '/moreInfo?address=' + address;
-  console.log(url);
   return $.ajax({
     type: 'PUT',
     url: url,
@@ -70,7 +65,6 @@ function editCustomerInfo(rawOgustToken) {
 }
 
 function fillForm(rawData) {
-  console.log(rawData);
   const data = rawData.data.info.thirdPartyInformations.array_values;
   const correspTable = {
     NIVEAU: 'pathology',

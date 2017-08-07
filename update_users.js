@@ -1,3 +1,4 @@
+require('dotenv').config();
 require('./config/mongoose');
 
 const moment = require('moment');
@@ -9,8 +10,8 @@ const _ = require('lodash');
 const User = require('./models/User');
 
 const API_LINK = 'https://my.ogust.com/api/v2/apiogust.php?method=';
-const PUBLIC_KEY = '24994193332347792252';
-const PRIVATE_KEY = '70D6D865FF2F7671';
+const PUBLIC_KEY = process.env.OGUST_PUBLIC_KEY;
+const PRIVATE_KEY = process.env.OGUST_PRIVATE_KEY;
 
 const getToken = async () => {
   const dateTime = new moment();
