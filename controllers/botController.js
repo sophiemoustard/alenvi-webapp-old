@@ -11,27 +11,27 @@ const language = translate.language;
 module.exports = {
   authorize: (req, res) => {
     if (!req.query.email || !req.query.password) {
-      return res.send(`Erreur: ${translate[language].missingParameters}`);
+      return res.status(400).send(`Erreur: ${translate[language].missingParameters}`);
       // return response.error(res, 400, translate[language].missingParameters);
     }
     if (!req.query && !req.query.redirect_uri) {
-      return res.send(`Erreur: ${translate[language].missingParameters}`);
+      return res.status(400).send(`Erreur: ${translate[language].missingParameters}`);
       // return response.error(res, 400, translate[language].missingParameters);
     }
     // Get by local email
     User.findOne({ 'local.email': req.query.email }, (err, user) => {
       if (err) {
-        return res.send(`Erreur: ${translate[language].unexpectedBehavior}`);
+        return res.status(500).send(`Erreur: ${translate[language].unexpectedBehavior}`);
         // return response.error(res, 500, translate[language].unexpectedBehavior);
       }
       if (!user) {
-        return res.send(`Erreur: ${translate[language].userAuthNotFound}`);
+        return res.status(404).send(`Erreur: ${translate[language].userAuthNotFound}`);
         // return response.error(res, 404, translate[language].userAuthNotFound);
       }
       // check if password matches
       bcrypt.compare(req.query.password, user.local.password, (error, isMatch) => {
         if (error || !isMatch) {
-          return res.send(`Erreur: ${translate[language].userAuthFailed}`);
+          return res.status(401).send(`Erreur: ${translate[language].userAuthFailed}`);
           // return response.error(res, 401, translate[language].userAuthFailed);
         }
         const payload = {
