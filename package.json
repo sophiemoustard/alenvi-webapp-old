@@ -6,12 +6,14 @@
   "author": "Pierre HOFMAN",
   "scripts": {
     "start": "node ./bin/www",
+    "doc": "apidoc -i routes/ -o apidoc/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {
     "node": "7.10.0"
   },
   "dependencies": {
+    "apidoc": "^0.17.6",
     "bcrypt": "^1.0.2",
     "body-parser": "~1.17.1",
     "cookie-parser": "~1.4.3",
@@ -38,5 +40,10 @@
     "eslint": "^4.0.0",
     "eslint-config-airbnb-base": "^11.2.0",
     "eslint-plugin-import": "^2.3.0"
-  }
+  },
+  "apidoc": {
+        "name": "Alenvi webapp API",
+        "version": "1.0.0",
+        "description": "Documentation of Alenvi's webapp API"
+    }
 }
