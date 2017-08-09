@@ -1,0 +1,183 @@
+/* API DOCUMENTATION for apidoc.js - Users */
+/**
+ * @api {post} /api/users/authenticate Authenticate an User
+ * @apiPermission none
+ * @apiName authenticate
+ * @apiGroup User
+ *
+ * @apiParam {String} email Email of the User.
+ * @apiParam {String} password Password of the User.
+ *
+ * @apiSuccess {Boolean} success Return true on success.
+ * @apiSuccess {String} message Human readable message to display for clients.
+ * @apiSuccess {Object} data User token with expiration and information
+ * @apiSuccess {String} data.token User token
+ * @apiSuccess {Object} data.user User information
+ * @apiSuccess {String} data.user._id User id
+ * @apiSuccess {String} data.user.updatedAt User update date
+ * @apiSuccess {String} data.user.createdAt User creation date
+ * @apiSuccess {String} data.user.firstname User firstname
+ * @apiSuccess {String} data.user.lastname User lastname
+ * @apiSuccess {String} data.user.employee_id User Ogust id
+ * @apiSuccess {String} data.user.sector User Ogust sector
+ * @apiSuccess {String} data.user.__v Internal revision of document set by Mongoose
+ * @apiSuccess {String} data.user.role User role
+ * @apiSuccess {Object} data.user.local User local information
+ * @apiSuccess {String} data.user.local.email User local email
+ * @apiSuccess {String} data.user.local.password User local password
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *    {
+ *      "success": true,
+ *      "message": "User authenticated successfully.",
+ *      "data": {
+ *                  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmaXJzdG5hbWUiOiJBZG1pbiIsImxhc3RuYW1lIjoiQWRtaW4iLCJfaWQiOiI1OTQ3ZDhlZDgyZWI2NzliZTQ4NTJkNjciLCJsb2NhbC5lbWFpbCI6ImFkbWluQGFsZW52aS5pbyIsInJvbGUiOiJhZG1pbiIsImVtcGxveWVlX2lkIjoxLCJzZWN0b3IiOiIqIiwiaWF0IjoxNTAyMjY3OTc3LCJleHAiOjE1MDIzNTQzNzd9.hgunCJnGMNAmHbqxvEU4Rk0iNm-j6fXRDbuHNGyaNmE",
+ *        "user": {
+ *            "_id": "5997d8ed85eg679be4852v67",
+ *            "updatedAt": "2017-06-19T14:00:13.733Z",
+ *            "createdAt": "2017-06-19T14:00:13.733Z",
+ *            "firstname": "Jean",
+ *            "lastname": "Dupont",
+ *            "employee_id": 97,
+ *            "sector": "*",
+ *            "__v": 0,
+ *            "role": "admin",
+ *            "local": {
+ *                "email": "jean.dupont@alenvi.io",
+ *                "password": "$2a$10$Rar57oH9pewhd/93tyT6f.O5cgiASa.h2msVsCwPn8q/R2mm6LHoS"
+ *            }
+ *        }
+ *      }
+ *     }
+ *
+ * @apiUse MissingParametersError
+ * @apiUse UnexpectedBehaviorError
+ * @apiUse UserAuthNotFoundError
+ * @apiUse UserAuthFailedError
+ */
+
+/**
+ * @api {get} /api/users/ Retrieve all users
+ * @apiPermission User
+ * @apiName showAll
+ * @apiGroup User
+ *
+ * @apiHeader {String} x-access-token User access-token from Alenvi
+ *
+ * @apiSuccess {Boolean} success Return true on success.
+ * @apiSuccess {String} message Human readable message to display for clients.
+ * @apiSuccess {Object} data List of all users.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *         "success": true,
+ *         "message": "Utilisateurs trouvés avec succès.",
+ *         "data": {
+ *             "users": [
+ *                 {
+ *                     "_id": "5842k1aeff6r07ce01405642",
+ *                     "__v": 0,
+ *                     "createdAt": "2017-06-19T13:29:16.872Z",
+ *                     "sector": "1m*",
+ *                     "lastname": "Doe",
+ *                     "firstname": "John",
+ *                     "updatedAt": "2017-06-21T00:25:21.537Z",
+ *                     "employee_id": 497607720,
+ *                     "role": "auxiliary",
+ *                     "facebook": {
+ *                         "facebookId": "304018628931254"
+ *                     },
+ *                     "local": {
+ *                         "email": "john.doe@gmail.com",
+ *                         "password": "$3a$10$Qgzj3i6xazSuxslbK6YKn.Cdrptm6esqkldDyAyMznqLlg/YUsIbG"
+ *                     }
+ *                 },
+ *                 {
+ *                       "_id": "6842k1aefm6r07ce01405647",
+ *                     "__v": 0,
+ *                     "createdAt": "2017-06-19T13:29:16.872Z",
+ *                     "sector": "1m*",
+ *                     "lastname": "Doe",
+ *                     "firstname": "Jane",
+ *                     "updatedAt": "2017-06-21T00:25:21.537Z",
+ *                     "employee_id": 497607720,
+ *                     "role": "auxiliary",
+ *                     "facebook": {
+ *                         "facebookId": "304018628931250"
+ *                     },
+ *                     "local": {
+ *                         "email": "jane.doe@gmail.com",
+ *                         "password": "$3a$10$Qgzj3i6xazSuxslbK6YKn.Cdrptm6esqkldDyAyMznqLlg/YUsIbG"
+ *                     }
+ *                 },
+ *             ]
+ *         }
+ *       }
+ *
+ * @apiUse MissingParametersError
+ * @apiUse UnexpectedBehaviorError
+ * @apiUse UserAuthNotFoundError
+ * @apiUse UserAuthFailedError
+ */
+
+/**
+ * @api {get} /api/users/:_id Show an user by ID
+ * @apiPermission User
+ * @apiName show
+ * @apiGroup User
+ *
+ * @apiParam {String} _id Unique id of the User.
+ * 
+ * @apiHeader {String} x-access-token User access-token from Alenvi
+ *
+ * @apiSuccess {Boolean} success Return true on success.
+ * @apiSuccess {String} message Human readable message to display for clients.
+ * @apiSuccess {Object} data User token with expiration and information
+ * @apiSuccess {String} data.token User token
+ * @apiSuccess {Object} data.user User information
+ * @apiSuccess {String} data.user._id User id
+ * @apiSuccess {String} data.user.updatedAt User update date
+ * @apiSuccess {String} data.user.createdAt User creation date
+ * @apiSuccess {String} data.user.firstname User firstname
+ * @apiSuccess {String} data.user.lastname User lastname
+ * @apiSuccess {String} data.user.employee_id User Ogust id
+ * @apiSuccess {String} data.user.sector User Ogust sector
+ * @apiSuccess {String} data.user.__v Internal revision of document set by Mongoose
+ * @apiSuccess {String} data.user.role User role
+ * @apiSuccess {Object} data.user.facebook User Facebook information
+ * @apiSuccess {String} data.user.facebook.facebookId User Facebook id
+ * @apiSuccess {Object} data.user.local User local information
+ * @apiSuccess {String} data.user.local.email User local email
+ * @apiSuccess {String} data.user.local.password User local password
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *    {
+ *         "success": true,
+ *         "message": "Utilisateur trouvé avec succès.",
+ *         "data": {
+ *             "user": {
+ *                 "_id": "6842k1aefm6r07ce01405647",
+ *                 "__v": 0,
+ *                 "createdAt": "2017-06-19T13:29:16.872Z",
+ *                 "sector": "1k*",
+ *                 "lastname": "Doe",
+ *                 "firstname": "John",
+ *                 "updatedAt": "2017-06-21T00:25:21.537Z",
+ *                 "employee_id": 547017476,
+ *                 "role": "auxiliary",
+ *                 "facebook": {
+ *                     "facebookId": "402068626903294"
+ *                 },
+ *                 "local": {
+ *                     "email": "john.doe@gmail.com",
+ *                     "password": "$5h$93$Auzj7i0xnoSqfgkbK6BKc.Fdrpom7esukldDoAzPznwLpg/YMsIbG"
+ *                 }
+ *             }
+ *         }
+ *     }
+ *
+ * @apiUse UserNotFoundError
+ */

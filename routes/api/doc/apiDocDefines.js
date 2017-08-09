@@ -2,7 +2,7 @@
 /**
  * @apiDefine UnexpectedBehaviorError
  *
- * @apiError UnexpectedBehavior There is an unexpected behavior from the server.
+ * @apiError (500) UnexpectedBehavior There is an unexpected behavior from the server.
  *
  * @apiErrorExample Error-Response:
  *    HTTP/1.1 500 Internal Server Error
