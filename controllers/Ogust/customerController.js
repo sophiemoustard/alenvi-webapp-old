@@ -1,5 +1,6 @@
 const translate = require('../../helpers/translate');
 const customers = require('../../models/Ogust/Customer');
+const { redirectToBot } = require('./../../models/bot/bot');
 
 const language = translate.language;
 
@@ -107,18 +108,9 @@ const editThirdPartyInformation = async (req, res) => {
       res.status(400).json({ success: false, message: thirdPartyInfos.body.message });
     } else {
       if (req.query.address) {
-        const address = encodeURIComponent(req.query.address);
-        const uri = `${process.env.BOT_HOSTNAME}/editCustomerDone?address=${address}`;
-        const rp = require('request-promise');
-        const request = async (url) => {
-          const options = {
-            url,
-            resolveWithFullResponse: true,
-            time: true,
-          };
-          const result = await rp.get(options);
-        };
-        request(uri);
+        await redirectToBot(req.query.address);
+      } else {
+        return res.status(400).send({ success: true, message: translate[language].missingParameters });
       }
       res.status(200).json({ success: true, message: translate[language].thirdPartyInfoEdited, data: { user: thirdPartyInfos.body } });
     }
