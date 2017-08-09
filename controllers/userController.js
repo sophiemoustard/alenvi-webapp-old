@@ -91,7 +91,7 @@ module.exports = {
   // Create a new user
   create(req, res) {
     // Check if users mandatory fields are existing
-    if (req.body.email && req.body.password) {
+    if (req.body.email && req.body.password && req.body.role) {
       const payload = {
         firstname: req.body.firstname ? req.body.firstname : '',
         lastname: req.body.lastname ? req.body.lastname : '',
@@ -99,7 +99,7 @@ module.exports = {
         'local.password': req.body.password,
         employee_id: req.body.employee_id ? req.body.employee_id : '',
         customer_id: req.body.customer_id ? req.body.customer_id : '',
-        role: req.body.role ? req.body.role : '',
+        role: req.body.role,
         sector: req.body.sector ? req.body.sector : '',
         'facebook.facebookId': req.body.facebookId ? req.body.facebookId : '',
         'facebook.email': req.body.facebookEmail ? req.body.facebookEmail : '',
