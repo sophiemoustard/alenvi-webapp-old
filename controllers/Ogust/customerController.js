@@ -1,6 +1,6 @@
 const translate = require('../../helpers/translate');
 const customers = require('../../models/Ogust/Customer');
-const { redirectToBot } = require('./../../models/bot/bot');
+const { redirectToBot } = require('./../../models/Bot/Bot');
 
 const language = translate.language;
 
