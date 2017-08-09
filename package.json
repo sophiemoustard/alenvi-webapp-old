@@ -5,8 +5,8 @@
   "private": true,
   "author": "Pierre HOFMAN",
   "scripts": {
-    "start": "node ./bin/www",
-    "doc": "apidoc -i routes/ -o apidoc/",
+    "start": "npm run doc && node ./bin/www",
+    "doc": "apidoc -i ./routes/ -o ./public/apidoc/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {
@@ -45,5 +45,5 @@
         "name": "Alenvi webapp API",
         "version": "1.0.0",
         "description": "Documentation of Alenvi's webapp API"
-    }
+  }
 }
