@@ -2,18 +2,17 @@ require('dotenv').config();
 
 require('./config/config.js');
 
-const express       = require('express');
-const path          = require('path');
-const favicon       = require('serve-favicon');
-const morgan        = require('morgan');
-const _             = require('lodash');
-const cookieParser  = require('cookie-parser');
-const bodyParser    = require('body-parser');
-const passport      = require('passport');
-const session       = require('express-session');
+const express = require('express');
+const path = require('path');
+const favicon = require('serve-favicon');
+const morgan = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+// const passport = require('passport');
+// const session = require('express-session');
 
-const router        = express.Router();
-const app           = express();
+const router = express.Router();
+const app = express();
 
 // Db connection
 require('./config/mongoose');
@@ -43,6 +42,8 @@ app.use(bodyParser.json());
 
 // Allows to use /public folder
 app.use(express.static(path.join(__dirname, 'public')));
+// Allows to use /public/apidoc folder
+app.use(express.static(path.join(__dirname, 'public/apidoc')));
 
 // Required to use passport
 // require('./config/passport');
