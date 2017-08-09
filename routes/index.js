@@ -4,9 +4,9 @@ const path = require('path');
 const router = express.Router();
 
 // Alenvi REST API documentation
-// router.get('/api', (req, res) => {
-//   res.sendFile(path.join(__dirname, '/../public/apidoc/index.html'));
-// });
+router.get('/api', (req, res) => {
+  res.sendFile(path.join(__dirname, '/../public/apidoc/index.html'));
+});
 
 // Alenvi REST API
 router.use('/api/users', require('./api/users'));
