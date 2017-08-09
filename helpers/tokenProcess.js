@@ -17,7 +17,7 @@ module.exports = {
       const token = req.body.token || req.query.token || req.headers['x-access-token'];
       // if there is no token
       if (!token) {
-        res.status(401).json({ success: false, message: translate[language].tokenNotFound });
+        return res.status(401).json({ success: false, message: translate[language].tokenNotFound });
       }
       // verifies secret and checks expiration then decode token
       jwt.verify(token, options.secret, function(err, decoded) {
