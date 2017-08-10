@@ -1,6 +1,7 @@
 /* API DOCUMENTATION for apidoc.js - Users */
 /**
  * @api {post} /api/users/authenticate Authenticate an User
+ * @apiVersion 1.0.0
  * @apiPermission none
  * @apiName authenticate
  * @apiGroup User
@@ -59,6 +60,7 @@
 
 /**
  * @api {get} /api/users/ Retrieve all users
+ * @apiVersion 1.0.0
  * @apiPermission User
  * @apiName showAll
  * @apiGroup User
@@ -124,6 +126,7 @@
 
 /**
  * @api {get} /api/users/:_id Show an user by ID
+ * @apiVersion 1.0.0
  * @apiPermission User
  * @apiName show
  * @apiGroup User
@@ -184,6 +187,7 @@
 
 /**
  * @api {post} /api/users Create a new user
+ * @apiVersion 1.0.0
  * @apiPermission none
  * @apiName create
  * @apiGroup User
@@ -251,6 +255,7 @@
 
 /**
  * @api {put} /api/users/:_id Update an user by id
+ * @apiVersion 1.0.0
  * @apiPermission admin
  * @apiName update
  * @apiGroup User
@@ -320,6 +325,7 @@
 
 /**
  * @api {delete} /api/users/:_id Delete an user by id
+ * @apiVersion 1.0.0
  * @apiPermission admin
  * @apiName update
  * @apiGroup User

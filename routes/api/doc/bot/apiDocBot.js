@@ -1,6 +1,7 @@
 /* API DOCUMENTATION for apidoc.js - Bot */
 /**
  * @api {get} /api/bot/authorize Authorize authentication by Facebook
+ * @apiVersion 1.0.0
  * @apiPermission none
  * @apiName authorize
  * @apiGroup Bot
@@ -20,6 +21,7 @@
 
 /**
  * @api {get} /api/bot/user/:_id Retrieve User information
+ * @apiVersion 1.0.0
  * @apiPermission none
  * @apiName getUserByParamId
  * @apiGroup Bot
