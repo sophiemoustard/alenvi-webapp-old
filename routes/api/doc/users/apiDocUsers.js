@@ -53,9 +53,9 @@
  *     }
  *
  * @apiUse MissingParametersError
- * @apiUse UnexpectedBehaviorError
- * @apiUse UserAuthNotFoundError
  * @apiUse UserAuthFailedError
+ * @apiUse UserAuthNotFoundError
+ * @apiUse UnexpectedBehaviorError
  */
 
 /**
@@ -70,6 +70,22 @@
  * @apiSuccess {Boolean} success Return true on success.
  * @apiSuccess {String} message Human readable message to display for clients.
  * @apiSuccess {Object} data List of all users.
+ * @apiSuccess {Object} data Users information
+ * @apiSuccess {Object[]} data.user Users information
+ * @apiSuccess {String} data.users._id User id
+ * @apiSuccess {String} data.users.updatedAt User update date
+ * @apiSuccess {String} data.users.createdAt User creation date
+ * @apiSuccess {String} data.users.firstname User firstname
+ * @apiSuccess {String} data.users.lastname User lastname
+ * @apiSuccess {String} data.users.employee_id User Ogust id
+ * @apiSuccess {String} data.users.sector User Ogust sector
+ * @apiSuccess {String} data.users.__v Internal revision of document set by Mongoose
+ * @apiSuccess {String} data.users.role User role
+ * @apiSuccess {Object} data.users.facebook User Facebook information
+ * @apiSuccess {String} data.users.facebook.facebookId User Facebook id
+ * @apiSuccess {Object} data.users.local User local information
+ * @apiSuccess {String} data.users.local.email User local email
+ * @apiSuccess {String} data.users.local.password User local password
  *
  * @apiSuccessExample Success-Response:
  *     HTTP/1.1 200 OK
@@ -119,9 +135,9 @@
  *       }
  *
  * @apiUse MissingParametersError
- * @apiUse UnexpectedBehaviorError
- * @apiUse UserAuthNotFoundError
  * @apiUse UserAuthFailedError
+ * @apiUse UserAuthNotFoundError
+ * @apiUse UnexpectedBehaviorError
  */
 
 /**
@@ -137,8 +153,7 @@
  *
  * @apiSuccess {Boolean} success Return true on success.
  * @apiSuccess {String} message Human readable message to display for clients.
- * @apiSuccess {Object} data User token with expiration and information
- * @apiSuccess {String} data.token User token
+ * @apiSuccess {Object} data User information
  * @apiSuccess {Object} data.user User information
  * @apiSuccess {String} data.user._id User id
  * @apiSuccess {String} data.user.updatedAt User update date
