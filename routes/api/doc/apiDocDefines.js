@@ -4,7 +4,7 @@
  *
  * @apiError (Error 500) UnexpectedBehavior There is an unexpected behavior from the server.
  *
- * @apiErrorExample Error-Response:
+ * @apiErrorExample Error500-Response:
  *    HTTP/1.1 500 Internal Server Error
  *    {
  *      "success": false,
@@ -18,7 +18,7 @@
  *
  * @apiError Forbidden The user doesn't have the rights to perform the request.
  *
- * @apiErrorExample Error-Response:
+ * @apiErrorExample Error403-Response:
  *    HTTP/1.1 403 Forbidden
  *    {
  *      "success": false,
@@ -32,7 +32,7 @@
  *
  * @apiError TokenNotFound There is no token provided.
  *
- * @apiErrorExample Error-Response:
+ * @apiErrorExample Error401-Response:
  *    HTTP/1.1 401 Unauthorized
  *    {
  *      "success": false,
@@ -46,7 +46,7 @@
  *
  * @apiError TokenAuthFailed Failed to authenticate token.
  *
- * @apiErrorExample Error-Response:
+ * @apiErrorExample Error401-Response:
  *    HTTP/1.1 401 Unauthorized
  *    {
  *      "success": false,
@@ -60,7 +60,7 @@
  *
  * @apiError TokenExpired The token is no longer valid.
  *
- * @apiErrorExample Error-Response:
+ * @apiErrorExample Error401-Response:
  *    HTTP/1.1 401 Unauthorized
  *    {
  *      "success": false,
@@ -74,7 +74,7 @@
  *
  * @apiError MissingParameters Missing mandatory parameters to run the operation.
  *
- * @apiErrorExample Error-Response:
+ * @apiErrorExample Error400-Response:
  *    HTTP/1.1 400 Bad Request
  *    {
  *      "success": false,
@@ -88,7 +88,7 @@
  *
  * @apiError UserNotFound User doesn't exist.
  *
- * @apiErrorExample Error-Response:
+ * @apiErrorExample Error404-Response:
  *    HTTP/1.1 404 Not Found
  *    {
  *      "success": false,
@@ -101,7 +101,7 @@
  *
  * @apiError UserShowAllNotFound User not found.
  *
- * @apiErrorExample Error-Response:
+ * @apiErrorExample Error404-Response:
  *    HTTP/1.1 404 Not Found
  *    {
  *      "success": false,
@@ -114,7 +114,7 @@
  *
  * @apiError UserEmailExists User email already exists.
  *
- * @apiErrorExample Error-Response:
+ * @apiErrorExample Error409-Response:
  *    HTTP/1.1 409 Conflict
  *    {
  *      "success": false,
@@ -127,7 +127,7 @@
  *
  * @apiError InvalidEmail Email is not valid.
  *
- * @apiErrorExample Error-Response:
+ * @apiErrorExample Error400-Response:
  *    HTTP/1.1 400 Bad Request
  *    {
  *      "success": false,
@@ -140,7 +140,7 @@
  *
  * @apiError UserAuthNotFound  The authentication failed because the user was not found.
  *
- * @apiErrorExample Error-Response:
+ * @apiErrorExample Error404-Response:
  *    HTTP/1.1 404 Not Found
  *    {
  *      "success": false,
@@ -153,7 +153,7 @@
  *
  * @apiError UserAuthFailed  The email address or password entered is not valid.
  *
- * @apiErrorExample Error-Response:
+ * @apiErrorExample Error401-Response:
  *    HTTP/1.1 401 Unauthorized
  *    {
  *      "success": false,
@@ -166,7 +166,7 @@
  *
  * @apiError OgustGetTokenFailed Ogust Token retrieving failed.
  *
- * @apiErrorExample Error-Response:
+ * @apiErrorExample Error500-Response:
  *    HTTP/1.1 500 Internal Server Error
  *    {
  *      "success": false,
@@ -179,7 +179,7 @@
  *
  * @apiError ServicesNotFound Ogust Services not found.
  *
- * @apiErrorExample Error-Response:
+ * @apiErrorExample Error404-Response:
  *    HTTP/1.1 404 Not Found
  *    {
  *      "success": false,
@@ -192,7 +192,7 @@
  *
  * @apiError ServiceNotFound Ogust Service not found.
  *
- * @apiErrorExample Error-Response:
+ * @apiErrorExample Error404-Response:
  *    HTTP/1.1 404 Not Found
  *    {
  *      "success": false,
@@ -205,7 +205,7 @@
  *
  * @apiError   SalariesNotFound Ogust employee\'s salaries not found.
  *
- * @apiErrorExample Error-Response:
+ * @apiErrorExample Error404-Response:
  *    HTTP/1.1 404 Not Found
  *    {
  *      "success": false,
