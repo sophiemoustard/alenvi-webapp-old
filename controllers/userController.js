@@ -25,7 +25,7 @@ const getUserByParamId = function (req, res, next) {
 // Check if user is allowed to access to this route : only himself or admin / coach can validate through this function
 const checkOnlyUserAllowed = function (req, res, next) {
   if (req.decoded.role != 'admin' && req.decoded.role != 'coach' && req.params._id !== req.decoded.id) {
-    res.status(403).json({ success: false, message: translate[language].forbidden });
+    return res.status(403).json({ success: false, message: translate[language].forbidden });
   }
   next();
 };
