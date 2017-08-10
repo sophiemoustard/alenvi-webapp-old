@@ -43,7 +43,7 @@ app.use(bodyParser.json());
 // Allows to use /public folder
 app.use(express.static(path.join(__dirname, 'public')));
 // Allows to use /public/apidoc folder
-// app.use(express.static(path.join(__dirname, 'public/apidoc')));
+app.use(express.static(path.join(__dirname, 'public/apidoc')));
 
 // Required to use passport
 // require('./config/passport');
