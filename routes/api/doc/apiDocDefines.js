@@ -212,3 +212,16 @@
  *      "error": "Ogust employee\'s salaries not found."
  *    }
  */
+
+/**
+ * @apiDefine thirdPartyInfoNotFoundError
+ *
+ * @apiError   thirdPartyInfoNotFound Ogust customer\'s third party information not found.
+ *
+ * @apiErrorExample Error404-Response:
+ *    HTTP/1.1 404 Not Found
+ *    {
+ *      "success": false,
+ *      "error": "Ogust third party information not found."
+ *    }
+ */
