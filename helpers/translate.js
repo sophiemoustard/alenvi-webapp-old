@@ -34,7 +34,10 @@ module.exports = {
     thirdPartyInfoFound: 'Ogust third party information retrieving failed.',
     thirdPartyInfoEdited: 'Ogust third party information edited successully.',
     salariesNotFound: 'Ogust employee\'s salaries not found.',
-    salariesFound: 'Ogust employee\'s found.'
+    salariesFound: 'Ogust employee\'s found.',
+    facebookGetWhitelistedDomainsOk: 'Facebook whitelisted domains found.',
+    facebookPostWhitelistedDomainsOk: 'Facebook whitelisted domain(s) added.',
+    facebookNoToken: 'Facebook Token not provided.'
   },
   'fr-FR': {
     /* Global errors */
@@ -70,6 +73,9 @@ module.exports = {
     thirdPartyInfoFound: 'Informations tierse récupérées avec succès.',
     thirdPartyInfoEdited: 'Informations tierse éditées avec succès.',
     salariesNotFound: 'Echec lors de la récupération des bulletins de salaire de l\'employé.',
-    salariesFound: 'Bulletins de salaire de l\'employé trouvés avec succès.'
+    salariesFound: 'Bulletins de salaire de l\'employé trouvés avec succès.',
+    facebookGetWhitelistedDomainsOk: 'Domains whitelistés Facebook récupérés avec succès.',
+    facebookPostWhitelistedDomainsOk: 'Domaine(s) whitelisté(s) ajoutés avec succès.',
+    facebookNoToken: 'Merci de fournir un token d\'accès de page Facebook.'
   }
 };

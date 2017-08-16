@@ -12,6 +12,7 @@ router.get('/api', (req, res) => {
 router.use('/api/users', require('./api/users'));
 router.use('/api/bot', require('./api/bot'));
 router.use('/api/ogust', require('./api/ogust'));
+router.use('/api/facebook', require('./api/facebook'));
 
 
 router.get('/bouh', (req, res) => {
