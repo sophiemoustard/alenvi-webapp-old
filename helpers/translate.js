@@ -66,9 +66,9 @@ module.exports = {
     servicesNotFound: 'Services Ogust non trouvés.',
     serviceFound: 'Service Ogust reçu avec succès.',
     serviceNotFound: 'Service Ogust non trouvé.',
-    thirdPartyInfoNotFound: 'La récupération des informations tierse a échoué.',
-    thirdPartyInfoFound: 'Informations tierse récupérées avec succès.',
-    thirdPartyInfoEdited: 'Informations tierse éditées avec succès.',
+    thirdPartyInfoNotFound: 'La récupération des informations tierces a échoué.',
+    thirdPartyInfoFound: 'Informations tierces récupérées avec succès.',
+    thirdPartyInfoEdited: 'Informations tierces éditées avec succès.',
     salariesNotFound: 'Echec lors de la récupération des bulletins de salaire de l\'employé.',
     salariesFound: 'Bulletins de salaire de l\'employé trouvés avec succès.'
   }
