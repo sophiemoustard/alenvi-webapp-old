@@ -112,7 +112,7 @@ const editThirdPartyInformation = async (req, res) => {
       } else {
         return res.status(400).send({ success: true, message: translate[language].missingParameters });
       }
-      res.status(200).json({ success: true, message: translate[language].thirdPartyInfoEdited, data: { user: thirdPartyInfos.body } });
+      res.status(200).json({ success: true, message: translate[language].thirdPartyInfoEdited, data: { info: thirdPartyInfos.body } });
     }
   } catch (e) {
     console.error(e);
