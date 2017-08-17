@@ -5,7 +5,7 @@ const router = express.Router();
 
 // Alenvi REST API documentation
 router.get('/api', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public', 'apidoc', 'index.html'));
+  res.sendFile(path.join(__dirname, '/../public/apidoc/index.html'));
 });
 
 // Alenvi REST API
