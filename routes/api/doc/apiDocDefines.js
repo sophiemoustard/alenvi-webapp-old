@@ -203,7 +203,7 @@
 /**
  * @apiDefine SalariesNotFoundError
  *
- * @apiError   SalariesNotFound Ogust employee\'s salaries not found.
+ * @apiError SalariesNotFound Ogust employee\'s salaries not found.
  *
  * @apiErrorExample Error404-Response:
  *    HTTP/1.1 404 Not Found
@@ -216,12 +216,25 @@
 /**
  * @apiDefine thirdPartyInfoNotFoundError
  *
- * @apiError   thirdPartyInfoNotFound Ogust customer\'s third party information not found.
+ * @apiError thirdPartyInfoNotFound Ogust customer\'s third party information not found.
  *
  * @apiErrorExample Error404-Response:
  *    HTTP/1.1 404 Not Found
  *    {
  *      "success": false,
  *      "error": "Ogust third party information not found."
+ *    }
+ */
+
+/**
+ * @apiDefine facebookNoTokenError
+ *
+ * @apiError facebookNoToken Facebook token not provided.
+ *
+ * @apiErrorExample Error400-Response:
+ *    HTTP/1.1 400 Not Found
+ *    {
+ *      "success": false,
+ *      "error": "Facebook Token not provided."
  *    }
  */
