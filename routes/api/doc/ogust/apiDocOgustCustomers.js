@@ -5,7 +5,7 @@
  * @apiVersion 1.0.0
  * @apiPermission Ogust
  * @apiName getAll
- * @apiGroup Ogust
+ * @apiGroup Ogust_Customers
  *
  * @apiHeader {String} x-ogust-token User token from Ogust
  *
@@ -220,11 +220,11 @@
 
 
 /**
- * @api {get} /api/ogust/customers/:id Get a customer by its id.
+ * @api {get} /api/ogust/customers/:id Get a customer by its id
  * @apiVersion 1.0.0
  * @apiPermission Ogust
  * @apiName getById
- * @apiGroup Ogust
+ * @apiGroup Ogust_Customers
  *
  * @apiHeader {String} x-ogust-token User token from Ogust
  *
@@ -347,7 +347,7 @@
  * @apiVersion 1.0.0
  * @apiPermission Ogust
  * @apiName getCustomerServices
- * @apiGroup Ogust
+ * @apiGroup Ogust_Customers
  *
  * @apiHeader {String} x-ogust-token User token from Ogust
  *
@@ -466,11 +466,11 @@
 
 
 /**
- * @api {get} /api/ogust/customers/:id/moreInfo Get customer detailed information by its id.
+ * @api {get} /api/ogust/customers/:id/moreInfo Get customer detailed information by its id
  * @apiVersion 1.0.0
  * @apiPermission Ogust
  * @apiName getThirdPartyInformation
- * @apiGroup Ogust
+ * @apiGroup Ogust_Customers
  *
  * @apiHeader {String} x-ogust-token User token from Ogust
  *
@@ -520,11 +520,11 @@
  */
 
 /**
- * @api {put} /api/ogust/customers/:id/moreInfo Edit customer detailed information by its id.
+ * @api {put} /api/ogust/customers/:id/moreInfo Edit customer detailed information by its id
  * @apiVersion 1.0.0
  * @apiPermission Ogust
  * @apiName editThirdPartyInformation
- * @apiGroup Ogust
+ * @apiGroup Ogust_Customers
  *
  * @apiHeader {String} x-ogust-token User token from Ogust
  *

@@ -5,7 +5,7 @@
  * @apiVersion 1.0.0
  * @apiPermission User
  * @apiName get
- * @apiGroup Ogust
+ * @apiGroup Ogust_Employees
  *
  * @apiHeader {String} x-access-token User access-token from Alenvi
  *
@@ -33,11 +33,11 @@
 
 
 /**
- * @api {get} /api/ogust/employees Get all employees from Ogust
+ * @api {get} /api/ogust/employees Get all employees
  * @apiVersion 1.0.0
  * @apiPermission Ogust
  * @apiName getAll
- * @apiGroup Ogust
+ * @apiGroup Ogust_Employees
  *
  * @apiHeader {String} x-ogust-token User token from Ogust
  *
@@ -238,11 +238,11 @@
  */
 
 /**
- * @api {get} /api/ogust/employees/sector/:sector Get all employees from Ogust by sector
+ * @api {get} /api/ogust/employees/sector/:sector Get all employees by sector
  * @apiVersion 1.0.0
  * @apiPermission Ogust
  * @apiName getAllBySector
- * @apiGroup Ogust
+ * @apiGroup Ogust_Employees
  *
  * @apiHeader {String} x-ogust-token User token from Ogust
  *
@@ -445,11 +445,11 @@
  */
 
 /**
- * @api {get} /api/ogust/employees/:id Get an employee by its id from Ogust
+ * @api {get} /api/ogust/employees/:id Get an employee by its id
  * @apiVersion 1.0.0
  * @apiPermission Ogust
  * @apiName getById
- * @apiGroup Ogust
+ * @apiGroup Ogust_Employees
  *
  * @apiHeader {String} x-ogust-token User token from Ogust
  *
@@ -561,7 +561,7 @@
  * @apiVersion 1.0.0
  * @apiPermission Ogust
  * @apiName getEmployeeServices
- * @apiGroup Ogust
+ * @apiGroup Ogust_Employees
  *
  * @apiHeader {String} x-ogust-token User token from Ogust
  *
@@ -683,7 +683,7 @@
  * @apiVersion 1.0.0
  * @apiPermission Ogust
  * @apiName getEmployeeCustomers
- * @apiGroup Ogust
+ * @apiGroup Ogust_Employees
  *
  * @apiHeader {String} x-ogust-token User token from Ogust
  *
@@ -883,7 +883,7 @@
  * @apiVersion 1.0.0
  * @apiPermission Ogust
  * @apiName getEmployeeSalaries
- * @apiGroup Ogust
+ * @apiGroup Ogust_Employees
  *
  * @apiHeader {String} x-ogust-token User token from Ogust
  *

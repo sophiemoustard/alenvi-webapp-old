@@ -5,7 +5,7 @@
  * @apiVersion 1.0.0
  * @apiPermission Ogust
  * @apiName getAll
- * @apiGroup Ogust
+ * @apiGroup Ogust_Services
  *
  * @apiHeader {String} x-ogust-token User token from Ogust
  *
@@ -127,7 +127,7 @@
  * @apiVersion 1.0.0
  * @apiPermission Ogust
  * @apiName getById
- * @apiGroup Ogust
+ * @apiGroup Ogust_Services
  *
  * @apiHeader {String} x-ogust-token User token from Ogust
  *
