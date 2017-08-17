@@ -6,7 +6,7 @@
   "author": "Pierre HOFMAN",
   "scripts": {
     "start": "node ./bin/www",
-    "postinstall": "npm run doc",
+    "heroku-postbuild": "npm run doc",
     "doc": "apidoc -i ./routes/ -o ./public/apidoc/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
