@@ -20,7 +20,7 @@
  */
 
 /**
- * @api {get} /api/bot/user/:_id Retrieve User information
+ * @api {get} /api/bot/user/:_id Get User information
  * @apiVersion 1.0.0
  * @apiPermission none
  * @apiName getUserByParamId

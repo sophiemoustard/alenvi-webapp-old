@@ -59,7 +59,7 @@
  */
 
 /**
- * @api {get} /api/users/ Retrieve all users
+ * @api {get} /api/users/ Get all users
  * @apiVersion 1.0.0
  * @apiPermission User
  * @apiName showAll
