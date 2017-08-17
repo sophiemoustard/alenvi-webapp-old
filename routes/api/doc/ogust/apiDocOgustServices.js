@@ -140,7 +140,11 @@
  * @apiSuccess {Object} data
  * @apiSuccess {Object} data.servicesRaw
  * @apiSuccess {String} data.servicesRaw.status Response status from Ogust.
- * @apiSuccess {Object} data.servicesRaw.service Object containing pagination options and service details.
+ * @apiSuccess {String} data.servicesRaw.service Object containing service details.
+ * @apiSuccess {Object} data.servicesRaw.service.id_employee Employee id linked to the intervention.
+ * @apiSuccess {String} data.servicesRaw.service.id_customer Customer id linked to the intervention.
+ * @apiSuccess {String} data.servicesRaw.service.start_date Intervention start date (YYYYMMDDHHMM).
+ * @apiSuccess {String} data.servicesRaw.service.end_date Intervention end date (YYYYMMDDHHMM).
  *
  * @apiSuccessExample Success-Response:
  *      HTTP/1.1 200 OK
