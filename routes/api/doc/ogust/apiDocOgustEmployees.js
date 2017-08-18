@@ -1,38 +1,6 @@
 /* API DOCUMENTATION for apidoc.js - Ogust - Employees */
 
 /**
- * @api {get} /api/ogust/token Get ogust token
- * @apiVersion 1.0.0
- * @apiPermission User
- * @apiName get
- * @apiGroup Ogust_Employees
- *
- * @apiHeader {String} x-access-token User access-token from Alenvi
- *
- * @apiSuccess {Boolean} success Return true on success.
- * @apiSuccess {String} message Human readable message to display for clients.
- * @apiSuccess {Object} data List of all users.
- * @apiSuccess {String} data.status Response status from Ogust.
- * @apiSuccess {String} data.token Token from Ogust.
- * @apiSuccess {String} data.expireDate Expiration date of token from Ogust.
- *
- * @apiSuccessExample Success-Response:
- *     HTTP/1.1 200 OK
- *      {
- *         "success": true,
- *         "message": "Token Ogust reçu avec succès.",
- *         "data": {
- *             "status": "OK",
- *             "token": "94KYPZ83P260W871H1793FCSIZF118KZ7F592N14",
- *             "expireDate": "2017-08-10T14:12:00+02:00"
- *         }
- *     }
- *
- * @apiUse OgustGetTokenFailedError
- */
-
-
-/**
  * @api {get} /api/ogust/employees Get all employees
  * @apiVersion 1.0.0
  * @apiPermission Ogust
@@ -41,10 +9,17 @@
  *
  * @apiHeader {String} x-ogust-token User token from Ogust
  *
- * @apiParam {String} status="A" Employee status
- * @apiParam {String} nature="S" Employee nature
- * @apiParam {Number} nbperpage=50 Number of records per page
- * @apiParam {Number} pagenum=1 Page number
+ * @apiParam {String} [status="A"] Employee status
+ * @apiParam {String} [nature="S"] Employee nature
+ * @apiParam {Number} [nbperpage=50] Number of records per page
+ * @apiParam {Number} [pagenum=1] Page number
+ *
+ * @apiExample {http} Example usage:
+ *    api/ogust/employees?status=A&nature=S
+ *    // header
+ *    {
+ *       "x-ogust-token": "2432E10TLL4A0S8WWXPLB8K91LF28370K3E61V88"
+ *    }
  *
  * @apiSuccess {Boolean} success Return true on success.
  * @apiSuccess {String} message Human readable message to display for clients.
@@ -252,6 +227,13 @@
  * @apiParam {String} [nbperpage="50"] Number of records per page
  * @apiParam {string} [pagenum="1"] Page number
  *
+ * @apiExample {http} Example usage:
+ *    api/ogust/sector/1b*?status=A&nature=S
+ *    // header
+ *    {
+ *       "x-ogust-token": "2432E10TLL4A0S8WWXPLB8K91LF28370K3E61V88"
+ *    }
+ *
  * @apiSuccess {Boolean} success Return true on success.
  * @apiSuccess {String} message Human readable message to display for clients.
  * @apiSuccess {Object} data List of all employees from Ogust.
@@ -454,7 +436,14 @@
  * @apiHeader {String} x-ogust-token User token from Ogust
  *
  * @apiParam {String} id Unique id of the employee
- * @apiParam {String} status="A" Employee status
+ * @apiParam {String} [status="A"] Employee status
+ *
+ * @apiExample {http} Example usage:
+ *    api/ogust/employees/485739287
+ *    // header
+ *    {
+ *       "x-ogust-token": "2432E10TLL4A0S8WWXPLB8K91LF28370K3E61V88"
+ *    }
  *
  * @apiSuccess {Boolean} success Return true on success.
  * @apiSuccess {String} message Human readable message to display for clients.
@@ -578,6 +567,13 @@
  * @apiParam {String} [nbPerPage="100"] Number of records per page
  * @apiParam {String} [pageNum="1"] Page number
  *
+ * @apiExample {http} Example usage:
+ *    api/ogust/employees/485739287/services?isDate=true&startDate=201708040000&endDate=201708040000
+ *    // header
+ *    {
+ *       "x-ogust-token": "2432E10TLL4A0S8WWXPLB8K91LF28370K3E61V88"
+ *    }
+ *
  * @apiSuccess {Boolean} success Return true on success.
  * @apiSuccess {String} message Human readable message to display for clients.
  * @apiSuccess {Object} data
@@ -688,6 +684,13 @@
  * @apiHeader {String} x-ogust-token User token from Ogust
  *
  * @apiParam {String} id Unique id of the employee
+ *
+ * @apiExample {http} Example usage:
+ *    api/ogust/employees/573839209/customers
+ *    // header
+ *    {
+ *       "x-ogust-token": "2432E10TLL4A0S8WWXPLB8K91LF28370K3E61V88"
+ *    }
  *
  * @apiSuccess {Boolean} success Return true on success.
  * @apiSuccess {String} message Human readable message to display for clients.
@@ -888,6 +891,14 @@
  * @apiHeader {String} x-ogust-token User token from Ogust
  *
  * @apiParam {String} id Unique id of the employee
+ *
+ *
+ * @apiExample {http} Example usage:
+ *    api/ogust/employees/573839209/salaries
+ *    // header
+ *    {
+ *       "x-ogust-token": "2432E10TLL4A0S8WWXPLB8K91LF28370K3E61V88"
+ *    }
  *
  * @apiSuccess {Boolean} success Return true on success.
  * @apiSuccess {String} message Human readable message to display for clients.

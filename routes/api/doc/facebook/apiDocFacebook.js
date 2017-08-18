@@ -9,6 +9,9 @@
  *
  * @apiParam {String} access_token Facebook page token
  *
+ * @apiExample {http} Example usage:
+ *    api/ogust/facebook/whitelistedDomains?access_token=26deb39664b6eb2df8f7b501429418d5fb6d12b4c5e08ea7d4a918ad39a608cd
+ *
  * @apiSuccess {Boolean} success Return true on success.
  * @apiSuccess {String} message Human readable message to display for clients.
  * @apiSuccess {Object} data
@@ -44,6 +47,13 @@
  *
  * @apiParam {String} access_token Facebook page token
  * @apiParam {Array} whitelisted_domains List of domains to whitelist
+ *
+ * @apiExample {http} Example usage:
+ *    api/ogust/facebook/whitelistedDomains?access_token=26deb39664b6eb2df8f7b501429418d5fb6d12b4c5e08ea7d4a918ad39a608cd
+ *    // body
+ *    {
+ *       "whitelisted_domains": ["http://itibimuh.sk/rasev"]
+ *    }
  *
  * @apiSuccess {Boolean} success Return true on success.
  * @apiSuccess {String} message Human readable message to display for clients.

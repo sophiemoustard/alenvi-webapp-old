@@ -9,10 +9,17 @@
  *
  * @apiHeader {String} x-ogust-token User token from Ogust
  *
- * @apiParam {String} status="A" Employee status
- * @apiParam {String} nature="S" Employee nature
- * @apiParam {Number} nbperpage=50 Number of records per page
- * @apiParam {Number} pagenum=1 Page number
+ * @apiParam {String} [status="A"] Employee status
+ * @apiParam {String} [nature="S"] Employee nature
+ * @apiParam {Number} [nbperpage=50] Number of records per page
+ * @apiParam {Number} [pagenum=1] Page number
+ *
+ * @apiExample {http} Example usage:
+ *    api/ogust/customers?status=A&nature=S
+ *    // header
+ *    {
+ *       "x-ogust-token": "2432E10TLL4A0S8WWXPLB8K91LF28370K3E61V88"
+ *    }
  *
  * @apiSuccess {Boolean} success Return true on success.
  * @apiSuccess {String} message Human readable message to display for clients.
@@ -230,6 +237,13 @@
  *
  * @apiParam {String} id Unique id of the employee
  *
+ * @apiExample {http} Example usage:
+ *    api/ogust/customers/485739287
+ *    // header
+ *    {
+ *       "x-ogust-token": "2432E10TLL4A0S8WWXPLB8K91LF28370K3E61V88"
+ *    }
+ *
  * @apiSuccess {Boolean} success Return true on success.
  * @apiSuccess {String} message Human readable message to display for clients.
  * @apiSuccess {Object} data
@@ -364,6 +378,13 @@
  * @apiParam {String} [nbPerPage="100"] Number of records per page
  * @apiParam {String} [pageNum="1"] Page number
  *
+ * @apiExample {http} Example usage:
+ *    api/ogust/customers/485739287/services?isDate=true&startDate=201708040000&endDate=201708040000
+ *    // header
+ *    {
+ *       "x-ogust-token": "2432E10TLL4A0S8WWXPLB8K91LF28370K3E61V88"
+ *    }
+ *
  * @apiSuccess {Boolean} success Return true on success.
  * @apiSuccess {String} message Human readable message to display for clients.
  * @apiSuccess {Object} data
@@ -475,9 +496,16 @@
  * @apiHeader {String} x-ogust-token User token from Ogust
  *
  * @apiParam {String} id Unique id of the employee
- * @apiParam {String} third_party="C" Customer category
- * @apiParam {Number} nbperpage=10 Number of records per page
- * @apiParam {Number} pagenum=1 Page number
+ * @apiParam {String} [third_party="C"] Customer category
+ * @apiParam {Number} [nbperpage=10] Number of records per page
+ * @apiParam {Number} [pagenum=1] Page number
+ *
+ * @apiExample {http} Example usage:
+ *    api/ogust/customers/573839209/moreInfo
+ *    // header
+ *    {
+ *       "x-ogust-token": "2432E10TLL4A0S8WWXPLB8K91LF28370K3E61V88"
+ *    }
  *
  * @apiSuccess {Boolean} success Return true on success.
  * @apiSuccess {String} message Human readable message to display for clients.
@@ -536,6 +564,23 @@
  * @apiParam {String} array_values.COMMNIV Customer pathology comment.
  * @apiParam {String} array_values.DETAILEVE Customer intervention details.
  * @apiParam {String} array_values.AUTRESCOMM Miscellaneous comments.
+ *
+ * @apiExample {http} Example usage:
+ *    api/ogust/customers/573839209/moreInfo
+ *    // header
+ *    {
+ *       "x-ogust-token": "2432E10TLL4A0S8WWXPLB8K91LF28370K3E61V88"
+ *    }
+ *
+ *    // body
+ *   {
+ *       "arrayValues": {
+ *          "NIVEAU": "-",
+ *          "COMMNIV": "BLA ?",
+ *          "DETAILEVE": "Bla...",
+ *          "AUTRESCOMM": "BLAHHH"
+ *       }
+ *   }
  *
  * @apiSuccess {Boolean} success Return true on success.
  * @apiSuccess {String} message Human readable message to display for clients.

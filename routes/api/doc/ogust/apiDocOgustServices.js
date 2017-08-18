@@ -21,6 +21,13 @@
  * @apiParam {String} [nbPerPage="100"] Number of records per page
  * @apiParam {String} [pageNum="1"] Page number
  *
+ * @apiExample {http} Example usage:
+ *    api/ogust/services?isDate=true&startDate=201708040000&endDate=201708040000
+ *    // header
+ *    {
+ *       "x-ogust-token": "2432E10TLL4A0S8WWXPLB8K91LF28370K3E61V88"
+ *    }
+ *
  * @apiSuccess {Boolean} success Return true on success.
  * @apiSuccess {String} message Human readable message to display for clients.
  * @apiSuccess {Object} data
@@ -134,6 +141,13 @@
  * @apiParam {String} id Unique id of service
  * @apiParam {String} [status="@!=|N"] Status of the service
  * @apiParam {String} [type="I"] Type of the service
+ *
+ * @apiExample {http} Example usage:
+ *    api/ogust/services/485739287
+ *    // header
+ *    {
+ *       "x-ogust-token": "2432E10TLL4A0S8WWXPLB8K91LF28370K3E61V88"
+ *    }
  *
  * @apiSuccess {Boolean} success Return true on success.
  * @apiSuccess {String} message Human readable message to display for clients.

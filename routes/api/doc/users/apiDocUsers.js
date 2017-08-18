@@ -9,6 +9,14 @@
  * @apiParam {String} email Email of the User.
  * @apiParam {String} password Password of the User.
  *
+ * @apiExample {http} Example usage:
+ *    api/users/authenticate
+ *    // body
+ *    {
+ *       "email": "ruif@dulup.tn",
+ *       "password": "test"
+ *    }
+ *
  * @apiSuccess {Boolean} success Return true on success.
  * @apiSuccess {String} message Human readable message to display for clients.
  * @apiSuccess {Object} data User token with expiration and information
@@ -66,6 +74,13 @@
  * @apiGroup User
  *
  * @apiHeader {String} x-access-token User access-token from Alenvi
+ *
+ * @apiExample {http} Example usage:
+ *    api/users
+ *    // header
+ *    {
+ *       "x-access-token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE1MDMwNTIwNDYsImV4cCI6MTUzNDU4ODA0NiwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoianJvY2tldEBleGFtcGxlLmNvbSIsIkdpdmVuTmFtZSI6IkpvaG5ueSIsIlN1cm5hbWUiOiJSb2NrZXQiLCJFbWFpbCI6Impyb2NrZXRAZXhhbXBsZS5jb20iLCJSb2xlIjpbIk1hbmFnZXIiLCJQcm9qZWN0IEFkbWluaXN0cmF0b3IiXX0.KbNoaDFRo7ElOrYNrXqzAUZCAR3vwh2aL5awcyVwpQ0"
+ *    }
  *
  * @apiSuccess {Boolean} success Return true on success.
  * @apiSuccess {String} message Human readable message to display for clients.
@@ -151,6 +166,13 @@
  *
  * @apiHeader {String} x-access-token User access-token from Alenvi
  *
+ * @apiExample {http} Example usage:
+ *    api/users/507f1f77bcf86cd799439011
+ *    // header
+ *    {
+ *       "x-access-token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE1MDMwNTIwNDYsImV4cCI6MTUzNDU4ODA0NiwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoianJvY2tldEBleGFtcGxlLmNvbSIsIkdpdmVuTmFtZSI6IkpvaG5ueSIsIlN1cm5hbWUiOiJSb2NrZXQiLCJFbWFpbCI6Impyb2NrZXRAZXhhbXBsZS5jb20iLCJSb2xlIjpbIk1hbmFnZXIiLCJQcm9qZWN0IEFkbWluaXN0cmF0b3IiXX0.KbNoaDFRo7ElOrYNrXqzAUZCAR3vwh2aL5awcyVwpQ0"
+ *    }
+ *
  * @apiSuccess {Boolean} success Return true on success.
  * @apiSuccess {String} message Human readable message to display for clients.
  * @apiSuccess {Object} data User information
@@ -220,6 +242,18 @@
  * @apiParam {String} [slackId] Slack id of the User.
  * @apiParam {String} [slackEmail] Slack email of the User.
  *
+ * @apiExample {http} Example usage:
+ *    api/users
+ *    // body
+ *    {
+ *       "firstname": "Ina"
+ *       "lastname": "Bell"
+ *       "email": "jureko@lo.it"
+ *       "password": "&x^uQHbN"
+ *       "employee_id": "374950284"
+ *       "role": "user"
+ *       "sector": "1c*"
+ *    }
  *
  * @apiSuccess {Boolean} success Return true on success.
  * @apiSuccess {String} message Human readable message to display for clients.
@@ -291,6 +325,25 @@
  * @apiParam {String} [slackId] Slack id of the User.
  * @apiParam {String} [slackEmail] Slack email of the User.
  *
+ * @apiExample {http} Example usage:
+ *    api/users/507f1f77bcf86cd799439011
+ *    // header
+ *    {
+ *       "x-access-token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE1MDMwNTIwNDYsImV4cCI6MTUzNDU4ODA0NiwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoianJvY2tldEBleGFtcGxlLmNvbSIsIkdpdmVuTmFtZSI6IkpvaG5ueSIsIlN1cm5hbWUiOiJSb2NrZXQiLCJFbWFpbCI6Impyb2NrZXRAZXhhbXBsZS5jb20iLCJSb2xlIjpbIk1hbmFnZXIiLCJQcm9qZWN0IEFkbWluaXN0cmF0b3IiXX0.KbNoaDFRo7ElOrYNrXqzAUZCAR3vwh2aL5awcyVwpQ0"
+ *    }
+ *
+ *    // body
+ *    {
+ *       "firstname": "Ina"
+ *       "lastname": "Bell"
+ *       "email": "jureko@lo.it"
+ *       "password": "&x^uQHbN"
+ *       "employee_id": "374950284"
+ *       "role": "user"
+ *       "sector": "1c*"
+ *       "facebookId": "1293093798150144"
+ *    }
+ *
  *
  * @apiSuccess {Boolean} success Return true on success.
  * @apiSuccess {String} message Human readable message to display for clients.
@@ -348,6 +401,13 @@
  * @apiHeader {String} x-access-token User access-token from Alenvi
  *
  * @apiParam {String} _id Unique id of the User.
+ *
+ * @apiExample {http} Example usage:
+ *    api/users/507f1f77bcf86cd799439011
+ *    // header
+ *    {
+ *       "x-access-token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE1MDMwNTIwNDYsImV4cCI6MTUzNDU4ODA0NiwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoianJvY2tldEBleGFtcGxlLmNvbSIsIkdpdmVuTmFtZSI6IkpvaG5ueSIsIlN1cm5hbWUiOiJSb2NrZXQiLCJFbWFpbCI6Impyb2NrZXRAZXhhbXBsZS5jb20iLCJSb2xlIjpbIk1hbmFnZXIiLCJQcm9qZWN0IEFkbWluaXN0cmF0b3IiXX0.KbNoaDFRo7ElOrYNrXqzAUZCAR3vwh2aL5awcyVwpQ0"
+ *    }
  *
  * @apiSuccess {Boolean} success Return true on success.
  * @apiSuccess {String} message Human readable message to display for clients.
