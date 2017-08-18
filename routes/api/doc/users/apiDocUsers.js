@@ -342,7 +342,7 @@
  * @api {delete} /api/users/:_id Delete an user by id
  * @apiVersion 1.0.0
  * @apiPermission admin
- * @apiName update
+ * @apiName delete
  * @apiGroup User
  *
  * @apiHeader {String} x-access-token User access-token from Alenvi
