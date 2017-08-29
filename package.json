@@ -18,6 +18,7 @@
     "bcrypt": "^1.0.2",
     "body-parser": "~1.17.1",
     "cookie-parser": "~1.4.3",
+    "cors": "^2.8.4",
     "crypto": "0.0.3",
     "debug": "~2.6.3",
     "dotenv": "^4.0.0",
@@ -43,8 +44,8 @@
     "eslint-plugin-import": "^2.3.0"
   },
   "apidoc": {
-        "name": "Alenvi webapp API",
-        "version": "1.0.0",
-        "description": "Documentation of Alenvi's webapp API"
+    "name": "Alenvi webapp API",
+    "version": "1.0.0",
+    "description": "Documentation of Alenvi's webapp API"
   }
 }

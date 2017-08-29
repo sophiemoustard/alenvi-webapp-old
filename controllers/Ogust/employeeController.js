@@ -101,7 +101,9 @@ const getEmployeeCustomers = async (req, res) => {
     // First we get services from Ogust by employee Id in a specific range
     const servicesInFourWeeks = await employees.getServices(
       req.headers['x-ogust-token'],
-      req.params.id, 'true', 'false', 2, 2, 'week', '', '',
+      req.params.id, 'true', 'false',
+      req.query.slotToSub || 2, req.query.slotToAdd || 2, req.query.intervalType || 'week',
+      '', '',
       req.query.status || '@!=|N',
       req.query.type || 'I',
       req.query.nbPerPage || '500',
