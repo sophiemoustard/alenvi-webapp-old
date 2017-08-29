@@ -11,7 +11,6 @@ const getEvents = async (req, res) => {
     if (!req.query.id_person) {
       return res.status(400).json({ success: false, message: translate[language].missingParameters });
     }
-    console.log(req.query);
     const servicesRaw = await employees.getServices(
       req.headers['x-ogust-token'],
       req.query.id_person, 'true', 'false',
@@ -26,57 +25,39 @@ const getEvents = async (req, res) => {
       return res.status(400).json({ success: false, message: servicesRaw.body.message });
     }
     // Put it in a variable so it's more readable
-    const servicesRawObj = servicesRaw.body.array_service.result;
-    if (Object.keys(servicesRawObj).length === 0) {
+    const events = servicesRaw.body.array_service.result;
+    if (Object.keys(events).length === 0) {
       // "Il semble que tu n'aies aucune intervention de prévues d'ici 2 semaines !"
       return res.status(404).json({ success: false, message: translate[language].servicesNotFound });
     }
-    // const uniqCustomers = [];
-    const events = [];
-    const id_customersArr = [];
-    for (const service in servicesRawObj) {
-      if (!_.includes(id_customersArr, servicesRawObj[service].id_customer)) {
-        const customerRaw = await customers.getCustomerById(req.headers['x-ogust-token'], servicesRawObj[service].id_customer, req.query.status || 'A');
+    const uniqCustomers = [];
+    for (const index in events) {
+      let isUniq = false;
+      if (!_.some(uniqCustomers, ['id_customer', events[index].id_customer])) {
+        isUniq = true;
+        const customerRaw = await customers.getCustomerById(req.headers['x-ogust-token'], events[index].id_customer, req.query.status || 'A');
         if (customerRaw.body.status == 'KO') {
           return res.status(400).json({ success: false, message: customerRaw.body.message });
         }
-        console.log(customerRaw.body);
-        id_customersArr.push(customerRaw.body.customers);
+        uniqCustomers.push(customerRaw.body.customer);
+        events[index].customer = {
+          id_customer: customerRaw.body.customer.id_customer,
+          title: customerRaw.body.customer.title,
+          firstname: customerRaw.body.customer.first_name,
+          lastname: customerRaw.body.customer.last_name
+        };
+      }
+      if (isUniq === false) {
+        const customerUncut = _.find(uniqCustomers, ['id_customer', events[index].id_customer]);
+        events[index].customer = {
+          id_customer: customerUncut.id_customer,
+          title: customerUncut.title,
+          firstname: customerUncut.first_name,
+          lastname: customerUncut.last_name
+        };
       }
     }
-    // const servicesUniqCustomers = _.uniqBy(_.values(servicesRawObj), 'id_customer');
-    // console.log(servicesUniqCustomers.length);
-    // for (const service in servicesRawObj) {
-    //   if (_.includes(servicesUniqCustomers[k], servicesRawObj[service].id_customer)) {
-    //     console.log('TEST');
-    //     // uniqCustomers.push(servicesRawObj[service].id_customer);
-    //     const customerRaw = await customers.getCustomerById(req.headers['x-ogust-token'], servicesRawObj[service].id_customer, req.query.status || 'A');
-    //     if (customerRaw.body.status == 'KO') {
-    //       return res.status(400).json({ success: false, message: customerRaw.body.message });
-    //     }
-    //     events.push({ customer: customerRaw.body.customer, services: servicesRawObj[service] });
-    //   }
-    // }
-    // res.status(200).json({ success: true, message: translate[language].userShowAllFound, data: { events } });
-    res.status(200).json({ success: true, message: translate[language].userShowAllFound, data: { id_customersArr } });
-    // const servicesUniqCustomers = _.uniqBy(_.values(servicesRawObj), 'id_customer');
-    // // Get only id_customer properties (without '0' id_customer)
-    // const uniqCustomers = servicesUniqCustomers.filter(
-    //   (service) => {
-    //     if (service.id_customer != 0 && service.id_customer != '271395715'
-    //     && service.id_customer != '244566438' && service.id_customer != '286871430') {
-    //       // Not Reunion Alenvi please
-    //       return service;
-    //     }
-    //   }).map(service => service.id_customer); // Put it in array of id_customer    for (const service in servicesRawObj) {
-    // for (let i = 0; i < uniqCustomers.length; i++) {
-    //   const customerRaw = await customers.getCustomerById(req.headers['x-ogust-token'], uniqCustomers[i], req.query.status || 'A');
-    //   if (customerRaw.body.status == 'KO') {
-    //     return res.status(400).json({ success: false, message: customerRaw.body.message });
-    //   }
-    //   myRawCustomers.push(customerRaw.body.customer);
-    // }
-    // res.status(200).json({ success: true, message: translate[language].userShowAllFound, data: { customers: myRawCustomers } });
+    res.status(200).json({ success: true, message: translate[language].userShowAllFound, data: { events } });
   } catch (e) {
     console.error(e);
     res.status(500).json({ success: false, message: translate[language].unexpectedBehavior });
