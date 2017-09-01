@@ -11,11 +11,28 @@ const { getIntervalInRange } = require('../../helpers/intervalInRange');
 ** - nature: customer nature
 ** Method: POST
 */
-exports.getCustomers = async (token, status, nbperpage, pagenum) => {
+
+// const param = {
+//   qs: {
+//
+//   },
+//   body: {
+//
+//   }
+// }
+//
+// const param2 = _pickBy(param);
+
+exports.getCustomers = async (params) => {
   const options = {
     url: `${Ogust.API_LINK}searchCustomer`,
     json: true,
-    body: { token, status, nbperpage, pagenum },
+    body: {
+      token: params.token,
+      status: params.status,
+      nbperpage: params.nbperpage,
+      pagenum: params.pagenum
+    },
     resolveWithFullResponse: true,
     time: true,
   };
@@ -31,11 +48,15 @@ exports.getCustomers = async (token, status, nbperpage, pagenum) => {
 ** - status: customer status
 ** Method: POST
 */
-exports.getCustomerById = async (token, id, status) => {
+exports.getCustomerById = async (params) => {
   const options = {
     url: `${Ogust.API_LINK}getCustomer`,
     json: true,
-    body: { token, id_customer: id, status },
+    body: {
+      token: params.token,
+      id_customer: params.id,
+      status: params.status
+    },
     resolveWithFullResponse: true,
     time: true,
   };
@@ -43,16 +64,16 @@ exports.getCustomerById = async (token, id, status) => {
   return result;
 };
 
-exports.getThirdPartyInformationByCustomerId = async (token, id, third_party, nbperpage, pagenum) => {
+exports.getThirdPartyInformationByCustomerId = async (params) => {
   const options = {
     url: `${Ogust.API_LINK}getThirdPartyInformations`,
     json: true,
     body: {
-      token,
-      nbperpage,
-      pagenum,
-      third_party,
-      third_party_id: id,
+      token: params.token,
+      nbperpage: params.nbperpage,
+      pagenum: params.pagenum,
+      third_party: params.third_party,
+      third_party_id: params.id,
     },
     resolveWithFullResponse: true,
     time: true,
@@ -61,15 +82,15 @@ exports.getThirdPartyInformationByCustomerId = async (token, id, third_party, nb
   return res;
 };
 
-exports.editThirdPartyInformationByCustomerId = async (token, id, thirdParty, arrayValues) => {
+exports.editThirdPartyInformationByCustomerId = async (params) => {
   const options = {
     url: `${Ogust.API_LINK}setThirdPartyInformations`,
     json: true,
     body: {
-      token,
-      third_party_id: id,
-      third_party: thirdParty,
-      array_values: arrayValues
+      token: params.token,
+      third_party_id: params.id,
+      third_party: params.third_party,
+      array_values: params.arrayValues
     },
     resolveWithFullResponse: true,
     time: true,
@@ -96,26 +117,26 @@ exports.editThirdPartyInformationByCustomerId = async (token, id, thirdParty, ar
 ** - pageNum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getServices = async (token, id, isRange, isDate, slotToSub, slotToAdd, intervalType, startDate, endDate, status, type, nbPerPage, pageNum) => {
+exports.getServices = async (params) => {
   let interval = {};
-  if (isRange == 'true') {
-    interval = getIntervalInRange(slotToSub, slotToAdd, intervalType);
+  if (params.isRange == 'true') {
+    interval = getIntervalInRange(params.slotToSub, params.slotToAdd, params.intervalType);
   }
-  if (isDate == 'true') {
-    interval.intervalBwd = parseInt(startDate, 10);
-    interval.intervalFwd = parseInt(endDate, 10);
+  if (params.isDate == 'true') {
+    interval.intervalBwd = parseInt(params.startDate, 10);
+    interval.intervalFwd = parseInt(params.endDate, 10);
   }
   const options = {
     url: `${Ogust.API_LINK}searchService`,
     json: true,
     body: {
-      token,
-      id_customer: id,
-      status,
-      type, // I = Intervention
+      token: params.token,
+      id_customer: params.id,
+      status: params.status,
+      type: params.type, // I = Intervention
       start_date: `${'@between|'}${interval.intervalBwd}|${interval.intervalFwd}`,
-      nbperpage: nbPerPage,
-      pagenum: pageNum
+      nbperpage: params.nbperpage,
+      pagenum: params.pagenum
     },
     resolveWithFullResponse: true,
     time: true

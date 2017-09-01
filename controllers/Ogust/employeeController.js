@@ -8,7 +8,15 @@ const language = translate.language;
 
 const getAll = async (req, res) => {
   try {
-    const users = await employees.getEmployees(req.headers['x-ogust-token'], req.query.status || 'A', req.query.nature || 'S', req.query.nbperpage || 50, req.query.pagenum || 1);
+    const params = {
+      token: req.headers['x-ogust-token'],
+      status: req.query.status || 'A',
+      nature: req.query.nature || 'S',
+      mobile_phone: req.query.mobile_phone || '',
+      nbperpage: req.query.nbperpage || 50,
+      pagenum: req.query.pagenum || 1
+    };
+    const users = await employees.getEmployees(params);
     if (users.body.status == 'KO') {
       res.status(400).json({ success: false, message: users.body.message });
       // throw new Error(`Error while getting employees: ${result.body.message}`);
@@ -28,7 +36,15 @@ const getAllBySector = async (req, res) => {
     if (!req.params.sector) {
       return res.status(400).json({ success: false, message: translate[language].missingParameters });
     }
-    const users = await employees.getEmployeesBySector(req.headers['x-ogust-token'], req.params.sector, req.query.status || 'A', req.query.nature || 'S', req.query.nbperpage, req.query.pagenum);
+    const params = {
+      token: req.headers['x-ogust-token'],
+      sector: req.params.sector,
+      status: req.query.status || 'A',
+      nature: req.query.nature || 'S',
+      nbperpage: req.query.nbperpage,
+      pagenum: req.query.pagenum
+    };
+    const users = await employees.getEmployeesBySector(params);
     if (users.body.status == 'KO') {
       res.status(400).json({ success: false, message: users.body.message });
     } else if (users.length === 0) {
@@ -44,7 +60,12 @@ const getAllBySector = async (req, res) => {
 
 const getById = async (req, res) => {
   try {
-    const user = await employees.getEmployeeById(req.headers['x-ogust-token'], req.params.id, req.query.status || 'A');
+    const params = {
+      token: req.headers['x-ogust-token'],
+      id: req.params.id,
+      status: req.query.status || 'A'
+    };
+    const user = await employees.getEmployeeById(params);
     if (user.body.status == 'KO') {
       res.status(400).json({ success: false, message: user.body.message });
     } else if (user.length === 0) {
@@ -66,17 +87,22 @@ const getEmployeeServices = async (req, res) => {
     }
     if ((req.query.isRange == 'true' && req.query.slotToSub && req.query.slotToAdd && req.query.intervalType)
     || (req.query.isDate == 'true' && req.query.startDate && req.query.endDate)) {
-      servicesRaw = await employees.getServices(
-        req.headers['x-ogust-token'],
-        req.params.id,
-        req.query.isRange || 'false',
-        req.query.isDate || 'false',
-        req.query.slotToSub || '', req.query.slotToAdd || '', req.query.intervalType || '',
-        req.query.startDate || '', req.query.endDate || '',
-        req.query.status || '@!=|N',
-        req.query.type || 'I',
-        req.query.nbPerPage || '100', req.query.pageNum || '1'
-      );
+      const params = {
+        token: req.headers['x-ogust-token'],
+        id: req.params.id,
+        isRange: req.query.isRange || 'false',
+        isDate: req.query.isDate || 'false',
+        slotToSub: req.query.slotToSub || '',
+        slotToAdd: req.query.slotToAdd || '',
+        intervalType: req.query.intervalType || '',
+        startDate: req.query.startDate || '',
+        endDate: req.query.endDate || '',
+        status: req.query.status || '@!=|N',
+        type: req.query.type || 'I',
+        nbperpage: req.query.nbPerPage || '100',
+        pagenum: req.query.pageNum || '1'
+      };
+      servicesRaw = await employees.getServices(params);
     } else {
       return res.status(400).json({ success: false, message: translate[language].missingParameters });
     }
@@ -98,17 +124,23 @@ const getEmployeeCustomers = async (req, res) => {
     if (!req.params.id) {
       return res.status(400).json({ success: false, message: translate[language].missingParameters });
     }
+    const params = {
+      token: req.headers['x-ogust-token'],
+      id: req.params.id,
+      isRange: 'true',
+      isDate: 'false',
+      slotToSub: req.query.slotToSub || 2,
+      slotToAdd: req.query.slotToAdd || 2,
+      intervalType: req.query.intervalType || 'week',
+      startDate: '',
+      endDate: '',
+      status: req.query.status || '@!=|N',
+      type: req.query.type || 'I',
+      nbperpage: req.query.nbPerPage || '500',
+      pagenum: req.query.pageNum || '1'
+    };
     // First we get services from Ogust by employee Id in a specific range
-    const servicesInFourWeeks = await employees.getServices(
-      req.headers['x-ogust-token'],
-      req.params.id, 'true', 'false',
-      req.query.slotToSub || 2, req.query.slotToAdd || 2, req.query.intervalType || 'week',
-      '', '',
-      req.query.status || '@!=|N',
-      req.query.type || 'I',
-      req.query.nbPerPage || '500',
-      req.query.pageNum || '1'
-    );
+    const servicesInFourWeeks = await employees.getServices(params);
     if (servicesInFourWeeks.body.status == 'KO') {
       return res.status(400).json({ success: false, message: servicesInFourWeeks.body.message });
     }
@@ -150,7 +182,13 @@ const getEmployeeSalaries = async (req, res) => {
     if (!req.params.id) {
       return res.status(400).json({ success: false, message: translate[language].missingParameters });
     }
-    const salariesRaw = await employees.getSalaries(req.headers['x-ogust-token'], req.params.id, req.query.nbPerPage || '24', req.query.pageNum || '1');
+    const params = {
+      token: req.headers['x-ogust-token'],
+      id: req.params.id,
+      nbperpage: req.query.nbPerPage || '24',
+      pagenum: req.query.pageNum || '1'
+    };
+    const salariesRaw = await employees.getSalaries(params);
     if (salariesRaw.body.status == 'KO') {
       res.status(400).json({ success: false, message: salariesRaw.body.message });
     } else if (salariesRaw.length === 0) {

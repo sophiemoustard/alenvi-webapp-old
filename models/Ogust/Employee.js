@@ -11,11 +11,18 @@ const { getIntervalInRange } = require('../../helpers/intervalInRange');
 ** - nature: employee nature (employee, customer...)
 ** Method: POST
 */
-exports.getEmployees = async (token, status, nature, nbperpage, pagenum) => {
+exports.getEmployees = async (params) => {
   const options = {
     url: `${Ogust.API_LINK}searchEmployee`,
     json: true,
-    body: { token, status, nature, nbperpage, pagenum },
+    body: {
+      token: params.token,
+      status: params.status,
+      nature: params.nature,
+      mobile_phone: params.mobile_phone,
+      nbperpage: params.nbperpage,
+      pagenum: params.pagenum
+    },
     resolveWithFullResponse: true,
     time: true,
   };
@@ -32,12 +39,19 @@ exports.getEmployees = async (token, status, nature, nbperpage, pagenum) => {
 ** - pagenum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getEmployeesBySector = async (token, sector, status, nature, nbperpage, pagenum) => {
+exports.getEmployeesBySector = async (params) => {
   const options = {
     url: `${Ogust.API_LINK}searchEmployee`,
     json: true,
     // status 'A' = 'Actif', nature 'S' = 'Salarié'
-    body: { token, sector, status, nature, nbperpage, pagenum },
+    body: {
+      token: params.token,
+      sector: params.sector,
+      status: params.status,
+      nature: params.nature,
+      nbperpage: params.nbperpage,
+      pagenum: params.pagenum
+    },
     resolveWithFullResponse: true,
     time: true,
   };
@@ -53,11 +67,15 @@ exports.getEmployeesBySector = async (token, sector, status, nature, nbperpage, 
 ** - status: employee status
 ** Method: POST
 */
-exports.getEmployeeById = async (token, id, status) => {
+exports.getEmployeeById = async (params) => {
   const options = {
     url: `${Ogust.API_LINK}getEmployee`,
     json: true,
-    body: { token, id_employee: id, status },
+    body: {
+      token: params.token,
+      id_employee: params.id,
+      status: params.status
+    },
     resolveWithFullResponse: true,
     time: true,
   };
@@ -83,26 +101,26 @@ exports.getEmployeeById = async (token, id, status) => {
 ** - pageNum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getServices = async (token, id, isRange, isDate, slotToSub, slotToAdd, intervalType, startDate, endDate, status, type, nbPerPage, pageNum) => {
+exports.getServices = async (params) => {
   let interval = {};
-  if (isRange == 'true') {
-    interval = getIntervalInRange(slotToSub, slotToAdd, intervalType);
+  if (params.isRange == 'true') {
+    interval = getIntervalInRange(params.slotToSub, params.slotToAdd, params.intervalType);
   }
-  if (isDate == 'true') {
-    interval.intervalBwd = parseInt(startDate, 10);
-    interval.intervalFwd = parseInt(endDate, 10);
+  if (params.isDate == 'true') {
+    interval.intervalBwd = parseInt(params.startDate, 10);
+    interval.intervalFwd = parseInt(params.endDate, 10);
   }
   const options = {
     url: `${Ogust.API_LINK}searchService`,
     json: true,
     body: {
-      token,
-      id_employee: id,
-      status,
-      type, // I = Intervention
+      token: params.token,
+      id_employee: params.id,
+      status: params.status,
+      type: params.type, // I = Intervention
       start_date: `${'@between|'}${interval.intervalBwd}|${interval.intervalFwd}`,
-      nbperpage: nbPerPage,
-      pagenum: pageNum
+      nbperpage: params.nbperpage,
+      pagenum: params.pagenum
     },
     resolveWithFullResponse: true,
     time: true
@@ -120,15 +138,15 @@ exports.getServices = async (token, id, isRange, isDate, slotToSub, slotToAdd, i
 ** - pageNum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getSalaries = async (token, id, nbperpage, pagenum) => {
+exports.getSalaries = async (params) => {
   const options = {
     url: `${Ogust.API_LINK}searchSalary`,
     json: true,
     body: {
-      token,
-      id_employee: id,
-      nbperpage,
-      pagenum,
+      token: params.token,
+      id_employee: params.id,
+      nbperpage: params.nbperpage,
+      pagenum: params.pagenum,
     },
     resolveWithFullResponse: true,
     time: true,

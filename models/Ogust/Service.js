@@ -25,25 +25,25 @@ const { getIntervalInRange } = require('../../helpers/intervalInRange');
 ** - pageNum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getServices = async (token, isRange, isDate, slotToSub, slotToAdd, intervalType, startDate, endDate, status, type, nbPerPage, pageNum) => {
+exports.getServices = async (params) => {
   let interval = {};
-  if (isRange == 'true') {
-    interval = getIntervalInRange(slotToSub, slotToAdd, intervalType);
+  if (params.isRange == 'true') {
+    interval = getIntervalInRange(params.slotToSub, params.slotToAdd, params.intervalType);
   }
-  if (isDate == 'true') {
-    interval.intervalBwd = parseInt(startDate, 10);
-    interval.intervalFwd = parseInt(endDate, 10);
+  if (params.isDate == 'true') {
+    interval.intervalBwd = parseInt(params.startDate, 10);
+    interval.intervalFwd = parseInt(params.endDate, 10);
   }
   const options = {
     url: `${Ogust.API_LINK}searchService`,
     json: true,
     body: {
-      token,
-      status,
-      type, // I = Intervention
+      token: params.token,
+      status: params.status,
+      type: params.type, // I = Intervention
       start_date: `${'@between|'}${interval.intervalBwd}|${interval.intervalFwd}`,
-      nbperpage: nbPerPage,
-      pagenum: pageNum
+      nbperpage: params.nbperpage,
+      pagenum: params.pagenum
     },
     resolveWithFullResponse: true,
     time: true
@@ -61,15 +61,15 @@ exports.getServices = async (token, isRange, isDate, slotToSub, slotToAdd, inter
 ** - type: 'I'...
 ** METHOD: POST
 */
-exports.getServiceById = async (token, id, status, type) => {
+exports.getServiceById = async (params) => {
   const options = {
     url: `${Ogust.API_LINK}getService`,
     json: true,
     body: {
-      token,
-      id_service: id,
-      status,
-      type // I = Intervention
+      token: params.token,
+      id_service: params.id,
+      status: params.status,
+      type: params.type // I = Intervention
     },
     resolveWithFullResponse: true,
     time: true

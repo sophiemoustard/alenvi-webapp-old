@@ -8,20 +8,21 @@ const getAll = async (req, res) => {
     let servicesRaw = {};
     if ((req.query.isRange == 'true' && req.query.slotToSub && req.query.slotToAdd && req.query.intervalType)
     || (req.query.isDate == 'true' && req.query.startDate && req.query.endDate)) {
-      servicesRaw = await services.getServices(
-        req.headers['x-ogust-token'],
-        req.query.isRange || false,
-        req.query.isDate || false,
-        req.query.slotToSub || '',
-        req.query.slotToAdd || '',
-        req.query.intervalType || '',
-        req.query.startDate || '',
-        req.query.endDate || '',
-        req.query.status || '@!=|N',
-        req.query.type || 'I',
-        req.query.nbPerPage || '100',
-        req.query.pageNum || '1'
-      );
+      const params = {
+        token: req.headers['x-ogust-token'],
+        isRange: req.query.isRange || false,
+        isDate: req.query.isDate || false,
+        slotToSub: req.query.slotToSub || '',
+        slotToAdd: req.query.slotToAdd || '',
+        intervalType: req.query.intervalType || '',
+        startDate: req.query.startDate || '',
+        endDate: req.query.endDate || '',
+        status: req.query.status || '@!=|N',
+        type: req.query.type || 'I',
+        nbperpage: req.query.nbPerPage || '100',
+        pagenum: req.query.pageNum || '1'
+      };
+      servicesRaw = await services.getServices(params);
     } else {
       return res.status(400).json({ success: false, message: translate[language].missingParameters });
     }
@@ -44,12 +45,13 @@ const getById = async (req, res) => {
     if (!req.params.id) {
       return res.status(400).json({ success: false, message: translate[language].missingParameters });
     }
-    servicesRaw = await services.getServiceById(
-      req.headers['x-ogust-token'],
-      req.params.id,
-      req.query.status || '@!=|N',
-      req.query.type || 'I'
-    );
+    const params = {
+      token: req.headers['x-ogust-token'],
+      id: req.params.id,
+      status: req.query.status || '@!=|N',
+      type: req.query.type || 'I'
+    };
+    servicesRaw = await services.getServiceById(params);
     if (servicesRaw.body.status == 'KO') {
       res.status(400).json({ success: false, message: servicesRaw.body.message });
     } else if (servicesRaw.length === 0) {
