@@ -1,6 +1,7 @@
 const translate = require('../../helpers/translate');
 const customers = require('../../models/Ogust/Customer');
 const { redirectToBot } = require('../../models/Bot/bot');
+const _ = require('lodash');
 
 const language = translate.language;
 
@@ -12,7 +13,8 @@ const getAll = async (req, res) => {
       nbperpage: req.query.nbperpage || 50,
       pagenum: req.query.pagenum || 1
     };
-    const users = await customers.getCustomers(params);
+    const newParams = _.pickBy(params);
+    const users = await customers.getCustomers(newParams);
     if (users.body.status == 'KO') {
       res.status(400).json({ success: false, message: users.body.message });
       // throw new Error(`Error while getting employees: ${result.body.message}`);
@@ -37,7 +39,8 @@ const getById = async (req, res) => {
       id: req.params.id,
       status: req.query.status || 'A'
     };
-    const user = await customers.getCustomerById(params);
+    const newParams = _.pickBy(params);
+    const user = await customers.getCustomerById(newParams);
     if (user.body.status == 'KO') {
       res.status(400).json({ success: false, message: user.body.message });
     } else if (user.length === 0) {
@@ -74,7 +77,8 @@ const getCustomerServices = async (req, res) => {
         nbperpage: req.query.nbPerPage || '100',
         pagenum: req.query.pageNum || '1'
       };
-      servicesRaw = await customers.getServices(params);
+      const newParams = _.pickBy(params);
+      servicesRaw = await customers.getServices(newParams);
     } else {
       return res.status(400).json({ success: false, message: translate[language].missingParameters });
     }
@@ -103,7 +107,8 @@ const getThirdPartyInformation = async (req, res) => {
       nbperpage: req.query.nbperpage || 10,
       pagenum: req.query.pagenum || 1
     };
-    const thirdPartyInfos = await customers.getThirdPartyInformationByCustomerId(params);
+    const newParams = _.pickBy(params);
+    const thirdPartyInfos = await customers.getThirdPartyInformationByCustomerId(newParams);
     if (thirdPartyInfos.body.status == 'KO') {
       res.status(400).json({ success: false, message: thirdPartyInfos.body.message });
     } else if (thirdPartyInfos.length === 0) {
@@ -128,7 +133,8 @@ const editThirdPartyInformation = async (req, res) => {
       third_party: req.query.third_party || 'C',
       arrayValues: req.body.arrayValues
     };
-    const thirdPartyInfos = await customers.editThirdPartyInformationByCustomerId(params);
+    const newParams = _.pickBy(params);
+    const thirdPartyInfos = await customers.editThirdPartyInformationByCustomerId(newParams);
     if (thirdPartyInfos.body.status == 'KO') {
       res.status(400).json({ success: false, message: thirdPartyInfos.body.message });
     } else {

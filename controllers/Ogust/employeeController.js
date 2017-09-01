@@ -16,7 +16,8 @@ const getAll = async (req, res) => {
       nbperpage: req.query.nbperpage || 50,
       pagenum: req.query.pagenum || 1
     };
-    const users = await employees.getEmployees(params);
+    const newParams = _.pickBy(params);
+    const users = await employees.getEmployees(newParams);
     if (users.body.status == 'KO') {
       res.status(400).json({ success: false, message: users.body.message });
       // throw new Error(`Error while getting employees: ${result.body.message}`);
@@ -44,7 +45,8 @@ const getAllBySector = async (req, res) => {
       nbperpage: req.query.nbperpage,
       pagenum: req.query.pagenum
     };
-    const users = await employees.getEmployeesBySector(params);
+    const newParams = _.pickBy(params);
+    const users = await employees.getEmployeesBySector(newParams);
     if (users.body.status == 'KO') {
       res.status(400).json({ success: false, message: users.body.message });
     } else if (users.length === 0) {
@@ -65,7 +67,8 @@ const getById = async (req, res) => {
       id: req.params.id,
       status: req.query.status || 'A'
     };
-    const user = await employees.getEmployeeById(params);
+    const newParams = _.pickBy(params);
+    const user = await employees.getEmployeeById(newParams);
     if (user.body.status == 'KO') {
       res.status(400).json({ success: false, message: user.body.message });
     } else if (user.length === 0) {
@@ -102,7 +105,8 @@ const getEmployeeServices = async (req, res) => {
         nbperpage: req.query.nbPerPage || '100',
         pagenum: req.query.pageNum || '1'
       };
-      servicesRaw = await employees.getServices(params);
+      const newParams = _.pickBy(params);
+      servicesRaw = await employees.getServices(newParams);
     } else {
       return res.status(400).json({ success: false, message: translate[language].missingParameters });
     }
@@ -140,7 +144,8 @@ const getEmployeeCustomers = async (req, res) => {
       pagenum: req.query.pageNum || '1'
     };
     // First we get services from Ogust by employee Id in a specific range
-    const servicesInFourWeeks = await employees.getServices(params);
+    const newParams = _.pickBy(params);
+    const servicesInFourWeeks = await employees.getServices(newParams);
     if (servicesInFourWeeks.body.status == 'KO') {
       return res.status(400).json({ success: false, message: servicesInFourWeeks.body.message });
     }
@@ -164,7 +169,13 @@ const getEmployeeCustomers = async (req, res) => {
     ).map(service => service.id_customer); // Put it in array of id_customer
     const myRawCustomers = [];
     for (let i = 0; i < uniqCustomers.length; i++) {
-      const customerRaw = await customers.getCustomerById(req.headers['x-ogust-token'], uniqCustomers[i], req.query.status || 'A');
+      const customerParams = {
+        token: req.headers['x-ogust-token'],
+        id: uniqCustomers[i],
+        status: req.query.status || 'A',
+      };
+      const newCustomerParams = _.pickBy(customerParams);
+      const customerRaw = await customers.getCustomerById(newCustomerParams);
       if (customerRaw.body.status == 'KO') {
         return res.status(400).json({ success: false, message: customerRaw.body.message });
       }
@@ -188,7 +199,8 @@ const getEmployeeSalaries = async (req, res) => {
       nbperpage: req.query.nbPerPage || '24',
       pagenum: req.query.pageNum || '1'
     };
-    const salariesRaw = await employees.getSalaries(params);
+    const newParams = _.pickBy(params);
+    const salariesRaw = await employees.getSalaries(newParams);
     if (salariesRaw.body.status == 'KO') {
       res.status(400).json({ success: false, message: salariesRaw.body.message });
     } else if (salariesRaw.length === 0) {

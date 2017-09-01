@@ -1,5 +1,6 @@
 const translate = require('../../helpers/translate');
 const services = require('../../models/Ogust/Service');
+const _ = require('lodash');
 
 const language = translate.language;
 
@@ -22,7 +23,8 @@ const getAll = async (req, res) => {
         nbperpage: req.query.nbPerPage || '100',
         pagenum: req.query.pageNum || '1'
       };
-      servicesRaw = await services.getServices(params);
+      const newParams = _.pickBy(params);
+      servicesRaw = await services.getServices(newParams);
     } else {
       return res.status(400).json({ success: false, message: translate[language].missingParameters });
     }
@@ -51,7 +53,8 @@ const getById = async (req, res) => {
       status: req.query.status || '@!=|N',
       type: req.query.type || 'I'
     };
-    servicesRaw = await services.getServiceById(params);
+    const newParams = _.pickBy(params);
+    servicesRaw = await services.getServiceById(newParams);
     if (servicesRaw.body.status == 'KO') {
       res.status(400).json({ success: false, message: servicesRaw.body.message });
     } else if (servicesRaw.length === 0) {
