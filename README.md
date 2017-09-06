@@ -1,6 +1,6 @@
-# Quasar App
+# Alenvi Webapp
 
-> A Quasar project
+> Alenvi Webapp in combination with 'Pigi' chatbot
 
 ## Build Setup
 
