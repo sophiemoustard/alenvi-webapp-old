@@ -12,7 +12,6 @@ export default {
     const data = [];
     let period;
     const mode = scheduler.getState().mode;
-    console.log(mode);
     switch (mode) {
       case 'month':
         period = 'month';
