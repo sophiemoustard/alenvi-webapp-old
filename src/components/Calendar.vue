@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <scheduler :events="events" @addToSlot="getEventsData" @subFromSlot="getEventsData" @agendaView="getEventsData"></scheduler>
+    <scheduler :events="events" @getData="getEventsData"></scheduler>
   </div>
 </template>
 

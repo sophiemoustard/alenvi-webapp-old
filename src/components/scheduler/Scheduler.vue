@@ -1,13 +1,13 @@
 <template lang="html">
   <div ref="scheduler_here" class="dhx_cal_container" style='width:100%; height:100%;'>
     <div class="dhx_cal_navline">
-      <div @click="decrement" class="dhx_cal_prev_button">&nbsp;</div>
-      <div @click="increment" class="dhx_cal_next_button">&nbsp;</div>
+      <div @click="getData" class="dhx_cal_prev_button">&nbsp;</div>
+      <div @click="getData" class="dhx_cal_next_button">&nbsp;</div>
       <div class="dhx_cal_today_button"></div>
       <div class="dhx_cal_date"></div>
-      <div class="dhx_cal_tab" name="day_tab" style="right:204px;"></div>
-      <div class="dhx_cal_tab" name="week_tab" style="right:140px;"></div>
-      <div class="dhx_cal_tab" name="month_tab" style="right:76px;"></div>
+      <div @click="getData" class="dhx_cal_tab" name="day_tab" style="right:204px;"></div>
+      <div @click="getData" class="dhx_cal_tab" name="week_tab" style="right:140px;"></div>
+      <div @click="getData" class="dhx_cal_tab" name="month_tab" style="right:76px;"></div>
     </div>
     <div class="dhx_cal_header"></div>
     <div class="dhx_cal_data"></div>
@@ -44,6 +44,8 @@ export default {
     scheduler.config.last_hour = 24;
     // disable double click
     scheduler.config.dblclick_create = false;
+    scheduler.config.drag_resize= false;
+    scheduler.config.drag_move= false;
     // scheduler.config.touch_tip = false;
     // disable left buttons on lightbox
     scheduler.config.buttons_left = [];
@@ -77,18 +79,15 @@ export default {
     // Scheduler data parser
     scheduler.parse(this.$props.events, 'json');
     // Prevent draggable events
-    scheduler.attachEvent('onBeforeDrag', this.blockReadOnly);
+    // scheduler.attachEvent('onEventDrag', this.blockReadOnly);
   },
   methods: {
-    blockReadOnly(id) {
-      if (!id) return true;
-      return !scheduler.getEvent(id).readonly;
-    },
-    increment() {
-      this.$emit('addToSlot');
-    },
-    decrement() {
-      this.$emit('subFromSlot');
+    // blockReadOnly(id) {
+    //   if (!id) return true;
+    //   return !scheduler.getEvent(id).readonly;
+    // },
+    getData() {
+      this.$emit('getData');
     }
   }
 }
