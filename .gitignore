@@ -50,3 +50,10 @@ jspm_packages
 
 # Env local variables
 .env
+
+#thumbs.db
+.thumbs.db
+
+#cordova
+cordova/platforms
+cordova/plugins
