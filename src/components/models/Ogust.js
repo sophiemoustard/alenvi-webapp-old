@@ -17,7 +17,7 @@ export default {
         period = 'month';
         break;
       case 'week':
-        period = 'week';
+        period = 'isoweek';
         break;
       case 'day':
         period = 'day';
