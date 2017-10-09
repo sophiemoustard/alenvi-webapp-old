@@ -21,6 +21,8 @@ import 'dhtmlx-scheduler/codebase/ext/dhtmlxscheduler_readonly.js';
 import 'dhtmlx-scheduler/codebase/ext/dhtmlxscheduler_container_autoresize.js';
 import responsive from './scripts/dhtmlxscheduler-responsive.js';
 
+import { debounce } from 'quasar'
+
 export default {
   name: 'scheduler',
   props: {
@@ -88,7 +90,23 @@ export default {
     // },
     getData() {
       this.$emit('getData');
-    }
+    },
+    handleScroll: debounce(function() {
+      const headerToFix = document.getElementsByClassName('dhx_cal_header')[0];
+      let currentScroll = window.pageYOffset;
+      console.log(currentScroll);
+      if (currentScroll >= 60) {
+        headerToFix.classList.add('header-fixed');
+      } else {
+        headerToFix.classList.remove('header-fixed');
+      }
+    }, 10)
+  },
+  created() {
+    window.addEventListener('scroll', this.handleScroll);
+  },
+  destroyed() {
+    window.removeEventListener('scroll', this.handleScroll);
   }
 }
 </script>
@@ -96,4 +114,10 @@ export default {
 <style lang="css" scoped>
   @import "~dhtmlx-scheduler/codebase/dhtmlxscheduler.css";
   @import "../../assets/dhtmlxscheduler-responsive.css";
+
+  .header-fixed {
+    position: fixed;
+    top: 0px !important;
+  }
+
 </style>
