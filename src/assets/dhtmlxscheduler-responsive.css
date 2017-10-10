@@ -158,9 +158,9 @@ tr.dhx_grid_event td {
 	}
 
 	/*scheduler data*/
-	.dhx_cal_data {
+	/*.dhx_cal_data {
 		overflow-y: auto !important;
-	}
+	}*/
 
 	.grey_section, .red_section {
 		font-size: 14px !important;

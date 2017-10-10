@@ -82,6 +82,11 @@ export default {
       }
     ];
 
+    var format = scheduler.date.date_to_str("%H:%i");
+    scheduler.templates.hour_scale = function(date){
+      return "<div style='height:44px;line-height:0px'>"+format(date)+"</div>";
+    }
+
     responsive.initResponsive(scheduler);
     // Scheduler initialization
     scheduler.init(this.$refs.scheduler_here, new Date(), 'week');
@@ -97,12 +102,6 @@ export default {
     scheduler.attachEvent("onClick", function (id, e) {
       scheduler.showLightbox(id);
     });
-
-    var format = scheduler.date.date_to_str("%H:%i");
-
-    scheduler.templates.hour_scale = function(date){
-      return "<div style='height:44px;line-height:0px'>"+format(date)+"</div>";
-    }
   },
   methods: {
     // blockReadOnly(id) {
@@ -147,8 +146,8 @@ export default {
   }
 
   .dhx_cal_data {
-    /*overflow-y: visible;*/
-    /*overflow-x: visible;*/
+    overflow-y: visible;
+    overflow-x: visible;
     border-top: none;
     /*padding-top: 10px;*/
   }
