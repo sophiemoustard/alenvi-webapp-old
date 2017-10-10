@@ -1,5 +1,6 @@
 <template lang="html">
   <div ref="scheduler_here" class="dhx_cal_container" style='width:100%; height:100%;'>
+    <q-window-resize-observable @resize="onResize" />
     <div class="dhx_cal_navline">
       <div @click="getData" class="dhx_cal_prev_button">&nbsp;</div>
       <div @click="getData" class="dhx_cal_next_button">&nbsp;</div>
@@ -21,9 +22,12 @@ import 'dhtmlx-scheduler/codebase/ext/dhtmlxscheduler_readonly.js';
 import 'dhtmlx-scheduler/codebase/ext/dhtmlxscheduler_container_autoresize.js';
 import responsive from './scripts/dhtmlxscheduler-responsive.js';
 
-import { debounce } from 'quasar'
+import { debounce, QWindowResizeObservable } from 'quasar'
 
 export default {
+  components: {
+    QWindowResizeObservable
+  },
   name: 'scheduler',
   props: {
     events: {
@@ -36,6 +40,12 @@ export default {
           end_date: '',
         }]
       }
+    }
+  },
+  data() {
+    return {
+      width: '',
+      height: ''
     }
   },
   mounted() {
@@ -94,13 +104,19 @@ export default {
     handleScroll: debounce(function() {
       const headerToFix = document.getElementsByClassName('dhx_cal_header')[0];
       let currentScroll = window.pageYOffset;
-      console.log(currentScroll);
-      if (currentScroll >= 60) {
+      console.log(this.width);
+      if (currentScroll >= 60 && this.width >= 768) {
+        headerToFix.classList.add('header-fixed');
+      } else if (currentScroll >= 131 && this.width < 768) {
         headerToFix.classList.add('header-fixed');
       } else {
         headerToFix.classList.remove('header-fixed');
       }
-    }, 10)
+    }, 10),
+    onResize(size) {
+      this.width = size.width;
+      this.height = size.height;
+    }
   },
   created() {
     window.addEventListener('scroll', this.handleScroll);
