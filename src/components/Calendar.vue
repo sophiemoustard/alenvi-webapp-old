@@ -10,6 +10,9 @@ import Ogust from './models/Ogust'
 import 'dhtmlx-scheduler'
 
 export default {
+  metaInfo: {
+    title: 'Planning'
+  },
   components: {
     Scheduler
   },

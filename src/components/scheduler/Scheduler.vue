@@ -58,6 +58,8 @@ export default {
     // hide select bar in day and week views
     scheduler.config.select = false;
     scheduler.config.touch_tip = false;
+    // scheduler.config.hour_size_px = 60;
+    scheduler.xy.scale_height = 25;
     scheduler.config.lightbox.sections = [
       {
         name: "description",
@@ -80,6 +82,15 @@ export default {
     scheduler.parse(this.$props.events, 'json');
     // Prevent draggable events
     // scheduler.attachEvent('onEventDrag', this.blockReadOnly);
+    scheduler.attachEvent("onClick", function (id, e) {
+      scheduler.showLightbox(id);
+    });
+
+    var format = scheduler.date.date_to_str("%H:%i");
+
+    scheduler.templates.hour_scale = function(date){
+      return "<div style='height:44px;line-height:0px'>"+format(date)+"</div>";
+    }
   },
   methods: {
     // blockReadOnly(id) {
@@ -93,7 +104,19 @@ export default {
 }
 </script>
 
-<style lang="css" scoped>
+<style lang="css">
   @import "~dhtmlx-scheduler/codebase/dhtmlxscheduler.css";
   @import "../../assets/dhtmlxscheduler-responsive.css";
+
+  .dhx_scale_hour {
+    border-bottom: none;
+    overflow: visible;
+  }
+
+  .dhx_cal_data {
+    /*overflow-y: visible;*/
+    /*overflow-x: visible;*/
+    border-top: none;
+    /*padding-top: 10px;*/
+  }
 </style>
