@@ -104,7 +104,6 @@ export default {
     handleScroll: debounce(function() {
       const headerToFix = document.getElementsByClassName('dhx_cal_header')[0];
       let currentScroll = window.pageYOffset;
-      console.log(this.width);
       if (currentScroll >= 60 && this.width >= 768) {
         headerToFix.classList.add('header-fixed');
       } else if (currentScroll >= 131 && this.width < 768) {
