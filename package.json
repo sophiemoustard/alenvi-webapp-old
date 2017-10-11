@@ -16,7 +16,7 @@
     "connect-history-api-fallback": "^1.1.0",
     "dhtmlx-scheduler": "^4.4.0",
     "express": "^4.15.4",
-    "moment": "^2.18.1",
+    "moment": "^2.19.0",
     "quasar-extras": "0.x",
     "quasar-framework": "^0.14.1",
     "vue": "~2.3.4",
