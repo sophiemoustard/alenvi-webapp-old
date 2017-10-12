@@ -1,5 +1,27 @@
 <template>
   <div class="layout-padding">
+    <div class="row justify-center">
+      <q-field class="col-xs-12 col-sm-6">
+        <q-input
+        v-model="customerCodes.doorCode"
+        float-label="Code porte"
+        type="textarea"
+        :min-rows="1"
+        :disable="disable">
+        </q-input>
+      </q-field>
+    </div>
+    <div class="row justify-center">
+      <q-field class="col-xs-12 col-sm-6">
+        <q-input
+        v-model="customerCodes.interCode"
+        float-label="Code interphone"
+        type="textarea"
+        :min-rows="1"
+        :disable="disable">
+        </q-input>
+      </q-field>
+    </div>
       <div class="row justify-center">
         <q-field class="col-xs-12 col-sm-6">
           <q-select
@@ -9,7 +31,7 @@
           :disable="disable"
           ></q-select>
         </q-field>
-    </div>
+      </div>
     <div class="row justify-center">
       <q-field class="col-xs-12 col-sm-6">
         <q-input
@@ -71,6 +93,10 @@ export default {
         accessToken: '',
         idCustomer: ''
       },
+      customerCodes: {
+        doorCode: '',
+        interCode: ''
+      },
       customerInfo: {
         pathology: '',
         comments: '',
@@ -120,6 +146,8 @@ export default {
       } else {
         this.queryParams.accessToken = this.$route.query.access_token
         this.queryParams.idCustomer = this.$route.query.id_customer
+        this.customerCodes.doorCode = this.$route.query.customer_door_code || ''
+        this.customerCodes.interCode = this.$route.query.customer_inter_code || ''
       }
     },
     async getCustomerInfo () {
@@ -149,6 +177,11 @@ export default {
     },
     async editCustomerInfo () {
       try {
+        if (PROD) {
+          apiLink = 'https://alenvi-api.herokuapp.com/ogust/customers'
+        } else {
+          apiLink = 'https://alenvi-api-dev.herokuapp.com/ogust/customers'
+        }
         const ogustToken = await Ogust.getOgustToken(this, this.queryParams.accessToken)
         let data = { arrayValues: {} }
         const infoTitles = {
@@ -160,7 +193,8 @@ export default {
         for (const k in infoTitles) {
           data.arrayValues[infoTitles[k]] = this.customerInfo[k]
         }
-        await this.$http.put(`https://alenvi-api-dev.herokuapp.com/ogust/customers/${this.queryParams.idCustomer}/moreInfo`, data, { headers: { 'x-ogust-token': ogustToken } })
+        await this.$http.put(`${apiLink}/${this.queryParams.idCustomer}/moreInfo`, data, { headers: { 'x-ogust-token': ogustToken } })
+        await editOgustCustomerCodes(this, ogustToken, this.queryParams.idCustomer, this.customerCodes)
         Toast.create('Modification effectuée ! :) Tu peux maintenant fermer la page.')
       } catch (e) {
         Toast.create("Erreur lors de l'édition de la fiche bénéficiaire :/")

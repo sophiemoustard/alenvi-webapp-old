@@ -57,6 +57,9 @@ export default {
   async getOgustCustomerDetails (context, customerId, ogustToken) {
     const customerDetails = await context.$http.get(`${API_LINK}/ogust/customers/${customerId}/moreInfo`, { headers: { 'x-ogust-token': ogustToken } });
     return customerDetails;
+  },
+  async editOgustCustomerCodes (context, ogustToken, customerId, data) {
+    await context.$http.put(`${API_LINK}/ogust/customers/${customerId}/editCustomerCodes`, data, { headers: { 'x-ogust-token': ogustToken } });
   }
 
 }
