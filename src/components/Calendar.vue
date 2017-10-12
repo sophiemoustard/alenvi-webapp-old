@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import { Toast } from 'quasar'
 import Scheduler from './scheduler/Scheduler.vue';
 import Ogust from './models/Ogust'
 import 'dhtmlx-scheduler'
@@ -32,16 +33,27 @@ export default {
   methods: {
     async getEventsData() {
       try {
-        if (!this.$route.query.access_token || !this.$route.query.id_person) {
-          throw new Error('Missing alenvi access token and/or employee id');
+        if (!this.$route.query.access_token || (!this.$route.query.id_employee && !this.$route.query.id_customer)) {
+          throw new Error('Missing alenvi access token and/or employee/customer id');
+        } else if (this.$route.query.id_employee && this.$route.query.id_customer) {
+          throw new Error('Only one ID is allowed !')
         } else {
           const token = this.$route.query.access_token;
-          const employeeId = this.$route.query.id_person;
+          let personId;
+          let personType;
+          if (this.$route.query.id_employee) {
+            personId = this.$route.query.id_employee;
+            personType = 'employee';
+          } else {
+            personId = this.$route.query.id_customer;
+            personType = 'customer';
+          }
           const ogustToken = await Ogust.getOgustToken(this, token);
-          this.events = await Ogust.getOgustEvents(this, ogustToken, '/calendar/events', employeeId);
+          this.events = await Ogust.getOgustEvents(this, ogustToken, '/calendar/events', personId, personType);
         }
       } catch (e) {
         console.error(e)
+        Toast.create("Erreur de chargement des données :/ Si le problème persiste, contacte l'équipe technique :)")
       }
     }
   }

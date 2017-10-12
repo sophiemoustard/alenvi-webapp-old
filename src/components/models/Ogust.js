@@ -1,6 +1,6 @@
 import moment from 'moment'
 
-const API_LINK = process.env.NODE_ENV === 'production' ? 'https://alenvi-api.herokuapp.com' : 'https://alenvi-api-dev.herokuapp.com'; //'https://799e2471.ngrok.io'
+const API_LINK = process.env.NODE_ENV === 'production' ? 'https://alenvi-api.herokuapp.com' : 'https://5d4eee3b.ngrok.io'; //'https://799e2471.ngrok.io'
 
 export default {
   async getOgustToken (context, token) {
@@ -8,7 +8,17 @@ export default {
     const ogustToken = res.body.data.token;
     return ogustToken;
   },
-  async getOgustEvents (context, ogustToken, apiPath, idPerson) {
+  async getOgustEvents (context, ogustToken, apiPath, idPerson, personType) {
+    let employeeId = '';
+    let customerId = '';
+    let eventPerson;
+    if (personType === 'employee') {
+      employeeId = idPerson;
+      eventPerson = 'customer';
+    } else {
+      customerId = idPerson;
+      eventPerson = 'employee'
+    }
     const data = [];
     let period;
     const mode = scheduler.getState().mode;
@@ -25,10 +35,15 @@ export default {
     }
     const startDate = moment(scheduler.getState().date).startOf(period).format('YYYYMMDD');
     const endDate = moment(scheduler.getState().date).endOf(period).format('YYYYMMDD');
-    const servicesRaw = await context.$http.get(`${API_LINK}${apiPath}?id_person=${idPerson}&isDate=true&startDate=${startDate}0000&endDate=${endDate}2359`, { headers: { 'x-ogust-token': ogustToken } });
+    const servicesRaw = await context.$http.get(`${API_LINK}${apiPath}?id_customer=${customerId}&id_employee=${employeeId}&isDate=true&startDate=${startDate}0000&endDate=${endDate}2359`, { headers: { 'x-ogust-token': ogustToken } });
     const eventsRaw = servicesRaw.body.data.events;
     for (const events in eventsRaw) {
-      const text = eventsRaw[events].customer.id_customer === '271395715' ? eventsRaw[events].customer.lastname : `${eventsRaw[events].customer.title} ${eventsRaw[events].customer.lastname}`;
+      let text = '';
+      if (personType === 'employee') {
+        text = eventsRaw[events].customer.customer_id === '271395715' ? eventsRaw[events].customer.lastname : `${eventsRaw[events].customer.title} ${eventsRaw[events].customer.lastname}`;
+      } else {
+        text = `${eventsRaw[events].employee.firstname} ${eventsRaw[events].employee.lastname}`
+      }
       data.push({
         id: eventsRaw[events].id_service,
         text,
