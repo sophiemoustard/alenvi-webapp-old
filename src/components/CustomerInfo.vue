@@ -177,11 +177,6 @@ export default {
     },
     async editCustomerInfo () {
       try {
-        if (PROD) {
-          apiLink = 'https://alenvi-api.herokuapp.com/ogust/customers'
-        } else {
-          apiLink = 'https://alenvi-api-dev.herokuapp.com/ogust/customers'
-        }
         const ogustToken = await Ogust.getOgustToken(this, this.queryParams.accessToken)
         let data = { arrayValues: {} }
         const infoTitles = {
@@ -193,8 +188,8 @@ export default {
         for (const k in infoTitles) {
           data.arrayValues[infoTitles[k]] = this.customerInfo[k]
         }
-        await this.$http.put(`${apiLink}/${this.queryParams.idCustomer}/moreInfo`, data, { headers: { 'x-ogust-token': ogustToken } })
-        await editOgustCustomerCodes(this, ogustToken, this.queryParams.idCustomer, this.customerCodes)
+        await Ogust.editOgustCustomerDetails(this, ogustToken, this.queryParams.idCustomer, data)
+        await Ogust.editOgustCustomerCodes(this, ogustToken, this.queryParams.idCustomer, this.customerCodes)
         Toast.create('Modification effectuée ! :) Tu peux maintenant fermer la page.')
       } catch (e) {
         Toast.create("Erreur lors de l'édition de la fiche bénéficiaire :/")

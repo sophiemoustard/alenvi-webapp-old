@@ -1,6 +1,6 @@
 import moment from 'moment'
 
-const API_LINK = process.env.NODE_ENV === 'production' ? 'https://alenvi-api.herokuapp.com' : 'https://5d4eee3b.ngrok.io'; //'https://799e2471.ngrok.io'
+const API_LINK = process.env.NODE_ENV === 'production' ? 'https://alenvi-api.herokuapp.com' : 'https://alenvi-api-dev.herokuapp.com'; //'https://799e2471.ngrok.io'
 
 export default {
   async getOgustToken (context, token) {
@@ -11,13 +11,10 @@ export default {
   async getOgustEvents (context, ogustToken, apiPath, idPerson, personType) {
     let employeeId = '';
     let customerId = '';
-    let eventPerson;
     if (personType === 'employee') {
       employeeId = idPerson;
-      eventPerson = 'customer';
     } else {
       customerId = idPerson;
-      eventPerson = 'employee'
     }
     const data = [];
     let period;
@@ -57,6 +54,9 @@ export default {
   async getOgustCustomerDetails (context, customerId, ogustToken) {
     const customerDetails = await context.$http.get(`${API_LINK}/ogust/customers/${customerId}/moreInfo`, { headers: { 'x-ogust-token': ogustToken } });
     return customerDetails;
+  },
+  async editOgustCustomerDetails (context, ogustToken, customerId, data) {
+    await context.$http.put(`${API_LINK}/ogust/customers/${customerId}/moreInfo`, data, { headers: { 'x-ogust-token': ogustToken } })
   },
   async editOgustCustomerCodes (context, ogustToken, customerId, data) {
     await context.$http.put(`${API_LINK}/ogust/customers/${customerId}/editCustomerCodes`, data, { headers: { 'x-ogust-token': ogustToken } });
