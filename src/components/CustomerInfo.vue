@@ -146,16 +146,16 @@ export default {
       } else {
         this.queryParams.accessToken = this.$route.query.access_token
         this.queryParams.idCustomer = this.$route.query.id_customer
-        this.customerCodes.doorCode = this.$route.query.customer_door_code || ''
-        this.customerCodes.interCode = this.$route.query.customer_inter_code || ''
       }
     },
     async getCustomerInfo () {
       try {
         const ogustToken = await Ogust.getOgustToken(this, this.queryParams.accessToken)
         const customerDetailsRaw = await Ogust.getOgustCustomerDetails(this, this.queryParams.idCustomer, ogustToken);
-        // const customerDetailsRaw = await this.$http.get(`https://alenvi-api-dev.herokuapp.com/ogust/customers/${this.queryParams.idCustomer}/moreInfo`, { headers: { 'x-ogust-token': ogustToken } })
         const customerDetails = customerDetailsRaw.body.data.info.thirdPartyInformations.array_values
+        const customerCodesRaw = await Ogust.getOgustCustomerCodes(this, this.queryParams.idCustomer, ogustToken);
+        this.customerCodes.doorCode = customerCodesRaw.door_code;
+        this.customerCodes.interCode = customerCodesRaw.intercom_code;
         this.disable = false
         if (customerDetails == null) {
           return

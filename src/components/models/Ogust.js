@@ -1,4 +1,5 @@
 import moment from 'moment'
+import _ from 'lodash'
 
 const API_LINK = process.env.NODE_ENV === 'production' ? 'https://alenvi-api.herokuapp.com' : 'https://alenvi-api-dev.herokuapp.com'; //'https://799e2471.ngrok.io'
 
@@ -57,6 +58,12 @@ export default {
   },
   async editOgustCustomerDetails (context, ogustToken, customerId, data) {
     await context.$http.put(`${API_LINK}/ogust/customers/${customerId}/moreInfo`, data, { headers: { 'x-ogust-token': ogustToken } })
+  },
+  async getOgustCustomerCodes (context, customerId, ogustToken) {
+    const customerInfoRaw = await context.$http.get(`${API_LINK}/ogust/customers/${customerId}`, { headers: { 'x-ogust-token': ogustToken } });
+    const customerInfo = customerInfoRaw.body.data.user.customer;
+    const customerCodes = _.pick(customerInfo, ['door_code', 'intercom_code']);
+    return customerCodes;
   },
   async editOgustCustomerCodes (context, ogustToken, customerId, data) {
     await context.$http.put(`${API_LINK}/ogust/customers/${customerId}/editCustomerCodes`, data, { headers: { 'x-ogust-token': ogustToken } });
