@@ -12,6 +12,7 @@
           <q-input v-model="credentials.email" float-label="Adresse email"/>
         </q-field>
       </div>
+      <!-- test -->
       <div class="row justify-center">
         <q-field class="col-xs-12 col-sm-3" icon="vpn_key">
           <q-input v-model="credentials.password" float-label="Mot de passe" type="password" />
