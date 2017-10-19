@@ -37,8 +37,16 @@ export default {
     const eventsRaw = servicesRaw.body.data.events;
     for (const events in eventsRaw) {
       let text = '';
+      let pathology = '';
+      let comments = '';
+      let interventionDetail = '';
+      let misc = '';
       if (personType === 'employee') {
         text = eventsRaw[events].customer.customer_id === '271395715' ? eventsRaw[events].customer.lastname : `${eventsRaw[events].customer.title} ${eventsRaw[events].customer.lastname}`;
+        pathology = `${eventsRaw[events].customer.pathology}`;
+        comments = `${eventsRaw[events].customer.comments}`;
+        interventionDetail = `${eventsRaw[events].customer.interventionDetail}`;
+        misc = `${eventsRaw[events].customer.misc}`
       } else {
         text = `${eventsRaw[events].employee.firstname} ${eventsRaw[events].employee.lastname}`
       }
@@ -48,10 +56,10 @@ export default {
         start_date: moment(eventsRaw[events].start_date, 'YYYYMMDDHHmm').format('YYYY-MM-DD HH:mm'),
         end_date: moment(eventsRaw[events].end_date, 'YYYYMMDDHHmm').format('YYYY-MM-DD HH:mm'),
         type: 'alenvi',
-        pathology: `${eventsRaw[events].customer.pathology}`,
-        comments: `${eventsRaw[events].customer.comments}`,
-        interventionDetail: `${eventsRaw[events].customer.interventionDetail}`,
-        misc: `${eventsRaw[events].customer.misc}`
+        pathology,
+        comments,
+        interventionDetail,
+        misc
       });
     }
     return data;

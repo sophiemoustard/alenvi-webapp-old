@@ -73,32 +73,34 @@ export default {
     scheduler.config.touch_tip = false;
     // scheduler.config.hour_size_px = 60;
     scheduler.xy.scale_height = 25;
-    scheduler.config.lightbox.sections = [
-      {
-        name: "Pathologie",
-        height: 20,
-        map_to: "pathology",
-        type: "textarea",
-      },
-      {
-        name: "Details",
-        height: 200,
-        map_to: "interventionDetail",
-        type: "textarea",
-      },
-      {
-        name: "Autres",
-        height: 100,
-        map_to: "misc",
-        type: "textarea",
-      },
-      {
-        name: "Commentaires",
-        height: 75,
-        map_to: "comments",
-        type: "textarea",
-      }
-    ];
+    if (!this.$route.query.id_customer) {
+      scheduler.config.lightbox.sections = [
+        {
+          name: "Pathologie",
+          height: 20,
+          map_to: "pathology",
+          type: "textarea",
+        },
+        {
+          name: "Details",
+          height: 200,
+          map_to: "interventionDetail",
+          type: "textarea",
+        },
+        {
+          name: "Autres",
+          height: 100,
+          map_to: "misc",
+          type: "textarea",
+        },
+        {
+          name: "Commentaires",
+          height: 75,
+          map_to: "comments",
+          type: "textarea",
+        }
+      ];
+    }
 
     var format = scheduler.date.date_to_str("%H:%i");
     scheduler.templates.hour_scale = function(date){
