@@ -1,7 +1,7 @@
 import moment from 'moment'
 import _ from 'lodash'
 
-const API_LINK = process.env.NODE_ENV === 'production' ? 'https://alenvi-api.herokuapp.com' : 'https://alenvi-api-dev.herokuapp.com'; //'https://799e2471.ngrok.io'
+const API_LINK = process.env.NODE_ENV === 'production' ? 'https://alenvi-api.herokuapp.com' : 'https://5d4eee3b.ngrok.io'; //'https://799e2471.ngrok.io'
 
 export default {
   async getOgustToken (context, token) {
@@ -47,10 +47,35 @@ export default {
         text,
         start_date: moment(eventsRaw[events].start_date, 'YYYYMMDDHHmm').format('YYYY-MM-DD HH:mm'),
         end_date: moment(eventsRaw[events].end_date, 'YYYYMMDDHHmm').format('YYYY-MM-DD HH:mm'),
-        type: 'alenvi'
+        type: 'alenvi',
+        pathology: `${eventsRaw[events].customer.pathology}`,
+        comments: `${eventsRaw[events].customer.comments}`,
+        interventionDetail: `${eventsRaw[events].customer.interventionDetail}`,
+        misc: `${eventsRaw[events].customer.misc}`
       });
     }
     return data;
+  },
+  async getOgustPerson (context, ogustToken, idPerson, personType) {
+    let personRaw;
+    let personData;
+    let title;
+    switch (personType) {
+      case 'employee':
+        personRaw = await context.$http.get(`${API_LINK}/ogust/employees/${idPerson}`, { headers: { 'x-ogust-token': ogustToken } });
+        personData = _.pick(personRaw.body.data.user[personType], ['first_name', 'last_name']);
+        title = `Planning de ${personData.first_name} ${personData.last_name.substring(0, 1)}.`;
+        break;
+      case 'customer':
+        personRaw = await context.$http.get(`${API_LINK}/ogust/customers/${idPerson}`, { headers: { 'x-ogust-token': ogustToken } });
+        personData = _.pick(personRaw.body.data.user[personType], ['first_name', 'last_name']);
+        title = `Planning de ${personData.first_name.substring(0, 1)}. ${personData.last_name}`;
+        break;
+    }
+    return {
+      title,
+      comment: personData.comment || ''
+    }
   },
   async getOgustCustomerDetails (context, customerId, ogustToken) {
     const customerDetails = await context.$http.get(`${API_LINK}/ogust/customers/${customerId}/moreInfo`, { headers: { 'x-ogust-token': ogustToken } });

@@ -67,6 +67,7 @@ export default {
     scheduler.locale.labels['icon_cancel'] = 'Fermer';
     // hide lightbox in month view
     scheduler.config.readonly_form = true;
+    scheduler.config.show_loading = true;
     // hide select bar in day and week views
     scheduler.config.select = false;
     scheduler.config.touch_tip = false;
@@ -74,11 +75,28 @@ export default {
     scheduler.xy.scale_height = 25;
     scheduler.config.lightbox.sections = [
       {
-        name: "description",
+        name: "Pathologie",
         height: 20,
-        map_to: "text",
+        map_to: "pathology",
         type: "textarea",
-        focus: true
+      },
+      {
+        name: "Details",
+        height: 200,
+        map_to: "interventionDetail",
+        type: "textarea",
+      },
+      {
+        name: "Autres",
+        height: 100,
+        map_to: "misc",
+        type: "textarea",
+      },
+      {
+        name: "Commentaires",
+        height: 75,
+        map_to: "comments",
+        type: "textarea",
       }
     ];
 

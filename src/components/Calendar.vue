@@ -11,15 +11,18 @@ import Ogust from './models/Ogust'
 import 'dhtmlx-scheduler'
 
 export default {
-  metaInfo: {
-    title: 'Planning'
+  metaInfo() {
+    return {
+    title: this.title
+    }
   },
   components: {
     Scheduler
   },
   data() {
     return {
-      events: []
+      events: [],
+      title: ''
     }
   },
   created() {
@@ -50,6 +53,8 @@ export default {
           }
           const ogustToken = await Ogust.getOgustToken(this, token);
           this.events = await Ogust.getOgustEvents(this, ogustToken, '/calendar/events', personId, personType);
+          const personData = await Ogust.getOgustPerson(this, ogustToken, personId, personType);
+          this.title = personData.title;
         }
       } catch (e) {
         console.error(e)
