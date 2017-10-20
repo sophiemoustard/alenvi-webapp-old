@@ -1,7 +1,13 @@
 import moment from 'moment'
 import _ from 'lodash'
 
-const API_LINK = process.env.NODE_ENV === 'production' ? 'https://alenvi-api.herokuapp.com' : 'https://alenvi-api-dev.herokuapp.com'; //'https://799e2471.ngrok.io'
+// const API_LINK = process.env.NODE_ENV === 'production' ? 'https://alenvi-api.herokuapp.com' : 'https://alenvi-api-dev.herokuapp.com'; //'https://799e2471.ngrok.io'
+let API_LINK;
+if (PROD) {
+  API_LINK = 'https://alenvi-api.herokuapp.com';
+} else {
+  API_LINK = 'https://alenvi-api-dev.herokuapp.com';
+}
 
 export default {
   async getOgustToken (context, token) {
@@ -77,7 +83,7 @@ export default {
       case 'customer':
         personRaw = await context.$http.get(`${API_LINK}/ogust/customers/${idPerson}`, { headers: { 'x-ogust-token': ogustToken } });
         personData = _.pick(personRaw.body.data.user[personType], ['first_name', 'last_name']);
-        title = `Planning de ${personData.first_name.substring(0, 1)}. ${personData.last_name}`;
+        title = personData.first_name ? `Planning de ${personData.first_name.substring(0, 1)}. ${personData.last_name}` : `Planning de ${personData.last_name}`;
         break;
     }
     return {
