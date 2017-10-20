@@ -36,7 +36,6 @@ export default {
   methods: {
     async getEventsData() {
       try {
-        // test
         if (!this.$route.query.access_token || (!this.$route.query.id_employee && !this.$route.query.id_customer)) {
           throw new Error('Missing alenvi access token and/or employee/customer id');
         } else if (this.$route.query.id_employee && this.$route.query.id_customer) {
