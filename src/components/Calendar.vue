@@ -53,12 +53,13 @@ export default {
           }
           const ogustToken = await Ogust.getOgustToken(this, token);
           this.events = await Ogust.getOgustEvents(this, ogustToken, '/calendar/events', personId, personType);
+          console.log(this.events);
           const personData = await Ogust.getOgustPerson(this, ogustToken, personId, personType);
           this.title = personData.title;
         }
       } catch (e) {
         console.error(e)
-        if (e.status === 404 && this.events.length === 0) {
+        if (e.status === 404) {
           Toast.create("Aucune intervention dans la période demandée");
         } else {
           Toast.create("Erreur de chargement des données :/ Si le problème persiste, contacte l'équipe technique :)")
