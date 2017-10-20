@@ -1,13 +1,7 @@
 import moment from 'moment'
 import _ from 'lodash'
 
-// const API_LINK = process.env.NODE_ENV === 'production' ? 'https://alenvi-api.herokuapp.com' : 'https://alenvi-api-dev.herokuapp.com'; //'https://799e2471.ngrok.io'
-let API_LINK;
-if (PROD) {
-  API_LINK = 'https://alenvi-api.herokuapp.com';
-} else {
-  API_LINK = 'https://alenvi-api-dev.herokuapp.com';
-}
+const API_LINK = process.env.NODE_ENV === 'production' ? 'https://alenvi-api.herokuapp.com' : 'https://alenvi-api-dev.herokuapp.com'; //'https://799e2471.ngrok.io'
 
 export default {
   async getOgustToken (context, token) {
