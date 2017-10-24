@@ -21,7 +21,6 @@ console.log((' Building Quasar App with "' + env.platform.theme + '" theme...\n'
 
 shell.mkdir('-p', targetPath)
 shell.cp('-R', 'src/statics', targetPath)
-shell.cp('-R', 'build/afterBuild/*', targetPath)
 
 function finalize () {
   console.log((

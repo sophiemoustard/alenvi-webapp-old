@@ -5,7 +5,7 @@ scripts_local
 public/apidoc
 
 # env
-.env
+.env*
 
 # ds_store
 .DS_Store
