@@ -52,9 +52,9 @@ export default {
             personType = 'customer';
           }
           const ogustToken = await Ogust.getOgustToken(this, token);
-          this.events = await Ogust.getOgustEvents(this, ogustToken, '/calendar/events', personId, personType);
           const personData = await Ogust.getOgustPerson(this, ogustToken, personId, personType);
           this.title = personData.title;
+          this.events = await Ogust.getOgustEvents(this, ogustToken, '/calendar/events', personId, personType);
         }
       } catch (e) {
         console.error(e)
