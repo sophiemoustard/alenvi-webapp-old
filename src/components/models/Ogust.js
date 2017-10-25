@@ -6,7 +6,7 @@ const API_LINK = process.env.NODE_ENV === 'production' ? 'https://alenvi-api.her
 export default {
   async getOgustToken (context, token) {
     const res = await context.$http.get(API_LINK + '/ogust/token', { headers: { 'x-access-token': token } });
-    const ogustToken = res.body.data.token;
+    const ogustToken = res.data.data.token;
     return ogustToken;
   },
   async getOgustEvents (context, ogustToken, apiPath, idPerson, personType) {
@@ -34,7 +34,7 @@ export default {
     const startDate = moment(scheduler.getState().date).startOf(period).format('YYYYMMDD');
     const endDate = moment(scheduler.getState().date).endOf(period).format('YYYYMMDD');
     const servicesRaw = await context.$http.get(`${API_LINK}${apiPath}?id_customer=${customerId}&id_employee=${employeeId}&isDate=true&startDate=${startDate}0000&endDate=${endDate}2359`, { headers: { 'x-ogust-token': ogustToken } });
-    const eventsRaw = servicesRaw.body.data.events;
+    const eventsRaw = servicesRaw.data.data.events;
     for (const events in eventsRaw) {
       let text = '';
       let pathology = '';
@@ -71,12 +71,12 @@ export default {
     switch (personType) {
       case 'employee':
         personRaw = await context.$http.get(`${API_LINK}/ogust/employees/${idPerson}`, { headers: { 'x-ogust-token': ogustToken } });
-        personData = _.pick(personRaw.body.data.user[personType], ['first_name', 'last_name']);
+        personData = _.pick(personRaw.data.data.user[personType], ['first_name', 'last_name']);
         title = `Planning de ${personData.first_name} ${personData.last_name.substring(0, 1)}.`;
         break;
       case 'customer':
         personRaw = await context.$http.get(`${API_LINK}/ogust/customers/${idPerson}`, { headers: { 'x-ogust-token': ogustToken } });
-        personData = _.pick(personRaw.body.data.user[personType], ['first_name', 'last_name']);
+        personData = _.pick(personRaw.data.data.user[personType], ['first_name', 'last_name']);
         title = personData.first_name ? `Planning de ${personData.first_name.substring(0, 1)}. ${personData.last_name}` : `Planning de ${personData.last_name}`;
         break;
     }
@@ -94,7 +94,7 @@ export default {
   },
   async getOgustCustomerCodes (context, customerId, ogustToken) {
     const customerInfoRaw = await context.$http.get(`${API_LINK}/ogust/customers/${customerId}`, { headers: { 'x-ogust-token': ogustToken } });
-    const customerInfo = customerInfoRaw.body.data.user.customer;
+    const customerInfo = customerInfoRaw.data.data.user.customer;
     const customerCodes = _.pick(customerInfo, ['door_code', 'intercom_code']);
     return customerCodes;
   },
