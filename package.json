@@ -11,9 +11,8 @@
     "build-dev": "node build/script.build-dev.js",
     "lint": "eslint --ext .js,.vue src",
     "start": "node server.js",
-    "postinstall": "if [ $NODE_ENV = \"production\" ]; then npm run build; else npm run build-dev; fi"
+    "postinstall": "node run.js"
   },
-  "engines": { "node": "8.6.0" },
   "dependencies": {
     "axios": "^0.17.0",
     "babel-runtime": "^6.25.0",
