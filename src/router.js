@@ -24,9 +24,11 @@ export default new VueRouter({
    */
   mode: 'history',
   routes: [
-    { path: '/', component: load('Hello') },
-    { path: '/authenticate', component: load('Authenticate') },
-    { path: '/editCustomerInfo', component: load('CustomerInfo') },
+    { path: '/', component: load('dashboard/Home') },
+    { path: '/dashboard/', component: load('dashboard/Home') },
+    { path: '/dashboard/login', component: load('dashboard/Authenticate') },
+    { path: '/bot/authenticate', component: load('bot/Authenticate') },
+    { path: '/bot/editCustomerInfo', component: load('bot/CustomerInfo') },
     { path: '/calendar', component: load('Calendar') },
 
     // Always leave this last one
