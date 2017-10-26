@@ -60,6 +60,7 @@ export default {
         });
         console.log(user);
         Cookies.set('alenvi_token', user.data.data.token, { path: '/', expires: 1 });
+        this.$router.push('/dashboard');
       } catch(e) {
         console.warn(e);
       }
