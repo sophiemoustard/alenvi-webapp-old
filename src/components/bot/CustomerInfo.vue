@@ -77,7 +77,7 @@
 
 <script>
 import { QInput, QField, QSelect, QBtn, Toast } from 'quasar'
-import Ogust from './models/Ogust'
+import Ogust from '../models/Ogust'
 
 export default {
   components: {

@@ -25,8 +25,9 @@ export default new VueRouter({
   mode: 'history',
   routes: [
     { path: '/', redirect: '/dashboard' },
-    { path: '/authenticate', component: load('Authenticate') },
-    { path: '/editCustomerInfo', component: load('CustomerInfo') },
+    { path: '/dashboard/login', component: load('dashboard/Authenticate') },
+    { path: '/bot/authenticate', component: load('bot/Authenticate') },
+    { path: '/bot/editCustomerInfo', component: load('bot/CustomerInfo') },
     { path: '/calendar', component: load('Calendar') },
     {
       path: '/dashboard',
