@@ -24,10 +24,28 @@ export default new VueRouter({
    */
   mode: 'history',
   routes: [
-    { path: '/', component: load('Hello') },
+    { path: '/', redirect: '/dashboard' },
     { path: '/authenticate', component: load('Authenticate') },
     { path: '/editCustomerInfo', component: load('CustomerInfo') },
     { path: '/calendar', component: load('Calendar') },
+    {
+      path: '/dashboard',
+      component: load('dashboard/layout/Layout'),
+      children: [
+        {
+          path: '',
+          component: load('dashboard/users/Users')
+        },
+        {
+          path: 'users',
+          component: load('dashboard/users/Users')
+        },
+        {
+          path: 'messages',
+          component: load('dashboard/messages/Messages')
+        }
+      ]
+    },
 
     // Always leave this last one
     { path: '*', component: load('Error404') } // Not found
