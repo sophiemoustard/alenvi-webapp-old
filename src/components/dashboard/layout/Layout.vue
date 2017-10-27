@@ -21,7 +21,6 @@
       <side-menu></side-menu>
     </div>
 
-    <!-- <side-menu></side-menu> -->
     <router-view/>
 
   </q-layout>
@@ -33,14 +32,8 @@ import {
   QLayout,
   QToolbar,
   QToolbarTitle,
-  QItemSide,
-  QItemMain,
-  QSideLink,
   QBtn,
-  QIcon,
-  QList,
-  QItemSeparator,
-  QItem } from 'quasar'
+  QIcon } from 'quasar'
 
 import SideMenu from './SideMenu.vue'
 
@@ -49,14 +42,8 @@ export default {
     QLayout,
     QToolbar,
     QToolbarTitle,
-    QItemSide,
-    QItemMain,
-    QSideLink,
     QBtn,
     QIcon,
-    QList,
-    QItemSeparator,
-    QItem,
     SideMenu
   }
 }

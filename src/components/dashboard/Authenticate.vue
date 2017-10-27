@@ -35,7 +35,6 @@ import {
   Cookies
 } from 'quasar'
 let test = Cookies.get('alenvi_token');
-console.log(test);
 
 export default {
   components: {

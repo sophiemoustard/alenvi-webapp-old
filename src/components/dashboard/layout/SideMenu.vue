@@ -11,9 +11,7 @@
         <router-link to="#">
           <q-icon name="person" color="tertiary" size="1.5rem" />
         </router-link>
-        <router-link to="#">
-          <q-icon name="exit to app" color="tertiary" size="1.5rem" class="on-right" />
-        </router-link>
+        <q-icon id="logout" name="exit to app" color="tertiary" size="1.5rem" class="on-right" @click="logout" />
       </q-item>
       <q-item-separator />
       <q-side-link item to="/dashboard/users" exact>
@@ -37,7 +35,8 @@ import {
   QList,
   QBtn,
   QIcon,
-  QSideLink } from 'quasar'
+  QSideLink,
+  Cookies } from 'quasar'
 
 export default {
   components: {
@@ -49,14 +48,23 @@ export default {
     QBtn,
     QIcon,
     QSideLink
+  },
+  methods: {
+    logout () {
+      Cookies.remove('alenvi_token');
+      this.$router.push('/dashboard/login');
+    }
   }
 }
 </script>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
   @import '~variables'
 
   .avatar
     width: 70px
     height: 70px
+
+  #logout
+    cursor: pointer
 </style>
