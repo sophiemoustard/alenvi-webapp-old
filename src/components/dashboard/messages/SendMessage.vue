@@ -5,7 +5,7 @@
       <q-select v-model="selectedSector" :options="orderedSectors" separator />
     </q-field>
     <q-field icon="message">
-      <q-input v-model="message" placeholder="Ecrire message..." type="textarea" :min-rows="2" :after="[sendIcon]"/>
+      <q-input v-model="message.content" placeholder="Ecrire message..." type="textarea" :min-rows="2" :after="[sendIcon]"/>
     </q-field>
     </div>
   </div>
@@ -16,7 +16,9 @@ import {
   QSelect,
   QField,
   QInput,
-  Toast } from 'quasar'
+  Toast,
+  Dialog,
+  Loading } from 'quasar'
 import _ from 'lodash'
 
 import users from '../../models/Users'
@@ -36,7 +38,11 @@ export default {
         '1a*': 'Communauté 1',
         '1b*': 'Communauté 2'
       },
-      message: ''
+      message: {
+        content: '',
+        success: 0,
+        failed: 0
+      }
     }
   },
   mounted () {
@@ -47,16 +53,26 @@ export default {
       return _.sortBy(this.sectors, ['value']);
     },
     sendIcon () {
-      const vm = this;
+      // const vm = this; no need of temp variables as using arrow function
       return {
         icon: 'send',
         content: true,
-        handler () {
-          const selectedSector = vm.sectorUserList[vm.selectedSector];
-          for (let i = 0, l = selectedSector.length; i < l; i++) {
-            console.log(selectedSector[i]._id);
-          // vm.sendMessage(selectedSector);
+        handler: async () => {
+          const sectorUserList = this.sectorUserList[this.selectedSector];
+          this.message.success = 0;
+          this.message.failed = 0;
+          Loading.show({ message: 'Envoi messages...' });
+          for (let i = 0, l = sectorUserList.length; i < l; i++) {
+            // console.log(selectedSector[i]._id);
+          await this.sendMessage(sectorUserList[i]._id);
           }
+          Loading.hide();
+          Dialog.create({
+            title: 'Récapitulatif',
+            message: `Envoyés: ${this.message.success} / Echec: ${this.message.failed}`,
+            buttons: ['Fermer']
+          });
+          // Toast.create('Message(s) envoyé(s)');
         }
       }
     }
@@ -64,8 +80,7 @@ export default {
   methods: {
     async getSectors () {
       try {
-        this.sectorUserList = await users.getAllsectors(this, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OWNhMWU5MzhjYzVjNTAwMTI1MWVhMWUiLCJpYXQiOjE1MDk0NDE0MTAsImV4cCI6MTUwOTUyNzgxMH0.JLFYBVsJiIRTgCdo3nFBeaj_KW4MPQNTK5e7oXeAgaI');
-        console.log(this.sectorUserList);
+        this.sectorUserList = await users.getAllsectors(this, 'eyJhbGciUzI1NiIsInR5cCI6I9.eyJfaWQiOiI1OTQ3ZDFhZWZmNmMyN2NlMDc0MDU2NWEiLCJpYXQiOjE1MDk2MTU5NTMsImV4cCI6MTUwOTcwMjM1M30.GeHC5wvl_WeP9WTkBdQwuRoVcGbMNnZM3ITHuKMGOkE');
         for (const k in this.sectorUserList) {
           this.sectors.push({
             label: this.correspSectors[k],
@@ -76,12 +91,14 @@ export default {
         console.error(e);
       }
     },
-    async sendMessage () {
+    async sendMessage (id) {
       try {
-        await users.sendMessageToBotUser(this, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OWNhMWU5MzhjYzVjNTAwMTI1MWVhMWUiLCJpYXQiOjE1MDk0NDE0MTAsImV4cCI6MTUwOTUyNzgxMH0.JLFYBVsJiIRTgCdo3nFBeaj_KW4MPQNTK5e7oXeAgaI', this.message, '5947d1aeff6c27ce07405656')
-        Toast.create('Message(s) envoyé(s)');
+        await users.sendMessageToBotUser(this, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX.eyJiOiI1OTQ3ZDFhZWZmNmMyN2NlMDc0MDU2NWEiLCJpYXQiOjE1MDk2MTU5NTMsImV4cCI6MTUwOTcwMjM1M30.GeHC5wvl_WeP9WTkBdQwuRoVcGbMNnZM3ITHuKMGOkE', this.message.content, id)
+        this.message.success++;
+        console.log(this.message.success);
       } catch (e) {
         console.error(e);
+        this.message.failed++;
       }
     }
   }
