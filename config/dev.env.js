@@ -9,6 +9,11 @@ if (module_exists('../.env')) {
   for (k in devEnv) {
     env[k] = `'${devEnv[k]}'`;
   }
+} else {
+  env = {
+    NODE_ENV: JSON.stringify(process.env.NODE_ENV),
+    API_HOSTNAME: JSON.stringify(process.env.API_HOSTNAME)
+  }
 }
 
 // module.exports = merge(prodEnv, {
