@@ -2,15 +2,15 @@ import _ from 'lodash';
 
 export default {
   async storeMessage (context, token, data, senderId) {
-    const storedMessage = await context.$http.post(`${process.env.API_HOSTNAME}/message/?senderId=${senderId}`, data, { headers: { 'x-access-token': token } });
+    const storedMessage = await context.$http.post(`${process.env.API_HOSTNAME}/messageToBot/?senderId=${senderId}`, data, { headers: { 'x-access-token': token } });
     return storedMessage;
   },
   async sendMessage (context, token, messageId, recipientId) {
-    const sentMessage = await context.$http.get(`${process.env.API_HOSTNAME}/message/${messageId}/send?recipientId=${recipientId}`, { headers: { 'x-access-token': token } });
+    const sentMessage = await context.$http.get(`${process.env.API_HOSTNAME}/messageToBot/${messageId}/send?recipientId=${recipientId}`, { headers: { 'x-access-token': token } });
     return sentMessage;
   },
   async addMessageRecipientById (context, token, messageId, data) {
-    await context.$http.put(`${process.env.API_HOSTNAME}/message/${messageId}/recipient`, data, { headers: { 'x-access-token': token } });
+    await context.$http.put(`${process.env.API_HOSTNAME}/messageToBot/${messageId}/recipient`, data, { headers: { 'x-access-token': token } });
   },
   async getMessagesBySenderId (context, token, senderId) {
     let messagesList = [];
@@ -18,7 +18,7 @@ export default {
       '1a*': '1',
       '1b*': '2'
     };
-    const sentMessagesRaw = await context.$http.get(`${process.env.API_HOSTNAME}/message/user/${senderId}`, { headers: { 'x-access-token': token } });
+    const sentMessagesRaw = await context.$http.get(`${process.env.API_HOSTNAME}/messageToBot/user/${senderId}`, { headers: { 'x-access-token': token } });
     const sentMessages = sentMessagesRaw.data.data.messages;
     for (let i = 0, l = sentMessages.length; i < l; i++) {
       const sent = _.countBy(sentMessages[i].recipients, 'success');
