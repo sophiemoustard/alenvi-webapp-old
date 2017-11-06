@@ -2,7 +2,7 @@
 
   <q-layout ref="layout" view="hHh Lpr lff" :left-breakpoint="996">
 
-    <q-toolbar slot="header" inverted>
+    <q-toolbar slot="header" color="white">
       <div class="logo-header">
         <img src="https://res.cloudinary.com/alenvi/image/upload/q_auto/v1507124345/images/business/alenvi_logo_complet_full.png" alt="Logo Alenvi" class="responsive">
       </div>
@@ -58,5 +58,8 @@ export default {
 
   .menu-icon-header
     margin-left: 98px
+
+  .q-toolbar
+    color: $primary
 
   </style>
