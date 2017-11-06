@@ -22,6 +22,7 @@ import {
 import _ from 'lodash'
 
 import users from '../../models/Users'
+import messages from '../../models/Messages'
 
 export default {
   components: {
@@ -39,6 +40,7 @@ export default {
         '1b*': 'Communauté 2'
       },
       message: {
+        id: '',
         content: '',
         success: 0,
         failed: 0
@@ -58,13 +60,19 @@ export default {
         icon: 'send',
         content: true,
         handler: async () => {
+          await this.storeMessage();
           const sectorUserList = this.sectorUserList[this.selectedSector];
           this.message.success = 0;
           this.message.failed = 0;
           Loading.show({ message: 'Envoi messages...' });
           for (let i = 0, l = sectorUserList.length; i < l; i++) {
             // console.log(selectedSector[i]._id);
-          await this.sendMessage(sectorUserList[i]._id);
+            const sentMessage = await this.sendMessage(this.message.id, sectorUserList[i]._id);
+            const recipient = {
+              success: sentMessage,
+              recipientId: sectorUserList[i]._id
+            };
+            await this.addMessageRecipient(this.message.id, recipient);
           }
           Loading.hide();
           Dialog.create({
@@ -80,7 +88,7 @@ export default {
   methods: {
     async getSectors () {
       try {
-        this.sectorUserList = await users.getAllsectors(this, 'eyJhbGciUzI1NiIsInR5cCI6I9.eyJfaWQiOiI1OTQ3ZDFhZWZmNmMyN2NlMDc0MDU2NWEiLCJpYXQiOjE1MDk2MTU5NTMsImV4cCI6MTUwOTcwMjM1M30.GeHC5wvl_WeP9WTkBdQwuRoVcGbMNnZM3ITHuKMGOkE');
+        this.sectorUserList = await users.getAllsectors(this, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTQ3ZDFhZWZmNmMyN2NlMDc0MDU2NWEiLCJpYXQiOjE1MDk5NTg1MzEsImV4cCI6MTUxMDA0NDkzMX0.rYa1pYL44WmSlYZJm_J91vRinPAQhjW00eK6Zs2MTpI');
         for (const k in this.sectorUserList) {
           this.sectors.push({
             label: this.correspSectors[k],
@@ -91,14 +99,34 @@ export default {
         console.error(e);
       }
     },
-    async sendMessage (id) {
+    async storeMessage () {
       try {
-        await users.sendMessageToBotUser(this, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX.eyJiOiI1OTQ3ZDFhZWZmNmMyN2NlMDc0MDU2NWEiLCJpYXQiOjE1MDk2MTU5NTMsImV4cCI6MTUwOTcwMjM1M30.GeHC5wvl_WeP9WTkBdQwuRoVcGbMNnZM3ITHuKMGOkE', this.message.content, id)
+        const data = {
+          message: this.message.content,
+          sectors: this.selectedSector
+        };
+        const storedMessage = await messages.storeMessage(this, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTQ3ZDFhZWZmNmMyN2NlMDc0MDU2NWEiLCJpYXQiOjE1MDk5NTg1MzEsImV4cCI6MTUxMDA0NDkzMX0.rYa1pYL44WmSlYZJm_J91vRinPAQhjW00eK6Zs2MTpI', data, '59ca1e938cc5c5001251ea1e');
+        this.message.id = storedMessage.data.data.message._id;
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async sendMessage (messageId, recipientId) {
+      try {
+        await messages.sendMessage(this, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTQ3ZDFhZWZmNmMyN2NlMDc0MDU2NWEiLCJpYXQiOjE1MDk5NTg1MzEsImV4cCI6MTUxMDA0NDkzMX0.rYa1pYL44WmSlYZJm_J91vRinPAQhjW00eK6Zs2MTpI', messageId, recipientId);
         this.message.success++;
-        console.log(this.message.success);
+        return true;
       } catch (e) {
         console.error(e);
         this.message.failed++;
+        return false;
+      }
+    },
+    async addMessageRecipient (messageId, data) {
+      try {
+        await messages.addMessageRecipientById(this, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTQ3ZDFhZWZmNmMyN2NlMDc0MDU2NWEiLCJpYXQiOjE1MDk5NTg1MzEsImV4cCI6MTUxMDA0NDkzMX0.rYa1pYL44WmSlYZJm_J91vRinPAQhjW00eK6Zs2MTpI', messageId, data);
+      } catch (e) {
+        console.error(e);
       }
     }
   }
