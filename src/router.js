@@ -10,7 +10,7 @@ function load (component) {
   return () => import(`@/${component}.vue`)
 }
 
-export default new VueRouter({
+const router = new VueRouter({
   /*
    * NOTE! VueRouter "history" mode DOESN'T works for Cordova builds,
    * it is only to be used only for websites.
@@ -35,15 +35,24 @@ export default new VueRouter({
       children: [
         {
           path: '',
-          component: load('dashboard/users/Users')
+          component: load('dashboard/users/Users'),
+          meta: {
+            cookies: ['alenvi_token']
+          }
         },
         {
           path: 'users',
-          component: load('dashboard/users/Users')
+          component: load('dashboard/users/Users'),
+          meta: {
+            cookies: ['alenvi_token']
+          }
         },
         {
           path: 'messages',
-          component: load('dashboard/messages/Messages')
+          component: load('dashboard/messages/Messages'),
+          meta: {
+            cookies: ['alenvi_token']
+          }
         }
       ]
     },
@@ -52,3 +61,15 @@ export default new VueRouter({
     { path: '*', component: load('Error404') } // Not found
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  if (to.meta.cookies && !to.meta.cookies.every(cookie => document.cookie.indexOf(cookie) !== -1)) {
+    next({
+      path: '/dashboard/login'
+    })
+  } else {
+    next();
+  }
+})
+
+export default router;

@@ -58,10 +58,10 @@ export default {
           password: this.credentials.password
         });
         console.log(user);
-        Cookies.set('alenvi_token', user.data.data.token, { path: '/', expires: 1 });
+        Cookies.set('alenvi_token', user.data.data.token, { path: '/', expires: 10 });
         this.$router.push('/dashboard');
       } catch(e) {
-        console.warn(e);
+        console.error(e);
       }
     }
   }
