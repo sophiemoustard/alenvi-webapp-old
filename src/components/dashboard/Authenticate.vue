@@ -53,7 +53,7 @@ export default {
   methods: {
     async submit () {
       try {
-        const user = await this.$http.post('https://alenvi-api.herokuapp.com/users/authenticate', {
+        const user = await this.$http.post(`${process.env.API_HOSTNAME}/users/authenticate`, {
           email: this.credentials.email,
           password: this.credentials.password
         });
