@@ -152,7 +152,7 @@ export default {
       try {
         const ogustToken = await Ogust.getOgustToken(this, this.queryParams.accessToken)
         const customerDetailsRaw = await Ogust.getOgustCustomerDetails(this, this.queryParams.idCustomer, ogustToken);
-        const customerDetails = customerDetailsRaw.body.data.info.thirdPartyInformations.array_values
+        const customerDetails = customerDetailsRaw.data.data.info.thirdPartyInformations.array_values
         const customerCodesRaw = await Ogust.getOgustCustomerCodes(this, this.queryParams.idCustomer, ogustToken);
         this.customerCodes.doorCode = customerCodesRaw.door_code;
         this.customerCodes.interCode = customerCodesRaw.intercom_code;
