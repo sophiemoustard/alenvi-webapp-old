@@ -72,7 +72,7 @@ router.beforeEach((to, from, next) => {
       path: '/dashboard/login'
     })
   } else {
-    if (to.path.match(/^\/bot\/.*/i)) {
+    if (to.path.match(/^\/(bot|calendar).*/i)) {
       next();
     } else {
       const value = Cookies.get('alenvi_token')
