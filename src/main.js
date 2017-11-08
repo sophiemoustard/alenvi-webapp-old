@@ -26,7 +26,7 @@ import 'quasar-extras/material-icons'
 // import 'quasar-extras/ionicons'
 // import 'quasar-extras/fontawesome'
 // import 'quasar-extras/animate'
-// export const eventBus = new Vue();
+export const eventBus = new Vue();
 
 Quasar.start(() => {
   /* eslint-disable no-new */

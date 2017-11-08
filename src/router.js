@@ -1,6 +1,10 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import VueMeta from 'vue-meta'
+import { Cookies } from 'quasar'
+
+import { eventBus } from './main'
+import token from './helpers/token/alenvi'
 
 Vue.use(VueRouter)
 Vue.use(VueMeta)
@@ -68,7 +72,14 @@ router.beforeEach((to, from, next) => {
       path: '/dashboard/login'
     })
   } else {
-    next();
+    if (to.path.match(/^\/bot\/.*/i)) {
+      next();
+    } else {
+      const value = Cookies.get('alenvi_token')
+      const payload = token.verifyToken(value);
+      eventBus.$emit('decodedToken', payload);
+      next();
+    }
   }
 })
 
