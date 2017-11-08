@@ -57,7 +57,7 @@ export default {
           email: this.credentials.email,
           password: this.credentials.password
         });
-        console.log(user);
+        // console.log(user);
         Cookies.set('alenvi_token', user.data.data.token, { path: '/', expires: 10 });
         this.$router.push('/dashboard');
       } catch(e) {
