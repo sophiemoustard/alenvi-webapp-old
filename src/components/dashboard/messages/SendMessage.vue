@@ -1,12 +1,12 @@
 <template>
   <div class="layout-padding row justify-center">
     <div style="width: 700px; max-width: 90vw;">
-    <q-field icon="group" class="field-margin">
-      <q-select v-model="selectedSector" :options="orderedSectors" separator />
-    </q-field>
-    <q-field icon="message">
-      <q-input v-model="message.content" placeholder="Ecrire message..." type="textarea" :min-rows="2" :after="[sendIcon]"/>
-    </q-field>
+      <q-field icon="group" class="field-margin">
+        <q-select v-model="selectedSector" :options="orderedSectors" separator />
+      </q-field>
+      <q-field icon="message">
+        <q-input v-model="message.content" placeholder="Ecrire message..." type="textarea" :min-rows="2" :after="[sendIcon]"/>
+      </q-field>
     </div>
   </div>
 </template>
