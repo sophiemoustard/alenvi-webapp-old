@@ -14,9 +14,33 @@ import Vue from 'vue'
 import Quasar from 'quasar'
 import router from './router'
 import Axios from 'axios'
+import { Cookies } from 'quasar'
+
+import alenvi from './helpers/token/alenvi'
+import ogustToken from './helpers/token/getOgustToken'
 
 Vue.config.productionTip = false
 Vue.use(Quasar) // Install Quasar Framework
+
+Axios.interceptors.request.use(async function (config) {
+  if (alenvi.checkAlenviCookie() && config.url.match(/ogust/i)) {
+    Axios.defaults.headers.common['x-access-token'] = Cookies.get('alenvi_token');
+    const token = await ogustToken.getOgustToken();
+    config.headers.common['x-ogust-token'] = token;
+  } else if (!alenvi.checkAlenviCookie() && config.url.match(/ogust/i)) {
+    alenvi.refreshAlenviCookies(this);
+    Axios.defaults.headers.common['x-access-token'] = Cookies.get('alenvi_token');
+    const token = await ogustToken.getOgustToken();
+    config.headers['x-ogust-token'] = token;
+  } else {
+    alenvi.refreshAlenviCookies(this);
+    Axios.defaults.headers.common['x-access-token'] = Cookies.get('alenvi_token');
+  }
+  return config;
+}, function (err) {
+  return Promise.reject(err);
+});
+
 Vue.prototype.$http = Axios;
 
 if (__THEME === 'mat') {
