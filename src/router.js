@@ -3,7 +3,6 @@ import VueRouter from 'vue-router'
 import VueMeta from 'vue-meta'
 import { Cookies } from 'quasar'
 
-import { eventBus } from './main'
 import alenvi from './helpers/token/alenvi'
 
 Vue.use(VueRouter)
@@ -68,18 +67,21 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.meta.cookies && !to.meta.cookies.every(cookie => document.cookie.indexOf(cookie) !== -1)) {
-    next({
-      path: '/dashboard/login'
-    })
-  } else {
-    if (to.path.match(/^\/(bot|calendar|dashboard\/login).*/i)) {
-      next();
-    } else {
-      const value = Cookies.get('alenvi_token')
-      const payload = alenvi.verifyToken(value);
-      eventBus.$emit('decodedToken', payload);
+    if (Cookies.get('alenvi_token')) {
+      console.log('MEH2')
       next();
     }
+    console.log('MEH')
+    const refresh = alenvi.refreshAlenviCookies();
+    if (refresh) {
+      next();
+    } else {
+      next({ path: '/dashboard/login' });
+    }
+  } else {
+    console.log(to.meta.cookies)
+    console.log('MEH3')
+    next();
   }
 })
 
