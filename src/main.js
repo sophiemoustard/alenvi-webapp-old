@@ -11,14 +11,12 @@ require(`./themes/app.${__THEME}.styl`)
 // require(`quasar/dist/quasar.ie.${__THEME}.css`)
 
 import Vue from 'vue'
-import Quasar from 'quasar'
+import Quasar, { Cookies } from 'quasar'
 import router from './router'
 import Axios from 'axios'
-import { Cookies } from 'quasar'
 
 import alenvi from './helpers/token/alenvi'
 import ogustToken from './helpers/token/getOgustToken'
-import { HTTP } from './helpers/http-common/httpCommon'
 
 Vue.config.productionTip = false
 Vue.use(Quasar) // Install Quasar Framework
