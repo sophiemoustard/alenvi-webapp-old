@@ -27,17 +27,17 @@ export default {
         Cookies.set('alenvi_token_expires_in', newToken.data.data.expiresIn, { path: '/', expires: date.addToDate(new Date(), { seconds: newToken.data.data.expiresIn }) });
         return true;
       }
-      Cookies.remove('alenvi_token');
-      Cookies.remove('user_id');
-      Cookies.remove('alenvi_token_expires_in');
+      Cookies.remove('alenvi_token', { path: '/' });
+      Cookies.remove('user_id', { path: '/' });
+      Cookies.remove('alenvi_token_expires_in', { path: '/' });
       return false;
     } catch (e) {
       console.error(e.message);
       if (e.status === 404) {
-        Cookies.remove('alenvi_token');
-        Cookies.remove('refresh_token');
-        Cookies.remove('user_id');
-        Cookies.remove('alenvi_token_expires_in');
+        Cookies.remove('alenvi_token', { path: '/' });
+        Cookies.remove('refresh_token', { path: '/' });
+        Cookies.remove('user_id', { path: '/' });
+        Cookies.remove('alenvi_token_expires_in', { path: '/' });
         return false;
       }
     }
