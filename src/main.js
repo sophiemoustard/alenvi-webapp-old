@@ -23,19 +23,28 @@ Vue.config.productionTip = false
 Vue.use(Quasar) // Install Quasar Framework
 
 Axios.interceptors.request.use(async function (config) {
-  if (Cookies.get('alenvi_token') && config.url.match(/ogust/i)) {
-    Axios.defaults.headers.common['x-access-token'] = Cookies.get('alenvi_token');
+  if (!Cookies.get('alenvi_token')) {
+    alenvi.refreshAlenviCookies(this);
+  }
+  Axios.defaults.headers.common['x-access-token'] = Cookies.get('alenvi_token');
+  if (config.url.match(/ogust/i)) {
     const token = await ogustToken.getOgustToken();
     config.headers.common['x-ogust-token'] = token;
-  } else if (!Cookies.get('alenvi_token') && config.url.match(/ogust/i)) {
-    alenvi.refreshAlenviCookies(this);
-    Axios.defaults.headers.common['x-access-token'] = Cookies.get('alenvi_token');
-    const token = await ogustToken.getOgustToken();
-    config.headers['x-ogust-token'] = token;
-  } else {
-    alenvi.refreshAlenviCookies(this);
-    Axios.defaults.headers.common['x-access-token'] = Cookies.get('alenvi_token');
   }
+
+  // if (Cookies.get('alenvi_token') && config.url.match(/ogust/i)) {
+  //   Axios.defaults.headers.common['x-access-token'] = Cookies.get('alenvi_token');
+  //   const token = await ogustToken.getOgustToken();
+  //   config.headers.common['x-ogust-token'] = token;
+  // } else if (!Cookies.get('alenvi_token') && config.url.match(/ogust/i)) {
+  //   alenvi.refreshAlenviCookies(this);
+  //   Axios.defaults.headers.common['x-access-token'] = Cookies.get('alenvi_token');
+  //   const token = await ogustToken.getOgustToken();
+  //   config.headers['x-ogust-token'] = token;
+  // } else {
+  //   alenvi.refreshAlenviCookies(this);
+  //   Axios.defaults.headers.common['x-access-token'] = Cookies.get('alenvi_token');
+  // }
   return config;
 }, function (err) {
   return Promise.reject(err);
