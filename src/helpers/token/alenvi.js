@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 import { Cookies, date } from 'quasar'
 
-import { HTTP } from '../http-common/httpCommon'
+import { axiosNoHeaders } from '../axiosInstances/noHeaders'
 
 export default {
   verifyToken (token) {
@@ -22,7 +22,7 @@ export default {
       if (Cookies.get('refresh_token')) {
         const data = {};
         data.refreshToken = Cookies.get('refresh_token');
-        const newToken = await HTTP.post(`${process.env.API_HOSTNAME}/users/refreshToken`, data);
+        const newToken = await axiosNoHeaders.post(`${process.env.API_HOSTNAME}/users/refreshToken`, data);
         Cookies.set('alenvi_token', newToken.data.data.token, { path: '/', expires: date.addToDate(new Date(), { seconds: newToken.data.data.expiresIn }) });
         Cookies.set('alenvi_token_expires_in', newToken.data.data.expiresIn, { path: '/', expires: date.addToDate(new Date(), { seconds: newToken.data.data.expiresIn }) });
         return true;
