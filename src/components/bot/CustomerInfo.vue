@@ -150,10 +150,10 @@ export default {
     },
     async getCustomerInfo () {
       try {
-        const ogustToken = await Ogust.getOgustToken(this, this.queryParams.accessToken)
-        const customerDetailsRaw = await Ogust.getOgustCustomerDetails(this, this.queryParams.idCustomer, ogustToken);
+        const ogustToken = await Ogust.getOgustToken(this.queryParams.accessToken)
+        const customerDetailsRaw = await Ogust.getOgustCustomerDetails(this.queryParams.idCustomer, ogustToken);
         const customerDetails = customerDetailsRaw.data.data.info.thirdPartyInformations.array_values
-        const customerCodesRaw = await Ogust.getOgustCustomerCodes(this, this.queryParams.idCustomer, ogustToken);
+        const customerCodesRaw = await Ogust.getOgustCustomerCodes(this.queryParams.idCustomer, ogustToken);
         this.customerCodes.doorCode = customerCodesRaw.door_code;
         this.customerCodes.interCode = customerCodesRaw.intercom_code;
         this.disable = false
@@ -177,7 +177,7 @@ export default {
     },
     async editCustomerInfo () {
       try {
-        const ogustToken = await Ogust.getOgustToken(this, this.queryParams.accessToken)
+        const ogustToken = await Ogust.getOgustToken(this.queryParams.accessToken)
         let data = { arrayValues: {} }
         const infoTitles = {
           pathology: 'NIVEAU',
@@ -188,8 +188,8 @@ export default {
         for (const k in infoTitles) {
           data.arrayValues[infoTitles[k]] = this.customerInfo[k]
         }
-        await Ogust.editOgustCustomerDetails(this, ogustToken, this.queryParams.idCustomer, data)
-        await Ogust.editOgustCustomerCodes(this, ogustToken, this.queryParams.idCustomer, this.customerCodes)
+        await Ogust.editOgustCustomerDetails(ogustToken, this.queryParams.idCustomer, data)
+        await Ogust.editOgustCustomerCodes(ogustToken, this.queryParams.idCustomer, this.customerCodes)
         Toast.create('Modification effectuée ! :) Tu peux maintenant fermer la page.')
       } catch (e) {
         Toast.create("Erreur lors de l'édition de la fiche bénéficiaire :/")

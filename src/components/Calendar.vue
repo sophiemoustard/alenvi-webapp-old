@@ -51,10 +51,10 @@ export default {
             personId = this.$route.query.id_customer;
             personType = 'customer';
           }
-          const ogustToken = await Ogust.getOgustToken(this, token);
-          const personData = await Ogust.getOgustPerson(this, ogustToken, personId, personType);
+          const ogustToken = await Ogust.getOgustToken(token);
+          const personData = await Ogust.getOgustPerson(ogustToken, personId, personType);
           this.title = personData.title;
-          this.events = await Ogust.getOgustEvents(this, ogustToken, '/calendar/events', personId, personType);
+          this.events = await Ogust.getOgustEvents(ogustToken, '/calendar/events', personId, personType);
         }
       } catch (e) {
         console.error(e)
