@@ -66,7 +66,8 @@ const router = new VueRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-  // Check if there is cookie on each meta cookies route ('alenvi_token',... ), if yes check if this exists in browser cookie
+  // SI: il y a des cookies requis ET que parmi ces cookies requis, un seul n'est pas présent dans la liste
+  // ALORS: Je redirige vers le login, le mec n'a pas le droit d'être là
   if (to.meta.cookies && !to.meta.cookies.every(cookie => document.cookie.indexOf(cookie) !== -1)) {
     const refresh = await alenvi.refreshAlenviCookies();
     console.log(refresh);
