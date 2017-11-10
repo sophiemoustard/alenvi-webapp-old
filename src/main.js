@@ -23,11 +23,11 @@ Vue.config.productionTip = false
 Vue.use(Quasar) // Install Quasar Framework
 
 Axios.interceptors.request.use(async function (config) {
-  if (alenvi.checkAlenviCookie() && config.url.match(/ogust/i)) {
+  if (Cookies.get('alenvi_token') && config.url.match(/ogust/i)) {
     Axios.defaults.headers.common['x-access-token'] = Cookies.get('alenvi_token');
     const token = await ogustToken.getOgustToken();
     config.headers.common['x-ogust-token'] = token;
-  } else if (!alenvi.checkAlenviCookie() && config.url.match(/ogust/i)) {
+  } else if (!Cookies.get('alenvi_token') && config.url.match(/ogust/i)) {
     alenvi.refreshAlenviCookies(this);
     Axios.defaults.headers.common['x-access-token'] = Cookies.get('alenvi_token');
     const token = await ogustToken.getOgustToken();

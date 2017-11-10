@@ -17,12 +17,6 @@ export default {
       }
     }
   },
-  checkAlenviCookie () {
-    if (Cookies.get('alenvi_token')) {
-      return true;
-    }
-    return false;
-  },
   async refreshAlenviCookies (context) {
     try {
       if (Cookies.get('refresh_token')) {
