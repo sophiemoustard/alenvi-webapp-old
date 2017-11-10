@@ -65,23 +65,17 @@ const router = new VueRouter({
   ]
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   // Check if there is cookie on each meta cookies route ('alenvi_token',... ), if yes check if this exists in browser cookie
   if (to.meta.cookies && !to.meta.cookies.every(cookie => document.cookie.indexOf(cookie) !== -1)) {
-    if (Cookies.get('alenvi_token')) {
-      console.log('MEH2')
-      next();
-    }
-    console.log('MEH')
-    const refresh = alenvi.refreshAlenviCookies();
+    const refresh = await alenvi.refreshAlenviCookies();
+    console.log(refresh);
     if (refresh) {
       next();
     } else {
       next({ path: '/dashboard/login' });
     }
   } else {
-    console.log(to.meta.cookies)
-    console.log('MEH3')
     next();
   }
 })
