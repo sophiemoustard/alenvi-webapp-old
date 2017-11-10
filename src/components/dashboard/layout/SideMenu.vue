@@ -52,6 +52,9 @@ export default {
   methods: {
     logout () {
       Cookies.remove('alenvi_token');
+      Cookies.remove('alenvi_token_expires_in');
+      Cookies.remove('refresh_token');
+      Cookies.remove('user_id');
       this.$router.push('/dashboard/login');
     }
   }
