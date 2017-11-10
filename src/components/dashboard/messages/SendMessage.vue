@@ -23,6 +23,7 @@ import _ from 'lodash'
 
 import users from '../../models/Users'
 import messages from '../../models/Messages'
+import ogust from '../../models/Ogust'
 
 export default {
   components: {
@@ -58,13 +59,14 @@ export default {
   methods: {
     async getSectors () {
       try {
-        this.sectorUserList = await users.getAllsectors(this, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTQ3ZDFhZWZmNmMyN2NlMDc0MDU2NWEiLCJpYXQiOjE1MTAyMjMwMzMsImV4cCI6MTUxMDMwOTQzM30.W0ypw9laACPprKjWrlJi9mAvcw7sqqpv3KgBGR4zm9I');
-        for (const k in this.sectorUserList) {
-          this.sectors.push({
-            label: this.correspSectors[k],
-            value: k
-          });
-        }
+        const allSectorsRaw = await ogust.getOgustSectors(this);
+        console.log(allSectorsRaw);
+        // for (const k in this.sectorUserList) {
+        //   this.sectors.push({
+        //     label: this.correspSectors[k],
+        //     value: k
+        //   });
+        // }
       } catch (e) {
         console.error(e);
       }
