@@ -48,7 +48,7 @@ export default {
       }
     }
   },
-  mounted () {
+  async mounted () {
     this.getSectors();
   },
   computed: {
@@ -59,7 +59,7 @@ export default {
   methods: {
     async getSectors () {
       try {
-        const allSectorsRaw = await ogust.getOgustSectors(this);
+        const allSectorsRaw = await ogust.getOgustSectors();
         console.log(allSectorsRaw);
         // for (const k in this.sectorUserList) {
         //   this.sectors.push({
