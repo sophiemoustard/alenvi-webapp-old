@@ -11,18 +11,29 @@ require(`./themes/app.${__THEME}.styl`)
 // require(`quasar/dist/quasar.ie.${__THEME}.css`)
 
 import Vue from 'vue'
-import Quasar from 'quasar'
+import Quasar, { Cookies } from 'quasar'
 import router from './router'
 import Axios from 'axios'
-import { Cookies } from 'quasar'
 
 import alenvi from './helpers/token/alenvi'
 import ogustToken from './helpers/token/getOgustToken'
-import { HTTP } from './helpers/http-common/httpCommon'
 
 Vue.config.productionTip = false
 Vue.use(Quasar) // Install Quasar Framework
-Vue.prototype.$httpAlenvi = HTTP;
+
+Axios.interceptors.request.use(async function (config) {
+  if (!Cookies.get('alenvi_token')) {
+    alenvi.refreshAlenviCookies(Vue);
+  }
+  Axios.defaults.headers.common['x-access-token'] = Cookies.get('alenvi_token');
+  if (config.url.match(/ogust/i)) {
+    const token = await ogustToken.getOgustToken(Vue);
+    config.headers.common['x-ogust-token'] = token;
+  }
+  return config;
+}, function (err) {
+  return Promise.reject(err);
+});
 
 Vue.prototype.$http = Axios;
 
@@ -42,31 +53,4 @@ Quasar.start(() => {
     router,
     render: h => h(require('./App'))
   })
-  Axios.interceptors.request.use(async function (config) {
-    if (!Cookies.get('alenvi_token')) {
-      alenvi.refreshAlenviCookies(Vue);
-    }
-    Axios.defaults.headers.common['x-access-token'] = Cookies.get('alenvi_token');
-    if (config.url.match(/ogust/i)) {
-      const token = await ogustToken.getOgustToken(Vue);
-      config.headers.common['x-ogust-token'] = token;
-    }
-
-    // if (Cookies.get('alenvi_token') && config.url.match(/ogust/i)) {
-    //   Axios.defaults.headers.common['x-access-token'] = Cookies.get('alenvi_token');
-    //   const token = await ogustToken.getOgustToken();
-    //   config.headers.common['x-ogust-token'] = token;
-    // } else if (!Cookies.get('alenvi_token') && config.url.match(/ogust/i)) {
-    //   alenvi.refreshAlenviCookies(this);
-    //   Axios.defaults.headers.common['x-access-token'] = Cookies.get('alenvi_token');
-    //   const token = await ogustToken.getOgustToken();
-    //   config.headers['x-ogust-token'] = token;
-    // } else {
-    //   alenvi.refreshAlenviCookies(this);
-    //   Axios.defaults.headers.common['x-access-token'] = Cookies.get('alenvi_token');
-    // }
-    return config;
-  }, function (err) {
-    return Promise.reject(err);
-  });
 })
