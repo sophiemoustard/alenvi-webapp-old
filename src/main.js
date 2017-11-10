@@ -22,6 +22,9 @@ Vue.config.productionTip = false
 Vue.use(Quasar) // Install Quasar Framework
 
 Axios.interceptors.request.use(async function (config) {
+  if (!config.url.match(/ogust/i) && (config.url.match(/users$/i) || config.url.match(/users\/authenticate/i))) {
+    return config;
+  }
   if (!Cookies.get('alenvi_token')) {
     alenvi.refreshAlenviCookies(Vue);
   }

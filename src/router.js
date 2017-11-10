@@ -66,6 +66,7 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
+  // Check if there is cookie on each meta cookies route ('alenvi_token',... ), if yes check if this exists in browser cookie
   if (to.meta.cookies && !to.meta.cookies.every(cookie => document.cookie.indexOf(cookie) !== -1)) {
     if (Cookies.get('alenvi_token')) {
       console.log('MEH2')
