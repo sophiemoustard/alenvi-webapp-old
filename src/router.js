@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import VueMeta from 'vue-meta'
-import { Cookies } from 'quasar'
 
 import alenvi from './helpers/token/alenvi'
 
