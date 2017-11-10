@@ -25,12 +25,12 @@ export default {
         const newToken = await HTTP.post(`${process.env.API_HOSTNAME}/users/refreshToken`, data);
         Cookies.set('alenvi_token', newToken.data.data.token, { path: '/', expires: date.addToDate(new Date(), { seconds: newToken.data.data.expiresIn }) });
         Cookies.set('alenvi_token_expires_in', newToken.data.data.expiresIn, { path: '/', expires: date.addToDate(new Date(), { seconds: newToken.data.data.expiresIn }) });
-      } else {
-        Cookies.remove('alenvi_token');
-        Cookies.remove('user_id');
-        Cookies.remove('alenvi_token_expires_in');
-        context.$router.push('/dashboard/login');
+        return true;
       }
+      Cookies.remove('alenvi_token');
+      Cookies.remove('user_id');
+      Cookies.remove('alenvi_token_expires_in');
+      return false;
     } catch (e) {
       console.error(e.message);
       if (e.status === 404) {
@@ -38,7 +38,7 @@ export default {
         Cookies.remove('refresh_token');
         Cookies.remove('user_id');
         Cookies.remove('alenvi_token_expires_in');
-        context.$router.push('/dashboard/login');
+        return false;
       }
     }
   }
