@@ -1,8 +1,9 @@
+import { axiosNoHeaders } from './../axiosInstances/noHeaders'
+
 export default {
-  async getOgustToken (context) {
+  async getOgustToken () {
     try {
-      console.log(context)
-      const res = await context.$httpAlenvi.get(process.env.API_HOSTNAME + '/ogust/token');
+      const res = await axiosNoHeaders.get(process.env.API_HOSTNAME + '/ogust/token');
       const ogustToken = res.data.data.token;
       return ogustToken;
     } catch (e) {
