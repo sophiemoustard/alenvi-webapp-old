@@ -1,6 +1,6 @@
 import moment from 'moment'
 import _ from 'lodash'
-import { alenviAxios } from '../../helpers/axiosInstances/main'
+import { alenviAxios } from '../../helpers/axiosInstances/mainInstance'
 import { axiosNoHeaders } from '../../helpers/axiosInstances/noHeaders'
 
 // const process.env.API_HOSTNAME = process.env.NODE_ENV === 'production' ? 'https://alenvi-api.herokuapp.com' : 'https://alenvi-api-dev.herokuapp.com'; //'https://799e2471.ngrok.io'
