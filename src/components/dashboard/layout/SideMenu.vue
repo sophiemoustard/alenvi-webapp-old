@@ -51,10 +51,10 @@ export default {
   },
   methods: {
     logout () {
-      Cookies.remove('alenvi_token');
-      Cookies.remove('alenvi_token_expires_in');
-      Cookies.remove('refresh_token');
-      Cookies.remove('user_id');
+      Cookies.remove('alenvi_token', { path: '/' });
+      Cookies.remove('alenvi_token_expires_in', { path: '/' });
+      Cookies.remove('refresh_token', { path: '/' });
+      Cookies.remove('user_id', { path: '/' });
       this.$router.push('/dashboard/login');
     }
   }
