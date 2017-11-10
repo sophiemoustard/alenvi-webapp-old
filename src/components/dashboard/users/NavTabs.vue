@@ -22,7 +22,7 @@ import {
 
 import Planning from './Planning.vue'
 import PigiAccounts from './PigiAccounts.vue'
-import EmploymentContract from './EmploymentContract.vue'
+import PlanningModification from './PlanningModification.vue'
 
 export default {
   props: ['navTabs'],
@@ -32,7 +32,7 @@ export default {
     QTabPane,
     Planning,
     PigiAccounts,
-    EmploymentContract
+    PlanningModification
   }
 }
 </script>
