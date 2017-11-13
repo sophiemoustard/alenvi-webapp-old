@@ -109,7 +109,10 @@ export default {
     return ogustSectorsRaw.data.data
   },
   async getEmployees (params) {
-    const employeesRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/employees`, params)
+    const qParams = {
+      params
+    };
+    const employeesRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/employees`, qParams);
     const employees = employeesRaw.data.data.users.array_employee.result;
     return employees;
   }
