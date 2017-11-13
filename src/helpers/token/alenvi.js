@@ -16,7 +16,7 @@ export default {
       }
     }
   },
-  async refreshAlenviCookies (context) {
+  async refreshAlenviCookies () {
     try {
       if (Cookies.get('refresh_token')) {
         const data = {};

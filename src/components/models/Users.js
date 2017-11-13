@@ -1,11 +1,10 @@
 import { alenviAxios } from '../../helpers/alenviAxios'
 
 export default {
-  async getAllByEmployeeId (employeeId) {
+  async showAll (params) {
     try {
-      const employeeIdRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users?employee_id=${employeeId}`);
-      console.log(employeeIdRaw);
-      return employeeIdRaw.data.data.user;
+      const employeeIdRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users`, { params });
+      return employeeIdRaw.data.data.users;
     } catch (e) {
       console.error(e);
     }

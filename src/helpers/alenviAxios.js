@@ -1,4 +1,3 @@
-import Vue from 'Vue'
 import axios from 'axios'
 import { Cookies } from 'quasar'
 
@@ -13,15 +12,15 @@ instance.interceptors.request.use(async function (config) {
     return config;
   }
   if (!Cookies.get('alenvi_token')) {
-    const refresh = await alenvi.refreshAlenviCookies(Vue);
+    const refresh = await alenvi.refreshAlenviCookies();
     if (!refresh) {
-      redirect.redirectToLogin(Vue);
+      redirect.redirectToLogin();
       return config;
     }
   }
   axios.defaults.headers.common['x-access-token'] = Cookies.get('alenvi_token');
   if (config.url.match(/ogust/i)) {
-    const token = await ogustToken.getOgustToken(Vue);
+    const token = await ogustToken.getOgustToken();
     config.headers.common['x-ogust-token'] = token;
   }
   return config;
