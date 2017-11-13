@@ -9,7 +9,6 @@
       <q-field icon="phone" helper="Numéro sans délimiteur (espaces, points...)">
         <q-input v-model="phoneNbr" float-label="Numéro de téléphone" :after="[{ icon: 'send', content: true, handler: handlePhone }]"/>
       </q-field>
-      <p v-if="employee">Est-ce bien l'auxiliaire {{ employee.first_name }} {{ employee.last_name }} que tu souhaites accueillir ?</p>
       <!-- <br>
       <q-search v-model="searchUserFromMobilePhone" :debounce="600" placeholder="Numéro auxiliaire" type="tel" stack-label="Numéro de téléphone" /> -->
     </div>
@@ -21,7 +20,8 @@
     QField,
     QInput,
     QSearch,
-    Dialog
+    Dialog,
+    Toast
   } from 'quasar';
 
   import users from '../../models/Users'
@@ -32,7 +32,7 @@
       QField,
       QInput,
       QSearch,
-      Dialog
+      Toast
     },
     data() {
       return {
@@ -49,6 +49,27 @@
           }
           const res = await ogust.getEmployees(payload);
           this.employee = res[0];
+          Dialog.create({
+            title: 'Accueil auxiliaire',
+            message: `Accueillir ${this.employee.first_name} ${this.employee.last_name} ?`,
+            buttons: [
+              {
+                label: 'Non',
+                handler: () => {
+                  Toast.create('Envoi annulé.');
+                  console.log('Annulé !');
+                }
+              },
+              {
+                label: 'Oui',
+                raised: true,
+                color: 'positive',
+                handler: () => {
+                  console.log('Auxiliaire accueilli !');
+                }
+              }
+            ]
+          })
         } catch (e) {
           console.error(e);
         }
@@ -58,6 +79,6 @@
 
 </script>
 
-<style lang="stylus">
-
+<style lang="stylus" scoped>
+  @import '~variables'
 </style>
