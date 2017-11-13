@@ -18,7 +18,8 @@ import {
   QInput,
   Toast,
   Dialog,
-  Loading } from 'quasar'
+  Loading,
+  Cookies } from 'quasar'
 import _ from 'lodash'
 
 import users from '../../models/Users'
@@ -34,7 +35,7 @@ export default {
   data () {
     return {
       sectors: [],
-      sectorUserList: {},
+      sectorUserList: [],
       selectedSector: '1a*',
       correspSectors: {
         '1a*': 'Communauté 1',
@@ -49,7 +50,8 @@ export default {
     }
   },
   async mounted () {
-    this.getSectors();
+    await this.getSectors();
+    await this.getEmployeesIdBySector();
   },
   computed: {
     orderedSectors () {
@@ -60,13 +62,30 @@ export default {
     async getSectors () {
       try {
         const allSectorsRaw = await ogust.getOgustSectors();
-        console.log(allSectorsRaw);
-        // for (const k in this.sectorUserList) {
-        //   this.sectors.push({
-        //     label: this.correspSectors[k],
-        //     value: k
-        //   });
-        // }
+        for (const k in allSectorsRaw.list) {
+          this.sectors.push({
+            label: allSectorsRaw.list[k],
+            value: k
+          });
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async getEmployeesIdBySector () {
+      try {
+        const employees = await ogust.getEmployees({ sector: this.selectedSector });
+        for (const k in employees) {
+          this.sectorUserList.push(employees[k].id_employee);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async getUserIdByEmployeeId (param) {
+      try {
+        const user = await users.showAll(param)
+        return user[0]._id;
       } catch (e) {
         console.error(e);
       }
@@ -77,7 +96,10 @@ export default {
           message: this.message.content,
           sectors: this.selectedSector
         };
-        const storedMessage = await messages.storeMessage(this, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTQ3ZDFhZWZmNmMyN2NlMDc0MDU2NWEiLCJpYXQiOjE1MTAyMjMwMzMsImV4cCI6MTUxMDMwOTQzM30.W0ypw9laACPprKjWrlJi9mAvcw7sqqpv3KgBGR4zm9I', data, '59ca1e938cc5c5001251ea1e');
+        if (!Cookies.get('user_id')) {
+          this.$router.push('/dashboard/login');
+        }
+        const storedMessage = await messages.storeMessage(data, Cookies.get('user_id'));
         this.message.id = storedMessage.data.data.message._id;
       } catch (e) {
         console.error(e);
@@ -85,7 +107,7 @@ export default {
     },
     async sendMessage (messageId, recipientId) {
       try {
-        await messages.sendMessage(this, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTQ3ZDFhZWZmNmMyN2NlMDc0MDU2NWEiLCJpYXQiOjE1MTAyMjMwMzMsImV4cCI6MTUxMDMwOTQzM30.W0ypw9laACPprKjWrlJi9mAvcw7sqqpv3KgBGR4zm9I', messageId, recipientId);
+        await messages.sendMessage(messageId, recipientId);
         this.message.success++;
         return true;
       } catch (e) {
@@ -96,27 +118,29 @@ export default {
     },
     async addMessageRecipient (messageId, data) {
       try {
-        await messages.addMessageRecipientById(this, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTQ3ZDFhZWZmNmMyN2NlMDc0MDU2NWEiLCJpYXQiOjE1MTAyMjMwMzMsImV4cCI6MTUxMDMwOTQzM30.W0ypw9laACPprKjWrlJi9mAvcw7sqqpv3KgBGR4zm9I', messageId, data);
+        await messages.addMessageRecipientById(messageId, data);
       } catch (e) {
         console.error(e);
       }
     },
     async handleMessage () {
       await this.storeMessage();
-      const sectorUserList = this.sectorUserList[this.selectedSector];
+      await this.getEmployeesIdBySector();
       this.message.success = 0;
       this.message.failed = 0;
       Loading.show({ message: 'Envoi messages...' });
-      for (let i = 0, l = sectorUserList.length; i < l; i++) {
-        // console.log(selectedSector[i]._id);
-        const sentMessage = await this.sendMessage(this.message.id, sectorUserList[i]._id);
+      for (let i = 0, l = this.sectorUserList.length; i < l; i++) {
+        const sentMessage = await this.sendMessage(this.message.id, this.sectorUserList[i]);
+        const userId = await this.getUserIdByEmployeeId({ employee_id: this.sectorUserList[i] });
         const recipient = {
           success: sentMessage,
-          recipientId: sectorUserList[i]._id
+          recipientId: userId
         };
         await this.addMessageRecipient(this.message.id, recipient);
       }
-      Loading.hide();
+      setTimeout(() => {
+        Loading.hide();
+      }, 10000);
       Dialog.create({
         title: 'Récapitulatif',
         message: `Envoyés: ${this.message.success} / Echec: ${this.message.failed}`,
