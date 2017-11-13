@@ -36,7 +36,7 @@ import {
   date
 } from 'quasar'
 
-import { axiosNoHeaders } from '../../helpers/axiosInstances/noHeaders'
+import axios from 'axios'
 
 let test = Cookies.get('alenvi_token');
 
@@ -57,7 +57,7 @@ export default {
   methods: {
     async submit () {
       try {
-        const user = await axiosNoHeaders.post(`${process.env.API_HOSTNAME}/users/authenticate`, {
+        const user = await axios.post(`${process.env.API_HOSTNAME}/users/authenticate`, {
           email: this.credentials.email,
           password: this.credentials.password
         });
