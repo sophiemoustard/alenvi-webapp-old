@@ -16,6 +16,9 @@
 </template>
 
 <script>
+
+  import twilio from '../../../helpers/twilio'
+
   import {
     QField,
     QInput,
@@ -57,15 +60,21 @@
                 label: 'Non',
                 handler: () => {
                   Toast.create('Envoi annulé.');
-                  console.log('Annulé !');
                 }
               },
               {
                 label: 'Oui',
                 raised: true,
                 color: 'positive',
-                handler: () => {
-                  console.log('Auxiliaire accueilli !');
+                handler: async () => {
+                  try {
+                    const message = await twilio.sendSMS(this.employee.mobile_phone);
+                    console.log('SMS envoyé =');
+                    console.log(message);
+                    console.log('Auxiliaire accueilli !');
+                  } catch (error) {
+                    Toast.create(`Erreur lors de l'envoi du SMS`);
+                  }
                 }
               }
             ]
