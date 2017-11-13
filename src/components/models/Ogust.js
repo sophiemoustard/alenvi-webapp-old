@@ -2,7 +2,7 @@ import moment from 'moment'
 import _ from 'lodash'
 import axios from 'axios'
 // For webapp requests
-import { alenviAxios } from '../../helpers/axiosInstances/mainInstance'
+import { alenviAxios } from '../../helpers/alenviAxios'
 
 // const process.env.API_HOSTNAME = process.env.NODE_ENV === 'production' ? 'https://alenvi-api.herokuapp.com' : 'https://alenvi-api-dev.herokuapp.com'; //'https://799e2471.ngrok.io'
 

@@ -1,6 +1,13 @@
+import { alenviAxios } from '../../helpers/alenviAxios'
+
 export default {
-  async getAllsectors (context, token) {
-    const sectorsRaw = await context.$http.get(`${process.env.API_HOSTNAME}/users/sectors`, { headers: { 'x-access-token': token } });
-    return sectorsRaw.data.data.sectors;
+  async getAllByEmployeeId (employeeId) {
+    try {
+      const employeeIdRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users?employee_id=${employeeId}`);
+      console.log(employeeIdRaw);
+      return employeeIdRaw.data.data.user;
+    } catch (e) {
+      console.error(e);
+    }
   }
 }

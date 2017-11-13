@@ -2,9 +2,9 @@ import Vue from 'Vue'
 import axios from 'axios'
 import { Cookies } from 'quasar'
 
-import alenvi from './../token/alenvi'
-import ogustToken from './../token/getOgustToken'
-import redirect from './../redirect'
+import alenvi from './token/alenvi'
+import ogustToken from './token/getOgustToken'
+import redirect from './redirect'
 
 const instance = axios.create();
 
