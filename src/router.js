@@ -69,7 +69,6 @@ router.beforeEach(async (to, from, next) => {
   // ALORS: Je redirige vers le login, le mec n'a pas le droit d'être là
   if (to.meta.cookies && !to.meta.cookies.every(cookie => document.cookie.indexOf(cookie) !== -1)) {
     const refresh = await alenvi.refreshAlenviCookies();
-    console.log(refresh);
     if (refresh) {
       next();
     } else {
