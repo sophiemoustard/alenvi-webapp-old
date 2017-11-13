@@ -29,4 +29,10 @@ instance.interceptors.request.use(async function (config) {
   return Promise.reject(err);
 });
 
+instance.interceptors.response.use((response) => {
+  return response;
+}, error => {
+  return Promise.reject(error.response);
+})
+
 export const alenviAxios = instance;
