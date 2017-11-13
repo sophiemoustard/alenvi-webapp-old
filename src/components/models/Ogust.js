@@ -3,7 +3,6 @@ import _ from 'lodash'
 import axios from 'axios'
 // For webapp requests
 import { alenviAxios } from '../../helpers/axiosInstances/mainInstance'
-// For webviews + calendar requests
 
 // const process.env.API_HOSTNAME = process.env.NODE_ENV === 'production' ? 'https://alenvi-api.herokuapp.com' : 'https://alenvi-api-dev.herokuapp.com'; //'https://799e2471.ngrok.io'
 
@@ -109,13 +108,9 @@ export default {
     const ogustSectorsRaw = await alenviAxios.post(`${process.env.API_HOSTNAME}/ogust/utils/getList?key=employee.sector`, {});
     return ogustSectorsRaw.data.data
   },
-  async getEmployeesIdBySector (sector) {
-    const employeesIdBySector = [];
-    const employeesBySectorRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/employees/sector/${sector}`)
-    const employeesBySector = employeesBySectorRaw.data.data.users.array_employee.result;
-    for (const k in employeesBySector) {
-      employeesIdBySector.push(employeesBySector[k].id_employee);
-    }
-    return employeesIdBySector;
+  async getEmployees (params) {
+    const employeesRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/employees`, params)
+    const employees = employeesRaw.data.data.users.array_employee.result;
+    return employees;
   }
 }
