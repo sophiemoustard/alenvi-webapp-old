@@ -29,11 +29,11 @@ export default {
           component: 'PigiAccounts'
         },
         {
-          label: 'Contrat Travail',
-          name: 'rh',
-          icon: 'subject',
+          label: 'Modifications Planning',
+          name: 'modifs-planning',
+          icon: 'update',
           default: false,
-          component: 'EmploymentContract'
+          component: 'PlanningModification'
         }
       ]
     }
