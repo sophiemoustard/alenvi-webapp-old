@@ -1,14 +1,20 @@
 <template>
   <div class="layout-padding row justify-center">
-    <q-data-table :data="messageList" :config="config" :columns="columns" />
+    <q-data-table :data="messageList" :config="config" :columns="columns">
+      <template slot="col-message" slot-scope="cell">
+        <div class="text-align-left">{{ cell.data }}</div>
+      </template>
+    </q-data-table>
   </div>
 </template>
 
 <script>
-import { QDataTable } from 'quasar'
+import { QDataTable, Cookies } from 'quasar'
+import _ from 'lodash'
 
 import users from '../../models/Users'
 import messages from '../../models/Messages'
+import ogust from '../../models/Ogust'
 
 export default {
   components: {
@@ -23,7 +29,19 @@ export default {
         bodyStyle: {
           maxHeight: '700px'
         },
-        rowHeight: '100px',
+        rowHeight: 'auto',
+        pagination: {
+          rowsPerPage: 10,
+          options: [10, 20, 30]
+        },
+        messages: {
+          noData: 'Pas de données disponibles.'
+        },
+        labels: {
+          allCols: 'Colonnes (toutes)',
+          rows: 'Lignes',
+          search: 'Rechercher'
+        },
         responsive: true
       },
       columns: [
@@ -35,6 +53,7 @@ export default {
           sort (a, b) {
             return (new Date(a)) - (new Date(b));
           },
+          type: 'date',
           format (value) {
             return new Date(value).toLocaleString([], {
               day: '2-digit',
@@ -59,21 +78,21 @@ export default {
           filter: true,
           sort: true,
           type: 'number',
-          width: '100px'
+          width: '120px'
         },
         {
           label: 'Envoyés',
           field: 'sent',
           filter: false,
           sort: false,
-          width: '50px'
+          width: '70px'
         },
         {
           label: 'Echec',
           field: 'failed',
           filter: false,
           sort: false,
-          width: '50px'
+          width: '70px'
         },
         {
           label: 'Total',
@@ -85,15 +104,28 @@ export default {
       ]
     }
   },
-  mounted () {
-    this.getMessages();
+  async mounted () {
+    await this.getMessages();
   },
   methods: {
-    async getMessages () {
+    async getMessages() {
       try {
-        const messagesList = await messages.getMessagesBySenderId(this, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTQ3ZDFhZWZmNmMyN2NlMDc0MDU2NWEiLCJpYXQiOjE1MDk4OTkzNTgsImV4cCI6MTUwOTk4NTc1OH0.jyjO7yLJ9fptUItS-83peXvcKxLh3qSsoalfAJRgPAc', '59ca1e938cc5c5001251ea1e');
-        // console.log(messagesList);
-        this.messageList = messagesList;
+        if (!Cookies.get('user_id')) {
+          return this.$router.replace('/dashboard/login');
+        }
+        const sectors = await ogust.getOgustSectors();
+        const messagesList = await messages.getMessagesBySenderId(Cookies.get('user_id'));
+        for (let i = 0, l = messagesList.length; i < l; i++) {
+          const sent = _.countBy(messagesList[i].recipients, 'success');
+          this.messageList.push({
+            date: messagesList[i].createdAt,
+            content: messagesList[i].content,
+            sector: sectors[messagesList[i].sectors[0]] || '-',
+            sent: sent.true || 0,
+            failed: sent.false || 0,
+            total: messagesList[i].recipients.length
+          });
+        }
       } catch (e) {
         console.error(e);
       }
@@ -102,5 +134,7 @@ export default {
 }
 </script>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
+  @import '~variables'
+
 </style>
