@@ -1,9 +1,11 @@
+import { alenviAxios } from '../../helpers/alenviAxios'
+
 export default {
-  async getPlanningUpdates (context, token) {
-    const planningUpdates = await context.$http.get(`${process.env.API_HOSTNAME}/planningUpdates`, { headers: { 'x-access-token': token } });
+  async getPlanningUpdates () {
+    const planningUpdates = await alenviAxios.get(`${process.env.API_HOSTNAME}/planningUpdates`);
     return planningUpdates;
   },
-  async updatePlanningUpdatesStatus (context, token, data) {
-    await context.$http.put(`${process.env.API_HOSTNAME}/planningUpdates`, data, { headers: { 'x-access-token': token } });
+  async updatePlanningUpdatesStatus (updateId, data) {
+    await alenviAxios.put(`${process.env.API_HOSTNAME}/planningUpdates/${updateId}/status`, data);
   }
 }
