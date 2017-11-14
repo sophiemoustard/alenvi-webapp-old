@@ -39,21 +39,21 @@ const router = new VueRouter({
           path: '',
           component: load('dashboard/users/Users'),
           meta: {
-            cookies: ['alenvi_token']
+            cookies: ['alenvi_token', 'refresh_token']
           }
         },
         {
           path: 'users',
           component: load('dashboard/users/Users'),
           meta: {
-            cookies: ['alenvi_token']
+            cookies: ['alenvi_token', 'refresh_token']
           }
         },
         {
           path: 'messages',
           component: load('dashboard/messages/Messages'),
           meta: {
-            cookies: ['alenvi_token']
+            cookies: ['alenvi_token', 'refresh_token']
           }
         }
       ]
