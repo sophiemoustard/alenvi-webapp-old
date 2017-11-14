@@ -1,24 +1,27 @@
 <template>
   <div class="layout-padding row justify-center">
     <q-data-table :data="planningUpdatesList" :config="config" :columns="columns" @refresh="refresh">
-      <template slot="col-checked" slot-scope="cell">
-        <q-icon v-if="cell.data" name="check" />
-        <q-checkbox v-if="!cell.data"  v-model="isChecked" val="true" />
+      <template slot="col-check" slot-scope="cell">
+        <div v-if="cell.data.checked">
+          <q-icon name="check" />
+        </div>
+        <q-btn v-if="!cell.data.checked" @click="process(cell.data.id)" loader color="primary" small>Traiter</q-btn>
       </template>
     </q-data-table>
   </div>
 </template>
 
 <script>
-import { QDataTable, QIcon, QCheckbox } from 'quasar'
+import { QDataTable, QIcon, QBtn, Cookies } from 'quasar'
 
 import planningUpdates from '../../models/PlanningUpdates'
+import ogust from '../../models/Ogust'
 
 export default {
   components: {
     QDataTable,
     QIcon,
-    QCheckbox
+    QBtn
   },
   data () {
     return {
@@ -35,6 +38,14 @@ export default {
         pagination: {
           rowsPerPage: 5,
           options: [5, 10, 15, 30]
+        },
+        messages: {
+          noData: 'Pas de données disponibles.'
+        },
+        labels: {
+          allCols: 'Colonnes (toutes)',
+          rows: 'Lignes',
+          search: 'Rechercher'
         },
         responsive: true
       },
@@ -99,35 +110,26 @@ export default {
         },
         {
           label: 'Traitée',
-          field: 'checked',
+          field: 'check',
           filter: true,
-          sort: true,
+          sort (a, b) {
+            return a.checked - b.checked;
+          },
           type: 'boolean',
-          width: '50px'
-        },
-        {
-          label: 'Traitée par',
-          field: 'checkBy',
-          filter: true,
-          sort: true,
-          type: 'string',
           width: '100px'
-        }
+        },
       ]
     }
   },
-  mounted () {
-    this.getPlanningUpdates();
+  async mounted () {
+    await this.getPlanningUpdates();
   },
   methods: {
     async getPlanningUpdates () {
       try {
-        const planningUpdatesRaw = await planningUpdates.getPlanningUpdates(this, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTQ3ZDFhZWZmNmMyN2NlMDc0MDU2NWEiLCJpYXQiOjE1MTAxNzIwMzgsImV4cCI6MTUxMDI1ODQzOH0.6A7JhwxGVBGMvrUAXikvicGmJAAwGkLEq2LoIqQKkG0');
+        const planningUpdatesRaw = await planningUpdates.getPlanningUpdates();
         const planningUpdatesList = planningUpdatesRaw.data.data.modifPlanning;
-        const correspSectors = {
-          '1a*': '1',
-          '1b*': '2'
-        };
+        const sectors = await ogust.getOgustSectors();
         for (let i = 0, l = planningUpdatesList.length; i < l; i++) {
           for (let j = 0, k = planningUpdatesList[i].planningModification.length; j < k; j++) {
             this.planningUpdatesList.push({
@@ -135,10 +137,9 @@ export default {
               author: `${planningUpdatesList[i].firstname} ${planningUpdatesList[i].lastname}`,
               content: planningUpdatesList[i].planningModification[j].content,
               involved: planningUpdatesList[i].planningModification[j].involved,
-              sector: correspSectors[planningUpdatesList[i].sector],
+              sector: sectors[planningUpdatesList[i].sector],
               type: planningUpdatesList[i].planningModification[j].modificationType,
-              checked: planningUpdatesList[i].planningModification[j].check.isChecked,
-              checkBy: planningUpdatesList[i].planningModification[j].check.checkBy,
+              check: { id: planningUpdatesList[i].planningModification[j]._id, checked: planningUpdatesList[i].planningModification[j].check.isChecked, checkedBy: planningUpdatesList[i].planningModification[j].check.checkBy },
             })
           }
         }
@@ -146,10 +147,27 @@ export default {
         console.error(e);
       }
     },
-    refresh (done) {
+    async refresh (done) {
       this.planningUpdatesList = [];
-      this.getPlanningUpdates();
+      await this.getPlanningUpdates();
       done();
+    },  
+    async process (updateId) {
+      try {
+        if (!Cookies.get('user_id')) {
+          this.$router.replace('/dashboard/login');
+        }
+        const payload = {
+          isChecked: true,
+          checkBy: Cookies.get('user_id'),
+          checkedAt: new Date()
+        }
+        await planningUpdates.updatePlanningUpdatesStatus(updateId, payload);
+        this.planningUpdatesList = [];
+        await this.getPlanningUpdates();
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 }
@@ -159,9 +177,5 @@ export default {
   @import '~variables'
 
   .q-data-table table td
-    text-align: center
     white-space: normal
-
-  .q-data-table table th
-    text-align: center
 </style>
