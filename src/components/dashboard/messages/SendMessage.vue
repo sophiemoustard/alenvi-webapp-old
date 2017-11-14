@@ -1,11 +1,12 @@
 <template>
   <div class="layout-padding row justify-center">
     <div style="width: 700px; max-width: 90vw;">
-    <q-field icon="group" class="field-margin">
+    <p class="caption">Envoi de message aux utilisateurs du bot</p>
+    <q-field icon="group" helper="Choix communauté">
       <q-select v-model="selectedSector" :options="orderedSectors" separator />
     </q-field>
     <q-field icon="message">
-      <q-input v-model="message.content" placeholder="Ecrire message..." type="textarea" :min-rows="2" :after="[{ icon: 'send', content: true, handler: handleMessage }]"/>
+      <q-input v-model="message.content" float-label="Ecrire message" type="textarea" :min-rows="2" :after="[{ icon: 'send', content: true, handler: handleMessage }]"/>
     </q-field>
     </div>
   </div>
