@@ -15,24 +15,7 @@ export default {
     await alenviAxios.put(`${process.env.API_HOSTNAME}/messageToBot/${messageId}/recipient`, data);
   },
   async getMessagesBySenderId (senderId) {
-    let messagesList = [];
-    const correspSectors = {
-      '1a*': '1',
-      '1b*': '2'
-    };
     const sentMessagesRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/messageToBot/user/${senderId}`);
-    const sentMessages = sentMessagesRaw.data.data.messages;
-    for (let i = 0, l = sentMessages.length; i < l; i++) {
-      const sent = _.countBy(sentMessages[i].recipients, 'success');
-      messagesList.push({
-        date: sentMessages[i].createdAt,
-        content: sentMessages[i].content,
-        sector: correspSectors[sentMessages[i].sectors[0]] || '-',
-        sent: sent.true || 0,
-        failed: sent.false || 0,
-        total: sentMessages[i].recipients.length
-      })
-    }
-    return messagesList;
+    return sentMessagesRaw.data.data.messages;
   }
 }
