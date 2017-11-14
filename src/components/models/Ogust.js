@@ -106,7 +106,7 @@ export default {
   },
   async getOgustSectors () {
     const ogustSectorsRaw = await alenviAxios.post(`${process.env.API_HOSTNAME}/ogust/utils/getList?key=employee.sector`, {});
-    return ogustSectorsRaw.data.data
+    return ogustSectorsRaw.data.data.list
   },
   async getEmployees (params) {
     const employeesRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/employees`, { params });
