@@ -28,7 +28,8 @@
   } from 'quasar';
 
   import users from '../../models/Users'
-  import ogust from '../../models/Ogust';
+  import ogust from '../../models/Ogust'
+  import activationCode from '../../models/ActivationCode'
 
   export default {
     components: {
@@ -68,7 +69,9 @@
                 color: 'positive',
                 handler: async () => {
                   try {
-                    const message = await twilio.sendSMS(this.employee.mobile_phone);
+                    const activationCodeRaw = await activationCode.create();
+                    const code = activationCodeRaw.code;
+                    const message = await twilio.sendSMS(this.employee.mobile_phone, { activationCode: code });
                     console.log('SMS envoyé =');
                     console.log(message);
                     console.log('Auxiliaire accueilli !');
