@@ -37,10 +37,6 @@ export default {
       sectors: [],
       sectorUserList: [],
       selectedSector: '1a*',
-      correspSectors: {
-        '1a*': 'Communauté 1',
-        '1b*': 'Communauté 2'
-      },
       message: {
         id: '',
         content: '',
@@ -51,7 +47,6 @@ export default {
   },
   async mounted () {
     await this.getSectors();
-    await this.getEmployeesIdBySector();
   },
   computed: {
     orderedSectors () {
@@ -62,9 +57,9 @@ export default {
     async getSectors () {
       try {
         const allSectorsRaw = await ogust.getOgustSectors();
-        for (const k in allSectorsRaw.list) {
+        for (const k in allSectorsRaw) {
           this.sectors.push({
-            label: allSectorsRaw.list[k],
+            label: allSectorsRaw[k],
             value: k
           });
         }
@@ -147,6 +142,9 @@ export default {
         buttons: ['Fermer']
       });
     }
+  },
+  beforeDestroy () {
+    clearTimeout(this.timeout);
   }
 }
 </script>
