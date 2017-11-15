@@ -69,7 +69,7 @@
                 color: 'positive',
                 handler: async () => {
                   try {
-                    const activationCodeRaw = await activationCode.create();
+                    const activationCodeRaw = await activationCode.create({ employee_id: this.employee.id_employee });
                     const code = activationCodeRaw.code;
                     const message = await twilio.sendSMS(this.employee.mobile_phone, { activationCode: code });
                     console.log('SMS envoyé =');
