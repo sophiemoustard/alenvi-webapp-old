@@ -65,7 +65,7 @@ export default {
         Cookies.set('alenvi_token', user.data.data.token, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }) });
         Cookies.set('alenvi_token_expires_in', user.data.data.expiresIn, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }) });
         Cookies.set('refresh_token', user.data.data.refreshToken, { path: '/', expires: 365 });
-        Cookies.set('user_id', user.data.data.user._id, { path: '/', expires: 365 });
+        Cookies.set('user_id', user.data.data.user._id, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }) });
         this.$router.push('/dashboard');
       } catch(e) {
         console.error(e);

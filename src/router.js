@@ -29,6 +29,7 @@ const router = new VueRouter({
     { path: '/', redirect: '/dashboard' },
     { path: '/dashboard/login', component: load('dashboard/Authenticate') },
     { path: '/bot/authenticate', component: load('bot/Authenticate') },
+    { path: '/bot/authenticatePhone', component: load('bot/AuthenticatePhone') },
     { path: '/bot/editCustomerInfo', component: load('bot/CustomerInfo') },
     { path: '/calendar', component: load('Calendar') },
     {
