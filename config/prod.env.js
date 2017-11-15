@@ -4,7 +4,7 @@ let env = {};
 
 if (module_exists('../.env')) {
   const prodEnv = require('../.env').prod;
-  for (k in prodEnv) {
+  for (const k in prodEnv) {
     env[k] = `'${prodEnv[k]}'`;
   }
 } else {
