@@ -2,17 +2,18 @@
   <div class="layout-padding row justify-center">
     <q-data-table :data="planningUpdatesList" :config="config" :columns="columns" @refresh="refresh">
       <template slot="col-check" slot-scope="cell">
-        <div v-if="cell.data.checked">
+        <!-- <div v-if="cell.data.checked">
           <q-icon name="check" />
-        </div>
-        <q-btn v-if="!cell.data.checked" @click="process(cell.data.id)" loader color="primary" small>Traiter</q-btn>
+        </div> -->
+        <q-checkbox v-model="planningUpdatesList[cell.row.__index].check.checked" @input="process(cell.data.id, planningUpdatesList[cell.row.__index].check.checked, cell.row.__index)" val="cell.data.checked"></q-checkbox>
+        <!-- <q-btn v-if="!cell.data.checked" @click="process(cell.data.id)" loader color="primary" small>Traiter</q-btn> -->
       </template>
     </q-data-table>
   </div>
 </template>
 
 <script>
-import { QDataTable, QIcon, QBtn, Cookies } from 'quasar'
+import { QDataTable, QIcon, QCheckbox, Toast, Cookies } from 'quasar'
 
 import planningUpdates from '../../models/PlanningUpdates'
 import ogust from '../../models/Ogust'
@@ -21,7 +22,8 @@ export default {
   components: {
     QDataTable,
     QIcon,
-    QBtn
+    QCheckbox,
+    Toast
   },
   data () {
     return {
@@ -152,20 +154,21 @@ export default {
       await this.getPlanningUpdates();
       done();
     },  
-    async process (updateId) {
+    async process (updateId, isChecked, cell) {
       try {
         if (!Cookies.get('user_id')) {
           this.$router.replace('/dashboard/login');
         }
         const payload = {
-          isChecked: true,
+          isChecked,
           checkBy: Cookies.get('user_id'),
           checkedAt: new Date()
         }
         await planningUpdates.updatePlanningUpdatesStatus(updateId, payload);
-        this.planningUpdatesList = [];
-        await this.getPlanningUpdates();
+        Toast.create('Modification traitée.');
       } catch (e) {
+        Toast.create('Erreur lors de la validation de la modification.');
+        this.planningUpdatesList[cell].check.checked = !this.planningUpdatesList[cell].check.checked;
         console.error(e);
       }
     }
