@@ -82,7 +82,6 @@ export default {
           label: 'Demande',
           field: 'content',
           filter: true,
-          sort: true,
           type: 'string',
           width: '400px'
         },
@@ -91,7 +90,7 @@ export default {
           field: 'involved',
           filter: true,
           sort: true,
-          type: 'number',
+          type: 'string',
           width: '100px'
         },
         {
@@ -99,7 +98,7 @@ export default {
           field: 'sector',
           filter: true,
           sort: true,
-          type: 'number',
+          type: 'string',
           width: '100px'
         },
         {
