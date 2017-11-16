@@ -2,11 +2,10 @@
   <div class="layout-padding row justify-center">
     <q-data-table :data="planningUpdatesList" :config="config" :columns="columns" @refresh="refresh">
       <template slot="col-check" slot-scope="cell">
-        <!-- <div v-if="cell.data.checked">
-          <q-icon name="check" />
-        </div> -->
         <q-checkbox v-model="planningUpdatesList[cell.row.__index].check.checked" @input="process(cell.data.id, planningUpdatesList[cell.row.__index].check.checked, cell.row.__index)" val="cell.data.checked"></q-checkbox>
-        <!-- <q-btn v-if="!cell.data.checked" @click="process(cell.data.id)" loader color="primary" small>Traiter</q-btn> -->
+      </template>
+      <template slot="col-remove" slot-scope="cell">
+        <q-icon class="cursor-pointer" name="delete" @click="remove(cell.data.id, cell.row.__index, cell.data.userId)" size="1.5rem" />
       </template>
     </q-data-table>
   </div>
@@ -119,6 +118,11 @@ export default {
           type: 'boolean',
           width: '100px'
         },
+        {
+          label: '',
+          field: 'remove',
+          width: '50px'
+        }
       ]
     }
   },
@@ -141,6 +145,7 @@ export default {
               sector: sectors[planningUpdatesList[i].sector],
               type: planningUpdatesList[i].planningModification[j].modificationType,
               check: { id: planningUpdatesList[i].planningModification[j]._id, checked: planningUpdatesList[i].planningModification[j].check.isChecked, checkedBy: planningUpdatesList[i].planningModification[j].check.checkBy },
+              remove: { id: planningUpdatesList[i].planningModification[j]._id, userId: planningUpdatesList[i]._id }
             })
           }
         }
@@ -168,6 +173,16 @@ export default {
       } catch (e) {
         Toast.create('Erreur lors de la validation de la modification.');
         this.planningUpdatesList[cell].check.checked = !this.planningUpdatesList[cell].check.checked;
+        console.error(e);
+      }
+    },
+    async remove (id, cell, userId) {
+      try {
+        await planningUpdates.removePlanningUpdateById(id, { userId });
+        this.planningUpdatesList.splice(cell, 1);
+        Toast.create('Modification supprimée.');
+      } catch (e) {
+        Toast.create('Erreur lors de la suppression de la modification.');
         console.error(e);
       }
     }

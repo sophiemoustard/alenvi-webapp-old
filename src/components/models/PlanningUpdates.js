@@ -7,5 +7,8 @@ export default {
   },
   async updatePlanningUpdatesStatus (updateId, data) {
     await alenviAxios.put(`${process.env.API_HOSTNAME}/planningUpdates/${updateId}/status`, data);
+  },
+  async removePlanningUpdateById (id, params) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/planningUpdates/${id}`, { params });
   }
 }
