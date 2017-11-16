@@ -5,7 +5,7 @@
         <img src="https://res.cloudinary.com/alenvi/image/upload/c_scale,w_70/v1499948101/images/bot/Pigi.png" alt="Image user" class="avatar">
       </q-item>
       <q-item>
-        <q-item-main class="text-bold text-center" label="User" />
+        <q-item-main class="text-bold text-center" :label="user.firstname" />
       </q-item>
       <q-item class="justify-center">
         <router-link to="#">
@@ -27,19 +27,7 @@
 </template>
 
 <script>
-import {
-  QItem,
-  QItemSide,
-  QItemMain,
-  QItemSeparator,
-  QList,
-  QBtn,
-  QIcon,
-  QSideLink,
-  Cookies } from 'quasar'
-
-export default {
-  components: {
+  import {
     QItem,
     QItemSide,
     QItemMain,
@@ -47,18 +35,62 @@ export default {
     QList,
     QBtn,
     QIcon,
-    QSideLink
-  },
-  methods: {
-    logout () {
-      Cookies.remove('alenvi_token', { path: '/' });
-      Cookies.remove('alenvi_token_expires_in', { path: '/' });
-      Cookies.remove('refresh_token', { path: '/' });
-      Cookies.remove('user_id', { path: '/' });
-      this.$router.push('/dashboard/login');
+    QSideLink,
+    Cookies
+  } from 'quasar'
+
+  import users from '../../models/Users'
+
+  export default {
+    components: {
+      QItem,
+      QItemSide,
+      QItemMain,
+      QItemSeparator,
+      QList,
+      QBtn,
+      QIcon,
+      QSideLink
+    },
+    data () {
+      return {
+        user: {
+          firstname: ''
+        }
+      }
+    },
+    mounted () {
+      this.getUserInfo();
+    },
+    methods: {
+      async getUserInfo() {
+        try {
+          if (!Cookies.get('user_id')) {
+            return this.$router.push('/dashboard/login');
+          }
+          const user = await users.getById(Cookies.get('user_id'));
+          this.user.firstname = user.firstname;
+        } catch (e) {
+          console.error(e);
+        }
+      },
+      logout() {
+        Cookies.remove('alenvi_token', {
+          path: '/'
+        });
+        Cookies.remove('alenvi_token_expires_in', {
+          path: '/'
+        });
+        Cookies.remove('refresh_token', {
+          path: '/'
+        });
+        Cookies.remove('user_id', {
+          path: '/'
+        });
+        this.$router.push('/dashboard/login');
+      }
     }
   }
-}
 </script>
 
 <style lang="stylus" scoped>
