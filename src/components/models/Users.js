@@ -14,5 +14,9 @@ export default {
     } catch (e) {
       console.error(e.response);
     }
+  },
+  async getById (id) {
+    const userRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/${id}`);
+    return userRaw.data.data.user;
   }
 }
