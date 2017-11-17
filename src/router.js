@@ -38,21 +38,21 @@ const router = new VueRouter({
       children: [
         {
           path: '',
-          component: load('dashboard/users/Users'),
+          component: load('dashboard/users/NavTabs'),
           meta: {
             cookies: ['alenvi_token', 'refresh_token']
           }
         },
         {
           path: 'users',
-          component: load('dashboard/users/Users'),
+          component: load('dashboard/users/NavTabs'),
           meta: {
             cookies: ['alenvi_token', 'refresh_token']
           }
         },
         {
           path: 'messages',
-          component: load('dashboard/messages/Messages'),
+          component: load('dashboard/messages/NavTabs'),
           meta: {
             cookies: ['alenvi_token', 'refresh_token']
           }
