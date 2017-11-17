@@ -58,7 +58,7 @@ export default {
         }
       } catch (e) {
         console.error(e)
-        if (e.status === 404) {
+        if (e.response.status === 404) {
           Toast.create("Aucune intervention dans la période demandée");
         } else {
           Toast.create("Erreur de chargement des données :/ Si le problème persiste, contacte l'équipe technique :)")
