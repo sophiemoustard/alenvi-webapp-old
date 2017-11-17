@@ -59,6 +59,9 @@ export default {
       try {
         const allSectorsRaw = await ogust.getOgustSectors();
         for (const k in allSectorsRaw) {
+          if (k === '*') {
+            continue;
+          }
           this.sectors.push({
             label: allSectorsRaw[k],
             value: k
