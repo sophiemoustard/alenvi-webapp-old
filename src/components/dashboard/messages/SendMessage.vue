@@ -6,7 +6,7 @@
       <q-select v-model="selectedSector" :options="orderedSectors" separator />
     </q-field>
     <q-field icon="message">
-      <q-input v-model="message.content" float-label="Ecrire message" type="textarea" :min-rows="2" :after="[{ icon: 'send', content: true, handler: handleMessage }]"/>
+      <q-input v-model="message.content" float-label="Ecrire message" type="textarea" :after="[{ icon: 'send', content: true, handler: handleMessage }]"/>
     </q-field>
     </div>
   </div>
