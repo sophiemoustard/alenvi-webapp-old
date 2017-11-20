@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { QDataTable, QIcon, QCheckbox, Toast, Cookies } from 'quasar'
+import { QDataTable, QIcon, QCheckbox, Cookies } from 'quasar'
 
 import planningUpdates from '../../models/PlanningUpdates'
 import { alenviAlert } from "../../../helpers/alerts";
