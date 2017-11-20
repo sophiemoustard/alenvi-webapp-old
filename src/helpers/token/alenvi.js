@@ -24,6 +24,7 @@ export default {
         const newToken = await axios.post(`${process.env.API_HOSTNAME}/users/refreshToken`, data);
         Cookies.set('alenvi_token', newToken.data.data.token, { path: '/', expires: date.addToDate(new Date(), { seconds: newToken.data.data.expiresIn }) });
         Cookies.set('alenvi_token_expires_in', newToken.data.data.expiresIn, { path: '/', expires: date.addToDate(new Date(), { seconds: newToken.data.data.expiresIn }) });
+        Cookies.set('user_id', newToken.data.data.user._id, { path: '/', expires: date.addToDate(new Date(), { seconds: newToken.data.data.expiresIn }) });
         return true;
       }
       Cookies.remove('alenvi_token', { path: '/' });
