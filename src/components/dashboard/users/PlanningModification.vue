@@ -16,6 +16,7 @@ import { QDataTable, QIcon, QCheckbox, Toast, Cookies } from 'quasar'
 
 import planningUpdates from '../../models/PlanningUpdates'
 import ogust from '../../models/Ogust'
+import users from '../../models/Users'
 
 export default {
   components: {
@@ -82,7 +83,7 @@ export default {
           field: 'content',
           filter: true,
           type: 'string',
-          width: '400px'
+          width: '200px'
         },
         {
           label: 'Concerné(e)',
@@ -119,6 +120,32 @@ export default {
           width: '100px'
         },
         {
+          label: 'Traitée par',
+          field: 'checkedBy',
+          filter: true,
+          sort: true,
+          type: 'string',
+          width: '100px'
+        },
+        {
+          label: 'Traitée le',
+          field: 'checkedAt',
+          filter: true,
+          sort (a, b) {
+            return (new Date(a)) - (new Date(b));
+          },
+          format (value) {
+            return new Date(value).toLocaleString([], {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            });
+          },
+          width: '150px'
+        },
+        {
           label: '',
           field: 'remove',
           width: '50px'
@@ -144,7 +171,9 @@ export default {
               involved: planningUpdatesList[i].planningModification[j].involved,
               sector: sectors[planningUpdatesList[i].sector],
               type: planningUpdatesList[i].planningModification[j].modificationType,
-              check: { id: planningUpdatesList[i].planningModification[j]._id, checked: planningUpdatesList[i].planningModification[j].check.isChecked, checkedBy: planningUpdatesList[i].planningModification[j].check.checkBy },
+              check: { id: planningUpdatesList[i].planningModification[j]._id, checked: planningUpdatesList[i].planningModification[j].check.isChecked },
+              checkedBy: planningUpdatesList[i].planningModification[j].check.checkBy ? await this.getUserById(planningUpdatesList[i].planningModification[j].check.checkBy) : '-',
+              checkedAt: planningUpdatesList[i].planningModification[j].check.checkedAt,
               remove: { id: planningUpdatesList[i].planningModification[j]._id, userId: planningUpdatesList[i]._id }
             })
           }
@@ -183,6 +212,14 @@ export default {
         Toast.create('Modification supprimée.');
       } catch (e) {
         Toast.create('Erreur lors de la suppression de la modification.');
+        console.error(e);
+      }
+    },
+    async getUserById (id) {
+      try {
+        const user = await users.getById(id);
+        return `${user.firstname} ${user.lastname.substring(0, 1)}.`
+      } catch (e) {
         console.error(e);
       }
     }
