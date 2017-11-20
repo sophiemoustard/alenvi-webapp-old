@@ -40,7 +40,7 @@
   } from 'quasar'
 
   import users from '../../models/Users'
-  import alenvi from '../../../helpers/token'
+  import alenvi from '../../../helpers/token/alenvi'
 
   export default {
     components: {
@@ -67,7 +67,7 @@
       async getUserInfo() {
         try {
           if (!Cookies.get('user_id')) {
-            if (!await alenvi.refreshAlenviCookies()) {
+            if (await !alenvi.refreshAlenviCookies()) {
               return this.$router.push('/dashboard/login');
             }
           }
