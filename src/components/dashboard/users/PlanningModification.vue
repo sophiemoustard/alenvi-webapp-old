@@ -15,7 +15,8 @@
 import { QDataTable, QIcon, QCheckbox, Cookies } from 'quasar'
 
 import planningUpdates from '../../models/PlanningUpdates'
-import { alenviAlert } from "../../../helpers/alerts";
+import { alenviAlert } from '../../../helpers/alerts'
+import alenvi from '../../../helpers/token/alenvi'
 import ogust from '../../models/Ogust'
 import users from '../../models/Users'
 
@@ -193,7 +194,9 @@ export default {
     async process (updateId, isChecked, cell) {
       try {
         if (!Cookies.get('user_id')) {
-          this.$router.replace('/dashboard/login');
+          if (await !alenvi.refreshAlenviCookies()) {
+            return this.$router.push('/dashboard/login');
+          }
         }
         const payload = {
           isChecked,
