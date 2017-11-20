@@ -58,7 +58,7 @@ export default {
     async submit () {
       try {
         const user = await axios.post(`${process.env.API_HOSTNAME}/users/authenticate`, {
-          email: this.credentials.email,
+          email: this.credentials.email.toLowerCase(),
           password: this.credentials.password
         });
         // console.log(user);

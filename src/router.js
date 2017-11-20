@@ -77,6 +77,8 @@ router.beforeEach(async (to, from, next) => {
       } else {
         next({ path: '/dashboard/login' });
       }
+    } else {
+      next();
     }
   } else {
     next();
