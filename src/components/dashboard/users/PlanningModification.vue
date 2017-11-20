@@ -23,8 +23,7 @@ export default {
   components: {
     QDataTable,
     QIcon,
-    QCheckbox,
-    Toast
+    QCheckbox
   },
   data () {
     return {
