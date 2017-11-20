@@ -15,6 +15,7 @@
 import { QDataTable, QIcon, QCheckbox, Toast, Cookies } from 'quasar'
 
 import planningUpdates from '../../models/PlanningUpdates'
+import { alenviAlert } from "../../../helpers/alerts";
 import ogust from '../../models/Ogust'
 import users from '../../models/Users'
 
@@ -135,6 +136,9 @@ export default {
             return (new Date(a)) - (new Date(b));
           },
           format (value) {
+            if (!value) {
+              return '-';
+            }
             return new Date(value).toLocaleString([], {
               day: '2-digit',
               month: '2-digit',
@@ -167,13 +171,13 @@ export default {
             this.planningUpdatesList.push({
               date: planningUpdatesList[i].planningModification[j].createdAt,
               author: `${planningUpdatesList[i].firstname} ${planningUpdatesList[i].lastname}`,
-              content: planningUpdatesList[i].planningModification[j].content,
+              content: planningUpdatesList[i].planningModification[j].content || '-',
               involved: planningUpdatesList[i].planningModification[j].involved,
               sector: sectors[planningUpdatesList[i].sector],
               type: planningUpdatesList[i].planningModification[j].modificationType,
               check: { id: planningUpdatesList[i].planningModification[j]._id, checked: planningUpdatesList[i].planningModification[j].check.isChecked },
               checkedBy: planningUpdatesList[i].planningModification[j].check.checkBy ? await this.getUserById(planningUpdatesList[i].planningModification[j].check.checkBy) : '-',
-              checkedAt: planningUpdatesList[i].planningModification[j].check.checkedAt,
+              checkedAt: planningUpdatesList[i].planningModification[j].check.checkedAt || '',
               remove: { id: planningUpdatesList[i].planningModification[j]._id, userId: planningUpdatesList[i]._id }
             })
           }
@@ -198,9 +202,9 @@ export default {
           checkedAt: new Date()
         }
         await planningUpdates.updatePlanningUpdatesStatus(updateId, payload);
-        Toast.create('Modification traitée.');
+        alenviAlert({ color: 'positive', icon: 'check', content: 'Modification traitée.', position: 'bottom-right', duration: 2500 });
       } catch (e) {
-        Toast.create('Erreur lors de la validation de la modification.');
+        alenviAlert({ color: 'error', icon: 'warning', content: 'Erreur lors de la validation de la modification.', position: 'bottom-right', duration: 2500 });
         this.planningUpdatesList[cell].check.checked = !this.planningUpdatesList[cell].check.checked;
         console.error(e);
       }
@@ -209,9 +213,9 @@ export default {
       try {
         await planningUpdates.removePlanningUpdateById(id, { userId });
         this.planningUpdatesList.splice(cell, 1);
-        Toast.create('Modification supprimée.');
+        alenviAlert({ color: 'positive', icon: 'check', content: 'Demande de modification supprimée.', position: 'bottom-right', duration: 2500 });
       } catch (e) {
-        Toast.create('Erreur lors de la suppression de la modification.');
+        alenviAlert({ color: 'error', icon: 'warning', content: 'Erreur lors de la suppression de la demande de modification.', position: 'bottom-right', duration: 2500 });
         console.error(e);
       }
     },
@@ -223,6 +227,9 @@ export default {
         console.error(e);
       }
     }
+  },
+  beforeDestroy () {
+    clearTimeout(this.timeout);
   }
 }
 </script>

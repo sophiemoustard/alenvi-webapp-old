@@ -37,6 +37,7 @@ import {
 } from 'quasar'
 
 import axios from 'axios'
+import { alenviAlert } from '../../helpers/alerts'
 
 let test = Cookies.get('alenvi_token');
 
@@ -68,9 +69,13 @@ export default {
         Cookies.set('user_id', user.data.data.user._id, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }) });
         this.$router.push('/dashboard');
       } catch(e) {
+        alenviAlert({ color: 'error', icon: 'warning', content: 'Impossible de se connecter.', position: 'bottom-right', duration: 2500 });
         console.error(e);
       }
     }
+  },
+  beforeDestroy () {
+    clearTimeout(this.timeout);
   }
 }
 </script>
