@@ -159,6 +159,11 @@ export default {
   },
   async mounted () {
     await this.getPlanningUpdates();
+    const vm = this;
+    setInterval(async () => {
+     this.planningUpdatesList = [];
+     await vm.getPlanningUpdates();
+    }, 10 * 60 * 1000)
   },
   methods: {
     async getPlanningUpdates () {
@@ -234,6 +239,7 @@ export default {
   },
   beforeDestroy () {
     clearTimeout(this.timeout);
+    clearInterval(this.interval);
   }
 }
 </script>
