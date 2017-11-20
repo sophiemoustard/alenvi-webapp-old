@@ -112,5 +112,9 @@ export default {
     const employeesRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/employees`, { params });
     const employees = employeesRaw.data.data.users.array_employee.result;
     return employees;
+  },
+  async getEmployeeById (ogustToken, id) {
+    const employeeRaw = await axios.get(`${process.env.API_HOSTNAME}/ogust/employees/${id}`, { headers: { 'x-ogust-token': ogustToken } });
+    return employeeRaw.data.data.user.employee
   }
 }
