@@ -200,10 +200,12 @@ export default {
         }
         const payload = {
           isChecked,
-          checkBy: Cookies.get('user_id'),
-          checkedAt: new Date()
+          checkBy: isChecked ? Cookies.get('user_id') : null,
+          checkedAt: isChecked ? new Date() : null
         }
         await planningUpdates.updatePlanningUpdatesStatus(updateId, payload);
+        this.planningUpdatesList[cell].checkedBy = payload.checkBy ? await this.getUserById(payload.checkBy) : '-';
+        this.planningUpdatesList[cell].checkedAt = payload.checkedAt ? new Date() : '';
         alenviAlert({ color: 'positive', icon: 'check', content: 'Modification traitée.', position: 'bottom-right', duration: 2500 });
       } catch (e) {
         alenviAlert({ color: 'error', icon: 'warning', content: 'Erreur lors de la validation de la modification.', position: 'bottom-right', duration: 2500 });
