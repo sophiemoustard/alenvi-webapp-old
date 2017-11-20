@@ -18,6 +18,10 @@ instance.interceptors.request.use(async function (config) {
       return config;
     }
   }
+  if (!Cookies.get('refresh_token')) {
+    redirect.redirectToLogin();
+    return config;
+  }
   // Headers for request only to API (alenvi)
   config.headers.common['x-access-token'] = Cookies.get('alenvi_token');
   // Headers for next request to get Ogust Token using axios instance

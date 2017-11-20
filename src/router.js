@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import VueMeta from 'vue-meta'
+import { Cookies } from 'quasar'
 
 import alenvi from './helpers/token/alenvi'
 
@@ -68,12 +69,14 @@ const router = new VueRouter({
 router.beforeEach(async (to, from, next) => {
   // SI: il y a des cookies requis ET que parmi ces cookies requis, un seul n'est pas présent dans la liste
   // ALORS: Je redirige vers le login, le mec n'a pas le droit d'être là
-  if (to.meta.cookies && !to.meta.cookies.every(cookie => document.cookie.indexOf(cookie) !== -1)) {
-    const refresh = await alenvi.refreshAlenviCookies();
-    if (refresh) {
-      next();
-    } else {
-      next({ path: '/dashboard/login' });
+  if (to.meta.cookies) {
+    if (!Cookies.get('alenvi_token')) {
+      const refresh = await alenvi.refreshAlenviCookies();
+      if (refresh) {
+        next();
+      } else {
+        next({ path: '/dashboard/login' });
+      }
     }
   } else {
     next();
