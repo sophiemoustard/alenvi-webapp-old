@@ -1,5 +1,5 @@
 <template>
-  <div class="layout-padding row justify-center">
+  <div class="layout-padding">
     <q-data-table :data="planningUpdatesList" :config="config" :columns="columns" @refresh="refresh">
       <template slot="col-check" slot-scope="cell">
         <q-checkbox v-model="planningUpdatesList[cell.row.__index].check.checked" @input="process(cell.data.id, planningUpdatesList[cell.row.__index].check.checked, cell.row.__index)" val="cell.data.checked"></q-checkbox>
@@ -118,7 +118,7 @@ export default {
             return a.checked - b.checked;
           },
           type: 'boolean',
-          width: '100px'
+          width: '80px'
         },
         {
           label: 'Traitée par',
@@ -244,9 +244,6 @@ export default {
 }
 </script>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
   @import '~variables'
-
-  .q-data-table table td
-    white-space: normal
 </style>
