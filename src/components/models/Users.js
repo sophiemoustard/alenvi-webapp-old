@@ -18,5 +18,9 @@ export default {
   async getById (id) {
     const userRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/${id}`);
     return userRaw.data.data.user;
+  },
+  async create (data) {
+    const newUser = await alenviAxios.post(`${process.env.API_HOSTNAME}/users`, data);
+    return newUser;
   }
 }
