@@ -22,9 +22,9 @@ export default {
         const data = {};
         data.refreshToken = Cookies.get('refresh_token');
         const newToken = await axios.post(`${process.env.API_HOSTNAME}/users/refreshToken`, data);
-        Cookies.set('alenvi_token', newToken.data.data.token, { path: '/', expires: date.addToDate(new Date(), { seconds: newToken.data.data.expiresIn }) });
-        Cookies.set('alenvi_token_expires_in', newToken.data.data.expiresIn, { path: '/', expires: date.addToDate(new Date(), { seconds: newToken.data.data.expiresIn }) });
-        Cookies.set('user_id', newToken.data.data.user._id, { path: '/', expires: date.addToDate(new Date(), { seconds: newToken.data.data.expiresIn }) });
+        Cookies.set('alenvi_token', newToken.data.data.token, { path: '/', expires: date.addToDate(new Date(), { seconds: newToken.data.data.expiresIn }), secure: process.env.NODE_ENV == 'development' ? false : true });
+        Cookies.set('alenvi_token_expires_in', newToken.data.data.expiresIn, { path: '/', expires: date.addToDate(new Date(), { seconds: newToken.data.data.expiresIn }), secure: process.env.NODE_ENV == 'development' ? false : true });
+        Cookies.set('user_id', newToken.data.data.user._id, { path: '/', expires: date.addToDate(new Date(), { seconds: newToken.data.data.expiresIn }), secure: process.env.NODE_ENV == 'development' ? false : true });
         return true;
       }
       Cookies.remove('alenvi_token', { path: '/' });
