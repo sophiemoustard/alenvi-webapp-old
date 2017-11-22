@@ -69,11 +69,9 @@
                 color: 'positive',
                 handler: async () => {
                   try {
-                    const activationCodeRaw = await activationCode.create({ employee_id: this.employee.id_employee });
-                    const code = activationCodeRaw.code;
+                    const { code } = await activationCode.create({ mobile_phone: this.employee.mobile_phone });
                     const message = await twilio.sendSMS(this.employee.mobile_phone, { activationCode: code });
-                    console.log('SMS envoyé =');
-                    console.log(message);
+                    console.log('SMS envoyé =', message);
                     console.log('Auxiliaire accueilli !');
                   } catch (error) {
                     Toast.create(`Erreur lors de l'envoi du SMS`);

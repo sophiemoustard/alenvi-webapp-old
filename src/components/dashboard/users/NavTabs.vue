@@ -51,7 +51,7 @@ export default {
           icon: 'supervisor account',
           default: false,
           component: 'PigiAccounts',
-          disable: true
+          // disable: true
         },
         {
           label: 'Modifications Planning',
