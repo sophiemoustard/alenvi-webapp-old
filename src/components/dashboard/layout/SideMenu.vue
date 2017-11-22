@@ -90,7 +90,7 @@
         Cookies.remove('user_id', {
           path: '/'
         });
-        this.$router.push('/dashboard/login');
+        this.$router.replace('/dashboard/login');
       }
     }
   }
