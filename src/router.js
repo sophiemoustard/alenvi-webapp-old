@@ -4,6 +4,7 @@ import VueMeta from 'vue-meta'
 import { Cookies } from 'quasar'
 
 import alenvi from './helpers/token/alenvi'
+import { EventBus } from './main'
 
 Vue.use(VueRouter)
 Vue.use(VueMeta)
@@ -29,6 +30,14 @@ const router = new VueRouter({
   routes: [
     { path: '/', redirect: '/dashboard' },
     { path: '/dashboard/login', component: load('dashboard/Authenticate') },
+    { path: '/enterCode', component: load('registration/EnterCode') },
+    {
+      path: '/register',
+      component: load('registration/Register'),
+      beforeEnter: (to, from, next) => {
+        next();
+      }
+    },
     { path: '/bot/authenticate', component: load('bot/Authenticate') },
     { path: '/bot/authenticatePhone', component: load('bot/AuthenticatePhone') },
     { path: '/bot/editCustomerInfo', component: load('bot/CustomerInfo') },
