@@ -4,14 +4,13 @@ import VueMeta from 'vue-meta'
 import { Cookies } from 'quasar'
 
 import alenvi from './helpers/token/alenvi'
-import { EventBus } from './main'
 
-Vue.use(VueRouter)
-Vue.use(VueMeta)
+Vue.use(VueRouter);
+Vue.use(VueMeta);
 
 function load (component) {
   // '@' is aliased to src/components
-  return () => import(`@/${component}.vue`)
+  return () => import(`@/${component}.vue`);
 }
 
 const router = new VueRouter({
@@ -32,14 +31,21 @@ const router = new VueRouter({
     { path: '/dashboard/login', component: load('dashboard/Authenticate') },
     { path: '/enterCode', component: load('registration/EnterCode') },
     {
-      path: '/register',
-      component: load('registration/Register'),
+      path: '/signup',
+      component: load('signup/Signup'),
       beforeEnter: (to, from, next) => {
-        next();
+        if (Cookies.get('is_activated') && Cookies.get('sector')) {
+          next();
+        } else {
+          next({ path: '/enterCode' });
+        }
       }
     },
     { path: '/bot/authenticate', component: load('bot/Authenticate') },
-    { path: '/bot/authenticatePhone', component: load('bot/AuthenticatePhone') },
+    {
+      path: '/bot/authenticatePhone',
+      component: load('bot/AuthenticatePhone')
+    },
     { path: '/bot/editCustomerInfo', component: load('bot/CustomerInfo') },
     { path: '/calendar', component: load('Calendar') },
     {
@@ -73,7 +79,7 @@ const router = new VueRouter({
     // Always leave this last one
     { path: '*', component: load('Error404') } // Not found
   ]
-})
+});
 
 router.beforeEach(async (to, from, next) => {
   // SI: il y a des cookies requis ET que parmi ces cookies requis, un seul n'est pas présent dans la liste
@@ -92,6 +98,6 @@ router.beforeEach(async (to, from, next) => {
   } else {
     next();
   }
-})
+});
 
-export default router;
+export default router
