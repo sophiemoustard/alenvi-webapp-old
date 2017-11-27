@@ -57,7 +57,7 @@ export default {
           this.events = await Ogust.getOgustEvents(ogustToken, '/calendar/events', personId, personType);
         }
       } catch (e) {
-        console.error(e)
+        console.error(e.response)
         if (e.response.status === 404) {
           Toast.create("Aucune intervention dans la période demandée");
         } else {
