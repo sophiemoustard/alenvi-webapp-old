@@ -88,14 +88,14 @@ export default {
       comment: personData.comment || ''
     }
   },
-  async getOgustCustomerDetails (customerId, ogustToken) {
+  async getOgustCustomerDetails (ogustToken, customerId) {
     const customerDetails = await axios.get(`${process.env.API_HOSTNAME}/ogust/customers/${customerId}/moreInfo`, { headers: { 'x-ogust-token': ogustToken } });
     return customerDetails;
   },
   async editOgustCustomerDetails (ogustToken, customerId, data) {
     await axios.put(`${process.env.API_HOSTNAME}/ogust/customers/${customerId}/moreInfo`, data, { headers: { 'x-ogust-token': ogustToken } })
   },
-  async getOgustCustomerCodes (customerId, ogustToken) {
+  async getOgustCustomerCodes (ogustToken, customerId) {
     const customerInfoRaw = await axios.get(`${process.env.API_HOSTNAME}/ogust/customers/${customerId}`, { headers: { 'x-ogust-token': ogustToken } });
     const customerInfo = customerInfoRaw.data.data.user.customer;
     const customerCodes = _.pick(customerInfo, ['door_code', 'intercom_code']);
@@ -116,5 +116,9 @@ export default {
   async getEmployeeById (ogustToken, id) {
     const employeeRaw = await axios.get(`${process.env.API_HOSTNAME}/ogust/employees/${id}`, { headers: { 'x-ogust-token': ogustToken } });
     return employeeRaw.data.data.user.employee
+  },
+  async createEmployee (ogustToken, data) {
+    const newEmployee = await axios.post(`${process.env.API_HOSTNAME}/ogust/employees`, data, { headers: { 'x-ogust-token': ogustToken } })
+    return newEmployee;
   }
 }
