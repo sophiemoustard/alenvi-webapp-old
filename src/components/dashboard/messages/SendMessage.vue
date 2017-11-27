@@ -2,9 +2,10 @@
   <div class="layout-padding row justify-center">
     <div style="width: 700px; max-width: 90vw;">
     <p class="caption">Envoi de message aux utilisateurs du bot</p>
-    <q-field icon="group" helper="Choix communauté">
+    <!-- <q-field icon="group" helper="Choix communauté">
       <q-select v-model="selectedSector" :options="orderedSectors" separator />
-    </q-field>
+    </q-field> -->
+    <select-sector v-model="selectedSector"></select-sector>
     <q-field icon="message">
       <q-input :disable="!selectedSector" v-model="message.content" float-label="Ecrire message" type="textarea" :min-rows="1" :after="[{ icon: 'send', content: true, handler: handleMessage }]"/>
     </q-field>
@@ -26,12 +27,14 @@ import _ from 'lodash'
 import users from '../../models/Users'
 import messages from '../../models/Messages'
 import ogust from '../../models/Ogust'
+import SelectSector from '../../SelectSector'
 
 export default {
   components: {
     QSelect,
     QField,
-    QInput
+    QInput,
+    SelectSector
   },
   data () {
     return {
@@ -137,19 +140,17 @@ export default {
         };
         await this.addMessageRecipient(this.message.id, recipient);
       }
-      setTimeout(() => {
-        Loading.hide();
-      }, 10000);
+      Loading.hide();
       Dialog.create({
         title: 'Récapitulatif',
         message: `Envoyés: ${this.message.success} / Echec: ${this.message.failed}`,
         buttons: ['Fermer']
       });
     }
-  },
-  beforeDestroy () {
-    clearTimeout(this.timeout);
   }
+  // beforeDestroy () {
+  //   clearTimeout(this.timeout);
+  // }
 }
 </script>
 

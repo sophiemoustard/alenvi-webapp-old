@@ -2,9 +2,10 @@
   <div class="layout-padding row justify-center">
     <div style="width: 700px; max-width: 90vw;">
     <p class="caption">Voir planning en tant que:</p>
-    <q-field icon="group" helper="Choix communauté">
+    <!-- <q-field icon="group" helper="Choix communauté">
       <q-select @change="getEmployeesIdBySector" v-model="selectedSector" :options="orderedSectors" separator />
-    </q-field>
+    </q-field> -->
+    <select-sector @input="getEmployeesIdBySector" v-model="selectedSector"></select-sector>
     <q-field icon="person" helper="Choix auxiliaire" >
       <q-select v-model="selectedAuxiliary" :options="orderedAuxiliary" separator :disable="!selectedSector"/>
     </q-field>
@@ -26,15 +27,17 @@ import {
 import _ from 'lodash'
 
 import ogust from '../../models/Ogust'
+import SelectSector from '../../SelectSector'
 
 export default {
   components: {
     QSelect,
     QField,
-    QBtn
+    QBtn,
+    SelectSector
   },
   async mounted () {
-    await this.getSectors();
+    // await this.getSectors();
   },
   data () {
     return {
@@ -45,9 +48,9 @@ export default {
     }
   },
   computed: {
-    orderedSectors () {
-      return _.sortBy(this.sectors, ['value']);
-    },
+    // orderedSectors () {
+    //   return _.sortBy(this.sectors, ['value']);
+    // },
     orderedAuxiliary () {
       return _.sortBy(this.auxiliaries, ['label']);
     },
@@ -59,26 +62,26 @@ export default {
     }
   },
   methods: {
-    async getSectors () {
-      try {
-        const allSectorsRaw = await ogust.getOgustSectors();
-        for (const k in allSectorsRaw) {
-          if (k === '*') {
-            continue;
-          }
-          this.sectors.push({
-            label: allSectorsRaw[k],
-            value: k
-          });
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    },
+    // async getSectors () {
+    //   try {
+    //     const allSectorsRaw = await ogust.getOgustSectors();
+    //     for (const k in allSectorsRaw) {
+    //       if (k === '*') {
+    //         continue;
+    //       }
+    //       this.sectors.push({
+    //         label: allSectorsRaw[k],
+    //         value: k
+    //       });
+    //     }
+    //   } catch (e) {
+    //     console.error(e);
+    //   }
+    // },
     async getEmployeesIdBySector () {
       try {
         this.auxiliaries = [];
-        const employees = await ogust.getEmployees({ sector: this.selectedSector });
+        const employees = await ogust.getEmployees(params);
         for (const k in employees) {
           this.auxiliaries.push({
             label: `${employees[k].first_name} ${employees[k].last_name}`,
