@@ -6,12 +6,12 @@
       </q-card-title>
       <q-card-separator />
       <q-card-main class="row justify-center layout-padding">
-        <div class="custom-input on-left" v-for="(box, index) in boxes" :key="index">
-          <q-input align="center" inverted @keyup="changeBoxAndMakeCode(index, $event)" :ref="'box' + (index + 1)" type="text" :autofocus="box.autofocus" v-model.number="box.model" :max-length="1"></q-input>
-        </div>
+        <!-- <div class="custom-input on-left" v-for="(box, index) in boxes" :key="index"> -->
+          <q-input class="custom-input on-left" v-for="(box, index) in boxes" :key="index" align="center" inverted @keyup="changeBoxAndMakeCode(index, $event)" :ref="'box' + (index + 1)" type="text" :autofocus="box.autofocus" v-model.number="box.model" :max-length="1"></q-input>
+        <!-- </div> -->
       </q-card-main>
       <q-card-actions class="row justify-end">
-        <q-btn @click="submit" color="primary" :disable="!code">Envoyer</q-btn>
+        <q-btn @click="submit" color="primary" :disable="!code" flat big>Envoyer</q-btn>
       </q-card-actions>
     </q-card>
   </div>
@@ -22,6 +22,7 @@ import { QInput, QCard, QCardTitle, QCardMain, QCardSeparator, QCardActions, QBt
 import _ from 'lodash'
 
 import activationCode from '../models/ActivationCode'
+import { alenviAlert } from '../../helpers/alerts'
 
 export default {
   components: {
@@ -71,23 +72,39 @@ export default {
     },
     async submit () {
       try {
-        const activationDataRaw = await activationCode.check({ code: this.code });
+        const activationDataRaw = await activationCode.check(this.code);
         Cookies.set('is_activated', activationDataRaw.token, { path: '/', expires: date.addToDate(new Date(), { days: 1 }), secure: process.env.NODE_ENV == 'development' ? false : true });
         Cookies.set('sector', activationDataRaw.activationData.sector, { path: '/', expires: date.addToDate(new Date(), { days: 1 }), secure: process.env.NODE_ENV == 'development' ? false : true });
         this.$router.replace('/signup');
       } catch (e) {
+        alenviAlert({
+          color: 'error',
+          icon: 'warning',
+          content: 'Code invalide. Rentre le à nouveau ;-)',
+          position: 'bottom-right',
+          duration: 3000
+        });
         console.error(e.response);
       }
     }
+  },
+  beforeDestroy () {
+    clearTimeout(this.timeout);
   }
 };
 </script>
 
 <style lang="stylus" scoped>
-@import '~variables';
+@import '~variables'
 
-.custom-input {
-  width: 50px;
-  height: 50px;
-}
+.q-if
+  font-size: 24px
+
+.custom-input
+  width: 60px
+  height: 60px
+  @media (max-width: 321px)
+    width: 50px
+    height: 50px
+
 </style>
