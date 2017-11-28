@@ -2,15 +2,15 @@
   <div class="row justify-center layout-padding">
     <q-card style="width: 500px">
       <q-card-title>
-        Entre le code à 4 chiffres que tu as reçu par sms
+        Entre le code à 4 chiffres que tu as reçu par SMS
       </q-card-title>
       <q-card-separator />
-      <q-card-main class="row justify-center">
+      <q-card-main class="row justify-center layout-padding">
         <div class="custom-input on-left" v-for="(box, index) in boxes" :key="index">
           <q-input align="center" inverted @keyup="changeBoxAndMakeCode(index, $event)" :ref="'box' + (index + 1)" type="text" :autofocus="box.autofocus" v-model.number="box.model" :max-length="1"></q-input>
         </div>
       </q-card-main>
-      <q-card-actions class="row justify-center">
+      <q-card-actions class="row justify-end">
         <q-btn @click="submit" color="primary" :disable="!code">Envoyer</q-btn>
       </q-card-actions>
     </q-card>
