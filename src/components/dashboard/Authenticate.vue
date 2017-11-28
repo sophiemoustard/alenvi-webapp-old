@@ -19,7 +19,7 @@
       </div>
       <div class="row justify-center">
         <div class="col-xs-12 col-sm-3">
-          <q-btn class="full-width" color="primary" @click="submit()">Login</q-btn>
+          <q-btn class="full-width" color="primary" @click="submit()" flat>Login</q-btn>
         </div>
       </div>
     </div>

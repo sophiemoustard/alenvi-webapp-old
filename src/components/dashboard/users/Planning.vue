@@ -10,7 +10,7 @@
       <q-select v-model="selectedAuxiliary" :options="orderedAuxiliary" separator :disable="!selectedSector"/>
     </q-field>
     <div class="row justify-center">
-      <q-btn class="justify-center" color="primary" :disable="!selectedAuxiliary"><a target="_blank" id="planning-button" :href="getPlanningLink">Accéder au planning</a></q-btn>
+      <q-btn class="justify-center" color="primary" :disable="!selectedAuxiliary" flat><a target="_blank" id="planning-button" :href="getPlanningLink">Accéder au planning</a></q-btn>
       <!-- <q-btn class="justify-center" color="primary" :disable="!selectedAuxiliary"><router-link class="planning-button" :to="{ path: '/calendar', query: { id_employee: selectedAuxiliary, access_token: getUserToken }}">Accéder au planning</router-link></q-btn> -->
     </div>
     </div>
@@ -99,6 +99,4 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables'
 
-  #planning-button
-    color: $white
 </style>

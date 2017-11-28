@@ -48,7 +48,7 @@
         </q-field>
       </q-card-main>
       <q-card-actions class="row justify-end">
-        <q-btn color="primary" @click="submit" :disable="$v.user.$invalid">Envoyer</q-btn>
+        <q-btn color="primary" @click="submit" :disable="$v.user.$invalid" flat>Envoyer</q-btn>
       </q-card-actions>
     </q-card>
   </div>
