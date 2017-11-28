@@ -29,7 +29,7 @@ const router = new VueRouter({
   routes: [
     { path: '/', redirect: '/dashboard' },
     { path: '/dashboard/login', component: load('dashboard/Authenticate') },
-    { path: '/enterCode', component: load('registration/EnterCode') },
+    { path: '/enterCode', component: load('signup/EnterCode') },
     {
       path: '/signup',
       component: load('signup/Signup'),
