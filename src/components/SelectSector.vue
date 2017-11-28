@@ -1,5 +1,5 @@
 <template>
-  <q-field icon="group" helper="Choix communauté">
+  <q-field icon="group" helper="Choix communauté (si elle n'est pas disponible, il faut la créer dans Ogust)">
     <q-select :value="value" ref="selectSector" @change="updateSector" :options="orderedSectors" separator />
   </q-field>
 </template>
