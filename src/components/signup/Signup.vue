@@ -6,43 +6,43 @@
       </q-card-media>
       <q-card-title>
         <div class="text-center">Bienvenue chez Alenvi !</div><br /> <span slot="subtitle">Afin de créer ton compte, nous avons besoin de certaines informations. Peux-tu renseigner les
-        champs suivants :</span></q-card-title>
+        champs suivants (<span class="text-italic">tous les champs sont à remplir</span>) :</span></q-card-title>
       <q-card-separator />
       <q-card-main>
-        <q-field :label-width="3" label="Civilité*">
+        <q-field :label-width="3" label="Civilité">
           <q-select :options="civilityOptions" v-model="user.civility" separator :error="$v.user.civility.$error" error-label="Champ requis"
             @blur="$v.user.civility.$touch" />
         </q-field>
-        <q-field :label-width="3" label="Nom*" :error="$v.user.lastname.$error" error-label="Champ requis">
+        <q-field :label-width="3" label="Nom" :error="$v.user.lastname.$error" error-label="Champ requis">
           <q-input type="text" v-model.trim="user.lastname" @blur="$v.user.lastname.$touch" />
         </q-field>
-        <q-field :label-width="3" label="Prénom*" :error="$v.user.firstname.$error" error-label="Champ requis">
+        <q-field :label-width="3" label="Prénom" :error="$v.user.firstname.$error" error-label="Champ requis">
           <q-input type="text" v-model.trim="user.firstname" @blur="$v.user.firstname.$touch" />
         </q-field>
-        <q-field :label-width="3" label="Mobile*" helper="ex: 0632648709" :error="$v.user.phoneNbr.$error" :error-label="phoneNumberError">
+        <q-field :label-width="3" label="Mobile" helper="ex: 0632648709" :error="$v.user.phoneNbr.$error" :error-label="phoneNumberError">
           <q-input type="tel" v-model.trim="user.phoneNbr" @blur="$v.user.phoneNbr.$touch" />
         </q-field>
-        <q-field :label-width="3" label="Adresse*" :error="$v.user.address.line.$error" error-label="Champ requis">
+        <q-field :label-width="3" label="Adresse" :error="$v.user.address.line.$error" error-label="Champ requis">
           <q-input type="text" v-model.trim="user.address.line" @blur="$v.user.address.line.$touch" />
         </q-field>
-        <q-field :label-width="3" label="Code postal*" :error="$v.user.address.zipCode.$error" :error-label="zipCodeError">
+        <q-field :label-width="3" label="Code postal" :error="$v.user.address.zipCode.$error" :error-label="zipCodeError">
           <q-input type="text" v-model.trim="user.address.zipCode" @blur="$v.user.address.zipCode.$touch" :max-length="5" />
         </q-field>
-        <q-field :label-width="3" label="Ville*" :error="$v.user.address.city.$error" error-label="Champ requis">
+        <q-field :label-width="3" label="Ville" :error="$v.user.address.city.$error" error-label="Champ requis">
           <q-input type="text" v-model.trim="user.address.city" @blur="$v.user.address.city.$touch" />
         </q-field>
-        <q-field :label-width="3" label="Email*" :error="$v.user.email.$error" :error-label="emailError">
+        <q-field :label-width="3" label="Email" :error="$v.user.email.$error" :error-label="emailError">
           <q-input type="email" v-model.trim="user.email" @blur="$v.user.email.$touch" />
         </q-field>
-        <q-field :label-width="3" label="Confirmation email*" helper="Entre une nouvelle fois ton adresse mail" :error="$v.user.emailConfirmation.$error"
+        <q-field :label-width="3" label="Confirmation email" helper="Entre une nouvelle fois ton adresse mail" :error="$v.user.emailConfirmation.$error"
           error-label="L'email entré et la confirmation sont différents.">
           <q-input type="email" v-model.trim="user.emailConfirmation" @blur="$v.user.emailConfirmation.$touch" />
         </q-field>
-        <q-field :label-width="3" label="Mot de passe*" helper="Doit contenir au moins 6 caractères jusqu'à 20 maximum" :error="$v.user.password.$error"
+        <q-field :label-width="3" label="Mot de passe" helper="Doit contenir au moins 6 caractères jusqu'à 20 maximum" :error="$v.user.password.$error"
           :error-label="passwordError">
           <q-input type="password" v-model.trim="user.password" @blur="$v.user.password.$touch" />
         </q-field>
-        <q-field :label-width="3" label="Confirmation mot de passe*" helper="Entre une nouvelle fois ton mot de passe" :error="$v.user.passwordConfirmation.$error"
+        <q-field :label-width="3" label="Confirmation mot de passe" helper="Entre une nouvelle fois ton mot de passe" :error="$v.user.passwordConfirmation.$error"
           error-label="Le mot de passe entré et la confirmation sont différents.">
           <q-input type="password" v-model.trim="user.passwordConfirmation" @blur="$v.user.passwordConfirmation.$touch" />
         </q-field>
@@ -50,8 +50,6 @@
       <q-card-actions class="row justify-end">
         <q-btn color="primary" @click="submit" :disable="$v.user.$invalid">Envoyer</q-btn>
       </q-card-actions>
-      <!-- <q-card-separator /> -->
-        <small>*Champs requis</small>
     </q-card>
   </div>
 </template>
