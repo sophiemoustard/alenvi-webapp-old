@@ -82,6 +82,7 @@ export default {
     async getEmployeesIdBySector () {
       try {
         this.auxiliaries = [];
+        this.selectedAuxiliary = '';
         const employees = await ogust.getEmployees({ sector: this.selectedSector });
         for (const k in employees) {
           this.auxiliaries.push({
