@@ -56,12 +56,13 @@
 
 
 <script>
-import { QInput, QField, QSelect, QCard, QCardTitle, QCardMain, QCardSeparator, QCardActions, QCardMedia, QBtn, Cookies } from 'quasar'
+import { QInput, QField, QSelect, QCard, QCardTitle, QCardMain, QCardSeparator, QCardActions, QCardMedia, QBtn, Cookies, Loading } from 'quasar'
 import { required, email, sameAs, numeric, minLength, maxLength } from 'vuelidate/lib/validators'
 
 import { phoneNumber } from '../../helpers/validation/phoneNbr'
 import ogust from '../models/Ogust'
 import users from '../models/Users'
+import { alenviAlert } from '../../helpers/alerts'
 
 export default {
   components: {
@@ -74,7 +75,7 @@ export default {
     QCardSeparator,
     QCardActions,
     QCardMedia,
-    QBtn,
+    QBtn
   },
   data () {
     return {
@@ -180,6 +181,7 @@ export default {
   methods: {
     async submit () {
       try {
+        Loading.show({ message: 'Création de ton compte en cours...' });
         const ogustData = {
           title: this.user.civility,
           last_name: this.user.lastname,
@@ -196,21 +198,38 @@ export default {
         const accessToken = Cookies.get('is_activated');
         const ogustToken = await ogust.getOgustToken(accessToken);
         const ogustNewUser = await ogust.createEmployee(ogustToken, ogustData);
-        console.log(ogustNewUser);
         const alenviData = {
           firstname: this.user.firstname,
           lastname: this.user.lastname,
-          'local.email': this.user.email,
+          local: {
+            email: this.user.email,
+            password: this.user.password
+          },
           employee_id: ogustNewUser.data.data.user.body.employee.id_employee,
           role: 'auxiliary',
-          'local.password': this.user.password
         };
         const newAlenviUser = await users.create(alenviData);
-        console.log(newAlenviUser);
+        const alenviToken = newAlenviUser.data.data.token;
+        Loading.show({ message: 'Redirection vers Pigi...'});
+        setTimeout(() => {
+          Loading.hide();
+          window.location.href = `${process.env.MESSENGER_LINK}?ref=${alenviToken}`
+        }, 2000);
       } catch (e) {
+        Loading.hide();
+        alenviAlert({
+          color: 'error',
+          icon: 'warning',
+          content: "Erreur lors de la création de ton compte, n'hésite pas à contacter l'équipe technique si le problème persiste ;-)",
+          position: 'bottom-right',
+          duration: 3000
+        });
         console.error(e.response);
       }
     }
+  },
+  beforeDestroy () {
+    clearTimeout(this.timeout);
   }
 };
 </script>
