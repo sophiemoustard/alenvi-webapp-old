@@ -180,7 +180,7 @@ export default {
     async submit () {
       try {
         Loading.show({ message: 'Création de ton compte en cours...' });
-        const accessToken = Cookies.get('is_activated');
+        const accessToken = Cookies.get('signup_is_activated');
         const mobilePhone = Cookies.get('signup_mobile');
         const ogustData = {
           title: this.user.civility,
