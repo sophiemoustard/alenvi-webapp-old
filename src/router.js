@@ -34,7 +34,7 @@ const router = new VueRouter({
       path: '/signup',
       component: load('signup/Signup'),
       beforeEnter: (to, from, next) => {
-        if (Cookies.get('is_activated') && Cookies.get('sector')) {
+        if (Cookies.get('signup_is_activated') && Cookies.get('signup_sector') && Cookies.get('signup_mobile')) {
           next();
         } else {
           next({ path: '/enterCode' });
