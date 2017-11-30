@@ -7,7 +7,8 @@
       <q-card-separator />
       <q-card-main class="row justify-center layout-padding">
         <!-- <div class="custom-input on-left" v-for="(box, index) in boxes" :key="index"> -->
-          <q-input class="custom-input on-left" v-for="(box, index) in boxes" :key="index" align="center" inverted @keyup="changeBoxAndMakeCode(index, $event)" :ref="'box' + (index + 1)" type="text" :autofocus="box.autofocus" v-model.number="box.model" :max-length="1"></q-input>
+          <q-input class="custom-input on-left" v-for="(box, index) in boxes" :key="index" align="center" @change="changeBoxAndMakeCode(index, $event)" :attributes="boxesStyle" :ref="'box' + (index + 1)" type="tel" :autofocus="box.autofocus" v-model.number="box.model" :max-length="1"></q-input>
+
         <!-- </div> -->
       </q-card-main>
       <q-card-actions class="row justify-end">
@@ -54,12 +55,16 @@ export default {
           autofocus: false
         }
       ],
-      code: ''
+      code: '',
+      boxesStyle: {
+        style: 'color: #E2007A; height: 40px',
+        autocorrect: 'off'
+      }
     }
   },
   methods: {
     changeBoxAndMakeCode (index, event) {
-      if (index !== (this.boxes.length - 1) && event.code.match(/Digit[0-9]/g)) {
+      if (index !== (this.boxes.length - 1) && event.match(/[0-9]/g)) {
         const newIndex = index + 1;
         this.$refs['box' + (newIndex + 1)][0].focus();
       } else if (index === (this.boxes.length - 1)) {
@@ -73,8 +78,9 @@ export default {
     async submit () {
       try {
         const activationDataRaw = await activationCode.check(this.code);
-        Cookies.set('is_activated', activationDataRaw.token, { path: '/', expires: date.addToDate(new Date(), { days: 1 }), secure: process.env.NODE_ENV == 'development' ? false : true });
-        Cookies.set('sector', activationDataRaw.activationData.sector, { path: '/', expires: date.addToDate(new Date(), { days: 1 }), secure: process.env.NODE_ENV == 'development' ? false : true });
+        Cookies.set('signup_is_activated', activationDataRaw.token, { path: '/', expires: date.addToDate(new Date(), { days: 1 }), secure: process.env.NODE_ENV == 'development' ? false : true });
+        Cookies.set('signup_sector', activationDataRaw.activationData.sector, { path: '/', expires: date.addToDate(new Date(), { days: 1 }), secure: process.env.NODE_ENV == 'development' ? false : true });
+        Cookies.set('signup_mobile', activationDataRaw.activationData.mobile_phone, { path: '/', expires: date.addToDate(new Date(), { days: 1 }), secure: process.env.NODE_ENV == 'development' ? false : true });
         this.$router.replace('/signup');
       } catch (e) {
         alenviAlert({
@@ -95,16 +101,16 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-@import '~variables'
+  @import '~variables'
 
-.q-if
-  font-size: 24px
+  .q-if
+    font-size: 24px
 
-.custom-input
-  width: 60px
-  height: 60px
-  @media (max-width: 321px)
-    width: 50px
-    height: 50px
-
+  .custom-input
+    color: $primary
+    width: 60px
+    height: 60px
+    @media (max-width: 321px)
+      width: 50px
+      height: 50px
 </style>
