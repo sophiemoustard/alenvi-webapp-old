@@ -34,8 +34,15 @@ import {
   QBtn
 } from 'quasar'
 
+import bot from '../models/Bot'
+
 export default {
-  data () {
+  components: {
+      QField,
+      QInput,
+      QBtn
+  },
+  data() {
     return {
       credentials: {
         email: '',
@@ -44,23 +51,28 @@ export default {
     }
   },
   methods: {
-    submit () {
-      var newLocation = 'https://alenvi-api.herokuapp.com/bot/authorize' + window.location.search;
-      if (window.location.search) {
-        newLocation += '&';
-      } else {
-        newLocation += '?'
+    async submit() {
+      try {
+        const user = await bot.authenticate(this.credentials);
+        const token = user.data.data.token;
+        console.log(user);
+        window.location.href = `${process.env.MESSENGER_LINK}?ref=${token}`
+      } catch (e) {
+        console.error(e.response);
       }
-      window.location = newLocation + 'email=' + this.credentials.email + '&password=' + this.credentials.password;
-      return false;
+      //   var newLocation = 'https://alenvi-api.herokuapp.com/bot/authorize' + window.location.search;
+      //   if (window.location.search) {
+      //     newLocation += '&';
+      //   } else {
+      //     newLocation += '?'
+      //   }
+      //   window.location = newLocation + 'email=' + this.credentials.email + '&password=' + this.credentials.password;
+      //   return false;
+      // }
     }
-  },
-  components: {
-    QField,
-    QInput,
-    QBtn
   }
 }
+
 </script>
 
 <style lang="css">
