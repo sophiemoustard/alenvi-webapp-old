@@ -38,7 +38,7 @@
           error-label="L'email entré et la confirmation sont différents.">
           <q-input type="email" v-model.trim="user.emailConfirmation" @blur="$v.user.emailConfirmation.$touch" />
         </q-field>
-        <q-field :label-width="3" label="Mot de passe" helper="Doit contenir au moins 6 caractères jusqu'à 20 maximum" :error="$v.user.password.$error"
+        <q-field :label-width="3" label="Mot de passe" helper="Crée ton mot de passe. Il doit contenir au moins 6 caractères jusqu'à 20 maximum" :error="$v.user.password.$error"
           :error-label="passwordError">
           <q-input type="password" v-model.trim="user.password" @blur="$v.user.password.$touch" />
         </q-field>
