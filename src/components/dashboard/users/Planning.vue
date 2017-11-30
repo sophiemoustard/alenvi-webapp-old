@@ -9,8 +9,8 @@
     <q-field icon="person" helper="Choix auxiliaire" >
       <q-select v-model="selectedAuxiliary" :options="orderedAuxiliary" separator :disable="!selectedSector"/>
     </q-field>
-    <div class="row justify-center">
-      <q-btn class="justify-center" color="primary" :disable="!selectedAuxiliary" @click="goUrl(getPlanningLink)" flat>Accéder au planning</q-btn>
+    <div class="row justify-end">
+      <q-btn color="primary" :disable="!selectedAuxiliary" @click="goUrl(getPlanningLink)" flat>Accéder au planning</q-btn>
       <!-- <q-btn class="justify-center" color="primary" :disable="!selectedAuxiliary"><router-link class="planning-button" :to="{ path: '/calendar', query: { id_employee: selectedAuxiliary, access_token: getUserToken }}">Accéder au planning</router-link></q-btn> -->
     </div>
     </div>
