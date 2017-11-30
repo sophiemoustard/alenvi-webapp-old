@@ -19,9 +19,6 @@
         <q-field :label-width="3" label="Prénom" :error="$v.user.firstname.$error" error-label="Champ requis">
           <q-input type="text" v-model.trim="user.firstname" @blur="$v.user.firstname.$touch" />
         </q-field>
-        <q-field :label-width="3" label="Mobile" helper="ex: 0632648709" :error="$v.user.phoneNbr.$error" :error-label="phoneNumberError">
-          <q-input type="tel" v-model.trim="user.phoneNbr" @blur="$v.user.phoneNbr.$touch" />
-        </q-field>
         <q-field :label-width="3" label="Adresse" :error="$v.user.address.line.$error" error-label="Champ requis">
           <q-input type="text" v-model.trim="user.address.line" @blur="$v.user.address.line.$touch" />
         </q-field>
@@ -59,9 +56,10 @@
 import { QInput, QField, QSelect, QCard, QCardTitle, QCardMain, QCardSeparator, QCardActions, QCardMedia, QBtn, Cookies, Loading } from 'quasar'
 import { required, email, sameAs, numeric, minLength, maxLength } from 'vuelidate/lib/validators'
 
-import { phoneNumber } from '../../helpers/validation/phoneNbr'
+// import { phoneNumber } from '../../helpers/validation/phoneNbr'
 import ogust from '../models/Ogust'
 import users from '../models/Users'
+import activationCode from '../models/ActivationCode'
 import { alenviAlert } from '../../helpers/alerts'
 
 export default {
@@ -112,7 +110,7 @@ export default {
       civility: { required },
       lastname: { required },
       firstname: { required },
-      phoneNbr: { required, phoneNumber },
+      // phoneNbr: { required, phoneNumber },
       address: {
         line: { required },
         zipCode: {
@@ -149,13 +147,13 @@ export default {
         return 'Email invalide'
       }
     },
-    phoneNumberError () {
-      if (!this.$v.user.phoneNbr.required) {
-        return 'Champ requis';
-      } else if (!this.$v.user.phoneNbr.phoneNumber) {
-        return 'Numéro invalide: il doit être de la forme 0693215423';
-      }
-    },
+    // phoneNumberError () {
+    //   if (!this.$v.user.phoneNbr.required) {
+    //     return 'Champ requis';
+    //   } else if (!this.$v.user.phoneNbr.phoneNumber) {
+    //     return 'Numéro invalide: il doit être de la forme 0693215423';
+    //   }
+    // },
     zipCodeError () {
       if (!this.$v.user.address.zipCode.required) {
         return 'Champ requis';
@@ -182,6 +180,8 @@ export default {
     async submit () {
       try {
         Loading.show({ message: 'Création de ton compte en cours...' });
+        const accessToken = Cookies.get('is_activated');
+        const mobilePhone = Cookies.get('signup_mobile');
         const ogustData = {
           title: this.user.civility,
           last_name: this.user.lastname,
@@ -193,9 +193,8 @@ export default {
           },
           email: this.user.email,
           sector: this.user.sector,
-          mobile_phone: this.user.phoneNbr
+          mobile_phone: mobilePhone
         };
-        const accessToken = Cookies.get('is_activated');
         const ogustToken = await ogust.getOgustToken(accessToken);
         const ogustNewUser = await ogust.createEmployee(ogustToken, ogustData);
         const alenviData = {
@@ -211,8 +210,12 @@ export default {
         const newAlenviUser = await users.create(alenviData);
         const alenviToken = newAlenviUser.data.data.token;
         Loading.show({ message: 'Redirection vers Pigi...'});
-        setTimeout(() => {
+        setTimeout(async () => {
           Loading.hide();
+          Cookies.remove('signup_is_activated', { path: '/' });
+          Cookies.remove('signup_sector', { path: '/' });
+          Cookies.remove('signup_mobile', { path: '/' });
+          await activationCode.delete(accessToken, mobilePhone);
           window.location.href = `${process.env.MESSENGER_LINK}?ref=${alenviToken}`
         }, 2000);
       } catch (e) {
