@@ -59,6 +59,7 @@ export default {
           });
           console.log('SMS envoyé =', message);
           console.log('Auxiliaire accueilli !');
+          Toast.create('SMS bien envoyé.');
         } catch (error) {
           Toast.create(`Erreur lors de l'envoi du SMS`);
         }
