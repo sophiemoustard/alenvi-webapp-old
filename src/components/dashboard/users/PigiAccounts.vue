@@ -4,7 +4,7 @@
       <p class="caption">Création de compte Alenvi et Ogust</p>
       <select-sector v-model="selectedSector"></select-sector>
       <q-field icon="phone" helper="Numéro sans délimiteur (espaces, points...)">
-        <q-input :disable="!selectedSector" v-model="phoneNbr" float-label="Numéro de téléphone" :after="[{ icon: 'send', content: true, handler: handlePhone }]"/>
+        <q-input :disable="!selectedSector" :loading="isLoading" v-model="phoneNbr" float-label="Numéro de téléphone" :after="[{ icon: 'send', content: true, handler: handlePhone }]"/>
       </q-field>
       <!-- <p class="caption">Envoi de code pour compte existant</p>
       <q-field icon="phone" helper="Numéro sans délimiteur (espaces, points...)">
@@ -38,7 +38,8 @@ export default {
       phoneNbr: '',
       // searchUserFromMobilePhone: ''
       employee: '',
-      selectedSector: ''
+      selectedSector: '',
+      isLoading: false
     };
   },
   methods: {
@@ -49,20 +50,19 @@ export default {
         // };
         // const res = await ogust.getEmployees(payload);
         // this.employee = res[0];
-        try {
-          const { code } = await activationCode.create({
+          this.isLoading = true;
+          const activationDataRaw = await activationCode.create({
             mobile_phone: this.phoneNbr,
             sector: this.selectedSector
           });
+          const code = activationDataRaw.activationData.code;
           const message = await twilio.sendSMS(this.phoneNbr, {
             activationCode: code
           });
           console.log('SMS envoyé =', message);
           console.log('Auxiliaire accueilli !');
+          this.isLoading = false;
           Toast.create('SMS bien envoyé.');
-        } catch (error) {
-          Toast.create(`Erreur lors de l'envoi du SMS`);
-        }
         // Dialog.create({
         //   title: 'Accueil auxiliaire',
         //   message: `Accueillir ${this.employee.first_name} ${this.employee.last_name} ?`,
@@ -84,6 +84,8 @@ export default {
         //   ]
         // })
       } catch (e) {
+        this.isLoading = false;
+        Toast.create(`Erreur lors de l'envoi du SMS`);
         console.error(e);
       }
     }
