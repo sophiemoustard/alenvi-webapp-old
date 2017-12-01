@@ -1,15 +1,24 @@
 <template>
   <div class="layout-padding row justify-center">
-    <q-data-table :data="messageList" :config="config" :columns="columns">
+    <q-data-table class="cursor-pointer" :data="messageList" :config="config" :columns="columns" @rowclick="displayDetails">
       <template slot="col-message" slot-scope="cell">
         <div class="text-align-left">{{ cell.data }}</div>
       </template>
     </q-data-table>
+    <q-modal ref="detailModal" minimized :content-css="{ padding: '30px' }">
+      <h5>Détails envoi</h5>
+      <p v-for="(recipient, index) in recipients" :key="index">
+        {{ recipient.name }} <q-icon v-if="recipient.success" name="done" color="positive" /><q-icon v-if="!recipient.success" name="clear" color="negative" />
+      </p>
+      <div class="row justify-end">
+        <q-btn color="primary" @click="$refs.detailModal.close()" flat>Fermer</q-btn>
+      </div>
+    </q-modal>
   </div>
 </template>
 
 <script>
-import { QDataTable, Cookies } from 'quasar'
+import { QDataTable, Cookies, QModal, QIcon, QBtn } from 'quasar'
 import _ from 'lodash'
 
 import users from '../../models/Users'
@@ -18,11 +27,15 @@ import ogust from '../../models/Ogust'
 
 export default {
   components: {
-    QDataTable
+    QDataTable,
+    QModal,
+    QIcon,
+    QBtn
   },
   data () {
     return {
       messageList: [],
+      recipients: [],
       config: {
         title: 'Messages Envoyés',
         noHeader: false,
@@ -117,17 +130,35 @@ export default {
         const messagesList = await messages.getMessagesBySenderId(Cookies.get('user_id'));
         const orderedMessageList = [];
         for (let i = 0, l = messagesList.length; i < l; i++) {
+          console.log(messagesList[i].recipients);
           const sent = _.countBy(messagesList[i].recipients, 'success');
           orderedMessageList.push({
             date: messagesList[i].createdAt,
             content: messagesList[i].content,
             sector: sectors[messagesList[i].sectors[0]] || '-',
-            sent: sent.true || 0,
-            failed: sent.false || 0,
-            total: messagesList[i].recipients.length
+            sent: sent.true || '-',
+            failed: sent.false || '-',
+            total: messagesList[i].recipients.length,
+            recipients: messagesList[i].recipients
           });
         }
         this.messageList = _.sortBy(orderedMessageList, ['date']).reverse();
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async displayDetails (row) {
+      try {
+        console.log(row);
+        this.recipients = [];
+        row.recipients.forEach(async (item) => {
+          const recipient = await users.getById(item.id)
+          this.recipients.push({
+            name: `${recipient.firstname}`,
+            success: item.success
+          });
+        })
+        this.$refs.detailModal.open();
       } catch (e) {
         console.error(e);
       }
@@ -139,4 +170,6 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables'
 
+  tr
+    cursor: pointer
 </style>
