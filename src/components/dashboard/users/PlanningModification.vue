@@ -161,7 +161,7 @@ export default {
   async mounted () {
     await this.getPlanningUpdates();
     const vm = this;
-    setInterval(async () => {
+    this.interval = setInterval(async () => {
      this.planningUpdatesList = [];
      await vm.getPlanningUpdates();
     }, 10 * 60 * 1000)
