@@ -13,6 +13,7 @@
 
 <script>
 import { QDataTable, QIcon, QCheckbox, Cookies } from 'quasar'
+import _ from 'lodash'
 
 import planningUpdates from '../../models/PlanningUpdates'
 import { alenviAlert } from '../../../helpers/alerts'
@@ -170,10 +171,11 @@ export default {
       try {
         const planningUpdatesRaw = await planningUpdates.getPlanningUpdates();
         const planningUpdatesList = planningUpdatesRaw.data.data.modifPlanning;
+        const orderedPlanningUpdatesList = [];
         const sectors = await ogust.getOgustSectors();
         for (let i = 0, l = planningUpdatesList.length; i < l; i++) {
           for (let j = 0, k = planningUpdatesList[i].planningModification.length; j < k; j++) {
-            this.planningUpdatesList.push({
+            orderedPlanningUpdatesList.push({
               date: planningUpdatesList[i].planningModification[j].createdAt,
               author: `${planningUpdatesList[i].firstname} ${planningUpdatesList[i].lastname}`,
               content: planningUpdatesList[i].planningModification[j].content || '-',
@@ -184,9 +186,10 @@ export default {
               checkedBy: planningUpdatesList[i].planningModification[j].check.checkBy ? await this.getUserById(planningUpdatesList[i].planningModification[j].check.checkBy) : '-',
               checkedAt: planningUpdatesList[i].planningModification[j].check.checkedAt || '',
               remove: { id: planningUpdatesList[i].planningModification[j]._id, userId: planningUpdatesList[i]._id }
-            })
+            });
           }
         }
+        this.planningUpdatesList = _.sortBy(orderedPlanningUpdatesList, ['date']).reverse();
       } catch (e) {
         console.error(e);
       }
