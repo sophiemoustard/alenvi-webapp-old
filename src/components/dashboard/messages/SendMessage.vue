@@ -46,6 +46,9 @@ export default {
         content: '',
         success: 0,
         failed: 0
+      },
+      progress: {
+        model: 0
       }
     }
   },
@@ -87,6 +90,7 @@ export default {
     async getUserIdByEmployeeId (param) {
       try {
         const user = await users.showAll(param)
+        console.log(user);
         return user[0]._id;
       } catch (e) {
         console.error(e);
@@ -130,9 +134,23 @@ export default {
       await this.getEmployeesIdBySector();
       this.message.success = 0;
       this.message.failed = 0;
-      Loading.show({ message: 'Envoi messages...' });
+      // Loading.show({ message: 'Envoi messages...' });
+      const progressDialog = Dialog.create({
+        title: 'Envoi',
+        message: 'Envoi en cours...',
+        progress: this.progress,
+        nobuttons: true,
+        onDismiss: () => {
+          Dialog.create({
+            title: 'Récapitulatif',
+            message: `Envoyés: ${this.message.success} / Echec: ${this.message.failed}`,
+            buttons: ['Fermer']
+          });
+        }
+      });
       for (let i = 0, l = this.sectorUserList.length; i < l; i++) {
         const sentMessage = await this.sendMessage(this.message.id, this.sectorUserList[i]);
+        this.progress.model += Math.floor(1 / l * 100);
         const userId = await this.getUserIdByEmployeeId({ employee_id: this.sectorUserList[i] });
         const recipient = {
           success: sentMessage,
@@ -140,12 +158,8 @@ export default {
         };
         await this.addMessageRecipient(this.message.id, recipient);
       }
-      Loading.hide();
-      Dialog.create({
-        title: 'Récapitulatif',
-        message: `Envoyés: ${this.message.success} / Echec: ${this.message.failed}`,
-        buttons: ['Fermer']
-      });
+      progressDialog.close();
+      // Loading.hide();
     }
   }
   // beforeDestroy () {
