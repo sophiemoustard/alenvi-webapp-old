@@ -86,7 +86,7 @@ export default {
         alenviAlert({
           color: 'error',
           icon: 'warning',
-          content: 'Code invalide. Rentre le à nouveau ;-)',
+          content: 'Code invalide',
           position: 'bottom-right',
           duration: 3000
         });
