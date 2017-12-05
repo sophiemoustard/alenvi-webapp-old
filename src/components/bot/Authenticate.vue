@@ -56,6 +56,8 @@ export default {
         const user = await bot.authenticate(this.credentials);
         const token = user.data.data.token;
         console.log(user);
+        console.log('MESSENGER_LINK', process.env.MESSENGER_LINK);
+        console.log('TOKEN', token);
         window.location.href = `${process.env.MESSENGER_LINK}?ref=${token}`
       } catch (e) {
         console.error(e.response);
