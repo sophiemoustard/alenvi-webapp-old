@@ -14,7 +14,7 @@
         <tr v-for="(role, index) in roles" :key="index">
           <td class="text-center">{{ role.name }}</td>
           <td class="text-center" v-for="(feature, index) in role.features" :key="index">
-            <q-input align="center" v-model="feature.permission_level" @change="updateRole(role)" />
+            <q-input type="number" align="center" v-model.trim.number="feature.permission_level" @change="updateRole(role)" />
           </td>
         </tr>
       </tbody>
@@ -38,9 +38,7 @@ export default {
   },
   data () {
     return {
-      // roles: {},
-      features: {},
-      featuresLength: 0,
+      // roles: {}
       roles: [
         {
           "name": "Admin",
@@ -65,7 +63,8 @@ export default {
               "name": "Params",
               "permission_level": "2"
             }
-          ]
+          ],
+          "_id": "12345"
         },
         {
           "name": "Tech",
@@ -90,35 +89,26 @@ export default {
               "name": "Params",
               "permission_level": "2"
             }
-          ]
+          ],
+          "_id": "123456"
         }
       ]
     }
   },
   async mounted () {
     // await this.getRoles();
-    await this.getFeatures();
   },
   methods: {
     async getRoles (params) {
       try {
-        this.roles = await roles.showAll(params)
-        console.log(this.roles);
-      } catch (e) {
-        console.error(e);
-      }
-    },
-    async getFeatures (params) {
-      try {
-        this.features = await features.showAll(params)
-        this.featuresLength = 4,
-        console.log(this.features);
+        this.roles = await roles.showAll(params);
       } catch (e) {
         console.error(e);
       }
     },
     async updateRole(params) {
       try {
+        console.log(params);
         const roleUpdated = await roles.update(params);
         console.log(roleUpdated);
       } catch (e) {
