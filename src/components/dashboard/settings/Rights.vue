@@ -12,9 +12,19 @@
       </thead>
       <tbody>
         <tr v-for="(role, index) in roles" :key="index">
-          <td class="text-center">{{ role.name }}</td>
+          <td class="text-center">
+            <q-input type="text" align="center" v-model="role.name" />
+          </td>
           <td class="text-center" v-for="(feature, index) in role.features" :key="index">
-            <q-input type="number" align="center" v-model.trim.number="feature.permission_level" @change="updateRole(role)" />
+            <q-input type="number" align="center" v-model.trim.number="feature.permission_level" @change="updateRole(role, feature.permission_level)" />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <q-input type="text" align="center" v-model="roleToAdd.name"/>
+          </td>
+          <td class="text-center" v-for="(feature, index) in roles[0].features" :key="index">
+            <q-input type="number" align="center" v-model="featurePermissionToAdd" @change="updateRoleToAdd(feature)" />
           </td>
         </tr>
       </tbody>
@@ -38,6 +48,12 @@ export default {
   },
   data () {
     return {
+      roleToAdd: {
+        features: {
+
+        }
+      },
+      featurePermissionToAdd: '',
       // roles: {}
       roles: [
         {
@@ -106,14 +122,32 @@ export default {
         console.error(e);
       }
     },
-    async updateRole(params) {
+    async updateRole(role, permission) {
       try {
-        console.log(params);
-        const roleUpdated = await roles.update(params);
-        console.log(roleUpdated);
+        if (!permission) {
+          return ;
+        }
+        const roleUpdated = await roles.update(role);
       } catch (e) {
         console.error(e);
       }
+    },
+    updateRoleToAdd(feature) {
+      console.log('FEATURE_NAME_TO_ADD', feature.name);
+      console.log('FEATURES_PERMISSION_TO_ADD', this.featurePermissionToAdd);
+
+      this.roleToAdd('');
+
+      // console.log('ROLE_TO_ADD', this.roleToAdd);
+
+      // for (let i = -1; i < this..length; ++i) {
+      //   console.log('FEATURE_NAME', feature.name);
+      //   console.log();
+      //   this.roleToAdd.features.push({
+      //     [feature.name]: this.featuresToAdd[0]
+      //   })
+      // }
+      console.log(this.roleToAdd);
     }
   }
 }
