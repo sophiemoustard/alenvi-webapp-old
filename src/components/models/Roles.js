@@ -8,5 +8,13 @@ export default {
     } catch (e) {
       console.error(e);
     }
+  },
+  async update (params) {
+    try {
+      const roleUpdated = await alenviAxios.put(`${process.env.API_HOSTNAME}/roles/${params._id}`);
+      return roleUpdated.data.data.role;
+    } catch (e) {
+      console.error(e);
+    }
   }
 }

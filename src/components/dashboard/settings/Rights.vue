@@ -14,7 +14,7 @@
         <tr v-for="(role, index) in roles" :key="index">
           <td class="text-center">{{ role.name }}</td>
           <td class="text-center" v-for="(feature, index) in role.features" :key="index">
-            <q-input align="center" v-model="feature.permission_level" />
+            <q-input align="center" v-model="feature.permission_level" @change="updateRole(role)" />
           </td>
         </tr>
       </tbody>
@@ -113,6 +113,14 @@ export default {
         this.features = await features.showAll(params)
         this.featuresLength = 4,
         console.log(this.features);
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async updateRole(params) {
+      try {
+        const roleUpdated = await roles.update(params);
+        console.log(roleUpdated);
       } catch (e) {
         console.error(e);
       }
