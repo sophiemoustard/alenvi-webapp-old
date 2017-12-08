@@ -72,6 +72,13 @@ const router = new VueRouter({
           meta: {
             cookies: ['alenvi_token', 'refresh_token']
           }
+        },
+        {
+          path: 'settings',
+          component: load('dashboard/settings/NavTabs'),
+          meta: {
+            cookies: ['alenvi_token', 'refresh_token']
+          }
         }
       ]
     },

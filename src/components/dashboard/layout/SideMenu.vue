@@ -22,6 +22,11 @@
         <q-item-side icon="message" />
         <q-item-main label="Envoi Messages" />
       </q-side-link>
+      <q-item-separator />
+      <q-side-link item to="/dashboard/settings" exact>
+        <q-item-side icon="settings" />
+        <q-item-main label="Paramètres" />
+      </q-side-link>
     </q-list>
   </div>
 </template>
