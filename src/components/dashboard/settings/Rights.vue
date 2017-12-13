@@ -1,34 +1,40 @@
 <template>
   <div class="layout-padding row justify-center">
-    <!-- <div style="width: 700px; max-width: 90vw;">
-      <p>Test</p>
-    </div> -->
-    <table class="q-table striped-odd highlight">
-      <thead>
-        <tr>
-          <th></th>
-          <th class="text-center" v-for="(feature, index) in roles[0].features" :key="index">{{ feature.name }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(role, index) in roles" :key="index">
-          <td class="text-center">
-            <q-input type="text" align="center" v-model="role.name" />
-          </td>
-          <td class="text-center" v-for="(feature, index) in role.features" :key="index">
-            <q-input type="number" align="center" v-model.trim.number="feature.permission_level" @change="updateRole(role, feature.permission_level)" />
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <q-input type="text" align="center" v-model="roleToAdd.name"/>
-          </td>
-          <td class="text-center" v-for="(feature, index) in roles[0].features" :key="index">
-            <q-input type="number" align="center" v-model="featurePermissionToAdd" @change="updateRoleToAdd(feature)" />
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div style="width: 1024px; max-width: 90vw;">
+      <p class="caption">Rôles existants:</p>
+      <table class="q-table striped-odd highlight">
+        <thead>
+          <tr>
+            <th></th>
+            <th class="text-center" v-for="(feature, index) in roles[0].features" :key="index">{{ feature.name }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(role, index) in roles" :key="index">
+            <td class="text-center">
+              <q-input type="text" align="center" v-model="role.name" />
+            </td>
+            <td class="text-center" v-for="(feature, index) in role.features" :key="index">
+              <q-input type="number" align="center" v-model.trim.number="feature.permission_level" @blur="updateRole(role, feature.permission_level)" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p>0: Aucun droit<br />1: Droit de visibilité (lecture)<br />2: Droit de modification (écriture)<br /></p>
+      <p class="caption">Nouveau rôle:</p>
+      <table>
+        <tbody>
+          <tr>
+            <td>
+              <q-input type="text" align="center" v-model="roleToAdd.name" placeholder="Nom rôle"/>
+            </td>
+            <td class="text-center" v-for="(feature, index) in roleToAdd.features" :key="index">
+              <q-input type="number" align="center" v-model.trim.number="feature.permission_level" @blur="logRoleToAddFeatures(index)" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -40,7 +46,7 @@ import {
 import _ from 'lodash'
 
 import roles from '../../models/Roles'
-import features from '../../models/Features'
+// import features from '../../models/Features'
 
 export default {
   components: {
@@ -49,75 +55,24 @@ export default {
   data () {
     return {
       roleToAdd: {
-        features: {
-
-        }
+        features: []
       },
-      featurePermissionToAdd: '',
-      // roles: {}
-      roles: [
-        {
-          "name": "Admin",
-          "features": [
-            {
-              "_id": "123122",
-              "name": "SendMessage",
-              "permission_level": "1"
-            },
-            {
-              "_id": "123122",
-              "name": "Account",
-              "permission_level": "2"
-            },
-            {
-              "_id": "123122",
-              "name": "Pigi",
-              "permission_level": "2"
-            },
-            {
-              "_id": "123122",
-              "name": "Params",
-              "permission_level": "2"
-            }
-          ],
-          "_id": "12345"
-        },
-        {
-          "name": "Tech",
-          "features": [
-            {
-              "_id": "123122",
-              "name": "SendMessage",
-              "permission_level": "2"
-            },
-            {
-              "_id": "123122",
-              "name": "Account",
-              "permission_level": "1"
-            },
-            {
-              "_id": "123122",
-              "name": "Pigi",
-              "permission_level": "2"
-            },
-            {
-              "_id": "123122",
-              "name": "Params",
-              "permission_level": "2"
-            }
-          ],
-          "_id": "123456"
-        }
-      ]
+      roles: [{
+        features: []
+      }],
+      featurePermissionsToAdd: [],
+      maxPermission: 2,
+      minPermission: 0
     }
   },
-  async mounted () {
-    // await this.getRoles();
+  async created () {
+    this.getRoles();
   },
   methods: {
-    async getRoles (params) {
+    async getRoles () {
       try {
-        this.roles = await roles.showAll(params);
+        this.roles = await roles.showAll();
+        this.initFeaturesInRoleToAdd();
       } catch (e) {
         console.error(e);
       }
@@ -127,16 +82,15 @@ export default {
         if (!permission) {
           return ;
         }
-        const roleUpdated = await roles.update(role);
+        console.log('roles features=', this.roles);
+        // const roleUpdated = await roles.update(role);
       } catch (e) {
         console.error(e);
       }
     },
     updateRoleToAdd(feature) {
-      console.log('FEATURE_NAME_TO_ADD', feature.name);
-      console.log('FEATURES_PERMISSION_TO_ADD', this.featurePermissionToAdd);
-
-      this.roleToAdd('');
+      // console.log('FEATURE_NAME_TO_ADD', feature.name);
+      // console.log('FEATURES_PERMISSION_TO_ADD', this.featurePermissionsToAdd);
 
       // console.log('ROLE_TO_ADD', this.roleToAdd);
 
@@ -147,8 +101,22 @@ export default {
       //     [feature.name]: this.featuresToAdd[0]
       //   })
       // }
-      console.log(this.roleToAdd);
+      // console.log(this.roleToAdd);
+    },
+    initFeaturesInRoleToAdd() {
+      for (let i = 0; i < this.roles[0].features.length; i++) {
+        this.roleToAdd.features[i] = {};
+        this.roleToAdd.features[i].name = this.roles[0].features[i].name;
+        this.roleToAdd.features[i].permission_level = 0;
+      }
+      console.log(this.roleToAdd.features);
+    },
+    logRoleToAddFeatures() {
+      console.log('features to add=', this.roleToAdd.features);
     }
+    // checkNumber() {
+
+    // }
   }
 }
 </script>
