@@ -2,7 +2,7 @@
   <div class="layout-padding row justify-center">
     <div style="width: 1024px; max-width: 90vw;">
       <p class="caption">Rôles existants:</p>
-      <table class="q-table striped-odd highlight vertical-separator compact">
+      <table class="q-table striped-odd highlight compact">
         <thead>
           <tr>
             <th class="text-center">Rôles \ Features</th>
@@ -16,6 +16,11 @@
             </td>
             <td class="text-center" v-for="(feature, indexFeature) in role.features" :key="indexFeature">
               <q-input type="number" align="center" v-model.trim.number="feature.permission_level" @blur="updateRole(role, feature.permission_level)" />
+            </td>
+            <td class="text-center">
+              <div class="row justify-end">
+                <q-btn icon="delete" color="primary" @click="deleteRole(role._id)" :disable="!roleToAdd.name" flat></q-btn>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -59,6 +64,7 @@ import {
   Dialog,
   QInput,
   QBtn,
+  QIcon,
   Cookies } from 'quasar'
 import _ from 'lodash'
 
@@ -68,7 +74,8 @@ import roles from '../../models/Roles'
 export default {
   components: {
     QInput,
-    QBtn
+    QBtn,
+    QIcon
   },
   data () {
     return {
