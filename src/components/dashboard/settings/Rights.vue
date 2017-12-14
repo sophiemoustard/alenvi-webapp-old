@@ -2,10 +2,10 @@
   <div class="layout-padding row justify-center">
     <div style="width: 1024px; max-width: 90vw;">
       <p class="caption">Rôles existants:</p>
-      <table class="q-table striped-odd highlight">
+      <table class="q-table striped-odd highlight vertical-separator compact">
         <thead>
           <tr>
-            <th></th>
+            <th class="text-center">Rôles \ Features</th>
             <th class="text-center" v-for="(feature, index) in roles[0].features" :key="index">{{ feature.name }}</th>
           </tr>
         </thead>
@@ -14,13 +14,14 @@
             <td class="text-center">
               <q-input type="text" align="center" v-model="role.name" />
             </td>
-            <td class="text-center" v-for="(feature, index) in role.features" :key="index">
+            <td class="text-center" v-for="(feature, indexFeature) in role.features" :key="indexFeature">
               <q-input type="number" align="center" v-model.trim.number="feature.permission_level" @blur="updateRole(role, feature.permission_level)" />
             </td>
           </tr>
         </tbody>
       </table>
       <div v-if="showRoleCreation" id="create-role">
+        <br>
         <p class="caption">Nouveau rôle:</p>
         <table>
           <thead>
@@ -83,15 +84,17 @@ export default {
     }
   },
   async created () {
-    // await this.getRoles();
-    this.roles = await roles.showAll();
-    console.log('this.roles=', this.roles);
-    this.initFeaturesInRoleToAdd();
+    try {
+      await this.getRoles();
+    } catch (e) {
+      console.error(e);
+    }
   },
   methods: {
     async getRoles () {
       try {
-        this.roles = await roles.showAll();
+        const rolesRaw = await roles.showAll();
+        this.roles = rolesRaw.data.roles;
         await this.initFeaturesInRoleToAdd();
       } catch (e) {
         console.error(e);
@@ -99,29 +102,14 @@ export default {
     },
     async updateRole(role, permission) {
       try {
+        // Check if permission is well sent instead of void
         if (!permission) {
           return ;
         }
-        console.log('roles features=', this.roles);
-        // const roleUpdated = await roles.update(role);
+        const roleUpdatedRaw = await roles.update(role);
       } catch (e) {
         console.error(e);
       }
-    },
-    updateRoleToAdd(feature) {
-      // console.log('FEATURE_NAME_TO_ADD', feature.name);
-      // console.log('FEATURES_PERMISSION_TO_ADD', this.featurePermissionsToAdd);
-
-      // console.log('ROLE_TO_ADD', this.roleToAdd);
-
-      // for (let i = -1; i < this..length; ++i) {
-      //   console.log('FEATURE_NAME', feature.name);
-      //   console.log();
-      //   this.roleToAdd.features.push({
-      //     [feature.name]: this.featuresToAdd[0]
-      //   })
-      // }
-      // console.log(this.roleToAdd);
     },
     initFeaturesInRoleToAdd() {
       for (let i = 0; i < this.roles[0].features.length; i++) {
@@ -130,14 +118,14 @@ export default {
         // this.roleToAdd.features[i].permission_level = 0;
         this.$set(this.roleToAdd.features, i, { name: this.roles[0].features[i].name, permission_level: 0, _id: this.roles[0].features[i]._id });
       }
-      console.log('this.roleToAdd.features=', this.roleToAdd.features);
     },
     async createRole() {
       try {
-        this.roleCreated = await roles.create(this.roleToAdd);
-        console.log('this.roleCreated=', this.roleCreated);
+        const roleCreatedRaw = await roles.create(this.roleToAdd);
+        this.roleCreated = roleCreatedRaw.data.role;
         this.showRoleCreation = false;
-        this.roles = await roles.showAll();
+        this.roleToAdd.name = "";
+        this.getRoles();
       } catch (e) {
         console.error(e);
       }

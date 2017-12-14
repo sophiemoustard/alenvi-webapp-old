@@ -4,15 +4,15 @@ export default {
   async showAll (params) {
     try {
       const roles = await alenviAxios.get(`${process.env.API_HOSTNAME}/roles`, { params });
-      return roles.data.data.roles;
+      return roles.data;
     } catch (e) {
       console.error(e);
     }
   },
   async update (params) {
     try {
-      const roleUpdated = await alenviAxios.put(`${process.env.API_HOSTNAME}/roles/${params._id}`);
-      return roleUpdated.data.data.role;
+      const roleUpdated = await alenviAxios.put(`${process.env.API_HOSTNAME}/roles/${params._id}`, params);
+      return roleUpdated.data;
     } catch (e) {
       console.error(e);
     }
@@ -20,7 +20,7 @@ export default {
   async create (params) {
     try {
       const roleCreated = await alenviAxios.post(`${process.env.API_HOSTNAME}/roles`, params);
-      return roleCreated.data.data.role;
+      return roleCreated.data;
     } catch (e) {
       console.error(e);
     }
