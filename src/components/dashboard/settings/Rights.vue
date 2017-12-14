@@ -20,20 +20,35 @@
           </tr>
         </tbody>
       </table>
+      <div v-if="showRoleCreation" id="create-role">
+        <p class="caption">Nouveau rôle:</p>
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th class="text-center" v-for="(feature, index) in roles[0].features" :key="index">{{ feature.name }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <q-input type="text" align="center" v-model="roleToAdd.name" placeholder="Nom rôle"/>
+              </td>
+              <td class="text-center" v-for="(feature, index) in roleToAdd.features" :key="index">
+                <q-input type="number" align="center" v-model.trim.number="feature.permission_level" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="row justify-end">
+          <q-btn color="primary" @click="createRole()" :disable="!roleToAdd.name" flat>Créer</q-btn>
+        </div>
+      </div>
       <p>0: Aucun droit<br />1: Droit de visibilité (lecture)<br />2: Droit de modification (écriture)<br /></p>
-      <p class="caption">Nouveau rôle:</p>
-      <table>
-        <tbody>
-          <tr>
-            <td>
-              <q-input type="text" align="center" v-model="roleToAdd.name" placeholder="Nom rôle"/>
-            </td>
-            <td class="text-center" v-for="(feature, index) in roleToAdd.features" :key="index">
-              <q-input type="number" align="center" v-model.trim.number="feature.permission_level" @blur="logRoleToAddFeatures(index)" />
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <!-- Show create role button -->
+      <div v-if="!showRoleCreation" class="row justify-begin">
+        <q-btn color="primary" @click="showRoleCreation = !showRoleCreation">Créer rôle</q-btn>
+      </div>
     </div>
   </div>
 </template>
@@ -42,6 +57,7 @@
 import {
   Dialog,
   QInput,
+  QBtn,
   Cookies } from 'quasar'
 import _ from 'lodash'
 
@@ -50,7 +66,8 @@ import roles from '../../models/Roles'
 
 export default {
   components: {
-    QInput
+    QInput,
+    QBtn
   },
   data () {
     return {
@@ -60,19 +77,22 @@ export default {
       roles: [{
         features: []
       }],
-      featurePermissionsToAdd: [],
+      showRoleCreation: false,
       maxPermission: 2,
       minPermission: 0
     }
   },
   async created () {
-    this.getRoles();
+    // await this.getRoles();
+    this.roles = await roles.showAll();
+    console.log('this.roles=', this.roles);
+    this.initFeaturesInRoleToAdd();
   },
   methods: {
     async getRoles () {
       try {
         this.roles = await roles.showAll();
-        this.initFeaturesInRoleToAdd();
+        await this.initFeaturesInRoleToAdd();
       } catch (e) {
         console.error(e);
       }
@@ -105,18 +125,20 @@ export default {
     },
     initFeaturesInRoleToAdd() {
       for (let i = 0; i < this.roles[0].features.length; i++) {
-        this.roleToAdd.features[i] = {};
-        this.roleToAdd.features[i].name = this.roles[0].features[i].name;
-        this.roleToAdd.features[i].permission_level = 0;
+        // this.roleToAdd.features[i] = {};
+        // this.roleToAdd.features[i].name = this.roles[0].features[i].name;
+        // this.roleToAdd.features[i].permission_level = 0;
+        this.$set(this.roleToAdd.features, i, { name: this.roles[0].features[i].name, permission_level: 0, _id: this.roles[0].features[i]._id });
       }
-      console.log(this.roleToAdd.features);
+      console.log('this.roleToAdd.features=', this.roleToAdd.features);
     },
-    logRoleToAddFeatures() {
-      console.log('features to add=', this.roleToAdd.features);
+    async createRole() {
+      try {
+        this.roleCreated = await roles.create(this.roleToAdd);
+      } catch (e) {
+        console.error(e);
+      }
     }
-    // checkNumber() {
-
-    // }
   }
 }
 </script>

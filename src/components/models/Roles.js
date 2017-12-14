@@ -16,5 +16,13 @@ export default {
     } catch (e) {
       console.error(e);
     }
+  },
+  async create (params) {
+    try {
+      const roleCreated = await alenviAxios.post(`${process.env.API_HOSTNAME}/roles`, params);
+      return roleCreated.data.data.role;
+    } catch (e) {
+      console.error(e);
+    }
   }
 }
