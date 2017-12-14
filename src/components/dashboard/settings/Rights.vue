@@ -135,6 +135,9 @@ export default {
     async createRole() {
       try {
         this.roleCreated = await roles.create(this.roleToAdd);
+        console.log('this.roleCreated=', this.roleCreated);
+        this.showRoleCreation = false;
+        this.roles = await roles.showAll();
       } catch (e) {
         console.error(e);
       }
