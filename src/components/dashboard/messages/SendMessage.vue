@@ -79,6 +79,7 @@ export default {
     },
     async getEmployeesIdBySector () {
       try {
+        this.sectorUserList = [];
         const employees = await ogust.getEmployees({ sector: this.selectedSector });
         for (const k in employees) {
           this.sectorUserList.push(employees[k].id_employee);
@@ -90,7 +91,6 @@ export default {
     async getUserIdByEmployeeId (param) {
       try {
         const user = await users.showAll(param)
-        console.log(user);
         return user[0]._id;
       } catch (e) {
         console.error(e);
@@ -158,6 +158,7 @@ export default {
         };
         await this.addMessageRecipient(this.message.id, recipient);
       }
+      this.progress.model = 0;
       progressDialog.close();
       // Loading.hide();
     }
