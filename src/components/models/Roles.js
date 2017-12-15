@@ -24,5 +24,13 @@ export default {
     } catch (e) {
       console.error(e);
     }
+  },
+  async delete (roleId) {
+    try {
+      const roleDeleted = await alenviAxios.delete(`${process.env.API_HOSTNAME}/roles/${roleId}`);
+      return roleDeleted.data;
+    } catch (e) {
+      console.error(e);
+    }
   }
 }

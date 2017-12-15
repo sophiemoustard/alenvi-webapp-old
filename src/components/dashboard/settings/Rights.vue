@@ -19,7 +19,7 @@
             </td>
             <td class="text-center">
               <div class="row justify-end">
-                <q-btn icon="delete" color="primary" @click="deleteRole(role._id)" :disable="!roleToAdd.name" flat></q-btn>
+                <q-btn icon="delete" color="primary" @click="deleteRole(role._id)" flat></q-btn>
               </div>
             </td>
           </tr>
@@ -132,6 +132,15 @@ export default {
         this.roleCreated = roleCreatedRaw.data.role;
         this.showRoleCreation = false;
         this.roleToAdd.name = "";
+        this.getRoles();
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async deleteRole(roleId) {
+      try {
+        const roleDeleted = await roles.delete(roleId);
+        console.log(roleDeleted);
         this.getRoles();
       } catch (e) {
         console.error(e);
