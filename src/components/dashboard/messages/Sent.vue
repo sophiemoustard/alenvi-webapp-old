@@ -130,7 +130,6 @@ export default {
         const messagesList = await messages.getMessagesBySenderId(Cookies.get('user_id'));
         const orderedMessageList = [];
         for (let i = 0, l = messagesList.length; i < l; i++) {
-          console.log(messagesList[i].recipients);
           const sent = _.countBy(messagesList[i].recipients, 'success');
           orderedMessageList.push({
             date: messagesList[i].createdAt,
