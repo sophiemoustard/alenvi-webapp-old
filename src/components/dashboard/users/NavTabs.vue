@@ -31,6 +31,7 @@ export default {
     QTab,
     QTabPane,
     PigiAccounts,
+    Users
   },
   data () {
     return {
