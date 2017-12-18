@@ -54,7 +54,14 @@ const router = new VueRouter({
       children: [
         {
           path: '',
-          component: load('dashboard/users/NavTabs'),
+          component: load('dashboard/planning/NavTabs'),
+          meta: {
+            cookies: ['alenvi_token', 'refresh_token']
+          }
+        },
+        {
+          path: 'planning',
+          component: load('dashboard/planning/NavTabs'),
           meta: {
             cookies: ['alenvi_token', 'refresh_token']
           }

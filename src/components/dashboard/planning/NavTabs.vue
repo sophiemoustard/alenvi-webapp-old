@@ -21,8 +21,8 @@ import {
   QTab,
   QTabPane } from 'quasar'
 
-import Users from './Users.vue'
-import PigiAccounts from './PigiAccounts.vue'
+import Planning from './Planning.vue'
+import PlanningModification from './PlanningModification.vue'
 
 export default {
   // props: ['navTabs'],
@@ -30,27 +30,26 @@ export default {
     QTabs,
     QTab,
     QTabPane,
-    PigiAccounts,
+    Planning,
+    PlanningModification
   },
   data () {
     return {
       tabInfo: [
         {
-          label: 'Vue utilisateurs',
-          name: 'users',
-          icon: 'supervisor account',
+          label: 'Vue planning',
+          name: 'planning',
+          icon: 'date range',
           default: true,
-          component: 'Users',
-          // disable: true
+          component: 'Planning'
         },
         {
-          label: 'Accueil Pigi',
-          name: 'pigi',
-          icon: 'person add',
+          label: 'Modifications Planning',
+          name: 'modifs-planning',
+          icon: 'update',
           default: false,
-          component: 'PigiAccounts',
-          // disable: true
-        },
+          component: 'PlanningModification'
+        }
       ]
     }
   }
