@@ -74,8 +74,8 @@ const router = new VueRouter({
           }
         },
         {
-          path: 'messages',
-          component: load('dashboard/messages/NavTabs'),
+          path: 'pigi',
+          component: load('dashboard/pigi/NavTabs'),
           meta: {
             cookies: ['alenvi_token', 'refresh_token']
           }

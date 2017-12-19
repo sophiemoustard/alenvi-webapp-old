@@ -12,14 +12,14 @@
         <tbody>
           <tr v-for="(role, index) in roles" :key="index">
             <td class="text-center">
-              <q-input type="text" align="center" v-model="role.name" />
+              <q-input type="text" align="center" v-model="role.name" :readonly="isRoleAdmin(role)" />
             </td>
             <td class="text-center" v-for="(feature, indexFeature) in role.features" :key="indexFeature">
-              <q-input type="number" align="center" v-model.trim.number="feature.permission_level" @blur="updateRole(role, feature.permission_level)" />
+              <q-input type="number" align="center" v-model.trim.number="feature.permission_level" :readonly="isRoleAdmin(role)" @blur="updateRole(role, feature.permission_level)" />
             </td>
             <td class="text-center">
               <div class="row justify-end">
-                <q-btn icon="delete" color="primary" @click="deleteRole(role._id)" flat></q-btn>
+                <q-btn icon="delete" color="primary" @click="deleteRole(role._id)" :disable="isRoleAdmin(role)" flat></q-btn>
               </div>
             </td>
           </tr>
@@ -123,6 +123,8 @@ export default {
         // this.roleToAdd.features[i] = {};
         // this.roleToAdd.features[i].name = this.roles[0].features[i].name;
         // this.roleToAdd.features[i].permission_level = 0;
+
+        // Have to use this.$set because in Quasar q-input v-model data isn't reactive
         this.$set(this.roleToAdd.features, i, { name: this.roles[0].features[i].name, permission_level: 0, _id: this.roles[0].features[i]._id });
       }
     },
@@ -145,6 +147,9 @@ export default {
       } catch (e) {
         console.error(e);
       }
+    },
+    isRoleAdmin(role) {
+      return role.name === 'Admin';
     }
   }
 }

@@ -22,7 +22,7 @@ import {
   QTabPane } from 'quasar'
 
 import Users from './Users.vue'
-import PigiAccounts from './PigiAccounts.vue'
+import AddAuxiliary from './AddAuxiliary.vue'
 
 export default {
   // props: ['navTabs'],
@@ -30,8 +30,8 @@ export default {
     QTabs,
     QTab,
     QTabPane,
-    PigiAccounts,
-    Users
+    Users,
+    AddAuxiliary
   },
   data () {
     return {
@@ -45,13 +45,13 @@ export default {
           // disable: true
         },
         {
-          label: 'Accueil Pigi',
-          name: 'pigi',
+          label: 'Accueil auxiliaire',
+          name: 'welcome_auxiliary',
           icon: 'person add',
           default: false,
-          component: 'PigiAccounts',
+          component: 'AddAuxiliary',
           // disable: true
-        },
+        }
       ]
     }
   }

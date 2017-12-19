@@ -6,7 +6,7 @@
         <img src="https://res.cloudinary.com/alenvi/image/upload/q_auto/v1507023533/images/users/IT/Jean-Christophe.jpg" />
       </q-card-media>
       <q-card-title class="text-center">
-        Jasmine Princesse
+        Princesse Jasmine
       </q-card-title>
       <!-- <q-card-separator />
       <q-card-main>

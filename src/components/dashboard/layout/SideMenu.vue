@@ -22,9 +22,9 @@
         <q-item-side icon="group" />
         <q-item-main label="Utilisateurs" />
       </q-side-link>
-      <q-side-link item to="/dashboard/messages" exact>
+      <q-side-link item to="/dashboard/pigi" exact>
         <q-item-side icon="message" />
-        <q-item-main label="Envoi Messages" />
+        <q-item-main label="Pigi" />
       </q-side-link>
       <q-item-separator />
       <q-side-link item to="/dashboard/settings" exact>

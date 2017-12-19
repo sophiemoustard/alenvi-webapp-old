@@ -38,7 +38,7 @@ export default {
           label: 'Envoi message',
           name: 'message',
           icon: 'message',
-          default: true,
+          default: false,
           component: 'SendMessage'
         },
         {
