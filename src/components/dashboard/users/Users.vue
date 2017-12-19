@@ -1,19 +1,16 @@
 <template>
   <div class="layout-padding justify-center">
     <!-- <div style="width: 700px; max-width: 90vw;"> -->
-    <p>EN CONSTRUCTION</p>
-    <q-card style="width: 150px">
+    <!-- <p>EN CONSTRUCTION</p>
+    <q-card v-for="(user, index) in users" :key="index" style="width: 150px">
       <q-card-media>
-        <img src="https://res.cloudinary.com/alenvi/image/upload/q_auto/v1507023533/images/users/IT/Jean-Christophe.jpg" />
-      </q-card-media>
+        <img :src="user.picture" alt=""> -->
+        <!-- <img src="https://res.cloudinary.com/alenvi/image/upload/q_auto/v1507023533/images/users/IT/Jean-Christophe.jpg" /> -->
+      <!-- </q-card-media>
       <q-card-title class="text-center">
-        Princesse Jasmine
+        {{user.first_name}} {{user.last_name}}
       </q-card-title>
-      <!-- <q-card-separator />
-      <q-card-main>
-        Card Content
-      </q-card-main> -->
-    </q-card>
+    </q-card> -->
     <!-- </div> -->
   </div>
 </template>
@@ -35,10 +32,21 @@ export default {
   },
   data() {
     return {
-      users: []
+      users: {}
     }
   },
+  created() {
+    this.getUsers();
+  },
   methods: {
+    async getUsers() {
+      try {
+        this.users = await users.showAll();
+        console.log(this.users);
+      } catch (e) {
+        console.error(e);
+      }
+    }
   }
 };
 </script>

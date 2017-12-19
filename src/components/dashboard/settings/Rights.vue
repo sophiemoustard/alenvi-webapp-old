@@ -12,13 +12,13 @@
         <tbody>
           <tr v-for="(role, index) in roles" :key="index">
             <td class="text-center">
-              <q-input type="text" align="center" v-model="role.name" :readonly="isRoleAdmin(role)" />
+              <q-input type="text" align="center" v-model="role.name" :readonly="isRoleAdmin(role)" @blur="updateRole(role, 1)"/>
             </td>
             <td class="text-center" v-for="(feature, indexFeature) in role.features" :key="indexFeature">
               <q-input type="number" align="center" v-model.trim.number="feature.permission_level" :readonly="isRoleAdmin(role)" @blur="updateRole(role, feature.permission_level)" />
             </td>
             <td class="text-center">
-              <div class="row justify-end">
+              <div class="justify-center">
                 <q-btn icon="delete" color="primary" @click="deleteRole(role._id)" :disable="isRoleAdmin(role)" flat></q-btn>
               </div>
             </td>
@@ -102,6 +102,7 @@ export default {
       try {
         const rolesRaw = await roles.showAll();
         this.roles = rolesRaw.data.roles;
+        console.log(this.roles);
         await this.initFeaturesInRoleToAdd();
       } catch (e) {
         console.error(e);

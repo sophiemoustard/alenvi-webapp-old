@@ -2,7 +2,7 @@ import { alenviAxios } from '../../helpers/alenviAxios'
 import axios from 'axios'
 
 export default {
-  async showAll (params, token = null) {
+  async showAll (params = null, token = null) {
     try {
       let employeeIdRaw;
       if (token) {
