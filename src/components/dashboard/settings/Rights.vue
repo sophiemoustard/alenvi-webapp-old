@@ -1,5 +1,5 @@
 <template>
-  <div class="layout-padding row justify-center">
+  <div class="layout-padding justify-center">
     <div style="width: 1024px; max-width: 90vw;">
       <p class="caption">Rôles existants:</p>
       <table class="q-table striped-odd highlight compact">

@@ -1,6 +1,7 @@
 <template>
-  <div class="layout-padding row justify-center">
+  <div class="layout-padding justify-center">
     <!-- <div style="width: 700px; max-width: 90vw;"> -->
+    <p>EN CONSTRUCTION</p>
     <q-card style="width: 150px">
       <q-card-media>
         <img src="https://res.cloudinary.com/alenvi/image/upload/q_auto/v1507023533/images/users/IT/Jean-Christophe.jpg" />
@@ -34,7 +35,7 @@ export default {
   },
   data() {
     return {
-
+      users: []
     }
   },
   methods: {
