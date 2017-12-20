@@ -15,7 +15,7 @@
     </q-toolbar>
 
     <div slot="left">
-      <side-menu></side-menu>
+      <side-menu v-if="user" :user="user"></side-menu>
     </div>
 
     <router-view/>
@@ -30,8 +30,10 @@ import {
   QToolbar,
   QToolbarTitle,
   QBtn,
-  QIcon } from 'quasar'
+  QIcon,
+  Cookies } from 'quasar'
 
+import users from '../../models/Users'
 import SideMenu from './SideMenu.vue'
 
 export default {
@@ -42,6 +44,28 @@ export default {
     QBtn,
     QIcon,
     SideMenu
+  },
+  beforeRouteEnter: async (to, from, next) => {
+      try {
+        if (Cookies.get('user_id')) {
+          const user = await users.getById(Cookies.get('user_id'));
+          next(vm => vm.setUserInfo(user));
+        } else {
+          next({ path: '/dashboard/login' });
+        }
+      } catch (e) {
+        console.error(e);
+      }
+  },
+  data () {
+    return {
+      user: null
+    }
+  },
+  methods: {
+    setUserInfo (user) {
+      this.user = user;
+    }
   }
 }
 </script>

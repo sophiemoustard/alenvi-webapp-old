@@ -18,16 +18,16 @@
         <q-item-side icon="date range" />
         <q-item-main label="Planning" />
       </q-side-link>
-      <q-side-link item to="/dashboard/users" exact>
+      <q-side-link v-can="{ feature: 'Utilisateurs', user }" item to="/dashboard/users" exact>
         <q-item-side icon="group" />
         <q-item-main label="Utilisateurs" />
       </q-side-link>
-      <q-side-link item to="/dashboard/pigi" exact>
+      <q-side-link v-can="{ feature: 'Pigi', user }" item to="/dashboard/pigi" exact>
         <q-item-side icon="message" />
         <q-item-main label="Pigi" />
       </q-side-link>
       <q-item-separator />
-      <q-side-link item to="/dashboard/settings" exact>
+      <q-side-link v-can="{ feature: 'Paramètres', user }" item to="/dashboard/settings" exact>
         <q-item-side icon="settings" />
         <q-item-main label="Paramètres" />
       </q-side-link>
@@ -48,10 +48,13 @@
     Cookies
   } from 'quasar'
 
+  import _ from 'lodash'
+
   import users from '../../models/Users'
   import alenvi from '../../../helpers/token/alenvi'
 
   export default {
+    props: ['user'],
     components: {
       QItem,
       QItemSide,
@@ -62,30 +65,7 @@
       QIcon,
       QSideLink
     },
-    data () {
-      return {
-        user: {
-          firstname: ''
-        }
-      }
-    },
-    mounted () {
-      this.getUserInfo();
-    },
     methods: {
-      async getUserInfo() {
-        try {
-          if (!Cookies.get('user_id')) {
-            if (await !alenvi.refreshAlenviCookies()) {
-              return this.$router.push('/dashboard/login');
-            }
-          }
-          const user = await users.getById(Cookies.get('user_id'));
-          this.user.firstname = user.firstname;
-        } catch (e) {
-          console.error(e);
-        }
-      },
       logout() {
         Cookies.remove('alenvi_token', {
           path: '/'
