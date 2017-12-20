@@ -1,16 +1,16 @@
 <template>
-  <div class="layout-padding justify-center">
+  <div class="layout-padding row justify-center">
     <!-- <div style="width: 700px; max-width: 90vw;"> -->
-    <!-- <p>EN CONSTRUCTION</p>
-    <q-card v-for="(user, index) in users" :key="index" style="width: 150px">
+    <!-- <p>EN CONSTRUCTION</p> -->
+    <q-card inline v-for="(user, index) in users" :key="index" style="width: 180px">
       <q-card-media>
-        <img :src="user.picture" alt=""> -->
+        <img :src="user.picture ? user.picture : 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_107,q_auto,w_180/v1513764284/images/users/default_avatar.png'" alt="">
         <!-- <img src="https://res.cloudinary.com/alenvi/image/upload/q_auto/v1507023533/images/users/IT/Jean-Christophe.jpg" /> -->
-      <!-- </q-card-media>
+      </q-card-media>
       <q-card-title class="text-center">
-        {{user.first_name}} {{user.last_name}}
+        {{user.firstname}}<br />{{user.lastname}}
       </q-card-title>
-    </q-card> -->
+    </q-card>
     <!-- </div> -->
   </div>
 </template>
@@ -18,6 +18,7 @@
 <script>
 
 import { QCard, QCardMain, QCardSeparator, QCardTitle, QCardMedia } from 'quasar';
+import _ from 'lodash'
 
 import users from '../../models/Users';
 import ogust from '../../models/Ogust';
@@ -42,6 +43,7 @@ export default {
     async getUsers() {
       try {
         this.users = await users.showAll();
+        _.remove(this.users, (o) => { console.log('o=', o); return o.firstname == 'Admin'});
         console.log(this.users);
       } catch (e) {
         console.error(e);
