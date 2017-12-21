@@ -45,11 +45,10 @@ export default {
     QIcon,
     SideMenu
   },
-  beforeRouteEnter: async (to, from, next) => {
+  async mounted (to, from, next) {
       try {
         if (Cookies.get('user_id')) {
-          const user = await users.getById(Cookies.get('user_id'));
-          next(vm => vm.setUserInfo(user));
+          this.user = await users.getById(Cookies.get('user_id'));
         } else {
           next({ path: '/dashboard/login' });
         }
