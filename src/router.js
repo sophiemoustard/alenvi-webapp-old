@@ -63,28 +63,32 @@ const router = new VueRouter({
           path: 'planning',
           component: load('dashboard/planning/NavTabs'),
           meta: {
-            cookies: ['alenvi_token', 'refresh_token']
+            cookies: ['alenvi_token', 'refresh_token'],
+            permission: 'Planning'
           }
         },
         {
           path: 'users',
           component: load('dashboard/users/NavTabs'),
           meta: {
-            cookies: ['alenvi_token', 'refresh_token']
+            cookies: ['alenvi_token', 'refresh_token'],
+            permission: 'Utilisateurs'
           }
         },
         {
           path: 'pigi',
           component: load('dashboard/pigi/NavTabs'),
           meta: {
-            cookies: ['alenvi_token', 'refresh_token']
+            cookies: ['alenvi_token', 'refresh_token'],
+            permission: 'Pigi'
           }
         },
         {
           path: 'settings',
           component: load('dashboard/settings/NavTabs'),
           meta: {
-            cookies: ['alenvi_token', 'refresh_token']
+            cookies: ['alenvi_token', 'refresh_token'],
+            permission: 'Paramètres'
           }
         }
       ]
