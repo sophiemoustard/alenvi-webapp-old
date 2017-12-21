@@ -111,7 +111,7 @@ export default {
     async updateRole(role, permission) {
       try {
         // Check if permission is well sent instead of void
-        if (!permission) {
+        if (isNaN(permission)) {
           return ;
         }
         const roleUpdatedRaw = await roles.update(role);
