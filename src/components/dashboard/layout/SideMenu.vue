@@ -2,7 +2,7 @@
   <div>
     <q-list class="no-border">
       <q-item class="justify-center">
-        <img :src="user.picture ? user.picture : 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_107,q_auto,w_180/v1513764284/images/users/default_avatar.png'" alt="Image user" class="avatar">
+        <img :src="user.picture ? user.picture : 'https://res.cloudinary.com/alenvi/image/upload/c_scale,q_auto/v1513764284/images/users/default_avatar.png'" alt="Image user" class="avatar-alenvi">
       </q-item>
       <q-item>
         <q-item-main class="text-bold text-center" :label="user.firstname" />
@@ -92,9 +92,9 @@
 <style lang="stylus" scoped>
   @import '~variables'
 
-  .avatar
-    width: 70px
-    height: 70px
+  .avatar-alenvi
+    width: 120px
+    height: 85px
 
   #logout
     cursor: pointer
