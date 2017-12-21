@@ -4,6 +4,7 @@ import VueMeta from 'vue-meta'
 import { Cookies } from 'quasar'
 
 import alenvi from './helpers/token/alenvi'
+import { checkPermission } from './helpers/permissions/checkPermission'
 
 Vue.use(VueRouter);
 Vue.use(VueMeta);
@@ -62,6 +63,14 @@ const router = new VueRouter({
         {
           path: 'planning',
           component: load('dashboard/planning/NavTabs'),
+          beforeEnter: async (to, from, next) => {
+            const hasPermission = await checkPermission(to);
+            if (hasPermission) {
+              next();
+            } else {
+              next({ path: 'pigi' });
+            }
+          },
           meta: {
             cookies: ['alenvi_token', 'refresh_token'],
             permission: 'Planning'
