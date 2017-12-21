@@ -2,7 +2,7 @@
   <div>
     <q-list class="no-border">
       <q-item class="justify-center">
-        <img src="https://res.cloudinary.com/alenvi/image/upload/c_scale,w_70/v1499948101/images/bot/Pigi.png" alt="Image user" class="avatar">
+        <img :src="user.picture ? user.picture : 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_107,q_auto,w_180/v1513764284/images/users/default_avatar.png'" alt="Image user" class="avatar">
       </q-item>
       <q-item>
         <q-item-main class="text-bold text-center" :label="user.firstname" />
