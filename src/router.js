@@ -63,14 +63,6 @@ const router = new VueRouter({
         {
           path: 'planning',
           component: load('dashboard/planning/NavTabs'),
-          beforeEnter: async (to, from, next) => {
-            const hasPermission = await checkPermission(to);
-            if (hasPermission) {
-              next();
-            } else {
-              next({ path: 'pigi' });
-            }
-          },
           meta: {
             cookies: ['alenvi_token', 'refresh_token'],
             permission: 'Planning'
@@ -113,14 +105,20 @@ router.beforeEach(async (to, from, next) => {
   // ALORS: Je redirige vers le login, le mec n'a pas le droit d'être là
   if (to.meta.cookies) {
     if (!Cookies.get('alenvi_token')) {
-      const refresh = await alenvi.refreshAlenviCookies();
-      if (refresh) {
-        next();
+      if (await alenvi.refreshAlenviCookies()) {
+        if (await checkPermission(to)) {
+          next();
+        } else {
+          next({ path: '/dashboard' })
+        }
       } else {
         next({ path: '/dashboard/login' });
       }
     } else {
-      next();
+      if (await checkPermission(to)) {
+        return next();
+      }
+      return next({ path: '/dashboard' });
     }
   } else {
     next();
