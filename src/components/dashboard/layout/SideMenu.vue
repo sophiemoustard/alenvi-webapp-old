@@ -14,7 +14,7 @@
         <q-icon id="logout" name="exit to app" color="tertiary" size="1.5rem" class="on-right" @click="logout" />
       </q-item>
       <q-item-separator />
-      <q-side-link item to="/dashboard/planning" exact>
+      <q-side-link v-can="{ feature: 'Planning', user }" item to="/dashboard/planning" exact>
         <q-item-side icon="date range" />
         <q-item-main label="Planning" />
       </q-side-link>
