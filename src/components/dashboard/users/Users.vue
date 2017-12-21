@@ -43,8 +43,7 @@ export default {
     async getUsers() {
       try {
         this.users = await users.showAll();
-        _.remove(this.users, (o) => { console.log('o=', o); return o.firstname == 'Admin'});
-        console.log(this.users);
+        _.remove(this.users, (o) => { return o.firstname == 'Admin'});
       } catch (e) {
         console.error(e);
       }
