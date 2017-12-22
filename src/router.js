@@ -92,6 +92,13 @@ const router = new VueRouter({
             cookies: ['alenvi_token', 'refresh_token'],
             permission: 'Paramètres'
           }
+        },
+        {
+          path: 'profile',
+          component: load('dashboard/users/Profile'),
+          meta: {
+            cookies: ['alenvi_token', 'refresh_token']
+          }
         }
       ]
     },
