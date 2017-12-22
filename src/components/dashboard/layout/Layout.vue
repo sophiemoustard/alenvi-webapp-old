@@ -33,6 +33,8 @@ import {
   QIcon,
   Cookies } from 'quasar'
 
+import { mapActions, mapGetters } from 'vuex'
+
 import users from '../../models/Users'
 import SideMenu from './SideMenu.vue'
 
@@ -45,26 +47,27 @@ export default {
     QIcon,
     SideMenu
   },
-  async mounted (to, from, next) {
-      try {
-        if (Cookies.get('user_id')) {
-          this.user = await users.getById(Cookies.get('user_id'));
-        } else {
-          next({ path: '/dashboard/login' });
-        }
-      } catch (e) {
-        console.error(e);
-      }
+  // async mounted () {
+  //     try {
+  //       if (Cookies.get('user_id')) {
+  //         this.user = await users.getById(Cookies.get('user_id'));
+  //       } else {
+  //         next({ path: '/dashboard/login' });
+  //       }
+  //     } catch (e) {
+  //       console.error(e);
+  //     }
+  // },
+  async mounted () {
+    await this.$store.dispatch('getUser');
   },
-  data () {
-    return {
-      user: null
-    }
+  computed: {
+    ...mapGetters([
+      'user'
+    ])
   },
   methods: {
-    setUserInfo (user) {
-      this.user = user;
-    }
+
   }
 }
 </script>

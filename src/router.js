@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import VueMeta from 'vue-meta'
 import { Cookies } from 'quasar'
 
+import { store } from './store/store'
 import alenvi from './helpers/token/alenvi'
 import { checkPermission } from './helpers/permissions/checkPermission'
 
@@ -106,7 +107,7 @@ router.beforeEach(async (to, from, next) => {
   if (to.meta.cookies) {
     if (!Cookies.get('alenvi_token')) {
       if (await alenvi.refreshAlenviCookies()) {
-        if (await checkPermission(to)) {
+        if (await checkPermission(to, store.state.user)) {
           next();
         } else {
           next({ path: '/dashboard' })
@@ -115,7 +116,7 @@ router.beforeEach(async (to, from, next) => {
         next({ path: '/dashboard/login' });
       }
     } else {
-      if (await checkPermission(to)) {
+      if (await checkPermission(to, store.state.user)) {
         return next();
       }
       return next({ path: '/dashboard' });
