@@ -58,9 +58,9 @@ export default {
   //       console.error(e);
   //     }
   // },
-  async mounted () {
-    await this.$store.dispatch('getUser');
-  },
+  // async mounted () {
+  //   await this.$store.dispatch('getUser');
+  // },
   computed: {
     ...mapGetters([
       'user'

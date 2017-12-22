@@ -105,9 +105,12 @@ router.beforeEach(async (to, from, next) => {
   // SI: il y a des cookies requis ET que parmi ces cookies requis, un seul n'est pas présent dans la liste
   // ALORS: Je redirige vers le login, le mec n'a pas le droit d'être là
   if (to.meta.cookies) {
+    if (store.getters.refreshState) {
+      await store.dispatch('getUser');
+    }
     if (!Cookies.get('alenvi_token')) {
       if (await alenvi.refreshAlenviCookies()) {
-        if (await checkPermission(to, store.state.user)) {
+        if (await checkPermission(to, store.getters.user)) {
           next();
         } else {
           next({ path: '/dashboard' })
@@ -116,7 +119,7 @@ router.beforeEach(async (to, from, next) => {
         next({ path: '/dashboard/login' });
       }
     } else {
-      if (await checkPermission(to, store.state.user)) {
+      if (await checkPermission(to, store.getters.user)) {
         return next();
       }
       return next({ path: '/dashboard' });

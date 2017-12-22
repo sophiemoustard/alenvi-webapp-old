@@ -9,16 +9,23 @@ Vue.use(Vuex);
 
 export const store = new Vuex.Store({
   state: {
-    user: null
+    user: null,
+    refreshState: true
   },
   getters: {
     user (state) {
       return state.user;
+    },
+    refreshState (state) {
+      return state.refreshState;
     }
   },
   mutations: {
     setUser (state, userData) {
       state.user = userData;
+    },
+    changeRefreshState (state) {
+      state.refreshState = false;
     }
   },
   actions: {
