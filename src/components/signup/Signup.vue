@@ -205,7 +205,7 @@ export default {
             password: this.user.password
           },
           employee_id: ogustNewUser.data.data.user.body.employee.id_employee,
-          role: 'auxiliary',
+          role: 'Auxiliaire',
         };
         const newAlenviUser = await users.create(alenviData);
         const alenviToken = newAlenviUser.data.data.token;

@@ -9,7 +9,7 @@ app.use((req, res, next) => {
     return res.redirect(['https://', req.hostname, req.url].join(''));
   }
   next();
-})
+});
 
 app.use(express.static(__dirname + '/dist'));
 
