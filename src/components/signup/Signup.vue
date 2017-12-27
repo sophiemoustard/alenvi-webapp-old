@@ -137,7 +137,7 @@ export default {
     }
   },
   mounted () {
-    this.user.sector = Cookies.get('sector');
+    this.user.sector = Cookies.get('signup_sector');
   },
   computed: {
     emailError () {
@@ -206,6 +206,7 @@ export default {
           },
           employee_id: ogustNewUser.data.data.user.body.employee.id_employee,
           role: 'Auxiliaire',
+          sector: this.user.sector
         };
         const newAlenviUser = await users.create(alenviData);
         const alenviToken = newAlenviUser.data.data.token;
