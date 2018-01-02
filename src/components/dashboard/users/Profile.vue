@@ -1,6 +1,15 @@
 <template>
-  <div class="layout-padding row justify-center">
-    EN CONSTRUCTION
+  <div class="layout-padding">
+    <div id="intro" class="row xs-gutter justify-center">
+      <div id="picture">
+        <img :src="user.picture ? user.picture : 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_107,q_auto,w_180/v1513764284/images/users/default_avatar.png'" alt="">
+      </div>
+      <div>
+        <p>PEDRO EL PAPO</p>
+        <p>IL SIGNORE GOBELEDO</p>
+        <p>Girafe</p>
+      </div>
+    </div>
     <!-- Picture -->
     <!-- First name -->
     <!-- Last name -->
@@ -39,4 +48,8 @@ export default {
 
 <style lang="stylus" scoped>
 @import '~variables';
+
+// #intro
+//   width: 100%
+
 </style>
