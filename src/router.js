@@ -95,7 +95,7 @@ const router = new VueRouter({
         },
         {
           path: 'profile',
-          component: load('dashboard/users/Profile'),
+          component: load('dashboard/profile/NavTabs'),
           meta: {
             cookies: ['alenvi_token', 'refresh_token']
           }
