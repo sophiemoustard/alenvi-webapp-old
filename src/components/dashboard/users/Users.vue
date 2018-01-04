@@ -2,7 +2,7 @@
   <div class="layout-padding row justify-center">
     <!-- <div style="width: 700px; max-width: 90vw;"> -->
     <!-- <p>EN CONSTRUCTION</p> -->
-    <q-card inline v-for="(user, index) in users" :key="index" style="width: 180px">
+    <q-card inline v-for="(user, index) in users" :key="index" style="width: 180px; cursor: pointer" @click="toProfile(user._id)">
       <q-card-media>
         <img :src="user.picture ? user.picture : 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_107,q_auto,w_180/v1513764284/images/users/default_avatar.png'" alt="">
         <!-- <img src="https://res.cloudinary.com/alenvi/image/upload/q_auto/v1507023533/images/users/IT/Jean-Christophe.jpg" /> -->
@@ -43,10 +43,13 @@ export default {
     async getUsers() {
       try {
         this.users = await users.showAll();
-        _.remove(this.users, (o) => { return o.firstname == 'Admin'});
+        _.remove(this.users, (o) => { return o.firstname === 'Admin' || o.firstname === 'Pigi' });
       } catch (e) {
         console.error(e);
       }
+    },
+    toProfile(userId) {
+      this.$router.push({ name: 'profile', params: { id: userId }});
     }
   }
 };
