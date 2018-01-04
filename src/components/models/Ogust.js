@@ -124,5 +124,9 @@ export default {
   async updateServiceById (ogustToken, serviceId, data) {
     const serviceUpdated = await axios.put(`${process.env.API_HOSTNAME}/ogust/services/${serviceId}`, data, { headers: { 'x-ogust-token': ogustToken } })
     return serviceUpdated;
+  },
+  async getEmployeeSalaries (employeeId) {
+    const salaries = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/employees/${employeeId}/salaries`);
+    return salaries.data.data.salaries.array_salary.result;
   }
 }
