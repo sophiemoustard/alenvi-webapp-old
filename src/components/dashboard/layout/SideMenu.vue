@@ -8,7 +8,7 @@
         <q-item-main class="text-bold text-center" :label="user.firstname" />
       </q-item>
       <q-item class="justify-center">
-        <router-link to="/dashboard/profile">
+        <router-link :to="{ name: 'profile', params: {id: user._id }}">
           <q-icon name="person" color="tertiary" size="1.5rem" />
         </router-link>
         <q-icon id="logout" name="exit to app" color="tertiary" size="1.5rem" class="on-right" @click="logout" />
