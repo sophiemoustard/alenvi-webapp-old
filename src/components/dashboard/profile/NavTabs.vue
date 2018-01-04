@@ -21,7 +21,7 @@ import {
   QTab,
   QTabPane } from 'quasar'
 
-import Profile from './profile.vue'
+import MainInformation from './MainInformation.vue'
 import Salaries from './Salaries.vue'
 import More from './MoreInformation.vue'
 
@@ -31,7 +31,7 @@ export default {
     QTabs,
     QTab,
     QTabPane,
-    Profile,
+    MainInformation,
     Salaries,
     More
   },
@@ -43,7 +43,7 @@ export default {
           name: 'profil',
           icon: 'person',
           default: true,
-          component: 'Profile',
+          component: 'MainInformation',
           // disable: true
         },
         {
