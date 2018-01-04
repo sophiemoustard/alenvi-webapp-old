@@ -120,5 +120,9 @@ export default {
   async createEmployee (ogustToken, data) {
     const newEmployee = await axios.post(`${process.env.API_HOSTNAME}/ogust/employees`, data, { headers: { 'x-ogust-token': ogustToken } })
     return newEmployee;
+  },
+  async updateServiceById (ogustToken, serviceId, data) {
+    const serviceUpdated = await axios.put(`${process.env.API_HOSTNAME}/ogust/services/${serviceId}`, data, { headers: { 'x-ogust-token': ogustToken } })
+    return serviceUpdated;
   }
 }

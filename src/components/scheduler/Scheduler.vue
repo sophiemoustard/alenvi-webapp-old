@@ -51,6 +51,8 @@ export default {
   mounted() {
     // Event date format
     scheduler.config.xml_date = '%Y-%m-%d %H:%i';
+    // Date format for each column (week and day views)
+    scheduler.config.day_date = '%j';
     // Blocking hours
     scheduler.config.first_hour = 8;
     scheduler.config.last_hour = 24;
@@ -62,17 +64,19 @@ export default {
     // disable left buttons on lightbox
     scheduler.config.buttons_left = [];
     // enable cancel button on lightbox's right wing
-    scheduler.config.buttons_right = ['dhx_cancel_btn'];
+    scheduler.config.buttons_right = ['dhx_cancel_btn', 'dhx_save_btn'];
     // changing cancel button label
     scheduler.locale.labels['icon_cancel'] = 'Fermer';
     // hide lightbox in month view
-    scheduler.config.readonly_form = true;
+    scheduler.config.readonly_form = false;
     scheduler.config.show_loading = true;
     // hide select bar in day and week views
     scheduler.config.select = false;
     scheduler.config.touch_tip = false;
     // scheduler.config.hour_size_px = 60;
     scheduler.xy.scale_height = 25;
+    // time step in lightbox
+    scheduler.config.time_step = 15;
     if (!this.$route.query.id_customer) {
       scheduler.config.lightbox.sections = [
         {
@@ -98,6 +102,12 @@ export default {
           height: 75,
           map_to: "comments",
           type: "textarea",
+        },
+        {
+          name: "Horaires",
+          height: 75,
+          map_to: "auto",
+          type: "time"
         }
       ];
     }
