@@ -1,6 +1,5 @@
 <template>
   <div class="layout-padding">
-    <p>EN CONSTRUCTION</p>
     <q-card inline v-for="(salary, index) in salaries" :key="index" style="cursor: pointer">
       <q-card-title class="text-center">
         {{salary.period_start}}
@@ -21,7 +20,6 @@
 
 import { date, QCard, QCardTitle, QCardActions, QBtn, QIcon } from "quasar";
 
-import _ from 'lodash'
 import moment from 'moment'
 
 import users from '../../models/Users';
@@ -47,7 +45,6 @@ export default {
     for (let i = 0, l = Object.keys(this.salaries).length; i < l; i++) {
       this.salaries[i].period_start = moment(this.salaries[i].period_start, 'YYYYMMDDHHmm').format('MM/YYYY');
     }
-    console.log(this.salaries);
   },
   methods: {
   }
