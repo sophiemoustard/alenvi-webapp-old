@@ -1,6 +1,6 @@
 <template>
   <div class="layout-padding">
-    <div id="intro" class="row xs-gutter justify-center">
+    <div class="row xs-gutter justify-center">
       <div id="picture">
         <img :src="user.alenvi.picture ? user.alenvi.picture : 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_107,q_auto,w_180/v1513764284/images/users/default_avatar.png'" alt="" style="width: 180px;">
       </div>
@@ -11,7 +11,7 @@
       </div>
     </div>
     <div class="row justify-center">
-      EN CONSTRUCTION
+      EN CONSTRUCTION [Stats, Gamification...]
     </div>
   </div>
 </template>
