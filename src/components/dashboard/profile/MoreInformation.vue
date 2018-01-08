@@ -17,7 +17,8 @@
       <q-input v-model="user.alenvi.local.email" />
       <q-input v-model="user.ogust.mobile_phone" />
       <q-input v-model="user.alenvi.employee_id" />
-      <q-input v-model="user.alenvi.sector" />
+      <select-sector v-model="user.alenvi.sector"></select-sector>
+      <!-- <q-input v-model="user.alenvi.sector" /> -->
       <!-- First name -->
       <!-- Last name -->
       <!-- Role -->
@@ -33,19 +34,20 @@
 
 <script>
 
-import { QInput, Cookies } from "quasar";
+import { QInput } from 'quasar';
 
-import _ from 'lodash'
 import moment from 'moment'
 
 import users from '../../models/Users';
 import ogust from '../../models/Ogust';
+import SelectSector from '../../SelectSector.vue'
 
 export default {
   components: {
-    QInput
+    QInput,
+    SelectSector
   },
-  data() {
+  data () {
     return {
       user: {
         alenvi: {},
@@ -57,7 +59,7 @@ export default {
       }
     }
   },
-  async created() {
+  async created () {
     try {
       this.user.alenvi = await users.getById(this.$route.params.id);
       this.user.ogust = await ogust.getEmployeeById(this.user.alenvi.employee_id);
