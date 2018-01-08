@@ -27,7 +27,7 @@
 
 <script>
 
-import { QInput, QBtn } from 'quasar';
+import { QInput, QBtn, Toast } from 'quasar';
 
 import moment from 'moment'
 
@@ -40,6 +40,7 @@ export default {
   components: {
     QInput,
     QBtn,
+    Toast,
     SelectSector,
     SelectRole
   },
@@ -89,10 +90,11 @@ export default {
           role: this.user.alenvi.role.name
         };
         const userUpdatedAlenvi = await users.updateById(userToSendAlenvi);
+        Toast.create(`Utilisateur Alenvi bien mis-à-jour`);
         const userUpdatedOgust = await ogust.setEmployee(userToSendOgust);
-        console.log(userUpdatedAlenvi);
-        console.log(userUpdatedOgust);
+        Toast.create(`Utilisateur Ogust bien mis-à-jour`);
       } catch (e) {
+        Toast.create(`Erreur lors de la mise-à-jour de l'utilisateur`);
         console.error(e);
       }
     }
