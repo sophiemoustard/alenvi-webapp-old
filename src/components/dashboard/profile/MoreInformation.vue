@@ -11,7 +11,7 @@
         Date de naissance: <q-input v-model="user.ogust.date_of_birth" type="date"/>
         Email: <q-input v-model="user.alenvi.local.email" />
         Mobile: <q-input v-model="user.ogust.mobile_phone" />
-        Identifiant employé: <q-input v-model="user.alenvi.employee_id" />
+        <p v-if="user.alenvi.employee_id">Identifiant employé:<br />{{ user.alenvi.employee_id }}</p>
         Communauté: <select-sector v-if="user.alenvi.sector" v-model="user.alenvi.sector" />
       </div>
     </div>
