@@ -82,12 +82,16 @@ export default {
           _id: this.$route.params.id,
           firstname: this.user.alenvi.firstname,
           lastname: this.user.alenvi.lastname,
-          email: this.user.alenvi.local.email,
+          local: {
+            email: this.user.alenvi.local.email
+          },
           sector: this.user.alenvi.sector,
           role: this.user.alenvi.role.name
         };
-        await users.updateById(userToSendAlenvi);
-        await ogust.setEmployee(userToSendOgust);
+        const userUpdatedAlenvi = await users.updateById(userToSendAlenvi);
+        const userUpdatedOgust = await ogust.setEmployee(userToSendOgust);
+        console.log(userUpdatedAlenvi);
+        console.log(userUpdatedOgust);
       } catch (e) {
         console.error(e);
       }
