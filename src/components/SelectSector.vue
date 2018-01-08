@@ -1,5 +1,5 @@
 <template>
-  <q-field icon="group" helper="Choix communauté (si elle n'est pas disponible, il faut la créer dans Ogust)">
+  <q-field :icon="icon" helper="Choix communauté (si elle n'est pas disponible, il faut la créer dans Ogust)">
     <q-select :value="value" ref="selectSector" @change="updateSector" :options="orderedSectors" separator />
   </q-field>
 </template>
@@ -11,7 +11,7 @@ import _ from 'lodash';
 import ogust from './models/Ogust';
 
 export default {
-  props: ['value'],
+  props: ['value', 'icon'],
   components: {
     QField,
     QSelect
