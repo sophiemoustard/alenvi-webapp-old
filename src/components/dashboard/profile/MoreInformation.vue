@@ -69,6 +69,7 @@ export default {
     async updateUser() {
       try {
         const userToSendOgust = {
+          title: this.user.ogust.title,
           id_employee: this.user.alenvi.employee_id,
           first_name: this.user.alenvi.firstname,
           last_name: this.user.alenvi.lastname,
@@ -84,8 +85,8 @@ export default {
           sector: this.user.alenvi.sector,
           role: this.user.alenvi.role.name
         };
-        users.updateById(userToSendAlenvi);
-        ogust.setEmployee(userToSendOgust);
+        await users.updateById(userToSendAlenvi);
+        await ogust.setEmployee(userToSendOgust);
       } catch (e) {
         console.error(e);
       }
