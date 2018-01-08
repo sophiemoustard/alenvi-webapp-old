@@ -7,7 +7,7 @@
       <div>
         <p><strong>{{ user.alenvi.firstname }} {{ user.alenvi.lastname }}</strong></p>
         <p>{{ user.alenvi.role.name }}</p>
-        <p v-if="user.alenvi.sector">Communauté: {{ user.alenvi.sector }}</p>
+        <p v-if="user.alenvi.sector">Communauté: {{ user.community }} ({{ user.alenvi.sector }})</p>
       </div>
     </div>
     <div class="row justify-center">
@@ -29,8 +29,14 @@ export default {
   data() {
     return {
       user: {
-        alenvi: {},
-        ogust: {}
+        alenvi: {
+          role: {},
+          local: {}
+        },
+        ogust: {
+          date_of_birth: ""
+        },
+        community: ""
       }
     }
   },
@@ -38,7 +44,8 @@ export default {
     try {
       this.user.alenvi = await users.getById(this.$route.params.id);
       this.user.ogust = await ogust.getEmployeeById(this.user.alenvi.employee_id);
-      console.log(this.user);
+      const sectors = await ogust.getOgustSectors();
+      this.user.community = sectors[this.user.alenvi.sector];
     } catch (e) {
       console.error(e);
     }

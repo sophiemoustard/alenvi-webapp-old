@@ -1,27 +1,33 @@
 <template>
   <div class="layout-padding">
-    <div id="picture">
-      <img :src="user.alenvi.picture ? user.alenvi.picture : 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_107,q_auto,w_180/v1513764284/images/users/default_avatar.png'" alt="" style="width: 180px;">
-    </div>
     <div class="row justify-center">
-      <div class="" style="width: 700px; max-width: 90vw;">
-        Prénom: <q-input v-model="user.alenvi.firstname" />
-        Nom: <q-input v-model="user.alenvi.lastname" />
-        Role: <select-role v-model="user.alenvi.role.name" />
-        Date de naissance: <q-input v-model="user.ogust.date_of_birth" type="date"/>
-        Email: <q-input v-model="user.alenvi.local.email" />
-        Mobile: <q-input v-model="user.ogust.mobile_phone" />
-        <p v-if="user.alenvi.employee_id">Identifiant employé:<br />{{ user.alenvi.employee_id }}</p>
-        Communauté: <select-sector v-if="user.alenvi.sector" v-model="user.alenvi.sector" />
+      <div id="picture">
+        <img :src="user.alenvi.picture ? user.alenvi.picture : 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_107,q_auto,w_180/v1513764284/images/users/default_avatar.png'" alt="" style="width: 180px;">
       </div>
     </div>
-              EN CONSTRUCTION
+    <br>
+    <div class="row justify-center">
+      <div class="" style="width: 400px; max-width: 90vw;">
+        <p v-if="user.alenvi.employee_id">Id Alenvi: {{ user.alenvi._id }}</p>
+        <p v-if="user.alenvi.employee_id">Id Ogust: {{ user.alenvi.employee_id }}</p>
+        <q-input v-model="user.alenvi.firstname" float-label="Prénom"/>
+        <q-input v-model="user.alenvi.lastname" float-label="Nom"/>
+        <select-role v-model="user.alenvi.role.name"/>
+        <!-- Date de naissance: <input v-model="user.ogust.date_of_birth" type="date" float-label="Date de naissance"/> -->
+        <q-input v-model="user.alenvi.local.email" float-label="Email"/>
+        <q-input v-model="user.ogust.mobile_phone" float-label="Mobile"/>
+        <select-sector v-if="user.alenvi.sector" v-model="user.alenvi.sector"/>
+      </div>
+    </div>
+    <div class="row justify-center">
+      <q-btn big flat>Modifier</q-btn>
+    </div>
   </div>
 </template>
 
 <script>
 
-import { QInput } from 'quasar';
+import { QInput, QBtn } from 'quasar';
 
 import moment from 'moment'
 
@@ -33,17 +39,17 @@ import SelectRole from '../../SelectRole.vue'
 export default {
   components: {
     QInput,
+    QBtn,
     SelectSector,
     SelectRole
   },
   data () {
     return {
       user: {
-        alenvi: {},
-        ogust: {}
-      },
-      userToSend: {
-        alenvi: {},
+        alenvi: {
+          role: {},
+          local: {}
+        },
         ogust: {}
       }
     }
@@ -52,13 +58,38 @@ export default {
     try {
       this.user.alenvi = await users.getById(this.$route.params.id);
       this.user.ogust = await ogust.getEmployeeById(this.user.alenvi.employee_id);
+      console.log('ALENVI=', this.user.alenvi);
+      console.log('OGUST=', this.user.ogust);
       this.user.ogust.date_of_birth = moment(this.user.ogust.date_of_birth, 'YYYYMMDD').format('YYYY-MM-DD');
-      console.log(this.user);
     } catch (e) {
       console.error(e);
     }
   },
   methods: {
+    async putUser() {
+      try {
+        const userToSendOgust = {
+          id_employee: this.user.alenvi.employee_id,
+          first_name: this.user.alenvi.firstname,
+          last_name: this.user.alenvi.lastname,
+          email: this.user.alenvi.local.email,
+          mobile_phone: this.user.ogust.mobile_phone,
+          sector: this.user.alenvi.sector
+        };
+        const userToSendAlenvi = {
+          _id: this.$route.params.id,
+          firstname: this.user.alenvi.firstname,
+          lastname: this.user.alenvi.lastname,
+          email: this.user.alenvi.local.email,
+          sector: this.user.alenvi.sector,
+          role: this.user.alenvi.role.name
+        };
+        users.updateById(userToSendAlenvi);
+        ogust.setEmployee(userToSendOgust);
+      } catch (e) {
+        console.error(e);
+      }
+    }
   }
 };
 </script>
