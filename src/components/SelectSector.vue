@@ -16,7 +16,7 @@ export default {
     QField,
     QSelect
   },
-  data() {
+  data () {
     return {
       sectors: []
     };
@@ -25,12 +25,12 @@ export default {
     await this.getSectors();
   },
   computed: {
-    orderedSectors() {
+    orderedSectors () {
       return _.sortBy(this.sectors, ['value']);
     }
   },
   methods: {
-    async getSectors() {
+    async getSectors () {
       try {
         const allSectorsRaw = await ogust.getOgustSectors();
         for (const k in allSectorsRaw) {
@@ -49,6 +49,6 @@ export default {
     updateSector (value) {
       this.$emit('input', value);
     }
-  },
+  }
 };
 </script>

@@ -7,7 +7,7 @@
       <div class="" style="width: 700px; max-width: 90vw;">
         Prénom: <q-input v-model="user.alenvi.firstname" />
         Nom: <q-input v-model="user.alenvi.lastname" />
-        Role: <q-input v-model="user.alenvi.role.name" />
+        Role: <select-role v-model="user.alenvi.role.name" />
         Date de naissance: <q-input v-model="user.ogust.date_of_birth" type="date"/>
         Email: <q-input v-model="user.alenvi.local.email" />
         Mobile: <q-input v-model="user.ogust.mobile_phone" />
@@ -28,11 +28,13 @@ import moment from 'moment'
 import users from '../../models/Users';
 import ogust from '../../models/Ogust';
 import SelectSector from '../../SelectSector.vue'
+import SelectRole from '../../SelectRole.vue'
 
 export default {
   components: {
     QInput,
-    SelectSector
+    SelectSector,
+    SelectRole
   },
   data () {
     return {

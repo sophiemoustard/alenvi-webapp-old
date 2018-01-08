@@ -22,5 +22,9 @@ export default {
   async create (data) {
     const newUser = await alenviAxios.post(`${process.env.API_HOSTNAME}/users`, data);
     return newUser;
+  },
+  async getRoles () {
+    const rolesRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/roles`);
+    return rolesRaw.data.data.roles;
   }
 }
