@@ -1,33 +1,21 @@
 <template>
   <div class="layout-padding">
-    <div class="row xs-gutter justify-center">
-      <div id="picture">
-        <img :src="user.alenvi.picture ? user.alenvi.picture : 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_107,q_auto,w_180/v1513764284/images/users/default_avatar.png'" alt="" style="width: 180px;">
-      </div>
-      <div>
-        <q-input v-model="user.alenvi.firstname" /> <q-input v-model="user.alenvi.lastname" />
-        <p>{{ user.alenvi.role.name }}</p>
-        <p v-if="user.alenvi.sector">Communauté: {{ user.alenvi.sector }}</p>
+    <div id="picture">
+      <img :src="user.alenvi.picture ? user.alenvi.picture : 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_107,q_auto,w_180/v1513764284/images/users/default_avatar.png'" alt="" style="width: 180px;">
+    </div>
+    <div class="row justify-center">
+      <div class="" style="width: 700px; max-width: 90vw;">
+        Prénom: <q-input v-model="user.alenvi.firstname" />
+        Nom: <q-input v-model="user.alenvi.lastname" />
+        Role: <q-input v-model="user.alenvi.role.name" />
+        Date de naissance: <q-input v-model="user.ogust.date_of_birth" type="date"/>
+        Email: <q-input v-model="user.alenvi.local.email" />
+        Mobile: <q-input v-model="user.ogust.mobile_phone" />
+        Identifiant employé: <q-input v-model="user.alenvi.employee_id" />
+        Communauté: <q-input v-if="user.alenvi.sector" v-model="user.alenvi.sector" />
       </div>
     </div>
-    <div class="" style="width: 700px; max-width: 90vw;">
-      <!-- Picture -->
-      <q-input v-model="user.alenvi.role.name" />
-      <q-input v-model="user.ogust.date_of_birth" type="date"/>
-      <q-input v-model="user.alenvi.local.email" />
-      <q-input v-model="user.ogust.mobile_phone" />
-      <q-input v-model="user.alenvi.employee_id" />
-      <q-input v-model="user.alenvi.sector" />
-      <!-- First name -->
-      <!-- Last name -->
-      <!-- Role -->
-      <!-- Date of birth -->
-      <!-- Email -->
-      <!-- Mobile phone -->
-      <!-- Employee id -->
-      <!-- Communauté (Sector), ex: "Girafe (1b*)" -->
-    </div>
-    <!-- EN CONSTRUCTION -->
+              EN CONSTRUCTION
   </div>
 </template>
 
