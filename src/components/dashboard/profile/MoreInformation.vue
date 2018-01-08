@@ -69,13 +69,14 @@ export default {
     async updateUser() {
       try {
         const userToSendOgust = {
-          title: this.user.ogust.title,
           id_employee: this.user.alenvi.employee_id,
           first_name: this.user.alenvi.firstname,
           last_name: this.user.alenvi.lastname,
           email: this.user.alenvi.local.email,
           mobile_phone: this.user.ogust.mobile_phone,
-          sector: this.user.alenvi.sector
+          sector: this.user.alenvi.sector,
+          title: this.user.ogust.title,
+          main_adress: this.user.ogust.main_address
         };
         const userToSendAlenvi = {
           _id: this.$route.params.id,
