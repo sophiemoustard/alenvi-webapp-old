@@ -74,9 +74,9 @@ export default {
           last_name: this.user.alenvi.lastname,
           email: this.user.alenvi.local.email,
           mobile_phone: this.user.ogust.mobile_phone,
-          sector: this.user.alenvi.sector,
-          title: this.user.ogust.title,
-          main_adress: this.user.ogust.main_address
+          sector: this.user.alenvi.sector
+          // title: this.user.ogust.title,
+          // main_adress: this.user.ogust.main_address
         };
         const userToSendAlenvi = {
           _id: this.$route.params.id,
