@@ -20,7 +20,7 @@
       </div>
     </div>
     <div class="row justify-center">
-      <q-btn big flat>Modifier</q-btn>
+      <q-btn big flat @click="updateUser()">Modifier</q-btn>
     </div>
   </div>
 </template>
@@ -66,7 +66,7 @@ export default {
     }
   },
   methods: {
-    async putUser() {
+    async updateUser() {
       try {
         const userToSendOgust = {
           id_employee: this.user.alenvi.employee_id,
