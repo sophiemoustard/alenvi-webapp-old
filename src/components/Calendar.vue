@@ -74,6 +74,9 @@ export default {
     },
     async updateEventById (event) {
       try {
+        if (event.error) {
+          throw new Error("L'heure de fin d'intervention est inférieure à l'heure de début");
+        }
         const ogustToken = await Ogust.getOgustToken(this.token);
         const updateServicePayload = {
           startDate: moment(event.start_date).format('YYYYMMDDHHmm'),
@@ -94,15 +97,20 @@ export default {
           arrayValues: {
             NIVEAU: event.pathology,
             COMMNIV: event.comments,
-            DETAILEVE: event.interventionDetails,
+            DETAILEVE: event.interventionDetail,
             AUTRESCOMM: event.misc
           }
         };
         await Ogust.editOgustCustomerDetails(ogustToken, event.id_customer, customerDetailsPayload);
         Toast.create('Ta demande a bien été enregistrée');
       } catch (e) {
-        Toast.create("Erreur lors de la modification de l'intervention :/ Si le problème persiste, contacte l'équipe technique :)");
-        console.error(e.response);
+        if (e.message) {
+          Toast.create(e.message);
+          console.error(e);
+        } else {
+          Toast.create("Erreur lors de la modification de l'intervention :/ Si le problème persiste, contacte l'équipe technique :)");
+          console.error(e.response);
+        }
       }
     }
   }

@@ -16,6 +16,7 @@
 </template>
 
 <script>
+import moment from 'moment';
 import 'dhtmlx-scheduler'
 import 'dhtmlx-scheduler/codebase/locale/locale_fr';
 import 'dhtmlx-scheduler/codebase/ext/dhtmlxscheduler_readonly.js';
@@ -182,6 +183,9 @@ export default {
       scheduler.showLightbox(id);
     });
     scheduler.attachEvent('onEventChanged', (id, e) => {
+      if (moment(event.end_date).isSameOrBefore(event.start_date)) {
+        e.error = true;
+      }
       this.$emit('eventUpdated', e);
       console.log('EVENT', e);
     });
