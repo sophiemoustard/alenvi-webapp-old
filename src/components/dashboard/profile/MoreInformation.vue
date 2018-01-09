@@ -27,7 +27,7 @@
 
 <script>
 
-import { QInput, QBtn } from 'quasar';
+import { QInput, QBtn, Toast } from 'quasar';
 
 import moment from 'moment'
 
@@ -40,6 +40,7 @@ export default {
   components: {
     QInput,
     QBtn,
+    Toast,
     SelectSector,
     SelectRole
   },
@@ -58,8 +59,8 @@ export default {
     try {
       this.user.alenvi = await users.getById(this.$route.params.id);
       this.user.ogust = await ogust.getEmployeeById(this.user.alenvi.employee_id);
-      console.log('ALENVI=', this.user.alenvi);
-      console.log('OGUST=', this.user.ogust);
+      // console.log('ALENVI=', this.user.alenvi);
+      // console.log('OGUST=', this.user.ogust);
       this.user.ogust.date_of_birth = moment(this.user.ogust.date_of_birth, 'YYYYMMDD').format('YYYY-MM-DD');
     } catch (e) {
       console.error(e);
@@ -82,13 +83,18 @@ export default {
           _id: this.$route.params.id,
           firstname: this.user.alenvi.firstname,
           lastname: this.user.alenvi.lastname,
-          email: this.user.alenvi.local.email,
+          local: {
+            email: this.user.alenvi.local.email
+          },
           sector: this.user.alenvi.sector,
           role: this.user.alenvi.role.name
         };
-        await users.updateById(userToSendAlenvi);
-        await ogust.setEmployee(userToSendOgust);
+        const userUpdatedAlenvi = await users.updateById(userToSendAlenvi);
+        Toast.create(`Utilisateur Alenvi bien mis-à-jour`);
+        const userUpdatedOgust = await ogust.setEmployee(userToSendOgust);
+        Toast.create(`Utilisateur Ogust bien mis-à-jour`);
       } catch (e) {
+        Toast.create(`Erreur lors de la mise-à-jour de l'utilisateur`);
         console.error(e);
       }
     }

@@ -63,6 +63,7 @@ const router = new VueRouter({
         },
         {
           path: 'planning',
+          name: 'planning',
           component: load('dashboard/planning/NavTabs'),
           meta: {
             cookies: ['alenvi_token', 'refresh_token'],
