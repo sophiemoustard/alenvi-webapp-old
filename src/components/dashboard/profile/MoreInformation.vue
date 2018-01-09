@@ -59,8 +59,8 @@ export default {
     try {
       this.user.alenvi = await users.getById(this.$route.params.id);
       this.user.ogust = await ogust.getEmployeeById(this.user.alenvi.employee_id);
-      console.log('ALENVI=', this.user.alenvi);
-      console.log('OGUST=', this.user.ogust);
+      // console.log('ALENVI=', this.user.alenvi);
+      // console.log('OGUST=', this.user.ogust);
       this.user.ogust.date_of_birth = moment(this.user.ogust.date_of_birth, 'YYYYMMDD').format('YYYY-MM-DD');
     } catch (e) {
       console.error(e);
