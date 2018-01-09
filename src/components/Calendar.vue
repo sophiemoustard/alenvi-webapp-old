@@ -86,7 +86,8 @@ export default {
           involved: event.text,
           check: {
             isChecked: true,
-            checkBy: process.env.ALENVI_BOT_ID
+            checkBy: process.env.ALENVI_BOT_ID,
+            checkedAt: new Date()
           }
         };
         await PlanningUpdates.storePlanningupdates(this.personId, this.token, planningUpdateParams);
