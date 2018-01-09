@@ -17,7 +17,8 @@ if (module_exists('../.env')) {
     CLOUDINARY_API_KEY: JSON.stringify(process.env.CLOUDINARY_API_KEY),
     CLOUDINARY_API_SECRET: JSON.stringify(process.env.CLOUDINARY_API_SECRET),
     CLOUDINARY_CLOUD_NAME: JSON.stringify(process.env.CLOUDINARY_CLOUD_NAME),
-    MESSENGER_LINK: JSON.stringify(process.env.MESSENGER_LINK)
+    MESSENGER_LINK: JSON.stringify(process.env.MESSENGER_LINK),
+    ALENVI_BOT_ID: JSON.stringify(process.env.ALENVI_BOT_ID)
   }
 }
 

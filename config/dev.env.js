@@ -12,7 +12,8 @@ if (module_exists('../.env')) {
 } else {
   env = {
     NODE_ENV: JSON.stringify(process.env.NODE_ENV),
-    API_HOSTNAME: JSON.stringify(process.env.API_HOSTNAME)
+    API_HOSTNAME: JSON.stringify(process.env.API_HOSTNAME),
+    ALENVI_BOT_ID: JSON.stringify(process.env.ALENVI_BOT_ID)
   }
 }
 
