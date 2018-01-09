@@ -55,6 +55,7 @@ export default {
       }
       data.push({
         id: eventsRaw[events].id_service,
+        id_customer: eventsRaw[events].customer.id_customer,
         text,
         start_date: moment(eventsRaw[events].start_date, 'YYYYMMDDHHmm').format('YYYY-MM-DD HH:mm'),
         end_date: moment(eventsRaw[events].end_date, 'YYYYMMDDHHmm').format('YYYY-MM-DD HH:mm'),

@@ -1,4 +1,5 @@
 import { alenviAxios } from '../../helpers/alenviAxios'
+import axios from 'axios'
 
 export default {
   async getPlanningUpdates () {
@@ -7,6 +8,10 @@ export default {
   },
   async updatePlanningUpdatesStatus (updateId, data) {
     await alenviAxios.put(`${process.env.API_HOSTNAME}/planningUpdates/${updateId}/status`, data);
+  },
+  async storePlanningupdates (id, token, data) {
+    const planningUpdate = await axios.post(`${process.env.API_HOSTNAME}/planningUpdates?employeeId=${id}`, data, { headers: { 'x-access-token': token } });
+    return planningUpdate;
   },
   async removePlanningUpdateById (id, params) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/planningUpdates/${id}`, { params });

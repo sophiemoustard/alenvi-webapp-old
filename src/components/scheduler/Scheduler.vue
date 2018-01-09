@@ -24,6 +24,112 @@ import responsive from './scripts/dhtmlxscheduler-responsive.js';
 
 import { debounce, QWindowResizeObservable } from 'quasar'
 
+const configDhtmlxScheduler = (vm) => {
+  // Event date format
+  scheduler.config.xml_date = '%Y-%m-%d %H:%i';
+  // Blocking hours
+  scheduler.config.first_hour = 8;
+  scheduler.config.last_hour = 24;
+  // disable double click
+  scheduler.config.dblclick_create = false;
+  scheduler.config.drag_resize = false;
+  scheduler.config.drag_move = false;
+  // scheduler.config.touch_tip = false;
+  // disable left buttons on lightbox
+  scheduler.config.buttons_left = [];
+  // enable cancel button on lightbox's right wing
+  scheduler.config.buttons_right = ['dhx_cancel_btn', 'dhx_save_btn'];
+  // changing cancel button label
+  scheduler.locale.labels['icon_cancel'] = 'Fermer';
+  // hide lightbox in month view
+  scheduler.config.show_loading = true;
+  // hide select bar in day and week views
+  scheduler.config.select = false;
+  scheduler.config.touch_tip = false;
+  // scheduler.config.hour_size_px = 60;
+  scheduler.xy.scale_height = 25;
+  // time step in lightbox
+  scheduler.config.time_step = 15;
+  // limit time in time picker dropdown in lightbox
+  scheduler.config.limit_time_select = true;
+
+  let lightboxSections = [];
+  if (vm.$route.query.id_employee && vm.$route.query.self === 'true') {
+    scheduler.config.readonly_form = false;
+    const pathologyOpts = [
+      { key: '-', label: '-' },
+      { key: 'Alzheimer', label: 'Alzheimer' },
+      { key: 'Parkinson', label: 'Parkinson' },
+      { key: 'Corps de Lewy', label: 'Corps de Lewy' },
+      { key: 'Autres troubles cognitifs', label: 'Autres troubles cognitifs' },
+      { key: 'AVC récent', label: 'AVC récent' },
+      { key: 'Autre', label: 'Autre' }
+    ];
+    lightboxSections = [
+      {
+        name: 'Pathologie',
+        height: 20,
+        map_to: 'pathology',
+        type: 'select',
+        options: pathologyOpts
+      },
+      {
+        name: 'Details',
+        height: 200,
+        map_to: 'interventionDetail',
+        type: 'textarea'
+      },
+      {
+        name: 'Autres',
+        height: 100,
+        map_to: 'misc',
+        type: 'textarea'
+      },
+      {
+        name: 'Commentaires',
+        height: 75,
+        map_to: 'comments',
+        type: 'textarea'
+      },
+      {
+        name: 'Horaires',
+        height: 75,
+        map_to: 'auto',
+        type: 'time'
+      }
+    ];
+  } else {
+    scheduler.config.readonly_form = true;
+    lightboxSections = [
+      {
+        name: 'Pathologie',
+        height: 20,
+        map_to: 'pathology',
+        type: 'textarea'
+      },
+      {
+        name: 'Details',
+        height: 200,
+        map_to: 'interventionDetail',
+        type: 'textarea'
+      },
+      {
+        name: 'Autres',
+        height: 100,
+        map_to: 'misc',
+        type: 'textarea'
+      },
+      {
+        name: 'Commentaires',
+        height: 200,
+        map_to: 'comments',
+        type: 'textarea'
+      }
+    ];
+  }
+  scheduler.config.lightbox.sections = lightboxSections;
+}
+
 export default {
   components: {
     QWindowResizeObservable
@@ -37,90 +143,33 @@ export default {
           id: '',
           text: '',
           start_date: '',
-          end_date: '',
+          end_date: ''
         }]
       }
     }
   },
-  data() {
+  data () {
     return {
       width: '',
       height: ''
     }
   },
-  mounted() {
-    // Event date format
-    scheduler.config.xml_date = '%Y-%m-%d %H:%i';
-    // Date format for each column (week and day views)
-    scheduler.config.day_date = '%j';
-    // Blocking hours
-    scheduler.config.first_hour = 8;
-    scheduler.config.last_hour = 24;
-    // disable double click
-    scheduler.config.dblclick_create = false;
-    scheduler.config.drag_resize= false;
-    scheduler.config.drag_move= false;
-    // scheduler.config.touch_tip = false;
-    // disable left buttons on lightbox
-    scheduler.config.buttons_left = [];
-    // enable cancel button on lightbox's right wing
-    scheduler.config.buttons_right = ['dhx_cancel_btn', 'dhx_save_btn'];
-    // changing cancel button label
-    scheduler.locale.labels['icon_cancel'] = 'Fermer';
-    // hide lightbox in month view
-    scheduler.config.readonly_form = false;
-    scheduler.config.show_loading = true;
-    // hide select bar in day and week views
-    scheduler.config.select = false;
-    scheduler.config.touch_tip = false;
-    // scheduler.config.hour_size_px = 60;
-    scheduler.xy.scale_height = 25;
-    // time step in lightbox
-    scheduler.config.time_step = 15;
-    if (!this.$route.query.id_customer) {
-      scheduler.config.lightbox.sections = [
-        {
-          name: "Pathologie",
-          height: 20,
-          map_to: "pathology",
-          type: "textarea",
-        },
-        {
-          name: "Details",
-          height: 200,
-          map_to: "interventionDetail",
-          type: "textarea",
-        },
-        {
-          name: "Autres",
-          height: 100,
-          map_to: "misc",
-          type: "textarea",
-        },
-        {
-          name: "Commentaires",
-          height: 75,
-          map_to: "comments",
-          type: "textarea",
-        },
-        {
-          name: "Horaires",
-          height: 75,
-          map_to: "auto",
-          type: "time"
-        }
-      ];
-    }
+  mounted () {
+    configDhtmlxScheduler(this);
 
-    var format = scheduler.date.date_to_str("%H:%i");
-    scheduler.templates.hour_scale = function(date){
-      return "<div style='height:44px;line-height:0px'>"+format(date)+"</div>";
+    scheduler.templates.day_scale_date = date => scheduler.date.date_to_str('%l %j')(date);
+    scheduler.templates.week_scale_date = date => scheduler.date.date_to_str('%l %j')(date);
+    scheduler.templates.month_scale_date = date => scheduler.date.date_to_str('%l')(date);
+    scheduler.templates.hour_scale = function (date) {
+      const format = scheduler.date.date_to_str('%H:%i');
+      return "<div style='height:44px;line-height:0px'>" + format(date) + '</div>';
     }
 
     responsive.initResponsive(scheduler);
+
     // Scheduler initialization
     scheduler.init(this.$refs.scheduler_here, new Date(), 'week');
-    scheduler.templates.event_class = function(start, end, event) {
+    scheduler.templates.event_class = function (start, end, event) {
       if (event.type == 'alenvi') {
         return 'alenvi_event'
       }
@@ -129,19 +178,36 @@ export default {
     scheduler.parse(this.$props.events, 'json');
     // Prevent draggable events
     // scheduler.attachEvent('onEventDrag', this.blockReadOnly);
-    scheduler.attachEvent("onClick", function (id, e) {
+    scheduler.attachEvent('onClick', function (id, e) {
       scheduler.showLightbox(id);
     });
+    scheduler.attachEvent('onEventChanged', (id, e) => {
+      this.$emit('eventUpdated', e);
+      console.log('EVENT', e);
+    });
+    // Remove date picker from lightbox, just keeping hour picker
+    if (this.$route.query.id_employee && this.$route.query.self === 'true') {
+      scheduler.attachEvent('onBeforeLightBox', () => {
+        const node = scheduler.formSection('Horaires').node;
+        const timeInputs = node.getElementsByTagName('select');
+        for (let i = 0, l = timeInputs.length; i < l; i++) {
+          if (i > 0 && i !== 4) {
+            timeInputs[i].style.display = 'none';// remove inputs
+          }
+        }
+        return true;
+      });
+    }
   },
   methods: {
     // blockReadOnly(id) {
     //   if (!id) return true;
     //   return !scheduler.getEvent(id).readonly;
     // },
-    getData() {
+    getData () {
       this.$emit('getData');
     },
-    handleScroll: debounce(function() {
+    handleScroll: debounce(function () {
       const headerToFix = document.getElementsByClassName('dhx_cal_header')[0];
       let currentScroll = window.pageYOffset;
       if (currentScroll >= 60 && this.width >= 768) {
@@ -152,15 +218,15 @@ export default {
         headerToFix.classList.remove('header-fixed');
       }
     }, 10),
-    onResize(size) {
+    onResize (size) {
       this.width = size.width;
       this.height = size.height;
     }
   },
-  created() {
+  created () {
     window.addEventListener('scroll', this.handleScroll);
   },
-  destroyed() {
+  destroyed () {
     window.removeEventListener('scroll', this.handleScroll);
   }
 }
