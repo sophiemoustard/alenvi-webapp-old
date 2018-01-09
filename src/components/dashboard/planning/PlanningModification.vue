@@ -40,8 +40,8 @@ export default {
         refresh: true,
         rowHeight: 'auto',
         pagination: {
-          rowsPerPage: 5,
-          options: [5, 10, 15, 30]
+          rowsPerPage: 30,
+          options: [30, 40, 50]
         },
         messages: {
           noData: 'Pas de données disponibles.'
