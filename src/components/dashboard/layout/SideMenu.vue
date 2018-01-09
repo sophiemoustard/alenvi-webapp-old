@@ -8,9 +8,12 @@
         <q-item-main class="text-bold text-center" :label="user.firstname" />
       </q-item>
       <q-item class="justify-center">
-        <router-link :to="{ name: 'profile', params: {id: user._id }}">
-          <q-icon name="person" color="tertiary" size="1.5rem" />
-        </router-link>
+        <q-side-link item :to="{ name: 'profile', params: {id: user._id }}" exact>
+          <q-icon name="person" color="tertiary" size="1.5rem"/>
+        </q-side-link>
+        <!-- <router-link :to="{ name: 'profile', params: {id: user._id }}">
+          <q-icon name="person" color="tertiary" size="1.5rem"/>
+        </router-link> -->
         <q-icon id="logout" name="exit to app" color="tertiary" size="1.5rem" class="on-right" @click="logout" />
       </q-item>
       <q-item-separator />
