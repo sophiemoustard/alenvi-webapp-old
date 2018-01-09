@@ -183,7 +183,7 @@ export default {
       scheduler.showLightbox(id);
     });
     scheduler.attachEvent('onEventChanged', (id, e) => {
-      if (moment(event.end_date).isSameOrBefore(event.start_date)) {
+      if (moment(e.end_date).isSameOrBefore(e.start_date)) {
         e.error = true;
       }
       this.$emit('eventUpdated', e);
