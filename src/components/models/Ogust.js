@@ -45,7 +45,7 @@ export default {
       let interventionDetail = '';
       let misc = '';
       if (personType === 'employee') {
-        text = eventsRaw[events].customer.customer_id === '271395715' ? eventsRaw[events].customer.lastname : `${eventsRaw[events].customer.title} ${eventsRaw[events].customer.lastname}`;
+        text = (eventsRaw[events].customer.id_customer === '286871430' || eventsRaw[events].customer.id_customer === '271395715' || eventsRaw[events].customer.id_customer === '244566438') ? eventsRaw[events].customer.lastname : `${eventsRaw[events].customer.title} ${eventsRaw[events].customer.lastname}`;
         pathology = `${eventsRaw[events].customer.pathology}`;
         comments = `${eventsRaw[events].customer.comments}`;
         interventionDetail = `${eventsRaw[events].customer.interventionDetail}`;
@@ -63,7 +63,8 @@ export default {
         pathology,
         comments,
         interventionDetail,
-        misc
+        misc,
+        readonly: (eventsRaw[events].customer.id_customer === '286871430' || eventsRaw[events].customer.id_customer === '271395715' || eventsRaw[events].customer.id_customer === '244566438')
       });
     }
     return data;
