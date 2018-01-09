@@ -187,7 +187,6 @@ export default {
         e.error = true;
       }
       this.$emit('eventUpdated', e);
-      console.log('EVENT', e);
     });
     // Remove date picker from lightbox, just keeping hour picker
     if (this.$route.query.id_employee && this.$route.query.self === 'true') {
