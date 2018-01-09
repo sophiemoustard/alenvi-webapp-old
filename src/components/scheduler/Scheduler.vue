@@ -183,9 +183,6 @@ export default {
       scheduler.showLightbox(id);
     });
     scheduler.attachEvent('onEventChanged', (id, e) => {
-      if (moment(e.end_date).isSameOrBefore(e.start_date)) {
-        e.error = true;
-      }
       this.$emit('eventUpdated', e);
     });
     // Remove date picker from lightbox, just keeping hour picker
