@@ -125,5 +125,9 @@ export default {
   async setEmployee (data) {
     const employeeUpdated = await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/employees/${data.id_employee}`, data);
     return employeeUpdated;
+  },
+  async getCustomers (data) {
+    const customers = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/customers`, { params: data });
+    return customers.data.data.users.array_customer.result;
   }
 }

@@ -23,6 +23,7 @@ import {
 
 import Users from './Users.vue'
 import AddAuxiliary from './AddAuxiliary.vue'
+import AddHelper from './AddHelper.vue'
 
 export default {
   // props: ['navTabs'],
@@ -31,7 +32,8 @@ export default {
     QTab,
     QTabPane,
     Users,
-    AddAuxiliary
+    AddAuxiliary,
+    AddHelper
   },
   data () {
     return {
@@ -50,6 +52,14 @@ export default {
           icon: 'person add',
           default: false,
           component: 'AddAuxiliary',
+          // disable: true
+        },
+        {
+          label: 'Accueil aidant',
+          name: 'welcome_helper',
+          icon: 'person add',
+          default: false,
+          component: 'AddHelper',
           // disable: true
         }
       ]
