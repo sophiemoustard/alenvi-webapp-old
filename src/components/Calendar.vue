@@ -64,9 +64,11 @@ export default {
           this.events = await Ogust.getOgustEvents(ogustToken, '/calendar/events', this.personId, personType);
         }
       } catch (e) {
-        console.error(e.response)
-        if (e.response.status === 404) {
-          Toast.create('Aucune intervention dans la période demandée');
+        console.error(e)
+        if (e.response) {
+          if (e.status === 404) {
+            Toast.create('Aucune intervention dans la période demandée');
+          }
         } else {
           Toast.create("Erreur de chargement des données :/ Si le problème persiste, contacte l'équipe technique :)")
         }

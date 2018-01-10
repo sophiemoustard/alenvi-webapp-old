@@ -99,7 +99,7 @@ const configDhtmlxScheduler = (vm) => {
         type: 'time'
       }
     ];
-  } else {
+  } else if (vm.$route.query.id_employee && vm.$route.query.self === 'false') {
     scheduler.config.readonly_form = true;
     lightboxSections = [
       {
@@ -127,6 +127,9 @@ const configDhtmlxScheduler = (vm) => {
         type: 'textarea'
       }
     ];
+  } else {
+    scheduler.config.readonly_form = true;
+    lightboxSections = [];
   }
   scheduler.config.lightbox.sections = lightboxSections;
 }

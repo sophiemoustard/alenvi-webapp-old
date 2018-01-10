@@ -12,7 +12,7 @@ export default {
     const ogustToken = res.data.data.token;
     return ogustToken;
   },
-  async getOgustEvents (ogustToken, apiPath, idPerson, personType) {
+  async getOgustEvents (ogustToken = null, apiPath, idPerson, personType) {
     let employeeId = '';
     let customerId = '';
     if (personType === 'employee') {
@@ -36,36 +36,27 @@ export default {
     }
     const startDate = moment(scheduler.getState().date).startOf(period).format('YYYYMMDD');
     const endDate = moment(scheduler.getState().date).endOf(period).format('YYYYMMDD');
-    const servicesRaw = await axios.get(`${process.env.API_HOSTNAME}${apiPath}?id_customer=${customerId}&id_employee=${employeeId}&isDate=true&startDate=${startDate}0000&endDate=${endDate}2359`, { headers: { 'x-ogust-token': ogustToken } });
+    const servicesRaw = ogustToken ? await axios.get(`${process.env.API_HOSTNAME}${apiPath}?id_customer=${customerId}&id_employee=${employeeId}&isDate=true&startDate=${startDate}0000&endDate=${endDate}2359`, { headers: { 'x-ogust-token': ogustToken } }) : await alenviAxios.get(`${process.env.API_HOSTNAME}${apiPath}?id_customer=${customerId}&isDate=true&startDate=${startDate}0000&endDate=${endDate}2359`);
     const eventsRaw = servicesRaw.data.data.events;
     for (const events in eventsRaw) {
-      let text = '';
-      let pathology = '';
-      let comments = '';
-      let interventionDetail = '';
-      let misc = '';
-      if (personType === 'employee') {
-        text = (eventsRaw[events].customer.id_customer === '286871430' || eventsRaw[events].customer.id_customer === '271395715' || eventsRaw[events].customer.id_customer === '244566438') ? eventsRaw[events].customer.lastname : `${eventsRaw[events].customer.title} ${eventsRaw[events].customer.lastname}`;
-        pathology = `${eventsRaw[events].customer.pathology}`;
-        comments = `${eventsRaw[events].customer.comments}`;
-        interventionDetail = `${eventsRaw[events].customer.interventionDetail}`;
-        misc = `${eventsRaw[events].customer.misc}`
-      } else {
-        text = `${eventsRaw[events].employee.firstname} ${eventsRaw[events].employee.lastname}`
-      }
-      data.push({
+      let event = {
         id: eventsRaw[events].id_service,
-        id_customer: eventsRaw[events].customer.id_customer,
-        text,
         start_date: moment(eventsRaw[events].start_date, 'YYYYMMDDHHmm').format('YYYY-MM-DD HH:mm'),
         end_date: moment(eventsRaw[events].end_date, 'YYYYMMDDHHmm').format('YYYY-MM-DD HH:mm'),
-        type: 'alenvi',
-        pathology,
-        comments,
-        interventionDetail,
-        misc,
-        readonly: (eventsRaw[events].customer.id_customer === '286871430' || eventsRaw[events].customer.id_customer === '271395715' || eventsRaw[events].customer.id_customer === '244566438')
-      });
+        type: 'alenvi'
+      };
+      if (personType === 'employee') {
+        event.text = (eventsRaw[events].customer.id_customer === '286871430' || eventsRaw[events].customer.id_customer === '271395715' || eventsRaw[events].customer.id_customer === '244566438') ? eventsRaw[events].customer.lastname : `${eventsRaw[events].customer.title} ${eventsRaw[events].customer.lastname}`;
+        event.id_customer = eventsRaw[events].customer.id_customer;
+        event.pathology = eventsRaw[events].customer.pathology;
+        event.comments = eventsRaw[events].customer.comments;
+        event.interventionDetail = eventsRaw[events].customer.interventionDetail;
+        event.misc = eventsRaw[events].customer.misc;
+        event.readonly = (eventsRaw[events].customer.id_customer === '286871430' || eventsRaw[events].customer.id_customer === '271395715' || eventsRaw[events].customer.id_customer === '244566438');
+      } else {
+        event.text = `${eventsRaw[events].employee.firstname} ${eventsRaw[events].employee.lastname}`
+      }
+      data.push(event);
     }
     return data;
   },
