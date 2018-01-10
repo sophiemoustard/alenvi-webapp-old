@@ -21,7 +21,6 @@ import { QCard, QCardMain, QCardSeparator, QCardTitle, QCardMedia } from 'quasar
 import _ from 'lodash'
 
 import users from '../../models/Users';
-import ogust from '../../models/Ogust';
 
 export default {
   components: {
@@ -31,16 +30,16 @@ export default {
     QCardSeparator,
     QCardMedia
   },
-  data() {
+  data () {
     return {
       users: {}
     }
   },
-  created() {
+  created () {
     this.getUsers();
   },
   methods: {
-    async getUsers() {
+    async getUsers () {
       try {
         this.users = await users.showAll();
         _.remove(this.users, (o) => { return o.firstname === 'Admin' || o.firstname === 'Pigi' });
@@ -48,8 +47,8 @@ export default {
         console.error(e);
       }
     },
-    toProfile(userId) {
-      this.$router.push({ name: 'profile', params: { id: userId }});
+    toProfile (userId) {
+      this.$router.push({ name: 'profile', params: { id: userId } });
     }
   }
 };
