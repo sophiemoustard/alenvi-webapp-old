@@ -55,6 +55,11 @@ export default {
       }
     }
   },
+  computed: {
+    getUser() {
+      return this.$store.getters.user;
+    }
+  },
   methods: {
     async submit () {
       try {
@@ -68,6 +73,9 @@ export default {
         Cookies.set('refresh_token', user.data.data.refreshToken, { path: '/', expires: 365, secure: process.env.NODE_ENV == 'development' ? false : true });
         Cookies.set('user_id', user.data.data.user._id, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV == 'development' ? false : true });
         await this.$store.dispatch('getUser');
+        if (this.getUser.role.name == 'Client') {
+          return this.$router.replace({ path: '/dashboard/customer/home' });
+        }
         this.$router.replace({ name: 'planning' });
       } catch(e) {
         alenviAlert({ color: 'error', icon: 'warning', content: 'Impossible de se connecter.', position: 'bottom-right', duration: 2500 });
