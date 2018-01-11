@@ -14,7 +14,7 @@
       </div>
       <div class="row justify-center">
         <q-field class="col-xs-12 col-sm-3" icon="vpn_key">
-          <q-input v-model="credentials.password" float-label="Mot de passe" type="password" />
+          <q-input @keyup.enter="submit" v-model="credentials.password" float-label="Mot de passe" type="password" />
         </q-field>
       </div>
       <div class="row justify-center">
@@ -39,8 +39,6 @@ import {
 import axios from 'axios'
 import { alenviAlert } from '../../helpers/alerts'
 
-let test = Cookies.get('alenvi_token');
-
 export default {
   components: {
     QField,
@@ -63,13 +61,13 @@ export default {
           password: this.credentials.password
         });
         // console.log(user);
-        Cookies.set('alenvi_token', user.data.data.token, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV == 'development' ? false : true });
-        Cookies.set('alenvi_token_expires_in', user.data.data.expiresIn, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV == 'development' ? false : true });
-        Cookies.set('refresh_token', user.data.data.refreshToken, { path: '/', expires: 365, secure: process.env.NODE_ENV == 'development' ? false : true });
-        Cookies.set('user_id', user.data.data.user._id, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV == 'development' ? false : true });
+        Cookies.set('alenvi_token', user.data.data.token, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV != 'development' });
+        Cookies.set('alenvi_token_expires_in', user.data.data.expiresIn, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV != 'development' });
+        Cookies.set('refresh_token', user.data.data.refreshToken, { path: '/', expires: 365, secure: process.env.NODE_ENV != 'development' });
+        Cookies.set('user_id', user.data.data.user._id, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV != 'development' });
         await this.$store.dispatch('getUser');
         this.$router.replace({ name: 'planning' });
-      } catch(e) {
+      } catch (e) {
         alenviAlert({ color: 'error', icon: 'warning', content: 'Impossible de se connecter.', position: 'bottom-right', duration: 2500 });
         console.error(e);
       }
