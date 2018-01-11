@@ -14,6 +14,7 @@
 
 <script>
 import { QField, QInput, Dialog, Toast } from 'quasar';
+import randomize from 'randomatic';
 
 import users from '../../models/Users';
 import ogust from '../../models/Ogust';
@@ -24,13 +25,13 @@ export default {
     QInput,
     Toast
   },
-  data() {
+  data () {
     return {
-      email: ""
+      email: ''
     }
   },
   methods: {
-    async handleEmail() {
+    async handleEmail () {
       try {
         const params = { email: this.email };
         const customer = await ogust.getCustomers(params);
@@ -49,10 +50,28 @@ export default {
             },
             {
               label: 'Oui',
-              handler () {
-                Toast.create('Email envoyé !')
-                console.log('On call la fonction d\'email');
-                console.log('Agreed!')
+              handler: async () => {
+                try {
+                  // Check if user already exist in Alenvi DB: if yes, send email, if no create customer then send email
+                  const user = await users.showAll({ customer_id: customer[0].id_customer });
+                  if (!user) {
+                    users.create({
+                      local: {
+                        email: this.email,
+                        password: randomize('0', 6)
+                      },
+                      customer_id: customer[0].id_customer,
+                      lastname: customer[0].last_name,
+                      role: 'Client'
+                    });
+                    Toast.create(`Utilisateur ${customer[0].last_name} créé dans la base Alenvi`);
+                  }
+                  console.log('On call la fonction d\'email');
+                  console.log('Agreed!')
+                  Toast.create('Email envoyé !')
+                } catch (e) {
+                  console.error(e);
+                }
               }
             }
           ]
