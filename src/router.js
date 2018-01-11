@@ -101,6 +101,30 @@ const router = new VueRouter({
           meta: {
             cookies: ['alenvi_token', 'refresh_token']
           }
+        },
+        {
+          path: 'customer/home',
+          name: 'customer home',
+          component: load('dashboard/customer/Home'),
+          meta: {
+            cookies: ['alenvi_token', 'refresh_token']
+          }
+        },
+        {
+          path: 'customer/planning',
+          name: 'customer planning',
+          component: load('dashboard/customer/Planning'),
+          meta: {
+            cookies: ['alenvi_token', 'refresh_token']
+          }
+        },
+        {
+          path: 'customer/documents',
+          name: 'customer documents',
+          component: load('dashboard/customer/documents/NavTabs'),
+          meta: {
+            cookies: ['alenvi_token', 'refresh_token']
+          }
         }
       ]
     },
