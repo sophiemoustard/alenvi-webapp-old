@@ -18,6 +18,7 @@ import randomize from 'randomatic';
 
 import users from '../../models/Users';
 import ogust from '../../models/Ogust';
+import email from '../../models/Email';
 
 export default {
   components: {
@@ -54,11 +55,12 @@ export default {
                 try {
                   // Check if user already exist in Alenvi DB: if yes, send email, if no create customer then send email
                   const user = await users.showAll({ customer_id: customer[0].id_customer });
+                  const password = randomize('0', 6);
                   if (!user) {
-                    users.create({
+                    const userCreated = await users.create({
                       local: {
                         email: this.email,
-                        password: randomize('0', 6)
+                        password
                       },
                       customer_id: customer[0].id_customer,
                       lastname: customer[0].last_name,
@@ -66,8 +68,17 @@ export default {
                     });
                     Toast.create(`Utilisateur ${customer[0].last_name} créé dans la base Alenvi`);
                   }
-                  console.log('On call la fonction d\'email');
-                  console.log('Agreed!')
+                  const sendEmail = await email.sendWelcome({
+                    sender: {
+                      email: 'contact@alenvi.io'
+                    },
+                    receiver: {
+                      email: this.email,
+                      title: customer[0].title,
+                      name: customer[0].last_name,
+                      password
+                    }
+                  });
                   Toast.create('Email envoyé !')
                 } catch (e) {
                   console.error(e);
