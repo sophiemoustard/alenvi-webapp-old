@@ -9,7 +9,7 @@ const instance = axios.create();
 
 instance.interceptors.request.use(async function (config) {
   // Ignore routes that don't need automatic token
-  if (!config.url.match(/ogust/i) && (config.url.match(/users\/authenticate/i) || config.url.match(/calendar/i))) {
+  if (!config.url.match(/ogust/i) && config.url.match(/users\/authenticate/i)) {
     return config;
   }
   if (!Cookies.get('alenvi_token')) {
@@ -27,7 +27,7 @@ instance.interceptors.request.use(async function (config) {
   config.headers.common['x-access-token'] = Cookies.get('alenvi_token');
   // Headers for next request to get Ogust Token using axios instance
   axios.defaults.headers.common['x-access-token'] = Cookies.get('alenvi_token');
-  if (config.url.match(/ogust/i)) {
+  if (config.url.match(/ogust/i) || config.url.match(/calendar\/events/i)) {
     const token = await ogustToken.getOgustToken();
     config.headers.common['x-ogust-token'] = token;
   }
