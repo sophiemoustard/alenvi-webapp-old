@@ -34,7 +34,10 @@ export default {
       try {
         const params = { email: this.email };
         const customer = await ogust.getCustomers(params);
-        await Dialog.create({
+        if (!customer[0]) {
+          return Toast.create('Impossible de trouver cet utilisateur')
+        }
+        Dialog.create({
           title: 'Envoi email',
           message: `Voulez-vous accueillir l'aidant ${customer[0].last_name} ?`,
           buttons: [
