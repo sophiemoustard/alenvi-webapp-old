@@ -1,17 +1,19 @@
 <template>
-  <div class="layout-padding row justify-center">
-    <div style="width: 700px; max-width: 90vw;">
-      <p class="caption">Création de compte Alenvi et Ogust</p>
-      <select-sector v-model="selectedSector"></select-sector>
-      <q-field icon="phone" helper="Numéro sans délimiteur (espaces, points...)">
-        <q-input :disable="!selectedSector" :loading="isLoading" v-model="phoneNbr" float-label="Numéro de téléphone" :after="[{ icon: 'send', content: true, handler: handlePhone }]"/>
-      </q-field>
-      <!-- <p class="caption">Envoi de code pour compte existant</p>
-      <q-field icon="phone" helper="Numéro sans délimiteur (espaces, points...)">
-        <q-input v-model="phoneNbr" float-label="Numéro de téléphone" :after="[{ icon: 'send', content: true, handler: handlePhone }]"/>
-      </q-field> -->
-      <!-- <br>
-      <q-search v-model="searchUserFromMobilePhone" :debounce="600" placeholder="Numéro auxiliaire" type="tel" stack-label="Numéro de téléphone" /> -->
+  <div class="layout-padding">
+    <div class="row justify-center">
+      <div style="width: 700px; max-width: 90vw;">
+        <p class="caption">Création de compte Alenvi et Ogust</p>
+        <select-sector v-model="selectedSector"></select-sector>
+        <q-field icon="phone" helper="Numéro sans délimiteur (espaces, points...)">
+          <q-input :disable="!selectedSector" :loading="isLoading" v-model="phoneNbr" float-label="Numéro de téléphone" :after="[{ icon: 'send', content: true, handler: handlePhone }]"/>
+        </q-field>
+        <!-- <p class="caption">Envoi de code pour compte existant</p>
+        <q-field icon="phone" helper="Numéro sans délimiteur (espaces, points...)">
+          <q-input v-model="phoneNbr" float-label="Numéro de téléphone" :after="[{ icon: 'send', content: true, handler: handlePhone }]"/>
+        </q-field> -->
+        <!-- <br>
+        <q-search v-model="searchUserFromMobilePhone" :debounce="600" placeholder="Numéro auxiliaire" type="tel" stack-label="Numéro de téléphone" /> -->
+      </div>
     </div>
   </div>
 </template>

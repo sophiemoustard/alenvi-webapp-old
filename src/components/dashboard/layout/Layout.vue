@@ -9,9 +9,9 @@
       <q-toolbar-title>
         Dashboard
       </q-toolbar-title>
-      <q-btn color="primary" flat big>
+      <!-- <q-btn color="primary" flat big>
         <q-icon name="email" />
-      </q-btn>
+      </q-btn> -->
     </q-toolbar>
 
     <div slot="left">

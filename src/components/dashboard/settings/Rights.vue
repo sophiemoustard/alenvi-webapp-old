@@ -12,7 +12,7 @@
         <tbody>
           <tr v-for="(role, index) in roles" :key="index">
             <td class="text-center">
-              <q-input type="text" align="center" v-model="role.name" :readonly="isRoleAdmin(role)" @blur="updateRole(role, 1)"/>
+              <q-input type="text" align="center" v-model="role.name" readonly @blur="updateRole(role, 1)"/> <!-- :readonly="isRoleAdmin(role)" -->
             </td>
             <td class="text-center" v-for="(feature, indexFeature) in role.features" :key="indexFeature">
               <q-input type="number" align="center" v-model.trim.number="feature.permission_level" :readonly="isRoleAdmin(role)" @blur="updateRole(role, feature.permission_level)" />
