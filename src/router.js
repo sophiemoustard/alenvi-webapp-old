@@ -146,16 +146,22 @@ router.beforeEach(async (to, from, next) => {
         if (await checkPermission(to, store.getters.user)) {
           next();
         } else {
-          next({ path: '/dashboard' })
+          if (store.getters.user.role.name === 'Client') {
+            return next({ path: '/dashboard/customer/home' });
+          }
+          next({ path: '/dashboard' });
         }
       } else {
         next({ path: '/dashboard/login' });
       }
     } else {
       if (await checkPermission(to, store.getters.user)) {
-        return next();
+        next();
+      } else if (store.getters.user.role.name === 'Client') {
+        next({ path: '/dashboard/customer/home' });
+      } else {
+        next({ path: '/dashboard' });
       }
-      return next({ path: '/dashboard' });
     }
   } else {
     next();
