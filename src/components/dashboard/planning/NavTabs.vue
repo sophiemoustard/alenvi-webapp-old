@@ -23,7 +23,6 @@ import {
 
 import Planning from './Planning.vue'
 import PlanningModification from './PlanningModification'
-import Calendar from '../customer/Calendar'
 
 export default {
   // props: ['navTabs'],
@@ -32,8 +31,7 @@ export default {
     QTab,
     QTabPane,
     Planning,
-    PlanningModification,
-    Calendar
+    PlanningModification
   },
   data () {
     return {
@@ -51,13 +49,6 @@ export default {
           icon: 'update',
           default: false,
           component: 'PlanningModification'
-        },
-        {
-          label: 'Test Planning',
-          name: 'calendar',
-          icon: 'date range',
-          default: false,
-          component: 'Calendar'
         }
       ]
     }
