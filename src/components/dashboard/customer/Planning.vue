@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <scheduler :events="events" @getData="getEventsData"></scheduler>
+    <scheduler :showTab="false" :customer="true" :events="events" @getData="getEventsData"></scheduler>
   </div>
 </template>
 
@@ -37,7 +37,7 @@ export default {
       try {
         this.personId = 345735114; // ID customer
         // this.title = personData.title;
-        this.events = await Ogust.getOgustEvents(null, '/calendar/events', this.personId, 'customer');
+        this.events = await Ogust.getOgustEvents(null, this.personId, 'customer');
       } catch (e) {
         console.error(e)
         if (e.status === 404) {

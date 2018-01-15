@@ -126,7 +126,7 @@ export default {
         if (!Cookies.get('user_id')) {
           return this.$router.replace('/dashboard/login');
         }
-        const sectors = await ogust.getOgustSectors();
+        const sectors = await ogust.getList('employee.sector');
         const messagesList = await messages.getMessagesBySenderId(Cookies.get('user_id'));
         const orderedMessageList = [];
         for (let i = 0, l = messagesList.length; i < l; i++) {
@@ -148,7 +148,6 @@ export default {
     },
     async displayDetails (row) {
       try {
-        console.log(row);
         this.recipients = [];
         row.recipients.forEach(async (item) => {
           const recipient = await users.getById(item.id)
