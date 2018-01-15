@@ -148,7 +148,6 @@ export default {
     },
     async displayDetails (row) {
       try {
-        console.log(row);
         this.recipients = [];
         row.recipients.forEach(async (item) => {
           const recipient = await users.getById(item.id)
