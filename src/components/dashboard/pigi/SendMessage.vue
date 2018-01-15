@@ -63,7 +63,7 @@ export default {
   methods: {
     async getSectors () {
       try {
-        const allSectorsRaw = await ogust.getOgustSectors();
+        const allSectorsRaw = await ogust.getList('employee.sector');
         for (const k in allSectorsRaw) {
           if (k === '*') {
             continue;
