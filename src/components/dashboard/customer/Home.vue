@@ -6,7 +6,7 @@
         <br>
         <p>Bénéficiaire concerné(e): <span v-if="user.first_name">{{ user.first_name }}</span> {{ user.last_name }}</p>
         <p v-if="auxiliaryRef">Auxiliaire d'envie référent(e): {{ auxiliaryRef }}</p>
-        <p>Coach référent(e): {{ coach }}</p>
+        <p v-if="coach">Coach référent(e): {{ coach }}</p>
       </div>
     </div>
   </div>
@@ -21,9 +21,9 @@ export default {
   },
   data () {
     return {
-      user: {},
-      coach: {},
-      auxiliaryRef: {}
+      user: '',
+      coach: '',
+      auxiliaryRef: ''
     }
   },
   computed: {
