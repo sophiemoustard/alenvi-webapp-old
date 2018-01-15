@@ -34,13 +34,10 @@ export default {
   async created () {
     try {
       this.user = await ogust.getCustomerById(this.getUser.customer_id);
-      console.log(this.user);
       const managers = await ogust.getList('employee.manager');
       this.coach = managers[this.user.manager];
-      console.log(this.coach);
       const customerDetailsRaw = await ogust.getOgustCustomerDetails(null, this.getUser.customer_id);
       this.auxiliaryRef = customerDetailsRaw.data.data.info.thirdPartyInformations.array_values['REF'];
-      console.log(this.auxiliaryRef);
     } catch (e) {
       console.error(e);
     }
