@@ -2,7 +2,7 @@
  <div class="row md-gutter layout-padding items-start">
     <div class="col-12">
       <div class="row text-center justify-center">
-        <h4>Blog : les derniers articles</h4>
+        <h5>Blog : les derniers articles</h5>
       </div>
     </div>
     <div v-for="(article, index) in lastArticles" :key="index" class="col-xs-12 col-sm-4">

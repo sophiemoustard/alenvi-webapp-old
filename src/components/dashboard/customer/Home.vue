@@ -1,14 +1,14 @@
 <template>
   <div class="layout-padding">
-    <div class="row justify-center">
-      <div style="width: 700px; max-width: 90vw;">
-        <h4>Bienvenue sur votre espace d'accompagnement privé Alenvi !</h4>
-        <br>
+    <h5 id="main-title" class="text-center">Bienvenue sur votre espace d'accompagnement privé Alenvi !</h5>
+    <!-- <div class="row justify-center"> -->
+      <br>
+      <!-- <div style="width: 700px; max-width: 90vw;"> -->
         <p>Bénéficiaire concerné(e): <span v-if="user.first_name">{{ user.first_name }}</span> {{ user.last_name }}</p>
         <p v-if="auxiliaryRef">Auxiliaire d'envie référent(e): {{ auxiliaryRef }}</p>
         <p v-if="coach">Coach référent(e): {{ coach }}</p>
-      </div>
-    </div>
+      <!-- </div> -->
+    <!-- </div> -->
     <latest-articles />
   </div>
 </template>
@@ -52,4 +52,8 @@ export default {
 
 <style lang="stylus" scoped>
 @import '~variables';
+
+#main-title
+  margin-bottom: 40px
+
 </style>
