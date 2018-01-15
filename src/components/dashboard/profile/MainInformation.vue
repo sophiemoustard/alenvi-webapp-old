@@ -18,15 +18,13 @@
 
 <script>
 
-import _ from 'lodash'
-
 import users from '../../models/Users';
 import ogust from '../../models/Ogust';
 
 export default {
   components: {
   },
-  data() {
+  data () {
     return {
       user: {
         alenvi: {
@@ -34,13 +32,13 @@ export default {
           local: {}
         },
         ogust: {
-          date_of_birth: ""
+          date_of_birth: ''
         },
-        community: ""
+        community: ''
       }
     }
   },
-  async created() {
+  async created () {
     try {
       this.user.alenvi = await users.getById(this.$route.params.id);
       this.user.ogust = await ogust.getEmployeeById(this.user.alenvi.employee_id);
