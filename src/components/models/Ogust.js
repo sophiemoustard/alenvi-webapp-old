@@ -23,6 +23,8 @@ export default {
     const data = [];
     let period;
     const mode = scheduler.getState().mode;
+    let minDate = scheduler.getState().date;
+    let maxDate = scheduler.getState().date;
     switch (mode) {
       case 'month':
         period = 'month';
@@ -33,9 +35,15 @@ export default {
       case 'day':
         period = 'day';
         break;
+      case 'customer_week':
+        period = 'date';
+        // minDate = scheduler.getState().min_date;
+        maxDate = moment(scheduler.getState().max_date).subtract(1, 'day');
+        console.log(minDate);
+        break;
     }
-    const startDate = moment(scheduler.getState().date).startOf(period).format('YYYYMMDD');
-    const endDate = moment(scheduler.getState().date).endOf(period).format('YYYYMMDD');
+    const startDate = moment(minDate).startOf(period).format('YYYYMMDD');
+    const endDate = moment(maxDate).endOf(period).format('YYYYMMDD');
     const servicesRaw = ogustToken ? await axios.get(`${process.env.API_HOSTNAME}${apiPath}?id_customer=${customerId}&id_employee=${employeeId}&isDate=true&startDate=${startDate}0000&endDate=${endDate}2359`, { headers: { 'x-ogust-token': ogustToken } }) : await alenviAxios.get(`${process.env.API_HOSTNAME}${apiPath}?id_customer=${customerId}&isDate=true&startDate=${startDate}0000&endDate=${endDate}2359`);
     const eventsRaw = servicesRaw.data.data.events;
     for (const events in eventsRaw) {
@@ -58,6 +66,7 @@ export default {
       }
       data.push(event);
     }
+    console.log(data);
     return data;
   },
   async getOgustPerson (ogustToken, idPerson, personType) {
@@ -97,9 +106,9 @@ export default {
   async editOgustCustomerCodes (ogustToken, customerId, data) {
     await axios.put(`${process.env.API_HOSTNAME}/ogust/customers/${customerId}/editCustomerCodes`, data, { headers: { 'x-ogust-token': ogustToken } });
   },
-  async getOgustSectors () {
-    const ogustSectorsRaw = await alenviAxios.post(`${process.env.API_HOSTNAME}/ogust/utils/getList?key=employee.sector`, {});
-    return ogustSectorsRaw.data.data.list
+  async getList (key) {
+    const ogustListRaw = await alenviAxios.post(`${process.env.API_HOSTNAME}/ogust/utils/getList?key=${key}`, {});
+    return ogustListRaw.data.data.list;
   },
   async getEmployees (params) {
     const employeesRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/employees`, { params });
