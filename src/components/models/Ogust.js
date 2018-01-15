@@ -108,7 +108,7 @@ export default {
   },
   async getEmployeeById (id) {
     const employeeRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/employees/${id}`);
-    return employeeRaw.data.data.user.employee
+    return employeeRaw.data.data.user.employee;
   },
   async createEmployee (ogustToken, data) {
     const newEmployee = await axios.post(`${process.env.API_HOSTNAME}/ogust/employees`, data, { headers: { 'x-ogust-token': ogustToken } })
@@ -129,5 +129,9 @@ export default {
   async getCustomers (data) {
     const customers = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/customers`, { params: data });
     return customers.data.data.users.array_customer.result;
+  },
+  async getCustomerById (id) {
+    const customerRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/customers/${id}`);
+    return customerRaw.data.data.user.customer;
   }
 }
