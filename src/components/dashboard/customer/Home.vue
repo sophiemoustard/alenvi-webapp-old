@@ -2,22 +2,25 @@
   <div class="layout-padding">
     <div class="row justify-center">
       <div style="width: 700px; max-width: 90vw;">
-        <p class="caption">Bienvenue sur votre espace d'accompagnement privé Alenvi !</p>
+        <h4>Bienvenue sur votre espace d'accompagnement privé Alenvi !</h4>
         <br>
         <p>Bénéficiaire concerné(e): <span v-if="user.first_name">{{ user.first_name }}</span> {{ user.last_name }}</p>
         <p v-if="auxiliaryRef">Auxiliaire d'envie référent(e): {{ auxiliaryRef }}</p>
         <p v-if="coach">Coach référent(e): {{ coach }}</p>
       </div>
     </div>
+    <latest-articles />
   </div>
 </template>
 
 <script>
 
 import ogust from '../../models/Ogust';
+import LatestArticles from './LatestArticles';
 
 export default {
   components: {
+    LatestArticles
   },
   data () {
     return {
