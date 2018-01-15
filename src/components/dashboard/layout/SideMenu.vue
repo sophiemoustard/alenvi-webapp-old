@@ -94,12 +94,12 @@
       QSideLink
     },
     computed: {
-      getUser() {
+      getUser () {
         return this.$store.getters.user;
       }
     },
     methods: {
-      logout() {
+      logout () {
         Cookies.remove('alenvi_token', {
           path: '/'
         });

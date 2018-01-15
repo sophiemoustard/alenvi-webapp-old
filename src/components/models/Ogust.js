@@ -89,8 +89,13 @@ export default {
       comment: personData.comment || ''
     }
   },
-  async getOgustCustomerDetails (ogustToken, customerId) {
-    const customerDetails = await axios.get(`${process.env.API_HOSTNAME}/ogust/customers/${customerId}/moreInfo`, { headers: { 'x-ogust-token': ogustToken } });
+  async getOgustCustomerDetails (ogustToken = null, customerId) {
+    let customerDetails = {};
+    if (ogustToken == null) {
+      customerDetails = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/customers/${customerId}/moreInfo`);
+    } else {
+      customerDetails = await axios.get(`${process.env.API_HOSTNAME}/ogust/customers/${customerId}/moreInfo`, { headers: { 'x-ogust-token': ogustToken } });
+    }
     return customerDetails;
   },
   async editOgustCustomerDetails (ogustToken, customerId, data) {
@@ -141,5 +146,13 @@ export default {
   async getCustomerById (id) {
     const customerRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/customers/${id}`);
     return customerRaw.data.data.user.customer;
+  },
+  async getCustomerInvoices (id) {
+    const customerInvoicesRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/customers/${id}/invoices`);
+    return customerInvoicesRaw.data.data.invoices.array_invoice.result;
+  },
+  async getCustomerFiscalAttests (id) {
+    const customerFiscalAttestsRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/customers/${id}/fiscalAttests`);
+    return customerFiscalAttestsRaw.data.data.fiscalAttests.array_fiscalattest.result;
   }
 }

@@ -37,14 +37,14 @@ export default {
         {
           label: 'Factures',
           name: 'invoices',
-          icon: 'verified user',
+          icon: 'euro symbol',
           default: true,
           component: 'Invoices'
         },
         {
           label: 'Attestations fiscales',
           name: 'envoi',
-          icon: 'mail outline',
+          icon: 'check',
           default: false,
           component: 'TaxCertificate'
         }

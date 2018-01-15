@@ -19,7 +19,7 @@
 
 <script>
 
-import { date, QCard, QCardTitle, QCardActions, QBtn, QIcon } from "quasar";
+import { QCard, QCardTitle, QCardActions, QBtn, QIcon } from 'quasar';
 
 import moment from 'moment'
 
@@ -34,13 +34,13 @@ export default {
     QBtn,
     QIcon
   },
-  data() {
+  data () {
     return {
       user: {},
       salaries: {}
     }
   },
-  async created() {
+  async created () {
     try {
       this.user = await users.getById(this.$route.params.id);
       this.salaries = await ogust.getEmployeeSalaries(this.user.employee_id);

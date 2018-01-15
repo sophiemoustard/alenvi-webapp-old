@@ -67,7 +67,7 @@ export default {
     }
   },
   methods: {
-    async updateUser() {
+    async updateUser () {
       try {
         const userToSendOgust = {
           id_employee: this.user.alenvi.employee_id,
