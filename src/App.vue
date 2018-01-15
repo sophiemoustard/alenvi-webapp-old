@@ -2,7 +2,7 @@
   <!-- Don't drop "q-app" class -->
   <div id="q-app">
     <router-view />
-    <q-ajax-bar color="primary" />
+    <q-ajax-bar color="primary" size="1px"/>
   </div>
 </template>
 
