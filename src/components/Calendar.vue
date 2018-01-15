@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <scheduler :events="events" @eventUpdated="updateEventById" @getData="getEventsData"></scheduler>
+    <scheduler :events="events" @eventUpdated="updateEventById" @viewChanged="getEventsData"></scheduler>
   </div>
 </template>
 
@@ -66,9 +66,11 @@ export default {
       } catch (e) {
         console.error(e)
         if (e.response) {
+          console.error(e.response);
           if (e.status === 404) {
-            Toast.create('Aucune intervention dans la période demandée');
+            return Toast.create('Aucune intervention dans la période demandée');
           }
+          Toast.create("Erreur de chargement des données :/ Si le problème persiste, contacte l'équipe technique :)")
         } else {
           Toast.create("Erreur de chargement des données :/ Si le problème persiste, contacte l'équipe technique :)")
         }

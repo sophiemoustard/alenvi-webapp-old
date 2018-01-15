@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <scheduler :showTab="false" :customer="true" :events="events" @getData="getEventsData"></scheduler>
+    <scheduler :showTab="false" :customer="true" :events="events" @viewChanged="getEventsData"></scheduler>
   </div>
 </template>
 
@@ -24,7 +24,7 @@ export default {
       personId: ''
     }
   },
-  async mounted () {
+  mounted () {
     this.getEventsData();
   },
   watch: {
@@ -32,11 +32,15 @@ export default {
       scheduler.parse(this.events, 'json');
     }
   },
+  computed: {
+    getUser () {
+      return this.$store.getters.user;
+    }
+  },
   methods: {
     async getEventsData () {
       try {
-        this.personId = 345735114; // ID customer
-        // this.title = personData.title;
+        this.personId = this.getUser.customer_id; // ID customer
         this.events = await Ogust.getOgustEvents(null, this.personId, 'customer');
       } catch (e) {
         console.error(e)

@@ -2,13 +2,14 @@
   <div ref="scheduler_here" class="dhx_cal_container" style='width:100%; height:100%;'>
     <q-window-resize-observable @resize="onResize" />
     <div class="dhx_cal_navline">
-      <div @click="getData" class="dhx_cal_prev_button">&nbsp;</div>
-      <div @click="getData" class="dhx_cal_next_button">&nbsp;</div>
+      <div class="dhx_cal_prev_button">&nbsp;</div>
+      <div class="dhx_cal_next_button">&nbsp;</div>
       <div class="dhx_cal_today_button"></div>
       <div class="dhx_cal_date"></div>
-      <div @click="getData" class="dhx_cal_tab" name="day_tab" style="right:204px;"></div>
-      <div @click="getData" class="dhx_cal_tab" name="week_tab" style="right:140px;"></div>
-      <div @click="getData" class="dhx_cal_tab" name="month_tab" style="right:76px;"></div>
+      <div v-if="!customer" class="dhx_cal_tab" name="day_tab" style="right:204px;"></div>
+      <div v-if="!customer" class="dhx_cal_tab" name="week_tab" style="right:140px;"></div>
+      <div v-if="!customer" class="dhx_cal_tab" name="month_tab" style="right:76px;"></div>
+      <div v-show="showTab" class="dhx_cal_tab" name="customer_week_tab" style="right:200px;"></div>
     </div>
     <div class="dhx_cal_header"></div>
     <div class="dhx_cal_data"></div>
@@ -42,6 +43,8 @@ const configDhtmlxScheduler = (vm) => {
   scheduler.config.buttons_right = ['dhx_cancel_btn', 'dhx_save_btn'];
   // changing cancel button label
   scheduler.locale.labels['icon_cancel'] = 'Fermer';
+  // custom view label
+  scheduler.locale.labels['customer_week_tab'] = 'Vue bénéficiaire';
   // hide lightbox in month view
   scheduler.config.show_loading = true;
   // hide select bar in day and week views
@@ -150,6 +153,12 @@ export default {
           end_date: ''
         }]
       }
+    },
+    customer: {
+      type: Boolean
+    },
+    showTab: {
+      type: Boolean
     }
   },
   data () {
@@ -161,18 +170,32 @@ export default {
   mounted () {
     configDhtmlxScheduler(this);
 
+    scheduler.attachEvent('onTemplatesReady', () => {
+      // custom view
+      scheduler.date.customer_week_start = date => scheduler.date.date_part(new Date(date.valueOf()));
+      scheduler.templates.customer_week_date = scheduler.templates.week_date;
+      scheduler.templates.customer_week_scale_date = date => scheduler.date.date_to_str('%l %j')(date);
+      scheduler.date.add_customer_week = (date, inc) => scheduler.date.add(date, inc * 7, 'day');
+    });
+    // standard views
     scheduler.templates.day_scale_date = date => scheduler.date.date_to_str('%l %j')(date);
-    scheduler.templates.week_scale_date = date => scheduler.date.date_to_str('%l %j')(date);
     scheduler.templates.month_scale_date = date => scheduler.date.date_to_str('%l')(date);
     scheduler.templates.hour_scale = function (date) {
       const format = scheduler.date.date_to_str('%H:%i');
       return "<div style='height:44px;line-height:0px'>" + format(date) + '</div>';
     }
+    // when clicking on prev and next buttons
+    scheduler.attachEvent('onViewChange', () => {
+      this.$emit('viewChanged');
+    })
+
+    // scheduler.templates.week_scale_date = date => scheduler.date.date_to_str('%l %j')(date);
 
     responsive.initResponsive(scheduler);
 
     // Scheduler initialization
-    scheduler.init(this.$refs.scheduler_here, new Date(), 'week');
+    const defaultView = this.customer ? 'customer_week' : 'week'
+    scheduler.init(this.$refs.scheduler_here, new Date(), defaultView);
     scheduler.templates.event_class = function (start, end, event) {
       if (event.type == 'alenvi') {
         return 'alenvi_event'
@@ -207,9 +230,9 @@ export default {
     //   if (!id) return true;
     //   return !scheduler.getEvent(id).readonly;
     // },
-    getData () {
-      this.$emit('getData');
-    },
+    // getData () {
+    //   this.$emit('getData');
+    // },
     handleScroll: debounce(function () {
       const headerToFix = document.getElementsByClassName('dhx_cal_header')[0];
       let currentScroll = window.pageYOffset;

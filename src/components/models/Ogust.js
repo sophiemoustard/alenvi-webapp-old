@@ -38,14 +38,13 @@ export default {
         break;
       case 'customer_week':
         period = 'date';
-        // minDate = scheduler.getState().min_date;
-        maxDate = moment(scheduler.getState().max_date).subtract(1, 'day');
-        console.log(minDate);
+        minDate = scheduler.getState().min_date;
+        maxDate = moment(scheduler.getState().max_date).subtract(1, 'day').toDate();
         break;
     }
     params.startDate = moment(minDate).startOf(period).format('YYYYMMDDHHmm');
     params.endDate = moment(maxDate).endOf(period).format('YYYYMMDDHHmm');
-    const servicesRaw = ogustToken ? await axios.get(`${process.env.API_HOSTNAME}/calendar/events`, { params }, { headers: { 'x-ogust-token': ogustToken } }) : await alenviAxios.get(`${process.env.API_HOSTNAME}/calendar/events`, { params });
+    const servicesRaw = ogustToken ? await axios.get(`${process.env.API_HOSTNAME}/calendar/events`, { params, headers: { 'x-ogust-token': ogustToken } }) : await alenviAxios.get(`${process.env.API_HOSTNAME}/calendar/events`, { params });
     const eventsRaw = servicesRaw.data.data.events;
     for (const events in eventsRaw) {
       let event = {
@@ -67,7 +66,6 @@ export default {
       }
       data.push(event);
     }
-    console.log(data);
     return data;
   },
   async getOgustPerson (ogustToken, idPerson, personType) {
