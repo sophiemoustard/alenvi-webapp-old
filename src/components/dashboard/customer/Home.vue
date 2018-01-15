@@ -13,9 +13,7 @@
 </template>
 
 <script>
-// import {  } from 'quasar';
 
-import users from '../../models/Users';
 import ogust from '../../models/Ogust';
 
 export default {
