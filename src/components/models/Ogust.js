@@ -12,13 +12,14 @@ export default {
     const ogustToken = res.data.data.token;
     return ogustToken;
   },
-  async getOgustEvents (ogustToken = null, apiPath, idPerson, personType) {
-    let employeeId = '';
-    let customerId = '';
+  async getOgustEvents (ogustToken = null, idPerson, personType) {
+    const params = {
+      isDate: true
+    };
     if (personType === 'employee') {
-      employeeId = idPerson;
+      params.id_employee = idPerson;
     } else {
-      customerId = idPerson;
+      params.id_customer = idPerson;
     }
     const data = [];
     let period;
@@ -42,9 +43,9 @@ export default {
         console.log(minDate);
         break;
     }
-    const startDate = moment(minDate).startOf(period).format('YYYYMMDD');
-    const endDate = moment(maxDate).endOf(period).format('YYYYMMDD');
-    const servicesRaw = ogustToken ? await axios.get(`${process.env.API_HOSTNAME}${apiPath}?id_customer=${customerId}&id_employee=${employeeId}&isDate=true&startDate=${startDate}0000&endDate=${endDate}2359`, { headers: { 'x-ogust-token': ogustToken } }) : await alenviAxios.get(`${process.env.API_HOSTNAME}${apiPath}?id_customer=${customerId}&isDate=true&startDate=${startDate}0000&endDate=${endDate}2359`);
+    params.startDate = moment(minDate).startOf(period).format('YYYYMMDDHHmm');
+    params.endDate = moment(maxDate).endOf(period).format('YYYYMMDDHHmm');
+    const servicesRaw = ogustToken ? await axios.get(`${process.env.API_HOSTNAME}/calendar/events`, { params }, { headers: { 'x-ogust-token': ogustToken } }) : await alenviAxios.get(`${process.env.API_HOSTNAME}/calendar/events`, { params });
     const eventsRaw = servicesRaw.data.data.events;
     for (const events in eventsRaw) {
       let event = {

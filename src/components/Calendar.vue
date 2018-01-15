@@ -61,7 +61,7 @@ export default {
           const ogustToken = await Ogust.getOgustToken(this.token);
           const personData = await Ogust.getOgustPerson(ogustToken, this.personId, personType);
           this.title = personData.title;
-          this.events = await Ogust.getOgustEvents(ogustToken, '/calendar/events', this.personId, personType);
+          this.events = await Ogust.getOgustEvents(ogustToken, this.personId, personType);
         }
       } catch (e) {
         console.error(e)
