@@ -59,7 +59,7 @@ export default {
     //   return Cookies.get('alenvi_token');
     // },
     getPlanningLink () {
-      return `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '' )}/calendar?id_employee=${this.selectedAuxiliary}&access_token=${Cookies.get('alenvi_token')}&self=true`;
+      return `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/calendar?id_employee=${this.selectedAuxiliary}&access_token=${Cookies.get('alenvi_token')}&self=true`;
     }
   },
   methods: {
