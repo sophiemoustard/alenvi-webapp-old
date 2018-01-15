@@ -48,8 +48,7 @@ export default {
   },
   async created () {
     try {
-      this.invoices = await ogust.getCustomerInvoices(276329398); // this.getUser.customer_id
-      console.log(this.invoices);
+      this.invoices = await ogust.getCustomerInvoices(this.getUser.customer_id); // 276329398
       for (let i = 0, l = Object.keys(this.invoices).length; i < l; i++) {
         this.invoices[i].start_of_period = moment(this.invoices[i].start_of_period, 'YYYYMMDD').format('DD/MM/YYYY');
         this.invoices[i].end_of_period = moment(this.invoices[i].end_of_period, 'YYYYMMDD').format('DD/MM/YYYY');

@@ -50,8 +50,7 @@ export default {
   },
   async created () {
     try {
-      this.fiscalAttests = await ogust.getCustomerFiscalAttests(276329398); // this.getUser.customer_id
-      console.log(this.fiscalAttests);
+      this.fiscalAttests = await ogust.getCustomerFiscalAttests(this.getUser.customer_id); // 276329398
       for (let i = 0, l = Object.keys(this.fiscalAttests).length; i < l; i++) {
         this.fiscalAttests[i].period_start = moment(this.fiscalAttests[i].period_start, 'YYYYMMDD').format('MM/YYYY');
       }
