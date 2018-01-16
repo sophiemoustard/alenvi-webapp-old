@@ -67,6 +67,8 @@ export default {
                       role: 'Client'
                     });
                     Toast.create(`Utilisateur ${customer[0].last_name} créé dans la base Alenvi`);
+                  } else {
+                    // const user = await users.update({ customer_id: customer[0].id_customer });
                   }
                   const sendEmail = await email.sendWelcome({
                     sender: {
