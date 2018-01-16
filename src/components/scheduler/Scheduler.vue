@@ -2,9 +2,9 @@
   <div ref="scheduler_here" class="dhx_cal_container" style='width:100%; height:100%;'>
     <q-window-resize-observable @resize="onResize" />
     <div class="dhx_cal_navline">
-      <div class="dhx_cal_prev_button">&nbsp;</div>
-      <div class="dhx_cal_next_button">&nbsp;</div>
-      <div class="dhx_cal_today_button"></div>
+      <div v-if="!customer" class="dhx_cal_prev_button"><q-btn round icon="keyboard arrow left" color="primary" big flat /></div>
+      <div v-if="!customer" class="dhx_cal_next_button"><q-btn icon="keyboard arrow right" color="primary" big flat /></div>
+      <div v-if="!customer" class="dhx_cal_today_button"></div>
       <div class="dhx_cal_date"></div>
       <div v-if="!customer" class="dhx_cal_tab" name="day_tab" style="right:204px;"></div>
       <div v-if="!customer" class="dhx_cal_tab" name="week_tab" style="right:140px;"></div>
@@ -24,7 +24,7 @@ import 'dhtmlx-scheduler/codebase/ext/dhtmlxscheduler_readonly.js';
 import 'dhtmlx-scheduler/codebase/ext/dhtmlxscheduler_container_autoresize.js';
 import responsive from './scripts/dhtmlxscheduler-responsive.js';
 
-import { debounce, QWindowResizeObservable } from 'quasar'
+import { debounce, QWindowResizeObservable, QBtn } from 'quasar'
 
 const configDhtmlxScheduler = (vm) => {
   // Event date format
@@ -139,7 +139,8 @@ const configDhtmlxScheduler = (vm) => {
 
 export default {
   components: {
-    QWindowResizeObservable
+    QWindowResizeObservable,
+    QBtn
   },
   name: 'scheduler',
   props: {
@@ -173,7 +174,7 @@ export default {
     scheduler.attachEvent('onTemplatesReady', () => {
       // custom view
       scheduler.date.customer_week_start = date => scheduler.date.date_part(new Date(date.valueOf()));
-      scheduler.templates.customer_week_date = scheduler.templates.week_date;
+      scheduler.templates.customer_week_date = (start, end) => `${scheduler.date.date_to_str('%j %F')(start)} &ndash; ${scheduler.date.date_to_str('%j %F')(scheduler.date.add(end,-1,"day"))}`;
       scheduler.templates.customer_week_scale_date = date => scheduler.date.date_to_str('%l %j')(date);
       scheduler.date.add_customer_week = (date, inc) => scheduler.date.add(date, inc * 7, 'day');
     });
@@ -258,25 +259,49 @@ export default {
 }
 </script>
 
-<style lang="css">
+<style lang="stylus">
+  @import '~variables'
   @import "~dhtmlx-scheduler/codebase/dhtmlxscheduler.css";
+  @import "~dhtmlx-scheduler/codebase/dhtmlxscheduler_flat.css";
   @import "../../assets/dhtmlxscheduler-responsive.css";
 
-  .dhx_scale_hour {
-    border-bottom: none;
-    overflow: visible;
-  }
+  .dhx_scale_hour
+    border-bottom: none
+    overflow: visible
 
-  .dhx_cal_data {
-    overflow-y: visible;
-    overflow-x: visible;
-    border-top: none;
+  .dhx_cal_data
+    overflow-y: visible
+    overflow-x: visible
+    border-top: none
     /*padding-top: 10px;*/
-  }
+  
+  .dhx_scale_bar
+    line-height: 15px
+  
+  .dhx_cal_navline.dhx_cal_date
+    color: $tertiary
 
-  .header-fixed {
-    position: fixed;
-    top: 0px !important;
-  }
+  .dhx_cal_tab
+    color: $tertiary
+  
+  .dhx_cal_tab.active
+    background-color: $light
+    color: $tertiary
+  
+  .dhx_cal_today_button
+    color: $tertiary
+  
+  .dhx_cal_prev_button
+    background-image: none
+  
+  .dhx_cal_next_button
+    background-image: none
+
+  .dhx_cancel_btn_set
+    background-color: $primary
+  
+  .header-fixed
+    position: fixed
+    top: 0px !important
 
 </style>
