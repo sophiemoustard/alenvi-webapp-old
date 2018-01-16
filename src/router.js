@@ -44,12 +44,10 @@ const router = new VueRouter({
       }
     },
     { path: '/bot/authenticate', component: load('bot/Authenticate') },
-    {
-      path: '/bot/authenticatePhone',
-      component: load('bot/AuthenticatePhone')
-    },
+    { path: '/bot/authenticatePhone', component: load('bot/AuthenticatePhone') },
     { path: '/bot/editCustomerInfo', component: load('bot/CustomerInfo') },
     { path: '/calendar', component: load('Calendar') },
+    { path: '/setPassword', component: load('dashboard/customer/SetPassword') },
     {
       path: '/dashboard',
       component: load('dashboard/layout/Layout'),
