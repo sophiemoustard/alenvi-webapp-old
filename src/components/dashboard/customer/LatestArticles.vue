@@ -88,7 +88,7 @@ export default {
     async getFeeds () {
       const feeds = await axios.get(`${process.env.API_HOSTNAME}/blog/rssFeeds`, {
         params: {
-          feed_url: 'http://blog.alenvi.io/rss/'
+          feed_url: 'http://blog.alenvi.io/tag/aidants-familiaux/rss/'
         }
       });
       const orderedFeeds = _.sortBy(feeds.data.data, ['pubDate']).reverse().slice(0,3);
