@@ -2,8 +2,8 @@
   <div ref="scheduler_here" class="dhx_cal_container" style='width:100%; height:100%;'>
     <q-window-resize-observable @resize="onResize" />
     <div class="dhx_cal_navline">
-      <div v-if="!customer" class="dhx_cal_prev_button"><q-btn round icon="keyboard arrow left" color="primary" big flat /></div>
-      <div v-if="!customer" class="dhx_cal_next_button"><q-btn icon="keyboard arrow right" color="primary" big flat /></div>
+      <div class="dhx_cal_prev_button relative-position" v-ripple>&nbsp;</div>
+      <div v-if="displayNext" class="dhx_cal_next_button relative-position" v-ripple>&nbsp;</div>
       <div v-if="!customer" class="dhx_cal_today_button"></div>
       <div class="dhx_cal_date"></div>
       <div v-if="!customer" class="dhx_cal_tab" name="day_tab" style="right:204px;"></div>
@@ -24,7 +24,7 @@ import 'dhtmlx-scheduler/codebase/ext/dhtmlxscheduler_readonly.js';
 import 'dhtmlx-scheduler/codebase/ext/dhtmlxscheduler_container_autoresize.js';
 import responsive from './scripts/dhtmlxscheduler-responsive.js';
 
-import { debounce, QWindowResizeObservable, QBtn } from 'quasar'
+import { debounce, QWindowResizeObservable, QBtn, Ripple } from 'quasar'
 
 const configDhtmlxScheduler = (vm) => {
   // Event date format
@@ -56,6 +56,8 @@ const configDhtmlxScheduler = (vm) => {
   scheduler.config.time_step = 15;
   // limit time in time picker dropdown in lightbox
   scheduler.config.limit_time_select = true;
+
+  scheduler.xy.scale_height = 45;
 
   let lightboxSections = [];
   if (vm.$route.query.id_employee && vm.$route.query.self === 'true') {
@@ -142,6 +144,9 @@ export default {
     QWindowResizeObservable,
     QBtn
   },
+  directives: {
+    Ripple
+  },
   name: 'scheduler',
   props: {
     events: {
@@ -165,7 +170,9 @@ export default {
   data () {
     return {
       width: '',
-      height: ''
+      height: '',
+      today: new Date,
+      displayNext: true
     }
   },
   mounted () {
@@ -173,10 +180,13 @@ export default {
 
     scheduler.attachEvent('onTemplatesReady', () => {
       // custom view
-      scheduler.date.customer_week_start = date => scheduler.date.date_part(new Date(date.valueOf()));
-      scheduler.templates.customer_week_date = (start, end) => `${scheduler.date.date_to_str('%j %F')(start)} &ndash; ${scheduler.date.date_to_str('%j %F')(scheduler.date.add(end,-1,"day"))}`;
-      scheduler.templates.customer_week_scale_date = date => scheduler.date.date_to_str('%l %j')(date);
+      // scheduler.date.customer_week_start = date => scheduler.date.date_part(new Date(date.valueOf()));
+      scheduler.date.customer_week_start = date => scheduler.date.week_start(date);
+      // scheduler.templates.customer_week_date = (start, end) => `${scheduler.date.date_to_str('%j %F')(start)} &ndash; ${scheduler.date.date_to_str('%j %F')(scheduler.date.add(end,-1,"day"))}`;
+      scheduler.templates.customer_week_date = scheduler.templates.week_date;
+      scheduler.templates.customer_week_scale_date = date => `<div>${scheduler.date.date_to_str('%D')(date)}.</div><big>${scheduler.date.date_to_str('%j')(date)}</big>`;
       scheduler.date.add_customer_week = (date, inc) => scheduler.date.add(date, inc * 7, 'day');
+      // scheduler.date.add_customer_week = scheduler.date.add_week;
     });
     // standard views
     scheduler.templates.day_scale_date = date => scheduler.date.date_to_str('%l %j')(date);
@@ -185,10 +195,20 @@ export default {
       const format = scheduler.date.date_to_str('%H:%i');
       return "<div style='height:44px;line-height:0px'>" + format(date) + '</div>';
     }
+    scheduler.attachEvent('onBeforeViewChange', (oldMode, oldDate, mode, date) => {
+      const todayAddOneWeek = moment(this.today).startOf('week').add(1, 'week');
+      this.displayNext = true;
+      if (this.customer && moment(date).isAfter(todayAddOneWeek)) {
+        console.log('PEH');
+        this.displayNext = false;
+        return false;
+      }
+      return true;
+    });
     // when clicking on prev and next buttons
     scheduler.attachEvent('onViewChange', () => {
       this.$emit('viewChanged');
-    })
+    });
 
     // scheduler.templates.week_scale_date = date => scheduler.date.date_to_str('%l %j')(date);
 
@@ -196,7 +216,7 @@ export default {
 
     // Scheduler initialization
     const defaultView = this.customer ? 'customer_week' : 'week'
-    scheduler.init(this.$refs.scheduler_here, new Date(), defaultView);
+    scheduler.init(this.$refs.scheduler_here, this.today, defaultView);
     scheduler.templates.event_class = function (start, end, event) {
       if (event.type == 'alenvi') {
         return 'alenvi_event'
@@ -206,7 +226,10 @@ export default {
     scheduler.parse(this.$props.events, 'json');
     // Prevent draggable events
     // scheduler.attachEvent('onEventDrag', this.blockReadOnly);
-    scheduler.attachEvent('onClick', function (id, e) {
+    scheduler.attachEvent('onClick', (id, e) => {
+      if (this.customer) {
+        return true;
+      }
       scheduler.showLightbox(id);
     });
     scheduler.attachEvent('onEventChanged', (id, e) => {
@@ -274,9 +297,19 @@ export default {
     overflow-x: visible
     border-top: none
     /*padding-top: 10px;*/
+
+  .dhx_cal_header div div
+    border: none
   
   .dhx_scale_bar
-    line-height: 15px
+    line-height: 20px
+    // position: fixed
+  
+  .dhx_scale_holder
+    background-image: url("../../assets/databg_custom.png")
+
+  .dhx_scale_holder_now
+    background-image: url("../../assets/databg_now_custom.png")
   
   .dhx_cal_navline.dhx_cal_date
     color: $tertiary
@@ -292,16 +325,36 @@ export default {
     color: $tertiary
   
   .dhx_cal_prev_button
-    background-image: none
+    color: $primary
   
-  .dhx_cal_next_button
-    background-image: none
+  .dhx_cal_event .dhx_footer
+    background: none
+    &:hover
+      background: none
+  
+  .dhx_cal_event:hover .dhx_footer
+    background: none
+  
+  // .dhx_cal_next_button
+  //   background-image: none
 
   .dhx_cancel_btn_set
     background-color: $primary
   
-  .header-fixed
-    position: fixed
-    top: 0px !important
+  // .header-fixed
+    // position: fixed
+    // top: 0px !important
+  
+  .alenvi_event div 
+        background-color: $primary !important;
+        color: white !important;
+
+    .dhx_cal_event_line.alenvi_event 
+        background-color: $primary !important;
+        color: white !important;
+
+    .dhx_cal_event_clear.alenvi_event 
+        background-color: $primary !important;
+        color: white !important;
 
 </style>

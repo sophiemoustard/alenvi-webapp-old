@@ -32,7 +32,7 @@ export default {
     }
   },
   mounted () {
-    this.getEventsData();
+    // this.getEventsData();
   },
   watch: {
     events: function (value) {
@@ -106,7 +106,11 @@ export default {
         await Ogust.editOgustCustomerDetails(ogustToken, event.id_customer, customerDetailsPayload);
         Toast.create('Ta demande a bien été enregistrée');
       } catch (e) {
-        Toast.create("Erreur lors de la modification de l'intervention :/ Si le problème persiste, contacte l'équipe technique :)");
+        if (e.response && e.response.status === 404) {
+          Toast.create('Aucune intervention dans la période demandée');
+        } else {
+          Toast.create("Erreur de chargement des données :/ Si le problème persiste, contacte l'équipe technique :)")
+        }
         console.error(e);
       }
     }

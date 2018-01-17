@@ -25,7 +25,7 @@ export default {
     }
   },
   mounted () {
-    this.getEventsData();
+    // this.getEventsData();
   },
   watch: {
     events: function (value) {
@@ -55,19 +55,6 @@ export default {
 }
 </script>
 
-<style>
-  .alenvi_event div {
-        background-color: #E2007A !important;
-        color: white !important;
-    }
-
-    .dhx_cal_event_line.alenvi_event {
-        background-color: #E2007A !important;
-        color: white !important;
-    }
-
-    .dhx_cal_event_clear.alenvi_event {
-        background-color: #E2007A !important;
-        color: white !important;
-    }
+<style lang="css" scoped>
+  
 </style>
