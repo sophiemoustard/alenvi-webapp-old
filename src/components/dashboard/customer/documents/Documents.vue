@@ -1,46 +1,26 @@
 <template>
   <div class="layout-padding">
-    <q-field style="max-width: 75px">
-      <q-select v-model="year" float-label="Année" :options="years" @change="getInvoicesAndFiscalAttests"></q-select>
+    <q-field label="Année" icon="ion-calendar" style="max-width: 175px">
+      <q-select v-model="year" :options="years" @change="getInvoicesAndFiscalAttests"></q-select>
     </q-field>
-    <!-- <hr> -->
-      <!-- <div style="width: 700px; max-width: 90vw;"> -->
-        <q-data-table v-if="Object.keys(fiscalAttests).length !== 0" class="cursor-pointer" :data="fiscalAttests" :config="configFiscalAttests" :columns="columnsFiscalAttests">
-          <template slot="col-print_url" slot-scope="cell">
-            <q-btn flat round small color="primary">
-              <a :href="cell.data" download>
-                <q-icon name="file download" />
-              </a>
-            </q-btn>
-            <!-- <q-icon class="cursor-pointer" name="delete" @click="remove(cell.data.id, cell.row.__index, cell.data.userId)" size="1.5rem" /> -->
-          </template>
-        </q-data-table>
-        <!-- <hr> -->
-        <!-- <p v-if="Object.keys(invoices).length === 0">Aucune facture disponible</p> -->
-        <!-- <q-card v-if="invoices" inline v-for="(invoice, index) in invoices" :key="index" style="cursor: pointer">
-          <q-card-title class="text-center">
-            {{invoice.start_of_period}} au {{ invoice.end_of_period }}
-          </q-card-title>
-          <q-card-actions align="around">
-            <q-btn flat round small color="primary">
-              <a :href="invoice.print_url" download>
-                <q-icon name="file download" />
-              </a>
-            </q-btn>
-          </q-card-actions>
-        </q-card> -->
-        <q-data-table class="cursor-pointer" :data="invoices" :config="configInvoices" :columns="columnsInvoices">
-          <template slot="col-print_url" slot-scope="cell">
-            <q-btn flat round small color="primary">
-              <a :href="cell.data" download>
-                <q-icon name="file download" />
-              </a>
-            </q-btn>
-            <!-- <q-icon class="cursor-pointer" name="delete" @click="remove(cell.data.id, cell.row.__index, cell.data.userId)" size="1.5rem" /> -->
-          </template>
-        </q-data-table>
-
-      <!-- </div> -->
+    <q-data-table v-if="Object.keys(fiscalAttests).length !== 0" class="cursor-pointer" :data="fiscalAttests" :config="configFiscalAttests" :columns="columnsFiscalAttests">
+      <template slot="col-print_url" slot-scope="cell">
+        <q-btn flat round small color="primary">
+          <a :href="cell.data" download>
+            <q-icon name="file download" />
+          </a>
+        </q-btn>
+      </template>
+    </q-data-table>
+    <q-data-table class="cursor-pointer" :data="invoices" :config="configInvoices" :columns="columnsInvoices">
+      <template slot="col-print_url" slot-scope="cell">
+        <q-btn flat round small color="primary">
+          <a :href="cell.data" download>
+            <q-icon name="file download" />
+          </a>
+        </q-btn>
+      </template>
+    </q-data-table>
   </div>
 </template>
 
@@ -82,7 +62,7 @@ export default {
           options: [10, 20, 30]
         },
         messages: {
-          noData: 'Pas de facture disponible.'
+          noData: 'Pas de facture disponible'
         },
         labels: {
           allCols: 'Colonnes (toutes)',
