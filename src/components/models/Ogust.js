@@ -24,8 +24,7 @@ export default {
     const data = [];
     let period;
     const mode = scheduler.getState().mode;
-    let minDate = scheduler.getState().date;
-    let maxDate = scheduler.getState().date;
+    const date = scheduler.getState().date;
     switch (mode) {
       case 'month':
         period = 'month';
@@ -37,13 +36,11 @@ export default {
         period = 'day';
         break;
       case 'customer_week':
-        period = 'date';
-        minDate = scheduler.getState().min_date;
-        maxDate = moment(scheduler.getState().max_date).subtract(1, 'day').toDate();
+        period = 'week';
         break;
     }
-    params.startDate = moment(minDate).startOf(period).format('YYYYMMDDHHmm');
-    params.endDate = moment(maxDate).endOf(period).format('YYYYMMDDHHmm');
+    params.startDate = moment(date).startOf(period).format('YYYYMMDDHHmm');
+    params.endDate = moment(date).endOf(period).format('YYYYMMDDHHmm');
     const servicesRaw = ogustToken ? await axios.get(`${process.env.API_HOSTNAME}/calendar/events`, { params, headers: { 'x-ogust-token': ogustToken } }) : await alenviAxios.get(`${process.env.API_HOSTNAME}/calendar/events`, { params });
     const eventsRaw = servicesRaw.data.data.events;
     for (const events in eventsRaw) {
@@ -51,7 +48,7 @@ export default {
         id: eventsRaw[events].id_service,
         start_date: moment(eventsRaw[events].start_date, 'YYYYMMDDHHmm').format('YYYY-MM-DD HH:mm'),
         end_date: moment(eventsRaw[events].end_date, 'YYYYMMDDHHmm').format('YYYY-MM-DD HH:mm'),
-        type: 'alenvi'
+        type: moment(eventsRaw[events].end_date, 'YYYYMMDDHHmm').isBefore(moment()) ? 'alenvi_past' : 'alenvi'
       };
       if (personType === 'employee') {
         event.text = (eventsRaw[events].customer.id_customer === '286871430' || eventsRaw[events].customer.id_customer === '271395715' || eventsRaw[events].customer.id_customer === '244566438') ? eventsRaw[events].customer.lastname : `${eventsRaw[events].customer.title} ${eventsRaw[events].customer.lastname}`;
