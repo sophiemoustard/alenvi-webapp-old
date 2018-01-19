@@ -20,35 +20,30 @@ import {
   QTab,
   QTabPane } from 'quasar'
 
-import Invoices from './Invoices.vue'
-import TaxCertificate from './TaxCertificate.vue';
-
 export default {
   components: {
     QTabs,
     QTab,
-    QTabPane,
-    Invoices,
-    TaxCertificate
+    QTabPane
   },
   data () {
     return {
-      tabInfo: [
-        {
-          label: 'Factures',
-          name: 'invoices',
-          icon: 'euro symbol',
-          default: true,
-          component: 'Invoices'
-        },
-        {
-          label: 'Attestations fiscales',
-          name: 'envoi',
-          icon: 'check',
-          default: false,
-          component: 'TaxCertificate'
-        }
-      ]
+      // tabInfo: [
+      //   {
+      //     label: 'Factures',
+      //     name: 'invoices',
+      //     icon: 'euro symbol',
+      //     default: true,
+      //     component: 'Invoices'
+      //   },
+      //   {
+      //     label: 'Attestations fiscales',
+      //     name: 'envoi',
+      //     icon: 'check',
+      //     default: false,
+      //     component: 'TaxCertificate'
+      //   }
+      // ]
     }
   }
 }

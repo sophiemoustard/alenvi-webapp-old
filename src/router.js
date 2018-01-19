@@ -119,7 +119,8 @@ const router = new VueRouter({
         {
           path: 'customer/documents',
           name: 'customer documents',
-          component: load('dashboard/customer/documents/NavTabs'),
+          // component: load('dashboard/customer/documents/NavTabs'),
+          component: load('dashboard/customer/documents/Documents'),
           meta: {
             cookies: ['alenvi_token', 'refresh_token']
           }
