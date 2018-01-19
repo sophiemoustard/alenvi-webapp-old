@@ -1,9 +1,9 @@
 <template>
   <div class="layout-padding">
     <q-field label="Année" icon="ion-calendar" style="max-width: 175px">
-      <q-select v-model="year" :options="years" @change="getInvoicesAndFiscalAttests"></q-select>
+      <q-select v-model="year" :options="years" @change="getInvoicesAndFiscalAttests"></q-select> <!-- :disable="invoices.length == 0" -->
     </q-field>
-    <q-data-table v-if="Object.keys(fiscalAttests).length !== 0" class="cursor-pointer" :data="fiscalAttests" :config="configFiscalAttests" :columns="columnsFiscalAttests">
+    <q-data-table v-if="fiscalAttests.length !== 0" class="cursor-pointer" :data="fiscalAttests" :config="configFiscalAttests" :columns="columnsFiscalAttests">
       <template slot="col-print_url" slot-scope="cell">
         <q-btn flat round small color="primary">
           <a :href="cell.data" download>
@@ -48,8 +48,8 @@ export default {
     return {
       years: [],
       year: moment().year().toString(),
-      invoices: {},
-      fiscalAttests: {},
+      invoices: [],
+      fiscalAttests: [],
       configInvoices: {
         title: 'Mes factures',
         noHeader: false,
@@ -168,7 +168,7 @@ export default {
   methods: {
     async getInvoices() {
       try {
-        this.invoices = [];
+        // this.invoices = [];
         this.invoices = await ogust.getCustomerInvoices(276329398, { year: this.year }); // this.getUser.customer_id
         for (let i = 0, l = Object.keys(this.invoices).length; i < l; i++) {
           this.invoices[i].invoice_date = moment(this.invoices[i].invoice_date, 'YYYYMMDD').toDate(); // .format('DD/MM/YYYY')
