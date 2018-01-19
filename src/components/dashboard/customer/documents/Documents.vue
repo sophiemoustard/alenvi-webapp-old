@@ -1,8 +1,12 @@
 <template>
   <div class="layout-padding">
-    <q-field label="Année" icon="ion-calendar" style="max-width: 175px">
+    <div class="row">
+      Période
+      <!-- <q-field class="on-left" label="Période" icon="ion-calendar" style="max-width: 175px"> -->
       <q-select v-model="year" :options="years" @change="getInvoicesAndFiscalAttests"></q-select> <!-- :disable="invoices.length == 0" -->
-    </q-field>
+      <!-- </q-field> -->
+      <q-select v-model="year" :options="years" @change="getInvoicesAndFiscalAttests"></q-select> <!-- :disable="invoices.length == 0" -->
+    </div>
     <q-data-table v-if="fiscalAttests.length !== 0" class="cursor-pointer" :data="fiscalAttests" :config="configFiscalAttests" :columns="columnsFiscalAttests">
       <template slot="col-print_url" slot-scope="cell">
         <q-btn flat round small color="primary">
