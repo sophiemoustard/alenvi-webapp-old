@@ -1,20 +1,70 @@
 <template lang="html">
-  <div ref="scheduler_here" class="dhx_cal_container" style='width:100%; height:100%;'>
-    <q-window-resize-observable @resize="onResize" />
-    <div class="dhx_cal_navline">
-      <div class="dhx_cal_prev_button relative-position" v-ripple>&nbsp;</div>
-      <div v-show="displayNext" class="dhx_cal_next_button relative-position" v-ripple>&nbsp;</div>
-      <div v-if="!customer" class="dhx_cal_today_button relative-position" v-ripple></div>
-      <div class="dhx_cal_date"></div>
-      <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="day_tab" style="right:204px;"></div>
-      <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="week_tab" style="right:140px;"></div>
-      <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="month_tab" style="right:76px;"></div>
-      <div v-show="showTab" class="dhx_cal_tab relative-position" v-ripple name="customer_week_tab" style="right:140px;"></div>
+  <div>
+    <div ref="scheduler_here" class="dhx_cal_container" style='width:100%; height:100%;'>
+      <q-window-resize-observable @resize="onResize" />
+      <div class="dhx_cal_navline">
+        <div class="dhx_cal_prev_button relative-position" v-ripple>&nbsp;</div>
+        <div v-show="displayNext" class="dhx_cal_next_button relative-position" v-ripple>&nbsp;</div>
+        <div v-if="!customer" class="dhx_cal_today_button relative-position" v-ripple></div>
+        <div class="dhx_cal_date"></div>
+        <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="day_tab" style="right:204px;"></div>
+        <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="week_tab" style="right:140px;"></div>
+        <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="month_tab" style="right:76px;"></div>
+        <div v-show="showTab" class="dhx_cal_tab relative-position" v-ripple name="customer_week_tab" style="right:140px;"></div>
+      </div>
+      <div class="dhx_cal_header"></div>
+      <div class="dhx_cal_data"></div>
+      <q-modal ref="custom_lightbox" minimized @close="!disable" :content-css="modalStyle">
+        <!-- <div class="row justify-center">
+      <q-field class="col-xs-12 col-sm-6">
+        <q-input
+        v-model="customerCodes.interCode"
+        float-label="Code interphone"
+        type="textarea"
+        :min-rows="1"
+        :disable="disable">
+        </q-input>
+      </q-field>
+    </div> -->
+        <p class="caption">{{ customerInfo.eventTitle }}</p>
+        <q-field>
+          <q-input v-model="customerInfo.doorCode" float-label="Code Porte" type="textarea" :min-rows="1" :disable="disable">
+          </q-input>
+        </q-field>
+        <q-field>
+          <q-input v-model="customerInfo.interCode" float-label="Code interphone" type="textarea" :min-rows="1" :disable="disable">
+          </q-input>
+        </q-field>
+        <q-field>
+          <q-select v-model="customerInfo.pathology" float-label="Pathologie" :options="selectOptions" :disable="disable"></q-select>
+        </q-field>
+        <q-field>
+          <q-input v-model="customerInfo.comments" float-label="Commentaires" type="textarea" :min-rows="4" :disable="disable">
+          </q-input>
+        </q-field>
+        <q-field>
+          <q-input v-model="customerInfo.interventionDetails" float-label="Détails intervention" type="textarea" :min-rows="4" :disable="disable">
+          </q-input>
+        </q-field>
+        <q-field>
+          <q-input v-model="customerInfo.misc" float-label="Autres" type="textarea" :min-rows="4" :disable="disable">
+          </q-input>
+        </q-field>
+        <div class="row justify-end">
+          <q-btn v-if="$route.query.id_employee && $route.query.self == false" class="on-left" color="primary" :disable="disable">
+            Enregistrer
+          </q-btn>
+          <q-btn color="tertiary" @click="$refs.custom_lightbox.close()">
+            Fermer
+          </q-btn>
+        </div>
+      </q-modal>
     </div>
-    <div class="dhx_cal_header"></div>
-    <div class="dhx_cal_data"></div>
   </div>
 </template>
+
+
+
 
 <script>
 import moment from 'moment';
@@ -24,7 +74,7 @@ import 'dhtmlx-scheduler/codebase/ext/dhtmlxscheduler_readonly.js';
 import 'dhtmlx-scheduler/codebase/ext/dhtmlxscheduler_container_autoresize.js';
 import responsive from './scripts/dhtmlxscheduler-responsive.js';
 
-import { debounce, QWindowResizeObservable, QBtn, Ripple } from 'quasar'
+import { debounce, QWindowResizeObservable, QBtn, QModal, QInput, QField, QSelect, Ripple } from 'quasar'
 
 const configDhtmlxScheduler = (vm) => {
   // Event date format
@@ -59,90 +109,94 @@ const configDhtmlxScheduler = (vm) => {
 
   scheduler.xy.scale_height = 45;
 
-  let lightboxSections = [];
-  if (vm.$route.query.id_employee && vm.$route.query.self === 'true') {
-    scheduler.config.readonly_form = false;
-    const pathologyOpts = [
-      { key: '-', label: '-' },
-      { key: 'Alzheimer', label: 'Alzheimer' },
-      { key: 'Parkinson', label: 'Parkinson' },
-      { key: 'Corps de Lewy', label: 'Corps de Lewy' },
-      { key: 'Autres troubles cognitifs', label: 'Autres troubles cognitifs' },
-      { key: 'AVC récent', label: 'AVC récent' },
-      { key: 'Autre', label: 'Autre' }
-    ];
-    lightboxSections = [
-      {
-        name: 'Pathologie',
-        height: 20,
-        map_to: 'pathology',
-        type: 'select',
-        options: pathologyOpts
-      },
-      {
-        name: 'Details',
-        height: 200,
-        map_to: 'interventionDetail',
-        type: 'textarea'
-      },
-      {
-        name: 'Autres',
-        height: 100,
-        map_to: 'misc',
-        type: 'textarea'
-      },
-      {
-        name: 'Commentaires',
-        height: 75,
-        map_to: 'comments',
-        type: 'textarea'
-      },
-      {
-        name: 'Horaires',
-        height: 75,
-        map_to: 'auto',
-        type: 'time'
-      }
-    ];
-  } else if (vm.$route.query.id_employee && vm.$route.query.self === 'false') {
-    scheduler.config.readonly_form = true;
-    lightboxSections = [
-      {
-        name: 'Pathologie',
-        height: 20,
-        map_to: 'pathology',
-        type: 'textarea'
-      },
-      {
-        name: 'Details',
-        height: 200,
-        map_to: 'interventionDetail',
-        type: 'textarea'
-      },
-      {
-        name: 'Autres',
-        height: 100,
-        map_to: 'misc',
-        type: 'textarea'
-      },
-      {
-        name: 'Commentaires',
-        height: 200,
-        map_to: 'comments',
-        type: 'textarea'
-      }
-    ];
-  } else {
-    scheduler.config.readonly_form = true;
-    lightboxSections = [];
-  }
-  scheduler.config.lightbox.sections = lightboxSections;
+  // let lightboxSections = [];
+  // if (vm.$route.query.id_employee && vm.$route.query.self === 'true') {
+  //   scheduler.config.readonly_form = false;
+  //   const pathologyOpts = [
+  //     { key: '-', label: '-' },
+  //     { key: 'Alzheimer', label: 'Alzheimer' },
+  //     { key: 'Parkinson', label: 'Parkinson' },
+  //     { key: 'Corps de Lewy', label: 'Corps de Lewy' },
+  //     { key: 'Autres troubles cognitifs', label: 'Autres troubles cognitifs' },
+  //     { key: 'AVC récent', label: 'AVC récent' },
+  //     { key: 'Autre', label: 'Autre' }
+  //   ];
+  //   lightboxSections = [
+  //     {
+  //       name: 'Pathologie',
+  //       height: 20,
+  //       map_to: 'pathology',
+  //       type: 'select',
+  //       options: pathologyOpts
+  //     },
+  //     {
+  //       name: 'Details',
+  //       height: 200,
+  //       map_to: 'interventionDetail',
+  //       type: 'textarea'
+  //     },
+  //     {
+  //       name: 'Autres',
+  //       height: 100,
+  //       map_to: 'misc',
+  //       type: 'textarea'
+  //     },
+  //     {
+  //       name: 'Commentaires',
+  //       height: 75,
+  //       map_to: 'comments',
+  //       type: 'textarea'
+  //     },
+  //     {
+  //       name: 'Horaires',
+  //       height: 75,
+  //       map_to: 'auto',
+  //       type: 'time'
+  //     }
+  //   ];
+  // } else if (vm.$route.query.id_employee && vm.$route.query.self === 'false') {
+  //   scheduler.config.readonly_form = true;
+  //   lightboxSections = [
+  //     {
+  //       name: 'Pathologie',
+  //       height: 20,
+  //       map_to: 'pathology',
+  //       type: 'textarea'
+  //     },
+  //     {
+  //       name: 'Details',
+  //       height: 200,
+  //       map_to: 'interventionDetail',
+  //       type: 'textarea'
+  //     },
+  //     {
+  //       name: 'Autres',
+  //       height: 100,
+  //       map_to: 'misc',
+  //       type: 'textarea'
+  //     },
+  //     {
+  //       name: 'Commentaires',
+  //       height: 200,
+  //       map_to: 'comments',
+  //       type: 'textarea'
+  //     }
+  //   ];
+  // } else {
+  //   scheduler.config.readonly_form = true;
+  //   lightboxSections = [];
+  // }
+  // scheduler.config.lightbox.sections = lightboxSections;
 }
 
 export default {
   components: {
     QWindowResizeObservable,
-    QBtn
+    QBtn,
+    QModal,
+    QInput,
+    QField,
+    QSelect
   },
   directives: {
     Ripple
@@ -172,7 +226,65 @@ export default {
       width: '',
       height: '',
       today: new Date(),
-      displayNext: true
+      displayNext: true,
+      disable: true,
+      customerCodes: {
+        doorCode: '',
+        interCode: ''
+      },
+      customerInfo: {
+        eventTitle: '',
+        pathology: '',
+        comments: '',
+        interventionDetails: '',
+        misc: '',
+        doorCode: '',
+        interCode: ''
+      },
+      selectOptions: [
+        {
+          label: '-',
+          value: '-'
+        },
+        {
+          label: 'Alzheimer',
+          value: 'Alzheimer'
+        },
+        {
+          label: 'Parkinson',
+          value: 'Parkinson'
+        },
+        {
+          label: 'Corps de Lewy',
+          value: 'Corps de Lewy'
+        },
+        {
+          label: 'Autres troubles cognitifs',
+          value: 'Autres troubles cognitifs'
+        },
+        {
+          label: 'AVC récent',
+          value: 'AVC récent'
+        },
+        {
+          label: 'Autre',
+          value: 'Autre'
+        }
+      ]
+    }
+  },
+  computed: {
+    modalStyle () {
+      const style = {
+        padding: '20px',
+        minWidth: '70vw',
+        minHeight: '80vh'
+      };
+      if (this.$q.platform.is.mobile) {
+        style.minWidth = '100vw';
+        return style;
+      }
+      return style;
     }
   },
   mounted () {
@@ -212,7 +324,6 @@ export default {
       }
     });
 
-
     // when clicking on prev and next buttons
     scheduler.attachEvent('onViewChange', (newMode, newDate) => {
       this.$emit('viewChanged');
@@ -225,8 +336,6 @@ export default {
       return true;
     });
 
-    // scheduler.templates.week_scale_date = date => scheduler.date.date_to_str('%l %j')(date);
-
     responsive.initResponsive(scheduler);
 
     // Scheduler initialization
@@ -237,15 +346,29 @@ export default {
     scheduler.parse(this.$props.events, 'json');
     // Prevent draggable events
     // scheduler.attachEvent('onEventDrag', this.blockReadOnly);
+    scheduler.showLightbox = (id) => {
+      const ev = scheduler.getEvent(id);
+      this.customerInfo.doorCode = ev.door_code;
+      this.customerInfo.interCode = ev.intercom_code;
+      this.customerInfo.pathology = ev.pathology;
+      this.customerInfo.comments = ev.comments;
+      this.customerInfo.interventionDetail = ev.interventionDetail;
+      this.customerInfo.misc = ev.misc;
+      this.customerInfo.eventTitle = `${ev.text} ${moment(ev.start_date, 'YYYY-MM-DD HH:mm').format('HH:mm')} - ${moment(ev.end_date, 'YYYY-MM-DD HH:mm').format('HH:mm')}`
+      if (this.$route.query.id_employee && this.$route.query.self === 'true') {
+        this.disable = false;
+      }
+      this.$refs.custom_lightbox.open();
+    };
     scheduler.attachEvent('onClick', (id, e) => {
       if (this.customer) {
         return true;
       }
       scheduler.showLightbox(id);
     });
-    scheduler.attachEvent('onEventChanged', (id, e) => {
-      this.$emit('eventUpdated', e);
-    });
+    // scheduler.attachEvent('onEventChanged', (id, e) => {
+    //   this.$emit('eventUpdated', e);
+    // });
     // Remove date picker from lightbox, just keeping hour picker
     if (this.$route.query.id_employee && this.$route.query.self === 'true') {
       scheduler.attachEvent('onBeforeLightBox', () => {
@@ -261,13 +384,6 @@ export default {
     }
   },
   methods: {
-    // blockReadOnly(id) {
-    //   if (!id) return true;
-    //   return !scheduler.getEvent(id).readonly;
-    // },
-    // getData () {
-    //   this.$emit('getData');
-    // },
     handleScroll: debounce(function () {
       const headerToFix = document.getElementsByClassName('dhx_cal_header')[0];
       let currentScroll = window.pageYOffset;
@@ -282,6 +398,9 @@ export default {
     onResize (size) {
       this.width = size.width;
       this.height = size.height;
+    },
+    updateEvent () {
+      this.$emit('eventUpdated', this.customerInfo);
     }
   },
   created () {

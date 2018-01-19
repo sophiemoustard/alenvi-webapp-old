@@ -53,6 +53,8 @@ export default {
       if (personType === 'employee') {
         event.text = (eventsRaw[events].customer.id_customer === '286871430' || eventsRaw[events].customer.id_customer === '271395715' || eventsRaw[events].customer.id_customer === '244566438') ? eventsRaw[events].customer.lastname : `${eventsRaw[events].customer.title} ${eventsRaw[events].customer.lastname}`;
         event.id_customer = eventsRaw[events].customer.id_customer;
+        event.door_code = eventsRaw[events].customer.door_code;
+        event.intercom_code = eventsRaw[events].customer.intercom_code;
         event.pathology = eventsRaw[events].customer.pathology;
         event.comments = eventsRaw[events].customer.comments;
         event.interventionDetail = eventsRaw[events].customer.interventionDetail;
