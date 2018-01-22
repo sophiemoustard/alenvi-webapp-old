@@ -1,11 +1,12 @@
 <template>
   <div class="layout-padding">
     <div class="row">
-      Période
+      <!-- Période -->
       <!-- <q-field class="on-left" label="Période" icon="ion-calendar" style="max-width: 175px"> -->
-      <q-select v-model="year" :options="years" @change="getInvoicesAndFiscalAttests"></q-select> <!-- :disable="invoices.length == 0" -->
+      <q-select v-model="year" :options="years"></q-select>&nbsp;
       <!-- </q-field> -->
-      <q-select v-model="year" :options="years" @change="getInvoicesAndFiscalAttests"></q-select> <!-- :disable="invoices.length == 0" -->
+      <q-select v-model="month" :options="months"></q-select> <!-- :disable="invoices.length == 0" -->
+      <q-btn flat @click="getInvoicesAndFiscalAttests">Filtrer</q-btn>
     </div>
     <q-data-table v-if="fiscalAttests.length !== 0" class="cursor-pointer" :data="fiscalAttests" :config="configFiscalAttests" :columns="columnsFiscalAttests">
       <template slot="col-print_url" slot-scope="cell">
@@ -33,6 +34,7 @@
 import ogust from '../../../models/Ogust';
 
 import moment from 'moment';
+moment.locale('fr')
 import _ from 'lodash';
 
 import { QCard, QCardTitle, QCardActions, QBtn, QIcon, QDataTable, QSelect, QField } from 'quasar';
@@ -51,7 +53,9 @@ export default {
   data () {
     return {
       years: [],
+      months: [],
       year: moment().year().toString(),
+      month: "",
       invoices: [],
       fiscalAttests: [],
       configInvoices: {
@@ -160,10 +164,20 @@ export default {
     }
   },
   created () {
+    this.month = moment().month(moment().month()).format('MMMM');
+    console.log(this.month);
     for (let year = moment().year(); year >= 2016; year--) {
+      const currentYear = year.toString();
       this.years.push({
-        label: year.toString(),
-        value: year.toString()
+        label: currentYear,
+        value: currentYear
+      })
+    }
+    for (let i = 12; i > 0; i--) {
+      const currentMonth = moment().month(i).format('MMMM');
+      this.months.push({
+        label: currentMonth,
+        value: currentMonth
       })
     }
     this.getInvoices();
@@ -172,8 +186,8 @@ export default {
   methods: {
     async getInvoices() {
       try {
-        // this.invoices = [];
-        this.invoices = await ogust.getCustomerInvoices(276329398, { year: this.year }); // this.getUser.customer_id
+        this.invoices = [];
+        this.invoices = await ogust.getCustomerInvoices(276329398, { year: this.year, month: moment().month(this.month).format('MM') }); // this.getUser.customer_id
         for (let i = 0, l = Object.keys(this.invoices).length; i < l; i++) {
           this.invoices[i].invoice_date = moment(this.invoices[i].invoice_date, 'YYYYMMDD').toDate(); // .format('DD/MM/YYYY')
           // this.invoices[i].start_of_period = moment(this.invoices[i].start_of_period, 'YYYYMMDD').toDate(); // .format('DD/MM/YYYY')
