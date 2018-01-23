@@ -399,6 +399,8 @@ export default {
       }
       scheduler.showLightbox(id);
     });
+    // prevent opening event when double clicking
+    scheduler.attachEvent('onDblClick', () => false);
     // scheduler.attachEvent('onEventChanged', (id, e) => {
     //   this.$emit('eventUpdated', e);
     // });
