@@ -70,7 +70,7 @@ export default {
         Cookies.set('alenvi_token_expires_in', user.data.data.expiresIn, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV != 'development' });
         Cookies.set('refresh_token', user.data.data.refreshToken, { path: '/', expires: 365, secure: process.env.NODE_ENV != 'development' });
         Cookies.set('user_id', user.data.data.user._id, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV != 'development' });
-        await this.$store.dispatch('getUser');
+        await this.$store.dispatch('getUser', Cookies.get('user_id'));
         if (this.getUser.role.name == 'Client') {
           return this.$router.replace({ path: '/dashboard/customer/home' });
         }

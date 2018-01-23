@@ -58,9 +58,9 @@ export default {
   //       console.error(e);
   //     }
   // },
-  // async mounted () {
-  //   await this.$store.dispatch('getUser');
-  // },
+  mounted () {
+    this.$store.dispatch('getUser', Cookies.get('user_id'));
+  },
   computed: {
     ...mapGetters([
       'user'

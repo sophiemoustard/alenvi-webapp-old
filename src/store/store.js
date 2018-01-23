@@ -1,16 +1,16 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { Cookies } from 'quasar'
+// import { Cookies } from 'quasar'
 
 import users from '../components/models/Users'
-import redirect from '../helpers/redirect'
+// import redirect from '../helpers/redirect'
 
 Vue.use(Vuex);
 
 export const store = new Vuex.Store({
   state: {
     user: null,
-    refreshState: true,
+    // refreshState: true,
     openModal: false,
     disableInput: true
   },
@@ -18,9 +18,9 @@ export const store = new Vuex.Store({
     user (state) {
       return state.user;
     },
-    refreshState (state) {
-      return state.refreshState;
-    },
+    // refreshState (state) {
+    //   return state.refreshState;
+    // },
     getOpenModal (state) {
       return state.openModal;
     },
@@ -32,9 +32,9 @@ export const store = new Vuex.Store({
     setUser (state, userData) {
       state.user = userData;
     },
-    changeRefreshState (state) {
-      state.refreshState = false;
-    },
+    // changeRefreshState (state) {
+    //   state.refreshState = false;
+    // },
     controlModal (state, open) {
       state.openModal = open;
     },
@@ -43,14 +43,15 @@ export const store = new Vuex.Store({
     }
   },
   actions: {
-    async getUser ({ commit }) {
+    async getUser ({ commit }, userId) {
       try {
-        if (Cookies.get('user_id')) {
-          const user = await users.getById(Cookies.get('user_id'));
-          commit('setUser', user);
-        } else {
-          redirect.redirectToLogin();
-        }
+        // if (Cookies.get('user_id')) {
+        const user = await users.getById(userId);
+        commit('setUser', user);
+        // } else {
+        // console.log('KEH');
+        // redirect.redirectToLogin();
+        // }
       } catch (e) {
         console.error(e);
       }
