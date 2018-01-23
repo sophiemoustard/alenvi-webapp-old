@@ -1,11 +1,12 @@
 <template>
   <div class="container">
-    <scheduler :events="events" @eventUpdated="updateEventById" @viewChanged="getEventsData"></scheduler>
+    <scheduler :events="events" @progressDone="progressDone" @eventUpdated="updateEventById" @viewChanged="getEventsData"></scheduler>
   </div>
 </template>
 
 <script>
 import { Toast } from 'quasar'
+import { mapMutations } from 'vuex'
 import moment from 'moment'
 import Scheduler from './scheduler/Scheduler.vue'
 import Ogust from './models/Ogust'
@@ -28,7 +29,8 @@ export default {
       events: [],
       title: '',
       token: '',
-      personId: ''
+      personId: '',
+      done: null
     }
   },
   mounted () {
@@ -78,6 +80,7 @@ export default {
     },
     async updateEventById (event) {
       try {
+        this.setDisableInput(true);
         const ogustToken = await Ogust.getOgustToken(this.token);
         const updateServicePayload = {
           startDate: moment(event.start_date).format('YYYYMMDDHHmm'),
@@ -104,6 +107,16 @@ export default {
           }
         };
         await Ogust.editOgustCustomerDetails(ogustToken, event.id_customer, customerDetailsPayload);
+        const customerCodesPayload = {
+          doorCode: event.door_code,
+          interCode: event.intercom_code
+        };
+        await Ogust.editOgustCustomerCodes(ogustToken, event.id_customer, customerCodesPayload);
+        
+        // vuex mutations to control input in modal as well as opening and closing modal
+        this.done();
+        this.setDisableInput(false);
+        this.controlModal(false);
         Toast.create('Ta demande a bien été enregistrée');
       } catch (e) {
         if (e.response && e.response.status === 404) {
@@ -113,7 +126,15 @@ export default {
         }
         console.error(e);
       }
-    }
+    },
+    progressDone (event) {
+      console.log(event);
+      this.done = event;
+    },
+    ...mapMutations([
+      'setDisableInput',
+      'controlModal'
+    ])
   }
 }
 </script>

@@ -10,7 +10,9 @@ Vue.use(Vuex);
 export const store = new Vuex.Store({
   state: {
     user: null,
-    refreshState: true
+    refreshState: true,
+    openModal: false,
+    disableInput: true
   },
   getters: {
     user (state) {
@@ -18,6 +20,12 @@ export const store = new Vuex.Store({
     },
     refreshState (state) {
       return state.refreshState;
+    },
+    getOpenModal (state) {
+      return state.openModal;
+    },
+    disableInput (state) {
+      return state.disableInput;
     }
   },
   mutations: {
@@ -26,6 +34,12 @@ export const store = new Vuex.Store({
     },
     changeRefreshState (state) {
       state.refreshState = false;
+    },
+    controlModal (state, open) {
+      state.openModal = open;
+    },
+    setDisableInput (state, display) {
+      state.disableInput = display;
     }
   },
   actions: {

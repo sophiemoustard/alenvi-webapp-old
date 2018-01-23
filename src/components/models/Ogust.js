@@ -46,6 +46,7 @@ export default {
     for (const events in eventsRaw) {
       let event = {
         id: eventsRaw[events].id_service,
+        id_employee: eventsRaw[events].id_employee,
         start_date: moment(eventsRaw[events].start_date, 'YYYYMMDDHHmm').format('YYYY-MM-DD HH:mm'),
         end_date: moment(eventsRaw[events].end_date, 'YYYYMMDDHHmm').format('YYYY-MM-DD HH:mm'),
         type: moment(eventsRaw[events].end_date, 'YYYYMMDDHHmm').isBefore(moment()) ? 'alenvi_past' : 'alenvi'

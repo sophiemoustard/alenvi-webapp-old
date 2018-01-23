@@ -14,8 +14,9 @@
       </div>
       <div class="dhx_cal_header"></div>
       <div class="dhx_cal_data"></div>
-      <q-modal ref="custom_lightbox" minimized @close="!disable" :content-css="modalStyle">
-        <!-- <div class="row justify-center">
+    </div>
+    <q-modal v-model="getOpenModal" minimized :content-css="modalStyle">
+      <!-- <div class="row justify-center">
       <q-field class="col-xs-12 col-sm-6">
         <q-input
         v-model="customerCodes.interCode"
@@ -26,45 +27,47 @@
         </q-input>
       </q-field>
     </div> -->
-        <p class="caption">{{ customerInfo.eventTitle }}</p>
-        <q-field>
-          <q-input v-model="customerInfo.doorCode" float-label="Code Porte" type="textarea" :min-rows="1" :disable="disable">
-          </q-input>
-        </q-field>
-        <q-field>
-          <q-input v-model="customerInfo.interCode" float-label="Code interphone" type="textarea" :min-rows="1" :disable="disable">
-          </q-input>
-        </q-field>
-        <q-field>
-          <q-select v-model="customerInfo.pathology" float-label="Pathologie" :options="selectOptions" :disable="disable"></q-select>
-        </q-field>
-        <q-field>
-          <q-input v-model="customerInfo.comments" float-label="Commentaires" type="textarea" :min-rows="4" :disable="disable">
-          </q-input>
-        </q-field>
-        <q-field>
-          <q-input v-model="customerInfo.interventionDetails" float-label="Détails intervention" type="textarea" :min-rows="4" :disable="disable">
-          </q-input>
-        </q-field>
-        <q-field>
-          <q-input v-model="customerInfo.misc" float-label="Autres" type="textarea" :min-rows="4" :disable="disable">
-          </q-input>
-        </q-field>
-        <div class="row justify-end">
-          <q-btn v-if="$route.query.id_employee && $route.query.self == false" class="on-left" color="primary" :disable="disable">
-            Enregistrer
-          </q-btn>
-          <q-btn color="tertiary" @click="$refs.custom_lightbox.close()">
-            Fermer
-          </q-btn>
-        </div>
-      </q-modal>
-    </div>
+      <p class="caption">{{ customerEventInfo.eventTitle }}</p>
+      <q-field>
+        <q-input v-model="customerEventInfo.doorCode" float-label="Code Porte" type="textarea" :min-rows="1" :disable="disableInput">
+        </q-input>
+      </q-field>
+      <q-field>
+        <q-input v-model="customerEventInfo.interCode" float-label="Code interphone" type="textarea" :min-rows="1" :disable="disableInput">
+        </q-input>
+      </q-field>
+      <q-field>
+        <q-select v-model="customerEventInfo.pathology" float-label="Pathologie" :options="selectOptions" :disable="disableInput"></q-select>
+      </q-field>
+      <q-field>
+        <q-input v-model="customerEventInfo.comments" float-label="Commentaires" type="textarea" :min-rows="4" :disable="disableInput">
+        </q-input>
+      </q-field>
+      <q-field>
+        <q-input v-model="customerEventInfo.interventionDetails" float-label="Détails intervention" type="textarea" :min-rows="4"
+          :disable="disableInput">
+        </q-input>
+      </q-field>
+      <q-field>
+        <q-input v-model="customerEventInfo.misc" float-label="Autres" type="textarea" :min-rows="4" :disable="disableInput">
+        </q-input>
+      </q-field>
+      <q-field label="Horaires">
+        <q-datetime-range type="time" format24h clear-label="Effacer" ok-label="OK" cancel-label="Annuler" v-model="customerEventInfo.eventRange"
+          :disable="disableInput" />
+      </q-field>
+      <div class="row justify-end">
+        <q-btn loader v-if="$route.query.id_employee === customerEventInfo.eventEmployeeId" @click="updateEvent" class="on-left" color="primary"
+          :disable="disableInput">
+          Enregistrer
+        </q-btn>
+        <q-btn color="tertiary" @click="controlModal(false)">
+          Fermer
+        </q-btn>
+      </div>
+    </q-modal>
   </div>
 </template>
-
-
-
 
 <script>
 import moment from 'moment';
@@ -74,7 +77,8 @@ import 'dhtmlx-scheduler/codebase/ext/dhtmlxscheduler_readonly.js';
 import 'dhtmlx-scheduler/codebase/ext/dhtmlxscheduler_container_autoresize.js';
 import responsive from './scripts/dhtmlxscheduler-responsive.js';
 
-import { debounce, QWindowResizeObservable, QBtn, QModal, QInput, QField, QSelect, Ripple } from 'quasar'
+import { debounce, QWindowResizeObservable, QBtn, QModal, QInput, QField, QSelect, QDatetimeRange, Ripple } from 'quasar'
+import { mapGetters, mapMutations } from 'vuex'
 
 const configDhtmlxScheduler = (vm) => {
   // Event date format
@@ -196,7 +200,8 @@ export default {
     QModal,
     QInput,
     QField,
-    QSelect
+    QSelect,
+    QDatetimeRange
   },
   directives: {
     Ripple
@@ -228,18 +233,26 @@ export default {
       today: new Date(),
       displayNext: true,
       disable: true,
+      modal: false,
       customerCodes: {
         doorCode: '',
         interCode: ''
       },
-      customerInfo: {
+      customerEventInfo: {
         eventTitle: '',
         pathology: '',
         comments: '',
         interventionDetails: '',
         misc: '',
         doorCode: '',
-        interCode: ''
+        interCode: '',
+        eventEmployeeId: '',
+        eventRange: {
+          from: null,
+          to: null
+        },
+        eventType: '',
+        eventId: ''
       },
       selectOptions: [
         {
@@ -285,9 +298,23 @@ export default {
         return style;
       }
       return style;
-    }
+    },
+    getOpenModal: {
+      get () {
+        return this.$store.state.openModal;
+      },
+      set (value) {
+        this.$store.commit('controlModal', value);
+      }
+    },
+    ...mapGetters([
+      'disableInput'
+    ])
   },
   mounted () {
+    // prevent quasar from breaking open/close methods from modal
+    this.controlModal(false);
+
     configDhtmlxScheduler(this);
 
     scheduler.attachEvent('onTemplatesReady', () => {
@@ -348,17 +375,23 @@ export default {
     // scheduler.attachEvent('onEventDrag', this.blockReadOnly);
     scheduler.showLightbox = (id) => {
       const ev = scheduler.getEvent(id);
-      this.customerInfo.doorCode = ev.door_code;
-      this.customerInfo.interCode = ev.intercom_code;
-      this.customerInfo.pathology = ev.pathology;
-      this.customerInfo.comments = ev.comments;
-      this.customerInfo.interventionDetail = ev.interventionDetail;
-      this.customerInfo.misc = ev.misc;
-      this.customerInfo.eventTitle = `${ev.text} ${moment(ev.start_date, 'YYYY-MM-DD HH:mm').format('HH:mm')} - ${moment(ev.end_date, 'YYYY-MM-DD HH:mm').format('HH:mm')}`
-      if (this.$route.query.id_employee && this.$route.query.self === 'true') {
-        this.disable = false;
+      this.setDisableInput(true);
+      this.customerEventInfo.doorCode = ev.door_code;
+      this.customerEventInfo.interCode = ev.intercom_code;
+      this.customerEventInfo.pathology = ev.pathology;
+      this.customerEventInfo.comments = ev.comments;
+      this.customerEventInfo.interventionDetail = ev.interventionDetail;
+      this.customerEventInfo.misc = ev.misc;
+      this.customerEventInfo.eventRange.from = moment(ev.start_date, 'YYYY-MM-DD HH:mm').toDate();
+      this.customerEventInfo.eventRange.to = moment(ev.end_date, 'YYYY-MM-DD HH:mm').toDate();
+      this.customerEventInfo.eventEmployeeId = ev.id_employee;
+      this.customerEventInfo.eventType = ev.type;
+      this.customerEventInfo.eventId = ev.id;
+      this.customerEventInfo.eventTitle = `${ev.text} ${moment(ev.start_date, 'YYYY-MM-DD HH:mm').format('HH:mm')} - ${moment(ev.end_date, 'YYYY-MM-DD HH:mm').format('HH:mm')}`
+      this.controlModal(true);
+      if (this.$route.query.id_employee === ev.id_employee && ev.type !== 'alenvi_past') {
+        this.setDisableInput(false);
       }
-      this.$refs.custom_lightbox.open();
     };
     scheduler.attachEvent('onClick', (id, e) => {
       if (this.customer) {
@@ -369,19 +402,19 @@ export default {
     // scheduler.attachEvent('onEventChanged', (id, e) => {
     //   this.$emit('eventUpdated', e);
     // });
-    // Remove date picker from lightbox, just keeping hour picker
-    if (this.$route.query.id_employee && this.$route.query.self === 'true') {
-      scheduler.attachEvent('onBeforeLightBox', () => {
-        const node = scheduler.formSection('Horaires').node;
-        const timeInputs = node.getElementsByTagName('select');
-        for (let i = 0, l = timeInputs.length; i < l; i++) {
-          if (i > 0 && i !== 4) {
-            timeInputs[i].style.display = 'none';// remove inputs
-          }
-        }
-        return true;
-      });
-    }
+    // // Remove date picker from lightbox, just keeping hour picker
+    // if (this.$route.query.id_employee && this.$route.query.self === 'true') {
+    //   scheduler.attachEvent('onBeforeLightBox', () => {
+    //     const node = scheduler.formSection('Horaires').node;
+    //     const timeInputs = node.getElementsByTagName('select');
+    //     for (let i = 0, l = timeInputs.length; i < l; i++) {
+    //       if (i > 0 && i !== 4) {
+    //         timeInputs[i].style.display = 'none';// remove inputs
+    //       }
+    //     }
+    //     return true;
+    //   });
+    // }
   },
   methods: {
     handleScroll: debounce(function () {
@@ -399,9 +432,27 @@ export default {
       this.width = size.width;
       this.height = size.height;
     },
-    updateEvent () {
-      this.$emit('eventUpdated', this.customerInfo);
-    }
+    updateEvent (event, done) { // 'event' & 'done' are parameters given by Quasar when using 'loader' prop with q-btn 
+      const ev = scheduler.getEvent(this.customerEventInfo.eventId);
+      ev.door_code = this.customerEventInfo.doorCode;
+      ev.intercom_code = this.customerEventInfo.interCode;
+      ev.pathology = this.customerEventInfo.pathology;
+      ev.comments = this.customerEventInfo.comments;
+      ev.interventionDetail = this.customerEventInfo.interventionDetail;
+      ev.misc = this.customerEventInfo.misc;
+      ev.start_date = moment(this.customerEventInfo.eventRange.from).format('YYYY-MM-DD HH:mm')
+      ev.end_date = moment(this.customerEventInfo.eventRange.to).format('YYYY-MM-DD HH:mm')
+      // Sending data to child component (no need of vuex)
+      this.$emit('progressDone', done);
+      this.$emit('eventUpdated', ev);
+      // Renders immediately the updated event in calendar
+      scheduler.updateEvent(ev.id);
+      scheduler.setCurrentView();
+    },
+    ...mapMutations([
+      'setDisableInput',
+      'controlModal'
+    ])
   },
   created () {
     window.addEventListener('scroll', this.handleScroll);
