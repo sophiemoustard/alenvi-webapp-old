@@ -32,8 +32,8 @@ export default {
       Cookies.remove('alenvi_token_expires_in', { path: '/' });
       return false;
     } catch (e) {
-      console.error(e.message);
-      if (e.status === 404) {
+      console.error(e.response.message);
+      if (e.response.status === 404) {
         Cookies.remove('alenvi_token', { path: '/' });
         Cookies.remove('refresh_token', { path: '/' });
         Cookies.remove('user_id', { path: '/' });
