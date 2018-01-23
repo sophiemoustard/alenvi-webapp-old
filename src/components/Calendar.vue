@@ -128,7 +128,6 @@ export default {
       }
     },
     progressDone (event) {
-      console.log(event);
       this.done = event;
     },
     ...mapMutations([
