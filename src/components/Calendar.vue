@@ -124,6 +124,8 @@ export default {
         } else {
           Toast.create("Erreur de chargement des données :/ Si le problème persiste, contacte l'équipe technique :)")
         }
+        this.done();
+        this.setDisableInput(false);
         console.error(e);
       }
     },
