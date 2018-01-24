@@ -111,7 +111,7 @@ export default {
           doorCode: event.door_code,
           interCode: event.intercom_code
         };
-        await Ogust.editOgustCustomerCodes(ogustToken, event.id_customer, customerCodesPayload);
+        await Ogust.editOgustCustomer(ogustToken, event.id_customer, customerCodesPayload);
         
         // vuex mutations to control input in modal as well as opening and closing modal
         this.done();

@@ -156,7 +156,7 @@ export default {
         const customerCodesRaw = await Ogust.getOgustCustomerCodes(ogustToken, this.queryParams.idCustomer);
         this.customerCodes.doorCode = customerCodesRaw.door_code;
         this.customerCodes.interCode = customerCodesRaw.intercom_code;
-        this.disable = false
+        this.disable = false;
         if (customerDetails == null) {
           return
         } else {
@@ -171,29 +171,29 @@ export default {
           }
         }
       } catch (e) {
-        console.error(e)
-        Toast.create('Erreur lors du chargement des données')
+        console.error(e.response);
+        Toast.create('Erreur lors du chargement des données');
       }
     },
     async editCustomerInfo () {
       try {
-        const ogustToken = await Ogust.getOgustToken(this.queryParams.accessToken)
-        let data = { arrayValues: {} }
+        const ogustToken = await Ogust.getOgustToken(this.queryParams.accessToken);
+        let data = { arrayValues: {} };
         const infoTitles = {
           pathology: 'NIVEAU',
           comments: 'COMMNIV',
           interventionDetails: 'DETAILEVE',
           misc: 'AUTRESCOMM'
-        }
+        };
         for (const k in infoTitles) {
           data.arrayValues[infoTitles[k]] = this.customerInfo[k]
         }
-        await Ogust.editOgustCustomerDetails(ogustToken, this.queryParams.idCustomer, data)
-        await Ogust.editOgustCustomerCodes(ogustToken, this.queryParams.idCustomer, this.customerCodes)
-        Toast.create('Modification effectuée ! :) Tu peux maintenant fermer la page.')
+        await Ogust.editOgustCustomerDetails(ogustToken, this.queryParams.idCustomer, data);
+        await Ogust.editOgustCustomer(ogustToken, this.queryParams.idCustomer, this.customerCodes);
+        Toast.create('Modification effectuée ! :) Tu peux maintenant fermer la page.');
       } catch (e) {
-        Toast.create("Erreur lors de l'édition de la fiche bénéficiaire :/")
-        console.error(e)
+        Toast.create("Erreur lors de l'édition de la fiche bénéficiaire :/");
+        console.error(e.response)
       }
     }
   }
