@@ -107,8 +107,12 @@ export default {
     const customerCodes = _.pick(customerInfo, ['door_code', 'intercom_code']);
     return customerCodes;
   },
-  async editOgustCustomerCodes (ogustToken, customerId, data) {
-    await axios.put(`${process.env.API_HOSTNAME}/ogust/customers/${customerId}/editCustomerCodes`, data, { headers: { 'x-ogust-token': ogustToken } });
+  async editOgustCustomer (ogustToken, customerId, data) {
+    if (ogustToken === null) {
+      await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/customers/${customerId}/edit`, data);
+    } else {
+      await axios.put(`${process.env.API_HOSTNAME}/ogust/customers/${customerId}/edit`, data, { headers: { 'x-ogust-token': ogustToken } });
+    }
   },
   async getList (key) {
     const ogustListRaw = await alenviAxios.post(`${process.env.API_HOSTNAME}/ogust/utils/getList?key=${key}`, {});

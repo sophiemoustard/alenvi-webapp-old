@@ -30,8 +30,7 @@ import {
   QToolbar,
   QToolbarTitle,
   QBtn,
-  QIcon,
-  Cookies } from 'quasar'
+  QIcon } from 'quasar'
 
 import { mapGetters } from 'vuex'
 
@@ -45,20 +44,6 @@ export default {
     QBtn,
     QIcon,
     SideMenu
-  },
-  // async mounted () {
-  //     try {
-  //       if (Cookies.get('user_id')) {
-  //         this.user = await users.getById(Cookies.get('user_id'));
-  //       } else {
-  //         next({ path: '/dashboard/login' });
-  //       }
-  //     } catch (e) {
-  //       console.error(e);
-  //     }
-  // },
-  async mounted () {
-    await this.$store.dispatch('getUser', Cookies.get('user_id'));
   },
   computed: {
     ...mapGetters([
