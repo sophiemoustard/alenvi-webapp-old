@@ -140,7 +140,6 @@ router.beforeEach(async (to, from, next) => {
     if (!Cookies.get('alenvi_token') || !Cookies.get('user_id')) {
       if (await alenvi.refreshAlenviCookies()) {
         if (store.state.refreshState) {
-          console.log('MEH');
           await store.dispatch('getUser', Cookies.get('user_id'));
         }
         if (await checkPermission(to, store.getters.user)) {
@@ -159,7 +158,6 @@ router.beforeEach(async (to, from, next) => {
       }
     } else {
       if (store.state.refreshState) {
-        console.log('MEH');
         await store.dispatch('getUser', Cookies.get('user_id'));
       }
       if (await checkPermission(to, store.getters.user)) {
