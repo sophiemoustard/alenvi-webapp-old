@@ -3,9 +3,20 @@
     <div class="row justify-center">
       <div style="width: 700px; max-width: 90vw;">
         <p class="caption">Création de compte aidant familial</p>
-        <q-field icon="mail" helper="Adresse email de l'aidant">
+        <!-- <q-field icon="mail" helper="Adresse email de l'aidant">
           <q-input v-model="email" float-label="Email" :after="[{ icon: 'send', content: true, handler: handleEmail }]"/>
-        </q-field>
+        </q-field> -->
+        <q-search v-model="terms" placeholder="Commencez à entrer le nom d'un bénéficiaire...">
+          <q-autocomplete @search="search" @selected="selected" />
+        </q-search>
+        <q-item tag="label" v-for="(helper, index) in helpers" :key="index">
+          <q-item-side>
+            <q-checkbox v-model="checked"></q-checkbox>
+          </q-item-side>
+          <q-item-main>
+            <q-item-tile label>{{ helper.first_name }} {{ helper.last_name }}</q-item-tile>
+          </q-item-main>
+        </q-item>
         <p>Un mot de passe sera généré automatiquement.</p>
       </div>
     </div>
@@ -13,8 +24,9 @@
 </template>
 
 <script>
-import { QField, QInput, Dialog, Toast } from 'quasar';
+import { QField, QInput, Dialog, Toast, QSearch, QAutocomplete, filter, QItem, QItemSide, QItemMain, QItemTile, QCheckbox } from 'quasar';
 import randomize from 'randomatic';
+import _ from 'lodash';
 
 import users from '../../models/Users';
 import ogust from '../../models/Ogust';
@@ -24,11 +36,21 @@ export default {
   components: {
     QField,
     QInput,
-    Toast
+    Toast,
+    QSearch,
+    QAutocomplete,
+    QItem,
+    QItemSide,
+    QItemMain,
+    QItemTile,
+    QCheckbox
   },
   data () {
     return {
-      email: ''
+      checked: true,
+      email: '',
+      terms: '',
+      helpers: ''
     }
   },
   methods: {
@@ -89,6 +111,33 @@ export default {
             }
           ]
         })
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    // terms = word typed in field, done = function to call at the end taking array of object
+    async search (terms, done) {
+      try {
+        let customers = await ogust.getCustomers({ lastName: `${terms}%` });
+        if (Object.keys(customers).length == 0) {
+          return done([]);
+        }
+        // Object of object to array of object
+        customers = _.sortBy(customers);
+        for (let i = 0, l = customers.length; i < l; i++) {
+          customers[i].label = customers[i].last_name;
+          customers[i].value = customers[i].last_name;
+        }
+        done(filter(terms, { field: 'last_name', list: customers }));
+      } catch (e) {
+        console.error(e);
+        done([]);
+      }
+    },
+    async selected (item) {
+      try {
+        this.helpers = await ogust.getCustomerContacts(item.id_customer);
+        console.log(this.helpers);
       } catch (e) {
         console.error(e);
       }
