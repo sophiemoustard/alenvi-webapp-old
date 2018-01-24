@@ -124,6 +124,15 @@ const router = new VueRouter({
           meta: {
             cookies: ['alenvi_token', 'refresh_token']
           }
+        },
+        {
+          path: 'customer/profile/:id',
+          name: 'customer profile',
+          // component: load('dashboard/customer/documents/NavTabs'),
+          component: load('dashboard/customer/Profile'),
+          meta: {
+            cookies: ['alenvi_token', 'refresh_token']
+          }
         }
       ]
     },

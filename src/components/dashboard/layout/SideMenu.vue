@@ -1,6 +1,6 @@
 <template>
   <div>
-    <q-list v-if="getUser.role.name != 'Client'" class="no-border">
+    <q-list v-if="user.role.name != 'Client'" class="no-border">
       <q-item class="justify-center">
         <img :src="user.picture ? user.picture : 'https://res.cloudinary.com/alenvi/image/upload/c_scale,q_auto/v1513764284/images/users/default_avatar.png'" alt="Image user" class="avatar-alenvi">
       </q-item>
@@ -39,12 +39,13 @@
         <q-item-main label="Paramètres" />
       </q-side-link>
     </q-list>
-    <q-list v-if="getUser.role.name == 'Client'" class="no-border">
+    <q-list v-if="user.role.name == 'Client'" class="no-border">
       <q-item>
         <q-item-main class="text-bold text-center" :label="user.lastname" />
       </q-item>
       <q-item class="justify-center">
-        <q-icon id="logout" name="exit to app" color="tertiary" size="1.5rem" class="on-right" @click="logout" />
+        <q-icon name="person" color="tertiary" size="1.5rem" class="on-right user-menu" @click="goToProfile" />
+        <q-icon name="exit to app" color="tertiary" size="1.5rem" class="on-right user-menu" @click="logout" />
       </q-item>
       <q-item-separator />
       <q-side-link item to="/dashboard/customer/home" exact>
@@ -76,13 +77,9 @@
     Cookies
   } from 'quasar'
 
-  import _ from 'lodash'
-
-  import users from '../../models/Users'
-  import alenvi from '../../../helpers/token/alenvi'
-
   export default {
     props: ['user'],
+    inject: ['layout'],
     components: {
       QItem,
       QItemSide,
@@ -92,11 +89,6 @@
       QBtn,
       QIcon,
       QSideLink
-    },
-    computed: {
-      getUser () {
-        return this.$store.getters.user;
-      }
     },
     methods: {
       logout () {
@@ -113,6 +105,11 @@
           path: '/'
         });
         this.$router.replace('/dashboard/login');
+      },
+      goToProfile () {
+        this.layout.hideCurrentSide(() => {
+          this.$router.push({ name: 'customer profile', params: { id: this.user._id } });
+        });
       }
       // changeRefreshState () {
       //   this.$store.commit('changeRefreshState');
@@ -127,7 +124,10 @@
   .avatar-alenvi
     width: 120px
     height: 85px
-
+  
   #logout
+    cursor: pointer
+
+  .user-menu
     cursor: pointer
 </style>
