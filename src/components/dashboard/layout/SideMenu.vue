@@ -47,15 +47,15 @@
         <q-icon id="logout" name="exit to app" color="tertiary" size="1.5rem" class="on-right" @click="logout" />
       </q-item>
       <q-item-separator />
-      <q-side-link @click.native="changeRefreshState" item to="/dashboard/customer/home" exact>
+      <q-side-link item to="/dashboard/customer/home" exact>
         <q-item-side icon="home" />
         <q-item-main label="Accueil" />
       </q-side-link>
-      <q-side-link @click.native="changeRefreshState" item to="/dashboard/customer/planning" exact>
+      <q-side-link item to="/dashboard/customer/planning" exact>
         <q-item-side icon="date range" />
         <q-item-main label="Planning" />
       </q-side-link>
-      <q-side-link @click.native="changeRefreshState" item to="/dashboard/customer/documents" exact>
+      <q-side-link item to="/dashboard/customer/documents" exact>
         <q-item-side icon="folder" />
         <q-item-main label="Mes documents" />
       </q-side-link>
@@ -113,7 +113,7 @@
           path: '/'
         });
         this.$router.replace('/dashboard/login');
-      },
+      }
       // changeRefreshState () {
       //   this.$store.commit('changeRefreshState');
       // }
