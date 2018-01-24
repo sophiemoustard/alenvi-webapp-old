@@ -10,7 +10,7 @@ Vue.use(Vuex);
 export const store = new Vuex.Store({
   state: {
     user: null,
-    // refreshState: true,
+    refreshState: true,
     openModal: false,
     disableInput: true
   },
@@ -32,9 +32,9 @@ export const store = new Vuex.Store({
     setUser (state, userData) {
       state.user = userData;
     },
-    // changeRefreshState (state) {
-    //   state.refreshState = false;
-    // },
+    changeRefreshState (state, refresh) {
+      state.refreshState = refresh;
+    },
     controlModal (state, open) {
       state.openModal = open;
     },

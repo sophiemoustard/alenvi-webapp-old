@@ -137,28 +137,39 @@ router.beforeEach(async (to, from, next) => {
   // SI: il y a des cookies requis ET que parmi ces cookies requis, un seul n'est pas présent dans la liste
   // ALORS: Je redirige vers le login, le mec n'a pas le droit d'être là
   if (to.meta.cookies) {
-    // if (store.getters.refreshState) {
-      // await store.dispatch('getUser');
-    // }
     if (!Cookies.get('alenvi_token') || !Cookies.get('user_id')) {
       if (await alenvi.refreshAlenviCookies()) {
+        if (store.state.refreshState) {
+          console.log('MEH');
+          await store.dispatch('getUser', Cookies.get('user_id'));
+        }
         if (await checkPermission(to, store.getters.user)) {
+          store.commit('changeRefreshState', false);
           next();
         } else {
           if (store.getters.user.role.name === 'Client') {
+            store.commit('changeRefreshState', false);
             return next({ path: '/dashboard/customer/home' });
           }
+          store.commit('changeRefreshState', false);
           next({ path: '/dashboard' });
         }
       } else {
         next({ path: '/dashboard/login' });
       }
     } else {
+      if (store.state.refreshState) {
+        console.log('MEH');
+        await store.dispatch('getUser', Cookies.get('user_id'));
+      }
       if (await checkPermission(to, store.getters.user)) {
+        store.commit('changeRefreshState', false);
         next();
       } else if (store.getters.user.role.name === 'Client') {
+        store.commit('changeRefreshState', false);
         next({ path: '/dashboard/customer/home' });
       } else {
+        store.commit('changeRefreshState', false);
         next({ path: '/dashboard' });
       }
     }
