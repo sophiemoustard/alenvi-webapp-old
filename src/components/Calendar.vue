@@ -102,7 +102,7 @@ export default {
           arrayValues: {
             NIVEAU: event.pathology,
             COMMNIV: event.comments,
-            DETAILEVE: event.interventionDetail,
+            DETAILEVE: event.interventionDetails,
             AUTRESCOMM: event.misc
           }
         };
@@ -112,7 +112,9 @@ export default {
           interCode: event.intercom_code
         };
         await Ogust.editOgustCustomer(ogustToken, event.id_customer, customerCodesPayload);
-        
+        // Renders immediately the updated event in calendar
+        scheduler.updateEvent(event.id);
+        scheduler.setCurrentView();
         // vuex mutations to control input in modal as well as opening and closing modal
         this.done();
         this.setDisableInput(false);

@@ -58,7 +58,7 @@ export default {
         event.intercom_code = eventsRaw[events].customer.intercom_code;
         event.pathology = eventsRaw[events].customer.pathology;
         event.comments = eventsRaw[events].customer.comments;
-        event.interventionDetail = eventsRaw[events].customer.interventionDetail;
+        event.interventionDetails = eventsRaw[events].customer.interventionDetails;
         event.misc = eventsRaw[events].customer.misc;
         event.readonly = (eventsRaw[events].customer.id_customer === '286871430' || eventsRaw[events].customer.id_customer === '271395715' || eventsRaw[events].customer.id_customer === '244566438');
       } else {

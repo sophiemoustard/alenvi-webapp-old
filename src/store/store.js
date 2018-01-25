@@ -12,20 +12,21 @@ export const store = new Vuex.Store({
     user: null,
     refreshState: true,
     openModal: false,
-    disableInput: true
+    disableInput: true,
+    disableTimePicker: true
   },
   getters: {
     user (state) {
       return state.user;
     },
-    // refreshState (state) {
-    //   return state.refreshState;
-    // },
     getOpenModal (state) {
       return state.openModal;
     },
     disableInput (state) {
       return state.disableInput;
+    },
+    disableTimePicker (state) {
+      return state.disableTimePicker;
     }
   },
   mutations: {
@@ -40,18 +41,16 @@ export const store = new Vuex.Store({
     },
     setDisableInput (state, display) {
       state.disableInput = display;
+    },
+    setDisableTimePicker (state, date) {
+      state.disableTimePicker = date;
     }
   },
   actions: {
     async getUser ({ commit }, userId) {
       try {
-        // if (Cookies.get('user_id')) {
         const user = await users.getById(userId);
         commit('setUser', user);
-        // } else {
-        // console.log('KEH');
-        // redirect.redirectToLogin();
-        // }
       } catch (e) {
         console.error(e);
       }

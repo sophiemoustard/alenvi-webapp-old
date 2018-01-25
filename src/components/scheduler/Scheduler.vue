@@ -54,7 +54,7 @@
       </q-field>
       <q-field label="Horaires">
         <q-datetime-range type="time" format24h clear-label="Effacer" ok-label="OK" cancel-label="Annuler" v-model="customerEventInfo.eventRange"
-          :disable="disableInput" />
+          :disable="disableTimePicker" />
       </q-field>
       <div class="row justify-end">
         <q-btn loader v-if="$route.query.id_employee === customerEventInfo.eventEmployeeId" @click="updateEvent" class="on-left" color="primary"
@@ -77,7 +77,7 @@ import 'dhtmlx-scheduler/codebase/ext/dhtmlxscheduler_readonly.js';
 import 'dhtmlx-scheduler/codebase/ext/dhtmlxscheduler_container_autoresize.js';
 import responsive from './scripts/dhtmlxscheduler-responsive.js';
 
-import { debounce, QWindowResizeObservable, QBtn, QModal, QInput, QField, QSelect, QDatetimeRange, Ripple } from 'quasar'
+import { debounce, QWindowResizeObservable, QBtn, QModal, QInput, QField, QSelect, QDatetimeRange, Ripple, Toast } from 'quasar'
 import { mapGetters, mapMutations } from 'vuex'
 
 const configDhtmlxScheduler = (vm) => {
@@ -215,7 +215,17 @@ export default {
           id: '',
           text: '',
           start_date: '',
-          end_date: ''
+          end_date: '',
+          id_employee: '',
+          type: '',
+          id_customer: '',
+          door_code: '',
+          intercom_code: '',
+          pathology: '',
+          comments: '',
+          interventionDetails: '',
+          misc: '',
+          readonly: ''
         }]
       }
     },
@@ -232,8 +242,7 @@ export default {
       height: '',
       today: new Date(),
       displayNext: true,
-      disable: true,
-      modal: false,
+      childEvents: this.events,
       customerCodes: {
         doorCode: '',
         interCode: ''
@@ -308,7 +317,8 @@ export default {
       }
     },
     ...mapGetters([
-      'disableInput'
+      'disableInput',
+      'disableTimePicker'
     ])
   },
   mounted () {
@@ -370,17 +380,20 @@ export default {
     scheduler.init(this.$refs.scheduler_here, this.today, defaultView);
 
     // Scheduler data parser
-    scheduler.parse(this.$props.events, 'json');
+    scheduler.parse(this.childEvents, 'json');
+    
     // Prevent draggable events
     // scheduler.attachEvent('onEventDrag', this.blockReadOnly);
     scheduler.showLightbox = (id) => {
       const ev = scheduler.getEvent(id);
+      // console.log('EV', ev);
       this.setDisableInput(true);
+      this.setDisableTimePicker(true);
       this.customerEventInfo.doorCode = ev.door_code;
       this.customerEventInfo.interCode = ev.intercom_code;
       this.customerEventInfo.pathology = ev.pathology;
       this.customerEventInfo.comments = ev.comments;
-      this.customerEventInfo.interventionDetail = ev.interventionDetail;
+      this.customerEventInfo.interventionDetails = ev.interventionDetails;
       this.customerEventInfo.misc = ev.misc;
       this.customerEventInfo.eventRange.from = moment(ev.start_date, 'YYYY-MM-DD HH:mm').toDate();
       this.customerEventInfo.eventRange.to = moment(ev.end_date, 'YYYY-MM-DD HH:mm').toDate();
@@ -388,9 +401,10 @@ export default {
       this.customerEventInfo.eventType = ev.type;
       this.customerEventInfo.eventId = ev.id;
       this.customerEventInfo.eventTitle = `${ev.text} ${moment(ev.start_date, 'YYYY-MM-DD HH:mm').format('HH:mm')} - ${moment(ev.end_date, 'YYYY-MM-DD HH:mm').format('HH:mm')}`
+      this.setDisableInput(false);
       this.controlModal(true);
       if (this.$route.query.id_employee === ev.id_employee && ev.type !== 'alenvi_past') {
-        this.setDisableInput(false);
+        this.setDisableTimePicker(false);
       }
     };
     scheduler.attachEvent('onClick', (id, e) => {
@@ -401,6 +415,7 @@ export default {
     });
     // prevent opening event when double clicking
     scheduler.attachEvent('onDblClick', () => false);
+
     // scheduler.attachEvent('onEventChanged', (id, e) => {
     //   this.$emit('eventUpdated', e);
     // });
@@ -434,25 +449,29 @@ export default {
       this.width = size.width;
       this.height = size.height;
     },
-    updateEvent (event, done) { // 'event' & 'done' are parameters given by Quasar when using 'loader' prop with q-btn 
-      const ev = scheduler.getEvent(this.customerEventInfo.eventId);
-      ev.door_code = this.customerEventInfo.doorCode;
-      ev.intercom_code = this.customerEventInfo.interCode;
-      ev.pathology = this.customerEventInfo.pathology;
-      ev.comments = this.customerEventInfo.comments;
-      ev.interventionDetail = this.customerEventInfo.interventionDetail;
-      ev.misc = this.customerEventInfo.misc;
-      ev.start_date = moment(this.customerEventInfo.eventRange.from).format('YYYY-MM-DD HH:mm')
-      ev.end_date = moment(this.customerEventInfo.eventRange.to).format('YYYY-MM-DD HH:mm')
-      // Sending data to child component (no need of vuex)
-      this.$emit('progressDone', done);
-      this.$emit('eventUpdated', ev);
-      // Renders immediately the updated event in calendar
-      scheduler.updateEvent(ev.id);
-      scheduler.setCurrentView();
+    updateEvent (event, done) { // 'event' & 'done' are parameters given by Quasar when using 'loader' prop with q-btn
+      try {
+        const ev = scheduler.getEvent(this.customerEventInfo.eventId);
+        ev.door_code = this.customerEventInfo.doorCode;
+        ev.intercom_code = this.customerEventInfo.interCode;
+        ev.pathology = this.customerEventInfo.pathology;
+        ev.comments = this.customerEventInfo.comments;
+        ev.interventionDetails = this.customerEventInfo.interventionDetails;
+        ev.misc = this.customerEventInfo.misc;
+        ev.start_date = this.customerEventInfo.eventRange.from;
+        ev.end_date = this.customerEventInfo.eventRange.to;
+        // Sending data to child component (no need of vuex)
+        this.$emit('progressDone', done);
+        this.$emit('eventUpdated', ev);
+      } catch (e) {
+        console.error(e);
+        Toast.create("Erreur lors de l'enregistrement");
+        done();
+      }
     },
     ...mapMutations([
       'setDisableInput',
+      'setDisableTimePicker',
       'controlModal'
     ])
   },
