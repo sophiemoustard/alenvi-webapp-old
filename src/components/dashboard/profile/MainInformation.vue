@@ -42,7 +42,7 @@ export default {
     try {
       this.user.alenvi = await users.getById(this.$route.params.id);
       this.user.ogust = await ogust.getEmployeeById(this.user.alenvi.employee_id);
-      const sectors = await ogust.getOgustSectors();
+      const sectors = await ogust.getList('employee.sector');
       this.user.community = sectors[this.user.alenvi.sector];
     } catch (e) {
       console.error(e);
