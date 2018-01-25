@@ -158,5 +158,9 @@ export default {
   async getCustomerFiscalAttests (id, params) {
     const customerFiscalAttestsRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/customers/${id}/fiscalAttests`, { params });
     return customerFiscalAttestsRaw.data.data.fiscalAttests.array_fiscalattest.result;
+  },
+  async getCustomerContacts (id, params) {
+    const customerContactsRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/customers/${id}/contacts`, { params });
+    return customerContactsRaw.data.data.contacts.array_contact.result;
   }
 }
