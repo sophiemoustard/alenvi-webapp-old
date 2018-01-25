@@ -6,7 +6,7 @@
       <q-select v-model="year" :options="years"></q-select>&nbsp;
       <!-- </q-field> -->
       <q-select v-model="month" :options="months"></q-select> <!-- :disable="invoices.length == 0" -->
-      <q-btn flat @click="getInvoicesAndFiscalAttests">Filtrer</q-btn>
+      <q-btn icon="filter list" flat @click="getInvoicesAndFiscalAttests" :disabled="isDisabled">Filtrer</q-btn>
     </div>
     <q-data-table v-if="fiscalAttests.length !== 0" class="cursor-pointer" :data="fiscalAttests" :config="configFiscalAttests" :columns="columnsFiscalAttests">
       <template slot="col-print_url" slot-scope="cell">
@@ -58,6 +58,7 @@ export default {
       month: "",
       invoices: [],
       fiscalAttests: [],
+      isDisabled: false,
       configInvoices: {
         title: 'Mes factures',
         noHeader: false,
@@ -180,6 +181,10 @@ export default {
         value: currentMonth
       })
     }
+    this.months.push({
+      label: 'Tous',
+      value: 'Tous'
+    });
     this.getInvoices();
     this.getFiscalAttests();
   },
@@ -187,13 +192,15 @@ export default {
     async getInvoices() {
       try {
         this.invoices = [];
-        this.invoices = await ogust.getCustomerInvoices(276329398, { year: this.year, month: moment().month(this.month).format('MM') }); // this.getUser.customer_id
+        this.isDisabled = true;
+        this.invoices = await ogust.getCustomerInvoices(276329398, { year: this.year, month: this.month == 'Tous' ? '' : moment().month(this.month).format('MM') }); // this.getUser.customer_id //
         for (let i = 0, l = Object.keys(this.invoices).length; i < l; i++) {
           this.invoices[i].invoice_date = moment(this.invoices[i].invoice_date, 'YYYYMMDD').toDate(); // .format('DD/MM/YYYY')
           // this.invoices[i].start_of_period = moment(this.invoices[i].start_of_period, 'YYYYMMDD').toDate(); // .format('DD/MM/YYYY')
           // this.invoices[i].end_of_period = moment(this.invoices[i].end_of_period, 'YYYYMMDD').toDate(); // .format('DD/MM/YYYY')
         }
         this.invoices = _.sortBy(this.invoices, ['end_of_period']).reverse();
+        this.isDisabled = false;
         console.log(this.invoices);
       } catch (e) {
         console.error(e);
