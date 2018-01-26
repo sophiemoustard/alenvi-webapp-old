@@ -7,7 +7,7 @@
         <q-icon name="menu"/>
       </q-btn>
       <q-toolbar-title>
-        Dashboard
+        {{ layoutTitle }}
       </q-toolbar-title>
       <!-- <q-btn color="primary" flat big>
         <q-icon name="email" />
@@ -48,7 +48,13 @@ export default {
   computed: {
     ...mapGetters([
       'user'
-    ])
+    ]),
+    layoutTitle () {
+      if (this.user.role.name === 'Client') {
+        return 'Votre espace Alenvi'
+      }
+      return 'Dashboard'
+    }
   },
   methods: {
 
