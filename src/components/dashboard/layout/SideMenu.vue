@@ -48,13 +48,13 @@
         <q-icon name="exit to app" color="tertiary" size="1.5rem" class="on-right user-menu" @click="logout" />
       </q-item>
       <q-item-separator /> -->
-      <q-side-link item to="/dashboard/customer/home" exact>
+      <!-- <q-side-link item to="/dashboard/customer/home" exact>
         <q-item-side icon="home" />
         <q-item-main label="Accueil" />
-      </q-side-link>
+      </q-side-link> -->
       <q-side-link item :to="{ name: 'customer profile', params: { id: user._id } }" exact>
         <q-item-side icon="person" />
-        <q-item-main :label="user.lastname" />
+        <q-item-main label="Mes informations" />
       </q-side-link>
       <q-side-link item to="/dashboard/customer/planning" exact>
         <q-item-side icon="date range" />

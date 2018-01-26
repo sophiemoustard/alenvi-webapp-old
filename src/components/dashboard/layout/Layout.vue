@@ -7,7 +7,7 @@
         <q-icon name="menu"/>
       </q-btn>
       <q-toolbar-title>
-        {{ layoutTitle }}
+        <router-link :class="{ 'router-link-active': false }" :to="{ name: 'customer home' }">{{ layoutTitle }}</router-link>
       </q-toolbar-title>
       <!-- <q-btn color="primary" flat big>
         <q-icon name="email" />
@@ -67,5 +67,11 @@ export default {
 
   .q-toolbar
     color: $primary
+  
+  a
+    color: $primary 
+    transition: none 
+    &:hover
+      color: none
 
   </style>
