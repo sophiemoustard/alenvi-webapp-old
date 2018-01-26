@@ -40,17 +40,21 @@
       </q-side-link>
     </q-list>
     <q-list v-if="user.role.name == 'Client'" class="no-border">
-      <q-item>
+      <!-- <q-item>
         <q-item-main class="text-bold text-center" :label="user.lastname" />
       </q-item>
       <q-item class="justify-center">
         <q-icon name="person" color="tertiary" size="1.5rem" class="on-right user-menu" @click="goToProfile" />
         <q-icon name="exit to app" color="tertiary" size="1.5rem" class="on-right user-menu" @click="logout" />
       </q-item>
-      <q-item-separator />
+      <q-item-separator /> -->
       <q-side-link item to="/dashboard/customer/home" exact>
         <q-item-side icon="home" />
         <q-item-main label="Accueil" />
+      </q-side-link>
+      <q-side-link item :to="{ name: 'customer profile', params: { id: user._id } }" exact>
+        <q-item-side icon="person" />
+        <q-item-main :label="user.lastname" />
       </q-side-link>
       <q-side-link item to="/dashboard/customer/planning" exact>
         <q-item-side icon="date range" />
@@ -59,6 +63,10 @@
       <q-side-link item to="/dashboard/customer/documents" exact>
         <q-item-side icon="folder" />
         <q-item-main label="Mes documents" />
+      </q-side-link>
+      <q-side-link item to="/dashboard/login" @click.native="logout" replace>
+        <q-item-side icon="exit to app" />
+        <q-item-main label="Déconnexion" />
       </q-side-link>
     </q-list>
   </div>
@@ -90,6 +98,9 @@
       QIcon,
       QSideLink
     },
+    mounted () {
+      console.log(this.$router);
+    },
     methods: {
       logout () {
         Cookies.remove('alenvi_token', {
@@ -104,7 +115,9 @@
         Cookies.remove('user_id', {
           path: '/'
         });
-        this.$router.replace('/dashboard/login');
+        if (this.user.role.name !== 'Client') {
+          this.$router.replace('/dashboard/login');
+        }
       },
       goToProfile () {
         this.layout.hideCurrentSide(() => {
@@ -130,4 +143,11 @@
 
   .user-menu
     cursor: pointer
+
+  .router-link-active
+    background: none
+    color: $primary 
+  
+  .router-link-active > div:first-child
+    color: $primary
 </style>

@@ -1,36 +1,42 @@
 <template>
   <div class="layout-padding">
     <div class="row justify-center">
-      <div id="picture">
-        <img :src="user.alenvi.picture ? user.alenvi.picture : 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_107,q_auto,w_180/v1513764284/images/users/default_avatar.png'" alt="" style="width: 180px;">
-      </div>
+      <h5>Votre profil</h5>
     </div>
     <br>
     <div class="row justify-center">
-      <div class="" style="width: 400px; max-width: 90vw;">
+      <div style="width: 500px; max-width: 90vw;">
         <q-input v-model="user.alenvi.firstname" float-label="Prénom"/>
         <q-input v-model="user.alenvi.lastname" float-label="Nom"/>
-        <select-role v-model="user.alenvi.role.name"/>
         <!-- Date de naissance: <input v-model="user.ogust.date_of_birth" type="date" float-label="Date de naissance"/> -->
-        <q-input v-model="user.alenvi.local.email" float-label="Email"/>
+        <q-field :error="$v.user.alenvi.local.email.$error" :error-label="emailError">
+          <q-input v-model="user.alenvi.local.email" float-label="Email" @blur="$v.user.alenvi.local.email.$touch"/>
+        </q-field>
         <q-input v-model="user.ogust.mobile_phone" float-label="Mobile"/>
         <q-input v-model="user.ogust.landline" float-label="Fixe"/>
+        <p class="caption">Changement de mot de passe</p>
+        <q-field helper="Entrez votre nouveau mot de passe. Il doit contenir au moins 6 caractères jusqu'à 20 maximum" :error="$v.user.credentials.password.$error"
+          error-label="Le mot de passe doit contenir entre 6 et 20 caractères.">
+          <q-input type="password" float-label="Nouveau mot de passe" v-model.trim="user.credentials.password" @blur="$v.user.credentials.password.$touch" />
+        </q-field>
+        <q-field :error="$v.user.credentials.passwordConfirm.$error" error-label="Le mot de passe entré et la confirmation sont différents.">
+          <q-input type="password" float-label="Confirmation nouveau mot de passe" v-model.trim="user.credentials.passwordConfirm" @blur="$v.user.credentials.passwordConfirm.$touch" />
+        </q-field>
       </div>
     </div>
-    <div class="row justify-center">
-      <q-btn big flat @click="updateUser">Enregistrer</q-btn>
+    <div class="row justify-center layout-padding">
+      <q-btn color="primary" icon="done" @click="updateUser" :disable="$v.user.$invalid">Enregistrer modifications</q-btn>
     </div>
   </div>
 </template>
 
 <script>
 
-import { QInput, QBtn, Toast } from 'quasar';
+import { QInput, QBtn, QField, Toast } from 'quasar'
+import { required, email, sameAs, minLength, maxLength } from 'vuelidate/lib/validators'
 
-// import moment from 'moment'
-
-import users from '../../models/Users';
-import ogust from '../../models/Ogust';
+import users from '../../models/Users'
+import ogust from '../../models/Ogust'
 import SelectSector from '../../SelectSector.vue'
 import SelectRole from '../../SelectRole.vue'
 
@@ -38,6 +44,7 @@ export default {
   components: {
     QInput,
     QBtn,
+    QField,
     Toast,
     SelectSector,
     SelectRole
@@ -45,11 +52,42 @@ export default {
   data () {
     return {
       user: {
+        credentials: {
+          password: '',
+          passwordConfirm: ''
+        },
         alenvi: {
           role: {},
           local: {}
         },
         ogust: {}
+      }
+    }
+  },
+  validations: {
+    user: {
+      credentials: {
+        password: {
+          minLength: minLength(6),
+          maxLength: maxLength(20)
+        },
+        passwordConfirm: {
+          sameAsPassword: sameAs('password')
+        }
+      },
+      alenvi: {
+        local: {
+          email: { required, email }
+        }
+      }
+    }
+  },
+  computed: {
+    emailError () {
+      if (!this.$v.user.alenvi.local.email.required) {
+        return 'Champ requis';
+      } else if (!this.$v.user.alenvi.local.email.email) {
+        return 'Email invalide'
       }
     }
   },
@@ -67,7 +105,6 @@ export default {
     async updateUser () {
       try {
         const userToSendOgust = {
-          id_customer: this.user.alenvi.customer_id,
           first_name: this.user.alenvi.firstname,
           last_name: this.user.alenvi.lastname,
           email: this.user.alenvi.local.email,
@@ -79,10 +116,11 @@ export default {
           firstname: this.user.alenvi.firstname,
           lastname: this.user.alenvi.lastname,
           local: {
-            email: this.user.alenvi.local.email
+            email: this.user.alenvi.local.email,
+            password: this.user.credentials.password
           }
         };
-        await ogust.setEmployee(userToSendOgust);
+        await ogust.editOgustCustomer(null, this.user.alenvi.customer_id, userToSendOgust);
         await users.updateById(userToSendAlenvi);
         Toast.create('Profil mis à jour');
       } catch (e) {
