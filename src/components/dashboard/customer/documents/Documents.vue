@@ -6,7 +6,9 @@
       <q-select v-model="year" :options="years"></q-select>&nbsp;
       <!-- </q-field> -->
       <q-select v-model="month" :options="months"></q-select> <!-- :disable="invoices.length == 0" -->
-      <q-btn icon="filter list" flat @click="getInvoicesAndFiscalAttests" :disabled="isDisabled">Filtrer</q-btn>
+      <div class="on-right column justify-center">
+        <q-btn icon="filter list" color="primary" @click="getInvoicesAndFiscalAttests" :disabled="isDisabled">Filtrer</q-btn>
+      </div>
     </div>
     <q-data-table v-if="fiscalAttests.length !== 0" class="cursor-pointer" :data="fiscalAttests" :config="configFiscalAttests" :columns="columnsFiscalAttests">
       <template slot="col-print_url" slot-scope="cell">
@@ -18,6 +20,9 @@
       </template>
     </q-data-table>
     <q-data-table class="cursor-pointer" :data="invoices" :config="configInvoices" :columns="columnsInvoices">
+      <template slot="col-amount_incl_taxe" slot-scope="cell">
+        <span>{{ cell.data }} &euro;</span>
+      </template>
       <template slot="col-print_url" slot-scope="cell">
         <q-btn flat round small color="primary">
           <a :href="cell.data" download>
@@ -55,7 +60,7 @@ export default {
       years: [],
       months: [],
       year: moment().year().toString(),
-      month: "",
+      month: '',
       invoices: [],
       fiscalAttests: [],
       isDisabled: false,
@@ -94,7 +99,7 @@ export default {
             return new Date(value).toLocaleString([], {
               day: '2-digit',
               month: '2-digit',
-              year: 'numeric',
+              year: 'numeric'
               // hour: '2-digit',
               // minute: '2-digit'
             });
@@ -166,7 +171,6 @@ export default {
   },
   created () {
     this.month = moment().month(moment().month()).format('MMMM');
-    console.log(this.month);
     for (let year = moment().year(); year >= 2016; year--) {
       const currentYear = year.toString();
       this.years.push({
@@ -189,7 +193,7 @@ export default {
     this.getFiscalAttests();
   },
   methods: {
-    async getInvoices() {
+    async getInvoices () {
       try {
         this.invoices = [];
         this.isDisabled = true;
@@ -201,12 +205,11 @@ export default {
         }
         this.invoices = _.sortBy(this.invoices, ['end_of_period']).reverse();
         this.isDisabled = false;
-        console.log(this.invoices);
       } catch (e) {
         console.error(e);
       }
     },
-    async getFiscalAttests() {
+    async getFiscalAttests () {
       try {
         this.fiscalAttests = [];
         this.fiscalAttests = await ogust.getCustomerFiscalAttests(235146870, { year: this.year }); // this.getUser.customer_id
@@ -219,7 +222,7 @@ export default {
         console.error(e);
       }
     },
-    getInvoicesAndFiscalAttests() {
+    getInvoicesAndFiscalAttests () {
       this.getInvoices();
       this.getFiscalAttests();
     }
