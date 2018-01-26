@@ -3,20 +3,24 @@
     <div class="row justify-center">
       <div style="width: 700px; max-width: 90vw;">
         <p class="caption">Création de compte aidant familial</p>
+        <!-- TEST by typing email -->
         <!-- <q-field icon="mail" helper="Adresse email de l'aidant">
           <q-input v-model="email" float-label="Email" :after="[{ icon: 'send', content: true, handler: handleEmail }]"/>
         </q-field> -->
-        <q-search v-model="terms" placeholder="Commencez à entrer le nom d'un bénéficiaire...">
+        <!-- TEST by typing the beginning of a client's name -->
+        <!-- <q-search v-model="terms" placeholder="Commencez à entrer le nom d'un bénéficiaire...">
           <q-autocomplete @search="search" @selected="selected" />
-        </q-search>
-        <q-item tag="label" v-for="(helper, index) in helpers" :key="index">
+        </q-search> -->
+        <!-- Find client's helpers on the fly -->
+        <!-- <q-item tag="label" v-for="(helper, index) in helpers" :key="index">
           <q-item-side>
             <q-checkbox v-model="checked"></q-checkbox>
           </q-item-side>
           <q-item-main>
             <q-item-tile label>{{ helper.first_name }} {{ helper.last_name }}</q-item-tile>
           </q-item-main>
-        </q-item>
+        </q-item> -->
+        
         <p>Un mot de passe sera généré automatiquement.</p>
       </div>
     </div>
@@ -50,7 +54,62 @@ export default {
       checked: true,
       email: '',
       terms: '',
-      helpers: ''
+      helpers: '',
+      config: {
+        title: 'Liste des aidants Ogust',
+        noHeader: false,
+        bodyStyle: {
+          maxHeight: '700px'
+        },
+        rowHeight: 'auto',
+        pagination: {
+          rowsPerPage: 10,
+          options: [10, 20, 30]
+        },
+        messages: {
+          noData: 'Pas d\'aidant ou de bénéficiaire'
+        },
+        labels: {
+          allCols: 'Colonnes (toutes)',
+          rows: 'Lignes',
+          search: 'Rechercher'
+        },
+        responsive: true
+      },
+      columns: [
+        {
+          label: 'Prénom aidant',
+          field: 'first_name',
+          width: '75px',
+          filter: false,
+          sort: true,
+          type: 'string',
+        },
+        {
+          label: 'Nom aidant',
+          field: 'last_name',
+          width: '75px',
+          filter: false,
+          sort: true,
+          type: 'string',
+        },
+        {
+          label: 'Nom bénéficiaire',
+          field: 'lastNameClient', // TODO: add all last name from clients in this object
+          width: '75px',
+          filter: false,
+          sort: true,
+          type: 'string',
+        },
+        {
+          label: 'Enregistré ?',
+          field: 'isRegistered',
+          filter: false,
+          sort: true,
+          type: 'boolean',
+          width: '75px'
+        }
+      ]
     }
   },
   methods: {
