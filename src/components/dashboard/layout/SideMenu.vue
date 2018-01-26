@@ -98,9 +98,6 @@
       QIcon,
       QSideLink
     },
-    mounted () {
-      console.log(this.$router);
-    },
     methods: {
       logout () {
         Cookies.remove('alenvi_token', {
