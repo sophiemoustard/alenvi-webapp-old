@@ -1,36 +1,38 @@
 <template>
-  <div>
-    <div class="layout-padding">
-      <!-- <p class="text-center">Dashboard Alenvi</p> -->
-      <div class="row justify-center">
-        <div class="alenvi-logo">
-          <img src="https://res.cloudinary.com/alenvi/image/upload/v1507124345/images/business/alenvi_logo_complet_full.png" class="responsive">
-        </div>
-      </div>
-      <div class="row justify-center">
+  <div class="row justify-center layout-padding">
+    <q-card flat class="layout-padding" style="width: 500px; max-width: 90vw;">
+      <q-card-media>
+        <img src="https://res.cloudinary.com/alenvi/image/upload/v1507124345/images/business/alenvi_logo_complet_full.png" class="responsive">
+      </q-card-media>
+      <q-card-main>
         <q-field class="col-xs-12 col-sm-3" icon="mail">
-          <q-input v-model.trim="credentials.email" float-label="Adresse email"/>
+          <q-input v-model.trim="credentials.email" float-label="Adresse email" />
         </q-field>
-      </div>
-      <div class="row justify-center">
         <q-field class="col-xs-12 col-sm-3" icon="vpn_key">
           <q-input @keyup.enter="submit" v-model="credentials.password" float-label="Mot de passe" type="password" />
         </q-field>
-      </div>
-      <div class="row justify-center">
-        <div class="col-xs-12 col-sm-3">
-          <q-btn class="full-width" color="primary" @click="submit()" flat>Login</q-btn>
-        </div>
-      </div>
-    </div>
+      </q-card-main>
+      <q-card-actions>
+        <q-btn class="full-width" color="primary" @click="submit()">Login</q-btn>
+      </q-card-actions>
+      <q-card-actions>
+        <router-link class="row justify-center" to="/forgotPassword">Mot de passe oublié ?</router-link>
+      </q-card-actions>
+    </q-card>
   </div>
 </template>
+
 
 <script>
 
 import {
   QField,
   QInput,
+  QCard,
+  QCardMain,
+  QCardSeparator,
+  QCardActions,
+  QCardMedia,
   QBtn,
   Cookies,
   date
@@ -43,6 +45,11 @@ export default {
   components: {
     QField,
     QInput,
+    QCard,
+    QCardMain,
+    QCardSeparator,
+    QCardActions,
+    QCardMedia,
     QBtn
   },
   data () {
@@ -54,7 +61,7 @@ export default {
     }
   },
   computed: {
-    getUser() {
+    getUser () {
       return this.$store.getters.user;
     }
   },

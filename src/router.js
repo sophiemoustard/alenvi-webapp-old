@@ -5,6 +5,7 @@ import { Cookies } from 'quasar'
 
 import { store } from './store/store'
 import alenvi from './helpers/token/alenvi'
+import users from './components/models/Users'
 import { checkPermission } from './helpers/permissions/checkPermission'
 
 Vue.use(VueRouter);
@@ -30,8 +31,11 @@ const router = new VueRouter({
   mode: 'history',
   routes: [
     { path: '/', redirect: '/dashboard' },
+    { path: '/dashboard/error403Pwd', component: load('dashboard/Error403ChangePwd') },
     { path: '/dashboard/login', component: load('dashboard/Authenticate') },
     { path: '/enterCode', component: load('signup/EnterCode') },
+    { path: '/forgotPassword', component: load('dashboard/ForgotPwd') },
+    { path: '/resetPassword/:token', component: load('dashboard/ResetPwd') },
     {
       path: '/signup',
       component: load('signup/Signup'),
