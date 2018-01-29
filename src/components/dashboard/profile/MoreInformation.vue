@@ -14,9 +14,20 @@
         <q-input v-model="user.alenvi.lastname" float-label="Nom"/>
         <select-role v-model="user.alenvi.role.name"/>
         <!-- Date de naissance: <input v-model="user.ogust.date_of_birth" type="date" float-label="Date de naissance"/> -->
-        <q-input v-model="user.alenvi.local.email" float-label="Email"/>
+        <q-field :error="$v.user.alenvi.local.email.$error" :error-label="emailError">
+          <q-input v-model="user.alenvi.local.email" float-label="Email" @blur="$v.user.alenvi.local.email.$touch"/>
+        </q-field>
+        <!-- <q-input v-model="user.alenvi.local.email" float-label="Email"/> -->
         <q-input v-model="user.ogust.mobile_phone" float-label="Mobile"/>
-        <select-sector v-if="user.alenvi.sector" v-model="user.alenvi.sector"/>
+        <select-sector v-if="user.alenvi.sector !== '*'" v-model="user.alenvi.sector"/>
+        <p class="caption">Changement de mot de passe</p>
+        <q-field helper="Entrez votre nouveau mot de passe. Il doit contenir au moins 6 caractères jusqu'à 20 maximum" :error="$v.user.credentials.password.$error"
+          error-label="Le mot de passe doit contenir entre 6 et 20 caractères.">
+          <q-input type="password" float-label="Nouveau mot de passe" v-model.trim="user.credentials.password" @blur="$v.user.credentials.password.$touch" />
+        </q-field>
+        <q-field :error="$v.user.credentials.passwordConfirm.$error" error-label="Le mot de passe entré et la confirmation sont différents.">
+          <q-input type="password" float-label="Confirmation nouveau mot de passe" v-model.trim="user.credentials.passwordConfirm" @blur="$v.user.credentials.passwordConfirm.$touch" />
+        </q-field>
       </div>
     </div>
     <div class="row justify-center">
@@ -27,7 +38,8 @@
 
 <script>
 
-import { QInput, QBtn, Toast } from 'quasar';
+import { QInput, QBtn, QField } from 'quasar';
+import { required, email, sameAs, minLength, maxLength } from 'vuelidate/lib/validators'
 
 import moment from 'moment'
 
@@ -35,23 +47,47 @@ import users from '../../models/Users';
 import ogust from '../../models/Ogust';
 import SelectSector from '../../SelectSector.vue'
 import SelectRole from '../../SelectRole.vue'
+import { alenviAlert } from '../../../helpers/alerts'
 
 export default {
   components: {
     QInput,
     QBtn,
-    Toast,
+    // Toast,
+    QField,
     SelectSector,
     SelectRole
   },
   data () {
     return {
       user: {
+        credentials: {
+          password: '',
+          passwordConfirm: ''
+        },
         alenvi: {
           role: {},
           local: {}
         },
         ogust: {}
+      }
+    }
+  },
+  validations: {
+    user: {
+      credentials: {
+        password: {
+          minLength: minLength(6),
+          maxLength: maxLength(20)
+        },
+        passwordConfirm: {
+          sameAsPassword: sameAs('password')
+        }
+      },
+      alenvi: {
+        local: {
+          email: { required, email }
+        }
       }
     }
   },
@@ -64,6 +100,15 @@ export default {
       this.user.ogust.date_of_birth = moment(this.user.ogust.date_of_birth, 'YYYYMMDD').format('YYYY-MM-DD');
     } catch (e) {
       console.error(e);
+    }
+  },
+  computed: {
+    emailError () {
+      if (!this.$v.user.alenvi.local.email.required) {
+        return 'Champ requis';
+      } else if (!this.$v.user.alenvi.local.email.email) {
+        return 'Email invalide'
+      }
     }
   },
   methods: {
@@ -84,17 +129,24 @@ export default {
           firstname: this.user.alenvi.firstname,
           lastname: this.user.alenvi.lastname,
           local: {
-            email: this.user.alenvi.local.email
+            email: this.user.alenvi.local.email,
+            password: this.user.credentials.password
           },
           sector: this.user.alenvi.sector,
-          role: this.user.alenvi.role.name
+          role: this.user.alenvi.role.name,
         };
         const userUpdatedAlenvi = await users.updateById(userToSendAlenvi);
-        Toast.create(`Utilisateur Alenvi bien mis-à-jour`);
+        // Toast.create(`Utilisateur Alenvi bien mis-à-jour`);
         const userUpdatedOgust = await ogust.setEmployee(userToSendOgust);
-        Toast.create(`Utilisateur Ogust bien mis-à-jour`);
+        // Toast.create(`Utilisateur Ogust bien mis-à-jour`);
+        alenviAlert({ color: 'positive', icon: 'thumb up', content: 'Profil mis à jour.', position: 'bottom-right', duration: 2500 });
+        this.credentials.password = '';
+        this.credentials.passwordConfirm = '';
       } catch (e) {
-        Toast.create(`Erreur lors de la mise-à-jour de l'utilisateur`);
+        alenviAlert({ color: 'error', icon: 'warning', content: 'Erreur lors de la mise à jour du profil.', position: 'bottom-right', duration: 2500 });
+        this.credentials.password = '';
+        this.credentials.passwordConfirm = '';
+        // Toast.create(`Erreur lors de la mise-à-jour de l'utilisateur`);
         console.error(e);
       }
     }

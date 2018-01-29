@@ -121,8 +121,12 @@ export default {
         await ogust.editOgustCustomer(null, this.user.alenvi.customer_id, userToSendOgust);
         await users.updateById(userToSendAlenvi);
         alenviAlert({ color: 'positive', icon: 'thumb up', content: 'Profil mis à jour.', position: 'bottom-right', duration: 2500 });
+        this.credentials.password = '';
+        this.credentials.passwordConfirm = '';
       } catch (e) {
         alenviAlert({ color: 'error', icon: 'warning', content: 'Erreur lors de la mise à jour de votre profil.', position: 'bottom-right', duration: 2500 });
+        this.credentials.password = '';
+        this.credentials.passwordConfirm = '';
         console.error(e);
       }
     }
