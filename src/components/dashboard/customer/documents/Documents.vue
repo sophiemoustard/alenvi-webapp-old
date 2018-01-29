@@ -207,6 +207,7 @@ export default {
         this.isDisabled = false;
       } catch (e) {
         console.error(e);
+        this.isDisabled = false;
       }
     },
     async getFiscalAttests () {
@@ -220,6 +221,7 @@ export default {
         console.log(this.fiscalAttests);
       } catch (e) {
         console.error(e);
+        this.isDisabled = false;
       }
     },
     getInvoicesAndFiscalAttests () {
