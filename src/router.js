@@ -40,8 +40,10 @@ const router = new VueRouter({
           }
         }
         if (store.getters.user.role.name === 'Client') {
+          store.commit('changeRefreshState', false);
           return next({ name: 'customer home' });
         }
+        store.commit('changeRefreshState', false);
         return next({ path: '/dashboard' });
       }
     },
