@@ -162,8 +162,8 @@ export default {
     await this.getPlanningUpdates();
     const vm = this;
     this.interval = setInterval(async () => {
-     this.planningUpdatesList = [];
-     await vm.getPlanningUpdates();
+      this.planningUpdatesList = [];
+      await vm.getPlanningUpdates();
     }, 10 * 60 * 1000)
   },
   methods: {
@@ -172,7 +172,7 @@ export default {
         const planningUpdatesRaw = await planningUpdates.getPlanningUpdates();
         const planningUpdatesList = planningUpdatesRaw.data.data.modifPlanning;
         const orderedPlanningUpdatesList = [];
-        const sectors = await ogust.getOgustSectors();
+        const sectors = await ogust.getList('employee.sector');
         for (let i = 0, l = planningUpdatesList.length; i < l; i++) {
           for (let j = 0, k = planningUpdatesList[i].planningModification.length; j < k; j++) {
             orderedPlanningUpdatesList.push({
@@ -198,7 +198,7 @@ export default {
       this.planningUpdatesList = [];
       await this.getPlanningUpdates();
       done();
-    },  
+    },
     async process (updateId, isChecked, cell) {
       try {
         if (!Cookies.get('user_id')) {
