@@ -197,10 +197,15 @@ export default {
     },
     async selected (item) {
       try {
-        this.helpers = await ogust.getCustomerContacts(item.id_customer);
+        const helpers = await ogust.getCustomerContacts(item.id_customer);
+        this.helpers = _.filter(helpers, (item) => item.email);
         for (const k in this.helpers) {
           const user = await users.showAll({ 'local.email': this.helpers[k].email });
-          this.checked = user.length !== 0;
+          if (!user) {
+            this.checked = false;
+          } else {
+            this.checked = true;
+          }
           this.$set(this.helpers[k], 'checked', this.checked);
         }
       } catch (e) {
