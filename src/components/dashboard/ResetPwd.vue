@@ -61,11 +61,11 @@ export default {
         const checkToken = await users.checkResetPasswordToken(to.params.token);
         next(vm => vm.setData(checkToken));
       } else {
-        next({ path: '/error403' });
+        next({ path: '/dashboard/error403Pwd' });
       }
     } catch (e) {
       console.error(e.response);
-      next({ path: '/error403' });
+      next({ path: '/dashboard/error403Pwd' });
     }
   },
   validations: {
@@ -135,8 +135,5 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables'
-
-  .alenvi-logo
-    width: 35%
 
 </style>

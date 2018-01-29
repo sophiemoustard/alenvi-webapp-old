@@ -17,6 +17,7 @@
           >
             Go back
           </q-btn>
+          <q-btn @click="goToForgot" color="primary">Recevoir un nouveau lien</q-btn>
         </p>
       </div>
     </div>
@@ -39,6 +40,9 @@ export default {
   methods: {
     goBack () {
       window.history.go(-1)
+    },
+    goToForgot () {
+      this.$router.push({ path: '/forgotPassword' });
     }
   }
 }
