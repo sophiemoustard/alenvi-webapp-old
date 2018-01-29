@@ -4,9 +4,6 @@
       <q-card-media>
         <img src="https://res.cloudinary.com/alenvi/image/upload/c_scale,q_auto,w_400/v1507124345/images/business/alenvi_logo_complet_full.png" alt="Logo Alenvi" class="responsive">
       </q-card-media>
-      <q-card-title>
-        Veuillez entrer votre email:
-      </q-card-title>
       <q-card-main>
         <q-field helper="Entrez votre nouveau mot de passe. Il doit contenir au moins 6 caractères jusqu'à 20 maximum" :error="$v.passwords.password.$error"
           error-label="Le mot de passe doit contenir entre 6 et 20 caractères.">
@@ -24,7 +21,7 @@
 </template>
 
 <script>
-import { QInput, QCard, QCardTitle, QCardMain, QCardSeparator, QCardActions, QCardMedia, QBtn, QField } from 'quasar'
+import { QInput, QCard, QCardMain, QCardSeparator, QCardActions, QCardMedia, QBtn, QField } from 'quasar'
 import { sameAs, minLength, maxLength, required } from 'vuelidate/lib/validators'
 
 import users from '../models/Users'
@@ -35,7 +32,6 @@ export default {
   components: {
     QInput,
     QCard,
-    QCardTitle,
     QCardMain,
     QCardSeparator,
     QCardActions,
