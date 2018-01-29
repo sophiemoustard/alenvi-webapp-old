@@ -5,11 +5,12 @@
 </template>
 
 <script>
-import { Toast } from 'quasar'
 import moment from 'moment'
+import 'dhtmlx-scheduler'
+
 import Scheduler from '../../scheduler/Scheduler.vue'
 import Ogust from '../../models/Ogust'
-import 'dhtmlx-scheduler'
+import { alenviAlert } from '../../../helpers/alerts'
 
 moment.locale('fr');
 
@@ -45,9 +46,9 @@ export default {
       } catch (e) {
         console.error(e)
         if (e.status === 404) {
-          Toast.create('Aucune intervention dans la période demandée');
+          alenviAlert({ color: 'error', icon: 'warning', content: 'Aucune intervention dans la période demandée.', position: 'bottom-right', duration: 2500 });
         } else {
-          Toast.create("Erreur de chargement des données :/ Si le problème persiste, contactez l'équipe technique :)")
+          alenviAlert({ color: 'error', icon: 'warning', content: "Erreur de chargement des données :/ Si le problème persiste, contactez l'équipe technique :)", position: 'bottom-right', duration: 2500 });
         }
       }
     }

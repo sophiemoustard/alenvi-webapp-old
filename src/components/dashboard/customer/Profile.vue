@@ -32,20 +32,20 @@
 
 <script>
 
-import { QInput, QBtn, QField, Toast } from 'quasar'
+import { QInput, QBtn, QField } from 'quasar'
 import { required, email, sameAs, minLength, maxLength } from 'vuelidate/lib/validators'
 
 import users from '../../models/Users'
 import ogust from '../../models/Ogust'
 import SelectSector from '../../SelectSector.vue'
 import SelectRole from '../../SelectRole.vue'
+import { alenviAlert } from '../../../helpers/alerts'
 
 export default {
   components: {
     QInput,
     QBtn,
     QField,
-    Toast,
     SelectSector,
     SelectRole
   },
@@ -95,8 +95,6 @@ export default {
     try {
       this.user.alenvi = await users.getById(this.$route.params.id);
       this.user.ogust = await ogust.getCustomerById(this.user.alenvi.customer_id);
-      console.log('OGUST', this.user.ogust);
-      // this.user.ogust.date_of_birth = moment(this.user.ogust.date_of_birth, 'YYYYMMDD').format('YYYY-MM-DD');
     } catch (e) {
       console.error(e);
     }
@@ -122,9 +120,9 @@ export default {
         };
         await ogust.editOgustCustomer(null, this.user.alenvi.customer_id, userToSendOgust);
         await users.updateById(userToSendAlenvi);
-        Toast.create('Profil mis à jour');
+        alenviAlert({ color: 'positive', icon: 'thumb up', content: 'Profil mis à jour.', position: 'bottom-right', duration: 2500 });
       } catch (e) {
-        Toast.create('Erreur lors de la mise à jour de votre profil');
+        alenviAlert({ color: 'error', icon: 'warning', content: 'Erreur lors de la mise à jour de votre profil.', position: 'bottom-right', duration: 2500 });
         console.error(e);
       }
     }
