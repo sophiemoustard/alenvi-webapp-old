@@ -166,6 +166,11 @@ export default {
       await vm.getPlanningUpdates();
     }, 10 * 60 * 1000)
   },
+  computed: {
+    user () {
+      return this.$store.getters.user;
+    }
+  },
   methods: {
     async getPlanningUpdates () {
       try {
@@ -183,12 +188,13 @@ export default {
               sector: sectors[planningUpdatesList[i].sector],
               type: planningUpdatesList[i].planningModification[j].modificationType,
               check: { id: planningUpdatesList[i].planningModification[j]._id, checked: planningUpdatesList[i].planningModification[j].check.isChecked },
-              checkedBy: planningUpdatesList[i].planningModification[j].check.checkBy ? await this.getUserById(planningUpdatesList[i].planningModification[j].check.checkBy) : '-',
+              checkedBy: planningUpdatesList[i].planningModification[j].check.checkBy ? `${planningUpdatesList[i].planningModification[j].check.checkBy.firstname} ${planningUpdatesList[i].planningModification[j].check.checkBy.lastname.substring(0, 1)}.` : '-',
               checkedAt: planningUpdatesList[i].planningModification[j].check.checkedAt || '',
               remove: { id: planningUpdatesList[i].planningModification[j]._id, userId: planningUpdatesList[i]._id }
             });
           }
         }
+        this.planningUpdatesList = orderedPlanningUpdatesList;
         this.planningUpdatesList = _.sortBy(orderedPlanningUpdatesList, ['date']).reverse();
       } catch (e) {
         console.error(e);
@@ -208,11 +214,11 @@ export default {
         }
         const payload = {
           isChecked,
-          checkBy: isChecked ? Cookies.get('user_id') : null,
+          checkBy: isChecked ? this.user._id : null,
           checkedAt: isChecked ? new Date() : null
         }
         await planningUpdates.updatePlanningUpdatesStatus(updateId, payload);
-        this.planningUpdatesList[cell].checkedBy = payload.checkBy ? await this.getUserById(payload.checkBy) : '-';
+        this.planningUpdatesList[cell].checkedBy = payload.checkBy ? `${this.user.firstname} ${this.user.lastname.substring(0, 1)}.` : '-';
         this.planningUpdatesList[cell].checkedAt = payload.checkedAt ? new Date() : '';
         alenviAlert({ color: 'positive', icon: 'check', content: 'Modification traitée.', position: 'bottom-right', duration: 2500 });
       } catch (e) {
