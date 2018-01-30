@@ -32,19 +32,15 @@ const router = new VueRouter({
   routes: [
     { path: '/',
       beforeEnter: async (to, from, next) => {
-        if (store.state.refreshState) {
-          if (Cookies.get('user_id')) {
-            await store.dispatch('getUser', Cookies.get('user_id'));
-          } else {
-            next({ path: '/dashboard/login' });
+        if (Cookies.get('user_id')) {
+          await store.dispatch('getUser', Cookies.get('user_id'));
+          if (store.getters.user.role.name === 'Client') {
+            return next({ name: 'customer home' });
           }
+          return next({ path: '/dashboard/planning' });
+        } else {
+          next({ path: '/dashboard/login' });
         }
-        if (store.getters.user.role.name === 'Client') {
-          store.commit('changeRefreshState', false);
-          return next({ name: 'customer home' });
-        }
-        store.commit('changeRefreshState', false);
-        return next({ path: '/dashboard' });
       }
     },
     { path: '/dashboard/error403Pwd', component: load('dashboard/Error403ChangePwd') },

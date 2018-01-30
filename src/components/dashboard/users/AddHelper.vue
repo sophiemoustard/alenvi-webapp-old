@@ -200,7 +200,7 @@ export default {
         const helpers = await ogust.getCustomerContacts(item.id_customer);
         this.helpers = _.filter(helpers, (item) => item.email);
         for (const k in this.helpers) {
-          const user = await users.showAll({ 'local.email': this.helpers[k].email });
+          const user = await users.showAll({ 'local.email': this.helpers[k].email, customer_id: this.helpers[k].id_customer });
           if (!user) {
             this.checked = false;
           } else {
