@@ -23,6 +23,7 @@ import {
 
 import Planning from './Planning.vue'
 import PlanningModification from './PlanningModification'
+import ConstrainedCoaches from "./ConstrainedCoaches";
 
 export default {
   // props: ['navTabs'],
@@ -31,7 +32,8 @@ export default {
     QTab,
     QTabPane,
     Planning,
-    PlanningModification
+    PlanningModification,
+    ConstrainedCoaches
   },
   data () {
     return {
@@ -49,6 +51,13 @@ export default {
           icon: 'update',
           default: false,
           component: 'PlanningModification'
+        },
+        {
+          label: 'Coach(s) de permanence',
+          name: 'constrained',
+          icon: 'perm contact calendar',
+          default: false,
+          component: 'ConstrainedCoaches'
         }
       ]
     }
