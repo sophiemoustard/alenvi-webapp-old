@@ -20,7 +20,7 @@
             <q-item-tile label>{{ helper.first_name }} {{ helper.last_name }}</q-item-tile>
           </q-item-main>
         </q-item>
-        
+
         <p>Un mot de passe sera généré automatiquement.</p>
       </div>
     </div>
