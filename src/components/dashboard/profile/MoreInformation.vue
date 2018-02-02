@@ -140,12 +140,12 @@ export default {
         const userUpdatedOgust = await ogust.setEmployee(userToSendOgust);
         // Toast.create(`Utilisateur Ogust bien mis-à-jour`);
         alenviAlert({ color: 'positive', icon: 'thumb up', content: 'Profil mis à jour.', position: 'bottom-right', duration: 2500 });
-        this.credentials.password = '';
-        this.credentials.passwordConfirm = '';
+        this.user.credentials.password = '';
+        this.user.credentials.passwordConfirm = '';
       } catch (e) {
         alenviAlert({ color: 'error', icon: 'warning', content: 'Erreur lors de la mise à jour du profil.', position: 'bottom-right', duration: 2500 });
-        this.credentials.password = '';
-        this.credentials.passwordConfirm = '';
+        this.user.credentials.password = '';
+        this.user.credentials.passwordConfirm = '';
         // Toast.create(`Erreur lors de la mise-à-jour de l'utilisateur`);
         console.error(e);
       }
