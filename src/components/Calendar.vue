@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <scheduler :events="events" @progressDone="progressDone" @eventUpdated="updateEventById" @viewChanged="getEventsData"></scheduler>
+    <scheduler :showTabFilter="true" :events="events" @progressDone="progressDone" @eventUpdated="updateEventById" @viewChanged="getEventsData"></scheduler>
   </div>
 </template>
 
@@ -142,19 +142,21 @@ export default {
 }
 </script>
 
-<style>
-  .alenvi_event div {
-        background-color: #E2007A !important;
-        color: white !important;
-    }
+<style lang="stylus">
 
-    .dhx_cal_event_line.alenvi_event {
-        background-color: #E2007A !important;
-        color: white !important;
-    }
+  .dhx_cal_header, .dhx_cal_navline
+    position: fixed !important
+    background-color: white
 
-    .dhx_cal_event_clear.alenvi_event {
+  .alenvi_event div 
         background-color: #E2007A !important;
         color: white !important;
-    }
+
+    .dhx_cal_event_line.alenvi_event 
+        background-color: #E2007A !important;
+        color: white !important;
+
+    .dhx_cal_event_clear.alenvi_event 
+        background-color: #E2007A !important;
+        color: white !important;
 </style>

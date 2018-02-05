@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <scheduler :showTab="false" :customer="true" :events="events" @viewChanged="getEventsData"></scheduler>
+    <scheduler :showTabCustomer="false" :customer="true" :events="events" @viewChanged="getEventsData"></scheduler>
   </div>
 </template>
 
@@ -56,6 +56,6 @@ export default {
 }
 </script>
 
-<style lang="css" scoped>
+<style lang="stylus">
   
 </style>
