@@ -67,8 +67,8 @@
     </div>
     <div class="row justify-center">
       <div class="col-xs-12 col-sm-6">
-        <q-btn class="full-width" color="primary" @click="editCustomerInfo" :disable="disable">
-          Envoyer
+        <q-btn class="full-width" color="primary" @click="setModificationsOn(true)"> <!-- editCustomerInfo --> <!-- :disable="disable" -->
+          {{buttonName}} <!-- Enregistrer -->
         </q-btn>
       </div>
     </div>
@@ -132,7 +132,8 @@ export default {
           label: 'Autre',
           value: 'Autre'
         }
-      ]
+      ],
+      buttonName: 'Modifier...'
     }
   },
   mounted () {
@@ -156,7 +157,7 @@ export default {
         const customerCodesRaw = await Ogust.getOgustCustomerCodes(ogustToken, this.queryParams.idCustomer);
         this.customerCodes.doorCode = customerCodesRaw.door_code;
         this.customerCodes.interCode = customerCodesRaw.intercom_code;
-        this.disable = false;
+        // this.disable = false;
         if (customerDetails == null) {
           return
         } else {
@@ -195,6 +196,13 @@ export default {
         Toast.create("Erreur lors de l'édition de la fiche bénéficiaire :/");
         console.error(e.response)
       }
+    },
+    setModificationsOn (toSend) {
+      if (toSend && !this.disable) {
+        this.editCustomerInfo();
+      }
+      this.disable = false;
+      this.buttonName = 'Enregistrer';
     }
   }
 }
