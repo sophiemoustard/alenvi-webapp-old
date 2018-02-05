@@ -197,7 +197,7 @@ export default {
       try {
         this.invoices = [];
         this.isDisabled = true;
-        this.invoices = await ogust.getCustomerInvoices(276329398, { year: this.year, month: this.month == 'Tous' ? '' : moment().month(this.month).format('MM') }); // this.getUser.customer_id //
+        this.invoices = await ogust.getCustomerInvoices(this.getUser.customer_id, { year: this.year, month: this.month == 'Tous' ? '' : moment().month(this.month).format('MM') }); // 276329398 //
         for (let i = 0, l = Object.keys(this.invoices).length; i < l; i++) {
           this.invoices[i].invoice_date = moment(this.invoices[i].invoice_date, 'YYYYMMDD').toDate(); // .format('DD/MM/YYYY')
           // this.invoices[i].start_of_period = moment(this.invoices[i].start_of_period, 'YYYYMMDD').toDate(); // .format('DD/MM/YYYY')
@@ -213,7 +213,7 @@ export default {
     async getFiscalAttests () {
       try {
         this.fiscalAttests = [];
-        this.fiscalAttests = await ogust.getCustomerFiscalAttests(235146870, { year: this.year }); // this.getUser.customer_id
+        this.fiscalAttests = await ogust.getCustomerFiscalAttests(this.getUser.customer_id, { year: this.year }); // 235146870
         for (let i = 0, l = Object.keys(this.fiscalAttests).length; i < l; i++) {
           this.fiscalAttests[i].period_start = moment(this.fiscalAttests[i].period_start, 'YYYYMMDD').format('MM/YYYY');
         }
