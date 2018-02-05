@@ -1,8 +1,8 @@
 <template lang="html">
   <div>
     <div ref="scheduler_here" class="dhx_cal_container" style='width:100%; height:100%;'>
-      <q-window-resize-observable @resize="onResize" />
-      <div class="dhx_cal_navline">
+      <!-- <q-window-resize-observable @resize="onResize" /> -->
+      <div ref="cal_navline" class="dhx_cal_navline">
         <div class="dhx_cal_prev_button relative-position" v-ripple>&nbsp;</div>
         <div v-show="displayNext" class="dhx_cal_next_button relative-position" v-ripple>&nbsp;</div>
         <div v-if="!customer" class="dhx_cal_today_button relative-position" v-ripple></div>
@@ -10,23 +10,13 @@
         <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="day_tab" style="right:204px;"></div>
         <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="week_tab" style="right:140px;"></div>
         <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="month_tab" style="right:76px;"></div>
-        <div v-show="showTab" class="dhx_cal_tab relative-position" v-ripple name="customer_week_tab" style="right:140px;"></div>
+        <div v-show="showTabCustomer" class="dhx_cal_tab relative-position" v-ripple name="customer_week_tab" style="right:140px;"></div>
+        <div v-show="showTabFilter" class="dhx_cal_tab relative-position" @click.stop.prevent="filter" name="filter_tab" v-ripple style="left: 230px;"><q-icon name="filter list" size="1.5rem" flat /></div>
       </div>
-      <div class="dhx_cal_header"></div>
+      <div ref="cal_header" class="dhx_cal_header"></div>
       <div class="dhx_cal_data"></div>
     </div>
     <q-modal v-model="getOpenModal" minimized :content-css="modalStyle">
-      <!-- <div class="row justify-center">
-      <q-field class="col-xs-12 col-sm-6">
-        <q-input
-        v-model="customerCodes.interCode"
-        float-label="Code interphone"
-        type="textarea"
-        :min-rows="1"
-        :disable="disable">
-        </q-input>
-      </q-field>
-    </div> -->
       <p class="caption">{{ customerEventInfo.eventTitle }}</p>
       <q-field>
         <q-input v-model="customerEventInfo.doorCode" float-label="Code Porte" type="textarea" :min-rows="1" :disable="disableInput">
@@ -77,7 +67,7 @@ import 'dhtmlx-scheduler/codebase/ext/dhtmlxscheduler_readonly.js';
 import 'dhtmlx-scheduler/codebase/ext/dhtmlxscheduler_container_autoresize.js';
 import responsive from './scripts/dhtmlxscheduler-responsive.js';
 
-import { debounce, QWindowResizeObservable, QBtn, QModal, QInput, QField, QSelect, QDatetimeRange, Ripple, Toast } from 'quasar'
+import { debounce, QWindowResizeObservable, QBtn, QModal, QInput, QField, QSelect, QDatetimeRange, QIcon, Ripple, Toast } from 'quasar'
 import { mapGetters, mapMutations } from 'vuex'
 
 const configDhtmlxScheduler = (vm) => {
@@ -112,85 +102,6 @@ const configDhtmlxScheduler = (vm) => {
   scheduler.config.limit_time_select = true;
 
   scheduler.xy.scale_height = 45;
-
-  // let lightboxSections = [];
-  // if (vm.$route.query.id_employee && vm.$route.query.self === 'true') {
-  //   scheduler.config.readonly_form = false;
-  //   const pathologyOpts = [
-  //     { key: '-', label: '-' },
-  //     { key: 'Alzheimer', label: 'Alzheimer' },
-  //     { key: 'Parkinson', label: 'Parkinson' },
-  //     { key: 'Corps de Lewy', label: 'Corps de Lewy' },
-  //     { key: 'Autres troubles cognitifs', label: 'Autres troubles cognitifs' },
-  //     { key: 'AVC récent', label: 'AVC récent' },
-  //     { key: 'Autre', label: 'Autre' }
-  //   ];
-  //   lightboxSections = [
-  //     {
-  //       name: 'Pathologie',
-  //       height: 20,
-  //       map_to: 'pathology',
-  //       type: 'select',
-  //       options: pathologyOpts
-  //     },
-  //     {
-  //       name: 'Details',
-  //       height: 200,
-  //       map_to: 'interventionDetail',
-  //       type: 'textarea'
-  //     },
-  //     {
-  //       name: 'Autres',
-  //       height: 100,
-  //       map_to: 'misc',
-  //       type: 'textarea'
-  //     },
-  //     {
-  //       name: 'Commentaires',
-  //       height: 75,
-  //       map_to: 'comments',
-  //       type: 'textarea'
-  //     },
-  //     {
-  //       name: 'Horaires',
-  //       height: 75,
-  //       map_to: 'auto',
-  //       type: 'time'
-  //     }
-  //   ];
-  // } else if (vm.$route.query.id_employee && vm.$route.query.self === 'false') {
-  //   scheduler.config.readonly_form = true;
-  //   lightboxSections = [
-  //     {
-  //       name: 'Pathologie',
-  //       height: 20,
-  //       map_to: 'pathology',
-  //       type: 'textarea'
-  //     },
-  //     {
-  //       name: 'Details',
-  //       height: 200,
-  //       map_to: 'interventionDetail',
-  //       type: 'textarea'
-  //     },
-  //     {
-  //       name: 'Autres',
-  //       height: 100,
-  //       map_to: 'misc',
-  //       type: 'textarea'
-  //     },
-  //     {
-  //       name: 'Commentaires',
-  //       height: 200,
-  //       map_to: 'comments',
-  //       type: 'textarea'
-  //     }
-  //   ];
-  // } else {
-  //   scheduler.config.readonly_form = true;
-  //   lightboxSections = [];
-  // }
-  // scheduler.config.lightbox.sections = lightboxSections;
 }
 
 export default {
@@ -201,7 +112,8 @@ export default {
     QInput,
     QField,
     QSelect,
-    QDatetimeRange
+    QDatetimeRange,
+    QIcon
   },
   directives: {
     Ripple
@@ -232,7 +144,10 @@ export default {
     customer: {
       type: Boolean
     },
-    showTab: {
+    showTabCustomer: {
+      type: Boolean
+    },
+    showTabFilter: {
       type: Boolean
     }
   },
@@ -381,7 +296,7 @@ export default {
 
     // Scheduler data parser
     scheduler.parse(this.childEvents, 'json');
-    
+
     // Prevent draggable events
     // scheduler.attachEvent('onEventDrag', this.blockReadOnly);
     scheduler.showLightbox = (id) => {
@@ -473,7 +388,10 @@ export default {
       'setDisableInput',
       'setDisableTimePicker',
       'controlModal'
-    ])
+    ]),
+    filter () {
+      console.log('TEST');
+    }
   },
   created () {
     window.addEventListener('scroll', this.handleScroll);
@@ -499,6 +417,10 @@ export default {
     overflow-x: visible
     border-top: none
     /*padding-top: 10px;*/
+  
+  // .dhx_cal_header
+  //   position: fixed
+  //   background: white
 
   .dhx_cal_header div div
     border: none
