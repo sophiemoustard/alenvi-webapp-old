@@ -3,9 +3,9 @@
     <q-popover v-model="showFilter">
       <q-list link style="min-width: 200px">
         <q-list-header>
-          <q-field icon="search">
+          <!-- <q-field icon="search"> -->
             <!-- <q-input v-model="search" placeholder="Recherche" /> -->
-          </q-field>
+          <!-- </q-field> -->
         </q-list-header>
         <q-collapsible group="sectors" v-if="sectors.length !== 0" v-for="(sector, index) in filteredSectors" :key="index" :label="sector.label" @open="getEmployeesBySector(sector.value)">
           <q-list link no-border>
