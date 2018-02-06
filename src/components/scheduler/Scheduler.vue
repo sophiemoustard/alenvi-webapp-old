@@ -451,10 +451,10 @@ export default {
     // position: fixed
   
   .dhx_scale_holder
-    background-image: url("~assets/databg_custom.png")
+    background-image: url("./img/databg_custom.png")
 
   .dhx_scale_holder_now
-    background-image: url("~assets/databg_now_custom.png")
+    background-image: url("./img/databg_now_custom.png")
   
   .dhx_cal_navline.dhx_cal_date
     color: $tertiary
@@ -483,7 +483,7 @@ export default {
   .dhx_cal_prev_button
     width: 30px
     border-radius: 50%
-    background: url("~assets/chevron-left.png") no-repeat center center
+    background: url("./img/chevron-left.png") no-repeat center center
     &:hover
       background-color: rgba(0, 0, 0, .07)
   
@@ -498,7 +498,7 @@ export default {
   .dhx_cal_next_button
     width: 30px
     border-radius: 50%
-    background: url("~assets/chevron-right.png") no-repeat center center
+    background: url("./img/chevron-right.png") no-repeat center center
     &:hover
       background-color: rgba(0, 0, 0, .07)
 
