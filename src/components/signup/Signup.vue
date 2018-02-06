@@ -28,6 +28,14 @@
         <q-field :label-width="3" label="Ville" :error="$v.user.address.city.$error" error-label="Champ requis">
           <q-input type="text" v-model.trim="user.address.city" @blur="$v.user.address.city.$touch" />
         </q-field>
+        <q-field :label-width="3" label="Date de naissance" :error="$v.user.dateOfBirth.$error" error-label="Champ requis">
+          <q-datetime v-model="user.dateOfBirth" @blur="$v.user.dateOfBirth.$touch"/>
+          <!-- <q-input type="date" v-model.trim="user.birthday" @blur="$v.user.birthday.$touch" /> -->
+        </q-field>
+        <q-field :label-width="3" label="Département (99 si étranger)" :error="$v.user.stateOfBirth.$error" :error-label="stateOfBirthError">
+          <q-input type="number" v-model.trim="user.stateOfBirth" @blur="$v.user.stateOfBirth.$touch" />
+        </q-field>
+        <!-- <hr> -->
         <q-field :label-width="3" label="Email" :error="$v.user.email.$error" :error-label="emailError">
           <q-input type="email" v-model.trim="user.email" @blur="$v.user.email.$touch" />
         </q-field>
@@ -53,7 +61,7 @@
 
 
 <script>
-import { QInput, QField, QSelect, QCard, QCardTitle, QCardMain, QCardSeparator, QCardActions, QCardMedia, QBtn, Cookies, Loading } from 'quasar'
+import { QInput, QField, QSelect, QCard, QCardTitle, QCardMain, QCardSeparator, QCardActions, QCardMedia, QBtn, Cookies, Loading, QDatetime } from 'quasar'
 import { required, email, sameAs, numeric, minLength, maxLength } from 'vuelidate/lib/validators'
 
 // import { phoneNumber } from '../../helpers/validation/phoneNbr'
@@ -73,6 +81,7 @@ export default {
     QCardSeparator,
     QCardActions,
     QCardMedia,
+    QDatetime,
     QBtn
   },
   data () {
@@ -87,6 +96,10 @@ export default {
           zipCode: '',
           city: ''
         },
+        dateOfBirth: '',
+        stateOfBirth: '',
+        placeOfBirth: '',
+        countryOfBirth: [],
         phoneNbr: '',
         email: '',
         emailConfirmation: '',
@@ -133,6 +146,11 @@ export default {
       passwordConfirmation: {
         required,
         sameAsPassword: sameAs('password')
+      },
+      birthday: { required },
+      stateOfBirth: {
+        required,
+        maxLength: maxLength(2)
       }
     }
   },
@@ -169,11 +187,17 @@ export default {
       }
     },
     formError () {
-        console.log(this.$v.user);
       if (!this.$v.user.$error) {
         return true
       }
       return false
+    },
+    stateOfBirthError () {
+      if (!this.$v.user.stateOfBirth.required) {
+        return 'Champ requis'
+      } else if (!this.$v.user.stateOfBirth.maxLength) {
+        return 'Le département doit contenir 1 ou 2 chiffres.'
+      }
     }
   },
   methods: {
@@ -193,7 +217,8 @@ export default {
           },
           email: this.user.email,
           sector: this.user.sector,
-          mobile_phone: mobilePhone
+          mobile_phone: mobilePhone,
+          date_of_birth: this.user.birthday
         };
         const ogustToken = await ogust.getOgustToken(accessToken);
         const ogustNewUser = await ogust.createEmployee(ogustToken, ogustData);
