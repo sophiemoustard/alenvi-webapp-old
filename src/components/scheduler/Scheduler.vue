@@ -11,11 +11,12 @@
         <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="week_tab" style="right:140px;"></div>
         <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="month_tab" style="right:76px;"></div>
         <div v-show="showTabCustomer" class="dhx_cal_tab relative-position" v-ripple name="customer_week_tab" style="right:140px;"></div>
-        <div v-show="showTabFilter" class="dhx_cal_tab relative-position" @click.stop.prevent="filter" name="filter_tab" v-ripple style="left: 230px;"><q-icon name="filter list" size="1.5rem" flat /></div>
+        <div v-show="showTabFilter" class="dhx_cal_tab relative-position" name="filter_tab" @click="displayFilter" v-ripple style="left: 230px;"><sector-filter></sector-filter></div>
       </div>
-      <div ref="cal_header" class="dhx_cal_header"></div>
+      <div class="dhx_cal_header"></div>
       <div class="dhx_cal_data"></div>
     </div>
+
     <q-modal v-model="getOpenModal" minimized :content-css="modalStyle">
       <p class="caption">{{ customerEventInfo.eventTitle }}</p>
       <q-field>
@@ -67,8 +68,20 @@ import 'dhtmlx-scheduler/codebase/ext/dhtmlxscheduler_readonly.js';
 import 'dhtmlx-scheduler/codebase/ext/dhtmlxscheduler_container_autoresize.js';
 import responsive from './scripts/dhtmlxscheduler-responsive.js';
 
-import { debounce, QWindowResizeObservable, QBtn, QModal, QInput, QField, QSelect, QDatetimeRange, QIcon, Ripple, Toast } from 'quasar'
+import {
+  debounce,
+  QWindowResizeObservable,
+  QBtn,
+  QModal,
+  QInput,
+  QField,
+  QSelect,
+  QDatetimeRange,
+  Ripple,
+  Toast } from 'quasar'
 import { mapGetters, mapMutations } from 'vuex'
+
+import SectorFilter from '../dashboard/SectorFilter.vue'
 
 const configDhtmlxScheduler = (vm) => {
   // Event date format
@@ -113,7 +126,7 @@ export default {
     QField,
     QSelect,
     QDatetimeRange,
-    QIcon
+    SectorFilter
   },
   directives: {
     Ripple
@@ -233,7 +246,8 @@ export default {
     },
     ...mapGetters([
       'disableInput',
-      'disableTimePicker'
+      'disableTimePicker',
+      'showFilter'
     ])
   },
   mounted () {
@@ -274,6 +288,13 @@ export default {
           return 'alenvi_past_event';
         }
       }
+    });
+
+    scheduler.attachEvent('onBeforeViewChange', (oldMode, oldDate, mode, date) => {
+      if (mode === 'filter') {
+        return false;
+      }
+      return true;
     });
 
     // when clicking on prev and next buttons
@@ -389,8 +410,8 @@ export default {
       'setDisableTimePicker',
       'controlModal'
     ]),
-    filter () {
-      console.log('TEST');
+    displayFilter () {
+      this.$store.commit('toggleFilter', !this.showFilter)
     }
   },
   created () {

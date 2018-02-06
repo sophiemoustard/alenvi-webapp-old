@@ -13,7 +13,8 @@ export const store = new Vuex.Store({
     refreshState: true,
     openModal: false,
     disableInput: true,
-    disableTimePicker: true
+    disableTimePicker: true,
+    showFilter: false
   },
   getters: {
     user (state) {
@@ -27,6 +28,9 @@ export const store = new Vuex.Store({
     },
     disableTimePicker (state) {
       return state.disableTimePicker;
+    },
+    showFilter (state) {
+      return state.showFilter;
     }
   },
   mutations: {
@@ -44,6 +48,9 @@ export const store = new Vuex.Store({
     },
     setDisableTimePicker (state, date) {
       state.disableTimePicker = date;
+    },
+    toggleFilter (state, toggle) {
+      state.showFilter = toggle;
     }
   },
   actions: {
