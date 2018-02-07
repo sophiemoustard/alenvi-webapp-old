@@ -29,13 +29,17 @@
           <q-input type="text" v-model.trim="user.address.city" @blur="$v.user.address.city.$touch" />
         </q-field>
         <q-field :label-width="3" label="Date de naissance" :error="$v.user.dateOfBirth.$error" error-label="Champ requis">
-          <q-datetime v-model="user.dateOfBirth" @blur="$v.user.dateOfBirth.$touch"/>
-          <!-- <q-input type="date" v-model.trim="user.birthday" @blur="$v.user.birthday.$touch" /> -->
+          <q-datetime v-model="user.dateOfBirth" @blur="$v.user.dateOfBirth.$touch" monday-first :month-names="monthNames" :day-names="dayNames" ok-label="APPLIQUER" no-clear cancel-label="ANNULER" min="1920-01-01" :max="new Date()"/>
         </q-field>
         <q-field :label-width="3" label="Département (99 si étranger)" :error="$v.user.stateOfBirth.$error" :error-label="stateOfBirthError">
           <q-input type="number" v-model.trim="user.stateOfBirth" @blur="$v.user.stateOfBirth.$touch" />
         </q-field>
-        <!-- <hr> -->
+        <q-field :label-width="3" label="Lieu de naissance" :error="$v.user.placeOfBirth.$error" error-label="Champ requis">
+          <q-input type="text" v-model.trim="user.placeOfBirth" @blur="$v.user.placeOfBirth.$touch" />
+        </q-field>
+        <q-field :label-width="3" label="Pays de naissance" :error="$v.user.countryOfBirth.$error" error-label="Champ requis">
+          <q-select v-model="user.countryOfBirth" :options="countries" @blur="$v.user.countryOfBirth.$touch" filter autofocus-filter/>
+        </q-field>
         <q-field :label-width="3" label="Email" :error="$v.user.email.$error" :error-label="emailError">
           <q-input type="email" v-model.trim="user.email" @blur="$v.user.email.$touch" />
         </q-field>
@@ -45,11 +49,11 @@
         </q-field>
         <q-field :label-width="3" label="Mot de passe" helper="Crée ton mot de passe. Il doit contenir au moins 6 caractères jusqu'à 20 maximum" :error="$v.user.password.$error"
           :error-label="passwordError">
-          <q-input type="password" v-model.trim="user.password" @blur="$v.user.password.$touch" />
+          <q-input type="password" v-model="user.password" @blur="$v.user.password.$touch" />
         </q-field>
         <q-field :label-width="3" label="Confirmation mot de passe" helper="Entre une nouvelle fois ton mot de passe" :error="$v.user.passwordConfirmation.$error"
           error-label="Le mot de passe entré et la confirmation sont différents.">
-          <q-input type="password" v-model.trim="user.passwordConfirmation" @blur="$v.user.passwordConfirmation.$touch" />
+          <q-input type="password" v-model="user.passwordConfirmation" @blur="$v.user.passwordConfirmation.$touch" />
         </q-field>
       </q-card-main>
       <q-card-actions class="row justify-end">
@@ -63,6 +67,8 @@
 <script>
 import { QInput, QField, QSelect, QCard, QCardTitle, QCardMain, QCardSeparator, QCardActions, QCardMedia, QBtn, Cookies, Loading, QDatetime } from 'quasar'
 import { required, email, sameAs, numeric, minLength, maxLength } from 'vuelidate/lib/validators'
+
+import _ from 'lodash'
 
 // import { phoneNumber } from '../../helpers/validation/phoneNbr'
 import ogust from '../models/Ogust'
@@ -86,6 +92,9 @@ export default {
   },
   data () {
     return {
+      dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
+      monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
+      countries: [],
       user: {
         civility: '',
         lastname: '',
@@ -99,7 +108,7 @@ export default {
         dateOfBirth: '',
         stateOfBirth: '',
         placeOfBirth: '',
-        countryOfBirth: [],
+        countryOfBirth: 'FR',
         phoneNbr: '',
         email: '',
         emailConfirmation: '',
@@ -147,15 +156,18 @@ export default {
         required,
         sameAsPassword: sameAs('password')
       },
-      birthday: { required },
+      dateOfBirth: { required },
       stateOfBirth: {
         required,
         maxLength: maxLength(2)
-      }
+      },
+      countryOfBirth: { required },
+      placeOfBirth: { required }
     }
   },
   mounted () {
     this.user.sector = Cookies.get('signup_sector');
+    this.getCountries();
   },
   computed: {
     emailError () {
@@ -218,7 +230,10 @@ export default {
           email: this.user.email,
           sector: this.user.sector,
           mobile_phone: mobilePhone,
-          date_of_birth: this.user.birthday
+          date_of_birth: this.user.dateOfBirth,
+          place_of_birth: this.user.placeOfBirth,
+          state_of_birth: this.user.stateOfBirth,
+          country_of_birth: this.user.countryOfBirth
         };
         const ogustToken = await ogust.getOgustToken(accessToken);
         const ogustNewUser = await ogust.createEmployee(ogustToken, ogustData);
@@ -235,7 +250,7 @@ export default {
         };
         const newAlenviUser = await users.create(alenviData);
         const alenviToken = newAlenviUser.data.data.token;
-        Loading.show({ message: 'Redirection vers Pigi...'});
+        Loading.show({ message: 'Redirection vers Pigi...' });
         setTimeout(async () => {
           Loading.hide();
           Cookies.remove('signup_is_activated', { path: '/' });
@@ -255,6 +270,15 @@ export default {
         });
         console.error(e.response);
       }
+    },
+    async getCountries () {
+      const ogustToken = await ogust.getOgustToken(Cookies.get('signup_is_activated'));
+      const countriesRaw = await ogust.getList('employee.country_of_birth', ogustToken);
+      delete countriesRaw['0'];
+      for (const k in countriesRaw) {
+        this.countries.push({ label: countriesRaw[k], value: k });
+      }
+      console.log(this.countries);
     }
   },
   beforeDestroy () {

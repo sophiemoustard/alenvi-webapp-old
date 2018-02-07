@@ -114,8 +114,13 @@ export default {
       await axios.put(`${process.env.API_HOSTNAME}/ogust/customers/${customerId}/edit`, data, { headers: { 'x-ogust-token': ogustToken } });
     }
   },
-  async getList (key) {
-    const ogustListRaw = await alenviAxios.post(`${process.env.API_HOSTNAME}/ogust/utils/getList?key=${key}`, {});
+  async getList (key, ogustToken = null) {
+    let ogustListRaw = {};
+    if (ogustToken == null) {
+      ogustListRaw = await axios.post(`${process.env.API_HOSTNAME}/ogust/utils/getList?key=${key}`, { headers: { 'x-ogust-token': ogustToken } });
+    } else {
+      ogustListRaw = await alenviAxios.post(`${process.env.API_HOSTNAME}/ogust/utils/getList?key=${key}`, {});
+    }
     return ogustListRaw.data.data.list;
   },
   async getEmployees (params) {
