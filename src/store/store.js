@@ -14,7 +14,9 @@ export const store = new Vuex.Store({
     openModal: false,
     disableInput: true,
     disableTimePicker: true,
-    showFilter: false
+    showFilter: false,
+    ogustUser: null,
+    auxiliariesChosen: null
   },
   getters: {
     user (state) {
@@ -31,6 +33,12 @@ export const store = new Vuex.Store({
     },
     showFilter (state) {
       return state.showFilter;
+    },
+    ogustUser (state) {
+      return state.ogustUser;
+    },
+    auxiliariesChosen (state) {
+      return state.auxiliariesChosen;
     }
   },
   mutations: {
@@ -51,6 +59,12 @@ export const store = new Vuex.Store({
     },
     toggleFilter (state, toggle) {
       state.showFilter = toggle;
+    },
+    setOgustUser (state, ogustUserData) {
+      state.ogustUser = ogustUserData;
+    },
+    setAuxiliariesChosen (state, auxiliaries) {
+      state.auxiliariesChosen = auxiliaries;
     }
   },
   actions: {

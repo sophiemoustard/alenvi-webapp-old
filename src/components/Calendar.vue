@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <scheduler :showTabFilter="true" :events="events" @progressDone="progressDone" @eventUpdated="updateEventById" @viewChanged="getEventsData"></scheduler>
+    <scheduler :showTabFilter="true" :events="events" @progressDone="progressDone" @eventUpdated="updateEventById" @viewChanged="getEventsData" @applyFilter="getEventsData"></scheduler>
   </div>
 </template>
 
@@ -8,6 +8,7 @@
 import { Toast } from 'quasar'
 import { mapMutations } from 'vuex'
 import moment from 'moment'
+import _ from 'lodash'
 import Scheduler from './scheduler/Scheduler.vue'
 import Ogust from './models/Ogust'
 import PlanningUpdates from './models/PlanningUpdates'
@@ -33,12 +34,17 @@ export default {
       done: null
     }
   },
+  computed: {
+    auxiliariesChosen () {
+      return this.$store.getters.auxiliariesChosen;
+    }
+  },
   mounted () {
     // this.getEventsData();
   },
   watch: {
     events: function (value) {
-      scheduler.parse(this.events, 'json');
+      scheduler.parse(value, 'json');
     }
   },
   methods: {
@@ -62,8 +68,18 @@ export default {
           }
           const ogustToken = await Ogust.getOgustToken(this.token);
           const personData = await Ogust.getOgustPerson(ogustToken, this.personId, personType);
+          this.$store.commit('setOgustUser', personData);
           this.title = personData.title;
-          this.events = await Ogust.getOgustEvents(ogustToken, this.personId, personType);
+          if (this.auxiliariesChosen && this.auxiliariesChosen.length !== 0) {
+            this.events = [];
+            for (let i = 0, l = this.auxiliariesChosen.length; i < l; i++) {
+              const events = await Ogust.getOgustEvents(ogustToken, this.auxiliariesChosen[i], personType);
+              this.events = this.events.concat(events);
+            }
+            // scheduler.setCurrentView();
+          } else {
+            this.events = await Ogust.getOgustEvents(ogustToken, this.personId, personType);
+          }
         }
       } catch (e) {
         console.error(e)

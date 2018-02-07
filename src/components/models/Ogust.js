@@ -75,7 +75,7 @@ export default {
     switch (personType) {
       case 'employee':
         personRaw = await axios.get(`${process.env.API_HOSTNAME}/ogust/employees/${idPerson}`, { headers: { 'x-ogust-token': ogustToken } });
-        personData = _.pick(personRaw.data.data.user[personType], ['first_name', 'last_name']);
+        personData = _.pick(personRaw.data.data.user[personType], ['first_name', 'last_name', 'sector', 'id_employee']);
         title = `Planning de ${personData.first_name} ${personData.last_name.substring(0, 1)}.`;
         break;
       case 'customer':
@@ -86,7 +86,9 @@ export default {
     }
     return {
       title,
-      comment: personData.comment || ''
+      comment: personData.comment || '',
+      sector: personData.sector || '',
+      id_employee: personData.id_employee || ''
     }
   },
   async getOgustCustomerDetails (ogustToken = null, customerId) {

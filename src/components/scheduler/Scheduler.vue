@@ -11,7 +11,9 @@
         <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="week_tab" style="right:140px;"></div>
         <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="month_tab" style="right:76px;"></div>
         <div v-show="showTabCustomer" class="dhx_cal_tab relative-position" v-ripple name="customer_week_tab" style="right:140px;"></div>
-        <div v-show="showTabFilter" class="dhx_cal_tab relative-position" name="filter_tab" @click="displayFilter" v-ripple style="left: 230px;"><sector-filter></sector-filter></div>
+        <div v-show="showTabFilter" class="dhx_cal_tab relative-position" name="filter_tab" @click="displayFilter" v-ripple style="left: 230px;">
+          <sector-filter v-if="ogustUser" @auxiliariesChosen="applyFilter" />
+        </div>
       </div>
       <div class="dhx_cal_header"></div>
       <div class="dhx_cal_data"></div>
@@ -134,7 +136,7 @@ export default {
   name: 'scheduler',
   props: {
     events: {
-      type: Array,
+      type: event,
       default () {
         return [{
           id: '',
@@ -247,7 +249,9 @@ export default {
     ...mapGetters([
       'disableInput',
       'disableTimePicker',
-      'showFilter'
+      'showFilter',
+      'ogustUser',
+      'auxiliariesChosen'
     ])
   },
   mounted () {
@@ -412,6 +416,15 @@ export default {
     ]),
     displayFilter () {
       this.$store.commit('toggleFilter', !this.showFilter)
+    },
+    applyFilter () {
+      scheduler.filter_week = (id, event) => {
+        if (this.auxiliariesChosen && this.auxiliariesChosen.indexOf(event.id_employee) !== -1) {
+          return true;
+        }
+        return false;
+      }
+      this.$emit('applyFilter');
     }
   },
   created () {

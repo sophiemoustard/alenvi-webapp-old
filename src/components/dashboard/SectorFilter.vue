@@ -1,25 +1,18 @@
 <template>
   <q-icon name="filter list" size="1.5rem" flat>
-    <q-popover v-model="showFilter">
-      <q-list link style="min-width: 200px">
-        <q-list-header>
-          <!-- <q-field icon="search"> -->
-            <!-- <q-input v-model="search" placeholder="Recherche" /> -->
-          <!-- </q-field> -->
+    <q-popover v-model="showFilter" @open="getEmployeesBySector(ogustUser.sector)">
+      <q-list link no-border style="min-width: 200px">
+        <q-list-header v-if="auxiliaries.length !== 0">
+          <q-field icon="search">
+            <q-input v-model="search" placeholder="Recherche" />
+          </q-field>
         </q-list-header>
-        <q-collapsible group="sectors" v-if="sectors.length !== 0" v-for="(sector, index) in filteredSectors" :key="index" :label="sector.label" @open="getEmployeesBySector(sector.value)">
-          <q-list link no-border>
-            <q-inner-loading :visible="auxiliaries.length === 0">
-              <q-spinner size="30px" />
-            </q-inner-loading>
-            <q-item v-for="(auxiliary, index) in auxiliaries" :key="index">
-                <q-checkbox v-model="auxiliaryId" :val="auxiliary.value" :label="auxiliary.label" />
-            </q-item>
-          </q-list>
-        </q-collapsible>
-        <!-- <q-item v-for="n in 3" :key="n" @click="showToast(), $refs.popover2.close()">
-          <q-item-main label="Label" />
-        </q-item> -->
+        <q-inner-loading :visible="auxiliaries.length === 0">
+          <q-spinner size="50px" />
+        </q-inner-loading>
+        <q-item v-for="(auxiliary, index) in filteredAuxiliaries" :key="index">
+          <q-checkbox v-model="auxiliariesIds" :val="auxiliary.value" :label="auxiliary.label" @change="chooseAuxiliaries" />
+        </q-item>
       </q-list>
     </q-popover>
   </q-icon>
@@ -35,11 +28,11 @@ import {
   QItem,
   QItemMain,
   QItemSide,
-  QCollapsible,
   QInnerLoading,
   QCheckbox,
   QSpinner,
-  QAutocomplete
+  QField,
+  QInput
 } from 'quasar'
 
 import ogust from '../models/Ogust'
@@ -53,17 +46,17 @@ export default {
     QItem,
     QItemMain,
     QItemSide,
-    QCollapsible,
     QInnerLoading,
     QCheckbox,
     QSpinner,
-    QAutocomplete
+    QField,
+    QInput
   },
   data () {
     return {
       sectors: [],
       auxiliaries: [],
-      auxiliaryId: [],
+      auxiliariesIds: [],
       search: ''
     }
   },
@@ -76,39 +69,19 @@ export default {
         this.$store.commit('toggleFilter', value);
       }
     },
-    filteredSectors () {
-      return this.sectors.filter((item) => {
-        return item.label.match(this.search);
+    ogustUser () {
+      return this.$store.getters.ogustUser;
+    },
+    filteredAuxiliaries () {
+      return this.auxiliaries.filter((item) => {
+        return item.label.match(new RegExp(`${this.search}`, 'i'));
       })
     }
   },
-  watch: {
-    auxiliaryId: (value) => {
-      console.log('AUXILIARY IDS', value);
-    }
-  },
-  async mounted () {
-    await this.getSectors();
-    console.log(this.sectors);
+  mounted () {
+    this.auxiliariesIds.push(this.$store.state.ogustUser.id_employee);
   },
   methods: {
-    async getSectors () {
-      try {
-        this.sectors = [];
-        const allSectorsRaw = await ogust.getList('employee.sector');
-        for (const k in allSectorsRaw) {
-          if (k === '*') {
-            continue;
-          }
-          this.sectors.push({
-            label: allSectorsRaw[k],
-            value: k
-          });
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    },
     async getEmployeesBySector (sector) {
       try {
         this.auxiliaries = [];
@@ -122,6 +95,10 @@ export default {
       } catch (e) {
         console.error(e);
       }
+    },
+    chooseAuxiliaries () {
+      this.$emit('auxiliariesChosen');
+      this.$store.commit('setAuxiliariesChosen', this.auxiliariesIds);
     }
   }
 }
