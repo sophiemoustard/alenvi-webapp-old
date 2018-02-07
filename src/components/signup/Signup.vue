@@ -29,7 +29,7 @@
           <q-input type="text" v-model.trim="user.address.city" @blur="$v.user.address.city.$touch" />
         </q-field>
         <q-field :label-width="3" label="Date de naissance" :error="$v.user.dateOfBirth.$error" error-label="Champ requis">
-          <q-datetime v-model="user.dateOfBirth" @blur="$v.user.dateOfBirth.$touch" monday-first :month-names="monthNames" :day-names="dayNames" ok-label="APPLIQUER" no-clear cancel-label="ANNULER" min="1920-01-01" :max="new Date()"/>
+          <q-datetime v-model="user.dateOfBirth" @blur="$v.user.dateOfBirth.$touch" monday-first :month-names="monthNames" :day-names="dayNames" ok-label="APPLIQUER" no-clear cancel-label="ANNULER" min="1920-01-01" :max="new Date()" format="DD/MM/YYYY"/>
         </q-field>
         <q-field :label-width="3" label="Département (99 si étranger)" :error="$v.user.stateOfBirth.$error" :error-label="stateOfBirthError">
           <q-input type="number" v-model.trim="user.stateOfBirth" @blur="$v.user.stateOfBirth.$touch" />
@@ -39,6 +39,9 @@
         </q-field>
         <q-field :label-width="3" label="Pays de naissance" :error="$v.user.countryOfBirth.$error" error-label="Champ requis">
           <q-select v-model="user.countryOfBirth" :options="countries" @blur="$v.user.countryOfBirth.$touch" filter autofocus-filter/>
+        </q-field>
+        <q-field :label-width="3" label="Numéro de sécurité sociale" :error="$v.user.socialInsuranceNumber.$error" :error-label="socialInsuranceNumberError">
+          <q-input type="number" v-model.trim="user.socialInsuranceNumber" @blur="$v.user.socialInsuranceNumber.$touch" />
         </q-field>
         <q-field :label-width="3" label="Email" :error="$v.user.email.$error" :error-label="emailError">
           <q-input type="email" v-model.trim="user.email" @blur="$v.user.email.$touch" />
@@ -58,6 +61,7 @@
       </q-card-main>
       <q-card-actions class="row justify-end">
         <q-btn color="primary" @click="submit" :disable="$v.user.$invalid" flat>Envoyer</q-btn>
+        <!-- <q-btn color="primary" @click="test" flat>Envoyer</q-btn> -->
       </q-card-actions>
     </q-card>
   </div>
@@ -65,10 +69,11 @@
 
 
 <script>
-import { QInput, QField, QSelect, QCard, QCardTitle, QCardMain, QCardSeparator, QCardActions, QCardMedia, QBtn, Cookies, Loading, QDatetime } from 'quasar'
+import { QInput, QField, QSelect, QCard, QCardTitle, QCardMain, QCardSeparator, QCardActions, QCardMedia, QBtn, Cookies, Loading, QDatetime, date } from 'quasar'
 import { required, email, sameAs, numeric, minLength, maxLength } from 'vuelidate/lib/validators'
 
 import _ from 'lodash'
+import moment from 'moment'
 
 // import { phoneNumber } from '../../helpers/validation/phoneNbr'
 import ogust from '../models/Ogust'
@@ -113,7 +118,8 @@ export default {
         email: '',
         emailConfirmation: '',
         password: '',
-        passwordConfirmation: ''
+        passwordConfirmation: '',
+        socialInsuranceNumber: ''
       },
       civilityOptions: [
         {
@@ -160,6 +166,11 @@ export default {
       stateOfBirth: {
         required,
         maxLength: maxLength(2)
+      },
+      socialInsuranceNumber: {
+        required,
+        maxLength: maxLength(15),
+        minLength: minLength(15)
       },
       countryOfBirth: { required },
       placeOfBirth: { required }
@@ -210,6 +221,13 @@ export default {
       } else if (!this.$v.user.stateOfBirth.maxLength) {
         return 'Le département doit contenir 1 ou 2 chiffres.'
       }
+    },
+    socialInsuranceNumberError () {
+      if (!this.$v.user.socialInsuranceNumber.required) {
+        return 'Champ requis'
+      } else if (!this.$v.user.socialInsuranceNumber.maxLength || !this.$v.user.socialInsuranceNumber.minLength) {
+        return 'Le numéro de sécurité sociale doit contenir 15 chiffres.'
+      }
     }
   },
   methods: {
@@ -230,10 +248,11 @@ export default {
           email: this.user.email,
           sector: this.user.sector,
           mobile_phone: mobilePhone,
-          date_of_birth: this.user.dateOfBirth,
+          date_of_birth: moment(this.user.dateOfBirth).format('YYYYMMDD'),
           place_of_birth: this.user.placeOfBirth,
           state_of_birth: this.user.stateOfBirth,
-          country_of_birth: this.user.countryOfBirth
+          country_of_birth: this.user.countryOfBirth,
+          social_insurance_number: this.user.socialInsuranceNumber
         };
         const ogustToken = await ogust.getOgustToken(accessToken);
         const ogustNewUser = await ogust.createEmployee(ogustToken, ogustData);
@@ -272,13 +291,17 @@ export default {
       }
     },
     async getCountries () {
-      const ogustToken = await ogust.getOgustToken(Cookies.get('signup_is_activated'));
-      const countriesRaw = await ogust.getList('employee.country_of_birth', ogustToken);
-      delete countriesRaw['0'];
-      for (const k in countriesRaw) {
-        this.countries.push({ label: countriesRaw[k], value: k });
+      try {
+        const ogustToken = await ogust.getOgustToken(Cookies.get('signup_is_activated'));
+        const countriesRaw = await ogust.getList('employee.country_of_birth', ogustToken);
+        delete countriesRaw['0'];
+        for (const k in countriesRaw) {
+          this.countries.push({ label: countriesRaw[k], value: k });
+        }
+        console.log(this.countries);
+      } catch (e) {
+        console.error(e);
       }
-      console.log(this.countries);
     }
   },
   beforeDestroy () {
