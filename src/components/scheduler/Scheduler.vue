@@ -418,14 +418,22 @@ export default {
       this.$store.commit('toggleFilter', !this.showFilter)
     },
     applyFilter () {
-      scheduler.filter_week = (id, event) => {
-        console.log(this.auxiliariesChosen.indexOf(event.id_employee));
-        this.$emit('applyFilter');
-        if (this.auxiliariesChosen && this.auxiliariesChosen.indexOf(event.id_employee) !== -1) {
+      // scheduler.filter_week = (id, event) => {
+      // console.log(id);
+      // console.log(this.auxiliariesChosen.indexOf(event.id_employee));
+      //   this.$emit('applyFilter');
+      //   if (this.auxiliariesChosen && this.auxiliariesChosen.indexOf(event.id_employee) !== -1) {
+      //     return true;
+      //   }
+      //   return false;
+      // }
+      scheduler.filter_day = scheduler.filter_month = scheduler.filter_week = (id, event) => {
+        if (this.auxiliariesChosen && this.auxiliariesChosen === event.id_employee) {
           return true;
         }
         return false;
       }
+      this.$emit('applyFilter');
     }
   },
   created () {

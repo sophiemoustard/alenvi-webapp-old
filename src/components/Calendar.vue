@@ -70,16 +70,19 @@ export default {
           const personData = await Ogust.getOgustPerson(ogustToken, this.personId, personType);
           this.$store.commit('setOgustUser', personData);
           this.title = personData.title;
-          if (this.auxiliariesChosen && this.auxiliariesChosen.length !== 0) {
-            this.events = [];
-            for (let i = 0, l = this.auxiliariesChosen.length; i < l; i++) {
-              const events = await Ogust.getOgustEvents(ogustToken, this.auxiliariesChosen[i], personType);
-              this.events = this.events.concat(events);
-            }
-            // scheduler.setCurrentView();
+          // if (this.auxiliariesChosen && this.auxiliariesChosen.length !== 0) {
+          //   this.events = [];
+          //   for (let i = 0, l = this.auxiliariesChosen.length; i < l; i++) {
+          //     const events = await Ogust.getOgustEvents(ogustToken, this.auxiliariesChosen[i], personType);
+          //     this.events = this.events.concat(events);
+          //   }
+          if (this.auxiliariesChosen) {
+            this.events = await Ogust.getOgustEvents(ogustToken, this.auxiliariesChosen, personType);
           } else {
             this.events = await Ogust.getOgustEvents(ogustToken, this.personId, personType);
           }
+          scheduler.updateView();
+          console.log(this.events);
         }
       } catch (e) {
         console.error(e)

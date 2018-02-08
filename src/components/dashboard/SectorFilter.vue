@@ -1,5 +1,5 @@
 <template>
-  <q-icon name="filter list" size="1.5rem" flat>
+  <q-icon name="person" size="1.5rem" flat>
     <q-popover v-model="showFilter" @open="getEmployeesBySector(ogustUser.sector)">
       <q-list link no-border style="min-width: 200px">
         <q-list-header v-if="auxiliaries.length !== 0">
@@ -11,7 +11,8 @@
           <q-spinner size="50px" />
         </q-inner-loading>
         <q-item v-for="(auxiliary, index) in filteredAuxiliaries" :key="index">
-          <q-checkbox v-model="auxiliariesIds" :val="auxiliary.value" :label="auxiliary.label" @change="chooseAuxiliaries" />
+          <!-- <q-checkbox v-model="auxiliariesIds" :val="auxiliary.value" :label="auxiliary.label" @change="chooseAuxiliaries" /> -->
+          <q-radio v-model="auxiliaryId" :val="auxiliary.value" :label="auxiliary.label" @change="chooseAuxiliaries" />
         </q-item>
       </q-list>
     </q-popover>
@@ -30,6 +31,7 @@ import {
   QItemSide,
   QInnerLoading,
   QCheckbox,
+  QRadio,
   QSpinner,
   QField,
   QInput
@@ -48,6 +50,7 @@ export default {
     QItemSide,
     QInnerLoading,
     QCheckbox,
+    QRadio,
     QSpinner,
     QField,
     QInput
@@ -56,7 +59,8 @@ export default {
     return {
       sectors: [],
       auxiliaries: [],
-      auxiliariesIds: [],
+      auxiliaryId: '',
+      // auxiliariesIds: [],
       search: ''
     }
   },
@@ -79,7 +83,8 @@ export default {
     }
   },
   mounted () {
-    this.auxiliariesIds.push(this.$store.state.ogustUser.id_employee);
+    // this.auxiliariesIds.push(this.$store.state.ogustUser.id_employee);
+    this.auxiliaryId = this.$store.state.ogustUser.id_employee;
   },
   methods: {
     async getEmployeesBySector (sector) {
@@ -98,7 +103,7 @@ export default {
     },
     chooseAuxiliaries () {
       this.$emit('auxiliariesChosen');
-      this.$store.commit('setAuxiliariesChosen', this.auxiliariesIds);
+      this.$store.commit('setAuxiliariesChosen', this.auxiliaryId);
     }
   }
 }
