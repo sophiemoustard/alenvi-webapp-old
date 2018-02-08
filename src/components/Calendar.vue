@@ -81,8 +81,8 @@ export default {
           } else {
             this.events = await Ogust.getOgustEvents(ogustToken, this.personId, personType);
           }
-          scheduler.updateView();
-          console.log(this.events);
+          // scheduler.updateView();
+          // console.log(this.events);
         }
       } catch (e) {
         console.error(e)
