@@ -119,9 +119,9 @@ export default {
   async getList (key, ogustToken = null) {
     let ogustListRaw = {};
     if (ogustToken == null) {
-      ogustListRaw = await axios.post(`${process.env.API_HOSTNAME}/ogust/utils/getList?key=${key}`, { headers: { 'x-ogust-token': ogustToken } });
-    } else {
       ogustListRaw = await alenviAxios.post(`${process.env.API_HOSTNAME}/ogust/utils/getList?key=${key}`, {});
+    } else {
+      ogustListRaw = await axios.post(`${process.env.API_HOSTNAME}/ogust/utils/getList?key=${key}`, { headers: { 'x-ogust-token': ogustToken } });
     }
     return ogustListRaw.data.data.list;
   },
