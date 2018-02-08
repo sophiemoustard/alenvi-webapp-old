@@ -12,7 +12,7 @@ app.use(history());
 //   next();
 // });
 
-app.use(sslRedirect());
+app.use(sslRedirect(['development', 'production']));
 
 app.use(express.static(__dirname + '/dist'));
 
