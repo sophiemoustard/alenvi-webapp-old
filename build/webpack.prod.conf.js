@@ -12,7 +12,7 @@ var
 module.exports = merge(baseWebpackConfig, {
   module: {
     rules: cssUtils.styleRules({
-      sourceMap: config.build.productionSourceMap,
+      // sourceMap: config.build.productionSourceMap,
       extract: true,
       postcss: true
     })
