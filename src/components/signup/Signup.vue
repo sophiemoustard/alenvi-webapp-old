@@ -72,7 +72,7 @@
 import { QInput, QField, QSelect, QCard, QCardTitle, QCardMain, QCardSeparator, QCardActions, QCardMedia, QBtn, Cookies, Loading, QDatetime, date } from 'quasar'
 import { required, email, sameAs, numeric, minLength, maxLength } from 'vuelidate/lib/validators'
 
-import _ from 'lodash'
+// import _ from 'lodash'
 import moment from 'moment'
 
 // import { phoneNumber } from '../../helpers/validation/phoneNbr'
