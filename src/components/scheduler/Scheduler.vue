@@ -465,10 +465,10 @@ export default {
     // position: fixed
   
   .dhx_scale_holder
-    background: url("img/databg_custom.png")
+    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAsCAIAAAArRUU2AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAB3RJTUUH4gEREC41Aw9nHAAAABZJREFUCNdj+P//PxMDA8OQwOfPnwcAKy4FwcX82PUAAAAASUVORK5CYII=')
 
   .dhx_scale_holder_now
-    background: url("img/databg_now_custom.png")
+    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAsCAIAAAArRUU2AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAB3RJTUUH4gEREDIsgROSgQAAABZJREFUCNdj+P95IRMDA8OQwOcvPgQA44cFa6kqCcUAAAAASUVORK5CYII=')
   
   .dhx_cal_navline.dhx_cal_date
     color: $tertiary
@@ -497,7 +497,7 @@ export default {
   .dhx_cal_prev_button
     width: 30px
     border-radius: 50%
-    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAQAAAD8x0bcAAAAPUlEQVR4AWMYIkCIYQEQE1ByjuErgxUhJd8YnAgrccZv1R6G/wzxhJxsxPCO4S6DHL2V3WbQIxyczIM/xgGTtxCuXoKoZQAAAABJRU5ErkJggg==') no-repeat center center
+    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAAAAAAAA+UO7fwAAAAlwSFlzAAAASAAAAEgARslrPgAAAORJREFUSMft1T8KwjAUBvAvcRI8jFtbOviHHkDwJIXuegGbHsFTiIODi2nOIG46OIirLk1dOog45CURHPJtGV5+PHi8B4SEhPxT8jwfUWt6rmhRFEvG2DpJkn5d1zvTOuaKtm276J5nrfVQCHE3qeWe0IvWemqKWnf8BZ0IIU6UP8iwD5QM+0IBwlR/oNemabKqqo42KEAbroct4tSxlPKQpukTQAZgwDmfR1G0UUrdfgr7xsmbyxdutTJ94Na7usMZgHGHz+I4XiuljIbQ6UhIKfdvna/Ksty6/EeOzVkMCQnxlhck2ouoK+MN0AAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxOC0wMS0xOFQxMDowNzoxMyswMDowMGL8TZcAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTgtMDEtMThUMTA6MDc6MTMrMDA6MDATofUrAAAAKHRFWHRzdmc6YmFzZS11cmkAZmlsZTovLy90bXAvbWFnaWNrLU5Td0Y1d0NE+kVb4wAAAABJRU5ErkJggg==') no-repeat center center
     &:hover
       background-color: rgba(0, 0, 0, .07)
   
@@ -512,7 +512,7 @@ export default {
   .dhx_cal_next_button
     width: 30px
     border-radius: 50%
-    background: url("~statics/img/chevron-right.png") no-repeat center center
+    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAAAAAAAA+UO7fwAAAAlwSFlzAAAASAAAAEgARslrPgAAAPRJREFUSMft1aFOxDAcgPHvP2YwQLBonmFbdwkYPAlP0mTzuwfYPO6egIA4dwmotbwNqHMrhplT164Hpp9s2v7SihZSqdR/pbW+i7HPmc/kpmk6EdlUVXVujNn9Cay1vhaRZ+BSRFZ1Xcs4jh8nh621e6XUC/AIXAH3S07uddXGmG+l1OuMi8gqFPeCZ7woircsyxbh3jCAtfZrKR4Ez3hZllsReQIufPEsFAbI81wOhvbHrpVjJx7Wtu3tNE3vwA2Ac64bhmF9UngpGgTHQL3hWCh4PpnA54yKyLrv+yDUC/59MnPgwTnXLUGDivUtplKpaP0Awbh4tLAnJEMAAAAldEVYdGRhdGU6Y3JlYXRlADIwMTgtMDEtMThUMTA6MDc6NTArMDA6MDDXXlnwAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDE4LTAxLTE4VDEwOjA3OjUwKzAwOjAwpgPhTAAAACh0RVh0c3ZnOmJhc2UtdXJpAGZpbGU6Ly8vdG1wL21hZ2ljay1icU1SUGdGMAb+9OcAAAAASUVORK5CYII=') no-repeat center center
     &:hover
       background-color: rgba(0, 0, 0, .07)
 
