@@ -497,7 +497,7 @@ export default {
   .dhx_cal_prev_button
     width: 30px
     border-radius: 50%
-    // background-image: url("/statics/img/chevron-left.png") no-repeat center center
+    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAQAAAD8x0bcAAAAPUlEQVR4AWMYIkCIYQEQE1ByjuErgxUhJd8YnAgrccZv1R6G/wzxhJxsxPCO4S6DHL2V3WbQIxyczIM/xgGTtxCuXoKoZQAAAABJRU5ErkJggg==') no-repeat center center
     &:hover
       background-color: rgba(0, 0, 0, .07)
   
