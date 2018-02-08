@@ -433,7 +433,6 @@ export default {
         }
         return false;
       }
-      scheduler.updateView();
       this.$emit('applyFilter');
     }
   },
