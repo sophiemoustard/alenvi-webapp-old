@@ -11,7 +11,7 @@
         <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="week_tab" style="right:140px;"></div>
         <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="month_tab" style="right:76px;"></div>
         <div v-show="showTabCustomer" class="dhx_cal_tab relative-position" v-ripple name="customer_week_tab" style="right:140px;"></div>
-        <div v-show="showTabFilter" class="dhx_cal_tab relative-position" name="filter_tab" @click="displayFilter" v-ripple style="left: 230px;">
+        <div v-show="showTabFilter && !$route.query.id_customer" class="dhx_cal_tab relative-position" name="filter_tab" @click="displayFilter" v-ripple style="left: 230px;">
           <sector-filter v-if="ogustUser" @auxiliariesChosen="applyFilter" />
         </div>
       </div>

@@ -61,7 +61,8 @@ export default {
       auxiliaries: [],
       auxiliaryId: '',
       // auxiliariesIds: [],
-      search: ''
+      search: '',
+      timeout: null
     }
   },
   computed: {

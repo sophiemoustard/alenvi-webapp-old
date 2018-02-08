@@ -68,9 +68,6 @@ export default {
           }
           const ogustToken = await Ogust.getOgustToken(this.token);
           this.$store.commit('getOgustToken', ogustToken);
-          const personData = await Ogust.getOgustPerson(ogustToken, this.personId, personType);
-          this.$store.commit('setOgustUser', personData);
-          this.title = personData.title;
           // if (this.auxiliariesChosen && this.auxiliariesChosen.length !== 0) {
           //   this.events = [];
           //   for (let i = 0, l = this.auxiliariesChosen.length; i < l; i++) {
@@ -78,8 +75,14 @@ export default {
           //     this.events = this.events.concat(events);
           //   }
           if (this.auxiliariesChosen) {
+            const personData = await Ogust.getOgustPerson(ogustToken, this.auxiliariesChosen, personType);
+            this.title = personData.title;
             this.events = await Ogust.getOgustEvents(ogustToken, this.auxiliariesChosen, personType);
+            this.$store.commit('toggleFilter', false);
           } else {
+            const personData = await Ogust.getOgustPerson(ogustToken, this.personId, personType);
+            this.$store.commit('setOgustUser', personData);
+            this.title = personData.title;
             this.events = await Ogust.getOgustEvents(ogustToken, this.personId, personType);
           }
         }
