@@ -1,15 +1,18 @@
 const express = require('express');
 const app = express();
 const history = require('connect-history-api-fallback');
+const sslRedirect = require('heroku-ssl-redirect');
 
 app.use(history());
 
-app.use((req, res, next) => {
-  if (req.secure) {
-    return res.redirect(['https://', req.hostname, req.url].join(''));
-  }
-  next();
-});
+// app.use((req, res, next) => {
+//   if (req.secure) {
+//     return res.redirect(['https://', req.hostname, req.url].join(''));
+//   }
+//   next();
+// });
+
+app.use(sslRedirect());
 
 app.use(express.static(__dirname + '/dist'));
 
