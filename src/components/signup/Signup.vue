@@ -29,7 +29,7 @@
           <q-input type="text" v-model.trim="user.address.city" @blur="$v.user.address.city.$touch" />
         </q-field>
         <q-field :label-width="3" label="Date de naissance" :error="$v.user.dateOfBirth.$error" error-label="Champ requis">
-          <q-datetime v-model="user.dateOfBirth" @blur="$v.user.dateOfBirth.$touch" monday-first :month-names="monthNames" :day-names="dayNames" ok-label="APPLIQUER" no-clear cancel-label="ANNULER" min="1920-01-01" :max="new Date()" format="DD/MM/YYYY"/>
+          <q-datetime v-model="user.dateOfBirth" @blur="$v.user.dateOfBirth.$touch" monday-first :month-names="monthNames" :day-names="dayNames" ok-label="APPLIQUER" no-clear cancel-label="ANNULER" min="1920-01-01" :max="getMaxDate" format="DD/MM/YYYY"/>
         </q-field>
         <q-field :label-width="3" label="Département (99 si étranger)" :error="$v.user.stateOfBirth.$error" :error-label="stateOfBirthError">
           <q-input type="number" v-model.trim="user.stateOfBirth" @blur="$v.user.stateOfBirth.$touch" />
@@ -69,7 +69,7 @@
 
 
 <script>
-import { QInput, QField, QSelect, QCard, QCardTitle, QCardMain, QCardSeparator, QCardActions, QCardMedia, QBtn, Cookies, Loading, QDatetime, date } from 'quasar'
+import { QInput, QField, QSelect, QCard, QCardTitle, QCardMain, QCardSeparator, QCardActions, QCardMedia, QBtn, Cookies, Loading, QDatetime } from 'quasar'
 import { required, email, sameAs, numeric, minLength, maxLength } from 'vuelidate/lib/validators'
 
 // import _ from 'lodash'
@@ -228,6 +228,9 @@ export default {
       } else if (!this.$v.user.socialInsuranceNumber.maxLength || !this.$v.user.socialInsuranceNumber.minLength) {
         return 'Le numéro de sécurité sociale doit contenir 15 chiffres.'
       }
+    },
+    getMaxDate () {
+      return `${moment().year()}-12-31`
     }
   },
   methods: {
