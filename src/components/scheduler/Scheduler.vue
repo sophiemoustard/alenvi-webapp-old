@@ -465,10 +465,10 @@ export default {
     // position: fixed
   
   .dhx_scale_holder
-    background-image: url("./img/databg_custom.png")
+    background-image: url("img/databg_custom.png")
 
   .dhx_scale_holder_now
-    background-image: url("./img/databg_now_custom.png")
+    background-image: url("img/databg_now_custom.png")
   
   .dhx_cal_navline.dhx_cal_date
     color: $tertiary
@@ -512,7 +512,7 @@ export default {
   .dhx_cal_next_button
     width: 30px
     border-radius: 50%
-    background-image: url("./img/chevron-right.png") no-repeat center center
+    background-image: url("img/chevron-right.png") no-repeat center center
     &:hover
       background-color: rgba(0, 0, 0, .07)
 
