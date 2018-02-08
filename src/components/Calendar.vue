@@ -8,7 +8,7 @@
 import { Toast } from 'quasar'
 import { mapMutations } from 'vuex'
 import moment from 'moment'
-import _ from 'lodash'
+// import _ from 'lodash'
 import Scheduler from './scheduler/Scheduler.vue'
 import Ogust from './models/Ogust'
 import PlanningUpdates from './models/PlanningUpdates'
