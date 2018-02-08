@@ -512,7 +512,7 @@ export default {
   .dhx_cal_next_button
     width: 30px
     border-radius: 50%
-    background: url("img/chevron-right.png") no-repeat center center
+    background: url("~statics/img/chevron-right.png") no-repeat center center
     &:hover
       background-color: rgba(0, 0, 0, .07)
 
