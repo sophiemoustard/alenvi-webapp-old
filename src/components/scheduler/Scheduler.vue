@@ -419,12 +419,13 @@ export default {
     },
     applyFilter () {
       scheduler.filter_week = (id, event) => {
+        console.log(this.auxiliariesChosen.indexOf(event.id_employee));
+          this.$emit('applyFilter');
         if (this.auxiliariesChosen && this.auxiliariesChosen.indexOf(event.id_employee) !== -1) {
           return true;
         }
         return false;
       }
-      this.$emit('applyFilter');
     }
   },
   created () {
@@ -496,7 +497,7 @@ export default {
   .dhx_cal_prev_button
     width: 30px
     border-radius: 50%
-    background: url("/statics/img/chevron-left.png") no-repeat center center
+    // background-image: url("/statics/img/chevron-left.png") no-repeat center center
     &:hover
       background-color: rgba(0, 0, 0, .07)
   
@@ -511,7 +512,7 @@ export default {
   .dhx_cal_next_button
     width: 30px
     border-radius: 50%
-    background: url("/statics/img/chevron-right.png") no-repeat center center
+    // background-image: url("/statics/img/chevron-right.png") no-repeat center center
     &:hover
       background-color: rgba(0, 0, 0, .07)
 
