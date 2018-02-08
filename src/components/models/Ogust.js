@@ -125,8 +125,13 @@ export default {
     }
     return ogustListRaw.data.data.list;
   },
-  async getEmployees (params) {
-    const employeesRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/employees`, { params });
+  async getEmployees (params, ogustToken = null) {
+    let employeesRaw = {};
+    if (ogustToken === null) {
+      employeesRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/employees`, { params });
+    } else {
+      employeesRaw = await axios.get(`${process.env.API_HOSTNAME}/ogust/employees`, { params, headers: { 'x-ogust-token': ogustToken } });
+    }
     const employees = employeesRaw.data.data.users.array_employee.result;
     return employees;
   },

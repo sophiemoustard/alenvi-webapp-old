@@ -76,6 +76,9 @@ export default {
     ogustUser () {
       return this.$store.getters.ogustUser;
     },
+    ogustToken () {
+      return this.$store.getters.ogustToken;
+    },
     filteredAuxiliaries () {
       return this.auxiliaries.filter((item) => {
         return item.label.match(new RegExp(`${this.search}`, 'i'));
@@ -90,7 +93,7 @@ export default {
     async getEmployeesBySector (sector) {
       try {
         this.auxiliaries = [];
-        const employees = await ogust.getEmployees({ sector });
+        const employees = await ogust.getEmployees({ sector }, this.ogustToken);
         for (const k in employees) {
           this.auxiliaries.push({
             label: `${employees[k].first_name} ${employees[k].last_name}`,

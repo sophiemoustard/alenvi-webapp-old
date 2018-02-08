@@ -16,7 +16,8 @@ export const store = new Vuex.Store({
     disableTimePicker: true,
     showFilter: false,
     ogustUser: null,
-    auxiliariesChosen: null
+    auxiliariesChosen: null,
+    ogustToken: null
   },
   getters: {
     user (state) {
@@ -39,6 +40,9 @@ export const store = new Vuex.Store({
     },
     auxiliariesChosen (state) {
       return state.auxiliariesChosen;
+    },
+    ogustToken (state) {
+      return state.ogustToken;
     }
   },
   mutations: {
@@ -65,6 +69,9 @@ export const store = new Vuex.Store({
     },
     setAuxiliariesChosen (state, auxiliaries) {
       state.auxiliariesChosen = auxiliaries;
+    },
+    getOgustToken (state, token) {
+      state.ogustToken = token;
     }
   },
   actions: {

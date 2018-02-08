@@ -67,6 +67,7 @@ export default {
             personType = 'customer';
           }
           const ogustToken = await Ogust.getOgustToken(this.token);
+          this.$store.commit('getOgustToken', ogustToken);
           const personData = await Ogust.getOgustPerson(ogustToken, this.personId, personType);
           this.$store.commit('setOgustUser', personData);
           this.title = personData.title;
