@@ -82,14 +82,13 @@ export default {
           } else {
             this.events = await Ogust.getOgustEvents(ogustToken, this.personId, personType);
           }
-          // scheduler.updateView();
-          // console.log(this.events);
         }
       } catch (e) {
         console.error(e)
         if (e.response) {
           console.error(e.response);
           if (e.response.status === 404) {
+            this.events = [];
             return Toast.create('Aucune intervention dans la période demandée');
           }
           Toast.create("Erreur de chargement des données :/ Si le problème persiste, contacte l'équipe technique :)")
