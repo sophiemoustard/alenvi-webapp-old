@@ -305,7 +305,7 @@ export default {
         }
         console.log(this.countries);
       } catch (e) {
-        console.error(e);
+        console.error(e.response);
       }
     }
   },
