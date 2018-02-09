@@ -280,7 +280,7 @@ export default {
           Cookies.remove('signup_sector', { path: '/' });
           Cookies.remove('signup_mobile', { path: '/' });
           await activationCode.delete(accessToken, mobilePhone);
-          await twilio.senSMSConfirm(mobilePhone, accessToken);
+          await twilio.sendSMSConfirm(mobilePhone, accessToken);
           window.location.href = `${process.env.MESSENGER_LINK}?ref=${alenviToken}`
         }, 2000);
       } catch (e) {
