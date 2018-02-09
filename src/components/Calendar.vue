@@ -92,6 +92,7 @@ export default {
           console.error(e.response);
           if (e.response.status === 404) {
             this.events = [];
+            this.$store.commit('toggleFilter', false);
             return Toast.create('Aucune intervention dans la période demandée');
           }
           Toast.create("Erreur de chargement des données :/ Si le problème persiste, contacte l'équipe technique :)")

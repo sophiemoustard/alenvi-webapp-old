@@ -1,16 +1,16 @@
 <template>
-  <q-icon name="person" size="1.5rem" flat>
+  <q-icon name="search" size="1.5rem" flat>
     <q-popover v-model="showFilter" @open="getEmployeesBySector(ogustUser.sector)">
       <q-list link no-border style="min-width: 200px">
-        <q-list-header v-if="auxiliaries.length !== 0">
-          <q-field icon="search">
+        <!-- <q-list-header v-if="auxiliaries.length !== 0"> -->
+          <!-- <q-field icon="search">
             <q-input v-model="search" placeholder="Recherche" />
-          </q-field>
-        </q-list-header>
+          </q-field> -->
+        <!-- </q-list-header> -->
         <q-inner-loading :visible="auxiliaries.length === 0">
           <q-spinner size="50px" />
         </q-inner-loading>
-        <q-item v-for="(auxiliary, index) in filteredAuxiliaries" :key="index">
+        <q-item v-for="(auxiliary, index) in auxiliaries" :key="index">
           <!-- <q-checkbox v-model="auxiliariesIds" :val="auxiliary.value" :label="auxiliary.label" @change="chooseAuxiliaries" /> -->
           <q-radio v-model="auxiliaryId" :val="auxiliary.value" :label="auxiliary.label" @change="chooseAuxiliaries" />
         </q-item>
@@ -25,16 +25,16 @@ import {
   QIcon,
   QPopover,
   QList,
-  QListHeader,
+  // QListHeader,
   QItem,
   QItemMain,
   QItemSide,
   QInnerLoading,
   QCheckbox,
   QRadio,
-  QSpinner,
-  QField,
-  QInput
+  QSpinner
+  // QField,
+  // QInput
 } from 'quasar'
 
 import ogust from '../models/Ogust'
@@ -44,25 +44,24 @@ export default {
     QIcon,
     QPopover,
     QList,
-    QListHeader,
+    // QListHeader,
     QItem,
     QItemMain,
     QItemSide,
     QInnerLoading,
     QCheckbox,
     QRadio,
-    QSpinner,
-    QField,
-    QInput
+    QSpinner
+    // QField,
+    // QInput
   },
   data () {
     return {
       sectors: [],
       auxiliaries: [],
-      auxiliaryId: '',
+      auxiliaryId: ''
       // auxiliariesIds: [],
-      search: '',
-      timeout: null
+      // search: '',
     }
   },
   computed: {
@@ -79,12 +78,12 @@ export default {
     },
     ogustToken () {
       return this.$store.getters.ogustToken;
-    },
-    filteredAuxiliaries () {
-      return this.auxiliaries.filter((item) => {
-        return item.label.match(new RegExp(`${this.search}`, 'i'));
-      })
     }
+    // filteredAuxiliaries () {
+    //   return this.auxiliaries.filter((item) => {
+    //     return item.label.match(new RegExp(`${this.search}`, 'i'));
+    //   })
+    // }
   },
   mounted () {
     // this.auxiliariesIds.push(this.$store.state.ogustUser.id_employee);
