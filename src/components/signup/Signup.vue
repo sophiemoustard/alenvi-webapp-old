@@ -78,6 +78,7 @@ import moment from 'moment'
 // import { phoneNumber } from '../../helpers/validation/phoneNbr'
 import ogust from '../models/Ogust'
 import users from '../models/Users'
+import twilio from '../../helpers/twilio'
 import activationCode from '../models/ActivationCode'
 import { alenviAlert } from '../../helpers/alerts'
 
@@ -279,6 +280,7 @@ export default {
           Cookies.remove('signup_sector', { path: '/' });
           Cookies.remove('signup_mobile', { path: '/' });
           await activationCode.delete(accessToken, mobilePhone);
+          await twilio.senSMSConfirm(mobilePhone, accessToken);
           window.location.href = `${process.env.MESSENGER_LINK}?ref=${alenviToken}`
         }, 2000);
       } catch (e) {
