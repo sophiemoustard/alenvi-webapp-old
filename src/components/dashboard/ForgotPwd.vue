@@ -5,11 +5,11 @@
         <img src="https://res.cloudinary.com/alenvi/image/upload/c_scale,q_auto,w_400/v1507124345/images/business/alenvi_logo_complet_full.png" alt="Logo Alenvi" class="responsive">
       </q-card-media>
       <q-card-title>
-        Veuillez entrer votre email:
+        Nous allons vous envoyer un email pour réinitialiser votre mot de passe. Veuillez renseigner votre adresse email:
       </q-card-title>
       <q-card-main>
         <q-field icon="mail" :error="$v.email.$error" error-label="Veuillez rentrer un email valide. (ex: mail@mail.com)">
-          <q-input v-model="email" float-label="Email" @blur="$v.email.$touch"/>
+          <q-input v-model.trim="email" float-label="Email" @blur="$v.email.$touch"/>
         </q-field>
       </q-card-main>
       <q-card-actions class="row justify-end">
@@ -87,8 +87,5 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables'
-
-  .alenvi-logo
-    width: 35%
 
 </style>

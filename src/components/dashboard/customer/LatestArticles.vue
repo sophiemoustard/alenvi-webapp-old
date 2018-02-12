@@ -143,6 +143,9 @@ export default {
 /*.q-card-title
   font-family: alenviTitleFont */
 
+.q-card-title
+  line-height: 1.5rem;
+
 .q-card-container
   padding: 16px 0px 0px 16px
 

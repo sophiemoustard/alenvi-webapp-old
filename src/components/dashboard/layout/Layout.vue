@@ -53,7 +53,7 @@ export default {
       if (this.user.role.name === 'Client') {
         return {
           link: { name: 'customer home' },
-          content: 'Votre espace Alenvi'
+          content: 'Mon espace Alenvi'
         };
       }
       return {

@@ -5,27 +5,44 @@
     </div>
     <br>
     <div class="row justify-center">
-      <div style="width: 500px; max-width: 90vw;">
-        <q-input v-model="user.alenvi.firstname" float-label="Prénom"/>
-        <q-input v-model="user.alenvi.lastname" float-label="Nom"/>
+      <div class="inputs">
+        <q-input v-model="user.alenvi.firstname" stack-label="Prénom" placeholder="à compléter" :disable="!isEditMode"/>
+        <q-input v-model="user.alenvi.lastname" stack-label="Nom" placeholder="à compléter" :disable="!isEditMode"/>
         <!-- Date de naissance: <input v-model="user.ogust.date_of_birth" type="date" float-label="Date de naissance"/> -->
         <q-field :error="$v.user.alenvi.local.email.$error" :error-label="emailError">
-          <q-input v-model="user.alenvi.local.email" float-label="Email" @blur="$v.user.alenvi.local.email.$touch"/>
+          <q-input v-model="user.alenvi.local.email" stack-label="Email" @blur="$v.user.alenvi.local.email.$touch" placeholder="à compléter" :disable="!isEditMode"/>
         </q-field>
-        <q-input v-model="user.ogust.mobile_phone" float-label="Mobile"/>
-        <q-input v-model="user.ogust.landline" float-label="Fixe"/>
-        <p class="caption">Changement de mot de passe</p>
-        <q-field helper="Entrez votre nouveau mot de passe. Il doit contenir au moins 6 caractères jusqu'à 20 maximum" :error="$v.user.credentials.password.$error"
-          error-label="Le mot de passe doit contenir entre 6 et 20 caractères.">
-          <q-input type="password" float-label="Nouveau mot de passe" v-model.trim="user.credentials.password" @blur="$v.user.credentials.password.$touch" />
-        </q-field>
-        <q-field :error="$v.user.credentials.passwordConfirm.$error" error-label="Le mot de passe entré et la confirmation sont différents.">
-          <q-input type="password" float-label="Confirmation nouveau mot de passe" v-model.trim="user.credentials.passwordConfirm" @blur="$v.user.credentials.passwordConfirm.$touch" />
-        </q-field>
+        <q-input v-model="user.ogust.mobile_phone" stack-label="Téléphone mobile" placeholder="à compléter" :disable="!isEditMode"/>
+        <q-input v-model="user.ogust.landline" stack-label="Téléphone fixe" placeholder="à compléter" :disable="!isEditMode"/>
       </div>
     </div>
     <div class="row justify-center layout-padding">
-      <q-btn color="primary" icon="done" @click="updateUser" :disable="$v.user.$invalid">Enregistrer modifications</q-btn>
+      <q-btn color="primary" @click="activateEditMode" :disable="$v.user.$invalid">{{ editModeButtonName }}</q-btn>
+    </div>
+    <div class="row justify-center">
+      <div class="inputs">
+        <p style="text-align: left">Mot de passe</p>
+      </div>
+    </div>
+    <div class="row justify-center">
+      <div class="inputs">
+        <div id="changePassword" v-if="isChangePassword">
+          <!-- <p class="caption">Mot de passe</p> -->
+          <q-field :error="$v.user.credentials.password.$error"
+            error-label="Le mot de passe doit contenir entre 6 et 20 caractères.">
+            <q-input type="password" stack-label="Nouveau mot de passe" v-model.trim="user.credentials.password" @blur="$v.user.credentials.password.$touch" />
+          </q-field>
+          <q-field :error="$v.user.credentials.passwordConfirm.$error" error-label="Le mot de passe entré et la confirmation sont différents.">
+            <q-input type="password" stack-label="Confirmation nouveau mot de passe" v-model.trim="user.credentials.passwordConfirm" @blur="$v.user.credentials.passwordConfirm.$touch" />
+          </q-field>
+        </div>
+      </div>
+    </div>
+    <div v-if="!isChangePassword" class="row justify-center layout-padding">
+      <q-btn color="primary" @click="isChangePassword = true">Changement de mot de passe</q-btn>
+    </div>
+    <div v-if="isChangePassword" class="row justify-center layout-padding">
+      <q-btn color="primary" @click="updateUser" :disable="$v.user.credentials.$invalid">Modifier mon mot de passe</q-btn>
     </div>
   </div>
 </template>
@@ -61,7 +78,11 @@ export default {
           local: {}
         },
         ogust: {}
-      }
+      },
+      isChangePassword: false,
+      isEditMode: false,
+      editModeButtonName: 'Modifier'
+      // changePasswordButtonName: 'Changement de mot de passe'
     }
   },
   validations: {
@@ -121,13 +142,29 @@ export default {
         await ogust.editOgustCustomer(null, this.user.alenvi.customer_id, userToSendOgust);
         await users.updateById(userToSendAlenvi);
         alenviAlert({ color: 'positive', icon: 'thumb up', content: 'Profil mis à jour.', position: 'bottom-right', duration: 2500 });
-        this.credentials.password = '';
-        this.credentials.passwordConfirm = '';
+        this.user.credentials.password = '';
+        this.user.credentials.passwordConfirm = '';
       } catch (e) {
         alenviAlert({ color: 'error', icon: 'warning', content: 'Erreur lors de la mise à jour de votre profil.', position: 'bottom-right', duration: 2500 });
-        this.credentials.password = '';
-        this.credentials.passwordConfirm = '';
+        this.user.credentials.password = '';
+        this.user.credentials.passwordConfirm = '';
         console.error(e);
+      }
+    },
+    // activateChangePassword () {
+    // if (this.isChangePassword) {
+    //   return this.updateUser();
+    // }
+    // this.isChangePassword = true;
+    // this.changePasswordButtonName = 'Modifier mon mot de passe';
+    // },
+    activateEditMode () {
+      if (!this.isEditMode) {
+        this.isEditMode = true;
+        this.editModeButtonName = 'Enregistrer mes modifications'
+      } else {
+        this.isEditMode = false;
+        this.editModeButtonName = 'Modifier'
       }
     }
   }
@@ -136,5 +173,9 @@ export default {
 
 <style lang="stylus" scoped>
 @import '~variables';
+
+.inputs
+  width: 500px
+  max-width: 90vw
 
 </style>

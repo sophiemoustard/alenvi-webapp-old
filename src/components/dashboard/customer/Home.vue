@@ -1,6 +1,17 @@
 <template>
   <div class="layout-padding">
     <h5 id="main-title" class="text-center">Bienvenue sur votre espace d'accompagnement privé Alenvi !</h5>
+    <div class="row justify-center xl-gutter">
+      <div @click="goTo({ name: 'customer planning' })">
+        <q-icon name="date range" size="5rem"></q-icon>
+        <p class="text-center">Planning</p>
+      </div>
+      <div @click="goTo({ name: 'customer documents' })">
+        <q-icon name="folder" size="5rem"></q-icon>
+        <p class="text-center">Facturation</p>
+      </div>
+    </div>
+
     <!-- <div class="row justify-center"> -->
       <!-- <br> -->
       <!-- <div style="width: 700px; max-width: 90vw;"> -->
@@ -17,10 +28,12 @@
 
 import ogust from '../../models/Ogust';
 import LatestArticles from './LatestArticles';
+import { QIcon } from 'quasar'
 
 export default {
   components: {
-    LatestArticles
+    LatestArticles,
+    QIcon
   },
   data () {
     return {
@@ -46,6 +59,9 @@ export default {
     }
   },
   methods: {
+    goTo (name) {
+      this.$router.push(name);
+    }
   }
 };
 </script>
