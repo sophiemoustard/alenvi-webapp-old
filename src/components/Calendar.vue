@@ -167,9 +167,10 @@ export default {
 
 <style lang="stylus">
 
-  .dhx_cal_header, .dhx_cal_navline
-    position: fixed !important
-    background-color: white
+  // .dhx_cal_header
+  //   position: fixed !important
+  //   top: 0
+  //   background-color: white
 
   .alenvi_event div 
         background-color: #E2007A !important;

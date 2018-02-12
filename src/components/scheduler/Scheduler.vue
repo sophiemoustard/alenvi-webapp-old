@@ -2,6 +2,7 @@
   <div>
     <div ref="scheduler_here" class="dhx_cal_container" style='width:100%; height:100%;'>
       <!-- <q-window-resize-observable @resize="onResize" /> -->
+      <q-resize-observable @resize="onResize" />
       <div ref="cal_navline" class="dhx_cal_navline">
         <div class="dhx_cal_prev_button relative-position" v-ripple>&nbsp;</div>
         <div v-show="displayNext" class="dhx_cal_next_button relative-position" v-ripple>&nbsp;</div>
@@ -11,6 +12,7 @@
         <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="week_tab" style="right:140px;"></div>
         <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="month_tab" style="right:76px;"></div>
         <div v-show="showTabCustomer" class="dhx_cal_tab relative-position" v-ripple name="customer_week_tab" style="right:140px;"></div>
+        <div v-show="customer" class="dhx_cal_tab" name="customer_three_days_tab" style="right:140px;"></div>
         <div v-show="showTabFilter && !$route.query.id_customer" class="dhx_cal_tab relative-position" name="filter_tab" @click="displayFilter" v-ripple style="left: 230px;">
           <sector-filter v-if="ogustUser" @auxiliariesChosen="applyFilter" />
         </div>
@@ -68,11 +70,13 @@ import 'dhtmlx-scheduler'
 import 'dhtmlx-scheduler/codebase/locale/locale_fr';
 import 'dhtmlx-scheduler/codebase/ext/dhtmlxscheduler_readonly.js';
 import 'dhtmlx-scheduler/codebase/ext/dhtmlxscheduler_container_autoresize.js';
+import 'dhtmlx-scheduler/codebase/ext/dhtmlxscheduler_limit.js';
 import responsive from './scripts/dhtmlxscheduler-responsive.js';
 
 import {
   debounce,
   QWindowResizeObservable,
+  QResizeObservable,
   QBtn,
   QModal,
   QInput,
@@ -86,6 +90,8 @@ import { mapGetters, mapMutations } from 'vuex'
 import SectorFilter from '../dashboard/SectorFilter.vue'
 
 const configDhtmlxScheduler = (vm) => {
+  // config line mark of current time
+  scheduler.config.mark_now = true;
   // Event date format
   scheduler.config.xml_date = '%Y-%m-%d %H:%i';
   // Blocking hours
@@ -122,6 +128,7 @@ const configDhtmlxScheduler = (vm) => {
 export default {
   components: {
     QWindowResizeObservable,
+    QResizeObservable,
     QBtn,
     QModal,
     QInput,
@@ -280,10 +287,17 @@ export default {
       // scheduler.date.customer_week_start = date => scheduler.date.date_part(new Date(date.valueOf()));
       scheduler.date.customer_week_start = date => scheduler.date.week_start(date);
       scheduler.templates.customer_week_date = scheduler.templates.week_date;
-      // scheduler.templates.customer_week_date = scheduler.templates.week_date;
       scheduler.templates.customer_week_scale_date = scheduler.templates.week_scale_date;
       scheduler.date.add_customer_week = (date, inc) => scheduler.date.add(date, inc * 7, 'day');
       // scheduler.date.add_customer_week = scheduler.date.add_week;
+
+      // custom 'customer_three_days' view
+      scheduler.date.customer_three_days_start = date => scheduler.date.date_part(new Date(date.valueOf()));
+      scheduler.date.customer_three_days_end = startDate => scheduler.date.add(startDate, 3, 'day');
+      scheduler.templates.customer_three_days_date = (start, end) => `${scheduler.date.date_to_str('%j %F')(start)} &ndash; ${scheduler.date.date_to_str('%j %F')(scheduler.date.add(end, -1, 'day'))}`;
+      scheduler.templates.customer_three_days_scale_date = scheduler.templates.week_scale_date;
+      scheduler.date.add_customer_three_days = (date, inc) => scheduler.date.add(date, inc * 3, 'day');
+
       // custom color events
       scheduler.templates.event_class = function (start, end, event) {
         if (event.type === 'alenvi') {
@@ -312,6 +326,12 @@ export default {
       }
       return true;
     });
+
+    // scheduler.addMarkedTimespan({
+    //   start_date: new Date(),
+    //   // end_date: scheduler.date.add(date, 2, 'hour'),
+    //   type: 'dhx_time_block'
+    // });
 
     responsive.initResponsive(scheduler);
 
@@ -355,23 +375,6 @@ export default {
     });
     // prevent opening event when double clicking
     scheduler.attachEvent('onDblClick', () => false);
-
-    // scheduler.attachEvent('onEventChanged', (id, e) => {
-    //   this.$emit('eventUpdated', e);
-    // });
-    // // Remove date picker from lightbox, just keeping hour picker
-    // if (this.$route.query.id_employee && this.$route.query.self === 'true') {
-    //   scheduler.attachEvent('onBeforeLightBox', () => {
-    //     const node = scheduler.formSection('Horaires').node;
-    //     const timeInputs = node.getElementsByTagName('select');
-    //     for (let i = 0, l = timeInputs.length; i < l; i++) {
-    //       if (i > 0 && i !== 4) {
-    //         timeInputs[i].style.display = 'none';// remove inputs
-    //       }
-    //     }
-    //     return true;
-    //   });
-    // }
   },
   methods: {
     handleScroll: debounce(function () {
@@ -385,10 +388,11 @@ export default {
         headerToFix.classList.remove('header-fixed');
       }
     }, 10),
-    onResize (size) {
-      this.width = size.width;
-      this.height = size.height;
-    },
+    onResize: debounce(() => {
+      scheduler.updateView();
+      // this.width = size.width;
+      // this.height = size.height;
+    }, 200),
     updateEvent (event, done) { // 'event' & 'done' are parameters given by Quasar when using 'loader' prop with q-btn
       try {
         const ev = scheduler.getEvent(this.customerEventInfo.eventId);
@@ -527,9 +531,9 @@ export default {
   .dhx_cancel_btn_set
     background-color: $primary
   
-  // .header-fixed
-    // position: fixed
-    // top: 0px !important
+  .header-fixed
+    position: fixed
+    top: 60px !important
   
   .alenvi_event div 
     background-color: $primary !important;
@@ -554,5 +558,8 @@ export default {
   .dhx_cal_event_clear.alenvi_past_event 
     background-color: $primary-light !important;
     color: white !important;
+  
+  .responsive-container
+    width: 100% !important
 
 </style>

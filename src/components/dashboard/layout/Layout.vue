@@ -61,9 +61,6 @@ export default {
         content: 'Dashboard'
       };
     }
-  },
-  methods: {
-
   }
 }
 </script>
