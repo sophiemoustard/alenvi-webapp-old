@@ -81,7 +81,7 @@ export default {
       },
       isChangePassword: false,
       isEditMode: false,
-      editModeButtonName: 'Modifier',
+      editModeButtonName: 'Modifier'
       // changePasswordButtonName: 'Changement de mot de passe'
     }
   },
@@ -152,11 +152,11 @@ export default {
       }
     },
     // activateChangePassword () {
-      // if (this.isChangePassword) {
-      //   return this.updateUser();
-      // }
-      // this.isChangePassword = true;
-      // this.changePasswordButtonName = 'Modifier mon mot de passe';
+    // if (this.isChangePassword) {
+    //   return this.updateUser();
+    // }
+    // this.isChangePassword = true;
+    // this.changePasswordButtonName = 'Modifier mon mot de passe';
     // },
     activateEditMode () {
       if (!this.isEditMode) {

@@ -52,17 +52,17 @@
         <q-item-side icon="home" />
         <q-item-main label="Accueil" />
       </q-side-link> -->
-      <q-side-link item :to="{ name: 'customer profile', params: { id: user._id } }" exact>
-        <q-item-side icon="person" />
-        <q-item-main label="Mes informations" />
-      </q-side-link>
       <q-side-link item to="/dashboard/customer/planning" exact>
         <q-item-side icon="date range" />
         <q-item-main label="Planning" />
       </q-side-link>
       <q-side-link item to="/dashboard/customer/documents" exact>
         <q-item-side icon="folder" />
-        <q-item-main label="Mes documents" />
+        <q-item-main label="Facturation" />
+      </q-side-link>
+      <q-side-link item :to="{ name: 'customer profile', params: { id: user._id } }" exact>
+        <q-item-side icon="person" />
+        <q-item-main label="Mes informations" />
       </q-side-link>
       <q-side-link item to="/dashboard/login" @click.native="logout" replace>
         <q-item-side icon="exit to app" />
