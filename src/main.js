@@ -14,9 +14,16 @@ import Vue from 'vue'
 import Quasar from 'quasar'
 import router from './router'
 import Vuelidate from 'vuelidate'
+import Raven from 'raven-js'
+import RavenVue from 'raven-js/plugins/vue'
 
 import { can } from './directives/can'
 import { store } from './store/store'
+
+Raven
+  .config('https://db50f77df4cc4e4eafa8e221d267c541@sentry.io/287454')
+  .addPlugin(RavenVue, Vue)
+  .install();
 
 Vue.config.productionTip = false
 Vue.use(Quasar) // Install Quasar Framework
