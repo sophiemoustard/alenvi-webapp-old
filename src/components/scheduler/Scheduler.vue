@@ -1,4 +1,4 @@
-<template lang="html">
+<template>
   <div>
     <div ref="scheduler_here" class="dhx_cal_container" style='width:100%; height:100%;'>
       <!-- <q-window-resize-observable @resize="onResize" /> -->
@@ -8,11 +8,11 @@
         <div v-show="displayNext" class="dhx_cal_next_button relative-position" v-ripple>&nbsp;</div>
         <div v-if="!customer" class="dhx_cal_today_button relative-position" v-ripple></div>
         <div class="dhx_cal_date"></div>
-        <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="day_tab" style="right:204px;"></div>
+        <!-- <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="day_tab" style="right:204px;"></div> -->
+        <div v-show="!customer" class="dhx_cal_tab relative-position" v-ripple name="three_days_tab" style="left:200px;"></div>
         <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="week_tab" style="right:140px;"></div>
         <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="month_tab" style="right:76px;"></div>
         <div v-show="showTabCustomer" class="dhx_cal_tab relative-position" v-ripple name="customer_week_tab" style="right:140px;"></div>
-        <div v-show="customer" class="dhx_cal_tab" name="customer_three_days_tab" style="right:140px;"></div>
         <div v-show="showTabFilter && !$route.query.id_customer" class="dhx_cal_tab relative-position" name="filter_tab" @click="displayFilter" v-ripple style="left: 230px;">
           <sector-filter v-if="ogustUser" @auxiliariesChosen="applyFilter" />
         </div>
@@ -110,6 +110,7 @@ const configDhtmlxScheduler = (vm) => {
   scheduler.locale.labels['icon_cancel'] = 'Fermer';
   // custom view label
   scheduler.locale.labels['customer_week_tab'] = 'Semaine';
+  scheduler.locale.labels['three_days_tab'] = '3 jours';
   // hide lightbox in month view
   scheduler.config.show_loading = true;
   // hide select bar in day and week views
@@ -271,8 +272,8 @@ export default {
       // Custom week_date header format (week standard view)
       scheduler.templates.week_date = (start, end) => `${scheduler.date.date_to_str('%j %F')(start)} &ndash; ${scheduler.date.date_to_str('%j %F')(scheduler.date.add(end, -1, 'day'))}`;
       // Custom day_scale format (day standard view)
-      scheduler.templates.day_scale_date = date => `<div>${scheduler.date.date_to_str('%D')(date)}.</div><big>${scheduler.date.date_to_str('%j')(date)}</big>`;
-      scheduler.templates.day_date = date => scheduler.date.date_to_str('%F %Y')(date);
+      // scheduler.templates.day_scale_date = date => `<div>${scheduler.date.date_to_str('%D')(date)}.</div><big>${scheduler.date.date_to_str('%j')(date)}</big>`;
+      // scheduler.templates.day_date = date => scheduler.date.date_to_str('%F %Y')(date);
       // Custom month_scale format (month standard view)
       scheduler.templates.month_scale_date = date => scheduler.date.date_to_str('%l')(date);
       // Custom week_scale format (week standard view)
@@ -292,11 +293,11 @@ export default {
       // scheduler.date.add_customer_week = scheduler.date.add_week;
 
       // custom 'customer_three_days' view
-      scheduler.date.customer_three_days_start = date => scheduler.date.date_part(new Date(date.valueOf()));
-      scheduler.date.customer_three_days_end = startDate => scheduler.date.add(startDate, 3, 'day');
-      scheduler.templates.customer_three_days_date = (start, end) => `${scheduler.date.date_to_str('%j %F')(start)} &ndash; ${scheduler.date.date_to_str('%j %F')(scheduler.date.add(end, -1, 'day'))}`;
-      scheduler.templates.customer_three_days_scale_date = scheduler.templates.week_scale_date;
-      scheduler.date.add_customer_three_days = (date, inc) => scheduler.date.add(date, inc * 3, 'day');
+      scheduler.date.three_days_start = date => scheduler.date.date_part(new Date(date.valueOf()));
+      scheduler.date.three_days_end = startDate => scheduler.date.add(startDate, 3, 'day');
+      scheduler.templates.three_days_date = (start, end) => `${scheduler.date.date_to_str('%j %F')(start)} &ndash; ${scheduler.date.date_to_str('%j %F')(scheduler.date.add(end, -1, 'day'))}`;
+      scheduler.templates.three_days_scale_date = scheduler.templates.week_scale_date;
+      scheduler.date.add_three_days = (date, inc) => scheduler.date.add(date, inc * 3, 'day');
 
       // custom color events
       scheduler.templates.event_class = function (start, end, event) {
@@ -336,7 +337,14 @@ export default {
     responsive.initResponsive(scheduler);
 
     // Scheduler initialization
-    const defaultView = this.customer ? 'customer_week' : 'week'
+    let defaultView = '';
+    if (this.$q.platform.is.mobile && this.customer) {
+      defaultView = 'three_days';
+    } else if (this.customer) {
+      defaultView = 'customer_week';
+    } else {
+      defaultView = 'week';
+    }
     scheduler.init(this.$refs.scheduler_here, this.today, defaultView);
 
     // Scheduler data parser
@@ -454,7 +462,7 @@ export default {
   @import '~variables'
   @import "~dhtmlx-scheduler/codebase/dhtmlxscheduler.css";
   @import "~dhtmlx-scheduler/codebase/dhtmlxscheduler_flat.css";
-  @import "../../assets/dhtmlxscheduler-responsive.css";
+  @import "~assets/dhtmlxscheduler-responsive.css";
 
   .dhx_scale_hour
     border-bottom: none

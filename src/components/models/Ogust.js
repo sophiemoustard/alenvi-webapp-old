@@ -24,7 +24,8 @@ export default {
     const data = [];
     let period;
     const mode = scheduler.getState().mode;
-    const date = scheduler.getState().date;
+    let startDate = scheduler.getState().date;
+    let endDate = scheduler.getState().date;
     switch (mode) {
       case 'month':
         period = 'month';
@@ -38,9 +39,14 @@ export default {
       case 'customer_week':
         period = 'week';
         break;
+      case 'three_days':
+        period = 'day';
+        startDate = scheduler.getState().min_date;
+        endDate = scheduler.date.add(scheduler.getState().max_date, -1, 'day');
     }
-    params.startDate = moment(date).startOf(period).format('YYYYMMDDHHmm');
-    params.endDate = moment(date).endOf(period).format('YYYYMMDDHHmm');
+    params.startDate = moment(startDate).startOf(period).format('YYYYMMDDHHmm');
+    params.endDate = moment(endDate).endOf(period).format('YYYYMMDDHHmm');
+    console.log(params);
     const servicesRaw = ogustToken ? await axios.get(`${process.env.API_HOSTNAME}/calendar/events`, { params, headers: { 'x-ogust-token': ogustToken } }) : await alenviAxios.get(`${process.env.API_HOSTNAME}/calendar/events`, { params });
     const eventsRaw = servicesRaw.data.data.events;
     for (const events in eventsRaw) {

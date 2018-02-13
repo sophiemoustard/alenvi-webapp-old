@@ -1,7 +1,9 @@
 <template>
-  <div class="container">
+<div class="row justify-center" style="max-width: 100vw">
+  <div class="full-width" style="max-width: 95vw">
     <scheduler :showTabFilter="true" :events="events" @progressDone="progressDone" @eventUpdated="updateEventById" @viewChanged="getEventsData" @applyFilter="getEventsData"></scheduler>
   </div>
+</div>
 </template>
 
 <script>
