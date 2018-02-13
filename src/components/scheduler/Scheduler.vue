@@ -143,7 +143,7 @@ export default {
   name: 'scheduler',
   props: {
     events: {
-      type: event,
+      type: Array,
       default () {
         return [{
           id: '',
@@ -392,7 +392,7 @@ export default {
       scheduler.updateView();
       // this.width = size.width;
       // this.height = size.height;
-    }, 200),
+    }, 500),
     updateEvent (event, done) { // 'event' & 'done' are parameters given by Quasar when using 'loader' prop with q-btn
       try {
         const ev = scheduler.getEvent(this.customerEventInfo.eventId);
@@ -439,13 +439,14 @@ export default {
       }
       this.$emit('applyFilter');
     }
-  },
-  created () {
-    window.addEventListener('scroll', this.handleScroll);
-  },
-  destroyed () {
-    window.removeEventListener('scroll', this.handleScroll);
   }
+  // NOT SUPPORTED BY FIREFOX
+  // created () {
+  //   window.addEventListener('scroll', this.handleScroll);
+  // },
+  // destroyed () {
+  //   window.removeEventListener('scroll', this.handleScroll);
+  // }
 }
 </script>
 
