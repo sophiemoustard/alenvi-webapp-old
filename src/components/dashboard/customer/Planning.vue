@@ -57,5 +57,7 @@ export default {
 </script>
 
 <style lang="stylus">
-  
+  .dhx_cal_navline, .dhx_cal_header
+    position: fixed !important
+    background-color: white
 </style>

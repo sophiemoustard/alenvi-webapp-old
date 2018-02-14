@@ -1,9 +1,8 @@
 <template>
-<div class="row justify-center" style="max-width: 100vw">
-  <div class="full-width" style="max-width: 95vw">
-    <scheduler :showTabFilter="true" :events="events" @progressDone="progressDone" @eventUpdated="updateEventById" @viewChanged="getEventsData" @applyFilter="getEventsData"></scheduler>
+  <div>
+    <scheduler :showTabFilter="true" :events="events" @progressDone="progressDone" @eventUpdated="updateEventById" @viewChanged="getEventsData"
+      @applyFilter="getEventsData"></scheduler>
   </div>
-</div>
 </template>
 
 <script>
@@ -173,7 +172,15 @@ export default {
   //   position: fixed !important
   //   top: 0
   //   background-color: white
-
+  // @media (max-width: 767px)
+  //   .dhx_cal_date, .dhx_cal_prev_button, .dhx_cal_next_button
+  //     top: 0 !important
+  .dhx_cal_header, .dhx_cal_navline
+    position: fixed !important
+    background-color: white
+    @media (max-width: 767px)
+      position: absolute !important 
+    
   .alenvi_event div 
         background-color: #E2007A !important;
         color: white !important;

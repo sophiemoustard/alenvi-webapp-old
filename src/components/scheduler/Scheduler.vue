@@ -1,8 +1,8 @@
 <template>
   <div>
-    <div ref="scheduler_here" class="dhx_cal_container" style='width:100%; height:100%;'>
-      <!-- <q-window-resize-observable @resize="onResize" /> -->
-      <q-resize-observable @resize="onResize" />
+    <div ref="scheduler_here" class="dhx_cal_container" style="width:100%; height:100%;">
+      <q-scroll-observable v-if="$q.platform.is.mobile" @scroll="handleScroll" />
+      <q-resize-observable v-if="customer" @resize="onResize" />
       <div ref="cal_navline" class="dhx_cal_navline">
         <div class="dhx_cal_prev_button relative-position" v-ripple>&nbsp;</div>
         <div v-show="displayNext" class="dhx_cal_next_button relative-position" v-ripple>&nbsp;</div>
@@ -75,7 +75,7 @@ import responsive from './scripts/dhtmlxscheduler-responsive.js';
 
 import {
   debounce,
-  QWindowResizeObservable,
+  QScrollObservable,
   QResizeObservable,
   QBtn,
   QModal,
@@ -84,10 +84,13 @@ import {
   QSelect,
   QDatetimeRange,
   Ripple,
-  Toast } from 'quasar'
+  Toast,
+  dom } from 'quasar'
 import { mapGetters, mapMutations } from 'vuex'
 
 import SectorFilter from '../dashboard/SectorFilter.vue'
+
+const { viewport } = dom;
 
 const configDhtmlxScheduler = (vm) => {
   // config line mark of current time
@@ -124,11 +127,13 @@ const configDhtmlxScheduler = (vm) => {
   scheduler.config.limit_time_select = true;
 
   scheduler.xy.scale_height = 45;
+  scheduler.xy.margin_left = 10;
+
 }
 
 export default {
   components: {
-    QWindowResizeObservable,
+    QScrollObservable,
     QResizeObservable,
     QBtn,
     QModal,
@@ -233,6 +238,11 @@ export default {
       ]
     }
   },
+  watch: {
+    width (value) {
+      console.log('WIDTH', value);
+    }
+  },
   computed: {
     modalStyle () {
       const style = {
@@ -281,7 +291,7 @@ export default {
       // Custom hour_scale format (standard view)
       scheduler.templates.hour_scale = function (date) {
         const format = scheduler.date.date_to_str('%H:%i');
-        return "<div style='height:44px;line-height:0px'>" + format(date) + '</div>';
+        return "<div style='height:44px;line-height:0px;width:45px;'>" + format(date) + '</div>';
       }
 
       // custom 'customer_week' view
@@ -338,7 +348,7 @@ export default {
 
     // Scheduler initialization
     let defaultView = '';
-    if (this.$q.platform.is.mobile && this.customer) {
+    if (this.$q.platform.is.mobile) {
       defaultView = 'three_days';
     } else if (this.customer) {
       defaultView = 'customer_week';
@@ -385,18 +395,20 @@ export default {
     scheduler.attachEvent('onDblClick', () => false);
   },
   methods: {
-    handleScroll: debounce(function () {
+    handleScroll: debounce((scroll) => {
       const headerToFix = document.getElementsByClassName('dhx_cal_header')[0];
-      let currentScroll = window.pageYOffset;
-      if (currentScroll >= 60 && this.width >= 768) {
+      const { width } = viewport();
+      // let currentScroll = window.pageYOffset;
+      let currentScroll = scroll.position;
+      if (currentScroll >= 60 && width >= 768) {
         headerToFix.classList.add('header-fixed');
-      } else if (currentScroll >= 131 && this.width < 768) {
+      } else if (currentScroll >= 131 && width < 768) {
         headerToFix.classList.add('header-fixed');
       } else {
         headerToFix.classList.remove('header-fixed');
       }
     }, 10),
-    onResize: debounce(() => {
+    onResize: debounce((size) => {
       scheduler.updateView();
       // this.width = size.width;
       // this.height = size.height;
@@ -541,8 +553,8 @@ export default {
     background-color: $primary
   
   .header-fixed
-    position: fixed
-    top: 60px !important
+    position: fixed !important
+    top: 0px !important
   
   .alenvi_event div 
     background-color: $primary !important;
