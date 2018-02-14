@@ -46,7 +46,6 @@ export default {
     }
     params.startDate = moment(startDate).startOf(period).format('YYYYMMDDHHmm');
     params.endDate = moment(endDate).endOf(period).format('YYYYMMDDHHmm');
-    console.log(params);
     const servicesRaw = ogustToken ? await axios.get(`${process.env.API_HOSTNAME}/calendar/events`, { params, headers: { 'x-ogust-token': ogustToken } }) : await alenviAxios.get(`${process.env.API_HOSTNAME}/calendar/events`, { params });
     const eventsRaw = servicesRaw.data.data.events;
     for (const events in eventsRaw) {
