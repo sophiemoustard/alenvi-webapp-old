@@ -41,9 +41,9 @@ export default {
       return true;
     });
 
-    scheduler.attachEvent('onSchedulerResize', function () {
-      scheduler.setCurrentView();
-    });
+    // scheduler.attachEvent('onSchedulerResize', function () {
+    //   scheduler.setCurrentView();
+    // });
 
     // scheduler.attachEvent("onTemplatesReady", function () {
     // 	if (classic[scheduler.skin]) {

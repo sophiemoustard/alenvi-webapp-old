@@ -1,7 +1,7 @@
 <template>
   <div>
     <div ref="scheduler_here" class="dhx_cal_container" style="width:100%; height:100%;">
-      <q-scroll-observable v-if="$q.platform.is.mobile" @scroll="handleScroll" />
+      <q-scroll-observable v-if="$q.platform.is.mobile && !customer" @scroll="handleScroll" />
       <q-resize-observable v-if="customer" @resize="onResize" />
       <div ref="cal_navline" class="dhx_cal_navline">
         <div class="dhx_cal_prev_button relative-position" v-ripple>&nbsp;</div>
@@ -105,10 +105,6 @@ const configDhtmlxScheduler = (vm) => {
   scheduler.config.drag_resize = false;
   scheduler.config.drag_move = false;
   // scheduler.config.touch_tip = false;
-  // disable left buttons on lightbox
-  scheduler.config.buttons_left = [];
-  // enable cancel button on lightbox's right wing
-  scheduler.config.buttons_right = ['dhx_cancel_btn', 'dhx_save_btn'];
   // changing cancel button label
   scheduler.locale.labels['icon_cancel'] = 'Fermer';
   // custom view label
@@ -126,9 +122,12 @@ const configDhtmlxScheduler = (vm) => {
   // limit time in time picker dropdown in lightbox
   scheduler.config.limit_time_select = true;
 
+  // scheduler position config
   scheduler.xy.scale_height = 45;
   scheduler.xy.margin_left = 10;
 
+  // prevent from creating events
+  scheduler.config.readonly = true;
 }
 
 export default {
@@ -238,11 +237,6 @@ export default {
       ]
     }
   },
-  watch: {
-    width (value) {
-      console.log('WIDTH', value);
-    }
-  },
   computed: {
     modalStyle () {
       const style = {
@@ -319,6 +313,22 @@ export default {
       }
     });
 
+    scheduler.renderEvent = (container, ev) => {
+      const containerWidth = container.style.width;
+      const containerHeight = container.style.height;
+      console.log(containerHeight);
+      const html = `<div class="dhx_event_move" style="width: ${containerWidth}"></div>
+                    <div class="dhx_body" style="height: ${containerHeight.replace(/\D+/g, '') - 15}px">
+                      <span class="event_date">
+                        ${scheduler.templates.event_header(ev.start_date, ev.end_date, ev)}
+                      </span><br/>
+                      <span>${scheduler.templates.event_text(ev.start_date, ev.end_date, ev)}</span>
+                    </div>
+                    <div class="dhx_event_resize dhx_footer" style="width: ${containerWidth}"></div>`;
+      container.innerHTML = html;
+      return true;
+    };
+
     scheduler.attachEvent('onBeforeViewChange', (oldMode, oldDate, mode, date) => {
       if (mode === 'filter') {
         return false;
@@ -329,9 +339,15 @@ export default {
     // when clicking on prev and next buttons
     scheduler.attachEvent('onViewChange', (newMode, newDate) => {
       this.$emit('viewChanged');
-      const todayAddOneWeek = moment(this.today).startOf('week').add(1, 'week');
+      let daylimit = null;
+      if (newMode === 'customer_week') {
+        daylimit = moment(this.today).startOf('week').add(1, 'week');
+      } else {
+        daylimit = moment(this.today).startOf('day').add(9, 'days');
+      }
       this.displayNext = true;
-      if (this.customer && newMode === 'customer_week' && moment(newDate).isSame(todayAddOneWeek)) {
+      if (this.customer && (newMode === 'customer_week' || newMode === 'three_days') && moment(newDate).isSame(daylimit)) {
+        console.log('MEH');
         this.displayNext = false;
         return false;
       }
@@ -534,6 +550,9 @@ export default {
     &:hover
       background-color: rgba(0, 0, 0, .07)
   
+  .dhx_cal_event .dhx_title
+    text-align: start
+
   .dhx_cal_event .dhx_footer
     background: none
     &:hover
@@ -582,5 +601,8 @@ export default {
   
   .responsive-container
     width: 100% !important
+  
+  .event_date
+    font-weight: bold
 
 </style>
