@@ -21,7 +21,7 @@ import { can } from './directives/can'
 import { store } from './store/store'
 
 Raven
-  .config('https://db50f77df4cc4e4eafa8e221d267c541@sentry.io/287454')
+  .config('https://db50f77df4cc4e4eafa8e221d267c541@sentry.io/287454', { environment: 'production' })
   .addPlugin(RavenVue, Vue)
   .install();
 
