@@ -235,20 +235,19 @@ export default {
       label: 'Tous',
       value: 'Tous'
     });
-    // this.getInvoices({ month: moment().month(this.month).format('MM') });
-    this.getInvoices();
+    this.getInvoices({ startPeriod: moment().subtract(1, 'months').startOf('month').format('YYYYMMDD'), endPeriod: moment().endOf('month').format('YYYYMMDD') });
     this.getFiscalAttests();
   },
   methods: {
     async getInvoices (params) {
       try {
-        // if (params) {
-        //   this.invoices = await ogust.getCustomerInvoices(235146870, params);
-        //   console.log(this.invoices);
-        // }
         this.invoices = [];
         this.isDisabled = true;
-        this.invoices = await ogust.getCustomerInvoices(235146870, { year: this.year, month: this.month == 'Tous' ? '' : moment().month(this.month).format('MM') }); // 276329398 // this.getUser.customer_id
+        if (params) {
+          this.invoices = await ogust.getCustomerInvoices(this.getUser.customer_id, { startPeriod: params.startPeriod, endPeriod: params.endPeriod });
+        } else {
+          this.invoices = await ogust.getCustomerInvoices(this.getUser.customer_id, { year: this.year, month: this.month == 'Tous' ? '' : moment().month(this.month).format('MM') }); // 276329398 // this.getUser.customer_id
+        }
         for (let i = 0, l = Object.keys(this.invoices).length; i < l; i++) {
           this.invoices[i].invoice_date = moment(this.invoices[i].invoice_date, 'YYYYMMDD').format('DD/MM/YYYY') // .format('DD/MM/YYYY') // .toDate();
           // this.invoices[i].start_of_period = moment(this.invoices[i].start_of_period, 'YYYYMMDD').toDate(); // .format('DD/MM/YYYY')
@@ -264,7 +263,7 @@ export default {
     async getFiscalAttests () {
       try {
         this.fiscalAttests = [];
-        this.fiscalAttests = await ogust.getCustomerFiscalAttests(235146870, {}); // 235146870 // this.getUser.customer_id // year: this.year
+        this.fiscalAttests = await ogust.getCustomerFiscalAttests(this.getUser.customer_id, {}); // 235146870 // this.getUser.customer_id // year: this.year
         for (let i = 0, l = Object.keys(this.fiscalAttests).length; i < l; i++) {
           this.fiscalAttests[i].period_start = moment(this.fiscalAttests[i].period_start, 'YYYYMMDD').format('MM/YYYY');
           this.fiscalAttests[i].reference = moment(this.fiscalAttests[i].reference, 'YYYY-M').format('YYYY');
@@ -278,6 +277,9 @@ export default {
     getInvoicesAndFiscalAttests () {
       this.getInvoices();
       this.getFiscalAttests();
+    },
+    getLastInvoices () {
+
     }
   }
 };
