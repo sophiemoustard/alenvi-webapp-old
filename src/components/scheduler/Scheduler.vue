@@ -270,7 +270,6 @@ export default {
   mounted () {
     // prevent quasar from breaking open/close methods from modal
     this.controlModal(false);
-    console.log(this.$refs.cal_navline.style);
 
     configDhtmlxScheduler(this);
 
@@ -318,7 +317,6 @@ export default {
     scheduler.renderEvent = (container, ev) => {
       const containerWidth = container.style.width;
       const containerHeight = container.style.height;
-      console.log(containerHeight);
       const html = `<div class="dhx_event_move" style="width: ${containerWidth}"></div>
                     <div class="custom_event" style="height: ${containerHeight.replace(/\D+/g, '') - 10}px">
                       <span class="event_date">
@@ -349,7 +347,6 @@ export default {
       }
       this.displayNext = true;
       if (this.customer && (newMode === 'customer_week' || newMode === 'three_days') && moment(newDate).isSame(daylimit)) {
-        console.log('MEH');
         this.displayNext = false;
         return false;
       }
@@ -384,7 +381,6 @@ export default {
     // scheduler.attachEvent('onEventDrag', this.blockReadOnly);
     scheduler.showLightbox = (id) => {
       const ev = scheduler.getEvent(id);
-      // console.log('EV', ev);
       this.setDisableInput(true);
       this.setDisableTimePicker(true);
       this.customerEventInfo.doorCode = ev.door_code;
