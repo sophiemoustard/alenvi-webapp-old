@@ -1,7 +1,7 @@
 <template>
   <div>
     <div ref="scheduler_here" class="dhx_cal_container" style="width:100%; height:100%;">
-      <q-scroll-observable v-if="$q.platform.is.mobile && !customer" @scroll="handleScroll" />
+      <q-scroll-observable @scroll="handleScroll" />
       <q-resize-observable v-if="customer" @resize="onResize" />
       <div ref="cal_navline" class="dhx_cal_navline">
         <div class="dhx_cal_prev_button relative-position" v-ripple>&nbsp;</div>
@@ -17,7 +17,7 @@
           <sector-filter v-if="ogustUser" @auxiliariesChosen="applyFilter" />
         </div>
       </div>
-      <div class="dhx_cal_header"></div>
+      <div ref="cal_header" class="dhx_cal_header"></div>
       <div class="dhx_cal_data"></div>
     </div>
 
@@ -263,12 +263,14 @@ export default {
       'disableTimePicker',
       'showFilter',
       'ogustUser',
-      'auxiliariesChosen'
+      'auxiliariesChosen',
+      'toggleDrawer'
     ])
   },
   mounted () {
     // prevent quasar from breaking open/close methods from modal
     this.controlModal(false);
+    console.log(this.$refs.cal_navline.style);
 
     configDhtmlxScheduler(this);
 
@@ -318,7 +320,7 @@ export default {
       const containerHeight = container.style.height;
       console.log(containerHeight);
       const html = `<div class="dhx_event_move" style="width: ${containerWidth}"></div>
-                    <div class="dhx_body" style="height: ${containerHeight.replace(/\D+/g, '') - 15}px">
+                    <div class="custom_event" style="height: ${containerHeight.replace(/\D+/g, '') - 10}px">
                       <span class="event_date">
                         ${scheduler.templates.event_header(ev.start_date, ev.end_date, ev)}
                       </span><br/>
@@ -360,9 +362,11 @@ export default {
     //   type: 'dhx_time_block'
     // });
 
-    responsive.initResponsive(scheduler);
+    responsive.initResponsive(scheduler, { customer: this.customer, mobile: this.$q.platform.is.mobile });
 
     // Scheduler initialization
+
+    // Scheduler default view
     let defaultView = '';
     if (this.$q.platform.is.mobile) {
       defaultView = 'three_days';
@@ -411,20 +415,33 @@ export default {
     scheduler.attachEvent('onDblClick', () => false);
   },
   methods: {
-    handleScroll: debounce((scroll) => {
+    handleScroll: debounce(function (scroll) {
       const headerToFix = document.getElementsByClassName('dhx_cal_header')[0];
       const { width } = viewport();
       // let currentScroll = window.pageYOffset;
       let currentScroll = scroll.position;
       if (currentScroll >= 60 && width >= 768) {
-        headerToFix.classList.add('header-fixed');
+        if (this.customer && !this.$q.platform.is.mobile && this.toggleDrawer) {
+          headerToFix.classList.add('header-fixed-customer');
+          this.$refs.cal_header.style.left = `350px`
+        } else if (this.customer && !this.$q.platform.is.mobile && !this.toggleDrawer) {
+          headerToFix.classList.add('header-fixed-customer');
+        } else {
+          headerToFix.classList.add('header-fixed');
+        }
       } else if (currentScroll >= 131 && width < 768) {
-        headerToFix.classList.add('header-fixed');
+        if (this.customer && this.$q.platform.is.mobile) {
+          headerToFix.classList.add('header-fixed-customer');
+        } else {
+          headerToFix.classList.add('header-fixed');
+        }
       } else {
+        this.$refs.cal_header.style.left = `50px`
         headerToFix.classList.remove('header-fixed');
+        headerToFix.classList.remove('header-fixed-customer');
       }
     }, 10),
-    onResize: debounce((size) => {
+    onResize: debounce(function (size) {
       scheduler.updateView();
       // this.width = size.width;
       // this.height = size.height;
@@ -536,7 +553,6 @@ export default {
     &:hover
       background-color: rgba(0, 0, 0, .1)
 
-  
   .dhx_cal_today_button
     color: $tertiary
     &:hover
@@ -572,8 +588,11 @@ export default {
     background-color: $primary
   
   .header-fixed
-    position: fixed !important
+    position: fixed
     top: 0px !important
+    &-customer
+      top: 52px !important
+      position: fixed
   
   .alenvi_event div 
     background-color: $primary !important;
@@ -604,5 +623,8 @@ export default {
   
   .event_date
     font-weight: bold
+  
+  .custom_event
+    padding: 5px
 
 </style>

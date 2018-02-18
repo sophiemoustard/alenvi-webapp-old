@@ -175,11 +175,11 @@ export default {
   // @media (max-width: 767px)
   //   .dhx_cal_date, .dhx_cal_prev_button, .dhx_cal_next_button
   //     top: 0 !important
-  .dhx_cal_header, .dhx_cal_navline
-    position: fixed !important
-    background-color: white
-    @media (max-width: 767px)
-      position: absolute !important 
+  // .dhx_cal_header, .dhx_cal_navline
+  //   position: fixed !important
+  //   background-color: white
+  //   @media (max-width: 767px)
+  //     position: absolute !important 
     
   .alenvi_event div 
         background-color: #E2007A !important;

@@ -3,7 +3,7 @@
   <q-layout ref="layout" view="hHh Lpr lff" :left-breakpoint="992">
 
     <q-toolbar slot="header" color="white">
-      <q-btn color="primary" flat big @click="$refs.layout.toggleLeft()">
+      <q-btn color="primary" flat big @click="toggleLeft">
         <q-icon name="menu"/>
       </q-btn>
       <q-toolbar-title>
@@ -47,7 +47,8 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'user'
+      'user',
+      'toggleDrawer'
     ]),
     layoutTitle () {
       if (this.user.role.name === 'Client') {
@@ -60,6 +61,12 @@ export default {
         link: { path: '/dashboard/planning' },
         content: 'Dashboard'
       };
+    }
+  },
+  methods: {
+    toggleLeft () {
+      this.$store.commit('setToggleDrawer', !this.toggleDrawer);
+      this.$refs.layout.toggleLeft();
     }
   }
 }

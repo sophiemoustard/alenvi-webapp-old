@@ -17,7 +17,8 @@ export const store = new Vuex.Store({
     showFilter: false,
     ogustUser: null,
     auxiliariesChosen: null,
-    ogustToken: null
+    ogustToken: null,
+    toggleDrawer: true
   },
   getters: {
     user (state) {
@@ -43,6 +44,9 @@ export const store = new Vuex.Store({
     },
     ogustToken (state) {
       return state.ogustToken;
+    },
+    toggleDrawer (state) {
+      return state.toggleDrawer;
     }
   },
   mutations: {
@@ -72,6 +76,9 @@ export const store = new Vuex.Store({
     },
     getOgustToken (state, token) {
       state.ogustToken = token;
+    },
+    setToggleDrawer (state, toggle) {
+      state.toggleDrawer = toggle;
     }
   },
   actions: {

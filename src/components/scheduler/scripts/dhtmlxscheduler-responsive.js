@@ -1,5 +1,5 @@
 export default {
-  initResponsive (scheduler) {
+  initResponsive (scheduler, options) {
     // regular header height for Terrace or Flat skin
     var navbarHeight = 59,
       // regular header for Glossy or Standart skin
@@ -18,7 +18,11 @@ export default {
     var classic = { 'glossy': true, 'classic': true };
 
     function setSizes (navHeight, navHeightClassicSkin, scaleDate) {
-      scheduler.xy.nav_height = navHeight;
+      if (options && options.customer && options.mobile) {
+        scheduler.xy.nav_height = 70;
+      } else {
+        scheduler.xy.nav_height = navHeight;
+      }
 
       if (classic[scheduler.skin]) {
         scheduler.xy.nav_height = navHeightClassicSkin;
