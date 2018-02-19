@@ -155,7 +155,7 @@ export default {
                   //
                   await email.sendWelcome({
                     sender: {
-                      email: 'test@alenvi.io'
+                      email: 'support@alenvi.io'
                     },
                     receiver: {
                       email: helper.email,
