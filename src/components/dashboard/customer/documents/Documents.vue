@@ -291,7 +291,7 @@ export default {
 .margin-bottom
   margin-bottom: 10px
 
-#fiscalAttestTitle0164112552
+#fiscalAttestTitle
   margin-top: 70px
   margin-bottom: 20px
 </style>
