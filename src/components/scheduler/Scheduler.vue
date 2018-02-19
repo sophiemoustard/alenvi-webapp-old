@@ -180,8 +180,7 @@ export default {
   },
   data () {
     return {
-      width: '',
-      height: '',
+      width: viewport().width,
       today: new Date(),
       displayNext: true,
       childEvents: this.events,
@@ -413,10 +412,7 @@ export default {
   methods: {
     handleScroll: debounce(function (scroll) {
       const headerToFix = document.getElementsByClassName('dhx_cal_header')[0];
-      const { width } = viewport();
-      // let currentScroll = window.pageYOffset;
-      let currentScroll = scroll.position;
-      if (currentScroll >= 60 && width >= 768) {
+      if (scroll.position >= 60 && this.width >= 768) {
         if (this.customer && !this.$q.platform.is.mobile && this.toggleDrawer) {
           headerToFix.classList.add('header-fixed-customer');
           this.$refs.cal_header.style.left = `350px`
@@ -425,7 +421,7 @@ export default {
         } else {
           headerToFix.classList.add('header-fixed');
         }
-      } else if (currentScroll >= 131 && width < 768) {
+      } else if (scroll.position >= 131 && this.width < 768) {
         if (this.customer && this.$q.platform.is.mobile) {
           headerToFix.classList.add('header-fixed-customer');
         } else {
