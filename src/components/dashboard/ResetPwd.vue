@@ -28,7 +28,6 @@ import { QInput, QCard, QCardMain, QCardSeparator, QCardActions, QCardMedia, QBt
 import { sameAs, minLength, maxLength, required } from 'vuelidate/lib/validators'
 
 import users from '../models/Users'
-import email from '../models/Email'
 import { alenviAlert } from '../../helpers/alerts'
 
 export default {
@@ -104,7 +103,6 @@ export default {
           }
         };
         await users.updateById(userPayload, this.token);
-        await email.sendChangePasswordOk({ email: this.userEmail }, this.token);
         alenviAlert({
           color: 'positive',
           icon: 'warning',
