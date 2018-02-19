@@ -65,7 +65,7 @@ export default {
         event.comments = eventsRaw[events].customer.comments;
         event.interventionDetails = eventsRaw[events].customer.interventionDetails;
         event.misc = eventsRaw[events].customer.misc;
-        event.readonly = (eventsRaw[events].customer.id_customer === '286871430' || eventsRaw[events].customer.id_customer === '271395715' || eventsRaw[events].customer.id_customer === '244566438');
+        event.readonly = (eventsRaw[events].customer.id_customer === '286871430' || eventsRaw[events].customer.id_customer === '271395715' || eventsRaw[events].customer.id_customer === '244566438' || eventsRaw[events].customer.id_customer === '349780044' || eventsRaw[events].customer.id_customer === '356779196' || eventsRaw[events].customer.id_customer === '356779463');
       } else {
         event.text = `${eventsRaw[events].employee.firstname} ${eventsRaw[events].employee.lastname}`
       }
