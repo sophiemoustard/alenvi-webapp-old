@@ -474,7 +474,7 @@ export default {
       //   }
       //   return false;
       // }
-      scheduler.filter_day = scheduler.filter_month = scheduler.filter_week = (id, event) => {
+      scheduler.filter_day = scheduler.filter_month = scheduler.filter_three_days = scheduler.filter_week = (id, event) => {
         if (this.auxiliariesChosen && this.auxiliariesChosen === event.id_employee) {
           return true;
         }
@@ -616,5 +616,6 @@ export default {
   
   .custom_event
     padding: 5px
+    overflow: hidden
 
 </style>
