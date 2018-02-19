@@ -394,12 +394,10 @@ export default {
       this.customerEventInfo.eventType = ev.type;
       this.customerEventInfo.eventId = ev.id;
       this.customerEventInfo.eventTitle = `${ev.text} ${moment(ev.start_date, 'YYYY-MM-DD HH:mm').format('HH:mm')} - ${moment(ev.end_date, 'YYYY-MM-DD HH:mm').format('HH:mm')}`
-      if (!ev.readonly) {
-        this.setDisableInput(false);
-      }
       this.controlModal(true);
       if (this.$route.query.id_employee === ev.id_employee && !ev.readonly) {
         this.setDisableTimePicker(false);
+        this.setDisableInput(false);
       }
       // if (this.$route.query.id_employee === ev.id_employee && ev.type !== 'alenvi_past') {
       //   this.setDisableTimePicker(false);
