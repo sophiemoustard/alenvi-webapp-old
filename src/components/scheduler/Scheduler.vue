@@ -421,7 +421,7 @@ export default {
         } else {
           headerToFix.classList.add('header-fixed');
         }
-      } else if (this.customer && scroll.position >= 70 && this.width < 768) {
+      } else if (this.customer && scroll.position >= 71 && this.width < 768) {
         headerToFix.classList.add('header-fixed-customer');
       } else if (scroll.position >= 131 && this.width < 768) {
         headerToFix.classList.add('header-fixed');
