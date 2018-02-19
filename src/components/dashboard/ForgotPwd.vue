@@ -5,7 +5,7 @@
         <img src="https://res.cloudinary.com/alenvi/image/upload/c_scale,q_auto,w_400/v1507124345/images/business/alenvi_logo_complet_full.png" alt="Logo Alenvi" class="responsive">
       </q-card-media>
       <q-card-title>
-        Nous allons vous envoyer un email pour réinitialiser votre mot de passe. Veuillez renseigner votre adresse email:
+        Nous allons vous envoyer un email pour réinitialiser votre mot de passe. Veuillez renseigner votre adresse email :
       </q-card-title>
       <q-card-main>
         <q-field icon="mail" :error="$v.email.$error" error-label="Veuillez rentrer un email valide. (ex: mail@mail.com)">
