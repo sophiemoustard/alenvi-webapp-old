@@ -421,12 +421,10 @@ export default {
         } else {
           headerToFix.classList.add('header-fixed');
         }
+      } else if (this.customer && scroll.position >= 70 && this.width < 768) {
+        headerToFix.classList.add('header-fixed-customer');
       } else if (scroll.position >= 131 && this.width < 768) {
-        if (this.customer && this.$q.platform.is.mobile) {
-          headerToFix.classList.add('header-fixed-customer');
-        } else {
-          headerToFix.classList.add('header-fixed');
-        }
+        headerToFix.classList.add('header-fixed');
       } else {
         this.$refs.cal_header.style.left = `50px`
         headerToFix.classList.remove('header-fixed');
