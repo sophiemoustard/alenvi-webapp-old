@@ -59,6 +59,7 @@ const router = new VueRouter({
         }
       }
     },
+    { path: '/signup/test', component: load('signup/Test') },
     { path: '/bot/authenticate', component: load('bot/Authenticate') },
     { path: '/bot/authenticatePhone', component: load('bot/AuthenticatePhone') },
     { path: '/bot/editCustomerInfo', component: load('bot/CustomerInfo') },
