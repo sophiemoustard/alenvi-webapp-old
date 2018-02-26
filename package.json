@@ -9,7 +9,8 @@
   "scripts": {
     "lint": "eslint --ext .js,.vue src",
     "test": "echo \"No test specified\" && exit 0",
-    "postinstall": "quasar build"
+    "postinstall": "quasar build",
+    "start": "node server.js"
   },
   "dependencies": {
     "axios": "^0.17.1",
