@@ -209,7 +209,7 @@ export default {
       try {
         if (!Cookies.get('user_id')) {
           if (await !alenvi.refreshAlenviCookies()) {
-            return this.$router.push('/dashboard/login');
+            return this.$router.push('/login');
           }
         }
         const payload = {

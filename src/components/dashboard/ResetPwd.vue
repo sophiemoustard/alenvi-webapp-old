@@ -111,7 +111,7 @@ export default {
           duration: 2000
         });
         this.timeout = setTimeout(() => {
-          this.$router.replace({ path: '/dashboard/login' });
+          this.$router.replace({ path: '/login' });
         }, 2000)
       } catch (e) {
         alenviAlert({

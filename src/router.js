@@ -39,12 +39,12 @@ const router = new VueRouter({
           }
           return next({ path: '/dashboard/planning' });
         } else {
-          next({ path: '/dashboard/login' });
+          next({ path: '/login' });
         }
       }
     },
     { path: '/dashboard/error403Pwd', component: load('dashboard/Error403ChangePwd') },
-    { path: '/dashboard/login', component: load('dashboard/Authenticate') },
+    { path: '/login', component: load('dashboard/Authenticate') },
     { path: '/enterCode', component: load('signup/EnterCode') },
     { path: '/forgotPassword', component: load('dashboard/ForgotPwd') },
     { path: '/resetPassword/:token', component: load('dashboard/ResetPwd') },
@@ -180,7 +180,7 @@ router.beforeEach(async (to, from, next) => {
           next({ path: '/dashboard' });
         }
       } else {
-        next({ path: '/dashboard/login' });
+        next({ path: '/login' });
       }
     } else {
       if (store.state.refreshState) {
