@@ -1,0 +1,79 @@
+<template>
+  <q-icon name="search" size="1.5rem" flat>
+    <q-popover v-model="showFilter" @show="getEmployeesBySector(ogustUser.sector)">
+      <q-list link no-border style="min-width: 200px">
+        <!-- <q-list-header v-if="auxiliaries.length !== 0"> -->
+          <!-- <q-field icon="search">
+            <q-input v-model="search" placeholder="Recherche" />
+          </q-field> -->
+        <!-- </q-list-header> -->
+        <q-inner-loading :visible="auxiliaries.length === 0">
+          <q-spinner size="50px" />
+        </q-inner-loading>
+        <q-item v-for="(auxiliary, index) in auxiliaries" :key="index">
+          <!-- <q-checkbox v-model="auxiliariesIds" :val="auxiliary.value" :label="auxiliary.label" @change="chooseAuxiliaries" /> -->
+          <q-radio v-model="auxiliaryId" :val="auxiliary.value" :label="auxiliary.label" @input="chooseAuxiliaries" />
+        </q-item>
+      </q-list>
+    </q-popover>
+  </q-icon>
+</template>
+
+<script>
+export default {
+  data () {
+    return {
+      sectors: [],
+      auxiliaries: [],
+      auxiliaryId: ''
+      // auxiliariesIds: [],
+      // search: '',
+    }
+  },
+  computed: {
+    showFilter: {
+      get () {
+        return this.$store.state.main.showFilter;
+      },
+      set (value) {
+        this.$store.commit('main/toggleFilter', value);
+      }
+    },
+    ogustUser () {
+      return this.$store.getters['main/ogustUser'];
+    },
+    ogustToken () {
+      return this.$store.getters['main/ogustToken'];
+    }
+    // filteredAuxiliaries () {
+    //   return this.auxiliaries.filter((item) => {
+    //     return item.label.match(new RegExp(`${this.search}`, 'i'));
+    //   })
+    // }
+  },
+  mounted () {
+    // this.auxiliariesIds.push(this.$store.state.ogustUser.id_employee);
+    this.auxiliaryId = this.$store.state.main.ogustUser.id_employee;
+  },
+  methods: {
+    async getEmployeesBySector (sector) {
+      try {
+        this.auxiliaries = [];
+        const employees = await this.$ogust.getEmployees({ sector }, this.ogustToken);
+        for (const k in employees) {
+          this.auxiliaries.push({
+            label: `${employees[k].first_name} ${employees[k].last_name}`,
+            value: employees[k].id_employee
+          });
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    chooseAuxiliaries () {
+      this.$emit('auxiliariesChosen');
+      this.$store.commit('main/setAuxiliariesChosen', this.auxiliaryId);
+    }
+  }
+}
+</script>

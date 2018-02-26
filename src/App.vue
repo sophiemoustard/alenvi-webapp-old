@@ -1,5 +1,4 @@
 <template>
-  <!-- Don't drop "q-app" class -->
   <div id="q-app">
     <router-view />
     <q-ajax-bar color="primary" size="1px"/>
@@ -7,22 +6,10 @@
 </template>
 
 <script>
-import { QAjaxBar } from 'quasar'
-/*
- * Root component
- */
 export default {
-  components: {
-    QAjaxBar
-  }
-}
+  name: 'App',
+};
 </script>
 
-<style lang="stylus">
-  @import '~variables'
-  body
-    color: $tertiary
-
-    h1, h2, h3, h4, h5, h6
-    color: $tertiary
+<style>
 </style>

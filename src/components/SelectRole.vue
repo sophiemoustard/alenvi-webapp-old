@@ -5,17 +5,10 @@
 </template>
 
 <script>
-import { QField, QSelect } from 'quasar';
 import _ from 'lodash';
-
-import users from './models/Users';
 
 export default {
   props: ['value', 'icon'],
-  components: {
-    QField,
-    QSelect
-  },
   data () {
     return {
       roles: []
@@ -32,7 +25,7 @@ export default {
   methods: {
     async getRoles () {
       try {
-        const allRoles = await users.getRoles();
+        const allRoles = await this.$users.getRoles();
         for (const k in allRoles) {
           this.roles.push({
             label: allRoles[k].name,

@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const app = express();
 const history = require('connect-history-api-fallback');
@@ -14,7 +15,7 @@ app.use(history());
 
 app.use(sslRedirect(['development', 'production']));
 
-app.use(express.static(__dirname + '/dist'));
+app.use(express.static(path.join(__dirname, '/dist/spa-mat')));
 
 app.set('port', (process.env.PORT || 8080));
 

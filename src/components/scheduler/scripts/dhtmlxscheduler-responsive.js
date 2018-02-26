@@ -9,7 +9,7 @@ export default {
       // height for Glossy and Standart in Mobile mode
       navbarClassicMobileHeight = 140,
       // load QuickInfo if mobile browser detected
-      loadQuickInfo = true,
+      // loadQuickInfo = true,
       // navbar label formats for Regular and Mobile modes
       scaleDate = '%F, %D %d',
       scaleDateMobile = '%D %d';
@@ -44,42 +44,5 @@ export default {
       }
       return true;
     });
-
-    // scheduler.attachEvent('onSchedulerResize', function () {
-    //   scheduler.setCurrentView();
-    // });
-
-    // scheduler.attachEvent("onTemplatesReady", function () {
-    // 	if (classic[scheduler.skin]) {
-    // 		addCss("../Content/dhtmlxScheduler/dhtmlxscheduler-responsive-classic.css");
-    // 	}
-    // });
-    //
-    // function addCss(source) {
-    // 	var cssFileTag = document.createElement("link");
-    // 	cssFileTag.setAttribute("rel", "stylesheet");
-    // 	cssFileTag.setAttribute("type", "text/css");
-    // 	cssFileTag.setAttribute("href", source);
-    //
-    // 	document.getElementsByTagName("head")[0].appendChild(cssFileTag);
-    // }
-    //
-    // function addJS(url, callback) {
-    // 	var head = document.getElementsByTagName('head')[0];
-    // 	var script = document.createElement('script');
-    // 	script.type = 'text/javascript';
-    // 	script.src = url;
-    // 	script.onreadystatechange = callback;
-    // 	script.onload = callback;
-    // 	head.appendChild(script);
-    // }
-    //
-    //
-    // if (/Android|webOS|iPhone|iPad|iPod|IEMobile/i.test(navigator.userAgent) && loadQuickInfo) {
-    // 	addJS("../../../dhtmlx-scheduler/ext/dhtmlxscheduler_quick_info.js", function () {
-    // 		scheduler.config.touch = "force";
-    // 		scheduler.xy.menu_width = 0;
-    // 	});
-    // }
   }
 }

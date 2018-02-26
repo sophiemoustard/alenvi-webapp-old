@@ -1,4 +1,4 @@
-import redirect from '../helpers/redirect';
+import redirect from '../router/redirect';
 
 export const can = (el, binding) => {
   if (binding.value.user.role && binding.value.user.role.features) {

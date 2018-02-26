@@ -5,17 +5,10 @@
 </template>
 
 <script>
-import { QField, QSelect } from 'quasar';
 import _ from 'lodash';
-
-import ogust from './models/Ogust';
 
 export default {
   props: ['value', 'icon'],
-  components: {
-    QField,
-    QSelect
-  },
   data () {
     return {
       sectors: []
@@ -32,7 +25,7 @@ export default {
   methods: {
     async getSectors () {
       try {
-        const allSectorsRaw = await ogust.getList('employee.sector');
+        const allSectorsRaw = await this.$ogust.getList('employee.sector');
         for (const k in allSectorsRaw) {
           if (k === '*') {
             continue;

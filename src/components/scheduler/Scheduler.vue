@@ -13,7 +13,7 @@
         <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="week_tab" style="right:140px;"></div>
         <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="month_tab" style="right:76px;"></div>
         <div v-show="showTabCustomer" class="dhx_cal_tab relative-position" v-ripple name="customer_week_tab" style="right:140px;"></div>
-        <div v-show="showTabFilter && !$route.query.id_customer" class="dhx_cal_tab relative-position" name="filter_tab" @click="displayFilter" v-ripple style="left: 230px;">
+        <div v-show="showTabFilter && !$route.query.id_customer" class="dhx_cal_tab relative-position" name="filter_tab" @click.self="displayFilter" v-ripple style="left: 230px;">
           <sector-filter v-if="ogustUser" @auxiliariesChosen="applyFilter" />
         </div>
       </div>
@@ -23,34 +23,35 @@
 
     <q-modal v-model="getOpenModal" minimized :content-css="modalStyle">
       <p class="caption">{{ customerEventInfo.eventTitle }}</p>
-      <q-field>
-        <q-input v-model="customerEventInfo.doorCode" float-label="Code Porte" type="textarea" :min-rows="1" :disable="disableInput">
-        </q-input>
+      <q-field class="custom-field">
+        <q-input v-model="customerEventInfo.doorCode" float-label="Code Porte" type="text" :disable="disableInput" />
       </q-field>
-      <q-field>
-        <q-input v-model="customerEventInfo.interCode" float-label="Code interphone" type="textarea" :min-rows="1" :disable="disableInput">
-        </q-input>
+      <q-field class="custom-field">
+        <q-input v-model="customerEventInfo.interCode" float-label="Code interphone" type="text" :disable="disableInput" />
       </q-field>
-      <q-field>
+      <q-field class="custom-field">
         <q-select v-model="customerEventInfo.pathology" float-label="Pathologie" :options="selectOptions" :disable="disableInput"></q-select>
       </q-field>
-      <q-field>
-        <q-input v-model="customerEventInfo.comments" float-label="Commentaires" type="textarea" :min-rows="4" :disable="disableInput">
-        </q-input>
+      <q-field class="custom-field">
+        <q-input v-model="customerEventInfo.comments" float-label="Commentaires" type="textarea" :min-rows="4" :disable="disableInput" />
       </q-field>
-      <q-field>
+      <q-field class="custom-field">
         <q-input v-model="customerEventInfo.interventionDetails" float-label="Détails intervention" type="textarea" :min-rows="4"
-          :disable="disableInput">
-        </q-input>
+          :disable="disableInput" />
       </q-field>
-      <q-field>
-        <q-input v-model="customerEventInfo.misc" float-label="Autres" type="textarea" :min-rows="4" :disable="disableInput">
-        </q-input>
+      <q-field class="custom-field">
+        <q-input v-model="customerEventInfo.misc" float-label="Autres" type="textarea" :min-rows="4" :disable="disableInput" />
       </q-field>
-      <q-field label="Horaires">
-        <q-datetime-range type="time" format24h clear-label="Effacer" ok-label="OK" cancel-label="Annuler" v-model="customerEventInfo.eventRange"
-          :disable="disableTimePicker" />
-      </q-field>
+      <div class="row">
+        <q-field class="on-left" style="width: 49%">
+          <q-datetime class="custom-field" type="time" format24h clear-label="Effacer" stack-label="Heure de début" ok-label="OK" cancel-label="Annuler" v-model="customerEventInfo.eventFrom"
+            :disable="disableTimePicker" />
+        </q-field>
+        <q-field class="on-right" style="width: 49%">
+          <q-datetime class="custom-field" type="time" format24h clear-label="Effacer" stack-label="Heure de fin" ok-label="OK" cancel-label="Annuler" v-model="customerEventInfo.eventTo"
+            :disable="disableTimePicker" />
+        </q-field>
+      </div>
       <div class="row justify-end">
         <q-btn loader v-if="$route.query.id_employee === customerEventInfo.eventEmployeeId" @click="updateEvent" class="on-left" color="primary"
           :disable="disableInput">
@@ -65,7 +66,7 @@
 </template>
 
 <script>
-import moment from 'moment';
+/* global scheduler */
 import 'dhtmlx-scheduler'
 import 'dhtmlx-scheduler/codebase/locale/locale_fr';
 import 'dhtmlx-scheduler/codebase/ext/dhtmlxscheduler_readonly.js';
@@ -75,20 +76,10 @@ import responsive from './scripts/dhtmlxscheduler-responsive.js';
 
 import {
   debounce,
-  QScrollObservable,
-  QResizeObservable,
-  QBtn,
-  QModal,
-  QInput,
-  QField,
-  QSelect,
-  QDatetimeRange,
-  Ripple,
-  Toast,
   dom } from 'quasar'
 import { mapGetters, mapMutations } from 'vuex'
 
-import SectorFilter from '../dashboard/SectorFilter.vue'
+import SectorFilter from '../../components/SectorFilter'
 
 const { viewport } = dom;
 
@@ -132,18 +123,7 @@ const configDhtmlxScheduler = (vm) => {
 
 export default {
   components: {
-    QScrollObservable,
-    QResizeObservable,
-    QBtn,
-    QModal,
-    QInput,
-    QField,
-    QSelect,
-    QDatetimeRange,
     SectorFilter
-  },
-  directives: {
-    Ripple
   },
   name: 'scheduler',
   props: {
@@ -197,10 +177,8 @@ export default {
         doorCode: '',
         interCode: '',
         eventEmployeeId: '',
-        eventRange: {
-          from: null,
-          to: null
-        },
+        eventFrom: null,
+        eventTo: null,
         eventType: '',
         eventId: ''
       },
@@ -251,20 +229,20 @@ export default {
     },
     getOpenModal: {
       get () {
-        return this.$store.state.openModal;
+        return this.$store.state.main.openModal;
       },
       set (value) {
-        this.$store.commit('controlModal', value);
+        this.$store.commit('main/controlModal', value);
       }
     },
-    ...mapGetters([
-      'disableInput',
-      'disableTimePicker',
-      'showFilter',
-      'ogustUser',
-      'auxiliariesChosen',
-      'toggleDrawer'
-    ])
+    ...mapGetters({
+      disableInput: 'main/disableInput',
+      disableTimePicker: 'main/disableTimePicker',
+      showFilter: 'main/showFilter',
+      ogustUser: 'main/ogustUser',
+      auxiliariesChosen: 'main/auxiliariesChosen',
+      toggleDrawer: 'main/toggleDrawer'
+    })
   },
   mounted () {
     // prevent quasar from breaking open/close methods from modal
@@ -340,12 +318,12 @@ export default {
       this.$emit('viewChanged');
       let daylimit = null;
       if (newMode === 'customer_week') {
-        daylimit = moment(this.today).startOf('week').add(1, 'week');
+        daylimit = this.$moment(this.today).startOf('week').add(1, 'week');
       } else {
-        daylimit = moment(this.today).startOf('day').add(9, 'days');
+        daylimit = this.$moment(this.today).startOf('day').add(9, 'days');
       }
       this.displayNext = true;
-      if (this.customer && (newMode === 'customer_week' || newMode === 'three_days') && moment(newDate).isSame(daylimit)) {
+      if (this.customer && (newMode === 'customer_week' || newMode === 'three_days') && this.$moment(newDate).isSame(daylimit)) {
         this.displayNext = false;
         return false;
       }
@@ -388,12 +366,12 @@ export default {
       this.customerEventInfo.comments = ev.comments;
       this.customerEventInfo.interventionDetails = ev.interventionDetails;
       this.customerEventInfo.misc = ev.misc;
-      this.customerEventInfo.eventRange.from = moment(ev.start_date, 'YYYY-MM-DD HH:mm').toDate();
-      this.customerEventInfo.eventRange.to = moment(ev.end_date, 'YYYY-MM-DD HH:mm').toDate();
+      this.customerEventInfo.eventFrom = this.$moment(ev.start_date, 'YYYY-MM-DD HH:mm').toDate();
+      this.customerEventInfo.eventTo = this.$moment(ev.end_date, 'YYYY-MM-DD HH:mm').toDate();
       this.customerEventInfo.eventEmployeeId = ev.id_employee;
       this.customerEventInfo.eventType = ev.type;
       this.customerEventInfo.eventId = ev.id;
-      this.customerEventInfo.eventTitle = `${ev.text} ${moment(ev.start_date, 'YYYY-MM-DD HH:mm').format('HH:mm')} - ${moment(ev.end_date, 'YYYY-MM-DD HH:mm').format('HH:mm')}`
+      this.customerEventInfo.eventTitle = `${ev.text} ${this.$moment(ev.start_date, 'YYYY-MM-DD HH:mm').format('HH:mm')} - ${this.$moment(ev.end_date, 'YYYY-MM-DD HH:mm').format('HH:mm')}`
       this.controlModal(true);
       if (this.$route.query.id_employee === ev.id_employee && !ev.readonly) {
         this.setDisableTimePicker(false);
@@ -448,24 +426,30 @@ export default {
         ev.comments = this.customerEventInfo.comments;
         ev.interventionDetails = this.customerEventInfo.interventionDetails;
         ev.misc = this.customerEventInfo.misc;
-        ev.start_date = this.customerEventInfo.eventRange.from;
-        ev.end_date = this.customerEventInfo.eventRange.to;
+        ev.start_date = this.customerEventInfo.eventFrom;
+        ev.end_date = this.customerEventInfo.eventTo;
         // Sending data to child component (no need of vuex)
         this.$emit('progressDone', done);
         this.$emit('eventUpdated', ev);
       } catch (e) {
         console.error(e);
-        Toast.create("Erreur lors de l'enregistrement");
+        this.$q.notify({
+          color: 'error',
+          icon: 'warning',
+          detail: "Erreur lors de l'enregistrement",
+          position: 'bottom-right',
+          timeout: 2500
+        });
         done();
       }
     },
-    ...mapMutations([
-      'setDisableInput',
-      'setDisableTimePicker',
-      'controlModal'
-    ]),
+    ...mapMutations({
+      setDisableInput: 'main/setDisableInput',
+      setDisableTimePicker: 'main/setDisableTimePicker',
+      controlModal: 'main/controlModal'
+    }),
     displayFilter () {
-      this.$store.commit('toggleFilter', !this.showFilter)
+      this.$store.commit('main/toggleFilter', !this.showFilter)
     },
     applyFilter () {
       // scheduler.filter_week = (id, event) => {
@@ -502,6 +486,9 @@ export default {
   @import "~dhtmlx-scheduler/codebase/dhtmlxscheduler_flat.css";
   @import "~assets/dhtmlxscheduler-responsive.css";
 
+  .custom-field
+    margin: 16px 0
+
   .dhx_scale_hour
     border-bottom: none
     overflow: visible
@@ -511,24 +498,24 @@ export default {
     overflow-x: visible
     border-top: none
     /*padding-top: 10px;*/
-  
+
   // .dhx_cal_header
   //   position: fixed
   //   background: white
 
   .dhx_cal_header div div
     border: none
-  
+
   .dhx_scale_bar
     line-height: 20px
     // position: fixed
-  
+
   .dhx_scale_holder
     background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAsCAIAAAArRUU2AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAB3RJTUUH4gEREC41Aw9nHAAAABZJREFUCNdj+P//PxMDA8OQwOfPnwcAKy4FwcX82PUAAAAASUVORK5CYII=')
 
   .dhx_scale_holder_now
     background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAsCAIAAAArRUU2AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAB3RJTUUH4gEREDIsgROSgQAAABZJREFUCNdj+P95IRMDA8OQwOcvPgQA44cFa6kqCcUAAAAASUVORK5CYII=')
-  
+
   .dhx_cal_navline.dhx_cal_date
     color: $tertiary
 
@@ -538,7 +525,7 @@ export default {
     &:hover
       text-decoration: none
       background-color: rgba(0, 0, 0, .07)
-  
+
   .dhx_cal_tab.active
     background-color: rgba(0, 0, 0, .07)
     color: $tertiary
@@ -551,14 +538,14 @@ export default {
     &:hover
       text-decoration: none
       background-color: rgba(0, 0, 0, .07)
-  
+
   .dhx_cal_prev_button
     width: 30px
     border-radius: 50%
     background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAAAAAAAA+UO7fwAAAAlwSFlzAAAASAAAAEgARslrPgAAAORJREFUSMft1T8KwjAUBvAvcRI8jFtbOviHHkDwJIXuegGbHsFTiIODi2nOIG46OIirLk1dOog45CURHPJtGV5+PHi8B4SEhPxT8jwfUWt6rmhRFEvG2DpJkn5d1zvTOuaKtm276J5nrfVQCHE3qeWe0IvWemqKWnf8BZ0IIU6UP8iwD5QM+0IBwlR/oNemabKqqo42KEAbroct4tSxlPKQpukTQAZgwDmfR1G0UUrdfgr7xsmbyxdutTJ94Na7usMZgHGHz+I4XiuljIbQ6UhIKfdvna/Ksty6/EeOzVkMCQnxlhck2ouoK+MN0AAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxOC0wMS0xOFQxMDowNzoxMyswMDowMGL8TZcAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTgtMDEtMThUMTA6MDc6MTMrMDA6MDATofUrAAAAKHRFWHRzdmc6YmFzZS11cmkAZmlsZTovLy90bXAvbWFnaWNrLU5Td0Y1d0NE+kVb4wAAAABJRU5ErkJggg==') no-repeat center center
     &:hover
       background-color: rgba(0, 0, 0, .07)
-  
+
   .dhx_cal_event .dhx_title
     text-align: start
 
@@ -566,10 +553,10 @@ export default {
     background: none
     &:hover
       background: none
-  
+
   .dhx_cal_event:hover .dhx_footer
     background: none
-  
+
   .dhx_cal_next_button
     width: 30px
     border-radius: 50%
@@ -579,44 +566,44 @@ export default {
 
   .dhx_cancel_btn_set
     background-color: $primary
-  
+
   .header-fixed
     position: fixed
     top: 0px !important
     &-customer
       top: 52px !important
       position: fixed
-  
-  .alenvi_event div 
+
+  .alenvi_event div
     background-color: $primary !important;
     color: white !important;
 
-  .dhx_cal_event_line.alenvi_event 
+  .dhx_cal_event_line.alenvi_event
     background-color: $primary !important;
     color: white !important;
 
-  .dhx_cal_event_clear.alenvi_event 
+  .dhx_cal_event_clear.alenvi_event
     background-color: $primary !important;
     color: white !important;
-  
-  .alenvi_past_event div 
+
+  .alenvi_past_event div
     background-color: $primary-light !important;
     color: white !important;
 
-  .dhx_cal_event_line.alenvi_past_event 
+  .dhx_cal_event_line.alenvi_past_event
     background-color: $primary-light !important;
     color: white !important;
 
-  .dhx_cal_event_clear.alenvi_past_event 
+  .dhx_cal_event_clear.alenvi_past_event
     background-color: $primary-light !important;
     color: white !important;
-  
+
   .responsive-container
     width: 100% !important
-  
+
   .event_date
     font-weight: bold
-  
+
   .custom_event
     padding: 5px
     overflow: hidden
