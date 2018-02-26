@@ -64,7 +64,7 @@
         <q-item-side icon="person" />
         <q-item-main label="Mes informations" />
       </q-side-link>
-      <q-side-link item to="/dashboard/login" @click.native="logout" replace>
+      <q-side-link item to="/login" @click.native="logout" replace>
         <q-item-side icon="exit to app" />
         <q-item-main label="Déconnexion" />
       </q-side-link>
@@ -113,7 +113,7 @@
           path: '/'
         });
         if (this.user.role.name !== 'Client') {
-          this.$router.replace('/dashboard/login');
+          this.$router.replace('/login');
         }
       },
       goToProfile () {

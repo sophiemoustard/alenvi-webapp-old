@@ -103,7 +103,7 @@ export default {
           sectors: this.selectedSector
         };
         if (!Cookies.get('user_id')) {
-          this.$router.push('/dashboard/login');
+          this.$router.push('/login');
         }
         const storedMessage = await messages.storeMessage(data, Cookies.get('user_id'));
         this.message.id = storedMessage.data.data.message._id;

@@ -2,7 +2,7 @@ import router from '../router'
 
 export default {
   redirectToLogin () {
-    router.replace('/dashboard/login');
+    router.replace('/login');
   },
   redirectToDashboard () {
     router.replace('/dashboard');

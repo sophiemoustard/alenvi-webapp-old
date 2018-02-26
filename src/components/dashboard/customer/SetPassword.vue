@@ -78,7 +78,7 @@ export default {
         const user = await users.update(`${process.env.API_HOSTNAME}/users/`, {
           password: this.credentials.password
         });
-        this.$router.replace({ path: '/dashboard/login' });
+        this.$router.replace({ path: '/login' });
       } catch (e) {
         alenviAlert({ color: 'error', icon: 'warning', content: 'Impossible de se connecter.', position: 'bottom-right', duration: 2500 });
         console.error(e);

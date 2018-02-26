@@ -124,7 +124,7 @@ export default {
     async getMessages() {
       try {
         if (!Cookies.get('user_id')) {
-          return this.$router.replace('/dashboard/login');
+          return this.$router.replace('/login');
         }
         const sectors = await ogust.getList('employee.sector');
         const messagesList = await messages.getMessagesBySenderId(Cookies.get('user_id'));
