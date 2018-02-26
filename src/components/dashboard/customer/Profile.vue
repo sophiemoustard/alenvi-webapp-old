@@ -163,6 +163,7 @@ export default {
         this.isEditMode = true;
         this.editModeButtonName = 'Enregistrer mes modifications'
       } else {
+        this.updateUser();
         this.isEditMode = false;
         this.editModeButtonName = 'Modifier'
       }
