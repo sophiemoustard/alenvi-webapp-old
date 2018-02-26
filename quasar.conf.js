@@ -1,7 +1,5 @@
 // Configuration for your app
-if (process.env.NODE_ENV === 'development') {
-  require('dotenv').config();
-}
+require('dotenv').config();
 
 module.exports = function (ctx) {
   return {
@@ -124,7 +122,8 @@ module.exports = function (ctx) {
         'Cookies',
         'Loading',
         'Dialog'
-      ]
+      ],
+      i18n: 'fr'
     },
     // animations: 'all' --- includes all animations
     animations: [
