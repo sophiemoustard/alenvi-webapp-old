@@ -33,7 +33,7 @@ export default [
     path: '/signup',
     component: () => import('pages/signup/SignUp'),
     beforeEnter: (to, from, next) => {
-      if (Cookies.get('signup_is_activated') && Cookies.get('signup_sector') && Cookies.get('signup_mobile')) {
+      if (Cookies.get('signup_is_activated') && Cookies.get('signup_sector') && Cookies.get('signup_mobile') && Cookies.get('signup_managerId')) {
         next();
       } else {
         next({ path: '/enterCode' });
