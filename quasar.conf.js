@@ -122,7 +122,8 @@ module.exports = function (ctx) {
         'Cookies',
         'Loading',
         'Dialog'
-      ]
+      ],
+      i18n: 'fr'
     },
     // animations: 'all' --- includes all animations
     animations: [
