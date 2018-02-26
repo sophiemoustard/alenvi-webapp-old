@@ -68,13 +68,13 @@
       </q-card>
     </div>
     <!-- Test -->
-    <div class="row justify-center">
+    <!-- <div class="row justify-center">
       <div style="width: 600px; max-width: 90vw;">
         <q-field :label-width="3" label="Titulaire du compte" :error="$v.user.rib.fullname.$error" error-label="Champ requis">
           <q-input type="text" v-model="user.rib.fullname" @blur="$v.user.rib.fullname.$touch" />
         </q-field>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
