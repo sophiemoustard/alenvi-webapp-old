@@ -1,17 +1,89 @@
 <template>
   <div padding>
-        <div class="row justify-center">
-      <q-card class="layout-padding" style="width: 600px; max-width: 90vw;">
+    <div class="row justify-center layout-padding">
+       <q-card flat style="width: 700px; max-width: 90vw;">
         <q-card-media class="justify-start">
-          <img src="https://res.cloudinary.com/alenvi/image/upload/c_scale,q_auto,w_400/v1507124345/images/business/alenvi_logo_complet_full.png" alt="Logo Alenvi" class="alenvi-logo">
+          <img style="max-width: 300px" src="https://res.cloudinary.com/alenvi/image/upload/c_scale,q_auto,w_400/v1507124345/images/business/alenvi_logo_complet_full.png" alt="Logo Alenvi" class="alenvi-logo">
         </q-card-media>
-        <q-card-title>
+        <q-card-title class="layout-padding">
           <div class="text-center">Bienvenue chez Alenvi !</div><br /><span slot="subtitle">Nous allons maintenant terminer ta création de compte. Merci de renseigner les champs suivants, relis-toi bien car ces infos sont importantes :-)
             N’hésite pas à appeler ton coach en cas de question !</span>
         </q-card-title>
         <q-card-separator />
         <q-card-main>
-          <q-field :label-width="3" label="Civilité">
+          <q-stepper color="primary" ref="stepper" alternative-labels vertical>
+            <q-step default name="first" title="Ad style">
+              <q-field :label-width="3" label="Civilité">
+                <q-select :options="civilityOptions" v-model="user.civility" separator :error="$v.user.civility.$error" error-label="Champ requis"
+                  @blur="$v.user.civility.$touch" />
+              </q-field>
+              <q-field :label-width="3" label="Nom" :error="$v.user.lastname.$error" error-label="Champ requis">
+                <q-input type="text" v-model.trim="user.lastname" @blur="$v.user.lastname.$touch" />
+              </q-field>
+              <q-field :label-width="3" label="Prénom" :error="$v.user.firstname.$error" error-label="Champ requis">
+                <q-input type="text" v-model.trim="user.firstname" @blur="$v.user.firstname.$touch" />
+              </q-field>
+              <q-field :label-width="3" label="Adresse" :error="$v.user.address.line.$error" error-label="Champ requis">
+                <q-input type="text" v-model.trim="user.address.line" @blur="$v.user.address.line.$touch" />
+              </q-field>
+              <q-field :label-width="3" label="Code postal" :error="$v.user.address.zipCode.$error" :error-label="zipCodeError">
+                <q-input type="text" v-model.trim="user.address.zipCode" @blur="$v.user.address.zipCode.$touch" :max-length="5" />
+              </q-field>
+              <q-field :label-width="3" label="Ville" :error="$v.user.address.city.$error" error-label="Champ requis">
+                <q-input type="text" v-model.trim="user.address.city" @blur="$v.user.address.city.$touch" />
+              </q-field>
+              <q-field :label-width="3" label="Email" :error="$v.user.email.$error" :error-label="emailError">
+                <q-input type="email" v-model.trim="user.email" @blur="$v.user.email.$touch" />
+              </q-field>
+              <q-field :label-width="3" label="Confirmation email" helper="Entre une nouvelle fois ton adresse mail" :error="$v.user.emailConfirmation.$error"
+                error-label="L'email entré et la confirmation sont différents.">
+                <q-input type="email" v-model.trim="user.emailConfirmation" @blur="$v.user.emailConfirmation.$touch" />
+              </q-field>
+              <q-field :label-width="3" label="Mot de passe" helper="Crée ton mot de passe. Il doit contenir au moins 6 caractères jusqu'à 20 maximum" :error="$v.user.password.$error"
+                :error-label="passwordError">
+                <q-input type="password" v-model="user.password" @blur="$v.user.password.$touch" />
+              </q-field>
+              <q-field :label-width="3" label="Confirmation mot de passe" helper="Entre une nouvelle fois ton mot de passe" :error="$v.user.passwordConfirmation.$error"
+                error-label="Le mot de passe entré et la confirmation sont différents.">
+                <q-input type="password" v-model="user.passwordConfirmation" @blur="$v.user.passwordConfirmation.$touch" />
+              </q-field>
+              <q-uploader :url="url" />
+              <!-- Navigation for this step at the end of QStep-->
+              <q-stepper-navigation>
+                <q-btn color="secondary" @click="$refs.stepper.next()" label="Continue" />
+              </q-stepper-navigation>
+            </q-step>
+            <q-step error name="second" title="Custom channels" subtitle="Alert message">
+              <p>Test</p>
+              <q-stepper-navigation>
+                <q-btn color="secondary" @click="$refs.stepper.next()" label="Next" />
+                <q-btn color="secondary" flat @click="$refs.stepper.previous()" label="Back" />
+              </q-stepper-navigation>
+            </q-step>
+            <q-step name="third" title="Get code">
+              <p>Test</p>
+              <q-stepper-navigation>
+                <q-btn color="secondary" @click="$refs.stepper.next()" label="Next" />
+                <q-btn color="secondary" flat @click="$refs.stepper.previous()" label="Back" />
+              </q-stepper-navigation>
+            </q-step>
+            <q-step name="fifth" disable title="Disabled">
+              <p>Test</p>
+              <q-stepper-navigation>
+                <q-btn color="secondary" @click="$refs.stepper.next()" label="Next" />
+                <q-btn color="secondary" flat @click="$refs.stepper.previous()" label="Back" />
+              </q-stepper-navigation>
+            </q-step>
+            <q-step name="fourth" title="Review and Finalize">
+              <p>Test</p>
+              <q-stepper-navigation>
+                <q-btn color="secondary" @click="$refs.stepper.next()" label="Next" />
+                <q-btn color="secondary" flat @click="$refs.stepper.previous()" label="Back" />
+              </q-stepper-navigation>
+            </q-step>
+          </q-stepper>
+
+          <!-- <q-field :label-width="3" label="Civilité">
             <q-select :options="civilityOptions" v-model="user.civility" separator :error="$v.user.civility.$error" error-label="Champ requis"
               @blur="$v.user.civility.$touch" />
           </q-field>
@@ -62,14 +134,13 @@
           <q-field :label-width="3" label="Confirmation mot de passe" helper="Entre une nouvelle fois ton mot de passe" :error="$v.user.passwordConfirmation.$error"
             error-label="Le mot de passe entré et la confirmation sont différents.">
             <q-input type="password" v-model="user.passwordConfirmation" @blur="$v.user.passwordConfirmation.$touch" />
-          </q-field>
+          </q-field>-->
         </q-card-main>
-        <q-card-actions class="row justify-end">
+        <!-- <q-card-actions class="row justify-end">
           <q-btn color="primary" @click="submit" :disable="$v.user.$invalid" flat>Envoyer</q-btn>
-          <!-- <q-btn color="primary" @click="test" flat>Envoyer</q-btn> -->
-        </q-card-actions>
+        </q-card-actions> -->
       </q-card>
-    </div>
+
     <!-- Test -->
     <!-- <div class="row justify-center">
       <div style="width: 600px; max-width: 90vw;">
@@ -78,6 +149,7 @@
         </q-field>
       </div>
     </div> -->
+    </div>
   </div>
 </template>
 
@@ -88,6 +160,7 @@ export default {
   // name: 'PageName',
   data () {
     return {
+      url: '',
       countries: [],
       user: {
         civility: '',

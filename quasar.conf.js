@@ -112,7 +112,11 @@ module.exports = function (ctx) {
         'QScrollObservable',
         'QResizeObservable',
         'QInnerLoading',
-        'QAjaxBar'
+        'QAjaxBar',
+        'QStepper',
+        'QStep',
+        'QStepperNavigation',
+        'QUploader'
       ],
       directives: [
         'Ripple'

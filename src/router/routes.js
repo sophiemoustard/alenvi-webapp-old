@@ -32,13 +32,13 @@ export default [
   {
     path: '/signup',
     component: () => import('pages/signup/SignUp'),
-    beforeEnter: (to, from, next) => {
-      if (Cookies.get('signup_is_activated') && Cookies.get('signup_sector') && Cookies.get('signup_mobile')) {
-        next();
-      } else {
-        next({ path: '/enterCode' });
-      }
-    }
+    // beforeEnter: (to, from, next) => {
+    //   if (Cookies.get('signup_is_activated') && Cookies.get('signup_sector') && Cookies.get('signup_mobile')) {
+    //     next();
+    //   } else {
+    //     next({ path: '/enterCode' });
+    //   }
+    // }
   },
   { path: '/forgotPassword', component: () => import('pages/signin/ForgotPwd') },
   { path: '/resetPassword/:token', component: () => import('pages/signin/ResetPwd') },
