@@ -71,6 +71,7 @@ export default {
         this.$q.cookies.set('signup_is_activated', activationDataRaw.token, { path: '/', expires: date.addToDate(new Date(), { days: 1 }), secure: process.env.NODE_ENV !== 'development' });
         this.$q.cookies.set('signup_sector', activationDataRaw.activationData.sector, { path: '/', expires: date.addToDate(new Date(), { days: 1 }), secure: process.env.NODE_ENV !== 'development' });
         this.$q.cookies.set('signup_mobile', activationDataRaw.activationData.mobile_phone, { path: '/', expires: date.addToDate(new Date(), { days: 1 }), secure: process.env.NODE_ENV !== 'development' });
+        this.$q.cookies.set('signup_managerId', activationDataRaw.activationData.managerId, { path: '/', expires: date.addToDate(new Date(), { days: 1 }), secure: process.env.NODE_ENV !== 'development' });
         this.$router.replace('/signup');
       } catch (e) {
         this.$q.notify({

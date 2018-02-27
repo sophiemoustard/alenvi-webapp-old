@@ -4,8 +4,9 @@
       <div style="width: 700px; max-width: 90vw;">
         <p class="caption">Création de compte Alenvi et Ogust</p>
         <select-sector v-model="selectedSector"></select-sector>
+        <select-manager v-model="selectedManager"></select-manager>
         <q-field icon="phone" helper="Numéro sans délimiteur (espaces, points...)">
-          <q-input :disable="!selectedSector" :loading="isLoading" v-model="phoneNbr" float-label="Numéro de téléphone" :after="[{ icon: 'send', content: true, handler: handlePhone }]"/>
+          <q-input :disable="!selectedSector || !selectedManager" :loading="isLoading" v-model="phoneNbr" float-label="Numéro de téléphone" @keyup.enter="handlePhone" :after="[{ icon: 'send', content: true, handler: handlePhone }]"/>
         </q-field>
         <!-- <p class="caption">Envoi de code pour compte existant</p>
         <q-field icon="phone" helper="Numéro sans délimiteur (espaces, points...)">
@@ -20,10 +21,12 @@
 
 <script>
 import SelectSector from '../../../components/SelectSector';
+import SelectManager from '../../../components/SelectManager';
 
 export default {
   components: {
-    SelectSector
+    SelectSector,
+    SelectManager
   },
   data () {
     return {
@@ -31,6 +34,7 @@ export default {
       // searchUserFromMobilePhone: ''
       employee: '',
       selectedSector: '',
+      selectedManager: '',
       isLoading: false
     };
   },
@@ -42,10 +46,18 @@ export default {
         // };
         // const res = await ogust.getEmployees(payload);
         // this.employee = res[0];
+        console.log('MANAGER', this.selectedManager);
+        await this.$q.dialog({
+          title: 'Confirmation accueil',
+          message: `Es-tu sûr de vouloir envoyer un message au ${this.phoneNbr} ?`,
+          ok: 'Envoyer',
+          cancel: 'Annuler'
+        })
         this.isLoading = true;
         const activationDataRaw = await this.$activationCode.create({
           mobile_phone: this.phoneNbr,
-          sector: this.selectedSector
+          sector: this.selectedSector,
+          managerId: this.selectedManager
         });
         const code = activationDataRaw.activationData.code;
         const message = await this.$twilio.sendSMS(this.phoneNbr, {
@@ -61,26 +73,6 @@ export default {
           position: 'bottom-right',
           timeout: 2500
         });
-        // Dialog.create({
-        //   title: 'Accueil auxiliaire',
-        //   message: `Accueillir ${this.employee.first_name} ${this.employee.last_name} ?`,
-        //   buttons: [
-        //     {
-        //       label: 'Non',
-        //       handler: () => {
-        //         Toast.create('Envoi annulé.');
-        //       }
-        //     },
-        //     {
-        //       label: 'Oui',
-        //       raised: true,
-        //       color: 'positive',
-        //       handler: async () => {
-
-        //       }
-        //     }
-        //   ]
-        // })
       } catch (e) {
         this.isLoading = false;
         this.$q.notify({
