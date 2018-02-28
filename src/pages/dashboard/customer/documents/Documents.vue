@@ -8,7 +8,7 @@
       <!-- </q-field> -->
       <q-select v-model="month" :options="months"></q-select> <!-- :disable="invoices.length == 0" -->
       <div class="on-right column justify-center">
-        <q-btn color="primary" @click="getInvoices" :disabled="isDisabled">Afficher les factures</q-btn> <!-- icon="filter list" --> <!-- getInvoicesAndFiscalAttests -->
+        <q-btn color="primary" @click="getInvoices(null)" :disabled="isDisabled">Afficher les factures</q-btn> <!-- icon="filter list" --> <!-- getInvoicesAndFiscalAttests -->
       </div>
     </div>
     <!-- <q-data-table v-if="fiscalAttests.length !== 0" class="cursor-pointer" :data="fiscalAttests" :config="configFiscalAttests" :columns="columnsFiscalAttests">
@@ -228,9 +228,9 @@ export default {
         this.invoices = [];
         this.isDisabled = true;
         if (params) {
-          this.invoices = await this.$ogust.getCustomerInvoices(235146870, { startPeriod: params.startPeriod, endPeriod: params.endPeriod });
+          this.invoices = await this.$ogust.getCustomerInvoices(this.getUser.customer_id, { startPeriod: params.startPeriod, endPeriod: params.endPeriod });
         } else {
-          this.invoices = await this.$ogust.getCustomerInvoices(235146870, { year: this.year, month: this.month === 'Tous' ? '' : this.$moment().month(this.month).format('MM') }); // 276329398 // this.getUser.customer_id
+          this.invoices = await this.$ogust.getCustomerInvoices(this.getUser.customer_id, { year: this.year, month: this.month === 'Tous' ? '' : this.$moment().month(this.month).format('MM') }); // 276329398 // this.getUser.customer_id
         }
         for (let i = 0, l = Object.keys(this.invoices).length; i < l; i++) {
           this.invoices[i].invoice_date = this.$moment(this.invoices[i].invoice_date, 'YYYYMMDD').format('DD/MM/YYYY') // .format('DD/MM/YYYY') // .toDate();
