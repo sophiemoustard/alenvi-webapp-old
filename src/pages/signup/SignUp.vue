@@ -12,129 +12,87 @@
         <q-card-separator />
         <q-card-main>
           <q-stepper color="primary" ref="stepper" alternative-labels vertical>
-            <q-step default name="first" title="Ad style">
-              <q-field :label-width="3" label="Civilité">
-                <q-select :options="civilityOptions" v-model="user.civility" separator :error="$v.user.civility.$error" error-label="Champ requis"
+            <q-step default name="first" title="Informations personnelles (1)">
+              <q-field icon="perm identity" :label-width="3">
+                <q-select :options="civilityOptions" v-model="user.civility" float-label="Civilité" separator :error="$v.user.civility.$error" error-label="Champ requis"
                   @blur="$v.user.civility.$touch" />
               </q-field>
-              <q-field :label-width="3" label="Nom" :error="$v.user.lastname.$error" error-label="Champ requis">
-                <q-input type="text" v-model.trim="user.lastname" @blur="$v.user.lastname.$touch" />
+              <q-field icon="person" :error="$v.user.lastname.$error" error-label="Champ requis">
+                <q-input type="text" v-model.trim="user.lastname" float-label="Nom" @blur="$v.user.lastname.$touch" />
               </q-field>
-              <q-field :label-width="3" label="Prénom" :error="$v.user.firstname.$error" error-label="Champ requis">
-                <q-input type="text" v-model.trim="user.firstname" @blur="$v.user.firstname.$touch" />
+              <q-field icon="person" :error="$v.user.firstname.$error" error-label="Champ requis">
+                <q-input type="text" v-model.trim="user.firstname" float-label="Prénom" @blur="$v.user.firstname.$touch" />
               </q-field>
-              <q-field :label-width="3" label="Adresse" :error="$v.user.address.line.$error" error-label="Champ requis">
-                <q-input type="text" v-model.trim="user.address.line" @blur="$v.user.address.line.$touch" />
+              <q-field icon="home" :error="$v.user.address.line.$error" error-label="Champ requis">
+                <q-input type="text" v-model.trim="user.address.line" float-label="Adresse" @blur="$v.user.address.line.$touch" />
               </q-field>
-              <q-field :label-width="3" label="Code postal" :error="$v.user.address.zipCode.$error" :error-label="zipCodeError">
-                <q-input type="text" v-model.trim="user.address.zipCode" @blur="$v.user.address.zipCode.$touch" :max-length="5" />
+              <q-field icon="home" :error="$v.user.address.zipCode.$error" :error-label="zipCodeError">
+                <q-input type="text" v-model.trim="user.address.zipCode" float-label="Code postal" @blur="$v.user.address.zipCode.$touch" :max-length="5" />
               </q-field>
-              <q-field :label-width="3" label="Ville" :error="$v.user.address.city.$error" error-label="Champ requis">
-                <q-input type="text" v-model.trim="user.address.city" @blur="$v.user.address.city.$touch" />
+              <q-field icon="home" :error="$v.user.address.city.$error" error-label="Champ requis">
+                <q-input type="text" v-model.trim="user.address.city" float-label="Ville" @blur="$v.user.address.city.$touch" />
               </q-field>
-              <q-field :label-width="3" label="Email" :error="$v.user.email.$error" :error-label="emailError">
-                <q-input type="email" v-model.trim="user.email" @blur="$v.user.email.$touch" />
+              <q-field icon="email" :error="$v.user.email.$error" :error-label="emailError">
+                <q-input type="email" v-model.trim="user.email" float-label="Email" @blur="$v.user.email.$touch" />
               </q-field>
-              <q-field :label-width="3" label="Confirmation email" helper="Entre une nouvelle fois ton adresse mail" :error="$v.user.emailConfirmation.$error"
+              <q-field icon="email" helper="Entre une nouvelle fois ton adresse mail" :error="$v.user.emailConfirmation.$error"
                 error-label="L'email entré et la confirmation sont différents.">
-                <q-input type="email" v-model.trim="user.emailConfirmation" @blur="$v.user.emailConfirmation.$touch" />
+                <q-input type="email" v-model.trim="user.emailConfirmation" float-label="Confirmation email" @blur="$v.user.emailConfirmation.$touch" />
               </q-field>
-              <q-field :label-width="3" label="Mot de passe" helper="Crée ton mot de passe. Il doit contenir au moins 6 caractères jusqu'à 20 maximum" :error="$v.user.password.$error"
+              <q-field icon="lock" helper="Crée ton mot de passe. Il doit contenir au moins 6 caractères jusqu'à 20 maximum" :error="$v.user.password.$error"
                 :error-label="passwordError">
-                <q-input type="password" v-model="user.password" @blur="$v.user.password.$touch" />
+                <q-input type="password" v-model="user.password" float-label="Mot de passe" @blur="$v.user.password.$touch" />
               </q-field>
-              <q-field :label-width="3" label="Confirmation mot de passe" helper="Entre une nouvelle fois ton mot de passe" :error="$v.user.passwordConfirmation.$error"
+              <q-field icon="lock" helper="Entre une nouvelle fois ton mot de passe" :error="$v.user.passwordConfirmation.$error"
                 error-label="Le mot de passe entré et la confirmation sont différents.">
-                <q-input type="password" v-model="user.passwordConfirmation" @blur="$v.user.passwordConfirmation.$touch" />
+                <q-input type="password" v-model="user.passwordConfirmation" float-label="Confirmation mot de passe" @blur="$v.user.passwordConfirmation.$touch" />
               </q-field>
-              <q-uploader :url="url" />
               <!-- Navigation for this step at the end of QStep-->
               <q-stepper-navigation>
-                <q-btn color="secondary" @click="$refs.stepper.next()" label="Continue" />
+                <q-btn color="primary" flat @click="$refs.stepper.next()" label="Enregistrer" />
               </q-stepper-navigation>
             </q-step>
-            <q-step error name="second" title="Custom channels" subtitle="Alert message">
-              <p>Test</p>
+            <q-step name="second" title="Informations personnelles (2)">
+              <q-field icon="date range" :error="$v.user.dateOfBirth.$error" error-label="Champ requis">
+                <q-datetime v-model="user.dateOfBirth" float-label="Date de naissance" @blur="$v.user.dateOfBirth.$touch" first-day-of-week="1"
+                ok-label="APPLIQUER" no-clear cancel-label="ANNULER"
+                min="1920-01-01" :max="getMaxDate"
+              format="DD/MM/YYYY"/>
+              </q-field>
+              <q-field icon="ion-earth" :error="$v.user.countryOfBirth.$error" error-label="Champ requis">
+                <q-select v-model="user.countryOfBirth" :options="countries" float-label="Pays de naissance" @blur="$v.user.countryOfBirth.$touch" filter autofocus-filter/>
+              </q-field>
+              <q-field icon="ion-earth" :error="$v.user.stateOfBirth.$error" :error-label="stateOfBirthError">
+                <q-input type="number" v-model.trim="user.stateOfBirth" float-label="Département (99 si étranger)" @blur="$v.user.stateOfBirth.$touch" />
+              </q-field>
+              <q-field icon="location city" :error="$v.user.placeOfBirth.$error" error-label="Champ requis">
+                <q-input type="text" v-model.trim="user.placeOfBirth" float-label="Lieu de naissance" @blur="$v.user.placeOfBirth.$touch" />
+              </q-field>
+              <q-field icon="mdi-account-card-details" :error="$v.user.socialInsuranceNumber.$error" :error-label="socialInsuranceNumberError">
+                <q-input type="number" v-model.trim="user.socialInsuranceNumber" float-label="Numéro de sécurité sociale" @blur="$v.user.socialInsuranceNumber.$touch" />
+              </q-field>
               <q-stepper-navigation>
-                <q-btn color="secondary" @click="$refs.stepper.next()" label="Next" />
-                <q-btn color="secondary" flat @click="$refs.stepper.previous()" label="Back" />
+                <q-btn color="primary" flat @click="$refs.stepper.next()" label="Enregistrer" />
+                <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
               </q-stepper-navigation>
             </q-step>
-            <q-step name="third" title="Get code">
-              <p>Test</p>
+            <q-step name="third" title="Informations de paiement">
               <q-stepper-navigation>
-                <q-btn color="secondary" @click="$refs.stepper.next()" label="Next" />
-                <q-btn color="secondary" flat @click="$refs.stepper.previous()" label="Back" />
+                <q-btn color="primary" flat @click="$refs.stepper.next()" label="Enregistrer" />
+                <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
               </q-stepper-navigation>
             </q-step>
-            <q-step name="fifth" disable title="Disabled">
-              <p>Test</p>
+            <q-step name="fourth" title="Documents annexes">
+              <q-uploader :url="url" />
+              <q-uploader :url="url" />
+              <q-uploader :url="url" />
+              <q-uploader :url="url" />
               <q-stepper-navigation>
-                <q-btn color="secondary" @click="$refs.stepper.next()" label="Next" />
-                <q-btn color="secondary" flat @click="$refs.stepper.previous()" label="Back" />
-              </q-stepper-navigation>
-            </q-step>
-            <q-step name="fourth" title="Review and Finalize">
-              <p>Test</p>
-              <q-stepper-navigation>
-                <q-btn color="secondary" @click="$refs.stepper.next()" label="Next" />
-                <q-btn color="secondary" flat @click="$refs.stepper.previous()" label="Back" />
+                <q-btn color="primary" flat @click="$refs.stepper.next()" label="Terminer mon inscription" />
+                <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
               </q-stepper-navigation>
             </q-step>
           </q-stepper>
-
-          <!-- <q-field :label-width="3" label="Civilité">
-            <q-select :options="civilityOptions" v-model="user.civility" separator :error="$v.user.civility.$error" error-label="Champ requis"
-              @blur="$v.user.civility.$touch" />
-          </q-field>
-          <q-field :label-width="3" label="Nom" :error="$v.user.lastname.$error" error-label="Champ requis">
-            <q-input type="text" v-model.trim="user.lastname" @blur="$v.user.lastname.$touch" />
-          </q-field>
-          <q-field :label-width="3" label="Prénom" :error="$v.user.firstname.$error" error-label="Champ requis">
-            <q-input type="text" v-model.trim="user.firstname" @blur="$v.user.firstname.$touch" />
-          </q-field>
-          <q-field :label-width="3" label="Adresse" :error="$v.user.address.line.$error" error-label="Champ requis">
-            <q-input type="text" v-model.trim="user.address.line" @blur="$v.user.address.line.$touch" />
-          </q-field>
-          <q-field :label-width="3" label="Code postal" :error="$v.user.address.zipCode.$error" :error-label="zipCodeError">
-            <q-input type="text" v-model.trim="user.address.zipCode" @blur="$v.user.address.zipCode.$touch" :max-length="5" />
-          </q-field>
-          <q-field :label-width="3" label="Ville" :error="$v.user.address.city.$error" error-label="Champ requis">
-            <q-input type="text" v-model.trim="user.address.city" @blur="$v.user.address.city.$touch" />
-          </q-field>
-          <q-field :label-width="3" label="Date de naissance" :error="$v.user.dateOfBirth.$error" error-label="Champ requis">
-            <q-datetime v-model="user.dateOfBirth" @blur="$v.user.dateOfBirth.$touch" first-day-of-week="1"
-            ok-label="APPLIQUER" no-clear cancel-label="ANNULER"
-            min="1920-01-01" :max="getMaxDate"
-          format="DD/MM/YYYY"/>
-          </q-field>
-          <q-field :label-width="3" label="Département (99 si étranger)" :error="$v.user.stateOfBirth.$error" :error-label="stateOfBirthError">
-            <q-input type="number" v-model.trim="user.stateOfBirth" @blur="$v.user.stateOfBirth.$touch" />
-          </q-field>
-          <q-field :label-width="3" label="Lieu de naissance" :error="$v.user.placeOfBirth.$error" error-label="Champ requis">
-            <q-input type="text" v-model.trim="user.placeOfBirth" @blur="$v.user.placeOfBirth.$touch" />
-          </q-field>
-          <q-field :label-width="3" label="Pays de naissance" :error="$v.user.countryOfBirth.$error" error-label="Champ requis">
-            <q-select v-model="user.countryOfBirth" :options="countries" @blur="$v.user.countryOfBirth.$touch" filter autofocus-filter/>
-          </q-field>
-          <q-field :label-width="3" label="Numéro de sécurité sociale" :error="$v.user.socialInsuranceNumber.$error" :error-label="socialInsuranceNumberError">
-            <q-input type="number" v-model.trim="user.socialInsuranceNumber" @blur="$v.user.socialInsuranceNumber.$touch" />
-          </q-field>
-          <q-field :label-width="3" label="Email" :error="$v.user.email.$error" :error-label="emailError">
-            <q-input type="email" v-model.trim="user.email" @blur="$v.user.email.$touch" />
-          </q-field>
-          <q-field :label-width="3" label="Confirmation email" helper="Entre une nouvelle fois ton adresse mail" :error="$v.user.emailConfirmation.$error"
-            error-label="L'email entré et la confirmation sont différents.">
-            <q-input type="email" v-model.trim="user.emailConfirmation" @blur="$v.user.emailConfirmation.$touch" />
-          </q-field>
-          <q-field :label-width="3" label="Mot de passe" helper="Crée ton mot de passe. Il doit contenir au moins 6 caractères jusqu'à 20 maximum" :error="$v.user.password.$error"
-            :error-label="passwordError">
-            <q-input type="password" v-model="user.password" @blur="$v.user.password.$touch" />
-          </q-field>
-          <q-field :label-width="3" label="Confirmation mot de passe" helper="Entre une nouvelle fois ton mot de passe" :error="$v.user.passwordConfirmation.$error"
-            error-label="Le mot de passe entré et la confirmation sont différents.">
-            <q-input type="password" v-model="user.passwordConfirmation" @blur="$v.user.passwordConfirmation.$touch" />
-          </q-field>-->
         </q-card-main>
         <!-- <q-card-actions class="row justify-end">
           <q-btn color="primary" @click="submit" :disable="$v.user.$invalid" flat>Envoyer</q-btn>
