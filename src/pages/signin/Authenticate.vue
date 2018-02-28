@@ -61,7 +61,11 @@ export default {
         if (this.$q.platform.is.desktop) {
           this.$store.commit('main/setToggleDrawer', true);
         }
-        this.$router.replace({ path: '/dashboard/planning' });
+        if (user.data.data.user.role === 'Client') {
+          this.$router.replace({ path: '/dashboard/customer/home' });
+        } else {
+          this.$router.replace({ path: '/dashboard/planning' });
+        }
       } catch (e) {
         this.$q.notify({
           color: 'negative',
