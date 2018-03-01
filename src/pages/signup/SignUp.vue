@@ -14,7 +14,7 @@
           <q-stepper color="primary" ref="stepper" alternative-labels vertical>
             <q-step default name="first" title="Informations personnelles (1)">
               <q-field icon="perm identity" :label-width="3">
-                <q-select :options="civilityOptions" v-model="user.civility" float-label="Civilité" separator :error="$v.user.civility.$error" error-label="Champ requis"
+                <q-select :options="user.civilityOptions" v-model="user.civility" float-label="Civilité" separator :error="$v.user.civility.$error" error-label="Champ requis"
                   @blur="$v.user.civility.$touch" />
               </q-field>
               <q-field icon="person" :error="$v.user.lastname.$error" error-label="Champ requis">
@@ -54,7 +54,7 @@
             </q-step>
             <q-step name="second" title="Informations personnelles (2)">
               <q-field icon="date range" :error="$v.user.dateOfBirth.$error" error-label="Champ requis">
-                <q-datetime v-model="user.dateOfBirth" float-label="Date de naissance" @blur="$v.user.dateOfBirth.$touch" first-day-of-week="1"
+                <q-datetime v-model="user.dateOfBirth" float-label="Date de naissance" @blur="$v.user.dateOfBirth.$touch" :first-day-of-week="Number(1)"
                 ok-label="APPLIQUER" no-clear cancel-label="ANNULER"
                 min="1920-01-01" :max="getMaxDate"
               format="DD/MM/YYYY"/>
@@ -77,17 +77,17 @@
               </q-stepper-navigation>
             </q-step>
             <q-step name="third" title="Informations de paiement">
-              <q-field icon="person" :error="$v.user.rib.fullname.$error" error-label="Champ requis">
-                <q-input type="text" v-model.trim="user.rib.fullname" float-label="Nom complet" @blur="$v.user.rib.fullname.$touch" />
+              <q-field icon="person" :error="$v.user.administrative.payment.rib.fullname.$error" error-label="Champ requis">
+                <q-input type="text" v-model.trim="user.administrative.payment.rib.fullname" float-label="Nom complet" @blur="$v.user.administrative.payment.rib.fullname.$touch" />
               </q-field>
-              <q-field icon="mdi-account-card-details" :error="$v.user.rib.bankname.$error" error-label="Champ requis">
-                <q-input type="text" v-model.trim="user.rib.bankname" float-label="Nom de la banque" @blur="$v.user.rib.bankname.$touch" />
+              <q-field icon="mdi-account-card-details" :error="$v.user.administrative.payment.rib.bankName.$error" error-label="Champ requis">
+                <q-input type="text" v-model.trim="user.administrative.payment.rib.bankName" float-label="Nom de la banque" @blur="$v.user.administrative.payment.rib.bankName.$touch" />
               </q-field>
-              <q-field icon="mdi-account-card-details" :error="$v.user.rib.iban.$error" :error-label="ibanError">
-                <q-input type="number" v-model.trim="user.rib.iban" float-label="IBAN" @blur="$v.user.rib.iban.$touch" />
+              <q-field icon="mdi-account-card-details" :error="$v.user.administrative.payment.rib.iban.$error" :error-label="ibanError">
+                <q-input type="text" v-model.trim="user.administrative.payment.rib.iban" float-label="IBAN" @blur="$v.user.administrative.payment.rib.iban.$touch" />
               </q-field>
-              <q-field icon="mdi-account-card-details" :error="$v.user.rib.bic.$error" :error-label="bicError">
-                <q-input type="number" v-model.trim="user.rib.bic" float-label="BIC" @blur="$v.user.rib.bic.$touch" />
+              <q-field icon="mdi-account-card-details" :error="$v.user.administrative.payment.rib.bic.$error" :error-label="bicError">
+                <q-input type="text" v-model.trim="user.administrative.payment.rib.bic" float-label="BIC" @blur="$v.user.administrative.payment.rib.bic.$touch" />
               </q-field>
               <q-stepper-navigation>
                 <q-btn color="primary" @click="$refs.stepper.next()" label="Enregistrer" />
@@ -95,10 +95,24 @@
               </q-stepper-navigation>
             </q-step>
             <q-step name="fourth" title="Documents annexes">
-              <q-uploader :url="url" />
-              <q-uploader :url="url" />
-              <q-uploader :url="url" />
-              <q-uploader :url="url" />
+              <q-field icon="mdi-account-card-details" :error="$v.user.administrative.idCard.$error" error-label="Champ requis">
+                <q-uploader :url="url" float-label="Carte d'identité"/>
+              </q-field>
+              <q-field icon="mdi-account-card-details" :error="$v.user.administrative.vitalCard.$error" error-label="Champ requis">
+                <q-uploader :url="url" float-label="Carte vitale"/>
+              </q-field>
+              <q-field icon="mdi-account-card-details" :error="$v.user.administrative.navigoCard.$error" error-label="Champ requis">
+                <q-uploader :url="url" float-label="Navigo"/>
+              </q-field>
+              <q-field icon="mdi-account-card-details" :error="$v.user.administrative.drivingLicence.$error" error-label="Champ requis">
+                <q-uploader :url="url" float-label="Permis de conduire"/>
+              </q-field>
+              <q-field icon="mdi-account-card-details" :error="$v.user.administrative.mutualFund.$error" error-label="Champ requis">
+                <q-uploader :url="url" float-label="Mutuelle"/>
+              </q-field>
+              <q-field icon="mdi-account-card-details" :error="$v.user.administrative.certificates.$error" error-label="Champ requis">
+                <q-uploader :url="url" float-label="Diplômes et / ou certicats" multiple/>
+              </q-field>
               <q-stepper-navigation>
                 <q-btn color="primary" @click="$refs.stepper.next()" label="Terminer mon inscription" />
                 <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
@@ -152,23 +166,43 @@ export default {
         password: '',
         passwordConfirmation: '',
         socialInsuranceNumber: '',
-        rib: {
-          fullname: '',
-          bankname: '',
-          iban: '',
-          bic: ''
-        }
-      },
-      civilityOptions: [
-        {
-          label: 'Monsieur',
-          value: 'M.'
+        administrative: {
+          payment: {
+            rib: {
+              fullname: '',
+              bankName: '',
+              iban: '',
+              bic: ''
+            }
+          },
+          idCard: {
+            parent: process.env.PARENT_GOOGLE_FOLDER_ID
+          },
+          vitalCard: {
+            parent: process.env.PARENT_GOOGLE_FOLDER_ID
+          },
+          navigoCard: {
+            parent: process.env.PARENT_GOOGLE_FOLDER_ID
+          },
+          drivingLicence: {
+            parent: process.env.PARENT_GOOGLE_FOLDER_ID
+          },
+          mutualFund: {
+            parent: process.env.PARENT_GOOGLE_FOLDER_ID
+          },
+          certificates: []
         },
-        {
-          label: 'Madame',
-          value: 'Mme'
-        }
-      ]
+        civilityOptions: [
+          {
+            label: 'Monsieur',
+            value: 'M.'
+          },
+          {
+            label: 'Madame',
+            value: 'Mme'
+          }
+        ]
+      }
     }
   },
   validations: {
@@ -212,18 +246,28 @@ export default {
       },
       countryOfBirth: { required },
       placeOfBirth: { required },
-      rib: {
-        fullname: { required },
-        bankname: { required },
-        iban: {
-          required,
-          minLength: minLength(27),
-          maxLength: maxLength(27)
+      administrative: {
+        payment: {
+          rib: {
+            fullname: { required },
+            bankName: { required },
+            iban: {
+              required,
+              minLength: minLength(27),
+              maxLength: maxLength(27)
+            },
+            bic: {
+              required,
+              minLength: minLength(8)
+            }
+          }
         },
-        bic: {
-          required,
-          minLength: minLength(8)
-        }
+        idCard: { required },
+        vitalCard: { required },
+        navigoCard: { required },
+        drivingLicence: { required },
+        mutualFund: { required },
+        certificates: [ required ]
       }
     }
   },
@@ -281,16 +325,16 @@ export default {
       }
     },
     ibanError () {
-      if (!this.$v.user.rib.iban.required) {
+      if (!this.$v.user.administrative.payment.rib.iban.required) {
         return 'Champ requis'
-      } else if (!this.$v.user.rib.iban.minLength || !this.$v.user.rib.iban.maxLength) {
+      } else if (!this.$v.user.administrative.payment.rib.iban.minLength || !this.$v.user.administrative.payment.rib.iban.maxLength) {
         return 'L\'IBAN doit contenir 27 caractères.'
       }
     },
     bicError () {
-      if (!this.$v.user.rib.bic.required) {
+      if (!this.$v.user.administrative.payment.rib.bic.required) {
         return 'Champ requis'
-      } else if (!this.$v.user.rib.iban.minLength) {
+      } else if (!this.$v.user.administrative.payment.rib.iban.minLength) {
         return 'Le BIC doit contenir au moins 8 caractères.'
       }
     },
