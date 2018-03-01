@@ -34,10 +34,18 @@ export default {
       }
     }
   },
+  computed: {
+    formattedCredentials () {
+      return {
+        email: this.credentials.email.toLowerCase(),
+        password: this.credentials.password
+      }
+    }
+  },
   methods: {
     async submit () {
       try {
-        const user = await this.$bot.authenticate(this.credentials);
+        const user = await this.$bot.authenticate(this.formattedCredentials);
         const token = user.data.data.token;
         console.log(user);
         console.log('MESSENGER_LINK', process.env.MESSENGER_LINK);
