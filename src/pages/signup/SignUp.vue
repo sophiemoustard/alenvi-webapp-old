@@ -49,7 +49,7 @@
               </q-field>
               <!-- Navigation for this step at the end of QStep-->
               <q-stepper-navigation>
-                <q-btn color="primary" flat @click="$refs.stepper.next()" label="Enregistrer" />
+                <q-btn color="primary" @click="$refs.stepper.next()" label="Enregistrer" />
               </q-stepper-navigation>
             </q-step>
             <q-step name="second" title="Informations personnelles (2)">
@@ -72,13 +72,25 @@
                 <q-input type="number" v-model.trim="user.socialInsuranceNumber" float-label="Numéro de sécurité sociale" @blur="$v.user.socialInsuranceNumber.$touch" />
               </q-field>
               <q-stepper-navigation>
-                <q-btn color="primary" flat @click="$refs.stepper.next()" label="Enregistrer" />
+                <q-btn color="primary" @click="$refs.stepper.next()" label="Enregistrer" />
                 <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
               </q-stepper-navigation>
             </q-step>
             <q-step name="third" title="Informations de paiement">
+              <q-field icon="person" :error="$v.user.rib.fullname.$error" error-label="Champ requis">
+                <q-input type="text" v-model.trim="user.rib.fullname" float-label="Nom complet" @blur="$v.user.rib.fullname.$touch" />
+              </q-field>
+              <q-field icon="mdi-account-card-details" :error="$v.user.rib.bankname.$error" error-label="Champ requis">
+                <q-input type="text" v-model.trim="user.rib.bankname" float-label="Nom de la banque" @blur="$v.user.rib.bankname.$touch" />
+              </q-field>
+              <q-field icon="mdi-account-card-details" :error="$v.user.rib.iban.$error" :error-label="ibanError">
+                <q-input type="number" v-model.trim="user.rib.iban" float-label="IBAN" @blur="$v.user.rib.iban.$touch" />
+              </q-field>
+              <q-field icon="mdi-account-card-details" :error="$v.user.rib.bic.$error" :error-label="bicError">
+                <q-input type="number" v-model.trim="user.rib.bic" float-label="BIC" @blur="$v.user.rib.bic.$touch" />
+              </q-field>
               <q-stepper-navigation>
-                <q-btn color="primary" flat @click="$refs.stepper.next()" label="Enregistrer" />
+                <q-btn color="primary" @click="$refs.stepper.next()" label="Enregistrer" />
                 <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
               </q-stepper-navigation>
             </q-step>
@@ -88,7 +100,7 @@
               <q-uploader :url="url" />
               <q-uploader :url="url" />
               <q-stepper-navigation>
-                <q-btn color="primary" flat @click="$refs.stepper.next()" label="Terminer mon inscription" />
+                <q-btn color="primary" @click="$refs.stepper.next()" label="Terminer mon inscription" />
                 <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
               </q-stepper-navigation>
             </q-step>
@@ -201,7 +213,17 @@ export default {
       countryOfBirth: { required },
       placeOfBirth: { required },
       rib: {
-        fullname: { required }
+        fullname: { required },
+        bankname: { required },
+        iban: {
+          required,
+          minLength: minLength(27),
+          maxLength: maxLength(27)
+        },
+        bic: {
+          required,
+          minLength: minLength(8)
+        }
       }
     }
   },
@@ -256,6 +278,20 @@ export default {
         return 'Champ requis'
       } else if (!this.$v.user.socialInsuranceNumber.maxLength || !this.$v.user.socialInsuranceNumber.minLength) {
         return 'Le numéro de sécurité sociale doit contenir 15 chiffres.'
+      }
+    },
+    ibanError () {
+      if (!this.$v.user.rib.iban.required) {
+        return 'Champ requis'
+      } else if (!this.$v.user.rib.iban.minLength || !this.$v.user.rib.iban.maxLength) {
+        return 'L\'IBAN doit contenir 27 caractères.'
+      }
+    },
+    bicError () {
+      if (!this.$v.user.rib.bic.required) {
+        return 'Champ requis'
+      } else if (!this.$v.user.rib.iban.minLength) {
+        return 'Le BIC doit contenir au moins 8 caractères.'
       }
     },
     getMaxDate () {
