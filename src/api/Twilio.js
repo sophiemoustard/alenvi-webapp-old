@@ -7,7 +7,7 @@ export default {
     return res;
   },
   async sendSMSConfirm (phoneNbr, token) {
-    const res = await axios.post(`${process.env.API_HOSTNAME}/twilio/sendConfirm/${phoneNbr}`, {});
+    const res = await axios.post(`${process.env.API_HOSTNAME}/twilio/sendConfirm/${phoneNbr}`, {}, { headers: { 'x-access-token': token } });
     return res;
   }
 }
