@@ -49,7 +49,8 @@
               </q-field>
               <!-- Navigation for this step at the end of QStep-->
               <q-stepper-navigation>
-                <q-btn color="primary" @click="$refs.stepper.next()" label="Enregistrer" />
+                <q-btn color="primary" :disable="hasStep1Errors" @click="firstStep()" label="Créer compte et aller sur Pigi" /> <!-- :disable="$v.user.$invalid" -->
+                <!-- <q-btn color="primary" :disable="$v.user.$invalid" @click="$refs.stepper.next()" label="Créer compte et aller sur Pigi" /> -->
               </q-stepper-navigation>
             </q-step>
             <q-step name="second" title="Informations personnelles (2)">
@@ -77,12 +78,6 @@
               </q-stepper-navigation>
             </q-step>
             <q-step name="third" title="Informations de paiement">
-              <q-field icon="person" :error="$v.user.administrative.payment.rib.fullname.$error" error-label="Champ requis">
-                <q-input type="text" v-model.trim="user.administrative.payment.rib.fullname" float-label="Nom complet" @blur="$v.user.administrative.payment.rib.fullname.$touch" />
-              </q-field>
-              <q-field icon="mdi-account-card-details" :error="$v.user.administrative.payment.rib.bankName.$error" error-label="Champ requis">
-                <q-input type="text" v-model.trim="user.administrative.payment.rib.bankName" float-label="Nom de la banque" @blur="$v.user.administrative.payment.rib.bankName.$touch" />
-              </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.payment.rib.iban.$error" :error-label="ibanError">
                 <q-input type="text" v-model.trim="user.administrative.payment.rib.iban" float-label="IBAN" @blur="$v.user.administrative.payment.rib.iban.$touch" />
               </q-field>
@@ -90,22 +85,25 @@
                 <q-input type="text" v-model.trim="user.administrative.payment.rib.bic" float-label="BIC" @blur="$v.user.administrative.payment.rib.bic.$touch" />
               </q-field>
               <q-stepper-navigation>
-                <q-btn color="primary" @click="$refs.stepper.next()" label="Enregistrer" />
+                <q-btn color="primary" :disable="$v.user.$invalid" @click="$refs.stepper.next()" label="Enregistrer" />
                 <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
               </q-stepper-navigation>
             </q-step>
             <q-step name="fourth" title="Documents annexes">
+              <q-field icon="mdi-account-card-details" :error="$v.user.picture.$error" error-label="Champ requis">
+                <q-uploader :url="url" float-label="Photo"/>
+              </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.idCard.$error" error-label="Champ requis">
                 <q-uploader :url="url" float-label="Carte d'identité"/>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.vitalCard.$error" error-label="Champ requis">
                 <q-uploader :url="url" float-label="Carte vitale"/>
               </q-field>
-              <q-field icon="mdi-account-card-details" :error="$v.user.administrative.navigoCard.$error" error-label="Champ requis">
-                <q-uploader :url="url" float-label="Navigo"/>
+              <q-field icon="mdi-account-card-details" :error="$v.user.administrative.navigoInvoice.$error" error-label="Champ requis">
+                <q-uploader :url="url" float-label="Facture Navigo"/>
               </q-field>
-              <q-field icon="mdi-account-card-details" :error="$v.user.administrative.drivingLicence.$error" error-label="Champ requis">
-                <q-uploader :url="url" float-label="Permis de conduire"/>
+              <q-field icon="mdi-account-card-details" :error="$v.user.administrative.phoneInvoice.$error" error-label="Champ requis">
+                <q-uploader :url="url" float-label="Facture de téléphone"/>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.mutualFund.$error" error-label="Champ requis">
                 <q-uploader :url="url" float-label="Mutuelle"/>
@@ -114,7 +112,7 @@
                 <q-uploader :url="url" float-label="Diplômes et / ou certicats" multiple/>
               </q-field>
               <q-stepper-navigation>
-                <q-btn color="primary" @click="$refs.stepper.next()" label="Terminer mon inscription" />
+                <q-btn color="primary" :disable="$v.user.$invalid" @click="$refs.stepper.next()" label="Terminer mon inscription" />
                 <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
               </q-stepper-navigation>
             </q-step>
@@ -144,6 +142,7 @@ export default {
   // name: 'PageName',
   data () {
     return {
+      accessToken: '',
       url: '',
       countries: [],
       user: {
@@ -165,11 +164,11 @@ export default {
         emailConfirmation: '',
         password: '',
         passwordConfirmation: '',
+        managerId: '',
         socialInsuranceNumber: '',
         administrative: {
           payment: {
             rib: {
-              fullname: '',
               bankName: '',
               iban: '',
               bic: ''
@@ -181,13 +180,13 @@ export default {
           vitalCard: {
             parent: process.env.PARENT_GOOGLE_FOLDER_ID
           },
-          navigoCard: {
-            parent: process.env.PARENT_GOOGLE_FOLDER_ID
-          },
-          drivingLicence: {
+          navigoInvoice: {
             parent: process.env.PARENT_GOOGLE_FOLDER_ID
           },
           mutualFund: {
+            parent: process.env.PARENT_GOOGLE_FOLDER_ID
+          },
+          phoneInvoice: {
             parent: process.env.PARENT_GOOGLE_FOLDER_ID
           },
           certificates: []
@@ -201,7 +200,7 @@ export default {
             label: 'Madame',
             value: 'Mme'
           }
-        ]
+        ],
       }
     }
   },
@@ -246,11 +245,10 @@ export default {
       },
       countryOfBirth: { required },
       placeOfBirth: { required },
+      picture: { required },
       administrative: {
         payment: {
           rib: {
-            fullname: { required },
-            bankName: { required },
             iban: {
               required,
               minLength: minLength(27),
@@ -264,15 +262,18 @@ export default {
         },
         idCard: { required },
         vitalCard: { required },
-        navigoCard: { required },
-        drivingLicence: { required },
+        navigoInvoice: { required },
         mutualFund: { required },
+        phoneInvoice: { required },
         certificates: [ required ]
       }
     }
   },
   mounted () {
     this.user.sector = this.$q.cookies.get('signup_sector');
+    this.user.mobilePhone = this.$q.cookies.get('signup_mobile');
+    this.user.managerId = this.$q.cookies.get('signup_managerId');
+    this.accessToken = this.$q.cookies.get('signup_is_activated');
     this.getCountries();
   },
   computed: {
@@ -340,9 +341,79 @@ export default {
     },
     getMaxDate () {
       return `${this.$moment().year()}-12-31`
+    },
+    hasStep1Errors () {
+      return this.$v.user.civility.$invalid ? true : this.$v.user.firstname.$invalid ? true : this.$v.user.lastname.$invalid ? true
+        : this.$v.user.address.zipCode.$invalid ? true : this.$v.user.address.city.$invalid ? true : this.$v.user.address.line.$invalid ? true
+          : this.$v.user.email.$invalid ? true : this.$v.user.emailConfirmation.$invalid ? true
+            : this.$v.user.password.$invalid ? true : !!this.$v.user.passwordConfirmation.$invalid
     }
   },
   methods: {
+    async firstStep () {
+      try {
+        this.$q.loading.show({ message: 'Création de ton compte en cours...' });
+        const ogustData = {
+          title: this.user.civility,
+          last_name: this.user.lastname,
+          first_name: this.user.firstname,
+          main_address: {
+            line: this.user.address.line,
+            zip: this.user.address.zipCode,
+            city: this.user.address.city
+          },
+          email: this.user.email,
+          sector: this.user.sector,
+          mobile_phone: this.user.mobilePhone
+        };
+        const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
+        const ogustNewUser = await this.$ogust.createEmployee(ogustToken, ogustData);
+        const alenviData = {
+          firstname: this.user.firstname,
+          lastname: this.user.lastname,
+          local: {
+            email: this.user.email,
+            password: this.user.password
+          },
+          employee_id: ogustNewUser.data.data.user.body.employee.id_employee,
+          role: 'Auxiliaire',
+          sector: this.user.sector,
+          managerId: this.user.managerId
+        };
+        const newAlenviUser = await this.$users.create(alenviData);
+        const alenviToken = newAlenviUser.data.data.token;
+        this.$q.loading.show({ message: 'Redirection vers Pigi...' });
+        setTimeout(async () => {
+          this.$q.loading.hide();
+          this.$q.cookies.remove('signup_is_activated', { path: '/' });
+          this.$q.cookies.remove('signup_sector', { path: '/' });
+          this.$q.cookies.remove('signup_mobile', { path: '/' });
+          this.$q.cookies.remove('signup_managerId', { path: '/' });
+          await this.$activationCode.delete(this.accessToken, this.user.mobilePhone);
+          await this.$twilio.sendSMSConfirm(this.user.mobilePhone, this.accessToken);
+          window.location.href = `${process.env.MESSENGER_LINK}?ref=${alenviToken}`
+        }, 2000);
+      } catch (e) {
+        this.$q.loading.hide();
+        this.$q.notify({
+          color: 'negative',
+          icon: 'warning',
+          detail: 'Erreur lors de la création de ton compte, n\'hésite pas à contacter l\'équipe technique si le problème persiste ;-)',
+          position: 'bottom-right',
+          timeout: 2500
+        });
+        console.error(e.response);
+      }
+    },
+    async secondStep () {
+
+    },
+    async thirdStep () {
+
+    },
+    async lastStep () {
+
+    },
     async submit () {
       try {
         this.$q.loading.show({ message: 'Création de ton compte en cours...' });
