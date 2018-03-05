@@ -73,7 +73,7 @@
                 <q-input type="number" v-model.trim="user.socialInsuranceNumber" float-label="Numéro de sécurité sociale" @blur="$v.user.socialInsuranceNumber.$touch" />
               </q-field>
               <q-stepper-navigation>
-                <q-btn color="primary" @click="$refs.stepper.next()" label="Enregistrer" />
+                <q-btn color="primary" :disable="hasStep2Errors" @click="$refs.stepper.next()" label="Enregistrer" />
                 <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
               </q-stepper-navigation>
             </q-step>
@@ -85,7 +85,7 @@
                 <q-input type="text" v-model.trim="user.administrative.payment.rib.bic" float-label="BIC" @blur="$v.user.administrative.payment.rib.bic.$touch" />
               </q-field>
               <q-stepper-navigation>
-                <q-btn color="primary" :disable="$v.user.$invalid" @click="$refs.stepper.next()" label="Enregistrer" />
+                <q-btn color="primary" :disable="hasStep3Errors" @click="$refs.stepper.next()" label="Enregistrer" />
                 <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
               </q-stepper-navigation>
             </q-step>
@@ -112,7 +112,7 @@
                 <q-uploader :url="url" float-label="Diplômes et / ou certicats" multiple/>
               </q-field>
               <q-stepper-navigation>
-                <q-btn color="primary" :disable="$v.user.$invalid" @click="$refs.stepper.next()" label="Terminer mon inscription" />
+                <q-btn color="primary" :disable="hasStep4Errors" @click="$refs.stepper.next()" label="Terminer mon inscription" />
                 <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
               </q-stepper-navigation>
             </q-step>
@@ -347,6 +347,18 @@ export default {
         : this.$v.user.address.zipCode.$invalid ? true : this.$v.user.address.city.$invalid ? true : this.$v.user.address.line.$invalid ? true
           : this.$v.user.email.$invalid ? true : this.$v.user.emailConfirmation.$invalid ? true
             : this.$v.user.password.$invalid ? true : !!this.$v.user.passwordConfirmation.$invalid
+    },
+    hasStep2Errors () {
+      return this.$v.user.dateOfBirth.$invalid ? true : this.$v.user.countryOfBirth.$invalid ? true : this.$v.user.stateOfBirth.$invalid ? true
+        : this.$v.user.placeOfBirth.$invalid ? true : !!this.$v.user.socialInsuranceNumber.$invalid
+    },
+    hasStep3Errors () {
+      return this.$v.user.administrative.payment.rib.iban.$invalid ? true : !!this.$v.user.administrative.payment.rib.bic.$invalid
+    },
+    hasStep4Errors () {
+      return this.$v.user.picture.$invalid ? true : this.$v.user.administrative.idCard.$invalid ? true : this.$v.user.administrative.vitalCard.$invalid ? true
+        : this.$v.user.administrative.navigoInvoice.$invalid ? true : this.$v.user.administrative.phoneInvoice.$invalid ? true
+          : this.$v.user.administrative.mutualFund.$invalid ? true : !!this.$v.user.administrative.certificates.$invalid
     }
   },
   methods: {
