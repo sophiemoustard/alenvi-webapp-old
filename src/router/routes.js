@@ -40,6 +40,7 @@ export default [
       }
     }
   },
+  { path: '/signupComplete', component: () => import('pages/signup/SignUpComplete') },
   { path: '/forgotPassword', component: () => import('pages/signin/ForgotPwd') },
   { path: '/resetPassword/:token', component: () => import('pages/signin/ResetPwd') },
   { path: '/error403Pwd', component: () => import('pages/signin/403') },
@@ -144,6 +145,7 @@ export default [
       }
     ]
   },
+  { path: '/401', component: () => import('pages/401') },
   { // Always leave this as last one
     path: '*',
     component: () => import('pages/404')

@@ -141,8 +141,13 @@ export default {
     const employees = employeesRaw.data.data.users.array_employee.result;
     return employees;
   },
-  async getEmployeeById (id) {
-    const employeeRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/employees/${id}`);
+  async getEmployeeById (id, ogustToken = null) {
+    let employeeRaw = {};
+    if (ogustToken === null) {
+      employeeRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/employees/${id}`);
+    } else {
+      employeeRaw = axios.get(`${process.env.API_HOSTNAME}/ogust/employees/${id}`, { headers: { 'x-ogust-token': ogustToken } });
+    }
     return employeeRaw.data.data.user.employee;
   },
   async createEmployee (ogustToken, data) {
@@ -157,8 +162,13 @@ export default {
     const salaries = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/employees/${employeeId}/salaries`);
     return salaries.data.data.salaries.array_salary.result;
   },
-  async setEmployee (data) {
-    const employeeUpdated = await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/employees/${data.id_employee}`, data);
+  async setEmployee (data, ogustToken = null) {
+    let employeeUpdated = {};
+    if (ogustToken === null) {
+      employeeUpdated = await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/employees/${data.id_employee}`, data);
+    } else {
+      employeeUpdated = await axios.put(`${process.env.API_HOSTNAME}/ogust/employees/${data.id_employee}`, data, { headers: { 'x-ogust-token': ogustToken } });
+    }
     return employeeUpdated;
   },
   async getCustomers (data) {

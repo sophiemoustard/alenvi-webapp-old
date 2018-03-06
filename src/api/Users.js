@@ -5,7 +5,7 @@ export default {
   async showAll (params = null, token = null) {
     try {
       let employeeIdRaw;
-      if (token) {
+      if (token === null) {
         employeeIdRaw = await axios.get(`${process.env.API_HOSTNAME}/users`, { params, headers: { 'x-access-token': token } });
       } else {
         employeeIdRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users`, { params });
@@ -15,20 +15,25 @@ export default {
       console.error(e.response);
     }
   },
-  async getById (id) {
-    const userRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/${id}`);
+  async getById (id, token = null) {
+    let userRaw = {};
+    if (token === null) {
+      userRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/${id}`);
+    } else {
+      userRaw = await axios.get(`${process.env.API_HOSTNAME}/users/${id}`, { headers: { 'x-access-token': token } });
+    }
     return userRaw.data.data.user;
   },
   async create (data) {
-    const newUser = await alenviAxios.post(`${process.env.API_HOSTNAME}/users`, data);
+    const newUser = await axios.post(`${process.env.API_HOSTNAME}/users`, data);
     return newUser;
   },
   async updateById (data, token = null) {
     let userUpdated;
-    if (token) {
-      userUpdated = await axios.put(`${process.env.API_HOSTNAME}/users/${data._id}`, data, { headers: { 'x-access-token': token } })
-    } else {
+    if (token === null) {
       userUpdated = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${data._id}`, data)
+    } else {
+      userUpdated = await axios.put(`${process.env.API_HOSTNAME}/users/${data._id}`, data, { headers: { 'x-access-token': token } })
     }
     return userUpdated;
   },
