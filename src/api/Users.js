@@ -6,9 +6,9 @@ export default {
     try {
       let employeeIdRaw;
       if (token === null) {
-        employeeIdRaw = await axios.get(`${process.env.API_HOSTNAME}/users`, { params, headers: { 'x-access-token': token } });
-      } else {
         employeeIdRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users`, { params });
+      } else {
+        employeeIdRaw = await axios.get(`${process.env.API_HOSTNAME}/users`, { params, headers: { 'x-access-token': token } });
       }
       return employeeIdRaw.data.data.users;
     } catch (e) {
