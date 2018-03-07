@@ -53,25 +53,25 @@
             <!-- Last step -->
             <q-step name="third" title="Documents annexes">
               <q-field icon="mdi-account-card-details" :error="$v.user.picture.$error" error-label="Champ requis">
-                <q-uploader :url="url" float-label="Photo"/>
+                <q-uploader name="picture" :url="pictureUploadUrl" :headers="headers" :addtional-fields="[{ name: fileName, value: `${user.firstname}_${user.lastname}` }]" float-label="Photo"/>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.idCard.$error" error-label="Champ requis">
-                <q-uploader :url="url" float-label="Carte d'identité"/>
+                <q-uploader name="idCard" :url="docsUploadUrl" :headers="headers" float-label="Carte d'identité"/>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.vitalCard.$error" error-label="Champ requis">
-                <q-uploader :url="url" float-label="Carte vitale"/>
+                <q-uploader name="vitalCard" :url="docsUploadUrl" :headers="headers" float-label="Carte vitale"/>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.navigoInvoice.$error" error-label="Champ requis">
-                <q-uploader :url="url" float-label="Facture Navigo"/>
+                <q-uploader name="navigoInvoice" :url="docsUploadUrl" :headers="headers" float-label="Facture Navigo"/>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.phoneInvoice.$error" error-label="Champ requis">
-                <q-uploader :url="url" float-label="Facture de téléphone"/>
+                <q-uploader name="phoneInvoice" :url="docsUploadUrl" :headers="headers" float-label="Facture de téléphone"/>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.mutualFund.$error" error-label="Champ requis">
-                <q-uploader :url="url" float-label="Mutuelle"/>
+                <q-uploader name="mutualFund" :url="docsUploadUrl" :headers="headers" float-label="Mutuelle"/>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.certificates.$error" error-label="Champ requis">
-                <q-uploader :url="url" float-label="Diplômes et / ou certicats" multiple/>
+                <q-uploader name="certificates" :url="docsUploadUrl" :headers="headers" float-label="Diplômes et / ou certicats" multiple/>
               </q-field>
               <q-stepper-navigation>
                 <q-btn color="primary" :disable="hasStep3Errors" @click="lastStep()" label="Terminer mon inscription" />
@@ -105,7 +105,6 @@ export default {
   data () {
     return {
       accessToken: '',
-      url: '',
       countries: [],
       user: {
         dateOfBirth: '',
@@ -203,6 +202,8 @@ export default {
       const ogustUser = await this.$ogust.getById(alenviUser.employee_id, ogustToken);
       console.log(ogustUser);
       this.user = {
+        lastname: ogustUser.last_name,
+        firstname: ogustUser.first_name,
         dateOfBirth: ogustUser.date_of_birth,
         stateOfBirth: ogustUser.state_of_birth,
         placeOfBirth: ogustUser.place_of_birth,
@@ -265,6 +266,17 @@ export default {
       return this.$v.user.picture.$invalid ? true : this.$v.user.administrative.idCard.$invalid ? true : this.$v.user.administrative.vitalCard.$invalid ? true
         : this.$v.user.administrative.navigoInvoice.$invalid ? true : this.$v.user.administrative.phoneInvoice.$invalid ? true
           : this.$v.user.administrative.mutualFund.$invalid ? true : !!this.$v.user.administrative.certificates.$invalid
+    },
+    docsUploadUrl () {
+      return `${process.env.API_HOSTNAME}/uploader/${this.$route.query.id}/drive/uploadFile`;
+    },
+    pictureUploadUrl () {
+      return `${process.env.API_HOSTNAME}/uploader/${this.$route.query.id}/cloudinary/uploadImage`;
+    },
+    headers () {
+      return {
+        'x-access-token': this.$route.query.token
+      }
     }
   },
   methods: {
