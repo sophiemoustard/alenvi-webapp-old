@@ -1,9 +1,11 @@
 <template>
-  <q-uploader url="http://localhost:3000/uploader/drive/createFile/"
-              :headers="{ 'x-access-token': ' eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTQ3ZDhlZDgyZWI2NzliZTQ4NTJkNjciLCJyb2xlIjoiQWRtaW4iLCJpYXQiOjE1MjAyNDA5MzYsImV4cCI6MTUyMDMyNzMzNn0.kwp8l62iOdn1oslC8JPLmwZFAqF3zJcN-duClSFET1k'}"
-              name="TEST"
-              multiple
-              :additionalFields="additionalFields"></q-uploader>
+  <div>
+    <q-uploader ref="up1" :url="`http://localhost:3000/uploader/${$q.cookies.get('user_id')}/drive/uploadFile/`" :headers="{ 'x-access-token': $q.cookies.get('alenvi_token') }"
+      name="idCard" :additionalFields="additionalFields"></q-uploader>
+    <q-uploader ref="up2" :url="`http://localhost:3000/uploader/${$q.cookies.get('user_id')}/cloudinary/uploadImage/`" :headers="{ 'x-access-token': $q.cookies.get('alenvi_token') }"
+      name="picture" multiple :additionalFields="additionalFields"></q-uploader>
+  <q-btn @click="upload"></q-btn>
+  </div>
 </template>
 
 <script>
@@ -11,10 +13,19 @@ export default {
   data () {
     return {
       additionalFields: [
-        // { name: 'fileName', value: 'SUPERTEST' },
-        { name: 'parentFolderId', value: '1d2y74hXo1uyVpcH5AS66MK6VwoicKFCw' },
-        { name: '_id', value: '5a96e9ca1acdebe79b5a425c' }
+        { name: 'fileName', value: 'SUPERTEST' },
+        // { name: 'parentFolderId', value: '1d2y74hXo1uyVpcH5AS66MK6VwoicKFCw' },
+        // { name: '_id', value: '5a96e9ca1acdebe79b5a425c' }
       ],
+    }
+  },
+  methods: {
+    add (file) {
+      console.log(file);
+    },
+    upload () {
+      this.$refs.up1.upload();
+      this.$refs.up2.upload();
     }
   }
   // methods: {
