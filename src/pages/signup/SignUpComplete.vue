@@ -53,7 +53,7 @@
             <!-- Last step -->
             <q-step name="third" title="Documents annexes">
               <q-field icon="mdi-account-card-details" :error="$v.user.picture.$error" error-label="Champ requis">
-                <q-uploader name="picture" :url="pictureUploadUrl" :headers="headers" :addtional-fields="[{ name: 'fileName', value: `${user.firstname}_${user.lastname}` }]" float-label="Photo"/>
+                <q-uploader name="picture" :url="pictureUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `${user.firstname}_${user.lastname}` }]" float-label="Photo"/>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.idCard.$error" error-label="Champ requis">
                 <q-uploader name="idCard" :url="docsUploadUrl" :headers="headers" float-label="Carte d'identité"/>
@@ -270,36 +270,36 @@ export default {
   methods: {
     async firstStep () {
       try {
-        const ogustData = {
-          date_of_birth: this.user.dateOfBirth,
-          country_of_birth: this.user.countryOfBirth,
-          state_of_birth: this.user.stateOfBirth,
-          place_of_birth: this.user.placeOfBirth,
-          social_insurance_number: this.user.socialInsuranceNumber
-        };
-        const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
-        const ogustUserUpdated = await this.$ogust.setEmployee(ogustData, ogustToken);
+        // const ogustData = {
+        //   date_of_birth: this.user.dateOfBirth,
+        //   country_of_birth: this.user.countryOfBirth,
+        //   state_of_birth: this.user.stateOfBirth,
+        //   place_of_birth: this.user.placeOfBirth,
+        //   social_insurance_number: this.user.socialInsuranceNumber
+        // };
+        // const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
+        // const ogustUserUpdated = await this.$ogust.setEmployee(ogustData, ogustToken);
         this.$refs.stepper.next();
-        console.log(ogustUserUpdated);
+        // console.log(ogustUserUpdated);
       } catch (e) {
         console.error(e.response);
       }
     },
     async secondStep () {
       try {
-        const alenviData = {
-          administrative: {
-            payment: {
-              rib: {
-                iban: this.user.administrative.payment.rib.iban,
-                bic: this.user.admninistrative.payment.rib.bic
-              }
-            }
-          }
-        }
-        const userUpdated = await this.$users.updateById(alenviData, this.accessToken);
+        // const alenviData = {
+        //   administrative: {
+        //     payment: {
+        //       rib: {
+        //         iban: this.user.administrative.payment.rib.iban,
+        //         bic: this.user.admninistrative.payment.rib.bic
+        //       }
+        //     }
+        //   }
+        // }
+        // const userUpdated = await this.$users.updateById(alenviData, this.accessToken);
         this.$refs.stepper.next();
-        console.log(userUpdated);
+        // console.log(userUpdated);
       } catch (e) {
         console.error(e.response);
       }
