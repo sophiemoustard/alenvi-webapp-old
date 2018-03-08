@@ -7,7 +7,9 @@
       <q-card-separator />
       <q-card-main class="row justify-center layout-padding">
         <!-- <div class="custom-input on-left" v-for="(box, index) in boxes" :key="index"> -->
-          <q-input class="custom-input on-left" v-for="(box, index) in boxes" :key="index" align="center" @input="changeBoxAndMakeCode(index, $event)" :attributes="boxesStyle" :ref="'box' + (index + 1)" type="tel" :autofocus="box.autofocus" v-model.number="box.model" :max-length="1"></q-input>
+        <q-input class="custom-input on-left" v-for="(box, index) in boxes" :key="index" align="center" @input="changeBoxAndMakeCode(index, $event)"
+          :attributes="boxesStyle" :ref="'box' + (index + 1)" type="tel" :autofocus="box.autofocus" v-model.number="box.model"
+          :max-length="1"></q-input>
         <!-- </div> -->
       </q-card-main>
       <q-card-actions class="row justify-end">
@@ -41,7 +43,7 @@ export default {
           autofocus: false
         }
       ],
-      code: '',
+      code: [0, 0, 0, 0],
       boxesStyle: {
         style: 'color: #E2007A; height: 40px',
         autocorrect: 'off'
@@ -49,25 +51,26 @@ export default {
     }
   },
   mounted () {
-    console.log(this.$refs);
+    // console.log(this.$refs);
   },
   methods: {
     changeBoxAndMakeCode (index, event) {
-      console.log('MEH');
       if (index !== (this.boxes.length - 1) && event.match(/[0-9]/g)) {
+        this.code.splice(index, 1, event);
         const newIndex = index + 1;
         this.$refs['box' + (newIndex + 1)][0].focus();
       } else if (index === (this.boxes.length - 1)) {
         this.$refs['box' + this.boxes.length][0].blur();
-        this.code = '';
-        for (let i = 0, l = this.boxes.length; i < l; i++) {
-          this.code += this.boxes[i].model;
-        }
+        this.code.splice(index, 1, event);
+        // this.code = '';
+        // for (let i = 0, l = this.boxes.length; i < l; i++) {
+        //   this.code += this.boxes[i].model;
+        // }
       }
     },
     async submit () {
       try {
-        const activationDataRaw = await this.$activationCode.check(this.code);
+        const activationDataRaw = await this.$activationCode.check(this.code.join(''));
         this.$q.cookies.set('signup_is_activated', activationDataRaw.token, { path: '/', expires: date.addToDate(new Date(), { days: 1 }), secure: process.env.NODE_ENV !== 'development' });
         this.$q.cookies.set('signup_sector', activationDataRaw.activationData.sector, { path: '/', expires: date.addToDate(new Date(), { days: 1 }), secure: process.env.NODE_ENV !== 'development' });
         this.$q.cookies.set('signup_mobile', activationDataRaw.activationData.mobile_phone, { path: '/', expires: date.addToDate(new Date(), { days: 1 }), secure: process.env.NODE_ENV !== 'development' });
