@@ -57,7 +57,8 @@ export default {
         const activationDataRaw = await this.$activationCode.create({
           mobile_phone: this.phoneNbr,
           sector: this.selectedSector,
-          managerId: this.selectedManager
+          managerId: this.selectedManager,
+          firstSMS: Date.now()
         });
         const code = activationDataRaw.activationData.code;
         const message = await this.$twilio.sendSMS(this.phoneNbr, {

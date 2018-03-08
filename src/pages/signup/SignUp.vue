@@ -190,7 +190,12 @@ export default {
           employee_id: ogustNewUser.data.data.user.body.employee.id_employee,
           role: 'Auxiliaire',
           sector: this.user.sector,
-          managerId: this.user.managerId
+          managerId: this.user.managerId,
+          administrative: {
+            signup: {
+              firstSmsDate: this.$q.cookies.get('signup_firstSMS')
+            }
+          }
         };
         const newAlenviUser = await this.$users.create(alenviData);
         const alenviToken = newAlenviUser.data.data.token;
@@ -201,6 +206,7 @@ export default {
           this.$q.cookies.remove('signup_sector', { path: '/' });
           this.$q.cookies.remove('signup_mobile', { path: '/' });
           this.$q.cookies.remove('signup_managerId', { path: '/' });
+          this.$q.cookies.remove('signup_firstSMS', { path: '/' });
           await this.$activationCode.delete(this.accessToken, this.user.mobilePhone);
           await this.$twilio.sendSMSConfirm(this.user.mobilePhone, this.accessToken);
           window.location.href = `${process.env.MESSENGER_LINK}?ref=${alenviToken}`
