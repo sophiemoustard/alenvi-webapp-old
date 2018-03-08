@@ -191,6 +191,7 @@ export default {
           role: 'Auxiliaire',
           sector: this.user.sector,
           managerId: this.user.managerId,
+          mobilePhone: this.user.mobilePhone,
           administrative: {
             signup: {
               firstSmsDate: this.$q.cookies.get('signup_firstSMS')
@@ -199,6 +200,7 @@ export default {
         };
         const newAlenviUser = await this.$users.create(alenviData);
         const alenviToken = newAlenviUser.data.data.token;
+        const alenviUserId = newAlenviUser.data.data.user._id;
         this.$q.loading.show({ message: 'Redirection vers Pigi...' });
         setTimeout(async () => {
           this.$q.loading.hide();
@@ -208,7 +210,7 @@ export default {
           this.$q.cookies.remove('signup_managerId', { path: '/' });
           this.$q.cookies.remove('signup_firstSMS', { path: '/' });
           await this.$activationCode.delete(this.accessToken, this.user.mobilePhone);
-          await this.$twilio.sendSMSConfirm(this.user.mobilePhone, this.accessToken);
+          await this.$twilio.sendSMSConfirm({ id: alenviUserId, phoneNbr: this.user.mobilePhone }, this.accessToken);
           window.location.href = `${process.env.MESSENGER_LINK}?ref=${alenviToken}`
         }, 2000);
       } catch (e) {
