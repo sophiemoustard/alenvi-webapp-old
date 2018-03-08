@@ -146,7 +146,7 @@ export default {
     if (ogustToken === null) {
       employeeRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/employees/${id}`);
     } else {
-      employeeRaw = axios.get(`${process.env.API_HOSTNAME}/ogust/employees/${id}`, { headers: { 'x-ogust-token': ogustToken } });
+      employeeRaw = await axios.get(`${process.env.API_HOSTNAME}/ogust/employees/${id}`, { headers: { 'x-ogust-token': ogustToken } });
     }
     return employeeRaw.data.data.user.employee;
   },
