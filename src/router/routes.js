@@ -1,6 +1,7 @@
 import { Cookies } from 'quasar'
 
 import store from '../store/index'
+import users from '../api/Users'
 
 export default [
   {
@@ -33,14 +34,30 @@ export default [
     path: '/signup',
     component: () => import('pages/signup/SignUp'),
     beforeEnter: (to, from, next) => {
-      if (Cookies.get('signup_is_activated') && Cookies.get('signup_sector') && Cookies.get('signup_mobile') && Cookies.get('signup_managerId')) {
+      if (Cookies.get('signup_is_activated') && Cookies.get('signup_sector') && Cookies.get('signup_mobile') && Cookies.get('signup_managerId') && Cookies.get('signup_firstSMS')) {
         next();
       } else {
         next({ path: '/enterCode' });
       }
     }
   },
-  { path: '/signupComplete', component: () => import('pages/signup/SignUpComplete') },
+  {
+    path: '/signupComplete',
+    component: () => import('pages/signup/SignUpComplete'),
+    beforeEnter: async (to, from, next) => {
+      try {
+        if (to.query.token && to.query.id) {
+          await users.getById(to.query.id, to.params.token);
+          next();
+        } else {
+          next({ path: '/401' });
+        }
+      } catch (e) {
+        console.error(e.response);
+        next({ path: '/401' });
+      }
+    }
+  },
   { path: '/forgotPassword', component: () => import('pages/signin/ForgotPwd') },
   { path: '/resetPassword/:token', component: () => import('pages/signin/ResetPwd') },
   { path: '/error403Pwd', component: () => import('pages/signin/403') },

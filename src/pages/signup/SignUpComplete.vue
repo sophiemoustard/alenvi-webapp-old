@@ -53,7 +53,7 @@
             <!-- Last step -->
             <q-step name="third" title="Documents annexes">
               <q-field icon="mdi-account-card-details" :error="$v.user.picture.$error" error-label="Champ requis">
-                <q-uploader name="picture" :url="pictureUploadUrl" :headers="headers" :addtional-fields="[{ name: fileName, value: `${user.firstname}_${user.lastname}` }]" float-label="Photo"/>
+                <q-uploader name="picture" :url="pictureUploadUrl" :headers="headers" :addtional-fields="[{ name: 'fileName', value: `${user.firstname}_${user.lastname}` }]" float-label="Photo"/>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.idCard.$error" error-label="Champ requis">
                 <q-uploader name="idCard" :url="docsUploadUrl" :headers="headers" float-label="Carte d'identité"/>
@@ -105,6 +105,7 @@ export default {
   data () {
     return {
       accessToken: '',
+      ogustToken: '',
       countries: [],
       user: {
         dateOfBirth: '',
@@ -180,26 +181,13 @@ export default {
       }
     }
   },
-  async beforeRouteEnter (to, from, next) {
-    try {
-      if (to.query.token && to.query.id) {
-        await this.$users.getById(to.query.id, to.params.token);
-        next();
-      } else {
-        next({ path: '/401' });
-      }
-    } catch (e) {
-      console.error(e.response);
-      next({ path: '/401' });
-    }
-  },
   async mounted () {
     try {
       this.accessToken = this.$route.query.token;
       const alenviUser = await this.$users.getById(this.$route.query.id, this.accessToken);
       console.log(alenviUser);
-      const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
-      const ogustUser = await this.$ogust.getById(alenviUser.employee_id, ogustToken);
+      this.ogustToken = await this.$ogust.getOgustToken(this.accessToken);
+      const ogustUser = await this.$ogust.getEmployeeById(alenviUser.employee_id, this.ogustToken);
       console.log(ogustUser);
       this.user = {
         lastname: ogustUser.last_name,
@@ -280,9 +268,6 @@ export default {
     }
   },
   methods: {
-    setData (user) {
-      this.user = user;
-    },
     async firstStep () {
       try {
         const ogustData = {
@@ -323,8 +308,8 @@ export default {
     },
     async getCountries () {
       try {
-        const ogustToken = await this.$ogust.getOgustToken(this.$q.cookies.get('signup_is_activated'));
-        const countriesRaw = await this.$ogust.getList('employee.country_of_birth', ogustToken);
+        // const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
+        const countriesRaw = await this.$ogust.getList('employee.country_of_birth', this.ogustToken);
         delete countriesRaw['0'];
         for (const k in countriesRaw) {
           this.countries.push({ label: countriesRaw[k], value: k });
