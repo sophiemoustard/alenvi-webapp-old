@@ -47,7 +47,7 @@ export default [
     beforeEnter: async (to, from, next) => {
       try {
         if (to.query.token && to.query.id) {
-          await users.getById(to.query.id, to.params.token);
+          await users.getById(to.query.id, to.query.token);
           next();
         } else {
           next({ path: '/401' });
