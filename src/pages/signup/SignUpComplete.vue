@@ -13,7 +13,7 @@
         <q-card-main>
           <q-stepper color="primary" ref="stepper" alternative-labels vertical>
             <!-- First step -->
-            <q-step name="first" title="Informations personnelles (suite)">
+            <q-step name="first" title="Informations personnelles (suite)" default>
               <q-field icon="date range" :error="$v.user.dateOfBirth.$error" error-label="Champ requis">
                 <q-datetime v-model="user.dateOfBirth" float-label="Date de naissance" @blur="$v.user.dateOfBirth.$touch" :first-day-of-week="Number(1)"
                 ok-label="APPLIQUER" no-clear cancel-label="ANNULER"
@@ -53,7 +53,7 @@
             <!-- Last step -->
             <q-step name="third" title="Documents annexes">
               <q-field icon="mdi-account-card-details" :error="$v.user.picture.$error" error-label="Champ requis">
-                <q-uploader name="picture" :url="pictureUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `${user.firstname}_${user.lastname}` }]" float-label="Photo"/>
+                <q-uploader name="picture" :url="pictureUploadUrl" :headers="headers" :addtional-fields="[{ name: fileName, value: `${user.firstname}_${user.lastname}` }]" float-label="Photo"/>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.idCard.$error" error-label="Champ requis">
                 <q-uploader name="idCard" :url="docsUploadUrl" :headers="headers" float-label="Carte d'identité"/>
@@ -105,7 +105,6 @@ export default {
   data () {
     return {
       accessToken: '',
-      ogustToken: '',
       countries: [],
       user: {
         dateOfBirth: '',
@@ -181,13 +180,26 @@ export default {
       }
     }
   },
+  async beforeRouteEnter (to, from, next) {
+    try {
+      if (to.query.token && to.query.id) {
+        await this.$users.getById(to.query.id, to.params.token);
+        next();
+      } else {
+        next({ path: '/401' });
+      }
+    } catch (e) {
+      console.error(e.response);
+      next({ path: '/401' });
+    }
+  },
   async mounted () {
     try {
       this.accessToken = this.$route.query.token;
       const alenviUser = await this.$users.getById(this.$route.query.id, this.accessToken);
       console.log(alenviUser);
-      this.ogustToken = await this.$ogust.getOgustToken(this.accessToken);
-      const ogustUser = await this.$ogust.getEmployeeById(alenviUser.employee_id, this.ogustToken);
+      const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
+      const ogustUser = await this.$ogust.getById(alenviUser.employee_id, ogustToken);
       console.log(ogustUser);
       this.user = {
         lastname: ogustUser.last_name,
@@ -207,6 +219,9 @@ export default {
         }
       }
       this.getCountries();
+      if (this.$route.query.step && (this.$route.query.step === 'first' || this.$route.query.step === 'second' || this.$route.query.step === 'third')) {
+        this.$refs.stepper.goToStep(this.$route.query.step);
+      }
     } catch (e) {
       console.error(e);
     }
@@ -268,38 +283,41 @@ export default {
     }
   },
   methods: {
+    setData (user) {
+      this.user = user;
+    },
     async firstStep () {
       try {
-        // const ogustData = {
-        //   date_of_birth: this.user.dateOfBirth,
-        //   country_of_birth: this.user.countryOfBirth,
-        //   state_of_birth: this.user.stateOfBirth,
-        //   place_of_birth: this.user.placeOfBirth,
-        //   social_insurance_number: this.user.socialInsuranceNumber
-        // };
-        // const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
-        // const ogustUserUpdated = await this.$ogust.setEmployee(ogustData, ogustToken);
+        const ogustData = {
+          date_of_birth: this.user.dateOfBirth,
+          country_of_birth: this.user.countryOfBirth,
+          state_of_birth: this.user.stateOfBirth,
+          place_of_birth: this.user.placeOfBirth,
+          social_insurance_number: this.user.socialInsuranceNumber
+        };
+        const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
+        const ogustUserUpdated = await this.$ogust.setEmployee(ogustData, ogustToken);
         this.$refs.stepper.next();
-        // console.log(ogustUserUpdated);
+        console.log(ogustUserUpdated);
       } catch (e) {
         console.error(e.response);
       }
     },
     async secondStep () {
       try {
-        // const alenviData = {
-        //   administrative: {
-        //     payment: {
-        //       rib: {
-        //         iban: this.user.administrative.payment.rib.iban,
-        //         bic: this.user.admninistrative.payment.rib.bic
-        //       }
-        //     }
-        //   }
-        // }
-        // const userUpdated = await this.$users.updateById(alenviData, this.accessToken);
+        const alenviData = {
+          administrative: {
+            payment: {
+              rib: {
+                iban: this.user.administrative.payment.rib.iban,
+                bic: this.user.admninistrative.payment.rib.bic
+              }
+            }
+          }
+        }
+        const userUpdated = await this.$users.updateById(alenviData, this.accessToken);
         this.$refs.stepper.next();
-        // console.log(userUpdated);
+        console.log(userUpdated);
       } catch (e) {
         console.error(e.response);
       }
@@ -308,8 +326,8 @@ export default {
     },
     async getCountries () {
       try {
-        // const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
-        const countriesRaw = await this.$ogust.getList('employee.country_of_birth', this.ogustToken);
+        const ogustToken = await this.$ogust.getOgustToken(this.$q.cookies.get('signup_is_activated'));
+        const countriesRaw = await this.$ogust.getList('employee.country_of_birth', ogustToken);
         delete countriesRaw['0'];
         for (const k in countriesRaw) {
           this.countries.push({ label: countriesRaw[k], value: k });
