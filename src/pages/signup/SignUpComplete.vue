@@ -314,10 +314,17 @@ export default {
               }
             }
           }
-        }
-        const userUpdated = await this.$users.updateById(alenviData, this.accessToken);
+        };
+        const userAlenviUpdated = await this.$users.updateById(alenviData, this.accessToken);
+        const ogustData = {
+          iban_number: this.user.administrative.payment.rib.iban,
+          bic_number: this.user.admninistrative.payment.rib.bic
+        };
+        const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
+        const userOgustUpdated = await this.$ogust.setEmployee(ogustData, ogustToken);
         this.$refs.stepper.next();
-        console.log(userUpdated);
+        console.log(userAlenviUpdated);
+        console.log(userOgustUpdated);
       } catch (e) {
         console.error(e.response);
       }
