@@ -20,7 +20,8 @@ module.exports = function (ctx) {
       'roles',
       'twilio',
       'moment',
-      'can'
+      'can',
+      'lodash'
     ],
     css: [
       'app.styl'

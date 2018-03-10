@@ -93,12 +93,21 @@ export default [
         }
       },
       {
-        path: 'users',
-        name: 'users',
-        component: () => import('pages/dashboard/users/NavTabs'),
+        path: 'auxiliaries',
+        name: 'auxiliaries',
+        component: () => import('pages/dashboard/auxiliaries/NavTabs'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permission: 'Utilisateurs'
+          permission: 'Auxiliaires'
+        }
+      },
+      {
+        path: 'caregivers',
+        name: 'caregivers',
+        component: () => import('pages/dashboard/caregivers/AddHelper'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permission: 'Aidants'
         }
       },
       {

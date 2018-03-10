@@ -1,0 +1,304 @@
+<template>
+    <q-table
+      :data="userList"
+      :columns="columns"
+      row-key="name"
+      :rows-per-page-options="[30, 40, 50]"
+      :pagination.sync="pagination"
+      :filter="filter"
+      dense
+      rows-per-page-label="Lignes"
+      :pagination-label="paginationLabel"
+      no-data-label="Données non disponibles"
+      no-results-label="Pas de résultats">
+      <template slot="top" slot-scope="props">
+        <q-search
+          hide-underline
+          color="primary"
+          v-model="filter"
+          clearable
+          placeholder="Recherche"
+          class="col-6" />
+      </template>
+      <q-td slot="body-cell-secondSmsDate" slot-scope="props" :props="props">
+        <q-icon name="done" color="positive" v-if="props.value === true" />
+        <q-icon name="clear" color="negative" v-if="props.value === false || props.value === '-'" />
+      </q-td>
+      <q-td slot="body-cell-pigiConnection" slot-scope="props" :props="props">
+        <q-icon name="done" color="positive" v-if="props.value === true" />
+        <q-icon name="clear" color="negative" v-if="props.value === false || props.value === '-'" />
+      </q-td>
+      <q-td slot="body-cell-personalInfo" slot-scope="props" :props="props">
+        <q-icon name="done" color="positive" v-if="props.value === true" />
+        <q-icon name="clear" color="negative" v-if="props.value === false || props.value === '-'" />
+      </q-td>
+      <q-td slot="body-cell-paymentInfo" slot-scope="props" :props="props">
+        <q-icon name="done" color="positive" v-if="props.value === true" />
+        <q-icon name="clear" color="negative" v-if="props.value === false || props.value === '-'" />
+      </q-td>
+      <q-td slot="body-cell-miscDocuments" slot-scope="props" :props="props">
+        <q-icon name="done" color="positive" v-if="props.value === true" />
+        <q-icon name="clear" color="negative" v-if="props.value === false || props.value === '-'" />
+      </q-td>
+    </q-table>
+</template>
+
+<script>
+export default {
+  data () {
+    return {
+      userList: [],
+      isChecked: false,
+      filter: '',
+      pagination: {
+        sortBy: 'date', // String, column "name" property value
+        descending: true,
+        page: 1,
+        rowsPerPage: 30 // current rows per page being displayed
+      },
+      columns: [
+        {
+          name: 'firstSmsDate',
+          label: 'Date SMS Accueil',
+          field: 'firstSmsDate',
+          align: 'left',
+          sortable: true,
+          sort: (a, b) => new Date(a) - new Date(b),
+          format (value) {
+            if (value === '-') {
+              return '-';
+            }
+            return new Date(value).toLocaleString([], {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            });
+          }
+        },
+        {
+          name: 'auxiliary',
+          label: 'Auxiliaire',
+          field: 'auxiliary',
+          align: 'left',
+          sortable: true
+        },
+        {
+          name: 'secondSmsDate',
+          label: 'SMS confirmation inscription',
+          field: 'secondSmsDate',
+          align: 'center',
+          sortable: true
+        },
+        {
+          name: 'pigiConnection',
+          label: 'Connexion Pigi',
+          field: 'pigiConnection',
+          align: 'center',
+          sortable: true
+        },
+        {
+          name: 'personalInfo',
+          label: 'Informations personnelles',
+          field: 'personalInfo',
+          align: 'center',
+          sortable: true
+        },
+        {
+          name: 'paymentInfo',
+          label: 'Informations de paiement',
+          field: 'paymentInfo',
+          align: 'center',
+          sortable: true
+        },
+        {
+          name: 'miscDocuments',
+          label: 'Documents annexes',
+          field: 'miscDocuments',
+          align: 'center',
+          sortable: true
+        }
+      ]
+    };
+  },
+  async mounted () {
+    await this.getPlanningUpdates();
+  },
+  computed: {
+    user () {
+      return this.$store.getters['main/user'];
+    }
+  },
+  methods: {
+    async getPlanningUpdates () {
+      try {
+        const userList = await this.$users.showAll({ role: 'Auxiliaire' });
+        const ogustUserList = await this.$ogust.getEmployees();
+        for (let i = 0, l = userList.length; i < l; i++) {
+          for (const k in ogustUserList) {
+            if (
+              userList[i].employee_id === Number(ogustUserList[k].id_employee)
+            ) {
+              this.userList.push({
+                firstSmsDate:
+                  userList[i].administrative &&
+                  userList[i].administrative.signup.firstSmsDate
+                    ? userList[i].administrative.signup.firstSmsDate
+                    : '-',
+                auxiliary: `${userList[i].firstname} ${userList[i].lastname}`,
+                secondSmsDate:
+                  userList[i].administrative &&
+                  userList[i].administrative.signup.secondSmsDate
+                    ? !!userList[i].administrative.signup.secondSmsDate
+                    : '-',
+                pigiConnection: userList[i].facebook
+                  ? !!userList[i].facebook.address
+                  : '-',
+                personalInfo:
+                  !!ogustUserList[k].date_of_birth &&
+                  !!ogustUserList[k].place_of_birth &&
+                  !!ogustUserList[k].state_of_birth &&
+                  !!ogustUserList[k].country_of_birth,
+                paymentInfo:
+                  userList[i].administrative &&
+                  userList[i].administrative.payment &&
+                  userList[i].administrative.payment.rib
+                    ? !!userList[i].administrative.payment.rib.iban &&
+                      !!userList[i].administrative.payment.rib.iban
+                    : '-',
+                miscDocuments: userList[i].administrative
+                  ? !!userList[i].administrative.vitalCard &&
+                    !!userList[i].administrative.idCard &&
+                    !!userList[i].administrative.healthAttest &&
+                    !!userList[i].administrative.certificates &&
+                    !!userList[i].administrative.phoneInvoice &&
+                    !!userList[i].administrative.mutualFund &&
+                    !!userList[i].administrative.navigoInvoice
+                  : '-'
+              });
+            }
+          }
+        }
+        console.log(this.userList);
+        // let ogustUserList = [];
+        // userList = userList.filter(user => {
+        //   ogustUserList = this.$_.filter(ogustUserListRaw, (ogustUser) => user.employee_id === ogustUser.id_employee)
+        //   console.log('ogustUserList', ogustUserList);
+        //   return !user.administrative.signup.complete;
+        // });
+        // for (let i = 0, l = userList.length; i < l; i++) {
+        //   this.userList.push({
+        //     date: userList[i].planningModification[j].createdAt,
+        //     author: `${userList[i].firstname} ${userList[i].lastname}`,
+        //     content: userList[i].planningModification[j].content || '-',
+        //     involved: userList[i].planningModification[j].involved,
+        //     sector: sectors[userList[i].sector],
+        //     type: userList[i].planningModification[j].modificationType,
+        //     check: { id: userList[i].planningModification[j]._id, checked: userList[i].planningModification[j].check.isChecked },
+        //     checkedBy: userList[i].planningModification[j].check.checkBy ? `${userList[i].planningModification[j].check.checkBy.firstname} ${userList[i].planningModification[j].check.checkBy.lastname.substring(0, 1)}.` : '-',
+        //     checkedAt: userList[i].planningModification[j].check.checkedAt || '',
+        //     remove: { id: userList[i].planningModification[j]._id, userId: userList[i]._id }
+        //   });
+        // }
+        // this.userList = _.sortBy(orderedPlanningUpdatesList, ['date']).reverse();
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async process (updateId, isChecked, cell) {
+      try {
+        const payload = {
+          isChecked,
+          checkBy: isChecked ? this.user._id : null,
+          checkedAt: isChecked ? new Date() : null
+        };
+        await this.$planningUpdates.updatePlanningUpdatesStatus(
+          updateId,
+          payload
+        );
+        this.userList[cell].checkedBy = payload.checkBy
+          ? `${this.user.firstname} ${this.user.lastname.substring(0, 1)}.`
+          : '-';
+        this.userList[cell].checkedAt = payload.checkedAt ? new Date() : '';
+        this.$q.notify({
+          color: 'positive',
+          icon: 'thumb up',
+          detail: 'Modification traitée.',
+          position: 'bottom-right',
+          timeout: 2500
+        });
+      } catch (e) {
+        this.$q.notify({
+          color: 'negative',
+          icon: 'warning',
+          detail: 'Erreur lors de la validation de la modification.',
+          position: 'bottom-right',
+          timeout: 2500
+        });
+        this.userList[cell].check.checked = !this.userList[cell].check.checked;
+        console.error(e);
+      }
+    },
+    async remove (id, cell, userId) {
+      try {
+        this.$q
+          .dialog({
+            title: 'Confirmation',
+            message:
+              'Etes-vous sûr de vouloir supprimer cette demande de modification ?',
+            ok: 'OK',
+            cancel: 'Annuler'
+          })
+          .then(async () => {
+            await this.$planningUpdates.removePlanningUpdateById(id, {
+              userId
+            });
+            this.userList.splice(cell, 1);
+            this.$q.notify({
+              color: 'positive',
+              icon: 'thumb up',
+              detail: 'Demande de modification supprimée.',
+              position: 'bottom-right',
+              timeout: 2500
+            });
+          })
+          .catch(() => {
+            this.$q.notify({
+              color: 'info',
+              icon: 'thumb up',
+              detail: 'Suppression annulée',
+              position: 'bottom-right',
+              timeout: 2500
+            });
+          });
+      } catch (e) {
+        this.$q.notify({
+          color: 'negative',
+          icon: 'warning',
+          detail:
+            'Erreur lors de la suppression de la demande de modification.',
+          position: 'bottom-right',
+          timeout: 2500
+        });
+        console.error(e);
+      }
+    },
+    async getUserById (id) {
+      try {
+        const user = await this.$users.getById(id);
+        return `${user.firstname} ${user.lastname.substring(0, 1)}.`;
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    paginationLabel (start, end, total) {
+      return `${start} - ${end} de ${total}`;
+    }
+  }
+};
+</script>
+
+<style lang="stylus" scoped>
+@import '~variables';
+</style>

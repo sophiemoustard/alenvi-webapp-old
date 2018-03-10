@@ -17,15 +17,15 @@
 
 <script>
 import Users from './Users.vue'
-import AddAuxiliary from './AddAuxiliary.vue'
-import AddHelper from './AddHelper.vue'
+import AddAuxiliary from './AddAuxiliary'
+import IntegrationTracking from './IntegrationTracking'
 
 export default {
   // props: ['navTabs'],
   components: {
     Users,
     AddAuxiliary,
-    AddHelper
+    IntegrationTracking
   },
   data () {
     return {
@@ -47,11 +47,11 @@ export default {
           // disable: true
         },
         {
-          label: 'Accueil aidant',
-          name: 'welcome_helper',
-          icon: 'person add',
+          label: 'Suivi intégration',
+          name: 'integration_tracking',
+          icon: 'playlist add check',
           default: false,
-          component: 'AddHelper',
+          component: 'IntegrationTracking',
           // disable: true
         }
       ]

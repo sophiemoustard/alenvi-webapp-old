@@ -20,9 +20,13 @@
         <q-item-side icon="date range" />
         <q-item-main label="Planning" />
       </q-item>
-      <q-item v-can="{ feature: 'Utilisateurs', user }" to="/dashboard/users" exact>
+      <q-item v-can="{ feature: 'Auxiliaires', user }" to="/dashboard/auxiliaries" exact>
+        <q-item-side icon="ion-android-contacts" />
+        <q-item-main label="Auxiliaires d'envie" />
+      </q-item>
+      <q-item v-can="{ feature: 'Aidants', user }" to="/dashboard/caregivers" exact>
         <q-item-side icon="group" />
-        <q-item-main label="Utilisateurs" />
+        <q-item-main label="Aidants familiaux" />
       </q-item>
       <q-item v-can="{ feature: 'Pigi', user }" to="/dashboard/pigi" exact>
         <q-item-side icon="message" />
