@@ -24,7 +24,7 @@
                 <q-select v-model="user.countryOfBirth" :options="countries" float-label="Pays de naissance" @blur="$v.user.countryOfBirth.$touch" filter autofocus-filter/>
               </q-field>
               <q-field icon="ion-earth" :error="$v.user.stateOfBirth.$error" :error-label="stateOfBirthError">
-                <q-input type="number" v-model.trim="user.stateOfBirth" float-label="Département (99 si étranger)" @blur="$v.user.stateOfBirth.$touch" />
+                <q-input type="number" v-model.trim="user.stateOfBirth" float-label="Département de naissance (99 si étranger)" @blur="$v.user.stateOfBirth.$touch" />
               </q-field>
               <q-field icon="location city" :error="$v.user.placeOfBirth.$error" error-label="Champ requis">
                 <q-input type="text" v-model.trim="user.placeOfBirth" float-label="Lieu de naissance" @blur="$v.user.placeOfBirth.$touch" />
@@ -78,6 +78,7 @@
                 <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
               </q-stepper-navigation>
             </q-step>
+            <q-inner-loading :visible="inProgress" />
           </q-stepper>
         </q-card-main>
         <!-- <q-card-actions class="row justify-end">
@@ -104,20 +105,20 @@ export default {
   // name: 'PageName',
   data () {
     return {
+      inProgress: false,
       accessToken: '',
       countries: [],
       user: {
         dateOfBirth: '',
         stateOfBirth: '',
         placeOfBirth: '',
-        countryOfBirth: 'FR',
+        countryOfBirth: '',
         phoneNbr: '',
         managerId: '',
         socialInsuranceNumber: '',
         administrative: {
           payment: {
             rib: {
-              bankName: '',
               iban: '',
               bic: ''
             }
@@ -195,34 +196,38 @@ export default {
   // },
   async mounted () {
     try {
+      if (this.$route.query.step && (this.$route.query.step === 'first' || this.$route.query.step === 'second' || this.$route.query.step === 'third')) {
+        this.$refs.stepper.goToStep(this.$route.query.step);
+      }
       this.accessToken = this.$route.query.token;
+      this.inProgress = true;
       const alenviUser = await this.$users.getById(this.$route.query.id, this.accessToken);
       console.log(alenviUser);
       const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
       const ogustUser = await this.$ogust.getEmployeeById(alenviUser.employee_id, ogustToken);
       console.log(ogustUser);
       this.user = {
+        id_employee: ogustUser.id_employee,
         lastname: ogustUser.last_name,
         firstname: ogustUser.first_name,
         dateOfBirth: ogustUser.date_of_birth,
         stateOfBirth: ogustUser.state_of_birth,
         placeOfBirth: ogustUser.place_of_birth,
-        countryOfBirth: ogustUser.country_of_birth,
+        countryOfBirth: ogustUser.country_of_birth || 'FR',
         socialInsuranceNumber: ogustUser.social_insurance_number,
-        administrative: {
-          payment: {
-            rib: {
-              iban: '',
-              bic: ''
-            }
-          },
-        }
+        // administrative: {
+        //   payment: {
+        //     rib: {
+        //       iban: '',
+        //       bic: ''
+        //     }
+        //   }
+        // }
       }
       this.getCountries();
-      if (this.$route.query.step && (this.$route.query.step === 'first' || this.$route.query.step === 'second' || this.$route.query.step === 'third')) {
-        this.$refs.stepper.goToStep(this.$route.query.step);
-      }
+      this.inProgress = false;
     } catch (e) {
+      this.inProgress = false;
       console.error(e);
     }
   },
@@ -251,7 +256,7 @@ export default {
     bicError () {
       if (!this.$v.user.administrative.payment.rib.bic.required) {
         return 'Champ requis'
-      } else if (!this.$v.user.administrative.payment.rib.iban.minLength) {
+      } else if (!this.$v.user.administrative.payment.rib.bic.minLength) {
         return 'Le BIC doit contenir au moins 8 caractères.'
       }
     },
@@ -264,11 +269,6 @@ export default {
     },
     hasStep2Errors () {
       return this.$v.user.administrative.payment.rib.iban.$invalid ? true : !!this.$v.user.administrative.payment.rib.bic.$invalid
-    },
-    hasStep3Errors () {
-      return this.$v.user.picture.$invalid ? true : this.$v.user.administrative.idCard.$invalid ? true : this.$v.user.administrative.vitalCard.$invalid ? true
-        : this.$v.user.administrative.navigoInvoice.$invalid ? true : this.$v.user.administrative.phoneInvoice.$invalid ? true
-          : this.$v.user.administrative.mutualFund.$invalid ? true : !!this.$v.user.administrative.certificates.$invalid
     },
     docsUploadUrl () {
       return `${process.env.API_HOSTNAME}/uploader/${this.$route.query.id}/drive/uploadFile`;
@@ -289,51 +289,71 @@ export default {
     async firstStep () {
       try {
         const ogustData = {
+          id_employee: this.user.id_employee,
           date_of_birth: this.user.dateOfBirth,
           country_of_birth: this.user.countryOfBirth,
           state_of_birth: this.user.stateOfBirth,
           place_of_birth: this.user.placeOfBirth,
           social_insurance_number: this.user.socialInsuranceNumber
         };
+        this.inProgress = true;
         const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
         const ogustUserUpdated = await this.$ogust.setEmployee(ogustData, ogustToken);
+        this.inProgress = false;
         this.$refs.stepper.next();
         console.log(ogustUserUpdated);
       } catch (e) {
+        this.inProgress = false;
         console.error(e.response);
       }
     },
     async secondStep () {
       try {
+        console.log('QWD');
+        console.log(this.user);
+        console.log('DWQ');
+        const bic = this.user.administrative.payment.rib.bic;
+        const iban = this.user.administrative.payment.rib.iban;
+        console.log(this.user.administrative.payment.rib.iban);
+        console.log(this.user.administrative.payment.rib.bic);
+        // WTF bug
         const alenviData = {
           administrative: {
             payment: {
               rib: {
-                iban: this.user.administrative.payment.rib.iban,
-                bic: this.user.admninistrative.payment.rib.bic
+                iban,
+                bic
               }
             }
           }
         };
+        console.log('qwdqwd');
+        this.inProgress = true;
         const userAlenviUpdated = await this.$users.updateById(alenviData, this.accessToken);
+        console.log('test');
         const ogustData = {
+          id_tiers: this.user.id_employee,
           iban_number: this.user.administrative.payment.rib.iban,
           bic_number: this.user.admninistrative.payment.rib.bic
         };
+        console.log('test2');
         const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
-        const userOgustUpdated = await this.$ogust.setEmployee(ogustData, ogustToken);
+        const updatedBankInfo = await this.$ogust.setEmployeeBankInfo(ogustData, ogustToken);
+        // const userOgustUpdated = await this.$ogust.setEmployee(ogustData, ogustToken);
+        this.inProgress = false;
         this.$refs.stepper.next();
-        console.log(userAlenviUpdated);
-        console.log(userOgustUpdated);
+        console.log('userAlenviUpdated', userAlenviUpdated);
+        console.log('updatedBankInfo', updatedBankInfo);
       } catch (e) {
-        console.error(e.response);
+        this.inProgress = false;
+        console.error(e);
       }
     },
     async lastStep () {
     },
     async getCountries () {
       try {
-        const ogustToken = await this.$ogust.getOgustToken(this.$q.cookies.get('signup_is_activated'));
+        const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
         const countriesRaw = await this.$ogust.getList('employee.country_of_birth', ogustToken);
         delete countriesRaw['0'];
         for (const k in countriesRaw) {
@@ -343,7 +363,15 @@ export default {
       } catch (e) {
         console.error(e.response);
       }
-    }
+    },
+    async hasStep3Errors () {
+      const user = await this.$users.getById(this.$route.query.id, this.accessToken);
+      // publicId
+      // driveId
+      return user.picture ? true : user.administrative ? true : user.administrative.idCard ? true : user.administrative.vitalCard ? true
+        : user.administrative.navigoInvoice ? true : user.administrative.phoneInvoice ? true
+          : user.administrative.mutualFund ? true : !!user.administrative.certificates
+    },
   }
 }
 </script>

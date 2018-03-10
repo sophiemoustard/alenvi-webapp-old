@@ -190,5 +190,9 @@ export default {
   async getCustomerContacts (id, params) {
     const customerContactsRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/customers/${id}/contacts`, { params });
     return customerContactsRaw.data.data.contacts.array_contact.result;
+  },
+  async setEmployeeBankInfo (data, ogustToken = null) {
+    const employeeBankInfoRaw = await axios.put(`${process.env.API_HOSTNAME}/ogust/bankInfo`, data, { headers: { 'x-ogust-token': ogustToken } });
+    return employeeBankInfoRaw.data.data.updatedBankInfo.result;
   }
 }
