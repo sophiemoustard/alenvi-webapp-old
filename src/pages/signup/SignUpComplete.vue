@@ -116,6 +116,9 @@ export default {
         phoneNbr: '',
         managerId: '',
         socialInsuranceNumber: '',
+        picture: {
+          link: ''
+        },
         administrative: {
           payment: {
             rib: {
@@ -204,16 +207,17 @@ export default {
       const alenviUser = await this.$users.getById(this.$route.query.id, this.accessToken);
       const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
       const ogustUser = await this.$ogust.getEmployeeById(alenviUser.employee_id, ogustToken);
-      this.user.id_employee = ogustUser.id_employee;
-      this.user.lastname = ogustUser.last_name;
-      this.user.firstname = ogustUser.first_name;
-      this.user.dateOfBirth = this.$moment(ogustUser.date_of_birth).toDate();
-      this.user.stateOfBirth = ogustUser.state_of_birth;
-      this.user.placeOfBirth = ogustUser.place_of_birth;
+      this.user.id_employee = ogustUser.id_employee || '';
+      this.user.lastname = ogustUser.last_name || '';
+      this.user.firstname = ogustUser.first_name || '';
+      this.user.dateOfBirth = this.$moment(ogustUser.date_of_birth).toDate() || '';
+      this.user.stateOfBirth = ogustUser.state_of_birth || '';
+      this.user.placeOfBirth = ogustUser.place_of_birth || '';
       this.user.countryOfBirth = ogustUser.country_of_birth || 'FR';
-      this.user.socialInsuranceNumber = ogustUser.social_insurance_number;
-      this.user.administrative.payment.rib.iban = ogustUser.bank_information.iban_number;
-      this.user.administrative.payment.rib.bic = ogustUser.bank_information.rib_number;
+      this.user.socialInsuranceNumber = ogustUser.social_insurance_number || '';
+      this.user.administrative.payment.rib.iban = ogustUser.bank_information[0].iban_number || '';
+      this.user.administrative.payment.rib.bic = ogustUser.bank_information[0].bic_number || '';
+      this.user.picture.link = alenviUser.picture ? alenviUser.picture.link : '';
       this.getCountries();
       this.inProgress = false;
     } catch (e) {
@@ -312,22 +316,17 @@ export default {
           }
         };
         this.inProgress = true;
-        console.log('user=', this.user);
-        console.log('alenviData=', alenviData);
-        const userAlenviUpdated = await this.$users.updateById(alenviData, this.accessToken);
+        await this.$users.updateById(alenviData, this.accessToken);
         const ogustData = {
           id_tiers: this.user.id_employee,
           iban_number: iban,
           bic_number: bic
         };
-        console.log('test2');
         const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
-        const updatedBankInfo = await this.$ogust.setEmployeeBankInfo(ogustData, ogustToken);
+        await this.$ogust.setEmployeeBankInfo(ogustData, ogustToken);
         // const userOgustUpdated = await this.$ogust.setEmployee(ogustData, ogustToken);
         this.inProgress = false;
         this.$refs.stepper.next();
-        console.log('userAlenviUpdated', userAlenviUpdated);
-        console.log('updatedBankInfo', updatedBankInfo);
       } catch (e) {
         this.inProgress = false;
         console.error(e);
