@@ -20,26 +20,26 @@
           placeholder="Recherche"
           class="col-6" />
       </template>
-      <q-td slot="body-cell-secondSmsDate" slot-scope="props" :props="props">
+       <q-td slot="body-cell-secondSmsDate" slot-scope="props" :props="props">
         <q-icon name="done" color="positive" v-if="props.value === true" />
         <q-icon name="clear" color="negative" v-if="props.value === false || props.value === '-'" />
-      </q-td>
+       </q-td>
       <q-td slot="body-cell-pigiConnection" slot-scope="props" :props="props">
         <q-icon name="done" color="positive" v-if="props.value === true" />
         <q-icon name="clear" color="negative" v-if="props.value === false || props.value === '-'" />
-      </q-td>
+       </q-td>
       <q-td slot="body-cell-personalInfo" slot-scope="props" :props="props">
         <q-icon name="done" color="positive" v-if="props.value === true" />
         <q-icon name="clear" color="negative" v-if="props.value === false || props.value === '-'" />
-      </q-td>
+       </q-td>
       <q-td slot="body-cell-paymentInfo" slot-scope="props" :props="props">
         <q-icon name="done" color="positive" v-if="props.value === true" />
         <q-icon name="clear" color="negative" v-if="props.value === false || props.value === '-'" />
-      </q-td>
+       </q-td>
       <q-td slot="body-cell-miscDocuments" slot-scope="props" :props="props">
         <q-icon name="done" color="positive" v-if="props.value === true" />
         <q-icon name="clear" color="negative" v-if="props.value === false || props.value === '-'" />
-      </q-td>
+       </q-td>
     </q-table>
 </template>
 
@@ -180,92 +180,6 @@ export default {
             }
           }
         }
-      } catch (e) {
-        console.error(e);
-      }
-    },
-    async process (updateId, isChecked, cell) {
-      try {
-        const payload = {
-          isChecked,
-          checkBy: isChecked ? this.user._id : null,
-          checkedAt: isChecked ? new Date() : null
-        };
-        await this.$planningUpdates.updatePlanningUpdatesStatus(
-          updateId,
-          payload
-        );
-        this.userList[cell].checkedBy = payload.checkBy
-          ? `${this.user.firstname} ${this.user.lastname.substring(0, 1)}.`
-          : '-';
-        this.userList[cell].checkedAt = payload.checkedAt ? new Date() : '';
-        this.$q.notify({
-          color: 'positive',
-          icon: 'thumb up',
-          detail: 'Modification traitée.',
-          position: 'bottom-right',
-          timeout: 2500
-        });
-      } catch (e) {
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de la validation de la modification.',
-          position: 'bottom-right',
-          timeout: 2500
-        });
-        this.userList[cell].check.checked = !this.userList[cell].check.checked;
-        console.error(e);
-      }
-    },
-    async remove (id, cell, userId) {
-      try {
-        this.$q
-          .dialog({
-            title: 'Confirmation',
-            message:
-              'Etes-vous sûr de vouloir supprimer cette demande de modification ?',
-            ok: 'OK',
-            cancel: 'Annuler'
-          })
-          .then(async () => {
-            await this.$planningUpdates.removePlanningUpdateById(id, {
-              userId
-            });
-            this.userList.splice(cell, 1);
-            this.$q.notify({
-              color: 'positive',
-              icon: 'thumb up',
-              detail: 'Demande de modification supprimée.',
-              position: 'bottom-right',
-              timeout: 2500
-            });
-          })
-          .catch(() => {
-            this.$q.notify({
-              color: 'info',
-              icon: 'thumb up',
-              detail: 'Suppression annulée',
-              position: 'bottom-right',
-              timeout: 2500
-            });
-          });
-      } catch (e) {
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail:
-            'Erreur lors de la suppression de la demande de modification.',
-          position: 'bottom-right',
-          timeout: 2500
-        });
-        console.error(e);
-      }
-    },
-    async getUserById (id) {
-      try {
-        const user = await this.$users.getById(id);
-        return `${user.firstname} ${user.lastname.substring(0, 1)}.`;
       } catch (e) {
         console.error(e);
       }
