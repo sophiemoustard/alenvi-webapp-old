@@ -53,28 +53,28 @@
             <!-- Last step -->
             <q-step name="third" title="Documents annexes">
               <q-field icon="mdi-account-card-details" :error="$v.user.picture.$error" error-label="Champ requis">
-                <q-uploader name="picture" :url="pictureUploadUrl" :headers="headers" :addtional-fields="[{ name: 'fileName', value: `${user.firstname}_${user.lastname}` }]" float-label="Photo"/>
+                <q-uploader name="picture" :url="pictureUploadUrl" :headers="headers" :addtional-fields="[{ name: 'fileName', value: `${user.firstname}_${user.lastname}` }]" float-label="Photo" auto-expand/>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.idCard.$error" error-label="Champ requis">
-                <q-uploader name="idCard" :url="docsUploadUrl" :headers="headers" float-label="Carte d'identité"/>
+                <q-uploader name="idCard" :url="docsUploadUrl" :headers="headers" float-label="Carte d'identité" auto-expand/>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.vitalCard.$error" error-label="Champ requis">
-                <q-uploader name="vitalCard" :url="docsUploadUrl" :headers="headers" float-label="Carte vitale"/>
+                <q-uploader name="vitalCard" :url="docsUploadUrl" :headers="headers" float-label="Carte vitale" auto-expand/>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.navigoInvoice.$error" error-label="Champ requis">
-                <q-uploader name="navigoInvoice" :url="docsUploadUrl" :headers="headers" float-label="Facture Navigo"/>
+                <q-uploader name="navigoInvoice" :url="docsUploadUrl" :headers="headers" float-label="Facture Navigo" auto-expand/>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.phoneInvoice.$error" error-label="Champ requis">
-                <q-uploader name="phoneInvoice" :url="docsUploadUrl" :headers="headers" float-label="Facture de téléphone"/>
+                <q-uploader name="phoneInvoice" :url="docsUploadUrl" :headers="headers" float-label="Facture de téléphone" auto-expand/>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.mutualFund.$error" error-label="Champ requis">
-                <q-uploader name="mutualFund" :url="docsUploadUrl" :headers="headers" float-label="Mutuelle"/>
+                <q-uploader name="mutualFund" :url="docsUploadUrl" :headers="headers" float-label="Mutuelle" auto-expand/>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.certificates.$error" error-label="Champ requis">
-                <q-uploader name="certificates" :url="docsUploadUrl" :headers="headers" float-label="Diplômes et / ou certicats" multiple/>
+                <q-uploader name="certificates" :url="docsUploadUrl" :headers="headers" float-label="Diplômes et / ou certicats" multiple auto-expand/>
               </q-field>
               <q-stepper-navigation>
-                <q-btn color="primary" :disable="hasStep3Errors" @click="lastStep()" label="Terminer mon inscription" />
+                <q-btn color="primary" :disable="!hasStep3Errors" @click="lastStep()" label="Terminer mon inscription" />
                 <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
               </q-stepper-navigation>
             </q-step>
@@ -106,6 +106,7 @@ export default {
   data () {
     return {
       inProgress: false,
+      isSignupComplete: false,
       accessToken: '',
       countries: [],
       user: {
@@ -127,19 +128,24 @@ export default {
             }
           },
           idCard: {
-            parent: process.env.PARENT_GOOGLE_FOLDER_ID
+            driveId: '',
+            link: ''
           },
           vitalCard: {
-            parent: process.env.PARENT_GOOGLE_FOLDER_ID
+            driveId: '',
+            link: ''
           },
           navigoInvoice: {
-            parent: process.env.PARENT_GOOGLE_FOLDER_ID
+            driveId: '',
+            link: ''
           },
           mutualFund: {
-            parent: process.env.PARENT_GOOGLE_FOLDER_ID
+            driveId: '',
+            link: ''
           },
           phoneInvoice: {
-            parent: process.env.PARENT_GOOGLE_FOLDER_ID
+            driveId: '',
+            link: ''
           },
           certificates: []
         }
@@ -205,6 +211,9 @@ export default {
       this.accessToken = this.$route.query.token;
       this.inProgress = true;
       const alenviUser = await this.$users.getById(this.$route.query.id, this.accessToken);
+      if (alenviUser.administrative.signup.complete) {
+        this.isSignupComplete = true;
+      }
       const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
       const ogustUser = await this.$ogust.getEmployeeById(alenviUser.employee_id, ogustToken);
       this.user.id_employee = ogustUser.id_employee || '';
@@ -264,6 +273,16 @@ export default {
     hasStep2Errors () {
       return this.$v.user.administrative.payment.rib.iban.$invalid ? true : !!this.$v.user.administrative.payment.rib.bic.$invalid
     },
+    hasStep3Errors () {
+      return !!this.user.picture.link &&
+        !!this.user.administrative.vitalCard.link &&
+        !!this.user.administrative.idCard.link &&
+        !!this.user.administrative.healthAttest.link &&
+        !!this.user.administrative.certificates &&
+        !!this.user.administrative.phoneInvoice.link &&
+        !!this.user.administrative.mutualFund.link &&
+        !!this.user.administrative.navigoInvoice.link
+    },
     docsUploadUrl () {
       return `${process.env.API_HOSTNAME}/uploader/${this.$route.query.id}/drive/uploadFile`;
     },
@@ -277,9 +296,6 @@ export default {
     }
   },
   methods: {
-    setData (user) {
-      this.user = user;
-    },
     async firstStep () {
       try {
         const ogustData = {
@@ -324,7 +340,6 @@ export default {
         };
         const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
         await this.$ogust.setEmployeeBankInfo(ogustData, ogustToken);
-        // const userOgustUpdated = await this.$ogust.setEmployee(ogustData, ogustToken);
         this.inProgress = false;
         this.$refs.stepper.next();
       } catch (e) {
@@ -333,6 +348,7 @@ export default {
       }
     },
     async lastStep () {
+
     },
     async getCountries () {
       try {
@@ -346,15 +362,7 @@ export default {
       } catch (e) {
         console.error(e.response);
       }
-    },
-    async hasStep3Errors () {
-      const user = await this.$users.getById(this.$route.query.id, this.accessToken);
-      // publicId
-      // driveId
-      return user.picture ? true : user.administrative ? true : user.administrative.idCard ? true : user.administrative.vitalCard ? true
-        : user.administrative.navigoInvoice ? true : user.administrative.phoneInvoice ? true
-          : user.administrative.mutualFund ? true : !!user.administrative.certificates
-    },
+    }
   }
 }
 </script>
