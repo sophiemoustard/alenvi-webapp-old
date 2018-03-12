@@ -202,28 +202,16 @@ export default {
       this.accessToken = this.$route.query.token;
       this.inProgress = true;
       const alenviUser = await this.$users.getById(this.$route.query.id, this.accessToken);
-      console.log(alenviUser);
       const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
       const ogustUser = await this.$ogust.getEmployeeById(alenviUser.employee_id, ogustToken);
-      console.log(ogustUser);
-      this.user = {
-        id_employee: ogustUser.id_employee,
-        lastname: ogustUser.last_name,
-        firstname: ogustUser.first_name,
-        dateOfBirth: ogustUser.date_of_birth,
-        stateOfBirth: ogustUser.state_of_birth,
-        placeOfBirth: ogustUser.place_of_birth,
-        countryOfBirth: ogustUser.country_of_birth || 'FR',
-        socialInsuranceNumber: ogustUser.social_insurance_number,
-        // administrative: {
-        //   payment: {
-        //     rib: {
-        //       iban: '',
-        //       bic: ''
-        //     }
-        //   }
-        // }
-      }
+      this.user.id_employee = ogustUser.id_employee;
+      this.user.lastname = ogustUser.last_name;
+      this.user.firstname = ogustUser.first_name;
+      this.user.dateOfBirth = this.$moment(ogustUser.date_of_birth).toDate();
+      this.user.stateOfBirth = ogustUser.state_of_birth;
+      this.user.placeOfBirth = ogustUser.place_of_birth;
+      this.user.countryOfBirth = ogustUser.country_of_birth || 'FR';
+      this.user.socialInsuranceNumber = ogustUser.social_insurance_number;
       this.getCountries();
       this.inProgress = false;
     } catch (e) {
@@ -290,7 +278,7 @@ export default {
       try {
         const ogustData = {
           id_employee: this.user.id_employee,
-          date_of_birth: this.user.dateOfBirth,
+          date_of_birth: this.$moment(this.user.dateOfBirth).format('YYYYMMDD'),
           country_of_birth: this.user.countryOfBirth,
           state_of_birth: this.user.stateOfBirth,
           place_of_birth: this.user.placeOfBirth,
@@ -298,10 +286,9 @@ export default {
         };
         this.inProgress = true;
         const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
-        const ogustUserUpdated = await this.$ogust.setEmployee(ogustData, ogustToken);
+        await this.$ogust.setEmployee(ogustData, ogustToken);
         this.inProgress = false;
         this.$refs.stepper.next();
-        console.log(ogustUserUpdated);
       } catch (e) {
         this.inProgress = false;
         console.error(e.response);
@@ -309,15 +296,10 @@ export default {
     },
     async secondStep () {
       try {
-        console.log('QWD');
-        console.log(this.user);
-        console.log('DWQ');
-        const bic = this.user.administrative.payment.rib.bic;
         const iban = this.user.administrative.payment.rib.iban;
-        console.log(this.user.administrative.payment.rib.iban);
-        console.log(this.user.administrative.payment.rib.bic);
-        // WTF bug
+        const bic = this.user.administrative.payment.rib.bic;
         const alenviData = {
+          _id: this.$route.query.id,
           administrative: {
             payment: {
               rib: {
@@ -327,10 +309,10 @@ export default {
             }
           }
         };
-        console.log('qwdqwd');
         this.inProgress = true;
+        console.log('user=', this.user);
+        console.log('alenviData=', alenviData);
         const userAlenviUpdated = await this.$users.updateById(alenviData, this.accessToken);
-        console.log('test');
         const ogustData = {
           id_tiers: this.user.id_employee,
           iban_number: this.user.administrative.payment.rib.iban,
