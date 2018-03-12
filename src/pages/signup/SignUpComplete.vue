@@ -212,6 +212,8 @@ export default {
       this.user.placeOfBirth = ogustUser.place_of_birth;
       this.user.countryOfBirth = ogustUser.country_of_birth || 'FR';
       this.user.socialInsuranceNumber = ogustUser.social_insurance_number;
+      this.user.administrative.payment.rib.iban = ogustUser.bank_information.iban_number;
+      this.user.administrative.payment.rib.bic = ogustUser.bank_information.rib_number;
       this.getCountries();
       this.inProgress = false;
     } catch (e) {
@@ -315,8 +317,8 @@ export default {
         const userAlenviUpdated = await this.$users.updateById(alenviData, this.accessToken);
         const ogustData = {
           id_tiers: this.user.id_employee,
-          iban_number: this.user.administrative.payment.rib.iban,
-          bic_number: this.user.admninistrative.payment.rib.bic
+          iban_number: iban,
+          bic_number: bic
         };
         console.log('test2');
         const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
