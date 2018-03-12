@@ -26,16 +26,16 @@
   },
   "devDependencies": {
     "babel-eslint": "8.2.1",
-    "eslint": "^4.15.0",
+    "eslint": "^4.18.2",
     "eslint-config-airbnb-base": "11.3.0",
     "eslint-config-standard": "^11.0.0",
     "eslint-friendly-formatter": "3.0.0",
     "eslint-loader": "1.7.1",
-    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-import": "^2.9.0",
     "eslint-plugin-node": "^6.0.0",
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-standard": "^3.0.1",
-    "eslint-plugin-vue": "4.0.0"
+    "eslint-plugin-vue": "^4.3.0"
   },
   "engines": {
     "node": ">= 8.9.0",

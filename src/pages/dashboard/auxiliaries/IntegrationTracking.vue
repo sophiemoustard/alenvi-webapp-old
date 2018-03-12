@@ -180,28 +180,6 @@ export default {
             }
           }
         }
-        console.log(this.userList);
-        // let ogustUserList = [];
-        // userList = userList.filter(user => {
-        //   ogustUserList = this.$_.filter(ogustUserListRaw, (ogustUser) => user.employee_id === ogustUser.id_employee)
-        //   console.log('ogustUserList', ogustUserList);
-        //   return !user.administrative.signup.complete;
-        // });
-        // for (let i = 0, l = userList.length; i < l; i++) {
-        //   this.userList.push({
-        //     date: userList[i].planningModification[j].createdAt,
-        //     author: `${userList[i].firstname} ${userList[i].lastname}`,
-        //     content: userList[i].planningModification[j].content || '-',
-        //     involved: userList[i].planningModification[j].involved,
-        //     sector: sectors[userList[i].sector],
-        //     type: userList[i].planningModification[j].modificationType,
-        //     check: { id: userList[i].planningModification[j]._id, checked: userList[i].planningModification[j].check.isChecked },
-        //     checkedBy: userList[i].planningModification[j].check.checkBy ? `${userList[i].planningModification[j].check.checkBy.firstname} ${userList[i].planningModification[j].check.checkBy.lastname.substring(0, 1)}.` : '-',
-        //     checkedAt: userList[i].planningModification[j].check.checkedAt || '',
-        //     remove: { id: userList[i].planningModification[j]._id, userId: userList[i]._id }
-        //   });
-        // }
-        // this.userList = _.sortBy(orderedPlanningUpdatesList, ['date']).reverse();
       } catch (e) {
         console.error(e);
       }
