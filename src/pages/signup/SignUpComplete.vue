@@ -214,12 +214,9 @@ export default {
   // },
   async mounted () {
     try {
-      // OMFG dat trick
-      setTimeout(() => {
-        if (this.$route.query.step && (this.$route.query.step === 'first' || this.$route.query.step === 'second' || this.$route.query.step === 'third')) {
-          this.$refs.stepper.goToStep(this.$route.query.step);
-        }
-      }, 0)
+      if (this.$route.query.step && (this.$route.query.step === 'first' || this.$route.query.step === 'second' || this.$route.query.step === 'third')) {
+        this.$refs.stepper.goToStep(this.$route.query.step);
+      }
       this.accessToken = this.$route.query.token;
       this.inProgress = true;
       this.alenviUser = await this.$users.getById(this.$route.query.id, this.accessToken);
