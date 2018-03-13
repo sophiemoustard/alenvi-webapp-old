@@ -53,25 +53,32 @@
             <!-- Last step -->
             <q-step name="third" title="Documents annexes">
               <q-field icon="mdi-account-card-details" :error="$v.user.picture.$error" error-label="Champ requis">
-                <q-uploader name="picture" :url="pictureUploadUrl" :headers="headers" :addtional-fields="[{ name: 'fileName', value: `${user.firstname}_${user.lastname}` }]" float-label="Photo" auto-expand/>
+                <q-uploader name="picture" :url="pictureUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `picture_${user.firstname}_${user.lastname}` }]" float-label="Photo" @finish="afterUpload()" auto-expand/>
+                <p class="upload-done" v-if="alenviUser.picture">Fichier mis en ligne <q-icon name="check" /></p>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.idCard.$error" error-label="Champ requis">
-                <q-uploader name="idCard" :url="docsUploadUrl" :headers="headers" float-label="Carte d'identité" auto-expand/>
+                <q-uploader name="idCard" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `id_${user.firstname}_${user.lastname}` }]" float-label="Carte d'identité" @finish="afterUpload()" auto-expand/>
+                <p class="upload-done" v-if="alenviUser.administrative.idCard">Fichier mis en ligne <q-icon name="check" /></p>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.vitalCard.$error" error-label="Champ requis">
-                <q-uploader name="vitalCard" :url="docsUploadUrl" :headers="headers" float-label="Carte vitale" auto-expand/>
+                <q-uploader name="vitalCard" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `vital_${user.firstname}_${user.lastname}` }]" float-label="Carte vitale" @finish="afterUpload()" auto-expand/>
+                <p class="upload-done" v-if="alenviUser.administrative.vitalCard">Fichier mis en ligne <q-icon name="check" /></p>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.navigoInvoice.$error" error-label="Champ requis">
-                <q-uploader name="navigoInvoice" :url="docsUploadUrl" :headers="headers" float-label="Facture Navigo" auto-expand/>
+                <q-uploader name="navigoInvoice" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `navigo_${user.firstname}_${user.lastname}` }]" float-label="Facture Navigo" @finish="afterUpload()" auto-expand/>
+                <p class="upload-done" v-if="alenviUser.administrative.navigoInvoice">Fichier mis en ligne <q-icon name="check" /></p>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.phoneInvoice.$error" error-label="Champ requis">
-                <q-uploader name="phoneInvoice" :url="docsUploadUrl" :headers="headers" float-label="Facture de téléphone" auto-expand/>
-              </q-field>
-              <q-field icon="mdi-account-card-details" :error="$v.user.administrative.mutualFund.$error" error-label="Champ requis">
-                <q-uploader name="mutualFund" :url="docsUploadUrl" :headers="headers" float-label="Mutuelle" auto-expand/>
+                <q-uploader name="phoneInvoice" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `phone_${user.firstname}_${user.lastname}` }]" float-label="Facture de téléphone" @finish="afterUpload()" auto-expand/>
+                <p class="upload-done" v-if="alenviUser.administrative.phoneInvoice">Fichier mis en ligne <q-icon name="check" /></p>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.certificates.$error" error-label="Champ requis">
-                <q-uploader name="certificates" :url="docsUploadUrl" :headers="headers" float-label="Diplômes et / ou certicats" multiple auto-expand/>
+                <q-uploader name="certificates" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `certificate_${user.firstname}_${user.lastname}` }]" float-label="Diplômes et / ou certicats" @finish="afterUpload()" multiple auto-expand/>
+                <p class="upload-done" v-if="alenviUser.administrative.certificates">Fichier mis en ligne <q-icon name="check" /></p>
+              </q-field>
+              <q-field icon="mdi-account-card-details" :error="$v.user.administrative.mutualFund.$error" error-label="Champ requis">
+                <q-uploader name="mutualFund" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `mutual_${user.firstname}_${user.lastname}` }]" float-label="Mutuelle (falcultatif)" @finish="afterUpload()" auto-expand/>
+                <p class="upload-done" v-if="alenviUser.administrative.mutualFund">Fichier mis en ligne <q-icon name="check" /></p>
               </q-field>
               <q-stepper-navigation>
                 <q-btn color="primary" :disable="!hasStep3Errors" @click="lastStep()" label="Terminer mon inscription" />
@@ -105,6 +112,8 @@ export default {
   // name: 'PageName',
   data () {
     return {
+      alenviUser: {},
+      ogustUser: {},
       inProgress: false,
       isSignupComplete: false,
       accessToken: '',
@@ -210,23 +219,26 @@ export default {
       }
       this.accessToken = this.$route.query.token;
       this.inProgress = true;
-      const alenviUser = await this.$users.getById(this.$route.query.id, this.accessToken);
-      if (alenviUser.administrative.signup.complete) {
+      this.alenviUser = await this.$users.getById(this.$route.query.id, this.accessToken);
+      if (this.alenviUser.administrative.signup.complete) {
         this.isSignupComplete = true;
+        // TO DO MESSAGE
       }
       const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
-      const ogustUser = await this.$ogust.getEmployeeById(alenviUser.employee_id, ogustToken);
-      this.user.id_employee = ogustUser.id_employee || '';
-      this.user.lastname = ogustUser.last_name || '';
-      this.user.firstname = ogustUser.first_name || '';
-      this.user.dateOfBirth = this.$moment(ogustUser.date_of_birth).toDate() || '';
-      this.user.stateOfBirth = ogustUser.state_of_birth || '';
-      this.user.placeOfBirth = ogustUser.place_of_birth || '';
-      this.user.countryOfBirth = ogustUser.country_of_birth || 'FR';
-      this.user.socialInsuranceNumber = ogustUser.social_insurance_number || '';
-      this.user.administrative.payment.rib.iban = ogustUser.bank_information[0].iban_number || '';
-      this.user.administrative.payment.rib.bic = ogustUser.bank_information[0].bic_number || '';
-      this.user.picture.link = alenviUser.picture ? alenviUser.picture.link : '';
+      this.ogustUser = await this.$ogust.getEmployeeById(this.alenviUser.employee_id, ogustToken);
+      this.user.id_employee = this.ogustUser.id_employee || '';
+      this.user.lastname = this.ogustUser.last_name || '';
+      this.user.firstname = this.ogustUser.first_name || '';
+      this.user.dateOfBirth = this.$moment(this.ogustUser.date_of_birth).toDate() || '';
+      this.user.stateOfBirth = this.ogustUser.state_of_birth || '';
+      this.user.placeOfBirth = this.ogustUser.place_of_birth || '';
+      this.user.countryOfBirth = this.ogustUser.country_of_birth || 'FR';
+      this.user.socialInsuranceNumber = this.ogustUser.social_insurance_number || '';
+      if (this.ogustUser.bank_information[0]) {
+        this.user.administrative.payment.rib.iban = this.ogustUser.bank_information[0].iban_number || '';
+        this.user.administrative.payment.rib.bic = this.ogustUser.bank_information[0].bic_number || '';
+      }
+      this.user.picture.link = this.alenviUser.picture ? this.alenviUser.picture.link : '';
       this.getCountries();
       this.inProgress = false;
     } catch (e) {
@@ -274,14 +286,20 @@ export default {
       return this.$v.user.administrative.payment.rib.iban.$invalid ? true : !!this.$v.user.administrative.payment.rib.bic.$invalid
     },
     hasStep3Errors () {
-      return !!this.user.picture.link &&
-        !!this.user.administrative.vitalCard.link &&
-        !!this.user.administrative.idCard.link &&
-        !!this.user.administrative.healthAttest.link &&
-        !!this.user.administrative.certificates &&
-        !!this.user.administrative.phoneInvoice.link &&
-        !!this.user.administrative.mutualFund.link &&
-        !!this.user.administrative.navigoInvoice.link
+      console.log('alenviUser=', this.alenviUser);
+      if (this.alenviUser.picture && this.alenviUser.administrative && this.alenviUser.administrative.idCard &&
+        this.alenviUser.administrative.healthAttest && this.alenviUser.administrative.vitalCard && this.alenviUser.administrative.certificates &&
+        this.alenviUser.administrative.phoneInvoice && this.alenviUser.administrative.navigoInvoice) {
+        return true;
+      }
+      return false;
+      // return this.alenviUser.picture ? true : this.alenviUser.administrative ? true
+      //   : this.alenviUser.administrative.idCard ? true
+      //     : this.alenviUser.administrative.healthAttest ? true
+      //       : this.alenviUser.administrative.vitalCard ? true
+      //         : this.alenviUser.administrative.certificates ? true
+      //           : this.alenviUser.administrative.phoneInvoice ? true
+      //             : !!this.alenviUser.administrative.navigoInvoice
     },
     docsUploadUrl () {
       return `${process.env.API_HOSTNAME}/uploader/${this.$route.query.id}/drive/uploadFile`;
@@ -309,6 +327,15 @@ export default {
         this.inProgress = true;
         const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
         await this.$ogust.setEmployee(ogustData, ogustToken);
+        const alenviData = {
+          _id: this.$route.query.id,
+          administrative: {
+            signup: {
+              step: 'second'
+            }
+          }
+        };
+        await this.$users.updateById(alenviData, this.accessToken);
         this.inProgress = false;
         this.$refs.stepper.next();
       } catch (e) {
@@ -323,6 +350,9 @@ export default {
         const alenviData = {
           _id: this.$route.query.id,
           administrative: {
+            signup: {
+              step: 'third'
+            },
             payment: {
               rib: {
                 iban,
@@ -348,7 +378,11 @@ export default {
       }
     },
     async lastStep () {
-
+      this.$q.loading.show({ message: 'Redirection vers Pigi...' });
+      setTimeout(async () => {
+        this.$q.loading.hide();
+        window.location.href = `${process.env.MESSENGER_LINK}?ref=${this.accessToken}`
+      }, 2000);
     },
     async getCountries () {
       try {
@@ -362,6 +396,13 @@ export default {
       } catch (e) {
         console.error(e.response);
       }
+    },
+    async afterUpload () {
+      try {
+        this.alenviUser = await this.$users.getById(this.$route.query.id, this.accessToken);
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 }
@@ -371,4 +412,9 @@ export default {
 @import '~variables'
 .q-field
   margin: 16px 0
+
+.upload-done
+  margin-top: 10px
+  margin-bottom: 5px
+  color: $positive
 </style>
