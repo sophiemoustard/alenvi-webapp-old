@@ -85,7 +85,7 @@
                 <q-uploader name="certificates" :url="docsUploadUrl" :headers="headers"
                 :additional-fields="[{ name: 'fileName', value: `certificate_${user.firstname}_${user.lastname}` }]"
                 float-label="Diplômes et / ou certicats" @finish="afterUpload()" multiple auto-expand extensions=".jpg, .jpeg, .png, .pdf"/>
-                <p class="upload-done" v-if="alenviUser && alenviUser.administrative.certificates">Fichiers mis en ligne <q-icon name="check" /></p>
+                <p class="upload-done" v-if="alenviUser && alenviUser.administrative.certificates">Fichier(s) mis en ligne <q-icon name="check" /></p>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.mutualFund.$error" error-label="Champ requis">
                 <q-uploader name="mutualFund" :url="docsUploadUrl" :headers="headers"
