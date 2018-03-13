@@ -31,7 +31,7 @@
             <q-input type="text" v-model.trim="user.address.city" @blur="$v.user.address.city.$touch" />
           </q-field>
           <q-field :label-width="3" label="Date de naissance" :error="$v.user.dateOfBirth.$error" error-label="Champ requis">
-            <q-datetime v-model="user.dateOfBirth" @blur="$v.user.dateOfBirth.$touch" first-day-of-week="1"
+            <q-datetime v-model="user.dateOfBirth" @blur="$v.user.dateOfBirth.$touch" :first-day-of-week="Number(1)"
             ok-label="APPLIQUER" no-clear cancel-label="ANNULER"
             min="1920-01-01" :max="getMaxDate"
           format="DD/MM/YYYY"/>
