@@ -56,9 +56,6 @@ export default [
         console.error(e.response);
         next({ path: '/401' });
       }
-    },
-    meta: {
-      cookies: ['alenvi_token', 'refresh_token']
     }
   },
   { path: '/forgotPassword', component: () => import('pages/signin/ForgotPwd') },
