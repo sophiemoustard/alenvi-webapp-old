@@ -108,13 +108,7 @@ export default {
         emailConfirmation: '',
         password: '',
         passwordConfirmation: '',
-        socialInsuranceNumber: '',
-        rib: {
-          fullname: '',
-          bankname: '',
-          iban: '',
-          bic: ''
-        }
+        socialInsuranceNumber: ''
       },
       civilityOptions: [
         {
@@ -168,10 +162,7 @@ export default {
         minLength: minLength(15)
       },
       countryOfBirth: { required },
-      placeOfBirth: { required },
-      rib: {
-        fullname: { required }
-      }
+      placeOfBirth: { required }
     }
   },
   mounted () {
