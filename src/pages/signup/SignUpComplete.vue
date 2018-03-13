@@ -34,7 +34,6 @@
               </q-field>
               <q-stepper-navigation>
                 <q-btn color="primary" :disable="hasStep1Errors" @click="firstStep()" label="Enregistrer" />
-                <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
               </q-stepper-navigation>
             </q-step>
             <!-- 2nd step -->
