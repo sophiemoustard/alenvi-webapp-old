@@ -54,53 +54,41 @@
             <q-step name="third" title="Documents annexes">
               <q-field icon="mdi-account-card-details" :error="$v.user.picture.$error" error-label="Champ requis">
                 <q-uploader name="picture" :url="pictureUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `picture_${user.firstname}_${user.lastname}` }]" float-label="Photo" @finish="afterUpload()" auto-expand/>
-                <p class="upload-done" v-if="alenviUser.picture">Fichier mis en ligne <q-icon name="check" /></p>
+                <p class="upload-done" v-if="alenviUser && alenviUser.picture">Fichier mis en ligne <q-icon name="check" /></p>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.idCard.$error" error-label="Champ requis">
                 <q-uploader name="idCard" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `id_${user.firstname}_${user.lastname}` }]" float-label="Carte d'identité" @finish="afterUpload()" auto-expand/>
-                <p class="upload-done" v-if="alenviUser.administrative.idCard">Fichier mis en ligne <q-icon name="check" /></p>
+                <p class="upload-done" v-if="alenviUser && alenviUser.administrative.idCard">Fichier mis en ligne <q-icon name="check" /></p>
               </q-field>
-              <q-field icon="mdi-account-card-details" :error="$v.user.administrative.vitalCard.$error" error-label="Champ requis">
-                <q-uploader name="vitalCard" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `vital_${user.firstname}_${user.lastname}` }]" float-label="Carte vitale" @finish="afterUpload()" auto-expand/>
-                <p class="upload-done" v-if="alenviUser.administrative.vitalCard">Fichier mis en ligne <q-icon name="check" /></p>
+              <q-field icon="mdi-account-card-details" :error="$v.user.administrative.healthAttest.$error" error-label="Champ requis">
+                <q-uploader name="healthAttest" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `healthattest_${user.firstname}_${user.lastname}` }]" float-label="Attestation d'assurance maladie en cours de validité" @finish="afterUpload()" auto-expand/>
+                <p class="upload-done" v-if="alenviUser && alenviUser.administrative.healthAttest">Fichier mis en ligne <q-icon name="check" /></p>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.navigoInvoice.$error" error-label="Champ requis">
                 <q-uploader name="navigoInvoice" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `navigo_${user.firstname}_${user.lastname}` }]" float-label="Facture Navigo" @finish="afterUpload()" auto-expand/>
-                <p class="upload-done" v-if="alenviUser.administrative.navigoInvoice">Fichier mis en ligne <q-icon name="check" /></p>
+                <p class="upload-done" v-if="alenviUser && alenviUser.administrative.navigoInvoice">Fichier mis en ligne <q-icon name="check" /></p>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.phoneInvoice.$error" error-label="Champ requis">
                 <q-uploader name="phoneInvoice" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `phone_${user.firstname}_${user.lastname}` }]" float-label="Facture de téléphone" @finish="afterUpload()" auto-expand/>
-                <p class="upload-done" v-if="alenviUser.administrative.phoneInvoice">Fichier mis en ligne <q-icon name="check" /></p>
+                <p class="upload-done" v-if="alenviUser && alenviUser.administrative.phoneInvoice">Fichier mis en ligne <q-icon name="check" /></p>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.certificates.$error" error-label="Champ requis">
                 <q-uploader name="certificates" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `certificate_${user.firstname}_${user.lastname}` }]" float-label="Diplômes et / ou certicats" @finish="afterUpload()" multiple auto-expand/>
-                <p class="upload-done" v-if="alenviUser.administrative.certificates">Fichier mis en ligne <q-icon name="check" /></p>
+                <p class="upload-done" v-if="alenviUser && alenviUser.administrative.certificates">Fichier mis en ligne <q-icon name="check" /></p>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.mutualFund.$error" error-label="Champ requis">
                 <q-uploader name="mutualFund" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `mutual_${user.firstname}_${user.lastname}` }]" float-label="Mutuelle (falcultatif)" @finish="afterUpload()" auto-expand/>
-                <p class="upload-done" v-if="alenviUser.administrative.mutualFund">Fichier mis en ligne <q-icon name="check" /></p>
+                <p class="upload-done" v-if="alenviUser && alenviUser.administrative.mutualFund">Fichier mis en ligne <q-icon name="check" /></p>
               </q-field>
               <q-stepper-navigation>
-                <q-btn color="primary" :disable="!hasStep3Errors" @click="lastStep()" label="Terminer mon inscription" />
+                <q-btn color="primary" :disable="hasStep3Errors" @click="lastStep()" label="Terminer mon inscription" />
                 <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
               </q-stepper-navigation>
             </q-step>
             <q-inner-loading :visible="inProgress" />
           </q-stepper>
         </q-card-main>
-        <!-- <q-card-actions class="row justify-end">
-          <q-btn color="primary" @click="submit" :disable="$v.user.$invalid" flat>Envoyer</q-btn>
-        </q-card-actions> -->
       </q-card>
-
-    <!-- Test -->
-    <!-- <div class="row justify-center">
-      <div style="width: 600px; max-width: 90vw;">
-        <q-field :label-width="3" label="Titulaire du compte" :error="$v.user.rib.fullname.$error" error-label="Champ requis">
-          <q-input type="text" v-model="user.rib.fullname" @blur="$v.user.rib.fullname.$touch" />
-        </q-field>
-      </div>
-    </div> -->
     </div>
   </div>
 </template>
@@ -112,8 +100,9 @@ export default {
   // name: 'PageName',
   data () {
     return {
-      alenviUser: {},
-      ogustUser: {},
+      hasStep3Errors: true,
+      alenviUser: null,
+      ogustUser: null,
       inProgress: false,
       isSignupComplete: false,
       accessToken: '',
@@ -140,7 +129,7 @@ export default {
             driveId: '',
             link: ''
           },
-          vitalCard: {
+          healthAttest: {
             driveId: '',
             link: ''
           },
@@ -191,7 +180,7 @@ export default {
           }
         },
         idCard: { required },
-        vitalCard: { required },
+        healthAttest: { required },
         navigoInvoice: { required },
         mutualFund: { required },
         phoneInvoice: { required },
@@ -219,31 +208,14 @@ export default {
       }
       this.accessToken = this.$route.query.token;
       this.inProgress = true;
-      this.alenviUser = await this.$users.getById(this.$route.query.id, this.accessToken);
-      if (this.alenviUser.administrative.signup.complete) {
-        this.isSignupComplete = true;
-        // TO DO MESSAGE
-      }
-      const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
-      this.ogustUser = await this.$ogust.getEmployeeById(this.alenviUser.employee_id, ogustToken);
-      this.user.id_employee = this.ogustUser.id_employee || '';
-      this.user.lastname = this.ogustUser.last_name || '';
-      this.user.firstname = this.ogustUser.first_name || '';
-      this.user.dateOfBirth = this.$moment(this.ogustUser.date_of_birth).toDate() || '';
-      this.user.stateOfBirth = this.ogustUser.state_of_birth || '';
-      this.user.placeOfBirth = this.ogustUser.place_of_birth || '';
-      this.user.countryOfBirth = this.ogustUser.country_of_birth || 'FR';
-      this.user.socialInsuranceNumber = this.ogustUser.social_insurance_number || '';
-      if (this.ogustUser.bank_information[0]) {
-        this.user.administrative.payment.rib.iban = this.ogustUser.bank_information[0].iban_number || '';
-        this.user.administrative.payment.rib.bic = this.ogustUser.bank_information[0].bic_number || '';
-      }
-      this.user.picture.link = this.alenviUser.picture ? this.alenviUser.picture.link : '';
-      this.getCountries();
+      await this.setAlenviUser();
+      await this.checkStep3Errors();
+      await this.setOgustUser();
+      await this.getCountries();
       this.inProgress = false;
     } catch (e) {
-      this.inProgress = false;
       console.error(e);
+      this.inProgress = false;
     }
   },
   computed: {
@@ -285,22 +257,14 @@ export default {
     hasStep2Errors () {
       return this.$v.user.administrative.payment.rib.iban.$invalid ? true : !!this.$v.user.administrative.payment.rib.bic.$invalid
     },
-    hasStep3Errors () {
-      console.log('alenviUser=', this.alenviUser);
-      if (this.alenviUser.picture && this.alenviUser.administrative && this.alenviUser.administrative.idCard &&
-        this.alenviUser.administrative.healthAttest && this.alenviUser.administrative.vitalCard && this.alenviUser.administrative.certificates &&
-        this.alenviUser.administrative.phoneInvoice && this.alenviUser.administrative.navigoInvoice) {
-        return true;
-      }
-      return false;
-      // return this.alenviUser.picture ? true : this.alenviUser.administrative ? true
-      //   : this.alenviUser.administrative.idCard ? true
-      //     : this.alenviUser.administrative.healthAttest ? true
-      //       : this.alenviUser.administrative.vitalCard ? true
-      //         : this.alenviUser.administrative.certificates ? true
-      //           : this.alenviUser.administrative.phoneInvoice ? true
-      //             : !!this.alenviUser.administrative.navigoInvoice
-    },
+    // hasStep3Errors () {
+    //   return this.alenviUser.picture ? true : this.alenviUser.administrative ? true
+    //     : this.alenviUser.administrative.idCard ? true
+    //       : this.alenviUser.administrative.healthAttest ? true
+    //         : this.alenviUser.administrative.certificates ? true
+    //             : this.alenviUser.administrative.phoneInvoice ? true
+    //               : !!this.alenviUser.administrative.navigoInvoice
+    // },
     docsUploadUrl () {
       return `${process.env.API_HOSTNAME}/uploader/${this.$route.query.id}/drive/uploadFile`;
     },
@@ -381,7 +345,7 @@ export default {
       this.$q.loading.show({ message: 'Redirection vers Pigi...' });
       setTimeout(async () => {
         this.$q.loading.hide();
-        window.location.href = `${process.env.MESSENGER_LINK}?ref=${this.accessToken}`
+        window.location.href = `${process.env.MESSENGER_LINK}`;
       }, 2000);
     },
     async getCountries () {
@@ -400,8 +364,40 @@ export default {
     async afterUpload () {
       try {
         this.alenviUser = await this.$users.getById(this.$route.query.id, this.accessToken);
+        this.checkStep3Errors();
       } catch (e) {
         console.error(e);
+      }
+    },
+    checkStep3Errors () {
+      if (this.alenviUser.picture && this.alenviUser.administrative && this.alenviUser.administrative.idCard &&
+        this.alenviUser.administrative.healthAttest && this.alenviUser.administrative.certificates &&
+        this.alenviUser.administrative.phoneInvoice && this.alenviUser.administrative.navigoInvoice) {
+        this.hasStep3Errors = false;
+      }
+    },
+    async setAlenviUser () {
+      this.alenviUser = await this.$users.getById(this.$route.query.id, this.accessToken);
+      if (this.alenviUser.administrative.signup.complete) {
+        this.isSignupComplete = true;
+        // TO DO MESSAGE
+      }
+      this.user.picture.link = this.alenviUser.picture ? this.alenviUser.picture.link : '';
+    },
+    async setOgustUser () {
+      const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
+      this.ogustUser = await this.$ogust.getEmployeeById(this.alenviUser.employee_id, ogustToken);
+      this.user.id_employee = this.ogustUser.id_employee || '';
+      this.user.lastname = this.ogustUser.last_name || '';
+      this.user.firstname = this.ogustUser.first_name || '';
+      this.user.dateOfBirth = this.$moment(this.ogustUser.date_of_birth).toDate() || '';
+      this.user.stateOfBirth = this.ogustUser.state_of_birth || '';
+      this.user.placeOfBirth = this.ogustUser.place_of_birth || '';
+      this.user.countryOfBirth = this.ogustUser.country_of_birth || 'FR';
+      this.user.socialInsuranceNumber = this.ogustUser.social_insurance_number || '';
+      if (this.ogustUser.bank_information[0]) {
+        this.user.administrative.payment.rib.iban = this.ogustUser.bank_information[0].iban_number || '';
+        this.user.administrative.payment.rib.bic = this.ogustUser.bank_information[0].bic_number || '';
       }
     }
   }
