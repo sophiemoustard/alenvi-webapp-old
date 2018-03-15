@@ -123,7 +123,7 @@ export default {
     };
   },
   async mounted () {
-    await this.getPlanningUpdates();
+    await this.getAuxiliaries();
   },
   computed: {
     user () {
@@ -131,15 +131,14 @@ export default {
     }
   },
   methods: {
-    async getPlanningUpdates () {
+    async getAuxiliaries () {
       try {
-        const userList = await this.$users.showAll({ role: 'Auxiliaire' });
+        const userListRaw = await this.$users.showAll({ role: 'Auxiliaire' });
+        const userList = userListRaw.filter(auxiliary => auxiliary.administrative && !auxiliary.administrative.signup.complete)
         const ogustUserList = await this.$ogust.getEmployees();
         for (let i = 0, l = userList.length; i < l; i++) {
           for (const k in ogustUserList) {
-            if (
-              userList[i].employee_id === Number(ogustUserList[k].id_employee)
-            ) {
+            if (userList[i].employee_id === Number(ogustUserList[k].id_employee)) {
               this.userList.push({
                 firstSmsDate:
                   userList[i].administrative &&
