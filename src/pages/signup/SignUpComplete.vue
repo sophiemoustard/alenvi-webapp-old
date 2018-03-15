@@ -90,8 +90,8 @@
                 <q-uploader name="certificates" :url="docsUploadUrl" :headers="headers"
                 :additional-fields="[{ name: 'fileName', value: `certificate_${user.firstname}_${user.lastname}` }]"
                 float-label="Diplômes et / ou certicats" @finish="afterUpload()" multiple auto-expand extensions=".jpg, .jpeg, .png, .pdf"/>
-                <p class="upload-done" v-if="alenviUser && alenviUser.administrative.certificates">Fichier(s) mis en ligne <q-icon name="check" /></p>
-                <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.certificates">Fichier manquant <q-icon name="warning" /></p>
+                <p class="upload-done" v-if="alenviUser && alenviUser.administrative.certificates.length !== 0">Fichier(s) mis en ligne <q-icon name="check" /></p>
+                <p class="upload-not-done" v-if="alenviUser && alenviUser.administrative.certificates === 0">Fichier manquant <q-icon name="warning" /></p>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.mutualFund.$error" error-label="Champ requis">
                 <q-uploader name="mutualFund" :url="docsUploadUrl" :headers="headers"
@@ -362,10 +362,21 @@ export default {
       }
     },
     async lastStep () {
+      this.progress = true;
+      const alenviData = {
+        _id: this.$route.query.id,
+        administrative: {
+          signup: {
+            complete: true
+          },
+        }
+      };
+      await this.$users.updateById(alenviData, this.accessToken);
       this.$q.loading.show({ message: 'Redirection vers Pigi...' });
       setTimeout(async () => {
         this.$q.loading.hide();
-        window.location.href = `${process.env.MESSENGER_LINK}`;
+        this.progress = false;
+        window.location.href = `${process.env.MESSENGER_LINK}?ref=signup_complete`;
       }, 2000);
     },
     async getCountries () {
