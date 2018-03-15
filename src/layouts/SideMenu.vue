@@ -2,7 +2,7 @@
   <div>
     <q-list v-if="user.role.name !== 'Client'" class="no-border">
       <q-item class="justify-center">
-        <img :src="user.picture.link ? user.picture.link : 'https://res.cloudinary.com/alenvi/image/upload/c_scale,q_auto/v1513764284/images/users/default_avatar.png'" alt="Image user" class="avatar-alenvi">
+        <img :src="user.picture && user.picture.link ? user.picture.link : 'https://res.cloudinary.com/alenvi/image/upload/c_scale,q_auto/v1513764284/images/users/default_avatar.png'" alt="Image user" class="avatar-alenvi">
       </q-item>
       <q-item>
         <q-item-main class="text-bold text-center" :label="user.firstname" />
