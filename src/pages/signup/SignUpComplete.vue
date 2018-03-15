@@ -56,42 +56,49 @@
                 :additional-fields="[{ name: 'fileName', value: `picture_${user.firstname}_${user.lastname}` }]"
                 float-label="Photo" @finish="afterUpload()" auto-expand extensions=".jpg, .jpeg, .png, .pdf"/>
                 <p class="upload-done" v-if="alenviUser && alenviUser.picture">Fichier mis en ligne <q-icon name="check" /></p>
+                <p class="upload-not-done" v-if="alenviUser && !alenviUser.picture">Fichier manquant <q-icon name="warning" /></p>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.idCard.$error" error-label="Champ requis">
                 <q-uploader name="idCard" :url="docsUploadUrl" :headers="headers"
                 :additional-fields="[{ name: 'fileName', value: `id_${user.firstname}_${user.lastname}` }]"
                 float-label="Carte d'identité" @finish="afterUpload()" auto-expand extensions=".jpg, .jpeg, .png, .pdf"/>
                 <p class="upload-done" v-if="alenviUser && alenviUser.administrative.idCard">Fichier mis en ligne <q-icon name="check" /></p>
+                <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.idCard">Fichier manquant <q-icon name="warning" /></p>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.healthAttest.$error" error-label="Champ requis">
                 <q-uploader name="healthAttest" :url="docsUploadUrl" :headers="headers"
                 :additional-fields="[{ name: 'fileName', value: `healthattest_${user.firstname}_${user.lastname}` }]"
                 float-label="Attestation d'assurance maladie en cours de validité" @finish="afterUpload()" auto-expand extensions=".jpg, .jpeg, .png, .pdf"/>
                 <p class="upload-done" v-if="alenviUser && alenviUser.administrative.healthAttest">Fichier mis en ligne <q-icon name="check" /></p>
+                <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.healthAttest">Fichier manquant <q-icon name="warning" /></p>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.navigoInvoice.$error" error-label="Champ requis">
                 <q-uploader name="navigoInvoice" :url="docsUploadUrl" :headers="headers"
                 :additional-fields="[{ name: 'fileName', value: `navigo_${user.firstname}_${user.lastname}` }]"
                 float-label="Facture Navigo" @finish="afterUpload()" auto-expand extensions=".jpg, .jpeg, .png, .pdf"/>
                 <p class="upload-done" v-if="alenviUser && alenviUser.administrative.navigoInvoice">Fichier mis en ligne <q-icon name="check" /></p>
+                <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.navigoInvoice">Fichier manquant <q-icon name="warning" /></p>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.phoneInvoice.$error" error-label="Champ requis">
                 <q-uploader name="phoneInvoice" :url="docsUploadUrl" :headers="headers"
                 :additional-fields="[{ name: 'fileName', value: `phone_${user.firstname}_${user.lastname}` }]"
                 float-label="Facture de téléphone" @finish="afterUpload()" auto-expand extensions=".jpg, .jpeg, .png, .pdf"/>
                 <p class="upload-done" v-if="alenviUser && alenviUser.administrative.phoneInvoice">Fichier mis en ligne <q-icon name="check" /></p>
+                <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.phoneInvoice">Fichier manquant <q-icon name="warning" /></p>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.certificates.$error" error-label="Champ requis">
                 <q-uploader name="certificates" :url="docsUploadUrl" :headers="headers"
                 :additional-fields="[{ name: 'fileName', value: `certificate_${user.firstname}_${user.lastname}` }]"
                 float-label="Diplômes et / ou certicats" @finish="afterUpload()" multiple auto-expand extensions=".jpg, .jpeg, .png, .pdf"/>
                 <p class="upload-done" v-if="alenviUser && alenviUser.administrative.certificates">Fichier(s) mis en ligne <q-icon name="check" /></p>
+                <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.certificates">Fichier manquant <q-icon name="warning" /></p>
               </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.mutualFund.$error" error-label="Champ requis">
                 <q-uploader name="mutualFund" :url="docsUploadUrl" :headers="headers"
                 :additional-fields="[{ name: 'fileName', value: `mutual_${user.firstname}_${user.lastname}` }]"
                 float-label="Mutuelle (falcultatif)" @finish="afterUpload()" auto-expand extensions=".jpg, .jpeg, .png, .pdf"/>
                 <p class="upload-done" v-if="alenviUser && alenviUser.administrative.mutualFund">Fichier mis en ligne <q-icon name="check" /></p>
+                <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.mutualFund">Fichier manquant <q-icon name="warning" /></p>
               </q-field>
               <q-stepper-navigation>
                 <q-btn color="primary" :disable="hasStep3Errors" @click="lastStep()" label="Terminer mon inscription" />
@@ -426,4 +433,9 @@ export default {
   margin-top: 10px
   margin-bottom: 5px
   color: $positive
+
+.upload-not-done
+  margin-top: 10px
+  margin-bottom: 5px
+  color: $negative
 </style>
