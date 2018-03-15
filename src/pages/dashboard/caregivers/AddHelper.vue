@@ -11,12 +11,12 @@
           <q-autocomplete @search="search" @selected="selected" />
         </q-search>
         <!-- Find client's helpers on the fly -->
-        <q-item v-if="checked !== null" tag="label" v-for="(helper, index) in helpers" :key="index">
+        <q-item v-if="helpers" tag="label" v-for="(helper, index) in helpers" :key="index">
           <q-item-side>
-            <q-checkbox v-model="helper.checked" :disable="helper.checked" @input="handleEmail(helper)"></q-checkbox>
+            <q-checkbox v-model="helper.checked" :disable="helper.checked" @input="handleEmail(helper, index)"></q-checkbox>
           </q-item-side>
           <q-item-main>
-            <q-item-tile label>{{ helper.first_name }} {{ helper.last_name }}</q-item-tile>
+            <q-item-tile label>{{ helper.last_name }} {{ helper.first_name }}</q-item-tile>
           </q-item-main>
         </q-item>
 
@@ -33,10 +33,10 @@ import _ from 'lodash';
 export default {
   data () {
     return {
-      checked: null,
+      // checked: false,
       email: '',
       terms: '',
-      helpers: ''
+      helpers: null
       // config: {
       //   title: 'Liste des aidants Ogust',
       //   noHeader: false,
@@ -95,7 +95,7 @@ export default {
     }
   },
   methods: {
-    async handleEmail (helper) {
+    async handleEmail (helper, index) {
       try {
         this.$q.dialog({
           title: 'Envoi email',
@@ -143,7 +143,8 @@ export default {
             timeout: 2500
           });
         }).catch(() => {
-        })
+          this.helpers[index].checked = false;
+        });
       } catch (e) {
         this.$q.notify({
           color: 'negative',
@@ -177,16 +178,31 @@ export default {
     },
     async selected (item) {
       try {
-        const helpers = await this.$ogust.getCustomerContacts(item.id_customer);
-        this.helpers = _.filter(helpers, (item) => item.email);
-        for (const k in this.helpers) {
-          const user = await this.$users.showAll({ 'local.email': this.helpers[k].email, customer_id: this.helpers[k].id_customer });
-          if (!user) {
-            this.checked = false;
-          } else {
-            this.checked = true;
+        this.helpers = [];
+        const ogustHelpers = await this.$ogust.getCustomerContacts(item.id_customer);
+        const filteredOgustHelpers = _.filter(ogustHelpers, helper => helper.email);
+        const alenviHelpers = await this.$users.showAll({ role: 'Client' });
+        let processed = false;
+        for (let k = 0, l = filteredOgustHelpers.length; k < l; k++) {
+          for (let i = 0, len = alenviHelpers.length; i < len; i++) {
+            if (alenviHelpers[i].local.email === filteredOgustHelpers[k].email) {
+              processed = true;
+              this.helpers.push({
+                first_name: filteredOgustHelpers[k].first_name,
+                last_name: filteredOgustHelpers[k].last_name,
+                email: filteredOgustHelpers[k].email,
+                checked: true
+              });
+            }
           }
-          this.$set(this.helpers[k], 'checked', this.checked);
+          if (!processed) {
+            this.helpers.push({
+              first_name: filteredOgustHelpers[k].first_name,
+              last_name: filteredOgustHelpers[k].last_name,
+              email: filteredOgustHelpers[k].email,
+              checked: false
+            });
+          }
         }
       } catch (e) {
         console.error(e);
