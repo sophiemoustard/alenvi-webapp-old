@@ -11,40 +11,40 @@
         </q-card-title>
         <q-card-separator />
         <q-card-main>
-              <q-field icon="perm identity" :label-width="3">
-                <q-select :options="user.civilityOptions" v-model="user.civility" float-label="Civilité" separator :error="$v.user.civility.$error" error-label="Champ requis"
-                  @blur="$v.user.civility.$touch" />
-              </q-field>
-              <q-field icon="person" :error="$v.user.lastname.$error" error-label="Champ requis">
-                <q-input type="text" v-model.trim="user.lastname" float-label="Nom" @blur="$v.user.lastname.$touch" />
-              </q-field>
-              <q-field icon="person" :error="$v.user.firstname.$error" error-label="Champ requis">
-                <q-input type="text" v-model.trim="user.firstname" float-label="Prénom" @blur="$v.user.firstname.$touch" />
-              </q-field>
-              <q-field icon="home" :error="$v.user.address.line.$error" error-label="Champ requis">
-                <q-input type="text" v-model.trim="user.address.line" float-label="Adresse" @blur="$v.user.address.line.$touch" />
-              </q-field>
-              <q-field icon="home" :error="$v.user.address.zipCode.$error" :error-label="zipCodeError">
-                <q-input type="text" v-model.trim="user.address.zipCode" float-label="Code postal" @blur="$v.user.address.zipCode.$touch" :max-length="5" />
-              </q-field>
-              <q-field icon="home" :error="$v.user.address.city.$error" error-label="Champ requis">
-                <q-input type="text" v-model.trim="user.address.city" float-label="Ville" @blur="$v.user.address.city.$touch" />
-              </q-field>
-              <q-field icon="email" :error="$v.user.email.$error" :error-label="emailError">
-                <q-input type="email" v-model.trim="user.email" float-label="Email" @blur="$v.user.email.$touch" />
-              </q-field>
-              <q-field icon="email" helper="Entre une nouvelle fois ton adresse mail" :error="$v.user.emailConfirmation.$error"
-                error-label="L'email entré et la confirmation sont différents.">
-                <q-input type="email" v-model.trim="user.emailConfirmation" float-label="Confirmation email" @blur="$v.user.emailConfirmation.$touch" />
-              </q-field>
-              <q-field icon="lock" helper="Crée ton mot de passe. Il doit contenir au moins 6 caractères jusqu'à 20 maximum" :error="$v.user.password.$error"
-                :error-label="passwordError">
-                <q-input type="password" v-model="user.password" float-label="Mot de passe" @blur="$v.user.password.$touch" />
-              </q-field>
-              <q-field icon="lock" helper="Entre une nouvelle fois ton mot de passe" :error="$v.user.passwordConfirmation.$error"
-                error-label="Le mot de passe entré et la confirmation sont différents.">
-                <q-input type="password" v-model="user.passwordConfirmation" float-label="Confirmation mot de passe" @blur="$v.user.passwordConfirmation.$touch" />
-              </q-field>
+          <q-field icon="perm identity" :label-width="3">
+            <q-select :options="user.civilityOptions" v-model="user.civility" float-label="Civilité" separator :error="$v.user.civility.$error" error-label="Champ requis"
+              @blur="$v.user.civility.$touch" />
+          </q-field>
+          <q-field icon="person" :error="$v.user.lastname.$error" error-label="Champ requis">
+            <q-input type="text" v-model.trim="user.lastname" float-label="Nom" @blur="$v.user.lastname.$touch" />
+          </q-field>
+          <q-field icon="person" :error="$v.user.firstname.$error" error-label="Champ requis">
+            <q-input type="text" v-model.trim="user.firstname" float-label="Prénom" @blur="$v.user.firstname.$touch" />
+          </q-field>
+          <q-field icon="home" :error="$v.user.address.line.$error" error-label="Champ requis">
+            <q-input type="text" v-model.trim="user.address.line" float-label="Adresse" @blur="$v.user.address.line.$touch" />
+          </q-field>
+          <q-field icon="home" :error="$v.user.address.zipCode.$error" :error-label="zipCodeError">
+            <q-input type="text" v-model.trim="user.address.zipCode" float-label="Code postal" @blur="$v.user.address.zipCode.$touch" :max-length="5" />
+          </q-field>
+          <q-field icon="home" :error="$v.user.address.city.$error" error-label="Champ requis">
+            <q-input type="text" v-model.trim="user.address.city" float-label="Ville" @blur="$v.user.address.city.$touch" />
+          </q-field>
+          <q-field icon="email" :error="$v.user.email.$error" :error-label="emailError">
+            <q-input type="email" v-model.trim="user.email" float-label="Email" @blur="$v.user.email.$touch" />
+          </q-field>
+          <q-field icon="email" helper="Entre une nouvelle fois ton adresse mail" :error="$v.user.emailConfirmation.$error"
+            error-label="L'email entré et la confirmation sont différents.">
+            <q-input type="email" v-model.trim="user.emailConfirmation" float-label="Confirmation email" @blur="$v.user.emailConfirmation.$touch" />
+          </q-field>
+          <q-field icon="lock" helper="Crée ton mot de passe. Il doit contenir au moins 6 caractères jusqu'à 20 maximum" :error="$v.user.password.$error"
+            :error-label="passwordError">
+            <q-input type="password" v-model="user.password" float-label="Mot de passe" @blur="$v.user.password.$touch" />
+          </q-field>
+          <q-field icon="lock" helper="Entre une nouvelle fois ton mot de passe" :error="$v.user.passwordConfirmation.$error"
+            error-label="Le mot de passe entré et la confirmation sont différents.">
+            <q-input type="password" v-model="user.passwordConfirmation" float-label="Confirmation mot de passe" @blur="$v.user.passwordConfirmation.$touch" />
+          </q-field>
         </q-card-main>
         <q-card-actions class="row justify-end">
           <q-btn color="primary" @click="submit" :disable="$v.user.$invalid" flat>Envoyer</q-btn>
