@@ -3,7 +3,7 @@
     <div class="row justify-center">
       <div style="width: 700px; max-width: 90vw;">
         <p class="caption">Sélection des coachs de permanence</p>
-        <q-item tag="label" v-for="(coach, index) in coaches" :key="index">
+        <q-item v-if="coaches" tag="label" v-for="(coach, index) in coaches" :key="index">
           <q-item-side>
             <q-checkbox v-model="coach.isConstrained" @input="handleConstrainedCoach(coach)"></q-checkbox>
           </q-item-side>
@@ -24,17 +24,18 @@ export default {
       checked: null,
       email: '',
       terms: '',
-      coaches: {}
+      coaches: null
     }
   },
-  async created () {
+  async mounted () {
     try {
-      this.coaches = await this.$users.showAll({ role: 'Coach' });
-      for (let i = 0, l = this.coaches.length; i < l; i++) {
-        if (!this.coaches[i].isConstrained) {
-          this.coaches[i].isConstrained = false;
+      const coaches = await this.$users.showAll({ role: 'Coach' });
+      for (let i = 0, l = coaches.length; i < l; i++) {
+        if (!coaches[i].isConstrained) {
+          coaches[i].isConstrained = false;
         }
       }
+      this.coaches = coaches;
     } catch (e) {
       console.error(e);
     }
