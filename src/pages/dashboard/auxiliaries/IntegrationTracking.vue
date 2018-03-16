@@ -1,6 +1,6 @@
 <template>
     <q-table
-      :data="userList"
+      :data="filteredUserList"
       :columns="columns"
       row-key="name"
       :rows-per-page-options="[30, 40, 50]"
@@ -18,7 +18,12 @@
           v-model="filter"
           clearable
           placeholder="Recherche"
-          class="col-6" />
+          class="col-9" />
+        <q-toggle
+          color="primary"
+          v-model="isComplete"
+          label="Historique intégration"
+          class="col-3" />
       </template>
        <q-td slot="body-cell-secondSmsDate" slot-scope="props" :props="props">
         <q-icon name="done" color="positive" v-if="props.value === true" />
@@ -49,9 +54,10 @@ export default {
     return {
       userList: [],
       isChecked: false,
+      isComplete: false,
       filter: '',
       pagination: {
-        sortBy: 'date', // String, column "name" property value
+        sortBy: 'firstSmsDate', // String, column "name" property value
         descending: true,
         page: 1,
         rowsPerPage: 30 // current rows per page being displayed
@@ -128,13 +134,18 @@ export default {
   computed: {
     user () {
       return this.$store.getters['main/user'];
+    },
+    filteredUserList () {
+      if (this.isComplete) {
+        return this.userList.filter(auxiliary => !auxiliary.complete);
+      }
+      return this.userList.filter(auxiliary => auxiliary.complete);
     }
   },
   methods: {
     async getAuxiliaries () {
       try {
-        const userListRaw = await this.$users.showAll({ role: 'Auxiliaire' });
-        const userList = userListRaw.filter(auxiliary => auxiliary.administrative && !auxiliary.administrative.signup.complete)
+        const userList = await this.$users.showAll({ role: 'Auxiliaire' });
         const ogustUserList = await this.$ogust.getEmployees();
         for (let i = 0, l = userList.length; i < l; i++) {
           for (const k in ogustUserList) {
@@ -171,10 +182,9 @@ export default {
                     !!userList[i].administrative.idCard &&
                     !!userList[i].administrative.healthAttest &&
                     !!userList[i].administrative.certificates &&
-                    !!userList[i].administrative.phoneInvoice &&
-                    !!userList[i].administrative.mutualFund &&
-                    !!userList[i].administrative.navigoInvoice
-                  : '-'
+                    !!userList[i].administrative.phoneInvoice
+                  : '-',
+                complete: userList[i].administrative.complete
               });
             }
           }
