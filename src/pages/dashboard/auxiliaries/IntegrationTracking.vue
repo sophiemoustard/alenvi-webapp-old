@@ -184,7 +184,7 @@ export default {
                     !!userList[i].administrative.certificates &&
                     !!userList[i].administrative.phoneInvoice
                   : '-',
-                complete: userList[i].administrative.complete
+                complete: userList[i].administrative.signup.complete
               });
             }
           }
