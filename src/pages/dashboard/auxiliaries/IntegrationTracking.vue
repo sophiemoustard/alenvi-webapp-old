@@ -136,7 +136,7 @@ export default {
       return this.$store.getters['main/user'];
     },
     filteredUserList () {
-      if (this.isComplete) {
+      if (!this.isComplete) {
         return this.userList.filter(auxiliary => !auxiliary.complete);
       }
       return this.userList.filter(auxiliary => auxiliary.complete);
