@@ -136,10 +136,11 @@ export default {
       return this.$store.getters['main/user'];
     },
     filteredUserList () {
+      console.log(this.userList);
       if (!this.isComplete) {
         return this.userList.filter(auxiliary => !auxiliary.complete);
       }
-      return this.userList.filter(auxiliary => auxiliary.complete);
+      return this.userList.filter(auxiliary => auxiliary.complete && auxiliary.firstSmsDate !== '-');
     }
   },
   methods: {
