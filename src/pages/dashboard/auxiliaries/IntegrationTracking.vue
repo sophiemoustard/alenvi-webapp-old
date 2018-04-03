@@ -179,8 +179,7 @@ export default {
                       !!userList[i].administrative.payment.rib.iban
                     : '-',
                 miscDocuments: userList[i].administrative
-                  ? !!userList[i].administrative.vitalCard &&
-                    !!userList[i].administrative.idCard &&
+                  ? !!userList[i].administrative.idCard &&
                     !!userList[i].administrative.healthAttest &&
                     !!userList[i].administrative.certificates &&
                     !!userList[i].administrative.phoneInvoice
