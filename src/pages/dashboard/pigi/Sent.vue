@@ -22,7 +22,7 @@
           placeholder="Recherche"
           class="col-6" />
       </template>
-      <q-tr slot="body" slot-scope="props" :props="props" @click.native=displayDetails(props.row) class="cursor-pointer">
+      <q-tr slot="body" slot-scope="props" :props="props" @click.native="displayDetails(props.row)" class="cursor-pointer">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
           {{ col.value }}
         </q-td>

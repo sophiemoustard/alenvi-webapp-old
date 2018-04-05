@@ -25,30 +25,21 @@
           label="Historique intégration"
           class="col-3" />
       </template>
-       <q-td slot="body-cell-secondSmsDate" slot-scope="props" :props="props">
-        <q-icon name="done" color="positive" v-if="props.value === true" />
-        <q-icon name="clear" color="negative" v-if="props.value === false || props.value === '-'" />
-       </q-td>
-      <q-td slot="body-cell-pigiConnection" slot-scope="props" :props="props">
-        <q-icon name="done" color="positive" v-if="props.value === true" />
-        <q-icon name="clear" color="negative" v-if="props.value === false || props.value === '-'" />
-       </q-td>
-      <q-td slot="body-cell-personalInfo" slot-scope="props" :props="props">
-        <q-icon name="done" color="positive" v-if="props.value === true" />
-        <q-icon name="clear" color="negative" v-if="props.value === false || props.value === '-'" />
-       </q-td>
-      <q-td slot="body-cell-paymentInfo" slot-scope="props" :props="props">
-        <q-icon name="done" color="positive" v-if="props.value === true" />
-        <q-icon name="clear" color="negative" v-if="props.value === false || props.value === '-'" />
-       </q-td>
-      <q-td slot="body-cell-miscDocuments" slot-scope="props" :props="props">
-        <q-icon name="done" color="positive" v-if="props.value === true" />
-        <q-icon name="clear" color="negative" v-if="props.value === false || props.value === '-'" />
-       </q-td>
+      <q-tr slot="body" slot-scope="props" class="cursor-pointer" @click.native="goToDriveFolder(props.row)">
+        <q-td v-for="col in props.cols" :key="col.name" :props="props">
+          <span v-if="col.name === 'firstSmsDate' || col.name === 'auxiliary'">{{ col.value }}</span>
+          <div v-else>
+            <q-icon name="done" color="positive" v-if="col.value === true" />
+            <q-icon name="clear" color="negative" v-if="col.value === false || col.value === '-'" />
+          </div>
+        </q-td>
+      </q-tr>
     </q-table>
 </template>
 
 <script>
+import { openURL } from 'quasar'
+
 export default {
   data () {
     return {
@@ -136,7 +127,6 @@ export default {
       return this.$store.getters['main/user'];
     },
     filteredUserList () {
-      console.log(this.userList);
       if (!this.isComplete) {
         return this.userList.filter(auxiliary => !auxiliary.complete);
       }
@@ -184,7 +174,8 @@ export default {
                     !!userList[i].administrative.certificates &&
                     !!userList[i].administrative.phoneInvoice
                   : '-',
-                complete: userList[i].administrative.signup.complete
+                complete: userList[i].administrative.signup.complete,
+                driveFolderLink: userList[i].administrative.driveFolder ? userList[i].administrative.driveFolder.link : false
               });
             }
           }
@@ -195,6 +186,11 @@ export default {
     },
     paginationLabel (start, end, total) {
       return `${start} - ${end} de ${total}`;
+    },
+    goToDriveFolder (row) {
+      if (row.driveFolderLink) {
+        openURL(row.driveFolderLink);
+      }
     }
   }
 };
