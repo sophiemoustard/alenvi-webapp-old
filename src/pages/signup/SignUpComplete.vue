@@ -229,9 +229,9 @@ export default {
   // },
   async mounted () {
     try {
-      if (this.$route.query.step && (this.$route.query.step === 'first' || this.$route.query.step === 'second' || this.$route.query.step === 'third')) {
-        this.$refs.stepper.goToStep(this.$route.query.step);
-      }
+      // if (this.$route.query.step && (this.$route.query.step === 'first' || this.$route.query.step === 'second' || this.$route.query.step === 'third')) {
+      //   this.$refs.stepper.goToStep(this.$route.query.step);
+      // }
       this.accessToken = this.$route.query.token;
       this.inProgress = true;
       await this.setAlenviUser();
@@ -418,6 +418,9 @@ export default {
       if (this.alenviUser.administrative.signup.complete) {
         this.isSignupComplete = true;
         // TO DO MESSAGE
+      }
+      if (this.alenviUser.administrative.signup.step) {
+        this.$refs.stepper.goToStep(this.alenviUser.administrative.signup.step);
       }
       this.user.picture.link = this.alenviUser.picture ? this.alenviUser.picture.link : '';
     },
