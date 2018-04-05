@@ -51,6 +51,12 @@
             </q-step>
             <!-- Last step -->
             <q-step name="third" title="Documents annexes">
+              <p>Pour envoyer un document:</p>
+              <ul>
+                <li>Appuie d'abord sur cette icône: <q-icon name="add" /></li>
+                <li>Choisis le fichier que tu souhaites envoyer</li>
+                <li>Appuie ensuite sur cette icône: <q-icon name="cloud upload" /> pour finaliser l'envoi du fichier</li>
+              </ul>
               <q-field icon="mdi-account-card-details" :error="$v.user.picture.$error" error-label="Champ requis">
                 <q-uploader name="picture" :url="pictureUploadUrl" :headers="headers"
                 :additional-fields="[{ name: 'fileName', value: `photo_${user.firstname}_${user.lastname}` }]"
