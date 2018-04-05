@@ -6,7 +6,8 @@
           <img src="https://res.cloudinary.com/alenvi/image/upload/c_scale,q_auto,w_400/v1507124345/images/business/alenvi_logo_complet_full.png" alt="Logo Alenvi" class="alenvi-logo">
         </q-card-media>
         <q-card-title>
-          <div class="text-center">Bienvenue chez Alenvi !</div><br /><span slot="subtitle">Nous allons maintenant terminer ta création de compte. Merci de renseigner les champs suivants, relis-toi bien car ces infos sont importantes :-)
+          <div class="text-center">Bienvenue chez Alenvi !</div><br />
+          <span slot="subtitle">Nous allons maintenant terminer ta création de compte. Merci de renseigner les champs suivants, relis-toi bien car ces infos sont importantes :-)
             N’hésite pas à appeler ton coach en cas de question !</span>
         </q-card-title>
         <q-card-separator />
@@ -44,7 +45,9 @@
           <q-field icon="lock" helper="Entre une nouvelle fois ton mot de passe" :error="$v.user.passwordConfirmation.$error"
             error-label="Le mot de passe entré et la confirmation sont différents.">
             <q-input type="password" v-model="user.passwordConfirmation" float-label="Confirmation mot de passe" @blur="$v.user.passwordConfirmation.$touch" />
-          </q-field>
+          </q-field><br>
+          <p style="color: red"><strong>Note bien tes identifiants (email et mot de passe).</strong></p>
+          <p style="color: red"><strong>Un SMS te sera envoyé une fois que tu auras cliqué sur "Envoyer". Il s'agit de la prochaine étape de ton inscription chez Alenvi.</strong></p>
         </q-card-main>
         <q-card-actions class="row justify-end">
           <q-btn color="primary" @click="submit" :disable="$v.user.$invalid" flat>Envoyer</q-btn>
