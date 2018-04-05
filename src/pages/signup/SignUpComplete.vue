@@ -51,6 +51,12 @@
             </q-step>
             <!-- Last step -->
             <q-step name="third" title="Documents annexes">
+              <p>Pour envoyer un document:</p>
+              <ul>
+                <li>Appuie d'abord sur cette icône: <q-icon name="add" /></li>
+                <li>Choisis le fichier que tu souhaites envoyer</li>
+                <li>Appuie ensuite sur cette icône: <q-icon name="cloud upload" /> pour finaliser l'envoi du fichier</li>
+              </ul>
               <q-field icon="mdi-account-card-details" :error="$v.user.picture.$error" error-label="Champ requis">
                 <q-uploader name="picture" :url="pictureUploadUrl" :headers="headers"
                 :additional-fields="[{ name: 'fileName', value: `photo_${user.firstname}_${user.lastname}` }]"
@@ -223,9 +229,9 @@ export default {
   // },
   async mounted () {
     try {
-      if (this.$route.query.step && (this.$route.query.step === 'first' || this.$route.query.step === 'second' || this.$route.query.step === 'third')) {
-        this.$refs.stepper.goToStep(this.$route.query.step);
-      }
+      // if (this.$route.query.step && (this.$route.query.step === 'first' || this.$route.query.step === 'second' || this.$route.query.step === 'third')) {
+      //   this.$refs.stepper.goToStep(this.$route.query.step);
+      // }
       this.accessToken = this.$route.query.token;
       this.inProgress = true;
       await this.setAlenviUser();
@@ -412,6 +418,9 @@ export default {
       if (this.alenviUser.administrative.signup.complete) {
         this.isSignupComplete = true;
         // TO DO MESSAGE
+      }
+      if (this.alenviUser.administrative.signup.step) {
+        this.$refs.stepper.goToStep(this.alenviUser.administrative.signup.step);
       }
       this.user.picture.link = this.alenviUser.picture ? this.alenviUser.picture.link : '';
     },
