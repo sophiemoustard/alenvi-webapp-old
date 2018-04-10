@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="row justify-center">
+  <div class="row justify-center">
     <q-card flat class="layout-padding" style="width: 500px; max-width: 90vw">
       <q-card-media>
         <img src="https://res.cloudinary.com/alenvi/image/upload/c_scale,q_auto,w_400/v1507124345/images/business/alenvi_logo_complet_full.png" alt="Logo Alenvi" class="responsive">
@@ -20,11 +20,13 @@
         <q-btn @click="submit" color="primary" :disable="$v.passwords.$invalid">Envoyer</q-btn>
       </q-card-actions>
     </q-card>
-  </q-page>
+  </div>
 </template>
 
 <script>
 import { sameAs, minLength, maxLength, required } from 'vuelidate/lib/validators'
+
+import users from '../../api/Users'
 
 export default {
   data () {
@@ -42,13 +44,17 @@ export default {
   async beforeRouteEnter (to, from, next) {
     try {
       if (to.params.token) {
-        const checkToken = await this.$users.checkResetPasswordToken(to.params.token);
+        const checkToken = await users.checkResetPasswordToken(to.params.token);
         next(vm => vm.setData(checkToken));
       } else {
         next({ path: '/error403Pwd' });
       }
     } catch (e) {
-      console.error(e.response);
+      if (e.response) {
+        console.error(e.response);
+      } else {
+        console.error(e);
+      }
       next({ path: '/error403Pwd' });
     }
   },
@@ -68,12 +74,10 @@ export default {
   },
   methods: {
     setData (checkToken) {
-      console.log('CHECKTOKEN', checkToken);
       this.token = checkToken.token;
       this.userId = checkToken.user._id;
       this.userEmail = checkToken.user.email;
-      console.log(this.token);
-      console.log(this.userId);
+      this.from = checkToken.user.from;
     },
     async submit () {
       try {
@@ -84,20 +88,34 @@ export default {
           },
           resetPassword: {
             token: null,
-            expiresIn: null
+            expiresIn: null,
+            from: null
           }
         };
         await this.$users.updateById(userPayload, this.token);
+        let detail = '';
+        let action = null;
+        switch (this.from) {
+          case 'p':
+            detail = 'Mot de passe changé. Redirection vers Pigi...';
+            action = () => {
+              window.location.href = `${process.env.MESSENGER_LINK}`;
+            };
+            break;
+          default:
+            detail = 'Mot de passe changé. Redirection vers la page de connexion...';
+            action = () => {
+              this.$router.replace({ path: '/login' });
+            };
+        }
         this.$q.notify({
           color: 'positive',
-          icon: 'warning',
-          detail: 'Mot de passe changé. Redirection vers la page de connexion...',
+          icon: 'thumb up',
+          detail,
           position: 'bottom-right',
           timeout: 2500
         });
-        this.timeout = setTimeout(() => {
-          this.$router.replace({ path: '/dashboard/login' });
-        }, 2000)
+        this.timeout = setTimeout(action, 2000)
       } catch (e) {
         this.$q.notify({
           color: 'negative',
@@ -118,4 +136,6 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables'
+  .q-field
+    margin: 0 0 10px 0
 </style>

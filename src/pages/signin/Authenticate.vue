@@ -16,7 +16,7 @@
         <q-btn class="full-width" color="primary" @click="submit">Login</q-btn>
       </q-card-actions>
       <q-card-actions>
-        <router-link class="row justify-center" to="/forgotPassword"><small>Mot de passe oublié ?</small></router-link>
+        <router-link class="row justify-center" :to="{ path: '/forgotPassword', query: { from: 'w' } }"><small>Mot de passe oublié ?</small></router-link>
       </q-card-actions>
     </q-card>
   </div>

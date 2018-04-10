@@ -21,6 +21,10 @@
         <q-btn class="full-width" color="primary" @click="submit()">Login</q-btn>
       </div>
     </div>
+    <div class="col-xs-12 row justify-center q-mt-md">
+      <router-link class="forgot-link" :to="{ path: '/forgotPassword', query: { from: 'p' } }"><small>Mot de passe oublié ?</small>
+      </router-link>
+    </div>
   </div>
 </template>
 
@@ -76,9 +80,17 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+@import '~variables'
+
 .alenvi-logo
   width: 125px
   height: 125px
+
 .q-field
   margin: 0 0 10px 0
+
+.forgot-link
+  text-decoration: none
+  color: $primary
+  font-weight: bold
 </style>

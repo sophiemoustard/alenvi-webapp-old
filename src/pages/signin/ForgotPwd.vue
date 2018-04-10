@@ -34,7 +34,9 @@ export default {
   methods: {
     async submit () {
       try {
-        await this.$users.forgotPassword({ email: this.email });
+        const payload = { email: this.email, from: this.$route.query.from || 'w' };
+        console.log(payload);
+        await this.$users.forgotPassword(payload);
         this.$q.notify({
           color: 'positive',
           icon: 'thumb up',
