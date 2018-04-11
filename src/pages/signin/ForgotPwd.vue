@@ -34,8 +34,7 @@ export default {
   methods: {
     async submit () {
       try {
-        const payload = { email: this.email, from: this.$route.query.from || 'w' };
-        console.log(payload);
+        const payload = { email: this.email.toLowerCase(), from: this.$route.query.from || 'w' };
         await this.$users.forgotPassword(payload);
         this.$q.notify({
           color: 'positive',
