@@ -1,30 +1,24 @@
 <template>
-  <div class="layout-padding">
-    <p class="text-center">Entre tes identifiants pour continuer avec Pigi !</p>
-    <div class="row justify-center">
-      <div class="alenvi-logo">
-        <img src="https://res.cloudinary.com/alenvi/image/upload/v1499948101/images/bot/Pigi.png" class="responsive">
-      </div>
-    </div>
-    <div class="row justify-center">
-      <q-field class="col-xs-12 col-sm-3" icon="mail">
-        <q-input v-model.trim="credentials.email" float-label="Adresse email"/>
-      </q-field>
-    </div>
-    <div class="row justify-center">
-      <q-field class="col-xs-12 col-sm-3" icon="vpn_key">
-        <q-input v-model="credentials.password" float-label="Mot de passe" type="password" />
-      </q-field>
-    </div>
-    <div class="row justify-center">
-      <div class="col-xs-12 col-sm-3">
-        <q-btn class="full-width" color="primary" @click="submit()">Login</q-btn>
-      </div>
-    </div>
-    <div class="col-xs-12 row justify-center q-mt-md">
-      <router-link class="forgot-link" :to="{ path: '/forgotPassword', query: { from: 'p' } }"><small>Mot de passe oublié ?</small>
-      </router-link>
-    </div>
+  <div class="layout-padding row justify-center">
+    <q-card flat class="layout-padding" style="width: 500px; max-width: 90vw;">
+      <q-card-media>
+        <img src="https://res.cloudinary.com/alenvi/image/upload/v1507124345/images/business/alenvi_logo_complet_full.png" class="responsive">
+      </q-card-media>
+      <q-card-main>
+        <q-field class="col-xs-12 col-sm-3" icon="mail">
+          <q-input @keyup.enter="submit" v-model.trim="credentials.email" float-label="Adresse email" />
+        </q-field>
+        <q-field class="col-xs-12 col-sm-3" icon="vpn_key">
+          <q-input @keyup.enter="submit" v-model="credentials.password" float-label="Mot de passe" type="password" />
+        </q-field>
+      </q-card-main>
+      <q-card-actions>
+        <q-btn class="full-width" color="primary" @click="submit">Login</q-btn>
+      </q-card-actions>
+      <q-card-actions>
+        <router-link class="row justify-center" :to="{ path: '/forgotPassword', query: { from: 'p' } }"><small>Mot de passe oublié ?</small></router-link>
+      </q-card-actions>
+    </q-card>
   </div>
 </template>
 
@@ -89,8 +83,4 @@ export default {
 .q-field
   margin: 0 0 10px 0
 
-.forgot-link
-  text-decoration: none
-  color: $primary
-  font-weight: bold
 </style>
