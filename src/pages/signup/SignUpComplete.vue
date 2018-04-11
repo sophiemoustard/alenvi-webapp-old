@@ -78,33 +78,12 @@
                 <p class="upload-done" v-if="alenviUser && alenviUser.administrative.healthAttest">Fichier mis en ligne <q-icon name="check" /></p>
                 <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.healthAttest">Fichier manquant <q-icon name="warning" /></p>
               </q-field>
-              <q-field icon="mdi-account-card-details" :error="$v.user.administrative.navigoInvoice.$error" error-label="Champ requis">
-                <q-uploader name="navigoInvoice" :url="docsUploadUrl" :headers="headers"
-                :additional-fields="[{ name: 'fileName', value: `navigo_${user.firstname}_${user.lastname}` }]"
-                float-label="Facture Navigo" @finish="afterUpload()" auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
-                <p class="upload-done" v-if="alenviUser && alenviUser.administrative.navigoInvoice">Fichier mis en ligne <q-icon name="check" /></p>
-                <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.navigoInvoice">Fichier manquant <q-icon name="warning" /></p>
-              </q-field>
-              <q-field icon="mdi-account-card-details" :error="$v.user.administrative.phoneInvoice.$error" error-label="Champ requis">
-                <q-uploader name="phoneInvoice" :url="docsUploadUrl" :headers="headers"
-                :additional-fields="[{ name: 'fileName', value: `telephone_${user.firstname}_${user.lastname}` }]"
-                float-label="Facture de téléphone" @finish="afterUpload()" auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
-                <p class="upload-done" v-if="alenviUser && alenviUser.administrative.phoneInvoice">Fichier mis en ligne <q-icon name="check" /></p>
-                <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.phoneInvoice">Fichier manquant <q-icon name="warning" /></p>
-              </q-field>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.certificates.$error" error-label="Champ requis">
                 <q-uploader name="certificates" :url="docsUploadUrl" :headers="headers"
                 :additional-fields="[{ name: 'fileName', value: `certif-diplome_${user.firstname}_${user.lastname}` }]"
                 float-label="Diplômes et / ou certicats" @finish="afterUpload()" multiple auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
                 <p class="upload-done" v-if="alenviUser && alenviUser.administrative.certificates[0]">Fichier(s) mis en ligne <q-icon name="check" /></p>
                 <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.certificates[0]">Fichier manquant <q-icon name="warning" /></p>
-              </q-field>
-              <q-field icon="mdi-account-card-details" :error="$v.user.administrative.mutualFund.$error" error-label="Champ requis">
-                <q-uploader name="mutualFund" :url="docsUploadUrl" :headers="headers"
-                :additional-fields="[{ name: 'fileName', value: `mutuelle_${user.firstname}_${user.lastname}` }]"
-                float-label="Mutuelle (falcultatif)" @finish="afterUpload()" auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" />
-                <p class="upload-done" v-if="alenviUser && alenviUser.administrative.mutualFund">Fichier mis en ligne <q-icon name="check" /></p>
-                <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.mutualFund">Fichier manquant <q-icon name="warning" /></p>
               </q-field>
               <q-stepper-navigation>
                 <q-btn color="primary" :disable="hasStep3Errors" @click="lastStep()" label="Terminer mon inscription" />
@@ -159,18 +138,6 @@ export default {
             driveId: '',
             link: ''
           },
-          navigoInvoice: {
-            driveId: '',
-            link: ''
-          },
-          mutualFund: {
-            driveId: '',
-            link: ''
-          },
-          phoneInvoice: {
-            driveId: '',
-            link: ''
-          },
           certificates: []
         }
       }
@@ -207,9 +174,6 @@ export default {
         },
         idCard: { required },
         healthAttest: { required },
-        navigoInvoice: { required },
-        mutualFund: { required },
-        phoneInvoice: { required },
         certificates: [ required ]
       }
     }
@@ -408,8 +372,7 @@ export default {
     },
     checkStep3Errors () {
       if (this.alenviUser.picture && this.alenviUser.administrative && this.alenviUser.administrative.idCard &&
-        this.alenviUser.administrative.healthAttest && this.alenviUser.administrative.certificates &&
-        this.alenviUser.administrative.phoneInvoice && this.alenviUser.administrative.navigoInvoice) {
+        this.alenviUser.administrative.healthAttest && this.alenviUser.administrative.certificates) {
         this.hasStep3Errors = false;
       }
     },
