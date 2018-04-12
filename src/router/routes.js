@@ -58,6 +58,23 @@ export default [
       }
     }
   },
+  {
+    path: '/signup/optionalDocuments',
+    component: () => import('pages/signup/optionalDocuments'),
+    beforeEnter: async (to, from, next) => {
+      try {
+        if (to.query.token && to.query.id) {
+          await users.getById(to.query.id, to.query.token);
+          next();
+        } else {
+          next({ path: '/401' });
+        }
+      } catch (e) {
+        console.error(e.response);
+        next({ path: '/401' });
+      }
+    }
+  },
   { path: '/forgotPassword', component: () => import('pages/signin/ForgotPwd') },
   { path: '/resetPassword/:token', component: () => import('pages/signin/ResetPwd') },
   { path: '/error403Pwd', component: () => import('pages/signin/403') },
