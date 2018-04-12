@@ -236,7 +236,6 @@ export default {
         for (const k in countriesRaw) {
           this.countries.push({ label: countriesRaw[k], value: k });
         }
-        console.log(this.countries);
       } catch (e) {
         console.error(e.response);
       }
