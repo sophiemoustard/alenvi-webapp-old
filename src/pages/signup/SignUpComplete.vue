@@ -67,7 +67,7 @@
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.idCard.$error" error-label="Champ requis">
                 <q-uploader name="idCard" :url="docsUploadUrl" :headers="headers"
                 :additional-fields="[{ name: 'fileName', value: `cni_${user.firstname}_${user.lastname}` }]"
-                float-label="Carte d'identité" @finish="afterUpload()" auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
+                float-label="Carte d'identité / titre de séjour" @finish="afterUpload()" auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
                 <p class="upload-done" v-if="alenviUser && alenviUser.administrative.idCard">Fichier mis en ligne <q-icon name="check" /></p>
                 <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.idCard">Fichier manquant <q-icon name="warning" /></p>
               </q-field>
@@ -77,13 +77,6 @@
                 float-label="Attestation d'assurance maladie en cours de validité" @finish="afterUpload()" auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
                 <p class="upload-done" v-if="alenviUser && alenviUser.administrative.healthAttest">Fichier mis en ligne <q-icon name="check" /></p>
                 <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.healthAttest">Fichier manquant <q-icon name="warning" /></p>
-              </q-field>
-              <q-field icon="mdi-account-card-details" :error="$v.user.administrative.certificates.$error" error-label="Champ requis">
-                <q-uploader name="certificates" :url="docsUploadUrl" :headers="headers"
-                :additional-fields="[{ name: 'fileName', value: `certif-diplome_${user.firstname}_${user.lastname}` }]"
-                float-label="Diplômes et / ou certicats" @finish="afterUpload()" multiple auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
-                <p class="upload-done" v-if="alenviUser && alenviUser.administrative.certificates[0]">Fichier(s) mis en ligne <q-icon name="check" /></p>
-                <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.certificates[0]">Fichier manquant <q-icon name="warning" /></p>
               </q-field>
               <q-stepper-navigation>
                 <q-btn color="primary" :disable="hasStep3Errors" @click="lastStep()" label="Terminer mon inscription" />

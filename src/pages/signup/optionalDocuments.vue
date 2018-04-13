@@ -38,6 +38,13 @@
             <p class="upload-done" v-if="alenviUser && alenviUser.administrative.navigoInvoice">Fichier mis en ligne <q-icon name="check" /></p>
             <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.navigoInvoice">Fichier manquant <q-icon name="warning" /></p>
           </q-field>
+          <q-field icon="mdi-account-card-details">
+            <q-uploader name="certificates" :url="docsUploadUrl" :headers="headers"
+            :additional-fields="[{ name: 'fileName', value: `certif-diplome_${user.firstname}_${user.lastname}` }]"
+            float-label="Diplômes et / ou certicats" @finish="afterUpload()" multiple auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
+            <p class="upload-done" v-if="alenviUser && alenviUser.administrative.certificates[0]">Fichier(s) mis en ligne <q-icon name="check" /></p>
+            <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.certificates[0]">Fichier manquant <q-icon name="warning" /></p>
+          </q-field>
         </q-card-main>
       </q-card>
     </div>
