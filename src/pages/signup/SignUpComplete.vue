@@ -154,12 +154,36 @@ export default {
       accessToken: '',
       countries: [],
       user: {
+        id: '',
+        civility: '',
+        lastname: '',
+        firstname: '',
+        sector: '',
+        address: {
+          line: '',
+          zipCode: '',
+          city: ''
+        },
+        phoneNbr: '',
+        email: '',
+        emailConfirmation: '',
+        password: '',
+        passwordConfirmation: '',
+        managerId: '',
+        civilityOptions: [
+          {
+            label: 'Monsieur',
+            value: 'M.'
+          },
+          {
+            label: 'Madame',
+            value: 'Mme'
+          }
+        ],
         dateOfBirth: '',
         stateOfBirth: '',
         placeOfBirth: '',
         countryOfBirth: '',
-        phoneNbr: '',
-        managerId: '',
         socialInsuranceNumber: '',
         picture: {
           link: ''
@@ -268,11 +292,11 @@ export default {
       this.user.mobilePhone = this.$q.cookies.get('signup_mobile');
       this.user.managerId = this.$q.cookies.get('signup_managerId');
       this.accessToken = this.$q.cookies.get('signup_is_activated');
-      this.accessToken = this.$route.query.token;
+      // this.accessToken = this.$route.query.token;
       this.inProgress = true;
-      await this.setAlenviUser();
-      await this.checkStep3Errors();
-      await this.setOgustUser();
+      // await this.setAlenviUser();
+      await this.checkStep4Errors();
+      // await this.setOgustUser();
       await this.getCountries();
       this.inProgress = false;
     } catch (e) {
@@ -397,9 +421,12 @@ export default {
         }
       };
       const newAlenviUser = await this.$users.create(alenviData);
+      this.user.id = newAlenviUser.data.data.user._id;
     },
     async secondStep () {
       try {
+        await this.setAlenviUser();
+        await this.setOgustUser();
         const ogustData = {
           id_employee: this.user.id_employee,
           date_of_birth: this.$moment(this.user.dateOfBirth).format('YYYYMMDD'),
