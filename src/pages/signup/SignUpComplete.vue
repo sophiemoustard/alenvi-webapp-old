@@ -14,6 +14,47 @@
           <q-stepper color="primary" ref="stepper" alternative-labels vertical>
             <!-- First step -->
             <q-step name="first" title="Informations personnelles (suite)" default>
+              <q-field icon="perm identity" :label-width="3">
+                <q-select :options="user.civilityOptions" v-model="user.civility" float-label="Civilité" separator :error="$v.user.civility.$error" error-label="Champ requis"
+                  @blur="$v.user.civility.$touch" />
+              </q-field>
+              <q-field icon="person" :error="$v.user.lastname.$error" error-label="Champ requis">
+                <q-input type="text" v-model.trim="user.lastname" float-label="Nom" @blur="$v.user.lastname.$touch" />
+              </q-field>
+              <q-field icon="person" :error="$v.user.firstname.$error" error-label="Champ requis">
+                <q-input type="text" v-model.trim="user.firstname" float-label="Prénom" @blur="$v.user.firstname.$touch" />
+              </q-field>
+              <q-field icon="home" :error="$v.user.address.line.$error" error-label="Champ requis">
+                <q-input type="text" v-model.trim="user.address.line" float-label="Adresse" @blur="$v.user.address.line.$touch" />
+              </q-field>
+              <q-field icon="home" :error="$v.user.address.zipCode.$error" :error-label="zipCodeError">
+                <q-input type="text" v-model.trim="user.address.zipCode" float-label="Code postal" @blur="$v.user.address.zipCode.$touch" :max-length="5" />
+              </q-field>
+              <q-field icon="home" :error="$v.user.address.city.$error" error-label="Champ requis">
+                <q-input type="text" v-model.trim="user.address.city" float-label="Ville" @blur="$v.user.address.city.$touch" />
+              </q-field>
+              <q-field icon="email" :error="$v.user.email.$error" :error-label="emailError">
+                <q-input type="email" v-model.trim="user.email" float-label="Email" @blur="$v.user.email.$touch" />
+              </q-field>
+              <q-field icon="email" helper="Entre une nouvelle fois ton adresse mail" :error="$v.user.emailConfirmation.$error"
+                error-label="L'email entré et la confirmation sont différents.">
+                <q-input type="email" v-model.trim="user.emailConfirmation" float-label="Confirmation email" @blur="$v.user.emailConfirmation.$touch" />
+              </q-field>
+              <q-field icon="lock" helper="Crée ton mot de passe. Il doit contenir au moins 6 caractères jusqu'à 20 maximum" :error="$v.user.password.$error"
+                :error-label="passwordError">
+                <q-input type="password" v-model="user.password" float-label="Mot de passe" @blur="$v.user.password.$touch" />
+              </q-field>
+              <q-field icon="lock" helper="Entre une nouvelle fois ton mot de passe" :error="$v.user.passwordConfirmation.$error"
+                error-label="Le mot de passe entré et la confirmation sont différents.">
+                <q-input type="password" v-model="user.passwordConfirmation" float-label="Confirmation mot de passe" @blur="$v.user.passwordConfirmation.$touch" />
+              </q-field><br>
+              <p style="color: red"><strong>Note bien tes identifiants (email et mot de passe).</strong></p>
+              <q-stepper-navigation>
+                <q-btn color="primary" :disable="hasStep1Errors" @click="firstStep()" label="Enregistrer" />
+              </q-stepper-navigation>
+            </q-step>
+            <!-- Second step -->
+            <q-step name="second" title="Informations personnelles (suite)">
               <q-field icon="date range" :error="$v.user.dateOfBirth.$error" error-label="Champ requis">
                 <q-datetime v-model="user.dateOfBirth" float-label="Date de naissance" @blur="$v.user.dateOfBirth.$touch" :first-day-of-week="Number(1)"
                 ok-label="APPLIQUER" no-clear cancel-label="ANNULER"
@@ -33,11 +74,11 @@
                 <q-input type="number" v-model.trim="user.socialInsuranceNumber" float-label="Numéro de sécurité sociale" @blur="$v.user.socialInsuranceNumber.$touch" />
               </q-field>
               <q-stepper-navigation>
-                <q-btn color="primary" :disable="hasStep1Errors" @click="firstStep()" label="Enregistrer" />
+                <q-btn color="primary" :disable="hasStep2Errors" @click="secondStep()" label="Enregistrer" />
               </q-stepper-navigation>
             </q-step>
-            <!-- 2nd step -->
-            <q-step name="second" title="Informations de paiement">
+            <!-- 3rd step -->
+            <q-step name="third" title="Informations de paiement">
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.payment.rib.iban.$error" :error-label="ibanError">
                 <q-input type="text" v-model.trim="user.administrative.payment.rib.iban" float-label="IBAN" @blur="$v.user.administrative.payment.rib.iban.$touch" />
               </q-field>
@@ -45,12 +86,12 @@
                 <q-input type="text" v-model.trim="user.administrative.payment.rib.bic" float-label="BIC" @blur="$v.user.administrative.payment.rib.bic.$touch" />
               </q-field>
               <q-stepper-navigation>
-                <q-btn color="primary" :disable="hasStep2Errors" @click="secondStep()" label="Enregistrer" />
+                <q-btn color="primary" :disable="hasStep3Errors" @click="thirdStep()" label="Enregistrer" />
                 <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
               </q-stepper-navigation>
             </q-step>
             <!-- Last step -->
-            <q-step name="third" title="Documents annexes">
+            <q-step name="fourth" title="Documents annexes">
               <p>Pour envoyer un document:</p>
               <ul>
                 <li>Appuie d'abord sur cette icône: <q-icon name="add" size="1.5rem" /></li>
@@ -86,7 +127,7 @@
                 <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.certificates[0]">Fichier manquant <q-icon name="warning" /></p>
               </q-field>
               <q-stepper-navigation>
-                <q-btn color="primary" :disable="hasStep3Errors" @click="lastStep()" label="Terminer mon inscription" />
+                <q-btn color="primary" :disable="hasStep4Errors" @click="lastStep()" label="Terminer mon inscription" />
                 <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
               </q-stepper-navigation>
             </q-step>
@@ -99,13 +140,13 @@
 </template>
 
 <script>
-import { required, minLength, maxLength } from 'vuelidate/lib/validators'
+import { required, minLength, maxLength, numeric, email, sameAs } from 'vuelidate/lib/validators'
 
 export default {
   // name: 'PageName',
   data () {
     return {
-      hasStep3Errors: true,
+      hasStep4Errors: true,
       alenviUser: null,
       ogustUser: null,
       inProgress: false,
@@ -145,6 +186,33 @@ export default {
   },
   validations: {
     user: {
+      civility: { required },
+      lastname: { required },
+      firstname: { required },
+      // phoneNbr: { required, phoneNumber },
+      address: {
+        line: { required },
+        zipCode: {
+          required,
+          numeric,
+          minLength: minLength(5)
+        },
+        city: { required }
+      },
+      email: { required, email },
+      emailConfirmation: {
+        required,
+        sameAsEmail: sameAs('email')
+      },
+      password: {
+        required,
+        minLength: minLength(6),
+        maxLength: maxLength(20)
+      },
+      passwordConfirmation: {
+        required,
+        sameAsPassword: sameAs('password')
+      },
       dateOfBirth: { required },
       stateOfBirth: {
         required,
@@ -196,6 +264,10 @@ export default {
       // if (this.$route.query.step && (this.$route.query.step === 'first' || this.$route.query.step === 'second' || this.$route.query.step === 'third')) {
       //   this.$refs.stepper.goToStep(this.$route.query.step);
       // }
+      this.user.sector = this.$q.cookies.get('signup_sector');
+      this.user.mobilePhone = this.$q.cookies.get('signup_mobile');
+      this.user.managerId = this.$q.cookies.get('signup_managerId');
+      this.accessToken = this.$q.cookies.get('signup_is_activated');
       this.accessToken = this.$route.query.token;
       this.inProgress = true;
       await this.setAlenviUser();
@@ -209,6 +281,27 @@ export default {
     }
   },
   computed: {
+    emailError () {
+      if (!this.$v.user.email.required) {
+        return 'Champ requis';
+      } else if (!this.$v.user.email.email) {
+        return 'Email invalide'
+      }
+    },
+    zipCodeError () {
+      if (!this.$v.user.address.zipCode.required) {
+        return 'Champ requis';
+      } else if (!this.$v.user.address.zipCode.minLength || !this.$v.user.address.zipCode.numeric) {
+        return 'Code postal invalide';
+      }
+    },
+    passwordError () {
+      if (!this.$v.user.password.required) {
+        return 'Champ requis';
+      } else if (!this.$v.user.password.minLength) {
+        return 'Le mot de passe doit contenir entre 6 et 20 caractères.'
+      }
+    },
     stateOfBirthError () {
       if (!this.$v.user.stateOfBirth.required) {
         return 'Champ requis'
@@ -240,11 +333,11 @@ export default {
     getMaxDate () {
       return `${this.$moment().year()}-12-31`
     },
-    hasStep1Errors () {
+    hasStep2Errors () {
       return this.$v.user.dateOfBirth.$invalid ? true : this.$v.user.countryOfBirth.$invalid ? true : this.$v.user.stateOfBirth.$invalid ? true
         : this.$v.user.placeOfBirth.$invalid ? true : !!this.$v.user.socialInsuranceNumber.$invalid
     },
-    hasStep2Errors () {
+    hasStep3Errors () {
       return this.$v.user.administrative.payment.rib.iban.$invalid ? true : !!this.$v.user.administrative.payment.rib.bic.$invalid
     },
     // hasStep3Errors () {
@@ -269,6 +362,43 @@ export default {
   },
   methods: {
     async firstStep () {
+      const ogustData = {
+        title: this.user.civility,
+        last_name: this.user.lastname,
+        first_name: this.user.firstname,
+        main_address: {
+          line: this.user.address.line,
+          zip: this.user.address.zipCode,
+          city: this.user.address.city
+        },
+        email: this.user.email,
+        sector: this.user.sector,
+        mobile_phone: this.user.mobilePhone
+      };
+      const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
+      const ogustNewUser = await this.$ogust.createEmployee(ogustToken, ogustData);
+      const alenviData = {
+        firstname: this.user.firstname,
+        lastname: this.user.lastname,
+        local: {
+          email: this.user.email,
+          password: this.user.password
+        },
+        employee_id: ogustNewUser.data.data.user.body.employee.id_employee,
+        role: 'Auxiliaire',
+        sector: this.user.sector,
+        managerId: this.user.managerId,
+        mobilePhone: this.user.mobilePhone,
+        administrative: {
+          signup: {
+            firstSmsDate: this.$q.cookies.get('signup_firstSMS'),
+            step: 'second'
+          }
+        }
+      };
+      const newAlenviUser = await this.$users.create(alenviData);
+    },
+    async secondStep () {
       try {
         const ogustData = {
           id_employee: this.user.id_employee,
@@ -285,7 +415,7 @@ export default {
           _id: this.$route.query.id,
           administrative: {
             signup: {
-              step: 'second'
+              step: 'third'
             }
           }
         };
@@ -297,7 +427,7 @@ export default {
         console.error(e.response);
       }
     },
-    async secondStep () {
+    async thirdStep () {
       try {
         const iban = this.user.administrative.payment.rib.iban;
         const bic = this.user.administrative.payment.rib.bic;
@@ -305,7 +435,7 @@ export default {
           _id: this.$route.query.id,
           administrative: {
             signup: {
-              step: 'third'
+              step: 'fourth'
             },
             payment: {
               rib: {
@@ -370,7 +500,7 @@ export default {
         console.error(e);
       }
     },
-    checkStep3Errors () {
+    checkStep4Errors () {
       if (this.alenviUser.picture && this.alenviUser.administrative && this.alenviUser.administrative.idCard &&
         this.alenviUser.administrative.healthAttest && this.alenviUser.administrative.certificates) {
         this.hasStep3Errors = false;
