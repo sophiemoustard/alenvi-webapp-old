@@ -1,6 +1,7 @@
 <template>
   <q-tabs align="justify">
     <q-tab v-for="(tab, index) in tabInfo"
+          v-can="{ feature: tab.feature, user }"
           :key="index"
           :icon="tab.icon"
           slot="title"
@@ -16,6 +17,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 import Planning from './Planning.vue'
 import PlanningModification from './PlanningModification'
 import ConstrainedCoaches from './ConstrainedCoaches'
@@ -35,24 +38,32 @@ export default {
           name: 'planning',
           icon: 'date range',
           default: true,
-          component: 'Planning'
+          component: 'Planning',
+          feature: 'Planning'
         },
         {
           label: 'Modifications Planning',
           name: 'modifs-planning',
           icon: 'update',
           default: false,
-          component: 'PlanningModification'
+          component: 'PlanningModification',
+          feature: 'Modifications Planning'
         },
         {
           label: 'Coach(s) de permanence',
           name: 'constrained',
           icon: 'perm contact calendar',
           default: false,
-          component: 'ConstrainedCoaches'
+          component: 'ConstrainedCoaches',
+          feature: 'Permanence'
         }
       ]
     }
+  },
+  computed: {
+    ...mapGetters({
+      user: 'main/user'
+    })
   }
 }
 </script>
