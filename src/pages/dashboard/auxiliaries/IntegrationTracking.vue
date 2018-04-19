@@ -44,6 +44,13 @@
       <div class="row q-mb-md">
         <q-btn icon="folder" label="Dossier Google Drive" color="primary" flat @click="goTo(auxiliary.driveFolderLink)" />
       </div>
+      <div class="row no-wrap q-mb-md">
+        <div class="on-left">A parlé à Pigi</div>
+        <div>
+          <q-icon name="done" color="positive" v-if="auxiliary.pigiConnection" />
+          <q-icon name="clear" color="negative" v-if="!auxiliary.pigiConnection" />
+        </div>
+      </div>
       <div class="row q-mb-md gutter-sm">
         <div v-for="(info, index) in auxiliary.info" :key="index" inline class="col-xs-12 col-md-4 row justify-center">
           <q-card style="width: 100%">
@@ -112,13 +119,13 @@ export default {
           align: 'left',
           sortable: true
         },
-        {
-          name: 'secondSmsDate',
-          label: 'SMS confirmation inscription',
-          field: 'secondSmsDate',
-          align: 'center',
-          sortable: true
-        },
+        // {
+        //   name: 'secondSmsDate',
+        //   label: 'SMS confirmation inscription',
+        //   field: 'secondSmsDate',
+        //   align: 'center',
+        //   sortable: true
+        // },
         {
           name: 'pigiConnection',
           label: 'Connexion Pigi',
@@ -172,6 +179,7 @@ export default {
         for (let i = 0, l = userList.length; i < l; i++) {
           for (const k in ogustUserList) {
             if (userList[i].employee_id === Number(ogustUserList[k].id_employee)) {
+              console.log(ogustUserList[i]);
               this.userList.push({
                 firstSmsDate:
                   userList[i].administrative &&
@@ -179,16 +187,30 @@ export default {
                     ? userList[i].administrative.signup.firstSmsDate
                     : '-',
                 auxiliary: `${userList[i].firstname} ${userList[i].lastname}`,
-                secondSmsDate:
-                  userList[i].administrative &&
-                  userList[i].administrative.signup.secondSmsDate
-                    ? !!userList[i].administrative.signup.secondSmsDate
-                    : '-',
+                // secondSmsDate:
+                //   userList[i].administrative &&
+                //   userList[i].administrative.signup.secondSmsDate
+                //     ? !!userList[i].administrative.signup.secondSmsDate
+                //     : '-',
                 pigiConnection: userList[i].facebook
                   ? !!userList[i].facebook.address
-                  : '-',
+                  : false,
                 personalInfo: {
                   data: {
+                    email: {
+                      label: 'Email',
+                      done: !!ogustUserList[k].email
+                    },
+                    address: {
+                      label: 'Adresse (rue + CP + ville)',
+                      done: !!ogustUserList[k].main_address.line &&
+                      !!ogustUserList[k].main_address.zip &&
+                      !!ogustUserList[k].main_address.city
+                    },
+                    socialInsuranceNumber: {
+                      label: 'Numéro sécu',
+                      done: !!ogustUserList[k].social_insurance_number
+                    },
                     dateOfBirth: {
                       label: 'Date de naissance',
                       done: !!ogustUserList[k].date_of_birth
@@ -209,7 +231,10 @@ export default {
                   done: !!ogustUserList[k].date_of_birth &&
                   !!ogustUserList[k].place_of_birth &&
                   !!ogustUserList[k].state_of_birth &&
-                  !!ogustUserList[k].country_of_birth
+                  !!ogustUserList[k].country_of_birth &&
+                  !!ogustUserList[k].main_address.line &&
+                  !!ogustUserList[k].main_address.zip &&
+                  !!ogustUserList[k].main_address.city
                 },
                 paymentInfo: {
                   data: {
@@ -239,7 +264,7 @@ export default {
                   data: {
                     idCard: {
                       label: 'CNI',
-                      done: userList[i].administrative ? !!userList[i].administrative.idCard : false
+                      done: userList[i].administrative ? userList[i].administrative.idCard.length !== 0 : false
                     },
                     healthAttest: {
                       label: 'Attestation carte vitale',
@@ -285,6 +310,8 @@ export default {
             data: row.miscDocuments.data
           }
         },
+        pigiConnection: row.pigiConnection,
+        secondSmsDate: row.secondSmsDate,
         name: row.auxiliary,
         driveFolderLink: row.driveFolderLink
       };
