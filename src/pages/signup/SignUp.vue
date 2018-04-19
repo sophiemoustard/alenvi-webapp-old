@@ -77,7 +77,7 @@
                 <q-btn color="primary" :disable="hasStep2Errors" @click="secondStep()" label="Enregistrer" />
               </q-stepper-navigation>
             </q-step>
-            <!-- 3rd step -->
+            <!-- Third step -->
             <q-step name="third" title="Informations de paiement">
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.payment.rib.iban.$error" :error-label="ibanError">
                 <q-input type="text" v-model.trim="user.administrative.payment.rib.iban" float-label="IBAN" @blur="$v.user.administrative.payment.rib.iban.$touch" />
@@ -176,7 +176,7 @@ export default {
         dateOfBirth: '',
         stateOfBirth: '',
         placeOfBirth: '',
-        countryOfBirth: '',
+        countryOfBirth: 'FR',
         socialInsuranceNumber: '',
         picture: {
           link: ''
@@ -278,17 +278,26 @@ export default {
   // },
   async mounted () {
     try {
-      if (this.$route.query.step && (this.$route.query.step === 'first' || this.$route.query.step === 'second' ||
+      this.inProgress = true;
+      if (this.$route.query.step && (this.$route.query.step === 'second' ||
         this.$route.query.step === 'third' || this.$route.query.step === 'fourth')) {
         this.$refs.stepper.goToStep(this.$route.query.step);
       }
       this.user.sector = this.$q.cookies.get('signup_sector');
       this.user.mobilePhone = this.$q.cookies.get('signup_mobile');
       this.user.managerId = this.$q.cookies.get('signup_managerId');
-      this.accessToken = this.$q.cookies.get('signup_is_activated');
+      this.accessToken = this.$q.cookies.get('signup_token');
       // this.accessToken = this.$route.query.token;
+      await this.getCountries();
+      if (this.$route.query.token && this.$route.query.id) {
+        this.hasAccount = true;
+        await this.setAlenviUser();
+        await this.setOgustUser();
+      }
+      this.inProgress = false;
     } catch (e) {
       console.error(e);
+      this.inProgress = false;
     }
   },
   computed: {
@@ -388,7 +397,12 @@ export default {
           mobile_phone: this.user.mobilePhone
         };
         const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
-        const ogustNewUser = await this.$ogust.createEmployee(ogustToken, ogustData);
+        let ogustUser, alenviUser = {};
+        if (this.$route.query.token && this.$route.query.id) {
+          ogustUser = await this.$ogust.setEmployee(ogustData, ogustToken);
+        } else {
+          ogustUser = await this.$ogust.createEmployee(ogustToken, ogustData);
+        }
         const alenviData = {
           firstname: this.user.firstname,
           lastname: this.user.lastname,
@@ -396,7 +410,7 @@ export default {
             email: this.user.email,
             password: this.user.password
           },
-          employee_id: ogustNewUser.data.data.user.body.employee.id_employee,
+          employee_id: ogustUser.data.data.user.body.employee.id_employee,
           role: 'Auxiliaire',
           sector: this.user.sector,
           managerId: this.user.managerId,
@@ -408,8 +422,14 @@ export default {
             }
           }
         };
-        const newAlenviUser = await this.$users.create(alenviData);
-        this.user.id = newAlenviUser.data.data.user._id;
+        if (this.$route.query.token && this.$route.query.id) {
+          alenviUser = await this.$users.updateById(alenviData, this.$route.query.token);
+        } else {
+          alenviUser = await this.$users.create(alenviData);
+        }
+        await this.setAlenviUser();
+        await this.setOgustUser();
+        this.user.id = alenviUser.data.data.user._id;
         this.inProgress = false;
         this.$refs.stepper.next();
       } catch (e) {
@@ -427,11 +447,9 @@ export default {
     async secondStep () {
       try {
         this.inProgress = true;
-        await this.getCountries();
-        await this.setAlenviUser();
-        await this.setOgustUser();
+        console.log(this.user.id_employee);
         const ogustData = {
-          id_employee: this.user.id_employee,
+          id_employee: Number(this.user.id_employee),
           date_of_birth: this.$moment(this.user.dateOfBirth).format('YYYYMMDD'),
           country_of_birth: this.user.countryOfBirth,
           state_of_birth: this.user.stateOfBirth,
