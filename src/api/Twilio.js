@@ -6,8 +6,8 @@ export default {
     const res = await alenviAxios.post(`${process.env.API_HOSTNAME}/twilio/send/${phoneNbr}`, data);
     return res;
   },
-  async sendSMSConfirm (params, token) {
-    const res = await axios.post(`${process.env.API_HOSTNAME}/twilio/sendConfirm/${params.phoneNbr}`, params, { headers: { 'x-access-token': token } });
+  async sendSMSWarning (params, token) {
+    const res = await axios.post(`${process.env.API_HOSTNAME}/twilio/sendWarning/${params.phoneNbr}`, params, { headers: { 'x-access-token': token } });
     return res;
   },
   async getRecords (params, token) {
