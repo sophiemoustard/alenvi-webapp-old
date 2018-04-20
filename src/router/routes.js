@@ -121,7 +121,7 @@ export default [
       {
         path: 'caregivers',
         name: 'caregivers',
-        component: () => import('pages/dashboard/caregivers/AddHelper'),
+        component: () => import('pages/dashboard/caregivers/NavTabs'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permission: 'Aidants'
