@@ -192,7 +192,12 @@ export default {
     return customerContactsRaw.data.data.contacts.array_contact.result;
   },
   async setEmployeeBankInfo (data, ogustToken = null) {
-    const employeeBankInfoRaw = await axios.put(`${process.env.API_HOSTNAME}/ogust/bankInfo`, data, { headers: { 'x-ogust-token': ogustToken } });
+    let employeeBankInfoRaw;
+    if (ogustToken === null) {
+      employeeBankInfoRaw = await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/bankInfo`, data);
+    } else {
+      employeeBankInfoRaw = await axios.put(`${process.env.API_HOSTNAME}/ogust/bankInfo`, data, { headers: { 'x-ogust-token': ogustToken } });
+    }
     return employeeBankInfoRaw.data.data.updatedBankInfo.result;
   }
 }

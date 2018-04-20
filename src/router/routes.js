@@ -41,23 +41,26 @@ export default [
       }
     }
   },
-  // {
-  //   path: '/signupComplete',
-  //   component: () => import('pages/signup/SignUpComplete'),
-  //   beforeEnter: async (to, from, next) => {
-  //     try {
-  //       if (to.query.token && to.query.id) {
-  //         await users.getById(to.query.id, to.query.token);
-  //         next();
-  //       } else {
-  //         next({ path: '/401' });
-  //       }
-  //     } catch (e) {
-  //       console.error(e.response);
-  //       next({ path: '/401' });
-  //     }
-  //   }
-  // },
+  {
+    path: '/signupComplete',
+    component: () => import('pages/signup/SignUpComplete'),
+    meta: {
+      cookies: ['alenvi_token', 'refresh_token']
+    }
+    // beforeEnter: async (to, from, next) => {
+    //   try {
+    //     if (store.getters['main/user'] && store.getters['main/user'].administrative && !store.getters['main/user'].administrative.signup.complete) {
+    //       // await users.getById(to.query.id, to.query.token);
+    //       next();
+    //     } else {
+    //       next({ path: '/401' });
+    //     }
+    //   } catch (e) {
+    //     console.error(e.response);
+    //     next({ path: '/401' });
+    //   }
+    // }
+  },
   {
     path: '/signup/optionalDocuments',
     component: () => import('pages/signup/optionalDocuments'),
