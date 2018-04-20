@@ -89,7 +89,6 @@ export default {
       try {
         const rolesRaw = await this.$roles.showAll();
         this.roles = rolesRaw.data.roles;
-        console.log(this.roles);
         await this.initFeaturesInRoleToAdd();
       } catch (e) {
         console.error(e);
