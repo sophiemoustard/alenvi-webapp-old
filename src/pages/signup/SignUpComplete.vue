@@ -79,7 +79,29 @@
                 <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.healthAttest">Fichier manquant <q-icon name="warning" /></p>
               </q-field>
               <q-stepper-navigation>
-                <q-btn color="primary" :disable="hasStep3Errors" @click="lastStep()" label="Terminer mon inscription" />
+                <q-btn color="primary" :disable="hasStep3Errors" @click="thirdStep()" label="Enregistrer" />
+                <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
+              </q-stepper-navigation>
+            </q-step>
+            <q-step name="fourth" title="Documents optionnels">
+              <p>
+                Merci de répondre à ces questions afin que Pigi puisse t'envoyer un lien pour
+                envoyer tes justificatifs.
+              </p>
+              <p>Possèdes-tu une carte Navigo ?</p>
+              <q-radio v-model="user.administrative.navigoInvoice.hasNavigoInvoice" val="true" label="Oui"/>
+              <q-radio v-model="user.administrative.navigoInvoice.hasNavigoInvoice" val="false" label="Non"/>
+              <p>Possèdes-tu une mutuelle ?</p>
+              <q-radio v-model="user.administrative.mutualFund.hasMutualFund" val="true" label="Oui"/>
+              <q-radio v-model="user.administrative.mutualFund.hasMutualFund" val="false" label="Non"/>
+              <p>Possèdes-tu un forfait téléphonique ?</p>
+              <q-radio v-model="user.administrative.phoneInvoice.hasPhoneInvoice" val="true" label="Oui"/>
+              <q-radio v-model="user.administrative.phoneInvoice.hasPhoneInvoice" val="false" label="Non"/>
+              <p>Possèdes-tu des diplômes et/ou certificats de travail ?</p>
+              <q-radio v-model="user.administrative.certificates.hasCertificates" val="true" label="Oui"/>
+              <q-radio v-model="user.administrative.certificates.hasCertificates" val="false" label="Non"/>
+              <q-stepper-navigation>
+                <q-btn color="primary" @click="lastStep()" label="Enregistrer" />
                 <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
               </q-stepper-navigation>
             </q-step>
@@ -133,7 +155,18 @@ export default {
             driveId: '',
             link: ''
           },
-          certificates: []
+          certificates: {
+            hasCertificates: ''
+          },
+          mutualFund: {
+            hasMutualFund: ''
+          },
+          navigoInvoice: {
+            hasNavigoInvoice: ''
+          },
+          phoneInvoice: {
+            hasPhoneInvoice: ''
+          }
         }
       }
     }
@@ -333,6 +366,9 @@ export default {
         console.error(e);
       }
     },
+    thirdStep () {
+      this.$refs.stepper.next();
+    },
     async lastStep () {
       this.progress = true;
       const alenviData = {
@@ -341,6 +377,10 @@ export default {
           signup: {
             complete: true
           },
+          mutualFund: this.user.administrative.mutualFund,
+          navigoInvoice: this.user.administrative.navigoInvoice,
+          phoneInvoice: this.user.administrative.phoneInvoice,
+          certificates: this.user.administrative.certificates
         }
       };
       // await this.$users.updateById(alenviData, this.accessToken);
