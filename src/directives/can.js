@@ -1,4 +1,5 @@
 import redirect from '../router/redirect';
+import store from '../store/index'
 
 const commentNode = (el, vnode) => {
   const comment = document.createComment(' ')
@@ -24,11 +25,12 @@ const commentNode = (el, vnode) => {
 }
 
 export const can = (el, binding, vnode) => {
-  if (binding.value.user.role && binding.value.user.role.features) {
-    for (let i = 0, l = binding.value.user.role.features.length; i < l; i++) {
-      if (binding.value.user.role.features[i].name === binding.value.feature) {
+  const user = store.getters['main/user'];
+  if (user.role && user.role.features) {
+    for (let i = 0, l = user.role.features.length; i < l; i++) {
+      if (user.role.features[i].name === binding.value.feature) {
         // el.style.display = binding.value.user.role.features[i].permission_level === 0 ? 'none' : el.style.display;
-        if (binding.value.user.role.features[i].permission_level === 0) {
+        if (user.role.features[i].permission_level === 0) {
           commentNode(el, vnode);
         }
       }

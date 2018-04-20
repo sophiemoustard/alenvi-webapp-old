@@ -1,7 +1,7 @@
 <template>
   <q-tabs align="justify">
     <q-tab v-for="(tab, index) in tabInfo"
-          v-can="{ feature: tab.feature, user }"
+          v-can="{ feature: tab.feature }"
           :key="index"
           :icon="tab.icon"
           slot="title"
@@ -17,8 +17,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-
 import Planning from './Planning.vue'
 import PlanningModification from './PlanningModification'
 import ConstrainedCoaches from './ConstrainedCoaches'
@@ -59,11 +57,6 @@ export default {
         }
       ]
     }
-  },
-  computed: {
-    ...mapGetters({
-      user: 'main/user'
-    })
   }
 }
 </script>
