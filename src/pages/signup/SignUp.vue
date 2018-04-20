@@ -60,6 +60,7 @@
 
 <script>
 import { required, email, sameAs, numeric, minLength, maxLength } from 'vuelidate/lib/validators'
+import { date } from 'quasar'
 
 export default {
   // name: 'PageName',
@@ -132,7 +133,7 @@ export default {
     this.user.sector = this.$q.cookies.get('signup_sector');
     this.user.mobilePhone = this.$q.cookies.get('signup_mobile');
     this.user.managerId = this.$q.cookies.get('signup_managerId');
-    this.accessToken = this.$q.cookies.get('signup_is_activated');
+    this.accessToken = this.$q.cookies.get('signup_token');
   },
   computed: {
     emailError () {
@@ -181,6 +182,7 @@ export default {
           sector: this.user.sector,
           mobile_phone: this.user.mobilePhone
         };
+        console.log(this.accessToken);
         const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
         const ogustNewUser = await this.$ogust.createEmployee(ogustToken, ogustData);
         const alenviData = {
@@ -206,17 +208,28 @@ export default {
         // const alenviToken = newAlenviUser.data.data.token;
         // const alenviUserId = newAlenviUser.data.data.user._id;
         // this.$q.loading.show({ message: 'Redirection vers Pigi...' });
-        this.$q.loading.show({ message: 'Redirection vers page de login...' });
         setTimeout(async () => {
           this.$q.loading.hide();
-          this.$q.cookies.remove('signup_is_activated', { path: '/' });
+          this.$q.cookies.remove('signup_token', { path: '/' });
           this.$q.cookies.remove('signup_sector', { path: '/' });
           this.$q.cookies.remove('signup_mobile', { path: '/' });
           this.$q.cookies.remove('signup_managerId', { path: '/' });
           this.$q.cookies.remove('signup_firstSMS', { path: '/' });
           await this.$activationCode.delete(this.accessToken, this.user.mobilePhone);
+          this.$q.loading.show({ message: 'Connexion au compte...' });
+          const user = await this.$axios.post(`${process.env.API_HOSTNAME}/users/authenticate`, {
+            email: this.user.email,
+            password: this.user.password
+          });
+          // console.log(user);
+          this.$q.cookies.set('alenvi_token', user.data.data.token, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV !== 'development' });
+          this.$q.cookies.set('alenvi_token_expires_in', user.data.data.expiresIn, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV !== 'development' });
+          this.$q.cookies.set('refresh_token', user.data.data.refreshToken, { path: '/', expires: 365, secure: process.env.NODE_ENV !== 'development' });
+          this.$q.cookies.set('user_id', user.data.data.user._id, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV !== 'development' });
+          await this.$store.dispatch('main/getUser', this.$q.cookies.get('user_id'));
+          this.$q.loading.show({ message: 'Redirection vers prochaine étape...' });
           this.$q.loading.hide();
-          this.$router.replace({ path: '/login' });
+          this.$router.replace({ path: '/signupComplete' });
           // await this.$twilio.sendSMSConfirm({ id: alenviUserId, phoneNbr: this.user.mobilePhone }, this.accessToken);
           // window.location.href = `${process.env.MESSENGER_LINK}?ref=${alenviToken}`
         }, 2000);
