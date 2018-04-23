@@ -6,7 +6,7 @@
           <img style="max-width: 300px" src="https://res.cloudinary.com/alenvi/image/upload/c_scale,q_auto,w_400/v1507124345/images/business/alenvi_logo_complet_full.png" alt="Logo Alenvi" class="alenvi-logo">
         </q-card-media>
         <q-card-title class="layout-padding">
-          <div class="text-center">Bienvenue chez Alenvi !</div><br /><span slot="subtitle">Nous allons maintenant terminer ta création de compte. Merci de renseigner les champs suivants, relis-toi bien car ces infos sont importantes :-)
+          <span slot="subtitle">Poursuivons ton inscription. Merci de renseigner les champs suivants, relis-toi bien car ces infos sont importantes :-)
             N’hésite pas à appeler ton coach en cas de question !</span>
         </q-card-title>
         <q-card-separator />
@@ -57,20 +57,23 @@
                 <li>Choisis le fichier que tu souhaites envoyer</li>
                 <li>Appuie ensuite sur cette icône: <q-icon name="cloud upload" size="1.5rem" /> pour finaliser l'envoi du fichier</li>
               </ul>
+              <p class="caption">Photo de toi:</p>
               <q-field icon="mdi-account-card-details" :error="$v.user.picture.$error" error-label="Champ requis">
                 <q-uploader name="picture" :url="pictureUploadUrl" :headers="headers"
                 :additional-fields="[{ name: 'fileName', value: `photo_${user.firstname}_${user.lastname}` }]"
-                float-label="Photo" @finish="afterUpload()" auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png"/>
+                @finish="afterUpload()" auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png"/>
                 <p class="upload-done" v-if="alenviUser && alenviUser.picture">Fichier mis en ligne <q-icon name="check" /></p>
                 <p class="upload-not-done" v-if="alenviUser && !alenviUser.picture">Fichier manquant <q-icon name="warning" /></p>
               </q-field>
+              <p class="caption">Carte d'identité (recto + verso) / titre de séjour:</p>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.idCard.$error" error-label="Champ requis">
                 <q-uploader name="idCard" :url="docsUploadUrl" :headers="headers"
                 :additional-fields="[{ name: 'fileName', value: `cni_${user.firstname}_${user.lastname}` }]"
-                float-label="Carte d'identité / titre de séjour" @finish="afterUpload()" multiple auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
+                @finish="afterUpload()" multiple auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
                 <p class="upload-done" v-if="alenviUser && alenviUser.administrative.idCard">Fichier mis en ligne <q-icon name="check" /></p>
                 <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.idCard">Fichier manquant <q-icon name="warning" /></p>
               </q-field>
+              <p class="caption">Carte vitale:</p>
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.healthAttest.$error" error-label="Champ requis">
                 <q-uploader name="healthAttest" :url="docsUploadUrl" :headers="headers"
                 :additional-fields="[{ name: 'fileName', value: `assurance-maladie_${user.firstname}_${user.lastname}` }]"
