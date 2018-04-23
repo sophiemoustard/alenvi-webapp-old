@@ -110,7 +110,7 @@
                 <q-radio v-model="user.hasMessenger" val="false" label="Non" @blur="$v.user.hasMessenger.$touch"/>
               </q-field>
               <q-stepper-navigation>
-                <q-btn color="primary" :disable="hasStep4Errors" @click="lastStep()" label="Enregistrer" />
+                <q-btn color="primary" @click="lastStep()" label="Enregistrer" />
                 <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
               </q-stepper-navigation>
             </q-step>
