@@ -139,6 +139,7 @@ export default {
   // name: 'PageName',
   data () {
     return {
+      timeout: null,
       hasStep3Errors: true,
       alenviUser: null,
       ogustUser: null,
@@ -322,7 +323,7 @@ export default {
     hasStep4Errors () {
       return this.$v.user.administrative.navigoInvoice.hasNavigoInvoice.$invalid ? true : this.$v.user.administrative.mutualFund.hasMutualFund.$invalid
         ? true : this.$v.user.administrative.phoneInvoice.hasPhoneInvoice.$invalid ? true : this.$v.user.administrative.certificates.hasCertificates.$invalid
-          ? true : !!this.$v.user.hasMessenger
+          ? true : this.$v.user.hasMessenger.$invalid ? true : !!this.$v.user.administrative.phoneInvoice.hasPhoneInvoice.$invalid
     },
     docsUploadUrl () {
       return `${process.env.API_HOSTNAME}/uploader/${this.storedUser._id}/drive/uploadFile`;
@@ -434,26 +435,33 @@ export default {
           mutualFund: this.user.administrative.mutualFund,
           navigoInvoice: this.user.administrative.navigoInvoice,
           phoneInvoice: this.user.administrative.phoneInvoice,
-          certificates: this.user.administrative.certificates
+          certificates: this.user.administrative.certificates,
+          healthAttest: this.user.administrative.healthAttest
         }
       };
       // await this.$users.updateById(alenviData, this.accessToken);
       await this.$users.updateById(alenviData);
-      this.$q.loading.show({ message: 'Redirection vers Pigi...' });
-      setTimeout(async () => {
-        this.$q.loading.hide();
-        this.progress = false;
-        if (this.user.hasMessenger) {
+      this.progress = false;
+      console.log(this.user.hasMessenger);
+      if (this.user.hasMessenger === 'true') {
+        this.$q.loading.show({ message: 'Redirection vers Pigi...' });
+        this.timeout = setTimeout(() => {
+          this.$q.loading.hide();
           if (Cookies.get('alenvi_token')) {
             window.location.href = `${process.env.MESSENGER_LINK}?ref=${Cookies.get('alenvi_token')}`;
           } else {
             window.location.href = `${process.env.MESSENGER_LINK}`;
           }
-        } else {
+        }, 2000);
+      } else {
+        this.$q.loading.show({ message: "Un SMS va t'être envoyé dans quelques instants..." });
+        this.timeout = setTimeout(async () => {
           await this.$twilio.sendSMSWarning({ phoneNbr: this.storedUser.mobilePhone, id: this.storedUser._id });
-        }
-        // window.location.href = `${process.env.MESSENGER_LINK}?ref=signup_complete`;
-      }, 2000);
+          this.$q.loading.hide();
+          window.close();
+        }, 3000)
+      }
+      // window.location.href = `${process.env.MESSENGER_LINK}?ref=signup_complete`;
     },
     async getCountries () {
       try {
@@ -530,6 +538,9 @@ export default {
         this.user.administrative.payment.rib.bic = this.ogustUser.bank_information[0].bic_number || '';
       }
     }
+  },
+  beforeDestroy () {
+    clearTimeout(this.timeout);
   }
 }
 </script>
