@@ -69,7 +69,7 @@
               <q-field icon="mdi-account-card-details" :error="$v.user.administrative.idCard.$error" error-label="Champ requis">
                 <q-uploader name="idCard" :url="docsUploadUrl" :headers="headers"
                 :additional-fields="[{ name: 'fileName', value: `cni_${user.firstname}_${user.lastname}` }]"
-                float-label="Carte d'identité / titre de séjour" @finish="afterUpload()" multiple auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
+                @finish="afterUpload()" multiple auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
                 <p class="upload-done" v-if="alenviUser && alenviUser.administrative.idCard.length !== 0">Fichier mis en ligne <q-icon name="check" /></p>
                 <p class="upload-not-done" v-if="alenviUser && alenviUser.administrative.idCard === 0">Fichier manquant <q-icon name="warning" /></p>
               </q-field>
