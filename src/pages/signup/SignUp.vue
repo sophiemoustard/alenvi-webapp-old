@@ -47,7 +47,7 @@
             <q-input type="password" v-model="user.passwordConfirmation" float-label="Confirmation mot de passe" @blur="$v.user.passwordConfirmation.$touch" />
           </q-field><br>
           <p style="color: red"><strong>Note bien tes identifiants (email et mot de passe).</strong></p>
-          <p style="color: red"><strong>Un SMS te sera envoyé une fois que tu auras cliqué sur "Envoyer". Il s'agit de la prochaine étape de ton inscription chez Alenvi.</strong></p>
+          <!-- <p style="color: red"><strong>Un SMS te sera envoyé une fois que tu auras cliqué sur "Envoyer". Il s'agit de la prochaine étape de ton inscription chez Alenvi.</strong></p> -->
         </q-card-main>
         <q-card-actions class="row justify-end">
           <q-btn color="primary" @click="submit" :disable="$v.user.$invalid" flat>Envoyer</q-btn>

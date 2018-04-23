@@ -50,7 +50,7 @@
               </q-stepper-navigation>
             </q-step>
             <!-- Last step -->
-            <q-step name="third" title="Documents annexes">
+            <q-step name="third" title="Documents obligatoires">
               <p>Pour envoyer un document:</p>
               <ul>
                 <li>Appuie d'abord sur cette icône: <q-icon name="add" size="1.5rem" /></li>
@@ -84,24 +84,33 @@
               </q-stepper-navigation>
             </q-step>
             <q-step name="fourth" title="Documents optionnels">
-              <p>
-                Merci de répondre à ces questions afin que Pigi puisse t'envoyer un lien pour
-                envoyer tes justificatifs.
-              </p>
-              <p>Possèdes-tu une carte Navigo ?</p>
-              <q-radio v-model="user.administrative.navigoInvoice.hasNavigoInvoice" val="true" label="Oui"/>
-              <q-radio v-model="user.administrative.navigoInvoice.hasNavigoInvoice" val="false" label="Non"/>
-              <p>Possèdes-tu une mutuelle ?</p>
-              <q-radio v-model="user.administrative.mutualFund.hasMutualFund" val="true" label="Oui"/>
-              <q-radio v-model="user.administrative.mutualFund.hasMutualFund" val="false" label="Non"/>
-              <p>Possèdes-tu un forfait téléphonique ?</p>
-              <q-radio v-model="user.administrative.phoneInvoice.hasPhoneInvoice" val="true" label="Oui"/>
-              <q-radio v-model="user.administrative.phoneInvoice.hasPhoneInvoice" val="false" label="Non"/>
-              <p>Possèdes-tu des diplômes et/ou certificats de travail ?</p>
-              <q-radio v-model="user.administrative.certificates.hasCertificates" val="true" label="Oui"/>
-              <q-radio v-model="user.administrative.certificates.hasCertificates" val="false" label="Non"/>
+              <p class="caption">Possèdes-tu une carte Navigo ?</p>
+              <q-field :error="$v.user.administrative.navigoInvoice.hasNavigoInvoice.$error" error-label="Champ requis">
+                <q-radio class="on-left" v-model="user.administrative.navigoInvoice.hasNavigoInvoice" val="true" label="Oui" @blur="$v.user.administrative.navigoInvoice.hasNavigoInvoice.$touch"/>
+                <q-radio v-model="user.administrative.navigoInvoice.hasNavigoInvoice" val="false" label="Non" @blur="$v.user.administrative.navigoInvoice.hasNavigoInvoice.$touch"/>
+              </q-field>
+              <p class="caption">Possèdes-tu une mutuelle ?</p>
+              <q-field :error="$v.user.administrative.mutualFund.hasMutualFund.$error" error-label="Champ requis">
+                <q-radio class="on-left" v-model="user.administrative.mutualFund.hasMutualFund" val="true" label="Oui" @blur="$v.user.administrative.mutualFund.hasMutualFund.$touch"/>
+                <q-radio v-model="user.administrative.mutualFund.hasMutualFund" val="false" label="Non" @blur="$v.user.administrative.mutualFund.hasMutualFund.$touch"/>
+              </q-field>
+              <p class="caption">Possèdes-tu un forfait téléphonique ?</p>
+              <q-field :error="$v.user.administrative.phoneInvoice.hasPhoneInvoice.$error" error-label="Champ requis">
+                <q-radio class="on-left" v-model="user.administrative.phoneInvoice.hasPhoneInvoice" val="true" label="Oui" @blur="$v.user.administrative.phoneInvoice.hasPhoneInvoice.$touch"/>
+                <q-radio v-model="user.administrative.phoneInvoice.hasPhoneInvoice" val="false" label="Non" @blur="$v.user.administrative.phoneInvoice.hasPhoneInvoice.$touch"/>
+              </q-field>
+              <p class="caption">Possèdes-tu des diplômes et/ou certificats de travail ?</p>
+              <q-field :error="$v.user.administrative.certificates.hasCertificates.$error" error-label="Champ requis">
+                <q-radio class="on-left" v-model="user.administrative.certificates.hasCertificates" val="true" label="Oui" @blur="$v.user.administrative.certificates.hasCertificates.$touch"/>
+                <q-radio v-model="user.administrative.certificates.hasCertificates" val="false" label="Non" @blur="$v.user.administrative.certificates.hasCertificates.$touch"/>
+              </q-field>
+              <p class="caption">Possèdes-tu l'application Facebook Messenger <q-icon name="mdi-facebook-messenger" size="1.5rem" style="color: #0084FF"/> ?</p>
+              <q-field :error="$v.user.hasMessenger.$error" error-label="Champ requis">
+                <q-radio class="on-left" v-model="user.hasMessenger" val="true" label="Oui" @blur="$v.user.hasMessenger.$touch"/>
+                <q-radio v-model="user.hasMessenger" val="false" label="Non" @blur="$v.user.hasMessenger.$touch"/>
+              </q-field>
               <q-stepper-navigation>
-                <q-btn color="primary" @click="lastStep()" label="Enregistrer" />
+                <q-btn color="primary" :disable="hasStep4Errors" @click="lastStep()" label="Enregistrer" />
                 <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
               </q-stepper-navigation>
             </q-step>
@@ -130,6 +139,7 @@ export default {
       accessToken: '',
       countries: [],
       user: {
+        hasMessenger: '',
         dateOfBirth: '',
         stateOfBirth: '',
         placeOfBirth: '',
@@ -173,6 +183,7 @@ export default {
   },
   validations: {
     user: {
+      hasMessenger: { required },
       dateOfBirth: { required },
       stateOfBirth: {
         required,
@@ -202,7 +213,18 @@ export default {
         },
         idCard: { required },
         healthAttest: { required },
-        certificates: [ required ]
+        certificates: {
+          hasCertificates: { required }
+        },
+        mutualFund: {
+          hasMutualFund: { required }
+        },
+        navigoInvoice: {
+          hasNavigoInvoice: { required }
+        },
+        phoneInvoice: {
+          hasPhoneInvoice: { required }
+        }
       }
     }
   },
@@ -283,6 +305,11 @@ export default {
     //             : this.alenviUser.administrative.phoneInvoice ? true
     //               : !!this.alenviUser.administrative.navigoInvoice
     // },
+    hasStep4Errors () {
+      return this.$v.user.administrative.navigoInvoice.hasNavigoInvoice.$invalid ? true : this.$v.user.administrative.mutualFund.hasMutualFund.$invalid
+        ? true : this.$v.user.administrative.phoneInvoice.hasPhoneInvoice.$invalid ? true : this.$v.user.administrative.certificates.hasCertificates.$invalid
+          ? true : !!this.$v.user.hasMessenger
+    },
     docsUploadUrl () {
       return `${process.env.API_HOSTNAME}/uploader/${this.storedUser._id}/drive/uploadFile`;
     },
@@ -366,8 +393,21 @@ export default {
         console.error(e);
       }
     },
-    thirdStep () {
-      this.$refs.stepper.next();
+    async thirdStep () {
+      try {
+        const alenviData = {
+          _id: this.storedUser._id,
+          administrative: {
+            signup: {
+              step: 'fourth'
+            }
+          }
+        };
+        await this.$users.updateById(alenviData);
+        this.$refs.stepper.next();
+      } catch (e) {
+        console.error(e);
+      }
     },
     async lastStep () {
       this.progress = true;
@@ -421,7 +461,7 @@ export default {
     },
     checkStep3Errors () {
       if (this.alenviUser.picture && this.alenviUser.administrative && this.alenviUser.administrative.idCard &&
-        this.alenviUser.administrative.healthAttest && this.alenviUser.administrative.certificates) {
+        this.alenviUser.administrative.healthAttest) {
         this.hasStep3Errors = false;
       }
     },

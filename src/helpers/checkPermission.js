@@ -16,5 +16,6 @@ export const checkPermission = async (to, user) => {
     return true;
   } catch (e) {
     console.error(e);
+    return false;
   }
 };
