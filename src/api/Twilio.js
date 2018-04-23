@@ -6,8 +6,13 @@ export default {
     const res = await alenviAxios.post(`${process.env.API_HOSTNAME}/twilio/send/${phoneNbr}`, data);
     return res;
   },
-  async sendSMSWarning (params, token) {
-    const res = await axios.post(`${process.env.API_HOSTNAME}/twilio/sendWarning/${params.phoneNbr}`, params, { headers: { 'x-access-token': token } });
+  async sendSMSWarning (params, token = null) {
+    let res;
+    if (token === null) {
+      res = await alenviAxios.post(`${process.env.API_HOSTNAME}/twilio/sendWarning/${params.phoneNbr}`, params);
+    } else {
+      res = await axios.post(`${process.env.API_HOSTNAME}/twilio/sendWarning/${params.phoneNbr}`, params, { headers: { 'x-access-token': token } });
+    }
     return res;
   },
   async getRecords (params, token) {

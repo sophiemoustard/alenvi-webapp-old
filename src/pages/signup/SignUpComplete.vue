@@ -429,10 +429,14 @@ export default {
       setTimeout(async () => {
         this.$q.loading.hide();
         this.progress = false;
-        if (Cookies.get('alenvi_token')) {
-          window.location.href = `${process.env.MESSENGER_LINK}?ref=${Cookies.get('alenvi_token')}`;
+        if (this.user.hasMessenger) {
+          if (Cookies.get('alenvi_token')) {
+            window.location.href = `${process.env.MESSENGER_LINK}?ref=${Cookies.get('alenvi_token')}`;
+          } else {
+            window.location.href = `${process.env.MESSENGER_LINK}`;
+          }
         } else {
-          window.location.href = `${process.env.MESSENGER_LINK}`;
+          await this.$twilio.sendSMSWarning({ phoneNbr: this.storedUser.mobilePhone, id: this.storedUser._id });
         }
         // window.location.href = `${process.env.MESSENGER_LINK}?ref=signup_complete`;
       }, 2000);
