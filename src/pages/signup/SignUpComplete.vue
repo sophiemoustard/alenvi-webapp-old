@@ -68,22 +68,22 @@
                 <q-uploader name="idCard" :url="docsUploadUrl" :headers="headers"
                 :additional-fields="[{ name: 'fileName', value: `cni_${user.firstname}_${user.lastname}` }]"
                 float-label="Carte d'identité / titre de séjour" @finish="afterUpload()" multiple auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
-                <p class="upload-done" v-if="alenviUser && alenviUser.administrative.idCard">Fichier mis en ligne <q-icon name="check" /></p>
-                <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.idCard">Fichier manquant <q-icon name="warning" /></p>
+                <p class="upload-done" v-if="alenviUser && alenviUser.administrative.idCard.length !== 0">Fichier mis en ligne <q-icon name="check" /></p>
+                <p class="upload-not-done" v-if="alenviUser && alenviUser.administrative.idCard === 0">Fichier manquant <q-icon name="warning" /></p>
               </q-field>
-              <q-field icon="mdi-account-card-details" :error="$v.user.administrative.healthAttest.$error" error-label="Champ requis">
-                <q-uploader name="healthAttest" :url="docsUploadUrl" :headers="headers"
-                :additional-fields="[{ name: 'fileName', value: `assurance-maladie_${user.firstname}_${user.lastname}` }]"
+              <q-field icon="mdi-account-card-details" :error="$v.user.administrative.vitalCard.$error" error-label="Champ requis">
+                <q-uploader name="vitalCard" :url="docsUploadUrl" :headers="headers"
+                :additional-fields="[{ name: 'fileName', value: `carte_vitale_${user.firstname}_${user.lastname}` }]"
                 float-label="Attestation d'assurance maladie en cours de validité" @finish="afterUpload()" auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
-                <p class="upload-done" v-if="alenviUser && alenviUser.administrative.healthAttest">Fichier mis en ligne <q-icon name="check" /></p>
-                <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.healthAttest">Fichier manquant <q-icon name="warning" /></p>
+                <p class="upload-done" v-if="alenviUser && alenviUser.administrative.vitalCard">Fichier mis en ligne <q-icon name="check" /></p>
+                <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.vitalCard">Fichier manquant <q-icon name="warning" /></p>
               </q-field>
               <q-stepper-navigation>
                 <q-btn color="primary" :disable="hasStep3Errors" @click="thirdStep()" label="Enregistrer" />
                 <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
               </q-stepper-navigation>
             </q-step>
-            <q-step name="fourth" title="Documents optionnels">
+            <q-step name="fourth" title="Documents optionnels" v-if="user.administrative">
               <p class="caption">Possèdes-tu une carte Navigo ?</p>
               <q-field :error="$v.user.administrative.navigoInvoice.hasNavigoInvoice.$error" error-label="Champ requis">
                 <q-radio class="on-left" v-model="user.administrative.navigoInvoice.hasNavigoInvoice" val="true" label="Oui" @blur="$v.user.administrative.navigoInvoice.hasNavigoInvoice.$touch"/>
@@ -104,13 +104,18 @@
                 <q-radio class="on-left" v-model="user.administrative.certificates.hasCertificates" val="true" label="Oui" @blur="$v.user.administrative.certificates.hasCertificates.$touch"/>
                 <q-radio v-model="user.administrative.certificates.hasCertificates" val="false" label="Non" @blur="$v.user.administrative.certificates.hasCertificates.$touch"/>
               </q-field>
+              <p class="caption">Possèdes-tu une attestation d'assurance maladie en cours de validité ?</p>
+              <q-field :error="$v.user.administrative.healthAttest.hasHealthAttest.$error" error-label="Champ requis">
+                <q-radio class="on-left" v-model="user.administrative.healthAttest.hasHealthAttest" val="true" label="Oui" @blur="$v.user.administrative.healthAttest.hasHealthAttest.$touch"/>
+                <q-radio v-model="user.administrative.healthAttest.hasHealthAttest" val="false" label="Non" @blur="$v.user.administrative.healthAttest.hasHealthAttest.$touch"/>
+              </q-field>
               <p class="caption">Possèdes-tu l'application Facebook Messenger <q-icon name="mdi-facebook-messenger" size="1.5rem" style="color: #0084FF"/> ?</p>
               <q-field :error="$v.user.hasMessenger.$error" error-label="Champ requis">
                 <q-radio class="on-left" v-model="user.hasMessenger" val="true" label="Oui" @blur="$v.user.hasMessenger.$touch"/>
                 <q-radio v-model="user.hasMessenger" val="false" label="Non" @blur="$v.user.hasMessenger.$touch"/>
               </q-field>
               <q-stepper-navigation>
-                <q-btn color="primary" @click="lastStep()" label="Enregistrer" />
+                <q-btn color="primary" :disable="hasStep4Errors" @click="lastStep()" label="Enregistrer" />
                 <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
               </q-stepper-navigation>
             </q-step>
@@ -161,9 +166,12 @@ export default {
             driveId: '',
             link: ''
           },
-          healthAttest: {
+          vitalCard: {
             driveId: '',
             link: ''
+          },
+          healthAttest: {
+            hasHealthAttest: ''
           },
           certificates: {
             hasCertificates: ''
@@ -212,7 +220,10 @@ export default {
           }
         },
         idCard: { required },
-        healthAttest: { required },
+        vitalCard: { required },
+        healthAttest: {
+          hasHealthAttest: { required }
+        },
         certificates: {
           hasCertificates: { required }
         },
@@ -465,7 +476,7 @@ export default {
     },
     checkStep3Errors () {
       if (this.alenviUser.picture && this.alenviUser.administrative && this.alenviUser.administrative.idCard &&
-        this.alenviUser.administrative.healthAttest) {
+        this.alenviUser.administrative.vitalCard) {
         this.hasStep3Errors = false;
       }
     },
@@ -475,6 +486,24 @@ export default {
       if (this.alenviUser.administrative.signup.complete) {
         this.isSignupComplete = true;
         // TO DO MESSAGE
+      }
+      if (this.alenviUser.administrative) {
+        if (this.alenviUser.administrative.navigoInvoice && this.$_.isBoolean(this.alenviUser.administrative.navigoInvoice.hasNavigoInvoice)) {
+          this.user.administrative.navigoInvoice.hasNavigoInvoice = this.alenviUser.administrative.navigoInvoice.hasNavigoInvoice.toString();
+        }
+        if (this.alenviUser.administrative.mutualFund && this.$_.isBoolean(this.alenviUser.administrative.mutualFund.hasMutualFund)) {
+          this.user.administrative.mutualFund.hasMutualFund = this.alenviUser.administrative.mutualFund.hasMutualFund.toString();
+        }
+        if (this.alenviUser.administrative.phoneInvoice && this.$_.isBoolean(this.alenviUser.administrative.phoneInvoice.hasPhoneInvoice)) {
+          this.user.administrative.phoneInvoice.hasPhoneInvoice = this.alenviUser.administrative.phoneInvoice.hasPhoneInvoice.toString();
+        }
+        if (this.alenviUser.administrative.certificates && this.$_.isBoolean(this.alenviUser.administrative.certificates.hasCertificates)) {
+          this.user.administrative.certificates.hasCertificates = this.alenviUser.administrative.certificates.hasCertificates.toString();
+        }
+        if (this.alenviUser.administrative.healthAttest && this.$_.isBoolean(this.alenviUser.administrative.healthAttest.hasHealthAttest)) {
+          this.user.administrative.healthAttest.hasHealthAttest = this.alenviUser.administrative.healthAttest.hasHealthAttest.toString();
+        }
+        console.log(this.user.administrative);
       }
       if (this.alenviUser.administrative.signup.step) {
         this.$refs.stepper.goToStep(this.alenviUser.administrative.signup.step);
