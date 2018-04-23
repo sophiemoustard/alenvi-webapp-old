@@ -7,7 +7,7 @@
         </q-card-media>
         <q-card-title>
           <div class="text-center">Bienvenue chez Alenvi !</div><br />
-          <span slot="subtitle">Nous allons maintenant terminer ta création de compte. Merci de renseigner les champs suivants, relis-toi bien car ces infos sont importantes :-)
+          <span slot="subtitle">Nous allons maintenant démarrer la création de ton compte afin de pouvoir t'inscrire chez Alenvi. Merci de renseigner les champs suivants, relis-toi bien car ces infos sont importantes :-)
             N’hésite pas à appeler ton coach en cas de question !</span>
         </q-card-title>
         <q-card-separator />
