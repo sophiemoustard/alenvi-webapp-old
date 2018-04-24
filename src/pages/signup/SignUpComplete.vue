@@ -2,7 +2,7 @@
   <div padding>
     <div class="row justify-center layout-padding">
       <transition appear enter-active-class="animated fadeIn">
-        <q-card v-if="!hasFinishedAndNotMessenger" flat style="width: 700px; max-width: 90vw;">
+        <q-card v-if="hasFinishedAndNotMessenger" flat style="width: 700px; max-width: 90vw;">
           <q-card-media class="justify-start">
             <img style="max-width: 300px" src="https://res.cloudinary.com/alenvi/image/upload/c_scale,q_auto,w_400/v1507124345/images/business/alenvi_logo_complet_full.png" alt="Logo Alenvi" class="alenvi-logo">
           </q-card-media>
@@ -13,7 +13,7 @@
         </q-card>
       </transition>
       <transition appear leave-active-class="animated fadeOut">
-        <q-card v-if="hasFinishedAndNotMessenger" flat style="width: 700px; max-width: 90vw;">
+        <q-card v-if="!hasFinishedAndNotMessenger" flat style="width: 700px; max-width: 90vw;">
           <q-card-media class="justify-start">
             <img style="max-width: 300px" src="https://res.cloudinary.com/alenvi/image/upload/c_scale,q_auto,w_400/v1507124345/images/business/alenvi_logo_complet_full.png" alt="Logo Alenvi" class="alenvi-logo">
           </q-card-media>
@@ -472,7 +472,6 @@ export default {
         this.timeout = setTimeout(async () => {
           await this.$twilio.sendSMSWarning({ phoneNbr: this.storedUser.mobilePhone, id: this.storedUser._id });
           this.$q.loading.hide();
-          window.close();
         }, 3000)
         this.hasFinishedAndNotMessenger = true;
       }
