@@ -17,31 +17,43 @@
             <li>Choisis le fichier que tu souhaites envoyer</li>
             <li>Appuie ensuite sur cette icône: <q-icon name="cloud upload" size="1.5rem" /> pour finaliser l'envoi du fichier</li>
           </ul>
+          <p class="caption">Attestation sécurité sociale (disponible sur téléchargement sur www.ameli.fr) :</p>
           <q-field icon="mdi-account-card-details">
-            <q-uploader name="phoneInvoice" :url="docsUploadUrl" :headers="headers"
+            <q-uploader name="healthAttestInvoice" :url="docsUploadUrl" :headers="headers"
             :additional-fields="[{ name: 'fileName', value: `telephone_${user.firstname}_${user.lastname}` }]"
-            float-label="Facture de téléphone" @finish="afterUpload()" auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
+            @finish="afterUpload()" auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
             <p class="upload-done" v-if="alenviUser && alenviUser.administrative.phoneInvoice">Fichier mis en ligne <q-icon name="check" /></p>
             <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.phoneInvoice">Fichier manquant <q-icon name="warning" /></p>
           </q-field>
+          <p class="caption">Facture de téléphone :</p>
+          <q-field icon="mdi-account-card-details">
+            <q-uploader name="phoneInvoice" :url="docsUploadUrl" :headers="headers"
+            :additional-fields="[{ name: 'fileName', value: `telephone_${user.firstname}_${user.lastname}` }]"
+            @finish="afterUpload()" auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
+            <p class="upload-done" v-if="alenviUser && alenviUser.administrative.phoneInvoice">Fichier mis en ligne <q-icon name="check" /></p>
+            <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.phoneInvoice">Fichier manquant <q-icon name="warning" /></p>
+          </q-field>
+          <p class="caption">Mutuelle (facultatif)</p>
           <q-field icon="mdi-account-card-details">
             <q-uploader name="mutualFund" :url="docsUploadUrl" :headers="headers"
             :additional-fields="[{ name: 'fileName', value: `mutuelle_${user.firstname}_${user.lastname}` }]"
-            float-label="Mutuelle (falcultatif)" @finish="afterUpload()" auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" />
+            @finish="afterUpload()" auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" />
             <p class="upload-done" v-if="alenviUser && alenviUser.administrative.mutualFund">Fichier mis en ligne <q-icon name="check" /></p>
             <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.mutualFund">Fichier manquant <q-icon name="warning" /></p>
           </q-field>
+          <p class="caption">Facture Navigo</p>
           <q-field icon="mdi-account-card-details">
             <q-uploader name="navigoInvoice" :url="docsUploadUrl" :headers="headers"
             :additional-fields="[{ name: 'fileName', value: `navigo_${user.firstname}_${user.lastname}` }]"
-            float-label="Facture Navigo" @finish="afterUpload()" auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
+            @finish="afterUpload()" auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
             <p class="upload-done" v-if="alenviUser && alenviUser.administrative.navigoInvoice">Fichier mis en ligne <q-icon name="check" /></p>
             <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.navigoInvoice">Fichier manquant <q-icon name="warning" /></p>
           </q-field>
+          <p class="caption">Diplômes et / ou certicats</p>
           <q-field icon="mdi-account-card-details">
             <q-uploader name="certificates" :url="docsUploadUrl" :headers="headers"
             :additional-fields="[{ name: 'fileName', value: `certif-diplome_${user.firstname}_${user.lastname}` }]"
-            float-label="Diplômes et / ou certicats" @finish="afterUpload()" multiple auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
+            @finish="afterUpload()" multiple auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
             <p class="upload-done" v-if="alenviUser && alenviUser.administrative.certificates[0]">Fichier(s) mis en ligne <q-icon name="check" /></p>
             <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.certificates[0]">Fichier manquant <q-icon name="warning" /></p>
           </q-field>
