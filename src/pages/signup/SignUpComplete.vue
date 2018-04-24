@@ -1,131 +1,144 @@
 <template>
   <div padding>
     <div class="row justify-center layout-padding">
-       <q-card flat style="width: 700px; max-width: 90vw;">
-        <q-card-media class="justify-start">
-          <img style="max-width: 300px" src="https://res.cloudinary.com/alenvi/image/upload/c_scale,q_auto,w_400/v1507124345/images/business/alenvi_logo_complet_full.png" alt="Logo Alenvi" class="alenvi-logo">
-        </q-card-media>
-        <q-card-title class="layout-padding">
-          <span slot="subtitle">Poursuivons ton inscription. Merci de renseigner les champs suivants, relis-toi bien car ces infos sont importantes :-)
-            N’hésite pas à appeler ton coach en cas de question !</span>
-        </q-card-title>
-        <q-card-separator />
-        <q-card-main>
-          <q-stepper color="primary" ref="stepper" alternative-labels vertical>
-            <!-- First step -->
-            <q-step name="first" title="Informations personnelles (suite)" default>
-              <q-field icon="date range" :error="$v.user.dateOfBirth.$error" error-label="Champ requis">
-                <q-datetime v-model="user.dateOfBirth" float-label="Date de naissance" @blur="$v.user.dateOfBirth.$touch" :first-day-of-week="Number(1)"
-                ok-label="APPLIQUER" no-clear cancel-label="ANNULER"
-                min="1920-01-01" :max="getMaxDate"
-              format="DD/MM/YYYY"/>
-              </q-field>
-              <q-field icon="ion-earth" :error="$v.user.countryOfBirth.$error" error-label="Champ requis">
-                <q-select v-model="user.countryOfBirth" :options="countries" float-label="Pays de naissance" @blur="$v.user.countryOfBirth.$touch" filter autofocus-filter/>
-              </q-field>
-              <q-field icon="ion-earth" :error="$v.user.stateOfBirth.$error" :error-label="stateOfBirthError">
-                <q-input type="number" v-model.trim="user.stateOfBirth" float-label="Département de naissance (99 si étranger)" @blur="$v.user.stateOfBirth.$touch" />
-              </q-field>
-              <q-field icon="location city" :error="$v.user.placeOfBirth.$error" error-label="Champ requis">
-                <q-input type="text" v-model.trim="user.placeOfBirth" float-label="Lieu de naissance" @blur="$v.user.placeOfBirth.$touch" />
-              </q-field>
-              <q-field icon="mdi-account-card-details" :error="$v.user.socialInsuranceNumber.$error" :error-label="socialInsuranceNumberError">
-                <q-input type="number" v-model.trim="user.socialInsuranceNumber" float-label="Numéro de sécurité sociale" @blur="$v.user.socialInsuranceNumber.$touch" />
-              </q-field>
-              <q-stepper-navigation>
-                <q-btn color="primary" :disable="hasStep1Errors" @click="firstStep()" label="Enregistrer" />
-              </q-stepper-navigation>
-            </q-step>
-            <!-- 2nd step -->
-            <q-step name="second" title="Informations de paiement">
-              <q-field icon="mdi-account-card-details" :error="$v.user.administrative.payment.rib.iban.$error" :error-label="ibanError">
-                <q-input type="text" v-model.trim="user.administrative.payment.rib.iban" float-label="IBAN" @blur="$v.user.administrative.payment.rib.iban.$touch" />
-              </q-field>
-              <q-field icon="mdi-account-card-details" :error="$v.user.administrative.payment.rib.bic.$error" :error-label="bicError">
-                <q-input type="text" v-model.trim="user.administrative.payment.rib.bic" float-label="BIC" @blur="$v.user.administrative.payment.rib.bic.$touch" />
-              </q-field>
-              <q-stepper-navigation>
-                <q-btn color="primary" :disable="hasStep2Errors" @click="secondStep()" label="Enregistrer" />
-                <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
-              </q-stepper-navigation>
-            </q-step>
-            <!-- Last step -->
-            <q-step name="third" title="Documents obligatoires">
-              <p>Pour envoyer un document:</p>
-              <ul>
-                <li>Appuie d'abord sur cette icône: <q-icon name="add" size="1.5rem" /></li>
-                <li>Choisis le fichier que tu souhaites envoyer</li>
-                <li>Appuie ensuite sur cette icône: <q-icon name="cloud upload" size="1.5rem" /> pour finaliser l'envoi du fichier</li>
-              </ul>
-              <p class="caption">Photo de toi:</p>
-              <q-field icon="mdi-account-card-details" :error="$v.user.picture.$error" error-label="Champ requis">
-                <q-uploader name="picture" :url="pictureUploadUrl" :headers="headers"
-                :additional-fields="[{ name: 'fileName', value: `photo_${user.firstname}_${user.lastname}` }]"
-                @finish="afterUpload()" auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png"/>
-                <p class="upload-done" v-if="alenviUser && alenviUser.picture">Fichier mis en ligne <q-icon name="check" /></p>
-                <p class="upload-not-done" v-if="alenviUser && !alenviUser.picture">Fichier manquant <q-icon name="warning" /></p>
-              </q-field>
-              <p class="caption">Carte d'identité (recto + verso) / titre de séjour:</p>
-              <q-field icon="mdi-account-card-details" :error="$v.user.administrative.idCard.$error" error-label="Champ requis">
-                <q-uploader name="idCard" :url="docsUploadUrl" :headers="headers"
-                :additional-fields="[{ name: 'fileName', value: `cni_${user.firstname}_${user.lastname}` }]"
-                @finish="afterUpload()" multiple auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
-                <p class="upload-done" v-if="alenviUser && alenviUser.administrative.idCard.length !== 0">Fichier mis en ligne <q-icon name="check" /></p>
-                <p class="upload-not-done" v-if="alenviUser && alenviUser.administrative.idCard === 0">Fichier manquant <q-icon name="warning" /></p>
-              </q-field>
-              <p class="caption">Carte vitale:</p>
-              <q-field icon="mdi-account-card-details" :error="$v.user.administrative.vitalCard.$error" error-label="Champ requis">
-                <q-uploader name="vitalCard" :url="docsUploadUrl" :headers="headers"
-                :additional-fields="[{ name: 'fileName', value: `carte_vitale_${user.firstname}_${user.lastname}` }]"
-                @finish="afterUpload()" auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
-                <p class="upload-done" v-if="alenviUser && alenviUser.administrative.vitalCard">Fichier mis en ligne <q-icon name="check" /></p>
-                <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.vitalCard">Fichier manquant <q-icon name="warning" /></p>
-              </q-field>
-              <q-stepper-navigation>
-                <q-btn color="primary" :disable="hasStep3Errors" @click="thirdStep()" label="Enregistrer" />
-                <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
-              </q-stepper-navigation>
-            </q-step>
-            <q-step name="fourth" title="Documents optionnels" v-if="user.administrative">
-              <p class="caption">Possèdes-tu une carte Navigo ?</p>
-              <q-field :error="$v.user.administrative.navigoInvoice.hasNavigoInvoice.$error" error-label="Champ requis">
-                <q-radio class="on-left" v-model="user.administrative.navigoInvoice.hasNavigoInvoice" val="true" label="Oui" @blur="$v.user.administrative.navigoInvoice.hasNavigoInvoice.$touch"/>
-                <q-radio v-model="user.administrative.navigoInvoice.hasNavigoInvoice" val="false" label="Non" @blur="$v.user.administrative.navigoInvoice.hasNavigoInvoice.$touch"/>
-              </q-field>
-              <p class="caption">Possèdes-tu une mutuelle ?</p>
-              <q-field :error="$v.user.administrative.mutualFund.hasMutualFund.$error" error-label="Champ requis">
-                <q-radio class="on-left" v-model="user.administrative.mutualFund.hasMutualFund" val="true" label="Oui" @blur="$v.user.administrative.mutualFund.hasMutualFund.$touch"/>
-                <q-radio v-model="user.administrative.mutualFund.hasMutualFund" val="false" label="Non" @blur="$v.user.administrative.mutualFund.hasMutualFund.$touch"/>
-              </q-field>
-              <p class="caption">Possèdes-tu un forfait téléphonique ?</p>
-              <q-field :error="$v.user.administrative.phoneInvoice.hasPhoneInvoice.$error" error-label="Champ requis">
-                <q-radio class="on-left" v-model="user.administrative.phoneInvoice.hasPhoneInvoice" val="true" label="Oui" @blur="$v.user.administrative.phoneInvoice.hasPhoneInvoice.$touch"/>
-                <q-radio v-model="user.administrative.phoneInvoice.hasPhoneInvoice" val="false" label="Non" @blur="$v.user.administrative.phoneInvoice.hasPhoneInvoice.$touch"/>
-              </q-field>
-              <p class="caption">Possèdes-tu des diplômes et/ou certificats de travail ?</p>
-              <q-field :error="$v.user.administrative.certificates.hasCertificates.$error" error-label="Champ requis">
-                <q-radio class="on-left" v-model="user.administrative.certificates.hasCertificates" val="true" label="Oui" @blur="$v.user.administrative.certificates.hasCertificates.$touch"/>
-                <q-radio v-model="user.administrative.certificates.hasCertificates" val="false" label="Non" @blur="$v.user.administrative.certificates.hasCertificates.$touch"/>
-              </q-field>
-              <p class="caption">Possèdes-tu une attestation d'assurance maladie en cours de validité ?</p>
-              <q-field :error="$v.user.administrative.healthAttest.hasHealthAttest.$error" error-label="Champ requis">
-                <q-radio class="on-left" v-model="user.administrative.healthAttest.hasHealthAttest" val="true" label="Oui" @blur="$v.user.administrative.healthAttest.hasHealthAttest.$touch"/>
-                <q-radio v-model="user.administrative.healthAttest.hasHealthAttest" val="false" label="Non" @blur="$v.user.administrative.healthAttest.hasHealthAttest.$touch"/>
-              </q-field>
-              <p class="caption">Possèdes-tu l'application Facebook Messenger <q-icon name="mdi-facebook-messenger" size="1.5rem" style="color: #0084FF"/> ?</p>
-              <q-field :error="$v.user.hasMessenger.$error" error-label="Champ requis">
-                <q-radio class="on-left" v-model="user.hasMessenger" val="true" label="Oui" @blur="$v.user.hasMessenger.$touch"/>
-                <q-radio v-model="user.hasMessenger" val="false" label="Non" @blur="$v.user.hasMessenger.$touch"/>
-              </q-field>
-              <q-stepper-navigation>
-                <q-btn color="primary" :disable="hasStep4Errors" @click="lastStep()" label="Enregistrer" />
-                <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
-              </q-stepper-navigation>
-            </q-step>
-            <q-inner-loading :visible="inProgress" />
-          </q-stepper>
-        </q-card-main>
-      </q-card>
+      <transition appear enter-active-class="animated fadeIn">
+        <q-card v-if="!hasFinishedAndNotMessenger" flat style="width: 700px; max-width: 90vw;">
+          <q-card-media class="justify-start">
+            <img style="max-width: 300px" src="https://res.cloudinary.com/alenvi/image/upload/c_scale,q_auto,w_400/v1507124345/images/business/alenvi_logo_complet_full.png" alt="Logo Alenvi" class="alenvi-logo">
+          </q-card-media>
+          <q-card-title class="layout-padding">
+            Vu que tu ne possèdes pas l'application mobile Messenger, tu vas maintenant recevoir un SMS t'indiquant la prochaine marche à suivre :)<br>
+            Tu peux dorénavant quitter cette page, merci à toi !
+          </q-card-title>
+        </q-card>
+      </transition>
+      <transition appear leave-active-class="animated fadeOut">
+        <q-card v-if="hasFinishedAndNotMessenger" flat style="width: 700px; max-width: 90vw;">
+          <q-card-media class="justify-start">
+            <img style="max-width: 300px" src="https://res.cloudinary.com/alenvi/image/upload/c_scale,q_auto,w_400/v1507124345/images/business/alenvi_logo_complet_full.png" alt="Logo Alenvi" class="alenvi-logo">
+          </q-card-media>
+          <q-card-title class="layout-padding">
+            <span slot="subtitle">Poursuivons ton inscription. Merci de renseigner les champs suivants, relis-toi bien car ces infos sont importantes :-)
+              N’hésite pas à appeler ton coach en cas de question !</span>
+          </q-card-title>
+          <q-card-separator />
+          <q-card-main>
+            <q-stepper color="primary" ref="stepper" alternative-labels vertical>
+              <!-- First step -->
+              <q-step name="first" title="Informations personnelles (suite)" default>
+                <q-field icon="date range" :error="$v.user.dateOfBirth.$error" error-label="Champ requis">
+                  <q-datetime v-model="user.dateOfBirth" float-label="Date de naissance" @blur="$v.user.dateOfBirth.$touch" :first-day-of-week="Number(1)"
+                  ok-label="APPLIQUER" no-clear cancel-label="ANNULER"
+                  min="1920-01-01" :max="getMaxDate"
+                format="DD/MM/YYYY"/>
+                </q-field>
+                <q-field icon="ion-earth" :error="$v.user.countryOfBirth.$error" error-label="Champ requis">
+                  <q-select v-model="user.countryOfBirth" :options="countries" float-label="Pays de naissance" @blur="$v.user.countryOfBirth.$touch" filter autofocus-filter/>
+                </q-field>
+                <q-field icon="ion-earth" :error="$v.user.stateOfBirth.$error" :error-label="stateOfBirthError">
+                  <q-input type="number" v-model.trim="user.stateOfBirth" float-label="Département de naissance (99 si étranger)" @blur="$v.user.stateOfBirth.$touch" />
+                </q-field>
+                <q-field icon="location city" :error="$v.user.placeOfBirth.$error" error-label="Champ requis">
+                  <q-input type="text" v-model.trim="user.placeOfBirth" float-label="Lieu de naissance" @blur="$v.user.placeOfBirth.$touch" />
+                </q-field>
+                <q-field icon="mdi-account-card-details" :error="$v.user.socialInsuranceNumber.$error" :error-label="socialInsuranceNumberError">
+                  <q-input type="number" v-model.trim="user.socialInsuranceNumber" float-label="Numéro de sécurité sociale" @blur="$v.user.socialInsuranceNumber.$touch" />
+                </q-field>
+                <q-stepper-navigation>
+                  <q-btn color="primary" :disable="hasStep1Errors" @click="firstStep()" label="Enregistrer" />
+                </q-stepper-navigation>
+              </q-step>
+              <!-- 2nd step -->
+              <q-step name="second" title="Informations de paiement">
+                <q-field icon="mdi-account-card-details" :error="$v.user.administrative.payment.rib.iban.$error" :error-label="ibanError">
+                  <q-input type="text" v-model.trim="user.administrative.payment.rib.iban" float-label="IBAN" @blur="$v.user.administrative.payment.rib.iban.$touch" />
+                </q-field>
+                <q-field icon="mdi-account-card-details" :error="$v.user.administrative.payment.rib.bic.$error" :error-label="bicError">
+                  <q-input type="text" v-model.trim="user.administrative.payment.rib.bic" float-label="BIC" @blur="$v.user.administrative.payment.rib.bic.$touch" />
+                </q-field>
+                <q-stepper-navigation>
+                  <q-btn color="primary" :disable="hasStep2Errors" @click="secondStep()" label="Enregistrer" />
+                  <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
+                </q-stepper-navigation>
+              </q-step>
+              <!-- Last step -->
+              <q-step name="third" title="Documents obligatoires">
+                <p>Pour envoyer un document:</p>
+                <ul>
+                  <li>Appuie d'abord sur cette icône: <q-icon name="add" size="1.5rem" /></li>
+                  <li>Choisis le fichier que tu souhaites envoyer</li>
+                  <li>Appuie ensuite sur cette icône: <q-icon name="cloud upload" size="1.5rem" /> pour finaliser l'envoi du fichier</li>
+                </ul>
+                <p class="caption">Photo de toi:</p>
+                <q-field icon="mdi-account-card-details" :error="$v.user.picture.$error" error-label="Champ requis">
+                  <q-uploader name="picture" :url="pictureUploadUrl" :headers="headers"
+                  :additional-fields="[{ name: 'fileName', value: `photo_${user.firstname}_${user.lastname}` }]"
+                  @finish="afterUpload()" auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png"/>
+                  <p class="upload-done" v-if="alenviUser && alenviUser.picture">Fichier mis en ligne <q-icon name="check" /></p>
+                  <p class="upload-not-done" v-if="alenviUser && !alenviUser.picture">Fichier manquant <q-icon name="warning" /></p>
+                </q-field>
+                <p class="caption">Carte d'identité (recto + verso) / titre de séjour:</p>
+                <q-field icon="mdi-account-card-details" :error="$v.user.administrative.idCard.$error" error-label="Champ requis">
+                  <q-uploader name="idCard" :url="docsUploadUrl" :headers="headers"
+                  :additional-fields="[{ name: 'fileName', value: `cni_${user.firstname}_${user.lastname}` }]"
+                  @finish="afterUpload()" multiple auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
+                  <p class="upload-done" v-if="alenviUser && alenviUser.administrative.idCard.length !== 0">Fichier mis en ligne <q-icon name="check" /></p>
+                  <p class="upload-not-done" v-if="alenviUser && alenviUser.administrative.idCard === 0">Fichier manquant <q-icon name="warning" /></p>
+                </q-field>
+                <p class="caption">Carte vitale:</p>
+                <q-field icon="mdi-account-card-details" :error="$v.user.administrative.vitalCard.$error" error-label="Champ requis">
+                  <q-uploader name="vitalCard" :url="docsUploadUrl" :headers="headers"
+                  :additional-fields="[{ name: 'fileName', value: `carte_vitale_${user.firstname}_${user.lastname}` }]"
+                  @finish="afterUpload()" auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
+                  <p class="upload-done" v-if="alenviUser && alenviUser.administrative.vitalCard">Fichier mis en ligne <q-icon name="check" /></p>
+                  <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.vitalCard">Fichier manquant <q-icon name="warning" /></p>
+                </q-field>
+                <q-stepper-navigation>
+                  <q-btn color="primary" :disable="hasStep3Errors" @click="thirdStep()" label="Enregistrer" />
+                  <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
+                </q-stepper-navigation>
+              </q-step>
+              <q-step name="fourth" title="Documents optionnels" v-if="user.administrative">
+                <p class="caption">Possèdes-tu une carte Navigo ?</p>
+                <q-field :error="$v.user.administrative.navigoInvoice.hasNavigoInvoice.$error" error-label="Champ requis">
+                  <q-radio class="on-left" v-model="user.administrative.navigoInvoice.hasNavigoInvoice" val="true" label="Oui" @blur="$v.user.administrative.navigoInvoice.hasNavigoInvoice.$touch"/>
+                  <q-radio v-model="user.administrative.navigoInvoice.hasNavigoInvoice" val="false" label="Non" @blur="$v.user.administrative.navigoInvoice.hasNavigoInvoice.$touch"/>
+                </q-field>
+                <p class="caption">Possèdes-tu une mutuelle ?</p>
+                <q-field :error="$v.user.administrative.mutualFund.hasMutualFund.$error" error-label="Champ requis">
+                  <q-radio class="on-left" v-model="user.administrative.mutualFund.hasMutualFund" val="true" label="Oui" @blur="$v.user.administrative.mutualFund.hasMutualFund.$touch"/>
+                  <q-radio v-model="user.administrative.mutualFund.hasMutualFund" val="false" label="Non" @blur="$v.user.administrative.mutualFund.hasMutualFund.$touch"/>
+                </q-field>
+                <p class="caption">Possèdes-tu un forfait téléphonique ?</p>
+                <q-field :error="$v.user.administrative.phoneInvoice.hasPhoneInvoice.$error" error-label="Champ requis">
+                  <q-radio class="on-left" v-model="user.administrative.phoneInvoice.hasPhoneInvoice" val="true" label="Oui" @blur="$v.user.administrative.phoneInvoice.hasPhoneInvoice.$touch"/>
+                  <q-radio v-model="user.administrative.phoneInvoice.hasPhoneInvoice" val="false" label="Non" @blur="$v.user.administrative.phoneInvoice.hasPhoneInvoice.$touch"/>
+                </q-field>
+                <p class="caption">Possèdes-tu des diplômes et/ou certificats de travail ?</p>
+                <q-field :error="$v.user.administrative.certificates.hasCertificates.$error" error-label="Champ requis">
+                  <q-radio class="on-left" v-model="user.administrative.certificates.hasCertificates" val="true" label="Oui" @blur="$v.user.administrative.certificates.hasCertificates.$touch"/>
+                  <q-radio v-model="user.administrative.certificates.hasCertificates" val="false" label="Non" @blur="$v.user.administrative.certificates.hasCertificates.$touch"/>
+                </q-field>
+                <p class="caption">Possèdes-tu une attestation d'assurance maladie en cours de validité ?</p>
+                <q-field :error="$v.user.administrative.healthAttest.hasHealthAttest.$error" error-label="Champ requis">
+                  <q-radio class="on-left" v-model="user.administrative.healthAttest.hasHealthAttest" val="true" label="Oui" @blur="$v.user.administrative.healthAttest.hasHealthAttest.$touch"/>
+                  <q-radio v-model="user.administrative.healthAttest.hasHealthAttest" val="false" label="Non" @blur="$v.user.administrative.healthAttest.hasHealthAttest.$touch"/>
+                </q-field>
+                <p class="caption">Possèdes-tu l'application Facebook Messenger <q-icon name="mdi-facebook-messenger" size="1.5rem" style="color: #0084FF"/> ?</p>
+                <q-field :error="$v.user.hasMessenger.$error" error-label="Champ requis">
+                  <q-radio class="on-left" v-model="user.hasMessenger" val="true" label="Oui" @blur="$v.user.hasMessenger.$touch"/>
+                  <q-radio v-model="user.hasMessenger" val="false" label="Non" @blur="$v.user.hasMessenger.$touch"/>
+                </q-field>
+                <q-stepper-navigation>
+                  <q-btn color="primary" :disable="hasStep4Errors" @click="lastStep()" label="Enregistrer" />
+                  <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
+                </q-stepper-navigation>
+              </q-step>
+              <q-inner-loading :visible="inProgress" />
+            </q-stepper>
+          </q-card-main>
+        </q-card>
+      </transition>
     </div>
   </div>
 </template>
@@ -139,6 +152,7 @@ export default {
   // name: 'PageName',
   data () {
     return {
+      hasFinishedAndNotMessenger: false,
       timeout: null,
       hasStep3Errors: true,
       alenviUser: null,
@@ -460,6 +474,7 @@ export default {
           this.$q.loading.hide();
           window.close();
         }, 3000)
+        this.hasFinishedAndNotMessenger = true;
       }
       // window.location.href = `${process.env.MESSENGER_LINK}?ref=signup_complete`;
     },
