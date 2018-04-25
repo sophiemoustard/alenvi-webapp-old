@@ -101,29 +101,29 @@
               </q-step>
               <q-step name="fourth" title="Documents optionnels" v-if="user.administrative">
                 <p class="caption">Possèdes-tu une carte Navigo ?</p>
-                <q-field :error="$v.user.administrative.navigoInvoice.hasNavigoInvoice.$error" error-label="Champ requis">
-                  <q-radio class="on-left" v-model="user.administrative.navigoInvoice.hasNavigoInvoice" val="true" label="Oui" @blur="$v.user.administrative.navigoInvoice.hasNavigoInvoice.$touch"/>
-                  <q-radio v-model="user.administrative.navigoInvoice.hasNavigoInvoice" val="false" label="Non" @blur="$v.user.administrative.navigoInvoice.hasNavigoInvoice.$touch"/>
+                <q-field :error="$v.user.administrative.navigoInvoice.has.$error" error-label="Champ requis">
+                  <q-radio class="on-left" v-model="user.administrative.navigoInvoice.has" val="true" label="Oui" @blur="$v.user.administrative.navigoInvoice.has.$touch"/>
+                  <q-radio v-model="user.administrative.navigoInvoice.has" val="false" label="Non" @blur="$v.user.administrative.navigoInvoice.has.$touch"/>
                 </q-field>
                 <p class="caption">Possèdes-tu une mutuelle ?</p>
-                <q-field :error="$v.user.administrative.mutualFund.hasMutualFund.$error" error-label="Champ requis">
-                  <q-radio class="on-left" v-model="user.administrative.mutualFund.hasMutualFund" val="true" label="Oui" @blur="$v.user.administrative.mutualFund.hasMutualFund.$touch"/>
-                  <q-radio v-model="user.administrative.mutualFund.hasMutualFund" val="false" label="Non" @blur="$v.user.administrative.mutualFund.hasMutualFund.$touch"/>
+                <q-field :error="$v.user.administrative.mutualFund.has.$error" error-label="Champ requis">
+                  <q-radio class="on-left" v-model="user.administrative.mutualFund.has" val="true" label="Oui" @blur="$v.user.administrative.mutualFund.has.$touch"/>
+                  <q-radio v-model="user.administrative.mutualFund.has" val="false" label="Non" @blur="$v.user.administrative.mutualFund.has.$touch"/>
                 </q-field>
                 <p class="caption">Possèdes-tu un forfait téléphonique ?</p>
-                <q-field :error="$v.user.administrative.phoneInvoice.hasPhoneInvoice.$error" error-label="Champ requis">
-                  <q-radio class="on-left" v-model="user.administrative.phoneInvoice.hasPhoneInvoice" val="true" label="Oui" @blur="$v.user.administrative.phoneInvoice.hasPhoneInvoice.$touch"/>
-                  <q-radio v-model="user.administrative.phoneInvoice.hasPhoneInvoice" val="false" label="Non" @blur="$v.user.administrative.phoneInvoice.hasPhoneInvoice.$touch"/>
+                <q-field :error="$v.user.administrative.phoneInvoice.has.$error" error-label="Champ requis">
+                  <q-radio class="on-left" v-model="user.administrative.phoneInvoice.has" val="true" label="Oui" @blur="$v.user.administrative.phoneInvoice.has.$touch"/>
+                  <q-radio v-model="user.administrative.phoneInvoice.has" val="false" label="Non" @blur="$v.user.administrative.phoneInvoice.has.$touch"/>
                 </q-field>
                 <p class="caption">Possèdes-tu des diplômes et/ou certificats de travail ?</p>
-                <q-field :error="$v.user.administrative.certificates.hasCertificates.$error" error-label="Champ requis">
-                  <q-radio class="on-left" v-model="user.administrative.certificates.hasCertificates" val="true" label="Oui" @blur="$v.user.administrative.certificates.hasCertificates.$touch"/>
-                  <q-radio v-model="user.administrative.certificates.hasCertificates" val="false" label="Non" @blur="$v.user.administrative.certificates.hasCertificates.$touch"/>
+                <q-field :error="$v.user.administrative.certificates.has.$error" error-label="Champ requis">
+                  <q-radio class="on-left" v-model="user.administrative.certificates.has" val="true" label="Oui" @blur="$v.user.administrative.certificates.has.$touch"/>
+                  <q-radio v-model="user.administrative.certificates.has" val="false" label="Non" @blur="$v.user.administrative.certificates.has.$touch"/>
                 </q-field>
                 <p class="caption">Possèdes-tu une attestation d'assurance maladie en cours de validité ?</p>
-                <q-field :error="$v.user.administrative.healthAttest.hasHealthAttest.$error" error-label="Champ requis">
-                  <q-radio class="on-left" v-model="user.administrative.healthAttest.hasHealthAttest" val="true" label="Oui" @blur="$v.user.administrative.healthAttest.hasHealthAttest.$touch"/>
-                  <q-radio v-model="user.administrative.healthAttest.hasHealthAttest" val="false" label="Non" @blur="$v.user.administrative.healthAttest.hasHealthAttest.$touch"/>
+                <q-field :error="$v.user.administrative.healthAttest.has.$error" error-label="Champ requis">
+                  <q-radio class="on-left" v-model="user.administrative.healthAttest.has" val="true" label="Oui" @blur="$v.user.administrative.healthAttest.has.$touch"/>
+                  <q-radio v-model="user.administrative.healthAttest.has" val="false" label="Non" @blur="$v.user.administrative.healthAttest.hasHealthAttest.$touch"/>
                 </q-field>
                 <p class="caption">Possèdes-tu l'application Facebook Messenger <q-icon name="mdi-facebook-messenger" size="1.5rem" style="color: #0084FF"/> ?</p>
                 <q-field :error="$v.user.hasMessenger.$error" error-label="Champ requis">
