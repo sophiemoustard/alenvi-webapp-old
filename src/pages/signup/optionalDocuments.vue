@@ -19,8 +19,8 @@
           </ul>
             <p class="caption">Attestation sécurité sociale (disponible sur téléchargement sur www.ameli.fr) :</p>
             <q-field icon="mdi-account-card-details">
-              <q-uploader name="healthAttestInvoice" :url="docsUploadUrl" :headers="headers"
-                :additional-fields="[{ name: 'fileName', value: `telephone_${user.firstname}_${user.lastname}` }]"
+              <q-uploader name="healthAttest" :url="docsUploadUrl" :headers="headers"
+                :additional-fields="[{ name: 'fileName', value: `attestation_secu_{user.firstname}_${user.lastname}` }]"
                 @finish="afterUpload()" auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
               <p class="upload-done" v-if="user && user.administrative.healthAttest.link">Fichier mis en ligne <q-icon name="check" /></p>
               <p class="upload-not-done" v-if="user && !user.administrative.healthAttest.link">Fichier manquant <q-icon name="warning" /></p>
