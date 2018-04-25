@@ -190,19 +190,19 @@ export default {
             link: ''
           },
           healthAttest: {
-            hasHealthAttest: ''
+            has: ''
           },
           certificates: {
-            hasCertificates: ''
+            has: ''
           },
           mutualFund: {
-            hasMutualFund: ''
+            has: ''
           },
           navigoInvoice: {
-            hasNavigoInvoice: ''
+            has: ''
           },
           phoneInvoice: {
-            hasPhoneInvoice: ''
+            has: ''
           }
         }
       }
@@ -241,19 +241,19 @@ export default {
         idCard: { required },
         vitalCard: { required },
         healthAttest: {
-          hasHealthAttest: { required }
+          has: { required }
         },
         certificates: {
-          hasCertificates: { required }
+          has: { required }
         },
         mutualFund: {
-          hasMutualFund: { required }
+          has: { required }
         },
         navigoInvoice: {
-          hasNavigoInvoice: { required }
+          has: { required }
         },
         phoneInvoice: {
-          hasPhoneInvoice: { required }
+          has: { required }
         }
       }
     }
