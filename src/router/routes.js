@@ -36,6 +36,8 @@ export default [
     beforeEnter: (to, from, next) => {
       if (Cookies.get('signup_token') && Cookies.get('signup_sector') && Cookies.get('signup_mobile') && Cookies.get('signup_managerId') && Cookies.get('signup_firstSMS')) {
         next();
+      } else if (Cookies.get('refresh_token')) {
+        next({ path: '/signupComplete' });
       } else {
         next({ path: '/enterCode' });
       }
