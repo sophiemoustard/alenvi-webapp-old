@@ -336,9 +336,9 @@ export default {
     //               : !!this.alenviUser.administrative.navigoInvoice
     // },
     hasStep4Errors () {
-      return this.$v.user.administrative.navigoInvoice.hasNavigoInvoice.$invalid ? true : this.$v.user.administrative.mutualFund.hasMutualFund.$invalid
-        ? true : this.$v.user.administrative.phoneInvoice.hasPhoneInvoice.$invalid ? true : this.$v.user.administrative.certificates.hasCertificates.$invalid
-          ? true : this.$v.user.hasMessenger.$invalid ? true : !!this.$v.user.administrative.phoneInvoice.hasPhoneInvoice.$invalid
+      return this.$v.user.administrative.navigoInvoice.has.$invalid ? true : this.$v.user.administrative.mutualFund.has.$invalid
+        ? true : this.$v.user.administrative.phoneInvoice.has.$invalid ? true : this.$v.user.administrative.certificates.has.$invalid
+          ? true : this.$v.user.hasMessenger.$invalid ? true : !!this.$v.user.administrative.phoneInvoice.has.$invalid
     },
     docsUploadUrl () {
       return `${process.env.API_HOSTNAME}/uploader/${this.storedUser._id}/drive/uploadFile`;
@@ -514,20 +514,20 @@ export default {
         // TO DO MESSAGE
       }
       if (this.alenviUser.administrative) {
-        if (this.alenviUser.administrative.navigoInvoice && this.$_.isBoolean(this.alenviUser.administrative.navigoInvoice.hasNavigoInvoice)) {
-          this.user.administrative.navigoInvoice.hasNavigoInvoice = this.alenviUser.administrative.navigoInvoice.hasNavigoInvoice.toString();
+        if (this.alenviUser.administrative.navigoInvoice && this.$_.isBoolean(this.alenviUser.administrative.navigoInvoice.has)) {
+          this.user.administrative.navigoInvoice.has = this.alenviUser.administrative.navigoInvoice.has.toString();
         }
-        if (this.alenviUser.administrative.mutualFund && this.$_.isBoolean(this.alenviUser.administrative.mutualFund.hasMutualFund)) {
-          this.user.administrative.mutualFund.hasMutualFund = this.alenviUser.administrative.mutualFund.hasMutualFund.toString();
+        if (this.alenviUser.administrative.mutualFund && this.$_.isBoolean(this.alenviUser.administrative.mutualFund.has)) {
+          this.user.administrative.mutualFund.has = this.alenviUser.administrative.mutualFund.has.toString();
         }
-        if (this.alenviUser.administrative.phoneInvoice && this.$_.isBoolean(this.alenviUser.administrative.phoneInvoice.hasPhoneInvoice)) {
-          this.user.administrative.phoneInvoice.hasPhoneInvoice = this.alenviUser.administrative.phoneInvoice.hasPhoneInvoice.toString();
+        if (this.alenviUser.administrative.phoneInvoice && this.$_.isBoolean(this.alenviUser.administrative.phoneInvoice.has)) {
+          this.user.administrative.phoneInvoice.has = this.alenviUser.administrative.phoneInvoice.has.toString();
         }
-        if (this.alenviUser.administrative.certificates && this.$_.isBoolean(this.alenviUser.administrative.certificates.hasCertificates)) {
-          this.user.administrative.certificates.hasCertificates = this.alenviUser.administrative.certificates.hasCertificates.toString();
+        if (this.alenviUser.administrative.certificates && this.$_.isBoolean(this.alenviUser.administrative.certificates.has)) {
+          this.user.administrative.certificates.has = this.alenviUser.administrative.certificates.has.toString();
         }
-        if (this.alenviUser.administrative.healthAttest && this.$_.isBoolean(this.alenviUser.administrative.healthAttest.hasHealthAttest)) {
-          this.user.administrative.healthAttest.hasHealthAttest = this.alenviUser.administrative.healthAttest.hasHealthAttest.toString();
+        if (this.alenviUser.administrative.healthAttest && this.$_.isBoolean(this.alenviUser.administrative.healthAttest.has)) {
+          this.user.administrative.healthAttest.has = this.alenviUser.administrative.healthAttest.has.toString();
         }
         console.log(this.user.administrative);
       }
