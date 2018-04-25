@@ -123,7 +123,7 @@
                 <p class="caption">Possèdes-tu une attestation d'assurance maladie en cours de validité ?</p>
                 <q-field :error="$v.user.administrative.healthAttest.has.$error" error-label="Champ requis">
                   <q-radio class="on-left" v-model="user.administrative.healthAttest.has" val="true" label="Oui" @blur="$v.user.administrative.healthAttest.has.$touch"/>
-                  <q-radio v-model="user.administrative.healthAttest.has" val="false" label="Non" @blur="$v.user.administrative.healthAttest.hasHealthAttest.$touch"/>
+                  <q-radio v-model="user.administrative.healthAttest.has" val="false" label="Non" @blur="$v.user.administrative.healthAttest.has.$touch"/>
                 </q-field>
                 <p class="caption">Possèdes-tu l'application Facebook Messenger <q-icon name="mdi-facebook-messenger" size="1.5rem" style="color: #0084FF"/> ?</p>
                 <q-field :error="$v.user.hasMessenger.$error" error-label="Champ requis">
