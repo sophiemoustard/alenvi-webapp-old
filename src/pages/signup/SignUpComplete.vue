@@ -68,6 +68,7 @@
                   <li>Appuie d'abord sur cette icône: <q-icon name="add" size="1.5rem" /></li>
                   <li>Choisis le fichier que tu souhaites envoyer</li>
                   <li>Appuie ensuite sur cette icône: <q-icon name="cloud upload" size="1.5rem" /> pour finaliser l'envoi du fichier</li>
+                  <li>Quand tu as terminé, appuis sur cette icône: <q-icon name="keyboard arrow up" size="1.5rem" /> afin de fermer le volet</li>
                 </ul>
                 <p class="caption">Photo de toi:</p>
                 <q-field icon="mdi-account-card-details" :error="$v.user.picture.$error" error-label="Champ requis">
