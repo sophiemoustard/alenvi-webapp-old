@@ -10,7 +10,7 @@ export const checkPermission = async (to, user) => {
           }
         }
       } else {
-        return redirect.redirectToLogin();
+        return redirect.redirectToLogin({ to });
       }
     }
     return true;
