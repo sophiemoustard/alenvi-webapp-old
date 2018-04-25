@@ -61,8 +61,8 @@
               <q-uploader name="certificates" :url="docsUploadUrl" :headers="headers"
                 :additional-fields="[{ name: 'fileName', value: `certif-diplome_${user.firstname}_${user.lastname}` }]"
                 @finish="afterUpload()" multiple auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
-              <p class="upload-done" v-if="user && user.administrative.certificates[0]">Fichier(s) mis en ligne <q-icon name="check" /></p>
-              <p class="upload-not-done" v-if="user && !user.administrative.certificates[0]">Fichier manquant <q-icon name="warning" /></p>
+              <p class="upload-done" v-if="user && user.administrative.certificates.docs[0]">Fichier(s) mis en ligne <q-icon name="check" /></p>
+              <p class="upload-not-done" v-if="user && !user.administrative.certificates.docs[0]">Fichier manquant <q-icon name="warning" /></p>
             </q-field>
           </div>
         </q-card-main>
