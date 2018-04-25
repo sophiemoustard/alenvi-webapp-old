@@ -17,7 +17,6 @@
             <li>Choisis le fichier que tu souhaites envoyer</li>
             <li>Appuie ensuite sur cette icône: <q-icon name="cloud upload" size="1.5rem" /> pour finaliser l'envoi du fichier</li>
           </ul>
-          <div v-if="user.administrative.healthAttest && user.administrative.healthAttest.has">
             <p class="caption">Attestation sécurité sociale (disponible sur téléchargement sur www.ameli.fr) :</p>
             <q-field icon="mdi-account-card-details">
               <q-uploader name="healthAttestInvoice" :url="docsUploadUrl" :headers="headers"
@@ -26,7 +25,6 @@
               <p class="upload-done" v-if="user && user.administrative.healthAttest.link">Fichier mis en ligne <q-icon name="check" /></p>
               <p class="upload-not-done" v-if="user && !user.administrative.healthAttest.link">Fichier manquant <q-icon name="warning" /></p>
             </q-field>
-          </div>
           <div v-if="user.administrative.phoneInvoice && user.administrative.phoneInvoice.has">
             <p class="caption">Facture de téléphone :</p>
             <q-field icon="mdi-account-card-details">
