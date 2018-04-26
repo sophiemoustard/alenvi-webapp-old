@@ -515,7 +515,7 @@ export default {
       }
     },
     checkStep3Errors () {
-      if (this.storedUser.picture && this.storedUser.administrative && this.storedUser.administrative.idCard &&
+      if (this.storedUser.picture && this.storedUser.administrative && this.storedUser.administrative.idCardRecto && this.storedUser.administrative.idCardVerso &&
         this.storedUser.administrative.vitalCard) {
         this.hasStep3Errors = false;
       }
