@@ -357,7 +357,6 @@ export default {
         driveFolderLink: row.driveFolderLink
       };
       this.isOpened = true;
-      console.log(this.auxiliary);
     },
     goTo (url) {
       openURL(url);
