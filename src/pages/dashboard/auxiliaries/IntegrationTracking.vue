@@ -52,7 +52,7 @@
         </div>
       </div>
       <div class="row q-mb-md gutter-sm">
-        <div v-for="(info, index) in auxiliary.info" :key="index" inline class="col-xs-12 col-md-4 row justify-center">
+        <div v-for="(info, index) in auxiliary.info" :key="index" inline class="col-xs-12 col-md-3 row justify-center">
           <q-card style="width: 100%">
             <q-card-title>{{ info.title }}</q-card-title>
             <q-card-main>
@@ -148,6 +148,13 @@ export default {
           sortable: true
         },
         {
+          name: 'mandatoryDocuments',
+          label: 'Documents obligatoires',
+          field: row => row.mandatoryDocuments.done,
+          align: 'center',
+          sortable: true
+        },
+        {
           name: 'miscDocuments',
           label: 'Documents annexes',
           field: row => row.miscDocuments.done,
@@ -168,7 +175,7 @@ export default {
       if (!this.isComplete) {
         return this.userList.filter(auxiliary => !auxiliary.complete);
       }
-      return this.userList.filter(auxiliary => auxiliary.complete && auxiliary.firstSmsDate !== '-');
+      return this.userList.filter(auxiliary => auxiliary.complete);
     }
   },
   methods: {
@@ -179,111 +186,141 @@ export default {
         for (let i = 0, l = userList.length; i < l; i++) {
           for (const k in ogustUserList) {
             if (userList[i].employee_id === Number(ogustUserList[k].id_employee)) {
-              console.log(ogustUserList[i]);
-              this.userList.push({
-                firstSmsDate:
-                  userList[i].administrative &&
-                  userList[i].administrative.signup.firstSmsDate
-                    ? userList[i].administrative.signup.firstSmsDate
-                    : '-',
-                auxiliary: `${userList[i].firstname} ${userList[i].lastname}`,
-                // secondSmsDate:
-                //   userList[i].administrative &&
-                //   userList[i].administrative.signup.secondSmsDate
-                //     ? !!userList[i].administrative.signup.secondSmsDate
-                //     : '-',
-                pigiConnection: userList[i].facebook
-                  ? !!userList[i].facebook.address
-                  : false,
-                personalInfo: {
-                  data: {
-                    email: {
-                      label: 'Email',
-                      done: !!ogustUserList[k].email
-                    },
-                    address: {
-                      label: 'Adresse (rue + CP + ville)',
-                      done: !!ogustUserList[k].main_address.line &&
-                      !!ogustUserList[k].main_address.zip &&
-                      !!ogustUserList[k].main_address.city
-                    },
-                    socialInsuranceNumber: {
-                      label: 'Numéro sécu',
-                      done: !!ogustUserList[k].social_insurance_number
-                    },
-                    dateOfBirth: {
-                      label: 'Date de naissance',
-                      done: !!ogustUserList[k].date_of_birth
-                    },
-                    placeOfBirth: {
-                      label: 'Lieu de naissance',
-                      done: !!ogustUserList[k].place_of_birth
-                    },
-                    stateOfBirth: {
-                      label: 'Département de naissance',
-                      done: !!ogustUserList[k].state_of_birth
-                    },
-                    countryOfBirth: {
-                      label: 'Pays de naissance',
-                      done: !!ogustUserList[k].country_of_birth
-                    },
+              const userListPayload = {};
+              userListPayload.firstSmsDate = userList[i].administrative &&
+                userList[i].administrative.signup.firstSmsDate
+                ? userList[i].administrative.signup.firstSmsDate
+                : '-';
+              userListPayload.auxiliary = `${userList[i].firstname} ${userList[i].lastname}`;
+              userListPayload.pigiConnection = userList[i].facebook
+                ? !!userList[i].facebook.address
+                : false;
+              userListPayload.personalInfo = {
+                data: {
+                  email: {
+                    label: 'Email',
+                    done: !!ogustUserList[k].email
                   },
-                  done: !!ogustUserList[k].date_of_birth &&
-                  !!ogustUserList[k].place_of_birth &&
-                  !!ogustUserList[k].state_of_birth &&
-                  !!ogustUserList[k].country_of_birth &&
-                  !!ogustUserList[k].main_address.line &&
-                  !!ogustUserList[k].main_address.zip &&
-                  !!ogustUserList[k].main_address.city
-                },
-                paymentInfo: {
-                  data: {
-                    iban: {
-                      label: 'IBAN',
-                      done: userList[i].administrative &&
-                  userList[i].administrative.payment &&
-                  userList[i].administrative.payment.rib
-                        ? !!userList[i].administrative.payment.rib.iban : false
-                    },
-                    bic: {
-                      label: 'BIC',
-                      done: userList[i].administrative &&
-                  userList[i].administrative.payment &&
-                  userList[i].administrative.payment.rib
-                        ? !!userList[i].administrative.payment.rib.bic : false
-                    },
+                  address: {
+                    label: 'Adresse (rue + CP + ville)',
+                    done: !!ogustUserList[k].main_address.line &&
+                    !!ogustUserList[k].main_address.zip &&
+                    !!ogustUserList[k].main_address.city
                   },
-                  done: userList[i].administrative &&
-                  userList[i].administrative.payment &&
-                  userList[i].administrative.payment.rib
-                    ? !!userList[i].administrative.payment.rib.iban &&
-                      !!userList[i].administrative.payment.rib.bic
-                    : '-'
-                },
-                miscDocuments: {
-                  data: {
-                    idCard: {
-                      label: 'CNI',
-                      done: userList[i].administrative ? userList[i].administrative.idCard.length !== 0 : false
-                    },
-                    healthAttest: {
-                      label: 'Attestation carte vitale',
-                      done: userList[i].administrative ? !!userList[i].administrative.healthAttest : false
-                    },
-                    certificates: {
-                      label: 'Diplômes et/ou certificats',
-                      done: userList[i].administrative ? userList[i].administrative.certificates.length !== 0 : false
-                    }
+                  socialInsuranceNumber: {
+                    label: 'Numéro sécu',
+                    done: !!ogustUserList[k].social_insurance_number
                   },
-                  done: userList[i].administrative
-                    ? !!userList[i].administrative.idCard &&
-                  !!userList[i].administrative.healthAttest &&
-                  userList[i].administrative.certificates.length !== 0
-                    : '-'
+                  dateOfBirth: {
+                    label: 'Date de naissance',
+                    done: !!ogustUserList[k].date_of_birth
+                  },
+                  placeOfBirth: {
+                    label: 'Lieu de naissance',
+                    done: !!ogustUserList[k].place_of_birth
+                  },
+                  stateOfBirth: {
+                    label: 'Département de naissance',
+                    done: !!ogustUserList[k].state_of_birth
+                  },
+                  countryOfBirth: {
+                    label: 'Pays de naissance',
+                    done: !!ogustUserList[k].country_of_birth
+                  },
                 },
-                complete: userList[i].administrative.signup.complete,
-                driveFolderLink: userList[i].administrative.driveFolder ? userList[i].administrative.driveFolder.link : false
-              });
+                done: !!ogustUserList[k].date_of_birth &&
+                !!ogustUserList[k].place_of_birth &&
+                !!ogustUserList[k].state_of_birth &&
+                !!ogustUserList[k].country_of_birth &&
+                !!ogustUserList[k].main_address.line &&
+                !!ogustUserList[k].main_address.zip &&
+                !!ogustUserList[k].main_address.city
+              };
+              userListPayload.paymentInfo = {
+                data: {
+                  iban: {
+                    label: 'IBAN',
+                    done: userList[i].administrative &&
+                    userList[i].administrative.payment &&
+                    userList[i].administrative.payment.rib
+                      ? !!userList[i].administrative.payment.rib.iban : false
+                  },
+                  bic: {
+                    label: 'BIC',
+                    done: userList[i].administrative &&
+                    userList[i].administrative.payment &&
+                    userList[i].administrative.payment.rib
+                      ? !!userList[i].administrative.payment.rib.bic : false
+                  },
+                },
+                done: userList[i].administrative &&
+                userList[i].administrative.payment &&
+                userList[i].administrative.payment.rib
+                  ? !!userList[i].administrative.payment.rib.iban &&
+                !!userList[i].administrative.payment.rib.bic
+                  : '-'
+              };
+              userListPayload.mandatoryDocuments = {
+                data: {
+                  picture: {
+                    label: 'Photo',
+                    done: !!userList[i].picture
+                  },
+                  idCard: {
+                    label: 'CNI',
+                    done: userList[i].administrative ? !!userList[i].administrative.idCardRecto || !!userList[i].administrative.idCardVerso : false
+                  }
+                },
+                done: userList[i].administrative
+                  ? (!!userList[i].administrative.idCardRecto || !!userList[i].administrative.idCardVerso) &&
+                  !!userList[i].picture : '-'
+              };
+              // for new users with vitalCard field
+              if (userList[i].administrative && userList[i].administrative.vitalCard) {
+                userListPayload.mandatoryDocuments.data.vitalCard = {
+                  label: 'Carte vitale',
+                  done: !!userList[i].administrative.vitalCard
+                };
+                userListPayload.mandatoryDocuments.done = userList[i].administrative
+                  ? (!!userList[i].administrative.idCardRecto || !!userList[i].administrative.idCardVerso) &&
+                  !!userList[i].picture && !!userList[i].administrative.vitalCard : '-'
+              }
+              // for misc docs
+              userListPayload.miscDocuments = { data: {} };
+              if (userList[i].administrative && userList[i].administrative.healthAttest && userList[i].administrative.healthAttest.has) {
+                userListPayload.miscDocuments.data.healthAttest = {
+                  label: 'Attestation carte vitale',
+                  done: userList[i].administrative ? !!userList[i].administrative.healthAttest.link : false
+                }
+              }
+              if (userList[i].administrative && userList[i].administrative.phoneInvoice && userList[i].administrative.phoneInvoice.has) {
+                userListPayload.miscDocuments.data.phoneInvoice = {
+                  label: 'Facture téléphonique',
+                  done: userList[i].administrative ? !!userList[i].administrative.phoneInvoice.link : false
+                }
+              }
+              if (userList[i].administrative && userList[i].administrative.navigoInvoice && userList[i].administrative.navigoInvoice.has) {
+                userListPayload.miscDocuments.data.navigoInvoice = {
+                  label: 'Facture Navigo',
+                  done: userList[i].administrative ? !!userList[i].administrative.navigoInvoice.link : false
+                }
+              }
+              if (userList[i].administrative && userList[i].administrative.mutualFund && userList[i].administrative.mutualFund.has) {
+                userListPayload.miscDocuments.data.mutualFund = {
+                  label: 'Justif mutuelle',
+                  done: userList[i].administrative ? !!userList[i].administrative.mutualFund.link : false
+                }
+              }
+              if (userList[i].administrative && userList[i].administrative.certificates && userList[i].administrative.certificates.has) {
+                userListPayload.miscDocuments.data.certificates = {
+                  label: 'Diplomes et/ou certificats de travail',
+                  done: userList[i].administrative ? !!userList[i].administrative.certificates.docs.length !== 0 : false
+                }
+              }
+              userListPayload.miscDocuments.done = this.$_.every(userListPayload.miscDocuments.data, ['done', true]);
+              userListPayload.complete = userList[i].administrative.signup.complete;
+              userListPayload.driveFolderLink = userList[i].administrative.driveFolder ? userList[i].administrative.driveFolder.link : false
+              this.userList.push(userListPayload);
             }
           }
         }
@@ -304,6 +341,10 @@ export default {
           paymentInfo: {
             title: 'Informations de paiement',
             data: row.paymentInfo.data
+          },
+          mandatoryDocuments: {
+            title: 'Documents obligatoires',
+            data: row.mandatoryDocuments.data
           },
           miscDocuments: {
             title: 'Documents annexes',
