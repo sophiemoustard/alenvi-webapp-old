@@ -73,33 +73,41 @@
                 <q-field icon="mdi-account-card-details" :error="$v.user.picture.$error" error-label="Champ requis">
                   <q-uploader v-if="storedUser && !storedUser.picture" name="picture" :url="pictureUploadUrl" :headers="headers"
                   :additional-fields="[{ name: 'fileName', value: `photo_${user.firstname}_${user.lastname}` }]"
-                  @finish="afterUpload()" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png" @uploaded="hasUploadedPicture = true"/>
+                  @finish="afterUpload('Picture')" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png"
+                  @add="uploadInstructions('Picture')" @remove:cancel="afterRemove('Picture')"/>
                   <p class="upload-done" v-if="storedUser && storedUser.picture">Fichier mis en ligne <q-icon name="check" /></p>
-                  <p class="upload-not-done" v-if="storedUser && !storedUser.picture">Fichier manquant <q-icon name="warning" /></p>
+                  <p class="upload-not-done" v-if="storedUser && !storedUser.picture && !hasPickedPicture">Fichier manquant <q-icon name="warning" /></p>
+                  <p class="picked" v-if="hasPickedPicture">Super ! Maintenant, appuie sur <q-icon name="cloud upload" /></p>
                 </q-field>
                 <p class="caption">Carte d'identité / titre de séjour (Recto) :</p>
                 <q-field icon="mdi-account-card-details" :error="$v.user.administrative.idCard.$error" error-label="Champ requis">
                   <q-uploader v-if="storedUser && !storedUser.administrative.idCardRecto" name="idCardRecto" :url="docsUploadUrl" :headers="headers"
                   :additional-fields="[{ name: 'fileName', value: `cni_recto_${user.firstname}_${user.lastname}` }]"
-                  @finish="afterUpload()" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
+                  @finish="afterUpload('IdCardRecto')" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
+                  @add="uploadInstructions('IdCardRecto')" @remove:cancel="afterRemove('IdCardRecto')"/>
                   <p class="upload-done" v-if="storedUser && storedUser.administrative.idCardRecto">Fichier mis en ligne <q-icon name="check" /></p>
-                  <p class="upload-not-done" v-if="storedUser && !storedUser.administrative.idCardRecto">Fichier manquant <q-icon name="warning" /></p>
+                  <p class="upload-not-done" v-if="storedUser && !storedUser.administrative.idCardRecto && !hasPickedIdCardRecto">Fichier manquant <q-icon name="warning" /></p>
+                  <p class="picked" v-if="hasPickedIdCardRecto">Super ! Maintenant, appuie sur <q-icon name="cloud upload" /></p>
                 </q-field>
                 <p class="caption">Carte d'identité / titre de séjour (Verso) :</p>
                 <q-field icon="mdi-account-card-details" :error="$v.user.administrative.idCard.$error" error-label="Champ requis">
                   <q-uploader v-if="storedUser && !storedUser.administrative.idCardVerso" name="idCardVerso" :url="docsUploadUrl" :headers="headers"
                   :additional-fields="[{ name: 'fileName', value: `cni_verso_${user.firstname}_${user.lastname}` }]"
-                  @finish="afterUpload()" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
+                  @finish="afterUpload('IdCardVerso')" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
+                  @add="uploadInstructions('IdCardVerso')" @remove:cancel="afterRemove('IdCardVerso')"/>
                   <p class="upload-done" v-if="storedUser && storedUser.administrative.idCardVerso">Fichier mis en ligne <q-icon name="check" /></p>
-                  <p class="upload-not-done" v-if="storedUser && !storedUser.administrative.idCardVerso">Fichier manquant <q-icon name="warning" /></p>
+                  <p class="upload-not-done" v-if="storedUser && !storedUser.administrative.idCardVerso && !hasPickedIdCardVerso">Fichier manquant <q-icon name="warning" /></p>
+                  <p class="picked" v-if="hasPickedIdCardVerso">Super ! Maintenant, appuie sur <q-icon name="cloud upload" /></p>
                 </q-field>
                 <p class="caption">Carte vitale :</p>
                 <q-field icon="mdi-account-card-details" :error="$v.user.administrative.vitalCard.$error" error-label="Champ requis">
                   <q-uploader v-if="storedUser && !storedUser.administrative.vitalCard" name="vitalCard" :url="docsUploadUrl" :headers="headers"
                   :additional-fields="[{ name: 'fileName', value: `carte_vitale_${user.firstname}_${user.lastname}` }]"
-                  @finish="afterUpload()" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
+                  @finish="afterUpload('VitalCard')" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
+                  @add="uploadInstructions('VitalCard')" @remove:cancel="afterRemove('VitalCard')"/>
                   <p class="upload-done" v-if="storedUser && storedUser.administrative.vitalCard">Fichier mis en ligne <q-icon name="check" /></p>
-                  <p class="upload-not-done" v-if="storedUser && !storedUser.administrative.vitalCard">Fichier manquant <q-icon name="warning" /></p>
+                  <p class="upload-not-done" v-if="storedUser && !storedUser.administrative.vitalCard && !hasPickedVitalCard">Fichier manquant <q-icon name="warning" /></p>
+                  <p class="picked" v-if="hasPickedVitalCard">Super ! Maintenant, appuie sur <q-icon name="cloud upload" /></p>
                 </q-field>
                 <q-stepper-navigation>
                   <q-btn color="primary" :disable="hasStep3Errors" @click="thirdStep()" label="Enregistrer" />
@@ -162,10 +170,10 @@ export default {
   // name: 'PageName',
   data () {
     return {
-      hasUploadedPicture: false,
-      hasUploadedIdCardRecto: false,
-      hasUploadedIdCardVerso: false,
-      hasUploadedVitalCard: false,
+      hasPickedPicture: false,
+      hasPickedIdCardRecto: false,
+      hasPickedIdCardVerso: false,
+      hasPickedVitalCard: false,
       hasFinishedAndNotMessenger: false,
       timeout: null,
       hasStep3Errors: true,
@@ -504,15 +512,19 @@ export default {
         console.error(e.response);
       }
     },
-    async afterUpload () {
+    async afterUpload (fileName) {
       try {
         // this.alenviUser = await this.$users.getById(this.$route.query.id, this.accessToken);
         // this.alenviUser = await this.$users.getById(this.storedUser._id);
+        this[`hasPicked${fileName}`] = false;
         await this.$store.dispatch('main/getUser', Cookies.get('user_id'));
         this.checkStep3Errors();
       } catch (e) {
         console.error(e);
       }
+    },
+    afterRemove (fileName) {
+      this[`hasPicked${fileName}`] = false;
     },
     checkStep3Errors () {
       if (this.storedUser.picture && this.storedUser.administrative && this.storedUser.administrative.idCardRecto && this.storedUser.administrative.idCardVerso &&
@@ -578,6 +590,9 @@ export default {
         this.user.administrative.payment.rib.iban = this.ogustUser.bank_information[0].iban_number || '';
         this.user.administrative.payment.rib.bic = this.ogustUser.bank_information[0].bic_number || '';
       }
+    },
+    uploadInstructions (fileName) {
+      this[`hasPicked${fileName}`] = true;
     }
   },
   beforeDestroy () {
@@ -590,6 +605,10 @@ export default {
 @import '~variables'
 .q-field
   margin: 16px 0
+.picked
+  margin-top: 10px
+  margin-bottom: 5px
+  color: $info
 .upload-done
   margin-top: 10px
   margin-bottom: 5px
