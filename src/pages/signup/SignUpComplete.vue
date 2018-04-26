@@ -68,27 +68,34 @@
                   <li>Appuie d'abord sur cette icône: <q-icon name="add" size="1.5rem" /></li>
                   <li>Choisis le fichier que tu souhaites envoyer</li>
                   <li>Appuie ensuite sur cette icône: <q-icon name="cloud upload" size="1.5rem" /> pour finaliser l'envoi du fichier</li>
-                  <li>Quand tu as terminé, appuis sur cette icône: <q-icon name="keyboard arrow up" size="1.5rem" /> afin de fermer le volet</li>
                 </ul>
-                <p class="caption">Photo de toi:</p>
+                <p class="caption">Photo de toi :</p>
                 <q-field icon="mdi-account-card-details" :error="$v.user.picture.$error" error-label="Champ requis">
-                  <q-uploader name="picture" :url="pictureUploadUrl" :headers="headers"
+                  <q-uploader v-if="!hasUploadedPicture" name="picture" :url="pictureUploadUrl" :headers="headers"
                   :additional-fields="[{ name: 'fileName', value: `photo_${user.firstname}_${user.lastname}` }]"
-                  @finish="afterUpload()" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png"/>
+                  @finish="afterUpload()" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png" @uploaded="hasUploadedPicture = true"/>
                   <p class="upload-done" v-if="alenviUser && alenviUser.picture">Fichier mis en ligne <q-icon name="check" /></p>
                   <p class="upload-not-done" v-if="alenviUser && !alenviUser.picture">Fichier manquant <q-icon name="warning" /></p>
                 </q-field>
-                <p class="caption">Carte d'identité (recto + verso) / titre de séjour:</p>
+                <p class="caption">Carte d'identité / titre de séjour (Recto) :</p>
                 <q-field icon="mdi-account-card-details" :error="$v.user.administrative.idCard.$error" error-label="Champ requis">
-                  <q-uploader name="idCard" :url="docsUploadUrl" :headers="headers"
+                  <q-uploader v-if="!hasUploadedIdCardRecto" name="idCard" :url="docsUploadUrl" :headers="headers"
                   :additional-fields="[{ name: 'fileName', value: `cni_${user.firstname}_${user.lastname}` }]"
                   @finish="afterUpload()" multiple auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
-                  <p class="upload-done" v-if="alenviUser && alenviUser.administrative.idCard.length !== 0">Fichier mis en ligne <q-icon name="check" /></p>
-                  <p class="upload-not-done" v-if="alenviUser && alenviUser.administrative.idCard === 0">Fichier manquant <q-icon name="warning" /></p>
+                  <p class="upload-done" v-if="alenviUser && alenviUser.administrative.idCard.recto">Fichier mis en ligne <q-icon name="check" /></p>
+                  <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.idCard.recto">Fichier manquant <q-icon name="warning" /></p>
                 </q-field>
-                <p class="caption">Carte vitale:</p>
+                <p class="caption">Carte d'identité / titre de séjour (Verso) :</p>
+                <q-field icon="mdi-account-card-details" :error="$v.user.administrative.idCard.$error" error-label="Champ requis">
+                  <q-uploader v-if="!hasUploadedIdCardVerso" name="idCard" :url="docsUploadUrl" :headers="headers"
+                  :additional-fields="[{ name: 'fileName', value: `cni_${user.firstname}_${user.lastname}` }]"
+                  @finish="afterUpload()" multiple auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
+                  <p class="upload-done" v-if="alenviUser && alenviUser.administrative.idCard.verso">Fichier mis en ligne <q-icon name="check" /></p>
+                  <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.idCard.verso">Fichier manquant <q-icon name="warning" /></p>
+                </q-field>
+                <p class="caption">Carte vitale :</p>
                 <q-field icon="mdi-account-card-details" :error="$v.user.administrative.vitalCard.$error" error-label="Champ requis">
-                  <q-uploader name="vitalCard" :url="docsUploadUrl" :headers="headers"
+                  <q-uploader v-if="!hasUploadedVitalCard" name="vitalCard" :url="docsUploadUrl" :headers="headers"
                   :additional-fields="[{ name: 'fileName', value: `carte_vitale_${user.firstname}_${user.lastname}` }]"
                   @finish="afterUpload()" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
                   <p class="upload-done" v-if="alenviUser && alenviUser.administrative.vitalCard">Fichier mis en ligne <q-icon name="check" /></p>
@@ -130,10 +137,12 @@
                   <q-radio class="on-left" v-model="user.hasMessenger" val="true" label="Oui" @blur="$v.user.hasMessenger.$touch"/>
                   <q-radio v-model="user.hasMessenger" val="false" label="Non" @blur="$v.user.hasMessenger.$touch"/>
                 </q-field>
-                <q-stepper-navigation>
-                  <q-btn color="primary" :disable="hasStep4Errors" @click="lastStep()" label="Enregistrer" />
-                  <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
-                </q-stepper-navigation>
+                <div>
+                  <!-- <q-stepper-navigation> -->
+                    <q-btn color="primary" :disable="hasStep4Errors" @click="lastStep()" label="Enregistrer" />
+                    <q-btn color="primary" flat @click="$refs.stepper.previous()" label="Retour" />
+                  <!-- </q-stepper-navigation> -->
+                </div>
               </q-step>
               <q-inner-loading :visible="inProgress" />
             </q-stepper>
@@ -153,6 +162,10 @@ export default {
   // name: 'PageName',
   data () {
     return {
+      hasUploadedPicture: false,
+      hasUploadedIdCardRecto: false,
+      hasUploadedIdCardVerso: false,
+      hasUploadedVitalCard: false,
       hasFinishedAndNotMessenger: false,
       timeout: null,
       hasStep3Errors: true,
@@ -513,7 +526,21 @@ export default {
         this.isSignupComplete = true;
         // TO DO MESSAGE
       }
+      if (this.alenviUser.picture) {
+        this.hasUploadedPicture = true;
+      }
       if (this.alenviUser.administrative) {
+        if (this.alenviUser.administrative.idCard) {
+          if (this.alenviUser.administrative.idCard.recto) {
+            this.hasUploadedIdCardRecto = true;
+          }
+          if (this.alenviUser.administrative.idCard.verso) {
+            this.hasUploadedIdCardVerso = true;
+          }
+        }
+        if (this.alenviUser.administrative.vitalCard) {
+          this.hasUploadedVitalCard = true;
+        }
         if (this.alenviUser.administrative.navigoInvoice && this.$_.isBoolean(this.alenviUser.administrative.navigoInvoice.has)) {
           this.user.administrative.navigoInvoice.has = this.alenviUser.administrative.navigoInvoice.has.toString();
         }
