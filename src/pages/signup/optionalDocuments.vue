@@ -1,5 +1,5 @@
 <template>
-  <div padding v-if="user">
+  <div padding>
     <div class="row justify-center">
       <q-card class="layout-padding" style="width: 600px; max-width: 90vw;">
         <q-card-media class="justify-start">
@@ -66,6 +66,9 @@
             </q-field>
           </div>
         </q-card-main>
+        <q-card-actions class="row justify-end">
+          <q-btn color="primary" @click="goToBot" flat>Retour Pigi</q-btn>
+        </q-card-actions>
       </q-card>
     </div>
   </div>
@@ -98,17 +101,6 @@ export default {
       // }
     }
   },
-  // async mounted () {
-  //   try {
-  //     this.accessToken = this.$route.query.token;
-  //     this.inProgress = true;
-  //     await this.setAlenviUser();
-  //     this.inProgress = false;
-  //   } catch (e) {
-  //     console.error(e);
-  //     this.inProgress = false;
-  //   }
-  // },
   computed: {
     user () {
       return this.$store.getters['main/user'];
@@ -130,9 +122,9 @@ export default {
         console.error(e);
       }
     },
-    // async setAlenviUser () {
-    //   this.user = await this.$users.getById(this.$route.query.id, this.accessToken);
-    // }
+    goToBot () {
+      window.location.href = `${process.env.MESSENGER_LINK}?ref=optional_docs_complete`;
+    }
   }
 }
 </script>
