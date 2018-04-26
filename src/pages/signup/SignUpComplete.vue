@@ -71,35 +71,35 @@
                 </ul>
                 <p class="caption">Photo de toi :</p>
                 <q-field icon="mdi-account-card-details" :error="$v.user.picture.$error" error-label="Champ requis">
-                  <q-uploader v-if="!hasUploadedPicture" name="picture" :url="pictureUploadUrl" :headers="headers"
+                  <q-uploader v-if="storedUser && !storedUser.picture" name="picture" :url="pictureUploadUrl" :headers="headers"
                   :additional-fields="[{ name: 'fileName', value: `photo_${user.firstname}_${user.lastname}` }]"
                   @finish="afterUpload()" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png" @uploaded="hasUploadedPicture = true"/>
-                  <p class="upload-done" v-if="alenviUser && alenviUser.picture">Fichier mis en ligne <q-icon name="check" /></p>
-                  <p class="upload-not-done" v-if="alenviUser && !alenviUser.picture">Fichier manquant <q-icon name="warning" /></p>
+                  <p class="upload-done" v-if="storedUser && storedUser.picture">Fichier mis en ligne <q-icon name="check" /></p>
+                  <p class="upload-not-done" v-if="storedUser && !storedUser.picture">Fichier manquant <q-icon name="warning" /></p>
                 </q-field>
                 <p class="caption">Carte d'identité / titre de séjour (Recto) :</p>
                 <q-field icon="mdi-account-card-details" :error="$v.user.administrative.idCard.$error" error-label="Champ requis">
-                  <q-uploader v-if="!hasUploadedIdCardRecto" name="idCardRecto" :url="docsUploadUrl" :headers="headers"
+                  <q-uploader v-if="storedUser && storedUser.administrative.idCard && !storedUser.administrative.idCard.recto" name="idCardRecto" :url="docsUploadUrl" :headers="headers"
                   :additional-fields="[{ name: 'fileName', value: `cni_recto_${user.firstname}_${user.lastname}` }]"
                   @finish="afterUpload()" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
-                  <p class="upload-done" v-if="alenviUser && alenviUser.administrative.idCard.recto">Fichier mis en ligne <q-icon name="check" /></p>
-                  <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.idCard.recto">Fichier manquant <q-icon name="warning" /></p>
+                  <p class="upload-done" v-if="storedUser && storedUser.administrative.idCard && storedUser.administrative.idCard.recto">Fichier mis en ligne <q-icon name="check" /></p>
+                  <p class="upload-not-done" v-if="storedUser && storedUser.administrative.idCard && !storedUser.administrative.idCard.recto">Fichier manquant <q-icon name="warning" /></p>
                 </q-field>
                 <p class="caption">Carte d'identité / titre de séjour (Verso) :</p>
                 <q-field icon="mdi-account-card-details" :error="$v.user.administrative.idCard.$error" error-label="Champ requis">
-                  <q-uploader v-if="!hasUploadedIdCardVerso" name="idCardVerso" :url="docsUploadUrl" :headers="headers"
+                  <q-uploader v-if="storedUser && storedUser.administrative.idCard && !storedUser.administrative.idCard.verso" name="idCardVerso" :url="docsUploadUrl" :headers="headers"
                   :additional-fields="[{ name: 'fileName', value: `cni_verso_${user.firstname}_${user.lastname}` }]"
                   @finish="afterUpload()" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
-                  <p class="upload-done" v-if="alenviUser && alenviUser.administrative.idCard.verso">Fichier mis en ligne <q-icon name="check" /></p>
-                  <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.idCard.verso">Fichier manquant <q-icon name="warning" /></p>
+                  <p class="upload-done" v-if="storedUser && storedUser.administrative.idCard && storedUser.administrative.idCard.verso">Fichier mis en ligne <q-icon name="check" /></p>
+                  <p class="upload-not-done" v-if="storedUser && storedUser.administrative.idCard && !storedUser.administrative.idCard.verso">Fichier manquant <q-icon name="warning" /></p>
                 </q-field>
                 <p class="caption">Carte vitale :</p>
                 <q-field icon="mdi-account-card-details" :error="$v.user.administrative.vitalCard.$error" error-label="Champ requis">
-                  <q-uploader v-if="!hasUploadedVitalCard" name="vitalCard" :url="docsUploadUrl" :headers="headers"
+                  <q-uploader v-if="storedUser && !storedUser.administrative.vitalCard" name="vitalCard" :url="docsUploadUrl" :headers="headers"
                   :additional-fields="[{ name: 'fileName', value: `carte_vitale_${user.firstname}_${user.lastname}` }]"
                   @finish="afterUpload()" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
-                  <p class="upload-done" v-if="alenviUser && alenviUser.administrative.vitalCard">Fichier mis en ligne <q-icon name="check" /></p>
-                  <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.vitalCard">Fichier manquant <q-icon name="warning" /></p>
+                  <p class="upload-done" v-if="storedUser && storedUser.administrative.vitalCard">Fichier mis en ligne <q-icon name="check" /></p>
+                  <p class="upload-not-done" v-if="storedUser && !storedUser.administrative.vitalCard">Fichier manquant <q-icon name="warning" /></p>
                 </q-field>
                 <q-stepper-navigation>
                   <q-btn color="primary" :disable="hasStep3Errors" @click="thirdStep()" label="Enregistrer" />
@@ -169,7 +169,7 @@ export default {
       hasFinishedAndNotMessenger: false,
       timeout: null,
       hasStep3Errors: true,
-      alenviUser: null,
+      // alenviUser: null,
       ogustUser: null,
       inProgress: false,
       isSignupComplete: false,
@@ -507,66 +507,65 @@ export default {
     async afterUpload () {
       try {
         // this.alenviUser = await this.$users.getById(this.$route.query.id, this.accessToken);
-        this.alenviUser = await this.$users.getById(this.storedUser._id);
+        // this.alenviUser = await this.$users.getById(this.storedUser._id);
+        await this.$store.dispatch('main/getUser', Cookies.get('user_id'));
         this.checkStep3Errors();
       } catch (e) {
         console.error(e);
       }
     },
     checkStep3Errors () {
-      if (this.alenviUser.picture && this.alenviUser.administrative && this.alenviUser.administrative.idCard &&
-        this.alenviUser.administrative.vitalCard) {
+      if (this.storedUser.picture && this.storedUser.administrative && this.storedUser.administrative.idCard &&
+        this.storedUser.administrative.vitalCard) {
         this.hasStep3Errors = false;
       }
     },
     async setAlenviUser () {
       // this.alenviUser = await this.$users.getById(this.$route.query.id, this.accessToken);
-      this.alenviUser = this.storedUser;
-      if (this.alenviUser.administrative.signup.complete) {
-        this.isSignupComplete = true;
-        // TO DO MESSAGE
+      // this.alenviUser = this.storedUser;
+      // if (this.alenviUser.administrative.signup.complete) {
+      //   this.isSignupComplete = true;
+      //   // TO DO MESSAGE
+      // }
+      // if (this.alenviUser.picture) {
+      //   this.hasUploadedPicture = true;
+      // }
+      // if (this.alenviUser.administrative) {
+      //   if (this.alenviUser.administrative.idCard) {
+      //     if (this.alenviUser.administrative.idCard.recto) {
+      //       this.hasUploadedIdCardRecto = true;
+      //     }
+      //     if (this.alenviUser.administrative.idCard.verso) {
+      //       this.hasUploadedIdCardVerso = true;
+      //     }
+      //   }
+      //   if (this.alenviUser.administrative.vitalCard) {
+      //     this.hasUploadedVitalCard = true;
+      //   }
+      if (this.storedUser.administrative.navigoInvoice && this.$_.isBoolean(this.storedUser.administrative.navigoInvoice.has)) {
+        this.user.administrative.navigoInvoice.has = this.storedUser.administrative.navigoInvoice.has.toString();
       }
-      if (this.alenviUser.picture) {
-        this.hasUploadedPicture = true;
+      if (this.storedUser.administrative.mutualFund && this.$_.isBoolean(this.storedUser.administrative.mutualFund.has)) {
+        this.user.administrative.mutualFund.has = this.storedUser.administrative.mutualFund.has.toString();
       }
-      if (this.alenviUser.administrative) {
-        if (this.alenviUser.administrative.idCard) {
-          if (this.alenviUser.administrative.idCard.recto) {
-            this.hasUploadedIdCardRecto = true;
-          }
-          if (this.alenviUser.administrative.idCard.verso) {
-            this.hasUploadedIdCardVerso = true;
-          }
-        }
-        if (this.alenviUser.administrative.vitalCard) {
-          this.hasUploadedVitalCard = true;
-        }
-        if (this.alenviUser.administrative.navigoInvoice && this.$_.isBoolean(this.alenviUser.administrative.navigoInvoice.has)) {
-          this.user.administrative.navigoInvoice.has = this.alenviUser.administrative.navigoInvoice.has.toString();
-        }
-        if (this.alenviUser.administrative.mutualFund && this.$_.isBoolean(this.alenviUser.administrative.mutualFund.has)) {
-          this.user.administrative.mutualFund.has = this.alenviUser.administrative.mutualFund.has.toString();
-        }
-        if (this.alenviUser.administrative.phoneInvoice && this.$_.isBoolean(this.alenviUser.administrative.phoneInvoice.has)) {
-          this.user.administrative.phoneInvoice.has = this.alenviUser.administrative.phoneInvoice.has.toString();
-        }
-        if (this.alenviUser.administrative.certificates && this.$_.isBoolean(this.alenviUser.administrative.certificates.has)) {
-          this.user.administrative.certificates.has = this.alenviUser.administrative.certificates.has.toString();
-        }
-        if (this.alenviUser.administrative.healthAttest && this.$_.isBoolean(this.alenviUser.administrative.healthAttest.has)) {
-          this.user.administrative.healthAttest.has = this.alenviUser.administrative.healthAttest.has.toString();
-        }
-        console.log(this.user.administrative);
+      if (this.storedUser.administrative.phoneInvoice && this.$_.isBoolean(this.storedUser.administrative.phoneInvoice.has)) {
+        this.user.administrative.phoneInvoice.has = this.storedUser.administrative.phoneInvoice.has.toString();
       }
-      if (this.alenviUser.administrative.signup.step) {
-        this.$refs.stepper.goToStep(this.alenviUser.administrative.signup.step);
+      if (this.storedUser.administrative.certificates && this.$_.isBoolean(this.storedUser.administrative.certificates.has)) {
+        this.user.administrative.certificates.has = this.storedUser.administrative.certificates.has.toString();
       }
-      this.user.picture.link = this.alenviUser.picture ? this.alenviUser.picture.link : '';
+      if (this.storedUser.administrative.healthAttest && this.$_.isBoolean(this.storedUser.administrative.healthAttest.has)) {
+        this.user.administrative.healthAttest.has = this.storedUser.administrative.healthAttest.has.toString();
+      }
+      if (this.storedUser.administrative.signup.step) {
+        this.$refs.stepper.goToStep(this.storedUser.administrative.signup.step);
+      }
+      this.user.picture.link = this.storedUser.picture ? this.storedUser.picture.link : '';
     },
     async setOgustUser () {
       // const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
-      // this.ogustUser = await this.$ogust.getEmployeeById(this.alenviUser.employee_id, ogustToken);
-      this.ogustUser = await this.$ogust.getEmployeeById(this.alenviUser.employee_id);
+      // this.ogustUser = await this.$ogust.getEmployeeById(this.storedUser.employee_id, ogustToken);
+      this.ogustUser = await this.$ogust.getEmployeeById(this.storedUser.employee_id);
       this.user.id_employee = this.ogustUser.id_employee || '';
       this.user.lastname = this.ogustUser.last_name || '';
       this.user.firstname = this.ogustUser.first_name || '';
