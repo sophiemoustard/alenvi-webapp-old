@@ -79,7 +79,7 @@
                 </q-field>
                 <p class="caption">Carte d'identité / titre de séjour (Recto) :</p>
                 <q-field icon="mdi-account-card-details" :error="$v.user.administrative.idCard.$error" error-label="Champ requis">
-                  <q-uploader v-if="storedUser && storedUser.administrative.idCard && !storedUser.administrative.idCard.recto" name="idCardRecto" :url="docsUploadUrl" :headers="headers"
+                  <q-uploader v-if="storedUser && !storedUser.administrative.idCard && !storedUser.administrative.idCard.recto" name="idCardRecto" :url="docsUploadUrl" :headers="headers"
                   :additional-fields="[{ name: 'fileName', value: `cni_recto_${user.firstname}_${user.lastname}` }]"
                   @finish="afterUpload()" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
                   <p class="upload-done" v-if="storedUser && storedUser.administrative.idCard && storedUser.administrative.idCard.recto">Fichier mis en ligne <q-icon name="check" /></p>
@@ -87,7 +87,7 @@
                 </q-field>
                 <p class="caption">Carte d'identité / titre de séjour (Verso) :</p>
                 <q-field icon="mdi-account-card-details" :error="$v.user.administrative.idCard.$error" error-label="Champ requis">
-                  <q-uploader v-if="storedUser && storedUser.administrative.idCard && !storedUser.administrative.idCard.verso" name="idCardVerso" :url="docsUploadUrl" :headers="headers"
+                  <q-uploader v-if="storedUser && !storedUser.administrative.idCard && !storedUser.administrative.idCard.verso" name="idCardVerso" :url="docsUploadUrl" :headers="headers"
                   :additional-fields="[{ name: 'fileName', value: `cni_verso_${user.firstname}_${user.lastname}` }]"
                   @finish="afterUpload()" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
                   <p class="upload-done" v-if="storedUser && storedUser.administrative.idCard && storedUser.administrative.idCard.verso">Fichier mis en ligne <q-icon name="check" /></p>
