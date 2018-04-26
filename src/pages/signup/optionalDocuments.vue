@@ -19,7 +19,7 @@
           </ul>
             <p class="caption">Attestation sécurité sociale (disponible sur téléchargement sur www.ameli.fr) :</p>
             <q-field icon="mdi-account-card-details">
-              <q-uploader name="healthAttest" :url="docsUploadUrl" :headers="headers"
+              <q-uploader v-if="user && !user.administrative.healthAttest.link" name="healthAttest" :url="docsUploadUrl" :headers="headers"
                 :additional-fields="[{ name: 'fileName', value: `attestation_secu_{user.firstname}_${user.lastname}` }]"
                 @finish="afterUpload()" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
               <p class="upload-done" v-if="user && user.administrative.healthAttest.link">Fichier mis en ligne <q-icon name="check" /></p>
@@ -28,7 +28,7 @@
           <div v-if="user.administrative.phoneInvoice && user.administrative.phoneInvoice.has">
             <p class="caption">Facture de téléphone :</p>
             <q-field icon="mdi-account-card-details">
-              <q-uploader name="phoneInvoice" :url="docsUploadUrl" :headers="headers"
+              <q-uploader v-if="user && !user.administrative.phoneInvoice.link" name="phoneInvoice" :url="docsUploadUrl" :headers="headers"
                 :additional-fields="[{ name: 'fileName', value: `telephone_${user.firstname}_${user.lastname}` }]"
                 @finish="afterUpload()" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
               <p class="upload-done" v-if="user && user.administrative.phoneInvoice.link">Fichier mis en ligne <q-icon name="check" /></p>
@@ -38,7 +38,7 @@
           <div v-if="user.administrative.mutualFund && user.administrative.mutualFund.has">
             <p class="caption">Mutuelle (facultatif)</p>
             <q-field icon="mdi-account-card-details">
-              <q-uploader name="mutualFund" :url="docsUploadUrl" :headers="headers"
+              <q-uploader v-if="user && !user.administrative.mutualFund.link" name="mutualFund" :url="docsUploadUrl" :headers="headers"
                 :additional-fields="[{ name: 'fileName', value: `mutuelle_${user.firstname}_${user.lastname}` }]"
                 @finish="afterUpload()" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" />
               <p class="upload-done" v-if="user && user.administrative.mutualFund.link">Fichier mis en ligne <q-icon name="check" /></p>
@@ -48,7 +48,7 @@
           <div v-if="user.administrative.navigoInvoice && user.administrative.navigoInvoice.has">
             <p class="caption">Facture Navigo</p>
             <q-field icon="mdi-account-card-details">
-              <q-uploader name="navigoInvoice" :url="docsUploadUrl" :headers="headers"
+              <q-uploader v-if="user && !user.administrative.navigoInvoice.link" name="navigoInvoice" :url="docsUploadUrl" :headers="headers"
                 :additional-fields="[{ name: 'fileName', value: `navigo_${user.firstname}_${user.lastname}` }]"
                 @finish="afterUpload()" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
               <p class="upload-done" v-if="user && user.administrative.navigoInvoice.link">Fichier mis en ligne <q-icon name="check" /></p>
@@ -58,7 +58,7 @@
           <div v-if="user.administrative.certificates && user.administrative.certificates.has">
             <p class="caption">Diplômes et / ou certicats</p>
             <q-field icon="mdi-account-card-details">
-              <q-uploader name="certificates" :url="docsUploadUrl" :headers="headers"
+              <q-uploader v-if="user && !user.administrative.certificates.docs[0]" name="certificates" :url="docsUploadUrl" :headers="headers"
                 :additional-fields="[{ name: 'fileName', value: `certif-diplome_${user.firstname}_${user.lastname}` }]"
                 @finish="afterUpload()" multiple auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
               <p class="upload-done" v-if="user && user.administrative.certificates.docs[0]">Fichier(s) mis en ligne <q-icon name="check" /></p>
