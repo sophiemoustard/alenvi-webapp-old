@@ -83,7 +83,7 @@
                   :additional-fields="[{ name: 'fileName', value: `cni_recto_${user.firstname}_${user.lastname}` }]"
                   @finish="afterUpload()" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
                   <p class="upload-done" v-if="storedUser && storedUser.administrative.idCard && storedUser.administrative.idCard.recto">Fichier mis en ligne <q-icon name="check" /></p>
-                  <p class="upload-not-done" v-if="storedUser && storedUser.administrative.idCard && !storedUser.administrative.idCard.recto">Fichier manquant <q-icon name="warning" /></p>
+                  <p class="upload-not-done" v-if="storedUser && !storedUser.administrative.idCard && !storedUser.administrative.idCard.recto">Fichier manquant <q-icon name="warning" /></p>
                 </q-field>
                 <p class="caption">Carte d'identité / titre de séjour (Verso) :</p>
                 <q-field icon="mdi-account-card-details" :error="$v.user.administrative.idCard.$error" error-label="Champ requis">
@@ -91,7 +91,7 @@
                   :additional-fields="[{ name: 'fileName', value: `cni_verso_${user.firstname}_${user.lastname}` }]"
                   @finish="afterUpload()" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
                   <p class="upload-done" v-if="storedUser && storedUser.administrative.idCard && storedUser.administrative.idCard.verso">Fichier mis en ligne <q-icon name="check" /></p>
-                  <p class="upload-not-done" v-if="storedUser && storedUser.administrative.idCard && !storedUser.administrative.idCard.verso">Fichier manquant <q-icon name="warning" /></p>
+                  <p class="upload-not-done" v-if="storedUser && !storedUser.administrative.idCard && !storedUser.administrative.idCard.verso">Fichier manquant <q-icon name="warning" /></p>
                 </q-field>
                 <p class="caption">Carte vitale :</p>
                 <q-field icon="mdi-account-card-details" :error="$v.user.administrative.vitalCard.$error" error-label="Champ requis">
