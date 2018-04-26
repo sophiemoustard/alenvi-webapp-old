@@ -21,7 +21,7 @@
             <q-field icon="mdi-account-card-details">
               <q-uploader name="healthAttest" :url="docsUploadUrl" :headers="headers"
                 :additional-fields="[{ name: 'fileName', value: `attestation_secu_{user.firstname}_${user.lastname}` }]"
-                @finish="afterUpload()" auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
+                @finish="afterUpload()" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
               <p class="upload-done" v-if="user && user.administrative.healthAttest.link">Fichier mis en ligne <q-icon name="check" /></p>
               <p class="upload-not-done" v-if="user && !user.administrative.healthAttest.link">Fichier manquant <q-icon name="warning" /></p>
             </q-field>
@@ -30,7 +30,7 @@
             <q-field icon="mdi-account-card-details">
               <q-uploader name="phoneInvoice" :url="docsUploadUrl" :headers="headers"
                 :additional-fields="[{ name: 'fileName', value: `telephone_${user.firstname}_${user.lastname}` }]"
-                @finish="afterUpload()" auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
+                @finish="afterUpload()" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
               <p class="upload-done" v-if="user && user.administrative.phoneInvoice.link">Fichier mis en ligne <q-icon name="check" /></p>
               <p class="upload-not-done" v-if="user && !user.administrative.phoneInvoice.link">Fichier manquant <q-icon name="warning" /></p>
             </q-field>
@@ -40,7 +40,7 @@
             <q-field icon="mdi-account-card-details">
               <q-uploader name="mutualFund" :url="docsUploadUrl" :headers="headers"
                 :additional-fields="[{ name: 'fileName', value: `mutuelle_${user.firstname}_${user.lastname}` }]"
-                @finish="afterUpload()" auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" />
+                @finish="afterUpload()" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" />
               <p class="upload-done" v-if="user && user.administrative.mutualFund.link">Fichier mis en ligne <q-icon name="check" /></p>
               <p class="upload-not-done" v-if="user && !user.administrative.mutualFund.link">Fichier manquant <q-icon name="warning" /></p>
             </q-field>
@@ -50,7 +50,7 @@
             <q-field icon="mdi-account-card-details">
               <q-uploader name="navigoInvoice" :url="docsUploadUrl" :headers="headers"
                 :additional-fields="[{ name: 'fileName', value: `navigo_${user.firstname}_${user.lastname}` }]"
-                @finish="afterUpload()" auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
+                @finish="afterUpload()" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
               <p class="upload-done" v-if="user && user.administrative.navigoInvoice.link">Fichier mis en ligne <q-icon name="check" /></p>
               <p class="upload-not-done" v-if="user && !user.administrative.navigoInvoice.link">Fichier manquant <q-icon name="warning" /></p>
             </q-field>
@@ -60,7 +60,7 @@
             <q-field icon="mdi-account-card-details">
               <q-uploader name="certificates" :url="docsUploadUrl" :headers="headers"
                 :additional-fields="[{ name: 'fileName', value: `certif-diplome_${user.firstname}_${user.lastname}` }]"
-                @finish="afterUpload()" multiple auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
+                @finish="afterUpload()" multiple auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
               <p class="upload-done" v-if="user && user.administrative.certificates.docs[0]">Fichier(s) mis en ligne <q-icon name="check" /></p>
               <p class="upload-not-done" v-if="user && !user.administrative.certificates.docs[0]">Fichier manquant <q-icon name="warning" /></p>
             </q-field>

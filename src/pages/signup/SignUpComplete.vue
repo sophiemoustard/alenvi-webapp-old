@@ -74,7 +74,7 @@
                 <q-field icon="mdi-account-card-details" :error="$v.user.picture.$error" error-label="Champ requis">
                   <q-uploader name="picture" :url="pictureUploadUrl" :headers="headers"
                   :additional-fields="[{ name: 'fileName', value: `photo_${user.firstname}_${user.lastname}` }]"
-                  @finish="afterUpload()" auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png"/>
+                  @finish="afterUpload()" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png"/>
                   <p class="upload-done" v-if="alenviUser && alenviUser.picture">Fichier mis en ligne <q-icon name="check" /></p>
                   <p class="upload-not-done" v-if="alenviUser && !alenviUser.picture">Fichier manquant <q-icon name="warning" /></p>
                 </q-field>
@@ -82,7 +82,7 @@
                 <q-field icon="mdi-account-card-details" :error="$v.user.administrative.idCard.$error" error-label="Champ requis">
                   <q-uploader name="idCard" :url="docsUploadUrl" :headers="headers"
                   :additional-fields="[{ name: 'fileName', value: `cni_${user.firstname}_${user.lastname}` }]"
-                  @finish="afterUpload()" multiple auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
+                  @finish="afterUpload()" multiple auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
                   <p class="upload-done" v-if="alenviUser && alenviUser.administrative.idCard.length !== 0">Fichier mis en ligne <q-icon name="check" /></p>
                   <p class="upload-not-done" v-if="alenviUser && alenviUser.administrative.idCard === 0">Fichier manquant <q-icon name="warning" /></p>
                 </q-field>
@@ -90,7 +90,7 @@
                 <q-field icon="mdi-account-card-details" :error="$v.user.administrative.vitalCard.$error" error-label="Champ requis">
                   <q-uploader name="vitalCard" :url="docsUploadUrl" :headers="headers"
                   :additional-fields="[{ name: 'fileName', value: `carte_vitale_${user.firstname}_${user.lastname}` }]"
-                  @finish="afterUpload()" auto-expand extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
+                  @finish="afterUpload()" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"/>
                   <p class="upload-done" v-if="alenviUser && alenviUser.administrative.vitalCard">Fichier mis en ligne <q-icon name="check" /></p>
                   <p class="upload-not-done" v-if="alenviUser && !alenviUser.administrative.vitalCard">Fichier manquant <q-icon name="warning" /></p>
                 </q-field>
