@@ -54,7 +54,7 @@ export default {
           this.$q.notify({
             color: 'negative',
             icon: 'warning',
-            detail: "Erreur de chargement des données :/ Si le problème persiste, contacte l'équipe technique :)",
+            detail: "Erreur de chargement des données :/ Si le problème persiste, contactez l'équipe technique : support@alenvi.io :)",
             position: 'bottom-right',
             timeout: 2500
           });
