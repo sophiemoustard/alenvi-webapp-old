@@ -1,5 +1,5 @@
 <template>
-  <q-icon name="search" size="1.5rem" flat>
+  <q-icon name="mdi-account-search" size="1.8rem" flat>
     <q-popover v-model="showFilter" @show="getEmployeesBySector(ogustUser.sector)">
       <q-list link no-border style="min-width: 200px">
         <!-- <q-list-header v-if="auxiliaries.length !== 0"> -->
