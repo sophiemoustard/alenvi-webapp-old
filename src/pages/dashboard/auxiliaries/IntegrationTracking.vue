@@ -175,7 +175,7 @@ export default {
       if (!this.isComplete) {
         return this.userList.filter(auxiliary => !auxiliary.complete);
       }
-      return this.userList.filter(auxiliary => auxiliary.complete);
+      return this.userList.filter(auxiliary => auxiliary.complete && this.$moment(auxiliary.createdAt).isAfter('02-28-2018'));
     }
   },
   methods: {
@@ -320,6 +320,7 @@ export default {
               userListPayload.miscDocuments.done = this.$_.every(userListPayload.miscDocuments.data, ['done', true]);
               userListPayload.complete = userList[i].administrative.signup.complete;
               userListPayload.driveFolderLink = userList[i].administrative.driveFolder ? userList[i].administrative.driveFolder.link : false
+              userListPayload.createdAt = userList[i].createdAt;
               this.userList.push(userListPayload);
             }
           }
