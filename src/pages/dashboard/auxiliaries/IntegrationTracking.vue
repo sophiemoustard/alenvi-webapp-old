@@ -314,7 +314,7 @@ export default {
               if (userList[i].administrative && userList[i].administrative.certificates && userList[i].administrative.certificates.has) {
                 userListPayload.miscDocuments.data.certificates = {
                   label: 'Diplomes et/ou certificats de travail',
-                  done: userList[i].administrative ? !!userList[i].administrative.certificates.docs.length !== 0 : false
+                  done: userList[i].administrative ? userList[i].administrative.certificates.docs.length !== 0 : false
                 }
               }
               userListPayload.miscDocuments.done = this.$_.every(userListPayload.miscDocuments.data, ['done', true]);
