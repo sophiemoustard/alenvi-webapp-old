@@ -56,6 +56,13 @@ export default {
         this.$q.cookies.set('user_id', user.data.data.user._id, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV !== 'development' });
         window.location.href = `${process.env.MESSENGER_LINK}?ref=${token}`
       } catch (e) {
+        this.$q.notify({
+          color: 'negative',
+          icon: 'warning',
+          detail: 'Impossible de se connecter.',
+          position: 'bottom-right',
+          timeout: 2500
+        });
         console.error(e.response);
       }
       //   var newLocation = 'https://alenvi-api.herokuapp.com/bot/authorize' + window.location.search;
