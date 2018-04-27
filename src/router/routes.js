@@ -100,14 +100,6 @@ export default [
           cookies: ['alenvi_token', 'refresh_token']
         }
       },
-      { path: 'test', component: () => import('pages/Test') },
-      {
-        path: 'test2',
-        component: () => import('pages/Test2'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token']
-        }
-      },
       {
         path: 'planning',
         name: 'planning',

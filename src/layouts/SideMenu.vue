@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- If we are another role than customer -->
     <q-list v-if="user.role.name !== 'Client'" class="no-border">
       <q-item class="justify-center">
         <img :src="user.picture && user.picture.link ? user.picture.link : 'https://res.cloudinary.com/alenvi/image/upload/c_scale,q_auto/v1513764284/images/users/default_avatar.png'" alt="Image user" class="avatar-alenvi">
@@ -8,7 +9,7 @@
         <q-item-main class="text-bold text-center" :label="user.firstname" />
       </q-item>
       <q-item class="justify-center">
-        <q-icon name="person" color="tertiary" size="1.5rem" @click.native="goToProfile"/>
+        <q-icon id="profile" name="person" color="tertiary" size="1.5rem" @click.native="goToProfile"/>
         <q-icon id="logout" name="exit to app" color="tertiary" size="1.5rem" class="on-right" @click.native="logout" />
       </q-item>
       <q-item-separator />
@@ -38,6 +39,7 @@
         <q-item-main label="Paramètres" />
       </q-item>
     </q-list>
+    <!-- If we are another customer -->
     <q-list v-if="user.role.name === 'Client'" class="no-border">
       <q-item to="/dashboard/customer/planning" exact>
         <q-item-side icon="date range" />
@@ -106,6 +108,9 @@ export default {
     height: 85px
 
   #logout
+    cursor: pointer
+
+  #profile
     cursor: pointer
 
   .user-menu
