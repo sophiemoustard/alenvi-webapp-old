@@ -35,7 +35,7 @@
     </div>
     <p class="caption">Liste SMS envoyés</p>
     <q-table
-      :data="filteredList"
+      :data="messageList"
       :columns="columns"
       row-key="name"
       :rows-per-page-options="[20, 30, 40]"
@@ -57,7 +57,7 @@
           placeholder="Recherche"
           class="col-12" />
       </template>
-    </q-table>
+    </q-table> <!-- :data="filteredList" -->
   </q-page>
 </template>
 
@@ -89,7 +89,7 @@ export default {
         {
           name: 'dateSent',
           required: true,
-          label: 'Date SMS accueil',
+          label: 'Date',
           field: 'dateSent',
           align: 'left',
           sortable: true,
@@ -104,6 +104,14 @@ export default {
           }
         },
         {
+          name: 'body',
+          required: true,
+          label: 'Contenu',
+          field: 'body',
+          align: 'left',
+          sortable: true
+        },
+        {
           name: 'to',
           required: true,
           label: 'Destinataire',
@@ -114,9 +122,9 @@ export default {
     }
   },
   computed: {
-    filteredList () {
-      return this.messageList.filter(message => message.body.match(/Bienvenue/));
-    }
+    // filteredList () {
+    //   return this.messageList.filter(message => message.body.match(/Bienvenue/));
+    // }
   },
   async mounted () {
     await this.getMessageList();
