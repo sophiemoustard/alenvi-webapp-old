@@ -14,11 +14,28 @@
         </q-field> -->
         <!-- <br>
         <q-search v-model="searchUserFromMobilePhone" :debounce="600" placeholder="Numéro auxiliaire" type="tel" stack-label="Numéro de téléphone" /> -->
+        <br>
+        <blockquote>
+          <p>Bienvenue chez Alenvi ! :)<br>
+          Utilise ce code: _CODE_ pour pouvoir commencer ton enregistrement ici avant ton intégration: https://app.alenvi.io/signup :-)</p>
+          <small><cite title="">SMS d'accueil</cite></small>
+        </blockquote>
+        <br>
+        <blockquote>
+          <p>
+            Attention, avant la signature de ton contrat, tu dois télécharger l'application Facebook Messenger afin de pouvoir utiliser les outils Alenvi.<br>
+            Voici les deux étapes à suivre:<br>
+            1. Si ton téléphone est un Iphone, clique sur ce lien https://appstore.com/messenger, sinon clique sur ce lien: https://play.google.com/store/apps/details?id=com.facebook.orca<br>
+            2. Une fois l'application installée, connecte-toi en cliquant sur le lien suivant: https://m.me/alenvipigi<br>
+            Si tu rencontres des difficultés, contacte dès aujourd'hui la personne qui t'a recruté chez Alenvi
+          </p>
+          <small><cite title="">2ème SMS si pas Messenger</cite></small>
+        </blockquote>
       </div>
     </div>
     <p class="caption">Liste SMS envoyés</p>
     <q-table
-      :data="filteredList"
+      :data="messageList"
       :columns="columns"
       row-key="name"
       :rows-per-page-options="[20, 30, 40]"
@@ -40,7 +57,7 @@
           placeholder="Recherche"
           class="col-12" />
       </template>
-    </q-table>
+    </q-table> <!-- :data="filteredList" -->
   </q-page>
 </template>
 
@@ -72,7 +89,7 @@ export default {
         {
           name: 'dateSent',
           required: true,
-          label: 'Date SMS accueil',
+          label: 'Date',
           field: 'dateSent',
           align: 'left',
           sortable: true,
@@ -87,6 +104,14 @@ export default {
           }
         },
         {
+          name: 'body',
+          required: true,
+          label: 'Contenu',
+          field: 'body',
+          align: 'left',
+          sortable: true
+        },
+        {
           name: 'to',
           required: true,
           label: 'Destinataire',
@@ -97,9 +122,9 @@ export default {
     }
   },
   computed: {
-    filteredList () {
-      return this.messageList.filter(message => message.body.match(/Bienvenue/));
-    }
+    // filteredList () {
+    //   return this.messageList.filter(message => message.body.match(/Bienvenue/));
+    // }
   },
   async mounted () {
     await this.getMessageList();
