@@ -68,7 +68,7 @@ export default {
         event.misc = eventsRaw[events].customer.misc;
         event.readonly = (eventsRaw[events].customer.id_customer === '286871430' || eventsRaw[events].customer.id_customer === '271395715' || eventsRaw[events].customer.id_customer === '244566438' || eventsRaw[events].customer.id_customer === '349780044' || eventsRaw[events].customer.id_customer === '356779196' || eventsRaw[events].customer.id_customer === '356779463');
       } else {
-        event.text = `${eventsRaw[events].employee.firstname} ${eventsRaw[events].employee.lastname}`
+        event.text = `${eventsRaw[events].employee.firstname} ${eventsRaw[events].employee.lastname}`;
       }
       data.push(event);
     }
@@ -95,7 +95,7 @@ export default {
       comment: personData.comment || '',
       sector: personData.sector || '',
       id_employee: personData.id_employee || ''
-    }
+    };
   },
   async getOgustCustomerDetails (ogustToken = null, customerId) {
     let customerDetails = {};
@@ -107,7 +107,7 @@ export default {
     return customerDetails;
   },
   async editOgustCustomerDetails (ogustToken, customerId, data) {
-    await axios.put(`${process.env.API_HOSTNAME}/ogust/customers/${customerId}/moreInfo`, data, { headers: { 'x-ogust-token': ogustToken } })
+    await axios.put(`${process.env.API_HOSTNAME}/ogust/customers/${customerId}/moreInfo`, data, { headers: { 'x-ogust-token': ogustToken } });
   },
   async getOgustCustomerCodes (ogustToken, customerId) {
     const customerInfoRaw = await axios.get(`${process.env.API_HOSTNAME}/ogust/customers/${customerId}`, { headers: { 'x-ogust-token': ogustToken } });

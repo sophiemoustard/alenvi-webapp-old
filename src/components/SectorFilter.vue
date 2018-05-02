@@ -33,17 +33,17 @@ export default {
   computed: {
     showFilter: {
       get () {
-        return this.$store.state.main.showFilter;
+        return this.$store.state.calendar.showFilter;
       },
       set (value) {
-        this.$store.commit('main/toggleFilter', value);
+        this.$store.commit('calendar/toggleFilter', value);
       }
     },
     ogustUser () {
-      return this.$store.getters['main/ogustUser'];
+      return this.$store.getters['calendar/ogustUser'];
     },
     ogustToken () {
-      return this.$store.getters['main/ogustToken'];
+      return this.$store.getters['calendar/ogustToken'];
     }
     // filteredAuxiliaries () {
     //   return this.auxiliaries.filter((item) => {
@@ -53,7 +53,7 @@ export default {
   },
   mounted () {
     // this.auxiliariesIds.push(this.$store.state.ogustUser.id_employee);
-    this.auxiliaryId = this.$store.state.main.ogustUser.id_employee;
+    this.auxiliaryId = this.$store.state.calendar.ogustUser.id_employee;
   },
   methods: {
     async getEmployeesBySector (sector) {
@@ -72,7 +72,7 @@ export default {
     },
     chooseAuxiliaries () {
       this.$emit('auxiliariesChosen');
-      this.$store.commit('main/setAuxiliariesChosen', this.auxiliaryId);
+      this.$store.commit('calendar/setAuxiliariesChosen', this.auxiliaryId);
     }
   }
 }
