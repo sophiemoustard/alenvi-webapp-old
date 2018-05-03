@@ -21,7 +21,8 @@ module.exports = function (ctx) {
       'twilio',
       'moment',
       'can',
-      'lodash'
+      'lodash',
+      'vue-croppie'
     ],
     css: [
       'app.styl'
