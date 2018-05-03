@@ -229,19 +229,19 @@ export default {
     },
     getOpenModal: {
       get () {
-        return this.$store.state.main.openModal;
+        return this.$store.state.calendar.openModal;
       },
       set (value) {
-        this.$store.commit('main/controlModal', value);
+        this.$store.commit('calendar/controlModal', value);
       }
     },
     ...mapGetters({
-      disableInput: 'main/disableInput',
-      disableTimePicker: 'main/disableTimePicker',
-      showFilter: 'main/showFilter',
-      ogustUser: 'main/ogustUser',
-      auxiliariesChosen: 'main/auxiliariesChosen',
-      toggleDrawer: 'main/toggleDrawer'
+      disableInput: 'calendar/disableInput',
+      disableTimePicker: 'calendar/disableTimePicker',
+      showFilter: 'calendar/showFilter',
+      ogustUser: 'calendar/ogustUser',
+      auxiliariesChosen: 'calendar/auxiliariesChosen',
+      toggleDrawer: 'calendar/toggleDrawer'
     })
   },
   mounted () {
@@ -444,12 +444,12 @@ export default {
       }
     },
     ...mapMutations({
-      setDisableInput: 'main/setDisableInput',
-      setDisableTimePicker: 'main/setDisableTimePicker',
-      controlModal: 'main/controlModal'
+      setDisableInput: 'calendar/setDisableInput',
+      setDisableTimePicker: 'calendar/setDisableTimePicker',
+      controlModal: 'calendar/controlModal'
     }),
     displayFilter () {
-      this.$store.commit('main/toggleFilter', !this.showFilter)
+      this.$store.commit('calendar/toggleFilter', !this.showFilter)
     },
     applyFilter () {
       // scheduler.filter_week = (id, event) => {

@@ -31,7 +31,7 @@ export default {
   },
   computed: {
     auxiliariesChosen () {
-      return this.$store.getters['main/auxiliariesChosen'];
+      return this.$store.getters['calendar/auxiliariesChosen'];
     }
   },
   mounted () {
@@ -88,7 +88,7 @@ export default {
           console.error(e.response);
           if (e.response.status === 404) {
             this.events = [];
-            this.$store.commit('main/toggleFilter', false);
+            this.$store.commit('calendar/toggleFilter', false);
             return this.$q.notify({
               color: 'negative',
               icon: 'warning',
@@ -190,11 +190,11 @@ export default {
       this.done = event;
     },
     ...mapMutations({
-      setDisableInput: 'main/setDisableInput',
-      controlModal: 'main/controlModal',
-      getOgustToken: 'main/getOgustToken',
-      toggleFilter: 'main/toggleFilter',
-      setOgustUser: 'main/setOgustUser'
+      setDisableInput: 'calendar/setDisableInput',
+      controlModal: 'calendar/controlModal',
+      getOgustToken: 'calendar/getOgustToken',
+      toggleFilter: 'calendar/toggleFilter',
+      setOgustUser: 'calendar/setOgustUser'
     })
   }
 }
