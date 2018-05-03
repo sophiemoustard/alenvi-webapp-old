@@ -25,3 +25,6 @@ export const ogustToken = (state) => {
 export const personType = (state) => {
   return state.personType;
 };
+export const modalBtnLoading = (state) => {
+  return state.modalBtnLoading;
+};

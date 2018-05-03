@@ -1,6 +1,6 @@
 <template>
   <div>
-    <scheduler :showTabFilter="true" :events="events" @progressDone="progressDone" @eventUpdated="updateEventById" @viewChanged="getEventsData"
+    <scheduler :showTabFilter="true" :events="events" @eventUpdated="updateEventById" @viewChanged="getEventsData"
       @applyFilter="getEventsData"></scheduler>
   </div>
 </template>
@@ -124,22 +124,24 @@ export default {
       try {
         this.setDisableInput(true);
         const ogustToken = await this.$ogust.getOgustToken(this.token);
-        const updateServicePayload = {
-          startDate: this.$moment(event.start_date).format('YYYYMMDDHHmm'),
-          endDate: this.$moment(event.end_date).format('YYYYMMDDHHmm')
-        }
-        await this.$ogust.updateServiceById(ogustToken, event.id, updateServicePayload);
-        const planningUpdateParams = {
-          type: 'Modif. Intervention',
-          content: `${this.$moment(event.start_date).format('dddd DD/MM')}.\nIntervention chez ${event.text} de ${this.$moment(event.start_date).format('HH:mm')} à ${this.$moment(event.end_date).format('HH:mm')}`,
-          involved: event.text,
-          check: {
-            isChecked: true,
-            checkBy: process.env.ALENVI_BOT_ID,
-            checkedAt: new Date()
+        if (this.personType === 'employee' && this.$route.query.id_employee === event.id_employee && event.dateChanged) {
+          const updateServicePayload = {
+            startDate: this.$moment(event.start_date).format('YYYYMMDDHHmm'),
+            endDate: this.$moment(event.end_date).format('YYYYMMDDHHmm')
           }
-        };
-        await this.$planningUpdates.storePlanningupdates(this.personId, this.token, planningUpdateParams);
+          await this.$ogust.updateServiceById(ogustToken, event.id, updateServicePayload);
+          const planningUpdateParams = {
+            type: 'Modif. Intervention',
+            content: `${this.$moment(event.start_date).format('dddd DD/MM')}.\nIntervention chez ${event.text} de ${this.$moment(event.start_date).format('HH:mm')} à ${this.$moment(event.end_date).format('HH:mm')}`,
+            involved: event.text,
+            check: {
+              isChecked: true,
+              checkBy: process.env.ALENVI_BOT_ID,
+              checkedAt: new Date()
+            }
+          };
+          await this.$planningUpdates.storePlanningupdates(this.personId, this.token, planningUpdateParams);
+        }
         const customerDetailsPayload = {
           arrayValues: {
             NIVEAU: event.pathology,
@@ -158,7 +160,7 @@ export default {
         scheduler.updateEvent(event.id);
         scheduler.setCurrentView();
         // vuex mutations to control input in modal as well as opening and closing modal
-        this.done();
+        this.setModalBtnLoading(false);
         this.setDisableInput(false);
         this.controlModal(false);
         this.$q.notify({
@@ -186,13 +188,10 @@ export default {
             timeout: 2500
           });
         }
-        this.done();
         this.setDisableInput(false);
-        console.error(e);
+        this.setModalBtnLoading(false);
+        e.response ? console.error(e.response) : console.error(e);
       }
-    },
-    progressDone (event) {
-      this.done = event;
     },
     ...mapMutations({
       setDisableInput: 'calendar/setDisableInput',
@@ -200,7 +199,8 @@ export default {
       getOgustToken: 'calendar/getOgustToken',
       toggleFilter: 'calendar/toggleFilter',
       setOgustUser: 'calendar/setOgustUser',
-      setPersonType: 'calendar/setPersonType'
+      setPersonType: 'calendar/setPersonType',
+      setModalBtnLoading: 'calendar/setModalBtnLoading'
     })
   }
 }

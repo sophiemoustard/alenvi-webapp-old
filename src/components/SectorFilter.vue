@@ -30,11 +30,6 @@ export default {
       // search: '',
     }
   },
-  watch: {
-    personId (value) {
-      console.log('personId', value);
-    }
-  },
   computed: {
     showFilter: {
       get () {

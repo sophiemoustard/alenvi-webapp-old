@@ -53,7 +53,11 @@
         </q-field>
       </div>
       <div class="row justify-end">
-        <q-btn loader v-if="$route.query.id_employee === customerEventInfo.eventEmployeeId" @click="updateEvent" class="on-left" color="primary"
+        <!-- <q-btn loader v-if="$route.query.id_employee === customerEventInfo.eventEmployeeId" @click="updateEvent" class="on-left" color="primary" -->
+        <!--   :disable="disableInput"> -->
+        <!--   Enregistrer -->
+        <!-- </q-btn> -->
+        <q-btn :loading="modalBtnLoading" @click="updateEvent" class="on-left" color="primary"
           :disable="disableInput">
           Enregistrer
         </q-btn>
@@ -241,7 +245,8 @@ export default {
       showFilter: 'calendar/showFilter',
       ogustUser: 'calendar/ogustUser',
       personChosen: 'calendar/personChosen',
-      toggleDrawer: 'calendar/toggleDrawer'
+      toggleDrawer: 'calendar/toggleDrawer',
+      modalBtnLoading: 'calendar/modalBtnLoading'
     })
   },
   mounted () {
@@ -372,10 +377,14 @@ export default {
       this.customerEventInfo.eventType = ev.type;
       this.customerEventInfo.eventId = ev.id;
       this.customerEventInfo.eventTitle = `${ev.text} ${this.$moment(ev.start_date, 'YYYY-MM-DD HH:mm').format('HH:mm')} - ${this.$moment(ev.end_date, 'YYYY-MM-DD HH:mm').format('HH:mm')}`
+      this.setDisableInput(false);
       this.controlModal(true);
       if (this.$route.query.id_employee === ev.id_employee && !ev.readonly) {
         this.setDisableTimePicker(false);
-        this.setDisableInput(false);
+        // this.setDisableInput(false);
+      } else if (ev.readonly) {
+        this.setDisableTimePicker(true);
+        this.setDisableInput(true);
       }
       // if (this.$route.query.id_employee === ev.id_employee && ev.type !== 'alenvi_past') {
       //   this.setDisableTimePicker(false);
@@ -426,10 +435,13 @@ export default {
         ev.comments = this.customerEventInfo.comments;
         ev.interventionDetails = this.customerEventInfo.interventionDetails;
         ev.misc = this.customerEventInfo.misc;
-        ev.start_date = this.customerEventInfo.eventFrom;
-        ev.end_date = this.customerEventInfo.eventTo;
+        ev.dateChanged = false;
+        if (!this.$moment(ev.start_date).isSame(this.customerEventInfo.eventFrom) || !this.$moment(ev.end_date).isSame(this.customerEventInfo.eventTo)) {
+          ev.start_date = this.customerEventInfo.eventFrom;
+          ev.end_date = this.customerEventInfo.eventTo;
+          ev.dateChanged = true;
+        }
         // Sending data to child component (no need of vuex)
-        this.$emit('progressDone', done);
         this.$emit('eventUpdated', ev);
       } catch (e) {
         console.error(e);
@@ -446,7 +458,7 @@ export default {
     ...mapMutations({
       setDisableInput: 'calendar/setDisableInput',
       setDisableTimePicker: 'calendar/setDisableTimePicker',
-      controlModal: 'calendar/controlModal'
+      controlModal: 'calendar/controlModal',
     }),
     displayFilter () {
       this.$store.commit('calendar/toggleFilter', !this.showFilter)

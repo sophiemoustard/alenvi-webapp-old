@@ -25,3 +25,6 @@ export const getOgustToken = (state, token) => {
 export const setPersonType = (state, type) => {
   state.personType = type;
 };
+export const setModalBtnLoading = (state, toggle) => {
+  state.modalBtnLoading = toggle;
+};

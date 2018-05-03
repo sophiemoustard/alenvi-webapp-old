@@ -7,5 +7,6 @@ export default {
   showFilter: false,
   personChosen: null,
   ogustToken: null,
-  personType: null
+  personType: null,
+  modalBtnLoading: false
 }
