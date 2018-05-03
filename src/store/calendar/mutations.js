@@ -16,9 +16,12 @@ export const toggleFilter = (state, toggle) => {
 export const setOgustUser = (state, ogustUserData) => {
   state.ogustUser = ogustUserData;
 };
-export const setAuxiliariesChosen = (state, auxiliaries) => {
-  state.auxiliariesChosen = auxiliaries;
+export const setPersonChosen = (state, person) => {
+  state.personChosen = person;
 };
 export const getOgustToken = (state, token) => {
   state.ogustToken = token;
+};
+export const setPersonType = (state, type) => {
+  state.personType = type;
 };

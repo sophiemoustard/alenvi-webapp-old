@@ -16,9 +16,12 @@ export const showFilter = (state) => {
 export const ogustUser = (state) => {
   return state.ogustUser;
 };
-export const auxiliariesChosen = (state) => {
-  return state.auxiliariesChosen;
+export const personChosen = (state) => {
+  return state.personChosen;
 };
 export const ogustToken = (state) => {
   return state.ogustToken;
+};
+export const personType = (state) => {
+  return state.personType;
 };

@@ -7,7 +7,7 @@
 
 <script>
 /* global scheduler */
-import { mapMutations } from 'vuex'
+import { mapMutations, mapGetters } from 'vuex'
 import Scheduler from '../../components/scheduler/Scheduler'
 import 'dhtmlx-scheduler'
 
@@ -30,9 +30,13 @@ export default {
     }
   },
   computed: {
-    auxiliariesChosen () {
-      return this.$store.getters['calendar/auxiliariesChosen'];
-    }
+    // personChosen () {
+    //   return this.$store.getters['calendar/personChosen'];
+    // },
+    ...mapGetters({
+      personChosen: 'calendar/personChosen',
+      personType: 'calendar/personType'
+    })
   },
   mounted () {
     // this.getEventsData();
@@ -54,32 +58,33 @@ export default {
           // const token = this.$route.query.access_token;
           this.token = this.$route.query.access_token;
           // let personId;
-          let personType;
+          // let personType;
           if (this.$route.query.id_employee) {
             this.personId = this.$route.query.id_employee;
-            personType = 'employee';
+            this.setPersonType('employee');
           } else {
             this.personId = this.$route.query.id_customer;
-            personType = 'customer';
+            this.setPersonType('customer');
           }
           const ogustToken = await this.$ogust.getOgustToken(this.token);
           this.getOgustToken(ogustToken);
-          // if (this.auxiliariesChosen && this.auxiliariesChosen.length !== 0) {
+          // if (this.personChosen && this.personChosen.length !== 0) {
           //   this.events = [];
-          //   for (let i = 0, l = this.auxiliariesChosen.length; i < l; i++) {
-          //     const events = await Ogust.getOgustEvents(ogustToken, this.auxiliariesChosen[i], personType);
+          //   for (let i = 0, l = this.personChosen.length; i < l; i++) {
+          //     const events = await Ogust.getOgustEvents(ogustToken, this.personChosen[i], this.personType);
           //     this.events = this.events.concat(events);
           //   }
-          if (this.auxiliariesChosen) {
-            const personData = await this.$ogust.getOgustPerson(ogustToken, this.auxiliariesChosen, personType);
-            this.title = personData.title;
-            this.events = await this.$ogust.getOgustEvents(ogustToken, this.auxiliariesChosen, personType);
-            this.toggleFilter(false);
-          } else {
-            const personData = await this.$ogust.getOgustPerson(ogustToken, this.personId, personType);
+          if (this.personChosen) {
+            const personData = await this.$ogust.getOgustPerson(ogustToken, this.personChosen, this.personType);
             this.setOgustUser(personData);
             this.title = personData.title;
-            this.events = await this.$ogust.getOgustEvents(ogustToken, this.personId, personType);
+            this.events = await this.$ogust.getOgustEvents(ogustToken, this.personChosen, this.personType);
+            this.toggleFilter(false);
+          } else {
+            const personData = await this.$ogust.getOgustPerson(ogustToken, this.personId, this.personType);
+            this.setOgustUser(personData);
+            this.title = personData.title;
+            this.events = await this.$ogust.getOgustEvents(ogustToken, this.personId, this.personType);
           }
         }
       } catch (e) {
@@ -194,7 +199,8 @@ export default {
       controlModal: 'calendar/controlModal',
       getOgustToken: 'calendar/getOgustToken',
       toggleFilter: 'calendar/toggleFilter',
-      setOgustUser: 'calendar/setOgustUser'
+      setOgustUser: 'calendar/setOgustUser',
+      setPersonType: 'calendar/setPersonType'
     })
   }
 }

@@ -13,8 +13,8 @@
         <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="week_tab" style="right:140px;"></div>
         <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="month_tab" style="right:76px;"></div>
         <div v-show="showTabCustomer" class="dhx_cal_tab relative-position" v-ripple name="customer_week_tab" style="right:140px;"></div>
-        <div v-show="showTabFilter && !$route.query.id_customer" class="dhx_cal_tab relative-position" name="filter_tab" @click.self="displayFilter" v-ripple style="left: 230px;">
-          <sector-filter v-if="ogustUser" @auxiliariesChosen="applyFilter" />
+        <div v-show="showTabFilter && !customer" class="dhx_cal_tab relative-position" name="filter_tab" @click.self="displayFilter" v-ripple style="left: 230px;">
+          <sector-filter v-if="ogustUser" @personChosen="applyFilter" />
         </div>
       </div>
       <div ref="cal_header" class="dhx_cal_header"></div>
@@ -240,7 +240,7 @@ export default {
       disableTimePicker: 'calendar/disableTimePicker',
       showFilter: 'calendar/showFilter',
       ogustUser: 'calendar/ogustUser',
-      auxiliariesChosen: 'calendar/auxiliariesChosen',
+      personChosen: 'calendar/personChosen',
       toggleDrawer: 'calendar/toggleDrawer'
     })
   },
@@ -454,15 +454,15 @@ export default {
     applyFilter () {
       // scheduler.filter_week = (id, event) => {
       // console.log(id);
-      // console.log(this.auxiliariesChosen.indexOf(event.id_employee));
+      // console.log(this.personChosen.indexOf(event.id_employee));
       //   this.$emit('applyFilter');
-      //   if (this.auxiliariesChosen && this.auxiliariesChosen.indexOf(event.id_employee) !== -1) {
+      //   if (this.personChosen && this.personChosen.indexOf(event.id_employee) !== -1) {
       //     return true;
       //   }
       //   return false;
       // }
       scheduler.filter_day = scheduler.filter_month = scheduler.filter_three_days = scheduler.filter_week = (id, event) => {
-        if (this.auxiliariesChosen && this.auxiliariesChosen === event.id_employee) {
+        if ((this.personChosen && this.personChosen === event.id_employee) || (this.personChosen && this.personChosen === event.id_customer)) {
           return true;
         }
         return false;

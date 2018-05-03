@@ -5,6 +5,7 @@ export default {
   disableInput: true,
   disableTimePicker: true,
   showFilter: false,
-  auxiliariesChosen: null,
-  ogustToken: null
+  personChosen: null,
+  ogustToken: null,
+  personType: null
 }

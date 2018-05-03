@@ -53,23 +53,19 @@ export default {
       let event = {
         id: eventsRaw[events].id_service,
         id_employee: eventsRaw[events].id_employee,
+        id_customer: eventsRaw[events].id_customer,
+        door_code: eventsRaw[events].customer.door_code,
+        intercom_code: eventsRaw[events].customer.intercom_code,
+        pathology: eventsRaw[events].customer.pathology,
+        comments: eventsRaw[events].customer.comments,
+        interventionDetails: eventsRaw[events].customer.interventionDetails,
+        misc: eventsRaw[events].customer.misc,
+        text: eventsRaw[events].customer.lastname.match(/^ALENVI/i) ? eventsRaw[events].customer.lastname : `${eventsRaw[events].customer.title} ${eventsRaw[events].customer.lastname}`,
         start_date: moment(eventsRaw[events].start_date, 'YYYYMMDDHHmm').format('YYYY-MM-DD HH:mm'),
         end_date: moment(eventsRaw[events].end_date, 'YYYYMMDDHHmm').format('YYYY-MM-DD HH:mm'),
-        type: moment(eventsRaw[events].end_date, 'YYYYMMDDHHmm').isBefore(moment()) ? 'alenvi_past' : 'alenvi'
+        type: moment(eventsRaw[events].end_date, 'YYYYMMDDHHmm').isBefore(moment()) ? 'alenvi_past' : 'alenvi',
+        readonly: eventsRaw[events].customer.lastname.match(/^ALENVI/i)
       };
-      if (personType === 'employee') {
-        event.text = (eventsRaw[events].customer.id_customer === '286871430' || eventsRaw[events].customer.id_customer === '271395715' || eventsRaw[events].customer.id_customer === '244566438') ? eventsRaw[events].customer.lastname : `${eventsRaw[events].customer.title} ${eventsRaw[events].customer.lastname}`;
-        event.id_customer = eventsRaw[events].customer.id_customer;
-        event.door_code = eventsRaw[events].customer.door_code;
-        event.intercom_code = eventsRaw[events].customer.intercom_code;
-        event.pathology = eventsRaw[events].customer.pathology;
-        event.comments = eventsRaw[events].customer.comments;
-        event.interventionDetails = eventsRaw[events].customer.interventionDetails;
-        event.misc = eventsRaw[events].customer.misc;
-        event.readonly = (eventsRaw[events].customer.id_customer === '286871430' || eventsRaw[events].customer.id_customer === '271395715' || eventsRaw[events].customer.id_customer === '244566438' || eventsRaw[events].customer.id_customer === '349780044' || eventsRaw[events].customer.id_customer === '356779196' || eventsRaw[events].customer.id_customer === '356779463');
-      } else {
-        event.text = `${eventsRaw[events].employee.firstname} ${eventsRaw[events].employee.lastname}`;
-      }
       data.push(event);
     }
     return data;
@@ -77,25 +73,25 @@ export default {
   async getOgustPerson (ogustToken, idPerson, personType) {
     let personRaw;
     let personData;
-    let title;
+    // let title;
     switch (personType) {
       case 'employee':
         personRaw = await axios.get(`${process.env.API_HOSTNAME}/ogust/employees/${idPerson}`, { headers: { 'x-ogust-token': ogustToken } });
         personData = _.pick(personRaw.data.data.user[personType], ['first_name', 'last_name', 'sector', 'id_employee']);
-        title = `Planning de ${personData.first_name} ${personData.last_name.substring(0, 1)}.`;
+        personData.title = `Planning de ${personData.first_name} ${personData.last_name.substring(0, 1)}.`;
         break;
       case 'customer':
         personRaw = await axios.get(`${process.env.API_HOSTNAME}/ogust/customers/${idPerson}`, { headers: { 'x-ogust-token': ogustToken } });
-        personData = _.pick(personRaw.data.data.user[personType], ['first_name', 'last_name']);
-        title = personData.first_name ? `Planning de ${personData.first_name.substring(0, 1)}. ${personData.last_name}` : `Planning de ${personData.last_name}`;
+        personData = _.pick(personRaw.data.data.user[personType], ['first_name', 'last_name', 'sector', 'id_customer']);
+        personData.title = personData.first_name ? `Planning de ${personData.first_name.substring(0, 1)}. ${personData.last_name}` : `Planning de ${personData.last_name}`;
         break;
     }
-    return {
-      title,
-      comment: personData.comment || '',
-      sector: personData.sector || '',
-      id_employee: personData.id_employee || ''
-    };
+    return personData;
+    // return {
+    //   title,
+    //   comment: personData.comment || '',
+    //   sector: personData.sector || '',
+    // };
   },
   async getOgustCustomerDetails (ogustToken = null, customerId) {
     let customerDetails = {};
@@ -151,11 +147,11 @@ export default {
     return employeeRaw.data.data.user.employee;
   },
   async createEmployee (ogustToken, data) {
-    const newEmployee = await axios.post(`${process.env.API_HOSTNAME}/ogust/employees`, data, { headers: { 'x-ogust-token': ogustToken } })
+    const newEmployee = await axios.post(`${process.env.API_HOSTNAME}/ogust/employees`, data, { headers: { 'x-ogust-token': ogustToken } });
     return newEmployee;
   },
   async updateServiceById (ogustToken, serviceId, data) {
-    const serviceUpdated = await axios.put(`${process.env.API_HOSTNAME}/ogust/services/${serviceId}`, data, { headers: { 'x-ogust-token': ogustToken } })
+    const serviceUpdated = await axios.put(`${process.env.API_HOSTNAME}/ogust/services/${serviceId}`, data, { headers: { 'x-ogust-token': ogustToken } });
     return serviceUpdated;
   },
   async getEmployeeSalaries (employeeId) {
@@ -171,9 +167,14 @@ export default {
     }
     return employeeUpdated;
   },
-  async getCustomers (data) {
-    const customers = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/customers`, { params: data });
-    return customers.data.data.users.array_customer.result;
+  async getCustomers (params, ogustToken = null) {
+    let customersRaw = {};
+    if (ogustToken === null) {
+      customersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/customers`, { params });
+    } else {
+      customersRaw = await axios.get(`${process.env.API_HOSTNAME}/ogust/customers`, { params, headers: { 'x-ogust-token': ogustToken } });
+    }
+    return customersRaw.data.data.users.array_customer.result;
   },
   async getCustomerById (id) {
     const customerRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/customers/${id}`);
