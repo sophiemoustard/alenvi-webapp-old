@@ -29,6 +29,9 @@ export default [
     name: 'login',
     component: () => import('pages/signin/Authenticate')
   },
+  {
+    path: '/test', component: () => import('pages/test')
+  },
   { path: '/enterCode', component: () => import('pages/signup/EnterCode') },
   {
     path: '/signup',
