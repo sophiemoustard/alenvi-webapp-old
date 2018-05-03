@@ -8,6 +8,7 @@
     <button @click="crop()">Crop Via Callback</button>
     <button @click="cropViaEvent()">Crop Via Event</button>
     <croppa v-model="myCroppa" :prevent-white-space="true"></croppa>
+    <button @click="uploadCroppedImage()">TEST UPLOAD</button>
   </div>
 </template>
 <script>
@@ -62,6 +63,7 @@ export default {
     uploadCroppedImage () {
       this.myCroppa.generateBlob(
         blob => {
+          console.log(blob);
           // write code to upload the cropped image file (a file is a blob)
         },
         'image/jpeg',
