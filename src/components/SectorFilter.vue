@@ -1,6 +1,6 @@
 <template>
   <q-icon name="mdi-account-search" size="1.8rem" flat>
-    <q-popover v-model="showFilter" @show="getPersonsBySector(ogustUser.sector)">
+    <q-popover v-model="showFilter" @show="getPersonsBySector(sector)">
       <q-list link no-border style="min-width: 200px">
         <!-- <q-list-header v-if="persons.length !== 0"> -->
           <!-- <q-field icon="search">
@@ -47,6 +47,12 @@ export default {
     },
     personType () {
       return this.$store.getters['calendar/personType'];
+    },
+    sector () {
+      if (this.$route.query.sector) {
+        return this.$route.query.sector;
+      }
+      return ogustUser.sector;
     }
     // filteredPersons () {
     //   return this.persons.filter((item) => {
