@@ -181,7 +181,7 @@ export default {
         this.helpers = [];
         const ogustHelpers = await this.$ogust.getCustomerContacts(item.id_customer);
         const filteredOgustHelpers = _.filter(ogustHelpers, helper => helper.email);
-        const alenviHelpers = await this.$users.showAll({ role: 'Client', customer_id: item.id_customer });
+        const alenviHelpers = await this.$users.showAll({ role: 'Client' });
         let processed = false;
         for (let k = 0, l = filteredOgustHelpers.length; k < l; k++) {
           for (let i = 0, len = alenviHelpers.length; i < len; i++) {
