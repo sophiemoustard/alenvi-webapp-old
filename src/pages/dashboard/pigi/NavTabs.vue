@@ -6,7 +6,8 @@
           slot="title"
           :label="tab.label"
           :default="tab.default"
-          :name="tab.name" />
+          :name="tab.name"
+          @click="$ga.event('Pigi', 'click', tab.label)"/>
     <q-tab-pane class="no-border" v-for="(tab, index) in tabInfo" :key="index" :name="tab.name">
                 <!-- Dynamic component loading  -->
       <component :is="tab.component" />
