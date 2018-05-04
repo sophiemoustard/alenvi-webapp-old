@@ -52,7 +52,7 @@ export default {
       if (this.$route.query.sector) {
         return this.$route.query.sector;
       }
-      return ogustUser.sector;
+      return this.ogustUser.sector;
     }
     // filteredPersons () {
     //   return this.persons.filter((item) => {
