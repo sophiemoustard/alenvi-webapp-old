@@ -22,7 +22,7 @@ module.exports = function (ctx) {
       'moment',
       'can',
       'lodash',
-      'vue-croppie'
+      'vue-croppa'
     ],
     css: [
       'app.styl'
