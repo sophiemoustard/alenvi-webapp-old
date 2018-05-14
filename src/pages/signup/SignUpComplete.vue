@@ -70,13 +70,15 @@
                   :prevent-white-space="true"
                   placeholder="Choisis ta photo"
                   :placeholder-font-size="10"
-                  :initial-image="storedUser.picture.link"
+                  :initial-image="hasPicture"
                   >
                 </croppa>
                 </div>
                 <q-btn icon="rotate left" @click="croppa.rotate(-1)" flat />
                 <q-btn icon="rotate right" @click="croppa.rotate(1)" flat />
                 <q-btn icon="cloud upload" @click="upload()" flat />
+                <p class="upload-done" v-if="storedUser && storedUser.picture">Photo mise en ligne <q-icon name="check" /></p>
+                <p class="upload-not-done" v-if="storedUser && !storedUser.picture && !hasPickedPicture">Photo manquante <q-icon name="warning" /></p>
                 <br><br>
                 <p>Pour envoyer un document:</p>
                 <ul>
@@ -388,6 +390,9 @@ export default {
         // 'x-access-token': this.$route.query.token
         'x-access-token': Cookies.get('alenvi_token') || ''
       }
+    },
+    hasPicture () {
+      return this.storedUser.picture ? this.storedUser.picture.link : '';
     },
     ...mapGetters({
       storedUser: 'main/user'
