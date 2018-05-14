@@ -22,7 +22,8 @@ module.exports = function (ctx) {
       'moment',
       'can',
       'lodash',
-      'vue-croppa'
+      'vue-croppa',
+      'vue-analytics'
     ],
     css: [
       'app.styl'
@@ -42,6 +43,7 @@ module.exports = function (ctx) {
     build: {
       scopeHoisting: true,
       vueRouterMode: 'history',
+      publicPath: '/',
       // gzip: true,
       // analyze: true,
       // extractCSS: false,
@@ -62,6 +64,7 @@ module.exports = function (ctx) {
         CLOUDINARY_API_KEY: JSON.stringify(process.env.CLOUDINARY_API_KEY),
         CLOUDINARY_API_SECRET: JSON.stringify(process.env.CLOUDINARY_API_SECRET),
         CLOUDINARY_CLOUD_NAME: JSON.stringify(process.env.CLOUDINARY_CLOUD_NAME),
+        GA_TRACKING_ID: JSON.stringify(process.env.GA_TRACKING_ID)
       }
     },
     devServer: {

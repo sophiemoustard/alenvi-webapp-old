@@ -1,16 +1,19 @@
 <template>
-  <q-icon name="mdi-account-search" size="1.8rem" flat>
-    <q-popover v-model="showFilter" @show="getPersonsBySector(ogustUser.sector)">
-      <q-list link no-border style="min-width: 200px">
-        <!-- <q-list-header v-if="persons.length !== 0"> -->
-          <!-- <q-field icon="search">
-            <q-input v-model="search" placeholder="Recherche" />
-          </q-field> -->
-        <!-- </q-list-header> -->
-        <q-inner-loading :visible="persons.length === 0">
-          <q-spinner size="50px" />
-        </q-inner-loading>
-        <q-item v-for="(person, index) in persons" :key="index">
+<q-icon name="mdi-account-search" size="1.8rem" flat>
+  <q-popover v-model="showFilter" @show="getPersonsBySector(sector)">
+    <q-list link no-border style="min-width: 200px">
+      <!-- <q-list-header v-if="persons.length !== 0"> -->
+      <!-- <q-field icon="search">
+           <q-input v-model="search" placeholder="Recherche" />
+      </q-field> -->
+      <!-- </q-list-header> -->
+      <q-inner-loading :visible="loading">
+        <q-spinner size="50px" />
+      </q-inner-loading>
+      <div class="q-px-sm">
+        <p class="caption" v-if="persons.length === 0"><q-icon class="on-left" color="tertiary" name="warning"/>Pas de personnes disponibles.</p>
+      </div>
+      <q-item v-for="(person, index) in persons" :key="index">
           <!-- <q-checkbox v-model="personsIds" :val="person.value" :label="person.label" @change="choosePersons" /> -->
           <q-radio v-model="personId" :val="person.value" :label="person.label" @input="choosePersons" />
         </q-item>
@@ -25,7 +28,8 @@ export default {
     return {
       sectors: [],
       persons: [],
-      personId: ''
+      personId: '',
+      loading: false
       // personsIds: [],
       // search: '',
     }
@@ -47,6 +51,12 @@ export default {
     },
     personType () {
       return this.$store.getters['calendar/personType'];
+    },
+    sector () {
+      if (this.$route.query.sector) {
+        return this.$route.query.sector;
+      }
+      return this.ogustUser.sector;
     }
     // filteredPersons () {
     //   return this.persons.filter((item) => {
@@ -66,6 +76,7 @@ export default {
   methods: {
     async getPersonsBySector (sector) {
       try {
+        this.loading = true;
         this.persons = [];
         switch (this.personType) {
           case 'employee':
@@ -79,16 +90,20 @@ export default {
             break;
           case 'customer':
             const customers = await this.$ogust.getCustomers({ sector }, this.ogustToken);
-            for (const k in customers) {
+            const filteredCustomers = this.$_.filter(customers, customer => !customer.last_name.match(/^ALENVI/i));
+            console.log(filteredCustomers);
+            for (const k in filteredCustomers) {
               this.persons.push({
                 label: `${customers[k].title} ${customers[k].last_name}`,
-                value: customers[k].id_customer
+                value: filteredCustomers[k].id_customer
               });
             }
             break;
         }
+        this.loading = false;
       } catch (e) {
         console.error(e);
+        this.loading = false;
       }
     },
     choosePersons () {

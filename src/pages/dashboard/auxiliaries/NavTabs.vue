@@ -7,7 +7,8 @@
           :label="tab.label"
           :default="tab.default"
           :disable="tab.disable || false"
-          :name="tab.name" />
+          :name="tab.name"
+          @click="$ga.event('Auxiliaires', 'click', tab.label)"/>
     <q-tab-pane class="no-border" v-for="(tab, index) in tabInfo" :key="index" :name="tab.name">
                 <!-- Dynamic component loading  -->
       <component :is="tab.component" />
