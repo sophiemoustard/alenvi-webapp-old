@@ -63,14 +63,28 @@
               </q-step>
               <!-- Last step -->
               <q-step name="third" title="Documents obligatoires">
+                <p class="caption">Photo de toi :</p>
+                <div class="row test">
+                <croppa v-model="croppa"
+                  accept="image/*"
+                  :prevent-white-space="true"
+                  placeholder="Choisis ta photo"
+                  :placeholder-font-size="10"
+                  :initial-image="storedUser.picture.link"
+                  >
+                </croppa>
+                </div>
+                <q-btn icon="rotate left" @click="croppa.rotate(-1)" flat />
+                <q-btn icon="rotate right" @click="croppa.rotate(1)" flat />
+                <q-btn icon="cloud upload" @click="upload()" flat />
+                <br><br>
                 <p>Pour envoyer un document:</p>
                 <ul>
                   <li>Appuie d'abord sur cette icône: <q-icon name="add" size="1.5rem" /></li>
                   <li>Choisis le fichier que tu souhaites envoyer</li>
                   <li>Appuie ensuite sur cette icône: <q-icon name="cloud upload" size="1.5rem" /> pour finaliser l'envoi du fichier</li>
                 </ul>
-                <p class="caption">Photo de toi :</p>
-                <q-field icon="mdi-account-card-details" :error="$v.user.picture.$error" error-label="Champ requis">
+                <!-- <q-field icon="mdi-account-card-details" :error="$v.user.picture.$error" error-label="Champ requis">
                   <q-uploader v-if="storedUser && !storedUser.picture" name="picture" :url="pictureUploadUrl" :headers="headers"
                   :additional-fields="[{ name: 'fileName', value: `photo_${user.firstname}_${user.lastname}` }]"
                   @finish="afterUpload('Picture')" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png"
@@ -78,7 +92,7 @@
                   <p class="upload-done" v-if="storedUser && storedUser.picture">Fichier mis en ligne <q-icon name="check" /></p>
                   <p class="upload-not-done" v-if="storedUser && !storedUser.picture && !hasPickedPicture">Fichier manquant <q-icon name="warning" /></p>
                   <p class="picked" v-if="hasPickedPicture">Super ! Maintenant, appuie sur <q-icon name="cloud upload" /></p>
-                </q-field>
+                </q-field> -->
                 <p class="caption">Carte d'identité / titre de séjour (Recto) :</p>
                 <q-field icon="mdi-account-card-details" :error="$v.user.administrative.idCard.$error" error-label="Champ requis">
                   <q-uploader v-if="storedUser && !storedUser.administrative.idCardRecto" name="idCardRecto" :url="docsUploadUrl" :headers="headers"
@@ -165,11 +179,13 @@
 import { required, minLength, maxLength } from 'vuelidate/lib/validators'
 import { mapGetters } from 'vuex'
 import { Cookies } from 'quasar'
+import 'vue-croppa/dist/vue-croppa.css'
 
 export default {
   // name: 'PageName',
   data () {
     return {
+      croppa: {},
       hasPickedPicture: false,
       hasPickedIdCardRecto: false,
       hasPickedIdCardVerso: false,
@@ -593,6 +609,19 @@ export default {
     },
     uploadInstructions (fileName) {
       this[`hasPicked${fileName}`] = true;
+    },
+    async upload () {
+      try {
+        let blob = await this.croppa.promisedBlob('image/jpeg', 0.8);
+        let data = new FormData();
+        data.append('fileName', `photo_${this.storedUser.firstname}_${this.storedUser.lastname}`);
+        data.append('Content-Type', blob.type || 'application/octet-stream');
+        data.append('picture', blob);
+        this.$axios.post(`${process.env.API_HOSTNAME}/uploader/${this.storedUser._id}/cloudinary/uploadImage`, data, { headers: { 'content-type': 'multipart/form-data', 'x-access-token': Cookies.get('alenvi_token') || '' } });
+        this.afterUpload('Picture');
+      } catch (e) {
+        console.error(e);
+      }
     }
   },
   beforeDestroy () {
