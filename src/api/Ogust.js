@@ -60,12 +60,17 @@ export default {
         comments: eventsRaw[events].customer.comments,
         interventionDetails: eventsRaw[events].customer.interventionDetails,
         misc: eventsRaw[events].customer.misc,
-        text: eventsRaw[events].customer.lastname.match(/^ALENVI/i) ? eventsRaw[events].customer.lastname : `${eventsRaw[events].customer.title} ${eventsRaw[events].customer.lastname}`,
         start_date: moment(eventsRaw[events].start_date, 'YYYYMMDDHHmm').format('YYYY-MM-DD HH:mm'),
         end_date: moment(eventsRaw[events].end_date, 'YYYYMMDDHHmm').format('YYYY-MM-DD HH:mm'),
         type: moment(eventsRaw[events].end_date, 'YYYYMMDDHHmm').isBefore(moment()) ? 'alenvi_past' : 'alenvi',
         readonly: eventsRaw[events].customer.lastname.match(/^ALENVI/i)
       };
+      if (personType === 'employee') {
+        event.text = eventsRaw[events].customer.lastname.match(/^ALENVI/i) ? eventsRaw[events].customer.lastname : `${eventsRaw[events].customer.title} ${eventsRaw[events].customer.lastname}`;
+      }
+      if (personType === 'customer') {
+        event.text = `${eventsRaw[events].employee.firstname} ${eventsRaw[events].employee.lastname}`;
+      }
       data.push(event);
     }
     return data;
