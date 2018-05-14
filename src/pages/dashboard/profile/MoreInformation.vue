@@ -11,6 +11,19 @@
       <div class="" style="width: 500px; max-width: 90vw;">
         <p v-if="user.alenvi.employee_id">Id Alenvi: {{ user.alenvi._id }}</p>
         <p v-if="user.alenvi.employee_id">Id Ogust: {{ user.alenvi.employee_id }}</p>
+        <div v-if="user.alenvi.picture" class="row test">
+          <croppa v-model="croppa"
+            accept="image/*"
+            :prevent-white-space="true"
+            placeholder="Choisis ta photo"
+            :placeholder-font-size="10"
+            :initial-image="hasPicture"
+            >
+          </croppa>
+        </div>
+        <q-btn icon="rotate left" @click="croppa.rotate(-1)" flat />
+        <q-btn icon="rotate right" @click="croppa.rotate(1)" flat />
+        <q-btn icon="cloud upload" @click="upload()" flat />
         <br>
         <q-field icon="person">
           <q-input v-model="user.alenvi.firstname" float-label="Prénom"/>
@@ -46,6 +59,8 @@
 import { required, email, sameAs, minLength, maxLength } from 'vuelidate/lib/validators'
 import SelectRole from '../../../components/SelectRole'
 import SelectSector from '../../../components/SelectSector'
+import { Cookies } from 'quasar'
+import 'vue-croppa/dist/vue-croppa.css'
 
 export default {
   components: {
@@ -54,6 +69,7 @@ export default {
   },
   data () {
     return {
+      croppa: {},
       user: {
         credentials: {
           password: '',
@@ -85,7 +101,7 @@ export default {
       }
     }
   },
-  async created () {
+  async mounted () {
     try {
       this.user.alenvi = await this.$users.getById(this.$route.params.id);
       this.user.ogust = await this.$ogust.getEmployeeById(this.user.alenvi.employee_id);
@@ -103,7 +119,10 @@ export default {
       } else if (!this.$v.user.alenvi.local.email.email) {
         return 'Email invalide'
       }
-    }
+    },
+    hasPicture () {
+      return this.user.alenvi.picture ? this.user.alenvi.picture.link : '';
+    },
   },
   methods: {
     async updateUser () {
@@ -150,6 +169,18 @@ export default {
         });
         this.user.credentials.password = '';
         this.user.credentials.passwordConfirm = '';
+        console.error(e);
+      }
+    },
+    async upload () {
+      try {
+        let blob = await this.croppa.promisedBlob('image/jpeg', 0.8);
+        let data = new FormData();
+        data.append('fileName', `photo_${this.user.alenvi.firstname}_${this.user.alenvi.lastname}`);
+        data.append('Content-Type', blob.type || 'application/octet-stream');
+        data.append('picture', blob);
+        this.$axios.post(`${process.env.API_HOSTNAME}/uploader/${this.$route.params.id}/cloudinary/uploadImage`, data, { headers: { 'content-type': 'multipart/form-data', 'x-access-token': Cookies.get('alenvi_token') || '' } });
+      } catch (e) {
         console.error(e);
       }
     }

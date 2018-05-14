@@ -65,14 +65,14 @@
               <q-step name="third" title="Documents obligatoires">
                 <p class="caption">Photo de toi :</p>
                 <div class="row test">
-                <croppa v-model="croppa"
-                  accept="image/*"
-                  :prevent-white-space="true"
-                  placeholder="Choisis ta photo"
-                  :placeholder-font-size="10"
-                  :initial-image="hasPicture"
-                  >
-                </croppa>
+                  <croppa v-model="croppa"
+                    accept="image/*"
+                    :prevent-white-space="true"
+                    placeholder="Choisis ta photo"
+                    :placeholder-font-size="10"
+                    :initial-image="hasPicture"
+                    >
+                  </croppa>
                 </div>
                 <q-btn icon="rotate left" @click="croppa.rotate(-1)" flat />
                 <q-btn icon="rotate right" @click="croppa.rotate(1)" flat />
