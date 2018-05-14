@@ -10,8 +10,8 @@
       <q-inner-loading :visible="loading">
         <q-spinner size="50px" />
       </q-inner-loading>
-      <div class="q-px-sm">
-        <p class="caption" v-if="persons.length === 0"><q-icon class="on-left" color="tertiary" name="warning"/>Pas de personnes disponibles.</p>
+      <div v-if="persons.length === 0 && !loading" class="q-px-sm">
+        <p class="caption"><q-icon class="on-left" color="tertiary" name="warning"/>Pas de personnes disponibles.</p>
       </div>
       <q-item v-for="(person, index) in persons" :key="index">
           <!-- <q-checkbox v-model="personsIds" :val="person.value" :label="person.label" @change="choosePersons" /> -->
