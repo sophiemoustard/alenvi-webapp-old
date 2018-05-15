@@ -1,18 +1,16 @@
 <template>
   <q-page padding>
-    <div class="row xs-gutter justify-center">
-      <div id="picture">
-        <img :src="user.alenvi.picture ? user.alenvi.picture : 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_107,q_auto,w_180/v1513764284/images/users/default_avatar.png'" alt="" style="width: 180px;">
-      </div>
+    <div class="row justify-center">
+      <img :src="user.alenvi.picture ? user.alenvi.picture : 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_107,q_auto,w_180/v1513764284/images/users/default_avatar.png'" alt="" class="avatar">
+    </div><br>
+    <div class="row justify-center">
       <div>
         <p><strong>{{ user.alenvi.firstname }} {{ user.alenvi.lastname }}</strong></p>
         <p>{{ user.alenvi.role.name }}</p>
         <p v-if="user.alenvi.sector">Communauté: {{ user.community }} ({{ user.alenvi.sector }})</p>
       </div>
     </div>
-    <div class="row justify-center">
-      EN CONSTRUCTION [Stats, Gamification...]
-    </div>
+    EN CONSTRUCTION [Stats, Gamification...]
   </q-page>
 </template>
 

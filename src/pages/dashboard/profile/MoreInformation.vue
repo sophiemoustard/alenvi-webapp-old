@@ -1,11 +1,11 @@
 <template>
   <q-page padding class="test">
-    <div class="row justify-center">
+    <!-- <div class="row justify-center">
       <div id="picture">
         <img :src="user.alenvi.picture ? user.alenvi.picture : 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_107,q_auto,w_180/v1513764284/images/users/default_avatar.png'" alt="" style="width: 180px;">
       </div>
     </div>
-    <br>
+    <br> -->
     <!-- <br> -->
     <div class="row justify-center">
       <div class="" style="width: 500px; max-width: 90vw;">
@@ -21,9 +21,11 @@
             >
           </croppa>
         </div>
-        <q-btn icon="rotate left" @click="croppa.rotate(-1)" flat />
-        <q-btn icon="rotate right" @click="croppa.rotate(1)" flat />
-        <q-btn icon="cloud upload" @click="upload()" flat />
+        <div v-if="user.alenvi.picture">
+          <q-btn icon="rotate left" @click="croppa.rotate(-1)" flat />
+          <q-btn icon="rotate right" @click="croppa.rotate(1)" flat />
+          <q-btn icon="cloud upload" @click="upload()" flat />
+        </div>
         <br>
         <q-field icon="person">
           <q-input v-model="user.alenvi.firstname" float-label="Prénom"/>
