@@ -23,7 +23,7 @@ module.exports = function (ctx) {
       'can',
       'lodash',
       'vue-croppa',
-      process.env.NODE_ENV === 'production' ? 'vue-analytics' : null
+      'vue-analytics'
     ],
     css: [
       'app.styl'
