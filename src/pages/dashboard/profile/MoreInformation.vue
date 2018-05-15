@@ -176,6 +176,7 @@ export default {
       try {
         let blob = await this.croppa.promisedBlob('image/jpeg', 0.8);
         let data = new FormData();
+        data.append('role', this.user.alenvi.role.name);
         data.append('fileName', `photo_${this.user.alenvi.firstname}_${this.user.alenvi.lastname}`);
         data.append('Content-Type', blob.type || 'application/octet-stream');
         data.append('picture', blob);
