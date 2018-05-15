@@ -2,6 +2,7 @@
 require('dotenv').config();
 
 module.exports = function (ctx) {
+  console.log(ctx);
   return {
     plugins: [
       'i18n',
