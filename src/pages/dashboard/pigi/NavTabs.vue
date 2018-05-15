@@ -7,7 +7,7 @@
           :label="tab.label"
           :default="tab.default"
           :name="tab.name"
-          @click="$ga.event('Pigi', 'click', tab.label)"/>
+          @click="pushGAEvents(tab.label)"/>
     <q-tab-pane class="no-border" v-for="(tab, index) in tabInfo" :key="index" :name="tab.name">
                 <!-- Dynamic component loading  -->
       <component :is="tab.component" />
@@ -42,6 +42,13 @@ export default {
           component: 'Sent'
         }
       ]
+    }
+  },
+  methods: {
+    pushGAEvents (label) {
+      if (process.env.NODE_ENV === 'production') {
+        this.$ga.event('Pigi', 'click', label);
+      }
     }
   }
 }

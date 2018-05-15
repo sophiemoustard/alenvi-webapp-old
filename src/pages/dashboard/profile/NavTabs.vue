@@ -8,7 +8,7 @@
           :default="tab.default"
           :disable="tab.disable || false"
           :name="tab.name"
-          @click="$ga.event('Profil', 'click', tab.label)"/>
+          @click="pushGAEvents(tab.label)"/>
     <q-tab-pane class="no-border" v-for="(tab, index) in tabInfo" :key="index" :name="tab.name">
                 <!-- Dynamic component loading  -->
       <component :is="tab.component" />
@@ -56,6 +56,13 @@ export default {
           // disable: true
         }
       ]
+    }
+  },
+  methods: {
+    pushGAEvents (label) {
+      if (process.env.NODE_ENV === 'production') {
+        this.$ga.event('Profil', 'click', label);
+      }
     }
   }
 }
