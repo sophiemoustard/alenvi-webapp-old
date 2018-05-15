@@ -57,6 +57,7 @@ module.exports = function (ctx) {
         })
       },
       env: {
+        NODE_ENV: JSON.stringify(process.env.NODE_ENV),
         API_HOSTNAME: JSON.stringify(process.env.API_HOSTNAME),
         MESSENGER_LINK: JSON.stringify(process.env.MESSENGER_LINK),
         TOKEN_SECRET: JSON.stringify(process.env.TOKEN_SECRET),
