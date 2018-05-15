@@ -2,7 +2,6 @@
 require('dotenv').config();
 
 module.exports = function (ctx) {
-  console.log(ctx);
   return {
     plugins: [
       'i18n',
@@ -24,7 +23,7 @@ module.exports = function (ctx) {
       'can',
       'lodash',
       'vue-croppa',
-      'vue-analytics'
+      process.env.NODE_ENV === 'production' ? 'vue-analytics' : null
     ],
     css: [
       'app.styl'
