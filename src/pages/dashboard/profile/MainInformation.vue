@@ -1,7 +1,7 @@
 <template>
   <q-page padding>
     <div class="row justify-center">
-      <img :src="user.alenvi.picture ? user.alenvi.picture : 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_107,q_auto,w_180/v1513764284/images/users/default_avatar.png'" alt="" class="avatar">
+      <img :src="user.alenvi.picture.link" alt="" class="avatar">
     </div><br>
     <div class="row justify-center">
       <div>
