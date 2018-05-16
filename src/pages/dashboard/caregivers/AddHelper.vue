@@ -191,6 +191,7 @@ export default {
                 first_name: filteredOgustHelpers[k].first_name,
                 last_name: filteredOgustHelpers[k].last_name,
                 email: filteredOgustHelpers[k].email,
+                id_customer: filteredOgustHelpers[k].id_customer,
                 checked: true
               });
             }
@@ -200,6 +201,7 @@ export default {
               first_name: filteredOgustHelpers[k].first_name,
               last_name: filteredOgustHelpers[k].last_name,
               email: filteredOgustHelpers[k].email,
+              id_customer: filteredOgustHelpers[k].id_customer,
               checked: false
             });
           }
