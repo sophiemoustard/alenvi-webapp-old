@@ -18,9 +18,9 @@ export default {
       isDate: true
     };
     if (personType === 'employee') {
-      params.id_employee = Number(idPerson);
+      params.id_employee = idPerson;
     } else {
-      params.id_customer = Number(idPerson);
+      params.id_customer = idPerson;
     }
     const data = [];
     let period;
