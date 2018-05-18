@@ -31,9 +31,9 @@ export default {
   async updateById (data, token = null) {
     let userUpdated;
     if (token === null) {
-      userUpdated = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${data._id}`, data)
+      userUpdated = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${data._id}`, data);
     } else {
-      userUpdated = await axios.put(`${process.env.API_HOSTNAME}/users/${data._id}`, data, { headers: { 'x-access-token': token } })
+      userUpdated = await axios.put(`${process.env.API_HOSTNAME}/users/${data._id}`, data, { headers: { 'x-access-token': token } });
     }
     return userUpdated;
   },
