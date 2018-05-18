@@ -13,8 +13,11 @@ export default [
         }
         if (store.getters['main/user'] && store.getters['main/user'].role.name === 'Client') {
           return next({ name: 'customer home' });
-        } else if (store.getters['main/user'] && store.getters['main/user'].role.name !== 'Client') {
-          return next({ path: '/dashboard/planning' });
+        } else if (store.getters['main/user'] && store.getters['main/user'].role.name === 'Auxiliaire') {
+          if (store.getters['main/user'].administrative && store.getters['main/user'].administrative.signup.complete) {
+            return next({ path: '/dashboard/planning' });
+          }
+          return next({ path: '/signup/signupComplete' });
           // console.log('FEH');
           // return next({ path: '/dashboard/test2' });
         }
