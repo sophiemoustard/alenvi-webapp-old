@@ -79,13 +79,13 @@ import 'dhtmlx-scheduler/codebase/ext/dhtmlxscheduler_limit.js';
 import responsive from './scripts/dhtmlxscheduler-responsive.js';
 
 import {
-  debounce,
-  dom } from 'quasar'
+  debounce
+} from 'quasar'
 import { mapGetters, mapMutations } from 'vuex'
 
 import SectorFilter from '../../components/SectorFilter'
 
-const { viewport } = dom;
+// const { viewport } = dom;
 
 const configDhtmlxScheduler = (vm) => {
   // config line mark of current time
@@ -164,7 +164,7 @@ export default {
   },
   data () {
     return {
-      width: viewport().width,
+      width: window.innerWidth,
       today: new Date(),
       displayNext: true,
       childEvents: this.events,
