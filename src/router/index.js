@@ -56,7 +56,7 @@ Router.beforeEach(async (to, from, next) => {
           next({ path: '/dashboard' });
         }
       } else {
-        next({ path: '/401' });
+        next({ path: '/login', query: { from: to.path } });
       }
     } else {
       if (store.state.main.refreshState) {
