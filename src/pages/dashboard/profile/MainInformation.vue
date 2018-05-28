@@ -1,5 +1,5 @@
 <template>
-  <q-page padding>
+  <q-page v-if="user.alenvi" padding>
     <div class="row justify-center">
       <img :src="user.alenvi.picture.link" alt="" class="avatar">
     </div><br>
@@ -19,13 +19,8 @@ export default {
   data () {
     return {
       user: {
-        alenvi: {
-          role: {},
-          local: {}
-        },
-        ogust: {
-          date_of_birth: ''
-        },
+        alenvi: null,
+        ogust: null,
         community: ''
       }
     }
@@ -33,9 +28,11 @@ export default {
   async created () {
     try {
       this.user.alenvi = await this.$users.getById(this.$route.params.id);
-      this.user.ogust = await this.$ogust.getEmployeeById(this.user.alenvi.employee_id);
-      const sectors = await this.$ogust.getList('employee.sector');
-      this.user.community = sectors[this.user.alenvi.sector];
+      if (this.user.alenvi.employee_id >= 9) {
+        this.user.ogust = await this.$ogust.getEmployeeById(this.user.alenvi.employee_id);
+        const sectors = await this.$ogust.getList('employee.sector');
+        this.user.community = sectors[this.user.alenvi.sector];
+      }
     } catch (e) {
       console.error(e);
     }

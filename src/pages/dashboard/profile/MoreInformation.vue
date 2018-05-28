@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="test">
+  <q-page v-if="user.alenvi" padding class="test">
     <!-- <div class="row justify-center">
       <div id="picture">
         <img :src="user.alenvi.picture ? user.alenvi.picture : 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_107,q_auto,w_180/v1513764284/images/users/default_avatar.png'" alt="" style="width: 180px;">
@@ -83,11 +83,8 @@ export default {
           password: '',
           passwordConfirm: ''
         },
-        alenvi: {
-          role: {},
-          local: {}
-        },
-        ogust: {}
+        alenvi: null,
+        ogust: null
       }
     }
   },
@@ -112,10 +109,15 @@ export default {
   async mounted () {
     try {
       this.user.alenvi = await this.$users.getById(this.$route.params.id);
-      this.user.ogust = await this.$ogust.getEmployeeById(this.user.alenvi.employee_id);
-      // console.log('ALENVI=', this.user.alenvi);
-      // console.log('OGUST=', this.user.ogust);
-      this.user.ogust.date_of_birth = this.$moment(this.user.ogust.date_of_birth, 'YYYYMMDD').format('YYYY-MM-DD');
+      if (!this.user.alenvi.youtube && this.user.alenvi.role.name !== 'Client') {
+        this.user.alenvi.youtube = { location: [] };
+      }
+      if (this.user.alenvi.employee_id.length >= 9) {
+        this.user.ogust = await this.$ogust.getEmployeeById(this.user.alenvi.employee_id);
+        // console.log('ALENVI=', this.user.alenvi);
+        // console.log('OGUST=', this.user.ogust);
+        this.user.ogust.date_of_birth = this.$moment(this.user.ogust.date_of_birth, 'YYYYMMDD').format('YYYY-MM-DD');
+      }
     } catch (e) {
       console.error(e);
     }
