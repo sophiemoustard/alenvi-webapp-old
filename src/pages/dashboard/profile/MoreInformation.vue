@@ -38,6 +38,12 @@
         <q-field icon="email">
           <q-input v-model="user.alenvi.local.email" float-label="Email" />
         </q-field>
+        <q-field icon="fab fa-youtube">
+          <q-chips-input float-label="Page vidéo" color="primary" v-model="user.alenvi.youtube.location"/>
+        </q-field>
+        <q-field icon="fab fa-youtube">
+          <q-input v-model="user.alenvi.youtube.link" float-label="Lien vidéo"/>
+        </q-field>
         <!-- <q-input v-model="user.ogust.mobile_phone" float-label="Mobile"/> -->
         <select-sector v-if="user.alenvi.sector !== '*'" v-model="user.alenvi.sector" icon="group"/>
         <br>

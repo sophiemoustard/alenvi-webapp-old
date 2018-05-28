@@ -32,8 +32,8 @@ module.exports = function (ctx) {
       ctx.theme.mat ? 'roboto-font' : null,
       'material-icons',
       'ionicons',
-      'mdi'
-      // 'fontawesome'
+      'mdi',
+      'fontawesome'
     ],
     supportIE: true,
     vendor: {
@@ -123,7 +123,8 @@ module.exports = function (ctx) {
         'QStep',
         'QStepperNavigation',
         'QUploader',
-        'QToggle'
+        'QToggle',
+        'QChipsInput'
       ],
       directives: [
         'Ripple'
