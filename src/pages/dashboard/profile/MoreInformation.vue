@@ -155,6 +155,10 @@ export default {
           },
           sector: this.user.alenvi.sector,
           role: this.user.alenvi.role.name,
+          youtube: {
+            location: this.user.alenvi.youtube.location,
+            link: this.user.alenvi.youtube.link
+          }
         };
         await this.$users.updateById(userToSendAlenvi);
         await this.$ogust.setEmployee(userToSendOgust);
