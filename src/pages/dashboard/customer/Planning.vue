@@ -14,6 +14,9 @@ export default {
   components: {
     Scheduler
   },
+  metaInfo: {
+    title: 'Votre espace - Planning',
+  },
   data () {
     return {
       events: [],

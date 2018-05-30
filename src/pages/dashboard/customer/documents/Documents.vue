@@ -84,6 +84,9 @@
 import _ from 'lodash'
 
 export default {
+  metaInfo: {
+    title: 'Votre espace - Factures',
+  },
   data () {
     return {
       years: [],

@@ -31,6 +31,12 @@ export default {
   components: {
     LatestArticles
   },
+  metaInfo: {
+    title: 'Votre espace',
+    meta: [
+      { name: 'description', content: 'Espace personnalisé pour accéder à vos documents et informations liés aux interventions réalisées par Alenvi.' },
+    ]
+  },
   data () {
     return {
       user: '',

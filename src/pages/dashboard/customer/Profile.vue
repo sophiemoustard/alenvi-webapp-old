@@ -66,6 +66,9 @@ export default {
     SelectSector,
     SelectRole
   },
+  metaInfo: {
+    title: 'Votre espace - Profil',
+  },
   data () {
     return {
       user: {
