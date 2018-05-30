@@ -66,6 +66,9 @@ export default {
     SelectSector,
     SelectRole
   },
+  metaInfo: {
+    title: 'Mes informations',
+  },
   data () {
     return {
       user: {

@@ -31,6 +31,9 @@ export default {
   components: {
     LatestArticles
   },
+  metaInfo: {
+    title: 'Votre espace'
+  },
   data () {
     return {
       user: '',

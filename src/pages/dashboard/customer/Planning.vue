@@ -14,6 +14,9 @@ export default {
   components: {
     Scheduler
   },
+  metaInfo: {
+    title: 'Planning',
+  },
   data () {
     return {
       events: [],

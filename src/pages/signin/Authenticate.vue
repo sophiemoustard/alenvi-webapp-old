@@ -27,6 +27,12 @@
 import { date } from 'quasar'
 
 export default {
+  metaInfo: {
+    title: 'Connexion',
+    meta: [
+      { name: 'description', content: 'Espace personnalisé pour accéder à vos documents et informations liés aux interventions réalisées par Alenvi.' },
+    ]
+  },
   data () {
     return {
       credentials: {
