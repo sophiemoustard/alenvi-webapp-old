@@ -67,7 +67,7 @@ export default {
     SelectRole
   },
   metaInfo: {
-    title: 'Votre espace - Profil',
+    title: 'Votre espace - Mes informations',
   },
   data () {
     return {
