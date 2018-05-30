@@ -32,10 +32,7 @@ export default {
     LatestArticles
   },
   metaInfo: {
-    title: 'Votre espace',
-    meta: [
-      { name: 'description', content: 'Espace personnalisé pour accéder à vos documents et informations liés aux interventions réalisées par Alenvi.' },
-    ]
+    title: 'Votre espace'
   },
   data () {
     return {

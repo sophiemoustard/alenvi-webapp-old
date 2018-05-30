@@ -15,7 +15,7 @@ export default {
     Scheduler
   },
   metaInfo: {
-    title: 'Votre espace - Planning',
+    title: 'Planning',
   },
   data () {
     return {
