@@ -9,7 +9,7 @@
 export default {
   name: 'App',
   metaInfo: {
-    // title: 'Alenvi Webapp',
+    title: 'Webapp',
     titleTemplate: 'Alenvi - %s',
     htmlAttrs: {
       lang: 'fr'

@@ -27,6 +27,9 @@
 import { date } from 'quasar'
 
 export default {
+  metaInfo: {
+    title: 'Connexion',
+  },
   data () {
     return {
       credentials: {
