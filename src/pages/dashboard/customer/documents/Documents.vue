@@ -34,8 +34,8 @@
           <td>{{ invoice.invoice_date }}</td>
           <td>{{ invoice.amount_incl_taxe }}</td>
           <td>
-            <q-btn flat round small color="primary">
-              <a :href="invoice.print_url" download>
+            <q-btn flat round small color="primary"  @click="downloadFile(invoice.print_url)">
+              <a download>
                 <q-icon name="file download" />
               </a>
             </q-btn>
@@ -56,8 +56,8 @@
         <tr v-for="(fiscalAttest, index) in fiscalAttests" :key="index">
           <td>{{ fiscalAttest.reference }}</td>
           <td>
-            <q-btn flat round small color="primary">
-              <a :href="fiscalAttest.print_url" download>
+            <q-btn flat round small color="primary" @click="downloadFile(fiscalAttest.print_url)">
+              <a download>
                 <q-icon name="file download" />
               </a>
             </q-btn>
@@ -82,6 +82,7 @@
 
 <script>
 import _ from 'lodash'
+import { openURL } from 'quasar'
 
 export default {
   data () {
@@ -264,6 +265,9 @@ export default {
     },
     getLastInvoices () {
 
+    },
+    downloadFile (url) {
+      openURL(url);
     }
   }
 }
