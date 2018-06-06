@@ -34,7 +34,7 @@
           <td>{{ invoice.invoice_date }}</td>
           <td>{{ invoice.amount_incl_taxe }}</td>
           <td>
-            <q-btn flat round small color="primary"  @click="downloadFile(invoice.print_url)">
+            <q-btn flat round small color="primary" @click="downloadFile(invoice.print_url, 'DL facture')">
               <a download>
                 <q-icon name="file download" />
               </a>
@@ -56,7 +56,7 @@
         <tr v-for="(fiscalAttest, index) in fiscalAttests" :key="index">
           <td>{{ fiscalAttest.reference }}</td>
           <td>
-            <q-btn flat round small color="primary" @click="downloadFile(fiscalAttest.print_url)">
+            <q-btn flat round small color="primary" @click="downloadFile(fiscalAttest.print_url, 'DL Attestation Fisc.')">
               <a download>
                 <q-icon name="file download" />
               </a>
@@ -269,7 +269,10 @@ export default {
     getLastInvoices () {
 
     },
-    downloadFile (url) {
+    downloadFile (url, label) {
+      if (process.env.NODE_ENV === 'production') {
+        this.$ga.event('Aidants', 'click', label);
+      }
       openURL(url);
     }
   }
