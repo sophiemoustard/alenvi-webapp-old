@@ -18,7 +18,7 @@
     "dotenv": "^5.0.1",
     "heroku-ssl-redirect": "0.0.4",
     "moment": "^2.22.1",
-    "quasar-cli": "^0.15.14",
+    "quasar-cli": "^0.15.20",
     "raven-js": "^3.25.1",
     "vue-analytics": "^5.10.5",
     "vue-croppa": "^1.3.6",
