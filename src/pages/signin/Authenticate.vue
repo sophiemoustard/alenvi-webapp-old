@@ -73,7 +73,6 @@ export default {
         }
 
         if (this.getUser.role.name === 'Client') {
-          this.$ga.page(this.$router);
           this.$router.replace({ path: '/dashboard/customer/home' });
         } else if (this.getUser.role.name === 'Auxiliaire' && !this.getUser.administrative.signup.complete) {
           this.$router.replace({ path: '/signupComplete' });

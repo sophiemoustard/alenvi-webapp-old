@@ -8,6 +8,6 @@ export default ({ app, router, Vue }) => {
     id: process.env.GA_TRACKING_ID,
     checkDuplicatedScript: true,
     router,
-    ignoreRoutes: ['login', 'settings']
+    ignoreRoutes: ['settings']
   });
 }
