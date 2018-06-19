@@ -175,7 +175,7 @@ export default {
       if (!this.isComplete) {
         return this.userList.filter(auxiliary => !auxiliary.complete);
       }
-      return this.userList.filter(auxiliary => auxiliary.complete && this.$moment(auxiliary.createdAt).isAfter('02-28-2018'));
+      return this.userList.filter(auxiliary => auxiliary.complete && this.$moment(auxiliary.createdAt).isAfter(new Date(2018, 2)));
     }
   },
   methods: {
