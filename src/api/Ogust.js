@@ -179,7 +179,7 @@ export default {
     } else {
       customersRaw = await axios.get(`${process.env.API_HOSTNAME}/ogust/customers`, { params, headers: { 'x-ogust-token': ogustToken } });
     }
-    return customersRaw.data.data.users.array_customer.result;
+    return customersRaw.data.data.customers.array_customer.result;
   },
   async getCustomerById (id) {
     const customerRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/customers/${id}`);
