@@ -59,8 +59,10 @@ export default [
       if (store.getters['main/user'] && store.getters['main/user'].administrative && !store.getters['main/user'].administrative.signup.complete) {
         // await users.getById(to.query.id, to.query.token);
         next();
+      } else if (store.getters['main/user'] && store.getters['main/user'].administrative && store.getters['main/user'].administrative.signup.complete) {
+        next({ path: '/alreadySignedUp' });
       } else {
-        next({ path: '/401' });
+        next({ path: 401 })
       }
     }
   },
@@ -84,6 +86,7 @@ export default [
     //   }
     // }
   },
+  { path: '/alreadySignedUp', component: () => import('pages/signup/AlreadySignedUp') },
   { path: '/forgotPassword', component: () => import('pages/signin/ForgotPwd') },
   { path: '/resetPassword/:token', component: () => import('pages/signin/ResetPwd') },
   { path: '/error403Pwd', component: () => import('pages/signin/403') },
