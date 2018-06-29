@@ -190,6 +190,7 @@ export default {
           }
         };
         const newAlenviUser = await this.$users.create(alenviData);
+        this.accessToken = newAlenviUser.data.data.token;
         const ogustData = {
           title: this.user.civility,
           last_name: this.user.lastname,
@@ -206,7 +207,7 @@ export default {
         // console.log(this.accessToken);
         const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
         const ogustNewUser = await this.$ogust.createEmployee(ogustToken, ogustData);
-        await this.$users.updateById({ _id: newAlenviUser.data.data.user._id, employee_id: ogustNewUser.data.data.user.body.employee.id_employee }, newAlenviUser.data.data.token);
+        await this.$users.updateById({ _id: newAlenviUser.data.data.user._id, employee_id: ogustNewUser.data.data.user.body.employee.id_employee }, this.accessToken);
         // const alenviToken = newAlenviUser.data.data.token;
         // const alenviUserId = newAlenviUser.data.data.user._id;
         // this.$q.loading.show({ message: 'Redirection vers Pigi...' });
