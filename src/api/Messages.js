@@ -1,19 +1,23 @@
 import { alenviAxios } from './ressources/alenviAxios'
 
 export default {
-  async storeMessage (data, senderId) {
-    const storedMessage = await alenviAxios.post(`${process.env.API_HOSTNAME}/messageToBot/?senderId=${senderId}`, data);
+  async storeMessage (data) {
+    const storedMessage = await alenviAxios.post(`${process.env.API_HOSTNAME}/messageToBot`, data);
     return storedMessage;
   },
-  async sendMessage (messageId, recipientId) {
-    const sentMessage = await alenviAxios.get(`${process.env.API_HOSTNAME}/messageToBot/${messageId}/send?recipientId=${recipientId}`);
+  async getById (messageId) {
+    const message = await alenviAxios.get(`${process.env.API_HOSTNAME}/messageToBot/${messageId}`);
+    return message.data.data.message;
+  },
+  async sendMessage (data) {
+    const sentMessage = await alenviAxios.post(`${process.env.API_HOSTNAME}/messageToBot/send`, data);
     return sentMessage;
   },
   async addMessageRecipientById (messageId, data) {
     await alenviAxios.put(`${process.env.API_HOSTNAME}/messageToBot/${messageId}/recipient`, data);
   },
-  async getMessagesBySenderId (senderId) {
-    const sentMessagesRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/messageToBot/user/${senderId}`);
+  async list (params) {
+    const sentMessagesRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/messageToBot`, { params });
     return sentMessagesRaw.data.data.messages;
   }
 }

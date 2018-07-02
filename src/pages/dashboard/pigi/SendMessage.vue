@@ -86,12 +86,13 @@ export default {
       try {
         const data = {
           message: this.message.content,
-          sectors: this.selectedSector
+          sectors: this.selectedSector,
+          senderId: this.user._id
         };
         // if (!Cookies.get('user_id')) {
         //   this.$router.push('/dashboard/login');
         // }
-        const storedMessage = await this.$messages.storeMessage(data, this.user._id);
+        const storedMessage = await this.$messages.storeMessage(data);
         this.message.id = storedMessage.data.data.message._id;
       } catch (e) {
         console.error(e);
@@ -99,7 +100,8 @@ export default {
     },
     async sendMessage (messageId, recipientId) {
       try {
-        await this.$messages.sendMessage(messageId, recipientId);
+        const message = await this.$messages.getById(messageId);
+        await this.$messages.sendMessage({ message: message.content, recipientId });
         this.message.success++;
         return true;
       } catch (e) {
