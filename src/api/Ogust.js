@@ -118,9 +118,9 @@ export default {
   },
   async editOgustCustomer (ogustToken, customerId, data) {
     if (ogustToken === null) {
-      await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/customers/${customerId}/edit`, data);
+      await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/customers/${customerId}`, data);
     } else {
-      await axios.put(`${process.env.API_HOSTNAME}/ogust/customers/${customerId}/edit`, data, { headers: { 'x-ogust-token': ogustToken } });
+      await axios.put(`${process.env.API_HOSTNAME}/ogust/customers/${customerId}`, data, { headers: { 'x-ogust-token': ogustToken } });
     }
   },
   async getList (key, ogustToken = null) {
