@@ -1,4 +1,3 @@
-import axios from 'axios'
 import { alenviAxios } from './ressources/alenviAxios'
 
 export default {
