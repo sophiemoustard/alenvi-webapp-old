@@ -150,8 +150,9 @@ export default {
           managerId: this.selectedManager,
         });
         const code = activationDataRaw.activationData.code;
-        const message = await this.$twilio.sendSMS(this.phoneNbr, {
-          activationCode: code
+        const message = await this.$twilio.sendSMS({
+          to: `+33${this.phoneNbr.substring(1)}`,
+          body: `Bienvenue chez Alenvi ! :) Utilise ce code: ${code} pour pouvoir commencer ton enregistrement ici avant ton intégration: https://app.alenvi.io/signup :-)`,
         });
         console.log('SMS envoyé =', message);
         console.log('Auxiliaire accueilli !');
@@ -181,7 +182,7 @@ export default {
     async getMessageList () {
       try {
         this.tableLoading = true;
-        const messagesListRaw = await this.$twilio.getRecords();
+        const messagesListRaw = await this.$twilio.getSMS();
         this.messageList = messagesListRaw.data.data.messageList;
         this.tableLoading = false;
       } catch (e) {

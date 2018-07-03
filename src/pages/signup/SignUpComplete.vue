@@ -513,7 +513,14 @@ export default {
       } else {
         this.$q.loading.show({ message: "Un SMS va t'être envoyé dans quelques instants..." });
         this.timeout = setTimeout(async () => {
-          await this.$twilio.sendSMSWarning({ phoneNbr: this.storedUser.mobilePhone, id: this.storedUser._id });
+          await this.$twilio.sendSMS({
+            to: `+33${this.storedUser.mobilePhone.substring(1)}`,
+            body: `Attention, avant la signature de ton contrat, tu dois télécharger l'application Facebook Messenger afin de pouvoir utiliser les outils Alenvi.
+    Voici les deux étapes à suivre:
+    1. Si ton téléphone est un Iphone, clique sur ce lien https://appstore.com/messenger, sinon clique sur ce lien: https://play.google.com/store/apps/details?id=com.facebook.orca
+    2. Une fois l'application installée, connecte-toi en cliquant sur le lien suivant: ${process.env.MESSENGER_LINK}
+Si tu rencontres des difficultés, contacte dès aujourd'hui la personne qui t'a recruté chez Alenvi`
+          });
           this.$q.loading.hide();
         }, 3000)
         this.hasFinishedAndNotMessenger = true;
