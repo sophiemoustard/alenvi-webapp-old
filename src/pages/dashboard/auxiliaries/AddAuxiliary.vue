@@ -183,7 +183,7 @@ export default {
       try {
         this.tableLoading = true;
         const messagesListRaw = await this.$twilio.getSMS();
-        this.messageList = messagesListRaw.data.data.messageList;
+        this.messageList = messagesListRaw.data.data.messages;
         this.tableLoading = false;
       } catch (e) {
         console.error(e);
