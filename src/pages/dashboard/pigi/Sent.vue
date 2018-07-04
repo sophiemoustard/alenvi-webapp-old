@@ -127,7 +127,7 @@ export default {
     async getMessages () {
       try {
         const sectors = await this.$ogust.getList('employee.sector');
-        const messagesList = await this.$messages.list({ senderId: this.user._id });
+        const messagesList = await this.$messages.list({});
         const orderedMessageList = [];
         for (let i = 0, l = messagesList.length; i < l; i++) {
           const sent = _.countBy(messagesList[i].recipients, 'success');
