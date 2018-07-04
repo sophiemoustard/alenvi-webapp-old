@@ -160,7 +160,7 @@ export default {
     // done = function to call at the end, taking array of object
     async search (terms, done) {
       try {
-        let customers = await this.$ogust.getCustomers({ lastName: `${terms}%` });
+        let customers = await this.$ogust.getCustomers({ last_name: `${terms}%` });
         if (Object.keys(customers).length === 0) {
           return done([]);
         }
