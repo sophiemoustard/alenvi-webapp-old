@@ -85,7 +85,7 @@ export default {
     async storeMessage () {
       try {
         const data = {
-          message: this.message.content,
+          content: this.message.content,
           sectors: this.selectedSector,
           senderId: this.user._id
         };
