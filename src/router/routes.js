@@ -20,8 +20,11 @@ export default [
           return next({ path: '/signup/signupComplete' });
           // console.log('FEH');
           // return next({ path: '/dashboard/test2' });
+        } else if (store.getters['main/user'] && store.getters['main/user'].role.name !== 'Auxiliaire' && store.getters['main/user'].role.name !== 'Client') {
+          next({ path: '/dashboard/planning' });
+        } else {
+          next({ path: '/login' });
         }
-        next({ path: '/login' });
       } catch (e) {
         console.error(e);
       }
