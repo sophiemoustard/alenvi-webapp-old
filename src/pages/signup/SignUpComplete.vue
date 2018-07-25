@@ -97,32 +97,32 @@
                 </q-field> -->
                 <p class="caption">Carte d'identité / titre de séjour (Recto) :</p>
                 <q-field icon="mdi-account-card-details" :error="$v.user.administrative.idCard.$error" error-label="Champ requis">
-                  <q-uploader v-if="storedUser && !storedUser.administrative.idCardRecto" name="idCardRecto" :url="docsUploadUrl" :headers="headers"
+                  <q-uploader v-if="storedUser && Object.keys(storedUser.administrative.idCardRecto).length === 0" name="idCardRecto" :url="docsUploadUrl" :headers="headers"
                   :additional-fields="[{ name: 'fileName', value: `cni_recto_${user.firstname}_${user.lastname}` }]"
                   @finish="afterUpload('IdCardRecto')" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
                   @add="uploadInstructions('IdCardRecto')" @remove:cancel="afterRemove('IdCardRecto')"/>
-                  <p class="upload-done" v-if="storedUser && storedUser.administrative.idCardRecto">Fichier mis en ligne <q-icon name="check" /></p>
-                  <p class="upload-not-done" v-if="storedUser && !storedUser.administrative.idCardRecto && !hasPickedIdCardRecto">Fichier manquant <q-icon name="warning" /></p>
+                  <p class="upload-done" v-if="storedUser && Object.keys(storedUser.administrative.idCardRecto).length !== 0">Fichier mis en ligne <q-icon name="check" /></p>
+                  <p class="upload-not-done" v-if="storedUser && Object.keys(storedUser.administrative.idCardRecto).length === 0 && !hasPickedIdCardRecto">Fichier manquant <q-icon name="warning" /></p>
                   <p class="picked" v-if="hasPickedIdCardRecto">Super ! Maintenant, appuie sur <q-icon name="cloud upload" /></p>
                 </q-field>
                 <p class="caption">Carte d'identité / titre de séjour (Verso) :</p>
                 <q-field icon="mdi-account-card-details" :error="$v.user.administrative.idCard.$error" error-label="Champ requis">
-                  <q-uploader v-if="storedUser && !storedUser.administrative.idCardVerso" name="idCardVerso" :url="docsUploadUrl" :headers="headers"
+                  <q-uploader v-if="storedUser && Object.keys(storedUser.administrative.idCardVerso).length === 0" name="idCardVerso" :url="docsUploadUrl" :headers="headers"
                   :additional-fields="[{ name: 'fileName', value: `cni_verso_${user.firstname}_${user.lastname}` }]"
                   @finish="afterUpload('IdCardVerso')" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
                   @add="uploadInstructions('IdCardVerso')" @remove:cancel="afterRemove('IdCardVerso')"/>
-                  <p class="upload-done" v-if="storedUser && storedUser.administrative.idCardVerso">Fichier mis en ligne <q-icon name="check" /></p>
-                  <p class="upload-not-done" v-if="storedUser && !storedUser.administrative.idCardVerso && !hasPickedIdCardVerso">Fichier manquant <q-icon name="warning" /></p>
+                  <p class="upload-done" v-if="storedUser && Object.keys(storedUser.administrative.idCardVerso).length !== 0">Fichier mis en ligne <q-icon name="check" /></p>
+                  <p class="upload-not-done" v-if="storedUser && Object.keys(storedUser.administrative.idCardVerso).length === 0 && !hasPickedIdCardVerso">Fichier manquant <q-icon name="warning" /></p>
                   <p class="picked" v-if="hasPickedIdCardVerso">Super ! Maintenant, appuie sur <q-icon name="cloud upload" /></p>
                 </q-field>
                 <p class="caption">Carte vitale :</p>
                 <q-field icon="mdi-account-card-details" :error="$v.user.administrative.vitalCard.$error" error-label="Champ requis">
-                  <q-uploader v-if="storedUser && !storedUser.administrative.vitalCard" name="vitalCard" :url="docsUploadUrl" :headers="headers"
+                  <q-uploader v-if="storedUser && Object.keys(storedUser.administrative.vitalCard).length === 0" name="vitalCard" :url="docsUploadUrl" :headers="headers"
                   :additional-fields="[{ name: 'fileName', value: `carte_vitale_${user.firstname}_${user.lastname}` }]"
                   @finish="afterUpload('VitalCard')" auto-expand hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
                   @add="uploadInstructions('VitalCard')" @remove:cancel="afterRemove('VitalCard')"/>
-                  <p class="upload-done" v-if="storedUser && storedUser.administrative.vitalCard">Fichier mis en ligne <q-icon name="check" /></p>
-                  <p class="upload-not-done" v-if="storedUser && !storedUser.administrative.vitalCard && !hasPickedVitalCard">Fichier manquant <q-icon name="warning" /></p>
+                  <p class="upload-done" v-if="storedUser && Object.keys(storedUser.administrative.vitalCard).length !== 0">Fichier mis en ligne <q-icon name="check" /></p>
+                  <p class="upload-not-done" v-if="storedUser && Object.keys(storedUser.administrative.vitalCard).length === 0 && !hasPickedVitalCard">Fichier manquant <q-icon name="warning" /></p>
                   <p class="picked" v-if="hasPickedVitalCard">Super ! Maintenant, appuie sur <q-icon name="cloud upload" /></p>
                 </q-field>
                 <q-stepper-navigation>
@@ -322,6 +322,7 @@ export default {
       await this.setOgustUser();
       await this.getCountries();
       this.inProgress = false;
+      console.log('storedUser = ', this.storedUser);
     } catch (e) {
       console.error(e);
       this.inProgress = false;
@@ -409,6 +410,7 @@ export default {
           place_of_birth: this.user.placeOfBirth,
           social_insurance_number: this.user.socialInsuranceNumber
         };
+        console.log('ogustData =', ogustData);
         this.inProgress = true;
         // const ogustToken = await this.$ogust.getOgustToken(this.accessToken);
         // await this.$ogust.setEmployee(ogustData, ogustToken);
@@ -427,7 +429,7 @@ export default {
         this.$refs.stepper.next();
       } catch (e) {
         this.inProgress = false;
-        console.error(e.response);
+        console.error(e);
       }
     },
     async secondStep () {
@@ -482,50 +484,54 @@ export default {
       }
     },
     async lastStep () {
-      this.progress = true;
-      const alenviData = {
-        _id: this.storedUser._id,
-        administrative: {
-          signup: {
-            complete: true
-          },
-          mutualFund: this.user.administrative.mutualFund,
-          navigoInvoice: this.user.administrative.navigoInvoice,
-          phoneInvoice: this.user.administrative.phoneInvoice,
-          certificates: this.user.administrative.certificates,
-          healthAttest: this.user.administrative.healthAttest
-        }
-      };
-      // await this.$users.updateById(alenviData, this.accessToken);
-      await this.$users.updateById(alenviData);
-      this.progress = false;
-      console.log(this.user.hasMessenger);
-      if (this.user.hasMessenger === 'true') {
-        this.$q.loading.show({ message: 'Redirection vers Pigi...' });
-        this.timeout = setTimeout(() => {
-          this.$q.loading.hide();
-          if (Cookies.get('alenvi_token')) {
-            window.location.href = `${process.env.MESSENGER_LINK}?ref=${Cookies.get('alenvi_token')}`;
-          } else {
-            window.location.href = `${process.env.MESSENGER_LINK}`;
+      try {
+        this.progress = true;
+        const alenviData = {
+          _id: this.storedUser._id,
+          administrative: {
+            signup: {
+              complete: true
+            },
+            mutualFund: this.user.administrative.mutualFund,
+            navigoInvoice: this.user.administrative.navigoInvoice,
+            phoneInvoice: this.user.administrative.phoneInvoice,
+            certificates: this.user.administrative.certificates,
+            healthAttest: this.user.administrative.healthAttest
           }
-        }, 2000);
-      } else {
-        this.$q.loading.show({ message: "Un SMS va t'être envoyé dans quelques instants..." });
-        this.timeout = setTimeout(async () => {
-          await this.$twilio.sendSMS({
-            to: `+33${this.storedUser.mobilePhone.substring(1)}`,
-            body: `Attention, avant la signature de ton contrat, tu dois télécharger l'application Facebook Messenger afin de pouvoir utiliser les outils Alenvi.
-    Voici les deux étapes à suivre:
-    1. Si ton téléphone est un Iphone, clique sur ce lien https://appstore.com/messenger, sinon clique sur ce lien: https://play.google.com/store/apps/details?id=com.facebook.orca
-    2. Une fois l'application installée, connecte-toi en cliquant sur le lien suivant: ${process.env.MESSENGER_LINK}
-Si tu rencontres des difficultés, contacte dès aujourd'hui la personne qui t'a recruté chez Alenvi`
-          });
-          this.$q.loading.hide();
-        }, 3000)
-        this.hasFinishedAndNotMessenger = true;
+        };
+        // await this.$users.updateById(alenviData, this.accessToken);
+        await this.$users.updateById(alenviData);
+        this.progress = false;
+        console.log(this.user.hasMessenger);
+        if (this.user.hasMessenger === 'true') {
+          this.$q.loading.show({ message: 'Redirection vers Pigi...' });
+          this.timeout = setTimeout(() => {
+            this.$q.loading.hide();
+            if (Cookies.get('alenvi_token')) {
+              window.location.href = `${process.env.MESSENGER_LINK}?ref=${Cookies.get('alenvi_token')}`;
+            } else {
+              window.location.href = `${process.env.MESSENGER_LINK}`;
+            }
+          }, 2000);
+        } else {
+          this.$q.loading.show({ message: "Un SMS va t'être envoyé dans quelques instants..." });
+          this.timeout = setTimeout(async () => {
+            await this.$twilio.sendSMS({
+              to: `+33${this.storedUser.mobilePhone.substring(1)}`,
+              body: `Attention, avant la signature de ton contrat, tu dois télécharger l'application Facebook Messenger afin de pouvoir utiliser les outils Alenvi.
+      Voici les deux étapes à suivre:
+      1. Si ton téléphone est un Iphone, clique sur ce lien https://appstore.com/messenger, sinon clique sur ce lien: https://play.google.com/store/apps/details?id=com.facebook.orca
+      2. Une fois l'application installée, connecte-toi en cliquant sur le lien suivant: ${process.env.MESSENGER_LINK}
+  Si tu rencontres des difficultés, contacte dès aujourd'hui la personne qui t'a recruté chez Alenvi`
+            });
+            this.$q.loading.hide();
+          }, 3000)
+          this.hasFinishedAndNotMessenger = true;
+        }
+        // window.location.href = `${process.env.MESSENGER_LINK}?ref=signup_complete`;
+      } catch (e) {
+        console.error(e);
       }
-      // window.location.href = `${process.env.MESSENGER_LINK}?ref=signup_complete`;
     },
     async getCountries () {
       try {

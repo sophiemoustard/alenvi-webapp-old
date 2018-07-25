@@ -1,7 +1,6 @@
 <template>
   <q-tabs align="justify">
     <q-tab v-for="(tab, index) in tabInfo"
-          v-can="{ feature: tab.feature }"
           :key="index"
           :icon="tab.icon"
           slot="title"
@@ -9,7 +8,7 @@
           :default="tab.default"
           :disable="tab.disable || false"
           :name="tab.name"
-          @click="pushGAEvents(tab.label)" />
+          @click="pushGAEvents(tab.label)" /><!-- v-can="{ feature: tab.feature }"-->
     <q-tab-pane class="no-border" v-for="(tab, index) in tabInfo" :key="index" :name="tab.name">
                 <!-- Dynamic component loading  -->
       <component :is="tab.component" />

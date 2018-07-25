@@ -17,24 +17,24 @@
         <q-item-side icon="dashboard" />
         <q-item-main label="Dashboard" />
       </q-item>
-      <q-item v-can="{ feature: 'Planning' }" to="/dashboard/planning" exact>
+      <q-item to="/dashboard/planning" exact> <!-- v-can="{ feature: 'Planning' }" -->
         <q-item-side icon="date range" />
         <q-item-main label="Planning" />
       </q-item>
-      <q-item v-can="{ feature: 'Auxiliaires' }" to="/dashboard/auxiliaries" exact>
+      <q-item to="/dashboard/auxiliaries" exact> <!-- v-can="{ feature: 'Auxiliaires' }" }" -->
         <q-item-side icon="ion-android-contacts" />
         <q-item-main label="Auxiliaires d'envie" />
       </q-item>
-      <q-item v-can="{ feature: 'Aidants' }" to="/dashboard/caregivers" exact>
+      <q-item to="/dashboard/caregivers" exact> <!-- v-can="{ feature: 'Aidants' }" -->
         <q-item-side icon="group" />
         <q-item-main label="Aidants familiaux" />
       </q-item>
-      <q-item v-can="{ feature: 'Pigi' }" to="/dashboard/pigi" exact>
+      <q-item to="/dashboard/pigi" exact> <!-- v-can="{ feature: 'Pigi' }" -->
         <q-item-side icon="message" />
         <q-item-main label="Pigi" />
       </q-item>
       <q-item-separator />
-      <q-item v-can="{ feature: 'Paramètres' }" to="/dashboard/settings" exact>
+      <q-item to="/dashboard/settings" exact> <!-- v-can="{ feature: 'Paramètres' }" -->
         <q-item-side icon="settings" />
         <q-item-main label="Paramètres" />
       </q-item>
