@@ -492,13 +492,171 @@ export default {
 }
 </script>
 
-<style lang="stylus">
-  @import '~variables'
+<style lang="css">
+  /* @import '~variables' */
   @import "~dhtmlx-scheduler/codebase/dhtmlxscheduler.css";
   @import "~dhtmlx-scheduler/codebase/dhtmlxscheduler_flat.css";
   @import "~assets/dhtmlxscheduler-responsive.css";
 
-  .custom-field
+.custom-field {
+  margin: 16px 0;
+}
+
+.dhx_scale_hour {
+  border-bottom: none;
+  overflow: visible;
+}
+
+.dhx_cal_data {
+  overflow-y: visible;
+  overflow-x: visible;
+  border-top: none;
+/*padding-top: 10px;*/;
+}
+
+.dhx_cal_header div div {
+  border: none;
+}
+
+.dhx_scale_bar {
+  line-height: 20px;
+}
+
+.dhx_scale_holder {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAsCAIAAAArRUU2AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAB3RJTUUH4gEREC41Aw9nHAAAABZJREFUCNdj+P//PxMDA8OQwOfPnwcAKy4FwcX82PUAAAAASUVORK5CYII=");
+}
+
+.dhx_scale_holder_now {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAsCAIAAAArRUU2AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAB3RJTUUH4gEREDIsgROSgQAAABZJREFUCNdj+P95IRMDA8OQwOcvPgQA44cFa6kqCcUAAAAASUVORK5CYII=");
+}
+
+.dhx_cal_navline.dhx_cal_date {
+  color: #737373;
+}
+
+.dhx_cal_tab {
+  color: #737373;
+  background-color: none;
+}
+
+.dhx_cal_tab:hover {
+  text-decoration: none;
+  background-color: rgba(0,0,0,0.07);
+}
+
+.dhx_cal_tab.active {
+  background-color: rgba(0,0,0,0.07);
+  color: #737373;
+  font-weight: 700;
+}
+
+.dhx_cal_tab.active:hover {
+  background-color: rgba(0,0,0,0.1);
+}
+
+.dhx_cal_today_button {
+  color: #737373;
+}
+
+.dhx_cal_today_button:hover {
+  text-decoration: none;
+  background-color: rgba(0,0,0,0.07);
+}
+
+.dhx_cal_prev_button {
+  width: 30px;
+  border-radius: 50%;
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAAAAAAAA+UO7fwAAAAlwSFlzAAAASAAAAEgARslrPgAAAORJREFUSMft1T8KwjAUBvAvcRI8jFtbOviHHkDwJIXuegGbHsFTiIODi2nOIG46OIirLk1dOog45CURHPJtGV5+PHi8B4SEhPxT8jwfUWt6rmhRFEvG2DpJkn5d1zvTOuaKtm276J5nrfVQCHE3qeWe0IvWemqKWnf8BZ0IIU6UP8iwD5QM+0IBwlR/oNemabKqqo42KEAbroct4tSxlPKQpukTQAZgwDmfR1G0UUrdfgr7xsmbyxdutTJ94Na7usMZgHGHz+I4XiuljIbQ6UhIKfdvna/Ksty6/EeOzVkMCQnxlhck2ouoK+MN0AAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxOC0wMS0xOFQxMDowNzoxMyswMDowMGL8TZcAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTgtMDEtMThUMTA6MDc6MTMrMDA6MDATofUrAAAAKHRFWHRzdmc6YmFzZS11cmkAZmlsZTovLy90bXAvbWFnaWNrLU5Td0Y1d0NE+kVb4wAAAABJRU5ErkJggg==") no-repeat center center;
+}
+
+.dhx_cal_prev_button:hover {
+  background-color: rgba(0,0,0,0.07);
+}
+
+.dhx_cal_event .dhx_title {
+  text-align: start;
+}
+
+.dhx_cal_event .dhx_footer {
+  background: none;
+}
+
+.dhx_cal_event .dhx_footer:hover {
+  background: none;
+}
+
+.dhx_cal_event:hover .dhx_footer {
+  background: none;
+}
+
+.dhx_cal_next_button {
+  width: 30px;
+  border-radius: 50%;
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAAAAAAAA+UO7fwAAAAlwSFlzAAAASAAAAEgARslrPgAAAPRJREFUSMft1aFOxDAcgPHvP2YwQLBonmFbdwkYPAlP0mTzuwfYPO6egIA4dwmotbwNqHMrhplT164Hpp9s2v7SihZSqdR/pbW+i7HPmc/kpmk6EdlUVXVujNn9Cay1vhaRZ+BSRFZ1Xcs4jh8nh621e6XUC/AIXAH3S07uddXGmG+l1OuMi8gqFPeCZ7woircsyxbh3jCAtfZrKR4Ez3hZllsReQIufPEsFAbI81wOhvbHrpVjJx7Wtu3tNE3vwA2Ac64bhmF9UngpGgTHQL3hWCh4PpnA54yKyLrv+yDUC/59MnPgwTnXLUGDivUtplKpaP0Awbh4tLAnJEMAAAAldEVYdGRhdGU6Y3JlYXRlADIwMTgtMDEtMThUMTA6MDc6NTArMDA6MDDXXlnwAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDE4LTAxLTE4VDEwOjA3OjUwKzAwOjAwpgPhTAAAACh0RVh0c3ZnOmJhc2UtdXJpAGZpbGU6Ly8vdG1wL21hZ2ljay1icU1SUGdGMAb+9OcAAAAASUVORK5CYII=") no-repeat center center;
+}
+
+.dhx_cal_next_button:hover {
+  background-color: rgba(0,0,0,0.07);
+}
+
+.dhx_cancel_btn_set {
+  background-color: #E2007A ;
+}
+
+.header-fixed {
+  position: fixed;
+  top: 0px !important;
+}
+
+.header-fixed-customer {
+  top: 52px !important;
+  position: fixed;
+}
+
+.alenvi_event div {
+  background-color: #E2007A !important;
+  color: #fff !important;
+}
+
+.dhx_cal_event_line.alenvi_event {
+  background-color: #E2007A !important;
+  color: #fff !important;
+}
+
+.dhx_cal_event_clear.alenvi_event {
+  background-color: #E2007A !important;
+  color: #fff !important;
+}
+
+.alenvi_past_event div {
+  background-color: #FF54B0 !important;
+  color: #fff !important;
+}
+
+.dhx_cal_event_line.alenvi_past_event {
+  background-color: #FF54B0 !important;
+  color: #fff !important;
+}
+
+.dhx_cal_event_clear.alenvi_past_event {
+  background-color: #FF54B0 !important;
+  color: #fff !important;
+}
+
+.responsive-container {
+  width: 100% !important;
+}
+
+.event_date {
+  font-weight: bold;
+}
+
+.custom_event {
+  padding: 5px;
+  overflow: hidden;
+}
+
+  /* .custom-field
     margin: 16px 0
 
   .dhx_scale_hour
@@ -511,7 +669,7 @@ export default {
     border-top: none
     /*padding-top: 10px;*/
 
-  // .dhx_cal_header
+  /* // .dhx_cal_header
   //   position: fixed
   //   background: white
 
@@ -529,10 +687,10 @@ export default {
     background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAsCAIAAAArRUU2AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAB3RJTUUH4gEREDIsgROSgQAAABZJREFUCNdj+P95IRMDA8OQwOcvPgQA44cFa6kqCcUAAAAASUVORK5CYII=')
 
   .dhx_cal_navline.dhx_cal_date
-    color: $tertiary
+    color: #737373
 
   .dhx_cal_tab
-    color: $tertiary
+    color: #737373
     background-color: none
     &:hover
       text-decoration: none
@@ -540,13 +698,13 @@ export default {
 
   .dhx_cal_tab.active
     background-color: rgba(0, 0, 0, .07)
-    color: $tertiary
+    color: #737373
     font-weight: 700
     &:hover
       background-color: rgba(0, 0, 0, .1)
 
   .dhx_cal_today_button
-    color: $tertiary
+    color: #737373
     &:hover
       text-decoration: none
       background-color: rgba(0, 0, 0, .07)
@@ -587,27 +745,27 @@ export default {
       position: fixed
 
   .alenvi_event div
-    background-color: $primary !important;
+    background-color: #E2007A !important;
     color: white !important;
 
   .dhx_cal_event_line.alenvi_event
-    background-color: $primary !important;
+    background-color: #E2007A !important;
     color: white !important;
 
   .dhx_cal_event_clear.alenvi_event
-    background-color: $primary !important;
+    background-color: #E2007A !important;
     color: white !important;
 
   .alenvi_past_event div
-    background-color: $primary-light !important;
+    background-color: #FF54B0 !important;
     color: white !important;
 
   .dhx_cal_event_line.alenvi_past_event
-    background-color: $primary-light !important;
+    background-color: #FF54B0 !important;
     color: white !important;
 
   .dhx_cal_event_clear.alenvi_past_event
-    background-color: $primary-light !important;
+    background-color: #FF54B0 !important;
     color: white !important;
 
   .responsive-container
@@ -618,6 +776,6 @@ export default {
 
   .custom_event
     padding: 5px
-    overflow: hidden
+    overflow: hidden */
 
 </style>

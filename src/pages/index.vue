@@ -1,7 +1,6 @@
 <template>
   <q-page class="flex flex-center">
-    <p>TEST</p>
-    <img src="~assets/quasar-logo-full.svg">
+    <img alt="Quasar logo" src="~assets/quasar-logo-full.svg">
   </q-page>
 </template>
 
@@ -10,6 +9,6 @@
 
 <script>
 export default {
-  name: 'PageIndex',
-};
+  name: 'PageIndex'
+}
 </script>

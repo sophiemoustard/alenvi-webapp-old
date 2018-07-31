@@ -1,9 +1,15 @@
 import { Cookies } from 'quasar'
 
 import store from '../store/index'
-// import users from '../api/Users'
 
-export default [
+const routes = [
+  // {
+  //   path: '/',
+  //   component: () => import('layouts/MyLayout.vue'),
+  //   children: [
+  //     { path: '', component: () => import('pages/Index.vue') }
+  //   ]
+  // }
   {
     path: '/',
     beforeEnter: async (to, from, next) => {
@@ -200,4 +206,14 @@ export default [
     path: '*',
     component: () => import('pages/404')
   }
-];
+]
+
+// Always leave this as last one
+if (process.env.MODE !== 'ssr') {
+  routes.push({
+    path: '*',
+    component: () => import('pages/Error404.vue')
+  })
+}
+
+export default routes

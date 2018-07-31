@@ -15,7 +15,7 @@ export default {
       lang: 'fr'
     }
   }
-};
+}
 </script>
 
 <style>

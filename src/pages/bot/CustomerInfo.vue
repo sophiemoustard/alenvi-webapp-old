@@ -3,7 +3,7 @@
     <div class="row justify-center">
       <q-field class="col-xs-12 col-sm-6">
         <q-input
-        v-model="customerCodes.door_code"
+        v-model="customerCodes.doorCode"
         float-label="Code porte"
         type="textarea"
         :min-rows="1"
@@ -14,7 +14,7 @@
     <div class="row justify-center">
       <q-field class="col-xs-12 col-sm-6">
         <q-input
-        v-model="customerCodes.intercom_code"
+        v-model="customerCodes.interCode"
         float-label="Code interphone"
         type="textarea"
         :min-rows="1"
@@ -85,8 +85,8 @@ export default {
         idCustomer: ''
       },
       customerCodes: {
-        door_code: '',
-        intercom_code: ''
+        doorCode: '',
+        interCode: ''
       },
       customerInfo: {
         pathology: '',
@@ -146,8 +146,8 @@ export default {
         const customerDetailsRaw = await this.$ogust.getOgustCustomerDetails(ogustToken, this.queryParams.idCustomer);
         const customerDetails = customerDetailsRaw.data.data.info.thirdPartyInformations.array_values
         const customerCodesRaw = await this.$ogust.getOgustCustomerCodes(ogustToken, this.queryParams.idCustomer);
-        this.customerCodes.door_code = customerCodesRaw.door_code;
-        this.customerCodes.intercom_code = customerCodesRaw.intercom_code;
+        this.customerCodes.doorCode = customerCodesRaw.door_code;
+        this.customerCodes.interCode = customerCodesRaw.intercom_code;
         // this.disable = false;
         if (customerDetails == null) {
           return
