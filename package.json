@@ -16,6 +16,7 @@
     "axios": "^0.18.0",
     "dhtmlx-scheduler": "^4.4.0",
     "dotenv": "^6.0.0",
+    "express": "^4.16.3",
     "heroku-ssl-redirect": "0.0.4",
     "moment": "^2.22.2",
     "randomatic": "^3.0.0",
@@ -37,7 +38,7 @@
     "eslint-plugin-promise": "^3.7.0",
     "eslint-plugin-standard": "^3.0.1",
     "eslint-plugin-vue": "^4.3.0",
-    "quasar-cli": "^0.17.0",
+    "quasar-cli": "^0.17.6",
     "strip-ansi": "^3.0.1"
   },
   "engines": {
