@@ -16,7 +16,6 @@
     "axios": "^0.18.0",
     "dhtmlx-scheduler": "^4.4.0",
     "dotenv": "^6.0.0",
-    "express": "^4.16.3",
     "heroku-ssl-redirect": "0.0.4",
     "moment": "^2.22.2",
     "randomatic": "^3.0.0",
