@@ -9,6 +9,7 @@
   "scripts": {
     "lint": "eslint --ext .js,.vue src",
     "test": "echo \"No test specified\" && exit 0",
+    "postinstall": "quasar build",
     "start": "node server.js"
   },
   "dependencies": {
