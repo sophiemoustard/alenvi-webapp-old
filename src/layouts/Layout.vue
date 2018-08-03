@@ -1,7 +1,7 @@
 <template>
   <q-layout view="hHh Lpr lff">
     <q-layout-header>
-      <q-toolbar color="white">
+      <q-toolbar :class="{ 'lt-md': user.role.name !== 'Client' }" color="white">
         <q-btn color="primary" flat big @click="toggleLeft">
           <q-icon name="menu" />
         </q-btn>
@@ -15,7 +15,7 @@
     </q-layout-header>
 
     <q-layout-drawer side="left" v-model="toggleDrawer">
-      <side-menu v-if="user" :user="user"></side-menu>
+      <side-menu ref="sideMenu" v-if="user" :user="user" />
     </q-layout-drawer>
 
     <q-page-container>
@@ -28,7 +28,7 @@
 <script>
 import { mapGetters } from 'vuex'
 
-import SideMenu from './SideMenu'
+import SideMenu from '../components/SideMenu'
 
 export default {
   components: {
@@ -63,6 +63,11 @@ export default {
     toggleLeft () {
       this.$store.commit('main/setToggleDrawer', !this.toggleDrawer);
     }
+  },
+  beforeRouteUpdate (to, from, next) {
+    this.$refs.sideMenu.collapsibleClosing(to, from);
+    this.$refs.sideMenu.collapsibleEntering(to);
+    next();
   }
 }
 </script>
