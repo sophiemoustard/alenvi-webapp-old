@@ -1,18 +1,17 @@
 <template>
   <div class="layout-padding">
-    <div class="row justify-center">
-      <div style="width: 700px; max-width: 90vw;">
-        <p class="caption">Sélection des coachs de permanence</p>
-        <q-item v-if="coaches" tag="label" v-for="(coach, index) in coaches" :key="index">
-          <q-item-side>
-            <q-checkbox v-model="coach.isConstrained" @input="handleConstrainedCoach(coach)"></q-checkbox>
-          </q-item-side>
-          <q-item-main>
-            <q-item-tile label>{{ coach.firstname }} {{ coach.lastname }}</q-item-tile>
-          </q-item-main>
-        </q-item>
-      </div>
-    </div>
+     <div style="max-width: 90vw;">
+       <h4>Modifications planning</h4>
+       <p class="caption">Sélection des coachs de permanence</p>
+       <q-item v-if="coaches" tag="label" v-for="(coach, index) in coaches" :key="index">
+         <q-item-side>
+           <q-checkbox v-model="coach.isConstrained" @input="handleConstrainedCoach(coach)"></q-checkbox>
+         </q-item-side>
+         <q-item-main>
+           <q-item-tile label>{{ coach.firstname }} {{ coach.lastname }}</q-item-tile>
+         </q-item-main>
+       </q-item>
+     </div>
   </div>
 </template>
 

@@ -116,11 +116,42 @@ const routes = [
       {
         path: 'planning',
         name: 'planning',
-        component: () => import('pages/dashboard/planning/NavTabs'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          permission: 'Planning'
-        }
+        component: () => import('pages/dashboard/planning/Planning'),
+        redirect: {
+          name: 'view planning'
+        },
+        children: [
+          {
+            path: 'view',
+            name: 'view planning',
+            component: () => import('pages/dashboard/planning/PlanningView'),
+            meta: {
+              cookies: ['alenvi_token', 'refresh_token'],
+              permission: 'Planning',
+              parent: 'planning'
+            },
+          },
+          {
+            path: 'modification',
+            name: 'modification planning',
+            component: () => import('pages/dashboard/planning/PlanningModification'),
+            meta: {
+              cookies: ['alenvi_token', 'refresh_token'],
+              permission: 'Planning',
+              parent: 'planning'
+            },
+          },
+          {
+            path: 'constrainedCoaches',
+            name: 'perm coach planning',
+            component: () => import('pages/dashboard/planning/ConstrainedCoaches'),
+            meta: {
+              cookies: ['alenvi_token', 'refresh_token'],
+              permission: 'Planning',
+              parent: 'planning'
+            },
+          }
+        ]
       },
       {
         path: 'auxiliaries',
@@ -132,13 +163,25 @@ const routes = [
         }
       },
       {
-        path: 'caregivers',
-        name: 'caregivers',
-        component: () => import('pages/dashboard/caregivers/NavTabs'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          permission: 'Aidants'
-        }
+        path: 'beneficiaries',
+        name: 'beneficiaries',
+        component: () => import('pages/dashboard/beneficiaries/Beneficiaries'),
+        redirect: {
+          name: 'add helper'
+        },
+        children: [
+          {
+            path: 'addHelper',
+            name: 'add helper',
+            component: () => import('pages/dashboard/beneficiaries/AddHelper'),
+            meta: {
+              cookies: ['alenvi_token', 'refresh_token'],
+              permission: 'Aidants',
+              parent: 'benef'
+            }
+          }
+        ]
+        ,
       },
       {
         path: 'pigi',
