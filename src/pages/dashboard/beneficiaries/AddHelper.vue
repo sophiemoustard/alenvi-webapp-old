@@ -1,28 +1,27 @@
 <template>
-  <q-page padding class="row justify-center">
-      <div style="width: 700px; max-width: 90vw;">
-        <p class="caption">Création de compte aidant familial</p>
-        <!-- TEST by typing email -->
-        <!-- <q-field icon="mail" helper="Adresse email de l'aidant">
-          <q-input v-model="email" float-label="Email" :after="[{ icon: 'send', content: true, handler: handleEmail }]"/>
-        </q-field> -->
-        <!-- TEST by typing the beginning of a client's name -->
-        <q-search v-model="terms" placeholder="Commencez à entrer le nom d'un bénéficiaire...">
-          <q-autocomplete @search="search" @selected="selected" />
-        </q-search>
-        <!-- Find client's helpers on the fly -->
-        <q-item v-if="helpers" tag="label" v-for="(helper, index) in helpers" :key="index">
-          <q-item-side>
-            <q-checkbox v-model="helper.checked" :disable="helper.checked" @input="handleEmail(helper, index)"></q-checkbox>
-          </q-item-side>
-          <q-item-main>
-            <q-item-tile label>{{ helper.last_name }} {{ helper.first_name }}</q-item-tile>
-          </q-item-main>
-        </q-item>
+   <div style="max-width: 90vw;">
+     <h4>Accueil aidants</h4>
+     <p class="caption">Création de compte aidant familial</p>
+     <!-- TEST by typing email -->
+     <!-- <q-field icon="mail" helper="Adresse email de l'aidant">
+       <q-input v-model="email" float-label="Email" :after="[{ icon: 'send', content: true, handler: handleEmail }]"/>
+     </q-field> -->
+     <!-- TEST by typing the beginning of a client's name -->
+     <q-search v-model="terms" placeholder="Commencez à entrer le nom d'un bénéficiaire...">
+       <q-autocomplete @search="search" @selected="selected" />
+     </q-search>
+     <!-- Find client's helpers on the fly -->
+     <q-item v-if="helpers" tag="label" v-for="(helper, index) in helpers" :key="index">
+       <q-item-side>
+         <q-checkbox v-model="helper.checked" :disable="helper.checked" @input="handleEmail(helper, index)"></q-checkbox>
+       </q-item-side>
+       <q-item-main>
+         <q-item-tile label>{{ helper.last_name }} {{ helper.first_name }}</q-item-tile>
+       </q-item-main>
+     </q-item>
 
-        <p>Un mot de passe sera généré automatiquement.</p>
-      </div>
-  </q-page>
+     <p>Un mot de passe sera généré automatiquement.</p>
+   </div>
 </template>
 
 <script>

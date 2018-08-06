@@ -1,5 +1,5 @@
 <template>
-  <q-page class="neutral-background">
+  <q-page class="neutral-background" padding>
     <router-view />
   </q-page>
 </template>

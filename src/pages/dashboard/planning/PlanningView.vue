@@ -1,15 +1,13 @@
 <template>
-  <div class="layout-padding">
-    <div style="max-width: 90vw;">
-      <h4>Vue planning</h4>
-      <p class="caption">Voir planning en tant que:</p>
-      <select-sector @input="getEmployeesIdBySector" v-model="selectedSector"></select-sector>
-      <q-field icon="person" helper="Choix auxiliaire" >
-        <q-select v-model="selectedAuxiliary" :options="orderedAuxiliary" separator :disable="!selectedSector"/>
-      </q-field>
-      <div class="row justify-end">
-        <q-btn color="primary" :disable="!selectedAuxiliary" @click="goUrl(getPlanningLink)" flat>Accéder au planning</q-btn>
-      </div>
+  <div style="max-width: 90vw;">
+    <h4>Vue planning</h4>
+    <p class="caption">Voir planning en tant que:</p>
+    <select-sector @input="getEmployeesIdBySector" v-model="selectedSector"></select-sector>
+    <q-field icon="person" helper="Choix auxiliaire" >
+      <q-select v-model="selectedAuxiliary" :options="orderedAuxiliary" separator :disable="!selectedSector"/>
+    </q-field>
+    <div class="row justify-end">
+      <q-btn color="primary" :disable="!selectedAuxiliary" @click="goUrl(getPlanningLink)" flat>Accéder au planning</q-btn>
     </div>
   </div>
 </template>
