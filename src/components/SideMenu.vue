@@ -1,9 +1,9 @@
 <template>
   <div>
     <!-- If we are another role than customer -->
-    <q-list v-if="user.role.name !== 'Client'" class="no-border">
+    <q-list v-if="user.role.name !== 'Client'" class="no-border sidemenu-flex">
       <q-list-header>
-        <q-item class="justify-center">
+       <q-item class="justify-center">
         <!-- <img src="user.picture.link" alt="Image user" class="avatar"> -->
           <img id="logo-sidemenu" src="https://res.cloudinary.com/alenvi/image/upload/v1507124345/images/business/alenvi_logo_complet_full.png" alt="Alenvi logo">
         </q-item>
@@ -67,18 +67,20 @@
           <!-- <q-item-side icon="settings" /> -->
           <!-- <q-item-main label="Paramètres" /> -->
         <!-- </q-item> -->
-        <q-item class="self-end">
-          <q-item-main :label="userFirstnameUpper" />
-          <q-item-side>
-            <q-btn flat icon="person" />
-          </q-item-side>
-          <q-item-side>
-            <q-btn flat icon="settings" />
-          </q-item-side>
-          <q-item-side>
-            <q-btn flat icon="lock_open" />
-          </q-item-side>
-        </q-item>
+        <div class="sidemenu-footer">
+          <q-item class="sidemenu-footer-border full-width">
+            <q-item-main :label="userFirstnameUpper" />
+            <q-item-side>
+              <q-btn flat icon="person" />
+            </q-item-side>
+            <q-item-side>
+              <q-btn flat icon="settings" />
+            </q-item-side>
+            <q-item-side>
+              <q-btn flat icon="lock_open" />
+            </q-item-side>
+          </q-item>
+        </div>
       <!-- </div> -->
     </q-list>
     <!-- If we are another customer -->
@@ -199,4 +201,25 @@ export default {
 
   .router-link-active > div:nth-child(2)
     color: $primary
+
+  .sidemenu-flex
+    display: flex
+    flex-direction: column
+    min-height: 100vh
+
+  .sidemenu-footer
+    flex-grow: 1
+    display: flex
+    align-items: flex-end
+    justify-content: space-between
+    padding-top: 0px
+    padding-bottom: 0px
+    // prevent border overlap from footer to last sidemenu object
+    margin-top: -1px
+    & .q-item
+      padding: 6px 2px 0px 16px
+    &-border
+      border-top: 1px solid #e0e0e0
+    // & .q-item-section + .q-item-section
+    //   margin-left: 5px
 </style>
