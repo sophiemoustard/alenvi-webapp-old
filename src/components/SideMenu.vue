@@ -10,7 +10,7 @@
       </q-list-header>
       <q-item-separator />
       <q-collapsible ref="rh" v-model="rhCollapsible" label="Ressources humaines">
-        <q-item>
+        <q-item to="/dashboard/rh/directory">
           <q-item-side icon="contacts" />
           <q-item-main label="Répertoire" />
         </q-item>

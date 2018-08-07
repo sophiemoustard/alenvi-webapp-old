@@ -181,7 +181,25 @@ const routes = [
             }
           }
         ]
-        ,
+      },
+      {
+        path: 'rh',
+        name: 'rh',
+        component: () => import('pages/dashboard/rh/Rh'),
+        redirect: {
+          name: 'add helper'
+        },
+        children: [
+          {
+            path: 'directory',
+            name: 'directory',
+            component: () => import('pages/dashboard/rh/Directory'),
+            meta: {
+              cookies: ['alenvi_token', 'refresh_token'],
+              parent: 'rh'
+            }
+          }
+        ]
       },
       {
         path: 'pigi',
