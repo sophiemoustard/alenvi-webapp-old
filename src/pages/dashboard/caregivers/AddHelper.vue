@@ -95,57 +95,51 @@ export default {
     }
   },
   methods: {
-    async handleEmail (helper, index) {
-      try {
-        this.$q.dialog({
-          title: 'Envoi email',
-          message: `Voulez-vous accueillir l'aidant ${helper.last_name} ?`,
-          ok: 'Confirmer',
-          cancel: 'Non'
-        }).then(async () => {
-          const password = randomize('0', 6);
-          if (helper.checked) {
-            await this.$users.create({
-              local: {
-                email: helper.email,
-                password
-              },
-              customer_id: helper.id_customer,
-              lastname: helper.last_name,
-              role: 'Client'
-            });
-            this.$q.notify({
-              color: 'positive',
-              icon: 'thumb up',
-              detail: `Utilisateur ${helper.last_name} créé dans la base Alenvi`,
-              position: 'bottom-right',
-              timeout: 2500
-            });
-          } // else
-          // const user = await users.update({ customer_id: customer[0].id_customer });
-          //
-          await this.$email.sendWelcome({
-            sender: {
-              email: 'support@alenvi.io'
-            },
-            receiver: {
+    handleEmail (helper, index) {
+      this.$q.dialog({
+        title: 'Envoi email',
+        message: `Voulez-vous accueillir l'aidant ${helper.last_name} ?`,
+        ok: 'Confirmer',
+        cancel: 'Non'
+      }).then(async () => {
+        const password = randomize('0', 6);
+        if (helper.checked) {
+          await this.$users.create({
+            local: {
               email: helper.email,
-              title: helper.title,
-              name: helper.last_name,
               password
-            }
+            },
+            customer_id: helper.id_customer,
+            lastname: helper.last_name,
+            role: 'Client'
           });
           this.$q.notify({
             color: 'positive',
             icon: 'thumb up',
-            detail: 'Email envoyé',
+            detail: `Utilisateur ${helper.last_name} créé dans la base Alenvi`,
             position: 'bottom-right',
             timeout: 2500
           });
-        }).catch(() => {
-          this.helpers[index].checked = false;
+        } // else
+        // const user = await users.update({ customer_id: customer[0].id_customer });
+        //
+        await this.$email.sendWelcome({
+          sender: {
+            email: 'support@alenvi.io'
+          },
+          receiver: {
+            email: helper.email,
+            password
+          }
         });
-      } catch (e) {
+        this.$q.notify({
+          color: 'positive',
+          icon: 'thumb up',
+          detail: 'Email envoyé',
+          position: 'bottom-right',
+          timeout: 2500
+        });
+      }).catch((e) => {
         this.$q.notify({
           color: 'negative',
           icon: 'warning',
@@ -154,7 +148,8 @@ export default {
           timeout: 2500
         });
         console.error(e);
-      }
+        this.helpers[index].checked = false;
+      });
     },
     // terms = word typed in field
     // done = function to call at the end, taking array of object
