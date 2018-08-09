@@ -8,6 +8,7 @@
 body
   color: $black
   font-family: 'Source Sans Pro', 'Roboto', 'Helvetica', 'Arial'
+  font-size: 16px
 
 h1, h2, h3, h4, h5, h6
   margin-top: 0
@@ -20,10 +21,15 @@ h1, h2, h3, h4, h5, h6
     margin: 0
   & .q-item-section + .q-item-section
     margin-left: 0px
+  & .q-collapsible .q-collapsible-inner > .q-item > .q-item-main > .q-item-label
+    font-size: 1.125rem
   & .q-collapsible-sub-item 
     & .q-item
       padding: 8px 16px 8px 0px
+      min-height: 20px
+      & .q-item-side
+        min-width: 24px
       & .q-item-side > .q-item-icon
-        font-size: 18px
-      & .q-item-main > .q-item-label
-        font-size: 0.9rem  
+        font-size: 1rem
+      // & .q-item-main > .q-item-label
+        // font-size: 0.9rem  
