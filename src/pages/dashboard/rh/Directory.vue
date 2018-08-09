@@ -35,7 +35,30 @@ export default {
         descending: true,
         page: 1,
         rowsPerPage: 30 // current rows per page being displayed
-      }
+      },
+      columns: [
+        {
+          name: 'name',
+          label: 'Nom',
+          field: 'name',
+          align: 'left',
+          sortable: true
+        },
+        {
+          name: 'startDate',
+          label: 'Depuis le...',
+          field: 'startDate',
+          align: 'left',
+          sortable: true
+        },
+        {
+          name: 'team',
+          label: 'Equipe',
+          field: 'sector',
+          align: 'left',
+          sortable: true
+        }
+      ]
     }
   }
 }
