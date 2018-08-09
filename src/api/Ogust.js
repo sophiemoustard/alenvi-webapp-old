@@ -197,6 +197,14 @@ export default {
     const customerContactsRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/customers/${id}/contacts`, { params });
     return customerContactsRaw.data.data.contacts.array_contact.result;
   },
+  async getContacts (params) {
+    const contactsRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/contacts`, { params });
+    return contactsRaw.data.data.contacts.array_contact.result;
+  },
+  async setContact (data) {
+    const contactUpdated = await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/contacts/${data.id_interloc}`, data);
+    return contactUpdated;
+  },
   async setEmployeeBankInfo (data, ogustToken = null) {
     let employeeBankInfoRaw;
     if (ogustToken === null) {
