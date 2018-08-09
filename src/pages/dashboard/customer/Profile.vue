@@ -136,14 +136,15 @@ export default {
           mobile: this.user.ogust.mobile,
           landline: this.user.ogust.landline
         };
+        const local = this.isChangePassword ? {
+          email: this.user.alenvi.local.email,
+          password: this.user.credentials.password
+        } : { email: this.user.alenvi.local.email };
         const userToSendAlenvi = {
           _id: this.$route.params.id,
           firstname: this.user.alenvi.firstname,
           lastname: this.user.alenvi.lastname,
-          local: {
-            email: this.user.alenvi.local.email,
-            password: this.user.credentials.password
-          }
+          local
         };
         await this.$ogust.setContact(userToSendOgust);
         await this.$users.updateById(userToSendAlenvi);
