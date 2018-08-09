@@ -71,6 +71,7 @@ export default {
   },
   data () {
     return {
+      contacts: null,
       user: {
         credentials: {
           password: '',
@@ -118,7 +119,8 @@ export default {
   async mounted () {
     try {
       this.user.alenvi = await this.$users.getById(this.$route.params.id);
-      this.user.ogust = await this.$ogust.getCustomerById(this.user.alenvi.customer_id);
+      this.contacts = await this.$ogust.getContacts({ email: this.user.alenvi.local.email });
+      this.user.ogust = this.contacts['0'];
     } catch (e) {
       console.error(e);
     }
@@ -127,10 +129,11 @@ export default {
     async updateUser () {
       try {
         const userToSendOgust = {
+          id_interloc: this.user.ogust.id_interloc,
           first_name: this.user.alenvi.firstname,
           last_name: this.user.alenvi.lastname,
           email: this.user.alenvi.local.email,
-          mobile_phone: this.user.ogust.mobile_phone,
+          mobile: this.user.ogust.mobile,
           landline: this.user.ogust.landline
         };
         const userToSendAlenvi = {
@@ -142,7 +145,7 @@ export default {
             password: this.user.credentials.password
           }
         };
-        await this.$ogust.editOgustCustomer(null, this.user.alenvi.customer_id, userToSendOgust);
+        await this.$ogust.setContact(userToSendOgust);
         await this.$users.updateById(userToSendAlenvi);
         this.$q.notify({
           color: 'positive',
