@@ -16,7 +16,7 @@
           <q-input v-model="user.alenvi.local.email" stack-label="Email" @blur="$v.user.alenvi.local.email.$touch" placeholder="à compléter" :disable="!isEditMode"/>
         </q-field>
         <q-field icon="smartphone">
-          <q-input v-model="user.ogust.mobile_phone" stack-label="Téléphone mobile" placeholder="à compléter" :disable="!isEditMode"/>
+          <q-input v-model="user.ogust.mobile" stack-label="Téléphone mobile" placeholder="à compléter" :disable="!isEditMode"/>
         </q-field>
         <q-field icon="local phone">
           <q-input v-model="user.ogust.landline" stack-label="Téléphone fixe" placeholder="à compléter" :disable="!isEditMode"/>
