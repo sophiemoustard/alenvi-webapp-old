@@ -123,7 +123,8 @@ module.exports = function (ctx) {
         'QUploader',
         'QToggle',
         'QChipsInput',
-        'QCollapsible'
+        'QCollapsible',
+        'QBtnToggle'
       ],
       directives: [
         'Ripple'
