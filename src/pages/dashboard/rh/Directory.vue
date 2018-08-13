@@ -20,25 +20,23 @@
       row-key="name"
       :rows-per-page-options="[15, 25, 35]"
       :pagination.sync="pagination"
-      dense
       rows-per-page-label="Lignes"
       :pagination-label="paginationLabel"
       no-data-label="Données non disponibles"
       no-results-label="Pas de résultats">
-      <q-tr slot="body" slot-scope="props" :props="props" class="datatable-row">
-        <q-td v-for="col in props.cols" :key="col.name" :props="props" class="datatable-cell">
+      <q-tr slot="body" slot-scope="props" :props="props" :class="['datatable-row', { 'datatable-row-inactive': !props.row.isActive }]">
+        <q-td v-for="col in props.cols"
+          :key="col.name"
+          :props="props">
           <q-item v-if="col.name === 'name'">
             <q-item-side :avatar="col.value.picture" />
             <q-item-main :label="col.value.name" />
           </q-item>
+          <template v-else-if="col.name === 'active'">
+            <div :class="{ activeDot: col.value, inactiveDot: !col.value }"></div>
+          </template>
           <template v-else>{{ col.value }}</template>
         </q-td>
-        <!-- <q-td slot="body-cell-name" :props="props" v-else>
-          <q-item>
-            <q-item-side :avatar="col.value.picture" />
-            <q-item-main :label="col.value.name" />
-          </q-item>
-        </q-td> -->
       </q-tr>
     </q-table>
   </div>
@@ -80,12 +78,20 @@ export default {
           field: 'sector',
           align: 'left',
           sortable: true
+        },
+        {
+          name: 'active',
+          label: '',
+          field: 'isActive',
+          align: 'right',
+          sortable: true
         }
       ]
     }
   },
   mounted () {
     this.getUserList();
+    console.log(this.props);
   },
   computed: {
     activeUserList () {
@@ -149,29 +155,62 @@ export default {
     box-shadow: none
 
   /deep/ .q-table
-    border-spacing: 0 3px
+    border-spacing: 0 12px
+    border-collapse: separate
+    &-horizontal-separator tbody td
+      border: none
     & thead
       border: none
-
-  /deep/ .q-table th.sortable:hover .q-icon, .q-table th.sorted
-    color: $primary
-
-  /deep/ td
-   & .q-item
-     padding: 8px 16px 8px 0px
-     & .q-item-side
-       & .q-item-avatar
-         width: 30px
-         height: 30px
-
-  .datatable-cell
-    background: white
-    border-bottom: 12px solid transparent
+    & th
+      padding: 8px 12px
+      &.sortable:hover .q-icon, &.sorted .q-icon
+        color: $primary
+    & td
+      padding: 8px 12px
+      & .q-item
+        // padding: 8px 16px 8px 0px
+        min-height: 30px
+        padding: 0
+        & .q-item-side
+          min-width: 30px
+          max-height: 30px
+          & .q-item-avatar
+            width: 29px
+            height: 29px
+            border: 1px solid #979797
+        & .q-item-section + .q-item-section
+          margin-left: 20px
 
   .datatable-row
     cursor: pointer
-    transition: 0.8s cubic-bezier(0.25, 0.8, 0.5, 1)
+    background: $white
     &:hover
-      box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .2)
+      background: $white
+      box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.2)
+      & td
+        border-top: 1px solid $light-grey
+        border-bottom: 1px solid $light-grey
+        &:first-child
+          border-left: 1px solid $light-grey
+        &:last-child
+          border-right: 1px solid $light-grey
+    &-inactive
+      background: rgba(255, 255, 255, 0.5)
+      &:hover
+        background: rgba(255, 255, 255, 0.5)
+
+  .activeDot
+    background: $tertiary
+    width: 9px
+    height: 9px
+    border-radius: 50%
+    display: inline-block
+
+  .inactiveDot
+    background: $primary-dark
+    width: 9px
+    height: 9px
+    border-radius: 50%
+    display: inline-block
 
 </style>
