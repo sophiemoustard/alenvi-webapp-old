@@ -1,14 +1,13 @@
 <template>
-  <q-field :icon="icon" helper="Choix communauté (si elle n'est pas disponible, il faut la créer dans Ogust)">
-    <q-select :value="value" ref="selectSector" @change="updateSector" :options="orderedSectors" separator />
-  </q-field>
+  <q-select :value="value" :stack-label="stackLabel" ref="selectSector" @change="updateSector" :options="orderedSectors" separator />
 </template>
 
 <script>
 import _ from 'lodash';
 
 export default {
-  props: ['value', 'icon'],
+  name: 'SelectSector',
+  props: ['value', 'icon', 'stackLabel'],
   data () {
     return {
       sectors: []
