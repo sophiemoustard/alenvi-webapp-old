@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 
 import main from './main';
 import calendar from './calendar';
+import rh from './rh';
 // import example from './module-example'
 
 Vue.use(Vuex)
@@ -31,7 +32,8 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
   modules: {
     main,
-    calendar
+    calendar,
+    rh
   }
 });
 
