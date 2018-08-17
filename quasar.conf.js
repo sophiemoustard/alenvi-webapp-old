@@ -111,6 +111,7 @@ module.exports = function (ctx) {
         'QTabs',
         'QTab',
         'QTabPane',
+        'QRouteTab',
         'QModal',
         'QAutocomplete',
         'QScrollObservable',
