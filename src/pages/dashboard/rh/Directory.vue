@@ -24,7 +24,12 @@
       :pagination-label="paginationLabel"
       no-data-label="Données non disponibles"
       no-results-label="Pas de résultats">
-      <q-tr slot="body" slot-scope="props" :props="props" :class="['datatable-row', { 'datatable-row-inactive': !props.row.isActive }]">
+      <q-tr
+        slot="body"
+        slot-scope="props"
+        :props="props"
+        :class="['datatable-row', { 'datatable-row-inactive': !props.row.isActive }]"
+        @click.native="goToUserProfile(props.row.auxiliary._id)">
         <q-td v-for="col in props.cols"
           :key="col.name"
           :props="props">
@@ -39,10 +44,13 @@
         </q-td>
       </q-tr>
     </q-table>
+    <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Ajouter une personne" />
   </div>
 </template>
 
 <script>
+import { getUserStartDate } from '../../../helpers/getUserStartDate';
+
 export default {
   data () {
     return {
@@ -91,7 +99,6 @@ export default {
   },
   mounted () {
     this.getUserList();
-    console.log(this.props);
   },
   computed: {
     activeUserList () {
@@ -110,13 +117,13 @@ export default {
         const users = await this.$users.showAll({ role: 'Auxiliaire' });
         const sectors = await this.$ogust.getList('employee.sector');
         this.userList = users.map((user) => {
-          const startDates = user.administrative.contracts.map(contract => this.$moment(contract.startDate, 'DD/MM/YYYY'));
           return {
             auxiliary: {
+              _id: user._id,
               name: `${user.firstname} ${user.lastname}`,
               picture: user.picture.link
             },
-            startDate: this.$moment.min(startDates).format('DD/MM/YYYY'),
+            startDate: getUserStartDate(user.administrative.contracts),
             sector: sectors[user.sector],
             isActive: user.isActive
           }
@@ -127,6 +134,9 @@ export default {
     },
     paginationLabel (start, end, total) {
       return `${start} - ${end} de ${total}`;
+    },
+    goToUserProfile (userId) {
+      this.$router.push({ name: 'directory profile', params: { id: userId } });
     }
   }
 }
@@ -212,5 +222,10 @@ export default {
     height: 9px
     border-radius: 50%
     display: inline-block
+
+  .fab-add-person
+    right: 60px
+    bottom: 18px
+    font-size: 16px
 
 </style>
