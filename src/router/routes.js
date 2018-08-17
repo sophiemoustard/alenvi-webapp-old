@@ -198,6 +198,30 @@ const routes = [
               cookies: ['alenvi_token', 'refresh_token'],
               parent: 'rh'
             }
+          },
+          {
+            path: 'directory/profile/:id',
+            name: 'directory profile',
+            component: () => import('pages/dashboard/rh/profile/Profile'),
+            props: true,
+            redirect: {
+              name: 'profile info'
+            },
+            meta: {
+              cookies: ['alenvi_token', 'refresh_token'],
+              parent: 'rh'
+            },
+            children: [
+              {
+                path: 'info',
+                name: 'profile info',
+                component: () => import('pages/dashboard/rh/profile/ProfileInfo'),
+                meta: {
+                  cookies: ['alenvi_token', 'refresh_token'],
+                  parent: 'rh'
+                }
+              }
+            ]
           }
         ]
       },
