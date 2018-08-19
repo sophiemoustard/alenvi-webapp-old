@@ -1,5 +1,5 @@
 <template>
-  <q-select :value="value" :stack-label="stackLabel" ref="selectMentor" @change="updateMentor" :options="orderedMentors" separator />
+  <q-select :value="value" color="white" inverted-light :stack-label="stackLabel" ref="selectMentor" @change="updateMentor" :options="orderedMentors" separator />
 </template>
 
 <script>
