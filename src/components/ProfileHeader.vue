@@ -41,10 +41,10 @@ import { mapGetters } from 'vuex';
 import { getUserStartDate } from '../helpers/getUserStartDate';
 export default {
   name: 'ProfileHeader',
-  props: ['user'],
   computed: {
     ...mapGetters({
-      currentUser: 'main/user'
+      currentUser: 'main/user',
+      user: 'rh/getUserProfile'
     }),
     userStatus () {
       if (this.user.isActive) return 'Profil actif';

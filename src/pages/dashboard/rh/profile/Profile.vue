@@ -1,13 +1,13 @@
 <template>
   <div>
-    <profile-header :user="user" class="header-margin" />
+    <profile-header class="header-margin" />
     <profile-tabs :tabsContent="tabsContent" />
     <router-view></router-view>
   </div>
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
+import { mapActions } from 'vuex'
 
 import ProfileHeader from '../../../../components/ProfileHeader'
 import ProfileTabs from '../../../../components/ProfileTabs'
@@ -20,7 +20,6 @@ export default {
   },
   data () {
     return {
-      user: null,
       tabsContent: [
         {
           label: 'Profil',
@@ -42,12 +41,11 @@ export default {
     }
   },
   async mounted () {
-    this.user = await this.$users.getById(this.id);
-    this.saveUserProfile(this.user);
+    this.getUserProfile(this.id);
   },
   methods: {
-    ...mapMutations({
-      saveUserProfile: 'rh/saveUserProfile'
+    ...mapActions({
+      getUserProfile: 'rh/getUserProfile'
     })
   }
 }
