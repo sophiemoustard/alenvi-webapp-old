@@ -8,7 +8,7 @@
         <q-search v-model="searchStr" placeholder="Rechercher un profil" color="white" inverted-light />
       </div>
       <div class="col-xs-12 col-md-1 row justify-end">
-        <q-btn text-color="dark-grey" color="white" class="btn-directory" @click="activeUsers = !activeUsers" size="form-inverted" push>
+        <q-btn text-color="dark-grey" color="white" class="btn-directory" @click="activeUsers = !activeUsers" size="form-inverted">
           <q-icon :class="{ 'btn-icon-disabled': activeUsers, 'btn-icon-enabled': !activeUsers }" name="visibility" />
           <div class="col-12" style="font-size: 9px">Inactifs</div>
         </q-btn>
@@ -163,6 +163,18 @@ export default {
 
   .q-table-container
     box-shadow: none
+
+  /deep/ .q-btn
+    box-shadow: none
+    &.q-focusable:focus > .q-focus-helper
+      background: transparent
+      box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5)
+
+  /deep/ .q-if-inverted
+    box-shadow: none
+
+  /deep/ .q-if-focused
+    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.2)
 
   /deep/ .q-table
     border-spacing: 0 12px
