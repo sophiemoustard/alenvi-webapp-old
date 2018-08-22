@@ -1,5 +1,5 @@
 <template>
-  <q-select :value="value" color="white" inverted-light :stack-label="stackLabel" ref="selectMentor" @change="updateMentor" :options="orderedMentors" separator />
+  <q-select :value="value" color="white" inverted-light :stack-label="stackLabel" ref="selectMentor" @change="updateMentor" @blur="blurHandler" :options="orderedMentors" separator />
 </template>
 
 <script>
@@ -37,6 +37,9 @@ export default {
     },
     updateMentor (value) {
       this.$emit('input', value);
+    },
+    blurHandler () {
+      this.$emit('myBlur');
     }
   }
 };
