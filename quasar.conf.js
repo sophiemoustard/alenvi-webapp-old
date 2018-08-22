@@ -24,6 +24,7 @@ module.exports = function (ctx) {
       'can',
       'lodash',
       'vue-croppa',
+      'vMask',
       process.env.NODE_ENV === 'production' ? 'vue-analytics' : null
     ],
     css: [
@@ -125,7 +126,8 @@ module.exports = function (ctx) {
         'QToggle',
         'QChipsInput',
         'QCollapsible',
-        'QBtnToggle'
+        'QBtnToggle',
+        'QOptionGroup'
       ],
       directives: [
         'Ripple'
