@@ -7,7 +7,7 @@
       </div>
       <div class="col-xs-12 col-md-6">
         <p class="input-caption">Marraine/parrain</p>
-        <select-mentor v-model="user.alenvi.mentor" :sector="user.alenvi.sector" @myBlur="updateUser({ alenvi: 'mentor' })"/>
+        <select-mentor v-model="user.alenvi.mentor" :sector="user.alenvi.sector" @myBlur="updateUser({ alenvi: 'mentor' })" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -17,45 +17,33 @@
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Nationalité</p>
-          <q-field>
-            <q-select v-model="user.alenvi.administrative.identity.nationality" color="white" inverted-light :options="nationalitiesOptions"
-             @blur="updateUser({ alenvi: 'administrative.identity.nationality', ogust: 'nationality' })"
-            />
-          </q-field>
+          <q-select v-model="user.alenvi.administrative.identity.nationality" color="white" inverted-light :options="nationalitiesOptions"
+            @blur="updateUser({ alenvi: 'administrative.identity.nationality', ogust: 'nationality' })" />
         </div>
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Date de naissance</p>
-          <q-field>
-            <q-datetime type="date" format="DD/MM/YYYY" v-model="user.alenvi.administrative.identity.dateOfBirth" color="white" inverted-light
-             @blur="updateUser({ alenvi: 'administrative.identity.dateOfBirth', ogust: 'date_of_birth' })"
-            />
-          </q-field>
+          <q-datetime type="date" format="DD/MM/YYYY" v-model="user.alenvi.administrative.identity.dateOfBirth" color="white" inverted-light
+            @blur="updateUser({ alenvi: 'administrative.identity.dateOfBirth', ogust: 'date_of_birth' })" />
         </div>
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Pays de naissance</p>
-          <q-field>
-            <q-select v-model="user.alenvi.administrative.identity.birthCountry" :options="countriesOptions" color="white" inverted-light
-             @blur="updateUser({ alenvi: 'administrative.identity.birthCountry', ogust: 'country_of_birth' })"
-            />
-          </q-field>
+          <q-select v-model="user.alenvi.administrative.identity.birthCountry" :options="countriesOptions" color="white" inverted-light
+            @blur="updateUser({ alenvi: 'administrative.identity.birthCountry', ogust: 'country_of_birth' })" />
         </div>
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Département de naissance</p>
-          <q-field>
-            <q-input v-model="user.alenvi.administrative.identity.birthState" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.identity.birthState', ogust: 'state_of_birth' })" />
-          </q-field>
+          <q-input v-model="user.alenvi.administrative.identity.birthState" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.identity.birthState', ogust: 'state_of_birth' })"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Ville de naissance</p>
-          <q-field>
-            <q-input v-model="user.alenvi.administrative.identity.birthCity" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.identity.birthCity', ogust: 'place_of_birth' })" />
-          </q-field>
+          <q-input v-model="user.alenvi.administrative.identity.birthCity" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.identity.birthCity', ogust: 'place_of_birth' })"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Numéro de sécurité sociale</p>
-          <q-field>
-            <q-input v-model="user.alenvi.administrative.identity.socialSecurityNumber" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.identity.socialSecurityNumber', ogust: 'social_insurance_number' })" />
-          </q-field>
+          <q-input v-model="user.alenvi.administrative.identity.socialSecurityNumber" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.identity.socialSecurityNumber', ogust: 'social_insurance_number' })"
+          />
         </div>
       </div>
     </div>
@@ -66,39 +54,33 @@
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Numéro de téléphone</p>
-          <q-field>
-            <q-input v-model.trim="user.alenvi.mobilePhone" color="white" inverted-light @blur="updateUser({ alenvi: 'mobilePhone', ogust: 'mobile_phone' })" />
-          </q-field>
+          <q-input v-model.trim="user.alenvi.mobilePhone" color="white" inverted-light @blur="updateUser({ alenvi: 'mobilePhone', ogust: 'mobile_phone' })"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Adresse email</p>
-          <q-field>
-            <q-input lower-case v-model.trim="user.alenvi.local.email" color="white" inverted-light @blur="updateUser({ alenvi: 'local.email', ogust: 'email' })" />
-          </q-field>
+          <q-input lower-case v-model.trim="user.alenvi.local.email" color="white" inverted-light @blur="updateUser({ alenvi: 'local.email', ogust: 'email' })"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Adresse, numéro et rue</p>
-          <q-field>
-            <q-input v-model="user.alenvi.administrative.contact.address" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.contact.address', ogust: 'main_address.line' })" />
-          </q-field>
+          <q-input v-model="user.alenvi.administrative.contact.address" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.contact.address', ogust: 'main_address.line' })"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Complément d'adresse</p>
-          <q-field>
-            <q-input v-model="user.alenvi.administrative.contact.additionalAddress" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.contact.additionalAddress', ogust: 'main_address.supplement' })" />
-          </q-field>
+          <q-input v-model="user.alenvi.administrative.contact.additionalAddress" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.contact.additionalAddress', ogust: 'main_address.supplement' })"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Code postal</p>
-          <q-field>
-            <q-input v-model="user.alenvi.administrative.contact.zipCode" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.contact.zipCode', ogust: 'main_address.zip' })" />
-          </q-field>
+          <q-input v-model="user.alenvi.administrative.contact.zipCode" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.contact.zipCode', ogust: 'main_address.zip' })"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Ville</p>
-          <q-field>
-            <q-input v-model="user.alenvi.administrative.contact.city" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.contact.city', ogust: 'main_address.city' })" />
-          </q-field>
+          <q-input v-model="user.alenvi.administrative.contact.city" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.contact.city', ogust: 'main_address.city' })"
+          />
         </div>
       </div>
     </div>
@@ -109,15 +91,13 @@
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Prénom et nom</p>
-          <q-field>
-            <q-input v-model="user.alenvi.administrative.emergencyContact.name" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.emergencyContact.name' })" />
-          </q-field>
+          <q-input v-model="user.alenvi.administrative.emergencyContact.name" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.emergencyContact.name' })"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Numéro de téléphone</p>
-          <q-field>
-            <q-input v-model.trim="user.alenvi.administrative.emergencyContact.phoneNumber" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.emergencyContact.phoneNumber' })" />
-          </q-field>
+          <q-input v-model.trim="user.alenvi.administrative.emergencyContact.phoneNumber" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.emergencyContact.phoneNumber' })"
+          />
         </div>
       </div>
     </div>
@@ -128,15 +108,14 @@
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">IBAN</p>
-          <q-field>
-            <q-input upper-case v-mask="'SS## #### #### #### #### #### ###'" v-model.trim="user.alenvi.administrative.payment.rib.iban" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.payment.rib.iban', ogust: 'iban_number' })" />
-          </q-field>
+          <q-input upper-case v-mask="'SS## #### #### #### #### #### ###'" v-model.trim="user.alenvi.administrative.payment.rib.iban"
+            color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.payment.rib.iban', ogust: 'iban_number' })"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">BIC</p>
-          <q-field>
-            <q-input upper-case v-model="user.alenvi.administrative.payment.rib.bic" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.payment.rib.bic', ogust: 'bic_number' })" />
-          </q-field>
+          <q-input upper-case v-model="user.alenvi.administrative.payment.rib.bic" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.payment.rib.bic', ogust: 'bic_number' })"
+          />
         </div>
       </div>
     </div>
@@ -151,14 +130,14 @@
             style="background: white">
             <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.idCardRecto.driveId)" alt="cni verso">
             <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.idCardRecto.driveId, 'administrative.idCardRecto')"  />
+              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.idCardRecto.driveId, 'administrative.idCardRecto')"
+              />
             </div>
           </div>
           <q-field v-if="!user.alenvi.administrative.idCardRecto.driveId">
-          <q-uploader ref="idCardRecto" name="idCardRecto" :url="docsUploadUrl" :headers="headers"
-            :additional-fields="[{ name: 'fileName', value: `cni_recto_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
-            hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light hide-upload-button
-            @add="uploadDocument('idCardRecto')" @finish="refreshUser" />
+            <q-uploader ref="idCardRecto" name="idCardRecto" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `cni_recto_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
+              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
+              hide-upload-button @add="uploadDocument('idCardRecto')" @finish="refreshUser" />
           </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
@@ -167,14 +146,14 @@
             style="background: white">
             <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.idCardVerso.driveId)" alt="cni verso">
             <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.idCardVerso.driveId, 'administrative.idCardVerso')" />
+              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.idCardVerso.driveId, 'administrative.idCardVerso')"
+              />
             </div>
           </div>
           <q-field v-if="!user.alenvi.administrative.idCardVerso.driveId">
-          <q-uploader ref="idCardVerso" name="idCardVerso" :url="docsUploadUrl" :headers="headers"
-            :additional-fields="[{ name: 'fileName', value: `cni_verso_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
-            hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light hide-upload-button
-            @add="uploadDocument('idCardVerso')" @finish="refreshUser" />
+            <q-uploader ref="idCardVerso" name="idCardVerso" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `cni_verso_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
+              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
+              hide-upload-button @add="uploadDocument('idCardVerso')" @finish="refreshUser" />
             <!-- <q-uploader url="test" color="white" inverted-light /> -->
           </q-field>
         </div>
@@ -186,14 +165,14 @@
             style="background: white">
             <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.healthAttest.driveId)" alt="cni verso">
             <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.healthAttest.driveId, 'administrative.healthAttest')"  />
+              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.healthAttest.driveId, 'administrative.healthAttest')"
+              />
             </div>
           </div>
           <q-field v-if="!user.alenvi.administrative.healthAttest.driveId">
-          <q-uploader ref="healthAttest" name="healthAttest" :url="docsUploadUrl" :headers="headers"
-            :additional-fields="[{ name: 'fileName', value: `assurance_maladie_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
-            hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light hide-upload-button
-            @add="uploadDocument('healthAttest')" @finish="refreshUser" />
+            <q-uploader ref="healthAttest" name="healthAttest" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `assurance_maladie_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
+              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
+              hide-upload-button @add="uploadDocument('healthAttest')" @finish="refreshUser" />
           </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
@@ -202,31 +181,32 @@
             style="background: white">
             <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.phoneInvoice.driveId)" alt="cni verso">
             <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')"   />
+              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')"
+              />
             </div>
           </div>
           <q-field v-if="!user.alenvi.administrative.phoneInvoice.driveId">
-          <q-uploader ref="phoneInvoice" name="phoneInvoice" :url="docsUploadUrl" :headers="headers"
-            :additional-fields="[{ name: 'fileName', value: `facture_telephone_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
-            hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light hide-upload-button
-            @add="uploadDocument('phoneInvoice')" @finish="refreshUser" />
+            <q-uploader ref="phoneInvoice" name="phoneInvoice" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `facture_telephone_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
+              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
+              hide-upload-button @add="uploadDocument('phoneInvoice')" @finish="refreshUser" />
           </q-field>
         </div>
         <div class="col-xs-12">
           <p class="input-caption col-xs-12">Diplome(s) ou certificats(s)</p>
           <q-field>
-          <q-uploader ref="certificates" name="certificates" :url="docsUploadUrl" :headers="headers"
-            :additional-fields="[{ name: 'fileName', value: `diplomes_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
-            hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light hide-upload-button
-            @add="uploadDocument('certificates')" @finish="refreshUser" />
+            <q-uploader ref="certificates" name="certificates" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `diplomes_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
+              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
+              hide-upload-button @add="uploadDocument('certificates')" @finish="refreshUser" />
           </q-field>
         </div>
-        <div v-if="user.alenvi.administrative.certificates && user.alenvi.administrative.certificates.length > 0" class="col-xs-12 col-md-6" v-for="(certificate, index) in user.alenvi.administrative.certificates" :key="index">
+        <div v-if="user.alenvi.administrative.certificates && user.alenvi.administrative.certificates.length > 0" class="col-xs-12 col-md-6"
+          v-for="(certificate, index) in user.alenvi.administrative.certificates" :key="index">
           <p class="input-caption col-xs-12">Diplome(s) ou certificats(s) ({{ index + 1 }})</p>
           <div v-if="certificate.driveId" class="row justify-between" style="background: white">
             <img class="doc-thumbnail" :src="getThumbnailUrl(certificate.driveId)" alt="cni verso">
             <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(certificate.driveId, 'certificates')" />
+              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(certificate.driveId, 'certificates')"
+              />
             </div>
           </div>
         </div>
@@ -240,34 +220,26 @@
         <div class="col-xs-12">
           <p class="input-caption">Voulez-vous adhérer à la mutuelle d'entreprise ?</p>
           <!-- <div class="row"> -->
-            <q-btn-toggle
-              class="full-width"
-              color="white"
-              text-color="black"
-              toggle-color="primary"
-              v-model="user.alenvi.administrative.mutualFund.has"
-              @input="updateUser({ alenvi: 'administrative.mutualFund.has' })"
-              :options="[
+          <q-btn-toggle class="full-width" color="white" text-color="black" toggle-color="primary" v-model="user.alenvi.administrative.mutualFund.has"
+            @input="updateUser({ alenvi: 'administrative.mutualFund.has' })" :options="[
                 { label: 'Oui', value: false },
                 { label: 'Non', value: true }
               ]" />
           <!-- </div> -->
           <div v-if="user.alenvi.administrative.mutualFund && user.alenvi.administrative.mutualFund.driveId" class="row justify-between"
-          style="background: white; margin-top: 24px;">
+            style="background: white; margin-top: 24px;">
             <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.mutualFund.driveId)" alt="cni verso">
             <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.mutualFund.driveId, 'administrative.mutualFund')" />
+              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.mutualFund.driveId, 'administrative.mutualFund')"
+              />
             </div>
           </div>
         </div>
         <div v-if="user.alenvi.administrative.mutualFund.has && !user.alenvi.administrative.mutualFund.driveId" class="col-xs-12">
           <p class="input-caption">Merci de nous transmettre le document mentionnant le fait que vous refusez la mutuelle Alenvi</p>
-          <q-field>
-          <q-uploader ref="mutualFund" name="mutualFund" :url="docsUploadUrl" :headers="headers"
-            :additional-fields="[{ name: 'fileName', value: `mutuelle_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
-            hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light hide-upload-button
-            @add="uploadDocument('mutualFund')" @finish="refreshUser" />
-          </q-field>
+          <q-uploader ref="mutualFund" name="mutualFund" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `mutuelle_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
+            hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
+            hide-upload-button @add="uploadDocument('mutualFund')" @finish="refreshUser" />
         </div>
       </div>
     </div>
@@ -278,11 +250,8 @@
       <div class="row gutter-profile-x">
         <div class="col-xs-12">
           <p class="input-caption">Avez-vous un abonnement de transports en commun ?</p>
-            <q-option-group
-              color="primary"
-              v-model="user.alenvi.administrative.transportInvoice.type"
-              @input="updateUser({ alenvi: 'administrative.transportInvoice.type' })"
-              :options="[
+          <q-option-group color="primary" v-model="user.alenvi.administrative.transportInvoice.type" @input="updateUser({ alenvi: 'administrative.transportInvoice.type' })"
+            :options="[
                 { label: 'Abonnement transports en commun', value: 'public' },
                 { label: 'Voiture personnelle', value: 'private' },
                 { label: 'Aucun', value: 'none' }
@@ -290,9 +259,9 @@
         </div>
         <div v-if="user.alenvi.administrative.transportInvoice.type === 'public'" class="col-xs-12">
           <p class="input-caption">Merci de nous transmettre votre justificatif d'abonnement</p>
-          <q-field>
-            <q-uploader url="test" color="white" inverted-light />
-          </q-field>
+          <q-uploader ref="transportInvoice" name="transportInvoice" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `justif_transport_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
+            hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
+            hide-upload-button @add="uploadDocument('transportInvoice')" @finish="refreshUser" />
         </div>
       </div>
     </div>
@@ -532,24 +501,24 @@ export default {
       & > div
         padding-top: 24px
 
-  .q-if /deep/
-    & .q-if-label
-      color: $dark-grey
+  // .q-if /deep/
+  //   & .q-if-label
+  //     color: $dark-grey
 
-  /deep/ .q-if
-    &-inverted
-      box-shadow: none
-      padding: 9px 14px 11px 14px
-    &-focused
-      box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.2)
-    &-baseline
-      line-height: 0
-    & input.q-input-target
-      height: 20px
-      line-height: 20px
-    & .q-if-inner
-      min-height: 20px
-      margin: 0
+  // /deep/ .q-if
+  //   &-inverted
+  //     box-shadow: none
+  //     padding: 9px 14px 11px 14px
+  //   &-focused
+  //     box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.2)
+  //   &-baseline
+  //     line-height: 0
+  //   & input.q-input-target
+  //     height: 20px
+  //     line-height: 20px
+  //   & .q-if-inner
+  //     min-height: 20px
+  //     margin: 0
 
   // /deep/ .q-if-focused
   //   box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.2)
