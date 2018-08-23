@@ -151,11 +151,14 @@
             style="background: white">
             <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.idCardRecto.driveId)" alt="cni verso">
             <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" />
+              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.idCardRecto.driveId, 'administrative.idCardRecto')"  />
             </div>
           </div>
-          <q-field v-if="!user.alenvi.administrative.idCardRecto">
-            <q-uploader url="test" color="white" inverted-light />
+          <q-field v-if="!user.alenvi.administrative.idCardRecto.driveId">
+          <q-uploader ref="idCardRecto" name="idCardRecto" :url="docsUploadUrl" :headers="headers"
+            :additional-fields="[{ name: 'fileName', value: `cni_recto_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
+            hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light hide-upload-button
+            @add="uploadDocument('idCardRecto')" @finish="refreshUser" />
           </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
@@ -164,14 +167,14 @@
             style="background: white">
             <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.idCardVerso.driveId)" alt="cni verso">
             <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" />
+              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.idCardVerso.driveId, 'administrative.idCardVerso')" />
             </div>
           </div>
-          <q-field v-if="!user.alenvi.administrative.idCardVerso">
+          <q-field v-if="!user.alenvi.administrative.idCardVerso.driveId">
           <q-uploader ref="idCardVerso" name="idCardVerso" :url="docsUploadUrl" :headers="headers"
             :additional-fields="[{ name: 'fileName', value: `cni_verso_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
             hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light hide-upload-button
-            @add="$refs.idCardVerso.upload()" />
+            @add="uploadDocument('idCardVerso')" @finish="refreshUser" />
             <!-- <q-uploader url="test" color="white" inverted-light /> -->
           </q-field>
         </div>
@@ -183,38 +186,47 @@
             style="background: white">
             <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.healthAttest.driveId)" alt="cni verso">
             <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" />
+              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.healthAttest.driveId, 'administrative.healthAttest')"  />
             </div>
           </div>
-          <q-field v-if="!user.alenvi.administrative.healthAttest">
-            <q-uploader url="test" color="white" inverted-light />
+          <q-field v-if="!user.alenvi.administrative.healthAttest.driveId">
+          <q-uploader ref="healthAttest" name="healthAttest" :url="docsUploadUrl" :headers="headers"
+            :additional-fields="[{ name: 'fileName', value: `assurance_maladie_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
+            hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light hide-upload-button
+            @add="uploadDocument('healthAttest')" @finish="refreshUser" />
           </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Facture téléphonique</p>
-          <div v-if="user.alenvi.administrative.idCardVerso && user.alenvi.administrative.idCardVerso.driveId" class="row justify-between"
+          <div v-if="user.alenvi.administrative.phoneInvoice && user.alenvi.administrative.phoneInvoice.driveId" class="row justify-between"
             style="background: white">
-            <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.idCardVerso.driveId)" alt="cni verso">
+            <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.phoneInvoice.driveId)" alt="cni verso">
             <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" />
+              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')"   />
             </div>
           </div>
-          <q-field v-if="!user.alenvi.administrative.idCardVerso">
-            <q-uploader url="test" color="white" inverted-light />
+          <q-field v-if="!user.alenvi.administrative.phoneInvoice.driveId">
+          <q-uploader ref="phoneInvoice" name="phoneInvoice" :url="docsUploadUrl" :headers="headers"
+            :additional-fields="[{ name: 'fileName', value: `facture_telephone_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
+            hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light hide-upload-button
+            @add="uploadDocument('phoneInvoice')" @finish="refreshUser" />
           </q-field>
         </div>
         <div class="col-xs-12">
           <p class="input-caption col-xs-12">Diplome(s) ou certificats(s)</p>
           <q-field>
-            <q-uploader url="test" color="white" inverted-light />
+          <q-uploader ref="certificates" name="certificates" :url="docsUploadUrl" :headers="headers"
+            :additional-fields="[{ name: 'fileName', value: `diplomes_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
+            hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light hide-upload-button
+            @add="uploadDocument('certificates')" @finish="refreshUser" />
           </q-field>
         </div>
-        <div v-if="user.alenvi.administrative.certificates && user.alenvi.administrative.certificates.docs.length > 0" class="col-xs-12 col-md-6" v-for="(certificate, index) in user.alenvi.administrative.certificates.docs" :key="index">
+        <div v-if="user.alenvi.administrative.certificates && user.alenvi.administrative.certificates.length > 0" class="col-xs-12 col-md-6" v-for="(certificate, index) in user.alenvi.administrative.certificates" :key="index">
           <p class="input-caption col-xs-12">Diplome(s) ou certificats(s) ({{ index + 1 }})</p>
           <div v-if="certificate.driveId" class="row justify-between" style="background: white">
             <img class="doc-thumbnail" :src="getThumbnailUrl(certificate.driveId)" alt="cni verso">
             <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" />
+              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(certificate.driveId, 'certificates')" />
             </div>
           </div>
         </div>
@@ -240,11 +252,21 @@
                 { label: 'Non', value: true }
               ]" />
           <!-- </div> -->
+          <div v-if="user.alenvi.administrative.mutualFund && user.alenvi.administrative.mutualFund.driveId" class="row justify-between"
+          style="background: white; margin-top: 24px;">
+            <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.mutualFund.driveId)" alt="cni verso">
+            <div class="self-end doc-delete">
+              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.mutualFund.driveId, 'administrative.mutualFund')" />
+            </div>
+          </div>
         </div>
-        <div v-if="user.alenvi.administrative.mutualFund.has" class="col-xs-12">
+        <div v-if="user.alenvi.administrative.mutualFund.has && !user.alenvi.administrative.mutualFund.driveId" class="col-xs-12">
           <p class="input-caption">Merci de nous transmettre le document mentionnant le fait que vous refusez la mutuelle Alenvi</p>
           <q-field>
-            <q-uploader url="test" color="white" inverted-light />
+          <q-uploader ref="mutualFund" name="mutualFund" :url="docsUploadUrl" :headers="headers"
+            :additional-fields="[{ name: 'fileName', value: `mutuelle_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
+            hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light hide-upload-button
+            @add="uploadDocument('mutualFund')" @finish="refreshUser" />
           </q-field>
         </div>
       </div>
@@ -281,11 +303,12 @@
 import { mapGetters } from 'vuex';
 import { Cookies } from 'quasar';
 
-// import gdrive from '../../../../api/googleDrive.js';
+import gdrive from '../../../../api/GoogleDrive.js';
 import nationalities from '../../../../data/nationalities.js';
 import countries from '../../../../data/countries.js';
 import SelectSector from '../../../../components/SelectSector';
 import SelectMentor from '../../../../components/SelectMentor';
+import { extend } from '../../../../helpers/utils.js';
 
 export default {
   components: {
@@ -303,12 +326,13 @@ export default {
               name: '',
               phoneNumber: ''
             },
+            idCardRecto: {},
+            idCardVerso: {},
             mutualFund: {
               has: null
             },
-            certificates: {
-              docs: []
-            },
+            certificates: [],
+            phoneInvoice: {},
             transportInvoice: {
               type: ''
             },
@@ -364,12 +388,10 @@ export default {
   },
   watch: {
     userProfile (value) {
-      this.user.alenvi = Object.assign({}, this.$_.merge(this.user.alenvi, value));
+      // this.user.alenvi = Object.assign({}, this.$_.merge(this.user.alenvi, value));
+      const args = [this.user.alenvi, value];
+      this.user.alenvi = Object.assign({}, extend(true, ...args));
       this.isLoaded = true;
-      console.log('USER', this.user.alenvi);
-    },
-    isLoaded (value) {
-      console.log('isLoaded', value);
     }
   },
   methods: {
@@ -431,7 +453,6 @@ export default {
           value = value.split(' ').join('');
         }
         const payload = this.$_.set({}, paths.ogust, value);
-        // payload.id_employee = this.userProfile.employee_id;
         if (paths.ogust.match(/(iban|bic)_number/i)) {
           payload.id_tiers = this.userProfile.employee_id;
           // await this.$ogust.setEmployeeBankInfo(payload);
@@ -443,6 +464,50 @@ export default {
       } catch (e) {
         console.error(e);
       }
+    },
+    uploadDocument (refName) {
+      this.$refs[refName].upload();
+      this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
+    },
+    async deleteDocument (driveId, path) {
+      try {
+        await gdrive.removeFileById({ id: driveId });
+        let payload = { _id: this.userProfile._id };
+        if (path === 'certificates') {
+          payload = Object.assign(payload, { [`administrative.${path}`]: { driveId } });
+          await this.$users.updateCertificates(payload);
+        } else {
+          payload = this.$_.set(payload, path, { driveId: null, link: null });
+          await this.$users.updateById(payload);
+        }
+        this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
+        this.$q.notify({
+          color: 'positive',
+          icon: 'done',
+          detail: 'Document supprimé',
+          position: 'bottom-left',
+          timeout: 2500
+        });
+      } catch (e) {
+        console.error(e);
+        this.$q.notify({
+          color: 'negative',
+          icon: 'warning',
+          detail: 'Erreur lors de la suppression du document',
+          position: 'bottom-left',
+          timeout: 2500
+        });
+      }
+    },
+    refreshUser () {
+      this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
+      this.$q.notify({
+        color: 'positive',
+        icon: 'done',
+        detail: 'Document envoyé',
+        position: 'bottom-left',
+        timeout: 2500
+      });
     }
   }
 }
