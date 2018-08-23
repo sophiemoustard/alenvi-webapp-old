@@ -1,0 +1,35 @@
+export const extend = (...sources) => {
+  // Variables
+  const extended = {};
+  let deep = false;
+  let i = 0;
+
+  // Check if a deep merge
+  if (typeof (sources[0]) === 'boolean') {
+    deep = sources[0];
+    i++;
+  }
+
+  // Merge the object into the extended object
+  const merge = (obj) => {
+    // console.log('OBJECT', obj);
+    for (const prop in obj) {
+      if (obj.hasOwnProperty(prop)) {
+        if (deep && Object.prototype.toString.call(obj[prop]) === '[object Object]') {
+          // If we're doing a deep merge and the property is an object
+          extended[prop] = extend(true, extended[prop], obj[prop]);
+        } else {
+          // Otherwise, do a regular merge
+          extended[prop] = obj[prop];
+        }
+      }
+    }
+  };
+
+    // Loop through each object and conduct a merge
+  for (; i < sources.length; i++) {
+    merge(sources[i]);
+  }
+
+  return extended;
+};
