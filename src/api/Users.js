@@ -37,6 +37,9 @@ export default {
     }
     return userUpdated;
   },
+  async updateCertificates (data) {
+    await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${data._id}/certificates`, data);
+  },
   async getRoles () {
     const rolesRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/roles`);
     return rolesRaw.data.data.roles;
