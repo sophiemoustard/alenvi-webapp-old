@@ -33,3 +33,18 @@ export const extend = (...sources) => {
 
   return extended;
 };
+
+export const clear = (obj) => {
+  const cleared = {};
+
+  for (const prop in obj) {
+    if (obj.hasOwnProperty(prop)) {
+      if (Object.prototype.toString.call(obj[prop]) === '[object Object]') {
+        cleared[prop] = clear(obj[prop]);
+      } else {
+        cleared[prop] = '';
+      }
+    }
+  }
+  return cleared;
+};
