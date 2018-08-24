@@ -1,5 +1,17 @@
 <template>
-  <q-select :value="value" color="white" inverted-light :stack-label="stackLabel" ref="selectSector" @change="updateSector" :options="orderedSectors" @blur="blurHandler" separator />
+  <q-select
+    :value="value"
+    color="white"
+    :error="errorProp"
+    inverted-light
+    :stack-label="stackLabel"
+    ref="selectSector"
+    @change="updateSector"
+    :options="orderedSectors"
+    @blur="blurHandler"
+    filter
+    filter-placeholder="Rechercher"
+    separator />
 </template>
 
 <script>
@@ -7,7 +19,7 @@ import _ from 'lodash';
 
 export default {
   name: 'SelectSector',
-  props: ['value', 'icon', 'stackLabel'],
+  props: ['value', 'icon', 'stackLabel', 'myError'],
   data () {
     return {
       sectors: []
@@ -19,6 +31,12 @@ export default {
   computed: {
     orderedSectors () {
       return _.sortBy(this.sectors, ['value']);
+    },
+    errorProp () {
+      if (this.myError) {
+        return this.myError
+      }
+      return null
     }
   },
   methods: {
