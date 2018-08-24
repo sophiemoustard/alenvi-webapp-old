@@ -5,10 +5,10 @@
         <h4>Répertoire</h4>
       </div>
       <div class="col-xs-12 col-md-6">
-        <q-search v-model="searchStr" placeholder="Rechercher un profil" color="white" inverted-light />
+        <q-search class="no-border input-search" v-model="searchStr" placeholder="Rechercher un profil" color="white" inverted-light />
       </div>
       <div class="col-xs-12 col-md-1 row justify-end">
-        <q-btn text-color="dark-grey" color="white" class="btn-directory" @click="activeUsers = !activeUsers" size="form-inverted">
+        <q-btn text-color="dark-grey" color="white" class="btn-directory" @click="activeUsers = !activeUsers" style="height: 40px">
           <q-icon :class="{ 'btn-icon-disabled': activeUsers, 'btn-icon-enabled': !activeUsers }" name="visibility" />
           <div class="col-12" style="font-size: 9px">Inactifs</div>
         </q-btn>
@@ -44,16 +44,171 @@
         </q-td>
       </q-tr>
     </q-table>
-    <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Ajouter une personne" />
+    <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Ajouter une personne" @click="opened = true" />
+    <q-modal v-model="opened" @hide="resetForm">
+      <div class="col modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-8">
+            <h5>Créer une nouvelle <span class="text-weight-bold">fiche auxiliaire</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer" style="text-align: right">
+            <span><q-icon name="clear" size="1rem" @click.native="opened = false" /></span>
+          </div>
+        </div>
+        <div class="row margin-input">
+          <div class="col-12">
+            <div class="row justify-between">
+              <p class="input-caption">Civilité</p>
+              <q-icon v-if="$v.newUser.administrative.identity.title.$error" name="error_outline" color="secondary" />
+            </div>
+            <q-select :options="civilityOptions" v-model="newUser.administrative.identity.title" color="white" inverted-light separator :error="$v.newUser.administrative.identity.title.$error"
+              @blur="$v.newUser.administrative.identity.title.$touch" />
+          </div>
+        </div>
+        <div class="row margin-input">
+          <div class="col-12">
+            <div class="row justify-between">
+              <p class="input-caption">Nom</p>
+              <q-icon v-if="$v.newUser.lastname.$error" name="error_outline" color="secondary" />
+            </div>
+            <q-input v-model="newUser.lastname" color="white" inverted-light :error="$v.newUser.lastname.$error"
+              @blur="$v.newUser.lastname.$touch" />
+          </div>
+        </div>
+        <div class="row margin-input">
+          <div class="col-12">
+            <div class="row justify-between">
+              <p class="input-caption">Prénom</p>
+              <q-icon v-if="$v.newUser.firstname.$error" name="error_outline" color="secondary" />
+            </div>
+            <q-input v-model="newUser.firstname" color="white" inverted-light :error="$v.newUser.firstname.$error"
+              @blur="$v.newUser.firstname.$touch" />
+          </div>
+        </div>
+        <div class="row margin-input">
+          <div class="col-12">
+            <div class="row justify-between">
+              <p class="input-caption">Numéro de téléphone</p>
+              <q-icon v-if="$v.newUser.mobilePhone.$error" name="error_outline" color="secondary" />
+            </div>
+            <q-input v-model="newUser.mobilePhone" color="white" inverted-light :error="$v.newUser.mobilePhone.$error"
+              @blur="$v.newUser.mobilePhone.$touch" />
+          </div>
+        </div>
+        <div class="row margin-input">
+          <div class="col-12">
+            <div class="row justify-between">
+              <p class="input-caption">Adresse</p>
+              <q-icon v-if="$v.newUser.administrative.contact.address.$error" name="error_outline" color="secondary" />
+            </div>
+            <q-input v-model="newUser.administrative.contact.address" color="white" inverted-light :error="$v.newUser.administrative.contact.address.$error"
+              @blur="$v.newUser.administrative.contact.address.$touch" />
+          </div>
+        </div>
+        <div class="row margin-input">
+          <div class="col-12">
+            <div class="row justify-between">
+              <p class="input-caption">Code Postal</p>
+              <q-icon v-if="$v.newUser.administrative.contact.zipCode.$error" name="error_outline" color="secondary" />
+            </div>
+            <q-input v-model="newUser.administrative.contact.zipCode" color="white" inverted-light :error="$v.newUser.administrative.contact.zipCode.$error"
+              @blur="$v.newUser.administrative.contact.zipCode.$touch" />
+          </div>
+        </div>
+        <div class="row margin-input">
+          <div class="col-12">
+            <div class="row justify-between">
+              <p class="input-caption">Ville</p>
+              <q-icon v-if="$v.newUser.administrative.contact.city.$error" name="error_outline" color="secondary" />
+            </div>
+            <q-input v-model="newUser.administrative.contact.city" color="white" inverted-light :error="$v.newUser.administrative.contact.city.$error"
+              @blur="$v.newUser.administrative.contact.city.$touch" />
+          </div>
+        </div>
+        <div class="row margin-input">
+          <div class="col-12">
+            <div class="row justify-between">
+              <p class="input-caption">Email</p>
+              <q-icon v-if="$v.newUser.local.email.$error" name="error_outline" color="secondary" />
+            </div>
+            <q-input v-model="newUser.local.email" color="white" inverted-light :error="$v.newUser.local.email.$error"
+              @blur="$v.newUser.local.email.$touch" />
+          </div>
+        </div>
+        <div class="row margin-input">
+          <div class="col-12">
+            <div class="row justify-between">
+              <p class="input-caption">Communauté</p>
+              <q-icon v-if="$v.newUser.sector.$error" name="error_outline" color="secondary" />
+            </div>
+            <select-sector v-model="newUser.sector" :myError="$v.newUser.sector.$error" @myBlur="$v.newUser.sector.$touch"/>
+          </div>
+        </div>
+        <div class="row margin-input last">
+          <div class="col-12">
+            <div class="row justify-between">
+              <p class="input-caption">Géré par</p>
+              <q-icon v-if="$v.newUser.ogustManagerId.$error" name="error_outline" color="secondary" />
+            </div>
+            <select-manager v-model="newUser.ogustManagerId" :myError="$v.newUser.ogustManagerId.$error" @myBlur="$v.newUser.ogustManagerId.$touch"/>
+          </div>
+        </div>
+      </div>
+      <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary" :loading="loading" @click="submit" />
+    </q-modal>
   </div>
 </template>
 
 <script>
+import { required, email, numeric } from 'vuelidate/lib/validators';
+import randomize from 'randomatic';
+
 import { getUserStartDate } from '../../../helpers/getUserStartDate';
+import { clear } from '../../../helpers/utils.js';
+import SelectSector from '../../../components/SelectSector';
+import SelectManager from '../../../components/SelectManager';
 
 export default {
+  components: {
+    SelectSector,
+    SelectManager
+  },
   data () {
     return {
+      loading: false,
+      opened: false,
+      civilityOptions: [
+        {
+          label: 'Monsieur',
+          value: 'M.'
+        },
+        {
+          label: 'Madame',
+          value: 'Mme'
+        }
+      ],
+      newUser: {
+        lastname: '',
+        firstname: '',
+        employee_id: '',
+        mobilePhone: '',
+        local: {
+          email: '',
+          password: ''
+        },
+        sector: '',
+        administrative: {
+          contact: {
+            address: '',
+            city: '',
+            zipCode: ''
+          },
+          identity: {
+            title: ''
+          }
+        },
+        ogustManagerId: ''
+      },
       userList: [],
       searchStr: '',
       activeUsers: true,
@@ -97,6 +252,29 @@ export default {
       ]
     }
   },
+  validations: {
+    newUser: {
+      lastname: { required },
+      firstname: { required },
+      mobilePhone: { required, numeric },
+      administrative: {
+        contact: {
+          address: { required },
+          zipCode: { required, numeric },
+          city: { required }
+        },
+        identity: {
+          title: { required }
+        }
+      },
+      local: {
+        email: { required, email }
+      },
+      sector: { required },
+      ogustManagerId: { required },
+      role: ''
+    }
+  },
   mounted () {
     this.getUserList();
   },
@@ -137,6 +315,84 @@ export default {
     },
     goToUserProfile (userId) {
       this.$router.push({ name: 'directory profile', params: { id: userId } });
+    },
+    resetForm () {
+      this.$v.newUser.$reset();
+      this.newUser = Object.assign({}, clear(this.newUser));
+    },
+    async createAlenviUser () {
+      this.newUser.local.password = randomize('*', 10);
+      this.newUser.role = 'Auxiliaire';
+      await this.$users.create(this.newUser);
+    },
+    async createOgustUser () {
+      const ogustPayload = {
+        title: this.newUser.administrative.identity.title,
+        last_name: this.newUser.lastname,
+        first_name: this.newUser.firstname,
+        main_address: {
+          line: this.newUser.administrative.contact.address,
+          zip: this.newUser.administrative.contact.zipCode,
+          city: this.newUser.administrative.contact.city
+        },
+        email: this.newUser.local.email,
+        sector: this.newUser.sector,
+        mobile_phone: this.newUser.mobilePhone,
+        manager: this.newUser.ogustManagerId
+      };
+      const newEmployee = await this.$ogust.createEmployee(ogustPayload);
+      return newEmployee;
+    },
+    async sendSms () {
+      const activationDataRaw = await this.$activationCode.create({ mobile_phone: this.newUser.mobilePhone });
+      const code = activationDataRaw.activationData.code;
+      await this.$twilio.sendSMS({
+        to: `+33${this.newUser.mobilePhone.substring(1)}`,
+        body: `Bienvenue chez Alenvi ! :) Utilise ce code: ${code} pour pouvoir commencer ton enregistrement ici avant ton intégration: https://app.alenvi.io/signup :-)`,
+      });
+    },
+    async submit () {
+      try {
+        this.loading = true;
+        this.$v.newUser.$touch();
+        if (this.$v.newUser.$error) {
+          throw new Error('Missing fields');
+        }
+        const newEmployee = await this.createOgustUser();
+        this.newUser.employee_id = newEmployee.data.data.employee.id_employee;
+        await this.createAlenviUser();
+        await this.getUserList();
+        await this.sendSms();
+        this.$q.notify({
+          color: 'positive',
+          icon: 'done',
+          detail: 'Fiche auxiliaire créée',
+          position: 'bottom-left',
+          timeout: 2500
+        });
+        this.loading = false;
+        this.opened = false;
+      } catch (e) {
+        console.error(e);
+        if (e.message === 'Missing fields') {
+          this.loading = false;
+          return this.$q.notify({
+            color: 'negative',
+            icon: 'warning',
+            detail: 'Merci de remplir tous les champs',
+            position: 'bottom-left',
+            timeout: 2500
+          });
+        }
+        this.$q.notify({
+          color: 'negative',
+          icon: 'warning',
+          detail: 'Erreur lors de la création de la fiche auxiliaire',
+          position: 'bottom-left',
+          timeout: 2500
+        });
+        this.loading = false;
+      }
     }
   }
 }
@@ -155,6 +411,11 @@ export default {
   // .btn-directory
   //   min-height: 40px
 
+  .input-search
+    font-size: 14px
+    & /deep/ .q-if-control.q-icon
+      margin-right: 8px
+
   .btn-icon
     &-disabled
       color: $light-grey
@@ -164,17 +425,17 @@ export default {
   .q-table-container
     box-shadow: none
 
-  /deep/ .q-btn
+  .btn-directory.q-btn /deep/
     box-shadow: none
     &.q-focusable:focus > .q-focus-helper
       background: transparent
       box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5)
 
-  /deep/ .q-if-inverted
-    box-shadow: none
+  // /deep/ .q-if-inverted
+  //   box-shadow: none
 
-  /deep/ .q-if-focused
-    box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.2)
+  // /deep/ .q-if-focused
+  //   box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.2)
 
   /deep/ .q-table
     border-spacing: 0 12px
@@ -183,8 +444,10 @@ export default {
       border: none
     & thead
       border: none
+      & tr
+        height: 48px
     & th
-      padding: 8px 12px
+      padding: 0px 12px
       &.sortable:hover .q-icon, &.sorted .q-icon
         color: $primary
     & td
@@ -239,5 +502,23 @@ export default {
     right: 60px
     bottom: 18px
     font-size: 16px
+
+  .modal
+    &-padding
+      padding: 24px 58px 0px 58px
+    &-btn
+      border-radius: 0
+
+  .q-if-inverted
+    border: 1px solid $light-grey
+
+  .bg-negative
+    background: none !important
+    color: inherit !important
+
+  .margin-input
+    margin-bottom: 6px
+    &.last
+      margin-bottom: 24px
 
 </style>
