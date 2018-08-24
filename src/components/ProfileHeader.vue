@@ -23,11 +23,13 @@
         </div>
       </div>
       <div class="col-6 row">
-        <div class="col-1">
-          <q-icon size="36px" name="phone_iphone"></q-icon>
+        <div class="col-1 relative-position">
+          <q-icon size="36px" name="phone_iphone" color="grey-2" />
+          <q-icon v-if="!user.isConfirmed" class="chip-icon" name="cancel" color="secondary" size="16px" />
+          <q-icon v-if="user.isConfirmed" class="chip-icon" name="check_circle" color="tertiary" size="16px" />
         </div>
         <div class="col-10 col full-height justify-between">
-          <div class="text-weight-bold">Compte webapp créé</div>
+          <div class="text-weight-bold">{{ isAccountConfirmed }}</div>
           <div class="send-message-link">Envoyer un message</div>
         </div>
       </div>
@@ -60,6 +62,12 @@ export default {
     isExternalUser () {
       if (this.user._id !== this.currentUser._id) return true;
       return false;
+    },
+    isAccountConfirmed () {
+      if (this.user.isConfirmed) {
+        return 'Compte webapp confirmé'
+      }
+      return 'Compte webapp non confirmé'
     }
   },
 }
@@ -101,4 +109,13 @@ export default {
     cursor: pointer
     &:hover
       text-decoration: underline
+
+  .chip-icon
+    height: 14px
+    position: absolute
+    right: 7px
+    top: -6px
+    width: 14px
+    border-radius: 50%
+    background: white
 </style>
