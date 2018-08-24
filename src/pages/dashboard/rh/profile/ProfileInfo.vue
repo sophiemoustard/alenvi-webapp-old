@@ -18,6 +18,8 @@
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Nationalité</p>
           <q-select v-model="user.alenvi.administrative.identity.nationality" color="white" inverted-light :options="nationalitiesOptions"
+            filter
+            filter-placeholder="Rechercher"
             @blur="updateUser({ alenvi: 'administrative.identity.nationality', ogust: 'nationality' })" />
         </div>
         <div class="col-xs-12 col-md-6">
@@ -28,6 +30,8 @@
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Pays de naissance</p>
           <q-select v-model="user.alenvi.administrative.identity.birthCountry" :options="countriesOptions" color="white" inverted-light
+            filter
+            filter-placeholder="Rechercher"
             @blur="updateUser({ alenvi: 'administrative.identity.birthCountry', ogust: 'country_of_birth' })" />
         </div>
         <div class="col-xs-12 col-md-6">
@@ -522,10 +526,6 @@ export default {
 
   // /deep/ .q-if-focused
   //   box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.2)
-
-  .input-caption
-    font-size: 12px
-    margin: 0 0 8px 0
 
   .doc-thumbnail
     padding: 13px 0px 40px 12px
