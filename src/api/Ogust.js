@@ -151,8 +151,13 @@ export default {
     }
     return employeeRaw.data.data.user.employee;
   },
-  async createEmployee (ogustToken, data) {
-    const newEmployee = await axios.post(`${process.env.API_HOSTNAME}/ogust/employees`, data, { headers: { 'x-ogust-token': ogustToken } });
+  async createEmployee (data, ogustToken = null) {
+    let newEmployee = null;
+    if (ogustToken === null) {
+      newEmployee = await alenviAxios.post(`${process.env.API_HOSTNAME}/ogust/employees`, data);
+    } else {
+      newEmployee = await axios.post(`${process.env.API_HOSTNAME}/ogust/employees`, data, { headers: { 'x-ogust-token': ogustToken } });
+    }
     return newEmployee;
   },
   async updateServiceById (ogustToken, serviceId, data) {
