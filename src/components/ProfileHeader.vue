@@ -1,5 +1,5 @@
 <template>
-  <div style="max-width: 90vw" v-if="user">
+  <div style="max-width: 90vw">
     <div class="row justify-between col-12">
       <div class="row items-baseline">
         <div class="row">
@@ -43,6 +43,7 @@ import { mapGetters } from 'vuex';
 import { getUserStartDate } from '../helpers/getUserStartDate';
 export default {
   name: 'ProfileHeader',
+  props: ['profileId'],
   computed: {
     ...mapGetters({
       currentUser: 'main/user',
@@ -113,8 +114,8 @@ export default {
   .chip-icon
     height: 14px
     position: absolute
-    right: 7px
-    top: -6px
+    right: 17px
+    top: -4px
     width: 14px
     border-radius: 50%
     background: white

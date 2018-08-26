@@ -357,16 +357,19 @@ export default {
     }
   },
   mounted () {
-
+    const args = [this.user.alenvi, this.$store.state.rh.userProfile];
+    this.user.alenvi = Object.assign({}, extend(true, ...args));
+    this.isLoaded = true;
   },
-  watch: {
-    userProfile (value) {
-      // this.user.alenvi = Object.assign({}, this.$_.merge(this.user.alenvi, value));
-      const args = [this.user.alenvi, value];
-      this.user.alenvi = Object.assign({}, extend(true, ...args));
-      this.isLoaded = true;
-    }
-  },
+  // watch: {
+  //   userProfile (value) {
+  //     // this.user.alenvi = Object.assign({}, this.$_.merge(this.user.alenvi, value));
+  //     const args = [this.user.alenvi, value];
+  //     this.user.alenvi = Object.assign({}, extend(true, ...args));
+  //     console.log('USER', this.user.alenvi);
+  //     this.isLoaded = true;
+  //   }
+  // },
   methods: {
     getThumbnailUrl (fileId) {
       return `https://drive.google.com/u/1/thumbnail?id=${fileId}`

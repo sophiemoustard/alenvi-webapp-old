@@ -7,6 +7,7 @@
         slot="title"
         :label="tab.label"
         :to="tab.to"
+        :alert="notifications[tab.notification][profileId] ? notifications[tab.notification][profileId] > 0 : false"
         exact />
     </q-tabs>
   </div>
@@ -15,7 +16,12 @@
 <script>
 export default {
   name: 'ProfileTabs',
-  props: ['tabsContent']
+  props: ['tabsContent', 'profileId'],
+  computed: {
+    notifications () {
+      return this.$store.getters['rh/getNotifications'];
+    }
+  }
 }
 </script>
 
@@ -55,4 +61,6 @@ export default {
           & .q-tabs-bar
             display: block !important
             color: $light-grey
+          & .q-dot
+            background: $secondary
 </style>

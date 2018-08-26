@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <profile-header class="header-margin" />
-    <profile-tabs :tabsContent="tabsContent" />
+  <div v-if="userProfile">
+    <profile-header :profileId="id" class="header-margin" />
+    <profile-tabs :profileId="id" :tabsContent="tabsContent" />
     <router-view></router-view>
   </div>
 </template>
@@ -18,24 +18,33 @@ export default {
     ProfileHeader,
     ProfileTabs
   },
+  computed: {
+    userProfile () {
+      return this.$store.getters['rh/getUserProfile'];
+    }
+  },
   data () {
     return {
       tabsContent: [
         {
           label: 'Profil',
-          to: { name: 'profile info', params: { id: this.id } }
+          to: { name: 'profile info', params: { id: this.id } },
+          notification: 'profiles'
         },
         {
           label: 'Test',
-          to: { name: 'planning' }
+          to: { name: 'planning' },
+          notification: 'profiles'
         },
         {
           label: 'Test',
-          to: { name: 'planning' }
+          to: { name: 'planning' },
+          notification: 'profiles'
         },
         {
           label: 'Test',
-          to: { name: 'planning' }
+          to: { name: 'planning' },
+          notification: 'profiles'
         }
       ]
     }
@@ -47,6 +56,9 @@ export default {
     ...mapActions({
       getUserProfile: 'rh/getUserProfile'
     })
+  },
+  beforeDestroy () {
+    this.$store.commit('rh/saveUserProfile', null);
   }
 }
 </script>
