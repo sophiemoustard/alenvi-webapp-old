@@ -36,6 +36,7 @@
           <q-item v-if="col.name === 'name'">
             <q-item-side :avatar="col.value.picture" />
             <q-item-main :label="col.value.name" />
+            <q-item-side v-if="notificationsProfiles[props.row.auxiliary._id] > 0" right icon="error" color="secondary" />
           </q-item>
           <template v-else-if="col.name === 'active'">
             <div :class="{ activeDot: col.value, inactiveDot: !col.value }"></div>
@@ -165,6 +166,7 @@ import randomize from 'randomatic';
 
 import { getUserStartDate } from '../../../helpers/getUserStartDate';
 import { clear } from '../../../helpers/utils.js';
+import { userProfileValidation } from '../../../helpers/userProfileValidation';
 import SelectSector from '../../../components/SelectSector';
 import SelectManager from '../../../components/SelectManager';
 
@@ -287,6 +289,9 @@ export default {
     },
     filteredUsers () {
       return this.activeUserList.filter(user => user.auxiliary.name.match(new RegExp(this.searchStr, 'i')));
+    },
+    notificationsProfiles () {
+      return this.$store.getters['rh/getNotificationsProfiles'];
     }
   },
   methods: {
@@ -295,6 +300,12 @@ export default {
         const users = await this.$users.showAll({ role: 'Auxiliaire' });
         const sectors = await this.$ogust.getList('employee.sector');
         this.userList = users.map((user) => {
+          const checkResult = userProfileValidation(user);
+          this.$store.commit('rh/saveNotification', {
+            type: 'profiles',
+            _id: user._id,
+            count: checkResult.error ? checkResult.error.details.length : 0
+          });
           return {
             auxiliary: {
               _id: user._id,
@@ -456,6 +467,8 @@ export default {
         // padding: 8px 16px 8px 0px
         min-height: 30px
         padding: 0
+        &-main
+          flex: 0 1 auto
         & .q-item-side
           min-width: 30px
           max-height: 30px
