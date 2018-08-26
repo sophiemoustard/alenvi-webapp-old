@@ -1,4 +1,9 @@
 export default {
   //
-  userProfile: null
+  userProfile: null,
+  notifications: {
+    profiles: {},
+    contracts: {},
+    tasks: {}
+  }
 }
