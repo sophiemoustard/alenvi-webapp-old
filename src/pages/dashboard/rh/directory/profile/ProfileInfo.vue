@@ -13,6 +13,7 @@
     <div class="q-mb-xl">
       <div class="row justify-between">
         <p class="text-weight-bold">Identité</p>
+        <q-icon v-if="$v.user.alenvi.administrative.identity.birthState.$error" name="error_outline" color="secondary" />
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
@@ -20,11 +21,13 @@
           <q-select v-model="user.alenvi.administrative.identity.nationality" color="white" inverted-light :options="nationalitiesOptions"
             filter
             filter-placeholder="Rechercher"
+            @focus="saveTmp('administrative.identity.nationality')"
             @blur="updateUser({ alenvi: 'administrative.identity.nationality', ogust: 'nationality' })" />
         </div>
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Date de naissance</p>
           <q-datetime type="date" format="DD/MM/YYYY" v-model="user.alenvi.administrative.identity.dateOfBirth" color="white" inverted-light
+            @focus="saveTmp('administrative.identity.dateOfBirth')"
             @blur="updateUser({ alenvi: 'administrative.identity.dateOfBirth', ogust: 'date_of_birth' })" />
         </div>
         <div class="col-xs-12 col-md-6">
@@ -32,21 +35,34 @@
           <q-select v-model="user.alenvi.administrative.identity.birthCountry" :options="countriesOptions" color="white" inverted-light
             filter
             filter-placeholder="Rechercher"
+            @focus="saveTmp('administrative.identity.birthCountry')"
             @blur="updateUser({ alenvi: 'administrative.identity.birthCountry', ogust: 'country_of_birth' })" />
         </div>
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Département de naissance</p>
-          <q-input v-model="user.alenvi.administrative.identity.birthState" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.identity.birthState', ogust: 'state_of_birth' })"
+          <q-input v-model="user.alenvi.administrative.identity.birthState"
+            color="white"
+            inverted-light
+            @focus="saveTmp('administrative.identity.birthState')"
+            @blur="updateUser({ alenvi: 'administrative.identity.birthState', ogust: 'state_of_birth' })"
           />
         </div>
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Ville de naissance</p>
-          <q-input v-model="user.alenvi.administrative.identity.birthCity" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.identity.birthCity', ogust: 'place_of_birth' })"
+          <q-input v-model="user.alenvi.administrative.identity.birthCity"
+            color="white"
+            inverted-light
+            @focus="saveTmp('administrative.identity.birthCity')"
+            @blur="updateUser({ alenvi: 'administrative.identity.birthCity', ogust: 'place_of_birth' })"
           />
         </div>
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Numéro de sécurité sociale</p>
-          <q-input v-model="user.alenvi.administrative.identity.socialSecurityNumber" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.identity.socialSecurityNumber', ogust: 'social_insurance_number' })"
+          <q-input v-model="user.alenvi.administrative.identity.socialSecurityNumber"
+            color="white"
+            inverted-light
+            @focus="saveTmp('administrative.identity.socialSecurityNumber')"
+            @blur="updateUser({ alenvi: 'administrative.identity.socialSecurityNumber', ogust: 'social_insurance_number' })"
           />
         </div>
       </div>
@@ -58,32 +74,57 @@
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Numéro de téléphone</p>
-          <q-input v-model.trim="user.alenvi.mobilePhone" color="white" inverted-light @blur="updateUser({ alenvi: 'mobilePhone', ogust: 'mobile_phone' })"
+          <q-input v-model.trim="user.alenvi.mobilePhone"
+            color="white"
+            inverted-light
+            @focus="saveTmp('mobilePhone')"
+            @blur="updateUser({ alenvi: 'mobilePhone', ogust: 'mobile_phone' })"
           />
         </div>
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Adresse email</p>
-          <q-input lower-case v-model.trim="user.alenvi.local.email" color="white" inverted-light @blur="updateUser({ alenvi: 'local.email', ogust: 'email' })"
+          <q-input v-model.trim="user.alenvi.local.email"
+            color="white"
+            inverted-light
+            lower-case
+            @focus="saveTmp('local.email')"
+            @blur="updateUser({ alenvi: 'local.email', ogust: 'email' })"
           />
         </div>
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Adresse, numéro et rue</p>
-          <q-input v-model="user.alenvi.administrative.contact.address" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.contact.address', ogust: 'main_address.line' })"
+          <q-input v-model="user.alenvi.administrative.contact.address"
+            color="white"
+            inverted-light
+            @focus="saveTmp('administrative.contact.address')"
+            @blur="updateUser({ alenvi: 'administrative.contact.address', ogust: 'main_address.line' })"
           />
         </div>
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Complément d'adresse</p>
-          <q-input v-model="user.alenvi.administrative.contact.additionalAddress" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.contact.additionalAddress', ogust: 'main_address.supplement' })"
+          <q-input v-model="user.alenvi.administrative.contact.additionalAddress"
+            color="white"
+            inverted-light
+            @focus="saveTmp('administrative.contact.addionalAddress')"
+            @blur="updateUser({ alenvi: 'administrative.contact.additionalAddress', ogust: 'main_address.supplement' })"
           />
         </div>
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Code postal</p>
-          <q-input v-model="user.alenvi.administrative.contact.zipCode" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.contact.zipCode', ogust: 'main_address.zip' })"
+          <q-input v-model="user.alenvi.administrative.contact.zipCode"
+            color="white"
+            inverted-light
+            @focus="saveTmp('administrative.contact.zipCode')"
+            @blur="updateUser({ alenvi: 'administrative.contact.zipCode', ogust: 'main_address.zip' })"
           />
         </div>
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Ville</p>
-          <q-input v-model="user.alenvi.administrative.contact.city" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.contact.city', ogust: 'main_address.city' })"
+          <q-input v-model="user.alenvi.administrative.contact.city"
+            color="white"
+            inverted-light
+            @focus="saveTmp('administrative.contact.city')"
+            @blur="updateUser({ alenvi: 'administrative.contact.city', ogust: 'main_address.city' })"
           />
         </div>
       </div>
@@ -95,12 +136,20 @@
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Prénom et nom</p>
-          <q-input v-model="user.alenvi.administrative.emergencyContact.name" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.emergencyContact.name' })"
+          <q-input v-model="user.alenvi.administrative.emergencyContact.name"
+           color="white"
+           inverted-light
+           @focus="saveTmp('administrative.emergencyContact.name')"
+           @blur="updateUser({ alenvi: 'administrative.emergencyContact.name' })"
           />
         </div>
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Numéro de téléphone</p>
-          <q-input v-model.trim="user.alenvi.administrative.emergencyContact.phoneNumber" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.emergencyContact.phoneNumber' })"
+          <q-input v-model.trim="user.alenvi.administrative.emergencyContact.phoneNumber"
+            color="white"
+            inverted-light
+            @focus="saveTmp('administrative.emergencyContact.phoneNumber')"
+            @blur="updateUser({ alenvi: 'administrative.emergencyContact.phoneNumber' })"
           />
         </div>
       </div>
@@ -114,11 +163,14 @@
           <p class="input-caption">IBAN</p>
           <q-input upper-case v-mask="'SS## #### #### #### #### #### ###'" v-model.trim="user.alenvi.administrative.payment.rib.iban"
             color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.payment.rib.iban', ogust: 'iban_number' })"
+            @focus="saveTmp('administrative.payment.rib.iban')"
           />
         </div>
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">BIC</p>
-          <q-input upper-case v-model="user.alenvi.administrative.payment.rib.bic" color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.payment.rib.bic', ogust: 'bic_number' })"
+          <q-input v-model="user.alenvi.administrative.payment.rib.bic"
+            upper-case color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.payment.rib.bic', ogust: 'bic_number' })"
+            @focus="saveTmp('administrative.payment.rib.bic')"
           />
         </div>
       </div>
@@ -275,13 +327,14 @@
 <script>
 import { mapGetters } from 'vuex';
 import { Cookies } from 'quasar';
+import { required, email, numeric, minLength, requiredIf } from 'vuelidate/lib/validators';
 
-import gdrive from '../../../../api/GoogleDrive.js';
-import nationalities from '../../../../data/nationalities.js';
-import countries from '../../../../data/countries.js';
-import SelectSector from '../../../../components/SelectSector';
-import SelectMentor from '../../../../components/SelectMentor';
-import { extend } from '../../../../helpers/utils.js';
+import gdrive from '../../../../../api/GoogleDrive.js';
+import nationalities from '../../../../../data/nationalities.js';
+import countries from '../../../../../data/countries.js';
+import SelectSector from '../../../../../components/SelectSector';
+import SelectMentor from '../../../../../components/SelectMentor';
+import { extend } from '../../../../../helpers/utils.js';
 
 export default {
   components: {
@@ -291,6 +344,7 @@ export default {
   data () {
     return {
       isLoaded: false,
+      tmpInput: '',
       user: {
         alenvi: {
           mentor: '',
@@ -334,6 +388,79 @@ export default {
       }
     }
   },
+  validations: {
+    user: {
+      alenvi: {
+        firstname: { required },
+        lastname: { required },
+        local: {
+          email: { required, email }
+        },
+        mobilePhone: { required, numeric },
+        sector: { required },
+        mentor: { required },
+        administrative: {
+          identity: {
+            nationality: { required },
+            dateOfBirth: { required },
+            birthCountry: { required },
+            birthState: { required },
+            birthCity: { required },
+            socialSecurityNumber: { required, numeric }
+          },
+          contact: {
+            address: { required },
+            zipCode: { required, numeric },
+            city: { required }
+          },
+          emergencyContact: {
+            name: { required },
+            phoneNumber: { required, numeric }
+          },
+          idCardRecto: {
+            driveId: { required }
+          },
+          idCardVerso: {
+            driveId: { required }
+          },
+          healthAttest: {
+            driveId: { required }
+          },
+          phoneInvoice: {
+            driveId: { required }
+          },
+          payment: {
+            rib: {
+              iban: {
+                required,
+                minLength: minLength(28)
+              },
+              bic: {
+                required,
+                minLength: minLength(8)
+              }
+            }
+          },
+          transportInvoice: {
+            type: { required },
+            driveId: { required: requiredIf((item) => {
+              return item.type === 'public'
+            })}
+          },
+          certificates: {
+            required,
+            minLength: minLength(1)
+          },
+          mutualFund: {
+            has: { required },
+            driveId: { required: requiredIf((item) => {
+              return item.has
+            })}
+          }
+        }
+      }
+    },
+  },
   computed: {
     ...mapGetters({
       userProfile: 'rh/getUserProfile'
@@ -374,8 +501,13 @@ export default {
     getThumbnailUrl (fileId) {
       return `https://drive.google.com/u/1/thumbnail?id=${fileId}`
     },
+    saveTmp (path) {
+      this.tmpInput = this.$_.get(this.user.alenvi, path)
+    },
     async updateUser (paths) {
       try {
+        // this.$_.get(this.$v.user.alenvi, paths.alenvi).$touch();
+        if (this.tmpInput === this.$_.get(this.user.alenvi, paths.alenvi)) return;
         if (paths.alenvi && paths.ogust) {
           await this.updateAlenviUser(paths.alenvi);
           await this.updateOgustUser(paths);
@@ -414,7 +546,7 @@ export default {
         const payload = this.$_.set({}, path, value);
         payload._id = this.userProfile._id;
         console.log('PAYLOAD ALENVI', payload);
-        // await this.$users.updateById(payload);
+        await this.$users.updateById(payload);
       } catch (e) {
         console.error(e);
       }

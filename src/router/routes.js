@@ -183,45 +183,35 @@ const routes = [
         ]
       },
       {
-        path: 'rh',
-        name: 'rh',
-        component: () => import('pages/dashboard/rh/Rh'),
+        path: 'rh/directory',
+        name: 'directory',
+        component: () => import('pages/dashboard/rh/directory/Directory'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'rh'
+        }
+      },
+      {
+        path: 'rh/directory/profile/:id',
+        name: 'directory profile',
+        component: () => import('pages/dashboard/rh/directory/profile/Profile'),
+        props: true,
         redirect: {
-          name: 'add helper'
+          name: 'profile info'
+        },
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'rh'
         },
         children: [
           {
-            path: 'directory',
-            name: 'directory',
-            component: () => import('pages/dashboard/rh/Directory'),
+            path: 'info',
+            name: 'profile info',
+            component: () => import('pages/dashboard/rh/directory/profile/ProfileInfo'),
             meta: {
               cookies: ['alenvi_token', 'refresh_token'],
               parent: 'rh'
             }
-          },
-          {
-            path: 'directory/profile/:id',
-            name: 'directory profile',
-            component: () => import('pages/dashboard/rh/profile/Profile'),
-            props: true,
-            redirect: {
-              name: 'profile info'
-            },
-            meta: {
-              cookies: ['alenvi_token', 'refresh_token'],
-              parent: 'rh'
-            },
-            children: [
-              {
-                path: 'info',
-                name: 'profile info',
-                component: () => import('pages/dashboard/rh/profile/ProfileInfo'),
-                meta: {
-                  cookies: ['alenvi_token', 'refresh_token'],
-                  parent: 'rh'
-                }
-              }
-            ]
           }
         ]
       },

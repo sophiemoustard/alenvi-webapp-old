@@ -1,5 +1,5 @@
 <template>
-  <div style="max-width: 90vw;">
+  <q-page class="neutral-background" style="max-width: 90vw;" padding>
     <div class="row items-start directory-header">
       <div class="col-xs-12 col-md-5">
         <h4>Répertoire</h4>
@@ -157,18 +157,18 @@
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary" :loading="loading" @click="submit" />
     </q-modal>
-  </div>
+  </q-page>
 </template>
 
 <script>
 import { required, email, numeric } from 'vuelidate/lib/validators';
 import randomize from 'randomatic';
 
-import { getUserStartDate } from '../../../helpers/getUserStartDate';
-import { clear } from '../../../helpers/utils.js';
-import { userProfileValidation } from '../../../helpers/userProfileValidation';
-import SelectSector from '../../../components/SelectSector';
-import SelectManager from '../../../components/SelectManager';
+import { getUserStartDate } from '../../../../helpers/getUserStartDate';
+import { clear } from '../../../../helpers/utils.js';
+import { userProfileValidation } from '../../../../helpers/userProfileValidation';
+import SelectSector from '../../../../components/SelectSector';
+import SelectManager from '../../../../components/SelectManager';
 
 export default {
   components: {

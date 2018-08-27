@@ -1,16 +1,16 @@
 <template>
-  <div v-if="userProfile">
+  <q-page padding v-if="userProfile" class="neutral-background">
     <profile-header :profileId="id" class="header-margin" />
     <profile-tabs :profileId="id" :tabsContent="tabsContent" />
     <router-view></router-view>
-  </div>
+  </q-page>
 </template>
 
 <script>
 import { mapActions } from 'vuex'
 
-import ProfileHeader from '../../../../components/ProfileHeader'
-import ProfileTabs from '../../../../components/ProfileTabs'
+import ProfileHeader from '../../../../../components/ProfileHeader'
+import ProfileTabs from '../../../../../components/ProfileTabs'
 
 export default {
   props: ['id'],
