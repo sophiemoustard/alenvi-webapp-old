@@ -515,6 +515,7 @@ export default {
     right: 60px
     bottom: 18px
     font-size: 16px
+    z-index: 2
 
   .modal
     &-padding
