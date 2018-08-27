@@ -7,7 +7,6 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
 
 import ProfileHeader from '../../../../../components/ProfileHeader'
 import ProfileTabs from '../../../../../components/ProfileTabs'
@@ -50,12 +49,7 @@ export default {
     }
   },
   async mounted () {
-    this.getUserProfile(this.id);
-  },
-  methods: {
-    ...mapActions({
-      getUserProfile: 'rh/getUserProfile'
-    })
+    this.$store.dispatch('rh/getUserProfile', this.id);
   },
   beforeDestroy () {
     this.$store.commit('rh/saveUserProfile', null);
