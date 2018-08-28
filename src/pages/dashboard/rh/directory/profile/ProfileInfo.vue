@@ -11,13 +11,16 @@
       </div>
     </div>
     <div class="q-mb-xl">
-      <div class="row justify-between">
+      <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Identité</p>
-        <q-icon v-if="$v.user.alenvi.administrative.identity.birthState.$error" name="error_outline" color="secondary" />
+        <p :class="[groupErrors('identity').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('identity').msg }}</p>
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <p class="input-caption">Nationalité</p>
+          <div class="row justify-between">
+            <p class="input-caption">Nationalité</p>
+            <q-icon v-if="$v.user.alenvi.administrative.identity.nationality.$error" name="error_outline" color="secondary" />
+          </div>
           <q-select v-model="user.alenvi.administrative.identity.nationality" color="white" inverted-light :options="nationalitiesOptions"
             filter
             filter-placeholder="Rechercher"
@@ -25,13 +28,19 @@
             @blur="updateUser({ alenvi: 'administrative.identity.nationality', ogust: 'nationality' })" />
         </div>
         <div class="col-xs-12 col-md-6">
-          <p class="input-caption">Date de naissance</p>
+          <div class="row justify-between">
+            <p class="input-caption">Date de naissance</p>
+            <q-icon v-if="$v.user.alenvi.administrative.identity.dateOfBirth.$error" name="error_outline" color="secondary" />
+          </div>
           <q-datetime type="date" format="DD/MM/YYYY" v-model="user.alenvi.administrative.identity.dateOfBirth" color="white" inverted-light
             @focus="saveTmp('administrative.identity.dateOfBirth')"
             @blur="updateUser({ alenvi: 'administrative.identity.dateOfBirth', ogust: 'date_of_birth' })" />
         </div>
         <div class="col-xs-12 col-md-6">
-          <p class="input-caption">Pays de naissance</p>
+          <div class="row justify-between">
+            <p class="input-caption">Pays de naissance</p>
+            <q-icon v-if="$v.user.alenvi.administrative.identity.birthCountry.$error" name="error_outline" color="secondary" />
+          </div>
           <q-select v-model="user.alenvi.administrative.identity.birthCountry" :options="countriesOptions" color="white" inverted-light
             filter
             filter-placeholder="Rechercher"
@@ -39,7 +48,10 @@
             @blur="updateUser({ alenvi: 'administrative.identity.birthCountry', ogust: 'country_of_birth' })" />
         </div>
         <div class="col-xs-12 col-md-6">
-          <p class="input-caption">Département de naissance</p>
+          <div class="row justify-between">
+            <p class="input-caption">Département de naissance</p>
+            <q-icon v-if="$v.user.alenvi.administrative.identity.birthState.$error" error-label="error" name="error_outline" color="secondary" />
+          </div>
           <q-input v-model="user.alenvi.administrative.identity.birthState"
             color="white"
             inverted-light
@@ -48,7 +60,10 @@
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <p class="input-caption">Ville de naissance</p>
+          <div class="row justify-between">
+            <p class="input-caption">Ville de naissance</p>
+            <q-icon v-if="$v.user.alenvi.administrative.identity.birthCity.$error" name="error_outline" color="secondary" />
+          </div>
           <q-input v-model="user.alenvi.administrative.identity.birthCity"
             color="white"
             inverted-light
@@ -57,7 +72,10 @@
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <p class="input-caption">Numéro de sécurité sociale</p>
+          <div class="row justify-between">
+            <p class="input-caption">Numéro de sécurité sociale</p>
+            <q-icon v-if="$v.user.alenvi.administrative.identity.socialSecurityNumber.$error" name="error_outline" color="secondary" />
+          </div>
           <q-input v-model="user.alenvi.administrative.identity.socialSecurityNumber"
             color="white"
             inverted-light
@@ -345,6 +363,14 @@ export default {
     return {
       isLoaded: false,
       tmpInput: '',
+      identityGroup: [
+        'user.alenvi.administrative.identity.nationality',
+        'user.alenvi.administrative.identity.dateOfBirth',
+        'user.alenvi.administrative.identity.birthCountry',
+        'user.alenvi.administrative.identity.birthState',
+        'user.alenvi.administrative.identity.birthCity',
+        'user.alenvi.administrative.identity.socialSecurityNumber'
+      ],
       user: {
         alenvi: {
           mentor: '',
@@ -388,78 +414,81 @@ export default {
       }
     }
   },
-  validations: {
-    user: {
-      alenvi: {
-        firstname: { required },
-        lastname: { required },
-        local: {
-          email: { required, email }
-        },
-        mobilePhone: { required, numeric },
-        sector: { required },
-        mentor: { required },
-        administrative: {
-          identity: {
-            nationality: { required },
-            dateOfBirth: { required },
-            birthCountry: { required },
-            birthState: { required },
-            birthCity: { required },
-            socialSecurityNumber: { required, numeric }
+  validations () {
+    return {
+      user: {
+        alenvi: {
+          firstname: { required },
+          lastname: { required },
+          local: {
+            email: { required, email }
           },
-          contact: {
-            address: { required },
-            zipCode: { required, numeric },
-            city: { required }
-          },
-          emergencyContact: {
-            name: { required },
-            phoneNumber: { required, numeric }
-          },
-          idCardRecto: {
-            driveId: { required }
-          },
-          idCardVerso: {
-            driveId: { required }
-          },
-          healthAttest: {
-            driveId: { required }
-          },
-          phoneInvoice: {
-            driveId: { required }
-          },
-          payment: {
-            rib: {
-              iban: {
-                required,
-                minLength: minLength(28)
-              },
-              bic: {
-                required,
-                minLength: minLength(8)
+          mobilePhone: { required, numeric },
+          sector: { required },
+          mentor: { required },
+          administrative: {
+            identity: {
+              nationality: { required },
+              dateOfBirth: { required },
+              birthCountry: { required },
+              birthState: { required },
+              birthCity: { required },
+              socialSecurityNumber: { required, numeric }
+            },
+            contact: {
+              address: { required },
+              zipCode: { required, numeric },
+              city: { required }
+            },
+            emergencyContact: {
+              name: { required },
+              phoneNumber: { required, numeric }
+            },
+            idCardRecto: {
+              driveId: { required }
+            },
+            idCardVerso: {
+              driveId: { required }
+            },
+            healthAttest: {
+              driveId: { required }
+            },
+            phoneInvoice: {
+              driveId: { required }
+            },
+            payment: {
+              rib: {
+                iban: {
+                  required,
+                  minLength: minLength(28)
+                },
+                bic: {
+                  required,
+                  minLength: minLength(8)
+                }
               }
+            },
+            transportInvoice: {
+              type: { required },
+              driveId: { required: requiredIf((item) => {
+                return item.type === 'public'
+              })}
+            },
+            certificates: {
+              required,
+              minLength: minLength(1)
+            },
+            mutualFund: {
+              has: { required },
+              driveId: { required: requiredIf((item) => {
+                return item.has
+              })}
             }
-          },
-          transportInvoice: {
-            type: { required },
-            driveId: { required: requiredIf((item) => {
-              return item.type === 'public'
-            })}
-          },
-          certificates: {
-            required,
-            minLength: minLength(1)
-          },
-          mutualFund: {
-            has: { required },
-            driveId: { required: requiredIf((item) => {
-              return item.has
-            })}
           }
         }
-      }
-    },
+      },
+      identityGroup: this.identityGroup
+    }
   },
   computed: {
     ...mapGetters({
@@ -484,20 +513,20 @@ export default {
     }
   },
   mounted () {
-    const args = [this.user.alenvi, this.$store.state.rh.userProfile];
-    this.user.alenvi = Object.assign({}, extend(true, ...args));
-    this.isLoaded = true;
+    this.mergeUser();
+    this.$v.user.alenvi.$touch();
   },
-  // watch: {
-  //   userProfile (value) {
-  //     // this.user.alenvi = Object.assign({}, this.$_.merge(this.user.alenvi, value));
-  //     const args = [this.user.alenvi, value];
-  //     this.user.alenvi = Object.assign({}, extend(true, ...args));
-  //     console.log('USER', this.user.alenvi);
-  //     this.isLoaded = true;
-  //   }
-  // },
+  watch: {
+    userProfile (value) {
+      this.mergeUser(value);
+    }
+  },
   methods: {
+    mergeUser (value = null) {
+      const args = [this.user.alenvi, value || this.$store.state.rh.userProfile];
+      this.user.alenvi = Object.assign({}, extend(true, ...args));
+      this.isLoaded = true;
+    },
     getThumbnailUrl (fileId) {
       return `https://drive.google.com/u/1/thumbnail?id=${fileId}`
     },
@@ -506,8 +535,17 @@ export default {
     },
     async updateUser (paths) {
       try {
-        // this.$_.get(this.$v.user.alenvi, paths.alenvi).$touch();
         if (this.tmpInput === this.$_.get(this.user.alenvi, paths.alenvi)) return;
+        this.$_.get(this.$v.user.alenvi, paths.alenvi).$touch();
+        if (this.$_.get(this.$v.user.alenvi, paths.alenvi).$error) {
+          return this.$q.notify({
+            color: 'secondary',
+            icon: 'warning',
+            detail: 'Champ(s) invalide(s)',
+            position: 'bottom-left',
+            timeout: 2500
+          });
+        }
         if (paths.alenvi && paths.ogust) {
           await this.updateAlenviUser(paths.alenvi);
           await this.updateOgustUser(paths);
@@ -616,6 +654,19 @@ export default {
         position: 'bottom-left',
         timeout: 2500
       });
+    },
+    groupErrors (group) {
+      let j = 0;
+      console.log('VUELIDATE', this.$v);
+      for (let i = 0, l = this[`${group}Group`].length; i < l; i++) {
+        if (this.$v.identityGroup[this[`${group}Group`][i]].$error) {
+          j++;
+        }
+      }
+      return {
+        errors: j,
+        msg: j > 0 ? `${j} information(s) manquante(s)` : 'Informations complètes'
+      }
     }
   }
 }
@@ -667,4 +718,11 @@ export default {
 
   .doc-delete
     padding: 0px 14px 17px 0px
+
+  .group-error
+    font-size: 12px
+    color: $secondary
+    &-ok
+      font-size: 12px
+      color: $tertiary
 </style>
