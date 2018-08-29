@@ -245,8 +245,8 @@ export default {
       showFilter: 'calendar/showFilter',
       ogustUser: 'calendar/ogustUser',
       personChosen: 'calendar/personChosen',
-      toggleDrawer: 'calendar/toggleDrawer',
-      modalBtnLoading: 'calendar/modalBtnLoading'
+      modalBtnLoading: 'calendar/modalBtnLoading',
+      toggleDrawer: 'main/toggleDrawer'
     })
   },
   mounted () {
@@ -416,7 +416,7 @@ export default {
       } else if (scroll.position >= 131 && this.width < 768) {
         headerToFix.classList.add('header-fixed');
       } else {
-        this.$refs.cal_header.style.left = `50px`
+        this.$refs.cal_header.style.left = scheduler.getState().mode === 'month' ? this.$refs.cal_header.style.left : `50px`
         headerToFix.classList.remove('header-fixed');
         headerToFix.classList.remove('header-fixed-customer');
       }
