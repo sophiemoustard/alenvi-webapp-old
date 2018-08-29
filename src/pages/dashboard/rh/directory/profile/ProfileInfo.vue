@@ -371,6 +371,11 @@ export default {
         'user.alenvi.administrative.identity.birthCity',
         'user.alenvi.administrative.identity.socialSecurityNumber'
       ],
+      contactGroup: [
+        'user.alenvi.administrative.contact.address',
+        'user.alenvi.administrative.contact.zipCode',
+        'user.alenvi.administrative.contact.city'
+      ],
       user: {
         alenvi: {
           mentor: '',
@@ -487,7 +492,8 @@ export default {
           }
         }
       },
-      identityGroup: this.identityGroup
+      identityGroup: this.identityGroup,
+      contactGroup: this.contactGroup
     }
   },
   computed: {
