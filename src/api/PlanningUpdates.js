@@ -10,7 +10,7 @@ export default {
     await alenviAxios.put(`${process.env.API_HOSTNAME}/planningUpdates/${updateId}/status`, data);
   },
   async storePlanningupdates (id, token, data) {
-    const planningUpdate = await axios.post(`${process.env.API_HOSTNAME}/planningUpdates?employeeId=${id}`, data, { headers: { 'x-access-token': token } });
+    const planningUpdate = await axios.post(`${process.env.API_HOSTNAME}/planningUpdates?employee_id=${id}`, data, { headers: { 'x-access-token': token } });
     return planningUpdate;
   },
   async removePlanningUpdateById (id, params) {

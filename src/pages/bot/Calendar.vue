@@ -152,8 +152,8 @@ export default {
         };
         await this.$ogust.editOgustCustomerDetails(ogustToken, event.id_customer, customerDetailsPayload);
         const customerCodesPayload = {
-          doorCode: event.door_code,
-          interCode: event.intercom_code
+          door_code: event.door_code,
+          intercom_code: event.intercom_code
         };
         await this.$ogust.editOgustCustomer(ogustToken, event.id_customer, customerCodesPayload);
         // Renders immediately the updated event in calendar
