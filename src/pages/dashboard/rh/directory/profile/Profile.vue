@@ -31,9 +31,9 @@ export default {
           notification: 'profiles'
         },
         {
-          label: 'Test',
-          to: { name: 'planning' },
-          notification: 'profiles'
+          label: 'Tâches',
+          to: { name: 'profile tasks' },
+          notification: 'tasks'
         },
         {
           label: 'Test',
