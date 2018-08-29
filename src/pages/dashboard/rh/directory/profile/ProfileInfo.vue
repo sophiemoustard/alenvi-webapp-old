@@ -86,12 +86,16 @@
       </div>
     </div>
     <div class="q-mb-xl">
-      <div class="row justify-between">
+      <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Contact</p>
+        <p :class="[groupErrors('contact').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('contact').msg }}</p>
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <p class="input-caption">Numéro de téléphone</p>
+          <div class="row justify-between">
+            <q-icon v-if="$v.user.alenvi.mobilePhone.$error" name="error_outline" color="secondary" />
+            <p class="input-caption">Numéro de téléphone</p>
+          </div>
           <q-input v-model.trim="user.alenvi.mobilePhone"
             color="white"
             inverted-light
@@ -100,7 +104,10 @@
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <p class="input-caption">Adresse email</p>
+          <div class="row justify-between">
+            <p class="input-caption">Adresse email</p>
+            <q-icon v-if="$v.user.alenvi.local.email.$error" name="error_outline" color="secondary" />
+          </div>
           <q-input v-model.trim="user.alenvi.local.email"
             color="white"
             inverted-light
@@ -110,7 +117,10 @@
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <p class="input-caption">Adresse, numéro et rue</p>
+          <div class="row justify-between">
+            <p class="input-caption">Adresse, numéro et rue</p>
+            <q-icon v-if="$v.user.alenvi.administrative.contact.address.$error" name="error_outline" color="secondary" />
+          </div>
           <q-input v-model="user.alenvi.administrative.contact.address"
             color="white"
             inverted-light
@@ -128,7 +138,10 @@
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <p class="input-caption">Code postal</p>
+          <div class="row justify-between">
+            <p class="input-caption">Code postal</p>
+            <q-icon v-if="$v.user.alenvi.administrative.contact.zipCode.$error" name="error_outline" color="secondary" />
+          </div>
           <q-input v-model="user.alenvi.administrative.contact.zipCode"
             color="white"
             inverted-light
@@ -137,7 +150,10 @@
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <p class="input-caption">Ville</p>
+          <div class="row justify-between">
+            <p class="input-caption">Ville</p>
+            <q-icon v-if="$v.user.alenvi.administrative.contact.city.$error" name="error_outline" color="secondary" />
+          </div>
           <q-input v-model="user.alenvi.administrative.contact.city"
             color="white"
             inverted-light
@@ -148,12 +164,16 @@
       </div>
     </div>
     <div class="q-mb-xl">
-      <div class="row justify-between">
+      <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Contact d'urgence</p>
+        <p :class="[groupErrors('emergencyContact').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('emergencyContact').msg }}</p>
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <p class="input-caption">Prénom et nom</p>
+          <div class="row justify-between">
+            <p class="input-caption">Prénom et nom</p>
+            <q-icon v-if="$v.user.alenvi.administrative.emergencyContact.name.$error" name="error_outline" color="secondary" />
+          </div>
           <q-input v-model="user.alenvi.administrative.emergencyContact.name"
            color="white"
            inverted-light
@@ -162,7 +182,10 @@
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <p class="input-caption">Numéro de téléphone</p>
+          <div class="row justify-between">
+            <p class="input-caption">Numéro de téléphone</p>
+            <q-icon v-if="$v.user.alenvi.administrative.emergencyContact.phoneNumber.$error" name="error_outline" color="secondary" />
+          </div>
           <q-input v-model.trim="user.alenvi.administrative.emergencyContact.phoneNumber"
             color="white"
             inverted-light
@@ -173,19 +196,26 @@
       </div>
     </div>
     <div class="q-mb-xl">
-      <div class="row justify-between">
+      <div class="row justify-between items-baseline">
         <p class="text-weight-bold">IBAN</p>
+        <p :class="[groupErrors('iban').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('iban').msg }}</p>
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <p class="input-caption">IBAN</p>
+          <div class="row justify-between">
+            <p class="input-caption">IBAN</p>
+            <q-icon v-if="$v.user.alenvi.administrative.payment.rib.iban.$error" name="error_outline" color="secondary" />
+          </div>
           <q-input upper-case v-mask="'SS## #### #### #### #### #### ###'" v-model.trim="user.alenvi.administrative.payment.rib.iban"
             color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.payment.rib.iban', ogust: 'iban_number' })"
             @focus="saveTmp('administrative.payment.rib.iban')"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <p class="input-caption">BIC</p>
+          <div class="row justify-between">
+            <p class="input-caption">BIC</p>
+            <q-icon v-if="$v.user.alenvi.administrative.payment.rib.bic.$error" name="error_outline" color="secondary" />
+          </div>
           <q-input v-model="user.alenvi.administrative.payment.rib.bic"
             upper-case color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.payment.rib.bic', ogust: 'bic_number' })"
             @focus="saveTmp('administrative.payment.rib.bic')"
@@ -194,12 +224,16 @@
       </div>
     </div>
     <div v-if="user.alenvi.administrative.driveFolder" class="q-mb-xl">
-      <div class="row justify-between">
+      <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Documents</p>
+        <p :class="[groupErrors('documents').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('documents').msg }}</p>
       </div>
       <div class="row gutter-profile items-stretch">
         <div class="col-xs-12 col-md-6">
-          <p class="input-caption">Carte d'identité (recto) ou passeport</p>
+          <div class="row justify-between">
+            <p class="input-caption">Carte d'identité (recto) ou passeport</p>
+            <q-icon v-if="$v.user.alenvi.administrative.idCardRecto.driveId.$error" name="error_outline" color="secondary" />
+          </div>
           <div v-if="user.alenvi.administrative.idCardRecto && user.alenvi.administrative.idCardRecto.driveId" class="row justify-between"
             style="background: white">
             <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.idCardRecto.driveId)" alt="cni verso">
@@ -232,8 +266,9 @@
           </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
-          <div>
+          <div class="row justify-between">
             <p class="input-caption">Attestation de sécurité sociale</p>
+            <q-icon v-if="$v.user.alenvi.administrative.healthAttest.driveId.$error" name="error_outline" color="secondary" />
           </div>
           <div v-if="user.alenvi.administrative.healthAttest && user.alenvi.administrative.healthAttest.driveId" class="row justify-between"
             style="background: white">
@@ -250,7 +285,10 @@
           </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
-          <p class="input-caption">Facture téléphonique</p>
+          <div class="row justify-between">
+            <p class="input-caption">Facture téléphonique</p>
+            <q-icon v-if="$v.user.alenvi.administrative.phoneInvoice.driveId.$error" name="error_outline" color="secondary" />
+          </div>
           <div v-if="user.alenvi.administrative.phoneInvoice && user.alenvi.administrative.phoneInvoice.driveId" class="row justify-between"
             style="background: white">
             <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.phoneInvoice.driveId)" alt="cni verso">
@@ -266,7 +304,10 @@
           </q-field>
         </div>
         <div class="col-xs-12">
-          <p class="input-caption col-xs-12">Diplome(s) ou certificats(s)</p>
+          <div class="row justify-between">
+            <p class="input-caption">Diplome(s) ou certificats(s)</p>
+            <q-icon v-if="$v.user.alenvi.administrative.certificates.$error" name="error_outline" color="secondary" />
+          </div>
           <q-field>
             <q-uploader ref="certificates" name="certificates" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `diplomes_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
               hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
@@ -289,10 +330,14 @@
     <div class="q-mb-xl">
       <div class="row justify-between">
         <p class="text-weight-bold">Mutuelle</p>
+        <p :class="[groupErrors('mutualFund').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('mutualFund').msg }}</p>
       </div>
       <div class="row gutter-profile-x">
         <div class="col-xs-12">
-          <p class="input-caption">Voulez-vous adhérer à la mutuelle d'entreprise ?</p>
+          <div class="row justify-between">
+            <p class="input-caption">Voulez-vous adhérer à la mutuelle d'entreprise ?</p>
+            <q-icon v-if="$v.user.alenvi.administrative.mutualFund.has.$error" name="error_outline" color="secondary" />
+          </div>
           <!-- <div class="row"> -->
           <q-btn-toggle class="full-width" color="white" text-color="black" toggle-color="primary" v-model="user.alenvi.administrative.mutualFund.has"
             @input="updateUser({ alenvi: 'administrative.mutualFund.has' })" :options="[
@@ -310,7 +355,10 @@
           </div>
         </div>
         <div v-if="user.alenvi.administrative.mutualFund.has && !user.alenvi.administrative.mutualFund.driveId" class="col-xs-12">
-          <p class="input-caption">Merci de nous transmettre le document mentionnant le fait que vous refusez la mutuelle Alenvi</p>
+          <div class="row justify-between">
+            <p class="input-caption">Merci de nous transmettre le document mentionnant le fait que vous refusez la mutuelle Alenvi</p>
+            <q-icon v-if="$v.user.alenvi.administrative.mutualFund.driveId.$error" name="error_outline" color="secondary" />
+          </div>
           <q-uploader ref="mutualFund" name="mutualFund" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `mutuelle_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
             hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
             hide-upload-button @add="uploadDocument('mutualFund')" @finish="refreshUser" />
@@ -320,10 +368,14 @@
     <div class="q-mb-xl">
       <div class="row justify-between">
         <p class="text-weight-bold">Transports</p>
+        <p :class="[groupErrors('transportInvoice').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('transportInvoice').msg }}</p>
       </div>
       <div class="row gutter-profile-x">
         <div class="col-xs-12">
-          <p class="input-caption">Avez-vous un abonnement de transports en commun ?</p>
+          <div class="row justify-between">
+            <p class="input-caption">Avez-vous un abonnement de transports en commun ?</p>
+            <q-icon v-if="$v.user.alenvi.administrative.transportInvoice.type.$error" name="error_outline" color="secondary" />
+          </div>
           <q-option-group color="primary" v-model="user.alenvi.administrative.transportInvoice.type" @input="updateUser({ alenvi: 'administrative.transportInvoice.type' })"
             :options="[
                 { label: 'Abonnement transports en commun', value: 'public' },
@@ -332,10 +384,21 @@
               ]" />
         </div>
         <div v-if="user.alenvi.administrative.transportInvoice.type === 'public'" class="col-xs-12">
-          <p class="input-caption">Merci de nous transmettre votre justificatif d'abonnement</p>
+          <div class="row justify-between">
+            <p class="input-caption">Merci de nous transmettre votre justificatif d'abonnement</p>
+            <q-icon v-if="$v.user.alenvi.administrative.transportInvoice.driveId.$error" name="error_outline" color="secondary" />
+          </div>
           <q-uploader ref="transportInvoice" name="transportInvoice" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `justif_transport_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
             hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
             hide-upload-button @add="uploadDocument('transportInvoice')" @finish="refreshUser" />
+        </div>
+        <div v-if="user.alenvi.administrative.transportInvoice && user.alenvi.administrative.transportInvoice.driveId" class="row justify-between"
+            style="background: white; margin-top: 24px;">
+            <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.transportInvoice.driveId)" alt="cni verso">
+            <div class="self-end doc-delete">
+              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.transportInvoice.driveId, 'administrative.transportInvoice')"
+              />
+            </div>
         </div>
       </div>
     </div>
@@ -375,6 +438,28 @@ export default {
         'user.alenvi.administrative.contact.address',
         'user.alenvi.administrative.contact.zipCode',
         'user.alenvi.administrative.contact.city'
+      ],
+      emergencyContactGroup: [
+        'user.alenvi.administrative.emergencyContact.name',
+        'user.alenvi.administrative.emergencyContact.phoneNumber'
+      ],
+      ibanGroup: [
+        'user.alenvi.administrative.payment.rib.iban',
+        'user.alenvi.administrative.payment.rib.bic'
+      ],
+      documentsGroup: [
+        'user.alenvi.administrative.idCardRecto.driveId',
+        'user.alenvi.administrative.healthAttest.driveId',
+        'user.alenvi.administrative.phoneInvoice.driveId',
+        'user.alenvi.administrative.certificates'
+      ],
+      mutualFundGroup: [
+        'user.alenvi.administrative.mutualFund.has',
+        'user.alenvi.administrative.mutualFund.driveId',
+      ],
+      transportInvoiceGroup: [
+        'user.alenvi.administrative.transportInvoice.type',
+        'user.alenvi.administrative.transportInvoice.driveId',
       ],
       user: {
         alenvi: {
@@ -493,7 +578,12 @@ export default {
         }
       },
       identityGroup: this.identityGroup,
-      contactGroup: this.contactGroup
+      contactGroup: this.contactGroup,
+      emergencyContactGroup: this.emergencyContactGroup,
+      ibanGroup: this.ibanGroup,
+      documentsGroup: this.documentsGroup,
+      mutualFundGroup: this.mutualFundGroup,
+      transportInvoiceGroup: this.transportInvoiceGroup
     }
   },
   computed: {
@@ -663,9 +753,9 @@ export default {
     },
     groupErrors (group) {
       let j = 0;
-      console.log('VUELIDATE', this.$v);
-      for (let i = 0, l = this[`${group}Group`].length; i < l; i++) {
-        if (this.$v.identityGroup[this[`${group}Group`][i]].$error) {
+      const groupName = `${group}Group`;
+      for (let i = 0, l = this[groupName].length; i < l; i++) {
+        if (this.$v[groupName][this[groupName][i]].$error) {
           j++;
         }
       }
