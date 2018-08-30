@@ -422,6 +422,9 @@ export default {
   // .btn-directory
   //   min-height: 40px
 
+  .input-caption
+    margin-bottom: 4px
+
   .input-search
     font-size: 14px
     & /deep/ .q-if-control.q-icon
