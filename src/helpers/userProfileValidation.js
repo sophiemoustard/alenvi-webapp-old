@@ -7,18 +7,18 @@ const userProfileSchema = Joi.object().keys({
   local: {
     email: Joi.string().required()
   },
-  administrative: {
+  administrative: Joi.object().keys({
     identity: Joi.object().keys({
       nationality: Joi.string().required(),
       dateOfBirth: Joi.string().required(),
-      birthContry: Joi.string().required(),
+      birthCountry: Joi.string().required(),
       birthState: Joi.string().required(),
       birthCity: Joi.string().required(),
       socialSecurityNumber: Joi.number().required()
     }),
     contact: Joi.object().keys({
       address: Joi.string().required(),
-      additionalAddress: Joi.string(),
+      additionalAddress: Joi.string().allow('', null),
       zipCode: Joi.string().required(),
       city: Joi.string().required()
     }),
@@ -34,8 +34,8 @@ const userProfileSchema = Joi.object().keys({
     },
     mutualFund: {
       has: Joi.boolean().required(),
-      driveId: Joi.string().required(),
-      link: Joi.string()
+      driveId: Joi.string().allow(null).when('has', { is: true, then: Joi.required() }),
+      link: Joi.string().allow(null)
     },
     navigoInvoice: {
       driveId: Joi.string().required(),
@@ -43,7 +43,7 @@ const userProfileSchema = Joi.object().keys({
     },
     transportInvoice: {
       type: Joi.string().required(),
-      driveId: Joi.string().required(),
+      driveId: Joi.string().when('type', { is: 'public', then: Joi.required() }),
       link: Joi.string()
     },
     phoneInvoice: {
@@ -60,10 +60,10 @@ const userProfileSchema = Joi.object().keys({
       link: Joi.string()
     },
     idCardVerso: {
-      driveId: Joi.string().required(),
-      link: Joi.string()
+      driveId: Joi.string().allow(null),
+      link: Joi.string().allow(null)
     }
-  }
+  })
 });
 
 const options = {
