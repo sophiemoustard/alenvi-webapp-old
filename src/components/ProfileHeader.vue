@@ -32,10 +32,33 @@
         </div>
         <div class="col-10 col full-height justify-between">
           <div class="text-weight-bold">{{ isAccountConfirmed }}</div>
-          <div class="send-message-link">Envoyer un message</div>
+          <div class="send-message-link" @click="opened = true">Envoyer un message</div>
         </div>
       </div>
     </div>
+    <!-- Modal envoi message -->
+    <q-modal v-model="opened" @hide="resetForm">
+      <div class="col modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-8">
+            <h5>Envoyer un <span class="text-weight-bold">message</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer" style="text-align: right">
+            <span><q-icon name="clear" size="1rem" @click.native="opened = false" /></span>
+          </div>
+        </div>
+        <div class="row margin-input">
+          <div class="col-12">
+            <div class="row justify-between">
+              <p class="input-caption">Message</p>
+            </div>
+            <!-- <q-select :options="typeMessageOptions" v-model="newUser.administrative.identity.title" color="white" inverted-light separator :error="$v.newUser.administrative.identity.title.$error"
+              @blur="$v.newUser.administrative.identity.title.$touch" /> -->
+          </div>
+        </div>
+      </div>
+      <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary" :loading="loading" @click="submit" />
+    </q-modal>
   </div>
 </template>
 
@@ -46,6 +69,21 @@ import { getUserStartDate } from '../helpers/getUserStartDate';
 export default {
   name: 'ProfileHeader',
   props: ['profileId'],
+  data () {
+    return {
+      opened: false,
+      typeMessageOptions: [
+        {
+          label: 'Pièces manquantes',
+          value: 'Pièces manquantes'
+        },
+        {
+          label: 'Intervention',
+          value: 'Intervention'
+        }
+      ],
+    }
+  },
   computed: {
     ...mapGetters({
       currentUser: 'main/user',
@@ -68,9 +106,9 @@ export default {
     },
     isAccountConfirmed () {
       if (this.user.isConfirmed) {
-        return 'Compte webapp confirmé'
+        return 'Accès WebApp activé'
       }
-      return 'Compte webapp non confirmé'
+      return 'Accès WebApp non activé'
     }
   },
 }
