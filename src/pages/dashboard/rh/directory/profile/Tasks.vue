@@ -2,7 +2,7 @@
   <div style="max-width: 90vw;">
     <q-item v-if="tasks" tag="label" v-for="(task, index) in tasks" :key="index">
       <q-item-side>
-        <q-checkbox v-model="task.isDone" @input="handleConstrainedCoach(coach)"></q-checkbox>
+        <q-checkbox v-model="task.isDone" @input="handleTask(task)"></q-checkbox>
       </q-item-side>
       <q-item-main>
         <q-item-tile label>{{ task.task.name }}</q-item-tile>
@@ -33,9 +33,9 @@ export default {
     }
   },
   methods: {
-    async handleConstrainedCoach (coach) {
+    async handleTask (task) {
       try {
-        await this.$users.updateById({ _id: coach._id, isConstrained: coach.isConstrained });
+        await this.$users.updateById({ _id: task._id, isDone: task.isDone });
         this.$q.notify({
           color: 'positive',
           icon: 'thumb up',
