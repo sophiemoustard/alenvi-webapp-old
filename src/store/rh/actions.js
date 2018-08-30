@@ -11,7 +11,7 @@ export async function getUserProfile ({ commit }, userId) {
     const user = await users.getById(userId);
     const userValidation = userProfileValidation(user);
     commit('saveUserProfile', user);
-    commit('saveNotification', { type: 'profiles', _id: user._id, count: userValidation.error.details.length });
+    commit('saveNotification', { type: 'profiles', _id: user._id, count: userValidation.error ? userValidation.error.details.length : 0 });
   } catch (e) {
     console.error(e);
   }
