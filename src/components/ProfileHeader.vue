@@ -23,10 +23,12 @@
         </div>
       </div>
       <div class="col-6 row">
-        <div class="col-1 relative-position">
-          <q-icon size="36px" name="phone_iphone" color="grey-2" />
-          <q-icon v-if="!user.isConfirmed" class="chip-icon" name="cancel" color="secondary" size="16px" />
-          <q-icon v-if="user.isConfirmed" class="chip-icon" name="check_circle" color="tertiary" size="16px" />
+        <div class="col-1">
+          <div class="full-height relative-position" style="width: 37px;">
+            <q-icon size="36px" name="phone_iphone" color="grey-2" />
+            <q-icon v-if="!user.isConfirmed" class="chip-icon" name="cancel" color="secondary" size="16px" />
+            <q-icon v-if="user.isConfirmed" class="chip-icon" name="check_circle" color="tertiary" size="16px" />
+          </div>
         </div>
         <div class="col-10 col full-height justify-between">
           <div class="text-weight-bold">{{ isAccountConfirmed }}</div>
@@ -114,7 +116,7 @@ export default {
   .chip-icon
     height: 14px
     position: absolute
-    right: 17px
+    right: 5px
     top: -4px
     width: 14px
     border-radius: 50%
