@@ -93,8 +93,8 @@
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
-            <q-icon v-if="$v.user.alenvi.mobilePhone.$error" name="error_outline" color="secondary" />
             <p class="input-caption">Numéro de téléphone</p>
+            <q-icon v-if="$v.user.alenvi.mobilePhone.$error" name="error_outline" color="secondary" />
           </div>
           <q-input v-model.trim="user.alenvi.mobilePhone"
             color="white"
@@ -272,7 +272,7 @@
           </div>
           <div v-if="user.alenvi.administrative.healthAttest && user.alenvi.administrative.healthAttest.driveId" class="row justify-between"
             style="background: white">
-            <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.healthAttest.driveId)" alt="cni verso">
+            <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.healthAttest.driveId)" alt="attestation secu">
             <div class="self-end doc-delete">
               <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.healthAttest.driveId, 'administrative.healthAttest')"
               />
@@ -471,6 +471,7 @@ export default {
             },
             idCardRecto: {},
             idCardVerso: {},
+            healthAttest: {},
             mutualFund: {
               has: null
             },
