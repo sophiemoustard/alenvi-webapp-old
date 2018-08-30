@@ -212,6 +212,15 @@ const routes = [
               cookies: ['alenvi_token', 'refresh_token'],
               parent: 'rh'
             }
+          },
+          {
+            path: 'tasks',
+            name: 'profile tasks',
+            component: () => import('pages/dashboard/rh/directory/profile/Tasks'),
+            meta: {
+              cookies: ['alenvi_token', 'refresh_token'],
+              parent: 'rh'
+            }
           }
         ]
       },
