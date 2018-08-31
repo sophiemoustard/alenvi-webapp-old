@@ -3,7 +3,7 @@
     <div class="row justify-between col-12">
       <div class="row items-baseline">
         <div class="row">
-          <q-icon v-if="isExternalUser" class="on-left cursor-pointer self-center" size="1rem" name="arrow_back" color="primary" @click.native="$router.go(-1)" />
+          <q-icon v-if="isExternalUser" class="on-left cursor-pointer self-center" size="1rem" name="arrow_back" color="primary" @click.native="$router.push({ name: 'directory'})" />
         </div>
         <h4>{{ user.firstname }} {{ user.lastname }}</h4>
       </div>
