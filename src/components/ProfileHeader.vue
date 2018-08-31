@@ -37,7 +37,7 @@
       </div>
     </div>
     <!-- Modal envoi message -->
-    <q-modal v-model="opened" @hide="resetForm">
+    <q-modal v-model="opened">
       <div class="col modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-8">
@@ -46,18 +46,26 @@
           <div class="col-1 cursor-pointer" style="text-align: right">
             <span><q-icon name="clear" size="1rem" @click.native="opened = false" /></span>
           </div>
+          <div class="row margin-input">
+            <q-select
+              v-model="typeMessage"
+              color="white"
+              inverted-light
+              :options="typeMessageOptions"/>
+          </div>
         </div>
         <div class="row margin-input">
           <div class="col-12">
             <div class="row justify-between">
               <p class="input-caption">Message</p>
             </div>
-            <!-- <q-select :options="typeMessageOptions" v-model="newUser.administrative.identity.title" color="white" inverted-light separator :error="$v.newUser.administrative.identity.title.$error"
-              @blur="$v.newUser.administrative.identity.title.$touch" /> -->
+            <q-input v-model="message" type="textarea" rows="7"
+              color="white" inverted-light
+            />
           </div>
         </div>
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary" :loading="loading" @click="submit" />
+      <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary" :loading="loading" @click="sendMessage()" />
     </q-modal>
   </div>
 </template>
@@ -71,11 +79,14 @@ export default {
   props: ['profileId'],
   data () {
     return {
+      loading: false,
       opened: false,
+      message: '',
+      typeMessage: 'PM',
       typeMessageOptions: [
         {
           label: 'Pièces manquantes',
-          value: 'Pièces manquantes'
+          value: 'PM'
         },
         {
           label: 'Intervention',
@@ -111,6 +122,35 @@ export default {
       return 'Accès WebApp non activé'
     }
   },
+  methods: {
+    async sendMessage () {
+      try {
+        const message = await this.$twilio.sendSMS({
+          to: `+33${this.user.mobilePhone.substring(1)}`,
+          body: this.message,
+        });
+        console.log('SMS envoyé =', message);
+        this.isLoading = false;
+        this.$q.notify({
+          color: 'positive',
+          icon: 'thumb up',
+          detail: 'SMS bien envoyé',
+          position: 'bottom-right',
+          timeout: 2500
+        });
+      } catch (e) {
+        this.isLoading = false;
+        this.$q.notify({
+          color: 'negative',
+          icon: 'warning',
+          detail: 'Erreur lors de l\'envoi du SMS',
+          position: 'bottom-right',
+          timeout: 2500
+        });
+        console.error(e);
+      }
+    }
+  }
 }
 </script>
 
@@ -159,4 +199,18 @@ export default {
     width: 14px
     border-radius: 50%
     background: white
+
+  .modal
+    &-padding
+      padding: 24px 58px 0px 58px
+    &-btn
+      border-radius: 0
+
+  .q-if-inverted
+    border: 1px solid $light-grey
+
+  .margin-input
+    margin-bottom: 6px
+    &.last
+      margin-bottom: 24px
 </style>
