@@ -18,6 +18,29 @@
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
+            <p class="input-caption">Prénom</p>
+            <q-icon v-if="$v.user.alenvi.firstname.$error" error-label="error" name="error_outline" color="secondary" />
+          </div>
+          <q-input v-model="user.alenvi.firstname"
+            color="white"
+            inverted-light
+            @focus="saveTmp('firstname')"
+            @blur="updateUser({ alenvi: 'firstname', ogust: 'first_name' })"
+          />
+        </div><div class="col-xs-12 col-md-6">
+          <div class="row justify-between">
+            <p class="input-caption">Nom</p>
+            <q-icon v-if="$v.user.alenvi.lastname.$error" error-label="error" name="error_outline" color="secondary" />
+          </div>
+          <q-input v-model="user.alenvi.lastname"
+            color="white"
+            inverted-light
+            @focus="saveTmp('lastname')"
+            @blur="updateUser({ alenvi: 'lastname', ogust: 'last_name' })"
+          />
+        </div>
+        <div class="col-xs-12 col-md-6">
+          <div class="row justify-between">
             <p class="input-caption">Nationalité</p>
             <q-icon v-if="$v.user.alenvi.administrative.identity.nationality.$error" name="error_outline" color="secondary" />
           </div>
@@ -229,17 +252,29 @@
         <p :class="[groupErrors('documents').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('documents').msg }}</p>
       </div>
       <div class="row gutter-profile items-stretch">
-        <div class="col-xs-12 col-md-6">
+        <div class="col-xs-12">
           <div class="row justify-between">
-            <p class="input-caption">Carte d'identité (recto) ou passeport</p>
+            <p class="input-caption">Merci de nous indiquer le type de document d'identité que vous possédez.</p>
+            <q-icon v-if="$v.identityType.$error" name="error_outline" color="secondary" />
+          </div>
+          <q-option-group color="primary" v-model="identityType"
+           :options="[
+             { label: 'Carte Nationale d\'Identité', value: 'cni' },
+             { label: 'Passeport', value: 'pp' },
+             { label: 'Titre de séjour', value: 'ts' }
+           ]" />
+        </div>
+        <div v-if="identityType === 'cni'" class="col-xs-12 col-md-6">
+          <div class="row justify-between">
+            <p class="input-caption">Carte d'identité (recto)</p>
             <q-icon v-if="$v.user.alenvi.administrative.idCardRecto.driveId.$error" name="error_outline" color="secondary" />
           </div>
           <div v-if="user.alenvi.administrative.idCardRecto && user.alenvi.administrative.idCardRecto.driveId" class="row justify-between"
             style="background: white">
-            <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.idCardRecto.driveId)" alt="cni verso">
+            <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.idCardRecto.driveId)" alt="cni recto">
             <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.idCardRecto.driveId, 'administrative.idCardRecto')"
-              />
+              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.idCardRecto.driveId, 'administrative.idCardRecto')" />
+              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.idCardRecto.link)" />
             </div>
           </div>
           <q-field v-if="!user.alenvi.administrative.idCardRecto.driveId">
@@ -248,20 +283,63 @@
               hide-upload-button @add="uploadDocument('idCardRecto')" @finish="refreshUser" />
           </q-field>
         </div>
-        <div class="col-xs-12 col-md-6">
-          <p class="input-caption">Carte d'identité (verso)</p>
+        <div v-if="identityType === 'cni'" class="col-xs-12 col-md-6">
+          <div class="row justify-between">
+            <p class="input-caption">Carte d'identité (verso)</p>
+            <q-icon v-if="$v.user.alenvi.administrative.idCardVerso.driveId.$error" name="error_outline" color="secondary" />
+          </div>
           <div v-if="user.alenvi.administrative.idCardVerso && user.alenvi.administrative.idCardVerso.driveId" class="row justify-between"
             style="background: white">
             <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.idCardVerso.driveId)" alt="cni verso">
             <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.idCardVerso.driveId, 'administrative.idCardVerso')"
-              />
+              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.idCardVerso.driveId, 'administrative.idCardVerso')" />
+              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.idCardVerso.link)" />
             </div>
           </div>
           <q-field v-if="!user.alenvi.administrative.idCardVerso.driveId">
             <q-uploader ref="idCardVerso" name="idCardVerso" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `cni_verso_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
               hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
               hide-upload-button @add="uploadDocument('idCardVerso')" @finish="refreshUser" />
+            <!-- <q-uploader url="test" color="white" inverted-light /> -->
+          </q-field>
+        </div>
+        <div v-if="identityType === 'pp'" class="col-xs-12 col-md-6">
+          <div class="row justify-between">
+            <p class="input-caption">Passeport</p>
+            <q-icon v-if="$v.user.alenvi.administrative.passport.driveId.$error" name="error_outline" color="secondary" />
+          </div>
+          <div v-if="user.alenvi.administrative.passport && user.alenvi.administrative.passport.driveId" class="row justify-between"
+            style="background: white">
+            <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.passport.driveId)" alt="passeport">
+            <div class="self-end doc-delete">
+              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.passport.driveId, 'administrative.passport')" />
+              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.passport.link)" />
+            </div>
+          </div>
+          <q-field v-if="!user.alenvi.administrative.passport.driveId">
+            <q-uploader ref="passport" name="passport" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `passeport_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
+              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
+              hide-upload-button @add="uploadDocument('passport')" @finish="refreshUser" />
+            <!-- <q-uploader url="test" color="white" inverted-light /> -->
+          </q-field>
+        </div>
+        <div v-if="identityType === 'ts'" class="col-xs-12 col-md-6">
+          <div class="row justify-between">
+            <p class="input-caption">Titre de séjour</p>
+            <q-icon v-if="$v.user.alenvi.administrative.residencePermit.driveId.$error" name="error_outline" color="secondary" />
+          </div>
+          <div v-if="user.alenvi.administrative.residencePermit && user.alenvi.administrative.residencePermit.driveId" class="row justify-between"
+            style="background: white">
+            <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.residencePermit.driveId)" alt="titre de séjour">
+            <div class="self-end doc-delete">
+              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.residencePermit.driveId, 'administrative.residencePermit')" />
+              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.residencePermit.link)" />
+            </div>
+          </div>
+          <q-field v-if="!user.alenvi.administrative.residencePermit.driveId">
+            <q-uploader ref="residencePermit" name="residencePermit" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `titre_de_séjour_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
+              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
+              hide-upload-button @add="uploadDocument('residencePermit')" @finish="refreshUser" />
             <!-- <q-uploader url="test" color="white" inverted-light /> -->
           </q-field>
         </div>
@@ -274,8 +352,8 @@
             style="background: white">
             <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.healthAttest.driveId)" alt="attestation secu">
             <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.healthAttest.driveId, 'administrative.healthAttest')"
-              />
+              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.healthAttest.driveId, 'administrative.healthAttest')" />
+              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.healthAttest.link)" />
             </div>
           </div>
           <q-field v-if="!user.alenvi.administrative.healthAttest.driveId">
@@ -293,8 +371,8 @@
             style="background: white">
             <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.phoneInvoice.driveId)" alt="cni verso">
             <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')"
-              />
+              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')" />
+              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.phoneInvoice.link)" />
             </div>
           </div>
           <q-field v-if="!user.alenvi.administrative.phoneInvoice.driveId">
@@ -320,8 +398,8 @@
           <div v-if="certificate.driveId" class="row justify-between" style="background: white">
             <img class="doc-thumbnail" :src="getThumbnailUrl(certificate.driveId)" alt="cni verso">
             <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(certificate.driveId, 'certificates')"
-              />
+              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(certificate.driveId, 'certificates')" />
+              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(certificate.link)" />
             </div>
           </div>
         </div>
@@ -349,8 +427,8 @@
             style="background: white; margin-top: 24px;">
             <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.mutualFund.driveId)" alt="cni verso">
             <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.mutualFund.driveId, 'administrative.mutualFund')"
-              />
+              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.mutualFund.driveId, 'administrative.mutualFund')" />
+              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.mutualFund.link)" />
             </div>
           </div>
         </div>
@@ -396,8 +474,8 @@
             style="background: white; margin-top: 24px;">
             <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.transportInvoice.driveId)" alt="cni verso">
             <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.transportInvoice.driveId, 'administrative.transportInvoice')"
-              />
+              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.transportInvoice.driveId, 'administrative.transportInvoice')" />
+              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.transportInvoice.link)" />
             </div>
         </div>
       </div>
@@ -407,7 +485,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import { Cookies } from 'quasar';
+import { Cookies, openURL } from 'quasar';
 import { required, email, numeric, minLength, requiredIf } from 'vuelidate/lib/validators';
 
 import gdrive from '../../../../../api/GoogleDrive.js';
@@ -426,7 +504,10 @@ export default {
     return {
       isLoaded: false,
       tmpInput: '',
+      identityType: '',
       identityGroup: [
+        'user.alenvi.firstname',
+        'user.alenvi.lastname',
         'user.alenvi.administrative.identity.nationality',
         'user.alenvi.administrative.identity.dateOfBirth',
         'user.alenvi.administrative.identity.birthCountry',
@@ -449,6 +530,9 @@ export default {
       ],
       documentsGroup: [
         'user.alenvi.administrative.idCardRecto.driveId',
+        'user.alenvi.administrative.idCardVerso.driveId',
+        'user.alenvi.administrative.passport.driveId',
+        'user.alenvi.administrative.residencePermit.driveId',
         'user.alenvi.administrative.healthAttest.driveId',
         'user.alenvi.administrative.phoneInvoice.driveId',
         'user.alenvi.administrative.certificates'
@@ -472,6 +556,8 @@ export default {
             idCardRecto: {},
             idCardVerso: {},
             healthAttest: {},
+            passport: {},
+            residencePermit: {},
             mutualFund: {
               has: null
             },
@@ -507,6 +593,7 @@ export default {
   },
   validations () {
     return {
+      identityType: { required },
       user: {
         alenvi: {
           firstname: { required },
@@ -536,10 +623,32 @@ export default {
               phoneNumber: { required, numeric }
             },
             idCardRecto: {
-              driveId: { required }
+              driveId: {
+                required: requiredIf(() => {
+                  return this.identityType === 'cni';
+                })
+              }
             },
             idCardVerso: {
-              driveId: { required }
+              driveId: {
+                required: requiredIf(() => {
+                  return this.identityType === 'cni';
+                })
+              }
+            },
+            passport: {
+              driveId: {
+                required: requiredIf(() => {
+                  return this.identityType === 'pp';
+                })
+              }
+            },
+            residencePermit: {
+              driveId: {
+                required: requiredIf(() => {
+                  return this.identityType === 'ts';
+                })
+              }
             },
             healthAttest: {
               driveId: { required }
@@ -607,11 +716,18 @@ export default {
       return {
         'x-access-token': Cookies.get('alenvi_token') || ''
       }
-    }
+    },
   },
   mounted () {
     this.mergeUser();
     this.$v.user.alenvi.$touch();
+    if (this.user.alenvi.administrative.passport.driveId) {
+      this.identityType = 'pp'
+    } else if (this.user.alenvi.administrative.idCardRecto.driveId) {
+      this.identityType = 'cni'
+    } else if (this.user.alenvi.administrative.residencePermit.driveId) {
+      this.identityType = 'ts'
+    }
   },
   watch: {
     userProfile (value) {
@@ -764,6 +880,9 @@ export default {
         errors: j,
         msg: j > 0 ? `${j} information(s) manquante(s)` : 'Informations complètes'
       }
+    },
+    goToUrl (url) {
+      openURL(url);
     }
   }
 }
