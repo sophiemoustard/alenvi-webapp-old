@@ -32,7 +32,7 @@
         </div>
         <div class="col-10 col full-height justify-between">
           <div class="text-weight-bold">{{ isAccountConfirmed }}</div>
-          <div class="send-message-link" @click="opened = true">Envoyer un message</div>
+          <div class="send-message-link" @click="opened = true">Envoyer un SMS</div>
         </div>
       </div>
     </div>
