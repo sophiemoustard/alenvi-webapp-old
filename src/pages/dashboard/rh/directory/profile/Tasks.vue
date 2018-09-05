@@ -12,7 +12,7 @@
 </template>
 
 <script>
-
+import { displayTask } from '../../../../../helpers/taskValidation.js'
 export default {
   data () {
     return {
@@ -27,7 +27,7 @@ export default {
   async mounted () {
     try {
       const user = await this.$users.getById(this.getUser._id);
-      this.tasks = user.procedure;
+      this.tasks = user.procedure.filter(task => displayTask(task, user));
     } catch (e) {
       console.error(e);
     }
@@ -36,6 +36,7 @@ export default {
     async handleTask (task) {
       try {
         await this.$users.updateTask({ user_id: this.getUser._id, task_id: task.task._id, isDone: task.check.isDone });
+        this.$store.dispatch('rh/getUserProfile', this.getUser._id);
         this.$q.notify({
           color: 'positive',
           icon: 'thumb up',
