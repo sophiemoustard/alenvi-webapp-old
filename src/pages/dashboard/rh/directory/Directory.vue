@@ -36,8 +36,10 @@
           <q-item v-if="col.name === 'name'">
             <q-item-side :avatar="col.value.picture" />
             <q-item-main :label="col.value.name" />
-            <q-item-side v-if="notificationsProfiles[props.row.auxiliary._id] > 0" right icon="error" color="secondary" />
           </q-item>
+          <template v-else-if="col.name === 'profileErrors'">
+            <q-icon v-if="notificationsProfiles[props.row.auxiliary._id] > 0" name="error" color="secondary" size="1rem" />
+          </template>
           <template v-else-if="col.name === 'active'">
             <div :class="{ activeDot: col.value, inactiveDot: !col.value }"></div>
           </template>
@@ -167,6 +169,7 @@ import randomize from 'randomatic';
 import { getUserStartDate } from '../../../../helpers/getUserStartDate';
 import { clear } from '../../../../helpers/utils.js';
 import { userProfileValidation } from '../../../../helpers/userProfileValidation';
+import { taskValidation } from '../../../../helpers/taskValidation';
 import SelectSector from '../../../../components/SelectSector';
 import SelectManager from '../../../../components/SelectManager';
 
@@ -228,6 +231,13 @@ export default {
           align: 'left',
           sortable: true,
           sort: (a, b) => a.name.split(' ')[1].toLowerCase() < b.name.split(' ')[1].toLowerCase() ? -1 : 1
+        },
+        {
+          name: 'profileErrors',
+          label: '',
+          field: 'profileErrors',
+          align: 'left',
+          sortable: true
         },
         {
           name: 'startDate',
@@ -300,11 +310,17 @@ export default {
         const users = await this.$users.showAll({ role: 'Auxiliaire' });
         const sectors = await this.$ogust.getList('employee.sector');
         this.userList = users.map((user) => {
-          const checkResult = userProfileValidation(user);
+          const checkProfileErrors = userProfileValidation(user);
           this.$store.commit('rh/saveNotification', {
             type: 'profiles',
             _id: user._id,
-            count: checkResult.error ? checkResult.error.details.length : 0
+            count: checkProfileErrors.error ? checkProfileErrors.error.details.length : 0
+          });
+          const checkTasks = user.procedure.filter(task => taskValidation(task, user).length > 0 && !task.check.isDone);
+          this.$store.commit('rh/saveNotification', {
+            type: 'tasks',
+            _id: user._id,
+            count: checkTasks.length > 0 ? checkTasks.length : 0
           });
           return {
             auxiliary: {
@@ -312,6 +328,7 @@ export default {
               name: `${user.firstname} ${user.lastname}`,
               picture: user.picture.link
             },
+            profileErrors: checkProfileErrors.error ? checkProfileErrors.error.details.length : 0,
             startDate: getUserStartDate(user.administrative.contracts),
             sector: sectors[user.sector],
             isActive: user.isActive
