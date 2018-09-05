@@ -7,7 +7,7 @@
       </div>
       <div class="col-xs-12 col-md-6">
         <p class="input-caption">Marraine/parrain</p>
-        <select-mentor v-model="user.alenvi.mentor" :sector="user.alenvi.sector" @myBlur="updateUser({ alenvi: 'mentor' })" />
+        <select-mentor v-model="user.alenvi.mentorId" :sector="user.alenvi.sector" @myBlur="updateUser({ alenvi: 'mentorId' })" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -547,7 +547,7 @@ export default {
       ],
       user: {
         alenvi: {
-          mentor: '',
+          mentorId: '',
           administrative: {
             emergencyContact: {
               name: '',
@@ -603,7 +603,7 @@ export default {
           },
           mobilePhone: { required, numeric },
           sector: { required },
-          mentor: { required },
+          mentorId: { required },
           administrative: {
             identity: {
               nationality: { required },
