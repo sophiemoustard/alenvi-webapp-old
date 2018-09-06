@@ -1,112 +1,126 @@
 <template>
-  <div class="layout-padding row justify-center">
-    <q-card flat class="layout-padding" style="width: 500px; max-width: 90vw;">
-      <q-card-media>
-        <img src="https://res.cloudinary.com/alenvi/image/upload/v1507124345/images/business/alenvi_logo_complet_full.png" class="responsive">
-      </q-card-media>
-      <q-card-main>
-        <q-field class="col-xs-12 col-sm-3" icon="mail">
-          <q-input @keyup.enter="submit" v-model.trim="credentials.email" float-label="Adresse email" />
-        </q-field>
-        <q-field class="col-xs-12 col-sm-3" icon="vpn_key">
-          <q-input @keyup.enter="submit" v-model="credentials.password" float-label="Mot de passe" type="password" />
-        </q-field>
-      </q-card-main>
-      <q-card-actions>
-        <q-btn class="full-width" color="primary" @click="submit">Login</q-btn>
-      </q-card-actions>
-      <q-card-actions>
-        <router-link class="row justify-center" :to="{ path: '/forgotPassword', query: { from: 'w' } }"><small>Mot de passe oublié ?</small></router-link>
-      </q-card-actions>
-    </q-card>
+  <div class="neutral-background column" style="height: 100vh"><!-- Column because we need to activate flex for last button (see his own class) -->
+    <div class="row signup-header-padding bg-white items-center">
+      <div class="col-6">
+        <img style="height: 30px" src="https://res.cloudinary.com/alenvi/image/upload/v1507019444/images/business/alenvi_logo_complet_183x50.png" alt="">
+      </div>
+      <div class="col-6">
+        <p class="no-margin" style="font-size: 0.8rem">Espace Auxiliaire d'envie</p>
+      </div>
+    </div>
+    <div class="signup-body-padding">
+      <div class="row justify-between items-center">
+        <div class="col-2" style="text-align: left">
+          <span><q-icon name="thumb up" size="2rem" /></span>
+        </div>
+        <div class="col-10 signup-bloctext-padding">
+          <p class="no-margin" style="font-size: 0.8rem">Pour vous connecter à votre compte Alenvi, merci de <span class="text-weight-bold">saisir votre identifiant</span> et votre <span class="text-weight-bold">mot de passe</span></p>
+        </div>
+      </div>
+      <div class="row margin-input">
+        <div class="col-12">
+          <div class="row justify-between">
+            <p class="input-caption">Email</p>
+          </div>
+          <q-input v-model.trim="user.alenvi.local.email" color="white" inverted-light lower-case @blur="$v.user.alenvi.local.email.$touch()"/>
+        </div>
+      </div>
+      <div class="row margin-input">
+        <div class="col-12">
+          <div class="row justify-between">
+            <p class="input-caption">Mot de passe</p>
+          </div>
+          <q-input v-model="user.alenvi.local.password" type="password" color="white" inverted-light lower-case @blur="$v.user.alenvi.local.password.$touch()"/>
+        </div>
+      </div>
+    </div>
+    <div class="flex-align-end">
+      <q-btn no-caps class="full-width signup-btn" label="Envoyer message" icon-right="send" color="primary" :loading="loading" @click="sendMessage()" />
+    </div>
   </div>
 </template>
 
 <script>
-
-import { date } from 'quasar'
+import { mapGetters } from 'vuex';
+import { required, email, sameAs, minLength } from 'vuelidate/lib/validators';
 
 export default {
-  metaInfo: {
-    title: 'Connexion',
-    meta: [
-      { name: 'description', content: 'Espace personnalisé pour accéder à vos documents et informations liés aux interventions réalisées par Alenvi.' },
-    ]
-  },
+  name: 'CreatePassword',
   data () {
     return {
-      credentials: {
-        email: '',
-        password: ''
-      }
+      loading: false,
+      user: {
+        alenvi: {
+          local: {
+            email: 'pierre.hofman@gmail.com',
+            password: ''
+          }
+        }
+      },
+      passwordConfirm: ''
+    }
+  },
+  validations () {
+    return {
+      user: {
+        alenvi: {
+          local: {
+            email: { required, email },
+            password: { required, minLength: minLength(4) }
+          }
+        }
+      },
+      passwordConfirm: { required, sameAsPassword: sameAs(() => this.user.alenvi.local.password) }
     }
   },
   computed: {
-    getUser () {
-      return this.$store.getters['main/user'];
-    }
-  },
-  async mounted () {
-  },
-  methods: {
-    async submit () {
-      try {
-        const user = await this.$axios.post(`${process.env.API_HOSTNAME}/users/authenticate`, {
-          email: this.credentials.email.toLowerCase(),
-          password: this.credentials.password
-        });
-        // console.log(user);
-        this.$q.cookies.set('alenvi_token', user.data.data.token, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV !== 'development' });
-        this.$q.cookies.set('alenvi_token_expires_in', user.data.data.expiresIn, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV !== 'development' });
-        this.$q.cookies.set('refresh_token', user.data.data.refreshToken, { path: '/', expires: 365, secure: process.env.NODE_ENV !== 'development' });
-        this.$q.cookies.set('user_id', user.data.data.user._id, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV !== 'development' });
-        await this.$store.dispatch('main/getUser', this.$q.cookies.get('user_id'));
-        // if (this.getUser.role.name === 'Client') {
-        //   return this.$router.replace({ path: '/dashboard/customer/home' });
-        // }
-        if (this.$q.platform.is.desktop) {
-          this.$store.commit('main/setToggleDrawer', true);
-        }
-
-        if (this.$route.query.from) {
-          return this.$router.replace({ path: this.$route.query.from });
-        }
-
-        if (this.getUser.role.name === 'Client') {
-          this.$router.replace({ path: '/dashboard/customer/home' });
-        } else if (this.getUser.role.name === 'Auxiliaire' && !this.getUser.administrative.signup.complete) {
-          this.$router.replace({ path: '/signupComplete' });
-        } else {
-          this.$router.replace({ path: '/dashboard/planning' });
-        }
-      } catch (e) {
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Impossible de se connecter.',
-          position: 'bottom-right',
-          timeout: 2500
-        });
-        console.error(e);
+    ...mapGetters({
+      // currentUser: 'main/user',
+      // user: 'rh/getUserProfile'
+    }),
+    passwordError () {
+      if (!this.$v.user.alenvi.local.password.required) {
+        return 'Champ requis';
+      } else if (!this.$v.user.alenvi.local.password.minLength) {
+        return 'Mot de passe trop court';
+      }
+    },
+    passwordConfirmError () {
+      if (!this.$v.passwordConfirm.required) {
+        return 'Champ requis';
+      } else if (!this.$v.passwordConfirm.sameAs) {
+        return 'Le mot de passe doit être identique';
       }
     }
-  },
-  beforeDestroy () {
-    // clearTimeout(this.timeout);
   }
 }
 </script>
 
 <style lang="stylus" scoped>
-.alenvi-logo
-  width: 300px;
-  height: 125px;
 
-.q-field
-  margin: 16px 0
+  .signup
+    &-header-padding
+      padding: 24px 24px 12px 24px
+    &-bloctext-padding
+      padding: 24px 0px 24px 0px
+    &-body-padding
+      padding: 0px 24px 0px 24px
+    &-btn
+      border-radius: 0
 
-/*.alenvi-logo img {
-  max-width: 100%;
-  height: auto;
-}*/
+  .margin-input
+    margin-bottom: 6px
+    &.last
+      margin-bottom: 24px
+
+  .flex-align-end
+    flex-grow: 1
+    display: flex
+    align-items: flex-end
+
+  // disable Quasar default input error colors
+  .bg-negative
+    background: white !important
+    color: black !important
+
 </style>

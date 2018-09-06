@@ -28,10 +28,10 @@
       </div>
       <div class="row margin-input">
         <div class="col-12">
-          <!-- <div class="row justify-between"> -->
+          <div class="row justify-between">
             <p class="input-caption">Mot de passe</p>
-            <!-- <q-icon v-if="$v.user.alenvi.local.password.$error" name="error_outline" color="secondary" /> -->
-          <!-- </div> -->
+            <q-icon v-if="$v.user.alenvi.local.password.$error" name="error_outline" color="secondary" />
+          </div>
           <q-field :error="$v.user.alenvi.local.password.$error" :error-label="passwordError">
             <q-input v-model="user.alenvi.local.password" type="password" color="white" inverted-light lower-case @blur="$v.user.alenvi.local.password.$touch()"/>
           </q-field>
@@ -43,7 +43,7 @@
             <p class="input-caption">Confirmation mot de passe</p>
             <q-icon v-if="$v.passwordConfirm.$error" name="error_outline" color="secondary" />
           </div>
-          <q-field :error="$v.passwordConfirm.$error" :error-label="passwordError">
+          <q-field :error="$v.passwordConfirm.$error" :error-label="passwordConfirmError">
             <q-input v-model="passwordConfirm" type="password" color="white" inverted-light lower-case @blur="$v.passwordConfirm.$touch()"/>
           </q-field>
         </div>
@@ -100,6 +100,13 @@ export default {
         return 'Mot de passe trop court';
       }
     },
+    passwordConfirmError () {
+      if (!this.$v.passwordConfirm.required) {
+        return 'Champ requis';
+      } else if (!this.$v.passwordConfirm.sameAs) {
+        return 'Le mot de passe doit être identique';
+      }
+    }
   }
 }
 </script>
@@ -125,5 +132,10 @@ export default {
     flex-grow: 1
     display: flex
     align-items: flex-end
+
+  // disable Quasar default input error colors
+  .bg-negative
+    background: white !important
+    color: black !important
 
 </style>
