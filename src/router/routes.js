@@ -45,7 +45,7 @@ const routes = [
     path: '/test', component: () => import('pages/test')
   },
   { path: '/enterCode', component: () => import('pages/signup/EnterCode') },
-  { path: '/createPassword', component: () => import('pages/signup/CreatePassword') },
+  { path: '/auxiliaries/createPassword', component: () => import('pages/dashboard/signup/auxiliaries/CreatePassword') },
   {
     path: '/signup',
     component: () => import('pages/signup/SignUp'),
