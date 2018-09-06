@@ -1,5 +1,5 @@
 import euSpace from '../data/euSpace';
-import users from '../api/Users';
+// import users from '../api/Users';
 
 const nationalityValidation = (userNationality) => {
   if (!userNationality) return;
@@ -43,12 +43,12 @@ export const displayTask = (task, user = null) => {
   return false;
 };
 
-export const autoCheckTask = async (task, user = null) => {
-  if (task.task.name.match(/attribuer parrain/i) && user.mentorId) {
-    console.log('MEH');
-    await users.updateTask({ user_id: user._id, task_id: task.task._id, isDone: true });
-    return true;
-  }
-  console.log('PEH');
-  return false;
-};
+// export const autoCheckTask = async (task, user = null) => {
+//   if (task.task.name.match(/attribuer parrain/i) && user.mentorId) {
+//     console.log('MEH');
+//     await users.updateTask({ user_id: user._id, task_id: task.task._id, isDone: true });
+//     return true;
+//   }
+//   console.log('PEH');
+//   return false;
+// };
