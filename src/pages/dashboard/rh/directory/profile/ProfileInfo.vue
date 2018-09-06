@@ -488,6 +488,7 @@ import { mapGetters } from 'vuex';
 import { Cookies, openURL } from 'quasar';
 import { required, email, numeric, minLength, requiredIf } from 'vuelidate/lib/validators';
 
+import { frPhoneNumber } from '../../../../../helpers/vuelidateCustomVal';
 import gdrive from '../../../../../api/GoogleDrive.js';
 import nationalities from '../../../../../data/nationalities.js';
 import countries from '../../../../../data/countries.js';
@@ -601,7 +602,7 @@ export default {
           local: {
             email: { required, email }
           },
-          mobilePhone: { required, numeric },
+          mobilePhone: { required, frPhoneNumber },
           sector: { required },
           mentorId: { required },
           administrative: {
@@ -620,7 +621,7 @@ export default {
             },
             emergencyContact: {
               name: { required },
-              phoneNumber: { required, numeric }
+              phoneNumber: { required, frPhoneNumber }
             },
             idCardRecto: {
               driveId: {
