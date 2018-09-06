@@ -229,7 +229,7 @@
             <p class="input-caption">IBAN</p>
             <q-icon v-if="$v.user.alenvi.administrative.payment.rib.iban.$error" name="error_outline" color="secondary" />
           </div>
-          <q-input upper-case v-mask="'SS## #### #### #### #### #### ###'" v-model.trim="user.alenvi.administrative.payment.rib.iban"
+          <q-input upper-case v-mask="'SS## #### #### #### #### #### ###'" v-model="user.alenvi.administrative.payment.rib.iban"
             color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.payment.rib.iban', ogust: 'iban_number' })"
             @focus="saveTmp('administrative.payment.rib.iban')"
           />
@@ -255,16 +255,16 @@
         <div class="col-xs-12">
           <div class="row justify-between">
             <p class="input-caption">Merci de nous indiquer le type de document d'identité que vous possédez.</p>
-            <q-icon v-if="$v.identityType.$error" name="error_outline" color="secondary" />
+            <q-icon v-if="$v.user.alenvi.administrative.identityDocs.$error" name="error_outline" color="secondary" />
           </div>
-          <q-option-group color="primary" v-model="identityType"
+          <q-option-group color="primary" v-model="user.alenvi.administrative.identityDocs" @input="updateUser({ alenvi: 'administrative.identityDocs' })"
            :options="[
              { label: 'Carte Nationale d\'Identité', value: 'cni' },
              { label: 'Passeport', value: 'pp' },
              { label: 'Titre de séjour', value: 'ts' }
            ]" />
         </div>
-        <div v-if="identityType === 'cni'" class="col-xs-12 col-md-6">
+        <div v-if="user.alenvi.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Carte d'identité (recto)</p>
             <q-icon v-if="$v.user.alenvi.administrative.idCardRecto.driveId.$error" name="error_outline" color="secondary" />
@@ -283,7 +283,7 @@
               hide-upload-button @add="uploadDocument('idCardRecto')" @finish="refreshUser" />
           </q-field>
         </div>
-        <div v-if="identityType === 'cni'" class="col-xs-12 col-md-6">
+        <div v-if="user.alenvi.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Carte d'identité (verso)</p>
             <q-icon v-if="$v.user.alenvi.administrative.idCardVerso.driveId.$error" name="error_outline" color="secondary" />
@@ -303,7 +303,7 @@
             <!-- <q-uploader url="test" color="white" inverted-light /> -->
           </q-field>
         </div>
-        <div v-if="identityType === 'pp'" class="col-xs-12 col-md-6">
+        <div v-if="user.alenvi.administrative.identityDocs === 'pp'" class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Passeport</p>
             <q-icon v-if="$v.user.alenvi.administrative.passport.driveId.$error" name="error_outline" color="secondary" />
@@ -323,7 +323,7 @@
             <!-- <q-uploader url="test" color="white" inverted-light /> -->
           </q-field>
         </div>
-        <div v-if="identityType === 'ts'" class="col-xs-12 col-md-6">
+        <div v-if="user.alenvi.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Titre de séjour</p>
             <q-icon v-if="$v.user.alenvi.administrative.residencePermit.driveId.$error" name="error_outline" color="secondary" />
@@ -486,9 +486,9 @@
 <script>
 import { mapGetters } from 'vuex';
 import { Cookies, openURL } from 'quasar';
-import { required, email, numeric, minLength, requiredIf } from 'vuelidate/lib/validators';
+import { required, email, numeric, minLength, maxLength, requiredIf } from 'vuelidate/lib/validators';
 
-import { frPhoneNumber } from '../../../../../helpers/vuelidateCustomVal';
+import { frPhoneNumber, iban } from '../../../../../helpers/vuelidateCustomVal';
 import gdrive from '../../../../../api/GoogleDrive.js';
 import nationalities from '../../../../../data/nationalities.js';
 import countries from '../../../../../data/countries.js';
@@ -554,6 +554,7 @@ export default {
               name: '',
               phoneNumber: ''
             },
+            identityDocs: '',
             idCardRecto: {},
             idCardVerso: {},
             healthAttest: {},
@@ -614,6 +615,7 @@ export default {
               birthCity: { required },
               socialSecurityNumber: { required, numeric }
             },
+            identityDocs: { required },
             contact: {
               address: { required },
               zipCode: { required, numeric },
@@ -626,28 +628,28 @@ export default {
             idCardRecto: {
               driveId: {
                 required: requiredIf(() => {
-                  return this.identityType === 'cni';
+                  return this.user.alenvi.administrative.identityDocs === 'cni';
                 })
               }
             },
             idCardVerso: {
               driveId: {
                 required: requiredIf(() => {
-                  return this.identityType === 'cni';
+                  return this.user.alenvi.administrative.identityDocs === 'cni';
                 })
               }
             },
             passport: {
               driveId: {
                 required: requiredIf(() => {
-                  return this.identityType === 'pp';
+                  return this.user.alenvi.administrative.identityDocs === 'pp';
                 })
               }
             },
             residencePermit: {
               driveId: {
                 required: requiredIf(() => {
-                  return this.identityType === 'ts';
+                  return this.user.alenvi.administrative.identityDocs === 'ts';
                 })
               }
             },
@@ -661,11 +663,12 @@ export default {
               rib: {
                 iban: {
                   required,
-                  minLength: minLength(28)
+                  iban
                 },
                 bic: {
                   required,
-                  minLength: minLength(8)
+                  minLength: minLength(8),
+                  maxLength: maxLength(11)
                 }
               }
             },
@@ -768,6 +771,7 @@ export default {
         } else {
           await this.updateOgustUser(paths);
         }
+        this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
         this.$q.notify({
           color: 'positive',
           icon: 'done',
