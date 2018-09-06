@@ -28,7 +28,7 @@ export default {
         this.mentors = allMentorsRaw.map(mentor => {
           return {
             label: `${mentor.firstname} ${mentor.lastname}`,
-            value: `${mentor.firstname} ${mentor.lastname}`
+            value: `${mentor._id}`
           }
         })
       } catch (e) {

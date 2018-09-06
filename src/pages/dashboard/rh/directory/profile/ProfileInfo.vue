@@ -7,7 +7,7 @@
       </div>
       <div class="col-xs-12 col-md-6">
         <p class="input-caption">Marraine/parrain</p>
-        <select-mentor v-model="user.alenvi.mentor" :sector="user.alenvi.sector" @myBlur="updateUser({ alenvi: 'mentor' })" />
+        <select-mentor v-model="user.alenvi.mentorId" :sector="user.alenvi.sector" @myBlur="updateUser({ alenvi: 'mentorId' })" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -488,6 +488,7 @@ import { mapGetters } from 'vuex';
 import { Cookies, openURL } from 'quasar';
 import { required, email, numeric, minLength, requiredIf } from 'vuelidate/lib/validators';
 
+import { frPhoneNumber } from '../../../../../helpers/vuelidateCustomVal';
 import gdrive from '../../../../../api/GoogleDrive.js';
 import nationalities from '../../../../../data/nationalities.js';
 import countries from '../../../../../data/countries.js';
@@ -547,7 +548,7 @@ export default {
       ],
       user: {
         alenvi: {
-          mentor: '',
+          mentorId: '',
           administrative: {
             emergencyContact: {
               name: '',
@@ -601,9 +602,9 @@ export default {
           local: {
             email: { required, email }
           },
-          mobilePhone: { required, numeric },
+          mobilePhone: { required, frPhoneNumber },
           sector: { required },
-          mentor: { required },
+          mentorId: { required },
           administrative: {
             identity: {
               nationality: { required },
@@ -620,7 +621,7 @@ export default {
             },
             emergencyContact: {
               name: { required },
-              phoneNumber: { required, numeric }
+              phoneNumber: { required, frPhoneNumber }
             },
             idCardRecto: {
               driveId: {
