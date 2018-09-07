@@ -1,17 +1,18 @@
 <template>
   <q-page class="neutral-background" style="max-width: 90vw;" padding>
-    <div class="row items-start directory-header">
+    <div class="row items-center directory-header">
       <div class="col-xs-12 col-md-5">
-        <h4>Répertoire</h4>
+        <h4 class="no-margin">Répertoire</h4>
       </div>
-      <div class="col-xs-12 col-md-6">
+      <div class="col-xs-12 col-md-5">
         <q-search class="no-border input-search" v-model="searchStr" placeholder="Rechercher un profil" color="white" inverted-light />
       </div>
-      <div class="col-xs-12 col-md-1 row justify-end">
-        <q-btn text-color="dark-grey" color="white" class="btn-directory" @click="activeUsers = !activeUsers" style="height: 40px">
+      <div class="col-xs-12 col-md-2 row justify-end">
+        <q-toggle v-model="inactiveUsers" color="primary" label="Inactifs" />
+        <!-- <q-btn text-color="dark-grey" color="white" class="btn-directory" @click="activeUsers = !activeUsers" style="height: 40px">
           <q-icon :class="{ 'btn-icon-disabled': activeUsers, 'btn-icon-enabled': !activeUsers }" name="visibility" />
           <div class="col-12" style="font-size: 9px">Inactifs</div>
-        </q-btn>
+        </q-btn> -->
       </div>
     </div>
     <q-table
@@ -38,7 +39,7 @@
             <q-item-main :label="col.value.name" />
           </q-item>
           <template v-else-if="col.name === 'profileErrors'">
-            <q-icon v-if="notificationsProfiles[props.row.auxiliary._id] > 0" name="error" color="secondary" size="1rem" />
+            <q-icon v-if="notificationsProfiles[props.row.auxiliary._id] > 0 && props.row.isActive" name="error" color="secondary" size="1rem" />
           </template>
           <template v-else-if="col.name === 'active'">
             <div :class="{ activeDot: col.value, inactiveDot: !col.value }"></div>
@@ -216,7 +217,7 @@ export default {
       },
       userList: [],
       searchStr: '',
-      activeUsers: true,
+      inactiveUsers: false,
       pagination: {
         sortBy: 'name', // String, column "name" property value
         descending: false,
@@ -292,10 +293,10 @@ export default {
   },
   computed: {
     activeUserList () {
-      if (this.activeUsers) {
-        return this.userList.filter(user => user.isActive);
+      if (this.inactiveUsers) {
+        return this.userList.filter(user => !user.isActive);
       }
-      return this.userList;
+      return this.userList.filter(user => user.isActive);
     },
     filteredUsers () {
       return this.activeUserList.filter(user => user.auxiliary.name.match(new RegExp(this.searchStr, 'i')));
@@ -310,25 +311,37 @@ export default {
         const users = await this.$users.showAll({ role: 'Auxiliaire' });
         const sectors = await this.$ogust.getList('employee.sector');
         this.userList = users.map((user) => {
-          const checkProfileErrors = userProfileValidation(user);
-          this.$store.commit('rh/saveNotification', {
-            type: 'profiles',
-            _id: user._id,
-            count: checkProfileErrors.error ? checkProfileErrors.error.details.length : 0
-          });
-          const checkTasks = user.procedure.filter(task => taskValidation(task, user).length > 0 && !task.check.isDone);
-          this.$store.commit('rh/saveNotification', {
-            type: 'tasks',
-            _id: user._id,
-            count: checkTasks.length > 0 ? checkTasks.length : 0
-          });
+          if (user.isActive) {
+            const checkProfileErrors = userProfileValidation(user);
+            this.$store.commit('rh/saveNotification', {
+              type: 'profiles',
+              _id: user._id,
+              count: checkProfileErrors.error ? checkProfileErrors.error.details.length : 0
+            });
+            const checkTasks = user.procedure.filter(task => taskValidation(task, user).length > 0 && !task.check.isDone);
+            this.$store.commit('rh/saveNotification', {
+              type: 'tasks',
+              _id: user._id,
+              count: checkTasks.length > 0 ? checkTasks.length : 0
+            });
+            return {
+              auxiliary: {
+                _id: user._id,
+                name: `${user.firstname} ${user.lastname}`,
+                picture: user.picture.link
+              },
+              profileErrors: checkProfileErrors.error ? checkProfileErrors.error.details.length : 0,
+              startDate: getUserStartDate(user.administrative.contracts),
+              sector: sectors[user.sector],
+              isActive: user.isActive
+            }
+          }
           return {
             auxiliary: {
               _id: user._id,
               name: `${user.firstname} ${user.lastname}`,
               picture: user.picture.link
             },
-            profileErrors: checkProfileErrors.error ? checkProfileErrors.error.details.length : 0,
             startDate: getUserStartDate(user.administrative.contracts),
             sector: sectors[user.sector],
             isActive: user.isActive
@@ -433,6 +446,7 @@ export default {
   //   min-height: 40px
 
   .directory-header
+    margin-bottom: 35px
     & .q-btn
       padding: 0
 
