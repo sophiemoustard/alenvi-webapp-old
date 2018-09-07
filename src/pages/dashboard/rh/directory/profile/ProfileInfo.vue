@@ -452,16 +452,16 @@
         <div class="col-xs-12">
           <div class="row justify-between">
             <p class="input-caption">Avez-vous un abonnement de transports en commun ?</p>
-            <q-icon v-if="$v.user.alenvi.administrative.transportInvoice.type.$error" name="error_outline" color="secondary" />
+            <q-icon v-if="$v.user.alenvi.administrative.transportInvoice.transportType.$error" name="error_outline" color="secondary" />
           </div>
-          <q-option-group color="primary" v-model="user.alenvi.administrative.transportInvoice.type" @input="updateUser({ alenvi: 'administrative.transportInvoice.type' })"
+          <q-option-group color="primary" v-model="user.alenvi.administrative.transportInvoice.transportType" @input="updateUser({ alenvi: 'administrative.transportInvoice.transportType' })"
             :options="[
                 { label: 'Abonnement transports en commun', value: 'public' },
                 { label: 'Voiture personnelle', value: 'private' },
                 { label: 'Aucun', value: 'none' }
               ]" />
         </div>
-        <div v-if="user.alenvi.administrative.transportInvoice.type === 'public'" class="col-xs-12">
+        <div v-if="user.alenvi.administrative.transportInvoice.transportType === 'public'" class="col-xs-12">
           <div class="row justify-between">
             <p class="input-caption">Merci de nous transmettre votre justificatif d'abonnement</p>
             <q-icon v-if="$v.user.alenvi.administrative.transportInvoice.driveId.$error" name="error_outline" color="secondary" />
@@ -543,7 +543,7 @@ export default {
         'user.alenvi.administrative.mutualFund.driveId',
       ],
       transportInvoiceGroup: [
-        'user.alenvi.administrative.transportInvoice.type',
+        'user.alenvi.administrative.transportInvoice.transportType',
         'user.alenvi.administrative.transportInvoice.driveId',
       ],
       user: {
@@ -673,10 +673,10 @@ export default {
               }
             },
             transportInvoice: {
-              type: { required },
+              transportType: { required },
               driveId: { required: requiredIf((item) => {
-                return item.type === 'public'
-              })}
+                return item.transportType === 'public'
+              }) }
             },
             certificates: {
               required,
@@ -725,13 +725,6 @@ export default {
   mounted () {
     this.mergeUser();
     this.$v.user.alenvi.$touch();
-    if (this.user.alenvi.administrative.passport.driveId) {
-      this.identityType = 'pp'
-    } else if (this.user.alenvi.administrative.idCardRecto.driveId) {
-      this.identityType = 'cni'
-    } else if (this.user.alenvi.administrative.residencePermit.driveId) {
-      this.identityType = 'ts'
-    }
   },
   watch: {
     userProfile (value) {
@@ -781,6 +774,7 @@ export default {
         });
       } catch (e) {
         console.error(e);
+        this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
         this.$q.notify({
           color: 'negative',
           icon: 'warning',
@@ -791,43 +785,35 @@ export default {
       }
     },
     async updateAlenviUser (path) {
-      try {
-        let value = this.$_.get(this.user.alenvi, path);
-        if (path.match(/dateOfBirth/i)) {
-          value = this.$moment(value).format('YYYY-MM-DD');
-        }
-        if (path.match(/iban/i)) {
-          value = value.split(' ').join('');
-        }
-        const payload = this.$_.set({}, path, value);
-        payload._id = this.userProfile._id;
-        console.log('PAYLOAD ALENVI', payload);
-        await this.$users.updateById(payload);
-      } catch (e) {
-        console.error(e);
+      let value = this.$_.get(this.user.alenvi, path);
+      if (path.match(/dateOfBirth/i)) {
+        value = this.$moment(value).format('YYYY-MM-DD');
       }
+      if (path.match(/iban/i)) {
+        value = value.split(' ').join('');
+      }
+      const payload = this.$_.set({}, path, value);
+      payload._id = this.userProfile._id;
+      console.log('PAYLOAD ALENVI', payload);
+      await this.$users.updateById(payload);
     },
     async updateOgustUser (paths) {
-      try {
-        let value = this.$_.get(this.user.alenvi, paths.alenvi);
-        if (paths.ogust.match(/date_of_birth/i)) {
-          value = this.$moment(value).format('YYYYMMDD');
-        }
-        if (paths.ogust.match(/iban_number/i)) {
-          value = value.split(' ').join('');
-        }
-        const payload = this.$_.set({}, paths.ogust, value);
-        if (paths.ogust.match(/(iban|bic)_number/i)) {
-          payload.id_tiers = this.userProfile.employee_id;
-          // await this.$ogust.setEmployeeBankInfo(payload);
-        } else {
-          payload.id_employee = this.userProfile.employee_id
-          // await this.$ogust.setEmployee(payload);
-        }
-        console.log('PAYLOAD OGUST', payload);
-      } catch (e) {
-        console.error(e);
+      let value = this.$_.get(this.user.alenvi, paths.alenvi);
+      if (paths.ogust.match(/date_of_birth/i)) {
+        value = this.$moment(value).format('YYYYMMDD');
       }
+      if (paths.ogust.match(/iban_number/i)) {
+        value = value.split(' ').join('');
+      }
+      const payload = this.$_.set({}, paths.ogust, value);
+      if (paths.ogust.match(/(iban|bic)_number/i)) {
+        payload.id_tiers = this.userProfile.employee_id;
+        // await this.$ogust.setEmployeeBankInfo(payload);
+      } else {
+        payload.id_employee = this.userProfile.employee_id
+        // await this.$ogust.setEmployee(payload);
+      }
+      console.log('PAYLOAD OGUST', payload);
     },
     uploadDocument (refName) {
       this.$refs[refName].upload();

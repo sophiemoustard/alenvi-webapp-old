@@ -46,8 +46,8 @@ const userProfileSchema = Joi.object().keys({
       link: Joi.string()
     },
     transportInvoice: Joi.object().keys({
-      type: Joi.string().required(),
-      driveId: Joi.string().when('type', { is: 'public', then: Joi.required() }),
+      transportType: Joi.string().required(),
+      driveId: Joi.string().when('transportType', { is: 'public', then: Joi.required() }),
       link: Joi.string()
     }).when('administrative.driveFolder', { is: Joi.exist(), then: Joi.required() }),
     phoneInvoice: Joi.object().keys({
