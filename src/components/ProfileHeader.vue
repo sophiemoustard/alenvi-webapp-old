@@ -37,8 +37,8 @@
       </div>
     </div>
     <!-- Modal envoi message -->
-    <q-modal v-model="opened">
-      <div class="col modal-padding">
+    <q-modal v-model="opened" :content-css="modalCssContainer">
+      <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-8">
             <h5>Envoyer un <span class="text-weight-bold">message</span></h5>
@@ -46,7 +46,24 @@
           <div class="col-1 cursor-pointer" style="text-align: right">
             <span><q-icon name="clear" size="1rem" @click.native="opened = false" /></span>
           </div>
-          <div class="row margin-input">
+        </div>
+        <div class="row margin-input">
+          <div class="col-12">
+            <div class="row">
+              <p class="input-caption">Support</p>
+            </div>
+            <q-select
+              v-model="messageSupport"
+              color="white"
+              inverted-light
+              :options="msgSupportOptions"/>
+          </div>
+        </div>
+        <div class="row margin-input">
+          <div class="col-12">
+            <div class="row">
+                <p class="input-caption">Support</p>
+            </div>
             <q-select
               v-model="typeMessage"
               color="white"
@@ -83,16 +100,20 @@ export default {
       opened: false,
       message: '',
       typeMessage: 'PM',
+      messageSupport: 'sms',
       typeMessageOptions: [
         {
           label: 'Pièces manquantes',
           value: 'PM'
         },
         {
-          label: 'Intervention',
-          value: 'Intervention'
+          label: 'Autres',
+          value: 'Autres'
         }
       ],
+      modalCssContainer: {
+        minWidth: '30vw'
+      }
     }
   },
   computed: {
@@ -120,6 +141,21 @@ export default {
         return 'Accès WebApp activé'
       }
       return 'Accès WebApp non activé'
+    },
+    msgSupportOptions () {
+      const options = [
+        {
+          label: 'SMS',
+          value: 'sms'
+        }
+      ];
+      if (this.user.facebook.address) {
+        options.push({
+          label: 'Pigi',
+          value: 'pigi'
+        });
+      }
+      return options
     }
   },
   methods: {
@@ -213,4 +249,8 @@ export default {
     margin-bottom: 6px
     &.last
       margin-bottom: 24px
+
+  .input-caption
+    margin-bottom: 4px
+
 </style>
