@@ -157,6 +157,11 @@
             <select-manager v-model="newUser.ogustManagerId" :myError="$v.newUser.ogustManagerId.$error" @myBlur="$v.newUser.ogustManagerId.$touch"/>
           </div>
         </div>
+        <div class="row margin-input last">
+          <div class="col-12">
+            <q-checkbox v-model="sendWelcomeMsg" label="Envoyer SMS d'accueil" />
+          </div>
+        </div>
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary" :loading="loading" @click="submit" />
     </q-modal>
@@ -183,6 +188,7 @@ export default {
     return {
       loading: false,
       opened: false,
+      sendWelcomeMsg: true,
       civilityOptions: [
         {
           label: 'Monsieur',
@@ -364,7 +370,8 @@ export default {
     async createAlenviUser () {
       this.newUser.local.password = randomize('*', 10);
       this.newUser.role = 'Auxiliaire';
-      await this.$users.create(this.newUser);
+      const newUser = await this.$users.create(this.newUser);
+      return newUser;
     },
     async createOgustUser () {
       const ogustPayload = {
@@ -384,8 +391,8 @@ export default {
       const newEmployee = await this.$ogust.createEmployee(ogustPayload);
       return newEmployee;
     },
-    async sendSms () {
-      const activationDataRaw = await this.$activationCode.create({ mobile_phone: this.newUser.mobilePhone });
+    async sendSms (newUserId) {
+      const activationDataRaw = await this.$activationCode.create({ mobile_phone: this.newUser.mobilePhone, newUserId });
       const code = activationDataRaw.activationData.code;
       await this.$twilio.sendSMS({
         to: `+33${this.newUser.mobilePhone.substring(1)}`,
@@ -401,9 +408,11 @@ export default {
         }
         const newEmployee = await this.createOgustUser();
         this.newUser.employee_id = newEmployee.data.data.employee.id_employee;
-        await this.createAlenviUser();
+        const newUser = await this.createAlenviUser();
         await this.getUserList();
-        await this.sendSms();
+        if (this.sendWelcomeMsg) {
+          await this.sendSms(newUser.data.data.user._id);
+        }
         this.$q.notify({
           color: 'positive',
           icon: 'done',
@@ -568,5 +577,8 @@ export default {
     margin-bottom: 6px
     &.last
       margin-bottom: 24px
+
+  /deep/ .q-option .q-option-label
+    font-size: 14px
 
 </style>
