@@ -49,8 +49,8 @@
       </q-tr>
     </q-table>
     <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Ajouter une personne" @click="opened = true" />
-    <q-modal v-model="opened" @hide="resetForm">
-      <div class="col modal-padding">
+    <q-modal v-model="opened" @hide="resetForm" :content-css="modalCssContainer">
+      <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-8">
             <h5>Créer une nouvelle <span class="text-weight-bold">fiche auxiliaire</span></h5>
@@ -189,6 +189,9 @@ export default {
       loading: false,
       opened: false,
       sendWelcomeMsg: true,
+      modalCssContainer: {
+        minWidth: '30vw'
+      },
       civilityOptions: [
         {
           label: 'Monsieur',
