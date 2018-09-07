@@ -2,7 +2,8 @@
 export const someAction = (state) => {}
  */
 
-import users from '../../api/Users'
+import users from '../../api/Users';
+import redirect from '../../router/redirect';
 
 export const getUser = async ({ commit }, userId) => {
   try {
@@ -10,5 +11,8 @@ export const getUser = async ({ commit }, userId) => {
     commit('setUser', user);
   } catch (e) {
     console.error(e);
+    if (e.status === 401) {
+      redirect.redirectToLogin();
+    }
   }
 };
