@@ -38,7 +38,16 @@ const routes = [
   },
   { path: '/login', name: 'login', component: () => import('pages/signin/Authenticate') },
   { path: '/enterCode', component: () => import('pages/signup/EnterCode') },
-  { path: '/createPassword', component: () => import('pages/signup/CreatePassword') },
+  { path: '/createPassword',
+    component: () => import('pages/signup/CreatePassword'),
+    beforeEnter: (to, from, next) => {
+      if (Cookies.get('signup_token') && Cookies.get('signup_userId') && Cookies.get('signup_userEmail')) {
+        next();
+      } else {
+        next({ path: '/enterCode' });
+      }
+    }
+  },
   {
     path: '/signup',
     component: () => import('pages/signup/SignUp'),

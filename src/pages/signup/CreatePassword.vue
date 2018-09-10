@@ -50,7 +50,7 @@
       </div>
     </div>
     <div class="flex-align-end">
-      <q-btn no-caps class="signup-btn" label="Créer mon compte Alenvi" icon-right="arrow_forward" color="primary" :loading="loading" @click="sendMessage()" />
+      <q-btn no-caps class="signup-btn" label="Créer mon compte Alenvi" icon-right="arrow_forward" color="primary" :loading="loading" @click="submit" />
     </div>
   </div>
 </template>
@@ -64,10 +64,12 @@ export default {
   data () {
     return {
       loading: false,
+      alenviToken: '',
       user: {
         alenvi: {
+          _id: '',
           local: {
-            email: 'pierre.hofman@gmail.com',
+            email: '',
             password: ''
           }
         }
@@ -88,6 +90,11 @@ export default {
       passwordConfirm: { required, sameAsPassword: sameAs(() => this.user.alenvi.local.password) }
     }
   },
+  mounted () {
+    this.user.alenvi.local.email = this.$q.cookies.get('signup_userEmail');
+    this.user.alenvi._id = this.$q.cookies.get('signup_userId');
+    this.alenviToken = this.$q.cookies.get('signup_token');
+  },
   computed: {
     ...mapGetters({
       // currentUser: 'main/user',
@@ -105,6 +112,29 @@ export default {
         return 'Champ requis';
       } else if (!this.$v.passwordConfirm.sameAs) {
         return 'Le mot de passe doit être identique';
+      }
+    }
+  },
+  methods: {
+    async submit () {
+      try {
+        await this.$users.updateById(this.user.alenvi, this.alenviToken);
+        this.$q.cookies.remove('signup_token', { path: '/' });
+        this.$q.cookies.remove('signup_userId', { path: '/' });
+        this.$q.cookies.remove('signup_userEmail', { path: '/' });
+        this.$router.replace('/login');
+      } catch (e) {
+        console.error(e);
+        if (e.response) {
+          console.log(e.response);
+        }
+        this.$q.notify({
+          color: 'negative',
+          icon: 'warning',
+          detail: 'Echec de la mise à jour de l\'utilisateur',
+          position: 'bottom-right',
+          timeout: 2500
+        });
       }
     }
   }
