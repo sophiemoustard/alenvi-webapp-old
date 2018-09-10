@@ -36,13 +36,9 @@ const routes = [
       }
     },
   },
-  {
-    path: '/login',
-    name: 'login',
-    component: () => import('pages/signin/AuthenticateOld')
-  },
+  { path: '/login', name: 'login', component: () => import('pages/signin/Authenticate') },
   { path: '/enterCode', component: () => import('pages/signup/EnterCode') },
-  { path: '/auxiliaries/createPassword', component: () => import('pages/dashboard/rh/signup/auxiliaries/CreatePassword') },
+  { path: '/createPassword', component: () => import('pages/signup/CreatePassword') },
   {
     path: '/signup',
     component: () => import('pages/signup/SignUp'),
