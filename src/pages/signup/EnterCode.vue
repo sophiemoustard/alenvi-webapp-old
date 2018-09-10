@@ -18,6 +18,7 @@
 </template>
 
 <script>
+import { date } from 'quasar';
 
 export default {
   data () {
@@ -64,7 +65,10 @@ export default {
     async submit () {
       try {
         const activationDataRaw = await this.$activationCode.check(this.code.join(''));
-        console.log(activationDataRaw);
+        this.$q.cookies.set('signup_token', activationDataRaw.token, { path: '/', expires: date.addToDate(new Date(), { days: 1 }), secure: process.env.NODE_ENV !== 'development' });
+        this.$q.cookies.set('signup_userEmail', activationDataRaw.activationData.userEmail, { path: '/', expires: date.addToDate(new Date(), { days: 1 }), secure: process.env.NODE_ENV !== 'development' });
+        this.$q.cookies.set('signup_userId', activationDataRaw.activationData.newUserId, { path: '/', expires: date.addToDate(new Date(), { days: 1 }), secure: process.env.NODE_ENV !== 'development' });
+        this.$router.replace({ path: '/createPassword' });
       } catch (e) {
         this.$q.notify({
           color: 'negative',
