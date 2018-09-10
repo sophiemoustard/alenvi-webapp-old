@@ -16,10 +16,10 @@
         <q-item-side icon="contacts" />
         <q-item-main label="Répertoire" />
       </q-item>
-      <q-item>
+      <!-- <q-item>
         <q-item-side icon="settings" />
         <q-item-main label="Configuration RH" />
-      </q-item>
+      </q-item> -->
     </q-collapsible>
     <q-item-separator />
     <q-collapsible ref="planning" v-model="activeRoutes.planning.open" collapseIcon="expand_more">
