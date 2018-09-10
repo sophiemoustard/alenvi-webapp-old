@@ -12,6 +12,36 @@
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
+        <p class="text-weight-bold">Photo</p>
+        <p :class="[groupErrors('picture').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('picture').msg }}</p>
+      </div>
+      <div class="row gutter-profile">
+        <div class="col-xs-12 col-md-6">
+          <div class="row justify-between">
+            <p class="input-caption">Choisis ta photo</p>
+            <q-icon v-if="$v.user.alenvi.picture.link.$error" error-label="error" name="error_outline" color="secondary" />
+          </div>
+          <div class="row justify-between" style="background: white">
+            <croppa v-model="croppa"
+              class="doc-thumbnail"
+              canvas-color="#EEE"
+              accept="image/*"
+              :prevent-white-space="true"
+              placeholder="Clique ici pour choisir ta photo"
+              :placeholder-font-size="10"
+              :show-remove-button="false"
+              :initial-image="hasPicture" />
+            <div class="self-end doc-delete">
+              <q-btn color="primary" round flat icon="cloud_upload" size="1rem" @click.native="uploadImage" />
+              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteImage" />
+              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.picture.link)" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="q-mb-xl">
+      <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Identité</p>
         <p :class="[groupErrors('identity').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('identity').msg }}</p>
       </div>
@@ -27,7 +57,8 @@
             @focus="saveTmp('firstname')"
             @blur="updateUser({ alenvi: 'firstname', ogust: 'first_name' })"
           />
-        </div><div class="col-xs-12 col-md-6">
+        </div>
+        <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Nom</p>
             <q-icon v-if="$v.user.alenvi.lastname.$error" error-label="error" name="error_outline" color="secondary" />
@@ -383,7 +414,7 @@
         </div>
         <div class="col-xs-12">
           <div class="row justify-between">
-            <p class="input-caption">Diplome(s) ou certificats(s)</p>
+            <p class="input-caption">Diplome(s) ou certificat(s)</p>
             <q-icon v-if="$v.user.alenvi.administrative.certificates.$error" name="error_outline" color="secondary" />
           </div>
           <q-field>
@@ -394,7 +425,7 @@
         </div>
         <div v-if="user.alenvi.administrative.certificates && user.alenvi.administrative.certificates.length > 0" class="col-xs-12 col-md-6"
           v-for="(certificate, index) in user.alenvi.administrative.certificates" :key="index">
-          <p class="input-caption col-xs-12">Diplome(s) ou certificats(s) ({{ index + 1 }})</p>
+          <p class="input-caption col-xs-12">Diplome(s) ou certificat(s) ({{ index + 1 }})</p>
           <div v-if="certificate.driveId" class="row justify-between" style="background: white">
             <img class="doc-thumbnail" :src="getThumbnailUrl(certificate.driveId)" alt="cni verso">
             <div class="self-end doc-delete">
@@ -413,7 +444,7 @@
       <div class="row gutter-profile-x">
         <div class="col-xs-12">
           <div class="row justify-between">
-            <p class="input-caption">Voulez-vous adhérer à la mutuelle d'entreprise ?</p>
+            <p class="input-caption">Veux-tu adhérer à la mutuelle d'entreprise ?</p>
             <q-icon v-if="$v.user.alenvi.administrative.mutualFund.has.$error" name="error_outline" color="secondary" />
           </div>
           <!-- <div class="row"> -->
@@ -434,7 +465,7 @@
         </div>
         <div v-if="user.alenvi.administrative.mutualFund.has && !user.alenvi.administrative.mutualFund.driveId" class="col-xs-12">
           <div class="row justify-between">
-            <p class="input-caption">Merci de nous transmettre le document mentionnant le fait que vous refusez la mutuelle Alenvi</p>
+            <p class="input-caption">Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle</p>
             <q-icon v-if="$v.user.alenvi.administrative.mutualFund.driveId.$error" name="error_outline" color="secondary" />
           </div>
           <q-uploader ref="mutualFund" name="mutualFund" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `mutuelle_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
@@ -451,7 +482,7 @@
       <div class="row gutter-profile-x">
         <div class="col-xs-12">
           <div class="row justify-between">
-            <p class="input-caption">Avez-vous un abonnement de transports en commun ?</p>
+            <p class="input-caption">Par quel moyen comptes-tu te rendre au travail ?</p>
             <q-icon v-if="$v.user.alenvi.administrative.transportInvoice.transportType.$error" name="error_outline" color="secondary" />
           </div>
           <q-option-group color="primary" v-model="user.alenvi.administrative.transportInvoice.transportType" @input="updateUser({ alenvi: 'administrative.transportInvoice.transportType' })"
@@ -463,7 +494,7 @@
         </div>
         <div v-if="user.alenvi.administrative.transportInvoice.transportType === 'public'" class="col-xs-12">
           <div class="row justify-between">
-            <p class="input-caption">Merci de nous transmettre votre justificatif d'abonnement</p>
+            <p class="input-caption">Merci de nous transmettre ton justificatif d'abonnement</p>
             <q-icon v-if="$v.user.alenvi.administrative.transportInvoice.driveId.$error" name="error_outline" color="secondary" />
           </div>
           <q-uploader ref="transportInvoice" name="transportInvoice" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `justif_transport_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
@@ -487,9 +518,11 @@
 import { mapGetters } from 'vuex';
 import { Cookies, openURL } from 'quasar';
 import { required, email, numeric, minLength, maxLength, requiredIf } from 'vuelidate/lib/validators';
+import 'vue-croppa/dist/vue-croppa.css'
 
 import { frPhoneNumber, iban } from '../../../../../helpers/vuelidateCustomVal';
 import gdrive from '../../../../../api/GoogleDrive.js';
+import cloudinary from '../../../../../api/Cloudinary.js';
 import nationalities from '../../../../../data/nationalities.js';
 import countries from '../../../../../data/countries.js';
 import SelectSector from '../../../../../components/SelectSector';
@@ -503,9 +536,13 @@ export default {
   },
   data () {
     return {
+      croppa: {},
       isLoaded: false,
       tmpInput: '',
       identityType: '',
+      pictureGroup: [
+        'user.alenvi.picture.link'
+      ],
       identityGroup: [
         'user.alenvi.firstname',
         'user.alenvi.lastname',
@@ -603,6 +640,9 @@ export default {
           local: {
             email: { required, email }
           },
+          picture: {
+            link: { required }
+          },
           mobilePhone: { required, frPhoneNumber },
           sector: { required },
           mentorId: { required },
@@ -691,6 +731,7 @@ export default {
           }
         }
       },
+      pictureGroup: this.pictureGroup,
       identityGroup: this.identityGroup,
       contactGroup: this.contactGroup,
       emergencyContactGroup: this.emergencyContactGroup,
@@ -721,6 +762,9 @@ export default {
         'x-access-token': Cookies.get('alenvi_token') || ''
       }
     },
+    hasPicture () {
+      return this.user.alenvi.picture ? this.user.alenvi.picture.link : '';
+    }
   },
   mounted () {
     this.mergeUser();
@@ -808,16 +852,45 @@ export default {
       const payload = this.$_.set({}, paths.ogust, value);
       if (paths.ogust.match(/(iban|bic)_number/i)) {
         payload.id_tiers = this.userProfile.employee_id;
-        // await this.$ogust.setEmployeeBankInfo(payload);
+        await this.$ogust.setEmployeeBankInfo(payload);
       } else {
         payload.id_employee = this.userProfile.employee_id
-        // await this.$ogust.setEmployee(payload);
+        await this.$ogust.setEmployee(payload);
       }
       console.log('PAYLOAD OGUST', payload);
     },
     uploadDocument (refName) {
       this.$refs[refName].upload();
       this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
+    },
+    async uploadImage () {
+      try {
+        let blob = await this.croppa.promisedBlob('image/jpeg', 0.8);
+        let data = new FormData();
+        data.append('_id', this.userProfile._id);
+        data.append('role', this.userProfile.role.name);
+        data.append('fileName', `photo_${this.userProfile.firstname}_${this.userProfile.lastname}`);
+        data.append('Content-Type', blob.type || 'application/octet-stream');
+        data.append('picture', blob);
+        await this.$axios.post(`${process.env.API_HOSTNAME}/cloudinary/upload`, data, { headers: { 'content-type': 'multipart/form-data', 'x-access-token': Cookies.get('alenvi_token') || '' } });
+        this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
+        this.$q.notify({
+          color: 'positive',
+          icon: 'done',
+          detail: 'Modification enregistrée',
+          position: 'bottom-left',
+          timeout: 2500
+        });
+      } catch (e) {
+        console.error(e);
+        this.$q.notify({
+          color: 'negative',
+          icon: 'warning',
+          detail: 'Erreur lors de la modification',
+          position: 'bottom-left',
+          timeout: 2500
+        });
+      }
     },
     async deleteDocument (driveId, path) {
       try {
@@ -844,6 +917,38 @@ export default {
           color: 'negative',
           icon: 'warning',
           detail: 'Erreur lors de la suppression du document',
+          position: 'bottom-left',
+          timeout: 2500
+        });
+      }
+    },
+    async deleteImage () {
+      try {
+        if (this.userProfile.picture && this.userProfile.picture.publicId) {
+          await cloudinary.deleteImageById({ id: this.userProfile.picture.publicId });
+          this.croppa.remove();
+        }
+        await this.$users.updateById({
+          _id: this.userProfile._id,
+          picture: {
+            link: null,
+            publicId: null
+          }
+        });
+        this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
+        this.$q.notify({
+          color: 'positive',
+          icon: 'done',
+          detail: 'Photo supprimée',
+          position: 'bottom-left',
+          timeout: 2500
+        });
+      } catch (e) {
+        console.error(e);
+        this.$q.notify({
+          color: 'negative',
+          icon: 'warning',
+          detail: 'Erreur lors de la suppression de la photo',
           position: 'bottom-left',
           timeout: 2500
         });
@@ -898,28 +1003,6 @@ export default {
       & > div
         padding-top: 24px
 
-  // .q-if /deep/
-  //   & .q-if-label
-  //     color: $dark-grey
-
-  // /deep/ .q-if
-  //   &-inverted
-  //     box-shadow: none
-  //     padding: 9px 14px 11px 14px
-  //   &-focused
-  //     box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.2)
-  //   &-baseline
-  //     line-height: 0
-  //   & input.q-input-target
-  //     height: 20px
-  //     line-height: 20px
-  //   & .q-if-inner
-  //     min-height: 20px
-  //     margin: 0
-
-  // /deep/ .q-if-focused
-  //   box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.2)
-
   .doc-thumbnail
     padding: 13px 0px 40px 12px
 
@@ -932,4 +1015,7 @@ export default {
     &-ok
       font-size: 12px
       color: $tertiary
+
+  .croppa-container
+    background-color: white
 </style>
