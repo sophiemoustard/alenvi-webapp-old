@@ -6,18 +6,21 @@
       </q-card-title>
       <q-card-separator />
       <q-card-main class="row justify-center layout-padding">
+        <!-- <div class="custom-input on-left" v-for="(box, index) in boxes" :key="index"> -->
         <q-input class="custom-input on-left" v-for="(box, index) in boxes" :key="index" align="center" @input="changeBoxAndMakeCode(index, $event)"
           :attributes="boxesStyle" :ref="'box' + (index + 1)" type="tel" :autofocus="box.autofocus" v-model.number="box.model"
-          :max-length="1" inverted-light color="white" />
+          :max-length="1"></q-input>
+        <!-- </div> -->
       </q-card-main>
-      <q-card-actions class="row">
-        <q-btn class="full-width send-btn" @click="submit" color="primary" :disable="!code">Envoyer</q-btn>
+      <q-card-actions class="row justify-end">
+        <q-btn @click="submit" color="primary" :disable="!code" flat big>Envoyer</q-btn>
       </q-card-actions>
     </q-card>
   </div>
 </template>
 
 <script>
+import { date } from 'quasar'
 
 export default {
   data () {
@@ -59,12 +62,21 @@ export default {
       } else if (index === (this.boxes.length - 1)) {
         this.$refs['box' + this.boxes.length][0].blur();
         this.code.splice(index, 1, event);
+        // this.code = '';
+        // for (let i = 0, l = this.boxes.length; i < l; i++) {
+        //   this.code += this.boxes[i].model;
+        // }
       }
     },
     async submit () {
       try {
         const activationDataRaw = await this.$activationCode.check(this.code.join(''));
-        console.log(activationDataRaw);
+        this.$q.cookies.set('signup_token', activationDataRaw.token, { path: '/', expires: date.addToDate(new Date(), { days: 1 }), secure: process.env.NODE_ENV !== 'development' });
+        this.$q.cookies.set('signup_sector', activationDataRaw.activationData.sector, { path: '/', expires: date.addToDate(new Date(), { days: 1 }), secure: process.env.NODE_ENV !== 'development' });
+        this.$q.cookies.set('signup_mobile', activationDataRaw.activationData.mobile_phone, { path: '/', expires: date.addToDate(new Date(), { days: 1 }), secure: process.env.NODE_ENV !== 'development' });
+        this.$q.cookies.set('signup_managerId', activationDataRaw.activationData.managerId, { path: '/', expires: date.addToDate(new Date(), { days: 1 }), secure: process.env.NODE_ENV !== 'development' });
+        this.$q.cookies.set('signup_firstSMS', activationDataRaw.activationData.firstSMS, { path: '/', expires: date.addToDate(new Date(), { days: 1 }), secure: process.env.NODE_ENV !== 'development' });
+        this.$router.replace('/signup');
       } catch (e) {
         this.$q.notify({
           color: 'negative',
@@ -96,13 +108,4 @@ export default {
     @media (max-width: 321px)
       width: 50px
       height: 50px
-
-  .q-if-inverted
-    border: 1px solid $light-grey
-
-  .q-card-actions
-    padding: 0
-
-  .send-btn
-    border-radius: 0px
 </style>
