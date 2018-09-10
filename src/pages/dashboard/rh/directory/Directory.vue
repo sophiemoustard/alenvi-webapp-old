@@ -240,7 +240,11 @@ export default {
           field: row => row.auxiliary,
           align: 'left',
           sortable: true,
-          sort: (a, b) => a.name.split(' ')[1].toLowerCase() < b.name.split(' ')[1].toLowerCase() ? -1 : 1
+          sort: (a, b) => {
+            const aArr = a.name.split(' ');
+            const bArr = b.name.split(' ');
+            return aArr[aArr.length - 1].toLowerCase() < bArr[bArr.length - 1].toLowerCase() ? -1 : 1
+          }
         },
         {
           name: 'profileErrors',
