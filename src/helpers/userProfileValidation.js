@@ -7,6 +7,9 @@ const userProfileSchema = Joi.object().keys({
   local: {
     email: Joi.string().required()
   },
+  picture: {
+    link: Joi.string().required()
+  },
   administrative: Joi.object().keys({
     driveFolder: Joi.object().keys({
       id: Joi.string()
