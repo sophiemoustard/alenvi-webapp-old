@@ -149,7 +149,7 @@ export default {
           value: 'sms'
         }
       ];
-      if (this.user.facebook.address) {
+      if (this.user.facebook && this.user.facebook.address) {
         options.push({
           label: 'Pigi',
           value: 'pigi'
