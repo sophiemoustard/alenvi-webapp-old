@@ -441,7 +441,7 @@ export default {
       return newEmployee;
     },
     async sendSms (newUserId) {
-      const activationDataRaw = await this.$activationCode.create({ mobile_phone: this.newUser.mobilePhone, newUserId, userEmail: this.newUser.local.email });
+      const activationDataRaw = await this.$activationCode.create({ newUserId, userEmail: this.newUser.local.email });
       const code = activationDataRaw.activationData.code;
       await this.$twilio.sendSMS({
         to: `+33${this.newUser.mobilePhone.substring(1)}`,
