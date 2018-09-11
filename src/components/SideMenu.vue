@@ -130,20 +130,17 @@ export default {
       if (this.$refs[this.$route.meta.parent]) {
         this.activeRoutes[this.$route.meta.parent].open = true;
         this.activeRoutes[this.$route.meta.parent].highlight = true;
-        this.$refs[this.$route.meta.parent].$el.style.background = '#FEFAFC';
       }
     },
     collapsibleClosing (to, from) {
       if (this.$refs[from.meta.parent] && to.meta.parent !== from.meta.parent) {
         this.activeRoutes[from.meta.parent].open = false;
         this.activeRoutes[from.meta.parent].highlight = false;
-        this.$refs[from.meta.parent].$el.style.background = '#FFFFFF';
       }
     },
     collapsibleEntering (to) {
       if (this.$refs[to.meta.parent]) {
         this.activeRoutes[to.meta.parent].highlight = true;
-        this.$refs[to.meta.parent].$el.style.background = '#FEFAFC';
       }
     },
     // changeRefreshState () {
