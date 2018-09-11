@@ -17,10 +17,6 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Choisis ta photo</p>
-            <q-icon v-if="$v.user.alenvi.picture.link.$error" error-label="error" name="error_outline" color="secondary" />
-          </div>
           <div class="row justify-between" style="background: white">
             <croppa v-model="croppa"
               class="doc-thumbnail"
@@ -30,11 +26,13 @@
               placeholder="Clique ici pour choisir ta photo"
               :placeholder-font-size="10"
               :show-remove-button="false"
-              :initial-image="hasPicture" />
+              :initial-image="hasPicture"
+              @file-choose="fileChosen = true"
+              @image-remove="fileChosen = false" />
             <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="cloud_upload" size="1rem" @click.native="uploadImage" />
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteImage" />
-              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.picture.link)" />
+              <q-btn v-if="fileChosen" color="primary" round flat icon="cloud_upload" size="1rem" @click.native="uploadImage" />
+              <q-btn v-if="hasPicture || fileChosen" color="primary" round flat icon="delete" size="1rem" @click.native="deleteImage" />
+              <q-btn v-if="hasPicture" color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.picture.link)" />
             </div>
           </div>
         </div>
@@ -537,6 +535,7 @@ export default {
   data () {
     return {
       croppa: {},
+      fileChosen: false,
       isLoaded: false,
       tmpInput: '',
       identityType: '',
@@ -873,6 +872,7 @@ export default {
         data.append('Content-Type', blob.type || 'application/octet-stream');
         data.append('picture', blob);
         await this.$axios.post(`${process.env.API_HOSTNAME}/cloudinary/upload`, data, { headers: { 'content-type': 'multipart/form-data', 'x-access-token': Cookies.get('alenvi_token') || '' } });
+        this.fileChosen = false;
         this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
         this.$q.notify({
           color: 'positive',
@@ -894,6 +894,12 @@ export default {
     },
     async deleteDocument (driveId, path) {
       try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
+          ok: true,
+          cancel: 'Annuler'
+        });
         await gdrive.removeFileById({ id: driveId });
         let payload = { _id: this.userProfile._id };
         if (path === 'certificates') {
@@ -913,6 +919,15 @@ export default {
         });
       } catch (e) {
         console.error(e);
+        if (e.message === '') {
+          return this.$q.notify({
+            color: 'positive',
+            icon: 'done',
+            detail: 'Suppression annulée',
+            position: 'bottom-left',
+            timeout: 2500
+          });
+        }
         this.$q.notify({
           color: 'negative',
           icon: 'warning',
@@ -924,6 +939,15 @@ export default {
     },
     async deleteImage () {
       try {
+        if (this.userProfile.picture && !this.userProfile.picture.link) {
+          return this.croppa.remove();
+        }
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Es-tu sûr(e) de vouloir supprimer ta photo ?',
+          ok: true,
+          cancel: 'Annuler'
+        });
         if (this.userProfile.picture && this.userProfile.picture.publicId) {
           await cloudinary.deleteImageById({ id: this.userProfile.picture.publicId });
           this.croppa.remove();
@@ -945,6 +969,15 @@ export default {
         });
       } catch (e) {
         console.error(e);
+        if (e.message === '') {
+          return this.$q.notify({
+            color: 'positive',
+            icon: 'done',
+            detail: 'Suppression annulée',
+            position: 'bottom-left',
+            timeout: 2500
+          });
+        }
         this.$q.notify({
           color: 'negative',
           icon: 'warning',
