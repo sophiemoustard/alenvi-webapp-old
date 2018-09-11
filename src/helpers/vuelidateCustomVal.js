@@ -5,6 +5,13 @@ export const frPhoneNumber = (value) => {
   return value.split(' ').join('').match(/[0]{1}[1-7]{1}[0-9]{8}/) || false;
 };
 
+export const frZipCode = (value) => {
+  if (!value) {
+    return false;
+  }
+  return value.split(' ').join('').match(/[0-9]{5}/) || false;
+}
+
 export const iban = (value) => {
   if (!value) {
     return false;
