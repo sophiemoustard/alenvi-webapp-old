@@ -8,7 +8,7 @@
         <q-search class="no-border input-search" v-model="searchStr" placeholder="Rechercher un profil" color="white" inverted-light />
       </div>
       <div class="col-xs-12 col-md-2 row justify-end">
-        <q-toggle v-model="inactiveUsers" color="primary" label="Inactifs" />
+        <q-toggle v-model="activeUsers" color="primary" label="Actifs" />
         <!-- <q-btn text-color="dark-grey" color="white" class="btn-directory" @click="activeUsers = !activeUsers" style="height: 40px">
           <q-icon :class="{ 'btn-icon-disabled': activeUsers, 'btn-icon-enabled': !activeUsers }" name="visibility" />
           <div class="col-12" style="font-size: 9px">Inactifs</div>
@@ -24,7 +24,9 @@
       rows-per-page-label="Lignes"
       :pagination-label="paginationLabel"
       no-data-label="Données non disponibles"
-      no-results-label="Pas de résultats">
+      no-results-label="Pas de résultats"
+      loading-label="Chargement..."
+      :loading="tableLoading">
       <q-tr
         slot="body"
         slot-scope="props"
@@ -65,8 +67,10 @@
               <p class="input-caption">Civilité</p>
               <q-icon v-if="$v.newUser.administrative.identity.title.$error" name="error_outline" color="secondary" />
             </div>
-            <q-select :options="civilityOptions" v-model="newUser.administrative.identity.title" color="white" inverted-light separator :error="$v.newUser.administrative.identity.title.$error"
-              @blur="$v.newUser.administrative.identity.title.$touch" />
+            <q-field :error="$v.newUser.administrative.identity.title.$error" error-label="Champ requis">
+              <q-select :options="civilityOptions" v-model="newUser.administrative.identity.title" color="white" inverted-light separator
+               @blur="$v.newUser.administrative.identity.title.$touch" />
+            </q-field>
           </div>
         </div>
         <div class="row margin-input">
@@ -75,8 +79,9 @@
               <p class="input-caption">Nom</p>
               <q-icon v-if="$v.newUser.lastname.$error" name="error_outline" color="secondary" />
             </div>
-            <q-input v-model="newUser.lastname" color="white" inverted-light :error="$v.newUser.lastname.$error"
-              @blur="$v.newUser.lastname.$touch" />
+            <q-field :error="$v.newUser.lastname.$error" error-label="Champ requis">
+              <q-input v-model="newUser.lastname" color="white" inverted-light @blur="$v.newUser.lastname.$touch" />
+            </q-field>
           </div>
         </div>
         <div class="row margin-input">
@@ -85,8 +90,9 @@
               <p class="input-caption">Prénom</p>
               <q-icon v-if="$v.newUser.firstname.$error" name="error_outline" color="secondary" />
             </div>
-            <q-input v-model="newUser.firstname" color="white" inverted-light :error="$v.newUser.firstname.$error"
-              @blur="$v.newUser.firstname.$touch" />
+            <q-field :error="$v.newUser.firstname.$error" error-label="Champ requis">
+              <q-input v-model="newUser.firstname" color="white" inverted-light @blur="$v.newUser.firstname.$touch" />
+            </q-field>
           </div>
         </div>
         <div class="row margin-input">
@@ -95,8 +101,9 @@
               <p class="input-caption">Numéro de téléphone</p>
               <q-icon v-if="$v.newUser.mobilePhone.$error" name="error_outline" color="secondary" />
             </div>
-            <q-input v-model="newUser.mobilePhone" color="white" inverted-light :error="$v.newUser.mobilePhone.$error"
-              @blur="$v.newUser.mobilePhone.$touch" />
+            <q-field :error="$v.newUser.mobilePhone.$error" :error-label="mobilePhoneError">
+              <q-input v-model="newUser.mobilePhone" color="white" inverted-light @blur="$v.newUser.mobilePhone.$touch" />
+            </q-field>
           </div>
         </div>
         <div class="row margin-input">
@@ -105,8 +112,10 @@
               <p class="input-caption">Adresse</p>
               <q-icon v-if="$v.newUser.administrative.contact.address.$error" name="error_outline" color="secondary" />
             </div>
-            <q-input v-model="newUser.administrative.contact.address" color="white" inverted-light :error="$v.newUser.administrative.contact.address.$error"
-              @blur="$v.newUser.administrative.contact.address.$touch" />
+            <q-field :error="$v.newUser.administrative.contact.address.$error" error-label="Champ requis">
+              <q-input v-model="newUser.administrative.contact.address" color="white" inverted-light
+                @blur="$v.newUser.administrative.contact.address.$touch" />
+            </q-field>
           </div>
         </div>
         <div class="row margin-input">
@@ -115,8 +124,10 @@
               <p class="input-caption">Code Postal</p>
               <q-icon v-if="$v.newUser.administrative.contact.zipCode.$error" name="error_outline" color="secondary" />
             </div>
-            <q-input v-model="newUser.administrative.contact.zipCode" color="white" inverted-light :error="$v.newUser.administrative.contact.zipCode.$error"
-              @blur="$v.newUser.administrative.contact.zipCode.$touch" />
+            <q-field :error="$v.newUser.administrative.contact.zipCode.$error" :error-label="zipCodeError">
+              <q-input v-model="newUser.administrative.contact.zipCode" color="white" inverted-light
+                @blur="$v.newUser.administrative.contact.zipCode.$touch" />
+            </q-field>
           </div>
         </div>
         <div class="row margin-input">
@@ -125,8 +136,9 @@
               <p class="input-caption">Ville</p>
               <q-icon v-if="$v.newUser.administrative.contact.city.$error" name="error_outline" color="secondary" />
             </div>
-            <q-input v-model="newUser.administrative.contact.city" color="white" inverted-light :error="$v.newUser.administrative.contact.city.$error"
-              @blur="$v.newUser.administrative.contact.city.$touch" />
+            <q-field :error="$v.newUser.administrative.contact.city.$error" error-label="Champ requis">
+              <q-input v-model="newUser.administrative.contact.city" color="white" inverted-light @blur="$v.newUser.administrative.contact.city.$touch" />
+            </q-field>
           </div>
         </div>
         <div class="row margin-input">
@@ -135,8 +147,9 @@
               <p class="input-caption">Email</p>
               <q-icon v-if="$v.newUser.local.email.$error" name="error_outline" color="secondary" />
             </div>
-            <q-input v-model="newUser.local.email" color="white" inverted-light :error="$v.newUser.local.email.$error"
-              @blur="$v.newUser.local.email.$touch" />
+            <q-field :error="$v.newUser.local.email.$error" :error-label="emailError">
+              <q-input v-model="newUser.local.email" color="white" inverted-light @blur="$v.newUser.local.email.$touch" />
+            </q-field>
           </div>
         </div>
         <div class="row margin-input">
@@ -145,7 +158,9 @@
               <p class="input-caption">Communauté</p>
               <q-icon v-if="$v.newUser.sector.$error" name="error_outline" color="secondary" />
             </div>
-            <select-sector v-model="newUser.sector" :myError="$v.newUser.sector.$error" @myBlur="$v.newUser.sector.$touch"/>
+            <q-field :error="$v.newUser.sector.$error" error-label="Champ requis">
+              <select-sector v-model="newUser.sector" @myBlur="$v.newUser.sector.$touch"/>
+            </q-field>
           </div>
         </div>
         <div class="row margin-input last">
@@ -154,7 +169,9 @@
               <p class="input-caption">Géré par</p>
               <q-icon v-if="$v.newUser.ogustManagerId.$error" name="error_outline" color="secondary" />
             </div>
-            <select-manager v-model="newUser.ogustManagerId" :myError="$v.newUser.ogustManagerId.$error" @myBlur="$v.newUser.ogustManagerId.$touch"/>
+            <q-field :error="$v.newUser.ogustManagerId.$error" error-label="Champ requis">
+              <select-manager v-model="newUser.ogustManagerId" @myBlur="$v.newUser.ogustManagerId.$touch"/>
+            </q-field>
           </div>
         </div>
         <div class="row margin-input last">
@@ -169,9 +186,10 @@
 </template>
 
 <script>
-import { required, email, numeric } from 'vuelidate/lib/validators';
+import { required, email } from 'vuelidate/lib/validators';
 import randomize from 'randomatic';
 
+import { frPhoneNumber, frZipCode } from '../../../../helpers/vuelidateCustomVal';
 import { getUserStartDate } from '../../../../helpers/getUserStartDate';
 import { clear } from '../../../../helpers/utils.js';
 import { userProfileValidation } from '../../../../helpers/userProfileValidation';
@@ -186,6 +204,7 @@ export default {
   },
   data () {
     return {
+      tableLoading: true,
       loading: false,
       opened: false,
       sendWelcomeMsg: true,
@@ -226,7 +245,7 @@ export default {
       },
       userList: [],
       searchStr: '',
-      inactiveUsers: false,
+      activeUsers: true,
       pagination: {
         sortBy: 'name', // String, column "name" property value
         descending: false,
@@ -270,7 +289,7 @@ export default {
         },
         {
           name: 'active',
-          label: '',
+          label: 'Actif',
           field: 'isActive',
           align: 'right',
           sortable: true
@@ -282,11 +301,11 @@ export default {
     newUser: {
       lastname: { required },
       firstname: { required },
-      mobilePhone: { required, numeric },
+      mobilePhone: { required, frPhoneNumber },
       administrative: {
         contact: {
           address: { required },
-          zipCode: { required, numeric },
+          zipCode: { required, frZipCode },
           city: { required }
         },
         identity: {
@@ -306,16 +325,37 @@ export default {
   },
   computed: {
     activeUserList () {
-      if (this.inactiveUsers) {
-        return this.userList.filter(user => !user.isActive);
+      if (this.activeUsers) {
+        return this.userList.filter(user => user.isActive);
       }
-      return this.userList.filter(user => user.isActive);
+      return this.userList.filter(user => !user.isActive);
     },
     filteredUsers () {
       return this.activeUserList.filter(user => user.auxiliary.name.match(new RegExp(this.searchStr, 'i')));
     },
     notificationsProfiles () {
       return this.$store.getters['rh/getNotificationsProfiles'];
+    },
+    mobilePhoneError () {
+      if (!this.$v.newUser.mobilePhone.required) {
+        return 'Champ requis';
+      } else if (!this.$v.newUser.mobilePhone.frPhoneNumber) {
+        return 'Numéro de téléphone non valide (doit être sous la forme 01XXXXXXXX)';
+      }
+    },
+    zipCodeError () {
+      if (!this.$v.newUser.administrative.contact.zipCode.required) {
+        return 'Champ requis';
+      } else if (!this.$v.newUser.administrative.contact.zipCode.frZipCode) {
+        return 'Code postal non valide (doit être sous la forme 92XXX)';
+      }
+    },
+    emailError () {
+      if (!this.$v.newUser.local.email.required) {
+        return 'Champ requis';
+      } else if (!this.$v.newUser.local.email.email) {
+        return 'Email non valide (doit être sous la forme XXXXX@XXXXX.XXX)';
+      }
     }
   },
   methods: {
@@ -360,7 +400,9 @@ export default {
             isActive: user.isActive
           }
         });
+        this.tableLoading = false;
       } catch (e) {
+        this.tableLoading = false;
         console.error(e);
       }
     },
@@ -411,7 +453,7 @@ export default {
         this.loading = true;
         this.$v.newUser.$touch();
         if (this.$v.newUser.$error) {
-          throw new Error('Missing fields');
+          throw new Error('Invalid fields');
         }
         const newEmployee = await this.createOgustUser();
         this.newUser.employee_id = newEmployee.data.data.employee.id_employee;
@@ -431,12 +473,12 @@ export default {
         this.opened = false;
       } catch (e) {
         console.error(e);
-        if (e.message === 'Missing fields') {
+        if (e.message === 'Invalid fields') {
           this.loading = false;
           return this.$q.notify({
             color: 'negative',
             icon: 'warning',
-            detail: 'Merci de remplir tous les champs',
+            detail: 'Champ(s) invalide(s)',
             position: 'bottom-left',
             timeout: 2500
           });
@@ -587,5 +629,14 @@ export default {
 
   /deep/ .q-option .q-option-label
     font-size: 14px
+
+  .q-field-bottom
+    padding-top: 2px
+
+  /deep/ .q-field
+    &-with-error
+      & .q-field-bottom
+        color: $secondary
+        padding-top: 2px
 
 </style>
