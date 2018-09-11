@@ -56,7 +56,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
 import { required, email, sameAs, minLength } from 'vuelidate/lib/validators';
 
 export default {
@@ -96,10 +95,6 @@ export default {
     this.alenviToken = this.$q.cookies.get('signup_token');
   },
   computed: {
-    ...mapGetters({
-      // currentUser: 'main/user',
-      // user: 'rh/getUserProfile'
-    }),
     passwordError () {
       if (!this.$v.user.alenvi.local.password.required) {
         return 'Champ requis';
