@@ -38,6 +38,7 @@ const routes = [
   },
   { path: '/login', name: 'login', component: () => import('pages/signin/Authenticate') },
   { path: '/enterCode', component: () => import('pages/signup/EnterCode') },
+  { path: '/messenger', component: () => import('pages/signup/ChooseMessengerPlatform') },
   { path: '/createPassword',
     component: () => import('pages/signup/CreatePassword'),
     beforeEnter: (to, from, next) => {
