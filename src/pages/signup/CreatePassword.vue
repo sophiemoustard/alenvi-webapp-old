@@ -15,7 +15,7 @@
             <span><q-icon name="thumb up" size="2rem" /></span>
           </div>
           <div class="col-10 signup-bloctext-padding">
-            <p class="no-margin" style="font-size: 0.8rem">Afin de confirmer la création de votre compte Alenvi, merci de <span class="text-weight-bold">choisir un mot de passe</span></p>
+            <p class="no-margin" style="font-size: 0.8rem;">Afin de confirmer la création de votre compte Alenvi, merci de <span class="text-weight-bold">choisir un mot de passe</span></p>
           </div>
         </div>
         <div class="row margin-input">
@@ -150,6 +150,7 @@ export default {
     &-btn
       @media screen and (min-width: 768px)
         font-size: 16px
+        margin-top: 20px
         margin-bottom: 24px
       @media screen and (max-width: 768px)
         border-radius: 0
