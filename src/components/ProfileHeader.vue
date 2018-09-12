@@ -62,7 +62,7 @@
         <div class="row margin-input">
           <div class="col-12">
             <div class="row">
-                <p class="input-caption">Support</p>
+                <p class="input-caption">Modèle</p>
             </div>
             <q-select
               v-model="typeMessage"
@@ -82,7 +82,7 @@
           </div>
         </div>
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary" :loading="loading" @click="sendMessage()" />
+      <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary" :loading="loading" @click.native="sendMessage" />
     </q-modal>
   </div>
 </template>
@@ -160,12 +160,44 @@ export default {
   },
   methods: {
     async sendMessage () {
+      if (this.messageSupport === 'sms') {
+        this.sendSMS();
+      } else {
+        this.sendMessageToBotUser();
+      }
+    },
+    async sendMessageToBotUser () {
       try {
-        const message = await this.$twilio.sendSMS({
+        await this.$message.sendMessage({
+          message: this.message,
+          address: this.user.facebook.address
+        });
+        this.isLoading = false;
+        this.$q.notify({
+          color: 'positive',
+          icon: 'thumb up',
+          detail: 'Message par Pigi bien envoyé',
+          position: 'bottom-right',
+          timeout: 2500
+        });
+      } catch (e) {
+        console.error(e);
+        this.isLoading = false;
+        this.$q.notify({
+          color: 'negative',
+          icon: 'warning',
+          detail: 'Erreur lors de l\'envoi du message par Pigi',
+          position: 'bottom-right',
+          timeout: 2500
+        });
+      }
+    },
+    async sendSMS () {
+      try {
+        await this.$twilio.sendSMS({
           to: `+33${this.user.mobilePhone.substring(1)}`,
           body: this.message,
         });
-        console.log('SMS envoyé =', message);
         this.isLoading = false;
         this.$q.notify({
           color: 'positive',
@@ -175,6 +207,7 @@ export default {
           timeout: 2500
         });
       } catch (e) {
+        console.error(e);
         this.isLoading = false;
         this.$q.notify({
           color: 'negative',
@@ -183,7 +216,6 @@ export default {
           position: 'bottom-right',
           timeout: 2500
         });
-        console.error(e);
       }
     }
   }
