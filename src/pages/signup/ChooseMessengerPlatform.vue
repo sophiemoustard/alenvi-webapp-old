@@ -8,46 +8,30 @@
         <p class="no-margin" style="font-size: 0.8rem; text-align: right">Espace Alenvi</p>
       </div>
     </div>
-    <div class="col-12 neutral-background signup-body-padding">
-      <div class="row justify-center signup-icon-padding">
-        <img style="height: 50px" src="https://upload.wikimedia.org/wikipedia/fr/thumb/d/d0/Facebook_Messenger_nouveau_logo.svg/220px-Facebook_Messenger_nouveau_logo.svg.png" alt="">
-      </div>
-      <p class="row justify-center no-margin signup-bloctexts">Chez Alenvi, <span class="text-weight-bold">Nous utilisons l'application Messenger afin de communiquer avec nos auxiliaires.</span></p>
-      <p class="row justify-center no-margin signup-bloctexts">Pour la télécharger, cliquez sur le bouton ci-dessous correspondant à votre téléphone !</p>
-      <!-- <div class="row margin-input">
-        <div class="col-12">
-          <div class="row justify-center">
-            <a style="" href='https://play.google.com/store/apps/details?id=com.facebook.orca&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Disponible sur Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/fr_badge_web_generic.png'/></a>
+    <div class="col-12 row justify-center neutral-background">
+      <div class="signup-body-padding">
+        <div class="row justify-center signup-icon-padding">
+          <img style="height: 60px" src="https://upload.wikimedia.org/wikipedia/fr/thumb/d/d0/Facebook_Messenger_nouveau_logo.svg/220px-Facebook_Messenger_nouveau_logo.svg.png" alt="">
+        </div>
+        <p class="no-margin signup-bloctexts">Chez Alenvi, <span class="text-weight-bold">Nous utilisons l'application Messenger afin de communiquer avec nos auxiliaires.</span></p>
+        <p class="no-margin signup-bloctexts">Pour la télécharger, cliquez sur le bouton ci-dessous correspondant à votre téléphone !</p>
+        <div class="row justify-center">
+          <div class="col-6" style="width: 136px" @click="sendSMS()">
+            <a href="https://play.google.com/store/apps/details?id=com.facebook.orca&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1"><img class="badge" alt='Disponible sur Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/fr_badge_web_generic.png'/></a>
+          </div>
+          <div class="col-6" style="width: 136px" @click="sendSMS()">
+            <a href="https://itunes.apple.com/fr/app/messenger/id454638411?mt=8"><img class="badge" style="margin:6%; width:85%" src="statics/App_Store_Badge_FR_RGB_blk_100517.svg" alt="Lien vers l'application Messenger sur l'App Store" /></a>
           </div>
         </div>
-      </div> -->
-      <!-- <div class="row margin-input">
-        <div class="col-12">
-          <div class="row justify-between">
-            <p class="input-caption">Email</p>
-          </div>
-          <q-input @keyup.enter="submit" v-model.trim="credentials.email" color="white" inverted-light lower-case/>
+        <div class="row justify-center">
+          <a :href="messengerLink"><q-btn no-caps class="signup-btn" label="J'ai déjà l'application" icon-right="arrow_forward" color="primary" /></a>
         </div>
-      </div>
-      <div class="row margin-input">
-        <div class="col-12">
-          <div class="row justify-between">
-            <p class="input-caption">Mot de passe</p>
-          </div>
-          <q-input @keyup.enter="submit" v-model="credentials.password" type="password" color="white" inverted-light/>
-        </div>
-      </div>
-      <router-link class="row justify-end" :to="{ path: '/forgotPassword', query: { from: 'w' } }"><small>Mot de passe oublié ?</small></router-link> -->
-      <div class="row justify-center">
-        <q-btn no-caps class="signup-btn" label="Me connecter" icon-right="ion-log-in" color="primary" @click="submit()" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-
-import { date } from 'quasar'
 
 export default {
   metaInfo: {
@@ -59,6 +43,14 @@ export default {
   name: 'Authentication',
   data () {
     return {
+      isLoading: false,
+      messengerLink: `${process.env.MESSENGER_LINK}`,
+      message:
+`Attention, avant la signature de ton contrat, tu dois télécharger l'application Facebook Messenger afin de pouvoir utiliser les outils Alenvi.
+Voici les deux étapes à suivre:
+  1. Si ton téléphone est un Iphone, clique sur ce lien https://appstore.com/messenger, sinon clique sur ce lien: https://play.google.com/store/apps/details?id=com.facebook.orca
+  2. Une fois l'application installée, connecte-toi en cliquant sur le lien suivant: ${process.env.MESSENGER_LINK}
+Si tu rencontres des difficultés, contacte dès aujourd'hui la personne qui t'a recruté chez Alenvi`,
       credentials: {
         email: '',
         password: ''
@@ -71,41 +63,27 @@ export default {
     }
   },
   methods: {
-    async submit () {
+    async sendSMS () {
       try {
-        const user = await this.$axios.post(`${process.env.API_HOSTNAME}/users/authenticate`, {
-          email: this.credentials.email.toLowerCase(),
-          password: this.credentials.password
+        const message = await this.$twilio.sendSMS({
+          to: `+33${this.getUser.mobilePhone.substring(1)}`,
+          body: this.message,
         });
-        // console.log(user);
-        this.$q.cookies.set('alenvi_token', user.data.data.token, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV !== 'development' });
-        this.$q.cookies.set('alenvi_token_expires_in', user.data.data.expiresIn, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV !== 'development' });
-        this.$q.cookies.set('refresh_token', user.data.data.refreshToken, { path: '/', expires: 365, secure: process.env.NODE_ENV !== 'development' });
-        this.$q.cookies.set('user_id', user.data.data.user._id, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV !== 'development' });
-        await this.$store.dispatch('main/getUser', this.$q.cookies.get('user_id'));
-        // if (this.getUser.role.name === 'Client') {
-        //   return this.$router.replace({ path: '/dashboard/customer/home' });
-        // }
-        if (this.$q.platform.is.desktop) {
-          this.$store.commit('main/setToggleDrawer', true);
-        }
-
-        if (this.$route.query.from) {
-          return this.$router.replace({ path: this.$route.query.from });
-        }
-
-        if (this.getUser.role.name === 'Client') {
-          this.$router.replace({ path: '/dashboard/customer/home' });
-        } else if (this.getUser.role.name === 'Auxiliaire' && !this.getUser.administrative.signup.complete) {
-          this.$router.replace({ path: '/signupComplete' });
-        } else {
-          this.$router.replace({ path: '/dashboard/planning' });
-        }
+        console.log('SMS envoyé =', message);
+        this.isLoading = false;
+        this.$q.notify({
+          color: 'positive',
+          icon: 'thumb up',
+          detail: 'SMS bien envoyé',
+          position: 'bottom-right',
+          timeout: 2500
+        });
       } catch (e) {
+        this.isLoading = false;
         this.$q.notify({
           color: 'negative',
           icon: 'warning',
-          detail: 'Impossible de se connecter.',
+          detail: 'Erreur lors de l\'envoi du SMS',
           position: 'bottom-right',
           timeout: 2500
         });
@@ -122,17 +100,17 @@ export default {
     &-header-padding
       padding: 24px 24px 12px 24px
     &-icon-padding
-      padding: 12px 24px 12px 24px
+      padding: 24px 0px 24px 0px
+    &-body-padding
+      padding: 0px 24px 0px 24px
     &-bloctexts
-      font-size: 0.8rem
+      // font-size: 0.8rem
       text-align: center
       padding: 0px 0px 24px 0px
-    &-body-padding
-      margin: 0 auto 0 auto
-      padding: 0px 24px 0px 24px
     &-btn
       @media screen and (min-width: 768px)
         font-size: 16px
+        margin-top: 24px
         margin-bottom: 24px
       @media screen and (max-width: 768px)
         border-radius: 0
@@ -144,4 +122,7 @@ export default {
     @media screen and (max-width: 768px)
       height: 85vh
 
+  .badge
+    max-width: 100%
+    height: auto
 </style>
