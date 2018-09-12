@@ -91,10 +91,9 @@ export default {
           case 'customer':
             const customers = await this.$ogust.getCustomers({ sector }, this.ogustToken);
             const filteredCustomers = this.$_.filter(customers, customer => !customer.last_name.match(/^ALENVI/i));
-            console.log(filteredCustomers);
             for (const k in filteredCustomers) {
               this.persons.push({
-                label: `${customers[k].title} ${customers[k].last_name}`,
+                label: `${filteredCustomers[k].title} ${filteredCustomers[k].last_name}`,
                 value: filteredCustomers[k].id_customer
               });
             }
