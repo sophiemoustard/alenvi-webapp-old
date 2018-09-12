@@ -519,7 +519,6 @@ import { required, email, numeric, minLength, maxLength, requiredIf } from 'vuel
 import 'vue-croppa/dist/vue-croppa.css'
 
 import { frPhoneNumber, iban } from '../../../../../helpers/vuelidateCustomVal';
-import { checkRIB } from '../../../../../helpers/bank';
 import gdrive from '../../../../../api/GoogleDrive.js';
 import cloudinary from '../../../../../api/Cloudinary.js';
 import nationalities from '../../../../../data/nationalities.js';
