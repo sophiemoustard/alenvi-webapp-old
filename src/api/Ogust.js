@@ -218,5 +218,9 @@ export default {
       employeeBankInfoRaw = await axios.put(`${process.env.API_HOSTNAME}/ogust/bankInfo`, data, { headers: { 'x-ogust-token': ogustToken } });
     }
     return employeeBankInfoRaw.data.data.updatedBankInfo.result;
+  },
+  async setAddress (data) {
+    const addressUpdated = await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/address/${data.id_address}`, data);
+    return addressUpdated;
   }
 }
