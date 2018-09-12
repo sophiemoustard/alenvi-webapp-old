@@ -26,7 +26,7 @@ export default {
     return {
       tabsContent: [
         {
-          label: 'Profil',
+          label: 'Infos personnelles',
           to: { name: 'profile info', params: { id: this.id } },
           notification: 'profiles'
         },
@@ -34,17 +34,17 @@ export default {
           label: 'Tâches',
           to: { name: 'profile tasks' },
           notification: 'tasks'
-        },
-        {
-          label: 'Test',
-          to: { name: 'planning' },
-          notification: 'profiles'
-        },
-        {
-          label: 'Test',
-          to: { name: 'planning' },
-          notification: 'profiles'
         }
+        // {
+        //   label: 'Test',
+        //   to: { name: 'planning' },
+        //   notification: 'profiles'
+        // },
+        // {
+        //   label: 'Test',
+        //   to: { name: 'planning' },
+        //   notification: 'profiles'
+        // }
       ]
     }
   },
