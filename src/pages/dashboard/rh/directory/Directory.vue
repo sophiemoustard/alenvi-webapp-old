@@ -233,6 +233,7 @@ export default {
         sector: '',
         administrative: {
           contact: {
+            addressId: '',
             address: '',
             city: '',
             zipCode: ''
@@ -457,6 +458,7 @@ export default {
         }
         const newEmployee = await this.createOgustUser();
         this.newUser.employee_id = newEmployee.data.data.employee.id_employee;
+        this.newUser.administrative.contact.addressId = newEmployee.data.data.employee.main_address.id_address;
         const newUser = await this.createAlenviUser();
         await this.getUserList();
         if (this.sendWelcomeMsg) {
