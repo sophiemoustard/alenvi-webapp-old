@@ -177,7 +177,7 @@
             color="white"
             inverted-light
             @focus="saveTmp('administrative.contact.address')"
-            @blur="updateUser({ alenvi: 'administrative.contact.address', ogust: 'main_address.line' })"
+            @blur="updateUser({ alenvi: 'administrative.contact.address', ogust: 'line' })"
           />
         </div>
         <div class="col-xs-12 col-md-6">
@@ -186,7 +186,7 @@
             color="white"
             inverted-light
             @focus="saveTmp('administrative.contact.addionalAddress')"
-            @blur="updateUser({ alenvi: 'administrative.contact.additionalAddress', ogust: 'main_address.supplement' })"
+            @blur="updateUser({ alenvi: 'administrative.contact.additionalAddress', ogust: 'supplement' })"
           />
         </div>
         <div class="col-xs-12 col-md-6">
@@ -198,7 +198,7 @@
             color="white"
             inverted-light
             @focus="saveTmp('administrative.contact.zipCode')"
-            @blur="updateUser({ alenvi: 'administrative.contact.zipCode', ogust: 'main_address.zip' })"
+            @blur="updateUser({ alenvi: 'administrative.contact.zipCode', ogust: 'zip' })"
           />
         </div>
         <div class="col-xs-12 col-md-6">
@@ -210,7 +210,7 @@
             color="white"
             inverted-light
             @focus="saveTmp('administrative.contact.city')"
-            @blur="updateUser({ alenvi: 'administrative.contact.city', ogust: 'main_address.city' })"
+            @blur="updateUser({ alenvi: 'administrative.contact.city', ogust: 'city' })"
           />
         </div>
       </div>
@@ -748,7 +748,7 @@ export default {
       return Object.keys(nationalities).map(nationality => ({ value: nationality, label: nationalities[nationality] }));
     },
     countriesOptions () {
-      return Object.keys(countries).map(country => ({ value: country, label: countries[country] }));
+      return ['FR', ...Object.keys(countries).filter(country => country !== 'FR')].map(country => ({ value: country, label: countries[country] }));
     },
     docsUploadUrl () {
       return `${process.env.API_HOSTNAME}/gdrive/upload`;
@@ -852,6 +852,9 @@ export default {
       if (paths.ogust.match(/(iban|bic)_number/i)) {
         payload.id_tiers = this.userProfile.employee_id;
         await this.$ogust.setEmployeeBankInfo(payload);
+      } else if (paths.ogust.match(/(city|line|supplement|zip)/i)) {
+        payload.id_address = this.userProfile.administrative.contact.addressId;
+        await this.$ogust.setAddress(payload);
       } else {
         payload.id_employee = this.userProfile.employee_id
         await this.$ogust.setEmployee(payload);
