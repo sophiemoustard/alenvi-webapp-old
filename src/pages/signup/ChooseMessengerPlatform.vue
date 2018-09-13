@@ -116,6 +116,7 @@ Si tu rencontres des difficultés, contacte dès aujourd'hui la personne qui t'a
         border-radius: 0
         position: absolute
         bottom: 0
+        left: 0
         width: 100%
 
   .neutral-background
