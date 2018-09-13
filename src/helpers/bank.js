@@ -18,14 +18,14 @@ export const checkRIB = (rib) => {
 
 export const getIbanFromRIB = (rib) => {
   const tmpIban = `${rib}FR00`.split('').map(char => parseInt(char, 36).toString()).join('');
-  let calculCle = 0;
-  let pos = 0;
-  while (pos < tmpIban.length) {
-    console.log(tmpIban.substr(pos, 9));
-    calculCle = parseInt(calculCle.toString() + tmpIban.substr(pos, 9), 10) % 97;
-    pos += 9;
+  let remainder = 0;
+  let start = 0;
+  let end = 9;
+  while (start < tmpIban.length) {
+    remainder = parseInt(remainder.toString() + tmpIban.substring(start, end), 10) % 97;
+    start += 9;
+    end += 9;
   }
-  console.log(calculCle);
-  const key = 98 - (calculCle % 97);
-  return key;
+  const key = 98 - (remainder % 97);
+  return `FR${key}${rib}`;
 };

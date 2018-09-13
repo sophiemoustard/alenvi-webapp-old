@@ -45,8 +45,8 @@ const userProfileSchema = Joi.object().keys({
       link: Joi.string().allow(null)
     }).when('administrative.driveFolder', { is: Joi.exist(), then: Joi.required() }),
     navigoInvoice: {
-      driveId: Joi.string(),
-      link: Joi.string()
+      driveId: Joi.string().allow(null),
+      link: Joi.string().allow(null)
     },
     transportInvoice: Joi.object().keys({
       transportType: Joi.string().required(),
@@ -57,7 +57,8 @@ const userProfileSchema = Joi.object().keys({
       driveId: Joi.string().required(),
       link: Joi.string()
     }).when('administrative.driveFolder', { is: Joi.exist(), then: Joi.required() }),
-    certificates: Joi.array().when('administrative.driveFolder', { is: Joi.exist(), then: Joi.array().min(1) }),
+    certificates: Joi.array(),
+    // certificates: Joi.array().when('administrative.driveFolder', { is: Joi.exist(), then: Joi.array().min(1) }),
     healthAttest: Joi.object().keys({
       driveId: Joi.string().required(),
       link: Joi.string()
@@ -67,9 +68,9 @@ const userProfileSchema = Joi.object().keys({
       link: Joi.string()
     }).when('administrative.identityDocs', { is: 'cni', then: Joi.required() }),
     idCardVerso: Joi.object().keys({
-      driveId: Joi.string(),
-      link: Joi.string()
-    }).when('administrative.identityDocs', { is: 'cni', then: Joi.required() }),
+      driveId: Joi.string().allow(null),
+      link: Joi.string().allow(null)
+    }),
     passport: Joi.object().keys({
       driveId: Joi.string(),
       link: Joi.string()

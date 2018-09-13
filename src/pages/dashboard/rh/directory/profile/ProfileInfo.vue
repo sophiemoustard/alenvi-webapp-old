@@ -30,9 +30,11 @@
               @file-choose="fileChosen = true"
               @image-remove="fileChosen = false" />
             <div class="self-end doc-delete">
-              <q-btn v-if="fileChosen" color="primary" round flat icon="cloud_upload" size="1rem" @click.native="uploadImage" />
+              <q-btn v-if="fileChosen || hasPicture" color="primary" icon="rotate left" @click="croppa.rotate(-1)" round flat size="1rem" />
+              <q-btn v-if="fileChosen || hasPicture" color="primary" icon="rotate right" @click="croppa.rotate(1)" round flat size="1rem" />
+              <q-btn v-if="fileChosen || hasPicture" color="primary" round flat icon="cloud_upload" size="1rem" @click.native="uploadImage" />
               <q-btn v-if="hasPicture || fileChosen" color="primary" round flat icon="delete" size="1rem" @click.native="deleteImage" />
-              <q-btn v-if="hasPicture" color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.picture.link)" />
+              <q-btn v-if="hasPicture && !fileChosen" color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.picture.link)" />
             </div>
           </div>
         </div>
@@ -47,93 +49,109 @@
         <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Prénom</p>
-            <q-icon v-if="$v.user.alenvi.firstname.$error" error-label="error" name="error_outline" color="secondary" />
+            <q-icon v-if="$v.user.alenvi.firstname.$error" name="error_outline" color="secondary" />
           </div>
-          <q-input v-model="user.alenvi.firstname"
-            color="white"
-            inverted-light
-            @focus="saveTmp('firstname')"
-            @blur="updateUser({ alenvi: 'firstname', ogust: 'first_name' })"
-          />
+          <q-field :error="$v.user.alenvi.firstname.$error" :error-label="requiredField">
+            <q-input v-model="user.alenvi.firstname"
+              color="white"
+              inverted-light
+              @focus="saveTmp('firstname')"
+              @blur="updateUser({ alenvi: 'firstname', ogust: 'first_name' })"
+            />
+          </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Nom</p>
-            <q-icon v-if="$v.user.alenvi.lastname.$error" error-label="error" name="error_outline" color="secondary" />
+            <q-icon v-if="$v.user.alenvi.lastname.$error" name="error_outline" color="secondary" />
           </div>
-          <q-input v-model="user.alenvi.lastname"
-            color="white"
-            inverted-light
-            @focus="saveTmp('lastname')"
-            @blur="updateUser({ alenvi: 'lastname', ogust: 'last_name' })"
-          />
+          <q-field :error="$v.user.alenvi.lastname.$error" :error-label="requiredField">
+            <q-input v-model="user.alenvi.lastname"
+              color="white"
+              inverted-light
+              @focus="saveTmp('lastname')"
+              @blur="updateUser({ alenvi: 'lastname', ogust: 'last_name' })"
+            />
+          </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Nationalité</p>
             <q-icon v-if="$v.user.alenvi.administrative.identity.nationality.$error" name="error_outline" color="secondary" />
           </div>
-          <q-select v-model="user.alenvi.administrative.identity.nationality" color="white" inverted-light :options="nationalitiesOptions"
+          <q-field :error="$v.user.alenvi.administrative.identity.nationality.$error" :error-label="requiredField">
+            <q-select v-model="user.alenvi.administrative.identity.nationality" color="white" inverted-light :options="nationalitiesOptions"
             filter
             filter-placeholder="Rechercher"
             @focus="saveTmp('administrative.identity.nationality')"
             @blur="updateUser({ alenvi: 'administrative.identity.nationality', ogust: 'nationality' })" />
+          </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Date de naissance</p>
             <q-icon v-if="$v.user.alenvi.administrative.identity.dateOfBirth.$error" name="error_outline" color="secondary" />
           </div>
-          <q-datetime type="date" format="DD/MM/YYYY" v-model="user.alenvi.administrative.identity.dateOfBirth" color="white" inverted-light
+          <q-field :error="$v.user.alenvi.administrative.identity.dateOfBirth.$error" :error-label="requiredField">
+            <q-datetime type="date" format="DD/MM/YYYY" v-model="user.alenvi.administrative.identity.dateOfBirth" color="white" inverted-light
             @focus="saveTmp('administrative.identity.dateOfBirth')"
             @blur="updateUser({ alenvi: 'administrative.identity.dateOfBirth', ogust: 'date_of_birth' })" />
+          </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Pays de naissance</p>
             <q-icon v-if="$v.user.alenvi.administrative.identity.birthCountry.$error" name="error_outline" color="secondary" />
           </div>
-          <q-select v-model="user.alenvi.administrative.identity.birthCountry" :options="countriesOptions" color="white" inverted-light
+          <q-field :error="$v.user.alenvi.administrative.identity.birthCountry.$error" :error-label="requiredField">
+            <q-select v-model="user.alenvi.administrative.identity.birthCountry" :options="countriesOptions" color="white" inverted-light
             filter
             filter-placeholder="Rechercher"
             @focus="saveTmp('administrative.identity.birthCountry')"
             @blur="updateUser({ alenvi: 'administrative.identity.birthCountry', ogust: 'country_of_birth' })" />
+          </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Département de naissance</p>
-            <q-icon v-if="$v.user.alenvi.administrative.identity.birthState.$error" error-label="error" name="error_outline" color="secondary" />
+            <q-icon v-if="$v.user.alenvi.administrative.identity.birthState.$error" name="error_outline" color="secondary" />
           </div>
-          <q-input v-model="user.alenvi.administrative.identity.birthState"
+          <q-field :error="$v.user.alenvi.administrative.identity.birthState.$error" :error-label="birthStateError">
+            <q-input v-model="user.alenvi.administrative.identity.birthState"
             color="white"
             inverted-light
             @focus="saveTmp('administrative.identity.birthState')"
             @blur="updateUser({ alenvi: 'administrative.identity.birthState', ogust: 'state_of_birth' })"
           />
+          </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Ville de naissance</p>
             <q-icon v-if="$v.user.alenvi.administrative.identity.birthCity.$error" name="error_outline" color="secondary" />
           </div>
-          <q-input v-model="user.alenvi.administrative.identity.birthCity"
+          <q-field :error="$v.user.alenvi.administrative.identity.birthCity.$error" :error-label="requiredField">
+            <q-input v-model="user.alenvi.administrative.identity.birthCity"
             color="white"
             inverted-light
             @focus="saveTmp('administrative.identity.birthCity')"
             @blur="updateUser({ alenvi: 'administrative.identity.birthCity', ogust: 'place_of_birth' })"
           />
+          </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Numéro de sécurité sociale</p>
             <q-icon v-if="$v.user.alenvi.administrative.identity.socialSecurityNumber.$error" name="error_outline" color="secondary" />
           </div>
-          <q-input v-model="user.alenvi.administrative.identity.socialSecurityNumber"
+          <q-field :error="$v.user.alenvi.administrative.identity.socialSecurityNumber.$error" :error-label="ssnError">
+            <q-input v-model="user.alenvi.administrative.identity.socialSecurityNumber"
             color="white"
             inverted-light
             @focus="saveTmp('administrative.identity.socialSecurityNumber')"
             @blur="updateUser({ alenvi: 'administrative.identity.socialSecurityNumber', ogust: 'social_insurance_number' })"
           />
+          </q-field>
         </div>
       </div>
     </div>
@@ -148,20 +166,23 @@
             <p class="input-caption">Numéro de téléphone</p>
             <q-icon v-if="$v.user.alenvi.mobilePhone.$error" name="error_outline" color="secondary" />
           </div>
-          <q-input v-model.trim="user.alenvi.mobilePhone"
+          <q-field :error="$v.user.alenvi.mobilePhone.$error" :error-label="phoneNbrError">
+            <q-input v-model.trim="user.alenvi.mobilePhone"
             type="tel"
             color="white"
             inverted-light
             @focus="saveTmp('mobilePhone')"
             @blur="updateUser({ alenvi: 'mobilePhone', ogust: 'mobile_phone' })"
           />
+          </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Adresse email</p>
             <q-icon v-if="$v.user.alenvi.local.email.$error" name="error_outline" color="secondary" />
           </div>
-          <q-input v-model.trim="user.alenvi.local.email"
+          <q-field :error="$v.user.alenvi.local.email.$error" :error-label="emailError">
+            <q-input v-model.trim="user.alenvi.local.email"
             type="email"
             color="white"
             inverted-light
@@ -169,18 +190,21 @@
             @focus="saveTmp('local.email')"
             @blur="updateUser({ alenvi: 'local.email', ogust: 'email' })"
           />
+          </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Adresse, numéro et rue</p>
             <q-icon v-if="$v.user.alenvi.administrative.contact.address.$error" name="error_outline" color="secondary" />
           </div>
-          <q-input v-model="user.alenvi.administrative.contact.address"
+          <q-field :error="$v.user.alenvi.administrative.contact.address.$error" :error-label="requiredField">
+            <q-input v-model="user.alenvi.administrative.contact.address"
             color="white"
             inverted-light
             @focus="saveTmp('administrative.contact.address')"
             @blur="updateUser({ alenvi: 'administrative.contact.address', ogust: 'line' })"
           />
+          </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Complément d'adresse</p>
@@ -196,24 +220,28 @@
             <p class="input-caption">Code postal</p>
             <q-icon v-if="$v.user.alenvi.administrative.contact.zipCode.$error" name="error_outline" color="secondary" />
           </div>
-          <q-input v-model="user.alenvi.administrative.contact.zipCode"
+          <q-field :error="$v.user.alenvi.administrative.contact.zipCode.$error" :error-label="zipCodeError">
+            <q-input v-model="user.alenvi.administrative.contact.zipCode"
             color="white"
             inverted-light
             @focus="saveTmp('administrative.contact.zipCode')"
             @blur="updateUser({ alenvi: 'administrative.contact.zipCode', ogust: 'zip' })"
           />
+          </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Ville</p>
             <q-icon v-if="$v.user.alenvi.administrative.contact.city.$error" name="error_outline" color="secondary" />
           </div>
-          <q-input v-model="user.alenvi.administrative.contact.city"
+          <q-field :error="$v.user.alenvi.administrative.contact.city.$error" :error-label="requiredField">
+            <q-input v-model="user.alenvi.administrative.contact.city"
             color="white"
             inverted-light
             @focus="saveTmp('administrative.contact.city')"
             @blur="updateUser({ alenvi: 'administrative.contact.city', ogust: 'city' })"
           />
+          </q-field>
         </div>
       </div>
     </div>
@@ -228,24 +256,28 @@
             <p class="input-caption">Prénom et nom</p>
             <q-icon v-if="$v.user.alenvi.administrative.emergencyContact.name.$error" name="error_outline" color="secondary" />
           </div>
-          <q-input v-model="user.alenvi.administrative.emergencyContact.name"
-           color="white"
-           inverted-light
-           @focus="saveTmp('administrative.emergencyContact.name')"
-           @blur="updateUser({ alenvi: 'administrative.emergencyContact.name' })"
-          />
+          <q-field :error="$v.user.alenvi.administrative.emergencyContact.name.$error" :error-label="requiredField">
+            <q-input v-model="user.alenvi.administrative.emergencyContact.name"
+              color="white"
+              inverted-light
+              @focus="saveTmp('administrative.emergencyContact.name')"
+              @blur="updateUser({ alenvi: 'administrative.emergencyContact.name' })"
+            />
+          </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Numéro de téléphone</p>
             <q-icon v-if="$v.user.alenvi.administrative.emergencyContact.phoneNumber.$error" name="error_outline" color="secondary" />
           </div>
-          <q-input v-model.trim="user.alenvi.administrative.emergencyContact.phoneNumber"
-            color="white"
-            inverted-light
-            @focus="saveTmp('administrative.emergencyContact.phoneNumber')"
-            @blur="updateUser({ alenvi: 'administrative.emergencyContact.phoneNumber' })"
-          />
+          <q-field :error="$v.user.alenvi.administrative.emergencyContact.phoneNumber.$error" :error-label="emergencyPhoneNbrError">
+            <q-input v-model.trim="user.alenvi.administrative.emergencyContact.phoneNumber"
+              color="white"
+              inverted-light
+              @focus="saveTmp('administrative.emergencyContact.phoneNumber')"
+              @blur="updateUser({ alenvi: 'administrative.emergencyContact.phoneNumber' })"
+            />
+          </q-field>
         </div>
       </div>
     </div>
@@ -260,20 +292,24 @@
             <p class="input-caption">IBAN</p>
             <q-icon v-if="$v.user.alenvi.administrative.payment.rib.iban.$error" name="error_outline" color="secondary" />
           </div>
-          <q-input upper-case v-mask="'SS## #### #### #### #### #### ###'" v-model="user.alenvi.administrative.payment.rib.iban"
+          <q-field :error="$v.user.alenvi.administrative.payment.rib.iban.$error" :error-label="ibanError">
+            <q-input upper-case v-mask="'SS## XXXX XXXX XXXX XXXX XXXX XXX'" v-model="user.alenvi.administrative.payment.rib.iban"
             color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.payment.rib.iban', ogust: 'iban_number' })"
             @focus="saveTmp('administrative.payment.rib.iban')"
           />
+          </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">BIC</p>
             <q-icon v-if="$v.user.alenvi.administrative.payment.rib.bic.$error" name="error_outline" color="secondary" />
           </div>
-          <q-input v-model="user.alenvi.administrative.payment.rib.bic"
+          <q-field :error="$v.user.alenvi.administrative.payment.rib.bic.$error" :error-label="bicError">
+            <q-input v-model="user.alenvi.administrative.payment.rib.bic"
             upper-case color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.payment.rib.bic', ogust: 'bic_number' })"
             @focus="saveTmp('administrative.payment.rib.bic')"
           />
+          </q-field>
         </div>
       </div>
     </div>
@@ -288,12 +324,14 @@
             <p class="input-caption">Merci de nous indiquer le type de document d'identité que vous possédez.</p>
             <q-icon v-if="$v.user.alenvi.administrative.identityDocs.$error" name="error_outline" color="secondary" />
           </div>
-          <q-option-group color="primary" v-model="user.alenvi.administrative.identityDocs" @input="updateUser({ alenvi: 'administrative.identityDocs' })"
+          <q-field :error="$v.user.alenvi.administrative.identityDocs.$error" :error-label="requiredField">
+            <q-option-group color="primary" v-model="user.alenvi.administrative.identityDocs" @input="updateUser({ alenvi: 'administrative.identityDocs' })"
            :options="[
              { label: 'Carte Nationale d\'Identité', value: 'cni' },
              { label: 'Passeport', value: 'pp' },
              { label: 'Titre de séjour', value: 'ts' }
            ]" />
+          </q-field>
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
           <div class="row justify-between">
@@ -308,7 +346,7 @@
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.idCardRecto.link)" />
             </div>
           </div>
-          <q-field v-if="!user.alenvi.administrative.idCardRecto.driveId">
+          <q-field v-if="$v.user.alenvi.administrative.idCardRecto.driveId.$error" :error="$v.user.alenvi.administrative.idCardRecto.driveId.$error">
             <q-uploader ref="idCardRecto" name="idCardRecto" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `cni_recto_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
               hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
               hide-upload-button @add="uploadDocument('idCardRecto')" @finish="refreshUser" />
@@ -317,7 +355,6 @@
         <div v-if="user.alenvi.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Carte d'identité (verso)</p>
-            <q-icon v-if="$v.user.alenvi.administrative.idCardVerso.driveId.$error" name="error_outline" color="secondary" />
           </div>
           <div v-if="user.alenvi.administrative.idCardVerso && user.alenvi.administrative.idCardVerso.driveId" class="row justify-between"
             style="background: white">
@@ -347,7 +384,7 @@
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.passport.link)" />
             </div>
           </div>
-          <q-field v-if="!user.alenvi.administrative.passport.driveId">
+          <q-field v-if="$v.user.alenvi.administrative.passport.driveId.$error" :error="$v.user.alenvi.administrative.passport.driveId.$error" :error-label="requiredDoc">
             <q-uploader ref="passport" name="passport" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `passeport_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
               hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
               hide-upload-button @add="uploadDocument('passport')" @finish="refreshUser" />
@@ -367,7 +404,7 @@
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.residencePermit.link)" />
             </div>
           </div>
-          <q-field v-if="!user.alenvi.administrative.residencePermit.driveId">
+          <q-field v-if="$v.user.alenvi.administrative.residencePermit.driveId.$error" :error="$v.user.alenvi.administrative.residencePermit.driveId.$error" :error-label="requiredDoc">
             <q-uploader ref="residencePermit" name="residencePermit" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `titre_de_séjour_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
               hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
               hide-upload-button @add="uploadDocument('residencePermit')" @finish="refreshUser" />
@@ -387,7 +424,7 @@
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.healthAttest.link)" />
             </div>
           </div>
-          <q-field v-if="!user.alenvi.administrative.healthAttest.driveId">
+          <q-field v-if="$v.user.alenvi.administrative.healthAttest.driveId.$error" :error="$v.user.alenvi.administrative.healthAttest.driveId.$error" :error-label="requiredDoc">
             <q-uploader ref="healthAttest" name="healthAttest" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `assurance_maladie_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
               hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
               hide-upload-button @add="uploadDocument('healthAttest')" @finish="refreshUser" />
@@ -406,16 +443,15 @@
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.phoneInvoice.link)" />
             </div>
           </div>
-          <q-field v-if="!user.alenvi.administrative.phoneInvoice.driveId">
+          <q-field v-if="$v.user.alenvi.administrative.phoneInvoice.driveId.$error" :error="$v.user.alenvi.administrative.phoneInvoice.driveId.$error" :error-label="requiredDoc">
             <q-uploader ref="phoneInvoice" name="phoneInvoice" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `facture_telephone_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
               hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
               hide-upload-button @add="uploadDocument('phoneInvoice')" @finish="refreshUser" />
           </q-field>
         </div>
         <div class="col-xs-12">
-          <div class="row justify-between">
+          <div class="row">
             <p class="input-caption">Diplome(s) ou certificat(s)</p>
-            <q-icon v-if="$v.user.alenvi.administrative.certificates.$error" name="error_outline" color="secondary" />
           </div>
           <q-field>
             <q-uploader ref="certificates" name="certificates" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `diplomes_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
@@ -468,9 +504,11 @@
             <p class="input-caption">Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle</p>
             <q-icon v-if="$v.user.alenvi.administrative.mutualFund.driveId.$error" name="error_outline" color="secondary" />
           </div>
-          <q-uploader ref="mutualFund" name="mutualFund" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `mutuelle_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
+          <q-field :error="$v.user.alenvi.administrative.mutualFund.driveId.$error" :error-label="requiredDoc">
+            <q-uploader ref="mutualFund" name="mutualFund" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `mutuelle_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
             hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
             hide-upload-button @add="uploadDocument('mutualFund')" @finish="refreshUser" />
+          </q-field>
         </div>
       </div>
     </div>
@@ -485,21 +523,25 @@
             <p class="input-caption">Par quel moyen comptes-tu te rendre au travail ?</p>
             <q-icon v-if="$v.user.alenvi.administrative.transportInvoice.transportType.$error" name="error_outline" color="secondary" />
           </div>
-          <q-option-group color="primary" v-model="user.alenvi.administrative.transportInvoice.transportType" @input="updateUser({ alenvi: 'administrative.transportInvoice.transportType' })"
+          <q-field :error="$v.user.alenvi.administrative.transportInvoice.transportType.$error" :error-label="requiredField">
+            <q-option-group color="primary" v-model="user.alenvi.administrative.transportInvoice.transportType" @input="updateUser({ alenvi: 'administrative.transportInvoice.transportType' })"
             :options="[
                 { label: 'Abonnement transports en commun', value: 'public' },
                 { label: 'Voiture personnelle', value: 'private' },
                 { label: 'Aucun', value: 'none' }
               ]" />
+          </q-field>
         </div>
         <div v-if="user.alenvi.administrative.transportInvoice.transportType === 'public'" class="col-xs-12">
           <div class="row justify-between">
             <p class="input-caption">Merci de nous transmettre ton justificatif d'abonnement</p>
             <q-icon v-if="$v.user.alenvi.administrative.transportInvoice.driveId.$error" name="error_outline" color="secondary" />
           </div>
-          <q-uploader ref="transportInvoice" name="transportInvoice" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `justif_transport_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
+          <q-field :error="$v.user.alenvi.administrative.transportInvoice.driveId.$error">
+           <q-uploader ref="transportInvoice" name="transportInvoice" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `justif_transport_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
             hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
             hide-upload-button @add="uploadDocument('transportInvoice')" @finish="refreshUser" />
+          </q-field>
         </div>
         <div v-if="user.alenvi.administrative.transportInvoice && user.alenvi.administrative.transportInvoice.driveId" class="row justify-between"
             style="background: white; margin-top: 24px;">
@@ -520,7 +562,7 @@ import { Cookies, openURL } from 'quasar';
 import { required, email, numeric, minLength, maxLength, requiredIf } from 'vuelidate/lib/validators';
 import 'vue-croppa/dist/vue-croppa.css'
 
-import { frPhoneNumber, iban } from '../../../../../helpers/vuelidateCustomVal';
+import { frPhoneNumber, iban, frZipCode, bic } from '../../../../../helpers/vuelidateCustomVal';
 import gdrive from '../../../../../api/GoogleDrive.js';
 import cloudinary from '../../../../../api/Cloudinary.js';
 import nationalities from '../../../../../data/nationalities.js';
@@ -536,6 +578,8 @@ export default {
   },
   data () {
     return {
+      requiredField: 'Champ requis',
+      requiredDoc: 'Document requis',
       croppa: {},
       fileChosen: false,
       isLoaded: false,
@@ -569,12 +613,10 @@ export default {
       ],
       documentsGroup: [
         'user.alenvi.administrative.idCardRecto.driveId',
-        'user.alenvi.administrative.idCardVerso.driveId',
         'user.alenvi.administrative.passport.driveId',
         'user.alenvi.administrative.residencePermit.driveId',
         'user.alenvi.administrative.healthAttest.driveId',
         'user.alenvi.administrative.phoneInvoice.driveId',
-        'user.alenvi.administrative.certificates'
       ],
       mutualFundGroup: [
         'user.alenvi.administrative.mutualFund.has',
@@ -652,14 +694,24 @@ export default {
               nationality: { required },
               dateOfBirth: { required },
               birthCountry: { required },
-              birthState: { required },
+              birthState: {
+                required,
+                numeric,
+                minLength: minLength(2),
+                maxLength: maxLength(3)
+              },
               birthCity: { required },
-              socialSecurityNumber: { required, numeric }
+              socialSecurityNumber: {
+                required,
+                numeric,
+                minLength: minLength(15),
+                maxLength: maxLength(15)
+              }
             },
             identityDocs: { required },
             contact: {
               address: { required },
-              zipCode: { required, numeric },
+              zipCode: { required, frZipCode },
               city: { required }
             },
             emergencyContact: {
@@ -667,13 +719,6 @@ export default {
               phoneNumber: { required, frPhoneNumber }
             },
             idCardRecto: {
-              driveId: {
-                required: requiredIf(() => {
-                  return this.user.alenvi.administrative.identityDocs === 'cni';
-                })
-              }
-            },
-            idCardVerso: {
               driveId: {
                 required: requiredIf(() => {
                   return this.user.alenvi.administrative.identityDocs === 'cni';
@@ -708,8 +753,7 @@ export default {
                 },
                 bic: {
                   required,
-                  minLength: minLength(8),
-                  maxLength: maxLength(11)
+                  bic
                 }
               }
             },
@@ -718,10 +762,6 @@ export default {
               driveId: { required: requiredIf((item) => {
                 return item.transportType === 'public'
               }) }
-            },
-            certificates: {
-              required,
-              minLength: minLength(1)
             },
             mutualFund: {
               has: { required },
@@ -765,6 +805,66 @@ export default {
     },
     hasPicture () {
       return this.user.alenvi.picture ? this.user.alenvi.picture.link : '';
+    },
+    birthStateError () {
+      if (!this.$v.user.alenvi.administrative.identity.birthState.required) {
+        return 'Champ requis';
+      } else if (!this.$v.user.alenvi.administrative.identity.birthState.minLength ||
+      !this.$v.user.alenvi.administrative.identity.birthState.maxLength ||
+      !this.$v.user.alenvi.administrative.identity.birthState.numeric) {
+        return 'Departement non valide';
+      }
+    },
+    ssnError () {
+      if (!this.$v.user.alenvi.administrative.identity.socialSecurityNumber.required) {
+        return 'Champ requis';
+      } else if (!this.$v.user.alenvi.administrative.identity.socialSecurityNumber.minLength ||
+      !this.$v.user.alenvi.administrative.identity.socialSecurityNumber.maxLength ||
+      !this.$v.user.alenvi.administrative.identity.socialSecurityNumber.numeric) {
+        return 'Numéro de sécurité sociale non valide';
+      }
+    },
+    phoneNbrError () {
+      if (!this.$v.user.alenvi.mobilePhone.required) {
+        return 'Champ requis';
+      } else if (!this.$v.user.alenvi.mobilePhone.frPhoneNumber) {
+        return 'Numéro de téléphone non valide';
+      }
+    },
+    emailError () {
+      if (!this.$v.user.alenvi.local.email.required) {
+        return 'Champ requis';
+      } else if (!this.$v.user.alenvi.local.email.email) {
+        return 'Email non valide';
+      }
+    },
+    zipCodeError () {
+      if (!this.$v.user.alenvi.administrative.contact.zipCode.required) {
+        return 'Champ requis';
+      } else if (!this.$v.user.alenvi.administrative.contact.zipCode.frZipCode) {
+        return 'Code postal non valide';
+      }
+    },
+    emergencyPhoneNbrError () {
+      if (!this.$v.user.alenvi.administrative.emergencyContact.phoneNumber.required) {
+        return 'Champ requis';
+      } else if (!this.$v.user.alenvi.administrative.emergencyContact.phoneNumber.frPhoneNumber) {
+        return 'Numéro de téléphone non valide';
+      }
+    },
+    ibanError () {
+      if (!this.$v.user.alenvi.administrative.payment.rib.iban.required) {
+        return 'Champ requis';
+      } else if (!this.$v.user.alenvi.administrative.payment.rib.iban.iban) {
+        return 'IBAN non valide';
+      }
+    },
+    bicError () {
+      if (!this.$v.user.alenvi.administrative.payment.rib.bic.required) {
+        return 'Champ requis';
+      } else if (!this.$v.user.alenvi.administrative.payment.rib.bic.bic) {
+        return 'BIC non valide';
+      }
     }
   },
   mounted () {
@@ -852,6 +952,13 @@ export default {
       }
       const payload = this.$_.set({}, paths.ogust, value);
       if (paths.ogust.match(/(iban|bic)_number/i)) {
+        if (paths.ogust === 'iban_number' && this.user.alenvi.administrative.payment.rib.bic) {
+          payload.bic_number = this.user.alenvi.administrative.payment.rib.bic;
+        } else if (paths.ogust === 'bic_number' && this.user.alenvi.administrative.payment.rib.iban) {
+          payload.iban_number = this.user.alenvi.administrative.payment.rib.iban.split(' ').join('');
+        } else {
+          return;
+        }
         payload.id_tiers = this.userProfile.employee_id;
         await this.$ogust.setEmployeeBankInfo(payload);
       } else if (paths.ogust.match(/(city|line|supplement|zip)/i)) {
@@ -869,6 +976,9 @@ export default {
     },
     async uploadImage () {
       try {
+        if (this.hasPicture && !this.fileChosen) {
+          this.deleteImage({ beforeUpload: true });
+        }
         let blob = await this.croppa.promisedBlob('image/jpeg', 0.8);
         let data = new FormData();
         data.append('_id', this.userProfile._id);
@@ -942,8 +1052,12 @@ export default {
         });
       }
     },
-    async deleteImage () {
+    async deleteImage (params) {
       try {
+        if (params.beforeUpload) {
+          await cloudinary.deleteImageById({ id: this.userProfile.picture.publicId });
+          return;
+        }
         if (this.userProfile.picture && !this.userProfile.picture.link) {
           return this.croppa.remove();
         }
@@ -1056,4 +1170,8 @@ export default {
 
   .croppa-container
     background-color: white
+
+  /deep/ .bg-negative
+    background: white !important
+    color: inherit !important
 </style>
