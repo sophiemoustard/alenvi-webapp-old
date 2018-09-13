@@ -341,21 +341,21 @@ export default {
       if (!this.$v.newUser.mobilePhone.required) {
         return 'Champ requis';
       } else if (!this.$v.newUser.mobilePhone.frPhoneNumber) {
-        return 'Numéro de téléphone non valide (doit être sous la forme 01XXXXXXXX)';
+        return 'Numéro de téléphone non valide';
       }
     },
     zipCodeError () {
       if (!this.$v.newUser.administrative.contact.zipCode.required) {
         return 'Champ requis';
       } else if (!this.$v.newUser.administrative.contact.zipCode.frZipCode) {
-        return 'Code postal non valide (doit être sous la forme 92XXX)';
+        return 'Code postal non valide';
       }
     },
     emailError () {
       if (!this.$v.newUser.local.email.required) {
         return 'Champ requis';
       } else if (!this.$v.newUser.local.email.email) {
-        return 'Email non valide (doit être sous la forme XXXXX@XXXXX.XXX)';
+        return 'Email non valide';
       }
     }
   },
