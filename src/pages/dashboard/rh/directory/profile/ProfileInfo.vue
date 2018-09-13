@@ -149,6 +149,7 @@
             <q-icon v-if="$v.user.alenvi.mobilePhone.$error" name="error_outline" color="secondary" />
           </div>
           <q-input v-model.trim="user.alenvi.mobilePhone"
+            type="tel"
             color="white"
             inverted-light
             @focus="saveTmp('mobilePhone')"
@@ -161,6 +162,7 @@
             <q-icon v-if="$v.user.alenvi.local.email.$error" name="error_outline" color="secondary" />
           </div>
           <q-input v-model.trim="user.alenvi.local.email"
+            type="email"
             color="white"
             inverted-light
             lower-case
