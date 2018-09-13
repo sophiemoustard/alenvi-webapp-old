@@ -124,8 +124,8 @@ export default {
     &-body-padding
       padding: 0px 24px 0px 24px
     &-btn
+      font-size: 16px
       @media screen and (min-width: 768px)
-        font-size: 16px
         margin-top: 20px
         margin-bottom: 24px
       @media screen and (max-width: 768px)

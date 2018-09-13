@@ -108,8 +108,8 @@ Si tu rencontres des difficultés, contacte dès aujourd'hui la personne qui t'a
       text-align: center
       padding: 0px 0px 24px 0px
     &-btn
+      font-size: 16px
       @media screen and (min-width: 768px)
-        font-size: 16px
         margin-top: 24px
         margin-bottom: 24px
       @media screen and (max-width: 768px)
