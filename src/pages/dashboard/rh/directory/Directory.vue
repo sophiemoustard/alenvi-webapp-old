@@ -458,7 +458,8 @@ export default {
         }
         const newEmployee = await this.createOgustUser();
         this.newUser.employee_id = newEmployee.data.data.employee.id_employee;
-        this.newUser.administrative.contact.addressId = newEmployee.data.data.employee.main_address.id_address;
+        const employee = await this.$ogust.getEmployeeById(this.newUser.employee_id);
+        this.newUser.administrative.contact.addressId = employee.main_address.id_address;
         const newUser = await this.createAlenviUser();
         await this.getUserList();
         if (this.sendWelcomeMsg) {
@@ -634,11 +635,5 @@ export default {
 
   .q-field-bottom
     padding-top: 2px
-
-  /deep/ .q-field
-    &-with-error
-      & .q-field-bottom
-        color: $secondary
-        padding-top: 2px
 
 </style>
