@@ -104,9 +104,8 @@ Si tu rencontres des difficultés, contacte dès aujourd'hui la personne qui t'a
     &-body-padding
       padding: 0px 24px 0px 24px
     &-bloctexts
-      // font-size: 0.8rem
       text-align: center
-      padding: 0px 0px 24px 0px
+      padding-bottom: 24px
     &-btn
       font-size: 16px
       @media screen and (min-width: 768px)
