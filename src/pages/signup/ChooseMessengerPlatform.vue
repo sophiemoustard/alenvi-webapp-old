@@ -13,7 +13,7 @@
         <div class="row justify-center signup-icon-padding">
           <img style="height: 60px" src="https://upload.wikimedia.org/wikipedia/fr/thumb/d/d0/Facebook_Messenger_nouveau_logo.svg/220px-Facebook_Messenger_nouveau_logo.svg.png" alt="">
         </div>
-        <p class="no-margin signup-bloctexts">Chez Alenvi, <span class="text-weight-bold">Nous utilisons l'application Messenger afin de communiquer avec nos auxiliaires.</span></p>
+        <p class="no-margin signup-bloctexts">Chez Alenvi, <span class="text-weight-bold">nous utilisons l'application Messenger afin de communiquer avec nos auxiliaires.</span></p>
         <p class="no-margin signup-bloctexts">Pour la télécharger, cliquez sur le bouton ci-dessous correspondant à votre téléphone !</p>
         <div class="row justify-center">
           <div class="col-6" style="width: 136px" @click="sendSMS()">
