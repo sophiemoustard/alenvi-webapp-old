@@ -47,7 +47,7 @@
             <span><q-icon name="clear" size="1rem" @click.native="opened = false" /></span>
           </div>
         </div>
-        <div class="row margin-input">
+        <!-- <div class="row margin-input">
           <div class="col-12">
             <div class="row">
               <p class="input-caption">Support</p>
@@ -58,7 +58,7 @@
               inverted-light
               :options="msgSupportOptions"/>
           </div>
-        </div>
+        </div> -->
         <div class="row margin-input">
           <div class="col-12">
             <div class="row">
@@ -100,7 +100,7 @@ export default {
       opened: false,
       message: '',
       typeMessage: 'PM',
-      messageSupport: 'sms',
+      // messageSupport: 'sms',
       typeMessageOptions: [
         {
           label: 'Pièces manquantes',
