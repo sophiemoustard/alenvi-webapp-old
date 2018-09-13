@@ -85,7 +85,7 @@
             <q-icon name="settings" color="black" />
           </q-item-side>
           <q-item-side>
-            <q-icon name="lock_open" color="black" @click.native="logout" />
+            <q-icon name="ion-log-out" color="black" @click.native="logout" />
           </q-item-side>
         </q-item>
       </div>
