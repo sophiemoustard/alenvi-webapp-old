@@ -130,9 +130,10 @@ export default {
         margin-bottom: 24px
       @media screen and (max-width: 768px)
         border-radius: 0
-        position: absolute
+        position: fixed
         bottom: 0
         width: 100%
+        z-index: 700
 
   .margin-input
     margin-bottom: 6px

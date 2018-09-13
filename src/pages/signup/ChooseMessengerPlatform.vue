@@ -113,10 +113,11 @@ Si tu rencontres des difficultés, contacte dès aujourd'hui la personne qui t'a
         margin-bottom: 24px
       @media screen and (max-width: 768px)
         border-radius: 0
-        position: absolute
+        position: fixed
         bottom: 0
         left: 0
         width: 100%
+        z-index: 700
 
   .neutral-background
     @media screen and (max-width: 768px)
