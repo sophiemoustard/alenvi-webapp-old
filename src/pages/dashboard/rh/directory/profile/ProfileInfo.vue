@@ -1,6 +1,6 @@
 <template>
   <div v-if="isLoaded">
-    <div class="row gutter-profile q-mb-xl">
+    <div v-if="currentUser.role.name !== 'Auxiliaire'" class="row gutter-profile q-mb-xl">
       <div class="col-xs-12 col-md-6">
         <p class="input-caption">Communauté</p>
         <select-sector v-model="user.alenvi.sector" @myBlur="updateUser({ alenvi: 'sector', ogust: 'sector' })" />
@@ -321,7 +321,7 @@
       <div class="row gutter-profile items-stretch">
         <div class="col-xs-12">
           <div class="row justify-between">
-            <p class="input-caption">Merci de nous indiquer le type de document d'identité que vous possédez.</p>
+            <p v-if="currentUser.role.name === 'Auxiliaire'" class="input-caption">Merci de nous indiquer le type de document d'identité que tu possèdes.</p>
             <q-icon v-if="$v.user.alenvi.administrative.identityDocs.$error" name="error_outline" color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.administrative.identityDocs.$error" :error-label="requiredField">
@@ -479,17 +479,17 @@
       </div>
       <div class="row gutter-profile-x">
         <div class="col-xs-12">
-          <div class="row justify-between">
+          <div v-if="currentUser.role.name === 'Auxiliaire'" class="row justify-between">
             <p class="input-caption">Veux-tu adhérer à la mutuelle d'entreprise ?</p>
             <q-icon v-if="$v.user.alenvi.administrative.mutualFund.has.$error" name="error_outline" color="secondary" />
           </div>
-          <!-- <div class="row"> -->
-          <q-btn-toggle class="full-width" color="white" text-color="black" toggle-color="primary" v-model="user.alenvi.administrative.mutualFund.has"
-            @input="updateUser({ alenvi: 'administrative.mutualFund.has' })" :options="[
-                { label: 'Oui', value: false },
-                { label: 'Non', value: true }
-              ]" />
-          <!-- </div> -->
+          <q-field :error="$v.user.alenvi.administrative.mutualFund.has.$error" :error-label="requiredField">
+            <q-btn-toggle class="full-width" color="white" text-color="black" toggle-color="primary" v-model="user.alenvi.administrative.mutualFund.has"
+              @input="updateUser({ alenvi: 'administrative.mutualFund.has' })" :options="[
+                  { label: 'Oui', value: false },
+                  { label: 'Non', value: true }
+                ]" />
+          </q-field>
           <div v-if="user.alenvi.administrative.mutualFund && user.alenvi.administrative.mutualFund.driveId" class="row justify-between"
             style="background: white; margin-top: 24px;">
             <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.mutualFund.driveId)" alt="cni verso">
@@ -501,7 +501,7 @@
         </div>
         <div v-if="user.alenvi.administrative.mutualFund.has && !user.alenvi.administrative.mutualFund.driveId" class="col-xs-12">
           <div class="row justify-between">
-            <p class="input-caption">Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle</p>
+            <p v-if="currentUser.role.name === 'Auxiliaire'" class="input-caption">Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle</p>
             <q-icon v-if="$v.user.alenvi.administrative.mutualFund.driveId.$error" name="error_outline" color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.administrative.mutualFund.driveId.$error" :error-label="requiredDoc">
@@ -519,7 +519,7 @@
       </div>
       <div class="row gutter-profile-x">
         <div class="col-xs-12">
-          <div class="row justify-between">
+          <div v-if="currentUser.role.name === 'Auxiliaire'" class="row justify-between">
             <p class="input-caption">Par quel moyen comptes-tu te rendre au travail ?</p>
             <q-icon v-if="$v.user.alenvi.administrative.transportInvoice.transportType.$error" name="error_outline" color="secondary" />
           </div>
@@ -533,11 +533,11 @@
           </q-field>
         </div>
         <div v-if="user.alenvi.administrative.transportInvoice.transportType === 'public'" class="col-xs-12">
-          <div class="row justify-between">
+          <div v-if="currentUser.role.name === 'Auxiliaire'" class="row justify-between">
             <p class="input-caption">Merci de nous transmettre ton justificatif d'abonnement</p>
             <q-icon v-if="$v.user.alenvi.administrative.transportInvoice.driveId.$error" name="error_outline" color="secondary" />
           </div>
-          <q-field :error="$v.user.alenvi.administrative.transportInvoice.driveId.$error">
+          <q-field :error="$v.user.alenvi.administrative.transportInvoice.driveId.$error" :error-label="requiredDoc">
            <q-uploader ref="transportInvoice" name="transportInvoice" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `justif_transport_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
             hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
             hide-upload-button @add="uploadDocument('transportInvoice')" @finish="refreshUser" />
@@ -784,7 +784,8 @@ export default {
   },
   computed: {
     ...mapGetters({
-      userProfile: 'rh/getUserProfile'
+      userProfile: 'rh/getUserProfile',
+      currentUser: 'main/user'
     }),
     nationalitiesOptions () {
       return Object.keys(nationalities).map(nationality => ({ value: nationality, label: nationalities[nationality] }));
