@@ -59,6 +59,7 @@ module.exports = function (ctx) {
         NODE_ENV: JSON.stringify(process.env.NODE_ENV),
         API_HOSTNAME: JSON.stringify(process.env.API_HOSTNAME),
         MESSENGER_LINK: JSON.stringify(process.env.MESSENGER_LINK),
+        ENTERCODE_LINK: JSON.stringify(process.env.ENTERCODE_LINK),
         TOKEN_SECRET: JSON.stringify(process.env.TOKEN_SECRET),
         ALENVI_BOT_ID: JSON.stringify(process.env.ALENVI_BOT_ID),
         CLOUDINARY_API_KEY: JSON.stringify(process.env.CLOUDINARY_API_KEY),
