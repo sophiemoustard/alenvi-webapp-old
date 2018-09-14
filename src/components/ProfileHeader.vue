@@ -100,11 +100,12 @@ export default {
       opened: false,
       message: '',
       typeMessage: 'PM',
-      // messageSupport: 'sms',
+      messageSupport: 'sms',
       typeMessageOptions: [
         {
           label: 'Pièces manquantes',
-          value: 'PM'
+          value: 'PM',
+          // text: `Bonjour ${this.user.firstname}, il manque des informations importantes dans ta...`
         },
         {
           label: 'Autres',
