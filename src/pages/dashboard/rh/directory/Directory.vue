@@ -152,7 +152,7 @@
             </q-field>
           </div>
         </div>
-        <div class="row margin-input last">
+        <div class="row margin-input">
           <div class="col-12">
             <div class="row justify-between">
               <p class="input-caption">Communauté</p>
@@ -160,6 +160,17 @@
             </div>
             <q-field :error="$v.newUser.sector.$error" error-label="Champ requis">
               <select-sector v-model="newUser.sector" @myBlur="$v.newUser.sector.$touch"/>
+            </q-field>
+          </div>
+        </div>
+        <div class="row margin-input last">
+          <div class="col-12">
+            <div class="row justify-between">
+              <p class="input-caption">Géré par</p>
+              <q-icon v-if="$v.newUser.ogustManagerId.$error" name="error_outline" color="secondary" />
+            </div>
+            <q-field :error="$v.newUser.ogustManagerId.$error" error-label="Champ requis">
+              <select-manager v-model="newUser.ogustManagerId" @myBlur="$v.newUser.ogustManagerId.$touch"/>
             </q-field>
           </div>
         </div>
@@ -231,6 +242,7 @@ export default {
             title: ''
           }
         },
+        ogustManagerId: ''
       },
       userList: [],
       searchStr: '',
@@ -305,6 +317,7 @@ export default {
         email: { required, email }
       },
       sector: { required },
+      ogustManagerId: { required }
     }
   },
   mounted () {
@@ -409,7 +422,7 @@ export default {
     async createAlenviUser () {
       this.newUser.local.password = randomize('*', 10);
       this.newUser.role = 'Auxiliaire';
-      this.newUSer.ogustManagerId = this.currentUser._id;
+      this.newUser.ogustManagerId = this.currentUser._id;
       const newUser = await this.$users.create(this.newUser);
       return newUser;
     },
