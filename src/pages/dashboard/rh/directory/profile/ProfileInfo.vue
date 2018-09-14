@@ -322,7 +322,6 @@
         <div class="col-xs-12">
           <div class="row justify-between">
             <p v-if="currentUser.role.name === 'Auxiliaire'" class="input-caption">Merci de nous indiquer le type de document d'identité que tu possèdes.</p>
-            <q-icon v-if="$v.user.alenvi.administrative.identityDocs.$error" name="error_outline" color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.administrative.identityDocs.$error" :error-label="requiredField">
             <q-option-group color="primary" v-model="user.alenvi.administrative.identityDocs" @input="updateUser({ alenvi: 'administrative.identityDocs' })"
@@ -340,7 +339,8 @@
           </div>
           <div v-if="user.alenvi.administrative.idCardRecto && user.alenvi.administrative.idCardRecto.driveId" class="row justify-between"
             style="background: white">
-            <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.idCardRecto.driveId)" alt="cni recto">
+            <custom-img class="doc-thumbnail" :driveId="user.alenvi.administrative.idCardRecto.driveId" alt="cni recto" />
+            <!-- <img class="doc-thumbnail" ref="`driveId-${user.alenvi.administrative.idCardRecto.driveId}`" alt="cni recto"> -->
             <div class="self-end doc-delete">
               <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.idCardRecto.driveId, 'administrative.idCardRecto')" />
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.idCardRecto.link)" />
@@ -358,7 +358,7 @@
           </div>
           <div v-if="user.alenvi.administrative.idCardVerso && user.alenvi.administrative.idCardVerso.driveId" class="row justify-between"
             style="background: white">
-            <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.idCardVerso.driveId)" alt="cni verso">
+            <custom-img class="doc-thumbnail" :driveId="user.alenvi.administrative.idCardVerso.driveId" alt="cni verso" />
             <div class="self-end doc-delete">
               <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.idCardVerso.driveId, 'administrative.idCardVerso')" />
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.idCardVerso.link)" />
@@ -378,7 +378,7 @@
           </div>
           <div v-if="user.alenvi.administrative.passport && user.alenvi.administrative.passport.driveId" class="row justify-between"
             style="background: white">
-            <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.passport.driveId)" alt="passeport">
+            <custom-img class="doc-thumbnail" :driveId="user.alenvi.administrative.passport.driveId" alt="passeport" />
             <div class="self-end doc-delete">
               <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.passport.driveId, 'administrative.passport')" />
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.passport.link)" />
@@ -398,7 +398,7 @@
           </div>
           <div v-if="user.alenvi.administrative.residencePermit && user.alenvi.administrative.residencePermit.driveId" class="row justify-between"
             style="background: white">
-            <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.residencePermit.driveId)" alt="titre de séjour">
+            <custom-img :driveId="user.alenvi.administrative.residencePermit.driveId" class="doc-thumbnail" alt="titre de séjour" />
             <div class="self-end doc-delete">
               <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.residencePermit.driveId, 'administrative.residencePermit')" />
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.residencePermit.link)" />
@@ -418,14 +418,14 @@
           </div>
           <div v-if="user.alenvi.administrative.healthAttest && user.alenvi.administrative.healthAttest.driveId" class="row justify-between"
             style="background: white">
-            <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.healthAttest.driveId)" alt="attestation secu">
+            <custom-img :driveId="user.alenvi.administrative.healthAttest.driveId" class="doc-thumbnail" alt="attestation secu" />
             <div class="self-end doc-delete">
               <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.healthAttest.driveId, 'administrative.healthAttest')" />
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.healthAttest.link)" />
             </div>
           </div>
           <q-field v-if="$v.user.alenvi.administrative.healthAttest.driveId.$error" :error="$v.user.alenvi.administrative.healthAttest.driveId.$error" :error-label="requiredDoc">
-            <q-uploader ref="healthAttest" name="healthAttest" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `assurance_maladie_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
+            <q-uploader ref="healthAttest" name="healthAttest" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `attestation_secu_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
               hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
               hide-upload-button @add="uploadDocument('healthAttest')" @finish="refreshUser" />
           </q-field>
@@ -437,7 +437,7 @@
           </div>
           <div v-if="user.alenvi.administrative.phoneInvoice && user.alenvi.administrative.phoneInvoice.driveId" class="row justify-between"
             style="background: white">
-            <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.phoneInvoice.driveId)" alt="cni verso">
+            <custom-img class="doc-thumbnail" :driveId="user.alenvi.administrative.phoneInvoice.driveId" alt="facture téléphone" />
             <div class="self-end doc-delete">
               <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')" />
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.phoneInvoice.link)" />
@@ -449,25 +449,31 @@
               hide-upload-button @add="uploadDocument('phoneInvoice')" @finish="refreshUser" />
           </q-field>
         </div>
-        <div class="col-xs-12">
+        <div class="col-xs-12 col-md-6">
           <div class="row">
             <p class="input-caption">Diplome(s) ou certificat(s)</p>
           </div>
-          <q-field>
+          <q-field v-if="user.alenvi.administrative.certificates.length === 0">
             <q-uploader ref="certificates" name="certificates" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `diplomes_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
               hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
               hide-upload-button @add="uploadDocument('certificates')" @finish="refreshUser" />
           </q-field>
-        </div>
-        <div v-if="user.alenvi.administrative.certificates && user.alenvi.administrative.certificates.length > 0" class="col-xs-12 col-md-6"
-          v-for="(certificate, index) in user.alenvi.administrative.certificates" :key="index">
-          <p class="input-caption col-xs-12">Diplome(s) ou certificat(s) ({{ index + 1 }})</p>
-          <div v-if="certificate.driveId" class="row justify-between" style="background: white">
-            <img class="doc-thumbnail" :src="getThumbnailUrl(certificate.driveId)" alt="cni verso">
-            <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(certificate.driveId, 'certificates')" />
-              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(certificate.link)" />
+          <div v-if="user.alenvi.administrative.certificates && user.alenvi.administrative.certificates.length > 0"
+            v-for="(certificate, index) in user.alenvi.administrative.certificates" :key="index">
+            <div v-if="certificate.driveId" class="row justify-between" style="background: white; margin-bottom: 24px">
+              <custom-img :driveId="certificate.driveId" class="doc-thumbnail" alt="diplôme" />
+              <div class="self-end doc-delete">
+                <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(certificate.driveId, 'certificates')" />
+                <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(certificate.link)" />
+              </div>
             </div>
+          </div>
+          <div v-if="user.alenvi.administrative.certificates && user.alenvi.administrative.certificates.length > 0">
+            <q-collapsible v-model="collapsibleOpened" label="Ajouter diplômes" :collapseIcon="collapsibleIcon">
+              <q-uploader ref="certificates" name="certificates" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `diplomes_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
+                hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
+                hide-upload-button @add="uploadDocument('certificates')" @finish="refreshUser" />
+            </q-collapsible>
           </div>
         </div>
       </div>
@@ -492,7 +498,7 @@
           </q-field>
           <div v-if="user.alenvi.administrative.mutualFund && user.alenvi.administrative.mutualFund.driveId" class="row justify-between"
             style="background: white; margin-top: 24px;">
-            <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.mutualFund.driveId)" alt="cni verso">
+            <img class="doc-thumbnail" alt="cni verso">
             <div class="self-end doc-delete">
               <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.mutualFund.driveId, 'administrative.mutualFund')" />
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.mutualFund.link)" />
@@ -537,7 +543,7 @@
             <p class="input-caption">Merci de nous transmettre ton justificatif d'abonnement</p>
             <q-icon v-if="$v.user.alenvi.administrative.transportInvoice.driveId.$error" name="error_outline" color="secondary" />
           </div>
-          <q-field :error="$v.user.alenvi.administrative.transportInvoice.driveId.$error" :error-label="requiredDoc">
+          <q-field v-if="$v.user.alenvi.administrative.transportInvoice.driveId.$error" :error="$v.user.alenvi.administrative.transportInvoice.driveId.$error" :error-label="requiredDoc">
            <q-uploader ref="transportInvoice" name="transportInvoice" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `justif_transport_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
             hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
             hide-upload-button @add="uploadDocument('transportInvoice')" @finish="refreshUser" />
@@ -545,7 +551,7 @@
         </div>
         <div v-if="user.alenvi.administrative.transportInvoice && user.alenvi.administrative.transportInvoice.driveId" class="row justify-between"
             style="background: white; margin-top: 24px;">
-            <img class="doc-thumbnail" :src="getThumbnailUrl(user.alenvi.administrative.transportInvoice.driveId)" alt="cni verso">
+            <custom-img :driveId="user.alenvi.administrative.transportInvoice.driveId" class="doc-thumbnail" alt="justif transport" />
             <div class="self-end doc-delete">
               <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.transportInvoice.driveId, 'administrative.transportInvoice')" />
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.transportInvoice.link)" />
@@ -569,17 +575,21 @@ import nationalities from '../../../../../data/nationalities.js';
 import countries from '../../../../../data/countries.js';
 import SelectSector from '../../../../../components/SelectSector';
 import SelectMentor from '../../../../../components/SelectMentor';
+import CustomImg from '../../../../../components/CustomImg';
 import { extend } from '../../../../../helpers/utils.js';
 
 export default {
   components: {
     SelectSector,
-    SelectMentor
+    SelectMentor,
+    CustomImg
   },
   data () {
     return {
       requiredField: 'Champ requis',
       requiredDoc: 'Document requis',
+      collapsibleOpened: false,
+      docsThmbnails: {},
       croppa: {},
       fileChosen: false,
       isLoaded: false,
@@ -612,6 +622,7 @@ export default {
         'user.alenvi.administrative.payment.rib.bic'
       ],
       documentsGroup: [
+        'user.alenvi.administrative.identityDocs',
         'user.alenvi.administrative.idCardRecto.driveId',
         'user.alenvi.administrative.passport.driveId',
         'user.alenvi.administrative.residencePermit.driveId',
@@ -686,7 +697,11 @@ export default {
           picture: {
             link: { required }
           },
-          mobilePhone: { required, frPhoneNumber },
+          mobilePhone: {
+            required,
+            frPhoneNumber,
+            maxLength: maxLength(10)
+          },
           sector: { required },
           mentorId: { required },
           administrative: {
@@ -711,12 +726,20 @@ export default {
             identityDocs: { required },
             contact: {
               address: { required },
-              zipCode: { required, frZipCode },
+              zipCode: {
+                required,
+                frZipCode,
+                maxLength: maxLength(5)
+              },
               city: { required }
             },
             emergencyContact: {
               name: { required },
-              phoneNumber: { required, frPhoneNumber }
+              phoneNumber: {
+                required,
+                frPhoneNumber,
+                maxLength: maxLength(10)
+              }
             },
             idCardRecto: {
               driveId: {
@@ -866,6 +889,12 @@ export default {
       } else if (!this.$v.user.alenvi.administrative.payment.rib.bic.bic) {
         return 'BIC non valide';
       }
+    },
+    collapsibleIcon () {
+      if (!this.collapsibleOpened) {
+        return 'add';
+      }
+      return 'mdi-blank-checkbox';
     }
   },
   mounted () {
@@ -882,9 +911,6 @@ export default {
       const args = [this.user.alenvi, value || this.$store.state.rh.userProfile];
       this.user.alenvi = Object.assign({}, extend(true, ...args));
       this.isLoaded = true;
-    },
-    getThumbnailUrl (fileId) {
-      return `https://drive.google.com/u/1/thumbnail?id=${fileId}`
     },
     saveTmp (path) {
       this.tmpInput = this.$_.get(this.user.alenvi, path)
@@ -1175,4 +1201,18 @@ export default {
   /deep/ .bg-negative
     background: white !important
     color: inherit !important
+
+  /deep/ .q-collapsible-inner
+    & .q-item
+      font-size: 12px
+      padding-left: 0
+      padding: 8px 0px
+      &-side
+        color: $primary
+        & > .q-icon
+          font-size: 16px
+
+  /deep/ .q-collapsible-sub-item
+    padding-left: 0
+    padding: 8px 0px
 </style>
