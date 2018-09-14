@@ -387,7 +387,7 @@ export default {
                 picture: user.picture.link
               },
               profileErrors: checkProfileErrors.error ? checkProfileErrors.error.details.length : 0,
-              startDate: getUserStartDate(user.administrative.contracts),
+              startDate: this.$moment(user.createdAt).format('DD/MM/YYYY'),
               sector: sectors[user.sector],
               isActive: user.isActive
             }
@@ -449,7 +449,7 @@ export default {
       const code = activationDataRaw.activationData.code;
       await this.$twilio.sendSMS({
         to: `+33${this.newUser.mobilePhone.substring(1)}`,
-        body: `Bienvenue chez Alenvi ! :) Utilise ce code: ${code} pour pouvoir commencer ton enregistrement ici avant ton intégration: ${process.env.ENTERCODE_LINK} :-)`,
+        body: `Bienvenue chez Alenvi ! :) Utilise ce code: ${code} pour pouvoir commencer ton enregistrement ici avant ton intégration: https://alenvi-webapp-dev.herokuapp.com/enterCode :-)`,
       });
     },
     async submit () {
@@ -485,6 +485,15 @@ export default {
             color: 'negative',
             icon: 'warning',
             detail: 'Champ(s) invalide(s)',
+            position: 'bottom-left',
+            timeout: 2500
+          });
+        }
+        if (e.status === 409) {
+          this.$q.notify({
+            color: 'negative',
+            icon: 'warning',
+            detail: 'Email déjà existant',
             position: 'bottom-left',
             timeout: 2500
           });
