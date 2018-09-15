@@ -62,4 +62,6 @@ export default {
 
   .header-margin
     margin-bottom: 60px
+    @media (max-width: 768px)
+      margin-bottom: 40px
 </style>
