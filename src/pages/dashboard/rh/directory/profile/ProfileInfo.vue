@@ -343,7 +343,7 @@
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.idCardRecto.link)" />
             </div>
           </div>
-          <q-field v-if="$v.user.alenvi.administrative.idCardRecto.driveId.$error" :error="$v.user.alenvi.administrative.idCardRecto.driveId.$error">
+          <q-field v-if="$v.user.alenvi.administrative.idCardRecto.driveId.$error" :error="$v.user.alenvi.administrative.idCardRecto.driveId.$error" :error-label="requiredDoc">
             <q-uploader ref="idCardRecto" name="idCardRecto" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `cni_recto_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
               hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
               hide-upload-button @add="uploadDocument('idCardRecto')" @finish="refreshUser" />
