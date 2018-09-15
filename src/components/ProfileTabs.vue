@@ -32,6 +32,8 @@ export default {
     margin-bottom: 24px
     & /deep/ .q-tabs
       &-scroller
+        & .q-tab
+          flex: 1 1 0
         a
           border-right: 24px solid transparent
           &:last-of-type
