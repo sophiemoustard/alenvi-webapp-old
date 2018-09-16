@@ -1,16 +1,18 @@
 <template>
   <div style="max-width: 90vw">
-    <div class="row justify-between col-12">
-      <div class="row items-baseline">
+    <div class="row col-xs-12 q-mb-md">
+      <div class="row items-baseline col-xs-12 col-md-10">
         <div class="row">
           <q-icon v-if="isExternalUser" class="on-left cursor-pointer self-center" size="1rem" name="arrow_back" color="primary" @click.native="$router.push({ name: 'directory'})" />
+          <h4>{{ user.firstname }} {{ user.lastname }}</h4>
         </div>
-        <h4>{{ user.firstname }} {{ user.lastname }}</h4>
       </div>
-      <img :src="user.picture.link" alt="Img user" class="avatar">
+      <div class="row custom-justify-end col-xs-12 col-md-2">
+        <img :src="user.picture.link" alt="Img user" class="avatar">
+      </div>
     </div>
-    <div class="row col-12 profile-info">
-      <div class="pl-lg col-6">
+    <div class="row col-xs-12 profile-info">
+      <div class="pl-lg col-xs-12 col-md-6">
         <div class="row items-center">
           <div class="row items-center justify-center on-left" style="width: 17px; height: 17px">
             <div :class="[{ activeDot: user.isActive, inactiveDot: !user.isActive }]" />
@@ -22,15 +24,13 @@
           <div>Depuis le {{ userStartDate }} ({{ userRelativeStartDate }})</div>
         </div>
       </div>
-      <div class="col-6 row">
-        <div class="col-1">
-          <div class="full-height relative-position" style="width: 37px;">
-            <q-icon size="36px" name="phone_iphone" color="grey-2" />
-            <q-icon v-if="!user.isConfirmed" class="chip-icon" name="cancel" color="secondary" size="16px" />
-            <q-icon v-if="user.isConfirmed" class="chip-icon" name="check_circle" color="tertiary" size="16px" />
-          </div>
+      <div class="pl-lg col-xs-12 col-md-6 row">
+        <div class="relative-position" style="width: 37px;">
+          <q-icon size="36px" name="phone_iphone" color="grey-2" />
+          <q-icon v-if="!user.isConfirmed" class="chip-icon" name="cancel" color="secondary" size="16px" />
+          <q-icon v-if="user.isConfirmed" class="chip-icon" name="check_circle" color="tertiary" size="16px" />
         </div>
-        <div class="col-10 col full-height justify-between">
+        <div class="column">
           <div class="text-weight-bold">{{ isAccountConfirmed }}</div>
           <div class="send-message-link" @click="opened = true">Envoyer un SMS</div>
         </div>
@@ -76,7 +76,7 @@
             <div class="row justify-between">
               <p class="input-caption">Message</p>
             </div>
-            <q-input v-model="message" type="textarea" rows="7"
+            <q-input v-model="messageComp" type="textarea" rows="7"
               color="white" inverted-light
             />
           </div>
@@ -90,7 +90,7 @@
 <script>
 import { mapGetters } from 'vuex';
 
-import { getUserStartDate } from '../helpers/getUserStartDate';
+// import { getUserStartDate } from '../helpers/getUserStartDate';
 export default {
   name: 'ProfileHeader',
   props: ['profileId'],
@@ -117,6 +117,8 @@ export default {
       }
     }
   },
+  mounted () {
+  },
   computed: {
     ...mapGetters({
       currentUser: 'main/user',
@@ -127,7 +129,7 @@ export default {
       return 'Profil inactif'
     },
     userStartDate () {
-      if (this.user.administrative && this.user.administrative.contracts) return getUserStartDate(this.user.administrative.contracts);
+      if (this.user.createdAt) return this.$moment(this.user.createdAt).format('DD/MM/YY');
       return 'N/A';
     },
     userRelativeStartDate () {
@@ -157,15 +159,24 @@ export default {
         });
       }
       return options
+    },
+    messageComp: {
+      get () {
+        if (this.typeMessage === 'PM') {
+          return `Bonjour ${this.user.firstname},\nIl manque encore des informations et documents importants pour compléter ton dossier Alenvi.\nClique ici pour compléter ton profil: ${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/profile/${this.user._id}\nSi tu rencontres des difficultés, n’hésite pas à t’adresser à ton/ta coach ou ta marraine.`;
+        }
+        return this.message;
+      },
+      set (value) {
+        this.message = value;
+      }
     }
   },
   methods: {
     async sendMessage () {
-      if (this.messageSupport === 'sms') {
-        this.sendSMS();
-      } else {
-        this.sendMessageToBotUser();
-      }
+      this.loading = true;
+      this.sendSMS();
+      this.loading = false;
     },
     async sendMessageToBotUser () {
       try {
@@ -173,7 +184,6 @@ export default {
           message: this.message,
           address: this.user.facebook.address
         });
-        this.isLoading = false;
         this.$q.notify({
           color: 'positive',
           icon: 'thumb up',
@@ -183,7 +193,7 @@ export default {
         });
       } catch (e) {
         console.error(e);
-        this.isLoading = false;
+        this.loading = false;
         this.$q.notify({
           color: 'negative',
           icon: 'warning',
@@ -197,9 +207,8 @@ export default {
       try {
         await this.$twilio.sendSMS({
           to: `+33${this.user.mobilePhone.substring(1)}`,
-          body: this.message,
+          body: this.messageComp,
         });
-        this.isLoading = false;
         this.$q.notify({
           color: 'positive',
           icon: 'thumb up',
@@ -209,7 +218,7 @@ export default {
         });
       } catch (e) {
         console.error(e);
-        this.isLoading = false;
+        this.loading = false;
         this.$q.notify({
           color: 'negative',
           icon: 'warning',
@@ -285,5 +294,15 @@ export default {
 
   .input-caption
     margin-bottom: 4px
+
+  .custom-justify
+    &-end
+      justify-content: flex-end
+      @media (max-width: 768px)
+        justify-content: center
+    &-center
+      justify-content: flex-start
+      @media (max-width: 768px)
+        justify-content: center
 
 </style>
