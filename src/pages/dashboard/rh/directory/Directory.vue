@@ -37,7 +37,7 @@
           :key="col.name"
           :props="props">
           <q-item v-if="col.name === 'name'">
-            <q-item-side :avatar="col.value.picture" />
+            <q-item-side :avatar="getAvatar(col.value.picture)" />
             <q-item-main :label="col.value.name" />
           </q-item>
           <template v-else-if="col.name === 'profileErrors'">
@@ -392,7 +392,7 @@ export default {
               auxiliary: {
                 _id: user._id,
                 name: `${user.firstname} ${user.lastname}`,
-                picture: user.picture.link
+                picture: user.picture.link || null
               },
               profileErrors: checkProfileErrors.error ? checkProfileErrors.error.details.length : 0,
               startDate: this.$moment(user.createdAt).format('DD/MM/YYYY'),
@@ -515,6 +515,9 @@ export default {
         });
         this.loading = false;
       }
+    },
+    getAvatar (link) {
+      return link || 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/images/users/default_avatar.png';
     }
   }
 }
