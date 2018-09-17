@@ -704,7 +704,7 @@ export default {
               birthCountry: '',
               birthState: '',
               birthCity: '',
-              socialSecurityNumber: 0
+              socialSecurityNumber: ''
             },
             contact: {
               address: '',
@@ -941,7 +941,7 @@ export default {
   },
   methods: {
     mergeUser (value = null) {
-      const args = [this.user.alenvi, value || this.$store.state.rh.userProfile];
+      const args = [this.user.alenvi, (value || this.$store.state.rh.userProfile)];
       this.user.alenvi = Object.assign({}, extend(true, ...args));
       this.isLoaded = true;
     },
