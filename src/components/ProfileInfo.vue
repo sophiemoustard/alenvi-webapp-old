@@ -861,7 +861,7 @@ export default {
       }
     },
     hasPicture () {
-      return !this.user.alenvi.picture || (this.user.alenvi.picture && !this.user.alenvi.picture.link) ? 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/images/users/default_avatar.png' : this.user.alenvi.picture.link;
+      return !this.user.alenvi.picture || (this.user.alenvi.picture && !this.user.alenvi.picture.link) ? null : this.user.alenvi.picture.link;
     },
     birthStateError () {
       if (!this.$v.user.alenvi.administrative.identity.birthState.required) {
