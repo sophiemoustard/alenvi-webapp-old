@@ -193,7 +193,7 @@ import { frPhoneNumber, frZipCode } from '../../../../helpers/vuelidateCustomVal
 import { getUserStartDate } from '../../../../helpers/getUserStartDate';
 import { clear } from '../../../../helpers/utils.js';
 import { userProfileValidation } from '../../../../helpers/userProfileValidation';
-import { taskValidation } from '../../../../helpers/taskValidation';
+// import { taskValidation } from '../../../../helpers/taskValidation';
 import SelectSector from '../../../../components/SelectSector';
 import SelectManager from '../../../../components/SelectManager';
 
@@ -382,12 +382,12 @@ export default {
               _id: user._id,
               count: checkProfileErrors.error ? checkProfileErrors.error.details.length : 0
             });
-            const checkTasks = user.procedure.filter(task => taskValidation(task, user).length > 0 && !task.check.isDone);
-            this.$store.commit('rh/saveNotification', {
-              type: 'tasks',
-              _id: user._id,
-              count: checkTasks.length > 0 ? checkTasks.length : 0
-            });
+            // const checkTasks = user.procedure.filter(task => taskValidation(task, user).length > 0 && !task.check.isDone);
+            // this.$store.commit('rh/saveNotification', {
+            //   type: 'tasks',
+            //   _id: user._id,
+            //   count: checkTasks.length > 0 ? checkTasks.length : 0
+            // });
             return {
               auxiliary: {
                 _id: user._id,
