@@ -264,14 +264,16 @@ export default {
             const aArr = a.name.split(' ');
             const bArr = b.name.split(' ');
             return aArr[aArr.length - 1].toLowerCase() < bArr[bArr.length - 1].toLowerCase() ? -1 : 1
-          }
+          },
+          style: 'width: 500px'
         },
         {
           name: 'profileErrors',
           label: '',
           field: 'profileErrors',
           align: 'left',
-          sortable: true
+          sortable: true,
+          style: 'width: 40px'
         },
         {
           name: 'startDate',
@@ -279,21 +281,24 @@ export default {
           field: 'startDate',
           align: 'left',
           sortable: true,
-          sort: (a, b) => (this.$moment(a, 'DD/MM/YYYY').toDate()) - (this.$moment(b, 'DD/MM/YYYY').toDate())
+          sort: (a, b) => (this.$moment(a, 'DD/MM/YYYY').toDate()) - (this.$moment(b, 'DD/MM/YYYY').toDate()),
+          style: 'width: 170px'
         },
         {
           name: 'team',
           label: 'Equipe',
           field: 'sector',
           align: 'left',
-          sortable: true
+          sortable: true,
+          style: 'width: 170px'
         },
         {
           name: 'active',
           label: 'Actif',
           field: 'isActive',
           align: 'right',
-          sortable: true
+          sortable: true,
+          style: 'width: 30px'
         }
       ]
     }
@@ -549,12 +554,6 @@ export default {
       background: transparent
       box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5)
 
-  // /deep/ .q-if-inverted
-  //   box-shadow: none
-
-  // /deep/ .q-if-focused
-  //   box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.2)
-
   /deep/ .q-table
     border-spacing: 0 12px
     border-collapse: separate
@@ -585,6 +584,11 @@ export default {
             border: 1px solid #979797
         & .q-item-section + .q-item-section
           margin-left: 20px
+    &-container
+      & .q-table-bottom
+        padding-left: 12px
+      & .q-table-nodata > i
+        display: none
 
   .datatable-row
     cursor: pointer
