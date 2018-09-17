@@ -89,6 +89,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import randomize from 'randomatic';
 
 // import { getUserStartDate } from '../helpers/getUserStartDate';
 export default {
@@ -105,7 +106,10 @@ export default {
         {
           label: 'Pièces manquantes',
           value: 'PM',
-          // text: `Bonjour ${this.user.firstname}, il manque des informations importantes dans ta...`
+        },
+        {
+          label: 'Envoi code d\'activation',
+          value: 'CA'
         },
         {
           label: 'Autres',
@@ -160,10 +164,17 @@ export default {
       }
       return options
     },
+    activationCode () {
+      if (this.typeMessage === 'CA') {
+        return randomize('0000');
+      }
+    },
     messageComp: {
       get () {
         if (this.typeMessage === 'PM') {
           return `Bonjour ${this.user.firstname},\nIl manque encore des informations et documents importants pour compléter ton dossier Alenvi.\nClique ici pour compléter ton profil: ${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/profile/${this.user._id}\nSi tu rencontres des difficultés, n’hésite pas à t’adresser à ton/ta coach ou ta marraine.`;
+        } else if (this.typeMessage === 'CA') {
+          return `Bienvenue chez Alenvi ! :)\nUtilise ce code: ${this.activationCode} pour pouvoir commencer ton enregistrement ici avant ton intégration: ${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/enterCode :-)`
         }
         return this.message;
       },
@@ -178,13 +189,16 @@ export default {
   methods: {
     async sendMessage () {
       this.loading = true;
+      if (this.typeMessage === 'CA') {
+        await this.$activationCode.create({ code: this.activationCode, newUserId: this.user._id, userEmail: this.user.local.email });
+      }
       this.sendSMS();
       this.loading = false;
     },
     async sendMessageToBotUser () {
       try {
         await this.$message.sendMessage({
-          message: this.message,
+          message: this.messageComp,
           address: this.user.facebook.address
         });
         this.$q.notify({
