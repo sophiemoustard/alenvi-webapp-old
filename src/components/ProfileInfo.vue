@@ -29,7 +29,7 @@
             <div class="self-end doc-delete">
               <q-btn v-if="hasPicture" color="primary" round flat icon="mdi-square-edit-outline" size="1rem" @click.native="openPictureEditionModal" />
               <q-btn v-if="hasPicture" color="primary" round flat icon="delete" size="1rem" @click.native="deleteImage" />
-              <a :href="pictureDlLink(user.alenvi.picture.link)" target="_blank">
+              <a :href="pictureDlLink(hasPicture)" target="_blank">
                 <q-btn v-if="hasPicture && !fileChosen" color="primary" round flat icon="save_alt" size="1rem" />
               </a>
             </div>
@@ -593,15 +593,18 @@ import { Cookies, openURL } from 'quasar';
 import { required, email, numeric, minLength, maxLength, requiredIf } from 'vuelidate/lib/validators';
 import 'vue-croppa/dist/vue-croppa.css'
 
-import { frPhoneNumber, iban, frZipCode, bic } from '../../../../../helpers/vuelidateCustomVal';
-import gdrive from '../../../../../api/GoogleDrive.js';
-import cloudinary from '../../../../../api/Cloudinary.js';
-import nationalities from '../../../../../data/nationalities.js';
-import countries from '../../../../../data/countries.js';
-import SelectSector from '../../../../../components/SelectSector';
-import SelectMentor from '../../../../../components/SelectMentor';
-import CustomImg from '../../../../../components/CustomImg';
-import { extend } from '../../../../../helpers/utils.js';
+import { frPhoneNumber, iban, frZipCode, bic } from '../helpers/vuelidateCustomVal';
+import { extend } from '../helpers/utils.js';
+
+import gdrive from '../api/GoogleDrive.js';
+import cloudinary from '../api/Cloudinary.js';
+
+import nationalities from '../data/nationalities.js';
+import countries from '../data/countries.js';
+
+import SelectSector from './SelectSector';
+import SelectMentor from './SelectMentor';
+import CustomImg from './CustomImg';
 
 export default {
   components: {
@@ -858,7 +861,7 @@ export default {
       }
     },
     hasPicture () {
-      return !this.user.alenvi.picture ? '' : this.user.alenvi.picture.link === 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/images/users/default_avatar.png' ? '' : this.user.alenvi.picture.link;
+      return !this.user.alenvi.picture || (this.user.alenvi.picture && !this.user.alenvi.picture.link) ? 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/images/users/default_avatar.png' : this.user.alenvi.picture.link;
     },
     birthStateError () {
       if (!this.$v.user.alenvi.administrative.identity.birthState.required) {
@@ -1204,7 +1207,7 @@ export default {
       this.fileChosen = false;
     },
     pictureDlLink (link) {
-      return this.hasPicture ? link.replace(/(\/upload)/i, `$1/fl_attachment:photo_${this.userProfile.firstname}_${this.userProfile.lastname}`) : '';
+      return link ? link.replace(/(\/upload)/i, `$1/fl_attachment:photo_${this.userProfile.firstname}_${this.userProfile.lastname}`) : '';
     }
   }
 }
