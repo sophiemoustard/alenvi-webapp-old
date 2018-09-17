@@ -8,7 +8,7 @@
         </div>
       </div>
       <div class="row custom-justify-end col-xs-12 col-md-2">
-        <img :src="user.picture.link" alt="Img user" class="avatar">
+        <img :src="hasPicture" alt="Img user" class="avatar">
       </div>
     </div>
     <div class="row col-xs-12 profile-info">
@@ -170,7 +170,10 @@ export default {
       set (value) {
         this.message = value;
       }
-    }
+    },
+    hasPicture () {
+      return !this.user.picture || (this.user.picture && !this.user.picture.link) ? 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/images/users/default_avatar.png' : this.user.picture.link;
+    },
   },
   methods: {
     async sendMessage () {

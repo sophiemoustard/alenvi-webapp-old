@@ -359,6 +359,9 @@ export default {
       } else if (!this.$v.newUser.local.email.email) {
         return 'Email non valide';
       }
+    },
+    hasPicture () {
+      return !this.user.picture || (this.user.picture && !this.user.picture.link) ? 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/images/users/default_avatar.png' : this.user.picture.link;
     }
   },
   methods: {

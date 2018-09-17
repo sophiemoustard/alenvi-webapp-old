@@ -211,7 +211,7 @@ const routes = [
           {
             path: 'info',
             name: 'profile info',
-            component: () => import('pages/dashboard/rh/directory/profile/ProfileInfo'),
+            component: () => import('components/ProfileInfo'),
             meta: {
               cookies: ['alenvi_token', 'refresh_token'],
               parent: 'rh'
@@ -239,7 +239,7 @@ const routes = [
       {
         path: 'profile/:id',
         name: 'profile',
-        component: () => import('pages/dashboard/profile/NavTabs'),
+        component: () => import('components/ProfileInfo'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token']
         }

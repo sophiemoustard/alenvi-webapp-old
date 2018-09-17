@@ -96,8 +96,10 @@ export default {
           this.$router.replace({ path: '/dashboard/customer/home' });
         } else if (this.getUser.role.name === 'Auxiliaire' && !this.getUser.administrative.signup.complete) {
           this.$router.replace({ path: '/signupComplete' });
+        } else if (this.getUser.role.name === 'Auxiliaire' && this.getUser.administrative.signup.complete) {
+          this.$router.replace({ path: `dashboard/rh/directory/profile/${this.$q.cookies.get('user_id')}/info` });
         } else {
-          this.$router.replace({ path: '/dashboard/planning' });
+          this.$router.replace({ name: 'directory' });
         }
       } catch (e) {
         this.$q.notify({
