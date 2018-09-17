@@ -8,24 +8,29 @@ const nationalityValidation = (userNationality) => {
 
 export const taskValidation = (task, user = null) => {
   const error = [];
-  if (task.task.name.match(/titre de séjour/i)) {
-    if (user.administrative && user.administrative.identity) {
-      if (nationalityValidation(user.administrative.identity.nationality) === -1) {
-        error.push({
-          detail: 'Nationality validation',
-          msg: 'Not from EU.'
-        })
-      }
-    }
+  if (!task.isDone) {
+    error.push({
+      detail: task.task.name
+    })
   }
-  if (task.task.name.match(/attribuer parrain/i)) {
-    if (!user.mentorId) {
-      error.push({
-        detail: 'Mentor validation',
-        msg: 'No mentor.'
-      })
-    }
-  }
+  // if (task.task.name.match(/titre de séjour/i)) {
+  //   if (user.administrative && user.administrative.identity) {
+  //     if (nationalityValidation(user.administrative.identity.nationality) === -1) {
+  //       error.push({
+  //         detail: 'Nationality validation',
+  //         msg: 'Not from EU.'
+  //       })
+  //     }
+  //   }
+  // }
+  // if (task.task.name.match(/attribuer parrain/i)) {
+  //   if (!user.mentorId) {
+  //     error.push({
+  //       detail: 'Mentor validation',
+  //       msg: 'No mentor.'
+  //     })
+  //   }
+  // }
   return error;
 };
 
@@ -35,12 +40,10 @@ export const displayTask = (task, user = null) => {
       if (nationalityValidation(user.administrative.identity.nationality) === -1) {
         return true;
       }
+      return false;
     }
   }
-  if (task.task.name.match(/attribuer parrain/i)) {
-    return true;
-  }
-  return false;
+  return true;
 };
 
 // export const autoCheckTask = async (task, user = null) => {
