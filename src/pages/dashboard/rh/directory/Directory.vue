@@ -204,6 +204,8 @@ export default {
   },
   data () {
     return {
+      userCreated: null,
+      newEmployee: null,
       tableLoading: true,
       loading: false,
       opened: false,
@@ -467,15 +469,15 @@ export default {
         if (this.$v.newUser.$error) {
           throw new Error('Invalid fields');
         }
-        const newEmployee = await this.createOgustUser();
-        this.newUser.employee_id = newEmployee.data.data.employee.id_employee;
+        this.newEmployee = await this.createOgustUser();
+        this.newUser.employee_id = this.newEmployee.data.data.employee.id_employee;
         const employee = await this.$ogust.getEmployeeById(this.newUser.employee_id);
         this.newUser.administrative.contact.addressId = employee.main_address.id_address;
-        const newUser = await this.createAlenviUser();
-        await this.getUserList();
+        this.userCreated = await this.createAlenviUser();
         if (this.sendWelcomeMsg) {
-          await this.sendSms(newUser.data.data.user._id);
+          await this.sendSms(this.userCreated.data.data.user._id);
         }
+        await this.getUserList();
         this.$q.notify({
           color: 'positive',
           icon: 'done',
@@ -489,22 +491,28 @@ export default {
         console.error(e);
         if (e.message === 'Invalid fields') {
           this.loading = false;
-          return this.$q.notify({
+          this.$q.notify({
             color: 'negative',
             icon: 'warning',
             detail: 'Champ(s) invalide(s)',
             position: 'bottom-left',
             timeout: 2500
           });
+          return;
         }
-        if (e.status === 409) {
-          this.$q.notify({
-            color: 'negative',
-            icon: 'warning',
-            detail: 'Email déjà existant',
-            position: 'bottom-left',
-            timeout: 2500
-          });
+        if (e.response) {
+          console.log(e.response);
+          if (e.response.status === 409) {
+            this.$q.notify({
+              color: 'negative',
+              icon: 'warning',
+              detail: 'Email déjà existant',
+              position: 'bottom-left',
+              timeout: 2500
+            });
+            this.loading = false;
+            return;
+          }
         }
         this.$q.notify({
           color: 'negative',

@@ -36,9 +36,9 @@ instance.interceptors.request.use(async function (config) {
   return Promise.reject(err);
 });
 
-instance.interceptors.response.use((response) => {
+instance.interceptors.response.use(function (response) {
   return response;
-}, error => {
+}, function (error) {
   return Promise.reject(error.response);
 })
 
