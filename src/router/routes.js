@@ -180,7 +180,7 @@ const routes = [
         ]
       },
       {
-        path: 'rh/auxiliaries/:id',
+        path: 'rh/auxiliaires/:id',
         name: 'auxiliary info',
         component: () => import('pages/dashboard/rh/auxiliaries/Info'),
         props: (route) => ({ id: route.params.id, token: route.query.access_token }),
@@ -194,7 +194,7 @@ const routes = [
         }
       },
       {
-        path: 'rh/directory',
+        path: 'rh/repertoire',
         name: 'directory',
         component: () => import('pages/dashboard/rh/directory/Directory'),
         meta: {
@@ -203,7 +203,7 @@ const routes = [
         }
       },
       {
-        path: 'rh/directory/profile/:id',
+        path: 'rh/repertoire/profil/:id',
         name: 'directory profile',
         component: () => import('pages/dashboard/rh/directory/profile/Profile'),
         props: true,
@@ -225,7 +225,7 @@ const routes = [
             }
           },
           {
-            path: 'tasks',
+            path: 'taches',
             name: 'profile tasks',
             component: () => import('pages/dashboard/rh/directory/profile/Tasks'),
             meta: {
