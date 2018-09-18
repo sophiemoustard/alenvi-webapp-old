@@ -49,7 +49,6 @@ export default {
   },
   methods: {
     changeBoxAndMakeCode (index, event) {
-      console.log('EVENT', event);
       if (index !== (this.boxes.length - 1) && event.match(/[0-9]/g)) {
         this.code.splice(index, 1, event);
         const newIndex = index + 1;
