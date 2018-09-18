@@ -81,9 +81,6 @@ export default {
         this.$q.cookies.set('refresh_token', user.data.data.refreshToken, { path: '/', expires: 365, secure: process.env.NODE_ENV !== 'development' });
         this.$q.cookies.set('user_id', user.data.data.user._id, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV !== 'development' });
         await this.$store.dispatch('main/getUser', this.$q.cookies.get('user_id'));
-        // if (this.getUser.role.name === 'Client') {
-        //   return this.$router.replace({ path: '/dashboard/customer/home' });
-        // }
         if (this.$q.platform.is.desktop) {
           this.$store.commit('main/setToggleDrawer', true);
         }
@@ -97,7 +94,7 @@ export default {
         } else if (this.getUser.role.name === 'Auxiliaire' && !this.getUser.administrative.signup.complete) {
           this.$router.replace({ path: '/signupComplete' });
         } else if (this.getUser.role.name === 'Auxiliaire' && this.getUser.administrative.signup.complete) {
-          this.$router.replace({ path: `dashboard/rh/directory/profile/${this.$q.cookies.get('user_id')}/info` });
+          this.$router.replace({ path: `dashboard/rh/auxiliaires/${this.$q.cookies.get('user_id')}` });
         } else {
           this.$router.replace({ name: 'directory' });
         }
