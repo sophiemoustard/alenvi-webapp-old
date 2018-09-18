@@ -26,8 +26,12 @@ export default {
   },
   methods: {
     async getThumbnailUrl () {
-      const file = await gdrive.getFileById({ id: this.driveId });
-      this.link = file.data.data.file.thumbnailLink;
+      try {
+        const file = await gdrive.getFileById({ id: this.driveId });
+        this.link = file.data.data.file.thumbnailLink;
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 }
