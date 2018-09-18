@@ -501,7 +501,7 @@ export default {
           return;
         }
         if (e.response) {
-          console.log(e.response);
+          console.error(e.response);
           if (e.response.status === 409) {
             this.$q.notify({
               color: 'negative',
