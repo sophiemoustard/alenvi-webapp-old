@@ -7,8 +7,7 @@
       <q-card-separator />
       <q-card-main class="row justify-center layout-padding">
         <q-input class="custom-input on-left" v-for="(box, index) in boxes" :key="index" align="center" @input="changeBoxAndMakeCode(index, $event)"
-          :attributes="boxesStyle" :ref="'box' + (index + 1)" type="tel" :autofocus="box.autofocus" v-model.number="box.model"
-          :max-length="1" inverted-light color="white" />
+          :attributes="boxesStyle" :ref="'box' + (index + 1)" type="text" :autofocus="box.autofocus" v-model.number="box.model" pattern="\d{1}" maxlength="1" inputmode="numeric" />
       </q-card-main>
       <q-card-actions class="row">
         <q-btn class="full-width send-btn" @click="submit" color="primary" :disable="!code">Envoyer</q-btn>
@@ -48,16 +47,14 @@ export default {
       }
     }
   },
-  mounted () {
-    // console.log(this.$refs);
-  },
   methods: {
     changeBoxAndMakeCode (index, event) {
+      console.log('EVENT', event);
       if (index !== (this.boxes.length - 1) && event.match(/[0-9]/g)) {
         this.code.splice(index, 1, event);
         const newIndex = index + 1;
         this.$refs['box' + (newIndex + 1)][0].focus();
-      } else if (index === (this.boxes.length - 1)) {
+      } else if (index === (this.boxes.length - 1) && event.match(/[0-9]/g)) {
         this.$refs['box' + this.boxes.length][0].blur();
         this.code.splice(index, 1, event);
       }
@@ -109,4 +106,11 @@ export default {
 
   .send-btn
     border-radius: 0px
+
+  .q-if
+    & input.q-input-target
+      height: 30px
+      line-height: 30px
+    &-focused
+      box-shadow: none
 </style>
