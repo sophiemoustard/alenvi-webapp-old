@@ -48,7 +48,7 @@ export default {
       ]
     }
   },
-  async mounted () {
+  mounted () {
     this.$store.dispatch('rh/getUserProfile', this.id);
   },
   beforeDestroy () {
