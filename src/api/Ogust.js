@@ -222,5 +222,9 @@ export default {
   async setAddress (data) {
     const addressUpdated = await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/address/${data.id_address}`, data);
     return addressUpdated;
+  },
+  async deleteEmployee (id) {
+    const employeeDeleted = await alenviAxios.delete(`${process.env.API_HOSTNAME}/ogust/employees/${id}`);
+    return employeeDeleted;
   }
 }
