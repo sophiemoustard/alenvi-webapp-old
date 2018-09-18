@@ -841,8 +841,14 @@ export default {
   computed: {
     ...mapGetters({
       userProfile: 'rh/getUserProfile',
-      currentUser: 'main/user'
+      mainUser: 'main/user'
     }),
+    currentUser () {
+      if (this.mainUser) {
+        return this.mainUser;
+      }
+      return this.userProfile;
+    },
     nationalitiesOptions () {
       return Object.keys(nationalities).map(nationality => ({ value: nationality, label: nationalities[nationality] }));
     },
