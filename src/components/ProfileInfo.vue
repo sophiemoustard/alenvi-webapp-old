@@ -173,7 +173,7 @@
           />
           </q-field>
         </div>
-        <div class="col-xs-12 col-md-6">
+        <!-- <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Adresse email</p>
             <q-icon v-if="$v.user.alenvi.local.email.$error" name="error_outline" color="secondary" />
@@ -188,7 +188,7 @@
             @blur="updateUser({ alenvi: 'local.email', ogust: 'email' })"
           />
           </q-field>
-        </div>
+        </div> -->
         <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Adresse, numéro et rue</p>
