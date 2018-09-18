@@ -100,6 +100,12 @@ const routes = [
   { path: '/bot/editCustomerInfo', component: () => import('pages/bot/CustomerInfo') },
   { path: '/bot/calendar', component: () => import('pages/bot/Calendar') },
   {
+    path: '/bot/auxiliaries/:id',
+    name: ' bot auxiliary info',
+    component: () => import('pages/bot/auxiliaryInfo'),
+    props: (route) => ({ id: route.params.id, token: route.query.access_token })
+  },
+  {
     path: '/dashboard',
     component: () => import('layouts/Layout'),
     children: [
@@ -183,14 +189,9 @@ const routes = [
         path: 'rh/auxiliaires/:id',
         name: 'auxiliary info',
         component: () => import('pages/dashboard/rh/auxiliaries/Info'),
-        props: (route) => ({ id: route.params.id, token: route.query.access_token }),
+        props: true,
         meta: {
-          cookies: (route) => {
-            if (!route.query.access_token) {
-              return ['alenvi_token', 'refresh_token'];
-            }
-            return null;
-          }
+          cookies: ['alenvi_token', 'refresh_token'],
         }
       },
       {

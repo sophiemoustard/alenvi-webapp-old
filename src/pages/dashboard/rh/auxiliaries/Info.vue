@@ -14,29 +14,12 @@ import ProfileInfo from '../../../../components/ProfileInfo'
 export default {
   props: {
     id: String,
-    token: {
-      type: String,
-      default: null
-    }
   },
   components: {
     ProfileInfo
   },
-  data () {
-    return {
-      user: null
-    }
-  },
-  async mounted () {
-    try {
-      if (this.token) {
-        this.user = await this.$users.getById(this.id, this.token);
-        return this.$store.commit('rh/saveUserProfile', this.user);
-      }
-      this.$store.dispatch('rh/getUserProfile', this.id);
-    } catch (e) {
-      console.error(e);
-    }
+  mounted () {
+    this.$store.dispatch('rh/getUserProfile', this.id);
   }
 }
 </script>
