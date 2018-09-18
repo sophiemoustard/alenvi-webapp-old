@@ -1,5 +1,5 @@
 <template>
-  <q-page class="neutral-background" style="max-width: 90vw;" padding>
+  <q-page class="neutral-background" padding>
     <div class="row items-center directory-header">
       <div class="col-xs-12 col-md-5">
         <h4 class="no-margin">Répertoire</h4>
@@ -9,10 +9,6 @@
       </div>
       <div class="col-xs-12 col-md-2 row justify-end">
         <q-toggle v-model="activeUsers" color="primary" label="Actifs" />
-        <!-- <q-btn text-color="dark-grey" color="white" class="btn-directory" @click="activeUsers = !activeUsers" style="height: 40px">
-          <q-icon :class="{ 'btn-icon-disabled': activeUsers, 'btn-icon-enabled': !activeUsers }" name="visibility" />
-          <div class="col-12" style="font-size: 9px">Inactifs</div>
-        </q-btn> -->
       </div>
     </div>
     <q-table

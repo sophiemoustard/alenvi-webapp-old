@@ -1,5 +1,5 @@
 <template>
-  <div style="max-width: 90vw">
+  <div>
     <div class="row col-xs-12 q-mb-md">
       <div class="row items-baseline col-xs-12 col-md-10">
         <div class="row">
