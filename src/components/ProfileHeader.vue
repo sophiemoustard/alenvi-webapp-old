@@ -192,8 +192,9 @@ export default {
       if (this.typeMessage === 'CA') {
         await this.$activationCode.create({ code: this.activationCode, newUserId: this.user._id, userEmail: this.user.local.email });
       }
-      this.sendSMS();
+      await this.sendSMS();
       this.loading = false;
+      this.opened = false;
     },
     async sendMessageToBotUser () {
       try {
@@ -223,7 +224,8 @@ export default {
     async sendSMS () {
       try {
         await this.$twilio.sendSMS({
-          to: `+33${this.user.mobilePhone.substring(1)}`,
+          // to: `+33${this.user.mobilePhone.substring(1)}`,
+          to: `+33674012180`,
           body: this.messageComp,
         });
         this.$q.notify({
