@@ -3,13 +3,6 @@ import { Cookies } from 'quasar'
 import store from '../store/index'
 
 const routes = [
-  // {
-  //   path: '/',
-  //   component: () => import('layouts/MyLayout.vue'),
-  //   children: [
-  //     { path: '', component: () => import('pages/Index.vue') }
-  //   ]
-  // }
   {
     path: '/',
     beforeEnter: async (to, from, next) => {
@@ -185,6 +178,20 @@ const routes = [
             }
           }
         ]
+      },
+      {
+        path: 'rh/auxiliaries/:id',
+        name: 'auxiliary info',
+        component: () => import('pages/dashboard/rh/auxiliaries/Info'),
+        props: (route) => ({ id: route.params.id, token: route.query.access_token }),
+        meta: {
+          cookies: (route) => {
+            if (!route.query.access_token) {
+              return ['alenvi_token', 'refresh_token'];
+            }
+            return null;
+          }
+        }
       },
       {
         path: 'rh/directory',
