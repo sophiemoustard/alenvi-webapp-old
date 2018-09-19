@@ -30,7 +30,7 @@ export default {
   async mounted () {
     try {
       this.user = await this.$users.getById(this.id, this.token);
-      console.log('USER', this.user);
+      this.user.mobilePhone = this.user.mobilePhone ? this.user.mobilePhone.split(' ').join('') : '';
       this.$store.commit('rh/saveUserProfile', this.user);
     } catch (e) {
       console.error(e);

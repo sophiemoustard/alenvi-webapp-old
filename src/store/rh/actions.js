@@ -10,6 +10,7 @@ import { taskValidation } from '../../helpers/taskValidation';
 export async function getUserProfile ({ commit }, userId) {
   try {
     const user = await users.getById(userId);
+    user.mobilePhone = user.mobilePhone.split(' ').join('');
     commit('saveUserProfile', user);
     const userValidation = userProfileValidation(user);
     commit('saveNotification', {
