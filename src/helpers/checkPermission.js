@@ -4,7 +4,7 @@ export const checkPermission = async (to, user) => {
   try {
     if (to.meta.permission) {
       if (user.role && user.role.rights) {
-        return user.role.rights.filter(right => right === to.meta.permission).length === 1;
+        return user.role.rights.filter(right => right.permission === to.meta.permission).length === 1;
       } else {
         return redirect.redirectToLogin({ to });
       }
