@@ -7,7 +7,7 @@
       <q-card-separator />
       <q-card-main class="row justify-center layout-padding">
         <q-input class="custom-input on-left" v-for="(box, index) in boxes" :key="index" align="center" @input="changeBoxAndMakeCode(index, $event)"
-          :attributes="boxesStyle" :ref="'box' + (index + 1)" type="text" :autofocus="box.autofocus" v-model.number="box.model" pattern="\d{1}" maxlength="1" inputmode="numeric" />
+          v-mask="'#'" :ref="'box' + (index + 1)" type="text" :autofocus="box.autofocus" v-model.number="box.model" pattern="\d+" maxlength="1" />
       </q-card-main>
       <q-card-actions class="row">
         <q-btn class="full-width send-btn" @click="submit" color="primary" :disable="!code">Envoyer</q-btn>
@@ -106,10 +106,15 @@ export default {
   .send-btn
     border-radius: 0px
 
-  .q-if
+  /deep/ .q-if
+    &:not(.q-if-disabled):not(.q-if-error):not(.q-if-warning):hover:before
+      color: inherit !important
     & input.q-input-target
-      height: 30px
-      line-height: 30px
+      height: 60px
+      line-height: 60px
+      @media (max-width: 321px)
+        height: 50px
+        line-height: 50px
     &-focused
       box-shadow: none
 </style>
