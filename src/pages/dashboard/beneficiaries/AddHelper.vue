@@ -7,7 +7,7 @@
        <q-input v-model="email" float-label="Email" :after="[{ icon: 'send', content: true, handler: handleEmail }]"/>
      </q-field> -->
      <!-- TEST by typing the beginning of a client's name -->
-     <q-search v-model="terms" placeholder="Commencez à entrer le nom d'un bénéficiaire...">
+     <q-search inverted-light color="white" v-model="terms" placeholder="Commencez à entrer le nom d'un bénéficiaire...">
        <q-autocomplete @search="search" @selected="selected" />
      </q-search>
      <!-- Find client's helpers on the fly -->

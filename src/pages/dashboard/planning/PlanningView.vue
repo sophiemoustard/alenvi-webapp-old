@@ -4,7 +4,7 @@
     <p class="caption">Voir planning en tant que:</p>
     <select-sector @input="getEmployeesIdBySector" v-model="selectedSector"></select-sector>
     <q-field icon="person" helper="Choix auxiliaire" >
-      <q-select v-model="selectedAuxiliary" :options="orderedAuxiliary" separator :disable="!selectedSector"/>
+      <q-select inverted-light color="white" v-model="selectedAuxiliary" :options="orderedAuxiliary" separator :disable="!selectedSector"/>
     </q-field>
     <div class="row justify-end">
       <q-btn color="primary" :disable="!selectedAuxiliary" @click="goUrl(getPlanningLink)" flat>Accéder au planning</q-btn>

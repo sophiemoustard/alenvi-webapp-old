@@ -27,7 +27,7 @@
           <q-checkbox v-model="props.value.checked" @input="process(props.value.id, props.value.checked, props.row.__index)" val="props.value.checked"></q-checkbox>
         </q-td>
         <q-td slot="body-cell-remove" slot-scope="props" :props="props">
-          <q-icon class="cursor-pointer" color="tertiary" name="delete" @click.native="remove(props.value.id, props.row.__index, props.value.userId)" size="1.5rem" />
+          <q-icon class="cursor-pointer" color="grey" name="delete" @click.native="remove(props.value.id, props.row.__index, props.value.userId)" size="1.5rem" />
         </q-td>
       </q-table>
     </div>
@@ -277,4 +277,7 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables'
+
+  .q-table-container
+    background: $white
 </style>
