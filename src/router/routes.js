@@ -14,13 +14,10 @@ const routes = [
           return next({ name: 'customer home' });
         } else if (store.getters['main/user'] && store.getters['main/user'].role.name === 'Auxiliaire') {
           if (store.getters['main/user'].administrative && store.getters['main/user'].administrative.signup.complete) {
-            return next({ path: '/dashboard/planning' });
+            return next({ name: 'auxiliary info', params: { id: store.getters['main/user']._id } });
           }
-          return next({ path: '/signup/signupComplete' });
-          // console.log('FEH');
-          // return next({ path: '/dashboard/test2' });
         } else if (store.getters['main/user'] && store.getters['main/user'].role.name !== 'Auxiliaire' && store.getters['main/user'].role.name !== 'Client') {
-          next({ path: '/dashboard/planning' });
+          next({ name: 'rh directory' });
         } else {
           next({ path: '/login' });
         }
@@ -209,7 +206,7 @@ const routes = [
         component: () => import('pages/dashboard/rh/directory/profile/Profile'),
         props: true,
         redirect: {
-          name: 'profile info'
+          name: 'directory profile info'
         },
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
