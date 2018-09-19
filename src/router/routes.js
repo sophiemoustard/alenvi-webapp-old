@@ -13,13 +13,9 @@ const routes = [
         if (store.getters['main/user'] && store.getters['main/user'].role.name === 'Client') {
           return next({ name: 'customer home' });
         } else if (store.getters['main/user'] && store.getters['main/user'].role.name === 'Auxiliaire') {
-          if (store.getters['main/user'].administrative && store.getters['main/user'].administrative.signup.complete) {
-            return next({ name: 'auxiliary info', params: { id: store.getters['main/user']._id } });
-          }
-        } else if (store.getters['main/user'] && store.getters['main/user'].role.name !== 'Auxiliaire' && store.getters['main/user'].role.name !== 'Client') {
-          next({ name: 'rh directory' });
+          return next({ name: 'auxiliary info', params: { id: store.getters['main/user']._id } });
         } else {
-          next({ path: '/login' });
+          next({ name: 'rh directory' });
         }
       } catch (e) {
         console.error(e);
@@ -111,6 +107,9 @@ const routes = [
         component: () => import('pages/dashboard/Home'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token']
+        },
+        redirect: {
+          path: '/'
         }
       },
       {
@@ -210,7 +209,7 @@ const routes = [
         },
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'rh'
+          parent: 'rh',
         },
         children: [
           {
@@ -257,9 +256,18 @@ const routes = [
           cookies: ['alenvi_token', 'refresh_token'],
           permission: 'Paramètres'
         }
-      },
+      }
+    ]
+  },
+  {
+    path: '/dashboard/customer',
+    component: () => import('layouts/CustomerLayout'),
+    redirect: {
+      name: 'customer home'
+    },
+    children: [
       {
-        path: 'customer/home',
+        path: 'home',
         name: 'customer home',
         component: () => import('pages/dashboard/customer/Home'),
         meta: {
@@ -267,7 +275,7 @@ const routes = [
         }
       },
       {
-        path: 'customer/planning',
+        path: 'planning',
         name: 'customer planning',
         component: () => import('pages/dashboard/customer/Planning'),
         meta: {
@@ -275,18 +283,16 @@ const routes = [
         }
       },
       {
-        path: 'customer/documents',
+        path: 'documents',
         name: 'customer documents',
-        // component: load('dashboard/customer/documents/NavTabs'),
         component: () => import('pages/dashboard/customer/documents/Documents'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token']
         }
       },
       {
-        path: 'customer/profile/:id',
+        path: 'profile/:id',
         name: 'customer profile',
-        // component: load('dashboard/customer/documents/NavTabs'),
         component: () => import('pages/dashboard/customer/Profile'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token']
