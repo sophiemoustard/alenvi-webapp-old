@@ -12,7 +12,7 @@
       <template slot="header">
         <q-item-main :class="{'text-weight-bold': activeRoutes.rh.highlight }" label="Ressources humaines" />
       </template>
-      <q-item to="/dashboard/rh/directory">
+      <q-item :to="{ name: 'rh directory' }">
         <q-item-side icon="contacts" />
         <q-item-main label="Répertoire" />
       </q-item>
@@ -26,15 +26,15 @@
       <template slot="header">
         <q-item-main :class="{'text-weight-bold': activeRoutes.planning.highlight }" label="Planning" />
       </template>
-      <q-item to="/dashboard/planning/view" exact>
+      <q-item :to="{ name: 'view planning'}" exact>
         <q-item-side icon="date range" />
         <q-item-main label="Vue planning" />
       </q-item>
-      <q-item to="/dashboard/planning/modification" exact>
+      <q-item :to="{ name: 'modification planning' }" exact>
         <q-item-side icon="update" />
         <q-item-main label="Modifications planning" />
       </q-item>
-      <q-item to="/dashboard/planning/constrainedCoaches" exact>
+      <q-item :to="{ name: 'constrained coaches' }" exact>
         <q-item-side icon="perm contact calendar" />
         <q-item-main label="Coach(s) de permanence" />
       </q-item>
@@ -44,52 +44,26 @@
       <template slot="header">
         <q-item-main :class="{'text-weight-bold': activeRoutes.benef.highlight }" label="Bénéficiaires" />
       </template>
-      <q-item to="/dashboard/beneficiaries/addHelper" exact>
+      <q-item :to="{ name: 'add helper' }" exact>
         <q-item-side icon="person add" />
         <q-item-main label="Accueil aidants" />
       </q-item>
     </q-collapsible>
     <q-item-separator />
-    <!-- <q-item>
-      <q-item-main class="text-bold text-center" :label="user.firstname" />
-    </q-item> -->
-    <!-- <q-item class="justify-center">
-      <q-icon id="profile" name="person" color="tertiary" size="1.5rem" @click.native="goToProfile"/>
-      <q-icon id="logout" name="exit to app" color="tertiary" size="1.5rem" class="on-right" @click.native="logout" />
-    </q-item> -->
-    <q-item to="/dashboard/auxiliaries" exact> <!-- v-can="{ feature: 'Auxiliaires' }" }" -->
-      <q-item-side icon="ion-contacts" />
-      <q-item-main label="Auxiliaires d'envie" />
-    </q-item>
-    <!-- <q-item to="/dashboard/caregivers" exact> v-can="{ feature: 'Aidants' }" -->
-      <!-- <q-item-side icon="group" /> -->
-      <!-- <q-item-main label="Aidants familiaux" /> -->
-    <!-- </q-item> -->
-    <!-- <q-item to="/dashboard/pigi" exact> v-can="{ feature: 'Pigi' }" -->
-      <!-- <q-item-side icon="message" /> -->
-      <!-- <q-item-main label="Pigi" /> -->
-    <!-- </q-item> -->
-    <!-- <div class="col"> -->
-      <q-item-separator />
-      <!-- <q-item to="/dashboard/settings" exact> v-can="{ feature: 'Paramètres' }" -->
-        <!-- <q-item-side icon="settings" /> -->
-        <!-- <q-item-main label="Paramètres" /> -->
-      <!-- </q-item> -->
-      <div class="sidemenu-footer">
-        <q-item class="sidemenu-footer-border full-width">
-          <q-item-main id="sidemenu-footer-user" :label="userFirstnameUpper" />
-          <q-item-side>
-            <q-icon name="person" color="black" />
-          </q-item-side>
-          <q-item-side>
-            <q-icon name="settings" color="black" />
-          </q-item-side>
-          <q-item-side>
-            <q-icon name="ion-log-out" color="black" @click.native="logout" />
-          </q-item-side>
-        </q-item>
-      </div>
-    <!-- </div> -->
+    <div class="sidemenu-footer">
+      <q-item class="sidemenu-footer-border full-width">
+        <q-item-main id="sidemenu-footer-user" :label="userFirstnameUpper" />
+        <q-item-side>
+          <q-icon name="person" color="black" />
+        </q-item-side>
+        <q-item-side>
+          <q-icon name="settings" color="black" />
+        </q-item-side>
+        <q-item-side>
+          <q-icon name="ion-log-out" color="black" @click.native="logout" />
+        </q-item-side>
+      </q-item>
+    </div>
   </q-list>
 </template>
 
