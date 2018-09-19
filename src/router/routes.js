@@ -146,7 +146,7 @@ const routes = [
           },
           {
             path: 'constrainedCoaches',
-            name: 'perm coach planning',
+            name: 'constrained coaches',
             component: () => import('pages/dashboard/planning/ConstrainedCoaches'),
             meta: {
               cookies: ['alenvi_token', 'refresh_token'],
@@ -196,7 +196,7 @@ const routes = [
       },
       {
         path: 'rh/repertoire',
-        name: 'directory',
+        name: 'rh directory',
         component: () => import('pages/dashboard/rh/directory/Directory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
@@ -205,7 +205,7 @@ const routes = [
       },
       {
         path: 'rh/repertoire/profil/:id',
-        name: 'directory profile',
+        name: 'rh directory profile',
         component: () => import('pages/dashboard/rh/directory/profile/Profile'),
         props: true,
         redirect: {
@@ -218,7 +218,7 @@ const routes = [
         children: [
           {
             path: 'info',
-            name: 'profile info',
+            name: 'directory profile info',
             component: () => import('components/ProfileInfo'),
             meta: {
               cookies: ['alenvi_token', 'refresh_token'],
@@ -227,7 +227,7 @@ const routes = [
           },
           {
             path: 'taches',
-            name: 'profile tasks',
+            name: 'directory profile tasks',
             component: () => import('pages/dashboard/rh/directory/profile/Tasks'),
             meta: {
               cookies: ['alenvi_token', 'refresh_token'],
