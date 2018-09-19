@@ -27,12 +27,12 @@ export default {
       tabsContent: [
         {
           label: 'Infos personnelles',
-          to: { name: 'profile info', params: { id: this.id } },
+          to: { name: 'directory profile info', params: { id: this.id } },
           notification: 'profiles'
         },
         {
           label: 'Tâches',
-          to: { name: 'profile tasks' },
+          to: { name: 'directory profile tasks' },
           notification: 'tasks'
         }
         // {

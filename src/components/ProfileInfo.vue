@@ -302,7 +302,7 @@
             <q-icon v-if="$v.user.alenvi.administrative.payment.rib.bic.$error" name="error_outline" color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.administrative.payment.rib.bic.$error" :error-label="bicError">
-            <q-input v-model="user.alenvi.administrative.payment.rib.bic"
+            <q-input v-model.trim="user.alenvi.administrative.payment.rib.bic"
             upper-case color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.payment.rib.bic', ogust: 'bic_number' })"
             @focus="saveTmp('administrative.payment.rib.bic')"
           />
@@ -1214,6 +1214,12 @@ export default {
     },
     pictureDlLink (link) {
       return link ? link.replace(/(\/upload)/i, `$1/fl_attachment:photo_${this.userProfile.firstname}_${this.userProfile.lastname}`) : '';
+    },
+    trim (str) {
+      if (typeof str !== 'string') {
+        return str;
+      }
+      return str.split(' ').join('');
     }
   }
 }
