@@ -90,13 +90,11 @@ export default {
         }
 
         if (this.getUser.role.name === 'Client') {
-          this.$router.replace({ path: '/dashboard/customer/home' });
-        } else if (this.getUser.role.name === 'Auxiliaire' && !this.getUser.administrative.signup.complete) {
-          this.$router.replace({ path: '/signupComplete' });
-        } else if (this.getUser.role.name === 'Auxiliaire' && this.getUser.administrative.signup.complete) {
-          this.$router.replace({ path: `dashboard/rh/auxiliaires/${this.$q.cookies.get('user_id')}` });
+          this.$router.replace({ name: 'customer home' });
+        } else if (this.getUser.role.name === 'Auxiliaire') {
+          this.$router.replace({ name: 'auxiliary info', params: { id: this.$q.cookies.get('user_id') } });
         } else {
-          this.$router.replace({ name: 'directory' });
+          this.$router.replace({ name: 'rh directory' });
         }
       } catch (e) {
         this.$q.notify({
