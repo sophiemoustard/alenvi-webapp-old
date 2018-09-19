@@ -1214,12 +1214,6 @@ export default {
     },
     pictureDlLink (link) {
       return link ? link.replace(/(\/upload)/i, `$1/fl_attachment:photo_${this.userProfile.firstname}_${this.userProfile.lastname}`) : '';
-    },
-    trim (str) {
-      if (typeof str !== 'string') {
-        return str;
-      }
-      return str.split(' ').join('');
     }
   }
 }
