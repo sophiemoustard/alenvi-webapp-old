@@ -51,12 +51,7 @@ Router.beforeEach(async (to, from, next) => {
           store.commit('main/changeRefreshState', false);
           next();
         } else {
-          if (store.getters['main/user'].role.name === 'Client') {
-            store.commit('main/changeRefreshState', false);
-            return next({ path: '/dashboard/customer/home' });
-          }
-          store.commit('main/changeRefreshState', false);
-          next({ path: '/dashboard' });
+          next('/401');
         }
       } else {
         next({ path: '/login', query: { from: to.path } });
@@ -68,17 +63,54 @@ Router.beforeEach(async (to, from, next) => {
       if (await checkPermission(to, store.getters['main/user'])) {
         store.commit('main/changeRefreshState', false);
         next();
-      } else if (store.getters['main/user'].role.name === 'Client') {
-        store.commit('main/changeRefreshState', false);
-        next({ path: '/dashboard/customer/home' });
       } else {
-        store.commit('main/changeRefreshState', false);
-        next({ path: '/dashboard' });
+        next('/401');
       }
     }
   } else {
     next();
   }
 });
+
+// Router.beforeEach(async (to, from, next) => {
+//   if (to.meta.cookies) {
+//     if (!Cookies.get('alenvi_token') || !Cookies.get('user_id')) {
+//       if (await alenvi.refreshAlenviCookies()) {
+//         if (store.state.main.refreshState) {
+//           await store.dispatch('main/getUser', Cookies.get('user_id'));
+//         }
+//         if (await checkPermission(to, store.getters['main/user'])) {
+//           store.commit('main/changeRefreshState', false);
+//           next();
+//         } else {
+//           if (store.getters['main/user'].role.name === 'Client') {
+//             store.commit('main/changeRefreshState', false);
+//             return next({ path: '/dashboard/customer/home' });
+//           }
+//           store.commit('main/changeRefreshState', false);
+//           next({ path: '/dashboard' });
+//         }
+//       } else {
+//         next({ path: '/login', query: { from: to.path } });
+//       }
+//     } else {
+//       if (store.state.main.refreshState) {
+//         await store.dispatch('main/getUser', Cookies.get('user_id'));
+//       }
+//       if (await checkPermission(to, store.getters['main/user'])) {
+//         store.commit('main/changeRefreshState', false);
+//         next();
+//       } else if (store.getters['main/user'].role.name === 'Client') {
+//         store.commit('main/changeRefreshState', false);
+//         next({ path: '/dashboard/customer/home' });
+//       } else {
+//         store.commit('main/changeRefreshState', false);
+//         next({ path: '/dashboard' });
+//       }
+//     }
+//   } else {
+//     next();
+//   }
+// });
 
 export default Router;
