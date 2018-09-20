@@ -390,7 +390,7 @@ export default {
               auxiliary: {
                 _id: user._id,
                 name: `${user.firstname} ${user.lastname}`,
-                picture: user.picture.link || null
+                picture: user.picture ? user.picture.link : null
               },
               profileErrors: checkProfileErrors.error ? checkProfileErrors.error.details.length : 0,
               startDate: this.$moment(user.createdAt).format('DD/MM/YYYY'),
