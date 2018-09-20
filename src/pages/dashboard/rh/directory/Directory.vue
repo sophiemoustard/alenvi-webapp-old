@@ -182,7 +182,7 @@
 </template>
 
 <script>
-import { required, email } from 'vuelidate/lib/validators';
+import { required, email, maxLength } from 'vuelidate/lib/validators';
 import randomize from 'randomatic';
 
 import { frPhoneNumber, frZipCode } from '../../../../helpers/vuelidateCustomVal';
@@ -201,7 +201,6 @@ export default {
   data () {
     return {
       userCreated: null,
-      newEmployee: null,
       tableLoading: true,
       loading: false,
       opened: false,
@@ -305,11 +304,19 @@ export default {
     newUser: {
       lastname: { required },
       firstname: { required },
-      mobilePhone: { required, frPhoneNumber },
+      mobilePhone: {
+        required,
+        frPhoneNumber,
+        maxLength: maxLength(10)
+      },
       administrative: {
         contact: {
           address: { required },
-          zipCode: { required, frZipCode },
+          zipCode: {
+            required,
+            frZipCode,
+            maxLength: maxLength(5)
+          },
           city: { required }
         },
         identity: {
@@ -345,14 +352,14 @@ export default {
     mobilePhoneError () {
       if (!this.$v.newUser.mobilePhone.required) {
         return 'Champ requis';
-      } else if (!this.$v.newUser.mobilePhone.frPhoneNumber) {
+      } else if (!this.$v.newUser.mobilePhone.frPhoneNumber || !this.$v.newUser.mobilePhone.maxLength) {
         return 'Numéro de téléphone non valide';
       }
     },
     zipCodeError () {
       if (!this.$v.newUser.administrative.contact.zipCode.required) {
         return 'Champ requis';
-      } else if (!this.$v.newUser.administrative.contact.zipCode.frZipCode) {
+      } else if (!this.$v.newUser.administrative.contact.zipCode.frZipCode || !this.$v.newUser.administrative.contact.zipCode.maxLength) {
         return 'Code postal non valide';
       }
     },
@@ -465,8 +472,12 @@ export default {
         if (this.$v.newUser.$error) {
           throw new Error('Invalid fields');
         }
-        this.newEmployee = await this.createOgustUser();
-        this.newUser.employee_id = this.newEmployee.data.data.employee.id_employee;
+        const existingEmployee = await this.$ogust.getEmployees({ email: this.newUser.local.email });
+        if (Object.keys(existingEmployee).length !== 0) {
+          throw new Error('Existing email');
+        }
+        const newEmployee = await this.createOgustUser();
+        this.newUser.employee_id = newEmployee.data.data.employee.id_employee;
         const employee = await this.$ogust.getEmployeeById(this.newUser.employee_id);
         this.newUser.administrative.contact.addressId = employee.main_address.id_address;
         this.userCreated = await this.createAlenviUser();
@@ -491,6 +502,17 @@ export default {
             color: 'negative',
             icon: 'warning',
             detail: 'Champ(s) invalide(s)',
+            position: 'bottom-left',
+            timeout: 2500
+          });
+          return;
+        }
+        if (e.message === 'Existing email') {
+          this.loading = false;
+          this.$q.notify({
+            color: 'negative',
+            icon: 'warning',
+            detail: 'Cet email est déjà utilisé par un compte existant',
             position: 'bottom-left',
             timeout: 2500
           });
