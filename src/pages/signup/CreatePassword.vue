@@ -119,7 +119,7 @@ export default {
         this.$q.cookies.remove('signup_token', { path: '/' });
         this.$q.cookies.remove('signup_userId', { path: '/' });
         this.$q.cookies.remove('signup_userEmail', { path: '/' });
-        this.$router.replace('/login');
+        this.$router.replace('/messenger');
       } catch (e) {
         console.error(e);
         if (e.response) {
