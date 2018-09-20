@@ -495,7 +495,7 @@
           </q-field>
           <div v-if="user.alenvi.administrative.mutualFund && user.alenvi.administrative.mutualFund.driveId" class="row justify-between"
             style="background: white; margin-top: 24px;">
-            <img class="doc-thumbnail" alt="cni verso">
+            <img class="doc-thumbnail" alt="justif mutuelle">
             <div class="self-end doc-delete">
               <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.mutualFund.driveId, 'administrative.mutualFund')" />
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.mutualFund.link)" />
@@ -503,8 +503,8 @@
           </div>
         </div>
         <div v-if="user.alenvi.administrative.mutualFund.has && !user.alenvi.administrative.mutualFund.driveId" class="col-xs-12">
-          <div class="row justify-between">
-            <p v-if="currentUser.role.name === 'Auxiliaire'" class="input-caption">Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle</p>
+          <div v-if="currentUser.role.name === 'Auxiliaire'" class="row justify-between">
+            <p class="input-caption">Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle</p>
             <q-icon v-if="$v.user.alenvi.administrative.mutualFund.driveId.$error" name="error_outline" color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.administrative.mutualFund.driveId.$error" :error-label="requiredDoc">
