@@ -224,8 +224,7 @@ export default {
     async sendSMS () {
       try {
         await this.$twilio.sendSMS({
-          // to: `+33${this.user.mobilePhone.substring(1)}`,
-          to: `+33674012180`,
+          to: `+33${this.user.mobilePhone.substring(1)}`,
           body: this.messageComp,
         });
         this.$q.notify({
