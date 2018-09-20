@@ -118,6 +118,8 @@ export default {
       try {
         this.user.alenvi.isConfirmed = true;
         await this.$users.updateById(this.user.alenvi, this.alenviToken);
+        const user = await this.$users.getById(this.user.alenvi._id, this.alenviToken);
+        this.$store.commit('main/setUser', user);
         this.$q.cookies.remove('signup_token', { path: '/' });
         this.$q.cookies.remove('signup_userId', { path: '/' });
         this.$q.cookies.remove('signup_userEmail', { path: '/' });
