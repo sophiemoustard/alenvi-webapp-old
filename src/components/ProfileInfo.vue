@@ -890,7 +890,7 @@ export default {
     phoneNbrError () {
       if (!this.$v.user.alenvi.mobilePhone.required) {
         return 'Champ requis';
-      } else if (!this.$v.user.alenvi.mobilePhone.frPhoneNumber) {
+      } else if (!this.$v.user.alenvi.mobilePhone.frPhoneNumber || !this.$v.user.alenvi.mobilePhone.maxLength) {
         return 'Numéro de téléphone non valide';
       }
     },
@@ -904,14 +904,14 @@ export default {
     zipCodeError () {
       if (!this.$v.user.alenvi.administrative.contact.zipCode.required) {
         return 'Champ requis';
-      } else if (!this.$v.user.alenvi.administrative.contact.zipCode.frZipCode) {
+      } else if (!this.$v.user.alenvi.administrative.contact.zipCode.frZipCode || !this.$v.user.alenvi.administrative.contact.zipCode.maxLength) {
         return 'Code postal non valide';
       }
     },
     emergencyPhoneNbrError () {
       if (!this.$v.user.alenvi.administrative.emergencyContact.phoneNumber.required) {
         return 'Champ requis';
-      } else if (!this.$v.user.alenvi.administrative.emergencyContact.phoneNumber.frPhoneNumber) {
+      } else if (!this.$v.user.alenvi.administrative.emergencyContact.phoneNumber.frPhoneNumber || !this.$v.user.alenvi.administrative.emergencyContact.phoneNumber.maxLength) {
         return 'Numéro de téléphone non valide';
       }
     },
