@@ -1,7 +1,7 @@
 <template>
   <q-layout view="hHh Lpr lff">
     <q-layout-header>
-      <q-toolbar :class="{ 'lt-md': user.role.name !== 'Client' }" color="white">
+      <q-toolbar v-if="user.role.name !== 'Auxiliaire'" class="lt-md" color="white">
         <q-btn color="primary" flat big @click="toggleLeft">
           <q-icon name="menu" />
         </q-btn>
@@ -50,15 +50,9 @@ export default {
       }
     },
     layoutTitle () {
-      if (this.user.role.name === 'Client') {
-        return {
-          link: { name: 'customer home' },
-          content: 'Mon espace Alenvi'
-        };
-      }
       return {
-        link: { path: '/dashboard/planning' },
-        content: 'Dashboard'
+        link: { name: 'rh directory' },
+        content: 'Ressources humaines'
       };
     }
   },
