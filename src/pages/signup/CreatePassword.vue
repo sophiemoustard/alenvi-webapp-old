@@ -72,7 +72,8 @@ export default {
           local: {
             email: '',
             password: ''
-          }
+          },
+          isConfirmed: ''
         }
       },
       passwordConfirm: ''
@@ -115,6 +116,7 @@ export default {
   methods: {
     async submit () {
       try {
+        this.user.alenvi.isConfirmed = true;
         await this.$users.updateById(this.user.alenvi, this.alenviToken);
         this.$q.cookies.remove('signup_token', { path: '/' });
         this.$q.cookies.remove('signup_userId', { path: '/' });
