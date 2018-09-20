@@ -173,8 +173,8 @@ export default {
     background: white !important
     color: black !important
 
-  .neutral-background
-    @media screen and (max-width: 768px)
-      height: 85vh
+  // .neutral-background
+  //   @media screen and (max-width: 768px)
+  //     height: 85vh
 
 </style>

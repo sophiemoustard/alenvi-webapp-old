@@ -119,9 +119,9 @@ Si tu rencontres des difficultés, contacte dès aujourd'hui la personne qui t'a
       //   width: 100%
       //   z-index: 700
 
-  .neutral-background
-    @media screen and (max-width: 768px)
-      height: 85vh
+  // .neutral-background
+  //   @media screen and (max-width: 768px)
+  //     height: 85vh
 
   .badge
     max-width: 100%
