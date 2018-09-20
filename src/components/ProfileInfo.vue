@@ -90,9 +90,11 @@
             <q-icon v-if="$v.user.alenvi.administrative.identity.dateOfBirth.$error" name="error_outline" color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.administrative.identity.dateOfBirth.$error" :error-label="requiredField">
-            <q-datetime type="date" format="DD/MM/YYYY" v-model="user.alenvi.administrative.identity.dateOfBirth" color="white" inverted-light
+            <q-datetime type="date" format="DD/MM/YYYY" v-model="user.alenvi.administrative.identity.dateOfBirth" color="white" inverted-light popover
             @focus="saveTmp('administrative.identity.dateOfBirth')"
-            @blur="updateUser({ alenvi: 'administrative.identity.dateOfBirth', ogust: 'date_of_birth' })" />
+            @blur="updateUser({ alenvi: 'administrative.identity.dateOfBirth', ogust: 'date_of_birth' })"
+            ok-label="OK"
+            cancel-label="Fermer" />
           </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
