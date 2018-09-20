@@ -176,7 +176,7 @@ const routes = [
             component: () => import('pages/dashboard/beneficiaries/AddHelper'),
             meta: {
               cookies: ['alenvi_token', 'refresh_token'],
-              permission: 'Aidants',
+              permission: 'users:welcome:user',
               parent: 'benef'
             }
           }
