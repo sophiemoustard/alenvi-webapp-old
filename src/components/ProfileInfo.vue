@@ -850,7 +850,7 @@ export default {
       return this.userProfile;
     },
     nationalitiesOptions () {
-      return Object.keys(nationalities).map(nationality => ({ value: nationality, label: nationalities[nationality] }));
+      return ['FR', ...Object.keys(nationalities).filter(nationality => nationality !== 'FR')].map(nationality => ({ value: nationality, label: nationalities[nationality] }));
     },
     countriesOptions () {
       return ['FR', ...Object.keys(countries).filter(country => country !== 'FR')].map(country => ({ value: country, label: countries[country] }));
