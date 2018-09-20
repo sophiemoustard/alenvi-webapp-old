@@ -38,12 +38,12 @@ const userProfileSchema = Joi.object().keys({
         bic: Joi.string().required()
       }
     },
-    identityDocs: Joi.string().when('administrative.driveFolder', { is: Joi.exist(), then: Joi.required() }),
+    identityDocs: Joi.string().when('driveFolder', { is: Joi.exist(), then: Joi.required() }),
     mutualFund: Joi.object().keys({
       has: Joi.boolean().required(),
       driveId: Joi.string().allow(null).when('has', { is: true, then: Joi.required() }),
       link: Joi.string().allow(null)
-    }).when('administrative.driveFolder', { is: Joi.exist(), then: Joi.required() }),
+    }).when('driveFolder', { is: Joi.exist(), then: Joi.required() }),
     navigoInvoice: {
       driveId: Joi.string().allow(null),
       link: Joi.string().allow(null)
@@ -52,21 +52,21 @@ const userProfileSchema = Joi.object().keys({
       transportType: Joi.string().required(),
       driveId: Joi.string().when('transportType', { is: 'public', then: Joi.required() }),
       link: Joi.string()
-    }).when('administrative.driveFolder', { is: Joi.exist(), then: Joi.required() }),
+    }).when('driveFolder', { is: Joi.exist(), then: Joi.required() }),
     phoneInvoice: Joi.object().keys({
       driveId: Joi.string().required(),
       link: Joi.string()
-    }).when('administrative.driveFolder', { is: Joi.exist(), then: Joi.required() }),
+    }).when('driveFolder', { is: Joi.exist(), then: Joi.required() }),
     certificates: Joi.array(),
     // certificates: Joi.array().when('administrative.driveFolder', { is: Joi.exist(), then: Joi.array().min(1) }),
     healthAttest: Joi.object().keys({
       driveId: Joi.string().required(),
       link: Joi.string()
-    }).when('administrative.driveFolder', { is: Joi.exist(), then: Joi.required() }),
+    }).when('driveFolder', { is: Joi.exist(), then: Joi.required() }),
     idCardRecto: Joi.object().keys({
-      driveId: Joi.string().required(),
+      driveId: Joi.string(),
       link: Joi.string()
-    }).when('administrative.identityDocs', { is: 'cni', then: Joi.required() }),
+    }).when('identityDocs', { is: Joi.string().valid('cni'), then: Joi.required() }),
     idCardVerso: Joi.object().keys({
       driveId: Joi.string().allow(null),
       link: Joi.string().allow(null)
@@ -74,11 +74,11 @@ const userProfileSchema = Joi.object().keys({
     passport: Joi.object().keys({
       driveId: Joi.string(),
       link: Joi.string()
-    }).when('administrative.identityDocs', { is: 'pp', then: Joi.required() }),
+    }).when('identityDocs', { is: Joi.string().valid('pp'), then: Joi.required() }),
     residencePermit: Joi.object().keys({
       driveId: Joi.string(),
       link: Joi.string()
-    }).when('administrative.identityDocs', { is: 'ts', then: Joi.required() })
+    }).when('identityDocs', { is: 'ts', then: Joi.required() })
   })
 });
 
