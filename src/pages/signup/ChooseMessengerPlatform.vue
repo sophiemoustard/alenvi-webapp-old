@@ -16,11 +16,11 @@
         <p class="no-margin signup-bloctexts">Chez Alenvi, <span class="text-weight-bold">nous utilisons l'application Messenger afin de communiquer avec nos auxiliaires.</span></p>
         <p class="no-margin signup-bloctexts">Pour la télécharger, cliquez sur le bouton ci-dessous correspondant à votre téléphone !</p>
         <div class="row justify-center">
-          <div class="col-6" style="width: 136px" @click="sendSMS()">
-            <a href="https://play.google.com/store/apps/details?id=com.facebook.orca&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1"><img class="badge" alt='Disponible sur Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/fr_badge_web_generic.png'/></a>
+          <div class="col-6" style="width: 136px">
+            <a @click="sendSMS()" href="https://play.google.com/store/apps/details?id=com.facebook.orca&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1"><img class="badge" alt='Disponible sur Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/fr_badge_web_generic.png'/></a>
           </div>
-          <div class="col-6" style="width: 136px" @click="sendSMS()">
-            <a href="https://itunes.apple.com/fr/app/messenger/id454638411?mt=8"><img class="badge" style="margin:6%; width:85%" src="statics/App_Store_Badge_FR_RGB_blk_100517.svg" alt="Lien vers l'application Messenger sur l'App Store" /></a>
+          <div class="col-6" style="width: 136px">
+            <a @click="sendSMS()" href="https://itunes.apple.com/fr/app/messenger/id454638411?mt=8"><img class="badge" style="margin:6%; width:85%" src="statics/App_Store_Badge_FR_RGB_blk_100517.svg" alt="Lien vers l'application Messenger sur l'App Store" /></a>
           </div>
         </div>
         <div class="row justify-center">
