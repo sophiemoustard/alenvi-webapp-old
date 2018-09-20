@@ -495,7 +495,7 @@
           </q-field>
           <div v-if="user.alenvi.administrative.mutualFund && user.alenvi.administrative.mutualFund.driveId" class="row justify-between"
             style="background: white; margin-top: 24px;">
-            <img class="doc-thumbnail" alt="justif mutuelle">
+            <custom-img :driveId="user.alenvi.administrative.mutualFund.driveId" class="doc-thumbnail" alt="justif mutuelle" />
             <div class="self-end doc-delete">
               <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.mutualFund.driveId, 'administrative.mutualFund')" />
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.mutualFund.link)" />
