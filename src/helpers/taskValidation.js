@@ -8,7 +8,7 @@ const nationalityValidation = (userNationality) => {
 
 export const taskValidation = (task, user = null) => {
   const error = [];
-  if (!task.isDone) {
+  if (!task.isDone && displayTask(task, user)) {
     error.push({
       detail: task.task.name
     })
