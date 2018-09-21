@@ -36,7 +36,7 @@ export default {
     async handleTask (task) {
       try {
         await this.$users.updateTask({ user_id: this.getUser._id, task_id: task.task._id, isDone: task.check.isDone });
-        this.$store.dispatch('rh/getUserProfile', this.getUser._id);
+        this.$store.dispatch('rh/updateNotifications');
         this.$q.notify({
           color: 'positive',
           icon: 'thumb up',

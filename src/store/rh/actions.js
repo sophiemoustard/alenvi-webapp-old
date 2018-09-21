@@ -17,8 +17,8 @@ export async function getUserProfile ({ commit }, userId) {
   }
 }
 
-export function updateNotifications ({ commit, state }) {
-  // console.log('MEH', user.administrative.identityDocs);
+export async function updateNotifications ({ dispatch, commit, state }) {
+  await dispatch('getUserProfile', state.userProfile._id);
   const user = state.userProfile;
   const userValidation = userProfileValidation(user);
   commit('saveNotification', {
