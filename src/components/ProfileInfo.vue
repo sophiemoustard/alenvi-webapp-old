@@ -978,7 +978,6 @@ export default {
           await this.updateOgustUser(paths);
         }
         this.$store.commit('rh/saveUserProfile', this.user.alenvi);
-        this.$store.dispatch('rh/updateNotifications', this.user.alenvi);
         this.$q.notify({
           color: 'positive',
           icon: 'done',
@@ -989,7 +988,6 @@ export default {
       } catch (e) {
         console.error(e);
         this.$store.commit('rh/saveUserProfile', this.user.alenvi);
-        this.$store.dispatch('rh/updateNotifications', this.user.alenvi);
         this.$q.notify({
           color: 'negative',
           icon: 'warning',
@@ -1043,7 +1041,6 @@ export default {
     uploadDocument (refName) {
       this.$refs[refName].upload();
       this.$store.commit('rh/saveUserProfile', this.user.alenvi);
-      this.$store.dispatch('rh/updateNotifications', this.user.alenvi);
     },
     async uploadImage () {
       try {
@@ -1060,7 +1057,6 @@ export default {
         data.append('picture', blob);
         await this.$axios.post(`${process.env.API_HOSTNAME}/cloudinary/upload`, data, { headers: { 'content-type': 'multipart/form-data', 'x-access-token': Cookies.get('alenvi_token') || '' } });
         this.$store.commit('rh/saveUserProfile', this.user.alenvi);
-        this.$store.dispatch('rh/updateNotifications', this.user.alenvi);
         this.loadingImage = false;
         this.closePictureEditionModal();
         this.$q.notify({
@@ -1100,7 +1096,6 @@ export default {
           await this.$users.updateById(payload);
         }
         this.$store.commit('rh/saveUserProfile', this.user.alenvi);
-        this.$store.dispatch('rh/updateNotifications', this.user.alenvi);
         this.$q.notify({
           color: 'positive',
           icon: 'done',
@@ -1155,7 +1150,6 @@ export default {
           }
         });
         this.$store.commit('rh/saveUserProfile', this.user.alenvi);
-        this.$store.dispatch('rh/updateNotifications', this.user.alenvi);
         this.$q.notify({
           color: 'positive',
           icon: 'done',
@@ -1185,7 +1179,6 @@ export default {
     },
     refreshUser () {
       this.$store.commit('rh/saveUserProfile', this.user.alenvi);
-      this.$store.dispatch('rh/updateNotifications', this.user.alenvi);
       this.$q.notify({
         color: 'positive',
         icon: 'done',
