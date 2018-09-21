@@ -110,7 +110,7 @@
             @blur="updateUser({ alenvi: 'administrative.identity.birthCountry', ogust: 'country_of_birth' })" />
           </q-field>
         </div>
-        <div v-if="this.user.alenvi.administrative.identity.nationality === 'FR'" class="col-xs-12 col-md-6">
+        <div v-if="this.user.alenvi.administrative.identity.birthCountry === 'FR'" class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Département de naissance</p>
             <q-icon v-if="$v.user.alenvi.administrative.identity.birthState.$error" name="error_outline" color="secondary" />
