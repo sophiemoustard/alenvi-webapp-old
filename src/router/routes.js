@@ -14,8 +14,10 @@ const routes = [
           return next({ name: 'customer home' });
         } else if (store.getters['main/user'] && store.getters['main/user'].role.name === 'Auxiliaire') {
           return next({ name: 'auxiliary info', params: { id: store.getters['main/user']._id } });
+        } else if (store.getters['main/user'] && store.getters['main/user'].role.name !== 'Auxiliaire' && store.getters['main/user'].role.name !== 'Client') {
+          return next({ name: 'rh directory ' });
         } else {
-          next({ name: 'rh directory' });
+          next({ path: '/login' });
         }
       } catch (e) {
         console.error(e);
