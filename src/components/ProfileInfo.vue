@@ -1229,6 +1229,7 @@ export default {
       this.fileChosen = true;
     },
     closePictureEditionModal () {
+      this.croppa.remove();
       this.imageEditionOpened = false;
       this.fileChosen = false;
     },
