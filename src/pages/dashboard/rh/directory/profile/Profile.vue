@@ -51,11 +51,11 @@ export default {
   mounted () {
     this.$store.dispatch('rh/getUserProfile', this.id);
   },
-  watch: {
-    userProfile (value) {
-      this.$store.dispatch('rh/updateNotifications', value);
-    }
-  },
+  // watch: {
+  //   userProfile () {
+  //     this.$store.dispatch('rh/updateNotifications');
+  //   }
+  // },
   beforeDestroy () {
     this.$store.commit('rh/saveUserProfile', null);
   }
