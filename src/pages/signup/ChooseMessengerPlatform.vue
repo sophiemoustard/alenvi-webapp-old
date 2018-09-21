@@ -108,20 +108,20 @@ Si tu rencontres des difficultés, contacte dès aujourd'hui la personne qui t'a
       padding-bottom: 24px
     &-btn
       font-size: 16px
-      @media screen and (min-width: 768px)
-        margin-top: 24px
-        margin-bottom: 24px
-      @media screen and (max-width: 768px)
-        border-radius: 0
-        position: fixed
-        bottom: 0
-        left: 0
-        width: 100%
-        z-index: 700
+      // @media screen and (min-width: 768px)
+      margin-top: 24px
+      margin-bottom: 24px
+      // @media screen and (max-width: 768px)
+      //   border-radius: 0
+      //   position: fixed
+      //   bottom: 0
+      //   left: 0
+      //   width: 100%
+      //   z-index: 700
 
-  .neutral-background
-    @media screen and (max-width: 768px)
-      height: 85vh
+  // .neutral-background
+  //   @media screen and (max-width: 768px)
+  //     height: 85vh
 
   .badge
     max-width: 100%
