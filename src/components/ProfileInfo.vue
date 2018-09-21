@@ -588,8 +588,8 @@
           </div>
         </div>
         <div class="row justify-center q-mb-md">
-          <q-spinner v-if="!croppa.hasImage" />
           <croppa
+            v-show="croppa.hasImage"
             v-model="croppa"
             canvas-color="#EEE"
             accept="image/*"
