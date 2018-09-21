@@ -346,7 +346,7 @@
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.idCardRecto.link)" />
             </div>
           </div>
-          <q-field v-if="$v.user.alenvi.administrative.idCardRecto.driveId.$error" :error="$v.user.alenvi.administrative.idCardRecto.driveId.$error" :error-label="requiredDoc">
+          <q-field v-if="!user.alenvi.administrative.idCardRecto.driveId" :error="$v.user.alenvi.administrative.idCardRecto.driveId.$error" :error-label="requiredDoc">
             <q-uploader ref="idCardRecto" name="idCardRecto" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `cni_recto_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
               hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
               hide-upload-button @add="uploadDocument('idCardRecto')" @finish="refreshUser" />
@@ -384,7 +384,7 @@
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.passport.link)" />
             </div>
           </div>
-          <q-field v-if="$v.user.alenvi.administrative.passport.driveId.$error" :error="$v.user.alenvi.administrative.passport.driveId.$error" :error-label="requiredDoc">
+          <q-field v-if="!user.alenvi.administrative.passport.driveId" :error="$v.user.alenvi.administrative.passport.driveId.$error" :error-label="requiredDoc">
             <q-uploader ref="passport" name="passport" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `passeport_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
               hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
               hide-upload-button @add="uploadDocument('passport')" @finish="refreshUser" />
@@ -404,7 +404,7 @@
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.residencePermit.link)" />
             </div>
           </div>
-          <q-field v-if="$v.user.alenvi.administrative.residencePermit.driveId.$error" :error="$v.user.alenvi.administrative.residencePermit.driveId.$error" :error-label="requiredDoc">
+          <q-field v-if="!user.alenvi.administrative.residencePermit.driveId" :error="$v.user.alenvi.administrative.residencePermit.driveId.$error" :error-label="requiredDoc">
             <q-uploader ref="residencePermit" name="residencePermit" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `titre_de_séjour_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
               hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
               hide-upload-button @add="uploadDocument('residencePermit')" @finish="refreshUser" />
@@ -424,7 +424,7 @@
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.healthAttest.link)" />
             </div>
           </div>
-          <q-field v-if="$v.user.alenvi.administrative.healthAttest.driveId.$error" :error="$v.user.alenvi.administrative.healthAttest.driveId.$error" :error-label="requiredDoc">
+          <q-field v-if="!user.alenvi.administrative.healthAttest.driveId" :error="$v.user.alenvi.administrative.healthAttest.driveId.$error" :error-label="requiredDoc">
             <q-uploader ref="healthAttest" name="healthAttest" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `attestation_secu_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
               hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
               hide-upload-button @add="uploadDocument('healthAttest')" @finish="refreshUser" />
@@ -443,7 +443,7 @@
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.phoneInvoice.link)" />
             </div>
           </div>
-          <q-field v-if="$v.user.alenvi.administrative.phoneInvoice.driveId.$error" :error="$v.user.alenvi.administrative.phoneInvoice.driveId.$error" :error-label="requiredDoc">
+          <q-field v-if="!user.alenvi.administrative.phoneInvoice.driveId" :error="$v.user.alenvi.administrative.phoneInvoice.driveId.$error" :error-label="requiredDoc">
             <q-uploader ref="phoneInvoice" name="phoneInvoice" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `facture_telephone_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
               hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
               hide-upload-button @add="uploadDocument('phoneInvoice')" @finish="refreshUser" />
@@ -676,6 +676,9 @@ export default {
       user: {
         alenvi: {
           mentorId: '',
+          local: {
+            email: ''
+          },
           administrative: {
             emergencyContact: {
               name: '',
@@ -846,6 +849,9 @@ export default {
       userProfile: 'rh/getUserProfile',
       mainUser: 'main/user'
     }),
+    compAlenviUser () {
+      return this.$_.cloneDeep(this.user.alenvi);
+    },
     currentUser () {
       if (this.mainUser) {
         return this.mainUser;
@@ -978,7 +984,7 @@ export default {
         } else {
           await this.updateOgustUser(paths);
         }
-        this.$store.commit('rh/saveUserProfile', this.user.alenvi);
+        this.$store.commit('rh/saveUserProfile', this.compAlenviUser);
         this.$q.notify({
           color: 'positive',
           icon: 'done',
@@ -1041,7 +1047,6 @@ export default {
     },
     uploadDocument (refName) {
       this.$refs[refName].upload();
-      this.$store.commit('rh/saveUserProfile', this.user.alenvi);
     },
     async uploadImage () {
       try {
@@ -1057,7 +1062,7 @@ export default {
         data.append('Content-Type', blob.type || 'application/octet-stream');
         data.append('picture', blob);
         await this.$axios.post(`${process.env.API_HOSTNAME}/cloudinary/upload`, data, { headers: { 'content-type': 'multipart/form-data', 'x-access-token': Cookies.get('alenvi_token') || '' } });
-        this.$store.commit('rh/saveUserProfile', this.user.alenvi);
+        this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
         this.loadingImage = false;
         this.closePictureEditionModal();
         this.$q.notify({
@@ -1096,7 +1101,7 @@ export default {
           payload = this.$_.set(payload, path, { driveId: null, link: null });
           await this.$users.updateById(payload);
         }
-        this.$store.commit('rh/saveUserProfile', this.user.alenvi);
+        this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
         this.$q.notify({
           color: 'positive',
           icon: 'done',
@@ -1150,7 +1155,7 @@ export default {
             publicId: null
           }
         });
-        this.$store.commit('rh/saveUserProfile', this.user.alenvi);
+        this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
         this.$q.notify({
           color: 'positive',
           icon: 'done',
@@ -1179,7 +1184,7 @@ export default {
       }
     },
     refreshUser () {
-      this.$store.commit('rh/saveUserProfile', this.user.alenvi);
+      this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
       this.$q.notify({
         color: 'positive',
         icon: 'done',
