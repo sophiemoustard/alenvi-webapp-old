@@ -35,21 +35,11 @@ export default {
           to: { name: 'directory profile tasks' },
           notification: 'tasks'
         }
-        // {
-        //   label: 'Test',
-        //   to: { name: 'planning' },
-        //   notification: 'profiles'
-        // },
-        // {
-        //   label: 'Test',
-        //   to: { name: 'planning' },
-        //   notification: 'profiles'
-        // }
       ]
     }
   },
   mounted () {
-    this.$store.dispatch('rh/getUserProfile', this.id);
+    this.$store.dispatch('rh/updateNotifications', this.id);
   },
   // watch: {
   //   userProfile () {

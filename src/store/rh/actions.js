@@ -17,8 +17,8 @@ export async function getUserProfile ({ commit }, userId) {
   }
 }
 
-export async function updateNotifications ({ dispatch, commit, state }) {
-  await dispatch('getUserProfile', state.userProfile._id);
+export async function updateNotifications ({ dispatch, commit, state }, userId) {
+  await dispatch('getUserProfile', userId);
   const user = state.userProfile;
   const userValidation = userProfileValidation(user);
   commit('saveNotification', {
