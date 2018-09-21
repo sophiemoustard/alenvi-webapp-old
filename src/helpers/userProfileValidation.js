@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import _ from 'lodash';
 
 const userProfileSchema = Joi.object().keys({
   firstname: Joi.string().required(),
@@ -87,4 +88,7 @@ const options = {
   allowUnknown: true
 };
 
-export const userProfileValidation = (profile) => Joi.validate(profile, userProfileSchema, options);
+export const userProfileValidation = (profile) => {
+  const clone = _.cloneDeep(profile);
+  return Joi.validate(clone, userProfileSchema, options);
+}

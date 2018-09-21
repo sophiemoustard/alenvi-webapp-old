@@ -588,7 +588,8 @@
           </div>
         </div>
         <div class="row justify-center q-mb-md">
-          <croppa v-model="croppa"
+          <croppa
+            v-model="croppa"
             canvas-color="#EEE"
             accept="image/*"
             :prevent-white-space="true"
@@ -1000,6 +1001,7 @@ export default {
           await this.updateOgustUser(paths);
         }
         this.$store.commit('rh/saveUserProfile', this.user.alenvi);
+        // this.$store.dispatch('rh/updateNotifications');
         this.$q.notify({
           color: 'positive',
           icon: 'done',
@@ -1146,13 +1148,6 @@ export default {
     },
     async deleteImage (params) {
       try {
-        // if (params.beforeUpload) {
-        //   await cloudinary.deleteImageById({ id: this.userProfile.picture.publicId });
-        //   return;
-        // }
-        // if (this.userProfile.picture && !this.userProfile.picture.link) {
-        //   return this.croppa.remove();
-        // }
         await this.$q.dialog({
           title: 'Confirmation',
           message: 'Es-tu sûr(e) de vouloir supprimer ta photo ?',

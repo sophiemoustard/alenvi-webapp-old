@@ -39,13 +39,13 @@ export default {
     }
   },
   mounted () {
-    this.$store.dispatch('rh/updateNotifications', this.id);
+    this.$store.dispatch('rh/getUserProfile', this.id);
   },
-  // watch: {
-  //   userProfile () {
-  //     this.$store.dispatch('rh/updateNotifications');
-  //   }
-  // },
+  watch: {
+    userProfile () {
+      this.$store.dispatch('rh/updateNotifications');
+    }
+  },
   beforeDestroy () {
     this.$store.commit('rh/saveUserProfile', null);
   }
