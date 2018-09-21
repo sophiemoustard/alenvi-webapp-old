@@ -849,9 +849,6 @@ export default {
       userProfile: 'rh/getUserProfile',
       mainUser: 'main/user'
     }),
-    compAlenviUser () {
-      return this.$_.cloneDeep(this.user.alenvi);
-    },
     currentUser () {
       if (this.mainUser) {
         return this.mainUser;
@@ -956,7 +953,7 @@ export default {
   },
   methods: {
     mergeUser () {
-      const args = [this.user.alenvi, this.$store.state.rh.userProfile];
+      const args = [this.user.alenvi, this.$_.cloneDeep(this.$store.state.rh.userProfile)];
       this.user.alenvi = Object.assign({}, extend(true, ...args));
       this.isLoaded = true;
     },
@@ -984,7 +981,7 @@ export default {
         } else {
           await this.updateOgustUser(paths);
         }
-        this.$store.commit('rh/saveUserProfile', this.compAlenviUser);
+        this.$store.commit('rh/saveUserProfile', this.user.alenvi);
         this.$q.notify({
           color: 'positive',
           icon: 'done',
