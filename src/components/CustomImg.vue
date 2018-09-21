@@ -1,5 +1,7 @@
 <template>
-  <img :src="link" :alt="alt">
+  <div class="thumbnail">
+    <img :src="link" :alt="alt">
+  </div>
 </template>
 
 <script>
@@ -36,3 +38,24 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus" scoped>
+  @import '~variables'
+
+  .thumbnail
+    position: relative
+    width: 150px
+    height: 150px
+    overflow: hidden
+
+  .thumbnail img
+    position: absolute
+    left: 50%
+    top: 50%
+    height: 100%
+    width: auto
+    -webkit-transform: translate(-50%,-50%);
+    -ms-transform: translate(-50%,-50%);
+    transform: translate(-50%,-50%);
+
+</style>

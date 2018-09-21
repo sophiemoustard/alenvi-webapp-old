@@ -339,7 +339,9 @@
           </div>
           <div v-if="user.alenvi.administrative.idCardRecto && user.alenvi.administrative.idCardRecto.driveId" class="row justify-between"
             style="background: white">
-            <custom-img class="doc-thumbnail" :driveId="user.alenvi.administrative.idCardRecto.driveId" alt="cni recto" />
+            <div class="doc-thumbnail">
+              <custom-img :driveId="user.alenvi.administrative.idCardRecto.driveId" alt="cni recto" />
+            </div>
             <!-- <img class="doc-thumbnail" ref="`driveId-${user.alenvi.administrative.idCardRecto.driveId}`" alt="cni recto"> -->
             <div class="self-end doc-delete">
               <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.idCardRecto.driveId, 'administrative.idCardRecto')" />
@@ -358,7 +360,9 @@
           </div>
           <div v-if="user.alenvi.administrative.idCardVerso && user.alenvi.administrative.idCardVerso.driveId" class="row justify-between"
             style="background: white">
-            <custom-img class="doc-thumbnail" :driveId="user.alenvi.administrative.idCardVerso.driveId" alt="cni verso" />
+            <div class="doc-thumbnail">
+              <custom-img :driveId="user.alenvi.administrative.idCardVerso.driveId" alt="cni verso" />
+            </div>
             <div class="self-end doc-delete">
               <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.idCardVerso.driveId, 'administrative.idCardVerso')" />
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.idCardVerso.link)" />
@@ -378,7 +382,9 @@
           </div>
           <div v-if="user.alenvi.administrative.passport && user.alenvi.administrative.passport.driveId" class="row justify-between"
             style="background: white">
-            <custom-img class="doc-thumbnail" :driveId="user.alenvi.administrative.passport.driveId" alt="passeport" />
+            <div class="doc-thumbnail">
+              <custom-img :driveId="user.alenvi.administrative.passport.driveId" alt="passeport" />
+            </div>
             <div class="self-end doc-delete">
               <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.passport.driveId, 'administrative.passport')" />
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.passport.link)" />
@@ -398,7 +404,9 @@
           </div>
           <div v-if="user.alenvi.administrative.residencePermit && user.alenvi.administrative.residencePermit.driveId" class="row justify-between"
             style="background: white">
-            <custom-img :driveId="user.alenvi.administrative.residencePermit.driveId" class="doc-thumbnail" alt="titre de séjour" />
+            <div class="doc-thumbnail">
+              <custom-img :driveId="user.alenvi.administrative.residencePermit.driveId" alt="titre de séjour" />
+            </div>
             <div class="self-end doc-delete">
               <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.residencePermit.driveId, 'administrative.residencePermit')" />
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.residencePermit.link)" />
@@ -418,7 +426,9 @@
           </div>
           <div v-if="user.alenvi.administrative.healthAttest && user.alenvi.administrative.healthAttest.driveId" class="row justify-between"
             style="background: white">
-            <custom-img :driveId="user.alenvi.administrative.healthAttest.driveId" class="doc-thumbnail" alt="attestation secu" />
+            <div class="doc-thumbnail">
+              <custom-img :driveId="user.alenvi.administrative.healthAttest.driveId" alt="attestation secu" />
+            </div>
             <div class="self-end doc-delete">
               <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.healthAttest.driveId, 'administrative.healthAttest')" />
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.healthAttest.link)" />
@@ -437,7 +447,9 @@
           </div>
           <div v-if="user.alenvi.administrative.phoneInvoice && user.alenvi.administrative.phoneInvoice.driveId" class="row justify-between"
             style="background: white">
-            <custom-img class="doc-thumbnail" :driveId="user.alenvi.administrative.phoneInvoice.driveId" alt="facture téléphone" />
+            <div class="doc-thumbnail">
+              <custom-img :driveId="user.alenvi.administrative.phoneInvoice.driveId" alt="facture téléphone" />
+            </div>
             <div class="self-end doc-delete">
               <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')" />
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.phoneInvoice.link)" />
@@ -461,7 +473,9 @@
           <div v-if="user.alenvi.administrative.certificates && user.alenvi.administrative.certificates.length > 0"
             v-for="(certificate, index) in user.alenvi.administrative.certificates" :key="index">
             <div v-if="certificate.driveId" class="row justify-between" style="background: white; margin-bottom: 24px">
-              <custom-img :driveId="certificate.driveId" class="doc-thumbnail" alt="diplôme" />
+              <div class="doc-thumbnail">
+                <custom-img :driveId="certificate.driveId" alt="diplôme" />
+              </div>
               <div class="self-end doc-delete">
                 <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(certificate.driveId, 'certificates')" />
                 <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(certificate.link)" />
@@ -498,7 +512,9 @@
           </q-field>
           <div v-if="user.alenvi.administrative.mutualFund && user.alenvi.administrative.mutualFund.driveId" class="row justify-between"
             style="background: white; margin-top: 24px;">
-            <custom-img :driveId="user.alenvi.administrative.mutualFund.driveId" class="doc-thumbnail" alt="justif mutuelle" />
+            <div class="doc-thumbnail">
+              <custom-img :driveId="user.alenvi.administrative.mutualFund.driveId" alt="justif mutuelle" />
+            </div>
             <div class="self-end doc-delete">
               <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.mutualFund.driveId, 'administrative.mutualFund')" />
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.mutualFund.link)" />
@@ -551,7 +567,9 @@
         </div>
         <div v-if="user.alenvi.administrative.transportInvoice && user.alenvi.administrative.transportInvoice.driveId" class="row justify-between"
             style="background: white; margin-top: 24px;">
-            <custom-img :driveId="user.alenvi.administrative.transportInvoice.driveId" class="doc-thumbnail" alt="justif transport" />
+            <div class="doc-thumbnail">
+              <custom-img :driveId="user.alenvi.administrative.transportInvoice.driveId" alt="justif transport" />
+            </div>
             <div class="self-end doc-delete">
               <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.transportInvoice.driveId, 'administrative.transportInvoice')" />
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.transportInvoice.link)" />
