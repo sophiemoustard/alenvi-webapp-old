@@ -112,7 +112,7 @@
         </div>
         <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
-            <p class="input-caption">Département de naissance</p>
+            <p class="input-caption">Département de naissance (99 si né(e) à l'étranger)</p>
             <q-icon v-if="$v.user.alenvi.administrative.identity.birthState.$error" name="error_outline" color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.administrative.identity.birthState.$error" :error-label="birthStateError">
@@ -175,7 +175,7 @@
           />
           </q-field>
         </div>
-        <div class="col-xs-12 col-md-6">
+        <div v-if="currentUser.role.name !== 'Auxiliaire'" class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Adresse email</p>
             <q-icon v-if="$v.user.alenvi.local.email.$error" name="error_outline" color="secondary" />
@@ -293,7 +293,7 @@
             <q-icon v-if="$v.user.alenvi.administrative.payment.rib.iban.$error" name="error_outline" color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.administrative.payment.rib.iban.$error" :error-label="ibanError">
-            <q-input upper-case v-mask="'SS## XXXX XXXX XXXX XXXX XXXX XXX'" v-model="user.alenvi.administrative.payment.rib.iban"
+            <q-input upper-case v-model="user.alenvi.administrative.payment.rib.iban"
             color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.payment.rib.iban', ogust: 'iban_number' })"
             @focus="saveTmp('administrative.payment.rib.iban')"
           />
@@ -846,9 +846,6 @@ export default {
       userProfile: 'rh/getUserProfile',
       mainUser: 'main/user'
     }),
-    compAlenviUser () {
-      return this.user.alenvi;
-    },
     currentUser () {
       if (this.mainUser) {
         return this.mainUser;
@@ -946,14 +943,14 @@ export default {
     this.mergeUser();
     this.$v.user.alenvi.$touch();
   },
-  // watch: {
-  //   userProfile (value) {
-  //     this.mergeUser(value);
-  //   }
-  // },
+  watch: {
+    userProfile (value) {
+      this.mergeUser(value);
+    }
+  },
   methods: {
-    mergeUser (value = null) {
-      const args = [this.user.alenvi, (value || this.$store.state.rh.userProfile)];
+    mergeUser () {
+      const args = [this.user.alenvi, this.$store.state.rh.userProfile];
       this.user.alenvi = Object.assign({}, extend(true, ...args));
       this.isLoaded = true;
     },
@@ -981,7 +978,7 @@ export default {
         } else {
           await this.updateOgustUser(paths);
         }
-        this.$store.commit('rh/saveUserProfile', this.compAlenviUser);
+        this.$store.commit('rh/saveUserProfile', this.user.alenvi);
         this.$q.notify({
           color: 'positive',
           icon: 'done',
