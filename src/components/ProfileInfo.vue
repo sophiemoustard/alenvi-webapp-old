@@ -175,22 +175,23 @@
           />
           </q-field>
         </div>
-        <!-- <div class="col-xs-12 col-md-6">
+        <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Adresse email</p>
             <q-icon v-if="$v.user.alenvi.local.email.$error" name="error_outline" color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.local.email.$error" :error-label="emailError">
             <q-input v-model.trim="user.alenvi.local.email"
-            type="email"
-            color="white"
-            inverted-light
-            lower-case
-            @focus="saveTmp('local.email')"
-            @blur="updateUser({ alenvi: 'local.email', ogust: 'email' })"
-          />
+              type="email"
+              color="white"
+              inverted-light
+              lower-case
+              disable
+              @focus="saveTmp('local.email')"
+              @blur="updateUser({ alenvi: 'local.email', ogust: 'email' })"
+            />
           </q-field>
-        </div> -->
+        </div>
         <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Adresse, numéro et rue</p>
@@ -845,6 +846,9 @@ export default {
       userProfile: 'rh/getUserProfile',
       mainUser: 'main/user'
     }),
+    compAlenviUser () {
+      return this.user.alenvi;
+    },
     currentUser () {
       if (this.mainUser) {
         return this.mainUser;
@@ -977,7 +981,7 @@ export default {
         } else {
           await this.updateOgustUser(paths);
         }
-        this.$store.commit('rh/saveUserProfile', this.user.alenvi);
+        this.$store.commit('rh/saveUserProfile', this.compAlenviUser);
         this.$q.notify({
           color: 'positive',
           icon: 'done',
