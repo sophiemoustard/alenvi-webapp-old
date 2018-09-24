@@ -186,7 +186,7 @@ import { required, email, maxLength } from 'vuelidate/lib/validators';
 import randomize from 'randomatic';
 
 import { frPhoneNumber, frZipCode } from '../../../../helpers/vuelidateCustomVal';
-import { getUserStartDate } from '../../../../helpers/getUserStartDate';
+// import { getUserStartDate } from '../../../../helpers/getUserStartDate';
 import { clear } from '../../../../helpers/utils.js';
 import { userProfileValidation } from '../../../../helpers/userProfileValidation';
 // import { taskValidation } from '../../../../helpers/taskValidation';
@@ -294,7 +294,7 @@ export default {
           label: 'Actif',
           field: 'isActive',
           align: 'right',
-          sortable: true,
+          sortable: false,
           style: 'width: 30px'
         }
       ]
@@ -411,7 +411,7 @@ export default {
               name: `${user.firstname} ${user.lastname}`,
               picture: user.picture.link
             },
-            startDate: getUserStartDate(user.administrative.contracts),
+            startDate: this.$moment(user.createdAt).format('DD/MM/YYYY'),
             sector: sectors[user.sector],
             isActive: user.isActive
           }
