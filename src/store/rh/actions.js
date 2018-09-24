@@ -2,6 +2,7 @@
 export function someAction (context) {
 }
 */
+import _ from 'lodash';
 
 import users from '../../api/Users'
 import { userProfileValidation } from '../../helpers/userProfileValidation';
@@ -18,8 +19,7 @@ export async function getUserProfile ({ commit }, userId) {
 }
 
 export async function updateNotifications ({ commit, state }, userId) {
-  // await dispatch('getUserProfile', userId);
-  const user = state.userProfile;
+  const user = _.cloneDeep(state.userProfile);
   const userValidation = userProfileValidation(user);
   commit('saveNotification', {
     type: 'profiles',
