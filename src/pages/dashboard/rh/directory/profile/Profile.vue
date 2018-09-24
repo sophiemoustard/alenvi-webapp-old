@@ -38,12 +38,12 @@ export default {
       ]
     }
   },
-  mounted () {
-    this.$store.dispatch('rh/getUserProfile', this.id);
+  async mounted () {
+    await this.$store.dispatch('rh/getUserProfile', this.id);
   },
   watch: {
-    userProfile () {
-      this.$store.dispatch('rh/updateNotifications');
+    async userProfile () {
+      await this.$store.dispatch('rh/updateNotifications');
     }
   },
   beforeDestroy () {
