@@ -1,18 +1,18 @@
 <template>
   <div class="row justify-center layout-padding">
-    <q-card style="width: 500px">
-      <q-card-title>
-        Entre le code à 4 chiffres que tu as reçu par SMS
-      </q-card-title>
-      <q-card-separator />
-      <q-card-main class="row justify-center layout-padding">
+    <div class="column items-center" style="width: 500px">
+      <div class="row">
+        <h5>Entre le code à 4 chiffres que tu as reçu par SMS</h5>
+      </div>
+      <div class="row no-wrap justify-center q-mb-md" style="max-width: 500px">
         <q-input class="custom-input on-left" v-for="(box, index) in boxes" :key="index" align="center" @input="changeBoxAndMakeCode(index, $event)"
-          v-mask="'#'" :ref="'box' + (index + 1)" type="tel" :autofocus="box.autofocus" v-model.number="box.model" pattern="\d+" />
-      </q-card-main>
-      <q-card-actions class="row">
+          v-mask="'#'" :ref="'box' + (index + 1)" type="tel" :autofocus="box.autofocus" v-model.number="box.model"
+          pattern="\d+" inverted-light color="white" />
+      </div>
+      <div class="row">
         <q-btn class="full-width send-btn" @click="submit" color="primary" :disable="!code">Envoyer</q-btn>
-      </q-card-actions>
-    </q-card>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -99,12 +99,10 @@ export default {
 
   .q-if-inverted
     border: 1px solid $light-grey
+    padding: 0
 
   .q-card-actions
     padding: 0
-
-  .send-btn
-    border-radius: 0px
 
   /deep/ .q-if
     &:not(.q-if-disabled):not(.q-if-error):not(.q-if-warning):hover:before
@@ -112,9 +110,8 @@ export default {
     & input.q-input-target
       height: 60px
       line-height: 60px
+      display: flex
       @media (max-width: 321px)
         height: 50px
         line-height: 50px
-    &-focused
-      box-shadow: none
 </style>
