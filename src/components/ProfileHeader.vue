@@ -172,7 +172,7 @@ export default {
     messageComp: {
       get () {
         if (this.typeMessage === 'PM') {
-          return `Bonjour ${this.user.firstname},\nIl manque encore des informations et documents importants pour compléter ton dossier Alenvi.\nClique ici pour compléter ton profil: ${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/profile/${this.user._id}\nSi tu rencontres des difficultés, n’hésite pas à t’adresser à ton/ta coach ou ta marraine.`;
+          return `Bonjour ${this.user.firstname},\nIl manque encore des informations et documents importants pour compléter ton dossier Alenvi.\nClique ici pour compléter ton profil: ${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/dashboard/rh/auxiliaires/${this.user._id}\nSi tu rencontres des difficultés, n’hésite pas à t’adresser à ton/ta coach ou ta marraine.`;
         } else if (this.typeMessage === 'CA') {
           return `Bienvenue chez Alenvi ! :)\nUtilise ce code: ${this.activationCode} pour pouvoir commencer ton enregistrement ici avant ton intégration: ${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/enterCode :-)`
         }
