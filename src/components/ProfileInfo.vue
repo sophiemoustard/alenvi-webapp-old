@@ -91,8 +91,6 @@
           </div>
           <q-field :error="$v.user.alenvi.administrative.identity.nationality.$error" :error-label="requiredField">
             <q-select v-model="user.alenvi.administrative.identity.nationality" color="white" inverted-light :options="nationalitiesOptions"
-            filter
-            filter-placeholder="Rechercher"
             @focus="saveTmp('administrative.identity.nationality')"
             @blur="updateUser({ alenvi: 'administrative.identity.nationality', ogust: 'nationality' })" />
           </q-field>
@@ -117,8 +115,6 @@
           </div>
           <q-field :error="$v.user.alenvi.administrative.identity.birthCountry.$error" :error-label="requiredField">
             <q-select v-model="user.alenvi.administrative.identity.birthCountry" :options="countriesOptions" color="white" inverted-light
-            filter
-            filter-placeholder="Rechercher"
             @focus="saveTmp('administrative.identity.birthCountry')"
             @blur="updateUser({ alenvi: 'administrative.identity.birthCountry', ogust: 'country_of_birth' })" />
           </q-field>
@@ -681,6 +677,9 @@ export default {
           local: {
             email: ''
           },
+          picture: {
+            link: ''
+          },
           administrative: {
             emergencyContact: {
               name: '',
@@ -954,8 +953,8 @@ export default {
     }
   },
   methods: {
-    mergeUser () {
-      const args = [this.user.alenvi, this.$_.cloneDeep(this.$store.state.rh.userProfile)];
+    mergeUser (value = null) {
+      const args = [this.user.alenvi, (value || this.userProfile)];
       this.user.alenvi = Object.assign({}, extend(true, ...args));
       this.isLoaded = true;
     },
