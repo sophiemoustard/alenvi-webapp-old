@@ -17,26 +17,39 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between" style="background: white">
-            <div class="doc-thumbnail">
-              <div v-if="hasPicture" class="picture-container">
-                <img :src="user.alenvi.picture.link" width="200px" height="200px" alt="photo profil">
+          <div class="row" style="background: white">
+            <div class="row justify-center col-xs-12" style="padding: 12px 0px;">
+              <croppa
+                v-model="croppa"
+                canvas-color="#EEE"
+                accept="image/*"
+                :initial-image="hasPicture"
+                :prevent-white-space="true"
+                placeholder="Clique ici pour choisir ta photo"
+                placeholder-color="black"
+                :placeholder-font-size="10"
+                :show-remove-button="false"
+                :disable-drag-and-drop="disablePictureEdition"
+                :disable-drag-to-move="disablePictureEdition"
+                :disable-scroll-to-zoom="disablePictureEdition"
+                :disable-pinch-to-zoom="disablePictureEdition"
+                @file-choose="choosePicture" />
               </div>
-              <div v-if="!hasPicture" class="row justify-center items-center cursor-pointer picture-container" @click="choosePicture">
-                <p class="no-margin" style="font-size: 10px">Clique ici pour choisir ta photo</p>
+              <div class="row justify-center col-xs-12">
+                <q-btn v-if="disablePictureEdition && hasPicture" color="primary" round flat icon="mdi-square-edit-outline" size="1rem" @click="disablePictureEdition = false" />
+                <q-btn v-if="disablePictureEdition && hasPicture" color="primary" round flat icon="delete" size="1rem" @click="deleteImage" />
+                <q-btn v-if="!disablePictureEdition" color="primary" icon="clear" @click="closePictureEdition" round flat size="1rem" />
+                <q-btn v-if="!disablePictureEdition" color="primary" icon="rotate left" @click="croppa.rotate(-1)" round flat size="1rem" />
+                <q-btn v-if="!disablePictureEdition" color="primary" icon="rotate right" @click="croppa.rotate(1)" round flat size="1rem" />
+                <q-btn v-if="!disablePictureEdition" :loading="loadingImage" color="primary" icon="done" @click="uploadImage" round flat size="1rem" />
+                <a :href="pictureDlLink(hasPicture)" target="_blank">
+                  <q-btn v-if="hasPicture && disablePictureEdition" color="primary" round flat icon="save_alt" size="1rem" />
+                </a>
               </div>
-            </div>
-            <div class="self-end doc-delete">
-              <q-btn v-if="hasPicture" color="primary" round flat icon="mdi-square-edit-outline" size="1rem" @click.native="openPictureEditionModal" />
-              <q-btn v-if="hasPicture" color="primary" round flat icon="delete" size="1rem" @click.native="deleteImage" />
-              <a :href="pictureDlLink(hasPicture)" target="_blank">
-                <q-btn v-if="hasPicture && !fileChosen" color="primary" round flat icon="save_alt" size="1rem" />
-              </a>
             </div>
           </div>
         </div>
       </div>
-    </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Identité</p>
@@ -577,36 +590,6 @@
         </div>
       </div>
     </div>
-    <q-modal v-model="imageEditionOpened" :content-css="modalCssContainer">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-8">
-            <h5>Edition <span class="text-weight-bold">photo</span></h5>
-          </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
-            <span><q-icon name="clear" size="1rem" @click.native="closePictureEditionModal" /></span>
-          </div>
-        </div>
-        <div class="row justify-center q-mb-md">
-          <croppa
-            v-show="croppa.hasImage"
-            v-model="croppa"
-            canvas-color="#EEE"
-            accept="image/*"
-            :prevent-white-space="true"
-            placeholder="Clique ici pour choisir ta photo"
-            :placeholder-font-size="10"
-            :show-remove-button="false"
-            :initial-image="hasPicture"
-            @file-choose="openPictureEditionModal" />
-        </div>
-        <div class="row justify-center q-mb-md">
-          <q-btn v-if="fileChosen" color="primary" icon="rotate left" @click="croppa.rotate(-1)" round flat size="1rem" />
-          <q-btn v-if="fileChosen" color="primary" icon="rotate right" @click="croppa.rotate(1)" round flat size="1rem" />
-        </div>
-      </div>
-      <q-btn :disable="!fileChosen" no-caps class="full-width modal-btn" label="Valider" color="primary" :loading="loadingImage" @click="uploadImage" />
-    </q-modal>
   </div>
 </template>
 
@@ -642,8 +625,7 @@ export default {
       },
       requiredField: 'Champ requis',
       requiredDoc: 'Document requis',
-      collapsibleOpened: false,
-      imageEditionOpened: false,
+      disablePictureEdition: true,
       docsThmbnails: {},
       croppa: {},
       loadingImage: false,
@@ -1091,9 +1073,9 @@ export default {
         data.append('Content-Type', blob.type || 'application/octet-stream');
         data.append('picture', blob);
         await this.$axios.post(`${process.env.API_HOSTNAME}/cloudinary/upload`, data, { headers: { 'content-type': 'multipart/form-data', 'x-access-token': Cookies.get('alenvi_token') || '' } });
-        this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
+        await this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
+        this.closePictureEdition();
         this.loadingImage = false;
-        this.closePictureEditionModal();
         this.$q.notify({
           color: 'positive',
           icon: 'done',
@@ -1130,7 +1112,7 @@ export default {
           payload = this.$_.set(payload, path, { driveId: null, link: null });
           await this.$users.updateById(payload);
         }
-        this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
+        await this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
         this.$q.notify({
           color: 'positive',
           icon: 'done',
@@ -1177,7 +1159,7 @@ export default {
             publicId: null
           }
         });
-        this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
+        await this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
         this.$q.notify({
           color: 'positive',
           icon: 'done',
@@ -1205,8 +1187,8 @@ export default {
         });
       }
     },
-    refreshUser () {
-      this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
+    async refreshUser () {
+      await this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
       this.$q.notify({
         color: 'positive',
         icon: 'done',
@@ -1233,16 +1215,19 @@ export default {
       openURL(url);
     },
     choosePicture () {
+      this.fileChosen = true;
+      this.disablePictureEdition = false;
       this.croppa.chooseFile();
     },
-    openPictureEditionModal () {
-      this.imageEditionOpened = true;
-      this.fileChosen = true;
-    },
-    closePictureEditionModal () {
-      this.croppa.remove();
-      this.imageEditionOpened = false;
+    closePictureEdition () {
+      this.disablePictureEdition = true;
       this.fileChosen = false;
+      if (!this.hasPicture && !this.fileChosen) {
+        this.croppa.remove();
+      }
+      if (this.hasPicture && !this.fileChosen) {
+        this.croppa.refresh();
+      }
     },
     pictureDlLink (link) {
       return link ? link.replace(/(\/upload)/i, `$1/fl_attachment:photo_${this.userProfile.firstname}_${this.userProfile.lastname}`) : '';
