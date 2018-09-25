@@ -1060,9 +1060,9 @@ export default {
     },
     async uploadImage () {
       try {
-        // if (this.hasPicture && !this.fileChosen) {
-        //   this.deleteImage({ beforeUpload: true });
-        // }
+        if (this.hasPicture && !this.fileChosen) {
+          await cloudinary.deleteImageById({ id: this.userProfile.picture.publicId });
+        }
         this.loadingImage = true;
         let blob = await this.croppa.promisedBlob('image/jpeg', 0.8);
         let data = new FormData();
@@ -1148,6 +1148,7 @@ export default {
           cancel: 'Annuler'
         });
         if (this.userProfile.picture && this.userProfile.picture.publicId) {
+          console.log('MEH')
           await cloudinary.deleteImageById({ id: this.userProfile.picture.publicId });
           this.croppa.remove();
         }
