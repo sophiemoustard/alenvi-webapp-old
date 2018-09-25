@@ -1,18 +1,17 @@
 <template>
   <div class="row justify-center layout-padding">
-    <div class="column items-center" style="width: 500px">
-      <div class="row">
-        <h5>Entre le code à 4 chiffres que tu as reçu par SMS</h5>
-      </div>
-      <div class="row no-wrap justify-center q-mb-md" style="max-width: 500px">
-        <q-input class="custom-input on-left" v-for="(box, index) in boxes" :key="index" align="center" @input="changeBoxAndMakeCode(index, $event)"
-          v-mask="'#'" :ref="'box' + (index + 1)" type="tel" :autofocus="box.autofocus" v-model.number="box.model"
-          pattern="\d+" inverted-light color="white" />
-      </div>
-      <div class="row">
-        <q-btn class="full-width send-btn" @click="submit" color="primary" :disable="!code">Envoyer</q-btn>
-      </div>
-    </div>
+    <q-card style="width: 500px">
+      <q-card-title>
+        Entre le code à 4 chiffres que tu as reçu par SMS
+      </q-card-title>
+      <q-card-separator />
+      <q-card-main class="row justify-center layout-padding">
+        <q-input v-model="code" v-mask="'####'" type="tel" inverted-light color="white" align="center" autofocus />
+      </q-card-main>
+      <q-card-actions class="row justify-center">
+        <q-btn class="full-width btn-submit" @click="submit" color="primary" :disable="!code" big>Envoyer</q-btn>
+      </q-card-actions>
+    </q-card>
   </div>
 </template>
 
@@ -22,25 +21,26 @@ import { date } from 'quasar';
 export default {
   data () {
     return {
-      boxes: [
-        {
-          model: '',
-          autofocus: true
-        },
-        {
-          model: '',
-          autofocus: false
-        },
-        {
-          model: '',
-          autofocus: false
-        },
-        {
-          model: '',
-          autofocus: false
-        }
-      ],
-      code: [0, 0, 0, 0],
+      // boxes: [
+      //   {
+      //     model: '',
+      //     autofocus: true
+      //   },
+      //   {
+      //     model: '',
+      //     autofocus: false
+      //   },
+      //   {
+      //     model: '',
+      //     autofocus: false
+      //   },
+      //   {
+      //     model: '',
+      //     autofocus: false
+      //   }
+      // ],
+      // code: [0, 0, 0, 0],
+      code: '',
       boxesStyle: {
         style: 'color: #E2007A; height: 40px',
         autocorrect: 'off'
@@ -48,19 +48,19 @@ export default {
     }
   },
   methods: {
-    changeBoxAndMakeCode (index, event) {
-      if (index !== (this.boxes.length - 1) && event.match(/[0-9]/g)) {
-        this.code.splice(index, 1, event);
-        const newIndex = index + 1;
-        this.$refs['box' + (newIndex + 1)][0].focus();
-      } else if (index === (this.boxes.length - 1) && event.match(/[0-9]/g)) {
-        this.$refs['box' + this.boxes.length][0].blur();
-        this.code.splice(index, 1, event);
-      }
-    },
+    // changeBoxAndMakeCode (index, event) {
+    //   if (index !== (this.boxes.length - 1) && event.match(/[0-9]/g)) {
+    //     this.code.splice(index, 1, event);
+    //     const newIndex = index + 1;
+    //     this.$refs['box' + (newIndex + 1)][0].focus();
+    //   } else if (index === (this.boxes.length - 1) && event.match(/[0-9]/g)) {
+    //     this.$refs['box' + this.boxes.length][0].blur();
+    //     this.code.splice(index, 1, event);
+    //   }
+    // },
     async submit () {
       try {
-        const activationDataRaw = await this.$activationCode.check(this.code.join(''));
+        const activationDataRaw = await this.$activationCode.check(this.code);
         this.$q.cookies.set('signup_token', activationDataRaw.token, { path: '/', expires: date.addToDate(new Date(), { days: 1 }), secure: process.env.NODE_ENV !== 'development' });
         this.$q.cookies.set('signup_userEmail', activationDataRaw.activationData.userEmail, { path: '/', expires: date.addToDate(new Date(), { days: 1 }), secure: process.env.NODE_ENV !== 'development' });
         this.$q.cookies.set('signup_userId', activationDataRaw.activationData.newUserId, { path: '/', expires: date.addToDate(new Date(), { days: 1 }), secure: process.env.NODE_ENV !== 'development' });
@@ -86,15 +86,15 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables'
 
+  .btn-submit
+    border-radius: 0
+
   .q-if
     font-size: 24px
 
   .custom-input
-    color: $primary
-    width: 60px
     height: 60px
     @media (max-width: 321px)
-      width: 50px
       height: 50px
 
   .q-if-inverted
@@ -105,12 +105,9 @@ export default {
     padding: 0
 
   /deep/ .q-if
-    &:not(.q-if-disabled):not(.q-if-error):not(.q-if-warning):hover:before
-      color: inherit !important
     & input.q-input-target
       height: 60px
       line-height: 60px
-      display: flex
       @media (max-width: 321px)
         height: 50px
         line-height: 50px
