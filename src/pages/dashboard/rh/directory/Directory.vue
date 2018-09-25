@@ -278,7 +278,8 @@ export default {
           field: 'startDate',
           align: 'left',
           sortable: true,
-          sort: (a, b) => (this.$moment(a, 'DD/MM/YYYY').toDate()) - (this.$moment(b, 'DD/MM/YYYY').toDate()),
+          format: (value) => this.$moment(value).format('DD/MM/YYYY'),
+          sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
           style: 'width: 170px'
         },
         {
@@ -400,7 +401,7 @@ export default {
                 picture: user.picture ? user.picture.link : null
               },
               profileErrors: checkProfileErrors.error ? checkProfileErrors.error.details.length : 0,
-              startDate: this.$moment(user.createdAt).format('DD/MM/YYYY'),
+              startDate: user.createdAt,
               sector: sectors[user.sector],
               isActive: user.isActive
             }
@@ -411,7 +412,7 @@ export default {
               name: `${user.firstname} ${user.lastname}`,
               picture: user.picture.link
             },
-            startDate: this.$moment(user.createdAt).format('DD/MM/YYYY'),
+            startDate: user.createdAt,
             sector: sectors[user.sector],
             isActive: user.isActive
           }
