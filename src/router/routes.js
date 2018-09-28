@@ -37,153 +37,89 @@ const routes = [
       }
     }
   },
-  // {
-  //   path: '/signup',
-  //   component: () => import('pages/signup/SignUp'),
-  //   beforeEnter: (to, from, next) => {
-  //     if (Cookies.get('signup_token') && Cookies.get('signup_sector') && Cookies.get('signup_mobile') && Cookies.get('signup_managerId') && Cookies.get('signup_firstSMS')) {
-  //       next();
-  //     } else if (Cookies.get('refresh_token')) {
-  //       next({ path: '/signupComplete' });
-  //     } else {
-  //       next({ path: '/enterCode' });
-  //     }
-  //   }
-  // },
-  // {
-  //   path: '/signupComplete',
-  //   component: () => import('pages/signup/SignUpComplete'),
-  //   meta: {
-  //     cookies: ['alenvi_token', 'refresh_token']
-  //   },
-  //   beforeEnter: (to, from, next) => {
-  //     if (store.getters['main/user'] && store.getters['main/user'].administrative && !store.getters['main/user'].administrative.signup.complete) {
-  //       // await users.getById(to.query.id, to.query.token);
-  //       next();
-  //     } else if (store.getters['main/user'] && store.getters['main/user'].administrative && store.getters['main/user'].administrative.signup.complete) {
-  //       next({ path: '/alreadySignedUp' });
-  //     } else {
-  //       next({ path: 401 })
-  //     }
-  //   }
-  // },
-  // {
-  // path: '/signup/optionalDocuments',
-  // component: () => import('pages/signup/optionalDocuments'),
-  // meta: {
-  //   cookies: ['alenvi_token', 'refresh_token']
-  // }
-  // beforeEnter: async (to, from, next) => {
-  //   try {
-  //     if (to.query.token && to.query.id) {
-  //       await users.getById(to.query.id, to.query.token);
-  //       next();
-  //     } else {
-  //       next({ path: '/401' });
-  //     }
-  //   } catch (e) {
-  //     console.error(e.response);
-  //     next({ path: '/401' });
-  //   }
-  // }
-  // },
-  // { path: '/alreadySignedUp', component: () => import('pages/signup/AlreadySignedUp') },
   { path: '/forgotPassword', component: () => import('pages/signin/ForgotPwd') },
   { path: '/resetPassword/:token', component: () => import('pages/signin/ResetPwd') },
   { path: '/error403Pwd', component: () => import('pages/signin/403') },
-  { path: '/bot/authenticate', component: () => import('pages/bot/Authenticate') },
-  { path: '/bot/editCustomerInfo', component: () => import('pages/bot/CustomerInfo') },
-  { path: '/bot/calendar', component: () => import('pages/bot/Calendar') },
+  // { path: '/bot/authenticate', component: () => import('pages/bot/Authenticate') },
+  // { path: '/bot/editCustomerInfo', component: () => import('pages/bot/CustomerInfo') },
+  // { path: '/bot/calendar', component: () => import('pages/bot/Calendar') },
+  // {
+  //   path: '/bot/auxiliaries/:id',
+  //   name: ' bot auxiliary info',
+  //   component: () => import('pages/bot/auxiliaryInfo'),
+  //   props: (route) => ({ id: route.params.id, token: route.query.access_token })
+  // },
   {
-    path: '/bot/auxiliaries/:id',
-    name: ' bot auxiliary info',
-    component: () => import('pages/bot/auxiliaryInfo'),
-    props: (route) => ({ id: route.params.id, token: route.query.access_token })
-  },
-  {
-    path: '/dashboard',
-    component: () => import('layouts/Layout'),
+    path: 'planning',
+    name: 'planning',
+    component: () => import('pages/dashboard/planning/Planning'),
+    redirect: {
+      name: 'view planning'
+    },
+    // Children so collapsible in side menu highlights good selection
     children: [
       {
-        path: '',
-        component: () => import('pages/dashboard/Home'),
+        path: 'view',
+        name: 'view planning',
+        component: () => import('pages/dashboard/planning/PlanningView'),
         meta: {
-          cookies: ['alenvi_token', 'refresh_token']
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['planning:read'],
+          parent: 'planning'
         },
-        redirect: {
-          path: '/'
+      },
+      {
+        path: 'modification',
+        name: 'modification planning',
+        component: () => import('pages/dashboard/planning/PlanningModification'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['planning:history'],
+          parent: 'planning'
+        },
+      },
+      {
+        path: 'constrainedCoaches',
+        name: 'constrained coaches',
+        component: () => import('pages/dashboard/planning/ConstrainedCoaches'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['duty:read'],
+          parent: 'planning'
+        },
+      }
+    ]
+  },
+  {
+    path: 'beneficiaries',
+    name: 'beneficiaries',
+    component: () => import('pages/dashboard/beneficiaries/Beneficiaries'),
+    redirect: {
+      name: 'add helper'
+    },
+    children: [
+      {
+        path: 'addHelper',
+        name: 'add helper',
+        component: () => import('pages/dashboard/beneficiaries/AddHelper'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['users:welcome:user'],
+          parent: 'benef'
         }
-      },
-      {
-        path: 'planning',
-        name: 'planning',
-        component: () => import('pages/dashboard/planning/Planning'),
-        redirect: {
-          name: 'view planning'
-        },
-        // Children so collapsible in side menu highlights good selection
-        children: [
-          {
-            path: 'view',
-            name: 'view planning',
-            component: () => import('pages/dashboard/planning/PlanningView'),
-            meta: {
-              cookies: ['alenvi_token', 'refresh_token'],
-              permission: 'planning:read',
-              parent: 'planning'
-            },
-          },
-          {
-            path: 'modification',
-            name: 'modification planning',
-            component: () => import('pages/dashboard/planning/PlanningModification'),
-            meta: {
-              cookies: ['alenvi_token', 'refresh_token'],
-              permission: 'planning:history',
-              parent: 'planning'
-            },
-          },
-          {
-            path: 'constrainedCoaches',
-            name: 'constrained coaches',
-            component: () => import('pages/dashboard/planning/ConstrainedCoaches'),
-            meta: {
-              cookies: ['alenvi_token', 'refresh_token'],
-              permission: 'duty:read',
-              parent: 'planning'
-            },
-          }
-        ]
-      },
-      // {
-      //   path: 'auxiliaries',
-      //   name: 'auxiliaries',
-      //   component: () => import('pages/dashboard/auxiliaries/NavTabs'),
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //     permission: 'Auxiliaires'
-      //   }
-      // },
-      {
-        path: 'beneficiaries',
-        name: 'beneficiaries',
-        component: () => import('pages/dashboard/beneficiaries/Beneficiaries'),
-        redirect: {
-          name: 'add helper'
-        },
-        children: [
-          {
-            path: 'addHelper',
-            name: 'add helper',
-            component: () => import('pages/dashboard/beneficiaries/AddHelper'),
-            meta: {
-              cookies: ['alenvi_token', 'refresh_token'],
-              permission: 'users:welcome:user',
-              parent: 'benef'
-            }
-          }
-        ]
-      },
+      }
+    ]
+  },
+  {
+    path: '/ni',
+    component: () => import('layouts/Layout'),
+    meta: {
+      cookies: ['alenvi_token', 'refresh_token']
+    },
+    redirect: {
+      path: '/'
+    },
+    children: [
       {
         path: 'rh/auxiliaires/:id',
         name: 'auxiliary info',
@@ -191,23 +127,24 @@ const routes = [
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permission: 'profiles:read'
+          permissions: ['profiles:read']
         }
       },
       {
-        path: 'rh/repertoire',
+        path: '',
         name: 'rh directory',
-        component: () => import('pages/dashboard/rh/directory/Directory'),
+        component: () => import('pages/ni/Directory'),
+        props: (route) => ({ sector: route.query.sector, role: route.query.role }),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permission: 'users:list',
+          permissions: ['users:list'],
           parent: 'rh'
         }
       },
       {
-        path: 'rh/repertoire/profil/:id',
+        path: ':id',
         name: 'rh directory profile',
-        component: () => import('pages/dashboard/rh/directory/profile/Profile'),
+        component: () => import('pages/ni/Profile'),
         props: true,
         redirect: {
           name: 'directory profile info'
@@ -224,17 +161,20 @@ const routes = [
             component: () => import('components/ProfileInfo'),
             meta: {
               cookies: ['alenvi_token', 'refresh_token'],
-              permission: 'profiles:edit:user',
+              permissions: [{
+                name: 'profiles:edit',
+                when: (paramsId, cookieId) => paramsId === cookieId
+              }, 'profiles:edit:user'],
               parent: 'rh'
             }
           },
           {
             path: 'taches',
             name: 'directory profile tasks',
-            component: () => import('pages/dashboard/rh/directory/profile/Tasks'),
+            component: () => import('components/ProfileTasks'),
             meta: {
               cookies: ['alenvi_token', 'refresh_token'],
-              permission: 'profiles:edit:user',
+              permissions: ['profiles:edit:user'],
               parent: 'rh'
             }
           }
@@ -245,7 +185,7 @@ const routes = [
       //   component: () => import('pages/dashboard/pigi/NavTabs'),
       //   meta: {
       //     cookies: ['alenvi_token', 'refresh_token'],
-      //     permission: 'Pigi'
+      //     permissions: 'Pigi'
       //   }
       // },
       // {
@@ -262,7 +202,7 @@ const routes = [
       //   component: () => import('pages/dashboard/settings/NavTabs'),
       //   meta: {
       //     cookies: ['alenvi_token', 'refresh_token'],
-      //     permission: 'Paramètres'
+      //     permissions: 'Paramètres'
       //   }
       // }
     ]
