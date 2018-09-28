@@ -3,7 +3,7 @@
     <div class="row col-xs-12 q-mb-md">
       <div class="row items-baseline col-xs-12 col-md-10">
         <div class="row">
-          <q-icon v-if="isExternalUser" class="on-left cursor-pointer self-center" size="1rem" name="arrow_back" color="primary" @click.native="$router.push({ name: 'rh directory'})" />
+          <q-icon v-if="isExternalUser" class="on-left cursor-pointer self-center" size="1rem" name="arrow_back" color="primary" @click.native="$router.push({ name: 'rh directory', query: { role: 'Auxiliaire' } })" />
           <h4>{{ user.firstname }} {{ user.lastname }}</h4>
         </div>
       </div>

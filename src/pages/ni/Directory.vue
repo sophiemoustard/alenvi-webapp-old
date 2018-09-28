@@ -185,15 +185,21 @@
 import { required, email, maxLength } from 'vuelidate/lib/validators';
 import randomize from 'randomatic';
 
-import { frPhoneNumber, frZipCode } from '../../../../helpers/vuelidateCustomVal';
+import { frPhoneNumber, frZipCode } from '../../helpers/vuelidateCustomVal';
 // import { getUserStartDate } from '../../../../helpers/getUserStartDate';
-import { clear } from '../../../../helpers/utils.js';
-import { userProfileValidation } from '../../../../helpers/userProfileValidation';
+import { clear } from '../../helpers/utils.js';
+import { userProfileValidation } from '../../helpers/userProfileValidation';
 // import { taskValidation } from '../../../../helpers/taskValidation';
-import SelectSector from '../../../../components/SelectSector';
-import SelectManager from '../../../../components/SelectManager';
+import SelectSector from '../../components/SelectSector';
+import SelectManager from '../../components/SelectManager';
 
 export default {
+  props: {
+    role: {
+      type: String,
+      default: 'Auxiliaire'
+    }
+  },
   components: {
     SelectSector,
     SelectManager
@@ -378,7 +384,7 @@ export default {
   methods: {
     async getUserList () {
       try {
-        const users = await this.$users.showAll({ role: 'Auxiliaire' });
+        const users = await this.$users.showAll({ role: this.role });
         const sectors = await this.$ogust.getList('employee.sector');
         this.userList = users.map((user) => {
           if (user.isActive) {

@@ -1,15 +1,15 @@
 <template>
   <q-page padding v-if="userProfile" class="neutral-background">
-    <profile-header :profileId="id" class="header-margin" />
-    <profile-tabs :profileId="id" :tabsContent="tabsContent" />
+    <profile-header v-if="currentUser.role.name !== 'Auxiliaire'" :profileId="id" class="header-margin" />
+    <profile-tabs v-if="currentUser.role.name !== 'Auxiliaire'" :profileId="id" :tabsContent="tabsContent" />
     <router-view></router-view>
   </q-page>
 </template>
 
 <script>
 
-import ProfileHeader from '../../../../../components/ProfileHeader'
-import ProfileTabs from '../../../../../components/ProfileTabs'
+import ProfileHeader from '../../components/ProfileHeader'
+import ProfileTabs from '../../components/ProfileTabs'
 
 export default {
   props: ['id'],
@@ -20,6 +20,9 @@ export default {
   computed: {
     userProfile () {
       return this.$store.getters['rh/getUserProfile'];
+    },
+    currentUser () {
+      return this.$store.getters['main/user'];
     }
   },
   data () {

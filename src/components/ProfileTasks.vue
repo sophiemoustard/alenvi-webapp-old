@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { displayTask } from '../../../../../helpers/taskValidation.js'
+import { displayTask } from '../helpers/taskValidation.js'
 export default {
   data () {
     return {
