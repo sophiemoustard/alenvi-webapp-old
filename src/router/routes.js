@@ -16,7 +16,7 @@ const routes = [
         } else if (store.getters['main/user'] && store.getters['main/user'].role.name === 'Auxiliaire') {
           return next({ name: 'auxiliary info', params: { id: store.getters['main/user']._id } });
         } else if (store.getters['main/user'] && store.getters['main/user'].role.name !== 'Auxiliaire' && store.getters['main/user'].role.name !== 'Client') {
-          return next({ name: 'administrative directory' });
+          return next({ name: 'administrative directory', query: { role: 'Auxiliaire' } });
         } else {
           next({ path: '/login' });
         }
@@ -144,7 +144,7 @@ const routes = [
       },
       {
         path: ':id',
-        name: 'profile info',
+        name: 'profile',
         component: () => import('pages/ni/Profile'),
         props: true,
         meta: {
