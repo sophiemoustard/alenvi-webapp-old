@@ -36,14 +36,11 @@ export default {
   .profile-tabs
     & /deep/ .q-tabs
       &-scroller
-        margin-left: -25px
+        & div:nth-last-child(2)
+          margin-right: 0 !important
         & .q-tab
           flex: 1 1 0
-          // padding-left: 24px
-        // a
-        //   border-right: 24px solid transparent
-        //   &:last-of-type
-        //     border: 0
+          margin-right: 24px
       &-normal
         & .q-tab-label
           color: $dark-grey
@@ -67,9 +64,8 @@ export default {
               font-weight: 700
             & .q-tabs-bar
               color: inherit
-              width: calc(100% - 25px)
-          // @media (min-width: 992px)
-            // padding-left: 0
+          @media (min-width: 992px)
+            padding-left: 0
           & .q-tabs-bar
             display: block !important
             color: $light-grey
