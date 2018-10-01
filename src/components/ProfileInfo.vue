@@ -1148,7 +1148,6 @@ export default {
           cancel: 'Annuler'
         });
         if (this.userProfile.picture && this.userProfile.picture.publicId) {
-          console.log('MEH')
           await cloudinary.deleteImageById({ id: this.userProfile.picture.publicId });
           this.croppa.remove();
         }

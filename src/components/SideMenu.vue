@@ -107,7 +107,6 @@ export default {
       }
     },
     collapsibleClosing (to, from) {
-      console.log('MEH');
       if (this.$refs[from.meta.parent] && to.meta.parent !== from.meta.parent) {
         this.activeRoutes[from.meta.parent].open = false;
         this.activeRoutes[from.meta.parent].highlight = false;
