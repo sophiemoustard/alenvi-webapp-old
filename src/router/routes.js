@@ -1,13 +1,14 @@
 import { Cookies } from 'quasar'
 
 import store from '../store/index'
+import alenvi from '../helpers/alenvi'
 
 const routes = [
   {
     path: '/',
     beforeEnter: async (to, from, next) => {
       try {
-        if (!store.getters['main/user'] && Cookies.get('user_id')) {
+        if (await alenvi.refreshAlenviCookies()) {
           await store.dispatch('main/getUser', Cookies.get('user_id'));
         }
         if (store.getters['main/user'] && store.getters['main/user'].role.name === 'Client') {
