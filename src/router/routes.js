@@ -152,6 +152,15 @@ const routes = [
           parent: 'administrative',
         }
       },
+      {
+        path: ':id/paye',
+        name: 'profile salaries',
+        component: () => import('pages/ni/Salaries'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['profiles:read']
+        }
+      },
       // {
       //   path: 'pigi',
       //   component: () => import('pages/dashboard/pigi/NavTabs'),
