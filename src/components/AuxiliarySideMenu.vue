@@ -8,11 +8,11 @@
       </q-item>
     </q-list-header>
     <q-item-separator />
-    <q-collapsible ref="administrative" v-model="activeRoutes.administrative.open" collapseIcon="expand_more">
+    <q-collapsible ref="rh" v-model="activeRoutes.rh.open" collapseIcon="expand_more">
       <template slot="header">
-        <q-item-main :class="{'text-weight-bold': activeRoutes.administrative.highlight }" label="Administratif" />
+        <q-item-main :class="{'text-weight-bold': activeRoutes.rh.highlight }" label="Ressources humaines" />
       </template>
-      <q-item :to="{ name: 'administrative directory', query: { role: 'Auxiliaire' } }" exact>
+      <q-item :to="{ name: 'rh directory' }">
         <q-item-side icon="contacts" />
         <q-item-main label="Répertoire" />
       </q-item>
@@ -84,7 +84,7 @@ export default {
           open: false,
           highlight: false
         },
-        administrative: {
+        rh: {
           open: false,
           highlight: false
         }
@@ -107,7 +107,6 @@ export default {
       }
     },
     collapsibleClosing (to, from) {
-      console.log('MEH');
       if (this.$refs[from.meta.parent] && to.meta.parent !== from.meta.parent) {
         this.activeRoutes[from.meta.parent].open = false;
         this.activeRoutes[from.meta.parent].highlight = false;

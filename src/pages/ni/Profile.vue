@@ -2,20 +2,23 @@
   <q-page padding v-if="userProfile" class="neutral-background">
     <profile-header v-if="currentUser.role.name !== 'Auxiliaire'" :profileId="id" class="header-margin" />
     <profile-tabs v-if="currentUser.role.name !== 'Auxiliaire'" :profileId="id" :tabsContent="tabsContent" />
-    <router-view></router-view>
+    <profile-info v-if="currentUser.role.name === 'Auxiliaire'" />
   </q-page>
 </template>
 
 <script>
 
-import ProfileHeader from '../../components/ProfileHeader'
-import ProfileTabs from '../../components/ProfileTabs'
+import ProfileHeader from '../../components/ProfileHeader';
+import ProfileTabs from '../../components/ProfileTabs';
+import ProfileInfo from '../../components/ProfileInfo';
+import ProfileTasks from '../../components/ProfileTasks';
 
 export default {
   props: ['id'],
   components: {
     ProfileHeader,
-    ProfileTabs
+    ProfileTabs,
+    ProfileInfo
   },
   computed: {
     userProfile () {
@@ -30,12 +33,16 @@ export default {
       tabsContent: [
         {
           label: 'Infos personnelles',
-          to: { name: 'directory profile info', params: { id: this.id } },
+          name: 'info',
+          default: true,
+          component: ProfileInfo,
           notification: 'profiles'
         },
         {
           label: 'Tâches',
-          to: { name: 'directory profile tasks' },
+          name: 'tasks',
+          default: false,
+          component: ProfileTasks,
           notification: 'tasks'
         }
       ]

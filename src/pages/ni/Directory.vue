@@ -433,7 +433,7 @@ export default {
       return `${start} - ${end} de ${total}`;
     },
     goToUserProfile (userId) {
-      this.$router.push({ name: 'rh directory profile', params: { id: userId } });
+      this.$router.push({ name: 'profile', params: { id: userId } });
     },
     resetForm () {
       this.$v.newUser.$reset();

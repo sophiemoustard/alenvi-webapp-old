@@ -1,14 +1,19 @@
 <template>
   <div class="profile-tabs">
     <q-tabs align="justify" color="transparent" text-color="primary">
-       <q-route-tab
+       <q-tab
         v-for="(tab, index) in tabsContent"
         :key="index"
         slot="title"
         :label="tab.label"
-        :to="tab.to"
+        :default="tab.default"
+        :name="tab.name"
         :alert="notifications[tab.notification][profileId] ? notifications[tab.notification][profileId] > 0 : false"
-        exact />
+        />
+      <q-tab-pane class="no-border" v-for="(tab, index) in tabsContent" :key="index" :name="tab.name">
+                <!-- Dynamic component loading  -->
+      <component :is="tab.component" />
+    </q-tab-pane>
     </q-tabs>
   </div>
 </template>
@@ -29,19 +34,23 @@ export default {
   @import '~variables'
 
   .profile-tabs
-    margin-bottom: 24px
     & /deep/ .q-tabs
       &-scroller
+        margin-left: -25px
         & .q-tab
           flex: 1 1 0
-        a
-          border-right: 24px solid transparent
-          &:last-of-type
-            border: 0
+          // padding-left: 24px
+        // a
+        //   border-right: 24px solid transparent
+        //   &:last-of-type
+        //     border: 0
       &-normal
         & .q-tab-label
           color: $dark-grey
           opacity: 1
+      & .q-tabs-panes .q-tab-pane
+        padding: 0
+        padding-top: 24px
       & > .q-tabs-head
         font-size: 24px
         &:not(.scrollable)
@@ -58,8 +67,9 @@ export default {
               font-weight: 700
             & .q-tabs-bar
               color: inherit
-          @media (min-width: 992px)
-            padding-left: 0
+              width: calc(100% - 25px)
+          // @media (min-width: 992px)
+            // padding-left: 0
           & .q-tabs-bar
             display: block !important
             color: $light-grey

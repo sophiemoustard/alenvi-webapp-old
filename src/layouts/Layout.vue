@@ -16,7 +16,7 @@
 
     <q-layout-drawer v-if="user.role.name !== 'Auxiliaire'" :width="250" side="left" v-model="toggleDrawer">
       <side-menu ref="sideMenu" v-if="user && user.role.name !== 'Client'" :user="user" />
-      <customer-side-menu v-if="user && user.role.name === 'Client'" :user="user" />
+      <!-- <customer-side-menu v-if="user && user.role.name === 'Client'" :user="user" /> -->
     </q-layout-drawer>
 
     <q-page-container>
@@ -51,8 +51,8 @@ export default {
     },
     layoutTitle () {
       return {
-        link: { name: 'rh directory' },
-        content: 'Ressources humaines'
+        link: { name: 'administrative directory' },
+        content: 'Administratif'
       };
     }
   },

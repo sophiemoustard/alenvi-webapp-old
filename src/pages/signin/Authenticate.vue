@@ -92,9 +92,9 @@ export default {
         if (this.getUser.role.name === 'Client') {
           this.$router.replace({ name: 'customer home' });
         } else if (this.getUser.role.name === 'Auxiliaire') {
-          this.$router.replace({ name: 'directory profile info', params: { id: this.$q.cookies.get('user_id') } });
+          this.$router.replace({ name: 'profile info', params: { id: this.$q.cookies.get('user_id') } });
         } else {
-          this.$router.replace({ name: 'rh directory' });
+          this.$router.replace({ name: 'administrative directory' });
         }
       } catch (e) {
         this.$q.notify({

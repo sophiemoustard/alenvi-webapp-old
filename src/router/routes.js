@@ -16,7 +16,7 @@ const routes = [
         } else if (store.getters['main/user'] && store.getters['main/user'].role.name === 'Auxiliaire') {
           return next({ name: 'auxiliary info', params: { id: store.getters['main/user']._id } });
         } else if (store.getters['main/user'] && store.getters['main/user'].role.name !== 'Auxiliaire' && store.getters['main/user'].role.name !== 'Client') {
-          return next({ name: 'rh directory' });
+          return next({ name: 'administrative directory' });
         } else {
           next({ path: '/login' });
         }
@@ -133,53 +133,24 @@ const routes = [
       },
       {
         path: '',
-        name: 'rh directory',
+        name: 'administrative directory',
         component: () => import('pages/ni/Directory'),
         props: (route) => ({ sector: route.query.sector, role: route.query.role }),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['users:list'],
-          parent: 'rh'
+          parent: 'administrative'
         }
       },
       {
         path: ':id',
-        name: 'rh directory profile',
+        name: 'profile info',
         component: () => import('pages/ni/Profile'),
         props: true,
-        redirect: {
-          name: 'directory profile info'
-        },
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'rh',
-        },
-        // Directory profile tabs
-        children: [
-          {
-            path: 'info',
-            name: 'directory profile info',
-            component: () => import('components/ProfileInfo'),
-            meta: {
-              cookies: ['alenvi_token', 'refresh_token'],
-              permissions: [{
-                name: 'profiles:edit',
-                when: (paramsId, cookieId) => paramsId === cookieId
-              }, 'profiles:edit:user'],
-              parent: 'rh'
-            }
-          },
-          {
-            path: 'taches',
-            name: 'directory profile tasks',
-            component: () => import('components/ProfileTasks'),
-            meta: {
-              cookies: ['alenvi_token', 'refresh_token'],
-              permissions: ['profiles:edit:user'],
-              parent: 'rh'
-            }
-          }
-        ]
+          parent: 'administrative',
+        }
       },
       // {
       //   path: 'pigi',
