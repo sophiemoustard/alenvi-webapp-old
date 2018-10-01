@@ -122,16 +122,6 @@ const routes = [
     },
     children: [
       {
-        path: 'rh/auxiliaires/:id',
-        name: 'auxiliary info',
-        component: () => import('pages/dashboard/rh/auxiliaries/Info'),
-        props: true,
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['profiles:read']
-        }
-      },
-      {
         path: '',
         name: 'administrative directory',
         component: () => import('pages/ni/Directory'),
