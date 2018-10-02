@@ -98,6 +98,7 @@ a
     background: $white
   & td
     padding: 8px 12px
+    font-size: 16px
     & .q-item
       // padding: 8px 16px 8px 0px
       min-height: 30px
