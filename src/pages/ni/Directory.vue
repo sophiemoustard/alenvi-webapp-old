@@ -17,11 +17,6 @@
       row-key="name"
       :rows-per-page-options="[15, 25, 35]"
       :pagination.sync="pagination"
-      rows-per-page-label="Lignes"
-      :pagination-label="paginationLabel"
-      no-data-label="Données non disponibles"
-      no-results-label="Pas de résultats"
-      loading-label="Chargement..."
       :loading="tableLoading">
       <q-tr
         slot="body"
@@ -428,9 +423,6 @@ export default {
         this.tableLoading = false;
         console.error(e);
       }
-    },
-    paginationLabel (start, end, total) {
-      return `${start} - ${end} de ${total}`;
     },
     goToUserProfile (userId) {
       this.$router.push({ name: 'profile', params: { id: userId } });

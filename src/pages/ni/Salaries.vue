@@ -1,18 +1,24 @@
 <template>
   <q-page padding class="neutral-background">
     <p v-if="Object.keys(salaries).length == 0">Aucun bulletin à afficher</p>
-    <q-card v-if="salaries" inline v-for="(salary, index) in salaries" :key="index" style="cursor: pointer">
-      <q-card-title class="text-center">
-        {{salary.period_start}}
-      </q-card-title>
-      <q-card-actions align="around">
-        <q-btn flat round small color="primary">
-          <a :href="salary.print_url" download>
-            <q-icon name="file download" />
-          </a>
-        </q-btn>
-      </q-card-actions>
-    </q-card>
+    <q-table
+      :data="salaries"
+      :columns="columns"
+      row-key="name"
+      :rows-per-page-options="[10]"
+      :pagination.sync="pagination"
+      :loading="tableLoading">
+        <q-td slot="body-cell-periodStart" slot-scope="props" :props="props">
+          {{ props.value }}
+        </q-td>
+        <q-td slot="body-cell-link" slot-scope="props" :props="props">
+          <q-btn flat round small color="primary">
+            <a :href="props.value">
+              <q-icon name="file download" />
+            </a>
+          </q-btn>
+        </q-td>
+    </q-table>
   </q-page>
 </template>
 
@@ -20,17 +26,44 @@
 export default {
   data () {
     return {
+      tableLoading: true,
       user: {},
-      salaries: {}
+      salaries: [],
+      pagination: {
+        sortBy: 'periodStart', // String, column "name" property value
+        descending: true,
+        page: 1,
+        rowsPerPage: 10 // current rows per page being displayed
+      },
+      columns: [
+        {
+          name: 'periodStart',
+          label: 'Date',
+          field: 'period_start',
+          align: 'left',
+          sortable: true,
+          format: (value) => this.$moment(value, 'YYYYMMDDHHmm').format('MMMM YYYY'),
+          sort: (a, b) => (this.$moment(a, 'YYYYMMDDHHmm').toDate()) - (this.$moment(b, 'YYYYMMDDHHmm').toDate()),
+          style: 'width: 170px'
+        },
+        {
+          name: 'link',
+          label: 'Visualiser',
+          field: 'print_url',
+          align: 'left',
+          style: 'width: 30px'
+        }
+      ]
     }
   },
   async created () {
     try {
       this.user = await this.$users.getById(this.$route.params.id);
-      this.salaries = await this.$ogust.getEmployeeSalaries(this.user.employee_id);
-      for (let i = 0, l = Object.keys(this.salaries).length; i < l; i++) {
-        this.salaries[i].period_start = this.$moment(this.salaries[i].period_start, 'YYYYMMDDHHmm').format('MM/YYYY');
+      const salaries = await this.$ogust.getEmployeeSalaries(this.user.employee_id);
+      for (const k in salaries) {
+        this.salaries.push(salaries[k]);
       }
+      this.tableLoading = false;
     } catch (e) {
       console.error(e);
     }
@@ -39,5 +72,47 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+@import '~variables'
+
+a
+  color: $primary
+  text-decoration: none
+
+.q-table-container
+  box-shadow: none
+
+/deep/ .q-table
+  border-spacing: 0 12px
+  border-collapse: separate
+  &-horizontal-separator tbody td
+    border: none
+  & thead
+    border: none
+    & tr
+      height: 48px
+  & th
+    padding: 0px 12px
+    &.sortable:hover .q-icon, &.sorted .q-icon
+      color: $primary
+  & tbody tr
+    background: $white
+  & td
+    padding: 8px 12px
+    & .q-item
+      // padding: 8px 16px 8px 0px
+      min-height: 30px
+      padding: 0
+      &-main
+        flex: 0 1 auto
+      & .q-item-side
+        min-width: 30px
+        max-height: 30px
+      & .q-item-section + .q-item-section
+        margin-left: 20px
+  &-container
+    & .q-table-bottom
+      padding-left: 12px
+    & .q-table-nodata > i
+      display: none
 
 </style>
