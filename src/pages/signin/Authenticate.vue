@@ -94,7 +94,7 @@ export default {
         } else if (this.getUser.role.name === 'Auxiliaire') {
           this.$router.replace({ name: 'profile', params: { id: this.$q.cookies.get('user_id') } });
         } else {
-          this.$router.replace({ name: 'administrative directory' });
+          this.$router.replace({ name: 'administrative directory', query: { role: 'Auxiliaire' } });
         }
       } catch (e) {
         this.$q.notify({
