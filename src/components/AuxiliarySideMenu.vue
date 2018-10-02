@@ -57,10 +57,10 @@
     <div class="sidemenu-footer">
       <q-item class="sidemenu-footer-border full-width">
         <q-item-main class="sidemenu-footer-user" :label="userFirstnameUpper" />
-        <!-- <q-item-side>
+        <q-item-side>
           <q-icon name="person" color="black" />
         </q-item-side>
-        <q-item-side>
+        <!-- <q-item-side>
           <q-icon name="settings" color="black" />
         </q-item-side> -->
         <q-item-side>
