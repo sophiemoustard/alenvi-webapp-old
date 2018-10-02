@@ -1,19 +1,53 @@
 .q-layout-drawer
-  & .q-item
-    padding: 12px 16px
-  & .q-item-separator-component
-    margin: 0
-  & .q-item-section + .q-item-section
-    margin-left: 0px
-  & .q-collapsible .q-collapsible-inner > .q-item > .q-item-main > .q-item-label
-    font-size: 1.125rem
-  & .q-collapsible-sub-item 
+  & .q-list
+    &.sidemenu-alenvi.sidemenu-flex
+      display: flex
+      flex-direction: column
+      min-height: 100vh
+      & .sidemenu-footer
+        flex-grow: 1
+        display: flex
+        align-items: flex-end
+        justify-content: space-between
+        padding-top: 0px
+        padding-bottom: 0px
+        // prevent border overlap from footer to last sidemenu object
+        margin-top: -1px
+        & .q-item
+          padding: 6px 2px 0px 16px
+          & .q-item-side
+            cursor: pointer
+        &-border
+          border-top: 1px solid #e0e0e0
+        // & .q-item-section + .q-item-section
+        //   margin-left: 5px
+        & .sidemenu-footer-user
+          & > .q-item-label
+            font-size: 11px
+            font-weight: bold
+            color: #A3A3A3
+    & .q-list-header img
+      width: 200px
     & .q-item
-      padding: 8px 16px 8px 0px
-      min-height: 20px
-      & .q-item-side
-        min-width: 24px
-      & .q-item-side > .q-item-icon
-        font-size: 1rem
-      // & .q-item-main > .q-item-label
-        // font-size: 0.9rem 
+      padding: 12px 16px
+    & .q-item-separator-component
+      margin: 0
+    & .q-item-section + .q-item-section
+      margin-left: 0px
+    & .q-collapsible .q-collapsible-inner > .q-item > .q-item-main > .q-item-label
+      font-size: 1.125rem
+    & .q-collapsible-sub-item 
+      & .q-item
+        padding: 8px 16px 8px 0px
+        min-height: 20px
+        & .q-item-side
+          min-width: 24px
+        & .q-item-side > .q-item-icon
+          font-size: 1rem
+
+    & .router-link-active
+      background: none
+      color: $primary
+
+    & .router-link-active > div:nth-child(2)
+      color: $primary

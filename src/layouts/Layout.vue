@@ -15,8 +15,8 @@
     </q-layout-header>
 
     <q-layout-drawer :width="250" side="left" v-model="toggleDrawer">
-      <side-menu v-if="user && user.role.name !== 'Auxiliaire'" :user="user" />
-      <auxiliary-side-menu v-if="user && user.role.name === 'Auxiliaire'" :user="user" />
+      <side-menu :ref="sidemenusRefs" v-if="user && user.role.name !== 'Auxiliaire'" :user="user" />
+      <auxiliary-side-menu :ref="sidemenusRefs" v-if="user && user.role.name === 'Auxiliaire'" :user="user" />
     </q-layout-drawer>
 
     <q-page-container>
@@ -56,6 +56,12 @@ export default {
         link: { name: 'administrative directory' },
         content: 'Administratif'
       };
+    },
+    sidemenusRefs () {
+      if (this.user && this.user.role.name !== 'Auxiliaire') {
+        return 'defaultMenu';
+      }
+      return 'auxiliaryMenu';
     }
   },
   methods: {
@@ -64,8 +70,8 @@ export default {
     }
   },
   beforeRouteUpdate (to, from, next) {
-    this.$refs.sideMenu.collapsibleClosing(to, from);
-    this.$refs.sideMenu.collapsibleEntering(to);
+    this.$refs[this.sidemenusRefs].collapsibleClosing(to, from);
+    this.$refs[this.sidemenusRefs].collapsibleEntering(to);
     next();
   }
 }
