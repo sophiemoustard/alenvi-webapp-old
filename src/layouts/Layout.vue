@@ -14,9 +14,9 @@
       </q-toolbar>
     </q-layout-header>
 
-    <q-layout-drawer v-if="user.role.name !== 'Auxiliaire'" :width="250" side="left" v-model="toggleDrawer">
-      <side-menu ref="sideMenu" v-if="user && user.role.name !== 'Client'" :user="user" />
-      <!-- <customer-side-menu v-if="user && user.role.name === 'Client'" :user="user" /> -->
+    <q-layout-drawer :width="250" side="left" v-model="toggleDrawer">
+      <side-menu v-if="user && user.role.name !== 'Auxiliaire'" :user="user" />
+      <auxiliary-side-menu v-if="user && user.role.name === 'Auxiliaire'" :user="user" />
     </q-layout-drawer>
 
     <q-page-container>
@@ -31,11 +31,13 @@ import { mapGetters } from 'vuex'
 
 import SideMenu from '../components/SideMenu'
 import CustomerSideMenu from '../components/CustomerSideMenu'
+import AuxiliarySideMenu from '../components/AuxiliarySideMenu'
 
 export default {
   components: {
     SideMenu,
-    CustomerSideMenu
+    CustomerSideMenu,
+    AuxiliarySideMenu
   },
   computed: {
     ...mapGetters({
