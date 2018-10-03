@@ -1,6 +1,6 @@
 <template>
   <q-page padding class="neutral-background">
-    <p v-if="Object.keys(salaries).length == 0">Aucun bulletin à afficher</p>
+    <p v-if="salaries.length == 0">Aucun bulletin à afficher</p>
     <q-table
       :data="salaries"
       :columns="columns"
@@ -66,6 +66,7 @@ export default {
       this.tableLoading = false;
     } catch (e) {
       console.error(e);
+      this.tableLoading = false;
     }
   }
 }
