@@ -15,7 +15,7 @@
       </div>
       <q-item v-for="(person, index) in persons" :key="index">
           <!-- <q-checkbox v-model="personsIds" :val="person.value" :label="person.label" @change="choosePersons" /> -->
-          <q-radio v-model="personId" :val="person.value" :label="person.label" @input="choosePersons" />
+          <q-radio v-model="personId" :val="person.value" :label="person.label" @input="choosePersons(person.value)" />
         </q-item>
       </q-list>
     </q-popover>
@@ -45,9 +45,6 @@ export default {
     },
     ogustUser () {
       return this.$store.getters['calendar/ogustUser'];
-    },
-    ogustToken () {
-      return this.$store.getters['calendar/ogustToken'];
     },
     personType () {
       return this.$store.getters['calendar/personType'];
@@ -80,16 +77,17 @@ export default {
         this.persons = [];
         switch (this.personType) {
           case 'employee':
-            const employees = await this.$ogust.getEmployees({ sector }, this.ogustToken);
+            const employees = await this.$ogust.getEmployees({ sector });
             for (const k in employees) {
               this.persons.push({
                 label: `${employees[k].first_name} ${employees[k].last_name}`,
                 value: employees[k].id_employee
               });
             }
+            console.log('PERSONS', this.persons);
             break;
           case 'customer':
-            const customers = await this.$ogust.getCustomers({ sector }, this.ogustToken);
+            const customers = await this.$ogust.getCustomers({ sector });
             const filteredCustomers = this.$_.filter(customers, customer => !customer.last_name.match(/^ALENVI/i));
             for (const k in filteredCustomers) {
               this.persons.push({
@@ -105,9 +103,9 @@ export default {
         this.loading = false;
       }
     },
-    choosePersons () {
+    choosePersons (personId) {
+      this.$store.commit('calendar/setPersonChosen', personId);
       this.$emit('personChosen');
-      this.$store.commit('calendar/setPersonChosen', this.personId);
     }
   }
 }

@@ -14,7 +14,7 @@ const routes = [
         if (store.getters['main/user'] && store.getters['main/user'].role.name === 'Client') {
           return next({ name: 'customer home' });
         } else if (store.getters['main/user'] && store.getters['main/user'].role.name === 'Auxiliaire') {
-          return next({ name: 'auxiliary info', params: { id: store.getters['main/user']._id } });
+          return next({ name: 'profile', params: { id: store.getters['main/user']._id } });
         } else if (store.getters['main/user'] && store.getters['main/user'].role.name !== 'Auxiliaire' && store.getters['main/user'].role.name !== 'Client') {
           return next({ name: 'administrative directory', query: { role: 'Auxiliaire' } });
         } else {
@@ -139,6 +139,10 @@ const routes = [
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
+          permissions: [{
+            name: 'profiles:edit',
+            when: (paramsId, cookieId) => paramsId === cookieId
+          }, 'profiles:edit:user'],
           parent: 'administrative',
         }
       },
@@ -151,6 +155,16 @@ const routes = [
           permissions: ['profiles:read']
         }
       },
+      {
+        path: ':id/planning',
+        name: 'profile planning',
+        component: () => import('pages/ni/Planning'),
+        props: (route) => ({ auxiliary: route.query.auxiliary, customer: route.query.customer }),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['planning:read']
+        }
+      }
       // {
       //   path: 'pigi',
       //   component: () => import('pages/dashboard/pigi/NavTabs'),
