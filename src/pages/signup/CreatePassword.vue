@@ -123,7 +123,8 @@ export default {
         this.$q.cookies.remove('signup_token', { path: '/' });
         this.$q.cookies.remove('signup_userId', { path: '/' });
         this.$q.cookies.remove('signup_userEmail', { path: '/' });
-        this.$router.replace('/messenger');
+        // this.$router.replace('/messenger');
+        this.$router.replace(`/ni/${this.user.alenvi._id}`);
       } catch (e) {
         console.error(e);
         if (e.response) {

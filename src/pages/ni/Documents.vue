@@ -1,14 +1,14 @@
 <template>
   <q-page padding class="neutral-background">
-    <p v-if="salaries.length == 0">Aucun bulletin à afficher</p>
+    <p v-if="documents.length == 0">Aucun document disponible</p>
     <q-table
-      :data="salaries"
+      :data="documents"
       :columns="columns"
       row-key="name"
       :rows-per-page-options="[10]"
       :pagination.sync="pagination"
       :loading="tableLoading">
-        <q-td slot="body-cell-periodStart" slot-scope="props" :props="props">
+        <q-td slot="body-cell-title" slot-scope="props" :props="props">
           {{ props.value }}
         </q-td>
         <q-td slot="body-cell-link" slot-scope="props" :props="props">
@@ -28,28 +28,26 @@ export default {
     return {
       tableLoading: true,
       user: {},
-      salaries: [],
+      documents: [],
       pagination: {
-        sortBy: 'periodStart', // String, column "name" property value
-        descending: true,
+        sortBy: 'title', // String, column "name" property value
+        descending: false,
         page: 1,
         rowsPerPage: 10 // current rows per page being displayed
       },
       columns: [
         {
-          name: 'periodStart',
-          label: 'Date',
-          field: 'period_start',
+          name: 'title',
+          label: 'Titre',
+          field: 'title',
           align: 'left',
           sortable: true,
-          format: (value) => this.$moment(value, 'YYYYMMDDHHmm').format('MMMM YYYY'),
-          sort: (a, b) => (this.$moment(a, 'YYYYMMDDHHmm').toDate()) - (this.$moment(b, 'YYYYMMDDHHmm').toDate()),
           style: 'width: 170px'
         },
         {
           name: 'link',
           label: 'Visualiser',
-          field: 'print_url',
+          field: 'link',
           align: 'left',
           style: 'width: 30px'
         }
@@ -59,10 +57,20 @@ export default {
   async created () {
     try {
       this.user = await this.$users.getById(this.$route.params.id);
-      const salaries = await this.$ogust.getEmployeeSalaries(this.user.employee_id);
-      for (const k in salaries) {
-        this.salaries.push(salaries[k]);
-      }
+      this.documents = [
+        {
+          title: 'Conditions de remboursement de mutuelle',
+          link: 'https://drive.google.com/file/d/0B9x9rvBHVX1TTWlPbHpFZlpUVzQ/view?usp=sharing'
+        },
+        {
+          title: 'Convention collective des services à la personne',
+          link: 'https://drive.google.com/open?id=0B3bqjy-Bj6OHeWx5RVZLYjM5eGM'
+        },
+        {
+          title: 'Evaluation des risques professionnels',
+          link: 'https://drive.google.com/drive/folders/0B9x9rvBHVX1TQ2VVZ3cxb0ZsYVE'
+        }
+      ];
       this.tableLoading = false;
     } catch (e) {
       console.error(e);

@@ -164,7 +164,16 @@ const routes = [
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['planning:read']
         }
-      }
+      },
+      {
+        path: ':id/docs',
+        name: 'profile docs',
+        component: () => import('pages/ni/Documents'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['profiles:read']
+        }
+      },
       // {
       //   path: 'pigi',
       //   component: () => import('pages/dashboard/pigi/NavTabs'),
