@@ -9,8 +9,13 @@ export default {
   async updatePlanningUpdatesStatus (updateId, data) {
     await alenviAxios.put(`${process.env.API_HOSTNAME}/planningUpdates/${updateId}/status`, data);
   },
-  async storePlanningupdates (id, token, data) {
-    const planningUpdate = await axios.post(`${process.env.API_HOSTNAME}/planningUpdates?employee_id=${id}`, data, { headers: { 'x-access-token': token } });
+  async storePlanningupdates (id, data, token = null) {
+    let planningUpdate;
+    if (token) {
+      planningUpdate = await axios.post(`${process.env.API_HOSTNAME}/planningUpdates?employee_id=${id}`, data, { headers: { 'x-access-token': token } });
+    } else {
+      planningUpdate = await alenviAxios.post(`${process.env.API_HOSTNAME}/planningUpdates?employee_id=${id}`, data);
+    }
     return planningUpdate;
   },
   async removePlanningUpdateById (id, params) {
