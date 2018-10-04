@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="" style="max-width: 90vw; margin: auto;">
     <div ref="scheduler_here" class="dhx_cal_container" style="width:100%; height:100%;">
       <q-scroll-observable @scroll="handleScroll" />
       <q-resize-observable v-if="customer" @resize="onResize" />
@@ -21,7 +21,7 @@
       <div class="dhx_cal_data"></div>
     </div>
 
-    <q-modal v-model="getOpenModal" minimized :content-css="modalStyle">
+    <q-modal v-model="openModal" minimized :content-css="modalStyle" @hide="closeModal" @escape-key="closeModal">
       <p class="caption">{{ customerEventInfo.eventTitle }}</p>
       <q-field class="custom-field">
         <q-input v-model="customerEventInfo.doorCode" float-label="Code Porte" type="text" :disable="disableInput" />
@@ -53,15 +53,11 @@
         </q-field>
       </div>
       <div class="row justify-end">
-        <!-- <q-btn loader v-if="$route.query.id_employee === customerEventInfo.eventEmployeeId" @click="updateEvent" class="on-left" color="primary" -->
-        <!--   :disable="disableInput"> -->
-        <!--   Enregistrer -->
-        <!-- </q-btn> -->
         <q-btn :loading="modalBtnLoading" @click="updateEvent" class="on-left" color="primary"
           :disable="disableInput">
           Enregistrer
         </q-btn>
-        <q-btn color="tertiary" @click="controlModal(false)">
+        <q-btn color="grey" @click="closeModal">
           Fermer
         </q-btn>
       </div>
@@ -81,7 +77,7 @@ import responsive from './scripts/dhtmlxscheduler-responsive.js';
 import {
   debounce
 } from 'quasar'
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters } from 'vuex'
 
 import SectorFilter from '../../components/SectorFilter'
 
@@ -164,6 +160,10 @@ export default {
   },
   data () {
     return {
+      disableInput: true,
+      disableTimePicker: true,
+      modalBtnLoading: false,
+      openModal: false,
       width: window.innerWidth,
       today: new Date(),
       displayNext: true,
@@ -231,28 +231,16 @@ export default {
       }
       return style;
     },
-    getOpenModal: {
-      get () {
-        return this.$store.state.calendar.openModal;
-      },
-      set (value) {
-        this.$store.commit('calendar/controlModal', value);
-      }
-    },
     ...mapGetters({
-      disableInput: 'calendar/disableInput',
-      disableTimePicker: 'calendar/disableTimePicker',
+      user: 'main/user',
+      toggleDrawer: 'main/toggleDrawer',
       showFilter: 'calendar/showFilter',
       ogustUser: 'calendar/ogustUser',
       personChosen: 'calendar/personChosen',
-      modalBtnLoading: 'calendar/modalBtnLoading',
-      toggleDrawer: 'main/toggleDrawer'
+      personType: 'calendar/personType'
     })
   },
   mounted () {
-    // prevent quasar from breaking open/close methods from modal
-    this.controlModal(false);
-
     configDhtmlxScheduler(this);
 
     scheduler.attachEvent('onTemplatesReady', () => {
@@ -363,8 +351,6 @@ export default {
     // scheduler.attachEvent('onEventDrag', this.blockReadOnly);
     scheduler.showLightbox = (id) => {
       const ev = scheduler.getEvent(id);
-      this.setDisableInput(true);
-      this.setDisableTimePicker(true);
       this.customerEventInfo.doorCode = ev.door_code;
       this.customerEventInfo.interCode = ev.intercom_code;
       this.customerEventInfo.pathology = ev.pathology;
@@ -377,18 +363,11 @@ export default {
       this.customerEventInfo.eventType = ev.type;
       this.customerEventInfo.eventId = ev.id;
       this.customerEventInfo.eventTitle = `${ev.text} ${this.$moment(ev.start_date, 'YYYY-MM-DD HH:mm').format('HH:mm')} - ${this.$moment(ev.end_date, 'YYYY-MM-DD HH:mm').format('HH:mm')}`
-      this.setDisableInput(false);
-      this.controlModal(true);
-      if (this.$route.query.id_employee === ev.id_employee && !ev.readonly) {
-        this.setDisableTimePicker(false);
-        // this.setDisableInput(false);
-      } else if (ev.readonly) {
-        this.setDisableTimePicker(true);
-        this.setDisableInput(true);
+      this.disableInput = false;
+      this.openModal = true;
+      if (this.user.employee_id === Number(ev.id_employee, 10) && !ev.readonly) {
+        this.disableTimePicker = false;
       }
-      // if (this.$route.query.id_employee === ev.id_employee && ev.type !== 'alenvi_past') {
-      //   this.setDisableTimePicker(false);
-      // }
     };
     scheduler.attachEvent('onClick', (id, e) => {
       if (this.customer) {
@@ -408,6 +387,9 @@ export default {
           this.$refs.cal_header.style.left = `350px`
         } else if (this.customer && !this.$q.platform.is.mobile && !this.toggleDrawer) {
           headerToFix.classList.add('header-fixed-customer');
+        } else if (!this.customer && !this.$q.platform.is.mobile && this.toggleDrawer) {
+          headerToFix.classList.add('header-fixed');
+          this.$refs.cal_header.style.left = scheduler.getState().mode === 'month' ? '250px' : `300px`;
         } else {
           headerToFix.classList.add('header-fixed');
         }
@@ -415,6 +397,9 @@ export default {
         headerToFix.classList.add('header-fixed-customer');
       } else if (scroll.position >= 131 && this.width < 768) {
         headerToFix.classList.add('header-fixed');
+      } else if (scroll.position === 0 && !this.customer && this.toggleDrawer) {
+        this.$refs.cal_header.style.left = scheduler.getState().mode !== 'month' ? '50px' : `-1px`
+        headerToFix.classList.remove('header-fixed');
       } else {
         this.$refs.cal_header.style.left = scheduler.getState().mode === 'month' ? this.$refs.cal_header.style.left : `50px`
         headerToFix.classList.remove('header-fixed');
@@ -422,12 +407,12 @@ export default {
       }
     }, 10),
     onResize: debounce(function (size) {
-      scheduler.updateView();
-      // this.width = size.width;
-      // this.height = size.height;
+      // scheduler.updateView();
+      scheduler.setCurrentView();
     }, 500),
-    updateEvent (event, done) { // 'event' & 'done' are parameters given by Quasar when using 'loader' prop with q-btn
+    async updateEvent () {
       try {
+        this.modalBtnLoading = true;
         const ev = scheduler.getEvent(this.customerEventInfo.eventId);
         ev.door_code = this.customerEventInfo.doorCode;
         ev.intercom_code = this.customerEventInfo.interCode;
@@ -442,9 +427,54 @@ export default {
           ev.dateChanged = true;
         }
         // Sending data to child component (no need of vuex)
-        this.$emit('eventUpdated', ev);
+        // this.$emit('eventUpdated', ev);
+        if (this.personType === 'employee' && this.user.employee_id === Number(ev.id_employee, 10) && ev.dateChanged) {
+          const updateServicePayload = {
+            startDate: this.$moment(ev.start_date).format('YYYYMMDDHHmm'),
+            endDate: this.$moment(ev.end_date).format('YYYYMMDDHHmm')
+          }
+          await this.$ogust.updateServiceById(ev.id, updateServicePayload);
+          const planningUpdateParams = {
+            type: 'Modif. Intervention',
+            content: `${this.$moment(ev.start_date).format('dddd DD/MM')}.\nIntervention chez ${ev.text} de ${this.$moment(ev.start_date).format('HH:mm')} à ${this.$moment(ev.end_date).format('HH:mm')}`,
+            involved: ev.text,
+            check: {
+              isChecked: true,
+              checkBy: process.env.ALENVI_BOT_ID,
+              checkedAt: new Date()
+            }
+          };
+          await this.$planningUpdates.storePlanningupdates(this.user.employee_id, planningUpdateParams);
+        }
+        const customerDetailsPayload = {
+          arrayValues: {
+            NIVEAU: ev.pathology,
+            COMMNIV: ev.comments,
+            DETAILEVE: ev.interventionDetails,
+            AUTRESCOMM: ev.misc
+          }
+        };
+        await this.$ogust.editOgustCustomerDetails(ev.id_customer, customerDetailsPayload);
+        const customerCodesPayload = {
+          door_code: ev.door_code,
+          intercom_code: ev.intercom_code
+        };
+        await this.$ogust.editOgustCustomer(ev.id_customer, customerCodesPayload);
+        // Renders immediately the updated event in calendar
+        scheduler.updateEvent(ev.id);
+        scheduler.setCurrentView();
+
+        this.closeModal();
+        this.$q.notify({
+          color: 'positive',
+          icon: 'thumb up',
+          detail: 'Ta demande a bien été enregistrée',
+          position: 'bottom-right',
+          timeout: 2500
+        });
       } catch (e) {
         console.error(e);
+        this.modalBtnLoading = false;
         this.$q.notify({
           color: 'error',
           icon: 'warning',
@@ -452,27 +482,12 @@ export default {
           position: 'bottom-right',
           timeout: 2500
         });
-        done();
       }
     },
-    ...mapMutations({
-      setDisableInput: 'calendar/setDisableInput',
-      setDisableTimePicker: 'calendar/setDisableTimePicker',
-      controlModal: 'calendar/controlModal',
-    }),
     displayFilter () {
       this.$store.commit('calendar/toggleFilter', !this.showFilter)
     },
     applyFilter () {
-      // scheduler.filter_week = (id, event) => {
-      // console.log(id);
-      // console.log(this.personChosen.indexOf(event.id_employee));
-      //   this.$emit('applyFilter');
-      //   if (this.personChosen && this.personChosen.indexOf(event.id_employee) !== -1) {
-      //     return true;
-      //   }
-      //   return false;
-      // }
       scheduler.filter_day = scheduler.filter_month = scheduler.filter_three_days = scheduler.filter_week = (id, event) => {
         if ((this.personChosen && this.personChosen === event.id_employee) || (this.personChosen && this.personChosen === event.id_customer)) {
           return true;
@@ -480,15 +495,14 @@ export default {
         return false;
       }
       this.$emit('applyFilter');
+    },
+    closeModal () {
+      this.openModal = false;
+      this.disableInput = true;
+      this.disableTimePicker = true;
+      this.modalBtnLoading = false;
     }
   }
-  // NOT SUPPORTED BY FIREFOX
-  // created () {
-  //   window.addEventListener('scroll', this.handleScroll);
-  // },
-  // destroyed () {
-  //   window.removeEventListener('scroll', this.handleScroll);
-  // }
 }
 </script>
 
@@ -655,127 +669,5 @@ export default {
   padding: 5px;
   overflow: hidden;
 }
-
-  /* .custom-field
-    margin: 16px 0
-
-  .dhx_scale_hour
-    border-bottom: none
-    overflow: visible
-
-  .dhx_cal_data
-    overflow-y: visible
-    overflow-x: visible
-    border-top: none
-    /*padding-top: 10px;*/
-
-  /* // .dhx_cal_header
-  //   position: fixed
-  //   background: white
-
-  .dhx_cal_header div div
-    border: none
-
-  .dhx_scale_bar
-    line-height: 20px
-    // position: fixed
-
-  .dhx_scale_holder
-    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAsCAIAAAArRUU2AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAB3RJTUUH4gEREC41Aw9nHAAAABZJREFUCNdj+P//PxMDA8OQwOfPnwcAKy4FwcX82PUAAAAASUVORK5CYII=')
-
-  .dhx_scale_holder_now
-    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAsCAIAAAArRUU2AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAB3RJTUUH4gEREDIsgROSgQAAABZJREFUCNdj+P95IRMDA8OQwOcvPgQA44cFa6kqCcUAAAAASUVORK5CYII=')
-
-  .dhx_cal_navline.dhx_cal_date
-    color: #737373
-
-  .dhx_cal_tab
-    color: #737373
-    background-color: none
-    &:hover
-      text-decoration: none
-      background-color: rgba(0, 0, 0, .07)
-
-  .dhx_cal_tab.active
-    background-color: rgba(0, 0, 0, .07)
-    color: #737373
-    font-weight: 700
-    &:hover
-      background-color: rgba(0, 0, 0, .1)
-
-  .dhx_cal_today_button
-    color: #737373
-    &:hover
-      text-decoration: none
-      background-color: rgba(0, 0, 0, .07)
-
-  .dhx_cal_prev_button
-    width: 30px
-    border-radius: 50%
-    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAAAAAAAA+UO7fwAAAAlwSFlzAAAASAAAAEgARslrPgAAAORJREFUSMft1T8KwjAUBvAvcRI8jFtbOviHHkDwJIXuegGbHsFTiIODi2nOIG46OIirLk1dOog45CURHPJtGV5+PHi8B4SEhPxT8jwfUWt6rmhRFEvG2DpJkn5d1zvTOuaKtm276J5nrfVQCHE3qeWe0IvWemqKWnf8BZ0IIU6UP8iwD5QM+0IBwlR/oNemabKqqo42KEAbroct4tSxlPKQpukTQAZgwDmfR1G0UUrdfgr7xsmbyxdutTJ94Na7usMZgHGHz+I4XiuljIbQ6UhIKfdvna/Ksty6/EeOzVkMCQnxlhck2ouoK+MN0AAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxOC0wMS0xOFQxMDowNzoxMyswMDowMGL8TZcAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTgtMDEtMThUMTA6MDc6MTMrMDA6MDATofUrAAAAKHRFWHRzdmc6YmFzZS11cmkAZmlsZTovLy90bXAvbWFnaWNrLU5Td0Y1d0NE+kVb4wAAAABJRU5ErkJggg==') no-repeat center center
-    &:hover
-      background-color: rgba(0, 0, 0, .07)
-
-  .dhx_cal_event .dhx_title
-    text-align: start
-
-  .dhx_cal_event .dhx_footer
-    background: none
-    &:hover
-      background: none
-
-  .dhx_cal_event:hover .dhx_footer
-    background: none
-
-  .dhx_cal_next_button
-    width: 30px
-    border-radius: 50%
-    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAAAAAAAA+UO7fwAAAAlwSFlzAAAASAAAAEgARslrPgAAAPRJREFUSMft1aFOxDAcgPHvP2YwQLBonmFbdwkYPAlP0mTzuwfYPO6egIA4dwmotbwNqHMrhplT164Hpp9s2v7SihZSqdR/pbW+i7HPmc/kpmk6EdlUVXVujNn9Cay1vhaRZ+BSRFZ1Xcs4jh8nh621e6XUC/AIXAH3S07uddXGmG+l1OuMi8gqFPeCZ7woircsyxbh3jCAtfZrKR4Ez3hZllsReQIufPEsFAbI81wOhvbHrpVjJx7Wtu3tNE3vwA2Ac64bhmF9UngpGgTHQL3hWCh4PpnA54yKyLrv+yDUC/59MnPgwTnXLUGDivUtplKpaP0Awbh4tLAnJEMAAAAldEVYdGRhdGU6Y3JlYXRlADIwMTgtMDEtMThUMTA6MDc6NTArMDA6MDDXXlnwAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDE4LTAxLTE4VDEwOjA3OjUwKzAwOjAwpgPhTAAAACh0RVh0c3ZnOmJhc2UtdXJpAGZpbGU6Ly8vdG1wL21hZ2ljay1icU1SUGdGMAb+9OcAAAAASUVORK5CYII=') no-repeat center center
-    &:hover
-      background-color: rgba(0, 0, 0, .07)
-
-  .dhx_cancel_btn_set
-    background-color: $primary
-
-  .header-fixed
-    position: fixed
-    top: 0px !important
-    &-customer
-      top: 52px !important
-      position: fixed
-
-  .alenvi_event div
-    background-color: #E2007A !important;
-    color: white !important;
-
-  .dhx_cal_event_line.alenvi_event
-    background-color: #E2007A !important;
-    color: white !important;
-
-  .dhx_cal_event_clear.alenvi_event
-    background-color: #E2007A !important;
-    color: white !important;
-
-  .alenvi_past_event div
-    background-color: #FF54B0 !important;
-    color: white !important;
-
-  .dhx_cal_event_line.alenvi_past_event
-    background-color: #FF54B0 !important;
-    color: white !important;
-
-  .dhx_cal_event_clear.alenvi_past_event
-    background-color: #FF54B0 !important;
-    color: white !important;
-
-  .responsive-container
-    width: 100% !important
-
-  .event_date
-    font-weight: bold
-
-  .custom_event
-    padding: 5px
-    overflow: hidden */
 
 </style>
