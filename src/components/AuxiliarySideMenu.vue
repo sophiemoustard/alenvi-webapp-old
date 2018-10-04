@@ -26,7 +26,7 @@
       </q-item>
     </q-collapsible>
     <q-item-separator />
-    <q-item>
+    <q-item :to="{ name: 'profile customers', params: { id: user._id } }" exact>
       <q-item-main label="Bénéficiaires" />
     </q-item>
     <q-item-separator />

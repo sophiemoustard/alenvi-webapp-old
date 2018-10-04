@@ -183,6 +183,15 @@ const routes = [
         }
       },
       {
+        path: ':id/customers',
+        name: 'profile customers',
+        component: () => import('pages/ni/CustomersDirectory'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['profiles:read']
+        }
+      },
+      {
         path: ':id/account',
         name: 'account info',
         component: () => import('pages/ni/AccountInfo'),
