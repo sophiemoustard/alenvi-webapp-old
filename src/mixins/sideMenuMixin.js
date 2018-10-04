@@ -42,6 +42,9 @@ export const sideMenuMixin = {
         });
       }
     },
+    toAccountInfo () {
+      this.$router.push({ name: 'account info' });
+    },
     collapsibleOpening () {
       if (this.$refs[this.$route.meta.parent]) {
         this.activeRoutes[this.$route.meta.parent].open = true;
