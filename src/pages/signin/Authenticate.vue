@@ -92,7 +92,7 @@ export default {
         if (this.getUser.role.name === 'Client') {
           this.$router.replace({ name: 'customer home' });
         } else if (this.getUser.role.name === 'Auxiliaire') {
-          this.$router.replace({ name: 'profile', params: { id: this.$q.cookies.get('user_id') } });
+          this.$router.replace({ name: 'profile planning', params: { id: this.$q.cookies.get('user_id') }, query: { auxiliary: 'true' } });
         } else {
           this.$router.replace({ name: 'administrative directory', query: { role: 'Auxiliaire' } });
         }
