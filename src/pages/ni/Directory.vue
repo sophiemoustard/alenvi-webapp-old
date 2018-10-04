@@ -425,7 +425,7 @@ export default {
       }
     },
     goToUserProfile (userId) {
-      this.$router.push({ name: 'profile', params: { id: userId } });
+      this.$router.push({ name: 'personal info', params: { id: userId } });
     },
     resetForm () {
       this.$v.newUser.$reset();

@@ -35,7 +35,7 @@ export default {
     },
     toProfile (userId) {
       console.log('qwdqwd');
-      this.$router.push({ name: 'profile', params: { id: userId } });
+      this.$router.push({ name: 'personal info', params: { id: userId } });
     }
   }
 

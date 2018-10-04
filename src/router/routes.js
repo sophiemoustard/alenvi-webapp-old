@@ -134,8 +134,8 @@ const routes = [
       },
       {
         path: ':id',
-        name: 'profile',
-        component: () => import('pages/ni/Profile'),
+        name: 'personal info',
+        component: () => import('pages/ni/PersonalInfo'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
@@ -177,6 +177,15 @@ const routes = [
         path: ':id/docs',
         name: 'profile docs',
         component: () => import('pages/ni/Documents'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['profiles:read']
+        }
+      },
+      {
+        path: ':id/account',
+        name: 'account info',
+        component: () => import('pages/ni/AccountInfo'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['profiles:read']

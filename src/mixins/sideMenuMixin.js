@@ -28,7 +28,7 @@ export const sideMenuMixin = {
       }
       if (this.user.role.name !== 'Client') {
         this.$router.push({
-          name: 'profile',
+          name: 'personal info',
           params: {
             id: this.user._id
           }
