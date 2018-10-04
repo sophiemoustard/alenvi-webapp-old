@@ -54,8 +54,11 @@ export default {
       try {
         if (this.auxiliary) {
           this.setPersonType('employee');
+          this.personId = this.user.employee_id;
         } else {
           this.setPersonType('customer');
+          const customer = await this.getFirstCustomer();
+          this.personId = customer.id_customer;
         }
         if (this.personChosen) {
           const personData = await this.$ogust.getOgustPerson(this.personChosen, this.personType);
@@ -64,10 +67,10 @@ export default {
           this.events = await this.$ogust.getOgustEvents(this.personChosen, this.personType);
           this.toggleFilter(false);
         } else {
-          const personData = await this.$ogust.getOgustPerson(this.user.employee_id, this.personType);
+          const personData = await this.$ogust.getOgustPerson(this.personId, this.personType);
           this.setOgustUser(personData);
           this.title = personData.title;
-          this.events = await this.$ogust.getOgustEvents(this.user.employee_id, this.personType);
+          this.events = await this.$ogust.getOgustEvents(this.personId, this.personType);
         }
       } catch (e) {
         console.error(e)
@@ -102,14 +105,15 @@ export default {
         }
       }
     },
+    async getFirstCustomer () {
+      const customers = await this.$ogust.getCustomers({ sector: this.user.sector });
+      const filteredCustomers = this.$_.filter(customers, customer => !customer.last_name.match(/^ALENVI/i));
+      return filteredCustomers[0];
+    },
     ...mapMutations({
-      setDisableInput: 'calendar/setDisableInput',
-      controlModal: 'calendar/controlModal',
-      getOgustToken: 'calendar/getOgustToken',
-      toggleFilter: 'calendar/toggleFilter',
       setOgustUser: 'calendar/setOgustUser',
       setPersonType: 'calendar/setPersonType',
-      setModalBtnLoading: 'calendar/setModalBtnLoading'
+      toggleFilter: 'calendar/toggleFilter'
     })
   }
 }

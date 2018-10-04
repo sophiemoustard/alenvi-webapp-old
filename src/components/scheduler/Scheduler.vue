@@ -398,7 +398,7 @@ export default {
       } else if (scroll.position >= 131 && this.width < 768) {
         headerToFix.classList.add('header-fixed');
       } else if (scroll.position === 0 && !this.customer && this.toggleDrawer) {
-        this.$refs.cal_header.style.left = scheduler.getState().mode !== 'month' ? this.$refs.cal_header.style.left : `-1px`
+        this.$refs.cal_header.style.left = scheduler.getState().mode !== 'month' ? '50px' : `-1px`
         headerToFix.classList.remove('header-fixed');
       } else {
         this.$refs.cal_header.style.left = scheduler.getState().mode === 'month' ? this.$refs.cal_header.style.left : `50px`
