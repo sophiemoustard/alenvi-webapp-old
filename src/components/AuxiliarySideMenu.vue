@@ -12,18 +12,17 @@
       <template slot="header">
         <q-item-main :class="{'text-weight-bold': activeRoutes.planning.highlight }" label="Planning" />
       </template>
-      <!-- <q-item :to="{ name: 'rh directory' }"> -->
-      <q-item>
+      <!-- <q-item>
         <q-item-side icon="event" />
         <q-item-main label="Le mien" />
-      </q-item>
-      <q-item>
-        <q-item-side icon="people" />
-        <q-item-main label="Bénéficiaires" />
-      </q-item>
-      <q-item>
+      </q-item> -->
+      <q-item :to="{ name: 'profile planning', params: { id: user._id }, query: { auxiliary: 'true' } }" exact>
         <q-item-side icon="face" />
         <q-item-main label="Auxiliaires" />
+      </q-item>
+      <q-item :to="{ name: 'profile planning', params: { id: user._id }, query: { customer: 'true' } }" exact>
+        <q-item-side icon="people" />
+        <q-item-main label="Bénéficiaires" />
       </q-item>
     </q-collapsible>
     <q-item-separator />
