@@ -14,7 +14,7 @@ const routes = [
         if (store.getters['main/user'] && store.getters['main/user'].role.name === 'Client') {
           return next({ name: 'customer home' });
         } else if (store.getters['main/user'] && store.getters['main/user'].role.name === 'Auxiliaire') {
-          return next({ name: 'profile', params: { id: store.getters['main/user']._id } });
+          return next({ name: 'profile planning', params: { id: store.getters['main/user']._id }, query: { auxiliary: 'true' } });
         } else if (store.getters['main/user'] && store.getters['main/user'].role.name !== 'Auxiliaire' && store.getters['main/user'].role.name !== 'Client') {
           return next({ name: 'administrative directory', query: { role: 'Auxiliaire' } });
         } else {
@@ -159,10 +159,18 @@ const routes = [
         path: ':id/planning',
         name: 'profile planning',
         component: () => import('pages/ni/Planning'),
-        props: (route) => ({ auxiliary: route.query.auxiliary, customer: route.query.customer }),
+        props: (route) => ({ auxiliary: route.query.auxiliary || null, customer: route.query.customer || null }),
+        beforeEnter: (to, from, next) => {
+          if (!to.query.auxiliary && !to.query.customer) {
+            to.query.auxiliary = 'true';
+            return next();
+          }
+          next();
+        },
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['planning:read']
+          permissions: ['planning:read'],
+          parent: 'planning'
         }
       },
       {

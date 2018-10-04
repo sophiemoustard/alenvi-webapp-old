@@ -84,7 +84,6 @@ export default {
                 value: employees[k].id_employee
               });
             }
-            console.log('PERSONS', this.persons);
             break;
           case 'customer':
             const customers = await this.$ogust.getCustomers({ sector });

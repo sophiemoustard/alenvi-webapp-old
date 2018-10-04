@@ -12,7 +12,7 @@ import 'dhtmlx-scheduler'
 export default {
   metaInfo () {
     return {
-      title: this.title
+      title: this.title ? this.title : '-'
     }
   },
   props: {
@@ -30,7 +30,7 @@ export default {
   },
   data () {
     return {
-      events: [],
+      events: null,
       title: '',
       token: '',
       personId: '',
@@ -42,36 +42,32 @@ export default {
       user: 'main/user',
       personChosen: 'calendar/personChosen',
       personType: 'calendar/personType'
-    })
-  },
-  watch: {
-    events: function (value) {
-      scheduler.parse(value, 'json');
+    }),
+    auxiliaryComp () {
+      return this.auxiliary;
+    },
+    customerComp () {
+      return this.customer;
     }
   },
   methods: {
-    async getEventsData () {
+    async getEventsData (event) {
       try {
-        if (this.auxiliary) {
+        if (this.auxiliaryComp) {
           this.setPersonType('employee');
-          this.personId = this.user.employee_id;
+          this.personId = event ? this.personChosen : this.user.employee_id;
         } else {
           this.setPersonType('customer');
           const customer = await this.getFirstCustomer();
-          this.personId = customer.id_customer;
+          this.personId = event ? this.personChosen : customer.id_customer;
         }
-        if (this.personChosen) {
-          const personData = await this.$ogust.getOgustPerson(this.personChosen, this.personType);
-          this.setOgustUser(personData);
-          this.title = personData.title;
-          this.events = await this.$ogust.getOgustEvents(this.personChosen, this.personType);
-          this.toggleFilter(false);
-        } else {
-          const personData = await this.$ogust.getOgustPerson(this.personId, this.personType);
-          this.setOgustUser(personData);
-          this.title = personData.title;
-          this.events = await this.$ogust.getOgustEvents(this.personId, this.personType);
-        }
+        const personData = await this.$ogust.getOgustPerson(this.personId, this.personType);
+        this.setOgustUser(personData);
+        this.title = personData.title;
+        this.events = await this.$ogust.getOgustEvents(this.personId, this.personType);
+        scheduler.clearAll();
+        scheduler.parse(this.events, 'json');
+        this.toggleFilter(false);
       } catch (e) {
         console.error(e)
         if (e.response) {
@@ -113,6 +109,7 @@ export default {
     ...mapMutations({
       setOgustUser: 'calendar/setOgustUser',
       setPersonType: 'calendar/setPersonType',
+      setPersonChosen: 'calendar/setPersonChosen',
       toggleFilter: 'calendar/toggleFilter'
     })
   }

@@ -23,34 +23,44 @@
 
     <q-modal v-model="openModal" minimized :content-css="modalStyle" @hide="closeModal" @escape-key="closeModal">
       <p class="caption">{{ customerEventInfo.eventTitle }}</p>
-      <q-field class="custom-field">
-        <q-input v-model="customerEventInfo.doorCode" float-label="Code Porte" type="text" :disable="disableInput" />
-      </q-field>
-      <q-field class="custom-field">
-        <q-input v-model="customerEventInfo.interCode" float-label="Code interphone" type="text" :disable="disableInput" />
-      </q-field>
-      <q-field class="custom-field">
-        <q-select v-model="customerEventInfo.pathology" float-label="Pathologie" :options="selectOptions" :disable="disableInput"></q-select>
-      </q-field>
-      <q-field class="custom-field">
-        <q-input v-model="customerEventInfo.comments" float-label="Commentaires" type="textarea" :min-rows="4" :disable="disableInput" />
-      </q-field>
-      <q-field class="custom-field">
-        <q-input v-model="customerEventInfo.interventionDetails" float-label="Détails intervention" type="textarea" :min-rows="4"
-          :disable="disableInput" />
-      </q-field>
-      <q-field class="custom-field">
-        <q-input v-model="customerEventInfo.misc" float-label="Autres" type="textarea" :min-rows="4" :disable="disableInput" />
-      </q-field>
-      <div class="row">
-        <q-field class="on-left" style="width: 49%">
-          <q-datetime class="custom-field" type="time" format24h clear-label="Effacer" stack-label="Heure de début" ok-label="OK" cancel-label="Annuler" v-model="customerEventInfo.eventFrom"
-            :disable="disableTimePicker" />
-        </q-field>
-        <q-field class="on-right" style="width: 49%">
-          <q-datetime class="custom-field" type="time" format24h clear-label="Effacer" stack-label="Heure de fin" ok-label="OK" cancel-label="Annuler" v-model="customerEventInfo.eventTo"
-            :disable="disableTimePicker" />
-        </q-field>
+      <div class="margin-input">
+        <p class="input-caption">Code porte</p>
+        <q-input v-model="customerEventInfo.doorCode" type="text" :disable="disableInput" inverted-light color="white" />
+      </div>
+      <div class="margin-input">
+        <p class="input-caption">Code interphone</p>
+        <q-input v-model="customerEventInfo.interCode" type="text" :disable="disableInput" inverted-light color="white" />
+      </div>
+      <div class="margin-input">
+        <p class="input-caption">Pathologie</p>
+        <q-select v-model="customerEventInfo.pathology" :options="selectOptions" :disable="disableInput" inverted-light color="white" />
+      </div>
+      <div class="margin-input">
+        <p class="input-caption">Commentaires</p>
+        <q-input v-model="customerEventInfo.comments" type="textarea" :min-rows="4" :disable="disableInput" inverted-light color="white" />
+      </div>
+      <div class="margin-input">
+        <p class="input-caption">Détails intervention</p>
+        <q-input v-model="customerEventInfo.interventionDetails" type="textarea" :min-rows="4"
+          :disable="disableInput" inverted-light color="white" />
+      </div>
+      <div class="margin-input">
+        <p class="input-caption">Autres</p>
+        <q-input v-model="customerEventInfo.misc" type="textarea" :min-rows="4" :disable="disableInput" inverted-light color="white" />
+      </div>
+      <div class="margin-input">
+        <div class="row gutter-sm">
+          <div class="col-xs-6">
+            <p class="input-caption">Heure de début</p>
+            <q-datetime type="time" format24h clear-label="Effacer" ok-label="OK" cancel-label="Annuler" v-model="customerEventInfo.eventFrom"
+              :disable="disableTimePicker" inverted-light color="white" />
+          </div>
+          <div class="col-xs-6">
+            <p class="input-caption">Heure de fin</p>
+            <q-datetime type="time" format24h clear-label="Effacer" ok-label="OK" cancel-label="Annuler" v-model="customerEventInfo.eventTo"
+              :disable="disableTimePicker" inverted-light color="white" />
+          </div>
+        </div>
       </div>
       <div class="row justify-end">
         <q-btn :loading="modalBtnLoading" @click="updateEvent" class="on-left" color="primary"
@@ -407,8 +417,8 @@ export default {
       }
     }, 10),
     onResize: debounce(function (size) {
-      // scheduler.updateView();
-      scheduler.setCurrentView();
+      scheduler.updateView();
+      // scheduler.setCurrentView();
     }, 500),
     async updateEvent () {
       try {
@@ -488,13 +498,13 @@ export default {
       this.$store.commit('calendar/toggleFilter', !this.showFilter)
     },
     applyFilter () {
-      scheduler.filter_day = scheduler.filter_month = scheduler.filter_three_days = scheduler.filter_week = (id, event) => {
-        if ((this.personChosen && this.personChosen === event.id_employee) || (this.personChosen && this.personChosen === event.id_customer)) {
-          return true;
-        }
-        return false;
-      }
-      this.$emit('applyFilter');
+      // scheduler.filter_day = scheduler.filter_month = scheduler.filter_three_days = scheduler.filter_week = (id, event) => {
+      //   if ((this.personChosen && this.personChosen === event.id_employee) || (this.personChosen && this.personChosen === event.id_customer)) {
+      //     return true;
+      //   }
+      //   return false;
+      // }
+      this.$emit('applyFilter', true);
     },
     closeModal () {
       this.openModal = false;
@@ -515,6 +525,14 @@ export default {
 .custom-field {
   margin: 16px 0;
 }
+
+ .q-if-inverted {
+    border: 1px solid #D0D0D0;
+ }
+
+ .margin-input {
+   margin-bottom: 6px;
+ }
 
 .dhx_scale_hour {
   border-bottom: none;
