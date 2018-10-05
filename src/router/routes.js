@@ -146,7 +146,7 @@ const routes = [
             name: 'profiles:edit',
             when: (paramsId, cookieId) => paramsId === cookieId
           }, 'profiles:edit:user'],
-          parent: 'administrative',
+          parent: 'administrative'
         }
       },
       {
@@ -155,7 +155,8 @@ const routes = [
         component: () => import('pages/ni/Salaries'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['profiles:read']
+          permissions: ['profiles:read'],
+          parent: 'administrative'
         }
       },
       {
@@ -182,7 +183,8 @@ const routes = [
         component: () => import('pages/ni/Documents'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['profiles:read']
+          permissions: ['profiles:read'],
+          parent: 'administrative'
         }
       },
       {
@@ -191,13 +193,14 @@ const routes = [
         component: () => import('pages/ni/CustomersDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['profiles:read']
+          permissions: ['profiles:read'],
         }
       },
       {
-        path: ':id/customers/:employee_id',
+        path: ':id/customers/:customerId',
         name: 'profile customers info',
-        component: () => import('pages/ni/CustomersDirectory'),
+        props: true,
+        component: () => import('pages/ni/CustomerInfo'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['profiles:read']

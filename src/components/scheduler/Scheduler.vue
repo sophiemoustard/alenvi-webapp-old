@@ -1,5 +1,5 @@
 <template>
-  <div class="" style="max-width: 90vw; margin: auto;">
+  <div>
     <div ref="scheduler_here" class="dhx_cal_container" style="width:100%; height:100%;">
       <q-scroll-observable @scroll="handleScroll" />
       <q-resize-observable v-if="customer" @resize="onResize" />
@@ -403,7 +403,7 @@ export default {
         } else {
           headerToFix.classList.add('header-fixed');
         }
-      } else if (this.customer && scroll.position >= 71 && this.width < 768) {
+      } else if (scroll.position >= 71 && this.width < 768) {
         headerToFix.classList.add('header-fixed-customer');
       } else if (scroll.position >= 131 && this.width < 768) {
         headerToFix.classList.add('header-fixed');

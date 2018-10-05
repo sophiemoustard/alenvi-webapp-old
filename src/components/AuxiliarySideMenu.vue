@@ -12,10 +12,10 @@
       <template slot="header">
         <q-item-main :class="{'text-weight-bold': activeRoutes.planning.highlight }" label="Planning" />
       </template>
-      <!-- <q-item>
+      <q-item :to="{ name: 'profile planning', params: { id: user._id }, query: { auxiliary: 'true', self: 'true' } }" exact>
         <q-item-side icon="event" />
         <q-item-main label="Le mien" />
-      </q-item> -->
+      </q-item>
       <q-item :to="{ name: 'profile planning', params: { id: user._id }, query: { auxiliary: 'true' } }" exact>
         <q-item-side icon="face" />
         <q-item-main label="Auxiliaires" />
@@ -35,15 +35,15 @@
         <q-item-main :class="{'text-weight-bold': activeRoutes.administrative.highlight }" label="Administratif" />
       </template>
       <!-- <q-item :to="{ name: 'view planning'}" exact> -->
-      <q-item>
+      <q-item :to="{ name: 'personal info', params: { id: user._id }}" exact>
         <q-item-side icon="person" />
         <q-item-main label="Infos personnelles" />
       </q-item>
-      <q-item>
+      <q-item :to="{ name: 'profile salaries', params: { id: user._id }}" exact>
         <q-item-side icon="layers" />
         <q-item-main label="Paye" />
       </q-item>
-      <q-item>
+      <q-item :to="{ name: 'profile docs', params: { id: user._id }}" exact>
         <q-item-side icon="insert_drive_file" />
         <q-item-main label="Documents" />
       </q-item>
