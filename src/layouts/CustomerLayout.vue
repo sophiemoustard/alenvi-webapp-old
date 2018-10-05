@@ -15,7 +15,7 @@
     </q-layout-header>
 
     <q-layout-drawer side="left" v-model="toggleDrawer">
-      <customer-side-menu v-if="user" :user="user" />
+      <side-menu-customer v-if="user" :user="user" />
     </q-layout-drawer>
 
     <q-page-container>
@@ -28,13 +28,11 @@
 <script>
 import { mapGetters } from 'vuex'
 
-import SideMenu from '../components/SideMenu'
-import CustomerSideMenu from '../components/CustomerSideMenu'
+import sideMenuCustomer from '../components/sideMenuCustomer'
 
 export default {
   components: {
-    SideMenu,
-    CustomerSideMenu
+    sideMenuCustomer
   },
   computed: {
     ...mapGetters({
