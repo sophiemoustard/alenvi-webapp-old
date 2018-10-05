@@ -15,7 +15,7 @@
         <q-input type="password" v-model.trim="user.credentials.passwordConfirm" @blur="$v.user.credentials.passwordConfirm.$touch" inverted-light color="white" />
       </q-field>
       <div class="row justify-center">
-        <q-btn big @click="updateUser()" color="primary">Modifier</q-btn>
+        <q-btn big @click="updateUser()" color="primary" :disabled="$v.user.$invalid">Modifier</q-btn>
       </div>
       <hr style="margin-top: 5%; margin-bottom: 5%">
       <div class="row justify-center">
