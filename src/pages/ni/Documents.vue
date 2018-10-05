@@ -5,8 +5,7 @@
       :data="documents"
       :columns="columns"
       row-key="name"
-      :rows-per-page-options="[10]"
-      :pagination.sync="pagination"
+      hide-bottom
       :loading="tableLoading">
         <q-td slot="body-cell-title" slot-scope="props" :props="props">
           {{ props.value }}
