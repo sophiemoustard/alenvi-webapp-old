@@ -17,6 +17,7 @@
         <q-field>
           <q-input
             v-model="customer.main_address.line"
+            disable
             inverted-light
             color="white" />
         </q-field>
@@ -29,7 +30,9 @@
           <q-input
             v-model="customer.door_code"
             inverted-light
-            color="white" />
+            color="white"
+            @focus="saveTmp('door_code')"
+            @blur="updateCustomer('door_code')" />
         </q-field>
       </div>
       <div class="col-xs-12 col-md-6">
@@ -40,7 +43,9 @@
           <q-input
             v-model="customer.intercom_code"
             inverted-light
-            color="white" />
+            color="white"
+            @focus="saveTmp('intercom_code')"
+            @blur="updateCustomer('intercom_code')" />
         </q-field>
       </div>
       <div class="col-xs-12 col-md-6">
@@ -52,7 +57,9 @@
             v-model="customerInfo.pathology"
             :options="selectOptions"
             inverted-light
-            color="white" />
+            color="white"
+            @focus="saveTmp('customerInfo')"
+            @blur="updateCustomerInfo" />
         </q-field>
       </div>
       <div class="col-xs-12 col-md-6">
@@ -65,7 +72,9 @@
             type="textarea"
             :rows="6"
             inverted-light
-            color="white" />
+            color="white"
+            @focus="saveTmp('customerInfo')"
+            @blur="updateCustomerInfo" />
         </q-field>
       </div>
       <div class="col-xs-12 col-md-6">
@@ -78,7 +87,9 @@
             type="textarea"
             :rows="6"
             inverted-light
-            color="white" />
+            color="white"
+            @focus="saveTmp('customerInfo')"
+            @blur="updateCustomerInfo" />
         </q-field>
       </div>
       <div class="col-xs-12 col-md-6">
@@ -91,7 +102,9 @@
             type="textarea"
             :rows="6"
             inverted-light
-            color="white" />
+            color="white"
+            @focus="saveTmp('customerInfo')"
+            @blur="updateCustomerInfo" />
         </q-field>
       </div>
     </div>
@@ -106,6 +119,7 @@ export default {
   },
   data () {
     return {
+      tmpInput: '',
       isLoaded: false,
       customer: null,
       customerInfo: {
@@ -143,7 +157,13 @@ export default {
           label: 'Autre',
           value: 'Autre'
         }
-      ]
+      ],
+      infoTitles: {
+        pathology: 'NIVEAU',
+        comments: 'COMMNIV',
+        interventionDetails: 'DETAILEVE',
+        misc: 'AUTRESCOMM'
+      }
     }
   },
   async mounted () {
@@ -158,14 +178,8 @@ export default {
         if (customerDetails == null) {
           return;
         } else {
-          const infoTitles = {
-            pathology: 'NIVEAU',
-            comments: 'COMMNIV',
-            interventionDetails: 'DETAILEVE',
-            misc: 'AUTRESCOMM'
-          }
-          for (const k in infoTitles) {
-            this.customerInfo[k] = customerDetails[infoTitles[k]]
+          for (const k in this.infoTitles) {
+            this.customerInfo[k] = customerDetails[this.infoTitles[k]]
           }
         }
         this.isLoaded = true;
@@ -175,11 +189,75 @@ export default {
           color: 'negative',
           icon: 'warning',
           detail: 'Erreur lors du chargement des données',
-          position: 'bottom-right',
+          position: 'bottom-left',
           timeout: 2500
         });
       }
     },
+    saveTmp (path) {
+      if (path === 'customerInfo') {
+        this.tmpInput = Object.assign({}, this.customerInfo);
+      } else {
+        this.tmpInput = this.$_.get(this.customer, path);
+      }
+    },
+    async updateCustomerInfo () {
+      try {
+        console.log('info', this.customerInfo);
+        if (this.$_.isEqual(this.tmpInput, this.customerInfo)) return 0;
+        let data = { arrayValues: {} };
+        const infoTitles = {
+          pathology: 'NIVEAU',
+          comments: 'COMMNIV',
+          interventionDetails: 'DETAILEVE',
+          misc: 'AUTRESCOMM'
+        };
+        for (const k in infoTitles) {
+          data.arrayValues[infoTitles[k]] = this.customerInfo[k]
+        }
+        await this.$ogust.editOgustCustomerDetails(this.customerId, data);
+        this.$q.notify({
+          color: 'positive',
+          icon: 'thumb up',
+          detail: 'Modification effectuée !',
+          position: 'bottom-left',
+          timeout: 2500
+        });
+      } catch (e) {
+        console.error(e);
+        this.$q.notify({
+          color: 'negative',
+          icon: 'warning',
+          detail: 'Erreur lors de l\'édition de la fiche bénéficiaire :/',
+          position: 'bottom-left',
+          timeout: 2500
+        });
+      }
+    },
+    async updateCustomer (path) {
+      try {
+        if (this.tmpInput === this.$_.get(this.customer, path)) return 0;
+        const value = this.$_.get(this.customer, path);
+        const payload = this.$_.set({}, path, value);
+        await this.$ogust.editOgustCustomer(this.customerId, payload);
+        this.$q.notify({
+          color: 'positive',
+          icon: 'thumb up',
+          detail: 'Modification effectuée !',
+          position: 'bottom-left',
+          timeout: 2500
+        });
+      } catch (e) {
+        console.error(e);
+        this.$q.notify({
+          color: 'negative',
+          icon: 'warning',
+          detail: 'Erreur lors de l\'édition de la fiche bénéficiaire :/',
+          position: 'bottom-left',
+          timeout: 2500
+        });
+      }
+    }
   }
 }
 </script>

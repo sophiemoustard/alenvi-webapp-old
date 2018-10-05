@@ -23,7 +23,7 @@
         slot-scope="props"
         :props="props"
         class="datatable-row"
-        @click.native="goToUserProfile(props.row.auxiliary._id)">
+        @click.native="goToCustomerProfile(props.row.customerId)">
         <q-td v-for="col in props.cols"
           :key="col.name"
           :props="props">
@@ -89,15 +89,15 @@ export default {
         this.tableLoading = true;
         const customers = this.ownCustomers ? await this.$ogust.getEmployeeCustomers(this.currentUser.employee_id) : await this.$ogust.getCustomers({ sector: this.currentUser.sector });
         const filteredCustomers = this.$_.filter(customers, customer => !customer.last_name.match(/^ALENVI/i));
-        this.customersList = filteredCustomers.map(customer => ({ name: `${customer.title} ${customer.last_name}` }));
+        this.customersList = filteredCustomers.map(customer => ({ name: `${customer.title} ${customer.last_name}`, customerId: customer.id_customer }));
         this.tableLoading = false;
       } catch (e) {
         this.tableLoading = false;
         console.error(e);
       }
     },
-    goToUserProfile (userId) {
-      this.$router.push({ name: 'personal info', params: { id: userId } });
+    goToCustomerProfile (customerId) {
+      this.$router.push({ name: 'profile customers info', params: { id: this.currentUser._id, customerId } });
     }
   }
 }
