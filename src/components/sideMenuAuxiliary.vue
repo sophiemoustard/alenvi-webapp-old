@@ -28,9 +28,10 @@
     <q-item-separator />
     <q-collapsible ref="benef" v-model="activeRoutes.benef.open" collapseIcon="expand_more">
       <template slot="header">
-        <q-item-main :class="{'text-weight-bold': activeRoutes.planning.highlight }" label="Bénéficiaires" />
+        <q-item-main :class="{'text-weight-bold': activeRoutes.benef.highlight }" label="Bénéficiaires" />
       </template>
       <q-item :to="{ name: 'profile customers', params: { id: user._id } }" exact>
+        <q-item-side icon="account_box" />
         <q-item-main label="Fiches" />
       </q-item>
     </q-collapsible>
