@@ -1,5 +1,6 @@
 <template>
   <q-page padding class="neutral-background">
+    <h4>Fiches de paie</h4>
     <p v-if="documents.length == 0">Aucun document disponible</p>
     <q-table
       :data="documents"
