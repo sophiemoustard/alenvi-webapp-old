@@ -194,6 +194,7 @@ const routes = [
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['profiles:read'],
+          parent: 'benef'
         }
       },
       {
