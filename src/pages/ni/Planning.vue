@@ -70,35 +70,24 @@ export default {
         this.toggleFilter(false);
       } catch (e) {
         console.error(e)
-        if (e.response) {
-          console.error(e.response);
-          if (e.response.status === 404) {
-            this.events = [];
-            this.$store.commit('calendar/toggleFilter', false);
-            return this.$q.notify({
-              color: 'negative',
-              icon: 'warning',
-              detail: 'Aucune intervention dans la période demandée',
-              position: 'bottom-right',
-              timeout: 2500
-            });
-          }
-          this.$q.notify({
-            color: 'negative',
+        if (e.status === 404) {
+          this.events = [];
+          this.$store.commit('calendar/toggleFilter', false);
+          return this.$q.notify({
+            color: 'secondary',
             icon: 'warning',
-            detail: "Erreur de chargement des données :/ Si le problème persiste, contacte l'équipe technique :)",
-            position: 'bottom-right',
-            timeout: 2500
-          });
-        } else {
-          this.$q.notify({
-            color: 'negative',
-            icon: 'warning',
-            detail: "Erreur de chargement des données :/ Si le problème persiste, contacte l'équipe technique :)",
+            detail: 'Aucune intervention dans la période demandée',
             position: 'bottom-right',
             timeout: 2500
           });
         }
+        this.$q.notify({
+          color: 'negative',
+          icon: 'warning',
+          detail: "Erreur de chargement des données :/ Si le problème persiste, contacte l'équipe technique :)",
+          position: 'bottom-right',
+          timeout: 2500
+        });
       }
     },
     async getFirstCustomer () {
