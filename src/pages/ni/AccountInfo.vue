@@ -1,27 +1,33 @@
 <template>
   <q-page class="neutral-background" padding>
+    <h4>Mon compte</h4>
     <div class="center-account">
-      <q-field icon="email">
-        <q-input v-model="user.credentials.email" float-label="Email" />
+      <p class="input-caption">Email</p>
+      <q-field class="margin-input">
+        <q-input v-model="user.credentials.email" inverted-light color="white" />
       </q-field>
-      <q-field icon="ion-android-lock" helper="Entrez votre nouveau mot de passe. Il doit contenir au moins 6 caractères jusqu'à 20 maximum" :error="$v.user.credentials.password.$error"
-        error-label="Le mot de passe doit contenir entre 6 et 20 caractères.">
-        <q-input type="password" float-label="Nouveau mot de passe" v-model.trim="user.credentials.password" @blur="$v.user.credentials.password.$touch" />
+      <p class="input-caption">Mot de passe</p>
+      <q-field class="margin-input" :error="$v.user.credentials.password.$error" error-label="Le mot de passe doit contenir entre 6 et 20 caractères.">
+        <q-input type="password" v-model.trim="user.credentials.password" @blur="$v.user.credentials.password.$touch" inverted-light color="white" />
       </q-field>
-      <q-field icon="ion-android-lock" :error="$v.user.credentials.passwordConfirm.$error" error-label="Le mot de passe entré et la confirmation sont différents.">
-        <q-input type="password" float-label="Confirmation nouveau mot de passe" v-model.trim="user.credentials.passwordConfirm" @blur="$v.user.credentials.passwordConfirm.$touch" />
+      <p class="input-caption">Confirmation mot de passe</p>
+      <q-field class="margin-input last" :error="$v.user.credentials.passwordConfirm.$error" error-label="Le mot de passe entré et la confirmation sont différents.">
+        <q-input type="password" v-model.trim="user.credentials.passwordConfirm" @blur="$v.user.credentials.passwordConfirm.$touch" inverted-light color="white" />
       </q-field>
       <div class="row justify-center">
-        <q-btn big flat @click="updateUser()" color="primary">Modifier</q-btn>
+        <q-btn big @click="updateUser()" color="primary">Modifier</q-btn>
       </div>
-      <q-btn>Connecter votre compte Messenger</q-btn>
+      <hr style="margin-top: 5%; margin-bottom: 5%">
+      <div class="row justify-center">
+        <q-btn big color="primary" @click="connectToBotMessenger">Connecter votre compte Messenger</q-btn>
+      </div>
     </div>
   </q-page>
 </template>
 
 <script>
 import { required, email, sameAs, minLength, maxLength } from 'vuelidate/lib/validators'
-
+import { Cookies } from 'quasar'
 export default {
   data () {
     return {
@@ -92,6 +98,10 @@ export default {
         this.user.credentials.passwordConfirm = '';
         console.error(e);
       }
+    },
+    async connectToBotMessenger () {
+      const token = Cookies.get('alenvi_token');
+      window.location.href = `${process.env.MESSENGER_LINK}?ref=${token}`
     }
   }
 }
@@ -102,4 +112,9 @@ export default {
     max-width: 40%
     margin-left: auto
     margin-right: auto
+
+  .margin-input
+    margin-bottom: 6px
+    &.last
+      margin-bottom: 24px
 </style>
