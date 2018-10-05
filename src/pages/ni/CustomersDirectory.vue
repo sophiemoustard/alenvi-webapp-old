@@ -2,12 +2,12 @@
   <q-page class="neutral-background" padding>
     <div class="row items-center directory-header">
       <div class="col-xs-12 col-md-4">
-        <h4 class="no-margin">Bénéficiaires</h4>
+        <h4>Bénéficiaires</h4>
       </div>
-      <div class="col-xs-12 col-md-5">
+      <div class="col-xs-12 col-md-5 margin-bottom-mobile">
         <q-search class="no-border input-search" v-model="searchStr" placeholder="Rechercher un bénéficiaire" color="white" inverted-light />
       </div>
-      <div class="col-xs-12 col-md-3 row justify-end">
+      <div class="col-xs-12 col-md-3 row justify-end-custom">
         <q-toggle v-model="ownCustomers" color="primary" label="Mes bénéficiaires" @input="getCustomersList" />
       </div>
     </div>
@@ -15,7 +15,7 @@
       :data="filteredUsers"
       :columns="columns"
       row-key="name"
-      :rows-per-page-options="[15, 25, 35]"
+      :rows-per-page-options="[]"
       :pagination.sync="pagination"
       :loading="tableLoading">
       <q-tr
@@ -106,8 +106,19 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables'
 
+  .margin-bottom-mobile
+    @media (max-width: 767px)
+      margin-bottom: 20px
+
+  .justify-end-custom
+    justify-content: flex-end
+    @media (max-width: 767px)
+      justify-content: flex-start
+
   .directory-header
     margin-bottom: 35px
+    @media (max-width: 767px)
+      margin-bottom: 10px
     & .q-btn
       padding: 0
 
