@@ -14,6 +14,7 @@
       <div class="row justify-center">
         <q-btn big flat @click="updateUser()" color="primary">Modifier</q-btn>
       </div>
+      <q-btn>Connecter votre compte Messenger</q-btn>
     </div>
   </q-page>
 </template>
@@ -62,7 +63,7 @@ export default {
         const userToSend = {
           _id: this.$route.params.id,
           local: {
-            email: this.user.crendentials.email
+            email: this.user.credentials.email
           }
         };
         if (this.user.credentials.password) {
