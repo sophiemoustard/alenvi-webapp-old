@@ -11,6 +11,9 @@
       <q-field icon="ion-android-lock" :error="$v.user.credentials.passwordConfirm.$error" error-label="Le mot de passe entré et la confirmation sont différents.">
         <q-input type="password" float-label="Confirmation nouveau mot de passe" v-model.trim="user.credentials.passwordConfirm" @blur="$v.user.credentials.passwordConfirm.$touch" />
       </q-field>
+      <div class="row justify-center">
+        <q-btn big flat @click="updateUser()" color="primary">Modifier</q-btn>
+      </div>
     </div>
   </q-page>
 </template>
@@ -26,7 +29,8 @@ export default {
           email: '',
           password: '',
           passwordConfirm: ''
-        }
+        },
+        alenvi: {}
       }
     }
   },
@@ -41,6 +45,51 @@ export default {
         passwordConfirm: {
           sameAsPassword: sameAs('password')
         }
+      }
+    }
+  },
+  async mounted () {
+    try {
+      this.user.alenvi = await this.$users.getById(this.$route.params.id);
+      this.user.credentials.email = this.user.alenvi.local.email;
+    } catch (e) {
+      console.error(e);
+    }
+  },
+  methods: {
+    async updateUser () {
+      try {
+        const userToSend = {
+          _id: this.$route.params.id,
+          local: {
+            email: this.user.crendentials.email
+          }
+        };
+        if (this.user.credentials.password) {
+          userToSend.local.password = this.user.credentials.password
+        };
+        console.log(userToSend);
+        await this.$users.updateById(userToSend);
+        this.$q.notify({
+          color: 'positive',
+          icon: 'thumb up',
+          detail: 'Profil mis à jour',
+          position: 'bottom-right',
+          timeout: 2500
+        });
+        this.user.credentials.password = '';
+        this.user.credentials.passwordConfirm = '';
+      } catch (e) {
+        this.$q.notify({
+          color: 'negative',
+          icon: 'warning',
+          detail: 'Erreur lors de la mise à jour du profil',
+          position: 'bottom-right',
+          timeout: 2500
+        });
+        this.user.credentials.password = '';
+        this.user.credentials.passwordConfirm = '';
+        console.error(e);
       }
     }
   }
