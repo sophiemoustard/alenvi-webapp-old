@@ -35,15 +35,15 @@
         <q-item-main :class="{'text-weight-bold': activeRoutes.administrative.highlight }" label="Administratif" />
       </template>
       <!-- <q-item :to="{ name: 'view planning'}" exact> -->
-      <q-item>
+      <q-item :to="{ name: 'personal info', params: { id: user._id }}" exact>
         <q-item-side icon="person" />
         <q-item-main label="Infos personnelles" />
       </q-item>
-      <q-item>
+      <q-item :to="{ name: 'profile salaries', params: { id: user._id }}" exact>
         <q-item-side icon="layers" />
         <q-item-main label="Paye" />
       </q-item>
-      <q-item>
+      <q-item :to="{ name: 'profile docs', params: { id: user._id }}" exact>
         <q-item-side icon="insert_drive_file" />
         <q-item-main label="Documents" />
       </q-item>
