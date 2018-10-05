@@ -2,7 +2,7 @@
   <q-page padding v-if="userProfile" class="neutral-background">
     <profile-header v-if="currentUser.role.name !== 'Auxiliaire'" :profileId="id" class="header-margin" />
     <profile-tabs v-if="currentUser.role.name !== 'Auxiliaire'" :profileId="id" :tabsContent="tabsContent" />
-    <h4 v-if="currentUser.role.name === 'Auxiliaire'">Mettre à jour mes informations personnelles</h4>
+    <h4 v-if="currentUser.role.name === 'Auxiliaire'">Informations personnelles</h4>
     <profile-info v-if="currentUser.role.name === 'Auxiliaire'" />
   </q-page>
 </template>
