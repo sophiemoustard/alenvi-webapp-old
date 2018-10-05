@@ -26,9 +26,14 @@
       </q-item>
     </q-collapsible>
     <q-item-separator />
-    <q-item :to="{ name: 'profile customers', params: { id: user._id } }" exact>
-      <q-item-main label="Bénéficiaires" />
-    </q-item>
+    <q-collapsible ref="benef" v-model="activeRoutes.benef.open" collapseIcon="expand_more">
+      <template slot="header">
+        <q-item-main :class="{'text-weight-bold': activeRoutes.planning.highlight }" label="Bénéficiaires" />
+      </template>
+      <q-item :to="{ name: 'profile customers', params: { id: user._id } }" exact>
+        <q-item-main label="Fiches" />
+      </q-item>
+    </q-collapsible>
     <q-item-separator />
     <q-collapsible ref="administrative" v-model="activeRoutes.administrative.open" collapseIcon="expand_more">
       <template slot="header">
@@ -83,10 +88,10 @@ export default {
           open: false,
           highlight: false
         },
-        // benef: {
-        //   open: false,
-        //   highlight: false
-        // },
+        benef: {
+          open: false,
+          highlight: false
+        },
         administrative: {
           open: false,
           highlight: false
