@@ -108,6 +108,11 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+
+  /deep/ .bg-negative
+    background: white !important
+    color: inherit !important
+
   .center-account
     max-width: 40%
     margin-left: auto
