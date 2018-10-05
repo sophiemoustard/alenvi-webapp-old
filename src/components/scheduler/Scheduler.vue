@@ -1,5 +1,5 @@
 <template>
-  <div class="" style="max-width: 90vw; margin: auto;">
+  <div>
     <div ref="scheduler_here" class="dhx_cal_container" style="width:100%; height:100%;">
       <q-scroll-observable @scroll="handleScroll" />
       <q-resize-observable v-if="customer" @resize="onResize" />
