@@ -1,13 +1,14 @@
 <template>
   <q-layout view="hHh Lpr lff">
     <q-layout-header>
-      <q-toolbar v-if="user.role.name !== 'Auxiliaire'" class="lt-md" color="white">
+      <q-toolbar class="row justify-between lt-md" color="white">
+        <img style="height: 30px" src="https://res.cloudinary.com/alenvi/image/upload/v1507019444/images/business/alenvi_logo_complet_183x50.png" alt="">
         <q-btn color="primary" flat big @click="toggleLeft">
           <q-icon name="menu" />
         </q-btn>
-        <q-toolbar-title>
+        <!-- <q-toolbar-title>
           <router-link :class="{ 'router-link-active': false }" :to="layoutTitle.link">{{ layoutTitle.content }}</router-link>
-        </q-toolbar-title>
+        </q-toolbar-title> -->
         <!-- <q-btn color="primary" flat big>
         <q-icon name="email" />
       </q-btn> -->
