@@ -50,67 +50,7 @@ const routes = [
   //   component: () => import('pages/bot/auxiliaryInfo'),
   //   props: (route) => ({ id: route.params.id, token: route.query.access_token })
   // },
-  {
-    path: 'planning',
-    name: 'planning',
-    component: () => import('pages/dashboard/planning/Planning'),
-    redirect: {
-      name: 'view planning'
-    },
-    // Children so collapsible in side menu highlights good selection
-    children: [
-      {
-        path: 'view',
-        name: 'view planning',
-        component: () => import('pages/dashboard/planning/PlanningView'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['planning:read'],
-          parent: 'planning'
-        },
-      },
-      {
-        path: 'modification',
-        name: 'modification planning',
-        component: () => import('pages/dashboard/planning/PlanningModification'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['planning:history'],
-          parent: 'planning'
-        },
-      },
-      {
-        path: 'constrainedCoaches',
-        name: 'constrained coaches',
-        component: () => import('pages/dashboard/planning/ConstrainedCoaches'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['duty:read'],
-          parent: 'planning'
-        },
-      }
-    ]
-  },
-  {
-    path: 'beneficiaries',
-    name: 'beneficiaries',
-    component: () => import('pages/dashboard/beneficiaries/Beneficiaries'),
-    redirect: {
-      name: 'add helper'
-    },
-    children: [
-      {
-        path: 'addHelper',
-        name: 'add helper',
-        component: () => import('pages/dashboard/beneficiaries/AddHelper'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['users:welcome:user'],
-          parent: 'benef'
-        }
-      }
-    ]
-  },
+
   {
     path: '/ni',
     component: () => import('layouts/Layout'),
@@ -132,6 +72,69 @@ const routes = [
           parent: 'administrative'
         }
       },
+      // Legacy routes
+      {
+        path: 'old/planning',
+        name: 'planning',
+        component: () => import('pages/dashboard/planning/Planning'),
+        redirect: {
+          name: 'view planning'
+        },
+        // Children so collapsible in side menu highlights good selection
+        children: [
+          {
+            path: 'view',
+            name: 'view planning',
+            component: () => import('pages/dashboard/planning/PlanningView'),
+            meta: {
+              cookies: ['alenvi_token', 'refresh_token'],
+              permissions: ['planning:read'],
+              parent: 'planning'
+            },
+          },
+          {
+            path: 'modification',
+            name: 'modification planning',
+            component: () => import('pages/dashboard/planning/PlanningModification'),
+            meta: {
+              cookies: ['alenvi_token', 'refresh_token'],
+              permissions: ['planning:history'],
+              parent: 'planning'
+            },
+          },
+          {
+            path: 'constrainedCoaches',
+            name: 'constrained coaches',
+            component: () => import('pages/dashboard/planning/ConstrainedCoaches'),
+            meta: {
+              cookies: ['alenvi_token', 'refresh_token'],
+              permissions: ['duty:read'],
+              parent: 'planning'
+            },
+          }
+        ]
+      },
+      {
+        path: 'old/beneficiaries',
+        name: 'beneficiaries',
+        component: () => import('pages/dashboard/beneficiaries/Beneficiaries'),
+        redirect: {
+          name: 'add helper'
+        },
+        children: [
+          {
+            path: 'addHelper',
+            name: 'add helper',
+            component: () => import('pages/dashboard/beneficiaries/AddHelper'),
+            meta: {
+              cookies: ['alenvi_token', 'refresh_token'],
+              permissions: ['users:welcome:user'],
+              parent: 'benef'
+            }
+          }
+        ]
+      },
+      // End of legacy
       {
         path: ':id',
         name: 'personal info',
@@ -185,6 +188,15 @@ const routes = [
       {
         path: ':id/customers',
         name: 'profile customers',
+        component: () => import('pages/ni/CustomersDirectory'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['profiles:read']
+        }
+      },
+      {
+        path: ':id/customers/:employee_id',
+        name: 'profile customers info',
         component: () => import('pages/ni/CustomersDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
