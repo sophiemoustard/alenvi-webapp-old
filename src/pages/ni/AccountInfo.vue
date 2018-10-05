@@ -3,8 +3,8 @@
     <h4>Mon compte</h4>
     <div class="center-account">
       <p class="input-caption">Email</p>
-      <q-field class="margin-input">
-        <q-input v-model="user.credentials.email" inverted-light color="white" />
+      <q-field class="margin-input" :error="$v.user.credentials.email.$error" error-label="Email invalide.">
+        <q-input v-model.trim="user.credentials.email" @blur="$v.user.credentials.email.$touch" inverted-light color="white" />
       </q-field>
       <p class="input-caption">Mot de passe</p>
       <q-field class="margin-input" :error="$v.user.credentials.password.$error" error-label="Le mot de passe doit contenir entre 6 et 20 caractères.">
