@@ -1,21 +1,25 @@
 <template>
   <div>
+    <div v-if="ogustUser" class="row justify-between items-baseline q-pt-sm">
+      <h5 style="margin: 0 0 0 10px">{{ogustUser.title}}</h5>
+      <sector-filter class="sector-filter" v-show="showTabFilter && !customer" v-if="ogustUser" @personChosen="applyFilter" @click.self="displayFilter" />
+    </div>
     <div ref="scheduler_here" class="dhx_cal_container" style="width:100%; height:100%;">
       <q-scroll-observable @scroll="handleScroll" />
       <q-resize-observable v-if="customer" @resize="onResize" />
       <div ref="cal_navline" class="dhx_cal_navline">
         <div class="dhx_cal_prev_button relative-position" v-ripple>&nbsp;</div>
         <div v-show="displayNext" class="dhx_cal_next_button relative-position" v-ripple>&nbsp;</div>
-        <div v-if="!customer" class="dhx_cal_today_button relative-position" v-ripple></div>
+        <div v-if="!customer && $q.platform.is.desktop" class="dhx_cal_today_button relative-position" v-ripple></div>
         <div class="dhx_cal_date"></div>
         <!-- <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="day_tab" style="right:204px;"></div> -->
-        <div v-show="!customer" class="dhx_cal_tab relative-position" v-ripple name="three_days_tab" style="left:200px;"></div>
-        <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="week_tab" style="right:140px;"></div>
-        <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="month_tab" style="right:76px;"></div>
+        <div v-show="!customer && $q.platform.is.desktop" class="dhx_cal_tab relative-position" v-ripple name="three_days_tab" style="left:200px;"></div>
+        <div v-if="!customer && $q.platform.is.desktop" class="dhx_cal_tab relative-position" v-ripple name="week_tab" style="right:140px;"></div>
+        <div v-if="!customer && $q.platform.is.desktop" class="dhx_cal_tab relative-position" v-ripple name="month_tab" style="right:76px;"></div>
         <div v-show="showTabCustomer" class="dhx_cal_tab relative-position" v-ripple name="customer_week_tab" style="right:140px;"></div>
-        <div v-show="showTabFilter && !customer" class="dhx_cal_tab relative-position" name="filter_tab" @click.self="displayFilter" v-ripple style="left: 230px;">
-          <sector-filter v-if="ogustUser" @personChosen="applyFilter" />
-        </div>
+      </div>
+      <div class="row justify-end select-view">
+        <q-select v-if="!customer && $q.platform.is.mobile" v-model="selectView" :options="viewOptions" @input="changeViewMode" />
       </div>
       <div ref="cal_header" class="dhx_cal_header"></div>
       <div class="dhx_cal_data"></div>
@@ -170,6 +174,21 @@ export default {
   },
   data () {
     return {
+      selectView: 'three_days',
+      viewOptions: [
+        {
+          label: '3 jours',
+          value: 'three_days'
+        },
+        {
+          label: 'Semaine',
+          value: 'week'
+        },
+        {
+          label: 'Mois',
+          value: 'month'
+        }
+      ],
       disableInput: true,
       disableTimePicker: true,
       modalBtnLoading: false,
@@ -318,7 +337,11 @@ export default {
 
     // when clicking on prev and next buttons
     scheduler.attachEvent('onViewChange', (newMode, newDate) => {
-      this.$emit('viewChanged');
+      if (this.personChosen) {
+        this.$emit('viewChanged', { personChosen: true });
+      } else {
+        this.$emit('viewChanged');
+      }
       let daylimit = null;
       if (newMode === 'customer_week') {
         daylimit = this.$moment(this.today).startOf('week').add(1, 'week');
@@ -504,13 +527,16 @@ export default {
       //   }
       //   return false;
       // }
-      this.$emit('applyFilter', true);
+      this.$emit('applyFilter', { personChosen: true });
     },
     closeModal () {
       this.openModal = false;
       this.disableInput = true;
       this.disableTimePicker = true;
       this.modalBtnLoading = false;
+    },
+    changeViewMode () {
+      scheduler.setCurrentView(scheduler.getState().date, this.selectView);
     }
   }
 }
@@ -522,170 +548,214 @@ export default {
   @import "~dhtmlx-scheduler/codebase/dhtmlxscheduler_flat.css";
   @import "~assets/dhtmlxscheduler-responsive.css";
 
-.custom-field {
-  margin: 16px 0;
-}
+  @media screen and (max-width: 767px) {
+    .dhx_cal_navline {
+      height: 50px !important;
+      width: 265px !important;
+    }
+    .dhx_cal_navline .dhx_cal_date {
+      top: 0 !important;
+      left: -10px !important;
+    }
 
- .q-if-inverted {
-    border: 1px solid #D0D0D0;
- }
+    .dhx_cal_navline .dhx_cal_tab {
+      top: 0px !important;
+      right: -2px !important;
+    }
 
- .margin-input {
-   margin-bottom: 6px;
- }
+    .dhx_cal_navline .dhx_cal_prev_button {
+      top: 0 !important;
+      left: 0 !important;
+      width: 30px !important;
+    }
+    .dhx_cal_navline .dhx_cal_next_button {
+      top: 0 !important;
+      right: 20px !important;
+      width: 30px !important;
+    }
+    .sector-filter {
+      margin-right: 6px;
+    }
+    .select-view {
+      margin-right: 10px;
+    }
+  }
 
-.dhx_scale_hour {
-  border-bottom: none;
-  overflow: visible;
-}
+  .select-view .q-input-target {
+    color: #454544;
+    font-size: 13px;
+  }
 
-.dhx_cal_data {
-  overflow-y: visible;
-  overflow-x: visible;
-  border-top: none;
-/*padding-top: 10px;*/;
-}
+  .sector-filter {
+    margin-right: 20px;
+  }
 
-.dhx_cal_header div div {
-  border: none;
-}
+  .custom-field {
+    margin: 16px 0;
+  }
 
-.dhx_scale_bar {
-  line-height: 20px;
-}
+   .q-if-inverted {
+      border: 1px solid #D0D0D0;
+   }
 
-.dhx_scale_holder {
-  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAsCAIAAAArRUU2AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAB3RJTUUH4gEREC41Aw9nHAAAABZJREFUCNdj+P//PxMDA8OQwOfPnwcAKy4FwcX82PUAAAAASUVORK5CYII=");
-}
+   .margin-input {
+     margin-bottom: 6px;
+   }
 
-.dhx_scale_holder_now {
-  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAsCAIAAAArRUU2AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAB3RJTUUH4gEREDIsgROSgQAAABZJREFUCNdj+P95IRMDA8OQwOcvPgQA44cFa6kqCcUAAAAASUVORK5CYII=");
-}
+  .dhx_scale_hour {
+    border-bottom: none;
+    overflow: visible;
+  }
 
-.dhx_cal_navline.dhx_cal_date {
-  color: #737373;
-}
+  .dhx_cal_data {
+    overflow-y: visible;
+    overflow-x: visible;
+    border-top: none;
+  /*padding-top: 10px;*/;
+  }
 
-.dhx_cal_tab {
-  color: #737373;
-  background-color: none;
-}
+  .dhx_cal_header div div {
+    border: none;
+  }
 
-.dhx_cal_tab:hover {
-  text-decoration: none;
-  background-color: rgba(0,0,0,0.07);
-}
+  .dhx_scale_bar {
+    line-height: 20px;
+  }
 
-.dhx_cal_tab.active {
-  background-color: rgba(0,0,0,0.07);
-  color: #737373;
-  font-weight: 700;
-}
+  .dhx_scale_holder {
+    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAsCAIAAAArRUU2AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAB3RJTUUH4gEREC41Aw9nHAAAABZJREFUCNdj+P//PxMDA8OQwOfPnwcAKy4FwcX82PUAAAAASUVORK5CYII=");
+  }
 
-.dhx_cal_tab.active:hover {
-  background-color: rgba(0,0,0,0.1);
-}
+  .dhx_scale_holder_now {
+    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAsCAIAAAArRUU2AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAB3RJTUUH4gEREDIsgROSgQAAABZJREFUCNdj+P95IRMDA8OQwOcvPgQA44cFa6kqCcUAAAAASUVORK5CYII=");
+  }
 
-.dhx_cal_today_button {
-  color: #737373;
-}
+  .dhx_cal_navline.dhx_cal_date {
+    color: #737373;
+    font-family: inherit;
+  }
 
-.dhx_cal_today_button:hover {
-  text-decoration: none;
-  background-color: rgba(0,0,0,0.07);
-}
+  .dhx_cal_tab {
+    color: #737373;
+    background-color: none;
+  }
 
-.dhx_cal_prev_button {
-  width: 30px;
-  border-radius: 50%;
-  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAAAAAAAA+UO7fwAAAAlwSFlzAAAASAAAAEgARslrPgAAAORJREFUSMft1T8KwjAUBvAvcRI8jFtbOviHHkDwJIXuegGbHsFTiIODi2nOIG46OIirLk1dOog45CURHPJtGV5+PHi8B4SEhPxT8jwfUWt6rmhRFEvG2DpJkn5d1zvTOuaKtm276J5nrfVQCHE3qeWe0IvWemqKWnf8BZ0IIU6UP8iwD5QM+0IBwlR/oNemabKqqo42KEAbroct4tSxlPKQpukTQAZgwDmfR1G0UUrdfgr7xsmbyxdutTJ94Na7usMZgHGHz+I4XiuljIbQ6UhIKfdvna/Ksty6/EeOzVkMCQnxlhck2ouoK+MN0AAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxOC0wMS0xOFQxMDowNzoxMyswMDowMGL8TZcAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTgtMDEtMThUMTA6MDc6MTMrMDA6MDATofUrAAAAKHRFWHRzdmc6YmFzZS11cmkAZmlsZTovLy90bXAvbWFnaWNrLU5Td0Y1d0NE+kVb4wAAAABJRU5ErkJggg==") no-repeat center center;
-}
+  .dhx_cal_tab:hover {
+    text-decoration: none;
+    background-color: rgba(0,0,0,0.07);
+  }
 
-.dhx_cal_prev_button:hover {
-  background-color: rgba(0,0,0,0.07);
-}
+  .dhx_cal_tab.active {
+    background-color: rgba(0,0,0,0.07);
+    color: #737373;
+    font-weight: 700;
+  }
 
-.dhx_cal_event .dhx_title {
-  text-align: start;
-}
+  .dhx_cal_tab.active:hover {
+    background-color: rgba(0,0,0,0.1);
+  }
 
-.dhx_cal_event .dhx_footer {
-  background: none;
-}
+  .dhx_cal_today_button {
+    color: #737373;
+  }
 
-.dhx_cal_event .dhx_footer:hover {
-  background: none;
-}
+  .dhx_cal_today_button:hover {
+    text-decoration: none;
+    background-color: rgba(0,0,0,0.07);
+  }
 
-.dhx_cal_event:hover .dhx_footer {
-  background: none;
-}
+  .dhx_cal_prev_button {
+    width: 30px;
+    border-radius: 50%;
+    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAAAAAAAA+UO7fwAAAAlwSFlzAAAASAAAAEgARslrPgAAAORJREFUSMft1T8KwjAUBvAvcRI8jFtbOviHHkDwJIXuegGbHsFTiIODi2nOIG46OIirLk1dOog45CURHPJtGV5+PHi8B4SEhPxT8jwfUWt6rmhRFEvG2DpJkn5d1zvTOuaKtm276J5nrfVQCHE3qeWe0IvWemqKWnf8BZ0IIU6UP8iwD5QM+0IBwlR/oNemabKqqo42KEAbroct4tSxlPKQpukTQAZgwDmfR1G0UUrdfgr7xsmbyxdutTJ94Na7usMZgHGHz+I4XiuljIbQ6UhIKfdvna/Ksty6/EeOzVkMCQnxlhck2ouoK+MN0AAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxOC0wMS0xOFQxMDowNzoxMyswMDowMGL8TZcAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTgtMDEtMThUMTA6MDc6MTMrMDA6MDATofUrAAAAKHRFWHRzdmc6YmFzZS11cmkAZmlsZTovLy90bXAvbWFnaWNrLU5Td0Y1d0NE+kVb4wAAAABJRU5ErkJggg==") no-repeat center center;
+  }
 
-.dhx_cal_next_button {
-  width: 30px;
-  border-radius: 50%;
-  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAAAAAAAA+UO7fwAAAAlwSFlzAAAASAAAAEgARslrPgAAAPRJREFUSMft1aFOxDAcgPHvP2YwQLBonmFbdwkYPAlP0mTzuwfYPO6egIA4dwmotbwNqHMrhplT164Hpp9s2v7SihZSqdR/pbW+i7HPmc/kpmk6EdlUVXVujNn9Cay1vhaRZ+BSRFZ1Xcs4jh8nh621e6XUC/AIXAH3S07uddXGmG+l1OuMi8gqFPeCZ7woircsyxbh3jCAtfZrKR4Ez3hZllsReQIufPEsFAbI81wOhvbHrpVjJx7Wtu3tNE3vwA2Ac64bhmF9UngpGgTHQL3hWCh4PpnA54yKyLrv+yDUC/59MnPgwTnXLUGDivUtplKpaP0Awbh4tLAnJEMAAAAldEVYdGRhdGU6Y3JlYXRlADIwMTgtMDEtMThUMTA6MDc6NTArMDA6MDDXXlnwAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDE4LTAxLTE4VDEwOjA3OjUwKzAwOjAwpgPhTAAAACh0RVh0c3ZnOmJhc2UtdXJpAGZpbGU6Ly8vdG1wL21hZ2ljay1icU1SUGdGMAb+9OcAAAAASUVORK5CYII=") no-repeat center center;
-}
+  .dhx_cal_prev_button:hover {
+    background-color: rgba(0,0,0,0.07);
+  }
 
-.dhx_cal_next_button:hover {
-  background-color: rgba(0,0,0,0.07);
-}
+  .dhx_cal_event .dhx_title {
+    text-align: start;
+  }
 
-.dhx_cancel_btn_set {
-  background-color: #E2007A ;
-}
+  .dhx_cal_event .dhx_footer {
+    background: none;
+  }
 
-.header-fixed {
-  position: fixed;
-  top: 0px !important;
-}
+  .dhx_cal_event .dhx_footer:hover {
+    background: none;
+  }
 
-.header-fixed-customer {
-  top: 52px !important;
-  position: fixed;
-}
+  .dhx_cal_event:hover .dhx_event_resize.dhx_footer {
+    background: none;
+    display: none;
+  }
 
-.alenvi_event div {
-  background-color: #E2007A !important;
-  color: #fff !important;
-}
+  .dhx_cal_next_button {
+    width: 30px;
+    border-radius: 50%;
+    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAAAAAAAA+UO7fwAAAAlwSFlzAAAASAAAAEgARslrPgAAAPRJREFUSMft1aFOxDAcgPHvP2YwQLBonmFbdwkYPAlP0mTzuwfYPO6egIA4dwmotbwNqHMrhplT164Hpp9s2v7SihZSqdR/pbW+i7HPmc/kpmk6EdlUVXVujNn9Cay1vhaRZ+BSRFZ1Xcs4jh8nh621e6XUC/AIXAH3S07uddXGmG+l1OuMi8gqFPeCZ7woircsyxbh3jCAtfZrKR4Ez3hZllsReQIufPEsFAbI81wOhvbHrpVjJx7Wtu3tNE3vwA2Ac64bhmF9UngpGgTHQL3hWCh4PpnA54yKyLrv+yDUC/59MnPgwTnXLUGDivUtplKpaP0Awbh4tLAnJEMAAAAldEVYdGRhdGU6Y3JlYXRlADIwMTgtMDEtMThUMTA6MDc6NTArMDA6MDDXXlnwAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDE4LTAxLTE4VDEwOjA3OjUwKzAwOjAwpgPhTAAAACh0RVh0c3ZnOmJhc2UtdXJpAGZpbGU6Ly8vdG1wL21hZ2ljay1icU1SUGdGMAb+9OcAAAAASUVORK5CYII=") no-repeat center center;
+  }
 
-.dhx_cal_event_line.alenvi_event {
-  background-color: #E2007A !important;
-  color: #fff !important;
-}
+  .dhx_cal_next_button:hover {
+    background-color: rgba(0,0,0,0.07);
+  }
 
-.dhx_cal_event_clear.alenvi_event {
-  background-color: #E2007A !important;
-  color: #fff !important;
-}
+  .dhx_cancel_btn_set {
+    background-color: #E2007A ;
+  }
 
-.alenvi_past_event div {
-  background-color: #FF54B0 !important;
-  color: #fff !important;
-}
+  .header-fixed {
+    position: fixed;
+    top: 0px !important;
+  }
 
-.dhx_cal_event_line.alenvi_past_event {
-  background-color: #FF54B0 !important;
-  color: #fff !important;
-}
+  .header-fixed-customer {
+    top: 52px !important;
+    position: fixed;
+  }
 
-.dhx_cal_event_clear.alenvi_past_event {
-  background-color: #FF54B0 !important;
-  color: #fff !important;
-}
+  .alenvi_event div {
+    background-color: #E2007A !important;
+    color: #fff !important;
+  }
 
-.responsive-container {
-  width: 100% !important;
-}
+  .dhx_cal_event_line.alenvi_event {
+    background-color: #E2007A !important;
+    color: #fff !important;
+  }
 
-.event_date {
-  font-weight: bold;
-}
+  .dhx_cal_event_clear.alenvi_event {
+    background-color: #E2007A !important;
+    color: #fff !important;
+  }
 
-.custom_event {
-  padding: 5px;
-  overflow: hidden;
-}
+  .alenvi_past_event div {
+    background-color: #FF54B0 !important;
+    color: #fff !important;
+  }
+
+  .dhx_cal_event_line.alenvi_past_event {
+    background-color: #FF54B0 !important;
+    color: #fff !important;
+  }
+
+  .dhx_cal_event_clear.alenvi_past_event {
+    background-color: #FF54B0 !important;
+    color: #fff !important;
+  }
+
+  .responsive-container {
+    width: 100% !important;
+  }
+
+  .event_date {
+    font-weight: bold;
+  }
+
+  .custom_event {
+    padding: 5px;
+    overflow: hidden;
+  }
 
 </style>
