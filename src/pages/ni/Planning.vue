@@ -1,6 +1,8 @@
 <template>
-  <scheduler :showTabFilter="true" :events="events" @viewChanged="getEventsData"
-    @applyFilter="getEventsData"></scheduler>
+  <q-page>
+    <scheduler :showTabFilter="true" :events="events" @viewChanged="getEventsData"
+      @applyFilter="getEventsData"></scheduler>
+  </q-page>
 </template>
 
 <script>
@@ -50,22 +52,25 @@ export default {
       return this.customer;
     }
   },
+  // async mounted () {
+  //   await this.getEventsData();
+  // },
   methods: {
     async getEventsData (event) {
       try {
         if (this.auxiliaryComp) {
           this.setPersonType('employee');
-          this.personId = event ? this.personChosen : this.user.employee_id;
+          this.personId = event && event.personChosen ? this.personChosen : this.user.employee_id;
         } else {
           this.setPersonType('customer');
           const customer = await this.getFirstCustomer();
-          this.personId = event ? this.personChosen : customer.id_customer;
+          this.personId = event && event.personChosen ? this.personChosen : customer.id_customer;
         }
+        scheduler.clearAll();
         const personData = await this.$ogust.getOgustPerson(this.personId, this.personType);
         this.setOgustUser(personData);
         this.title = personData.title;
         this.events = await this.$ogust.getOgustEvents(this.personId, this.personType);
-        scheduler.clearAll();
         scheduler.parse(this.events, 'json');
         this.toggleFilter(false);
       } catch (e) {
