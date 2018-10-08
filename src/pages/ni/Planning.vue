@@ -61,7 +61,7 @@ export default {
         if (this.auxiliaryComp) {
           this.setPersonType('employee');
           this.personId = event && event.personChosen ? this.personChosen : this.user.employee_id;
-        } else {
+        } else if (this.customerComp) {
           this.setPersonType('customer');
           const customer = await this.getFirstCustomer();
           this.personId = event && event.personChosen ? this.personChosen : customer.id_customer;
@@ -106,6 +106,11 @@ export default {
       setPersonChosen: 'calendar/setPersonChosen',
       toggleFilter: 'calendar/toggleFilter'
     })
+  },
+  beforeRouteUpdate (to, from, next) {
+    this.setOgustUser(null);
+    this.setPersonChosen(null);
+    next();
   }
 }
 </script>
