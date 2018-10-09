@@ -2,9 +2,10 @@
   <!-- If we are another role than customer -->
   <q-list class="no-border sidemenu-alenvi sidemenu-flex">
     <q-list-header>
-     <q-item class="justify-center">
-      <!-- <img src="user.picture.link" alt="Image user" class="avatar"> -->
-        <img src="https://res.cloudinary.com/alenvi/image/upload/v1507124345/images/business/alenvi_logo_complet_full.png" alt="Alenvi logo">
+      <q-item class="justify-center">
+        <!-- <img src="user.picture.link" alt="Image user" class="avatar"> -->
+        <img src="https://res.cloudinary.com/alenvi/image/upload/v1507124345/images/business/alenvi_logo_complet_full.png"
+          alt="Alenvi logo">
       </q-item>
     </q-list-header>
     <q-item-separator />
@@ -12,7 +13,8 @@
       <template slot="header">
         <q-item-main :class="{'text-weight-bold': activeRoutes.planning.highlight }" label="Planning" />
       </template>
-      <q-item :to="{ name: 'profile planning', params: { id: user._id }, query: { auxiliary: 'true', self: 'true' } }" exact>
+      <q-item :to="{ name: 'profile planning', params: { id: user._id }, query: { auxiliary: 'true', self: 'true' } }"
+        exact>
         <q-item-side icon="event" />
         <q-item-main label="Le mien" />
       </q-item>
@@ -69,7 +71,7 @@
       <q-item class="sidemenu-footer-border full-width">
         <q-item-main class="sidemenu-footer-user" :label="userFirstnameUpper" />
         <q-item-side>
-          <q-icon name="person" color="black" @click.native="toAccountInfo"/>
+          <q-icon name="person" color="black" @click.native="toAccountInfo" />
         </q-item-side>
         <!-- <q-item-side>
           <q-icon name="settings" color="black" />
@@ -83,7 +85,9 @@
 </template>
 
 <script>
-import { sideMenuMixin } from '../mixins/sideMenuMixin';
+import {
+  sideMenuMixin
+} from '../mixins/sideMenuMixin';
 
 export default {
   props: ['user'],
@@ -117,6 +121,7 @@ export default {
 
   }
 }
+
 </script>
 
 <style lang="stylus" scoped>
