@@ -216,6 +216,16 @@ const routes = [
           permissions: ['profiles:read']
         }
       },
+      {
+        path: ':id/team',
+        name: 'team directory',
+        component: () => import('pages/ni/Team'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['profiles:read'],
+          parent: 'team'
+        }
+      }
       // {
       //   path: 'pigi',
       //   component: () => import('pages/dashboard/pigi/NavTabs'),

@@ -55,9 +55,15 @@
       </q-item>
     </q-collapsible>
     <q-item-separator />
-    <q-item>
-      <q-item-main label="Equipe" />
-    </q-item>
+    <q-collapsible ref="team" v-model="activeRoutes.team.open" collapseIcon="expand_more">
+      <template slot="header">
+        <q-item-main :class="{'text-weight-bold': activeRoutes.team.highlight }" label="Equipe" />
+      </template>
+      <q-item :to="{ name: 'team directory', params: { id: user._id }}" exact>
+        <q-item-side icon="group" />
+        <q-item-main label="Répertoire" />
+      </q-item>
+    </q-collapsible>
     <q-item-separator />
     <div class="sidemenu-footer">
       <q-item class="sidemenu-footer-border full-width">
@@ -97,10 +103,10 @@ export default {
           open: false,
           highlight: false
         },
-        // team: {
-        //   open: false,
-        //   hightlight: false
-        // }
+        team: {
+          open: false,
+          hightlight: false
+        }
       }
     }
   },
