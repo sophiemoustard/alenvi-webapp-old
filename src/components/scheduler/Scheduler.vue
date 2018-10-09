@@ -479,6 +479,7 @@ export default {
     // Open intern hours modal
     scheduler.attachEvent('onEmptyClick', debounce(async () => {
       try {
+        if (this.customer) return true;
         await this.$q.dialog({
           message: 'Voulez-vous déclarer des heures internes ?',
           ok: true,
