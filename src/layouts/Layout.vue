@@ -2,10 +2,10 @@
   <q-layout view="hHh Lpr lff">
     <q-layout-header>
       <q-toolbar class="row justify-between lt-md" color="white">
-        <img style="height: 30px" src="https://res.cloudinary.com/alenvi/image/upload/v1507019444/images/business/alenvi_logo_complet_183x50.png" alt="">
-        <q-btn color="primary" flat big @click="toggleLeft">
-          <q-icon name="menu" />
+        <q-btn color="primary" flat round dense big @click="toggleLeft">
+          <q-icon name="menu" style="width: 24px; height: 24px" />
         </q-btn>
+        <img style="height: 30px" src="https://res.cloudinary.com/alenvi/image/upload/v1507019444/images/business/alenvi_logo_complet_183x50.png" alt="">
         <!-- <q-toolbar-title>
           <router-link :class="{ 'router-link-active': false }" :to="layoutTitle.link">{{ layoutTitle.content }}</router-link>
         </q-toolbar-title> -->
