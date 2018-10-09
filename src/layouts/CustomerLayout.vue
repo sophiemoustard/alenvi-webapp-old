@@ -2,7 +2,7 @@
   <q-layout view="hHh Lpr lff">
     <q-layout-header>
       <q-toolbar color="white">
-        <q-btn color="primary" flat big @click="toggleLeft">
+        <q-btn color="primary" flat dense round big @click="toggleLeft">
           <q-icon name="menu" />
         </q-btn>
         <q-toolbar-title>
