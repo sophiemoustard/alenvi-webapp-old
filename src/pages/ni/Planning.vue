@@ -114,18 +114,3 @@ export default {
   }
 }
 </script>
-
-<style lang="stylus">
-
-  .alenvi_event div
-        background-color: #E2007A !important;
-        color: white !important;
-
-    .dhx_cal_event_line.alenvi_event
-        background-color: #E2007A !important;
-        color: white !important;
-
-    .dhx_cal_event_clear.alenvi_event
-        background-color: #E2007A !important;
-        color: white !important;
-</style>

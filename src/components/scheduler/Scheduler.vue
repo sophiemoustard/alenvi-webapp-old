@@ -57,12 +57,12 @@
           <div class="col-xs-6">
             <p class="input-caption">Heure de début</p>
             <q-datetime type="time" format24h clear-label="Effacer" ok-label="OK" cancel-label="Annuler" v-model="customerEventInfo.eventFrom"
-              :disable="disableTimePicker" inverted-light color="white" />
+              :disable="disableTimePicker" inverted-light color="white" popover />
           </div>
           <div class="col-xs-6">
             <p class="input-caption">Heure de fin</p>
             <q-datetime type="time" format24h clear-label="Effacer" ok-label="OK" cancel-label="Annuler" v-model="customerEventInfo.eventTo"
-              :disable="disableTimePicker" inverted-light color="white" />
+              :disable="disableTimePicker" inverted-light color="white" popover />
           </div>
         </div>
       </div>
@@ -72,6 +72,52 @@
           Enregistrer
         </q-btn>
         <q-btn color="grey" @click="closeModal">
+          Fermer
+        </q-btn>
+      </div>
+    </q-modal>
+
+    <q-modal v-model="openInternHoursModal" minimized :content-css="modalStyle" @hide="closeInternHoursModal" @escape-key="closeInternHoursModal">
+      <div class="margin-input">
+        <p class="input-caption">Date</p>
+        <q-field :error="$v.internHoursInfo.eventDate.$error" :error-label="requiredField">
+          <q-datetime type="date" format="DD/MM/YYYY" v-model="internHoursInfo.eventDate" color="white" inverted-light popover :default-value="internHoursDefault" />
+        </q-field>
+      </div>
+      <div class="margin-input">
+        <div class="row gutter-sm">
+          <div class="col-xs-6">
+            <p class="input-caption">Heure de début</p>
+            <q-field :error="$v.internHoursInfo.eventFrom.$error" :error-label="requiredField">
+              <q-datetime type="time" format24h clear-label="Effacer" ok-label="OK" cancel-label="Annuler" v-model="internHoursInfo.eventFrom"
+                inverted-light color="white" popover :default-value="internHoursDefault" />
+            </q-field>
+          </div>
+          <div class="col-xs-6">
+            <p class="input-caption">Heure de fin</p>
+            <q-field :error="$v.internHoursInfo.eventTo.$error" :error-label="requiredField">
+              <q-datetime type="time" format24h clear-label="Effacer" ok-label="OK" cancel-label="Annuler" v-model="internHoursInfo.eventTo"
+                inverted-light color="white" popover :default-value="internHoursDefault" />
+            </q-field>
+          </div>
+        </div>
+      </div>
+      <div class="margin-input">
+        <p class="input-caption">Motif</p>
+        <q-field :error="$v.internHoursInfo.reason.$error" :error-label="requiredField">
+          <q-input
+            v-model="internHoursInfo.reason"
+            type="textarea"
+            :rows="6"
+            inverted-light
+            color="white" />
+        </q-field>
+      </div>
+      <div class="row justify-end">
+        <q-btn :loading="internHoursModalBtnLoading" @click="declareInternHours" class="on-left" color="primary">
+          Enregistrer
+        </q-btn>
+        <q-btn color="grey" @click="closeInternHoursModal">
           Fermer
         </q-btn>
       </div>
@@ -92,6 +138,7 @@ import {
   debounce
 } from 'quasar'
 import { mapGetters } from 'vuex'
+import { required } from 'vuelidate/lib/validators';
 
 import SectorFilter from '../../components/SectorFilter'
 
@@ -174,6 +221,16 @@ export default {
   },
   data () {
     return {
+      requiredField: 'Champ requis',
+      openInternHoursModal: false,
+      internHoursModalBtnLoading: false,
+      internHoursDefault: Date.now(),
+      internHoursInfo: {
+        eventFrom: null,
+        eventTo: null,
+        eventDate: null,
+        reason: ''
+      },
       selectView: 'three_days',
       viewOptions: [
         {
@@ -268,6 +325,14 @@ export default {
       personChosen: 'calendar/personChosen',
       personType: 'calendar/personType'
     })
+  },
+  validations: {
+    internHoursInfo: {
+      eventFrom: { required },
+      eventTo: { required },
+      eventDate: { required },
+      reason: { required }
+    }
   },
   mounted () {
     configDhtmlxScheduler(this);
@@ -408,8 +473,21 @@ export default {
       }
       scheduler.showLightbox(id);
     });
-    // prevent opening event when double clicking
+    // Prevent double click on event
     scheduler.attachEvent('onDblClick', () => false);
+
+    // Open intern hours modal
+    scheduler.attachEvent('onEmptyClick', debounce(async () => {
+      try {
+        await this.$q.dialog({
+          message: 'Voulez-vous déclarer des heures internes ?',
+          ok: true,
+          cancel: true
+        });
+        this.openInternHoursModal = true;
+      } catch (e) {
+      }
+    }), 500);
   },
   methods: {
     handleScroll: debounce(function (scroll) {
@@ -517,6 +595,46 @@ export default {
         });
       }
     },
+    async declareInternHours () {
+      try {
+        this.$v.internHoursInfo.$touch();
+        if (this.$v.internHoursInfo.$error) {
+          this.$q.notify({
+            color: 'secondary',
+            icon: 'warning',
+            detail: 'Merci de remplir tous les champs',
+            position: 'bottom-right',
+            timeout: 2500
+          });
+          return 0;
+        }
+        this.internHoursModalBtnLoading = true
+        const internHoursParams = {
+          type: 'Heures internes',
+          content: `${this.$moment(this.internHoursInfo.date).format('dddd DD/MM')}.\n${this.internHoursInfo.reason}.\n${this.$moment(this.internHoursInfo.eventFrom).format('HH:mm')} - ${this.$moment(this.internHoursInfo.eventTo).format('HH:mm')}`,
+          involved: `${this.user.firstname} ${this.user.lastname}`,
+        };
+        await this.$planningUpdates.storePlanningupdates(this.user.employee_id, internHoursParams);
+        this.$q.notify({
+          color: 'positive',
+          icon: 'thumb up',
+          detail: 'Ta demande a bien été enregistrée',
+          position: 'bottom-right',
+          timeout: 2500
+        });
+        this.closeInternHoursModal();
+      } catch (e) {
+        console.error(e);
+        this.internHoursModalBtnLoading = false
+        this.$q.notify({
+          color: 'error',
+          icon: 'secondary',
+          detail: "Erreur lors de l'envoi de la déclaration",
+          position: 'bottom-right',
+          timeout: 2500
+        });
+      }
+    },
     displayFilter () {
       this.$store.commit('calendar/toggleFilter', !this.showFilter)
     },
@@ -535,6 +653,12 @@ export default {
       this.disableTimePicker = true;
       this.modalBtnLoading = false;
     },
+    closeInternHoursModal () {
+      this.openInternHoursModal = false;
+      this.internHoursInfo.eventFrom = null;
+      this.internHoursInfo.eventTo = null;
+      this.internHoursInfo.reason = '';
+    },
     changeViewMode () {
       scheduler.setCurrentView(scheduler.getState().date, this.selectView);
     }
@@ -542,8 +666,40 @@ export default {
 }
 </script>
 
+<style lang="stylus" scoped>
+  @import '~variables'
+
+  .sector-filter
+    margin-right: 20px
+    @media screen and (max-width: 767px)
+      margin-right: 6px
+
+  .select-view
+    @media screen and (max-width: 767px)
+      margin-right: 10px
+    & /deep/ .q-input-target
+      color: #454544
+      font-size: 13px
+
+  .custom-field
+    margin: 16px 0
+
+  .q-if-inverted
+    border: 1px solid #D0D0D0;
+
+  .margin-input
+    margin-bottom: 6px;
+
+  .q-datetime .q-datetime-content .modal-buttons .q-btn .q-btn-inner > div
+    color: $primary !important;
+
+  .bg-negative
+    background: none !important
+    color: inherit !important
+
+</style>
+
 <style lang="css">
-  /* @import '~variables' */
   @import "~dhtmlx-scheduler/codebase/dhtmlxscheduler.css";
   @import "~dhtmlx-scheduler/codebase/dhtmlxscheduler_flat.css";
   @import "~assets/dhtmlxscheduler-responsive.css";
@@ -573,34 +729,7 @@ export default {
       right: 20px !important;
       width: 30px !important;
     }
-    .sector-filter {
-      margin-right: 6px;
-    }
-    .select-view {
-      margin-right: 10px;
-    }
   }
-
-  .select-view .q-input-target {
-    color: #454544;
-    font-size: 13px;
-  }
-
-  .sector-filter {
-    margin-right: 20px;
-  }
-
-  .custom-field {
-    margin: 16px 0;
-  }
-
-   .q-if-inverted {
-      border: 1px solid #D0D0D0;
-   }
-
-   .margin-input {
-     margin-bottom: 6px;
-   }
 
   .dhx_scale_hour {
     border-bottom: none;
