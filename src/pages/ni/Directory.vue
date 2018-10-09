@@ -551,17 +551,6 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables'
 
-  // .q-if-inverted
-  //   min-height: 40px
-
-  .directory-header
-    margin-bottom: 35px
-    & .q-btn
-      padding: 0
-
-  // .btn-directory
-  //   min-height: 40px
-
   .input-caption
     margin-bottom: 4px
 

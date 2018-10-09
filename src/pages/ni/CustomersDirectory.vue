@@ -115,13 +115,6 @@ export default {
     @media (max-width: 767px)
       justify-content: flex-start
 
-  .directory-header
-    margin-bottom: 35px
-    @media (max-width: 767px)
-      margin-bottom: 10px
-    & .q-btn
-      padding: 0
-
   .btn-icon
     &-disabled
       color: $light-grey
