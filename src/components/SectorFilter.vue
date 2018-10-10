@@ -1,5 +1,5 @@
 <template>
-<q-icon name="mdi-account-search" size="1.4rem" flat>
+<q-icon name="mdi-account-search" size="1.5rem" flat>
   <q-popover v-model="showFilter" @show="getPersonsBySector(sector)">
     <q-list link no-border style="min-width: 200px">
       <!-- <q-list-header v-if="persons.length !== 0"> -->

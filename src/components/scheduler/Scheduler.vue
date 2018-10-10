@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="ogustUser" class="row justify-between items-baseline q-pt-sm">
-      <h5 style="margin: 0 0 0 10px">{{ogustUser.title}}</h5>
+      <h4 style="margin: 0 0 0 10px !important">{{ogustUser.title}}</h4>
       <sector-filter class="sector-filter" v-show="showTabFilter && !customer" v-if="ogustUser" @personChosen="applyFilter" @click.self="displayFilter" />
     </div>
     <div ref="scheduler_here" class="dhx_cal_container" style="width:100%; height:100%;">
