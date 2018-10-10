@@ -1,111 +1,113 @@
 <template>
-  <q-page v-if="isLoaded" padding class="neutral-background">
-    <div class="row items-center col-xs-12 header-margin">
-      <div>
-        <q-icon class="on-left cursor-pointer self-center" size="1rem" name="arrow_back" color="primary" @click.native="$router.go(-1)" />
-      </div>
-      <h4 class="no-margin">{{ customer.title }} {{ customer.last_name }}</h4>
-    </div>
-    <div class="row">
-      <p class="text-weight-bold">Informations</p>
-    </div>
-    <div class="row gutter-profile">
-      <div class="col-xs-12 col-md-6">
-        <div class="row">
-          <p class="input-caption">Adresse</p>
+  <q-page padding class="neutral-background">
+    <div v-if="isLoaded">
+      <div class="row items-center col-xs-12 header-margin">
+        <div>
+          <q-icon class="on-left cursor-pointer self-center" size="1rem" name="arrow_back" color="primary" @click.native="$router.go(-1)" />
         </div>
-        <q-field>
-          <q-input
-            v-model="customer.main_address.line"
-            disable
-            inverted-light
-            color="white" />
-        </q-field>
+        <h4 class="no-margin">{{ customer.title }} {{ customer.last_name }}</h4>
       </div>
-      <div class="col-xs-12 col-md-6">
-        <div class="row">
-          <p class="input-caption">Code porte</p>
-        </div>
-        <q-field>
-          <q-input
-            v-model="customer.door_code"
-            inverted-light
-            color="white"
-            @focus="saveTmp('door_code')"
-            @blur="updateCustomer('door_code')" />
-        </q-field>
+      <div class="row">
+        <p class="text-weight-bold">Informations</p>
       </div>
-      <div class="col-xs-12 col-md-6">
-        <div class="row">
-          <p class="input-caption">Code interphone</p>
+      <div class="row gutter-profile">
+        <div class="col-xs-12 col-md-6">
+          <div class="row">
+            <p class="input-caption">Adresse</p>
+          </div>
+          <q-field>
+            <q-input
+              v-model="customer.main_address.line"
+              disable
+              inverted-light
+              color="white" />
+          </q-field>
         </div>
-        <q-field>
-          <q-input
-            v-model="customer.intercom_code"
-            inverted-light
-            color="white"
-            @focus="saveTmp('intercom_code')"
-            @blur="updateCustomer('intercom_code')" />
-        </q-field>
-      </div>
-      <div class="col-xs-12 col-md-6">
-        <div class="row">
-          <p class="input-caption">Pathologie</p>
+        <div class="col-xs-12 col-md-6">
+          <div class="row">
+            <p class="input-caption">Code porte</p>
+          </div>
+          <q-field>
+            <q-input
+              v-model="customer.door_code"
+              inverted-light
+              color="white"
+              @focus="saveTmp('door_code')"
+              @blur="updateCustomer('door_code')" />
+          </q-field>
         </div>
-        <q-field>
-          <q-select
-            v-model="customerInfo.pathology"
-            :options="selectOptions"
-            inverted-light
-            color="white"
-            @focus="saveTmp('customerInfo')"
-            @blur="updateCustomerInfo" />
-        </q-field>
-      </div>
-      <div class="col-xs-12 col-md-6">
-        <div class="row">
-          <p class="input-caption">Commentaires</p>
+        <div class="col-xs-12 col-md-6">
+          <div class="row">
+            <p class="input-caption">Code interphone</p>
+          </div>
+          <q-field>
+            <q-input
+              v-model="customer.intercom_code"
+              inverted-light
+              color="white"
+              @focus="saveTmp('intercom_code')"
+              @blur="updateCustomer('intercom_code')" />
+          </q-field>
         </div>
-        <q-field>
-          <q-input
-            v-model="customerInfo.comments"
-            type="textarea"
-            :rows="6"
-            inverted-light
-            color="white"
-            @focus="saveTmp('customerInfo')"
-            @blur="updateCustomerInfo" />
-        </q-field>
-      </div>
-      <div class="col-xs-12 col-md-6">
-        <div class="row">
-          <p class="input-caption">Détails intervention</p>
+        <div class="col-xs-12 col-md-6">
+          <div class="row">
+            <p class="input-caption">Pathologie</p>
+          </div>
+          <q-field>
+            <q-select
+              v-model="customerInfo.pathology"
+              :options="selectOptions"
+              inverted-light
+              color="white"
+              @focus="saveTmp('customerInfo')"
+              @blur="updateCustomerInfo" />
+          </q-field>
         </div>
-        <q-field>
-          <q-input
-            v-model="customerInfo.interventionDetails"
-            type="textarea"
-            :rows="6"
-            inverted-light
-            color="white"
-            @focus="saveTmp('customerInfo')"
-            @blur="updateCustomerInfo" />
-        </q-field>
-      </div>
-      <div class="col-xs-12 col-md-6">
-        <div class="row">
-          <p class="input-caption">Autres</p>
+        <div class="col-xs-12 col-md-6">
+          <div class="row">
+            <p class="input-caption">Commentaires</p>
+          </div>
+          <q-field>
+            <q-input
+              v-model="customerInfo.comments"
+              type="textarea"
+              :rows="6"
+              inverted-light
+              color="white"
+              @focus="saveTmp('customerInfo')"
+              @blur="updateCustomerInfo" />
+          </q-field>
         </div>
-        <q-field>
-          <q-input
-            v-model="customerInfo.misc"
-            type="textarea"
-            :rows="6"
-            inverted-light
-            color="white"
-            @focus="saveTmp('customerInfo')"
-            @blur="updateCustomerInfo" />
-        </q-field>
+        <div class="col-xs-12 col-md-6">
+          <div class="row">
+            <p class="input-caption">Détails intervention</p>
+          </div>
+          <q-field>
+            <q-input
+              v-model="customerInfo.interventionDetails"
+              type="textarea"
+              :rows="6"
+              inverted-light
+              color="white"
+              @focus="saveTmp('customerInfo')"
+              @blur="updateCustomerInfo" />
+          </q-field>
+        </div>
+        <div class="col-xs-12 col-md-6">
+          <div class="row">
+            <p class="input-caption">Autres</p>
+          </div>
+          <q-field>
+            <q-input
+              v-model="customerInfo.misc"
+              type="textarea"
+              :rows="6"
+              inverted-light
+              color="white"
+              @focus="saveTmp('customerInfo')"
+              @blur="updateCustomerInfo" />
+          </q-field>
+        </div>
       </div>
     </div>
   </q-page>

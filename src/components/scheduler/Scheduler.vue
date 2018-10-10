@@ -488,7 +488,7 @@ export default {
         this.openInternHoursModal = true;
       } catch (e) {
       }
-    }), 500);
+    }), 1000);
   },
   methods: {
     handleScroll: debounce(function (scroll) {
