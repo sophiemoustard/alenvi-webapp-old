@@ -19,7 +19,7 @@
       </div>
       <hr style="margin-top: 5%; margin-bottom: 5%">
       <div class="row justify-center">
-        <q-btn big color="primary" @click="connectToBotMessenger">Connecter votre compte Messenger</q-btn>
+        <q-btn big color="primary" @click="connectToBotMessenger">Connecter mon compte Messenger</q-btn>
       </div>
     </div>
   </q-page>
