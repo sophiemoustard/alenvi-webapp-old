@@ -6,7 +6,7 @@
       <q-field class="margin-input" :error="$v.user.credentials.email.$error" error-label="Email invalide.">
         <q-input v-model.trim="user.credentials.email" @blur="$v.user.credentials.email.$touch" inverted-light color="white" />
       </q-field>
-      <p class="input-caption">Mot de passe</p>
+      <p class="input-caption">Nouveau mot de passe</p>
       <q-field class="margin-input" :error="$v.user.credentials.password.$error" error-label="Le mot de passe doit contenir entre 6 et 20 caractères.">
         <q-input type="password" v-model.trim="user.credentials.password" @blur="$v.user.credentials.password.$touch" inverted-light color="white" />
       </q-field>
@@ -19,7 +19,7 @@
       </div>
       <hr style="margin-top: 5%; margin-bottom: 5%">
       <div class="row justify-center">
-        <q-btn big color="primary" @click="connectToBotMessenger">Connecter votre compte Messenger</q-btn>
+        <q-btn big color="primary" @click="connectToBotMessenger">Connecter mon compte Messenger</q-btn>
       </div>
     </div>
   </q-page>
@@ -115,10 +115,10 @@ export default {
 
   .center-account
     max-width: 40%
-    margin-left: auto
-    margin-right: auto
+    // margin-left: auto
+    // margin-right: auto
     @media screen && (max-width: 600px)
-      max-width: 90%
+      max-width: 100%
 
   .margin-input
     margin-bottom: 6px
