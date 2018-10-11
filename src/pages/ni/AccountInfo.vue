@@ -19,7 +19,7 @@
       </div>
       <hr style="margin-top: 5%; margin-bottom: 5%">
       <div class="row justify-center">
-        <q-btn big color="primary" @click="connectToBotMessenger">Connecter mon compte Messenger</q-btn>
+        <q-btn big color="primary" @click="logout">Déconnexion</q-btn>
       </div>
     </div>
   </q-page>
@@ -27,7 +27,6 @@
 
 <script>
 import { required, email, sameAs, minLength, maxLength } from 'vuelidate/lib/validators'
-import { Cookies } from 'quasar'
 export default {
   data () {
     return {
@@ -99,9 +98,22 @@ export default {
         console.error(e);
       }
     },
-    async connectToBotMessenger () {
-      const token = Cookies.get('alenvi_token');
-      window.location.href = `${process.env.MESSENGER_LINK}?ref=${token}`
+    logout () {
+      this.$q.cookies.remove('alenvi_token', {
+        path: '/'
+      });
+      this.$q.cookies.remove('alenvi_token_expires_in', {
+        path: '/'
+      });
+      this.$q.cookies.remove('refresh_token', {
+        path: '/'
+      });
+      this.$q.cookies.remove('user_id', {
+        path: '/'
+      });
+      if (this.user.alenvi.role.name !== 'Client') {
+        this.$router.replace('/login');
+      }
     }
   }
 }

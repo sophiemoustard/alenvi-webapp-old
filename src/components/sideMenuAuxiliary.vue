@@ -71,20 +71,25 @@
       <q-item class="sidemenu-footer-border full-width">
         <q-item-main class="sidemenu-footer-user" :label="userFirstnameUpper" />
         <q-item-side>
-          <q-icon name="person" color="black" @click.native="toAccountInfo" />
+          <q-icon name="mdi-facebook-messenger" color="black" @click.native="connectToBotMessenger" />
+        </q-item-side>
+        <q-item-side>
+          <router-link tag="i" class="q-icon material-icons text-black" :to="{ name: 'account info' }" exact>person</router-link>
         </q-item-side>
         <!-- <q-item-side>
           <q-icon name="settings" color="black" />
         </q-item-side> -->
-        <q-item-side>
+        <!-- <q-item-side>
           <q-icon name="ion-log-out" color="black" @click.native="logout" />
-        </q-item-side>
+        </q-item-side> -->
       </q-item>
     </div>
   </q-list>
 </template>
 
 <script>
+import { Cookies } from 'quasar';
+
 import {
   sideMenuMixin
 } from '../mixins/sideMenuMixin';
@@ -118,7 +123,10 @@ export default {
     this.collapsibleOpening();
   },
   methods: {
-
+    connectToBotMessenger () {
+      const token = Cookies.get('alenvi_token');
+      window.location.href = `${process.env.MESSENGER_LINK}?ref=${token}`
+    }
   }
 }
 
@@ -127,4 +135,6 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables'
 
+  .q-layout-drawer .q-list .router-link-active
+    color: $primary !important
 </style>
