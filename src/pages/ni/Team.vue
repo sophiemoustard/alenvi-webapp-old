@@ -14,7 +14,6 @@
       row-key="name"
       :rows-per-page-options="[15, 25, 35]"
       :pagination.sync="pagination"
-      hide-bottom
       :loading="tableLoading">
       <q-tr
         slot="body"
@@ -93,7 +92,7 @@ export default {
   methods: {
     async getUserList () {
       try {
-        const users = await this.$users.showAll({ role: 'Auxiliaire', sector: this.currentUser.sector, isActive: true });
+        const users = await this.$users.showAll({ role: 'Auxiliaire', isActive: true });
         this.userList = users.map(user => ({
           auxiliary: {
             name: `${user.firstname} ${user.lastname}`,
