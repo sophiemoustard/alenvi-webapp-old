@@ -487,6 +487,7 @@ export default {
         });
         this.openInternHoursModal = true;
       } catch (e) {
+        console.error(e);
       }
     }), 1000);
   },
