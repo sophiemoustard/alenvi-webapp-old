@@ -71,7 +71,7 @@
       <q-item class="sidemenu-footer-border full-width">
         <q-item-main class="sidemenu-footer-user" :label="userFirstnameUpper" />
         <q-item-side>
-          <q-icon name="mdi-facebook-messenger" color="black" @click.native="connectToBotMessenger" />
+          <q-icon class="messenger-blue-text" name="mdi-facebook-messenger" @click.native="connectToBotMessenger" />
         </q-item-side>
         <q-item-side>
           <router-link tag="i" class="q-icon material-icons text-black" :to="{ name: 'account info' }" exact>person</router-link>
@@ -134,6 +134,8 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables'
+  .messenger-blue-text
+    color: $messenger-blue
 
   .q-layout-drawer .q-list .router-link-active
     color: $primary !important
