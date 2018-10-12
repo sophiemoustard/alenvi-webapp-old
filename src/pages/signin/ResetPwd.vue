@@ -1,5 +1,5 @@
 <template>
-  <div class="row justify-center">
+  <div class="neutral-background" style="min-height: 100vh">
     <q-card flat class="layout-padding" style="width: 500px; max-width: 90vw">
       <q-card-media>
         <img src="https://res.cloudinary.com/alenvi/image/upload/c_scale,q_auto,w_400/v1507124345/images/business/alenvi_logo_complet_full.png" alt="Logo Alenvi" class="responsive">
@@ -8,15 +8,23 @@
         Veuillez renseigner un nouveau mot de passe:
       </q-card-title>
       <q-card-main>
-        <q-field :error="$v.passwords.password.$error" helper="6 caractères minimum"
-          error-label="Le mot de passe doit contenir entre 6 et 20 caractères.">
-          <q-input icon="vpn key" type="password" float-label="Nouveau mot de passe" v-model.trim="passwords.password" @blur="$v.passwords.password.$touch" />
-        </q-field>
-        <q-field :error="$v.passwords.passwordConfirm.$error" error-label="Le mot de passe entré et la confirmation sont différents.">
-          <q-input type="password" float-label="Confirmation nouveau mot de passe" v-model.trim="passwords.passwordConfirm" @blur="$v.passwords.passwordConfirm.$touch" />
-        </q-field>
+        <div class="margin-input">
+          <p class="input-caption">Nouveau mot de passe (6 caractères minimum)</p>
+          <q-field :error="$v.passwords.password.$error"
+            error-label="Le mot de passe doit contenir entre 6 et 20 caractères.">
+            <q-input icon="vpn key" type="password" v-model.trim="passwords.password" @blur="$v.passwords.password.$touch"
+              inverted-light color="white" />
+          </q-field>
+        </div>
+        <div class="margin-input">
+          <p class="input-caption">Confirmation nouveau mot de passe</p>
+          <q-field :error="$v.passwords.passwordConfirm.$error" error-label="Le mot de passe entré et la confirmation sont différents.">
+            <q-input type="password" v-model.trim="passwords.passwordConfirm" @blur="$v.passwords.passwordConfirm.$touch"
+              inverted-light color="white" />
+          </q-field>
+        </div>
       </q-card-main>
-      <q-card-actions class="row justify-end">
+      <q-card-actions class="row justify-center">
         <q-btn @click="submit" color="primary" :disable="$v.passwords.$invalid">Envoyer</q-btn>
       </q-card-actions>
     </q-card>
@@ -136,6 +144,11 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables'
-  .q-field
-    margin: 0 0 10px 0
+
+  .margin-input
+    margin-bottom: 10px
+
+  .bg-negative
+    background: white !important
+    color: inherit !important
 </style>

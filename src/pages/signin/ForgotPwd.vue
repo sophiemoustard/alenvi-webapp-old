@@ -1,5 +1,5 @@
 <template>
-  <div class="row justify-center">
+  <div class="neutral-background" style="min-height: 100vh">
     <q-card flat class="layout-padding" style="width: 500px; max-width: 90vw">
       <q-card-media>
         <img src="https://res.cloudinary.com/alenvi/image/upload/c_scale,q_auto,w_400/v1507124345/images/business/alenvi_logo_complet_full.png" alt="Logo Alenvi" class="responsive">
@@ -8,11 +8,12 @@
         Nous allons vous envoyer un email pour réinitialiser votre mot de passe. Veuillez renseigner votre adresse email :
       </q-card-title>
       <q-card-main>
-        <q-field icon="mail" :error="$v.email.$error" error-label="Veuillez rentrer un email valide. (ex: mail@mail.com)">
-          <q-input v-model.trim="email" float-label="Email" @blur="$v.email.$touch"/>
+        <p class="input-caption">Email</p>
+        <q-field :error="$v.email.$error" error-label="Veuillez rentrer un email valide. (ex: mail@mail.com)">
+          <q-input v-model.trim="email" @blur="$v.email.$touch" inverted-light color="white"/>
         </q-field>
       </q-card-main>
-      <q-card-actions class="row justify-end">
+      <q-card-actions class="row justify-center">
         <q-btn @click="submit" color="primary" :disable="$v.email.$invalid">Envoyer</q-btn>
       </q-card-actions>
     </q-card>
@@ -73,4 +74,8 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables'
+
+  .bg-negative
+    background: white !important
+    color: inherit !important
 </style>
