@@ -74,7 +74,7 @@
           <q-icon class="messenger-blue-text" name="mdi-facebook-messenger" @click.native="connectToBotMessenger" />
         </q-item-side>
         <q-item-side>
-          <router-link tag="i" class="q-icon material-icons text-black" :to="{ name: 'account info' }" exact>person</router-link>
+          <router-link tag="i" class="q-icon material-icons text-black" :to="{ name: 'account info', params: { id: user._id } }" exact>person</router-link>
         </q-item-side>
         <!-- <q-item-side>
           <q-icon name="settings" color="black" />

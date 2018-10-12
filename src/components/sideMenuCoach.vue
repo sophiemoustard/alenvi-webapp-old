@@ -51,15 +51,18 @@
     <div class="sidemenu-footer">
       <q-item class="sidemenu-footer-border full-width">
         <q-item-main class="sidemenu-footer-user" :label="userFirstnameUpper" />
-        <q-item-side>
+        <!-- <q-item-side>
           <q-icon name="person" color="black" @click.native="toAccountInfo"/>
-        </q-item-side>
+        </q-item-side> -->
         <!-- <q-item-side>
           <q-icon name="settings" color="black" />
         </q-item-side> -->
         <q-item-side>
-          <q-icon name="ion-log-out" color="black" @click.native="logout" />
+          <router-link tag="i" class="q-icon material-icons text-black" :to="{ name: 'account info', params: { id: user._id } }" exact>person</router-link>
         </q-item-side>
+        <!-- <q-item-side>
+          <q-icon name="ion-log-out" color="black" @click.native="logout" />
+        </q-item-side> -->
       </q-item>
     </div>
   </q-list>
@@ -101,4 +104,6 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables'
 
+  .q-layout-drawer .q-list .router-link-active
+    color: $primary !important
 </style>
