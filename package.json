@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Webapp used by coordinators, auxiliaries and customers to lead auxiliaries or know about families.",
   "productName": "Compani",
-  "cordovaId": "org.cordova.compani.app",
+  "cordovaId": "org.cordova.quasar.app",
   "author": "Pierre HOFMAN <pierre.hofman@epitech.eu>  & Jean-Christophe TREBALAG <jctrebalag@gmail.com>",
   "private": true,
   "scripts": {
