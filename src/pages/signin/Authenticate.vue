@@ -1,21 +1,14 @@
 <template>
-  <div class="row"><!-- Column because we need to activate flex for last button (see his own class) -->
-    <div class="col-12 row signup-header-padding bg-white items-center">
-      <div class="col-6">
-        <img style="height: 30px" src="https://res.cloudinary.com/alenvi/image/upload/v1539605431/images/business/Compani/compani_logo_1L_RVB_S.png" alt="">
-      </div>
-      <div class="col-6">
-        <p class="no-margin" style="font-size: 0.8rem; text-align: right">Espace Alenvi</p>
-      </div>
-    </div>
-    <div class="col-12 row justify-center neutral-background">
+  <div>
+    <compani-header />
+    <div class="col-12 row justify-center neutral-background" style="min-height: 100vh">
       <div class="signup-body-padding">
         <div class="row items-center">
           <div class="col-2" style="text-align: left">
             <span><q-icon name="lock" size="2rem" /></span>
           </div>
           <div class="col-10 signup-bloctext-padding">
-            <p class="no-margin" style="font-size: 0.8rem">Pour vous connecter à votre compte Alenvi, merci de <span class="text-weight-bold">saisir votre identifiant</span> et votre <span class="text-weight-bold">mot de passe</span></p>
+            <p class="no-margin" style="font-size: 0.8rem">Les services d’Alenvi sont maintenant disponibles via le site Compani.<br> Pour vous connecter à votre compte, merci de <span class="text-weight-bold">saisir votre identifiant</span> et votre <span class="text-weight-bold">mot de passe</span></p>
           </div>
         </div>
         <div class="row margin-input">
@@ -47,6 +40,8 @@
 
 import { date } from 'quasar'
 
+import CompaniHeader from '../../components/CompaniHeader';
+
 export default {
   metaInfo: {
     title: 'Connexion',
@@ -55,6 +50,9 @@ export default {
     ]
   },
   name: 'Authentication',
+  components: {
+    CompaniHeader
+  },
   data () {
     return {
       credentials: {
@@ -114,8 +112,6 @@ export default {
 <style lang="stylus" scoped>
 
   .signup
-    &-header-padding
-      padding: 24px 24px 12px 24px
     &-bloctext-padding
       padding: 24px 0px 24px 0px
     &-body-padding

@@ -1,42 +1,43 @@
 <template>
-  <div class="neutral-background" style="min-height: 100vh">
-    <q-card flat class="layout-padding" style="width: 500px; max-width: 90vw">
-      <q-card-media>
-        <img src="https://res.cloudinary.com/alenvi/image/upload/v1539605431/images/business/Compani/compani_logo_1L_RVB_S.png" alt="Logo Compani" class="responsive">
-      </q-card-media>
-      <q-card-title>
-        Veuillez renseigner un nouveau mot de passe:
-      </q-card-title>
-      <q-card-main>
-        <div class="margin-input">
-          <p class="input-caption">Nouveau mot de passe (6 caractères minimum)</p>
-          <q-field :error="$v.passwords.password.$error"
-            error-label="Le mot de passe doit contenir entre 6 et 20 caractères.">
-            <q-input icon="vpn key" type="password" v-model.trim="passwords.password" @blur="$v.passwords.password.$touch"
-              inverted-light color="white" />
-          </q-field>
-        </div>
-        <div class="margin-input">
-          <p class="input-caption">Confirmation nouveau mot de passe</p>
-          <q-field :error="$v.passwords.passwordConfirm.$error" error-label="Le mot de passe entré et la confirmation sont différents.">
-            <q-input type="password" v-model.trim="passwords.passwordConfirm" @blur="$v.passwords.passwordConfirm.$touch"
-              inverted-light color="white" />
-          </q-field>
-        </div>
-      </q-card-main>
-      <q-card-actions class="row justify-center">
-        <q-btn @click="submit" color="primary" :disable="$v.passwords.$invalid">Envoyer</q-btn>
-      </q-card-actions>
-    </q-card>
+  <div>
+    <compani-header />
+    <div class="neutral-background" style="min-height: 100vh">
+      <q-card flat style="width: 500px; max-width: 90vw; margin: auto">
+        <q-card-main>
+          <p class="q-mb-lg">Veuillez renseigner un nouveau mot de passe:</p>
+          <div class="margin-input">
+            <p class="input-caption">Nouveau mot de passe (6 caractères minimum)</p>
+            <q-field :error="$v.passwords.password.$error" error-label="Le mot de passe doit contenir entre 6 et 20 caractères.">
+              <q-input icon="vpn key" type="password" v-model.trim="passwords.password" @blur="$v.passwords.password.$touch"
+                inverted-light color="white" />
+            </q-field>
+          </div>
+          <div class="margin-input">
+            <p class="input-caption">Confirmation nouveau mot de passe</p>
+            <q-field :error="$v.passwords.passwordConfirm.$error" error-label="Le mot de passe entré et la confirmation sont différents.">
+              <q-input type="password" v-model.trim="passwords.passwordConfirm" @blur="$v.passwords.passwordConfirm.$touch"
+                inverted-light color="white" />
+            </q-field>
+          </div>
+        </q-card-main>
+        <q-card-actions class="row justify-center">
+          <q-btn @click="submit" color="primary" :disable="$v.passwords.$invalid">Envoyer</q-btn>
+        </q-card-actions>
+      </q-card>
+    </div>
   </div>
 </template>
 
 <script>
 import { sameAs, minLength, maxLength, required } from 'vuelidate/lib/validators'
 
+import CompaniHeader from '../../components/CompaniHeader';
 import users from '../../api/Users'
 
 export default {
+  components: {
+    CompaniHeader
+  },
   data () {
     return {
       passwords: {

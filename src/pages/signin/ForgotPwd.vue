@@ -1,29 +1,33 @@
 <template>
-  <div class="neutral-background" style="min-height: 100vh">
-    <q-card flat class="layout-padding" style="width: 500px; max-width: 90vw">
-      <q-card-media>
-        <img src="https://res.cloudinary.com/alenvi/image/upload/v1539605431/images/business/Compani/compani_logo_1L_RVB_S.png" alt="Logo Compani" class="responsive">
-      </q-card-media>
-      <q-card-title>
-        Nous allons vous envoyer un email pour réinitialiser votre mot de passe. Veuillez renseigner votre adresse email :
-      </q-card-title>
-      <q-card-main>
-        <p class="input-caption">Email</p>
-        <q-field :error="$v.email.$error" error-label="Veuillez rentrer un email valide. (ex: mail@mail.com)">
-          <q-input v-model.trim="email" @blur="$v.email.$touch" inverted-light color="white"/>
-        </q-field>
-      </q-card-main>
-      <q-card-actions class="row justify-center">
-        <q-btn @click="submit" color="primary" :disable="$v.email.$invalid">Envoyer</q-btn>
-      </q-card-actions>
-    </q-card>
+  <div>
+    <compani-header />
+    <div class="neutral-background" style="min-height: 100vh">
+      <q-card flat style="width: 500px; max-width: 90vw; margin: auto">
+        <q-card-main>
+          <p class="q-mb-lg">Nous allons vous envoyer un email pour réinitialiser votre mot de passe. Veuillez renseigner votre adresse
+          email :</p>
+          <p class="input-caption">Email</p>
+          <q-field :error="$v.email.$error" error-label="Veuillez rentrer un email valide. (ex: mail@mail.com)">
+            <q-input v-model.trim="email" @blur="$v.email.$touch" inverted-light color="white" />
+          </q-field>
+        </q-card-main>
+        <q-card-actions class="row justify-center">
+          <q-btn @click="submit" color="primary" :disable="$v.email.$invalid">Envoyer</q-btn>
+        </q-card-actions>
+      </q-card>
+    </div>
   </div>
 </template>
 
 <script>
 import { email, required } from 'vuelidate/lib/validators'
 
+import CompaniHeader from '../../components/CompaniHeader';
+
 export default {
+  components: {
+    CompaniHeader
+  },
   data () {
     return {
       email: ''
