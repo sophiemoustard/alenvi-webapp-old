@@ -5,7 +5,7 @@
         <q-btn color="primary" flat round dense big @click="toggleLeft">
           <q-icon name="menu" style="width: 24px; height: 24px" />
         </q-btn>
-        <img style="height: 30px" src="https://res.cloudinary.com/alenvi/image/upload/v1507019444/images/business/alenvi_logo_complet_183x50.png" alt="">
+        <img style="height: 20px" src="https://res.cloudinary.com/alenvi/image/upload/v1539605431/images/business/Compani/compani_logo_1L_RVB_S.png" alt="">
         <!-- <q-toolbar-title>
           <router-link :class="{ 'router-link-active': false }" :to="layoutTitle.link">{{ layoutTitle.content }}</router-link>
         </q-toolbar-title> -->

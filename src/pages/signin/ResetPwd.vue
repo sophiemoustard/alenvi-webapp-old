@@ -2,7 +2,7 @@
   <div class="neutral-background" style="min-height: 100vh">
     <q-card flat class="layout-padding" style="width: 500px; max-width: 90vw">
       <q-card-media>
-        <img src="https://res.cloudinary.com/alenvi/image/upload/c_scale,q_auto,w_400/v1507124345/images/business/alenvi_logo_complet_full.png" alt="Logo Alenvi" class="responsive">
+        <img src="https://res.cloudinary.com/alenvi/image/upload/v1539605431/images/business/Compani/compani_logo_1L_RVB_S.png" alt="Logo Compani" class="responsive">
       </q-card-media>
       <q-card-title>
         Veuillez renseigner un nouveau mot de passe:
