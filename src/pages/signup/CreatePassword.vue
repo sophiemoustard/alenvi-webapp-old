@@ -1,13 +1,6 @@
 <template>
-  <div class="row"><!-- Column because we need to activate flex for last button (see his own class) -->
-    <div class="col-12 row signup-header-padding bg-white items-center">
-      <div class="col-6">
-        <img style="height: 30px" src="https://res.cloudinary.com/alenvi/image/upload/v1539605431/images/business/Compani/compani_logo_1L_RVB_S.png" alt="Logo Compani">
-      </div>
-      <div class="col-6">
-        <p class="no-margin" style="font-size: 0.8rem; text-align: right">Espace Alenvi</p>
-      </div>
-    </div>
+  <div>
+    <compani-header />
     <div class="col-12 row justify-center neutral-background">
       <div class="signup-body-padding">
         <div class="row items-center">
@@ -15,7 +8,7 @@
             <span><q-icon name="thumb up" size="2rem" /></span>
           </div>
           <div class="col-10 signup-bloctext-padding">
-            <p class="no-margin" style="font-size: 0.8rem;">Afin de confirmer la création de votre compte Alenvi, merci de <span class="text-weight-bold">choisir un mot de passe</span></p>
+            <p class="no-margin" style="font-size: 0.8rem;">Afin de confirmer la création de votre compte, merci de <span class="text-weight-bold">choisir un mot de passe</span></p>
           </div>
         </div>
         <div class="row margin-input">
@@ -50,7 +43,7 @@
           </div>
         </div>
         <div class="row justify-center">
-          <q-btn no-caps class="signup-btn" label="Créer mon compte Alenvi" icon-right="arrow_forward" color="primary" :loading="loading" @click="submit" />
+          <q-btn no-caps class="signup-btn" label="Créer mon compte" icon-right="arrow_forward" color="primary" :loading="loading" @click="submit" />
         </div>
       </div>
     </div>
@@ -62,8 +55,13 @@
 import { date } from 'quasar'
 import { required, email, sameAs, minLength } from 'vuelidate/lib/validators';
 
+import CompaniHeader from '../../components/CompaniHeader';
+
 export default {
   name: 'CreatePassword',
+  components: {
+    CompaniHeader
+  },
   data () {
     return {
       loading: false,

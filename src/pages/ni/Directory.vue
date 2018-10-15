@@ -249,8 +249,8 @@ export default {
       searchStr: '',
       activeUsers: true,
       pagination: {
-        sortBy: 'name', // String, column "name" property value
-        descending: false,
+        sortBy: 'startDate', // String, column "name" property value
+        descending: true,
         page: 1,
         rowsPerPage: 15 // current rows per page being displayed
       },
@@ -464,7 +464,7 @@ export default {
       const code = activationDataRaw.activationData.code;
       await this.$twilio.sendSMS({
         to: `+33${this.newUser.mobilePhone.substring(1)}`,
-        body: `Bienvenue chez Alenvi ! :) Utilise ce code: ${code} pour pouvoir commencer ton enregistrement ici avant ton intégration: https://alenvi-webapp-dev.herokuapp.com/enterCode :-)`,
+        body: `Bienvenue chez Alenvi ! :) Utilise ce code: ${code} pour pouvoir commencer ton enregistrement sur Compani avant ton intégration: ${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/enterCode :-)`,
       });
     },
     async submit () {
