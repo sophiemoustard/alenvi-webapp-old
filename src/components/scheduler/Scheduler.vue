@@ -28,6 +28,20 @@
     <q-modal v-model="openModal" minimized :content-css="modalStyle" @hide="closeModal" @escape-key="closeModal">
       <p class="caption">{{ customerEventInfo.eventTitle }}</p>
       <div class="margin-input">
+        <div class="row gutter-sm">
+          <div class="col-xs-6">
+            <p class="input-caption">Heure de début</p>
+            <q-datetime type="time" format24h clear-label="Effacer" ok-label="OK" cancel-label="Annuler" v-model="customerEventInfo.eventFrom"
+              :disable="disableTimePicker" inverted-light color="white" popover />
+          </div>
+          <div class="col-xs-6">
+            <p class="input-caption">Heure de fin</p>
+            <q-datetime type="time" format24h clear-label="Effacer" ok-label="OK" cancel-label="Annuler" v-model="customerEventInfo.eventTo"
+              :disable="disableTimePicker" inverted-light color="white" popover />
+          </div>
+        </div>
+      </div>
+      <div class="margin-input">
         <p class="input-caption">Code porte</p>
         <q-input v-model="customerEventInfo.doorCode" type="text" :disable="disableInput" inverted-light color="white" />
       </div>
@@ -51,20 +65,6 @@
       <div class="margin-input">
         <p class="input-caption">Autres</p>
         <q-input v-model="customerEventInfo.misc" type="textarea" :min-rows="4" :disable="disableInput" inverted-light color="white" />
-      </div>
-      <div class="margin-input">
-        <div class="row gutter-sm">
-          <div class="col-xs-6">
-            <p class="input-caption">Heure de début</p>
-            <q-datetime type="time" format24h clear-label="Effacer" ok-label="OK" cancel-label="Annuler" v-model="customerEventInfo.eventFrom"
-              :disable="disableTimePicker" inverted-light color="white" popover />
-          </div>
-          <div class="col-xs-6">
-            <p class="input-caption">Heure de fin</p>
-            <q-datetime type="time" format24h clear-label="Effacer" ok-label="OK" cancel-label="Annuler" v-model="customerEventInfo.eventTo"
-              :disable="disableTimePicker" inverted-light color="white" popover />
-          </div>
-        </div>
       </div>
       <div class="row justify-end">
         <q-btn :loading="modalBtnLoading" @click="updateEvent" class="on-left" color="primary"
