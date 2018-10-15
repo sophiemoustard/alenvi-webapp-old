@@ -180,7 +180,11 @@ export default {
         const customerDetailsRaw = await this.$ogust.getOgustCustomerDetails(this.customerId);
         const customerDetails = customerDetailsRaw.data.data.info.thirdPartyInformations.array_values
         this.customer = await this.$ogust.getCustomerById(this.customerId);
-        if (customerDetails == null) {
+        if (customerDetails === null) {
+          for (const k in this.infoTitles) {
+            this.customerInfo[k] = '-';
+          }
+          this.isLoaded = true;
           return;
         } else {
           for (const k in this.infoTitles) {
