@@ -141,7 +141,7 @@ export default {
         if (this.$route.query.from) {
           return this.$router.replace({ path: this.$route.query.from });
         }
-        this.$router.replace({ name: 'profile planning', params: { id: this.$q.cookies.get('user_id') }, query: { auxiliary: 'true', self: 'true' } });
+        this.$router.replace({ name: 'personal info', params: { id: this.$q.cookies.get('user_id') } });
       } catch (e) {
         console.error(e);
         if (e.response) {
