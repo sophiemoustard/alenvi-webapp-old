@@ -40,6 +40,9 @@
 <script>
 
 export default {
+  metaInfo: {
+    title: 'Répertoire'
+  },
   data () {
     return {
       tableLoading: true,

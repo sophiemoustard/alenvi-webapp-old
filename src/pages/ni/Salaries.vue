@@ -25,6 +25,9 @@
 
 <script>
 export default {
+  metaInfo: {
+    title: 'Fiches de paie'
+  },
   data () {
     return {
       tableLoading: true,

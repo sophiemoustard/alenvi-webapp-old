@@ -195,6 +195,9 @@ export default {
       default: 'Auxiliaire'
     }
   },
+  metaInfo: {
+    title: 'Répertoire'
+  },
   components: {
     SelectSector,
     SelectManager

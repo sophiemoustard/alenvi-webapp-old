@@ -24,6 +24,9 @@
 
 <script>
 export default {
+  metaInfo: {
+    title: 'Documents'
+  },
   data () {
     return {
       tableLoading: true,

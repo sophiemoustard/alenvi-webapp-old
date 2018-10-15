@@ -23,6 +23,9 @@ export default {
     ProfileTabs,
     ProfileInfo
   },
+  metaInfo: {
+    title: 'Infos personnelles'
+  },
   computed: {
     userProfile () {
       return this.$store.getters['rh/getUserProfile'];

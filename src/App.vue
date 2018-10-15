@@ -9,8 +9,8 @@
 export default {
   name: 'App',
   metaInfo: {
-    title: 'Webapp',
-    titleTemplate: 'Alenvi - %s',
+    // title: 'Webapp',
+    titleTemplate: (titleChunk) => titleChunk ? `Compani - ${titleChunk}` : 'Compani',
     htmlAttrs: {
       lang: 'fr'
     }

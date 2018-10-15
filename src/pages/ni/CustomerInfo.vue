@@ -119,6 +119,9 @@ export default {
     id: String,
     customerId: String
   },
+  metaInfo: {
+    title: 'Fiche bénéficiaire'
+  },
   data () {
     return {
       tmpInput: '',

@@ -28,6 +28,9 @@
 <script>
 import { required, email, sameAs, minLength, maxLength } from 'vuelidate/lib/validators'
 export default {
+  metaInfo: {
+    title: 'Mon compte'
+  },
   data () {
     return {
       user: {

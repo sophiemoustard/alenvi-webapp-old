@@ -43,6 +43,9 @@ export default {
       default: 'Auxiliaire'
     }
   },
+  metaInfo: {
+    title: 'Bénéficiaires'
+  },
   data () {
     return {
       tableLoading: true,
