@@ -58,7 +58,7 @@
           <q-icon name="settings" color="black" />
         </q-item-side> -->
         <q-item-side>
-          <router-link tag="i" class="q-icon material-icons text-black" :to="{ name: 'account info', params: { id: user._id } }" exact>person</router-link>
+          <q-btn icon="person" big flat round dense :to="{ name: 'account info', params: { id: user._id } }" exact />
         </q-item-side>
         <!-- <q-item-side>
           <q-icon name="ion-log-out" color="black" @click.native="logout" />
