@@ -41,6 +41,9 @@ next()
 })
 */
 Router.beforeEach(async (to, from, next) => {
+  if (process.env.NODE_ENV === 'production' && window.location.hostname === 'app.alenvi.io') {
+    window.location.hostname = 'app.compani.fr';
+  }
   if (to.meta.cookies) {
     if (!Cookies.get('alenvi_token') || !Cookies.get('user_id')) {
       if (await alenvi.refreshAlenviCookies()) {
