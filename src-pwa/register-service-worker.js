@@ -7,6 +7,7 @@ import { register } from 'register-service-worker'
 
 register(process.env.SERVICE_WORKER_FILE, {
   ready () {
+    console.log('RIEORIERIEO');
     console.log('App is being served from cache by a service worker.')
   },
   registered (registration) { // registration -> a ServiceWorkerRegistration instance
@@ -23,6 +24,7 @@ register(process.env.SERVICE_WORKER_FILE, {
   },
   offline () {
     console.log('No internet connection found. App is running in offline mode.')
+    alert('OFFLINE <3');
   },
   error (err) {
     console.error('Error during service worker registration:', err)

@@ -15,7 +15,7 @@ app.use(history());
 
 app.use(sslRedirect(['development', 'production']));
 
-app.use(express.static(path.join(__dirname, '/dist/spa-mat')));
+app.use(express.static(path.join(__dirname, '/dist/pwa-mat')));
 
 app.set('port', (process.env.PORT || 8080));
 
