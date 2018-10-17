@@ -43,7 +43,7 @@ module.exports = function (ctx) {
       vueRouterMode: 'history',
       publicPath: '/',
       // vueCompiler: true,
-      // gzip: true,
+      gzip: true,
       // analyze: true,
       // extractCSS: false,
       useNotifier: false,
