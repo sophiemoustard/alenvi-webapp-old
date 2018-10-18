@@ -619,6 +619,7 @@ export default {
       modalCssContainer: {
         minWidth: '30vw'
       },
+      collapsibleOpened: false,
       requiredField: 'Champ requis',
       requiredDoc: 'Document requis',
       disablePictureEdition: true,
