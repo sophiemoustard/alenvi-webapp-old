@@ -1,49 +1,65 @@
 <template>
-  <div style="max-width: 90vw;">
+  <div>
     <h4>Vue planning</h4>
     <p class="caption">Voir planning en tant que:</p>
-    <select-sector @input="getEmployeesIdBySector" v-model="selectedSector"></select-sector>
-    <q-field icon="person" helper="Choix auxiliaire" >
-      <q-select inverted-light color="white" v-model="selectedAuxiliary" :options="orderedAuxiliary" separator :disable="!selectedSector"/>
-    </q-field>
-    <div class="row justify-end">
-      <q-btn color="primary" :disable="!selectedAuxiliary" @click="goUrl(getPlanningLink)" flat>Accéder au planning</q-btn>
-    </div>
+    <p class="input-caption">Communauté</p>
+    <select-sector class="q-mb-md" @input="getEmployeesBySector" v-model="selectedSector" />
+    <p class="input-caption">Auxiliaire</p>
+    <q-select class="q-mb-lg" inverted-light color="white" v-model="selectedAuxiliary" :options="orderedAuxiliary" separator :disable="!selectedSector"
+      @input="getEventsData" />
+    <scheduler :title="false" :scroll="false" :events="events" @viewChanged="getEventsData" />
   </div>
 </template>
 
 <script>
-import { openURL } from 'quasar'
-
-import _ from 'lodash'
+/* global scheduler */
+import { mapMutations, mapGetters } from 'vuex'
+import 'dhtmlx-scheduler'
 
 import SelectSector from '../../../components/SelectSector'
+import Scheduler from '../../../components/scheduler/Scheduler'
 
 export default {
+  metaInfo () {
+    return {
+      title: this.ogustUser ? this.ogustUser.title : ''
+    }
+  },
   components: {
-    SelectSector
+    SelectSector,
+    Scheduler
+  },
+  watch: {
+    events (value) {
+      console.log(value);
+    }
   },
   data () {
     return {
+      events: null,
       selectedSector: '',
-      selectedAuxiliary: '',
       sectors: [],
-      auxiliaries: []
+      auxiliaries: [],
+      selectedAuxiliary: '',
+      firstSelection: false
     }
   },
   computed: {
+    ...mapGetters({
+      user: 'main/user',
+      personType: 'calendar/personType',
+      ogustUser: 'calendar/ogustUser'
+    }),
     orderedAuxiliary () {
-      return _.sortBy(this.auxiliaries, ['label']);
-    },
-    getPlanningLink () {
-      return `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/bot/calendar?id_employee=${this.selectedAuxiliary}&access_token=${this.$q.cookies.get('alenvi_token')}&self=true`;
+      return this.$_.sortBy(this.auxiliaries, ['label']);
     }
   },
   methods: {
-    async getEmployeesIdBySector () {
+    async getEmployeesBySector () {
       try {
         this.auxiliaries = [];
         this.selectedAuxiliary = '';
+        scheduler.clearAll();
         const employees = await this.$ogust.getEmployees({ sector: this.selectedSector });
         for (const k in employees) {
           this.auxiliaries.push({
@@ -55,9 +71,52 @@ export default {
         console.error(e);
       }
     },
-    goUrl (url) {
-      openURL(url);
-    }
+    async getEventsData (event) {
+      try {
+        if (!this.selectedAuxiliary) return;
+        this.setPersonType('employee');
+        this.personId = this.selectedAuxiliary;
+        scheduler.clearAll();
+        const personData = await this.$ogust.getOgustPerson(this.personId, this.personType);
+        this.setOgustUser(personData);
+        this.events = await this.$ogust.getOgustEvents(this.personId, this.personType);
+        scheduler.parse(this.events, 'json');
+      } catch (e) {
+        console.error(e)
+        if (e.status === 404) {
+          this.events = [];
+          this.$store.commit('calendar/toggleFilter', false);
+          return this.$q.notify({
+            color: 'secondary',
+            icon: 'warning',
+            detail: 'Aucune intervention dans la période demandée',
+            position: 'bottom-right',
+            timeout: 2500
+          });
+        }
+        this.$q.notify({
+          color: 'negative',
+          icon: 'warning',
+          detail: "Erreur de chargement des données :/ Si le problème persiste, contacte l'équipe technique :)",
+          position: 'bottom-right',
+          timeout: 2500
+        });
+      }
+    },
+    changeAuxiliary () {
+      if (!this.firstSelection) {
+        this.getEventsData();
+      }
+    },
+    ...mapMutations({
+      setOgustUser: 'calendar/setOgustUser',
+      setPersonType: 'calendar/setPersonType',
+    })
+  },
+  beforeRouteUpdate (to, from, next) {
+    this.setOgustUser(null);
+    this.setPersonChosen(null);
+    next();
   }
 }
 </script>

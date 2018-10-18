@@ -25,7 +25,15 @@ const routes = [
       }
     },
   },
-  { path: '/login', name: 'login', component: () => import('pages/signin/Authenticate') },
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import('pages/signin/Authenticate'),
+    beforeEnter: (to, from, next) => {
+      if (Cookies.get('refresh_token')) return next({ path: '/' });
+      return next();
+    }
+  },
   { path: '/enterCode', component: () => import('pages/signup/EnterCode') },
   { path: '/messenger', component: () => import('pages/signup/ChooseMessengerPlatform') },
   { path: '/createPassword',

@@ -1,6 +1,6 @@
 <template>
   <q-page class="container">
-    <scheduler :showTabCustomer="false" :customer="true" :events="events" @viewChanged="getEventsData"></scheduler>
+    <scheduler :scroll="true" :showTabCustomer="false" :customer="true" :events="events" @viewChanged="getEventsData"></scheduler>
   </q-page>
 </template>
 
