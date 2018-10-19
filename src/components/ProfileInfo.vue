@@ -751,7 +751,9 @@ export default {
               dateOfBirth: { required },
               birthCountry: { required },
               birthState: {
-                required,
+                required: requiredIf(() => {
+                  return this.user.alenvi.administrative.identity.birthCountry === 'FR';
+                }),
                 numeric,
                 minLength: minLength(2),
                 maxLength: maxLength(3)
