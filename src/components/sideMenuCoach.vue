@@ -14,6 +14,10 @@
         <q-item-side icon="contacts" />
         <q-item-main label="Répertoire" />
       </q-item>
+      <q-item v-if="user.role.name === 'Admin'" :to="{ name: 'rh config', params: { id: user._id } }" exact>
+        <q-item-side icon="settings" />
+        <q-item-main label="Configuration RH" />
+      </q-item>
       <!-- <q-item>
         <q-item-side icon="settings" />
         <q-item-main label="Configuration RH" />
