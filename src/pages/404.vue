@@ -13,6 +13,7 @@
 </template>
 
 <script>
+// Test
 export default {
   name: 'Error404',
   data () {
