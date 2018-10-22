@@ -42,7 +42,7 @@ export default {
     async getEventsData () {
       try {
         this.personId = this.getUser.customer_id; // ID customer
-        this.events = await this.$ogust.getOgustEvents(null, this.personId, 'customer');
+        this.events = await this.$ogust.getOgustEvents(this.personId, 'customer');
       } catch (e) {
         console.error(e)
         if (e.status === 404) {
