@@ -80,6 +80,16 @@ const routes = [
           parent: 'administrative'
         }
       },
+      {
+        path: ':id/config',
+        name: 'rh config',
+        component: () => import('pages/ni/RhConfig'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['rhconfig:edit'],
+          parent: 'administrative'
+        }
+      },
       // Legacy routes
       {
         path: 'old/planning',
@@ -233,7 +243,11 @@ const routes = [
           permissions: ['profiles:read'],
           parent: 'team'
         }
-      }
+      },
+      // {
+      //   path: 'test',
+      //   component: () => import('pages/ni/TestGenFile')
+      // }
       // {
       //   path: 'pigi',
       //   component: () => import('pages/dashboard/pigi/NavTabs'),
