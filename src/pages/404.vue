@@ -13,7 +13,6 @@
 </template>
 
 <script>
-// Bouh
 export default {
   name: 'Error404',
   data () {
