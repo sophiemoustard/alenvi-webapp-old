@@ -15,6 +15,9 @@ import ProfileHeader from '../../components/ProfileHeader';
 import ProfileTabs from '../../components/ProfileTabs';
 import ProfileInfo from '../../components/ProfileInfo';
 import ProfileTasks from '../../components/ProfileTasks';
+import ProfileContracts from '../../components/ProfileContracts';
+import ProfileSalaries from '../../components/ProfileSalaries';
+import ProfileAbsences from '../../components/ProfileAbsences';
 
 export default {
   props: ['id'],
@@ -50,7 +53,25 @@ export default {
           default: false,
           component: ProfileTasks,
           notification: 'tasks'
-        }
+        },
+        {
+          label: 'Contrats',
+          name: 'contracts',
+          default: false,
+          component: ProfileContracts,
+        },
+        {
+          label: 'Données de paie',
+          name: 'salaries',
+          default: false,
+          component: ProfileSalaries,
+        },
+        {
+          label: 'Absences',
+          name: 'absences',
+          default: false,
+          component: ProfileAbsences,
+        },
       ]
     }
   },
