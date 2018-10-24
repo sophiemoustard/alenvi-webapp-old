@@ -615,7 +615,7 @@ export default {
         this.internHoursModalBtnLoading = true
         const internHoursParams = {
           type: 'Heures internes',
-          content: `${this.$moment(this.internHoursInfo.date).format('dddd DD/MM')}.\n${this.internHoursInfo.reason}.\n${this.$moment(this.internHoursInfo.eventFrom).format('HH:mm')} - ${this.$moment(this.internHoursInfo.eventTo).format('HH:mm')}`,
+          content: `${this.$moment(this.internHoursInfo.eventDate).format('dddd DD/MM')}.\n${this.internHoursInfo.reason}.\n${this.$moment(this.internHoursInfo.eventFrom).format('HH:mm')} - ${this.$moment(this.internHoursInfo.eventTo).format('HH:mm')}`,
           involved: `${this.user.firstname} ${this.user.lastname}`,
         };
         await this.$planningUpdates.storePlanningupdates(this.user.employee_id, internHoursParams);
