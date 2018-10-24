@@ -16,7 +16,7 @@ export const checkPermission = async (to, user) => {
   try {
     if (to.meta.permissions) {
       if (user.role && user.role.rights) {
-        return user.role.rights.filter(right => to.meta.permissions.find(findPermission(right, to.params.id || null))).length > 0;
+        return user.role.rights.filter(right => right ? to.meta.permissions.find(findPermission(right, to.params.id || null)) : false).length > 0;
       } else {
         return redirect.redirectToLogin({ to });
       }
