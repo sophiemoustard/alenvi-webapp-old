@@ -658,10 +658,13 @@ export default {
       this.modalBtnLoading = false;
     },
     closeInternHoursModal () {
+      this.$v.internHoursInfo.$reset();
       this.openInternHoursModal = false;
+      this.internHoursInfo.eventDate = null;
       this.internHoursInfo.eventFrom = null;
       this.internHoursInfo.eventTo = null;
       this.internHoursInfo.reason = '';
+      this.internHoursModalBtnLoading = false;
     },
     changeViewMode () {
       scheduler.setCurrentView(scheduler.getState().date, this.selectView);
