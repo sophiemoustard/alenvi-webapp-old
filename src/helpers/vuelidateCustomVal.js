@@ -29,3 +29,7 @@ export const bic = (value) => {
   }
   return ibantools.isValidBIC(value);
 }
+
+export const posDecimals = (value) => {
+  return value ? parseFloat(value) > 0 : false;
+}
