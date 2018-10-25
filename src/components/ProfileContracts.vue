@@ -8,6 +8,7 @@
 import * as JSZip from 'jszip';
 import * as JSZipUtils from 'jszip-utils';
 import * as Docxtemplater from 'docxtemplater';
+// import saveAs from 'file-saver';
 
 export default {
   data () {
@@ -26,6 +27,7 @@ export default {
 
       JSZipUtils.getBinaryContent('https://docxtemplater.com/tag-example.docx', function (error, content) {
         if (error) { throw error }
+        console.log('test');
         const zip = new JSZip(content);
         const doc = new Docxtemplater().loadZip(zip);
         doc.setData({
@@ -39,10 +41,11 @@ export default {
         } catch (e) {
           console.error(e);
         }
-        // const out = doc.getZip().generate({
-        //   type: 'blob',
-        //   mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-        // });
+        const out = doc.getZip().generate({
+          type: 'blob',
+          mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        });
+        console.log(out);
         // saveAs(out, 'output.docx');
       });
     } catch (e) {
