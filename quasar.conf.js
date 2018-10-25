@@ -25,6 +25,7 @@ module.exports = function (ctx) {
       'lodash',
       'vue-croppa',
       'vMask',
+      'companies',
       process.env.NODE_ENV === 'production' ? 'vue-analytics' : null
     ],
     css: [
