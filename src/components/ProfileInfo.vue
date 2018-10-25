@@ -994,6 +994,7 @@ export default {
           position: 'bottom-left',
           timeout: 2500
         });
+        this.tmpInput = '';
       } catch (e) {
         console.error(e);
         this.$store.commit('rh/saveUserProfile', this.user.alenvi);
@@ -1004,6 +1005,7 @@ export default {
           position: 'bottom-left',
           timeout: 2500
         });
+        this.tmpInput = '';
       }
     },
     async updateAlenviUser (path) {
@@ -1245,17 +1247,6 @@ export default {
     box-shadow: none
     & /deep/ button
       flex: 1
-
-  .gutter-profile
-    margin-top: -24px
-    margin-left: -24px
-    & > div
-      padding-top: 24px
-      padding-left: 24px
-    &-x
-      margin-top: -24px
-      & > div
-        padding-top: 24px
 
   .doc-thumbnail
     padding: 13px 0px 40px 12px
