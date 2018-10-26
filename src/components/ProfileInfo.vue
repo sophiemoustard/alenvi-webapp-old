@@ -360,7 +360,7 @@
           <q-field v-if="!user.alenvi.administrative.idCardRecto.driveId" :error="$v.user.alenvi.administrative.idCardRecto.driveId.$error" :error-label="requiredDoc">
             <q-uploader ref="idCardRecto" name="idCardRecto" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `cni_recto_${userProfile.firstname}_${userProfile.lastname}` }]"
               hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
-              hide-upload-button @add="uploadDocument($event, 'idCardRecto')" @uploaded="refreshUser" @fail="failmsg" />
+              hide-upload-button @add="uploadDocument($event, 'idCardRecto')" @uploaded="refreshUser" @fail="failMsg" />
           </q-field>
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
@@ -380,7 +380,7 @@
           <q-field v-if="!user.alenvi.administrative.idCardVerso.driveId">
             <q-uploader ref="idCardVerso" name="idCardVerso" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `cni_verso_${userProfile.firstname}_${userProfile.lastname}` }]"
               hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
-              hide-upload-button @add="uploadDocument($event, 'idCardVerso')" @uploaded="refreshUser" @fail="failmsg" />
+              hide-upload-button @add="uploadDocument($event, 'idCardVerso')" @uploaded="refreshUser" @fail="failMsg" />
             <!-- <q-uploader url="test" color="white" inverted-light /> -->
           </q-field>
         </div>
@@ -402,7 +402,7 @@
           <q-field v-if="!user.alenvi.administrative.passport.driveId" :error="$v.user.alenvi.administrative.passport.driveId.$error" :error-label="requiredDoc">
             <q-uploader ref="passport" name="passport" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `passeport_${userProfile.firstname}_${userProfile.lastname}` }]"
               hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
-              hide-upload-button @add="uploadDocument($event, 'passport')" @uploaded="refreshUser" @fail="failmsg" />
+              hide-upload-button @add="uploadDocument($event, 'passport')" @uploaded="refreshUser" @fail="failMsg" />
             <!-- <q-uploader url="test" color="white" inverted-light /> -->
           </q-field>
         </div>
@@ -424,7 +424,7 @@
           <q-field v-if="!user.alenvi.administrative.residencePermit.driveId" :error="$v.user.alenvi.administrative.residencePermit.driveId.$error" :error-label="requiredDoc">
             <q-uploader ref="residencePermit" name="residencePermit" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `titre_de_séjour_${userProfile.firstname}_${userProfile.lastname}` }]"
               hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
-              hide-upload-button @add="uploadDocument($event, 'residencePermit')" @uploaded="refreshUser" @fail="failmsg" />
+              hide-upload-button @add="uploadDocument($event, 'residencePermit')" @uploaded="refreshUser" @fail="failMsg" />
             <!-- <q-uploader url="test" color="white" inverted-light /> -->
           </q-field>
         </div>
@@ -446,7 +446,7 @@
           <q-field v-if="!user.alenvi.administrative.healthAttest.driveId" :error="$v.user.alenvi.administrative.healthAttest.driveId.$error" :error-label="requiredDoc">
             <q-uploader ref="healthAttest" name="healthAttest" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `attestation_secu_${userProfile.firstname}_${userProfile.lastname}` }]"
               hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
-              hide-upload-button @add="uploadDocument($event, 'healthAttest')" @uploaded="refreshUser" @fail="failmsg" />
+              hide-upload-button @add="uploadDocument($event, 'healthAttest')" @uploaded="refreshUser" @fail="failMsg" />
           </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
@@ -467,7 +467,7 @@
           <q-field v-if="!user.alenvi.administrative.phoneInvoice.driveId" :error="$v.user.alenvi.administrative.phoneInvoice.driveId.$error" :error-label="requiredDoc">
             <q-uploader ref="phoneInvoice" name="phoneInvoice" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `facture_telephone_${userProfile.firstname}_${userProfile.lastname}` }]"
               hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
-              hide-upload-button @add="uploadDocument($event, 'phoneInvoice')" @uploaded="refreshUser" @fail="failmsg" />
+              hide-upload-button @add="uploadDocument($event, 'phoneInvoice')" @uploaded="refreshUser" @fail="failMsg" />
           </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
@@ -477,7 +477,7 @@
           <q-field v-if="user.alenvi.administrative.certificates.length === 0">
             <q-uploader ref="certificates" name="certificates" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `diplomes_${userProfile.firstname}_${userProfile.lastname}` }]"
               hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
-              hide-upload-button @add="uploadDocument($event, 'certificates')" @uploaded="refreshUser" @fail="failmsg" />
+              hide-upload-button @add="uploadDocument($event, 'certificates')" @uploaded="refreshUser" @fail="failMsg" />
           </q-field>
           <div v-if="user.alenvi.administrative.certificates && user.alenvi.administrative.certificates.length > 0"
             v-for="(certificate, index) in user.alenvi.administrative.certificates" :key="index">
@@ -495,7 +495,7 @@
             <q-collapsible v-model="collapsibleOpened" label="Ajouter diplômes" :collapseIcon="collapsibleIcon">
               <q-uploader ref="certificates" name="certificates" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `diplomes_${userProfile.firstname}_${userProfile.lastname}` }]"
                 hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
-                hide-upload-button @add="uploadDocument($event, 'certificates')" @uploaded="refreshUser" @fail="failmsg" />
+                hide-upload-button @add="uploadDocument($event, 'certificates')" @uploaded="refreshUser" @fail="failMsg" />
             </q-collapsible>
           </div>
         </div>
