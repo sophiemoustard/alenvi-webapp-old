@@ -77,16 +77,45 @@
           </div>
         </div>
       </div>
+      <div class="q-mb-xl">
+        <p class="text-weight-bold">Documents</p>
+        <div class="row gutter-profile">
+          <div class="col-xs-12 col-md-6">
+            <p class="input-caption">Modèle de contrat</p>
+            <div v-if="company.rhConfig.contractTemplate && company.rhConfig.contractTemplate.id" class="row justify-between"
+            style="background: white">
+              <div class="doc-thumbnail">
+                <custom-img :driveId="company.rhConfig.contractTemplate.id" alt="facture téléphone" />
+              </div>
+              <div class="self-end doc-delete">
+                <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(company.rhConfig.contractTemplate.id)" />
+                <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(company.rhConfig.contractTemplate.link)" />
+              </div>
+            </div>
+            <q-field v-if="!company.rhConfig.contractTemplate.id">
+            <q-uploader ref="contractTemplate" name="contractTemplate" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `modele_contrat_${company.name}` }]"
+              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
+              hide-upload-button @add="uploadDocument($event, 'contractTemplate')" @uploaded="refreshUser" @fail="failMsg" />
+          </q-field>
+          </div>
+        </div>
+      </div>
     </div>
   </q-page>
 </template>
 
 <script>
+import { Cookies, openURL } from 'quasar';
 import { required, maxValue } from 'vuelidate/lib/validators';
 
 import { posDecimals } from '../../helpers/vuelidateCustomVal';
+import gdrive from '../../api/GoogleDrive.js';
+import CustomImg from '../../components/CustomImg';
 
 export default {
+  components: {
+    CustomImg
+  },
   data () {
     return {
       company: null,
@@ -96,6 +125,14 @@ export default {
   computed: {
     user () {
       return this.$store.getters['main/user'];
+    },
+    docsUploadUrl () {
+      return `${process.env.API_HOSTNAME}/companies/${this.company._id}/gdrive/${this.company.rhConfig.contractTemplate.folderId}/upload`;
+    },
+    headers () {
+      return {
+        'x-access-token': Cookies.get('alenvi_token') || ''
+      }
     }
   },
   validations: {
@@ -213,6 +250,93 @@ export default {
       } else if (!this.$_.get(this.$v.company.rhConfig, path).numeric) {
         return 'Nombre non valide';
       }
+    },
+    uploadDocument (files, refName) {
+      if (files[0].size > 5000000) {
+        this.$refs[refName].reset();
+        this.$q.notify({
+          color: 'negative',
+          icon: 'warning',
+          detail: 'Fichier trop volumineux (> 5 Mo)',
+          position: 'bottom-left',
+          timeout: 2500
+        });
+        return '';
+      } else {
+        this.$refs[refName].upload();
+      }
+    },
+    async refreshUser () {
+      await this.$store.dispatch('main/getUser', this.user._id);
+      this.$q.notify({
+        color: 'positive',
+        icon: 'done',
+        detail: 'Document envoyé',
+        position: 'bottom-left',
+        timeout: 2500
+      });
+      this.company = this.user.company;
+    },
+    failMsg () {
+      this.$q.notify({
+        color: 'negative',
+        icon: 'warning',
+        detail: 'Echec de l\'envoi du document',
+        position: 'bottom-left',
+        timeout: 2500
+      });
+    },
+    async deleteDocument (driveId) {
+      try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
+          ok: true,
+          cancel: 'Annuler'
+        });
+        await gdrive.removeFileById({ id: driveId });
+        const payload = {
+          _id: this.company._id,
+          rhConfig: {
+            contractTemplate: {
+              id: null,
+              link: null
+            }
+          }
+        };
+        await this.$companies.updateById(payload);
+        await this.$store.dispatch('main/getUser', this.user._id);
+        this.company = this.user.company;
+        this.$q.notify({
+          color: 'positive',
+          icon: 'done',
+          detail: 'Document supprimé',
+          position: 'bottom-left',
+          timeout: 2500
+        });
+      } catch (e) {
+        console.error(e);
+        if (e.message === '') {
+          return this.$q.notify({
+            color: 'positive',
+            icon: 'done',
+            detail: 'Suppression annulée',
+            position: 'bottom-left',
+            timeout: 2500
+          });
+        }
+        this.$q.notify({
+          color: 'negative',
+          icon: 'warning',
+          detail: 'Erreur lors de la suppression du document',
+          position: 'bottom-left',
+          timeout: 2500
+        });
+      }
+    },
+    goToUrl (url) {
+      url = `${url}?usp=sharing`
+      openURL(url);
     }
   }
 }
@@ -224,4 +348,10 @@ export default {
   /deep/ .bg-negative
     background: white !important
     color: inherit !important
+
+  .doc-thumbnail
+    padding: 13px 0px 40px 12px
+
+  .doc-delete
+    padding: 0px 14px 17px 0px
 </style>
