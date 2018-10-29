@@ -218,7 +218,7 @@ export default {
           rhConfig: {
             transportSubs: {
               subId: this.company.rhConfig.transportSubs[params.index]._id,
-              '$.price': this.company.rhConfig.transportSubs[params.index].price
+              price: this.company.rhConfig.transportSubs[params.index].price
             }
           }
         };
