@@ -439,6 +439,8 @@ export default {
       this.newUser.role = 'Auxiliaire';
       this.newUser.ogustManagerId = this.currentUser._id;
       const newUser = await this.$users.create(this.newUser);
+      console.log(newUser);
+      await this.$users.createDriveFolder({ _id: newUser.data.data.user._id });
       return newUser;
     },
     async createOgustUser () {
@@ -498,7 +500,7 @@ export default {
         this.opened = false;
       } catch (e) {
         console.error(e);
-        if (e.message === 'Invalid fields') {
+        if (e && e.message === 'Invalid fields') {
           this.loading = false;
           this.$q.notify({
             color: 'negative',
@@ -509,7 +511,7 @@ export default {
           });
           return;
         }
-        if (e.message === 'Existing email') {
+        if (e && e.message === 'Existing email') {
           this.loading = false;
           this.$q.notify({
             color: 'negative',
@@ -520,7 +522,7 @@ export default {
           });
           return;
         }
-        if (e.response) {
+        if (e && e.response) {
           console.error(e.response);
           if (e.response.status === 409) {
             this.$q.notify({
