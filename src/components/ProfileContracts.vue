@@ -1,5 +1,25 @@
 <template>
   <div>
+    <div class="row">
+      <q-card v-if="contracts" v-for="(contract, index) in contracts" :key="index" class="col-md-6 col-xs-12" style="cursor: pointer; background: white">
+        <q-card-title class="text-center">
+          {{contract.startDate}}
+        </q-card-title>
+        <q-card-main>
+          <p class="q-mb-lg">Statut: {{ contract.status }}</p>
+          <p class="q-mb-lg">Date de mise à jour: {{ contract.startDate }}</p>
+          <p class="q-mb-lg">Volume horaire hebdomadaire : {{ contract.weeklyHours }}</p>
+          <p class="q-mb-lg">Taux horaire: {{ contract.grossHourlyRate }}</p>
+        </q-card-main>
+        <q-card-actions align="around">
+          <q-btn flat round small color="primary">
+            <a :href="contract.grossHourlyRate" download>
+              <q-icon name="file download" />
+            </a>
+          </q-btn>
+        </q-card-actions>
+      </q-card>
+    </div>
     <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="opened = true" />
     <q-modal v-model="opened" :content-css="modalCssContainer">
       <div class="modal-padding">
@@ -15,11 +35,11 @@
           <div class="col-12">
             <div class="row justify-between">
               <p class="input-caption">Statut</p>
-              <q-icon v-if="$v.newContract.statut.$error" name="error_outline" color="secondary" />
+              <q-icon v-if="$v.newContract.status.$error" name="error_outline" color="secondary" />
             </div>
-            <q-field :error="$v.newContract.statut.$error" error-label="Champ requis">
-              <q-select :options="statutOptions" v-model="newContract.statut" color="white" inverted-light separator
-               @blur="$v.newContract.statut.$touch" />
+            <q-field :error="$v.newContract.status.$error" error-label="Champ requis">
+              <q-select :options="statusOptions" v-model="newContract.status" color="white" inverted-light separator
+               @blur="$v.newContract.status.$touch" />
             </q-field>
           </div>
         </div>
@@ -27,10 +47,10 @@
           <div class="col-12">
             <div class="row justify-between">
               <p class="input-caption">Volume horaire hebdomadaire</p>
-              <q-icon v-if="$v.newContract.volume.$error" name="error_outline" color="secondary" />
+              <q-icon v-if="$v.newContract.weeklyHours.$error" name="error_outline" color="secondary" />
             </div>
-            <q-field :error="$v.newContract.volume.$error" error-label="Champ requis">
-              <q-input v-model="newContract.volume" color="white" inverted-light @blur="$v.newContract.volume.$touch" />
+            <q-field :error="$v.newContract.weeklyHours.$error" error-label="Champ requis">
+              <q-input v-model="newContract.weeklyHours" color="white" inverted-light @blur="$v.newContract.weeklyHours.$touch" />
             </q-field>
           </div>
         </div>
@@ -38,10 +58,10 @@
           <div class="col-12">
             <div class="row justify-between">
               <p class="input-caption">Taux horaire</p>
-              <q-icon v-if="$v.newContract.hourlyRate.$error" name="error_outline" color="secondary" />
+              <q-icon v-if="$v.newContract.grossHourlyRate.$error" name="error_outline" color="secondary" />
             </div>
-            <q-field :error="$v.newContract.hourlyRate.$error" error-label="Champ requis">
-              <q-input v-model="newContract.hourlyRate" color="white" inverted-light @blur="$v.newContract.hourlyRate.$touch" />
+            <q-field :error="$v.newContract.grossHourlyRate.$error" error-label="Champ requis">
+              <q-input v-model="newContract.grossHourlyRate" color="white" inverted-light @blur="$v.newContract.grossHourlyRate.$touch" />
             </q-field>
           </div>
         </div>
@@ -82,9 +102,9 @@
 </template>
 
 <script>
-import * as JSZip from 'jszip';
+// import * as JSZip from 'jszip';
 import * as JSZipUtils from 'jszip-utils';
-import * as Docxtemplater from 'docxtemplater';
+// import * as Docxtemplater from 'docxtemplater';
 // import saveAs from 'file-saver';
 import { required } from 'vuelidate/lib/validators';
 
@@ -93,14 +113,15 @@ export default {
     return {
       loading: false,
       opened: false,
+      contracts: [],
       newContract: {
-        statut: '',
-        volume: '',
+        status: '',
+        weeklyHours: '',
         startDate: '',
-        hourlyRate: '',
+        grossHourlyRate: '',
         isActive: false
       },
-      statutOptions: [
+      statusOptions: [
         {
           label: 'Prestataire',
           value: 'Prestataire'
@@ -117,10 +138,10 @@ export default {
   },
   validations: {
     newContract: {
-      statut: { required },
-      volume: { required },
+      status: { required },
+      weeklyHours: { required },
       startDate: { required },
-      hourlyRate: { required }
+      grossHourlyRate: { required }
     }
   },
   computed: {
@@ -131,35 +152,97 @@ export default {
   async mounted () {
     const user = await this.$users.getById(this.getUser._id);
     console.log(user);
+    this.contracts = [
+      {
+        status: 'Prestataire',
+        weeklyHours: 35,
+        startDate: '01/11/2018',
+        grossHourlyRate: 9,
+        isActive: false
+      },
+      {
+        status: 'Prestataire',
+        weeklyHours: 35,
+        startDate: '01/12/2018',
+        grossHourlyRate: 9,
+        isActive: false
+      },
+      {
+        status: 'Prestataire',
+        weeklyHours: 35,
+        startDate: '01/01/2019',
+        grossHourlyRate: 9,
+        isActive: false
+      }
+    ]
   },
   methods: {
+    async testDocxBlob (url) {
+      return new Promise((resolve, reject) => {
+        JSZipUtils.getBinaryContent(url, (err, data) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(data);
+          }
+        });
+      });
+    },
     async getDocxBlob () {
       try {
-        JSZipUtils.getBinaryContent('https://docxtemplater.com/tag-example.docx', function (error, content) {
-          if (error) { throw error }
-          console.log('test');
-          const zip = new JSZip(content);
-          const doc = new Docxtemplater().loadZip(zip);
-          doc.setData({
-            first_name: 'John',
-            last_name: 'Doe',
-            phone: '0650769406',
-            description: 'New Website'
-          });
-          try {
-            doc.render();
-          } catch (e) {
-            console.error(e);
-          }
-          const out = doc.getZip().generate({
-            type: 'blob',
-            mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-          });
-          console.log(out);
-          // saveAs(out, 'output.docx');
-        });
+        const test = await this.testDocxBlob('https://drive.google.com/file/d/1qcxsH3D2sek4sA8EQWdCwiTQJq2r9Vwn/view?usp=sharing');
+        console.log(test);
+        // https://docxtemplater.com/tag-example.docx
+        // JSZipUtils.getBinaryContent('https://drive.google.com/file/d/1qcxsH3D2sek4sA8EQWdCwiTQJq2r9Vwn/view?usp=sharing', function (error, content) {
+        //   if (error) { throw error }
+        //   console.log('test');
+        //   const zip = new JSZip(content);
+        //   const doc = new Docxtemplater().loadZip(zip);
+        //   doc.setData({
+        //     firstName: 'John',
+        //     lastName: 'Doe',
+        //     // phone: '0650769406',
+        //     description: 'New Website'
+        //   });
+        //   try {
+        //     doc.render();
+        //   } catch (e) {
+        //     console.error(e);
+        //   }
+        //   const out = doc.getZip().generate({
+        //     type: 'blob',
+        //     mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        //   });
+        //   console.log(out);
+        //   saveAs(out, 'output.docx');
+        // });
       } catch (e) {
         console.error(e);
+      }
+    },
+    async submit () {
+      try {
+        this.loading = true;
+        this.getDocxBlob();
+        this.$q.notify({
+          color: 'positive',
+          icon: 'done',
+          detail: 'Contrat créée',
+          position: 'bottom-left',
+          timeout: 2500
+        });
+        this.loading = false;
+        this.opened = false;
+      } catch (e) {
+        console.error(e);
+        this.$q.notify({
+          color: 'negative',
+          icon: 'warning',
+          detail: 'Erreur lors de la création du contrat',
+          position: 'bottom-left',
+          timeout: 2500
+        });
+        this.loading = false;
       }
     }
   }
