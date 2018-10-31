@@ -25,6 +25,29 @@
         </div>
         <div class="col-xs-12 col-md-6">
           <div class="row">
+            <p class="input-caption">Ville</p>
+          </div>
+          <q-field>
+            <q-input
+              v-model="customer.main_address.city"
+              disable
+              inverted-light
+              color="white" />
+          </q-field>
+        </div><div class="col-xs-12 col-md-6">
+          <div class="row">
+            <p class="input-caption">Code postal</p>
+          </div>
+          <q-field>
+            <q-input
+              v-model="customer.main_address.zip"
+              disable
+              inverted-light
+              color="white" />
+          </q-field>
+        </div>
+        <div class="col-xs-12 col-md-6">
+          <div class="row">
             <p class="input-caption">Code porte</p>
           </div>
           <q-field>
