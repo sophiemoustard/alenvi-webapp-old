@@ -31,5 +31,5 @@ export const bic = (value) => {
 }
 
 export const posDecimals = (value) => {
-  return value ? parseFloat(value) > 0 : false;
+  return value ? parseFloat(value) >= 0 : false;
 }

@@ -33,7 +33,7 @@
                 inverted-light
                 suffix="€"
                 @focus="saveTmp('rhConfig.agentContracts.grossHourlyRate')"
-                @change="updateCompany('rhConfig.agentContracts.grossHourlyRate')" />
+                @change="updateCompany($event, 'rhConfig.agentContracts.grossHourlyRate')" />
             </q-field>
           </div>
         </div>
@@ -51,7 +51,7 @@
                 inverted-light
                 suffix="€"
                 @focus="saveTmp('rhConfig.phoneSubRefunding')"
-                @change="updateCompany('rhConfig.phoneSubRefunding')" />
+                @change="updateCompany($event, 'rhConfig.phoneSubRefunding')" />
             </q-field>
           </div>
         </div>
@@ -82,20 +82,38 @@
         <div class="row gutter-profile">
           <div class="col-xs-12 col-md-6">
             <p class="input-caption">Modèle de contrat</p>
-            <div v-if="company.rhConfig.contractTemplate && company.rhConfig.contractTemplate.id" class="row justify-between"
+            <div v-if="hasContractTemplate" class="row justify-between"
             style="background: white">
               <div class="doc-thumbnail">
-                <custom-img :driveId="company.rhConfig.contractTemplate.id" alt="facture téléphone" />
+                <custom-img :driveId="company.rhConfig.templates.contract.driveId" alt="template contrat" />
               </div>
               <div class="self-end doc-delete">
-                <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(company.rhConfig.contractTemplate.id)" />
-                <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(company.rhConfig.contractTemplate.link)" />
+                <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(company.rhConfig.templates.contract.driveId)" />
+                <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(company.rhConfig.templates.contract.link)" />
               </div>
             </div>
-            <q-field v-if="!company.rhConfig.contractTemplate.id">
-            <q-uploader ref="contractTemplate" name="contractTemplate" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `modele_contrat_${company.name}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
-              hide-upload-button @add="uploadDocument($event, 'contractTemplate')" @uploaded="refreshUser" @fail="failMsg" />
+            <q-field v-if="!hasContractTemplate">
+            <q-uploader ref="contract" name="contract" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `modele_contrat_${company.name}` }]"
+              hide-underline color="white" inverted-light
+              hide-upload-button @add="uploadDocument($event, 'contract')" @uploaded="refreshUser" @fail="failMsg" />
+          </q-field>
+          </div>
+          <div class="col-xs-12 col-md-6">
+            <p class="input-caption">Modèle d'avenant au contrat</p>
+            <div v-if="hasAmendmentTemplate" class="row justify-between"
+            style="background: white">
+              <div class="doc-thumbnail">
+                <custom-img :driveId="company.rhConfig.templates.amendment.driveId" alt="template avenant" />
+              </div>
+              <div class="self-end doc-delete">
+                <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(company.rhConfig.templates.amendment.driveId)" />
+                <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(company.rhConfig.templates.amendment.link)" />
+              </div>
+            </div>
+            <q-field v-if="!hasAmendmentTemplate">
+            <q-uploader ref="amendment" name="amendment" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `modele_avenant_${company.name}` }]"
+              hide-underline color="white" inverted-light
+              hide-upload-button @add="uploadDocument($event, 'amendment')" @uploaded="refreshUser" @fail="failMsg" />
           </q-field>
           </div>
         </div>
@@ -127,12 +145,18 @@ export default {
       return this.$store.getters['main/user'];
     },
     docsUploadUrl () {
-      return `${process.env.API_HOSTNAME}/companies/${this.company._id}/gdrive/${this.company.rhConfig.contractTemplate.folderId}/upload`;
+      return `${process.env.API_HOSTNAME}/companies/${this.company._id}/gdrive/${this.company.rhConfig.templates.folderId}/upload`;
     },
     headers () {
       return {
         'x-access-token': Cookies.get('alenvi_token') || ''
       }
+    },
+    hasContractTemplate () {
+      return this.company.rhConfig.templates && this.company.rhConfig.templates.contract && this.company.rhConfig.templates.contract.driveId;
+    },
+    hasAmendmentTemplate () {
+      return this.company.rhConfig.templates && this.company.rhConfig.templates.amendment && this.company.rhConfig.templates.amendment.driveId;
     }
   },
   validations: {
@@ -155,6 +179,10 @@ export default {
   },
   mounted () {
     this.company = this.user.company;
+    if (!this.company.rhConfig.templates) {
+      this.company.rhConfig.templates = {};
+    }
+    console.log('company', this.company);
   },
   methods: {
     saveTmp (path) {
@@ -162,6 +190,7 @@ export default {
     },
     async updateCompany (event, path) {
       try {
+        console.log('PATH', path);
         this.$_.set(this.company, path, event);
         console.log('VAL', this.$_.get(this.company, path));
         if (this.tmpInput === this.$_.get(this.company, path)) return;
