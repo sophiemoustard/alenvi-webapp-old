@@ -1,26 +1,38 @@
 <template>
   <div>
     <div class="row">
-      <q-card v-if="contracts" v-for="(contract, index) in contracts" :key="index" class="col-md-6 col-xs-12" style="cursor: pointer; background: white">
-        <q-card-title class="text-center">
+      <q-card v-if="contracts" v-for="(contract, index) in contracts" :key="index" style="cursor: pointer; background: white">
+        <!-- <q-card-title class="text-center">
           {{contract.startDate}}
-        </q-card-title>
+        </q-card-title> -->
         <q-card-main>
-          <p class="q-mb-lg">Statut: {{ contract.status }}</p>
-          <p class="q-mb-lg">Date de mise à jour: {{ contract.startDate }}</p>
-          <p class="q-mb-lg">Volume horaire hebdomadaire : {{ contract.weeklyHours }}</p>
-          <p class="q-mb-lg">Taux horaire: {{ contract.grossHourlyRate }}</p>
+          <p>Statut: {{ contract.status }}</p>
+          <q-table
+            :data="contracts"
+            :columns="columns"
+            row-key="name"
+            hide-bottom>
+            <q-td slot="body-cell-contractEmpty" slot-scope="props" :props="props">
+              <q-btn small color="secondary">{{ props.value }}</q-btn>
+            </q-td>
+            <q-td slot="body-cell-contractSigned" slot-scope="props" :props="props">
+              <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `contrat_signe_${getUser.firstname}_${getUser.lastname}` }]"
+                hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
+                hide-upload-button @add="uploadDocument($event, `signedContract_${props.row._id}`)" @uploaded="refreshUser" @fail="failMsg" />
+              <q-btn small color="secondary">{{ props.value }}</q-btn>
+            </q-td>
+          </q-table>
         </q-card-main>
-        <q-card-actions align="around">
+        <!-- <q-card-actions align="around">
           <q-btn flat round small color="primary">
             <a :href="contract.grossHourlyRate" download>
               <q-icon name="file download" />
             </a>
           </q-btn>
-        </q-card-actions>
+        </q-card-actions> -->
       </q-card>
+      <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="opened = true" />
     </div>
-    <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="opened = true" />
     <q-modal v-model="opened" :content-css="modalCssContainer">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
@@ -102,11 +114,13 @@
 </template>
 
 <script>
+import { Cookies } from 'quasar';
 // import * as JSZip from 'jszip';
 import * as JSZipUtils from 'jszip-utils';
 // import * as Docxtemplater from 'docxtemplater';
 // import saveAs from 'file-saver';
 import { required } from 'vuelidate/lib/validators';
+import { alenviAxios } from '../api/ressources/alenviAxios'
 
 export default {
   data () {
@@ -114,6 +128,32 @@ export default {
       loading: false,
       opened: false,
       contracts: [],
+      // contracts: [
+      //   {
+      //     status: 'Prestataire',
+      //     weeklyHours: 35,
+      //     startDate: '01/11/2018',
+      //     grossHourlyRate: 9,
+      //     isActive: false
+      //   },
+      //   {
+      //     status: 'Prestataire',
+      //     weeklyHours: 35,
+      //     startDate: '01/12/2018',
+      //     grossHourlyRate: 9,
+      //     isActive: false
+      //   },
+      //   {
+      //     status: 'Prestataire',
+      //     weeklyHours: 35,
+      //     startDate: '01/01/2019',
+      //     grossHourlyRate: 9,
+      //     isActive: false,
+      //     link: '',
+      //     contractEmpty: 'testtt',
+      //     contractSigned: 'test'
+      //   }
+      // ],
       newContract: {
         status: '',
         weeklyHours: '',
@@ -131,6 +171,49 @@ export default {
         //   value: 'mandataire'
         // }
       ],
+      columns: [
+        {
+          name: 'weeklyHours',
+          required: true,
+          label: 'Volume horaire hebdomadaire',
+          align: 'left',
+          field: 'weeklyHours',
+          sortable: true
+        },
+        {
+          name: 'startDate',
+          required: true,
+          label: 'Date d\'effet',
+          align: 'left',
+          field: 'startDate',
+          format: (value) => this.$moment(value).format('DD/MM/YYYY'),
+          sortable: true,
+        },
+        {
+          name: 'grossHourlyRate',
+          required: true,
+          label: 'Taux horaire',
+          align: 'left',
+          field: 'grossHourlyRate',
+          sortable: true,
+        },
+        {
+          name: 'contractEmpty',
+          required: true,
+          label: 'Contrat vierge',
+          align: 'left',
+          field: 'contractEmpty',
+          sortable: false
+        },
+        {
+          name: 'contractSigned',
+          required: true,
+          label: 'Contract signé',
+          align: 'left',
+          field: 'contractSigned',
+          sortable: false
+        }
+      ],
       modalCssContainer: {
         minWidth: '30vw'
       },
@@ -147,34 +230,20 @@ export default {
   computed: {
     getUser () {
       return this.$store.getters['rh/getUserProfile'];
-    }
+    },
+    docsUploadUrl () {
+      return `${process.env.API_HOSTNAME}/users/${this.getUser._id}/gdrive/${this.getUser.administrative.driveFolder.id}/upload`;
+    },
+    headers () {
+      return {
+        'x-access-token': Cookies.get('alenvi_token') || ''
+      }
+    },
   },
   async mounted () {
-    const user = await this.$users.getById(this.getUser._id);
-    console.log(user);
-    this.contracts = [
-      {
-        status: 'Prestataire',
-        weeklyHours: 35,
-        startDate: '01/11/2018',
-        grossHourlyRate: 9,
-        isActive: false
-      },
-      {
-        status: 'Prestataire',
-        weeklyHours: 35,
-        startDate: '01/12/2018',
-        grossHourlyRate: 9,
-        isActive: false
-      },
-      {
-        status: 'Prestataire',
-        weeklyHours: 35,
-        startDate: '01/01/2019',
-        grossHourlyRate: 9,
-        isActive: false
-      }
-    ]
+    // const user = await this.$users.getById(this.getUser._id);
+    // console.log(user);
+    this.contracts = this.getUser.administrative.contracts;
   },
   methods: {
     async testDocxBlob (url) {
@@ -188,42 +257,99 @@ export default {
         });
       });
     },
-    async getDocxBlob () {
+    async dlTemplate () {
       try {
-        const test = await this.testDocxBlob('https://drive.google.com/file/d/1qcxsH3D2sek4sA8EQWdCwiTQJq2r9Vwn/view?usp=sharing');
-        console.log(test);
-        // https://docxtemplater.com/tag-example.docx
-        // JSZipUtils.getBinaryContent('https://drive.google.com/file/d/1qcxsH3D2sek4sA8EQWdCwiTQJq2r9Vwn/view?usp=sharing', function (error, content) {
-        //   if (error) { throw error }
-        //   console.log('test');
-        //   const zip = new JSZip(content);
-        //   const doc = new Docxtemplater().loadZip(zip);
-        //   doc.setData({
-        //     firstName: 'John',
-        //     lastName: 'Doe',
-        //     // phone: '0650769406',
-        //     description: 'New Website'
-        //   });
-        //   try {
-        //     doc.render();
-        //   } catch (e) {
-        //     console.error(e);
-        //   }
-        //   const out = doc.getZip().generate({
-        //     type: 'blob',
-        //     mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-        //   });
-        //   console.log(out);
-        //   saveAs(out, 'output.docx');
-        // });
+        const file = await alenviAxios({
+          url: `${process.env.API_HOSTNAME}/gdrive/1odgQLlx6VVW8BLi3w01_aidhG4d8y2Cv/generatedocx`,
+          method: 'POST',
+          responseType: 'blob',
+          data: {
+            firstname: 'JC',
+            lastname: 'LeBorgne',
+            age: '30'
+          }
+        });
+        const url = window.URL.createObjectURL(new Blob([file.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'contrat.docx');
+        document.body.appendChild(link);
+        link.click();
       } catch (e) {
         console.error(e);
       }
     },
+    uploadDocument (files, refName) {
+      console.log(refName)
+      console.log(this.$refs[refName]);
+      if (files[0].size > 5000000) {
+        this.$refs[refName].reset();
+        this.$q.notify({
+          color: 'negative',
+          icon: 'warning',
+          detail: 'Fichier trop volumineux (> 5 Mo)',
+          position: 'bottom-left',
+          timeout: 2500
+        });
+        return '';
+      } else {
+        this.$refs[refName].upload();
+      }
+    },
+    failMsg () {
+      this.$q.notify({
+        color: 'negative',
+        icon: 'warning',
+        detail: 'Echec de l\'envoi du document',
+        position: 'bottom-left',
+        timeout: 2500
+      });
+    },
+    refreshUser () {
+      this.$q.notify({
+        color: 'positive',
+        icon: 'done',
+        detail: 'Document envoyé',
+        position: 'bottom-left',
+        timeout: 2500
+      });
+    },
+    // async getDocxBlob () {
+    //   try {
+    //     const test = await this.testDocxBlob('https://drive.google.com/file/d/1qcxsH3D2sek4sA8EQWdCwiTQJq2r9Vwn/view?usp=sharing');
+    //     console.log(test);
+    //     https:// docxtemplater.com/tag-example.docx
+    //     JSZipUtils.getBinaryContent('https://drive.google.com/file/d/1qcxsH3D2sek4sA8EQWdCwiTQJq2r9Vwn/view?usp=sharing', function (error, content) {
+    //       if (error) { throw error }
+    //       console.log('test');
+    //       const zip = new JSZip(content);
+    //       const doc = new Docxtemplater().loadZip(zip);
+    //       doc.setData({
+    //         firstName: 'John',
+    //         lastName: 'Doe',
+    //         // phone: '0650769406',
+    //         description: 'New Website'
+    //       });
+    //       try {
+    //         doc.render();
+    //       } catch (e) {
+    //         console.error(e);
+    //       }
+    //       const out = doc.getZip().generate({
+    //         type: 'blob',
+    //         mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    //       });
+    //       console.log(out);
+    //       saveAs(out, 'output.docx');
+    //     });
+    //   } catch (e) {
+    //     console.error(e);
+    //   }
+    // },
     async submit () {
       try {
         this.loading = true;
-        this.getDocxBlob();
+        await this.dlTemplate();
         this.$q.notify({
           color: 'positive',
           icon: 'done',
@@ -271,4 +397,14 @@ export default {
   .bg-negative
     background: none !important
     color: inherit !important
+
+  .q-table-container
+    box-shadow: none
+
+  .fab-add-person
+    right: 60px
+    bottom: 18px
+    font-size: 16px
+    z-index: 2
+
 </style>
