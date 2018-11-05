@@ -3,7 +3,7 @@
     <div v-if="isLoaded">
       <div class="row items-center col-xs-12 header-margin">
         <div>
-          <q-icon class="on-left cursor-pointer self-center" size="1rem" name="arrow_back" color="primary" @click.native="$router.go(-1)" />
+          <q-icon class="on-left cursor-pointer self-center" size="1rem" name="arrow_back" color="primary" @click.native="$router.push({ name: 'profile customers', params: { id } })" />
         </div>
         <h4 class="no-margin">{{ customer.title }} {{ customer.last_name }}</h4>
       </div>
