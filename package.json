@@ -15,6 +15,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "connect-history-api-fallback": "^1.5.0",
+    "date-holidays": "^1.2.8",
     "dhtmlx-scheduler": "^5.0.0",
     "docxtemplater": "^3.9.1",
     "dotenv": "^6.0.0",
@@ -26,6 +27,7 @@
     "jszip": "^2.6.1",
     "jszip-utils": "0.0.2",
     "moment": "^2.22.2",
+    "moment-business-days": "^1.0.6",
     "randomatic": "^3.0.0",
     "raven-js": "^3.26.4",
     "vue-analytics": "^5.12.2",
