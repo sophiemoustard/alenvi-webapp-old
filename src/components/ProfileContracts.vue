@@ -19,7 +19,7 @@
               </q-btn>
             </q-td>
             <q-td slot="body-cell-contractSigned" slot-scope="props" :props="props">
-              <q-uploader v-if="props.row.link" :ref="`signedContract_${props.row._id}`" name="signedContract" :url="docsUploadUrl" :headers="headers"
+              <q-uploader v-if="!props.row.link" :ref="`signedContract_${props.row._id}`" name="signedContract" :url="docsUploadUrl" :headers="headers"
                 :additional-fields="[
                   { name: 'fileName', value: `contrat_signe_${getUser.firstname}_${getUser.lastname}` },
                   { name: 'contractId', value: props.row._id }
@@ -44,9 +44,7 @@
               <q-icon name="file download" />
             </a>
           </q-btn> -->
-          <q-btn >
-
-          </q-btn>
+          <q-btn no-caps rounded color="primary" icon="add" label="Mettre fin au contrat" @click="opened = true" />
         </q-card-actions>
       </q-card>
       <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="opened = true" />
@@ -134,7 +132,7 @@
 <script>
 import { Cookies } from 'quasar';
 // import * as JSZip from 'jszip';
-// import * as JSZipUtils from 'jszip-utils';
+import * as JSZipUtils from 'jszip-utils';
 // import * as Docxtemplater from 'docxtemplater';
 // import saveAs from 'file-saver';
 import { required } from 'vuelidate/lib/validators';
@@ -245,17 +243,17 @@ export default {
     // this.contracts = this.getUser.administrative.contracts;
   },
   methods: {
-    // async testDocxBlob (url) {
-    //   return new Promise((resolve, reject) => {
-    //     JSZipUtils.getBinaryContent(url, (err, data) => {
-    //       if (err) {
-    //         reject(err);
-    //       } else {
-    //         resolve(data);
-    //       }
-    //     });
-    //   });
-    // },
+    async getBlob (url) {
+      return new Promise((resolve, reject) => {
+        JSZipUtils.getBinaryContent(url, (err, data) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(data);
+          }
+        });
+      });
+    },
     getContractsTable (idContract) {
       return this.contracts.filter((contract) => contract.parentContractId === idContract || contract._id === idContract);
     },
@@ -298,6 +296,37 @@ export default {
         this.$refs[refName][0].upload();
       }
     },
+    // async uploadDocument () {
+    //   try {
+    //     let blob = await this.getBlob('https://drive.google.com/file/d/1PR0UJyEV9CJkIQ9zCXD7amhZJIMT0ZtH/view?usp=drivesdk');
+    //     let data = new FormData();
+    //     data.append('contractId', props.row._id);
+    //     data.append('fileName', `contrat_signe_${getUser.firstname}_${getUser.lastname}`);
+    //     data.append('Content-Type', blob.type || 'application/octet-stream');
+    //     data.append(`signedContract`, blob);
+    //     await this.$alenviAxios.post(this.pictureUploadUrl, data, { headers: { 'content-type': 'multipart/form-data', 'x-access-token': Cookies.get('alenvi_token') || '' } });
+    //     await this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
+    //     this.closePictureEdition();
+    //     this.loadingImage = false;
+    //     this.$q.notify({
+    //       color: 'positive',
+    //       icon: 'done',
+    //       detail: 'Modification enregistrée',
+    //       position: 'bottom-left',
+    //       timeout: 2500
+    //     });
+    //   } catch (e) {
+    //     console.error(e);
+    //     this.loadingImage = false;
+    //     this.$q.notify({
+    //       color: 'negative',
+    //       icon: 'warning',
+    //       detail: 'Erreur lors de la modification',
+    //       position: 'bottom-left',
+    //       timeout: 2500
+    //     });
+    //   }
+    // },
     failMsg () {
       this.$q.notify({
         color: 'negative',
