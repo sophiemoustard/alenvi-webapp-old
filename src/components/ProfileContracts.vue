@@ -44,20 +44,21 @@
               <q-icon name="file download" />
             </a>
           </q-btn> -->
-          <q-btn no-caps color="primary" icon="add" label="Ajouter un avenant" @click="opened = true" />
-          <q-btn no-caps color="grey-6" icon="clear" label="Mettre fin au contrat" @click="opened = true" />
+          <q-btn no-caps color="primary" icon="add" label="Ajouter un avenant" @click="newContractModal = true" />
+          <q-btn no-caps color="grey-6" icon="clear" label="Mettre fin au contrat" @click="newContractModal = true" />
         </q-card-actions>
       </q-card>
-      <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="opened = true" />
+      <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="newContractModal = true" />
     </div>
-    <q-modal v-model="opened" :content-css="modalCssContainer">
+
+    <q-modal v-model="newContractModal" :content-css="modalCssContainer">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-8">
             <h5>Créer un <span class="text-weight-bold">nouveau contrat</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
-            <span><q-icon name="clear" size="1rem" @click.native="opened = false" /></span>
+            <span><q-icon name="clear" size="1rem" @click.native="newContractModal = false" /></span>
           </div>
         </div>
         <div class="row margin-input">
@@ -107,26 +108,15 @@
             </q-field>
           </div>
         </div>
-
-        <!-- <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Nom</p>
-              <q-icon v-if="$v.newUser.lastname.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newUser.lastname.$error" error-label="Champ requis">
-              <q-input v-model="newUser.lastname" color="white" inverted-light @blur="$v.newUser.lastname.$touch" />
-            </q-field>
-          </div>
-        </div> -->
         <div class="row margin-input last">
           <div class="col-12">
             <q-checkbox v-model="newContract.isActive" label="Contract actif" />
           </div>
         </div>
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Créer le contrat" icon-right="add" color="primary" :loading="loading" @click="submit" />
+      <q-btn no-caps class="full-width modal-btn" label="Créer le contrat" icon-right="add" color="primary" :loading="loading" @click="createNewContract" />
     </q-modal>
+
   </div>
 </template>
 
@@ -143,7 +133,7 @@ export default {
   data () {
     return {
       loading: false,
-      opened: false,
+      newContractModal: false,
       contracts: [],
       newContract: {
         status: '',
@@ -429,7 +419,7 @@ export default {
     //     console.error(e);
     //   }
     // },
-    async submit () {
+    async createNewContract () {
       try {
         this.loading = true;
         await this.dlTemplate();
@@ -441,7 +431,7 @@ export default {
           timeout: 2500
         });
         this.loading = false;
-        this.opened = false;
+        this.newContractModal = false;
       } catch (e) {
         console.error(e);
         this.$q.notify({
@@ -500,10 +490,10 @@ export default {
     color: $primary
     text-decoration: none
 
-  /deep/ .q-if-inner
+  /deep/ .q-uploader .q-if-inner
     display: none
 
-  /deep/ .q-if-control
+  /deep/ .q-uploader .q-if-control
     margin-left: 0
     color: $primary
     font-size: 1.5rem
