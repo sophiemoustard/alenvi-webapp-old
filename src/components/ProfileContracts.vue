@@ -38,13 +38,14 @@
             </q-td>
           </q-table>
         </q-card-main>
-        <q-card-actions align="around">
+        <q-card-actions align="end">
           <!-- <q-btn flat round small color="primary">
             <a :href="contract.grossHourlyRate" download>
               <q-icon name="file download" />
             </a>
           </q-btn> -->
-          <q-btn no-caps rounded color="primary" label="Mettre fin au contrat" @click="opened = true" />
+          <q-btn no-caps color="primary" icon="add" label="Ajouter un avenant" @click="opened = true" />
+          <q-btn no-caps color="grey-6" icon="clear" label="Mettre fin au contrat" @click="opened = true" />
         </q-card-actions>
       </q-card>
       <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="opened = true" />
