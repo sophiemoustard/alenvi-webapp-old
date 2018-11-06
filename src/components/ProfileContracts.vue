@@ -1,35 +1,53 @@
 <template>
   <div>
     <div class="row">
-      <q-card v-if="contracts" v-for="(contract, index) in contracts" :key="index" style="cursor: pointer; background: white">
+      <q-card v-if="contracts" v-for="(contract, index) in getRawContracts" :key="index" class="contract-card">
         <!-- <q-card-title class="text-center">
           {{contract.startDate}}
         </q-card-title> -->
         <q-card-main>
           <p>Statut: {{ contract.status }}</p>
           <q-table
-            :data="contracts"
+            :data="getContractsTable(contract._id)"
             :columns="columns"
             row-key="name"
             hide-bottom>
             <q-td slot="body-cell-contractEmpty" slot-scope="props" :props="props">
-              <q-btn small color="secondary">{{ props.value }}</q-btn>
+              <!-- <q-btn small color="secondary">{{ props.value }}</q-btn> -->
+              <q-btn flat round small color="primary" @click="dlTemplate()">
+                <q-icon name="file download" />
+              </q-btn>
             </q-td>
             <q-td slot="body-cell-contractSigned" slot-scope="props" :props="props">
-              <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `contrat_signe_${getUser.firstname}_${getUser.lastname}` }]"
+              <q-uploader v-if="props.row.link" :ref="`signedContract_${props.row._id}`" name="signedContract" :url="docsUploadUrl" :headers="headers"
+                :additional-fields="[
+                  { name: 'fileName', value: `contrat_signe_${getUser.firstname}_${getUser.lastname}` },
+                  { name: 'contractId', value: props.row._id }
+                ]"
                 hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
                 hide-upload-button @add="uploadDocument($event, `signedContract_${props.row._id}`)" @uploaded="refreshUser" @fail="failMsg" />
-              <q-btn small color="secondary">{{ props.value }}</q-btn>
+              <!-- <q-btn small color="secondary">{{ props.value }}</q-btn> -->
+              <q-btn v-else flat round small color="primary">
+                <a :href="contract.link" download>
+                  <q-icon name="file download" />
+                </a>
+              </q-btn>
+            </q-td>
+            <q-td slot="body-cell-isActive" slot-scope="props" :props="props">
+              <q-checkbox :readonly="props.value" :value="props.value" @input="updateContract({ contractId: props.row._id, isActive: props.value, cell: props.row.__index })"></q-checkbox> <!-- @input="updateContract({ contractId: props.row._id, isActive: props.value })" -->
             </q-td>
           </q-table>
         </q-card-main>
-        <!-- <q-card-actions align="around">
-          <q-btn flat round small color="primary">
+        <q-card-actions align="around">
+          <!-- <q-btn flat round small color="primary">
             <a :href="contract.grossHourlyRate" download>
               <q-icon name="file download" />
             </a>
+          </q-btn> -->
+          <q-btn >
+
           </q-btn>
-        </q-card-actions> -->
+        </q-card-actions>
       </q-card>
       <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="opened = true" />
     </div>
@@ -116,7 +134,7 @@
 <script>
 import { Cookies } from 'quasar';
 // import * as JSZip from 'jszip';
-import * as JSZipUtils from 'jszip-utils';
+// import * as JSZipUtils from 'jszip-utils';
 // import * as Docxtemplater from 'docxtemplater';
 // import saveAs from 'file-saver';
 import { required } from 'vuelidate/lib/validators';
@@ -128,32 +146,6 @@ export default {
       loading: false,
       opened: false,
       contracts: [],
-      // contracts: [
-      //   {
-      //     status: 'Prestataire',
-      //     weeklyHours: 35,
-      //     startDate: '01/11/2018',
-      //     grossHourlyRate: 9,
-      //     isActive: false
-      //   },
-      //   {
-      //     status: 'Prestataire',
-      //     weeklyHours: 35,
-      //     startDate: '01/12/2018',
-      //     grossHourlyRate: 9,
-      //     isActive: false
-      //   },
-      //   {
-      //     status: 'Prestataire',
-      //     weeklyHours: 35,
-      //     startDate: '01/01/2019',
-      //     grossHourlyRate: 9,
-      //     isActive: false,
-      //     link: '',
-      //     contractEmpty: 'testtt',
-      //     contractSigned: 'test'
-      //   }
-      // ],
       newContract: {
         status: '',
         weeklyHours: '',
@@ -174,7 +166,6 @@ export default {
       columns: [
         {
           name: 'weeklyHours',
-          required: true,
           label: 'Volume horaire hebdomadaire',
           align: 'left',
           field: 'weeklyHours',
@@ -182,7 +173,6 @@ export default {
         },
         {
           name: 'startDate',
-          required: true,
           label: 'Date d\'effet',
           align: 'left',
           field: 'startDate',
@@ -191,7 +181,6 @@ export default {
         },
         {
           name: 'grossHourlyRate',
-          required: true,
           label: 'Taux horaire',
           align: 'left',
           field: 'grossHourlyRate',
@@ -199,18 +188,23 @@ export default {
         },
         {
           name: 'contractEmpty',
-          required: true,
           label: 'Contrat vierge',
-          align: 'left',
+          align: 'center',
           field: 'contractEmpty',
           sortable: false
         },
         {
           name: 'contractSigned',
-          required: true,
           label: 'Contract signé',
           align: 'left',
           field: 'contractSigned',
+          sortable: false
+        },
+        {
+          name: 'isActive',
+          label: 'Actif',
+          align: 'left',
+          field: 'isActive',
           sortable: false
         }
       ],
@@ -239,23 +233,31 @@ export default {
         'x-access-token': Cookies.get('alenvi_token') || ''
       }
     },
+    getRawContracts () {
+      return this.contracts.filter((contract) => contract.contractType === 'contract');
+    }
   },
   async mounted () {
-    // const user = await this.$users.getById(this.getUser._id);
+    const user = await this.$users.getById(this.getUser._id);
+    this.contracts = user.administrative.contracts;
+    console.log('contracts =', this.contracts);
     // console.log(user);
-    this.contracts = this.getUser.administrative.contracts;
+    // this.contracts = this.getUser.administrative.contracts;
   },
   methods: {
-    async testDocxBlob (url) {
-      return new Promise((resolve, reject) => {
-        JSZipUtils.getBinaryContent(url, (err, data) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(data);
-          }
-        });
-      });
+    // async testDocxBlob (url) {
+    //   return new Promise((resolve, reject) => {
+    //     JSZipUtils.getBinaryContent(url, (err, data) => {
+    //       if (err) {
+    //         reject(err);
+    //       } else {
+    //         resolve(data);
+    //       }
+    //     });
+    //   });
+    // },
+    getContractsTable (idContract) {
+      return this.contracts.filter((contract) => contract.parentContractId === idContract || contract._id === idContract);
     },
     async dlTemplate () {
       try {
@@ -283,7 +285,7 @@ export default {
       console.log(refName)
       console.log(this.$refs[refName]);
       if (files[0].size > 5000000) {
-        this.$refs[refName].reset();
+        this.$refs[refName][0].reset();
         this.$q.notify({
           color: 'negative',
           icon: 'warning',
@@ -293,7 +295,7 @@ export default {
         });
         return '';
       } else {
-        this.$refs[refName].upload();
+        this.$refs[refName][0].upload();
       }
     },
     failMsg () {
@@ -305,14 +307,65 @@ export default {
         timeout: 2500
       });
     },
-    refreshUser () {
-      this.$q.notify({
-        color: 'positive',
-        icon: 'done',
-        detail: 'Document envoyé',
-        position: 'bottom-left',
-        timeout: 2500
-      });
+    async refreshUser () {
+      try {
+        const user = await this.$users.getById(this.getUser._id);
+        this.contracts = user.administrative.contracts;
+        this.$q.notify({
+          color: 'positive',
+          icon: 'done',
+          detail: 'Document envoyé',
+          position: 'bottom-left',
+          timeout: 2500
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async updateContract (data) {
+      try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Es-tu sûr(e) de vouloir activer ce document ?',
+          ok: true,
+          cancel: 'Annuler'
+        });
+        await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${data.contractId}`, { 'isActive': !data.isActive });
+        // Update manually checkbox because it's not dynamic
+        this.contracts[data.cell].isActive = !data.isActive;
+        const length = this.contracts.length;
+        for (let i = 0; i < length; i++) {
+          if (this.contracts[i].isActive && this.contracts[i]._id !== data.contractId) {
+            await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${this.contracts[i]._id}`, { 'isActive': false });
+            this.contracts[i].isActive = false;
+          }
+        }
+        this.$q.notify({
+          color: 'positive',
+          icon: 'done',
+          detail: 'Activité du contrat changée',
+          position: 'bottom-left',
+          timeout: 2500
+        });
+      } catch (e) {
+        console.error(e);
+        if (e.message === '') {
+          return this.$q.notify({
+            color: 'positive',
+            icon: 'done',
+            detail: 'Suppression annulée',
+            position: 'bottom-left',
+            timeout: 2500
+          });
+        }
+        this.$q.notify({
+          color: 'negative',
+          icon: 'warning',
+          detail: 'Erreur lors du changement de l\'activité du contrat',
+          position: 'bottom-left',
+          timeout: 2500
+        });
+      }
     },
     // async getDocxBlob () {
     //   try {
@@ -377,6 +430,12 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables';
+  .contract-card
+    cursor: pointer
+    background: white
+    width: 100%
+    margin-bottom: 20px
+
   .modal
     &-padding
       padding: 24px 58px 0px 58px
@@ -406,5 +465,9 @@ export default {
     bottom: 18px
     font-size: 16px
     z-index: 2
+
+  a
+    color: $primary
+    text-decoration: none
 
 </style>
