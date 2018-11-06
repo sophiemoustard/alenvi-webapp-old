@@ -499,4 +499,12 @@ export default {
     color: $primary
     text-decoration: none
 
+  /deep/ .q-if-inner
+    display: none
+
+  /deep/ .q-if-control
+    margin-left: 0
+    color: $primary
+    font-size: 1.5rem
+
 </style>
