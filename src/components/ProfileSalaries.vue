@@ -1,20 +1,9 @@
 <template>
   <div v-if="user">
-    <h6 class="q-mb-lg">Mois de {{ currentMonth }}</h6>
-    <div class="row gutter-profile">
-      <div class="col-xs-12 col-md-6">
-        <p class="text-weight-bold">Abonnement Transport</p>
-        <p>{{ calculateRefunding('transport') }} €</p>
-      </div>
-      <div class="col-xs-12 col-md-6">
-        <p class="text-weight-bold">Abonnement Téléphone</p>
-        <p>{{ calculateRefunding('phone') }} €</p>
-      </div>
-      <div class="col-xs-12 col-md-6">
-        <p class="text-weight-bold">Salaire mensuel brut</p>
-        <p>{{ salary }} €</p>
-      </div>
-    </div>
+    <h6 class="q-mb-lg text-weight-bold">{{ currentMonth }}</h6>
+    <p>Salaire brut mensuel : {{ salary }} €</p>
+    <p>Remboursement Navigo : {{ calculateRefunding('transport') }} €</p>
+    <p>Remboursement forfait téléphone : {{ calculateRefunding('phone') }} €</p>
   </div>
 </template>
 
@@ -67,7 +56,7 @@ export default {
       this.$moment(this.userLastContract.startDate).month() === this.$moment().month();
     },
     currentMonth () {
-      return this.$moment().format('MMMM');
+      return this.$moment().format('MMMM YYYY');
     },
     salary () {
       const workingDays = this.currentWorkingDays.length;
@@ -134,5 +123,10 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-@import '~variables';
+  @import '~variables';
+
+  h6
+    text-transform: capitalize
+  p
+    white-space: pre
 </style>
