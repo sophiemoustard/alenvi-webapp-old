@@ -489,6 +489,7 @@ export default {
     async createNewContract () {
       try {
         this.loading = true;
+        this.newContract.grossHourlyRate = parseFloat(this.newContract.grossHourlyRate.replace(/,/, '.'));
         await alenviAxios({
           url: `${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts`,
           method: 'POST',
@@ -506,6 +507,7 @@ export default {
         this.newContractModal = false;
         this.newAmendmentModal = false;
         this.newContract = {};
+        this.$v.newContract.$reset();
       } catch (e) {
         console.error(e);
         this.$q.notify({
@@ -519,6 +521,7 @@ export default {
         this.newContractModal = false;
         this.newAmendmentModal = false;
         this.newContract = {};
+        this.$v.newContract.$reset();
       }
     }
   }
