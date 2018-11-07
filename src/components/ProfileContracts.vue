@@ -45,13 +45,13 @@
             </a>
           </q-btn> -->
           <q-btn no-caps color="primary" icon="add" label="Ajouter un avenant" @click="fillAmendment(contract)"/>
-          <q-btn no-caps color="grey-6" icon="clear" label="Mettre fin au contrat" @click="newContractModal = true" />
+          <q-btn no-caps color="grey-6" icon="clear" label="Mettre fin au contrat" @click="endContractModal = true" />
         </q-card-actions>
       </q-card>
       <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="newContractModal = true" />
     </div>
 
-    <!-- New contract -->
+    <!-- New contract modal -->
     <q-modal v-model="newContractModal" :content-css="modalCssContainer">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
@@ -81,7 +81,7 @@
               <q-icon v-if="$v.newContract.weeklyHours.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newContract.weeklyHours.$error" error-label="Champ requis">
-              <q-input v-model="newContract.weeklyHours" color="white" inverted-light @blur="$v.newContract.weeklyHours.$touch" />
+              <q-input type="number" v-model="newContract.weeklyHours" color="white" suffix="hr" inverted-light @blur="$v.newContract.weeklyHours.$touch" />
             </q-field>
           </div>
         </div>
@@ -92,7 +92,7 @@
               <q-icon v-if="$v.newContract.grossHourlyRate.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newContract.grossHourlyRate.$error" error-label="Champ requis">
-              <q-input v-model="newContract.grossHourlyRate" color="white" inverted-light @blur="$v.newContract.grossHourlyRate.$touch" />
+              <q-input type="number" v-model="newContract.grossHourlyRate" color="white" suffix="€" inverted-light @blur="$v.newContract.grossHourlyRate.$touch" />
             </q-field>
           </div>
         </div>
@@ -118,7 +118,7 @@
       <q-btn no-caps class="full-width modal-btn" label="Créer le contrat" icon-right="add" color="primary" :loading="loading" @click="createNewContract" />
     </q-modal>
 
-    <!-- New amendment -->
+    <!-- New amendment modal -->
     <q-modal v-model="newAmendmentModal" :content-css="modalCssContainer">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
@@ -129,18 +129,6 @@
             <span><q-icon name="clear" size="1rem" @click.native="newAmendmentModal = false" /></span>
           </div>
         </div>
-        <!-- <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Statut</p>
-              <q-icon v-if="$v.newContract.status.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newContract.status.$error" error-label="Champ requis">
-              <q-select :options="statusOptions" v-model="newContract.status" color="white" inverted-light separator
-               @blur="$v.newContract.status.$touch" />
-            </q-field>
-          </div>
-        </div> -->
         <div class="row margin-input">
           <div class="col-12">
             <div class="row justify-between">
@@ -148,7 +136,7 @@
               <q-icon v-if="$v.newContract.weeklyHours.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newContract.weeklyHours.$error" error-label="Champ requis">
-              <q-input v-model="newContract.weeklyHours" color="white" inverted-light @blur="$v.newContract.weeklyHours.$touch" />
+              <q-input type="number" v-model="newContract.weeklyHours" color="white" suffix="hr" inverted-light @blur="$v.newContract.weeklyHours.$touch" />
             </q-field>
           </div>
         </div>
@@ -159,7 +147,7 @@
               <q-icon v-if="$v.newContract.grossHourlyRate.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newContract.grossHourlyRate.$error" error-label="Champ requis">
-              <q-input v-model="newContract.grossHourlyRate" color="white" inverted-light @blur="$v.newContract.grossHourlyRate.$touch" />
+              <q-input type="number" v-model="newContract.grossHourlyRate" color="white" suffix="€" inverted-light @blur="$v.newContract.grossHourlyRate.$touch" />
             </q-field>
           </div>
         </div>
@@ -180,13 +168,40 @@
       <q-btn no-caps class="full-width modal-btn" label="Créer le contrat" icon-right="add" color="primary" :loading="loading" @click="createNewContract" />
     </q-modal>
 
+    <!-- End contract modal -->
+    <q-modal v-model="endContractModal" :content-css="modalCssContainer">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-8">
+            <h5>Terminer un <span class="text-weight-bold">contrat</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer" style="text-align: right">
+            <span><q-icon name="clear" size="1rem" @click.native="endContractModal = false" /></span>
+          </div>
+        </div>
+        <div class="row margin-input">
+          <div class="col-12">
+            <div class="row justify-between">
+              <p class="input-caption">Date de fin de contrat</p>
+            </div>
+            <q-field>
+              <q-datetime type="date" format="DD/MM/YYYY" v-model="endContractDate" color="white" inverted-light popover
+              ok-label="OK"
+              cancel-label="Fermer" />
+            </q-field>
+          </div>
+        </div>
+      </div>
+      <q-btn no-caps class="full-width modal-btn" label="Mettre fin au contrat" icon-right="clear" color="primary" :loading="loading" @click="endContract" />
+    </q-modal>
+
   </div>
 </template>
 
 <script>
 import { Cookies } from 'quasar';
 // import * as JSZip from 'jszip';
-import * as JSZipUtils from 'jszip-utils';
+// import * as JSZipUtils from 'jszip-utils';
 // import * as Docxtemplater from 'docxtemplater';
 // import saveAs from 'file-saver';
 import { required } from 'vuelidate/lib/validators';
@@ -199,7 +214,7 @@ export default {
       newContractModal: false,
       newAmendmentModal: false,
       endContractModal: false,
-      currentContract: {},
+      endContractDate: '',
       contracts: [],
       newContract: {
         status: '',
@@ -295,22 +310,20 @@ export default {
   async mounted () {
     const user = await this.$users.getById(this.getUser._id);
     this.contracts = user.administrative.contracts;
-    console.log('contracts =', this.contracts);
-    // console.log(user);
-    // this.contracts = this.getUser.administrative.contracts;
+    this.newContract.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
   },
   methods: {
-    async getBlob (url) {
-      return new Promise((resolve, reject) => {
-        JSZipUtils.getBinaryContent(url, (err, data) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(data);
-          }
-        });
-      });
-    },
+    // async getBlob (url) {
+    //   return new Promise((resolve, reject) => {
+    //     JSZipUtils.getBinaryContent(url, (err, data) => {
+    //       if (err) {
+    //         reject(err);
+    //       } else {
+    //         resolve(data);
+    //       }
+    //     });
+    //   });
+    // },
     getContractsTable (idContract) {
       return this.contracts.filter((contract) => contract.parentContractId === idContract || contract._id === idContract);
     },
@@ -403,6 +416,7 @@ export default {
     },
     fillAmendment (data) {
       this.newContract = {
+        grossHourlyRate: this.getUser.company.rhConfig.providerContracts.grossHourlyRate,
         status: data.status,
         contractType: 'amendment',
         parentContractId: data._id
@@ -413,7 +427,7 @@ export default {
       try {
         await this.$q.dialog({
           title: 'Confirmation',
-          message: 'Es-tu sûr(e) de vouloir activer ce document ?',
+          message: 'Es-tu sûr(e) de vouloir activer ce contrat ?',
           ok: true,
           cancel: 'Annuler'
         });
@@ -489,7 +503,6 @@ export default {
     async createNewContract () {
       try {
         this.loading = true;
-        this.newContract.grossHourlyRate = parseFloat(this.newContract.grossHourlyRate.replace(/,/, '.'));
         await alenviAxios({
           url: `${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts`,
           method: 'POST',
@@ -503,11 +516,6 @@ export default {
           position: 'bottom-left',
           timeout: 2500
         });
-        this.loading = false;
-        this.newContractModal = false;
-        this.newAmendmentModal = false;
-        this.newContract = {};
-        this.$v.newContract.$reset();
       } catch (e) {
         console.error(e);
         this.$q.notify({
@@ -517,11 +525,38 @@ export default {
           position: 'bottom-left',
           timeout: 2500
         });
+      } finally {
         this.loading = false;
         this.newContractModal = false;
         this.newAmendmentModal = false;
         this.newContract = {};
         this.$v.newContract.$reset();
+      }
+    },
+    async endContract () {
+      try {
+        this.loading = true;
+        await alenviAxios({
+          url: `${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts`,
+          method: 'POST',
+          data: {
+            endDate: this.endContractDate
+          }
+        });
+        await this.refreshUser();
+        this.$q.notify({
+          color: 'positive',
+          icon: 'done',
+          detail: 'Contrat créée',
+          position: 'bottom-left',
+          timeout: 2500
+        });
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.loading = false;
+        this.endContractModal = false;
+        this.endContract = '';
       }
     }
   }
