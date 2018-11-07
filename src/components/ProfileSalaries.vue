@@ -1,5 +1,9 @@
 <template>
-  <div>
+  <div v-if="user">
+    <h6 class="q-mb-lg text-weight-bold">{{ currentMonth }}</h6>
+    <p>Salaire brut mensuel : {{ salary }} €</p>
+    <p>Remboursement Navigo : {{ calculateRefunding('transport') }} €</p>
+    <p>Remboursement forfait téléphone : {{ calculateRefunding('phone') }} €</p>
   </div>
 </template>
 
@@ -26,30 +30,103 @@ export default {
       user: null,
       contracts: null,
       company: null,
-      holidays: null
+      currentWorkingDays: null
     }
   },
   computed: {
+    userProfile () {
+      return this.$store.getters['rh/getUserProfile'];
+    },
     usePublicTransport () {
       return this.user.administrative.transportInvoice.transportType;
     },
     hasPhoneInvoice () {
       return this.user.administrative.phoneInvoice.driveId;
+    },
+    userLastContract () {
+      const moments = this.contracts.map(contract => this.$moment(contract.startDate));
+      return this.contracts.find(contract => { return this.$moment.max(moments).toISOString() === contract.startDate });
+    },
+    userCurrentMonthContracts () {
+      return this.contracts.filter(contract => this.$moment(contract.endDate).month() === this.$moment().month() ||
+      this.$moment(contract.startDate).month() === this.$moment().month());
+    },
+    isCurrentMonthContract () {
+      return this.$moment(this.userLastContract.endDate).month() === this.$moment().month() ||
+      this.$moment(this.userLastContract.startDate).month() === this.$moment().month();
+    },
+    currentMonth () {
+      return this.$moment().format('MMMM YYYY');
+    },
+    salary () {
+      const workingDays = this.currentWorkingDays.length;
+      if (this.userCurrentMonthContracts.length > 1) {
+        let salary = 0;
+        for (let i = 0, l = this.userCurrentMonthContracts.length; i < l; i++) {
+          const effectiveWorkingDays = this.calculateEffectiveWorkingDays(this.userCurrentMonthContracts[i]);
+          const { grossHourlyRate, weeklyHours } = this.userCurrentMonthContracts[i];
+          salary += Number.parseFloat((effectiveWorkingDays / workingDays) * 4.33 * grossHourlyRate * weeklyHours);
+        }
+        return salary.toFixed(2);
+      } else {
+        const effectiveWorkingDays = this.calculateEffectiveWorkingDays(this.userLastContract);
+        const { grossHourlyRate, weeklyHours } = this.userLastContract;
+        return Number.parseFloat((effectiveWorkingDays / workingDays) * 4.33 * grossHourlyRate * weeklyHours).toFixed(2);
+      }
     }
   },
   async mounted () {
-    this.user = await this.$users.getById(this.id);
-    this.holidays = currentHolidays;
-    console.log(this.holidays);
+    this.user = await this.$users.getById(this.userProfile._id);
+    this.currentWorkingDays = moment().monthBusinessDays();
     this.contracts = this.user.administrative.contracts;
     this.company = this.user.company;
-    console.log(moment().monthBusinessDays());
   },
   methods: {
+    calculateEffectiveWorkingDays (contract) {
+      const workingDays = this.currentWorkingDays.length;
+      let effectiveWorkingDays = 0;
+      if (contract.endDate && !contract.isActive && this.isCurrentMonthContract) {
+        effectiveWorkingDays = this.currentWorkingDays.filter(day => this.$moment(day).isSameOrBefore(contract.endDate)).length;
+      } else if (contract.startDate && contract.isActive && this.isCurrentMonthContract) {
+        effectiveWorkingDays = this.currentWorkingDays.filter(day => this.$moment(day).isSameOrAfter(contract.startDate)).length;
+      } else if (!contract.isActive) {
+        effectiveWorkingDays = 0;
+      } else {
+        effectiveWorkingDays = workingDays;
+      }
+      return effectiveWorkingDays;
+    },
+    calculateRefunding (type) {
+      if (!this.user.administrative[`${type}Invoice`]) return 0;
+      if (!this.user.administrative[`${type}Invoice`].link) return 0;
+      if (!this.userLastContract.isActive && !this.isCurrentMonthContract) return 0;
+      const workingDays = this.currentWorkingDays.length;
+      let refundAmount = 0;
+      switch (type) {
+        case 'transport':
+          if (this.user.administrative.transportInvoice.transportType !== 'public') return 'Non concerné(e)';
+          const currentSub = this.company.rhConfig.transportSubs.find(sub => sub.department === this.user.administrative.contact.zipCode.substring(0, 2));
+          refundAmount = currentSub.price;
+          break;
+        case 'phone':
+          refundAmount = this.company.rhConfig.phoneSubRefunding;
+          break;
+        default:
+          break;
+      }
+      const effectiveWorkingDays = this.calculateEffectiveWorkingDays(this.userLastContract);
+      // console.log('EFF', effectiveWorkingDays);
+      return Number.parseFloat((effectiveWorkingDays / workingDays) * refundAmount).toFixed(2);
+    }
   }
 };
 </script>
 
 <style lang="stylus" scoped>
-@import '~variables';
+  @import '~variables';
+
+  h6
+    text-transform: capitalize
+  p
+    white-space: pre
 </style>
