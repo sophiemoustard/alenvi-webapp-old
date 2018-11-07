@@ -72,7 +72,13 @@ export default {
     salary () {
       const workingDays = this.currentWorkingDays.length;
       if (this.userCurrentMonthContracts.length > 1) {
-
+        let salary = 0;
+        for (let i = 0, l = this.userCurrentMonthContracts.length; i < l; i++) {
+          const effectiveWorkingDays = this.calculateEffectiveWorkingDays(this.userCurrentMonthContracts[i]);
+          const { grossHourlyRate, weeklyHours } = this.userCurrentMonthContracts[i];
+          salary += Number.parseFloat((effectiveWorkingDays / workingDays) * 4.33 * grossHourlyRate * weeklyHours);
+        }
+        return salary.toFixed(2);
       } else {
         const effectiveWorkingDays = this.calculateEffectiveWorkingDays(this.userLastContract);
         const { grossHourlyRate, weeklyHours } = this.userLastContract;
@@ -94,6 +100,8 @@ export default {
         effectiveWorkingDays = this.currentWorkingDays.filter(day => this.$moment(day).isSameOrBefore(contract.endDate)).length;
       } else if (contract.startDate && contract.isActive && this.isCurrentMonthContract) {
         effectiveWorkingDays = this.currentWorkingDays.filter(day => this.$moment(day).isSameOrAfter(contract.startDate)).length;
+      } else if (!contract.isActive) {
+        effectiveWorkingDays = 0;
       } else {
         effectiveWorkingDays = workingDays;
       }
@@ -118,6 +126,7 @@ export default {
           break;
       }
       const effectiveWorkingDays = this.calculateEffectiveWorkingDays(this.userLastContract);
+      // console.log('EFF', effectiveWorkingDays);
       return Number.parseFloat((effectiveWorkingDays / workingDays) * refundAmount).toFixed(2);
     }
   }
