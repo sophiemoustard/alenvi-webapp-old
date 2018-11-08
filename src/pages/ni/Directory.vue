@@ -393,7 +393,7 @@ export default {
             this.$store.commit('rh/saveNotification', {
               type: 'profiles',
               _id: user._id,
-              count: checkProfileErrors.error ? checkProfileErrors.error.details.length : 0
+              count: checkProfileErrors.error ? 1 : 0
             });
             // const checkTasks = user.procedure.filter(task => taskValidation(task, user).length > 0 && !task.check.isDone);
             // this.$store.commit('rh/saveNotification', {
@@ -407,7 +407,7 @@ export default {
                 name: `${user.firstname} ${user.lastname}`,
                 picture: user.picture ? user.picture.link : null
               },
-              profileErrors: checkProfileErrors.error ? checkProfileErrors.error.details.length : 0,
+              profileErrors: checkProfileErrors.error ? 1 : 0,
               startDate: user.createdAt,
               sector: sectors[user.sector],
               isActive: user.isActive

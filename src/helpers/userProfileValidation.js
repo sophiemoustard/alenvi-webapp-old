@@ -82,9 +82,7 @@ const userProfileSchema = Joi.object().keys({
   })
 });
 
-const options = {
-  abortEarly: false,
-  allowUnknown: true
-};
-
-export const userProfileValidation = (profile) => Joi.validate(profile, userProfileSchema, options);
+export const userProfileValidation = (profile, options = {}) => {
+  options.allowUnknown = true;
+  return Joi.validate(profile, userProfileSchema, options);
+}
