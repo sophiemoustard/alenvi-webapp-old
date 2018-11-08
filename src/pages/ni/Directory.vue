@@ -241,6 +241,9 @@ export default {
           },
           identity: {
             title: ''
+          },
+          transportInvoice: {
+            transportType: 'public'
           }
         },
         ogustManagerId: ''
