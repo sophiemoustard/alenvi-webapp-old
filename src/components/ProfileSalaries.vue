@@ -56,13 +56,17 @@ export default {
       return this.$moment().format('MMMM YYYY');
     },
     salary () {
+      if (!this.userLastContract || this.userCurrentMonthContracts.length === 0) return 0;
+      // console.log('CURRENT CONTRACTS', this.userCurrentMonthContracts);
       const workingDays = this.currentWorkingDays.length;
       if (this.userCurrentMonthContracts.length > 1) {
         let salary = 0;
         for (let i = 0, l = this.userCurrentMonthContracts.length; i < l; i++) {
           const effectiveWorkingDays = this.calculateEffectiveWorkingDays(this.userCurrentMonthContracts[i]);
+          // console.log('EFF', effectiveWorkingDays);
           const { grossHourlyRate, weeklyHours } = this.userCurrentMonthContracts[i];
           salary += Number.parseFloat((effectiveWorkingDays / workingDays) * 4.33 * grossHourlyRate * weeklyHours);
+          // console.log('SALARY', Number.parseFloat((effectiveWorkingDays / workingDays) * 4.33 * grossHourlyRate * weeklyHours));
         }
         return salary.toFixed(2);
       } else {
@@ -87,9 +91,9 @@ export default {
       const workingDays = this.currentWorkingDays.length;
       let effectiveWorkingDays = 0;
       if (contract.endDate && this.isCurrentMonthContract(contract)) {
-        effectiveWorkingDays = this.currentWorkingDays.filter(day => this.$moment(day).isSameOrBefore(contract.endDate)).length;
+        effectiveWorkingDays = this.currentWorkingDays.filter(day => this.$moment(day).isSameOrBefore(contract.endDate, 'day')).length;
       } else if (contract.startDate && contract.isActive && this.isCurrentMonthContract(contract)) {
-        effectiveWorkingDays = this.currentWorkingDays.filter(day => this.$moment(day).isSameOrAfter(contract.startDate)).length;
+        effectiveWorkingDays = this.currentWorkingDays.filter(day => this.$moment(day).isSameOrAfter(contract.startDate, 'day')).length;
       } else if (!contract.isActive) {
         effectiveWorkingDays = 0;
       } else {
@@ -100,7 +104,7 @@ export default {
     calculateRefunding (type) {
       if (!this.user.administrative[`${type}Invoice`]) return 0;
       if (!this.user.administrative[`${type}Invoice`].link) return 0;
-      if (!this.userLastContract.isActive && !this.isCurrentMonthContract) return 0;
+      if (!this.userLastContract || this.userCurrentMonthContracts.length === 0) return 0;
       const workingDays = this.currentWorkingDays.length;
       let refundAmount = 0;
       let totalRefund = 0;
