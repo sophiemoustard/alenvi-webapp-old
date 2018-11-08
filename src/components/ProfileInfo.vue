@@ -946,18 +946,19 @@ export default {
       return 'mdi-blank-checkbox';
     }
   },
-  mounted () {
-    this.mergeUser();
+  async mounted () {
+    const user = await this.$users.getById(this.userProfile._id);
+    this.mergeUser(user);
     this.$v.user.alenvi.$touch();
   },
-  watch: {
-    userProfile (value) {
-      this.mergeUser(value);
-    }
-  },
+  // watch: {
+  //   userProfile (value) {
+  //     this.mergeUser(value);
+  //   }
+  // },
   methods: {
     mergeUser (value = null) {
-      const args = [this.user.alenvi, (value || this.userProfile)];
+      const args = [this.user.alenvi, value];
       this.user.alenvi = Object.assign({}, extend(true, ...args));
       this.isLoaded = true;
     },
@@ -985,7 +986,6 @@ export default {
         } else {
           await this.updateOgustUser(paths);
         }
-        this.$store.commit('rh/saveUserProfile', this.user.alenvi);
         // this.$store.dispatch('rh/updateNotifications');
         this.$q.notify({
           color: 'positive',
@@ -994,10 +994,8 @@ export default {
           position: 'bottom-left',
           timeout: 2500
         });
-        this.tmpInput = '';
       } catch (e) {
         console.error(e);
-        this.$store.commit('rh/saveUserProfile', this.user.alenvi);
         this.$q.notify({
           color: 'negative',
           icon: 'warning',
@@ -1005,6 +1003,8 @@ export default {
           position: 'bottom-left',
           timeout: 2500
         });
+      } finally {
+        this.$store.commit('rh/saveUserProfile', this.user.alenvi);
         this.tmpInput = '';
       }
     },
@@ -1018,7 +1018,6 @@ export default {
       }
       const payload = this.$_.set({}, path, value);
       payload._id = this.userProfile._id;
-      console.log('PAYLOAD ALENVI', payload);
       await this.$users.updateById(payload);
     },
     async updateOgustUser (paths) {
@@ -1079,7 +1078,6 @@ export default {
         await this.$axios.post(this.pictureUploadUrl, data, { headers: { 'content-type': 'multipart/form-data', 'x-access-token': Cookies.get('alenvi_token') || '' } });
         await this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
         this.closePictureEdition();
-        this.loadingImage = false;
         this.$q.notify({
           color: 'positive',
           icon: 'done',
@@ -1089,7 +1087,6 @@ export default {
         });
       } catch (e) {
         console.error(e);
-        this.loadingImage = false;
         this.$q.notify({
           color: 'negative',
           icon: 'warning',
@@ -1097,6 +1094,8 @@ export default {
           position: 'bottom-left',
           timeout: 2500
         });
+      } finally {
+        this.loadingImage = false;
       }
     },
     async deleteDocument (driveId, path) {
