@@ -11,6 +11,7 @@
             :data="getContractsTable(contract._id)"
             :columns="columns"
             row-key="name"
+            :pagination.sync="pagination"
             hide-bottom>
             <q-td slot="body-cell-contractEmpty" slot-scope="props" :props="props">
               <!-- <q-btn small color="secondary">{{ props.value }}</q-btn> -->
@@ -123,7 +124,7 @@
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-8">
-            <h5>Créer un <span class="text-weight-bold">nouvel avenant</span></h5>
+            <h5>Créer un <span class="text-weight-bold">avenant</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
             <span><q-icon name="clear" size="1rem" @click.native="newAmendmentModal = false" /></span>
@@ -165,7 +166,7 @@
           </div>
         </div>
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Créer le contrat" icon-right="add" color="primary" :loading="loading" @click="createNewContract" />
+      <q-btn no-caps class="full-width modal-btn" label="Créer l'avenant" icon-right="add" color="primary" :loading="loading" @click="createNewContract" />
     </q-modal>
 
     <!-- End contract modal -->
@@ -211,6 +212,7 @@ export default {
   data () {
     return {
       loading: false,
+      pagination: { rowsPerPage: 0 },
       newContractModal: false,
       newAmendmentModal: false,
       endContractModal: false,
@@ -311,6 +313,7 @@ export default {
     const user = await this.$users.getById(this.getUser._id);
     this.contracts = user.administrative.contracts;
     this.newContract.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
+    console.log(this.contracts);
   },
   methods: {
     // async getBlob (url) {
