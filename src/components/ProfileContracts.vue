@@ -35,7 +35,7 @@
               </q-btn>
             </q-td>
             <q-td slot="body-cell-isActive" slot-scope="props" :props="props">
-              <q-checkbox :readonly="props.value" :value="props.value" @input="updateContract({ contractId: props.row._id, isActive: props.value, cell: props.row.__index })"></q-checkbox> <!-- @input="updateContract({ contractId: props.row._id, isActive: props.value })" -->
+              <q-checkbox :readonly="props.value" :value="props.value" @input="updateContractActivity({ contractId: props.row._id, isActive: !props.value, cell: props.row.__index })"></q-checkbox> <!-- @input="updateContractActivity({ contractId: props.row._id, isActive: props.value })" -->
             </q-td>
           </q-table>
         </q-card-main>
@@ -46,7 +46,7 @@
             </a>
           </q-btn> -->
           <q-btn no-caps color="primary" icon="add" label="Ajouter un avenant" @click="fillAmendment(contract)"/>
-          <q-btn no-caps color="grey-6" icon="clear" label="Mettre fin au contrat" @click="endContractModal = true" />
+          <q-btn no-caps color="grey-6" icon="clear" label="Mettre fin au contrat" @click="fillEndContract(contract)" />
         </q-card-actions>
       </q-card>
       <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="newContractModal = true" />
@@ -186,7 +186,7 @@
               <p class="input-caption">Date de fin de contrat</p>
             </div>
             <q-field>
-              <q-datetime type="date" format="DD/MM/YYYY" v-model="endContractDate" color="white" inverted-light popover
+              <q-datetime type="date" format="DD/MM/YYYY" v-model="endContractData.date" color="white" inverted-light popover
               ok-label="OK"
               cancel-label="Fermer" />
             </q-field>
@@ -216,7 +216,10 @@ export default {
       newContractModal: false,
       newAmendmentModal: false,
       endContractModal: false,
-      endContractDate: '',
+      endContractData: {
+        date: '',
+        contractId: '',
+      },
       contracts: [],
       newContract: {
         status: '',
@@ -327,6 +330,23 @@ export default {
     //     });
     //   });
     // },
+    failMsg () {
+      this.$q.notify({
+        color: 'negative',
+        icon: 'warning',
+        detail: 'Echec de l\'envoi du document',
+        position: 'bottom-left',
+        timeout: 2500
+      });
+    },
+    async refreshUser () {
+      try {
+        const user = await this.$users.getById(this.getUser._id);
+        this.contracts = user.administrative.contracts;
+      } catch (e) {
+        console.error(e);
+      }
+    },
     getContractsTable (idContract) {
       return this.contracts.filter((contract) => contract.parentContractId === idContract || contract._id === idContract);
     },
@@ -400,23 +420,6 @@ export default {
     //     });
     //   }
     // },
-    failMsg () {
-      this.$q.notify({
-        color: 'negative',
-        icon: 'warning',
-        detail: 'Echec de l\'envoi du document',
-        position: 'bottom-left',
-        timeout: 2500
-      });
-    },
-    async refreshUser () {
-      try {
-        const user = await this.$users.getById(this.getUser._id);
-        this.contracts = user.administrative.contracts;
-      } catch (e) {
-        console.error(e);
-      }
-    },
     fillAmendment (data) {
       this.newContract = {
         grossHourlyRate: this.getUser.company.rhConfig.providerContracts.grossHourlyRate,
@@ -426,7 +429,7 @@ export default {
       };
       this.newAmendmentModal = true;
     },
-    async updateContract (data) {
+    async updateContractActivity (data) {
       try {
         await this.$q.dialog({
           title: 'Confirmation',
@@ -434,9 +437,9 @@ export default {
           ok: true,
           cancel: 'Annuler'
         });
-        await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${data.contractId}`, { 'isActive': !data.isActive });
+        await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${data.contractId}`, { 'isActive': data.isActive });
         // Update manually checkbox because it's not dynamic
-        this.contracts[data.cell].isActive = !data.isActive;
+        this.contracts[data.cell].isActive = data.isActive;
         const length = this.contracts.length;
         for (let i = 0; i < length; i++) {
           if (this.contracts[i].isActive && this.contracts[i]._id !== data.contractId) {
@@ -457,7 +460,7 @@ export default {
           return this.$q.notify({
             color: 'positive',
             icon: 'done',
-            detail: 'Suppression annulée',
+            detail: 'Mise à jour annulée',
             position: 'bottom-left',
             timeout: 2500
           });
@@ -536,30 +539,41 @@ export default {
         this.$v.newContract.$reset();
       }
     },
+    async fillEndContract (contract) {
+      this.endContractData.contractId = contract._id;
+      this.endContractModal = true
+    },
     async endContract () {
       try {
         this.loading = true;
         await alenviAxios({
-          url: `${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts`,
-          method: 'POST',
+          url: `${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${this.endContractData.contractId}`,
+          method: 'PUT',
           data: {
-            endDate: this.endContractDate
+            endDate: this.endContractData.date
           }
         });
         await this.refreshUser();
         this.$q.notify({
           color: 'positive',
           icon: 'done',
-          detail: 'Contrat créée',
+          detail: 'Contrat terminé',
           position: 'bottom-left',
           timeout: 2500
         });
       } catch (e) {
         console.error(e);
+        this.$q.notify({
+          color: 'negative',
+          icon: 'warning',
+          detail: 'Erreur lors de la mise à jour du contrat',
+          position: 'bottom-left',
+          timeout: 2500
+        });
       } finally {
         this.loading = false;
         this.endContractModal = false;
-        this.endContract = '';
+        this.endContractData = {};
       }
     }
   }
