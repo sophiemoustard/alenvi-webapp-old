@@ -44,16 +44,13 @@ export default {
       return this.user.administrative.phoneInvoice.driveId;
     },
     userLastContract () {
-      const moments = this.contracts.map(contract => this.$moment(contract.startDate));
-      return this.contracts.find(contract => { return this.$moment.max(moments).toISOString() === contract.startDate });
+      return this.contracts.find(contract => contract.isActive);
+      // const moments = this.contracts.map(contract => this.$moment(contract.startDate));
+      // return this.contracts.find(contract => { return this.$moment.max(moments).toISOString() === contract.startDate });
     },
     userCurrentMonthContracts () {
       return this.contracts.filter(contract => this.$moment(contract.endDate).month() === this.$moment().month() ||
       this.$moment(contract.startDate).month() === this.$moment().month());
-    },
-    isCurrentMonthContract () {
-      return this.$moment(this.userLastContract.endDate).month() === this.$moment().month() ||
-      this.$moment(this.userLastContract.startDate).month() === this.$moment().month();
     },
     currentMonth () {
       return this.$moment().format('MMMM YYYY');
@@ -78,16 +75,20 @@ export default {
   async mounted () {
     this.user = await this.$users.getById(this.userProfile._id);
     this.currentWorkingDays = moment().monthBusinessDays();
-    this.contracts = this.user.administrative.contracts;
+    this.contracts = this.user.administrative.contracts.filter(contract => contract.status === 'Prestataire');
     this.company = this.user.company;
   },
   methods: {
+    isCurrentMonthContract (contract) {
+      return this.$moment(contract.endDate).month() === this.$moment().month() ||
+      this.$moment(contract.startDate).month() === this.$moment().month();
+    },
     calculateEffectiveWorkingDays (contract) {
       const workingDays = this.currentWorkingDays.length;
       let effectiveWorkingDays = 0;
-      if (contract.endDate && !contract.isActive && this.isCurrentMonthContract) {
+      if (contract.endDate && this.isCurrentMonthContract(contract)) {
         effectiveWorkingDays = this.currentWorkingDays.filter(day => this.$moment(day).isSameOrBefore(contract.endDate)).length;
-      } else if (contract.startDate && contract.isActive && this.isCurrentMonthContract) {
+      } else if (contract.startDate && contract.isActive && this.isCurrentMonthContract(contract)) {
         effectiveWorkingDays = this.currentWorkingDays.filter(day => this.$moment(day).isSameOrAfter(contract.startDate)).length;
       } else if (!contract.isActive) {
         effectiveWorkingDays = 0;
@@ -102,6 +103,7 @@ export default {
       if (!this.userLastContract.isActive && !this.isCurrentMonthContract) return 0;
       const workingDays = this.currentWorkingDays.length;
       let refundAmount = 0;
+      let totalRefund = 0;
       switch (type) {
         case 'transport':
           if (this.user.administrative.transportInvoice.transportType !== 'public') return 'Non concerné(e)';
@@ -114,9 +116,16 @@ export default {
         default:
           break;
       }
-      const effectiveWorkingDays = this.calculateEffectiveWorkingDays(this.userLastContract);
-      // console.log('EFF', effectiveWorkingDays);
-      return Number.parseFloat((effectiveWorkingDays / workingDays) * refundAmount).toFixed(2);
+      if (this.userCurrentMonthContracts.length > 1) {
+        for (let i = 0, l = this.userCurrentMonthContracts.length; i < l; i++) {
+          const effectiveWorkingDays = this.calculateEffectiveWorkingDays(this.userCurrentMonthContracts[i]);
+          totalRefund += Number.parseFloat((effectiveWorkingDays / workingDays) * refundAmount);
+        }
+        return totalRefund.toFixed(2);
+      } else {
+        const effectiveWorkingDays = this.calculateEffectiveWorkingDays(this.userLastContract);
+        return Number.parseFloat((effectiveWorkingDays / workingDays) * refundAmount).toFixed(2);
+      }
     }
   }
 };
