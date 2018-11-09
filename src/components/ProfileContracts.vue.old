@@ -1,14 +1,14 @@
 <template>
   <div>
     <div class="row">
-      <q-card v-if="contracts" v-for="(contract, index) in contracts" :key="index" class="contract-card">
-        <q-card-title v-if="contract.endDate">
-          {{ cardTitle(contract.endDate) }}
-        </q-card-title>
+      <q-card v-if="contracts" v-for="(contract, index) in getRawContracts" :key="index" class="contract-card">
+        <!-- <q-card-title class="text-center">
+          {{contract.startDate}}
+        </q-card-title> -->
         <q-card-main>
           <p>Statut: {{ contract.status }}</p>
           <q-table
-            :data="contract.versions"
+            :data="getContractsTable(contract._id)"
             :columns="columns"
             row-key="name"
             :pagination.sync="pagination"
@@ -24,8 +24,7 @@
               <q-uploader v-if="!props.row.link" :ref="`signedContract_${props.row._id}`" name="signedContract" :url="docsUploadUrl" :headers="headers"
                 :additional-fields="[
                   { name: 'fileName', value: `contrat_signe_${getUser.firstname}_${getUser.lastname}` },
-                  { name: 'contractId', value: contract._id },
-                  { name: 'versionId', value: props.row._id }
+                  { name: 'contractId', value: props.row._id }
                 ]"
                 hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
                 hide-upload-button @add="uploadDocument($event, `signedContract_${props.row._id}`)" @uploaded="refreshUser" @fail="failMsg" />
@@ -47,8 +46,8 @@
               <q-icon name="file download" />
             </a>
           </q-btn> -->
-          <q-btn v-if="contract.isActive" no-caps color="primary" icon="add" label="Ajouter un avenant" @click="fillAmendment(contract)"/>
-          <q-btn v-if="contract.isActive" no-caps color="grey-6" icon="clear" label="Mettre fin au contrat" @click="fillEndContract(contract)" />
+          <q-btn no-caps color="primary" icon="add" label="Ajouter un avenant" @click="fillAmendment(contract)"/>
+          <q-btn no-caps color="grey-6" icon="clear" label="Mettre fin au contrat" @click="fillEndContract(contract)" />
         </q-card-actions>
       </q-card>
       <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="newContractModal = true" />
@@ -317,16 +316,16 @@ export default {
       return {
         'x-access-token': Cookies.get('alenvi_token') || ''
       }
+    },
+    getRawContracts () {
+      return this.contracts.filter((contract) => contract.contractType === 'contract');
     }
-    // getRawContracts () {
-    //   return this.contracts.filter((contract) => contract.contractType === 'contract');
-    // }
   },
   async mounted () {
     const user = await this.$users.getById(this.getUser._id);
     this.contracts = user.administrative.contracts;
     this.newContract.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
-    // console.log('contracts', this.contracts);
+    console.log(this.contracts);
   },
   methods: {
     // async getBlob (url) {
@@ -340,12 +339,6 @@ export default {
     //     });
     //   });
     // },
-    cardTitle (contractEndDate) {
-      if (this.$moment().isBefore(contractEndDate)) {
-        return `Le contrat se termine le ${this.$moment(contractEndDate).format('DD MMMM YYYY')}`
-      }
-      return `Contrat terminé le: ${this.$moment(contractEndDate).format('DD MMMM YYYY')}`
-    },
     failMsg () {
       this.$q.notify({
         color: 'negative',
