@@ -954,7 +954,9 @@ export default {
   },
   watch: {
     userProfile (value) {
-      this.mergeUser(value);
+      if (!this.$_.isEqual(value, this.user.alenvi)) {
+        this.mergeUser(value);
+      }
     }
   },
   methods: {
