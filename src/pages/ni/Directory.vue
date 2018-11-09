@@ -15,6 +15,7 @@
       :data="filteredUsers"
       :columns="columns"
       row-key="name"
+      binary-state-sort
       :rows-per-page-options="[15, 25, 35]"
       :pagination.sync="pagination"
       :loading="tableLoading">
