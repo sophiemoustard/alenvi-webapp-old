@@ -12,7 +12,8 @@
             :columns="columns"
             row-key="name"
             :pagination.sync="pagination"
-            hide-bottom>
+            hide-bottom
+            binary-state-sort>
             <q-td slot="body-cell-contractEmpty" slot-scope="props" :props="props">
               <!-- <q-btn small color="secondary">{{ props.value }}</q-btn> -->
               <q-btn flat round small color="primary" @click="dlTemplate()">
@@ -35,7 +36,7 @@
               </q-btn>
             </q-td>
             <q-td slot="body-cell-isActive" slot-scope="props" :props="props">
-              <q-checkbox :readonly="props.value" :value="props.value" @input="updateContractActivity({ contractId: props.row._id, isActive: !props.value, cell: props.row.__index })"></q-checkbox> <!-- @input="updateContractActivity({ contractId: props.row._id, isActive: props.value })" -->
+              <q-checkbox :readonly="props.value" :disable="$moment().isAfter(props.row.endDate)" :value="props.value" @input="updateContractActivity({ contractId: props.row._id, isActive: !props.value, cell: props.row.__index })"></q-checkbox> <!-- @input="updateContractActivity({ contractId: props.row._id, isActive: props.value })" -->
             </q-td>
           </q-table>
         </q-card-main>
@@ -253,6 +254,14 @@ export default {
           field: 'startDate',
           format: (value) => this.$moment(value).format('DD/MM/YYYY'),
           sortable: true,
+        },
+        {
+          name: 'endDate',
+          label: 'Date de fin',
+          align: 'left',
+          field: 'endDate',
+          format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : '∞',
+          sortable: true
         },
         {
           name: 'grossHourlyRate',
