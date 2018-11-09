@@ -28,7 +28,7 @@ export default {
   data () {
     return {
       user: null,
-      contracts: null,
+      contracts: [],
       company: null,
       currentWorkingDays: null
     }
@@ -56,7 +56,7 @@ export default {
       return this.$moment().format('MMMM YYYY');
     },
     salary () {
-      if (!this.userLastContract || this.userCurrentMonthContracts.length === 0) return 0;
+      // if (!this.userLastContract || this.userCurrentMonthContracts.length === 0) return 0;
       // console.log('CURRENT CONTRACTS', this.userCurrentMonthContracts);
       const workingDays = this.currentWorkingDays.length;
       if (this.userCurrentMonthContracts.length > 1) {
@@ -79,7 +79,10 @@ export default {
   async mounted () {
     this.user = await this.$users.getById(this.userProfile._id);
     this.currentWorkingDays = moment().monthBusinessDays();
-    this.contracts = this.user.administrative.contracts.filter(contract => contract.status === 'Prestataire');
+    const rawContracts = this.user.administrative.contracts.filter(contract => contract.status === 'Prestataire');
+    for (let i = 0, l = rawContracts.length; i < l; i++) {
+      this.contracts.push(...rawContracts[i].versions);
+    }
     this.company = this.user.company;
   },
   methods: {
@@ -104,7 +107,7 @@ export default {
     calculateRefunding (type) {
       if (!this.user.administrative[`${type}Invoice`]) return 0;
       if (!this.user.administrative[`${type}Invoice`].link) return 0;
-      if (!this.userLastContract || this.userCurrentMonthContracts.length === 0) return 0;
+      // if (!this.userLastContract || this.userCurrentMonthContracts.length === 0) return 0;
       const workingDays = this.currentWorkingDays.length;
       let refundAmount = 0;
       let totalRefund = 0;
