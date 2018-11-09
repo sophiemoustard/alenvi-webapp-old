@@ -8,7 +8,7 @@
         :label="tab.label"
         :default="tab.default"
         :name="tab.name"
-        :alert="tab.notification && notifications[tab.notification][profileId] ? notifications[tab.notification][profileId] > 0 : false"
+        :alert="tab.notification && notifications[tab.notification][profileId] ? notifications[tab.notification][profileId] : false"
         />
       <q-tab-pane class="no-border" v-for="(tab, index) in tabsContent" :key="index" :name="tab.name">
                 <!-- Dynamic component loading  -->

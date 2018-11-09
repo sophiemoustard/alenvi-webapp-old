@@ -952,11 +952,11 @@ export default {
     this.mergeUser(user);
     this.$v.user.alenvi.$touch();
   },
-  // watch: {
-  //   userProfile (value) {
-  //     this.mergeUser(value);
-  //   }
-  // },
+  watch: {
+    userProfile (value) {
+      this.mergeUser(value);
+    }
+  },
   methods: {
     mergeUser (value = null) {
       const args = [this.user.alenvi, value];

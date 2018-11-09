@@ -33,7 +33,10 @@
             <q-item-main :label="col.value.name" />
           </q-item>
           <template v-else-if="col.name === 'profileErrors'">
-            <q-icon v-if="notificationsProfiles[props.row.auxiliary._id] > 0 && props.row.isActive" name="error" color="secondary" size="1rem" />
+            <q-icon v-if="notificationsProfiles[props.row.auxiliary._id] && props.row.isActive" name="error" color="secondary" size="1rem" />
+          </template>
+          <template v-else-if="col.name === 'tasksErrors'">
+            <q-icon v-if="notificationsTasks[props.row.auxiliary._id] && props.row.isActive" name="error" color="secondary" size="1rem" />
           </template>
           <template v-else-if="col.name === 'active'">
             <div :class="{ activeDot: col.value, inactiveDot: !col.value }"></div>
@@ -185,7 +188,7 @@ import { frPhoneNumber, frZipCode } from '../../helpers/vuelidateCustomVal';
 // import { getUserStartDate } from '../../../../helpers/getUserStartDate';
 import { clear } from '../../helpers/utils.js';
 import { userProfileValidation } from '../../helpers/userProfileValidation';
-// import { taskValidation } from '../../../../helpers/taskValidation';
+import { taskValidation } from '../../helpers/taskValidation';
 import SelectSector from '../../components/SelectSector';
 import SelectManager from '../../components/SelectManager';
 
@@ -270,15 +273,21 @@ export default {
             const bArr = b.name.split(' ');
             return aArr[aArr.length - 1].toLowerCase() < bArr[bArr.length - 1].toLowerCase() ? -1 : 1
           },
-          style: 'width: 500px'
+          style: 'width: 450px'
         },
         {
           name: 'profileErrors',
-          label: '',
+          label: 'Documents',
           field: 'profileErrors',
           align: 'left',
           sortable: true,
-          style: 'width: 40px'
+        },
+        {
+          name: 'tasksErrors',
+          label: 'Tâches',
+          field: 'tasksErrors',
+          align: 'left',
+          sortable: true,
         },
         {
           name: 'startDate',
@@ -358,6 +367,9 @@ export default {
     notificationsProfiles () {
       return this.$store.getters['rh/getNotificationsProfiles'];
     },
+    notificationsTasks () {
+      return this.$store.getters['rh/getNotificationsTasks'];
+    },
     mobilePhoneError () {
       if (!this.$v.newUser.mobilePhone.required) {
         return 'Champ requis';
@@ -394,21 +406,22 @@ export default {
             this.$store.commit('rh/saveNotification', {
               type: 'profiles',
               _id: user._id,
-              count: checkProfileErrors.error ? 1 : 0
+              exists: !!checkProfileErrors.error
             });
-            // const checkTasks = user.procedure.filter(task => taskValidation(task, user).length > 0 && !task.check.isDone);
-            // this.$store.commit('rh/saveNotification', {
-            //   type: 'tasks',
-            //   _id: user._id,
-            //   count: checkTasks.length > 0 ? checkTasks.length : 0
-            // });
+            const checkTasks = taskValidation(user);
+            this.$store.commit('rh/saveNotification', {
+              type: 'tasks',
+              _id: user._id,
+              exists: checkTasks
+            });
             return {
               auxiliary: {
                 _id: user._id,
                 name: `${user.firstname} ${user.lastname}`,
                 picture: user.picture ? user.picture.link : null
               },
-              profileErrors: checkProfileErrors.error ? 1 : 0,
+              profileErrors: checkProfileErrors.error,
+              tasksErrors: checkTasks,
               startDate: user.createdAt,
               sector: sectors[user.sector],
               isActive: user.isActive

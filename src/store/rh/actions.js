@@ -2,7 +2,7 @@
 export function someAction (context) {
 }
 */
-import _ from 'lodash';
+// import _ from 'lodash';
 
 import users from '../../api/Users'
 import { userProfileValidation } from '../../helpers/userProfileValidation';
@@ -19,17 +19,18 @@ export async function getUserProfile ({ commit }, userId) {
 }
 
 export async function updateNotifications ({ commit, state }, userId) {
-  const user = _.cloneDeep(state.userProfile);
+  // const user = _.cloneDeep(state.userProfile);
+  const user = state.userProfile;
   const userValidation = userProfileValidation(user);
   commit('saveNotification', {
     type: 'profiles',
     _id: user._id,
-    count: userValidation.error ? userValidation.error.details.length : 0
+    exists: !!userValidation.error
   });
-  const checkTasks = user.procedure.filter(task => taskValidation(task, user).length > 0 && !task.check.isDone);
+  const checkTasks = taskValidation(user);
   commit('saveNotification', {
     type: 'tasks',
     _id: user._id,
-    count: checkTasks.length > 0 ? checkTasks.length : 0
+    exists: checkTasks
   });
 }

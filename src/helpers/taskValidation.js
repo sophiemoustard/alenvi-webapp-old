@@ -6,32 +6,26 @@ const nationalityValidation = (userNationality) => {
   return Object.keys(euSpace).indexOf(userNationality);
 }
 
-export const taskValidation = (task, user = null) => {
-  const error = [];
-  if (!task.isDone && displayTask(task, user)) {
-    error.push({
-      detail: task.task.name
-    })
+// export const taskValidation = (task, user = null) => {
+//   const error = [];
+//   if (!task.isDone && displayTask(task, user)) {
+//     error.push({
+//       detail: task.task.name
+//     })
+//   }
+//   return error;
+// };
+
+export const taskValidation = (user = null) => {
+  if (!user) throw new Error('No user.');
+  const tasks = user.procedure;
+  if (!Array.isArray(tasks)) throw new Error('Tasks must be an array.');
+  for (let i = 0, l = tasks.length; i < l; i++) {
+    if (!tasks[i].check.isDone && displayTask(tasks[i], user)) {
+      return true;
+    }
   }
-  // if (task.task.name.match(/titre de séjour/i)) {
-  //   if (user.administrative && user.administrative.identity) {
-  //     if (nationalityValidation(user.administrative.identity.nationality) === -1) {
-  //       error.push({
-  //         detail: 'Nationality validation',
-  //         msg: 'Not from EU.'
-  //       })
-  //     }
-  //   }
-  // }
-  // if (task.task.name.match(/attribuer parrain/i)) {
-  //   if (!user.mentorId) {
-  //     error.push({
-  //       detail: 'Mentor validation',
-  //       msg: 'No mentor.'
-  //     })
-  //   }
-  // }
-  return error;
+  return false;
 };
 
 export const displayTask = (task, user = null) => {
