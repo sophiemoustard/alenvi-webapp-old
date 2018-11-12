@@ -7,7 +7,7 @@
       </div>
       <div class="col-xs-12 col-md-6">
         <p class="input-caption">Marraine/parrain</p>
-        <select-mentor v-model="user.alenvi.mentorId" :sector="user.alenvi.sector" @myBlur="updateUser({ alenvi: 'mentorId' })" />
+        <q-input v-model="user.alenvi.mentor" inverted-light color="white" @focus="saveTmp('mentor')" @blur="updateUser({ alenvi: 'mentor' })" />
       </div>
     </div>
     <div class="q-mb-xl">
