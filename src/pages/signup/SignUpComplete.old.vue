@@ -26,8 +26,8 @@
             <q-stepper color="primary" ref="stepper" alternative-labels vertical>
               <!-- First step -->
               <q-step name="first" title="Informations personnelles (suite)" default>
-                <q-field icon="date range" :error="$v.user.dateOfBirth.$error" error-label="Champ requis">
-                  <q-datetime v-model="user.dateOfBirth" float-label="Date de naissance" @blur="$v.user.dateOfBirth.$touch" :first-day-of-week="Number(1)"
+                <q-field icon="date range" :error="$v.user.birthDate.$error" error-label="Champ requis">
+                  <q-datetime v-model="user.birthDate" float-label="Date de naissance" @blur="$v.user.birthDate.$touch" :first-day-of-week="Number(1)"
                   ok-label="APPLIQUER" no-clear cancel-label="ANNULER"
                   min="1920-01-01" :max="getMaxDate"
                 format="DD/MM/YYYY"/>
@@ -203,7 +203,7 @@ export default {
       countries: [],
       user: {
         hasMessenger: '',
-        dateOfBirth: '',
+        birthDate: '',
         stateOfBirth: '',
         placeOfBirth: '',
         countryOfBirth: '',
@@ -250,7 +250,7 @@ export default {
   validations: {
     user: {
       hasMessenger: { required },
-      dateOfBirth: { required },
+      birthDate: { required },
       stateOfBirth: {
         required,
         maxLength: maxLength(2)
@@ -361,7 +361,7 @@ export default {
       return `${this.$moment().year()}-12-31`
     },
     hasStep1Errors () {
-      return this.$v.user.dateOfBirth.$invalid ? true : this.$v.user.countryOfBirth.$invalid ? true : this.$v.user.stateOfBirth.$invalid ? true
+      return this.$v.user.birthDate.$invalid ? true : this.$v.user.countryOfBirth.$invalid ? true : this.$v.user.stateOfBirth.$invalid ? true
         : this.$v.user.placeOfBirth.$invalid ? true : !!this.$v.user.socialInsuranceNumber.$invalid
     },
     hasStep2Errors () {
@@ -404,7 +404,7 @@ export default {
       try {
         const ogustData = {
           id_employee: this.user.id_employee,
-          date_of_birth: this.$moment(this.user.dateOfBirth).format('YYYYMMDD'),
+          date_of_birth: this.$moment(this.user.birthDate).format('YYYYMMDD'),
           country_of_birth: this.user.countryOfBirth,
           state_of_birth: this.user.stateOfBirth,
           place_of_birth: this.user.placeOfBirth,
@@ -615,7 +615,7 @@ export default {
       this.user.id_employee = this.ogustUser.id_employee || '';
       this.user.lastname = this.ogustUser.last_name || '';
       this.user.firstname = this.ogustUser.first_name || '';
-      this.user.dateOfBirth = this.$moment(this.ogustUser.date_of_birth).toDate() || '';
+      this.user.birthDate = this.$moment(this.ogustUser.date_of_birth).toDate() || '';
       this.user.stateOfBirth = this.ogustUser.state_of_birth || '';
       this.user.placeOfBirth = this.ogustUser.place_of_birth || '';
       this.user.countryOfBirth = this.ogustUser.country_of_birth || 'FR';

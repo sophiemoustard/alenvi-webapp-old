@@ -211,7 +211,7 @@ export default {
                     label: 'Numéro sécu',
                     done: !!ogustUserList[k].social_insurance_number
                   },
-                  dateOfBirth: {
+                  birthDate: {
                     label: 'Date de naissance',
                     done: !!ogustUserList[k].date_of_birth
                   },

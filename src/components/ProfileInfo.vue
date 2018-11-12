@@ -98,12 +98,12 @@
         <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Date de naissance</p>
-            <q-icon v-if="$v.user.alenvi.administrative.identity.dateOfBirth.$error" name="error_outline" color="secondary" />
+            <q-icon v-if="$v.user.alenvi.administrative.identity.birthDate.$error" name="error_outline" color="secondary" />
           </div>
-          <q-field :error="$v.user.alenvi.administrative.identity.dateOfBirth.$error" :error-label="requiredField">
-            <q-datetime type="date" format="DD/MM/YYYY" v-model="user.alenvi.administrative.identity.dateOfBirth" color="white" inverted-light popover
-            @focus="saveTmp('administrative.identity.dateOfBirth')"
-            @blur="updateUser({ alenvi: 'administrative.identity.dateOfBirth', ogust: 'date_of_birth' })"
+          <q-field :error="$v.user.alenvi.administrative.identity.birthDate.$error" :error-label="requiredField">
+            <q-datetime type="date" format="DD/MM/YYYY" v-model="user.alenvi.administrative.identity.birthDate" color="white" inverted-light popover
+            @focus="saveTmp('administrative.identity.birthDate')"
+            @blur="updateUser({ alenvi: 'administrative.identity.birthDate', ogust: 'date_of_birth' })"
             ok-label="OK"
             cancel-label="Fermer" />
           </q-field>
@@ -536,7 +536,7 @@
             <q-icon v-if="$v.user.alenvi.administrative.mutualFund.driveId.$error" name="error_outline" color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.administrative.mutualFund.driveId.$error" :error-label="requiredDoc">
-            <q-uploader ref="mutualFund" name="mutualFund" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `mutuelle_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
+            <q-uploader ref="mutualFund" name="mutualFund" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `mutuelle_${userProfile.firstname}_${userProfile.lastname}` }]"
             hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
             hide-upload-button @add="uploadDocument($event, 'mutualFund')" @uploaded="refreshUser" @fail="failMsg" />
           </q-field>
@@ -565,7 +565,7 @@
             <q-icon v-if="$v.user.alenvi.administrative.transportInvoice.driveId.$error" name="error_outline" color="secondary" />
           </div>
           <q-field v-if="$v.user.alenvi.administrative.transportInvoice.driveId.$error" :error="$v.user.alenvi.administrative.transportInvoice.driveId.$error" :error-label="requiredDoc">
-           <q-uploader ref="transportInvoice" name="transportInvoice" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `justif_transport_${userProfile.firstname}_${userProfile.lastname}` }, { name: '_id', value: `${userProfile._id}` }]"
+           <q-uploader ref="transportInvoice" name="transportInvoice" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `justif_transport_${userProfile.firstname}_${userProfile.lastname}` }]"
             hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
             hide-upload-button @add="uploadDocument($event, 'transportInvoice')" @uploaded="refreshUser" @fail="failMsg" />
           </q-field>
@@ -582,6 +582,31 @@
         </div>
       </div>
     </div>
+    <!-- <div class="q-mb-xl">
+      <p class="text-weight-bold">Visite médicale</p>
+      <div class="row gutter-profile">
+        <div class="col-xs-12 col-md-6">
+          <div class="row">
+            <p class="input-caption">Certificat d'aptitude</p>
+          </div>
+          <q-uploader v-if="!user.alenvi.administrative.medicalCertificate.driveId" ref="medicalCertificate" name="medicalCertificate"
+            :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `certificat_medical_${userProfile.firstname}_${userProfile.lastname}` }]"
+            hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
+            inverted-light hide-upload-button @add="uploadDocument($event, 'medicalCertificate')" @uploaded="refreshUser"
+            @fail="failMsg" />
+          <div v-if="user.alenvi.administrative.medicalCertificate && user.alenvi.administrative.medicalCertificate.driveId"
+            class="row justify-between" style="background: white">
+            <div class="doc-thumbnail">
+              <custom-img :driveId="user.alenvi.administrative.medicalCertificate.driveId" alt="certificat médical" />
+            </div>
+            <div class="self-end doc-delete">
+              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.medicalCertificate.driveId, 'administrative.medicalCertificate')" />
+              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.medicalCertificate.link)" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> -->
   </div>
 </template>
 
@@ -638,7 +663,7 @@ export default {
         'user.alenvi.firstname',
         'user.alenvi.lastname',
         'user.alenvi.administrative.identity.nationality',
-        'user.alenvi.administrative.identity.dateOfBirth',
+        'user.alenvi.administrative.identity.birthDate',
         'user.alenvi.administrative.identity.birthCountry',
         'user.alenvi.administrative.identity.birthState',
         'user.alenvi.administrative.identity.birthCity',
@@ -697,6 +722,7 @@ export default {
               has: null
             },
             certificates: [],
+            medicalCertificates: {},
             phoneInvoice: {},
             transportInvoice: {
               type: ''
@@ -709,7 +735,7 @@ export default {
             },
             identity: {
               nationality: '',
-              dateOfBirth: '',
+              birthDate: '',
               birthCountry: '',
               birthState: '',
               birthCity: '',
@@ -749,7 +775,7 @@ export default {
           administrative: {
             identity: {
               nationality: { required },
-              dateOfBirth: { required },
+              birthDate: { required },
               birthCountry: { required },
               birthState: {
                 required: requiredIf(() => {
@@ -950,7 +976,9 @@ export default {
   async mounted () {
     const user = await this.$users.getById(this.userProfile._id);
     this.mergeUser(user);
+    console.log('user', this.user.alenvi);
     this.$v.user.alenvi.$touch();
+    this.isLoaded = true;
   },
   watch: {
     userProfile (value) {
@@ -963,7 +991,6 @@ export default {
     mergeUser (value = null) {
       const args = [this.user.alenvi, value];
       this.user.alenvi = Object.assign({}, extend(true, ...args));
-      this.isLoaded = true;
     },
     saveTmp (path) {
       this.tmpInput = this.$_.get(this.user.alenvi, path)
@@ -1013,7 +1040,7 @@ export default {
     },
     async updateAlenviUser (path) {
       let value = this.$_.get(this.user.alenvi, path);
-      if (path.match(/dateOfBirth/i)) {
+      if (path.match(/birthDate/i)) {
         value = this.$moment(value).format('YYYY-MM-DD');
       }
       if (path.match(/iban/i)) {

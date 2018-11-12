@@ -16,7 +16,7 @@ const userProfileSchema = Joi.object().keys({
     }),
     identity: Joi.object().keys({
       nationality: Joi.string().required(),
-      dateOfBirth: Joi.string().required(),
+      birthDate: Joi.string().required(),
       birthCountry: Joi.string().required(),
       birthState: Joi.string().required(),
       birthCity: Joi.string().required(),
