@@ -1040,9 +1040,6 @@ export default {
     },
     async updateAlenviUser (path) {
       let value = this.$_.get(this.user.alenvi, path);
-      if (path.match(/birthDate/i)) {
-        value = this.$moment(value).format('YYYY-MM-DD');
-      }
       if (path.match(/iban/i)) {
         value = value.split(' ').join('');
       }
