@@ -13,47 +13,45 @@
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Photo</p>
-        <p :class="[groupErrors('picture').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('picture').msg }}</p>
+        <p :class="[groupErrors('picture').errors > 0 ? 'group-error' : 'group-error-ok']">{{
+          groupErrors('picture').msg }}</p>
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
           <div class="row" style="background: white">
             <div class="row justify-center col-xs-12" style="padding: 12px 0px;">
-              <croppa
-                v-model="croppa"
-                canvas-color="#EEE"
-                accept="image/*"
-                :initial-image="hasPicture"
-                :prevent-white-space="true"
-                placeholder="Clique ici pour choisir ta photo"
-                placeholder-color="black"
-                :placeholder-font-size="10"
-                :show-remove-button="false"
-                :disable-drag-and-drop="disablePictureEdition"
-                :disable-drag-to-move="disablePictureEdition"
-                :disable-scroll-to-zoom="disablePictureEdition"
-                :disable-pinch-to-zoom="disablePictureEdition"
-                @file-choose="choosePicture" />
-              </div>
-              <div class="row justify-center col-xs-12">
-                <q-btn v-if="disablePictureEdition && hasPicture" color="primary" round flat icon="mdi-square-edit-outline" size="1rem" @click="disablePictureEdition = false" />
-                <q-btn v-if="disablePictureEdition && hasPicture" color="primary" round flat icon="delete" size="1rem" @click="deleteImage" />
-                <q-btn v-if="!disablePictureEdition" color="primary" icon="clear" @click="closePictureEdition" round flat size="1rem" />
-                <q-btn v-if="!disablePictureEdition" color="primary" icon="rotate left" @click="croppa.rotate(-1)" round flat size="1rem" />
-                <q-btn v-if="!disablePictureEdition" color="primary" icon="rotate right" @click="croppa.rotate(1)" round flat size="1rem" />
-                <q-btn v-if="!disablePictureEdition" :loading="loadingImage" color="primary" icon="done" @click="uploadImage" round flat size="1rem" />
-                <a :href="pictureDlLink(hasPicture)" target="_blank">
-                  <q-btn v-if="hasPicture && disablePictureEdition" color="primary" round flat icon="save_alt" size="1rem" />
-                </a>
-              </div>
+              <croppa v-model="croppa" canvas-color="#EEE" accept="image/*" :initial-image="hasPicture"
+                :prevent-white-space="true" placeholder="Clique ici pour choisir ta photo" placeholder-color="black"
+                :placeholder-font-size="10" :show-remove-button="false" :disable-drag-and-drop="disablePictureEdition"
+                :disable-drag-to-move="disablePictureEdition" :disable-scroll-to-zoom="disablePictureEdition"
+                :disable-pinch-to-zoom="disablePictureEdition" @file-choose="choosePicture" />
+            </div>
+            <div class="row justify-center col-xs-12">
+              <q-btn v-if="disablePictureEdition && hasPicture" color="primary" round flat icon="mdi-square-edit-outline"
+                size="1rem" @click="disablePictureEdition = false" />
+              <q-btn v-if="disablePictureEdition && hasPicture" color="primary" round flat icon="delete" size="1rem"
+                @click="deleteImage" />
+              <q-btn v-if="!disablePictureEdition" color="primary" icon="clear" @click="closePictureEdition" round flat
+                size="1rem" />
+              <q-btn v-if="!disablePictureEdition" color="primary" icon="rotate left" @click="croppa.rotate(-1)" round
+                flat size="1rem" />
+              <q-btn v-if="!disablePictureEdition" color="primary" icon="rotate right" @click="croppa.rotate(1)" round
+                flat size="1rem" />
+              <q-btn v-if="!disablePictureEdition" :loading="loadingImage" color="primary" icon="done" @click="uploadImage"
+                round flat size="1rem" />
+              <a :href="pictureDlLink(hasPicture)" target="_blank">
+                <q-btn v-if="hasPicture && disablePictureEdition" color="primary" round flat icon="save_alt" size="1rem" />
+              </a>
             </div>
           </div>
         </div>
       </div>
+    </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Identité</p>
-        <p :class="[groupErrors('identity').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('identity').msg }}</p>
+        <p :class="[groupErrors('identity').errors > 0 ? 'group-error' : 'group-error-ok']">{{
+          groupErrors('identity').msg }}</p>
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
@@ -62,12 +60,7 @@
             <q-icon v-if="$v.user.alenvi.firstname.$error" name="error_outline" color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.firstname.$error" :error-label="requiredField">
-            <q-input v-model="user.alenvi.firstname"
-              color="white"
-              inverted-light
-              @focus="saveTmp('firstname')"
-              @blur="updateUser({ alenvi: 'firstname', ogust: 'first_name' })"
-            />
+            <q-input v-model="user.alenvi.firstname" color="white" inverted-light @focus="saveTmp('firstname')" @blur="updateUser({ alenvi: 'firstname', ogust: 'first_name' })" />
           </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
@@ -76,12 +69,7 @@
             <q-icon v-if="$v.user.alenvi.lastname.$error" name="error_outline" color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.lastname.$error" :error-label="requiredField">
-            <q-input v-model="user.alenvi.lastname"
-              color="white"
-              inverted-light
-              @focus="saveTmp('lastname')"
-              @blur="updateUser({ alenvi: 'lastname', ogust: 'last_name' })"
-            />
+            <q-input v-model="user.alenvi.lastname" color="white" inverted-light @focus="saveTmp('lastname')" @blur="updateUser({ alenvi: 'lastname', ogust: 'last_name' })" />
           </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
@@ -91,8 +79,7 @@
           </div>
           <q-field :error="$v.user.alenvi.administrative.identity.nationality.$error" :error-label="requiredField">
             <q-select v-model="user.alenvi.administrative.identity.nationality" color="white" inverted-light :options="nationalitiesOptions"
-            @focus="saveTmp('administrative.identity.nationality')"
-            @blur="updateUser({ alenvi: 'administrative.identity.nationality', ogust: 'nationality' })" />
+              @focus="saveTmp('administrative.identity.nationality')" @blur="updateUser({ alenvi: 'administrative.identity.nationality', ogust: 'nationality' })" />
           </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
@@ -101,11 +88,9 @@
             <q-icon v-if="$v.user.alenvi.administrative.identity.birthDate.$error" name="error_outline" color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.administrative.identity.birthDate.$error" :error-label="requiredField">
-            <q-datetime type="date" format="DD/MM/YYYY" v-model="user.alenvi.administrative.identity.birthDate" color="white" inverted-light popover
-            @focus="saveTmp('administrative.identity.birthDate')"
-            @blur="updateUser({ alenvi: 'administrative.identity.birthDate', ogust: 'date_of_birth' })"
-            ok-label="OK"
-            cancel-label="Fermer" />
+            <q-datetime type="date" format="DD/MM/YYYY" v-model="user.alenvi.administrative.identity.birthDate" color="white"
+              inverted-light popover @focus="saveTmp('administrative.identity.birthDate')" @blur="updateUser({ alenvi: 'administrative.identity.birthDate', ogust: 'date_of_birth' })"
+              ok-label="OK" cancel-label="Fermer" />
           </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
@@ -114,9 +99,8 @@
             <q-icon v-if="$v.user.alenvi.administrative.identity.birthCountry.$error" name="error_outline" color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.administrative.identity.birthCountry.$error" :error-label="requiredField">
-            <q-select v-model="user.alenvi.administrative.identity.birthCountry" :options="countriesOptions" color="white" inverted-light
-            @focus="saveTmp('administrative.identity.birthCountry')"
-            @blur="updateUser({ alenvi: 'administrative.identity.birthCountry', ogust: 'country_of_birth' })" />
+            <q-select v-model="user.alenvi.administrative.identity.birthCountry" :options="countriesOptions" color="white"
+              inverted-light @focus="saveTmp('administrative.identity.birthCountry')" @blur="updateUser({ alenvi: 'administrative.identity.birthCountry', ogust: 'country_of_birth' })" />
           </q-field>
         </div>
         <div v-if="this.user.alenvi.administrative.identity.birthCountry === 'FR'" class="col-xs-12 col-md-6">
@@ -125,12 +109,8 @@
             <q-icon v-if="$v.user.alenvi.administrative.identity.birthState.$error" name="error_outline" color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.administrative.identity.birthState.$error" :error-label="birthStateError">
-            <q-input v-model="user.alenvi.administrative.identity.birthState"
-            color="white"
-            inverted-light
-            @focus="saveTmp('administrative.identity.birthState')"
-            @blur="updateUser({ alenvi: 'administrative.identity.birthState', ogust: 'state_of_birth' })"
-          />
+            <q-input v-model="user.alenvi.administrative.identity.birthState" color="white" inverted-light @focus="saveTmp('administrative.identity.birthState')"
+              @blur="updateUser({ alenvi: 'administrative.identity.birthState', ogust: 'state_of_birth' })" />
           </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
@@ -139,26 +119,19 @@
             <q-icon v-if="$v.user.alenvi.administrative.identity.birthCity.$error" name="error_outline" color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.administrative.identity.birthCity.$error" :error-label="requiredField">
-            <q-input v-model="user.alenvi.administrative.identity.birthCity"
-            color="white"
-            inverted-light
-            @focus="saveTmp('administrative.identity.birthCity')"
-            @blur="updateUser({ alenvi: 'administrative.identity.birthCity', ogust: 'place_of_birth' })"
-          />
+            <q-input v-model="user.alenvi.administrative.identity.birthCity" color="white" inverted-light @focus="saveTmp('administrative.identity.birthCity')"
+              @blur="updateUser({ alenvi: 'administrative.identity.birthCity', ogust: 'place_of_birth' })" />
           </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Numéro de sécurité sociale</p>
-            <q-icon v-if="$v.user.alenvi.administrative.identity.socialSecurityNumber.$error" name="error_outline" color="secondary" />
+            <q-icon v-if="$v.user.alenvi.administrative.identity.socialSecurityNumber.$error" name="error_outline"
+              color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.administrative.identity.socialSecurityNumber.$error" :error-label="ssnError">
-            <q-input v-model="user.alenvi.administrative.identity.socialSecurityNumber"
-            color="white"
-            inverted-light
-            @focus="saveTmp('administrative.identity.socialSecurityNumber')"
-            @blur="updateUser({ alenvi: 'administrative.identity.socialSecurityNumber', ogust: 'social_insurance_number' })"
-          />
+            <q-input v-model="user.alenvi.administrative.identity.socialSecurityNumber" color="white" inverted-light
+              @focus="saveTmp('administrative.identity.socialSecurityNumber')" @blur="updateUser({ alenvi: 'administrative.identity.socialSecurityNumber', ogust: 'social_insurance_number' })" />
           </q-field>
         </div>
       </div>
@@ -166,7 +139,8 @@
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Contact</p>
-        <p :class="[groupErrors('contact').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('contact').msg }}</p>
+        <p :class="[groupErrors('contact').errors > 0 ? 'group-error' : 'group-error-ok']">{{
+          groupErrors('contact').msg }}</p>
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
@@ -175,13 +149,8 @@
             <q-icon v-if="$v.user.alenvi.mobilePhone.$error" name="error_outline" color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.mobilePhone.$error" :error-label="phoneNbrError">
-            <q-input v-model.trim="user.alenvi.mobilePhone"
-            type="tel"
-            color="white"
-            inverted-light
-            @focus="saveTmp('mobilePhone')"
-            @blur="updateUser({ alenvi: 'mobilePhone', ogust: 'mobile_phone' })"
-          />
+            <q-input v-model.trim="user.alenvi.mobilePhone" type="tel" color="white" inverted-light @focus="saveTmp('mobilePhone')"
+              @blur="updateUser({ alenvi: 'mobilePhone', ogust: 'mobile_phone' })" />
           </q-field>
         </div>
         <div v-if="currentUser.role.name !== 'Auxiliaire'" class="col-xs-12 col-md-6">
@@ -190,15 +159,8 @@
             <q-icon v-if="$v.user.alenvi.local.email.$error" name="error_outline" color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.local.email.$error" :error-label="emailError">
-            <q-input v-model.trim="user.alenvi.local.email"
-              type="email"
-              color="white"
-              inverted-light
-              lower-case
-              disable
-              @focus="saveTmp('local.email')"
-              @blur="updateUser({ alenvi: 'local.email', ogust: 'email' })"
-            />
+            <q-input v-model.trim="user.alenvi.local.email" type="email" color="white" inverted-light lower-case
+              disable @focus="saveTmp('local.email')" @blur="updateUser({ alenvi: 'local.email', ogust: 'email' })" />
           </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
@@ -207,22 +169,14 @@
             <q-icon v-if="$v.user.alenvi.administrative.contact.address.$error" name="error_outline" color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.administrative.contact.address.$error" :error-label="requiredField">
-            <q-input v-model="user.alenvi.administrative.contact.address"
-            color="white"
-            inverted-light
-            @focus="saveTmp('administrative.contact.address')"
-            @blur="updateUser({ alenvi: 'administrative.contact.address', ogust: 'line' })"
-          />
+            <q-input v-model="user.alenvi.administrative.contact.address" color="white" inverted-light @focus="saveTmp('administrative.contact.address')"
+              @blur="updateUser({ alenvi: 'administrative.contact.address', ogust: 'line' })" />
           </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Complément d'adresse</p>
-          <q-input v-model="user.alenvi.administrative.contact.additionalAddress"
-            color="white"
-            inverted-light
-            @focus="saveTmp('administrative.contact.addionalAddress')"
-            @blur="updateUser({ alenvi: 'administrative.contact.additionalAddress', ogust: 'supplement' })"
-          />
+          <q-input v-model="user.alenvi.administrative.contact.additionalAddress" color="white" inverted-light @focus="saveTmp('administrative.contact.addionalAddress')"
+            @blur="updateUser({ alenvi: 'administrative.contact.additionalAddress', ogust: 'supplement' })" />
         </div>
         <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
@@ -230,12 +184,8 @@
             <q-icon v-if="$v.user.alenvi.administrative.contact.zipCode.$error" name="error_outline" color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.administrative.contact.zipCode.$error" :error-label="zipCodeError">
-            <q-input v-model="user.alenvi.administrative.contact.zipCode"
-            color="white"
-            inverted-light
-            @focus="saveTmp('administrative.contact.zipCode')"
-            @blur="updateUser({ alenvi: 'administrative.contact.zipCode', ogust: 'zip' })"
-          />
+            <q-input v-model="user.alenvi.administrative.contact.zipCode" color="white" inverted-light @focus="saveTmp('administrative.contact.zipCode')"
+              @blur="updateUser({ alenvi: 'administrative.contact.zipCode', ogust: 'zip' })" />
           </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
@@ -244,12 +194,8 @@
             <q-icon v-if="$v.user.alenvi.administrative.contact.city.$error" name="error_outline" color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.administrative.contact.city.$error" :error-label="requiredField">
-            <q-input v-model="user.alenvi.administrative.contact.city"
-            color="white"
-            inverted-light
-            @focus="saveTmp('administrative.contact.city')"
-            @blur="updateUser({ alenvi: 'administrative.contact.city', ogust: 'city' })"
-          />
+            <q-input v-model="user.alenvi.administrative.contact.city" color="white" inverted-light @focus="saveTmp('administrative.contact.city')"
+              @blur="updateUser({ alenvi: 'administrative.contact.city', ogust: 'city' })" />
           </q-field>
         </div>
       </div>
@@ -257,7 +203,8 @@
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Contact d'urgence</p>
-        <p :class="[groupErrors('emergencyContact').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('emergencyContact').msg }}</p>
+        <p :class="[groupErrors('emergencyContact').errors > 0 ? 'group-error' : 'group-error-ok']">{{
+          groupErrors('emergencyContact').msg }}</p>
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
@@ -266,12 +213,8 @@
             <q-icon v-if="$v.user.alenvi.administrative.emergencyContact.name.$error" name="error_outline" color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.administrative.emergencyContact.name.$error" :error-label="requiredField">
-            <q-input v-model="user.alenvi.administrative.emergencyContact.name"
-              color="white"
-              inverted-light
-              @focus="saveTmp('administrative.emergencyContact.name')"
-              @blur="updateUser({ alenvi: 'administrative.emergencyContact.name' })"
-            />
+            <q-input v-model="user.alenvi.administrative.emergencyContact.name" color="white" inverted-light @focus="saveTmp('administrative.emergencyContact.name')"
+              @blur="updateUser({ alenvi: 'administrative.emergencyContact.name' })" />
           </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
@@ -280,12 +223,8 @@
             <q-icon v-if="$v.user.alenvi.administrative.emergencyContact.phoneNumber.$error" name="error_outline" color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.administrative.emergencyContact.phoneNumber.$error" :error-label="emergencyPhoneNbrError">
-            <q-input v-model.trim="user.alenvi.administrative.emergencyContact.phoneNumber"
-              color="white"
-              inverted-light
-              @focus="saveTmp('administrative.emergencyContact.phoneNumber')"
-              @blur="updateUser({ alenvi: 'administrative.emergencyContact.phoneNumber' })"
-            />
+            <q-input v-model.trim="user.alenvi.administrative.emergencyContact.phoneNumber" color="white"
+              inverted-light @focus="saveTmp('administrative.emergencyContact.phoneNumber')" @blur="updateUser({ alenvi: 'administrative.emergencyContact.phoneNumber' })" />
           </q-field>
         </div>
       </div>
@@ -302,10 +241,8 @@
             <q-icon v-if="$v.user.alenvi.administrative.payment.rib.iban.$error" name="error_outline" color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.administrative.payment.rib.iban.$error" :error-label="ibanError">
-            <q-input upper-case v-model="user.alenvi.administrative.payment.rib.iban"
-            color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.payment.rib.iban', ogust: 'iban_number' })"
-            @focus="saveTmp('administrative.payment.rib.iban')"
-          />
+            <q-input upper-case v-model="user.alenvi.administrative.payment.rib.iban" color="white" inverted-light
+              @blur="updateUser({ alenvi: 'administrative.payment.rib.iban', ogust: 'iban_number' })" @focus="saveTmp('administrative.payment.rib.iban')" />
           </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
@@ -314,10 +251,8 @@
             <q-icon v-if="$v.user.alenvi.administrative.payment.rib.bic.$error" name="error_outline" color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.administrative.payment.rib.bic.$error" :error-label="bicError">
-            <q-input v-model.trim="user.alenvi.administrative.payment.rib.bic"
-            upper-case color="white" inverted-light @blur="updateUser({ alenvi: 'administrative.payment.rib.bic', ogust: 'bic_number' })"
-            @focus="saveTmp('administrative.payment.rib.bic')"
-          />
+            <q-input v-model.trim="user.alenvi.administrative.payment.rib.bic" upper-case color="white" inverted-light
+              @blur="updateUser({ alenvi: 'administrative.payment.rib.bic', ogust: 'bic_number' })" @focus="saveTmp('administrative.payment.rib.bic')" />
           </q-field>
         </div>
       </div>
@@ -325,16 +260,18 @@
     <div v-if="user.alenvi.administrative.driveFolder" class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Documents</p>
-        <p :class="[groupErrors('documents').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('documents').msg }}</p>
+        <p :class="[groupErrors('documents').errors > 0 ? 'group-error' : 'group-error-ok']">{{
+          groupErrors('documents').msg }}</p>
       </div>
       <div class="row gutter-profile items-stretch">
         <div class="col-xs-12">
           <div class="row justify-between">
-            <p v-if="currentUser.role.name === 'Auxiliaire'" class="input-caption">Merci de nous indiquer le type de document d'identité que tu possèdes.</p>
+            <p v-if="currentUser.role.name === 'Auxiliaire'" class="input-caption">Merci de nous indiquer le type de
+              document d'identité que tu possèdes.</p>
           </div>
           <q-field :error="$v.user.alenvi.administrative.identityDocs.$error" :error-label="requiredField">
             <q-option-group color="primary" v-model="user.alenvi.administrative.identityDocs" @input="updateUser({ alenvi: 'administrative.identityDocs' })"
-           :options="[
+              :options="[
              { label: 'Carte Nationale d\'Identité', value: 'cni' },
              { label: 'Passeport', value: 'pp' },
              { label: 'Titre de séjour', value: 'ts' }
@@ -357,10 +294,12 @@
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.idCardRecto.link)" />
             </div>
           </div>
-          <q-field v-if="!user.alenvi.administrative.idCardRecto.driveId" :error="$v.user.alenvi.administrative.idCardRecto.driveId.$error" :error-label="requiredDoc">
+          <q-field v-if="!user.alenvi.administrative.idCardRecto.driveId" :error="$v.user.alenvi.administrative.idCardRecto.driveId.$error"
+            :error-label="requiredDoc">
             <q-uploader ref="idCardRecto" name="idCardRecto" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `cni_recto_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
-              hide-upload-button @add="uploadDocument($event, 'idCardRecto')" @uploaded="refreshUser" @fail="failMsg" />
+              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
+              inverted-light hide-upload-button @add="uploadDocument($event, 'idCardRecto')" @uploaded="refreshUser"
+              @fail="failMsg" />
           </q-field>
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
@@ -379,8 +318,9 @@
           </div>
           <q-field v-if="!user.alenvi.administrative.idCardVerso.driveId">
             <q-uploader ref="idCardVerso" name="idCardVerso" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `cni_verso_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
-              hide-upload-button @add="uploadDocument($event, 'idCardVerso')" @uploaded="refreshUser" @fail="failMsg" />
+              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
+              inverted-light hide-upload-button @add="uploadDocument($event, 'idCardVerso')" @uploaded="refreshUser"
+              @fail="failMsg" />
             <!-- <q-uploader url="test" color="white" inverted-light /> -->
           </q-field>
         </div>
@@ -399,10 +339,11 @@
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.passport.link)" />
             </div>
           </div>
-          <q-field v-if="!user.alenvi.administrative.passport.driveId" :error="$v.user.alenvi.administrative.passport.driveId.$error" :error-label="requiredDoc">
+          <q-field v-if="!user.alenvi.administrative.passport.driveId" :error="$v.user.alenvi.administrative.passport.driveId.$error"
+            :error-label="requiredDoc">
             <q-uploader ref="passport" name="passport" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `passeport_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
-              hide-upload-button @add="uploadDocument($event, 'passport')" @uploaded="refreshUser" @fail="failMsg" />
+              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
+              inverted-light hide-upload-button @add="uploadDocument($event, 'passport')" @uploaded="refreshUser" @fail="failMsg" />
             <!-- <q-uploader url="test" color="white" inverted-light /> -->
           </q-field>
         </div>
@@ -411,8 +352,8 @@
             <p class="input-caption">Titre de séjour</p>
             <q-icon v-if="$v.user.alenvi.administrative.residencePermit.driveId.$error" name="error_outline" color="secondary" />
           </div>
-          <div v-if="user.alenvi.administrative.residencePermit && user.alenvi.administrative.residencePermit.driveId" class="row justify-between"
-            style="background: white">
+          <div v-if="user.alenvi.administrative.residencePermit && user.alenvi.administrative.residencePermit.driveId"
+            class="row justify-between" style="background: white">
             <div class="doc-thumbnail">
               <custom-img :driveId="user.alenvi.administrative.residencePermit.driveId" alt="titre de séjour" />
             </div>
@@ -421,10 +362,13 @@
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.residencePermit.link)" />
             </div>
           </div>
-          <q-field v-if="!user.alenvi.administrative.residencePermit.driveId" :error="$v.user.alenvi.administrative.residencePermit.driveId.$error" :error-label="requiredDoc">
-            <q-uploader ref="residencePermit" name="residencePermit" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `titre_de_séjour_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
-              hide-upload-button @add="uploadDocument($event, 'residencePermit')" @uploaded="refreshUser" @fail="failMsg" />
+          <q-field v-if="!user.alenvi.administrative.residencePermit.driveId" :error="$v.user.alenvi.administrative.residencePermit.driveId.$error"
+            :error-label="requiredDoc">
+            <q-uploader ref="residencePermit" name="residencePermit" :url="docsUploadUrl" :headers="headers"
+              :additional-fields="[{ name: 'fileName', value: `titre_de_séjour_${userProfile.firstname}_${userProfile.lastname}` }]"
+              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
+              inverted-light hide-upload-button @add="uploadDocument($event, 'residencePermit')" @uploaded="refreshUser"
+              @fail="failMsg" />
             <!-- <q-uploader url="test" color="white" inverted-light /> -->
           </q-field>
         </div>
@@ -443,10 +387,13 @@
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.healthAttest.link)" />
             </div>
           </div>
-          <q-field v-if="!user.alenvi.administrative.healthAttest.driveId" :error="$v.user.alenvi.administrative.healthAttest.driveId.$error" :error-label="requiredDoc">
-            <q-uploader ref="healthAttest" name="healthAttest" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `attestation_secu_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
-              hide-upload-button @add="uploadDocument($event, 'healthAttest')" @uploaded="refreshUser" @fail="failMsg" />
+          <q-field v-if="!user.alenvi.administrative.healthAttest.driveId" :error="$v.user.alenvi.administrative.healthAttest.driveId.$error"
+            :error-label="requiredDoc">
+            <q-uploader ref="healthAttest" name="healthAttest" :url="docsUploadUrl" :headers="headers"
+              :additional-fields="[{ name: 'fileName', value: `attestation_secu_${userProfile.firstname}_${userProfile.lastname}` }]"
+              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
+              inverted-light hide-upload-button @add="uploadDocument($event, 'healthAttest')" @uploaded="refreshUser"
+              @fail="failMsg" />
           </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
@@ -464,10 +411,13 @@
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.phoneInvoice.link)" />
             </div>
           </div>
-          <q-field v-if="!user.alenvi.administrative.phoneInvoice.driveId" :error="$v.user.alenvi.administrative.phoneInvoice.driveId.$error" :error-label="requiredDoc">
-            <q-uploader ref="phoneInvoice" name="phoneInvoice" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `facture_telephone_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
-              hide-upload-button @add="uploadDocument($event, 'phoneInvoice')" @uploaded="refreshUser" @fail="failMsg" />
+          <q-field v-if="!user.alenvi.administrative.phoneInvoice.driveId" :error="$v.user.alenvi.administrative.phoneInvoice.driveId.$error"
+            :error-label="requiredDoc">
+            <q-uploader ref="phoneInvoice" name="phoneInvoice" :url="docsUploadUrl" :headers="headers"
+              :additional-fields="[{ name: 'fileName', value: `facture_telephone_${userProfile.firstname}_${userProfile.lastname}` }]"
+              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
+              inverted-light hide-upload-button @add="uploadDocument($event, 'phoneInvoice')" @uploaded="refreshUser"
+              @fail="failMsg" />
           </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
@@ -475,9 +425,11 @@
             <p class="input-caption">Diplome(s) ou certificat(s)</p>
           </div>
           <q-field v-if="user.alenvi.administrative.certificates.length === 0">
-            <q-uploader ref="certificates" name="certificates" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `diplomes_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
-              hide-upload-button @add="uploadDocument($event, 'certificates')" @uploaded="refreshUser" @fail="failMsg" />
+            <q-uploader ref="certificates" name="certificates" :url="docsUploadUrl" :headers="headers"
+              :additional-fields="[{ name: 'fileName', value: `diplomes_${userProfile.firstname}_${userProfile.lastname}` }]"
+              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
+              inverted-light hide-upload-button @add="uploadDocument($event, 'certificates')" @uploaded="refreshUser"
+              @fail="failMsg" />
           </q-field>
           <div v-if="user.alenvi.administrative.certificates && user.alenvi.administrative.certificates.length > 0"
             v-for="(certificate, index) in user.alenvi.administrative.certificates" :key="index">
@@ -493,9 +445,11 @@
           </div>
           <div v-if="user.alenvi.administrative.certificates && user.alenvi.administrative.certificates.length > 0">
             <q-collapsible v-model="collapsibleOpened" label="Ajouter diplômes" :collapseIcon="collapsibleIcon">
-              <q-uploader ref="certificates" name="certificates" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `diplomes_${userProfile.firstname}_${userProfile.lastname}` }]"
-                hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
-                hide-upload-button @add="uploadDocument($event, 'certificates')" @uploaded="refreshUser" @fail="failMsg" />
+              <q-uploader ref="certificates" name="certificates" :url="docsUploadUrl" :headers="headers"
+                :additional-fields="[{ name: 'fileName', value: `diplomes_${userProfile.firstname}_${userProfile.lastname}` }]"
+                hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
+                inverted-light hide-upload-button @add="uploadDocument($event, 'certificates')" @uploaded="refreshUser"
+                @fail="failMsg" />
             </q-collapsible>
           </div>
         </div>
@@ -504,7 +458,8 @@
     <div class="q-mb-xl">
       <div class="row justify-between">
         <p class="text-weight-bold">Mutuelle</p>
-        <p :class="[groupErrors('mutualFund').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('mutualFund').msg }}</p>
+        <p :class="[groupErrors('mutualFund').errors > 0 ? 'group-error' : 'group-error-ok']">{{
+          groupErrors('mutualFund').msg }}</p>
       </div>
       <div class="row gutter-profile-x">
         <div class="col-xs-12">
@@ -532,13 +487,15 @@
         </div>
         <div v-if="user.alenvi.administrative.mutualFund.has && !user.alenvi.administrative.mutualFund.driveId" class="col-xs-12">
           <div v-if="currentUser.role.name === 'Auxiliaire'" class="row justify-between">
-            <p class="input-caption">Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle</p>
+            <p class="input-caption">Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une
+              autre mutuelle</p>
             <q-icon v-if="$v.user.alenvi.administrative.mutualFund.driveId.$error" name="error_outline" color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.administrative.mutualFund.driveId.$error" :error-label="requiredDoc">
             <q-uploader ref="mutualFund" name="mutualFund" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `mutuelle_${userProfile.firstname}_${userProfile.lastname}` }]"
-            hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
-            hide-upload-button @add="uploadDocument($event, 'mutualFund')" @uploaded="refreshUser" @fail="failMsg" />
+              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
+              inverted-light hide-upload-button @add="uploadDocument($event, 'mutualFund')" @uploaded="refreshUser"
+              @fail="failMsg" />
           </q-field>
         </div>
       </div>
@@ -546,32 +503,36 @@
     <div class="q-mb-xl">
       <div class="row justify-between">
         <p class="text-weight-bold">Transports</p>
-        <p :class="[groupErrors('transportInvoice').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('transportInvoice').msg }}</p>
+        <p :class="[groupErrors('transportInvoice').errors > 0 ? 'group-error' : 'group-error-ok']">{{
+          groupErrors('transportInvoice').msg }}</p>
       </div>
       <div class="row gutter-profile-x">
         <div class="col-xs-12">
           <div v-if="currentUser.role.name === 'Auxiliaire'" class="row justify-between">
             <p class="input-caption">Par quel moyen comptes-tu te rendre au travail ?</p>
-            <q-icon v-if="$v.user.alenvi.administrative.transportInvoice.transportType.$error" name="error_outline" color="secondary" />
+            <q-icon v-if="$v.user.alenvi.administrative.transportInvoice.transportType.$error" name="error_outline"
+              color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.administrative.transportInvoice.transportType.$error" :error-label="requiredField">
             <q-option-group color="primary" v-model="user.alenvi.administrative.transportInvoice.transportType" @input="updateUser({ alenvi: 'administrative.transportInvoice.transportType', ogust: 'means_of_transport' })"
-            :options="transportOptions" />
+              :options="transportOptions" />
           </q-field>
         </div>
-        <div v-if="user.alenvi.administrative.transportInvoice.transportType === 'public'" class="col-xs-12">
+        <div v-if="user.alenvi.administrative.transportInvoice.transportType === 'public'" class="col-xs-12 col-md-6">
           <div v-if="currentUser.role.name === 'Auxiliaire'" class="row justify-between">
             <p class="input-caption">Merci de nous transmettre ton justificatif d'abonnement</p>
             <q-icon v-if="$v.user.alenvi.administrative.transportInvoice.driveId.$error" name="error_outline" color="secondary" />
           </div>
-          <q-field v-if="$v.user.alenvi.administrative.transportInvoice.driveId.$error" :error="$v.user.alenvi.administrative.transportInvoice.driveId.$error" :error-label="requiredDoc">
-           <q-uploader ref="transportInvoice" name="transportInvoice" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `justif_transport_${userProfile.firstname}_${userProfile.lastname}` }]"
-            hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
-            hide-upload-button @add="uploadDocument($event, 'transportInvoice')" @uploaded="refreshUser" @fail="failMsg" />
+          <q-field v-if="$v.user.alenvi.administrative.transportInvoice.driveId.$error" :error="$v.user.alenvi.administrative.transportInvoice.driveId.$error"
+            :error-label="requiredDoc">
+            <q-uploader ref="transportInvoice" name="transportInvoice" :url="docsUploadUrl" :headers="headers"
+              :additional-fields="[{ name: 'fileName', value: `justif_transport_${userProfile.firstname}_${userProfile.lastname}` }]"
+              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
+              inverted-light hide-upload-button @add="uploadDocument($event, 'transportInvoice')" @uploaded="refreshUser"
+              @fail="failMsg" />
           </q-field>
-        </div>
-        <div v-if="user.alenvi.administrative.transportInvoice && user.alenvi.administrative.transportInvoice.driveId" class="row justify-between"
-            style="background: white; margin-top: 24px;">
+          <div v-if="user.alenvi.administrative.transportInvoice && user.alenvi.administrative.transportInvoice.driveId"
+            class="row justify-between" style="background: white; margin-top: 24px;">
             <div class="doc-thumbnail">
               <custom-img :driveId="user.alenvi.administrative.transportInvoice.driveId" alt="justif transport" />
             </div>
@@ -579,6 +540,7 @@
               <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.transportInvoice.driveId, 'administrative.transportInvoice')" />
               <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.transportInvoice.link)" />
             </div>
+          </div>
         </div>
       </div>
     </div>
