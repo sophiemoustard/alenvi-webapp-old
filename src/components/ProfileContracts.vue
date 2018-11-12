@@ -16,7 +16,7 @@
             binary-state-sort>
             <q-td slot="body-cell-contractEmpty" slot-scope="props" :props="props">
               <!-- <q-btn small color="secondary">{{ props.value }}</q-btn> -->
-              <q-btn flat round small color="primary" @click="dlTemplate()">
+              <q-btn flat round small color="primary" @click="dlTemplate(props.row)">
                 <q-icon name="file download" />
               </q-btn>
             </q-td>
@@ -316,9 +316,13 @@ export default {
       return {
         'x-access-token': Cookies.get('alenvi_token') || ''
       }
-    }
-    // getRawContracts () {
-    //   return this.contracts.filter((contract) => contract.contractType === 'contract');
+    },
+    // sortContract () {
+    //   const test = this.contracts;
+    //   return test.sort((a, b) => {
+    //     if ()
+    //     return this.$moment(a.endDate).isAfter(b.endDate)
+    //   });
     // }
   },
   async mounted () {
@@ -375,17 +379,32 @@ export default {
         console.error(e);
       }
     },
-    async dlTemplate () {
+    async dlTemplate (contract) {
       try {
+        const monthlyHours = Number.parseFloat(contract.weeklyHours * 4.33).toFixed(1);
+        const data = {
+          'title': this.getUser.administrative.identity.title,
+          'firstname': this.getUser.firstname,
+          'lastname': this.getUser.lastname,
+          'address': this.getUser.administrative.contact.address,
+          'city': this.getUser.administrative.contact.city,
+          'zipCode': this.getUser.administrative.contact.zipCode,
+          'birthDate': this.$moment(this.getUser.administrative.identity.birthDate).format('DD/MM/YYYY'),
+          'birthCountry': this.getUser.administrative.identity.birthCountry,
+          'birthState': this.getUser.administrative.identity.birthState,
+          'nationality': this.getUser.administrative.identity.nationality,
+          'SSN': this.getUser.administrative.identity.socialSecurityNumber,
+          'grossHourlyRate': contract.grossHourlyRate,
+          'monthlyHours': monthlyHours,
+          'salary': monthlyHours * contract.grossHourlyRate,
+          'startDate': this.$moment(contract.startDate).format('DD/MM/YYYY')
+        };
+        console.log(data);
         const file = await alenviAxios({
-          url: `${process.env.API_HOSTNAME}/gdrive/1odgQLlx6VVW8BLi3w01_aidhG4d8y2Cv/generatedocx`,
+          url: `${process.env.API_HOSTNAME}/gdrive/${this.getUser.company.rhConfig.templates.contract.driveId}/generatedocx`,
           method: 'POST',
           responseType: 'blob',
-          data: {
-            firstname: 'JC',
-            lastname: 'LeBorgne',
-            age: '30'
-          }
+          data
         });
         const url = window.URL.createObjectURL(new Blob([file.data]));
         const link = document.createElement('a');
