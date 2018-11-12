@@ -126,7 +126,7 @@
             <td>{{`{${index}\}`}}</td>
             <td>{{templateVar}}</td>
           </tr>
-          </table>
+        </table>
       </div>
     </div>
   </q-page>
