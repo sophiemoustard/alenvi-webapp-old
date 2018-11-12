@@ -354,9 +354,11 @@ export default {
         const payload = {
           _id: this.company._id,
           rhConfig: {
-            contractTemplate: {
-              id: null,
-              link: null
+            templates: {
+              contract: {
+                driveId: null,
+                link: null
+              }
             }
           }
         };
