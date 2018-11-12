@@ -2,8 +2,8 @@
   <div>
     <div class="row">
       <q-card v-if="contracts" v-for="(contract, index) in contracts" :key="index" class="contract-card">
-        <q-card-title v-if="contract.endDate">
-          {{ cardTitle(contract.endDate) }}
+        <q-card-title :style="{ color: cardTitle(contract.endDate).color }">
+          {{ cardTitle(contract.endDate).msg }}
         </q-card-title>
         <q-card-main>
           <p>Statut: {{ contract.status }}</p>
@@ -47,8 +47,8 @@
               <q-icon name="file download" />
             </a>
           </q-btn> -->
-          <q-btn v-if="contract.isActive" no-caps color="primary" icon="add" label="Ajouter un avenant" @click="fillAmendment(contract)"/>
-          <q-btn v-if="contract.isActive" no-caps color="grey-6" icon="clear" label="Mettre fin au contrat" @click="fillEndContract(contract)" />
+          <q-btn v-if="!contract.endDate" no-caps color="primary" icon="add" label="Ajouter un avenant" @click="fillAmendment(contract)"/>
+          <q-btn v-if="!contract.endDate" no-caps color="grey-6" icon="clear" label="Mettre fin au contrat" @click="fillEndContract(contract)" />
         </q-card-actions>
       </q-card>
       <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="newContractModal = true" />
@@ -227,8 +227,7 @@ export default {
         status: '',
         weeklyHours: '',
         startDate: '',
-        grossHourlyRate: '',
-        contractType: 'contract'
+        grossHourlyRate: ''
       },
       statusOptions: [
         {
@@ -325,6 +324,7 @@ export default {
   async mounted () {
     const user = await this.$users.getById(this.getUser._id);
     this.contracts = user.administrative.contracts;
+    console.log(this.contracts);
     this.newContract.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
     // console.log('contracts', this.contracts);
   },
@@ -342,9 +342,21 @@ export default {
     // },
     cardTitle (contractEndDate) {
       if (this.$moment().isBefore(contractEndDate)) {
-        return `Le contrat se termine le ${this.$moment(contractEndDate).format('DD MMMM YYYY')}`
+        return {
+          msg: `Le contrat se termine le ${this.$moment(contractEndDate).format('DD MMMM YYYY')}`,
+          color: 'orange'
+        }
+      } else if (this.$moment().isAfter(contractEndDate)) {
+        return {
+          msg: `Contrat terminé le: ${this.$moment(contractEndDate).format('DD MMMM YYYY')}`,
+          color: 'red'
+        }
+      } else {
+        return {
+          msg: 'Contrat actif',
+          color: 'green'
+        }
       }
-      return `Contrat terminé le: ${this.$moment(contractEndDate).format('DD MMMM YYYY')}`
     },
     failMsg () {
       this.$q.notify({
@@ -362,9 +374,6 @@ export default {
       } catch (e) {
         console.error(e);
       }
-    },
-    getContractsTable (idContract) {
-      return this.contracts.filter((contract) => contract.parentContractId === idContract || contract._id === idContract);
     },
     async dlTemplate () {
       try {
@@ -439,9 +448,7 @@ export default {
     fillAmendment (data) {
       this.newContract = {
         grossHourlyRate: this.getUser.company.rhConfig.providerContracts.grossHourlyRate,
-        status: data.status,
-        contractType: 'amendment',
-        parentContractId: data._id
+        status: data.status
       };
       this.newAmendmentModal = true;
     },
