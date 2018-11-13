@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="row">
-      <q-card v-if="contracts" v-for="(contract, index) in contracts" :key="index" class="contract-card">
+      <q-card v-if="contracts" v-for="(contract, index) in sortedContracts" :key="index" class="contract-card">
         <q-card-title :style="{ color: cardTitle(contract.endDate).color }">
           {{ cardTitle(contract.endDate).msg }}
         </q-card-title>
@@ -317,13 +317,10 @@ export default {
         'x-access-token': Cookies.get('alenvi_token') || ''
       }
     },
-    // sortContract () {
-    //   const test = this.contracts;
-    //   return test.sort((a, b) => {
-    //     if ()
-    //     return this.$moment(a.endDate).isAfter(b.endDate)
-    //   });
-    // }
+    sortedContracts () {
+      const contracts = this.contracts;
+      return contracts.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+    }
   },
   async mounted () {
     const user = await this.$users.getById(this.getUser._id);
