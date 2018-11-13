@@ -37,7 +37,7 @@
               </q-btn>
             </q-td>
             <q-td slot="body-cell-isActive" slot-scope="props" :props="props">
-              <q-checkbox :readonly="props.value" :disable="$moment().isAfter(props.row.endDate)" :value="props.value" @input="updateContractActivity({ contractId: props.row._id, isActive: !props.value, cell: props.row.__index })"></q-checkbox> <!-- @input="updateContractActivity({ contractId: props.row._id, isActive: props.value })" -->
+              <q-checkbox :disable="props.value || $moment().isAfter(props.row.endDate)" :value="props.value" @input="updateContractActivity({ contractId: contract._id, versionId: props.row._id, isActive: !props.value, cell: props.row.__index, contractIndex: index })"></q-checkbox> <!-- @input="updateContractActivity({ contractId: props.row._id, isActive: props.value })" -->
             </q-td>
           </q-table>
         </q-card-main>
@@ -47,7 +47,7 @@
               <q-icon name="file download" />
             </a>
           </q-btn> -->
-          <q-btn v-if="!contract.endDate" no-caps color="primary" icon="add" label="Ajouter un avenant" @click="fillAmendment(contract)"/>
+          <q-btn v-if="!contract.endDate" no-caps color="primary" icon="add" label="Ajouter un avenant" @click="fillVersion(contract)"/>
           <q-btn v-if="!contract.endDate" no-caps color="grey-6" icon="clear" label="Mettre fin au contrat" @click="fillEndContract(contract)" />
         </q-card-actions>
       </q-card>
@@ -121,25 +121,25 @@
       <q-btn no-caps class="full-width modal-btn" label="Créer le contrat" icon-right="add" color="primary" :loading="loading" @click="createNewContract" />
     </q-modal>
 
-    <!-- New amendment modal -->
-    <q-modal v-model="newAmendmentModal" :content-css="modalCssContainer">
+    <!-- New version modal -->
+    <q-modal v-model="newContractVersionModal" :content-css="modalCssContainer">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-8">
-            <h5>Créer un <span class="text-weight-bold">avenant</span></h5>
+            <h5>Créer une <span class="text-weight-bold">version</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
-            <span><q-icon name="clear" size="1rem" @click.native="newAmendmentModal = false" /></span>
+            <span><q-icon name="clear" size="1rem" @click.native="newContractVersionModal = false" /></span>
           </div>
         </div>
         <div class="row margin-input">
           <div class="col-12">
             <div class="row justify-between">
               <p class="input-caption">Volume horaire hebdomadaire</p>
-              <q-icon v-if="$v.newContract.weeklyHours.$error" name="error_outline" color="secondary" />
+              <q-icon v-if="$v.newContractVersion.weeklyHours.$error" name="error_outline" color="secondary" />
             </div>
-            <q-field :error="$v.newContract.weeklyHours.$error" error-label="Champ requis">
-              <q-input type="number" v-model="newContract.weeklyHours" color="white" suffix="hr" inverted-light @blur="$v.newContract.weeklyHours.$touch" />
+            <q-field :error="$v.newContractVersion.weeklyHours.$error" error-label="Champ requis">
+              <q-input type="number" v-model="newContractVersion.weeklyHours" color="white" suffix="hr" inverted-light @blur="$v.newContractVersion.weeklyHours.$touch" />
             </q-field>
           </div>
         </div>
@@ -147,10 +147,10 @@
           <div class="col-12">
             <div class="row justify-between">
               <p class="input-caption">Taux horaire</p>
-              <q-icon v-if="$v.newContract.grossHourlyRate.$error" name="error_outline" color="secondary" />
+              <q-icon v-if="$v.newContractVersion.grossHourlyRate.$error" name="error_outline" color="secondary" />
             </div>
-            <q-field :error="$v.newContract.grossHourlyRate.$error" error-label="Champ requis">
-              <q-input type="number" v-model="newContract.grossHourlyRate" color="white" suffix="€" inverted-light @blur="$v.newContract.grossHourlyRate.$touch" />
+            <q-field :error="$v.newContractVersion.grossHourlyRate.$error" error-label="Champ requis">
+              <q-input type="number" v-model="newContractVersion.grossHourlyRate" color="white" suffix="€" inverted-light @blur="$v.newContractVersion.grossHourlyRate.$touch" />
             </q-field>
           </div>
         </div>
@@ -158,17 +158,17 @@
           <div class="col-12">
             <div class="row justify-between">
               <p class="input-caption">Date d'effet</p>
-              <q-icon v-if="$v.newContract.startDate.$error" name="error_outline" color="secondary" />
+              <q-icon v-if="$v.newContractVersion.startDate.$error" name="error_outline" color="secondary" />
             </div>
-            <q-field :error="$v.newContract.startDate.$error" error-label="Champ requis">
-              <q-datetime type="date" format="DD/MM/YYYY" v-model="newContract.startDate" color="white" inverted-light popover
+            <q-field :error="$v.newContractVersion.startDate.$error" error-label="Champ requis">
+              <q-datetime type="date" format="DD/MM/YYYY" v-model="newContractVersion.startDate" color="white" inverted-light popover
               ok-label="OK"
               cancel-label="Fermer" />
             </q-field>
           </div>
         </div>
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Créer l'avenant" icon-right="add" color="primary" :loading="loading" @click="createNewContract" />
+      <q-btn no-caps class="full-width modal-btn" label="Créer l'avenant" icon-right="add" color="primary" :loading="loading" @click="createNewContractVersion" />
     </q-modal>
 
     <!-- End contract modal -->
@@ -216,7 +216,7 @@ export default {
       loading: false,
       pagination: { rowsPerPage: 0 },
       newContractModal: false,
-      newAmendmentModal: false,
+      newContractVersionModal: false,
       endContractModal: false,
       endContractData: {
         date: '',
@@ -225,6 +225,11 @@ export default {
       contracts: [],
       newContract: {
         status: '',
+        weeklyHours: '',
+        startDate: '',
+        grossHourlyRate: ''
+      },
+      newContractVersion: {
         weeklyHours: '',
         startDate: '',
         grossHourlyRate: ''
@@ -300,6 +305,11 @@ export default {
   validations: {
     newContract: {
       status: { required },
+      weeklyHours: { required },
+      startDate: { required },
+      grossHourlyRate: { required }
+    },
+    newContractVersion: {
       weeklyHours: { required },
       startDate: { required },
       grossHourlyRate: { required }
@@ -460,12 +470,10 @@ export default {
     //     });
     //   }
     // },
-    fillAmendment (data) {
-      this.newContract = {
-        grossHourlyRate: this.getUser.company.rhConfig.providerContracts.grossHourlyRate,
-        status: data.status
-      };
-      this.newAmendmentModal = true;
+    fillVersion (data) {
+      this.newContractVersion.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
+      this.newContractVersion.mainContractId = data._id;
+      this.newContractVersionModal = true;
     },
     async updateContractActivity (data) {
       try {
@@ -475,14 +483,14 @@ export default {
           ok: true,
           cancel: 'Annuler'
         });
-        await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${data.contractId}`, { 'isActive': data.isActive });
+        await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${data.contractId}/versions/${data.versionId}`, { 'isActive': data.isActive });
         // Update manually checkbox because it's not dynamic
-        this.contracts[data.cell].isActive = data.isActive;
-        const length = this.contracts.length;
+        this.contracts[data.contractIndex].versions[data.cell].isActive = data.isActive;
+        const length = this.contracts[data.contractIndex].versions.length;
         for (let i = 0; i < length; i++) {
-          if (this.contracts[i].isActive && this.contracts[i]._id !== data.contractId) {
-            await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${this.contracts[i]._id}`, { 'isActive': false });
-            this.contracts[i].isActive = false;
+          if (this.contracts[data.contractIndex].versions[i].isActive && this.contracts[data.contractIndex].versions[i]._id !== data.versionId) {
+            await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${this.contracts[data.contractIndex]._id}/versions/${this.contracts[data.contractIndex].versions[i]._id}`, { 'isActive': false });
+            this.contracts[data.contractIndex].versions[i].isActive = false;
           }
         }
         this.$q.notify({
@@ -556,7 +564,7 @@ export default {
         this.$q.notify({
           color: 'positive',
           icon: 'done',
-          detail: 'Contrat créée',
+          detail: 'Contrat créé',
           position: 'bottom-left',
           timeout: 2500
         });
@@ -572,9 +580,42 @@ export default {
       } finally {
         this.loading = false;
         this.newContractModal = false;
-        this.newAmendmentModal = false;
         this.newContract = {};
         this.$v.newContract.$reset();
+      }
+    },
+    async createNewContractVersion () {
+      try {
+        this.loading = true;
+        const mainContractId = this.newContractVersion.mainContractId;
+        delete this.newContractVersion.mainContractId;
+        await alenviAxios({
+          url: `${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${mainContractId}/versions`,
+          method: 'POST',
+          data: this.newContractVersion
+        });
+        await this.refreshUser();
+        this.$q.notify({
+          color: 'positive',
+          icon: 'done',
+          detail: 'Version créée',
+          position: 'bottom-left',
+          timeout: 2500
+        });
+      } catch (e) {
+        console.error(e);
+        this.$q.notify({
+          color: 'negative',
+          icon: 'warning',
+          detail: 'Erreur lors de la création de la version du contrat',
+          position: 'bottom-left',
+          timeout: 2500
+        });
+      } finally {
+        this.loading = false;
+        this.newContractVersionModal = false;
+        this.newContractVersion = {};
+        this.$v.newContractVersion.$reset();
       }
     },
     async fillEndContract (contract) {
