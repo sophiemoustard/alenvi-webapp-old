@@ -1,4 +1,5 @@
 import euSpace from '../data/euSpace';
+import moment from 'moment';
 // import users from '../api/Users';
 
 const nationalityValidation = (userNationality) => {
@@ -22,6 +23,14 @@ export const taskValidation = (user = null) => {
   if (!Array.isArray(tasks)) throw new Error('Tasks must be an array.');
   for (let i = 0, l = tasks.length; i < l; i++) {
     if (!tasks[i].check.isDone && displayTask(tasks[i], user)) {
+      if (tasks[i].task.name.match(/inscription (mutuelle|médecine)/i)) {
+        const contract = user.administrative.contracts.find(contract => contract.status === 'Prestataire' && !contract.endDate);
+        if (contract) {
+          const contractPlusSixWeeks = moment(contract.startDate).add(6, 'w');
+          return moment().isAfter(moment(contractPlusSixWeeks));
+        }
+        return false;
+      }
       return true;
     }
   }
@@ -36,6 +45,12 @@ export const displayTask = (task, user = null) => {
       }
       return false;
     }
+  }
+  if (task.task.name.match(/inscription mutuelle/i)) {
+    if (!user.administrative.mutualFund.has) {
+      return true;
+    }
+    return false;
   }
   return true;
 };
