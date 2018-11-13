@@ -64,8 +64,8 @@ const userProfileSchema = Joi.object().keys({
       link: Joi.string()
     }).when('driveFolder', { is: Joi.exist(), then: Joi.required() }),
     idCardRecto: Joi.object().keys({
-      driveId: Joi.string(),
-      link: Joi.string()
+      driveId: Joi.string().allow(null),
+      link: Joi.string().allow(null)
     }).when('identityDocs', { is: Joi.string().valid('cni'), then: Joi.required() }),
     idCardVerso: Joi.object().keys({
       driveId: Joi.string().allow(null),
@@ -75,10 +75,14 @@ const userProfileSchema = Joi.object().keys({
       driveId: Joi.string(),
       link: Joi.string()
     }).when('identityDocs', { is: Joi.string().valid('pp'), then: Joi.required() }),
-    residencePermit: Joi.object().keys({
-      driveId: Joi.string(),
-      link: Joi.string()
-    }).when('identityDocs', { is: 'ts', then: Joi.required() })
+    residencePermitRecto: Joi.object().keys({
+      driveId: Joi.string().allow(null),
+      link: Joi.string().allow(null)
+    }).when('identityDocs', { is: Joi.string().valid('ts'), then: Joi.required() }),
+    residencePermitVerso: Joi.object().keys({
+      driveId: Joi.string().allow(null),
+      link: Joi.string().allow(null)
+    }),
   })
 });
 

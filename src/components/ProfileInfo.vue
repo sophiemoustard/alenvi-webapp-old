@@ -350,24 +350,47 @@
         <div v-if="user.alenvi.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Titre de séjour</p>
-            <q-icon v-if="$v.user.alenvi.administrative.residencePermit.driveId.$error" name="error_outline" color="secondary" />
+            <q-icon v-if="$v.user.alenvi.administrative.residencePermitRecto.driveId.$error" name="error_outline" color="secondary" />
           </div>
-          <div v-if="user.alenvi.administrative.residencePermit && user.alenvi.administrative.residencePermit.driveId"
+          <div v-if="user.alenvi.administrative.residencePermitRecto && user.alenvi.administrative.residencePermitRecto.driveId"
             class="row justify-between" style="background: white">
             <div class="doc-thumbnail">
-              <custom-img :driveId="user.alenvi.administrative.residencePermit.driveId" alt="titre de séjour" />
+              <custom-img :driveId="user.alenvi.administrative.residencePermitRecto.driveId" alt="titre de séjour (recto)" />
             </div>
             <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.residencePermit.driveId, 'administrative.residencePermit')" />
-              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.residencePermit.link)" />
+              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.residencePermitRecto.driveId, 'administrative.residencePermitRecto')" />
+              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.residencePermitRecto.link)" />
             </div>
           </div>
-          <q-field v-if="!user.alenvi.administrative.residencePermit.driveId" :error="$v.user.alenvi.administrative.residencePermit.driveId.$error"
+          <q-field v-if="!user.alenvi.administrative.residencePermitRecto.driveId" :error="$v.user.alenvi.administrative.residencePermitRecto.driveId.$error"
             :error-label="requiredDoc">
-            <q-uploader ref="residencePermit" name="residencePermit" :url="docsUploadUrl" :headers="headers"
-              :additional-fields="[{ name: 'fileName', value: `titre_de_séjour_${userProfile.firstname}_${userProfile.lastname}` }]"
+            <q-uploader ref="residencePermitRecto" name="residencePermitRecto" :url="docsUploadUrl" :headers="headers"
+              :additional-fields="[{ name: 'fileName', value: `titre_de_séjour_recto_${userProfile.firstname}_${userProfile.lastname}` }]"
               hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
-              inverted-light hide-upload-button @add="uploadDocument($event, 'residencePermit')" @uploaded="refreshUser"
+              inverted-light hide-upload-button @add="uploadDocument($event, 'residencePermitRecto')" @uploaded="refreshUser"
+              @fail="failMsg" />
+            <!-- <q-uploader url="test" color="white" inverted-light /> -->
+          </q-field>
+        </div>
+        <div v-if="user.alenvi.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
+          <div class="row justify-between">
+            <p class="input-caption">Titre de séjour</p>
+          </div>
+          <div v-if="user.alenvi.administrative.residencePermitVerso && user.alenvi.administrative.residencePermitVerso.driveId"
+            class="row justify-between" style="background: white">
+            <div class="doc-thumbnail">
+              <custom-img :driveId="user.alenvi.administrative.residencePermitVerso.driveId" alt="titre de séjour (verso)" />
+            </div>
+            <div class="self-end doc-delete">
+              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.residencePermitVerso.driveId, 'administrative.residencePermitVerso')" />
+              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.residencePermitVerso.link)" />
+            </div>
+          </div>
+          <q-field v-if="!user.alenvi.administrative.residencePermitVerso.driveId">
+            <q-uploader ref="residencePermitVerso" name="residencePermitVerso" :url="docsUploadUrl" :headers="headers"
+              :additional-fields="[{ name: 'fileName', value: `titre_de_séjour_verso_${userProfile.firstname}_${userProfile.lastname}` }]"
+              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
+              inverted-light hide-upload-button @add="uploadDocument($event, 'residencePermitVerso')" @uploaded="refreshUser"
               @fail="failMsg" />
             <!-- <q-uploader url="test" color="white" inverted-light /> -->
           </q-field>
@@ -648,7 +671,7 @@ export default {
         'user.alenvi.administrative.identityDocs',
         'user.alenvi.administrative.idCardRecto.driveId',
         'user.alenvi.administrative.passport.driveId',
-        'user.alenvi.administrative.residencePermit.driveId',
+        'user.alenvi.administrative.residencePermitRecto.driveId',
         'user.alenvi.administrative.healthAttest.driveId',
         'user.alenvi.administrative.phoneInvoice.driveId',
       ],
@@ -679,7 +702,8 @@ export default {
             idCardVerso: {},
             healthAttest: {},
             passport: {},
-            residencePermit: {},
+            residencePermitRecto: {},
+            residencePermitVerso: {},
             mutualFund: {
               has: null
             },
@@ -787,7 +811,7 @@ export default {
                 })
               }
             },
-            residencePermit: {
+            residencePermitRecto: {
               driveId: {
                 required: requiredIf(() => {
                   return this.user.alenvi.administrative.identityDocs === 'ts';
