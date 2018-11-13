@@ -544,7 +544,7 @@
         </div>
       </div>
     </div>
-    <!-- <div class="q-mb-xl">
+    <div class="q-mb-xl">
       <p class="text-weight-bold">Visite médicale</p>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
@@ -556,7 +556,7 @@
             hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
             inverted-light hide-upload-button @add="uploadDocument($event, 'medicalCertificate')" @uploaded="refreshUser"
             @fail="failMsg" />
-          <div v-if="user.alenvi.administrative.medicalCertificate && user.alenvi.administrative.medicalCertificate.driveId"
+          <div v-if="user.alenvi.administrative.medicalCertificate.driveId"
             class="row justify-between" style="background: white">
             <div class="doc-thumbnail">
               <custom-img :driveId="user.alenvi.administrative.medicalCertificate.driveId" alt="certificat médical" />
@@ -568,7 +568,7 @@
           </div>
         </div>
       </div>
-    </div> -->
+    </div>
   </div>
 </template>
 
@@ -684,7 +684,7 @@ export default {
               has: null
             },
             certificates: [],
-            medicalCertificates: {},
+            medicalCertificate: {},
             phoneInvoice: {},
             transportInvoice: {
               type: ''
@@ -938,7 +938,6 @@ export default {
   async mounted () {
     const user = await this.$users.getById(this.userProfile._id);
     this.mergeUser(user);
-    console.log('user', this.user.alenvi);
     this.$v.user.alenvi.$touch();
     this.isLoaded = true;
   },
