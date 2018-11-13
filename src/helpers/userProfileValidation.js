@@ -64,25 +64,47 @@ const userProfileSchema = Joi.object().keys({
       link: Joi.string()
     }).when('driveFolder', { is: Joi.exist(), then: Joi.required() }),
     idCardRecto: Joi.object().keys({
-      driveId: Joi.string().allow(null),
-      link: Joi.string().allow(null)
-    }).when('identityDocs', { is: Joi.string().valid('cni'), then: Joi.required() }),
-    idCardVerso: Joi.object().keys({
-      driveId: Joi.string().allow(null),
-      link: Joi.string().allow(null)
+      driveId: Joi.string(),
+      link: Joi.string()
+    }).when('identityDocs', {
+      is: 'cni',
+      then: Joi.object({
+        driveId: Joi.required(),
+        link: Joi.required()
+      }),
+      otherwise: Joi.object({
+        driveId: Joi.allow(null),
+        link: Joi.allow(null)
+      })
     }),
     passport: Joi.object().keys({
       driveId: Joi.string(),
       link: Joi.string()
-    }).when('identityDocs', { is: Joi.string().valid('pp'), then: Joi.required() }),
-    residencePermitRecto: Joi.object().keys({
-      driveId: Joi.string().allow(null),
-      link: Joi.string().allow(null)
-    }).when('identityDocs', { is: Joi.string().valid('ts'), then: Joi.required() }),
-    residencePermitVerso: Joi.object().keys({
-      driveId: Joi.string().allow(null),
-      link: Joi.string().allow(null)
+    }).when('identityDocs', {
+      is: 'pp',
+      then: Joi.object({
+        driveId: Joi.required(),
+        link: Joi.required()
+      }),
+      otherwise: Joi.object({
+        driveId: Joi.allow(null),
+        link: Joi.allow(null)
+      })
     }),
+    residencePermitRecto: Joi.object().keys({
+      driveId: Joi.string(),
+      link: Joi.string()
+    }).when('identityDocs', {
+      is: 'ts',
+      then: Joi.object({
+        driveId: Joi.required(),
+        link: Joi.required()
+      }),
+      otherwise: Joi.object({
+        driveId: Joi.allow(null),
+        link: Joi.allow(null)
+      })
+    })
   })
 });
 
