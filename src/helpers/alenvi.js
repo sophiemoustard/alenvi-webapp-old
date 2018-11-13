@@ -24,8 +24,8 @@ export default {
         Cookies.remove('refresh_token', { path: '/' });
         Cookies.remove('user_id', { path: '/' });
         Cookies.remove('alenvi_token_expires_in', { path: '/' });
-        return false;
       }
+      return false;
     }
   }
 }
