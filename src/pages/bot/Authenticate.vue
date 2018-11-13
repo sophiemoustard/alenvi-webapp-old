@@ -47,9 +47,6 @@ export default {
       try {
         const user = await this.$bot.authenticate(this.formattedCredentials);
         const token = user.data.data.token;
-        console.log(user);
-        console.log('MESSENGER_LINK', process.env.MESSENGER_LINK);
-        console.log('TOKEN', token);
         this.$q.cookies.set('alenvi_token', user.data.data.token, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV !== 'development' });
         this.$q.cookies.set('alenvi_token_expires_in', user.data.data.expiresIn, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV !== 'development' });
         this.$q.cookies.set('refresh_token', user.data.data.refreshToken, { path: '/', expires: 365, secure: process.env.NODE_ENV !== 'development' });

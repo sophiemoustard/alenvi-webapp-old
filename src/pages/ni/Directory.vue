@@ -456,7 +456,6 @@ export default {
       this.newUser.role = 'Auxiliaire';
       this.newUser.ogustManagerId = this.currentUser._id;
       const newUser = await this.$users.create(this.newUser);
-      console.log(newUser);
       await this.$users.createDriveFolder({ _id: newUser.data.data.user._id });
       return newUser;
     },

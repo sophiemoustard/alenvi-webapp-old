@@ -209,7 +209,6 @@ export default {
     if (!this.company.rhConfig.templates) {
       this.company.rhConfig.templates = {};
     }
-    console.log('company', this.company);
   },
   methods: {
     saveTmp (path) {
@@ -217,9 +216,7 @@ export default {
     },
     async updateCompany (event, path) {
       try {
-        console.log('PATH', path);
         this.$_.set(this.company, path, event);
-        console.log('VAL', this.$_.get(this.company, path));
         if (this.tmpInput === this.$_.get(this.company, path)) return;
         this.$_.get(this.$v.company, path).$touch();
         if (this.$_.get(this.$v.company, path).$error) {

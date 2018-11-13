@@ -325,7 +325,6 @@ export default {
   async mounted () {
     const user = await this.$users.getById(this.getUser._id);
     this.contracts = user.administrative.contracts;
-    console.log(this.contracts);
     this.newContract.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
     // console.log('contracts', this.contracts);
   },
