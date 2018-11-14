@@ -537,7 +537,7 @@
               color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.administrative.transportInvoice.transportType.$error" :error-label="requiredField">
-            <q-option-group color="primary" v-model="user.alenvi.administrative.transportInvoice.transportType" @input="updateUser({ alenvi: 'administrative.transportInvoice.transportType', ogust: 'means_of_transport' })"
+            <q-option-group color="primary" v-model="user.alenvi.administrative.transportInvoice.transportType" @input="updateUser({ alenvi: 'administrative.transportInvoice.transportType', ogust: 'default_means_of_transport' })"
               :options="transportOptions" />
           </q-field>
         </div>
@@ -623,9 +623,9 @@ export default {
   data () {
     return {
       transportOptions: [
-        { label: 'Abonnement transports en commun', value: 'public' },
-        { label: 'Voiture personnelle', value: 'private' },
-        { label: 'Aucun', value: 'none' }
+        { label: 'Abonnement transports en commun', value: 'public', ogustValue: 'C' },
+        { label: 'Voiture personnelle', value: 'private', ogustValue: 'V' },
+        { label: 'Aucun', value: 'none', ogustValue: 'P' }
       ],
       modalCssContainer: {
         minWidth: '30vw'
@@ -1040,9 +1040,9 @@ export default {
       if (paths.ogust.match(/iban_number/i)) {
         value = value.split(' ').join('');
       }
-      if (paths.ogust === 'means_of_transport') {
+      if (paths.ogust === 'default_means_of_transport') {
         const correspondingOption = this.transportOptions.find(option => option.value === value);
-        value = correspondingOption.label;
+        value = correspondingOption.ogustValue;
       }
       const payload = this.$_.set({}, paths.ogust, value);
       if (paths.ogust.match(/(iban|bic)_number/i)) {
