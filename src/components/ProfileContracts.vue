@@ -555,6 +555,18 @@ export default {
     async createNewContract () {
       try {
         this.loading = true;
+        const newOgustContract = await alenviAxios({
+          url: `${process.env.API_HOSTNAME}/ogust/contracts`,
+          method: 'POST',
+          data: {
+            id_employee: this.getUser.employee_id.toString(),
+            start_date: this.$moment(this.newContract.startDate).format('YYYYMMDD'),
+            creation_date: this.$moment().format('YYYYMMDD'),
+            contractual_salary: Number.parseFloat(this.newContract.grossHourlyRate * this.newContract.weeklyHours * 4.33).toFixed(2),
+            contract_hours: Number.parseFloat(this.newContract.weeklyHours * 4.33).toFixed(1)
+          }
+        });
+        this.newContract.ogustContractId = newOgustContract.data.data.employment.id_contract;
         await alenviAxios({
           url: `${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts`,
           method: 'POST',
@@ -581,6 +593,7 @@ export default {
         this.loading = false;
         this.newContractModal = false;
         this.newContract = {};
+        this.newContract.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
         this.$v.newContract.$reset();
       }
     },
@@ -615,6 +628,7 @@ export default {
         this.loading = false;
         this.newContractVersionModal = false;
         this.newContractVersion = {};
+        this.newContractVersion.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
         this.$v.newContractVersion.$reset();
       }
     },
