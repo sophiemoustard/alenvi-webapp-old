@@ -43,6 +43,7 @@
                   contractId: contract._id,
                   versionId: props.row._id,
                   ogustContractId: props.row.ogustContractId,
+                  versionStartDate: props.row.startDate,
                   isActive: !props.value,
                   cell: props.row.__index,
                   contractIndex: index })">
@@ -510,6 +511,7 @@ export default {
     fillVersion (data) {
       this.newContractVersion.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
       this.newContractVersion.mainContractId = data._id;
+      this.newContractVersion.versions = data.versions;
       this.newContractVersionModal = true;
     },
     async updateContractActivity (data) {
@@ -524,10 +526,10 @@ export default {
         await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/contracts/${data.ogustContractId}`, { status: 'V' });
         await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${data.contractId}/versions/${data.versionId}`, { 'isActive': data.isActive });
         // Update manually checkbox because it's not dynamic
-        this.contracts[data.contractIndex].versions[data.cell].isActive = data.isActive;
+        this.sortedContracts[data.contractIndex].versions[data.cell].isActive = data.isActive;
         for (let i = 0, l = this.contracts[data.contractIndex].versions.length; i < l; i++) {
           if (this.contracts[data.contractIndex].versions[i].isActive && this.contracts[data.contractIndex].versions[i]._id !== data.versionId) {
-            await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/contracts/${this.contracts[data.contractIndex].versions[i].ogustContractId}`, { status: 'T' });
+            await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/contracts/${this.contracts[data.contractIndex].versions[i].ogustContractId}`, { status: 'T', end_date: this.$moment(data.versionStartDate).subtract(1, 'day').format('YYYYMMDD') });
             await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${this.contracts[data.contractIndex]._id}/versions/${this.contracts[data.contractIndex].versions[i]._id}`, { 'isActive': false });
             this.contracts[data.contractIndex].versions[i].isActive = false;
           }
@@ -638,15 +640,46 @@ export default {
     },
     async createNewContractVersion () {
       try {
+        console.log('1');
         this.loading = true;
         const mainContractId = this.newContractVersion.mainContractId;
+        const lastActiveVersion = this.newContractVersion.versions.find(version => version.isActive);
         delete this.newContractVersion.mainContractId;
+        delete this.newContractVersion.versions;
+        console.log('2');
+        // await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/contracts/${lastActiveVersion.ogustContractId}`,
+        //   { status: 'T',
+        //     end_date: this.$moment(this.newContractVersion.startDate).subtract(1, 'day').format('YYYYMMDD')
+        //   });
+        console.log('3');
+        await alenviAxios({
+          url: `${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${mainContractId}/versions/${lastActiveVersion._id}`,
+          method: 'PUT',
+          data: { endDate: this.$moment(this.newContractVersion.startDate).subtract(1, 'day').toDate() }
+        });
+        console.log('4');
+        const newOgustContract = await alenviAxios({
+          url: `${process.env.API_HOSTNAME}/ogust/contracts`,
+          method: 'POST',
+          data: {
+            id_employee: this.getUser.employee_id.toString(),
+            start_date: this.$moment(this.newContractVersion.startDate).format('YYYYMMDD'),
+            creation_date: this.$moment().format('YYYYMMDD'),
+            contractual_salary: Number.parseFloat(this.newContractVersion.grossHourlyRate * this.newContractVersion.weeklyHours * 4.33).toFixed(2),
+            contract_hours: Number.parseFloat(this.newContractVersion.weeklyHours * 4.33).toFixed(1),
+            // origine_contract: lastActiveVersion.ogustContractId,
+            source_contract: lastActiveVersion.ogustContractId
+          }
+        });
+        this.newContractVersion.ogustContractId = newOgustContract.data.data.employment.id_contract;
+        console.log('5');
         await alenviAxios({
           url: `${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${mainContractId}/versions`,
           method: 'POST',
           data: this.newContractVersion
         });
         await this.refreshUser();
+        console.log('6');
         this.$q.notify({
           color: 'positive',
           icon: 'done',
