@@ -56,8 +56,8 @@
               <q-icon name="file download" />
             </a>
           </q-btn> -->
-          <q-btn v-if="!contract.endDate" no-caps color="primary" icon="add" label="Ajouter un avenant" @click="fillVersion(contract)"/>
-          <q-btn v-if="!contract.endDate" no-caps color="grey-6" icon="clear" label="Mettre fin au contrat" @click="fillEndContract(contract)" />
+          <q-btn v-if="!contract.endDate" flat no-caps color="primary" icon="add" label="Ajouter un avenant" @click="fillVersion(contract)"/>
+          <q-btn v-if="!contract.endDate" flat no-caps color="grey-6" icon="clear" label="Mettre fin au contrat" @click="fillEndContract(contract)" />
         </q-card-actions>
       </q-card>
       <q-btn :disable="!hasBasicInfo" class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="newContractModal = true" />
