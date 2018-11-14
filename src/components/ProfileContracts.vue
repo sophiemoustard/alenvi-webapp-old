@@ -13,6 +13,7 @@
             row-key="name"
             :pagination.sync="pagination"
             hide-bottom
+            :visible-columns="visibleColumns"
             binary-state-sort>
             <q-td slot="body-cell-contractEmpty" slot-scope="props" :props="props">
               <!-- <q-btn small color="secondary">{{ props.value }}</q-btn> -->
@@ -37,7 +38,15 @@
               </q-btn>
             </q-td>
             <q-td slot="body-cell-isActive" slot-scope="props" :props="props">
-              <q-checkbox :disable="props.value || $moment().isAfter(props.row.endDate)" :value="props.value" @input="updateContractActivity({ contractId: contract._id, versionId: props.row._id, isActive: !props.value, cell: props.row.__index, contractIndex: index })"></q-checkbox> <!-- @input="updateContractActivity({ contractId: props.row._id, isActive: props.value })" -->
+              <q-checkbox :disable="props.value || $moment().isAfter(props.row.endDate)" :value="props.value"
+                @input="updateContractActivity({
+                  contractId: contract._id,
+                  versionId: props.row._id,
+                  ogustContractId: props.row.ogustContractId,
+                  isActive: !props.value,
+                  cell: props.row.__index,
+                  contractIndex: index })">
+              </q-checkbox> <!-- @input="updateContractActivity({ contractId: props.row._id, isActive: props.value })" -->
             </q-td>
           </q-table>
         </q-card-main>
@@ -244,6 +253,7 @@ export default {
         //   value: 'mandataire'
         // }
       ],
+      visibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractEmpty', 'contractSigned', 'isActive'],
       columns: [
         {
           name: 'weeklyHours',
@@ -295,6 +305,14 @@ export default {
           align: 'left',
           field: 'isActive',
           sortable: false
+        },
+        {
+          name: 'ogustContractId',
+          label: 'ogustContractId',
+          align: 'left',
+          field: 'ogustContractId',
+          sortable: false,
+          required: false
         }
       ],
       modalCssContainer: {
@@ -477,18 +495,20 @@ export default {
     },
     async updateContractActivity (data) {
       try {
+        console.log(data);
         await this.$q.dialog({
           title: 'Confirmation',
           message: 'Es-tu sûr(e) de vouloir activer ce contrat ?',
           ok: true,
           cancel: 'Annuler'
         });
+        await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/contracts/${data.ogustContractId}`, { status: 'V' });
         await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${data.contractId}/versions/${data.versionId}`, { 'isActive': data.isActive });
         // Update manually checkbox because it's not dynamic
         this.contracts[data.contractIndex].versions[data.cell].isActive = data.isActive;
-        const length = this.contracts[data.contractIndex].versions.length;
-        for (let i = 0; i < length; i++) {
+        for (let i = 0, l = this.contracts[data.contractIndex].versions.length; i < l; i++) {
           if (this.contracts[data.contractIndex].versions[i].isActive && this.contracts[data.contractIndex].versions[i]._id !== data.versionId) {
+            await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/contracts/${this.contracts[data.contractIndex].versions[i].ogustContractId}`, { status: 'T' });
             await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${this.contracts[data.contractIndex]._id}/versions/${this.contracts[data.contractIndex].versions[i]._id}`, { 'isActive': false });
             this.contracts[data.contractIndex].versions[i].isActive = false;
           }
