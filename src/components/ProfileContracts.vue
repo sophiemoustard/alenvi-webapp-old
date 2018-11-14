@@ -60,7 +60,16 @@
           <q-btn v-if="!contract.endDate" no-caps color="grey-6" icon="clear" label="Mettre fin au contrat" @click="fillEndContract(contract)" />
         </q-card-actions>
       </q-card>
-      <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="newContractModal = true" />
+      <q-btn :disable="!hasBasicInfo" class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="newContractModal = true" />
+      <div v-if="!hasBasicInfo" class="missingBasicInfo">
+        <p>/!\ Il manque une ou des information(s) importante(s) pour pouvoir créer un nouveau contrat parmi:</p>
+        <ul>
+          <li>Nom de famille</li>
+          <li>Nationalité</li>
+          <li>Adresse complète (sauf complément)</li>
+          <li>Date de naissance</li>
+        </ul>
+      </div>
     </div>
 
     <!-- New contract modal -->
@@ -348,6 +357,16 @@ export default {
     sortedContracts () {
       const contracts = this.contracts;
       return contracts.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+    },
+    hasBasicInfo () {
+      if (this.getUser.administrative && this.getUser.administrative.identity &&
+      this.getUser.lastname &&
+      this.getUser.administrative.identity.birthDate && this.getUser.administrative.identity.nationality &&
+      this.getUser.administrative.contact.address && this.getUser.administrative.contact.zipCode &&
+      this.getUser.administrative.contact.city) {
+        return true;
+      }
+      return false;
     }
   },
   async mounted () {
@@ -742,5 +761,12 @@ export default {
     margin-left: 0
     color: $primary
     font-size: 1.5rem
+
+  .missingBasicInfo
+    color: red
+    background: white
+    padding: 10px
+    margin-left: auto
+    margin-right: auto
 
 </style>
