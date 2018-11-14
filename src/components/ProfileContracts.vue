@@ -13,6 +13,7 @@
             row-key="name"
             :pagination.sync="pagination"
             hide-bottom
+            :visible-columns="visibleColumns"
             binary-state-sort>
             <q-td slot="body-cell-contractEmpty" slot-scope="props" :props="props">
               <!-- <q-btn small color="secondary">{{ props.value }}</q-btn> -->
@@ -37,7 +38,15 @@
               </q-btn>
             </q-td>
             <q-td slot="body-cell-isActive" slot-scope="props" :props="props">
-              <q-checkbox :disable="props.value || $moment().isAfter(props.row.endDate)" :value="props.value" @input="updateContractActivity({ contractId: contract._id, versionId: props.row._id, isActive: !props.value, cell: props.row.__index, contractIndex: index })"></q-checkbox> <!-- @input="updateContractActivity({ contractId: props.row._id, isActive: props.value })" -->
+              <q-checkbox :disable="props.value || $moment().isAfter(props.row.endDate)" :value="props.value"
+                @input="updateContractActivity({
+                  contractId: contract._id,
+                  versionId: props.row._id,
+                  ogustContractId: props.row.ogustContractId,
+                  isActive: !props.value,
+                  cell: props.row.__index,
+                  contractIndex: index })">
+              </q-checkbox> <!-- @input="updateContractActivity({ contractId: props.row._id, isActive: props.value })" -->
             </q-td>
           </q-table>
         </q-card-main>
@@ -47,11 +56,20 @@
               <q-icon name="file download" />
             </a>
           </q-btn> -->
-          <q-btn v-if="!contract.endDate" no-caps color="primary" icon="add" label="Ajouter un avenant" @click="fillVersion(contract)"/>
-          <q-btn v-if="!contract.endDate" no-caps color="grey-6" icon="clear" label="Mettre fin au contrat" @click="fillEndContract(contract)" />
+          <q-btn v-if="!contract.endDate" flat no-caps color="primary" icon="add" label="Ajouter un avenant" @click="fillVersion(contract)"/>
+          <q-btn v-if="!contract.endDate" flat no-caps color="grey-6" icon="clear" label="Mettre fin au contrat" @click="fillEndContract(contract)" />
         </q-card-actions>
       </q-card>
-      <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="newContractModal = true" />
+      <q-btn :disable="!hasBasicInfo" class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="newContractModal = true" />
+      <div v-if="!hasBasicInfo" class="missingBasicInfo">
+        <p>/!\ Il manque une ou des information(s) importante(s) pour pouvoir créer un nouveau contrat parmi:</p>
+        <ul>
+          <li>Nom de famille</li>
+          <li>Nationalité</li>
+          <li>Adresse complète (sauf complément)</li>
+          <li>Date de naissance</li>
+        </ul>
+      </div>
     </div>
 
     <!-- New contract modal -->
@@ -244,6 +262,7 @@ export default {
         //   value: 'mandataire'
         // }
       ],
+      visibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractEmpty', 'contractSigned', 'isActive'],
       columns: [
         {
           name: 'weeklyHours',
@@ -295,6 +314,14 @@ export default {
           align: 'left',
           field: 'isActive',
           sortable: false
+        },
+        {
+          name: 'ogustContractId',
+          label: 'ogustContractId',
+          align: 'left',
+          field: 'ogustContractId',
+          sortable: false,
+          required: false
         }
       ],
       modalCssContainer: {
@@ -330,6 +357,16 @@ export default {
     sortedContracts () {
       const contracts = this.contracts;
       return contracts.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+    },
+    hasBasicInfo () {
+      if (this.getUser.administrative && this.getUser.administrative.identity &&
+      this.getUser.lastname &&
+      this.getUser.administrative.identity.birthDate && this.getUser.administrative.identity.nationality &&
+      this.getUser.administrative.contact.address && this.getUser.administrative.contact.zipCode &&
+      this.getUser.administrative.contact.city) {
+        return true;
+      }
+      return false;
     }
   },
   async mounted () {
@@ -477,18 +514,20 @@ export default {
     },
     async updateContractActivity (data) {
       try {
+        console.log(data);
         await this.$q.dialog({
           title: 'Confirmation',
           message: 'Es-tu sûr(e) de vouloir activer ce contrat ?',
           ok: true,
           cancel: 'Annuler'
         });
+        await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/contracts/${data.ogustContractId}`, { status: 'V' });
         await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${data.contractId}/versions/${data.versionId}`, { 'isActive': data.isActive });
         // Update manually checkbox because it's not dynamic
         this.contracts[data.contractIndex].versions[data.cell].isActive = data.isActive;
-        const length = this.contracts[data.contractIndex].versions.length;
-        for (let i = 0; i < length; i++) {
+        for (let i = 0, l = this.contracts[data.contractIndex].versions.length; i < l; i++) {
           if (this.contracts[data.contractIndex].versions[i].isActive && this.contracts[data.contractIndex].versions[i]._id !== data.versionId) {
+            await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/contracts/${this.contracts[data.contractIndex].versions[i].ogustContractId}`, { status: 'T' });
             await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${this.contracts[data.contractIndex]._id}/versions/${this.contracts[data.contractIndex].versions[i]._id}`, { 'isActive': false });
             this.contracts[data.contractIndex].versions[i].isActive = false;
           }
@@ -722,5 +761,12 @@ export default {
     margin-left: 0
     color: $primary
     font-size: 1.5rem
+
+  .missingBasicInfo
+    color: red
+    background: white
+    padding: 10px
+    margin-left: auto
+    margin-right: auto
 
 </style>
