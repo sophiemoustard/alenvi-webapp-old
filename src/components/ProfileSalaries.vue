@@ -56,7 +56,7 @@ export default {
       return this.$moment().format('MMMM YYYY');
     },
     salary () {
-      if (!this.userLastContract) return 0;
+      if (!this.userLastContract && this.userCurrentMonthContracts.length === 0) return 0;
       // console.log('CURRENT CONTRACTS', this.userCurrentMonthContracts);
       const workingDays = this.currentWorkingDays.length;
       if (this.userCurrentMonthContracts.length > 1) {
@@ -105,7 +105,7 @@ export default {
       return effectiveWorkingDays;
     },
     calculateRefunding (type) {
-      if (!this.userLastContract) return 0;
+      if (!this.userLastContract && this.userCurrentMonthContracts.length === 0) return 0;
       if (!this.user.administrative[`${type}Invoice`]) return 0;
       if (!this.user.administrative[`${type}Invoice`].link) return 0;
       const workingDays = this.currentWorkingDays.length;
