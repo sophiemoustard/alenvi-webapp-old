@@ -7,7 +7,7 @@
         </q-card-title>
         <q-card-main>
           <p>Statut: {{ contract.status }}</p>
-          <q-table
+          <q-table class="test"
             :data="contract.versions"
             :columns="columns"
             row-key="name"
@@ -761,6 +761,15 @@ export default {
     margin-left: 0
     color: $primary
     font-size: 1.5rem
+
+  // /deep/ .q-uploader i
+  //   cursor: crosshair !important
+
+  // /deep/ .q-table-container ~ /deep/ .bg-white
+  //   background: blue !important
+
+  // /deep/ .q-table-container .tr:hover .q-uploader:hover > .q-if.q-if-inverted.q-if-inverted-light.bg-white
+  //   background: #F7F7F7 !important
 
   .missingBasicInfo
     color: red
