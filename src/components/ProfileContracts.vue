@@ -742,7 +742,6 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables';
   .contract-card
-    cursor: pointer
     background: white
     width: 100%
     margin-bottom: 20px
