@@ -15,7 +15,7 @@ const holidays = new Holidays('FR');
 const date = new Date();
 const currentYear = date.getFullYear();
 const currentHolidays = holidays.getHolidays(currentYear);
-moment.locale('fr', {
+moment.updateLocale('fr', {
   holidays: currentHolidays.map(holiday => holiday.date),
   holidayFormat: 'YYYY-MM-DD HH:mm:ss',
   workingWeekdays: [1, 2, 3, 4, 5, 6]
