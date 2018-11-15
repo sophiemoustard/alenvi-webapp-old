@@ -22,14 +22,16 @@
               </q-btn>
             </q-td>
             <q-td slot="body-cell-contractSigned" slot-scope="props" :props="props">
-              <q-uploader v-if="!props.row.link" :ref="`signedContract_${props.row._id}`" name="signedContract" :url="docsUploadUrl" :headers="headers"
-                :additional-fields="[
-                  { name: 'fileName', value: `contrat_signe_${getUser.firstname}_${getUser.lastname}` },
-                  { name: 'contractId', value: contract._id },
-                  { name: 'versionId', value: props.row._id }
-                ]"
-                hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" inverted-light
-                hide-upload-button @add="uploadDocument($event, `signedContract_${props.row._id}`)" @uploaded="refreshUser" @fail="failMsg" />
+              <div v-if="!props.row.link" class="row justify-center">
+                <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :url="docsUploadUrl" :headers="headers"
+                  :additional-fields="[
+                    { name: 'fileName', value: `contrat_signe_${getUser.firstname}_${getUser.lastname}` },
+                    { name: 'contractId', value: contract._id },
+                    { name: 'versionId', value: props.row._id }
+                  ]"
+                  hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
+                  hide-upload-button @add="uploadDocument($event, `signedContract_${props.row._id}`)" @uploaded="refreshUser" @fail="failMsg" />
+              </div>
               <!-- <q-btn small color="secondary">{{ props.value }}</q-btn> -->
               <q-btn v-else flat round small color="primary">
                 <a :href="props.row.link" download>
@@ -305,7 +307,7 @@ export default {
         {
           name: 'contractSigned',
           label: 'Contract signé',
-          align: 'left',
+          align: 'center',
           field: 'contractSigned',
           sortable: false
         },
@@ -781,18 +783,12 @@ export default {
     display: none
 
   /deep/ .q-uploader .q-if-control
-    margin-left: 0
     color: $primary
     font-size: 1.5rem
 
-  // /deep/ .q-uploader i
-  //   cursor: crosshair !important
-
-  // /deep/ .q-table-container ~ /deep/ .bg-white
-  //   background: blue !important
-
-  // /deep/ .q-table-container .tr:hover .q-uploader:hover > .q-if.q-if-inverted.q-if-inverted-light.bg-white
-  //   background: #F7F7F7 !important
+  /deep/ .q-uploader i input
+    // position: relative !important
+    cursor: pointer !important
 
   .missingBasicInfo
     color: red
