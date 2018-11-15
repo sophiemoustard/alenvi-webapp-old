@@ -94,7 +94,7 @@ export default {
       const workingDays = this.currentWorkingDays.length;
       let effectiveWorkingDays = 0;
       if (contract.endDate && this.isCurrentMonthContract(contract)) {
-        effectiveWorkingDays = this.currentWorkingDays.filter(day => this.$moment(day).isSameOrBefore(contract.endDate, 'day')).length;
+        effectiveWorkingDays = moment(contract.startDate).businessDiff(moment(contract.endDate));
       } else if (contract.startDate && contract.isActive && this.isCurrentMonthContract(contract)) {
         effectiveWorkingDays = this.currentWorkingDays.filter(day => this.$moment(day).isSameOrAfter(contract.startDate, 'day')).length;
       } else if (!contract.isActive) {
