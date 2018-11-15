@@ -529,7 +529,7 @@ export default {
         this.sortedContracts[data.contractIndex].versions[data.cell].isActive = data.isActive;
         for (let i = 0, l = this.contracts[data.contractIndex].versions.length; i < l; i++) {
           if (this.contracts[data.contractIndex].versions[i].isActive && this.contracts[data.contractIndex].versions[i]._id !== data.versionId) {
-            await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/contracts/${this.contracts[data.contractIndex].versions[i].ogustContractId}`, { status: 'T' }); // , end_date: this.$moment(data.versionStartDate).subtract(1, 'day').format('YYYYMMDD')
+            await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/contracts/${this.contracts[data.contractIndex].versions[i].ogustContractId}`, { status: 'T', end_date: this.$moment(data.versionStartDate).subtract(1, 'day').format('YYYYMMDD') });
             await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${this.contracts[data.contractIndex]._id}/versions/${this.contracts[data.contractIndex].versions[i]._id}`, { 'isActive': false });
             this.contracts[data.contractIndex].versions[i].isActive = false;
           }
@@ -543,22 +543,15 @@ export default {
         });
       } catch (e) {
         console.error(e);
-        if (e.message === '') {
-          return this.$q.notify({
-            color: 'positive',
-            icon: 'done',
-            detail: 'Mise à jour annulée',
+        if (e.message !== '') {
+          this.$q.notify({
+            color: 'negative',
+            icon: 'warning',
+            detail: 'Erreur lors du changement de l\'activité du contrat',
             position: 'bottom-left',
             timeout: 2500
           });
         }
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors du changement de l\'activité du contrat',
-          position: 'bottom-left',
-          timeout: 2500
-        });
       }
     },
     // async getDocxBlob () {
