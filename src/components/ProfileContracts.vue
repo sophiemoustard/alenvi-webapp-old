@@ -241,7 +241,7 @@ export default {
       endContractModal: false,
       endContractData: {
         date: '',
-        contractId: '',
+        contract: {},
       },
       contracts: [],
       newContract: {
@@ -690,14 +690,23 @@ export default {
       }
     },
     async fillEndContract (contract) {
-      this.endContractData.contractId = contract._id;
+      this.endContractData.contract = contract;
       this.endContractModal = true
     },
     async endContract () {
       try {
         this.loading = true;
+        const ogustVersionId = this.endContractData.contract.versions.find(version => version.isActive).ogustContractId;
         await alenviAxios({
-          url: `${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${this.endContractData.contractId}`,
+          url: `${process.env.API_HOSTNAME}/ogust/contracts/${ogustVersionId}`,
+          method: 'PUT',
+          data: {
+            status: 'T',
+            end_date: this.$moment(this.endContractData.date).format('YYYYMMDD')
+          }
+        });
+        await alenviAxios({
+          url: `${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${this.endContractData.contract._id}`,
           method: 'PUT',
           data: {
             endDate: this.endContractData.date
