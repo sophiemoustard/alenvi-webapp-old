@@ -599,7 +599,8 @@ export default {
             start_date: this.$moment(this.newContract.startDate).format('YYYYMMDD'),
             creation_date: this.$moment().format('YYYYMMDD'),
             contractual_salary: Number.parseFloat(this.newContract.grossHourlyRate * this.newContract.weeklyHours * 4.33).toFixed(2),
-            contract_hours: Number.parseFloat(this.newContract.weeklyHours * 4.33).toFixed(1)
+            contract_hours: Number.parseFloat(this.newContract.weeklyHours * 4.33).toFixed(1),
+            type_employer: 'S'
           }
         });
         this.newContract.ogustContractId = newOgustContract.data.data.employment.id_contract;
