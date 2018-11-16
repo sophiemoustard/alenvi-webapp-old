@@ -545,8 +545,8 @@ export default {
         // this.$emit('eventUpdated', ev);
         if (this.personType === 'employee' && this.user.employee_id === Number(ev.id_employee, 10) && ev.dateChanged) {
           const updateServicePayload = {
-            startDate: this.$moment(ev.start_date).format('YYYYMMDDHHmm'),
-            endDate: this.$moment(ev.end_date).format('YYYYMMDDHHmm')
+            start_date: this.$moment(ev.start_date).format('YYYYMMDDHHmm'),
+            end_date: this.$moment(ev.end_date).format('YYYYMMDDHHmm')
           }
           await this.$ogust.updateServiceById(ev.id, updateServicePayload);
           const planningUpdateParams = {
