@@ -103,7 +103,7 @@ const routes = [
       {
         path: 'ni/:id/customers',
         name: 'profile customers',
-        component: () => import('pages/ni/CustomersDirectory'),
+        component: () => import('pages/ni/AuxiliaryCustomersDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['profiles:read'],
@@ -137,6 +137,16 @@ const routes = [
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['profiles:read'],
           parent: 'team'
+        }
+      },
+      {
+        path: 'customers',
+        name: 'customers directory',
+        component: () => import('pages/customers/CustomersDirectory'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['profiles:read'],
+          parent: 'benef'
         }
       },
       // Legacy routes

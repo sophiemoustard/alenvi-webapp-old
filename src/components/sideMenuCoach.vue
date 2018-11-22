@@ -46,6 +46,10 @@
       <template slot="header">
         <q-item-main :class="{'text-weight-bold': activeRoutes.benef.highlight }" label="Bénéficiaires" />
       </template>
+      <q-item :to="{ name: 'customers directory' }" exact>
+        <q-item-side icon="contacts" />
+        <q-item-main label="Répertoire bénéficiaires" />
+      </q-item>
       <q-item :to="{ name: 'add helper' }" exact>
         <q-item-side icon="person add" />
         <q-item-main label="Accueil aidants" />
