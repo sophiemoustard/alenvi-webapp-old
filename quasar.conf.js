@@ -26,6 +26,7 @@ module.exports = function (ctx) {
       'vue-croppa',
       'vMask',
       'companies',
+      'customers',
       process.env.NODE_ENV === 'production' ? 'vue-analytics' : null
     ],
     css: [
