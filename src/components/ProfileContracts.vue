@@ -7,7 +7,7 @@
         </q-card-title>
         <q-card-main>
           <p>Statut: {{ contract.status }}</p>
-          <q-table class="test"
+          <q-table
             :data="contract.versions"
             :columns="columns"
             row-key="name"
