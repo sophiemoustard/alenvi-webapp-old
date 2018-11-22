@@ -26,9 +26,9 @@ instance.interceptors.request.use(async function (config) {
   // Headers for request only to API (alenvi)
   config.headers.common['x-access-token'] = Cookies.get('alenvi_token');
   // Headers for next request to get Ogust Token using axios instance
-  axios.defaults.headers.common['x-access-token'] = Cookies.get('alenvi_token');
+  // axios.defaults.headers.common['x-access-token'] = Cookies.get('alenvi_token');
   if (config.url.match(/ogust/i) || config.url.match(/calendar\/events/i)) {
-    const token = await ogustToken.getOgustToken();
+    const token = await ogustToken.getOgustToken(Cookies.get('alenvi_token'));
     config.headers.common['x-ogust-token'] = token;
   }
   return config;
