@@ -3,11 +3,11 @@
     <div class="row col-xs-12 q-mb-md">
       <div class="row items-baseline col-xs-12 col-md-10">
         <div class="row">
-          <q-icon v-if="isExternalUser" class="on-left cursor-pointer self-center" size="1rem" name="arrow_back" color="primary" @click.native="$router.push({ name: 'administrative directory', query: { role: 'Auxiliaire' } })" />
+          <q-icon v-if="isExternalUser" class="on-left cursor-pointer self-center" size="1rem" name="arrow_back" color="primary" @click.native="goToDirectory" />
           <h4>{{ user.firstname }} {{ user.lastname }}</h4>
         </div>
       </div>
-      <div class="row custom-justify-end col-xs-12 col-md-2">
+      <div v-if="!customer" class="row custom-justify-end col-xs-12 col-md-2">
         <img :src="hasPicture" alt="Img user" class="avatar">
       </div>
     </div>
@@ -24,7 +24,7 @@
           <div>Depuis le {{ userStartDate }} ({{ userRelativeStartDate }})</div>
         </div>
       </div>
-      <div class="pl-lg col-xs-12 col-md-6 row">
+      <div v-if="!customer" class="pl-lg col-xs-12 col-md-6 row">
         <div class="relative-position" style="width: 37px;">
           <q-icon size="36px" name="phone_iphone" color="grey-2" />
           <q-icon v-if="!user.isConfirmed" class="chip-icon" name="cancel" color="secondary" size="16px" />
@@ -94,7 +94,7 @@ import randomize from 'randomatic';
 // import { getUserStartDate } from '../helpers/getUserStartDate';
 export default {
   name: 'ProfileHeader',
-  props: ['profileId'],
+  props: ['profileId', 'customer'],
   data () {
     return {
       loading: false,
@@ -244,6 +244,13 @@ export default {
           position: 'bottom-right',
           timeout: 2500
         });
+      }
+    },
+    goToDirectory () {
+      if (this.customer) {
+        this.$router.push({ name: 'customers directory' });
+      } else {
+        this.$router.push({ name: 'administrative directory', query: { role: 'Auxiliaire' } });
       }
     }
   }

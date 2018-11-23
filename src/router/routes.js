@@ -149,6 +149,17 @@ const routes = [
           parent: 'benef'
         }
       },
+      {
+        path: 'customers/:id',
+        name: 'customers profile',
+        props: true,
+        component: () => import('pages/customers/Profile'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['profiles:read'],
+          parent: 'benef'
+        }
+      },
       // Legacy routes
       {
         path: 'old/planning',

@@ -24,7 +24,7 @@
         slot-scope="props"
         :props="props"
         :class="['datatable-row', { 'datatable-row-inactive': !props.row.isActive }]"
-        @click.native="goToUserProfile(props.row.customer._id)">
+        @click.native="goToCustomerProfile(props.row.customer._id)">
         <q-td v-for="col in props.cols"
           :key="col.name"
           :props="props">
@@ -49,7 +49,7 @@
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-8">
-            <h5>Créer une nouvelle <span class="text-weight-bold">fiche auxiliaire</span></h5>
+            <h5>Créer une nouvelle <span class="text-weight-bold">fiche bénéficiaire</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
             <span><q-icon name="clear" size="1rem" @click.native="opened = false" /></span>
@@ -59,11 +59,11 @@
           <div class="col-12">
             <div class="row justify-between">
               <p class="input-caption">Civilité</p>
-              <q-icon v-if="$v.newUser.administrative.identity.title.$error" name="error_outline" color="secondary" />
+              <q-icon v-if="$v.newCustomer.title.$error" name="error_outline" color="secondary" />
             </div>
-            <q-field :error="$v.newUser.administrative.identity.title.$error" error-label="Champ requis">
-              <q-select :options="civilityOptions" v-model="newUser.administrative.identity.title" color="white" inverted-light separator
-               @blur="$v.newUser.administrative.identity.title.$touch" />
+            <q-field :error="$v.newCustomer.title.$error" error-label="Champ requis">
+              <q-select :options="civilityOptions" v-model="newCustomer.title" color="white" inverted-light separator
+               @blur="$v.newCustomer.title.$touch" />
             </q-field>
           </div>
         </div>
@@ -71,67 +71,18 @@
           <div class="col-12">
             <div class="row justify-between">
               <p class="input-caption">Nom</p>
-              <q-icon v-if="$v.newUser.lastname.$error" name="error_outline" color="secondary" />
+              <q-icon v-if="$v.newCustomer.lastname.$error" name="error_outline" color="secondary" />
             </div>
-            <q-field :error="$v.newUser.lastname.$error" error-label="Champ requis">
-              <q-input v-model="newUser.lastname" color="white" inverted-light @blur="$v.newUser.lastname.$touch" />
+            <q-field :error="$v.newCustomer.lastname.$error" error-label="Champ requis">
+              <q-input v-model="newCustomer.lastname" color="white" inverted-light @blur="$v.newCustomer.lastname.$touch" />
             </q-field>
           </div>
         </div>
         <div class="row margin-input">
           <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Prénom</p>
-              <q-icon v-if="$v.newUser.firstname.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newUser.firstname.$error" error-label="Champ requis">
-              <q-input v-model="newUser.firstname" color="white" inverted-light @blur="$v.newUser.firstname.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Numéro de téléphone</p>
-              <q-icon v-if="$v.newUser.mobilePhone.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newUser.mobilePhone.$error" :error-label="mobilePhoneError">
-              <q-input v-model="newUser.mobilePhone" color="white" inverted-light @blur="$v.newUser.mobilePhone.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Adresse</p>
-              <q-icon v-if="$v.newUser.administrative.contact.address.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newUser.administrative.contact.address.$error" error-label="Champ requis">
-              <q-input v-model="newUser.administrative.contact.address" color="white" inverted-light
-                @blur="$v.newUser.administrative.contact.address.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Code Postal</p>
-              <q-icon v-if="$v.newUser.administrative.contact.zipCode.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newUser.administrative.contact.zipCode.$error" :error-label="zipCodeError">
-              <q-input v-model="newUser.administrative.contact.zipCode" color="white" inverted-light
-                @blur="$v.newUser.administrative.contact.zipCode.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Ville</p>
-              <q-icon v-if="$v.newUser.administrative.contact.city.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newUser.administrative.contact.city.$error" error-label="Champ requis">
-              <q-input v-model="newUser.administrative.contact.city" color="white" inverted-light @blur="$v.newUser.administrative.contact.city.$touch" />
+            <p class="input-caption">Prénom</p>
+            <q-field error-label=" ">
+              <q-input v-model="newCustomer.firstname" color="white" inverted-light />
             </q-field>
           </div>
         </div>
@@ -139,21 +90,67 @@
           <div class="col-12">
             <div class="row justify-between">
               <p class="input-caption">Email</p>
-              <q-icon v-if="$v.newUser.local.email.$error" name="error_outline" color="secondary" />
+              <q-icon v-if="$v.newCustomer.email.$error" name="error_outline" color="secondary" />
             </div>
-            <q-field :error="$v.newUser.local.email.$error" :error-label="emailError">
-              <q-input v-model="newUser.local.email" color="white" inverted-light @blur="$v.newUser.local.email.$touch" />
+            <q-field :error="$v.newCustomer.email.$error" error-label="Champ requis">
+              <q-input v-model="newCustomer.email" color="white" inverted-light @blur="$v.newCustomer.email.$touch" />
             </q-field>
           </div>
         </div>
         <div class="row margin-input">
           <div class="col-12">
             <div class="row justify-between">
-              <p class="input-caption">Communauté</p>
-              <q-icon v-if="$v.newUser.sector.$error" name="error_outline" color="secondary" />
+              <p class="input-caption">Adresse</p>
+              <q-icon v-if="$v.newCustomer.contact.address.$error" name="error_outline" color="secondary" />
             </div>
-            <q-field :error="$v.newUser.sector.$error" error-label="Champ requis">
-              <select-sector v-model="newUser.sector" @myBlur="$v.newUser.sector.$touch"/>
+            <q-field :error="$v.newCustomer.contact.address.$error" error-label="Champ requis">
+              <q-input v-model="newCustomer.contact.address" color="white" inverted-light
+                @blur="$v.newCustomer.contact.address.$touch" />
+            </q-field>
+          </div>
+        </div>
+        <div class="row margin-input">
+          <div class="col-12">
+            <div class="row justify-between">
+              <p class="input-caption">Code Postal</p>
+              <q-icon v-if="$v.newCustomer.contact.zipCode.$error" name="error_outline" color="secondary" />
+            </div>
+            <q-field :error="$v.newCustomer.contact.zipCode.$error" :error-label="zipCodeError">
+              <q-input v-model="newCustomer.contact.zipCode" color="white" inverted-light
+                @blur="$v.newCustomer.contact.zipCode.$touch" />
+            </q-field>
+          </div>
+        </div>
+        <div class="row margin-input">
+          <div class="col-12">
+            <div class="row justify-between">
+              <p class="input-caption">Ville</p>
+              <q-icon v-if="$v.newCustomer.contact.city.$error" name="error_outline" color="secondary" />
+            </div>
+            <q-field :error="$v.newCustomer.contact.city.$error" error-label="Champ requis">
+              <q-input v-model="newCustomer.contact.city" color="white" inverted-light @blur="$v.newCustomer.contact.city.$touch" />
+            </q-field>
+          </div>
+        </div>
+        <div class="row margin-input">
+          <div class="col-12">
+            <div class="row justify-between">
+              <p class="input-caption">Mode de paiement</p>
+              <q-icon v-if="$v.ogust.method_of_payment.$error" name="error_outline" color="secondary" />
+            </div>
+            <q-field :error="$v.ogust.method_of_payment.$error" error-label="Champ requis">
+              <select-ogust-list v-model="ogust.method_of_payment" listType="customer.method_of_payment" color="white" inverted-light @myBlur="$v.ogust.method_of_payment.$touch" />
+            </q-field>
+          </div>
+        </div>
+        <div class="row margin-input">
+          <div class="col-12">
+            <div class="row justify-between">
+              <p class="input-caption">Origine</p>
+              <q-icon v-if="$v.ogust.origin.$error" name="error_outline" color="secondary" />
+            </div>
+            <q-field :error="$v.ogust.origin.$error" error-label="Champ requis">
+              <select-ogust-list v-model="ogust.origin" listType="customer.origin" color="white" inverted-light @myBlur="$v.ogust.origin.$touch" />
             </q-field>
           </div>
         </div>
@@ -161,16 +158,11 @@
           <div class="col-12">
             <div class="row justify-between">
               <p class="input-caption">Géré par</p>
-              <q-icon v-if="$v.newUser.ogustManagerId.$error" name="error_outline" color="secondary" />
+              <q-icon v-if="$v.ogust.managerId.$error" name="error_outline" color="secondary" />
             </div>
-            <q-field :error="$v.newUser.ogustManagerId.$error" error-label="Champ requis">
-              <select-manager v-model="newUser.ogustManagerId" @myBlur="$v.newUser.ogustManagerId.$touch"/>
+            <q-field :error="$v.ogust.managerId.$error" error-label="Champ requis">
+              <select-ogust-list v-model="ogust.managerId" @myBlur="$v.ogust.managerId.$touch" listType="customer.manager" filter />
             </q-field>
-          </div>
-        </div>
-        <div class="row margin-input last">
-          <div class="col-12">
-            <q-checkbox v-model="sendWelcomeMsg" label="Envoyer SMS d'accueil" />
           </div>
         </div>
       </div>
@@ -180,15 +172,15 @@
 </template>
 
 <script>
-import { required, email, maxLength } from 'vuelidate/lib/validators';
-import randomize from 'randomatic';
+import { required, maxLength, email } from 'vuelidate/lib/validators';
 
-import { frPhoneNumber, frZipCode } from '../../helpers/vuelidateCustomVal';
+import { frZipCode } from '../../helpers/vuelidateCustomVal';
 import { clear } from '../../helpers/utils.js';
 // import { userProfileValidation } from '../../helpers/userProfileValidation';
 // import { taskValidation } from '../../helpers/taskValidation';
 import SelectSector from '../../components/SelectSector';
 import SelectManager from '../../components/SelectManager';
+import SelectOgustList from '../../components/SelectOgustList';
 
 export default {
   metaInfo: {
@@ -196,7 +188,8 @@ export default {
   },
   components: {
     SelectSector,
-    SelectManager
+    SelectManager,
+    SelectOgustList
   },
   data () {
     return {
@@ -218,31 +211,24 @@ export default {
           value: 'Mme'
         }
       ],
-      newUser: {
+      newCustomer: {
+        title: '',
         lastname: '',
         firstname: '',
-        employee_id: '',
-        mobilePhone: '',
-        local: {
-          email: '',
-          password: ''
+        email: '',
+        customer_id: '',
+        contact: {
+          ogustAddressId: '',
+          address: '',
+          city: '',
+          zipCode: ''
         },
-        sector: '',
-        administrative: {
-          contact: {
-            addressId: '',
-            address: '',
-            city: '',
-            zipCode: ''
-          },
-          identity: {
-            title: ''
-          },
-          transportInvoice: {
-            transportType: 'public'
-          }
-        },
-        ogustManagerId: ''
+        isActive: true
+      },
+      ogust: {
+        managerId: '',
+        method_of_payment: '',
+        origin: ''
       },
       customersList: [],
       searchStr: '',
@@ -311,36 +297,27 @@ export default {
     }
   },
   validations: {
-    newUser: {
+    newCustomer: {
+      title: { required },
       lastname: { required },
-      firstname: { required },
-      mobilePhone: {
-        required,
-        frPhoneNumber,
-        maxLength: maxLength(10)
-      },
-      administrative: {
-        contact: {
-          address: { required },
-          zipCode: {
-            required,
-            frZipCode,
-            maxLength: maxLength(5)
-          },
-          city: { required }
+      email: { email },
+      contact: {
+        address: { required },
+        zipCode: {
+          required,
+          frZipCode,
+          maxLength: maxLength(5)
         },
-        identity: {
-          title: { required }
-        }
+        city: { required }
       },
-      local: {
-        email: { required, email }
-      },
-      sector: { required },
-      ogustManagerId: { required }
+    },
+    ogust: {
+      managerId: { required },
+      method_of_payment: { required },
+      origin: { required }
     }
   },
-  mounted () {
+  async mounted () {
     this.getCustomersList();
   },
   computed: {
@@ -356,35 +333,30 @@ export default {
     filteredCustomers () {
       return this.activeCustomerList.filter(customer => customer.customer.name.match(new RegExp(this.searchStr, 'i')));
     },
-    notificationsProfiles () {
-      return this.$store.getters['rh/getNotificationsProfiles'];
-    },
-    notificationsTasks () {
-      return this.$store.getters['rh/getNotificationsTasks'];
-    },
-    mobilePhoneError () {
-      if (!this.$v.newUser.mobilePhone.required) {
-        return 'Champ requis';
-      } else if (!this.$v.newUser.mobilePhone.frPhoneNumber || !this.$v.newUser.mobilePhone.maxLength) {
-        return 'Numéro de téléphone non valide';
-      }
-    },
+    // notificationsProfiles () {
+    //   return this.$store.getters['rh/getNotificationsProfiles'];
+    // },
+    // notificationsTasks () {
+    //   return this.$store.getters['rh/getNotificationsTasks'];
+    // },
     zipCodeError () {
-      if (!this.$v.newUser.administrative.contact.zipCode.required) {
+      if (!this.$v.newCustomer.contact.zipCode.required) {
         return 'Champ requis';
-      } else if (!this.$v.newUser.administrative.contact.zipCode.frZipCode || !this.$v.newUser.administrative.contact.zipCode.maxLength) {
+      } else if (!this.$v.newCustomer.contact.zipCode.frZipCode || !this.$v.newCustomer.contact.zipCode.maxLength) {
         return 'Code postal non valide';
       }
     },
     emailError () {
-      if (!this.$v.newUser.local.email.required) {
+      if (!this.$v.newCustomer.email.required) {
         return 'Champ requis';
-      } else if (!this.$v.newUser.local.email.email) {
+      } else if (!this.$v.newCustomer.email.email) {
         return 'Email non valide';
       }
     },
-    hasPicture () {
-      return !this.user.picture || (this.user.picture && !this.user.picture.link) ? 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/images/users/default_avatar.png' : this.user.picture.link;
+    fullAddress () {
+      if (!this.$v.newCustomer.contact.$error) {
+        return `${this.newCustomer.contact.address} ${this.newCustomer.contact.zipCode} ${this.newCustomer.contact.city}`
+      }
     }
   },
   methods: {
@@ -436,67 +408,67 @@ export default {
         console.error(e);
       }
     },
-    goToUserProfile (userId) {
-      this.$router.push({ name: 'personal info', params: { id: userId } });
+    goToCustomerProfile (userId) {
+      this.$router.push({ name: 'customers profile', params: { id: userId } });
     },
     resetForm () {
-      this.$v.newUser.$reset();
-      this.newUser = Object.assign({}, clear(this.newUser));
+      this.$v.newCustomer.$reset();
+      this.newCustomer = Object.assign({}, clear(this.newCustomer));
     },
-    async createAlenviUser () {
-      this.newUser.local.password = randomize('*', 10);
-      this.newUser.role = 'Auxiliaire';
-      this.newUser.ogustManagerId = this.currentUser._id;
-      const newUser = await this.$users.create(this.newUser);
-      await this.$users.createDriveFolder({ _id: newUser.data.data.user._id });
-      return newUser;
+    async createAlenviCustomer () {
+      const payload = this.$_.pickBy(this.newCustomer);
+      const newCustomer = await this.$customers.create(payload);
+      return newCustomer;
     },
-    async createOgustUser () {
+    async createOgustCustomer () {
       const ogustPayload = {
-        title: this.newUser.administrative.identity.title,
-        last_name: this.newUser.lastname,
-        first_name: this.newUser.firstname,
+        title: this.newCustomer.title,
+        last_name: this.newCustomer.lastname,
+        first_name: this.newCustomer.firstname,
+        email: this.newCustomer.email,
         main_address: {
-          line: this.newUser.administrative.contact.address,
-          zip: this.newUser.administrative.contact.zipCode,
-          city: this.newUser.administrative.contact.city
+          line: this.newCustomer.contact.address,
+          zip: this.newCustomer.contact.zipCode,
+          city: this.newCustomer.contact.city
         },
-        email: this.newUser.local.email,
-        sector: this.newUser.sector,
-        mobile_phone: this.newUser.mobilePhone,
-        manager: this.newUser.ogustManagerId
+        method_of_payment: this.ogust.method_of_payment,
+        origin: this.ogust.origin,
+        manager: this.ogust.managerId
       };
-      const newEmployee = await this.$ogust.createEmployee(ogustPayload);
-      return newEmployee;
-    },
-    async sendSms (newUserId) {
-      const activationDataRaw = await this.$activationCode.create({ newUserId, userEmail: this.newUser.local.email });
-      const code = activationDataRaw.activationData.code;
-      await this.$twilio.sendSMS({
-        to: `+33${this.newUser.mobilePhone.substring(1)}`,
-        body: `Bienvenue chez Alenvi ! :) Utilise ce code: ${code} pour pouvoir commencer ton enregistrement sur Compani avant ton intégration: ${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/enterCode :-)`,
-      });
+      const cleanPayload = this.$_.pickBy(ogustPayload);
+      const newCustomer = await this.$ogust.createCustomer(cleanPayload);
+      return newCustomer;
     },
     async submit () {
       try {
         this.loading = true;
-        this.$v.newUser.$touch();
-        if (this.$v.newUser.$error) {
+        const isValidAddress = await this.validateAddress();
+        if (!isValidAddress) {
+          this.isLoding = false;
+          return this.$q.notify({
+            color: 'negative',
+            icon: 'warning',
+            detail: 'Adresse complète invalide.',
+            position: 'bottom-left',
+            timeout: 2500
+          });
+        }
+        this.$v.newCustomer.$touch();
+        if (this.$v.newCustomer.$error) {
           throw new Error('Invalid fields');
         }
-        const existingEmployee = await this.$ogust.getEmployees({ email: this.newUser.local.email });
-        if (Object.keys(existingEmployee).length !== 0) {
-          throw new Error('Existing email');
+        if (this.newCustomer.email !== '') {
+          const existingCustomer = await this.$ogust.getCustomers({ email: this.newCustomer.email });
+          if (Object.keys(existingCustomer).length !== 0) {
+            throw new Error('Existing email');
+          }
         }
-        const newEmployee = await this.createOgustUser();
-        this.newUser.employee_id = newEmployee.data.data.employee.id_employee;
-        const employee = await this.$ogust.getEmployeeById(this.newUser.employee_id);
-        this.newUser.administrative.contact.addressId = employee.main_address.id_address;
-        this.userCreated = await this.createAlenviUser();
-        if (this.sendWelcomeMsg) {
-          await this.sendSms(this.userCreated.data.data.user._id);
-        }
-        await this.getUserList();
+        const newCustomer = await this.createOgustCustomer();
+        this.newCustomer.customer_id = newCustomer.data.data.customer.id_customer;
+        const customer = await this.$ogust.getCustomerById(this.newCustomer.customer_id);
+        this.newCustomer.contact.ogustAddressId = customer.main_address.id_address;
+        this.customerCreated = await this.createAlenviCustomer();
+        await this.getCustomersList();
         this.$q.notify({
           color: 'positive',
           icon: 'done',
@@ -554,8 +526,14 @@ export default {
         this.loading = false;
       }
     },
-    getAvatar (link) {
-      return link || 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/images/users/default_avatar.png';
+    async validateAddress () {
+      if (!this.fullAddress) return false;
+      const res = await this.$axios.get('https://api-adresse.data.gouv.fr/search', {
+        params: {
+          q: this.fullAddress
+        }
+      });
+      return res.data.features.length === 1 && res.data.features[0].properties.score > 0.85;
     }
   }
 }

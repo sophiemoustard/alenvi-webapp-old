@@ -1092,7 +1092,7 @@ export default {
         data.append('Content-Type', blob.type || 'application/octet-stream');
         data.append('picture', blob);
         await this.$axios.post(this.pictureUploadUrl, data, { headers: { 'content-type': 'multipart/form-data', 'x-access-token': Cookies.get('alenvi_token') || '' } });
-        await this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
+        await this.$store.dispatch('rh/getUserProfile', { userId: this.userProfile._id });
         this.closePictureEdition();
         this.$q.notify({
           color: 'positive',
@@ -1131,7 +1131,7 @@ export default {
           payload = this.$_.set(payload, path, { driveId: null, link: null });
           await this.$users.updateById(payload);
         }
-        await this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
+        await this.$store.dispatch('rh/getUserProfile', { userId: this.userProfile._id });
         this.$q.notify({
           color: 'positive',
           icon: 'done',
@@ -1178,7 +1178,7 @@ export default {
             publicId: null
           }
         });
-        await this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
+        await this.$store.dispatch('rh/getUserProfile', { userId: this.userProfile._id });
         this.$q.notify({
           color: 'positive',
           icon: 'done',
@@ -1207,7 +1207,7 @@ export default {
       }
     },
     async refreshUser () {
-      await this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
+      await this.$store.dispatch('rh/getUserProfile', { userId: this.userProfile._id });
       this.$q.notify({
         color: 'positive',
         icon: 'done',

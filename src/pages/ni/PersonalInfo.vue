@@ -76,7 +76,7 @@ export default {
     }
   },
   async mounted () {
-    await this.$store.dispatch('rh/getUserProfile', this.id);
+    await this.$store.dispatch('rh/getUserProfile', { userId: this.id });
   },
   watch: {
     async userProfile () {

@@ -5,13 +5,20 @@ export function someAction (context) {
 // import _ from 'lodash';
 
 import users from '../../api/Users'
+import customers from '../../api/Customers'
 import { userProfileValidation } from '../../helpers/userProfileValidation';
 import { taskValidation } from '../../helpers/taskValidation';
 
-export async function getUserProfile ({ commit }, userId) {
+export async function getUserProfile ({ commit }, params) {
   try {
-    const user = await users.getById(userId);
-    user.mobilePhone = user.mobilePhone.split(' ').join('');
+    let user;
+    if (params.userId) {
+      user = await users.getById(params.userId);
+      user.mobilePhone = user.mobilePhone.split(' ').join('');
+    } else {
+      const userRaw = await customers.getById(params.customerId);
+      user = userRaw.data.data.customer;
+    }
     commit('saveUserProfile', user);
   } catch (e) {
     console.error(e);
