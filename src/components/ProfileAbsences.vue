@@ -1,78 +1,100 @@
 <template>
   <div>
-    <div class="row margin-input">
-      <div class="col-12">
-        <div class="row justify-between">
-          <p class="input-caption">Type d'absence</p>
-          <q-icon v-if="$v.newAbsence.reason.$error" name="error_outline" color="secondary" />
-        </div>
-        <q-field :error="$v.newAbsence.reason.$error" error-label="Champ requis">
-          <q-select :options="reasonOptions" v-model="newAbsence.reason" color="white" inverted-light separator
-            @blur="$v.newAbsence.reason.$touch" />
-        </q-field>
-      </div>
-    </div>
-    <div class="row margin-input gutter-profile">
-      <div class="col-xs-12 col-md-6">
-        <div class="row justify-between">
-          <p class="input-caption">Date de départ</p>
-          <q-icon v-if="$v.newAbsence.startDate.$error" name="error_outline" color="secondary" />
-        </div>
-        <q-field :error="$v.newAbsence.startDate.$error" error-label="Champ requis">
-          <q-datetime type="date" format="DD/MM/YYYY" v-model="newAbsence.startDate" color="white" inverted-light popover
-          ok-label="OK"
-          cancel-label="Fermer" />
-        </q-field>
-      </div>
-      <div class="col-xs-12 col-md-6">
-        <div class="row justify-between">
-          <p class="input-caption">Durée</p>
-          <!-- <q-icon v-if="$v.newAbsenceOptionsSelected.startDateOption.$error" name="error_outline" color="secondary" /> -->
-        </div>
-        <!-- <q-field :error="$v.newAbsenceOptionsSelected.startDateOption.$error" error-label="Champ requis"> -->
-          <q-select :options="dateOptions" v-model="newAbsenceOptionsSelected.startDateOption" color="white" inverted-light separator /> <!-- @blur="$v.newAbsenceOptionsSelected.startDateOption.$touch"  -->
-        <!-- </q-field> -->
-      </div>
-    </div>
-    <div class="row margin-input gutter-profile">
-      <div class="col-xs-12 col-md-6">
-        <div class="row justify-between">
-          <p class="input-caption">Date de fin</p>
-          <q-icon v-if="$v.newAbsence.endDate.$error" name="error_outline" color="secondary" />
-        </div>
-        <q-field :error="$v.newAbsence.endDate.$error" error-label="Champ requis">
-          <q-datetime type="date" format="DD/MM/YYYY" v-model="newAbsence.endDate" color="white" inverted-light popover
-          ok-label="OK"
-          cancel-label="Fermer" />
-        </q-field>
-      </div>
-      <div v-if="newAbsence.endDate > newAbsence.startDate" class="col-xs-12 col-md-6">
-        <div class="row justify-between">
-          <p class="input-caption">Durée</p>
-          <!-- <q-icon v-if="$v.newAbsenceOptionsSelected.startDateOption.$error" name="error_outline" color="secondary" /> -->
-        </div>
-        <!-- <q-field :error="$v.newAbsenceOptionsSelected.startDateOption.$error" error-label="Champ requis"> -->
-          <q-select :options="dateOptions" v-model="newAbsenceOptionsSelected.endDateOption" color="white" inverted-light separator /> <!-- @blur="$v.newAbsenceOptionsSelected.startDateOption.$touch"  -->
-        <!-- </q-field> -->
-      </div>
-    </div>
     <q-table :data="absences"
             :columns="columns"
             row-key="name"
             binary-state-sort>
     </q-table>
+    <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="ion-document" label="Créer une nouvelle absence" @click="newAbsenceModal = true" />
     <!-- <p></p> -->
-    <q-btn no-caps label="Confirmer" color="primary" :loading="loading" @click="addAbsence" />
+    <q-modal v-model="newAbsenceModal" :content-css="modalCssContainer">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-8">
+            <h5>Créer une <span class="text-weight-bold">absence</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer" style="text-align: right">
+            <span><q-icon name="clear" size="1rem" @click.native="newAbsenceModal = false" /></span>
+          </div>
+        </div>
+        <div class="row margin-input">
+          <div class="col-12">
+            <div class="row justify-between">
+              <p class="input-caption">Type d'absence</p>
+              <q-icon v-if="$v.newAbsence.reason.$error" name="error_outline" color="secondary" />
+            </div>
+            <q-field :error="$v.newAbsence.reason.$error" error-label="Champ requis">
+              <q-select :options="reasonOptions" v-model="newAbsence.reason" color="white" inverted-light separator
+                @blur="$v.newAbsence.reason.$touch" />
+            </q-field>
+          </div>
+        </div>
+        <div class="row margin-input">
+          <div class="col-12">
+            <div class="row justify-between">
+              <p class="input-caption">Date de départ</p>
+              <q-icon v-if="$v.newAbsence.startDate.$error" name="error_outline" color="secondary" />
+            </div>
+            <q-field :error="$v.newAbsence.startDate.$error" error-label="Champ requis">
+              <q-datetime type="date" format="DD/MM/YYYY" v-model="newAbsence.startDate" color="white" inverted-light popover
+              ok-label="OK"
+              cancel-label="Fermer" />
+            </q-field>
+          </div>
+        </div>
+        <div class="row margin-input">
+          <div class="col-12">
+            <div class="row justify-between">
+              <p class="input-caption">Durée</p>
+              <!-- <q-icon v-if="$v.newAbsenceOptionsSelected.startDateOption.$error" name="error_outline" color="secondary" /> -->
+            </div>
+            <!-- <q-field :error="$v.newAbsenceOptionsSelected.startDateOption.$error" error-label="Champ requis"> -->
+              <q-select :options="dateOptions" v-model="newAbsence.startDuration" color="white" inverted-light separator /> <!-- @blur="$v.newAbsenceOptionsSelected.startDateOption.$touch"  -->
+            <!-- </q-field> -->
+          </div>
+        </div>
+        <div class="row margin-input">
+          <div class="col-12">
+            <div class="row justify-between">
+              <p class="input-caption">Date de fin</p>
+              <q-icon v-if="$v.newAbsence.endDate.$error" name="error_outline" color="secondary" />
+            </div>
+            <q-field :error="$v.newAbsence.endDate.$error" error-label="Champ requis">
+              <q-datetime type="date" format="DD/MM/YYYY" v-model="newAbsence.endDate" color="white" inverted-light popover
+              ok-label="OK"
+              cancel-label="Fermer" />
+            </q-field>
+          </div>
+        </div>
+        <div v-if="newAbsence.endDate > newAbsence.startDate" class="row margin-input">
+          <div class="col-xs-12">
+            <div class="row justify-between">
+              <p class="input-caption">Durée</p>
+              <!-- <q-icon v-if="$v.newAbsenceOptionsSelected.startDateOption.$error" name="error_outline" color="secondary" /> -->
+            </div>
+            <!-- <q-field :error="$v.newAbsenceOptionsSelected.startDateOption.$error" error-label="Champ requis"> -->
+              <q-select :options="dateOptions" v-model="newAbsence.endDuration" color="white" inverted-light separator /> <!-- @blur="$v.newAbsenceOptionsSelected.startDateOption.$touch"  -->
+            <!-- </q-field> -->
+          </div>
+        </div>
+      </div>
+      <q-btn class="full-width modal-btn" no-caps label="Confirmer" color="primary" :loading="loading" @click="addAbsence" />
+    </q-modal>
   </div>
 </template>
 
 <script>
 import { required } from 'vuelidate/lib/validators';
+import { alenviAxios } from '../api/ressources/alenviAxios'
 
 export default {
   data () {
     return {
       loading: false,
+      newAbsenceModal: false,
+      modalCssContainer: {
+        minWidth: '30vw'
+      },
       absences: [],
       reasonOptions: [
         {
@@ -111,27 +133,27 @@ export default {
       dateOptions: [
         {
           label: 'Matinée',
-          value: 'morning'
+          value: 'Matinée'
         },
         {
           label: 'Après-midi',
-          value: 'afternoon'
+          value: 'Après-midi'
         },
         {
           label: 'Journée entière',
-          value: 'wholeDay'
+          value: 'Journée entière'
         }
       ],
       durations: {
-        morning: {
+        'Matinée': {
           start: 8,
           end: 14
         },
-        afternoon: {
+        'Après-midi': {
           start: 14,
           end: 20
         },
-        wholeDay: {
+        'Journée entière': {
           start: 8,
           end: 20
         }
@@ -146,10 +168,10 @@ export default {
           sortable: true,
         },
         {
-          name: 'startDateOptionsSelected.start',
+          name: 'startDuration',
           label: 'Période',
           align: 'left',
-          field: 'startDateOptionsSelected.start',
+          field: 'startDuration',
           sortable: true
         },
         {
@@ -161,10 +183,10 @@ export default {
           sortable: true
         },
         {
-          name: 'endDateOptionsSelected.end',
+          name: 'endDuration',
           label: 'Période',
           align: 'left',
-          field: 'endDateOptionsSelected.end',
+          field: 'endDuration',
           sortable: true,
         },
         {
@@ -188,12 +210,14 @@ export default {
       newAbsence: {
         startDate: '',
         endDate: '',
-        reason: ''
+        reason: '',
+        startDuration: '',
+        endDuration: ''
       },
-      newAbsenceOptionsSelected: {
-        startDateOption: '',
-        endDateOption: ''
-      },
+      // newAbsenceOptionsSelected: {
+      //   startDateOption: '',
+      //   endDateOption: ''
+      // },
     }
   },
   validations: {
@@ -212,32 +236,65 @@ export default {
     try {
       const user = await this.$users.getById(this.getUser._id);
       this.absences = user.administrative.absences;
-      for (let i = 0, l = this.absences.length; i < l; i++) {
-        console.log(this.$moment(this.absences[i].startDate).format('HH'));
-        if (this.$moment(this.absences[i].startDate).format('HH') < 10) {
-          this.absences[i].startDateOption = 'morning';
-        } else if (this.$moment(this.absences[i].startDate).format('HH')) {
-          // this.absences[i].startDateOption = this.absences[i].
-        }
-      }
-      console.log(user);
-      console.log(this.absences);
+      // for (let i = 0, l = this.absences.length; i < l; i++) {
+      //   console.log(this.$moment(this.absences[i].startDate).format('HH'));
+      //   if (this.$moment(this.absences[i].startDate).format('HH') < 10) {
+      //     this.absences[i].startDateOption = 'morning';
+      //   } else if (this.$moment(this.absences[i].startDate).format('HH')) {
+      //     // this.absences[i].startDateOption = this.absences[i].
+      //   }
+      // }
     } catch (e) {
       console.error(e);
     }
   },
   methods: {
-    addAbsence () {
-      const test = this.$moment(this.newAbsence.startDate).set('hours', this.durations[this.newAbsenceOptionsSelected.startDateOption].start);
-      const test2 = this.$moment(this.newAbsence.endDate).set('hours', this.durations[this.newAbsenceOptionsSelected.startDateOption].end);
-      console.log(test);
-      console.log(test2);
-      console.log('test');
+    async addAbsence () {
+      try {
+        this.newAbsence.startDate = this.$moment(this.newAbsence.startDate).set('hours', this.durations[this.newAbsence.startDuration].start);
+        if (this.newAbsence.endDuration) {
+          this.newAbsence.endDate = this.$moment(this.newAbsence.endDate).set('hours', this.durations[this.newAbsence.endDuration].end);
+        }
+        const test = await alenviAxios({
+          url: `${process.env.API_HOSTNAME}/users/${this.getUser._id}/absences`,
+          method: 'POST',
+          data: this.newAbsence
+        });
+        console.log(test);
+        // const test = this.$moment(this.newAbsence.startDate).set('hours', this.durations[this.newAbsence.startDuration].start);
+        // const test2 = this.$moment(this.newAbsence.endDate).set('hours', this.durations[this.newAbsence.endDuration].end);
+        // console.log(test);
+        // console.log(test2);
+        // console.log('test');
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.newAbsenceModal = false;
+        // this.newAbsence = {};
+      }
     },
   }
 };
 </script>
 
 <style lang="stylus" scoped>
-@import '~variables';
+  @import '~variables';
+
+  .modal
+    &-padding
+      padding: 24px 58px 0px 58px
+    &-btn
+      border-radius: 0
+
+  .margin-input
+    margin-bottom: 6px
+    &.last
+      margin-bottom: 24px
+
+  .q-field-bottom
+    padding-top: 2px
+
+  .q-if-inverted
+    border: 1px solid $light-grey
+
 </style>
