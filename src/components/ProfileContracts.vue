@@ -79,7 +79,7 @@
     <q-modal v-model="newContractModal" :content-css="modalCssContainer">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
-          <div class="col-8">
+          <div class="col-11">
             <h5>Créer un <span class="text-weight-bold">nouveau contrat</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
@@ -146,7 +146,7 @@
     <q-modal v-model="newContractVersionModal" :content-css="modalCssContainer">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
-          <div class="col-8">
+          <div class="col-11">
             <h5>Créer une <span class="text-weight-bold">version</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
@@ -196,7 +196,7 @@
     <q-modal v-model="endContractModal" :content-css="modalCssContainer">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
-          <div class="col-8">
+          <div class="col-11">
             <h5>Terminer un <span class="text-weight-bold">contrat</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">

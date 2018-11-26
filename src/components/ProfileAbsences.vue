@@ -1,16 +1,50 @@
 <template>
   <div>
     <q-table :data="absences"
-            :columns="columns"
-            row-key="name"
-            binary-state-sort>
+      :columns="columns"
+      row-key="name"
+      binary-state-sort>
+      <q-td slot="body-cell-link" slot-scope="props" :props="props">
+        <div v-if="!props.row.link" class="row justify-center">
+          <q-uploader :ref="`absenceReason_${props.row._id}`" name="signedContract" :url="docsUploadUrl" :headers="headers"
+            :additional-fields="[
+              { name: 'fileName', value: `justificatif_absence_${getUser.firstname}_${getUser.lastname}_${$moment().format('DD-MM-YYYY')}` },
+              { name: 'absenceId', value: props.row._id }
+            ]"
+            hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
+            hide-upload-button @add="uploadDocument($event, `absenceReason_${props.row._id}`)" @uploaded="refreshUser" @fail="failMsg" />
+        </div>
+        <q-btn v-else flat round small color="primary">
+          <a :href="props.row.link" download>
+            <q-icon name="file download" />
+          </a>
+        </q-btn>
+      </q-td>
     </q-table>
-    <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="ion-document" label="Créer une nouvelle absence" @click="newAbsenceModal = true" />
+    <!-- <div class="row margin-input">
+      <div class="col-xs-12">
+        <div class="row justify-between">
+          <p class="input-caption">Justificatif</p>
+          <q-icon v-if="$v.newAbsence.document.$error" error-label="Champ requis" />
+        </div>
+        <div class="row justify-center">
+            <q-uploader ref="absenceReason" name="absenceReason" :url="docsUploadUrl" :headers="headers"
+              :additional-fields="[
+                { name: 'fileName', value: `justificatif_absence_${getUser.firstname}_${getUser.lastname}_${this.$moment().format('DD-MM-YYYY')}` },
+                { name: 'absenceId', value: contract._id },
+                { name: 'versionId', value: props.row._id }
+              ]"
+              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
+              hide-upload-button @add="uploadDocument($event, `signedContract_${props.row._id}`)" @uploaded="refreshUser" @fail="failMsg" />
+          </div>
+      </div>
+    </div> -->
+    <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="ion-document" label="Enregistrer une absence" @click="newAbsenceModal = true" />
     <!-- <p></p> -->
     <q-modal v-model="newAbsenceModal" :content-css="modalCssContainer">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
-          <div class="col-8">
+          <div class="col-11">
             <h5>Créer une <span class="text-weight-bold">absence</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
@@ -36,7 +70,7 @@
               <q-icon v-if="$v.newAbsence.startDate.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newAbsence.startDate.$error" error-label="Champ requis">
-              <q-datetime type="date" format="DD/MM/YYYY" v-model="newAbsence.startDate" color="white" inverted-light popover
+              <q-datetime type="date" format="DD/MM/YYYY" v-model="newAbsence.startDate" :min="getTomorrow" color="white" inverted-light popover
               ok-label="OK"
               cancel-label="Fermer" />
             </q-field>
@@ -46,11 +80,11 @@
           <div class="col-12">
             <div class="row justify-between">
               <p class="input-caption">Durée</p>
-              <!-- <q-icon v-if="$v.newAbsenceOptionsSelected.startDateOption.$error" name="error_outline" color="secondary" /> -->
+              <q-icon v-if="$v.newAbsence.startDuration.$error" name="error_outline" color="secondary" />
             </div>
-            <!-- <q-field :error="$v.newAbsenceOptionsSelected.startDateOption.$error" error-label="Champ requis"> -->
+            <q-field :error="$v.newAbsence.startDuration.$error" error-label="Champ requis">
               <q-select :options="dateOptions" v-model="newAbsence.startDuration" color="white" inverted-light separator /> <!-- @blur="$v.newAbsenceOptionsSelected.startDateOption.$touch"  -->
-            <!-- </q-field> -->
+            </q-field>
           </div>
         </div>
         <div class="row margin-input">
@@ -60,21 +94,21 @@
               <q-icon v-if="$v.newAbsence.endDate.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newAbsence.endDate.$error" error-label="Champ requis">
-              <q-datetime type="date" format="DD/MM/YYYY" v-model="newAbsence.endDate" color="white" inverted-light popover
+              <q-datetime type="date" format="DD/MM/YYYY" v-model="newAbsence.endDate" :min="newAbsence.startDate" color="white" inverted-light popover
               ok-label="OK"
               cancel-label="Fermer" />
             </q-field>
           </div>
         </div>
-        <div v-if="newAbsence.endDate > newAbsence.startDate" class="row margin-input">
+        <div class="row margin-input">
           <div class="col-xs-12">
             <div class="row justify-between">
               <p class="input-caption">Durée</p>
-              <!-- <q-icon v-if="$v.newAbsenceOptionsSelected.startDateOption.$error" name="error_outline" color="secondary" /> -->
+              <q-icon v-if="$v.newAbsence.endDuration.$error" name="error_outline" color="secondary" />
             </div>
-            <!-- <q-field :error="$v.newAbsenceOptionsSelected.startDateOption.$error" error-label="Champ requis"> -->
-              <q-select :options="dateOptions" v-model="newAbsence.endDuration" color="white" inverted-light separator /> <!-- @blur="$v.newAbsenceOptionsSelected.startDateOption.$touch"  -->
-            <!-- </q-field> -->
+            <q-field :error="$v.newAbsence.endDuration.$error" error-label="Champ requis">
+              <q-select :disable="!newAbsence.endDate || newAbsence.endDate <= newAbsence.startDate" :options="dateOptions" v-model="newAbsence.endDuration" color="white" inverted-light separator /> <!-- @blur="$v.newAbsenceOptionsSelected.startDateOption.$touch"  -->
+            </q-field>
           </div>
         </div>
       </div>
@@ -84,6 +118,7 @@
 </template>
 
 <script>
+import { Cookies } from 'quasar';
 import { required } from 'vuelidate/lib/validators';
 import { alenviAxios } from '../api/ressources/alenviAxios'
 
@@ -91,6 +126,7 @@ export default {
   data () {
     return {
       loading: false,
+      newAbsence: {},
       newAbsenceModal: false,
       modalCssContainer: {
         minWidth: '30vw'
@@ -187,6 +223,7 @@ export default {
           label: 'Période',
           align: 'left',
           field: 'endDuration',
+          format: (value) => value || '/',
           sortable: true,
         },
         {
@@ -195,55 +232,47 @@ export default {
           align: 'left',
           field: 'reason',
           sortable: false
+        },
+        {
+          name: 'link',
+          label: 'Justificatif',
+          align: 'center',
+          field: 'link',
+          sortable: false
         }
-      ],
-      // absences: [
-      //   {
-      //     startDate: '2018-03-23T14:18:18.852Z',
-      //     endDate: '2018-03-23T14:18:18.852Z',
-      //     reason: 'Congé',
-      //     _id: '5bd053b59c7afde706eacde5',
-      //     driveId: '1dnGt41N6i79TE7_vhDvWN7BSWdoddZ0c',
-      //     link: 'https://drive.google.com/file/d/1dnGt41N6i79TE7_vhDvWN7BSWdoddZ0c/view?usp=drivesdk'
-      //   }
-      // ],
-      newAbsence: {
-        startDate: '',
-        endDate: '',
-        reason: '',
-        startDuration: '',
-        endDuration: ''
-      },
-      // newAbsenceOptionsSelected: {
-      //   startDateOption: '',
-      //   endDateOption: ''
-      // },
+      ]
     }
   },
   validations: {
     newAbsence: {
       startDate: { required },
       endDate: { required },
-      reason: { required }
+      reason: { required },
+      startDuration: { required },
+      endDuration: { required }
     }
   },
   computed: {
     getUser () {
       return this.$store.getters['rh/getUserProfile'];
-    }
+    },
+    getTomorrow () {
+      return this.$moment().add(1, 'day').toDate();
+    },
+    docsUploadUrl () {
+      return `${process.env.API_HOSTNAME}/users/${this.getUser._id}/gdrive/${this.getUser.administrative.driveFolder.id}/upload`;
+    },
+    headers () {
+      return {
+        'x-access-token': Cookies.get('alenvi_token') || ''
+      }
+    },
   },
   async mounted () {
     try {
       const user = await this.$users.getById(this.getUser._id);
       this.absences = user.administrative.absences;
-      // for (let i = 0, l = this.absences.length; i < l; i++) {
-      //   console.log(this.$moment(this.absences[i].startDate).format('HH'));
-      //   if (this.$moment(this.absences[i].startDate).format('HH') < 10) {
-      //     this.absences[i].startDateOption = 'morning';
-      //   } else if (this.$moment(this.absences[i].startDate).format('HH')) {
-      //     // this.absences[i].startDateOption = this.absences[i].
-      //   }
-      // }
+      console.log(this.absences);
     } catch (e) {
       console.error(e);
     }
@@ -261,18 +290,54 @@ export default {
           data: this.newAbsence
         });
         console.log(test);
-        // const test = this.$moment(this.newAbsence.startDate).set('hours', this.durations[this.newAbsence.startDuration].start);
-        // const test2 = this.$moment(this.newAbsence.endDate).set('hours', this.durations[this.newAbsence.endDuration].end);
-        // console.log(test);
-        // console.log(test2);
-        // console.log('test');
       } catch (e) {
         console.error(e);
       } finally {
         this.newAbsenceModal = false;
-        // this.newAbsence = {};
+        this.$v.newAbsence.$reset();
+        this.newAbsence = {};
+        const absencesRaw = await alenviAxios({
+          url: `${process.env.API_HOSTNAME}/users/${this.getUser._id}/absences`,
+          method: 'GET'
+        })
+        this.absences = absencesRaw.data.data.absences;
       }
     },
+    failMsg () {
+      this.$q.notify({
+        color: 'negative',
+        icon: 'warning',
+        detail: 'Echec de l\'envoi du document',
+        position: 'bottom-left',
+        timeout: 2500
+      });
+    },
+    async refreshUser () {
+      try {
+        const user = await this.$users.getById(this.getUser._id);
+        this.absences = user.administrative.absences;
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    uploadDocument (files, refName) {
+      console.log(refName)
+      console.log(this.$refs[refName]);
+      if (files[0].size > 5000000) {
+        this.$refs[refName][0].reset();
+        this.$q.notify({
+          color: 'negative',
+          icon: 'warning',
+          detail: 'Fichier trop volumineux (> 5 Mo)',
+          position: 'bottom-left',
+          timeout: 2500
+        });
+        return '';
+      } else {
+        console.log(this.$refs);
+        this.$refs[refName][0].upload();
+      }
+    }
   }
 };
 </script>
@@ -291,10 +356,20 @@ export default {
     &.last
       margin-bottom: 24px
 
+  .bg-negative
+    background: none !important
+    color: inherit !important
+
   .q-field-bottom
     padding-top: 2px
 
   .q-if-inverted
     border: 1px solid $light-grey
+
+  .fab-add-person
+    right: 60px
+    bottom: 18px
+    font-size: 16px
+    z-index: 2
 
 </style>
