@@ -216,7 +216,7 @@ export default {
         lastname: '',
         firstname: '',
         email: '',
-        customer_id: '',
+        customerId: '',
         contact: {
           ogustAddressId: '',
           address: '',
@@ -464,8 +464,8 @@ export default {
           }
         }
         const newCustomer = await this.createOgustCustomer();
-        this.newCustomer.customer_id = newCustomer.data.data.customer.id_customer;
-        const customer = await this.$ogust.getCustomerById(this.newCustomer.customer_id);
+        this.newCustomer.customerId = newCustomer.data.data.customer.id_customer;
+        const customer = await this.$ogust.getCustomerById(this.newCustomer.customerId);
         this.newCustomer.contact.ogustAddressId = customer.main_address.id_address;
         this.customerCreated = await this.createAlenviCustomer();
         await this.getCustomersList();
