@@ -59,11 +59,11 @@
           <div class="col-12">
             <div class="row justify-between">
               <p class="input-caption">Civilité</p>
-              <q-icon v-if="$v.newCustomer.title.$error" name="error_outline" color="secondary" />
+              <q-icon v-if="$v.newCustomer.identity.title.$error" name="error_outline" color="secondary" />
             </div>
-            <q-field :error="$v.newCustomer.title.$error" error-label="Champ requis">
-              <q-select :options="civilityOptions" v-model="newCustomer.title" color="white" inverted-light separator
-               @blur="$v.newCustomer.title.$touch" />
+            <q-field :error="$v.newCustomer.identity.title.$error" error-label="Champ requis">
+              <q-select :options="civilityOptions" v-model="newCustomer.identity.title" color="white" inverted-light separator
+               @blur="$v.newCustomer.identity.title.$touch" />
             </q-field>
           </div>
         </div>
@@ -71,10 +71,10 @@
           <div class="col-12">
             <div class="row justify-between">
               <p class="input-caption">Nom</p>
-              <q-icon v-if="$v.newCustomer.lastname.$error" name="error_outline" color="secondary" />
+              <q-icon v-if="$v.newCustomer.identity.lastname.$error" name="error_outline" color="secondary" />
             </div>
-            <q-field :error="$v.newCustomer.lastname.$error" error-label="Champ requis">
-              <q-input v-model="newCustomer.lastname" color="white" inverted-light @blur="$v.newCustomer.lastname.$touch" />
+            <q-field :error="$v.newCustomer.identity.lastname.$error" error-label="Champ requis">
+              <q-input v-model="newCustomer.identity.lastname" color="white" inverted-light @blur="$v.newCustomer.identity.lastname.$touch" />
             </q-field>
           </div>
         </div>
@@ -82,7 +82,7 @@
           <div class="col-12">
             <p class="input-caption">Prénom</p>
             <q-field error-label=" ">
-              <q-input v-model="newCustomer.firstname" color="white" inverted-light />
+              <q-input v-model="newCustomer.identity.firstname" color="white" inverted-light />
             </q-field>
           </div>
         </div>
@@ -101,11 +101,11 @@
           <div class="col-12">
             <div class="row justify-between">
               <p class="input-caption">Adresse</p>
-              <q-icon v-if="$v.newCustomer.contact.address.$error" name="error_outline" color="secondary" />
+              <q-icon v-if="$v.newCustomer.contact.address.street.$error" name="error_outline" color="secondary" />
             </div>
-            <q-field :error="$v.newCustomer.contact.address.$error" error-label="Champ requis">
-              <q-input v-model="newCustomer.contact.address" color="white" inverted-light
-                @blur="$v.newCustomer.contact.address.$touch" />
+            <q-field :error="$v.newCustomer.contact.address.street.$error" error-label="Champ requis">
+              <q-input v-model="newCustomer.contact.address.street" color="white" inverted-light
+                @blur="$v.newCustomer.contact.address.street.$touch" />
             </q-field>
           </div>
         </div>
@@ -113,11 +113,11 @@
           <div class="col-12">
             <div class="row justify-between">
               <p class="input-caption">Code Postal</p>
-              <q-icon v-if="$v.newCustomer.contact.zipCode.$error" name="error_outline" color="secondary" />
+              <q-icon v-if="$v.newCustomer.contact.address.zipCode.$error" name="error_outline" color="secondary" />
             </div>
-            <q-field :error="$v.newCustomer.contact.zipCode.$error" :error-label="zipCodeError">
-              <q-input v-model="newCustomer.contact.zipCode" color="white" inverted-light
-                @blur="$v.newCustomer.contact.zipCode.$touch" />
+            <q-field :error="$v.newCustomer.contact.address.zipCode.$error" :error-label="zipCodeError">
+              <q-input v-model="newCustomer.contact.address.zipCode" color="white" inverted-light
+                @blur="$v.newCustomer.contact.address.zipCode.$touch" />
             </q-field>
           </div>
         </div>
@@ -125,10 +125,10 @@
           <div class="col-12">
             <div class="row justify-between">
               <p class="input-caption">Ville</p>
-              <q-icon v-if="$v.newCustomer.contact.city.$error" name="error_outline" color="secondary" />
+              <q-icon v-if="$v.newCustomer.contact.address.city.$error" name="error_outline" color="secondary" />
             </div>
-            <q-field :error="$v.newCustomer.contact.city.$error" error-label="Champ requis">
-              <q-input v-model="newCustomer.contact.city" color="white" inverted-light @blur="$v.newCustomer.contact.city.$touch" />
+            <q-field :error="$v.newCustomer.contact.address.city.$error" error-label="Champ requis">
+              <q-input v-model="newCustomer.contact.address.city" color="white" inverted-light @blur="$v.newCustomer.contact.address.city.$touch" />
             </q-field>
           </div>
         </div>
@@ -212,16 +212,20 @@ export default {
         }
       ],
       newCustomer: {
-        title: '',
-        lastname: '',
-        firstname: '',
+        identity: {
+          title: '',
+          lastname: '',
+          firstname: ''
+        },
         email: '',
         customerId: '',
         contact: {
           ogustAddressId: '',
-          address: '',
-          city: '',
-          zipCode: ''
+          address: {
+            street: '',
+            city: '',
+            zipCode: ''
+          }
         },
         isActive: true
       },
@@ -298,17 +302,21 @@ export default {
   },
   validations: {
     newCustomer: {
-      title: { required },
-      lastname: { required },
+      identity: {
+        title: { required },
+        lastname: { required }
+      },
       email: { email },
       contact: {
-        address: { required },
-        zipCode: {
-          required,
-          frZipCode,
-          maxLength: maxLength(5)
-        },
-        city: { required }
+        address: {
+          street: { required },
+          zipCode: {
+            required,
+            frZipCode,
+            maxLength: maxLength(5)
+          },
+          city: { required }
+        }
       },
     },
     ogust: {
@@ -340,9 +348,9 @@ export default {
     //   return this.$store.getters['rh/getNotificationsTasks'];
     // },
     zipCodeError () {
-      if (!this.$v.newCustomer.contact.zipCode.required) {
+      if (!this.$v.newCustomer.contact.address.zipCode.required) {
         return 'Champ requis';
-      } else if (!this.$v.newCustomer.contact.zipCode.frZipCode || !this.$v.newCustomer.contact.zipCode.maxLength) {
+      } else if (!this.$v.newCustomer.contact.address.zipCode.frZipCode || !this.$v.newCustomer.contact.address.zipCode.maxLength) {
         return 'Code postal non valide';
       }
     },
@@ -354,8 +362,8 @@ export default {
       }
     },
     fullAddress () {
-      if (!this.$v.newCustomer.contact.$error) {
-        return `${this.newCustomer.contact.address} ${this.newCustomer.contact.zipCode} ${this.newCustomer.contact.city}`
+      if (!this.$v.newCustomer.contact.address.$error) {
+        return `${this.newCustomer.contact.address.street} ${this.newCustomer.contact.address.zipCode} ${this.newCustomer.contact.address.city}`
       }
     }
   },
@@ -395,7 +403,7 @@ export default {
           return {
             customer: {
               _id: customer._id,
-              name: customer.firstname ? `${customer.firstname} ${customer.lastname}` : customer.lastname,
+              name: customer.identity.firstname ? `${customer.identity.firstname} ${customer.identity.lastname}` : customer.identity.lastname,
             },
             startDate: customer.createdAt,
             // sector: sectors[customer.sector[0]],
@@ -422,14 +430,14 @@ export default {
     },
     async createOgustCustomer () {
       const ogustPayload = {
-        title: this.newCustomer.title,
-        last_name: this.newCustomer.lastname,
-        first_name: this.newCustomer.firstname,
+        title: this.newCustomer.identity.title,
+        last_name: this.newCustomer.identity.lastname,
+        first_name: this.newCustomer.identity.firstname,
         email: this.newCustomer.email,
         main_address: {
-          line: this.newCustomer.contact.address,
-          zip: this.newCustomer.contact.zipCode,
-          city: this.newCustomer.contact.city
+          line: this.newCustomer.contact.address.street,
+          zip: this.newCustomer.contact.address.zipCode,
+          city: this.newCustomer.contact.address.city
         },
         method_of_payment: this.ogust.method_of_payment,
         origin: this.ogust.origin,
