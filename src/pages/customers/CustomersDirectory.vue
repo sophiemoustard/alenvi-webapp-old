@@ -132,7 +132,7 @@
             </q-field>
           </div>
         </div>
-        <!-- <div class="row margin-input">
+        <div class="row margin-input">
           <div class="col-12">
             <div class="row justify-between">
               <p class="input-caption">Mode de paiement</p>
@@ -164,7 +164,7 @@
               <select-ogust-list v-model="ogust.managerId" @myBlur="$v.ogust.managerId.$touch" listType="customer.manager" filter />
             </q-field>
           </div>
-        </div> -->
+        </div>
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary" :loading="loading" @click="submit" />
     </q-modal>
@@ -180,7 +180,7 @@ import { clear } from '../../helpers/utils.js';
 // import { taskValidation } from '../../helpers/taskValidation';
 import SelectSector from '../../components/SelectSector';
 import SelectManager from '../../components/SelectManager';
-// import SelectOgustList from '../../components/SelectOgustList';
+import SelectOgustList from '../../components/SelectOgustList';
 
 export default {
   metaInfo: {
@@ -189,7 +189,7 @@ export default {
   components: {
     SelectSector,
     SelectManager,
-    // SelectOgustList
+    SelectOgustList
   },
   data () {
     return {
