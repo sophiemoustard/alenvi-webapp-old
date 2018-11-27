@@ -9,5 +9,11 @@ export default {
   },
   async create (data) {
     return alenviAxios.post(`${process.env.API_HOSTNAME}/customers`, data);
+  },
+  async updateById (data) {
+    return alenviAxios.put(`${process.env.API_HOSTNAME}/customers/${data._id}`, data);
+  },
+  async removeHelper (params) {
+    return alenviAxios.delete(`${process.env.API_HOSTNAME}/customers/${params._id}/helpers/${params.helperId}`);
   }
 }
