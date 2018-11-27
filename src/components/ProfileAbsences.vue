@@ -20,6 +20,10 @@
           </a>
         </q-btn>
       </q-td>
+      <q-td slot="body-cell-delete" slot-scope="props" :props="props">
+        <q-btn flat round small color="grey" icon="delete" @click.native="removeAbsence(props.value, props.row.__index)" />
+        <!-- <q-icon class="cursor-pointer" color="grey" name="delete" @click.native="remove(props.value.id, props.row.__index, props.value.userId)" size="1.5rem" /> -->
+      </q-td>
     </q-table>
     <!-- <div class="row margin-input">
       <div class="col-xs-12">
@@ -70,7 +74,7 @@
               <q-icon v-if="$v.newAbsence.startDate.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newAbsence.startDate.$error" error-label="Champ requis">
-              <q-datetime type="date" format="DD/MM/YYYY" v-model="newAbsence.startDate" :min="getTomorrow" color="white" inverted-light popover
+              <q-datetime type="date" format="DD/MM/YYYY" v-model="newAbsence.startDate" :min="$moment().startOf('month').toDate()" color="white" inverted-light popover
               ok-label="OK"
               cancel-label="Fermer" />
             </q-field>
@@ -239,6 +243,13 @@ export default {
           align: 'center',
           field: 'link',
           sortable: false
+        },
+        {
+          name: 'delete',
+          label: '',
+          align: 'left',
+          field: '_id',
+          sortable: false
         }
       ]
     }
@@ -255,9 +266,6 @@ export default {
   computed: {
     getUser () {
       return this.$store.getters['rh/getUserProfile'];
-    },
-    getTomorrow () {
-      return this.$moment().add(1, 'day').toDate();
     },
     docsUploadUrl () {
       return `${process.env.API_HOSTNAME}/users/${this.getUser._id}/gdrive/${this.getUser.administrative.driveFolder.id}/upload`;
@@ -336,6 +344,37 @@ export default {
       } else {
         console.log(this.$refs);
         this.$refs[refName].upload();
+      }
+    },
+    async removeAbsence (id, cell) {
+      try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Etes-vous sûr de vouloir supprimer cette absence ?',
+          ok: 'OK',
+          cancel: 'Annuler'
+        })
+        await alenviAxios({
+          url: `${process.env.API_HOSTNAME}/users/${this.getUser._id}/absences/${id}`,
+          method: 'DELETE'
+        })
+        this.absences.splice(cell, 1);
+        this.$q.notify({
+          color: 'positive',
+          icon: 'thumb up',
+          detail: 'Absence supprimée.',
+          position: 'bottom-right',
+          timeout: 2500
+        });
+      } catch (e) {
+        this.$q.notify({
+          color: 'negative',
+          icon: 'warning',
+          detail: 'Erreur lors de la suppression de l\'absence.',
+          position: 'bottom-right',
+          timeout: 2500
+        });
+        console.error(e);
       }
     }
   }
