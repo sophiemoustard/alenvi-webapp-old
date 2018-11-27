@@ -420,9 +420,13 @@ export default {
     async submit () {
       try {
         this.loading = true;
+        this.$v.newCustomer.$touch();
+        if (this.$v.newCustomer.$error) {
+          throw new Error('Invalid fields');
+        }
         const isValidAddress = await this.validateAddress();
         if (!isValidAddress) {
-          this.isLoding = false;
+          this.isLoading = false;
           return this.$q.notify({
             color: 'negative',
             icon: 'warning',
@@ -430,10 +434,6 @@ export default {
             position: 'bottom-left',
             timeout: 2500
           });
-        }
-        this.$v.newCustomer.$touch();
-        if (this.$v.newCustomer.$error) {
-          throw new Error('Invalid fields');
         }
         if (this.newCustomer.email !== '') {
           const existingCustomer = await this.$ogust.getCustomers({ email: this.newCustomer.email });
@@ -505,10 +505,9 @@ export default {
       }
     },
     async validateAddress () {
-      if (!this.fullAddress) return false;
       const res = await this.$axios.get('https://api-adresse.data.gouv.fr/search', {
         params: {
-          q: this.fullAddress
+          q: this.newCustomer.contact.address.fullAddress
         }
       });
       return res.data.features.length === 1 && res.data.features[0].properties.score > 0.85;
