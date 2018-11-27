@@ -104,10 +104,7 @@
               <q-icon v-if="$v.newCustomer.contact.address.fullAddress.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newCustomer.contact.address.fullAddress.$error" error-label="Champ requis">
-              <q-search v-model="newCustomer.contact.address.fullAddress" inverted-light color="white" placeholder=" " no-icon
-                @blur="$v.newCustomer.contact.address.fullAddress.$touch">
-                <q-autocomplete @search="searchAddress" @selected="selectedAddress" />
-              </q-search>
+              <search-address v-model="newCustomer.contact.address.fullAddress" @selected="selectedAddress" @blur="$v.newCustomer.contact.address.fullAddress.$touch" />
             </q-field>
           </div>
         </div>
@@ -159,6 +156,7 @@ import { clear } from '../../helpers/utils.js';
 import SelectSector from '../../components/SelectSector';
 import SelectManager from '../../components/SelectManager';
 import SelectOgustList from '../../components/SelectOgustList';
+import SearchAddress from '../../components/SearchAddress';
 
 export default {
   metaInfo: {
@@ -167,7 +165,8 @@ export default {
   components: {
     SelectSector,
     SelectManager,
-    SelectOgustList
+    SelectOgustList,
+    SearchAddress
   },
   data () {
     return {
@@ -512,32 +511,9 @@ export default {
       });
       return res.data.features.length === 1 && res.data.features[0].properties.score > 0.85;
     },
-    async searchAddress (terms, done) {
-      try {
-        const res = await this.$axios.get('https://api-adresse.data.gouv.fr/search', {
-          params: {
-            q: terms
-          }
-        });
-        const resultsList = res.data.features.sort((a, b) => b.properties.score - a.properties.score).map(result => {
-          return {
-            label: result.properties.label,
-            value: result.properties.label,
-            street: result.properties.name,
-            zipCode: result.properties.postcode,
-            city: result.properties.city,
-            location: result.geometry
-          }
-        });
-        done(resultsList);
-      } catch (e) {
-        console.error(e);
-        done([]);
-      }
-    },
     selectedAddress (item) {
-      const { label, value, ...payload } = item;
-      this.newCustomer.contact.address = Object.assign({}, this.newCustomer.contact.address, payload);
+      this.newCustomer.contact.address = Object.assign({}, this.newCustomer.contact.address, item);
+      console.log('address', this.newCustomer.contact.address);
     }
   }
 }
