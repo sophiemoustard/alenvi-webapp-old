@@ -101,34 +101,13 @@
           <div class="col-12">
             <div class="row justify-between">
               <p class="input-caption">Adresse</p>
-              <q-icon v-if="$v.newCustomer.contact.address.street.$error" name="error_outline" color="secondary" />
+              <q-icon v-if="$v.newCustomer.contact.address.fullAddress.$error" name="error_outline" color="secondary" />
             </div>
-            <q-field :error="$v.newCustomer.contact.address.street.$error" error-label="Champ requis">
-              <q-input v-model="newCustomer.contact.address.street" color="white" inverted-light
-                @blur="$v.newCustomer.contact.address.street.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Code Postal</p>
-              <q-icon v-if="$v.newCustomer.contact.address.zipCode.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newCustomer.contact.address.zipCode.$error" :error-label="zipCodeError">
-              <q-input v-model="newCustomer.contact.address.zipCode" color="white" inverted-light
-                @blur="$v.newCustomer.contact.address.zipCode.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Ville</p>
-              <q-icon v-if="$v.newCustomer.contact.address.city.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newCustomer.contact.address.city.$error" error-label="Champ requis">
-              <q-input v-model="newCustomer.contact.address.city" color="white" inverted-light @blur="$v.newCustomer.contact.address.city.$touch" />
+            <q-field :error="$v.newCustomer.contact.address.fullAddress.$error" error-label="Champ requis">
+              <q-search v-model="newCustomer.contact.address.fullAddress" inverted-light color="white" placeholder=" " no-icon
+                @blur="$v.newCustomer.contact.address.fullAddress.$touch">
+                <q-autocomplete @search="searchAddress" @selected="selectedAddress" />
+              </q-search>
             </q-field>
           </div>
         </div>
@@ -172,9 +151,8 @@
 </template>
 
 <script>
-import { required, maxLength, email } from 'vuelidate/lib/validators';
+import { required, email } from 'vuelidate/lib/validators';
 
-import { frZipCode } from '../../helpers/vuelidateCustomVal';
 import { clear } from '../../helpers/utils.js';
 // import { userProfileValidation } from '../../helpers/userProfileValidation';
 // import { taskValidation } from '../../helpers/taskValidation';
@@ -222,9 +200,7 @@ export default {
         contact: {
           ogustAddressId: '',
           address: {
-            street: '',
-            city: '',
-            zipCode: ''
+            fullAddress: '',
           }
         },
         isActive: true
@@ -309,13 +285,7 @@ export default {
       email: { email },
       contact: {
         address: {
-          street: { required },
-          zipCode: {
-            required,
-            frZipCode,
-            maxLength: maxLength(5)
-          },
-          city: { required }
+          fullAddress: { required }
         }
       },
     },
@@ -542,6 +512,33 @@ export default {
         }
       });
       return res.data.features.length === 1 && res.data.features[0].properties.score > 0.85;
+    },
+    async searchAddress (terms, done) {
+      try {
+        const res = await this.$axios.get('https://api-adresse.data.gouv.fr/search', {
+          params: {
+            q: terms
+          }
+        });
+        const resultsList = res.data.features.sort((a, b) => b.properties.score - a.properties.score).map(result => {
+          return {
+            label: result.properties.label,
+            value: result.properties.label,
+            street: result.properties.name,
+            zipCode: result.properties.postcode,
+            city: result.properties.city,
+            location: result.geometry
+          }
+        });
+        done(resultsList);
+      } catch (e) {
+        console.error(e);
+        done([]);
+      }
+    },
+    selectedAddress (item) {
+      const { label, value, ...payload } = item;
+      this.newCustomer.contact.address = Object.assign({}, this.newCustomer.contact.address, payload);
     }
   }
 }
