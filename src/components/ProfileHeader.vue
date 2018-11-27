@@ -4,7 +4,8 @@
       <div class="row items-baseline col-xs-12 col-md-10">
         <div class="row">
           <q-icon v-if="isExternalUser" class="on-left cursor-pointer self-center" size="1rem" name="arrow_back" color="primary" @click.native="goToDirectory" />
-          <h4>{{ user.firstname }} {{ user.lastname }}</h4>
+          <h4 v-if="!customer">{{ user.firstname }} {{ user.lastname }}</h4>
+          <h4 v-else>{{ user.identity.firstname }} {{ user.identity.lastname }}</h4>
         </div>
       </div>
       <div v-if="!customer" class="row custom-justify-end col-xs-12 col-md-2">
