@@ -513,7 +513,6 @@ export default {
     },
     selectedAddress (item) {
       this.newCustomer.contact.address = Object.assign({}, this.newCustomer.contact.address, item);
-      console.log('address', this.newCustomer.contact.address);
     }
   }
 }
