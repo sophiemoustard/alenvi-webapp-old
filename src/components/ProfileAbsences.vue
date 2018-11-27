@@ -6,7 +6,7 @@
       binary-state-sort>
       <q-td slot="body-cell-link" slot-scope="props" :props="props">
         <div v-if="!props.row.link" class="row justify-center">
-          <q-uploader :ref="`absenceReason_${props.row._id}`" name="signedContract" :url="docsUploadUrl" :headers="headers"
+          <q-uploader :ref="`absenceReason_${props.row._id}`" name="absenceReason" :url="docsUploadUrl" :headers="headers"
             :additional-fields="[
               { name: 'fileName', value: `justificatif_absence_${getUser.firstname}_${getUser.lastname}_${$moment().format('DD-MM-YYYY')}` },
               { name: 'absenceId', value: props.row._id }
@@ -324,7 +324,7 @@ export default {
       console.log(refName)
       console.log(this.$refs[refName]);
       if (files[0].size > 5000000) {
-        this.$refs[refName][0].reset();
+        this.$refs[refName].reset();
         this.$q.notify({
           color: 'negative',
           icon: 'warning',
@@ -335,7 +335,7 @@ export default {
         return '';
       } else {
         console.log(this.$refs);
-        this.$refs[refName][0].upload();
+        this.$refs[refName].upload();
       }
     }
   }
@@ -366,10 +366,30 @@ export default {
   .q-if-inverted
     border: 1px solid $light-grey
 
+  .q-table-container
+    box-shadow: none
+
   .fab-add-person
     right: 60px
     bottom: 18px
     font-size: 16px
     z-index: 2
+
+  a
+    color: $primary
+    text-decoration: none
+
+  /deep/ .q-uploader .q-if-inner
+    display: none
+
+  /deep/ .q-uploader input
+    cursor: pointer !important
+
+  /deep/ .q-uploader-pick-button
+    color: $primary
+    font-size: 1.5rem
+    // position: relative !important
+    cursor: pointer !important
+    // background: blue
 
 </style>
