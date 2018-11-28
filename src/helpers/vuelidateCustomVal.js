@@ -1,4 +1,5 @@
 const ibantools = require('ibantools');
+const axios = require('axios');
 
 export const frPhoneNumber = (value) => {
   if (!value) {
@@ -32,4 +33,17 @@ export const bic = (value) => {
 
 export const posDecimals = (value) => {
   return value ? parseFloat(value) >= 0 : false;
+}
+
+export const frAddress = async (value) => {
+  if (!value) return false;
+  const res = await axios.get('https://api-adresse.data.gouv.fr/search', {
+    params: {
+      q: value,
+      limit: 1
+    }
+  });
+  return new Promise(resolve => {
+    resolve(res.data.features.length === 1 && res.data.features[0].properties.score > 0.9);
+  });
 }

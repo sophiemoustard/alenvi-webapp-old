@@ -53,7 +53,7 @@
           <div class="row justify-between">
             <p class="input-caption">Adresse</p>
           </div>
-          <q-field>
+          <q-field :error="$v.customer.contact.address.fullAddress.$error" error-label="Adresse non valide">
             <search-address v-model="customer.contact.address.fullAddress" color="white" inverted-light @focus="saveTmp('contact.address.fullAddress')"
               @blur="updateUser({ alenvi: 'contact.address', ogust: 'address' })"
               @selected="selectedAddress" />
@@ -135,7 +135,7 @@
 <script>
 import { extend } from '../../helpers/utils.js';
 import SearchAddress from '../../components/SearchAddress';
-import { frPhoneNumber, iban, bic } from '../../helpers/vuelidateCustomVal';
+import { frPhoneNumber, iban, bic, frAddress } from '../../helpers/vuelidateCustomVal';
 
 export default {
   components: {
@@ -188,20 +188,7 @@ export default {
       contact: {
         phone: { frPhoneNumber },
         address: {
-          fullAddress: {
-            async frAddress (value) {
-              if (!value) return false;
-              const res = await this.$axios.get('https://api-adresse.data.gouv.fr/search', {
-                params: {
-                  q: value
-                }
-              });
-              console.log('RES', res);
-              return new Promise(resolve => {
-                resolve(res.data.features.length === 1 && res.data.features[0].properties.score > 0.85);
-              });
-            }
-          }
+          fullAddress: { frAddress }
         }
       },
       payment: {
@@ -238,17 +225,15 @@ export default {
     async updateUser (paths) {
       try {
         if (this.tmpInput === this.$_.get(this.customer, paths.alenvi)) return;
-        if (this.$_.get(this.$v.customer, paths.alenvi)) {
-          this.$_.get(this.$v.customer, paths.alenvi).$touch();
-          if (this.$_.get(this.$v.customer, paths.alenvi).$error) {
-            return this.$q.notify({
-              color: 'secondary',
-              icon: 'warning',
-              detail: 'Champ(s) invalide(s)',
-              position: 'bottom-left',
-              timeout: 2500
-            });
-          }
+        const isValid = await this.waitForValidation();
+        if (!isValid) {
+          return this.$q.notify({
+            color: 'secondary',
+            icon: 'warning',
+            detail: 'Champ(s) invalide(s)',
+            position: 'bottom-left',
+            timeout: 2500
+          });
         }
         if (paths.alenvi && paths.ogust) {
           await this.updateAlenviCustomer(paths.alenvi);
@@ -331,6 +316,17 @@ export default {
       } catch (e) {
         console.error(e);
       }
+    },
+    waitForValidation () {
+      return new Promise((resolve) => {
+        const unwatch = this.$watch(() => !this.$v.customer.$pending, (notPending) => {
+          console.log('NOT PENDING', notPending);
+          if (notPending) {
+            resolve(!this.$v.customer.$error);
+            unwatch();
+          }
+        }, { immediate: true });
+      })
     }
   }
 }
