@@ -44,7 +44,7 @@
           <div class="row justify-between">
             <p class="input-caption">Téléphone</p>
           </div>
-          <q-field>
+          <q-field :error="$v.customer.contact.phone.$error" error-label="Numéro de téléphone non valide">
             <q-input v-model.trim="customer.contact.phone" type="tel" color="white" inverted-light @focus="saveTmp('contact.phone')"
               @blur="updateUser({ alenvi: 'contact.phone', ogust: 'mobile_phone' })" />
           </q-field>
@@ -97,7 +97,7 @@
           <div class="row justify-between">
             <p class="input-caption">IBAN</p>
           </div>
-          <q-field>
+          <q-field :error="$v.customer.payment.iban.$error" error-label="IBAN non valide">
             <q-input v-model="customer.payment.iban" color="white" inverted-light @focus="saveTmp('payment.iban')"
               @blur="updateUser({ alenvi: 'payment.iban', ogust: 'iban_number' })" />
           </q-field>
@@ -106,7 +106,7 @@
           <div class="row justify-between">
             <p class="input-caption">BIC</p>
           </div>
-          <q-field>
+          <q-field :error="$v.customer.payment.bic.$error" error-label="BIC non valide">
             <q-input v-model="customer.payment.bic" color="white" inverted-light @focus="saveTmp('payment.bic')" @blur="updateUser({ alenvi: 'payment.bic', ogust: 'bic_number' })" />
           </q-field>
         </div>
@@ -341,4 +341,8 @@ export default {
   .q-table-container
     box-shadow: none
     background: white
+
+  .bg-negative
+    background: white !important
+    color: inherit !important
 </style>
