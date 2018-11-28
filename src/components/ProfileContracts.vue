@@ -17,7 +17,7 @@
             binary-state-sort>
             <q-td slot="body-cell-contractEmpty" slot-scope="props" :props="props">
               <!-- <q-btn small color="secondary">{{ props.value }}</q-btn> -->
-              <q-btn flat round small color="primary" @click="dlTemplate(props.row)">
+              <q-btn flat round small color="primary" @click="dlTemplate(props.row, props.row.__index)">
                 <q-icon name="file download" />
               </q-btn>
             </q-td>
@@ -425,7 +425,7 @@ export default {
         console.error(e);
       }
     },
-    async dlTemplate (contract) {
+    async dlTemplate (contract, index) {
       try {
         const monthlyHours = Number.parseFloat(contract.weeklyHours * 4.33).toFixed(1);
         const data = {
@@ -447,7 +447,7 @@ export default {
         };
         console.log(data);
         const file = await alenviAxios({
-          url: `${process.env.API_HOSTNAME}/gdrive/${this.getUser.company.rhConfig.templates.contract.driveId}/generatedocx`,
+          url: `${process.env.API_HOSTNAME}/gdrive/${index === 0 ? this.getUser.company.rhConfig.templates.contract.driveId : this.getUser.company.rhConfig.templates.amendment.driveId}/generatedocx`,
           method: 'POST',
           responseType: 'blob',
           data
