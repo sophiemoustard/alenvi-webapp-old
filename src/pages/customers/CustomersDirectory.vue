@@ -89,17 +89,6 @@
         <div class="row margin-input">
           <div class="col-12">
             <div class="row justify-between">
-              <p class="input-caption">Email</p>
-              <q-icon v-if="$v.newCustomer.email.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newCustomer.email.$error" error-label="Champ requis">
-              <q-input v-model="newCustomer.email" color="white" inverted-light @blur="$v.newCustomer.email.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
               <p class="input-caption">Adresse</p>
               <q-icon v-if="$v.newCustomer.contact.address.fullAddress.$error" name="error_outline" color="secondary" />
             </div>
@@ -433,12 +422,6 @@ export default {
             position: 'bottom-left',
             timeout: 2500
           });
-        }
-        if (this.newCustomer.email !== '') {
-          const existingCustomer = await this.$ogust.getCustomers({ email: this.newCustomer.email });
-          if (Object.keys(existingCustomer).length !== 0) {
-            throw new Error('Existing email');
-          }
         }
         const newCustomer = await this.createOgustCustomer();
         this.newCustomer.customerId = newCustomer.data.data.customer.id_customer;
