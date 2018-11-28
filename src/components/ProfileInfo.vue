@@ -13,8 +13,7 @@
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Photo</p>
-        <p :class="[groupErrors('picture').errors > 0 ? 'group-error' : 'group-error-ok']">{{
-          groupErrors('picture').msg }}</p>
+        <p :class="[groupErrors('picture').errors > 0 ? 'group-error' : 'group-error-ok']">{{groupErrors('picture').msg }}</p>
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
@@ -55,22 +54,14 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Prénom</p>
-            <q-icon v-if="$v.user.alenvi.firstname.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.firstname.$error" :error-label="requiredField">
-            <q-input v-model="user.alenvi.firstname" color="white" inverted-light @focus="saveTmp('firstname')" @blur="updateUser({ alenvi: 'firstname', ogust: 'first_name' })" />
-          </q-field>
+          <input-with-errors caption="Prénom" :error="$v.user.alenvi.firstname.$error" v-model="user.alenvi.firstname"
+            @myBlur="updateUser({ alenvi: 'firstname', ogust: 'first_name' })" @myFocus="saveTmp('firstname')"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Nom</p>
-            <q-icon v-if="$v.user.alenvi.lastname.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.lastname.$error" :error-label="requiredField">
-            <q-input v-model="user.alenvi.lastname" color="white" inverted-light @focus="saveTmp('lastname')" @blur="updateUser({ alenvi: 'lastname', ogust: 'last_name' })" />
-          </q-field>
+          <input-with-errors caption="Nom" :error="$v.user.alenvi.lastname.$error" v-model="user.alenvi.lastname"
+            @myBlur="updateUser({ alenvi: 'lastname', ogust: 'last_name' })" @myFocus="saveTmp('lastname')"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
@@ -104,35 +95,21 @@
           </q-field>
         </div>
         <div v-if="this.user.alenvi.administrative.identity.birthCountry === 'FR'" class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Département de naissance</p>
-            <q-icon v-if="$v.user.alenvi.administrative.identity.birthState.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.administrative.identity.birthState.$error" :error-label="birthStateError">
-            <q-input v-model="user.alenvi.administrative.identity.birthState" color="white" inverted-light @focus="saveTmp('administrative.identity.birthState')"
-              @blur="updateUser({ alenvi: 'administrative.identity.birthState', ogust: 'state_of_birth' })" />
-          </q-field>
+          <input-with-errors caption="Département de naissance" :error="$v.user.alenvi.administrative.identity.birthState.$error" :errorLabel="birthStateError"
+            v-model="user.alenvi.administrative.identity.birthState" @myBlur="updateUser({ alenvi: 'administrative.identity.birthState', ogust: 'state_of_birth' })"
+            @myFocus="saveTmp('administrative.identity.birthState')"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Ville de naissance</p>
-            <q-icon v-if="$v.user.alenvi.administrative.identity.birthCity.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.administrative.identity.birthCity.$error" :error-label="requiredField">
-            <q-input v-model="user.alenvi.administrative.identity.birthCity" color="white" inverted-light @focus="saveTmp('administrative.identity.birthCity')"
-              @blur="updateUser({ alenvi: 'administrative.identity.birthCity', ogust: 'place_of_birth' })" />
-          </q-field>
+          <input-with-errors caption="Ville de naissance" :error="$v.user.alenvi.administrative.identity.birthCity.$error" v-model="user.alenvi.administrative.identity.birthCity"
+            @myBlur="updateUser({ alenvi: 'administrative.identity.birthCity', ogust: 'place_of_birth' })" @myFocus="saveTmp('administrative.identity.birthCity')"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Numéro de sécurité sociale</p>
-            <q-icon v-if="$v.user.alenvi.administrative.identity.socialSecurityNumber.$error" name="error_outline"
-              color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.administrative.identity.socialSecurityNumber.$error" :error-label="ssnError">
-            <q-input v-model="user.alenvi.administrative.identity.socialSecurityNumber" color="white" inverted-light
-              @focus="saveTmp('administrative.identity.socialSecurityNumber')" @blur="updateUser({ alenvi: 'administrative.identity.socialSecurityNumber', ogust: 'social_insurance_number' })" />
-          </q-field>
+          <input-with-errors caption="Numéro de sécurité sociale" :error="$v.user.alenvi.administrative.identity.socialSecurityNumber.$error" :errorLabel="ssnError"
+            v-model="user.alenvi.administrative.identity.socialSecurityNumber" @myFocus="saveTmp('administrative.identity.socialSecurityNumber')"
+            @myBlur="updateUser({ alenvi: 'administrative.identity.socialSecurityNumber', ogust: 'social_insurance_number' })"
+          />
         </div>
       </div>
     </div>
@@ -144,34 +121,19 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Numéro de téléphone</p>
-            <q-icon v-if="$v.user.alenvi.mobilePhone.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.mobilePhone.$error" :error-label="phoneNbrError">
-            <q-input v-model.trim="user.alenvi.mobilePhone" type="tel" color="white" inverted-light @focus="saveTmp('mobilePhone')"
-              @blur="updateUser({ alenvi: 'mobilePhone', ogust: 'mobile_phone' })" />
-          </q-field>
+          <input-with-errors caption="Numéro de téléphone" :error="$v.user.alenvi.mobilePhone.$error" :errorLabel="phoneNbrError" v-model.trim="user.alenvi.mobilePhone"
+            type="tel" @myBlur="updateUser({ alenvi: 'mobilePhone', ogust: 'mobile_phone' })" @myFocus="saveTmp('mobilePhone')"
+          />
         </div>
         <div v-if="currentUser.role.name !== 'Auxiliaire'" class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Adresse email</p>
-            <q-icon v-if="$v.user.alenvi.local.email.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.local.email.$error" :error-label="emailError">
-            <q-input v-model.trim="user.alenvi.local.email" type="email" color="white" inverted-light lower-case
-              disable @focus="saveTmp('local.email')" @blur="updateUser({ alenvi: 'local.email', ogust: 'email' })" />
-          </q-field>
+          <input-with-errors caption="Adresse email" :error="$v.user.alenvi.local.email.$error" :errorLabel="emailError" type="email" lowerCase disable
+            v-model.trim="user.alenvi.local.email" @myBlur="updateUser({ alenvi: 'local.email', ogust: 'email' })" @myFocus="saveTmp('local.email')"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Adresse, numéro et rue</p>
-            <q-icon v-if="$v.user.alenvi.administrative.contact.address.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.administrative.contact.address.$error" :error-label="requiredField">
-            <q-input v-model="user.alenvi.administrative.contact.address" color="white" inverted-light @focus="saveTmp('administrative.contact.address')"
-              @blur="updateUser({ alenvi: 'administrative.contact.address', ogust: 'line' })" />
-          </q-field>
+          <input-with-errors caption="Adresse, numéro et rue" :error="$v.user.alenvi.administrative.contact.address.$error" v-model="user.alenvi.administrative.contact.address"
+            @myBlur="updateUser({ alenvi: 'administrative.contact.address', ogust: 'line' })" @myFocus="saveTmp('administrative.contact.address')"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Complément d'adresse</p>
@@ -179,24 +141,14 @@
             @blur="updateUser({ alenvi: 'administrative.contact.additionalAddress', ogust: 'supplement' })" />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Code postal</p>
-            <q-icon v-if="$v.user.alenvi.administrative.contact.zipCode.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.administrative.contact.zipCode.$error" :error-label="zipCodeError">
-            <q-input v-model="user.alenvi.administrative.contact.zipCode" color="white" inverted-light @focus="saveTmp('administrative.contact.zipCode')"
-              @blur="updateUser({ alenvi: 'administrative.contact.zipCode', ogust: 'zip' })" />
-          </q-field>
+          <input-with-errors caption="Code postal" :error="$v.user.alenvi.administrative.contact.zipCode.$error" :errorLabel="zipCodeError" v-model="user.alenvi.administrative.contact.zipCode"
+            @myBlur="updateUser({ alenvi: 'administrative.contact.zipCode', ogust: 'zip' })" @myFocus="saveTmp('administrative.contact.zipCode')"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Ville</p>
-            <q-icon v-if="$v.user.alenvi.administrative.contact.city.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.administrative.contact.city.$error" :error-label="requiredField">
-            <q-input v-model="user.alenvi.administrative.contact.city" color="white" inverted-light @focus="saveTmp('administrative.contact.city')"
-              @blur="updateUser({ alenvi: 'administrative.contact.city', ogust: 'city' })" />
-          </q-field>
+          <input-with-errors caption="Ville" :error="$v.user.alenvi.administrative.contact.city.$error" v-model="user.alenvi.administrative.contact.city"
+            @myBlur="updateUser({ alenvi: 'administrative.contact.city', ogust: 'city' })" @myFocus="saveTmp('administrative.contact.city')"
+          />
         </div>
       </div>
     </div>
@@ -208,24 +160,15 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Prénom et nom</p>
-            <q-icon v-if="$v.user.alenvi.administrative.emergencyContact.name.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.administrative.emergencyContact.name.$error" :error-label="requiredField">
-            <q-input v-model="user.alenvi.administrative.emergencyContact.name" color="white" inverted-light @focus="saveTmp('administrative.emergencyContact.name')"
-              @blur="updateUser({ alenvi: 'administrative.emergencyContact.name' })" />
-          </q-field>
+          <input-with-errors caption="Prénom et nom" :error="$v.user.alenvi.administrative.emergencyContact.name.$error" v-model="user.alenvi.administrative.emergencyContact.name"
+            @myBlur="updateUser({ alenvi: 'administrative.emergencyContact.name' })" @myFocus="saveTmp('administrative.emergencyContact.name')"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Numéro de téléphone</p>
-            <q-icon v-if="$v.user.alenvi.administrative.emergencyContact.phoneNumber.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.administrative.emergencyContact.phoneNumber.$error" :error-label="emergencyPhoneNbrError">
-            <q-input v-model.trim="user.alenvi.administrative.emergencyContact.phoneNumber" color="white"
-              inverted-light @focus="saveTmp('administrative.emergencyContact.phoneNumber')" @blur="updateUser({ alenvi: 'administrative.emergencyContact.phoneNumber' })" />
-          </q-field>
+          <input-with-errors caption="Numéro de téléphone" :error="$v.user.alenvi.administrative.emergencyContact.phoneNumber.$error" :errorLabel="emergencyPhoneNbrError"
+            v-model.trim="user.alenvi.administrative.emergencyContact.phoneNumber" @myFocus="saveTmp('administrative.emergencyContact.phoneNumber')"
+            @myBlur="updateUser({ alenvi: 'administrative.emergencyContact.phoneNumber' })"
+          />
         </div>
       </div>
     </div>
@@ -236,38 +179,27 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">IBAN</p>
-            <q-icon v-if="$v.user.alenvi.administrative.payment.rib.iban.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.administrative.payment.rib.iban.$error" :error-label="ibanError">
-            <q-input upper-case v-model="user.alenvi.administrative.payment.rib.iban" color="white" inverted-light
-              @blur="updateUser({ alenvi: 'administrative.payment.rib.iban', ogust: 'iban_number' })" @focus="saveTmp('administrative.payment.rib.iban')" />
-          </q-field>
+          <input-with-errors caption="IBAN" :error="$v.user.alenvi.administrative.payment.rib.iban.$error" :errorLabel="ibanError" upperCase v-model="user.alenvi.administrative.payment.rib.iban"
+            @myBlur="updateUser({ alenvi: 'administrative.payment.rib.iban', ogust: 'iban_number' })" @myFocus="saveTmp('administrative.payment.rib.iban')"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">BIC</p>
-            <q-icon v-if="$v.user.alenvi.administrative.payment.rib.bic.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.administrative.payment.rib.bic.$error" :error-label="bicError">
-            <q-input v-model.trim="user.alenvi.administrative.payment.rib.bic" upper-case color="white" inverted-light
-              @blur="updateUser({ alenvi: 'administrative.payment.rib.bic', ogust: 'bic_number' })" @focus="saveTmp('administrative.payment.rib.bic')" />
-          </q-field>
+          <input-with-errors caption="BIC" :error="$v.user.alenvi.administrative.payment.rib.bic.$error" :errorLabel="bicError" upperCase
+            v-model.trim="user.alenvi.administrative.payment.rib.bic" @myFocus="saveTmp('administrative.payment.rib.bic')"
+            @myBlur="updateUser({ alenvi: 'administrative.payment.rib.bic', ogust: 'bic_number' })"
+          />
         </div>
       </div>
     </div>
     <div v-if="user.alenvi.administrative.driveFolder" class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Documents</p>
-        <p :class="[groupErrors('documents').errors > 0 ? 'group-error' : 'group-error-ok']">{{
-          groupErrors('documents').msg }}</p>
+        <p :class="[groupErrors('documents').errors > 0 ? 'group-error' : 'group-error-ok']">{{groupErrors('documents').msg }}</p>
       </div>
       <div class="row gutter-profile items-stretch">
         <div class="col-xs-12">
           <div class="row justify-between">
-            <p v-if="currentUser.role.name === 'Auxiliaire'" class="input-caption">Merci de nous indiquer le type de
-              document d'identité que tu possèdes.</p>
+            <p v-if="currentUser.role.name === 'Auxiliaire'" class="input-caption">Merci de nous indiquer le type de document d'identité que tu possèdes.</p>
           </div>
           <q-field :error="$v.user.alenvi.administrative.identityDocs.$error" :error-label="requiredField">
             <q-option-group color="primary" v-model="user.alenvi.administrative.identityDocs" @input="updateUser({ alenvi: 'administrative.identityDocs' })"
@@ -614,11 +546,14 @@ import SelectSector from './SelectSector';
 import SelectMentor from './SelectMentor';
 import CustomImg from './CustomImg';
 
+import InputWithErrors from './form/InputWithErrors.vue';
+
 export default {
   components: {
     SelectSector,
     SelectMentor,
-    CustomImg
+    CustomImg,
+    InputWithErrors,
   },
   data () {
     return {
