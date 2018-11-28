@@ -220,7 +220,6 @@ export default {
   async mounted () {
     const customerRaw = await this.$customers.getById(this.userProfile._id);
     const customer = customerRaw.data.data.customer;
-    console.log('customer', customer);
     this.mergeUser(customer);
     this.$v.customer.$touch();
     this.isLoaded = true;
@@ -231,7 +230,7 @@ export default {
       this.customer = Object.assign({}, extend(true, ...args));
     },
     selectedAddress (item) {
-      this.customer.contact.address = Object.assign({}, this.newCustomer.contact.address, item);
+      this.customer.contact.address = Object.assign({}, this.customer.contact.address, item);
     },
     saveTmp (path) {
       this.tmpInput = this.$_.get(this.customer, path)
@@ -304,12 +303,17 @@ export default {
           payload.bic_number = this.customer.payment.bic;
           payload.iban_number = this.customer.payment.iban;
           payload.id_tiers = this.userProfile.customerId;
-          const res = await this.$ogust.setEmployeeBankInfo(payload);
-          console.log('RES BANK', res);
+          await this.$ogust.setEmployeeBankInfo(payload);
         }
       } else if (paths.ogust === 'address') {
-        payload.id_address = this.userProfile.contact.ogustAddressId;
-        await this.$ogust.setAddress(payload);
+        const { street, zipCode, city } = payload.address;
+        const addressPayload = {
+          line: street,
+          zip: zipCode,
+          city,
+          id_address: this.userProfile.contact.ogustAddressId
+        }
+        await this.$ogust.setAddress(addressPayload);
       } else {
         await this.$ogust.editOgustCustomer(this.userProfile.customerId, payload);
       }
