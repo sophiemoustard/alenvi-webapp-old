@@ -88,7 +88,7 @@
                 <custom-img :driveId="company.rhConfig.templates.contract.driveId" alt="template contrat" />
               </div>
               <div class="self-end doc-delete">
-                <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(company.rhConfig.templates.contract.driveId)" />
+                <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(company.rhConfig.templates.contract.driveId, 'contract')" />
                 <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(company.rhConfig.templates.contract.link)" />
               </div>
             </div>
@@ -106,7 +106,7 @@
                 <custom-img :driveId="company.rhConfig.templates.amendment.driveId" alt="template avenant" />
               </div>
               <div class="self-end doc-delete">
-                <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(company.rhConfig.templates.amendment.driveId)" />
+                <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(company.rhConfig.templates.amendment.driveId, 'amendment')" />
                 <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(company.rhConfig.templates.amendment.link)" />
               </div>
             </div>
@@ -339,7 +339,7 @@ export default {
         timeout: 2500
       });
     },
-    async deleteDocument (driveId) {
+    async deleteDocument (driveId, type) {
       try {
         await this.$q.dialog({
           title: 'Confirmation',
@@ -352,7 +352,7 @@ export default {
           _id: this.company._id,
           rhConfig: {
             templates: {
-              contract: {
+              [type]: {
                 driveId: null,
                 link: null
               }
