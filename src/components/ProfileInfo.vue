@@ -255,7 +255,7 @@
         </div>
         <div class="col-xs-12 col-md-6">
           <multiple-files-uploader caption="Diplome(s) ou certificat(s)" path="administrative.certificates" alt="facture téléphone"
-            @deleteDocument="deleteDocument($event, 'certificates')" name="certificates" collapsibleLabel="Ajouter diplômes" :userProfile="userProfile"
+            @delete="deleteDocument($event, 'certificates')" name="certificates" collapsibleLabel="Ajouter diplômes" :userProfile="userProfile"
             :url="docsUploadUrl" additionalFieldsName="diplomes" @uploaded="refreshUser" @upload="uploadDocument($event, 'certificates')"
           />
         </div>
@@ -279,31 +279,16 @@
                   { label: 'Non', value: true }
                 ]" />
           </q-field>
-          <div v-if="user.alenvi.administrative.mutualFund && user.alenvi.administrative.mutualFund.driveId" class="row justify-between"
-            style="background: white; margin-top: 24px;">
-            <div class="doc-thumbnail">
-              <custom-img :driveId="user.alenvi.administrative.mutualFund.driveId" alt="justif mutuelle" />
-            </div>
-            <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.mutualFund.driveId, 'administrative.mutualFund')" />
-              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.mutualFund.link)" />
-            </div>
-          </div>
         </div>
-        <div v-if="user.alenvi.administrative.mutualFund.has && !user.alenvi.administrative.mutualFund.driveId" class="col-xs-12">
-          <div v-if="currentUser.role.name === 'Auxiliaire'" class="row justify-between">
-            <p class="input-caption">Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une
-              autre mutuelle</p>
-            <q-icon v-if="$v.user.alenvi.administrative.mutualFund.driveId.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.administrative.mutualFund.driveId.$error" :error-label="requiredDoc">
-            <q-uploader ref="mutualFund" name="mutualFund" :headers="headers" :additional-fields="[{ name: 'fileName', value: `mutuelle_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" :url="docsUploadUrl"
-              inverted-light hide-upload-button @add="uploadDocument($event, 'mutualFund')" @uploaded="refreshUser"
-              @fail="failMsg" />
-          </q-field>
-        </div>
+        <div class="col-xs-12">
+          <file-uploader caption="Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle"
+            path="administrative.mutualFund" alt="justif mutuelle" :userProfile="userProfile" @upload="uploadDocument($event, 'mutualFund')"
+            @delete="deleteDocument(user.alenvi.administrative.mutualFund.driveId, 'administrative.mutualFund')" name="mutualFund" @uploaded="refreshUser"
+            additionalFieldsName="mutuelle" :displayUpload="user.alenvi.administrative.mutualFund.has && !user.alenvi.administrative.mutualFund.driveId"
+            :error="$v.user.alenvi.administrative.mutualFund.driveId.$error" :displayCaption="currentUser.role.name === 'Auxiliaire'"
+          />
       </div>
+        </div>
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between">
@@ -823,13 +808,9 @@ export default {
     },
     uploadDocument (files, refName) {
       if (files[0].size > 5000000) {
-        if (this.$refs[refName]) {
-          this.$refs[refName].reset();
-        } else {
-          const node = this.$children.filter(child => child.$refs && Object.keys(child.$refs).includes(refName));
-          if (node) {
-            node[0].$refs[refName].reset();
-          }
+        const node = this.$children.filter(child => child.$refs && Object.keys(child.$refs).includes(refName));
+        if (node) {
+          node[0].$refs[refName].reset();
         }
         this.$q.notify({
           color: 'negative',
@@ -840,13 +821,9 @@ export default {
         });
         return '';
       } else {
-        if (this.$refs[refName]) {
-          this.$refs[refName].upload();
-        } else {
-          const node = this.$children.filter(child => child.$refs && Object.keys(child.$refs).includes(refName));
-          if (node) {
-            node[0].$refs[refName].upload();
-          }
+        const node = this.$children.filter(child => child.$refs && Object.keys(child.$refs).includes(refName));
+        if (node) {
+          node[0].$refs[refName].upload();
         }
       }
     },
@@ -1043,12 +1020,6 @@ export default {
     box-shadow: none
     & /deep/ button
       flex: 1
-
-  .doc-thumbnail
-    padding: 13px 0px 40px 12px
-
-  .doc-delete
-    padding: 0px 14px 17px 0px
 
   .group-error
     font-size: 12px

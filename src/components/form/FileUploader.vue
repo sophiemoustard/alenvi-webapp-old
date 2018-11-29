@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="displayCaption" class="row justify-between">
+    <div v-if="displayCaption && displayUpload" class="row justify-between">
       <p class="input-caption">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
@@ -13,10 +13,10 @@
         <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(document.link)" />
       </div>
     </div>
-    <q-field v-if="!document.driveId" :error="error" :error-label="errorLabel">
-      <q-uploader :ref="name" :name="name" :url="docsUploadUrl" :headers="headers" :additional-fields="additionalFields"
+    <q-field v-if="!document.driveId && displayUpload" :error="error" :error-label="errorLabel">
+      <q-uploader :ref="name" :name="name" :url="docsUploadUrl" :headers="headers" :additional-fields="additionalFields" @fail="failMsg"
         hide-underline :extensions="extensions" color="white" inverted-light hide-upload-button @add="uploadDocument" @uploaded="documentUploaded"
-        @fail="failMsg" />
+      />
     </q-field>
   </div>
 </template>
@@ -37,23 +37,15 @@ export default {
   },
   props: {
     caption: String,
-    error: {
-      type: Boolean,
-      default: false,
-    },
+    error: { type: Boolean, default: false },
     path: String,
     alt: String,
     name: String,
     additionalFieldsName: String,
     userProfile: Object,
-    errorLabel: {
-      type: String,
-      default: 'Document requis',
-    },
-    displayCaption: {
-      type: Boolean,
-      default: true,
-    },
+    errorLabel: { type: String, default: 'Document requis' },
+    displayUpload: { type: Boolean, default: true },
+    displayCaption: { type: Boolean, default: true },
   },
   methods: {
     deleteDocument () {
@@ -75,15 +67,13 @@ export default {
         icon: 'warning',
         detail: 'Echec de l\'envoi du document',
         position: 'bottom-left',
-        timeout: 2500
+        timeout: 2500,
       });
     },
   },
   computed: {
     headers () {
-      return {
-        'x-access-token': Cookies.get('alenvi_token') || ''
-      };
+      return { 'x-access-token': Cookies.get('alenvi_token') || '' };
     },
     docsUploadUrl () {
       return `${process.env.API_HOSTNAME}/users/${this.userProfile._id}/gdrive/${this.userProfile.administrative.driveFolder.id}/upload`;
@@ -99,8 +89,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  @import '~variables'
-
   .doc-thumbnail
     padding: 13px 0px 40px 12px
 

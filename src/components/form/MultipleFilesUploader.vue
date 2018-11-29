@@ -58,7 +58,7 @@ export default {
   },
   methods: {
     deleteDocument (documentId) {
-      this.$emit('deleteDocument', documentId);
+      this.$emit('delete', documentId);
     },
     documentUploaded () {
       this.$emit('uploaded');
@@ -72,7 +72,7 @@ export default {
         icon: 'warning',
         detail: 'Echec de l\'envoi du document',
         position: 'bottom-left',
-        timeout: 2500
+        timeout: 2500,
       });
     },
     goToUrl (url) {
@@ -82,15 +82,10 @@ export default {
   },
   computed: {
     headers () {
-      return {
-        'x-access-token': Cookies.get('alenvi_token') || ''
-      };
+      return { 'x-access-token': Cookies.get('alenvi_token') || '' };
     },
     collapsibleIcon () {
-      if (!this.collapsibleOpened) {
-        return 'add';
-      }
-      return 'mdi-checkbox-blank';
+      return !this.collapsibleOpened ? 'add' : 'mdi-checkbox-blank';
     },
     additionalFields () {
       return [{ name: 'fileName', value: `${this.additionalFieldsName}_${this.userProfile.firstname}_${this.userProfile.lastname}` }];
