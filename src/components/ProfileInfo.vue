@@ -70,15 +70,10 @@
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Date de naissance</p>
-            <q-icon v-if="$v.user.alenvi.administrative.identity.birthDate.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.administrative.identity.birthDate.$error" :error-label="requiredField">
-            <q-datetime type="date" format="DD/MM/YYYY" v-model="user.alenvi.administrative.identity.birthDate" color="white"
-              inverted-light popover @focus="saveTmp('administrative.identity.birthDate')" @blur="updateUser({ alenvi: 'administrative.identity.birthDate', ogust: 'date_of_birth' })"
-              ok-label="OK" cancel-label="Fermer" />
-          </q-field>
+          <datetime-picker caption="Date de naissance" :error="$v.user.alenvi.administrative.identity.birthDate.$error"
+            v-model="user.alenvi.administrative.identity.birthDate" @myFocus="saveTmp('administrative.identity.birthDate')"
+            @myBlur="updateUser({ alenvi: 'administrative.identity.birthDate', ogust: 'date_of_birth' })"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
           <select-with-errors caption="Pays de naissance" :error="$v.user.alenvi.administrative.identity.birthCountry.$error" :options="nationalitiesOptions"
@@ -352,6 +347,7 @@ import InputWithErrors from './form/InputWithErrors.vue';
 import SelectWithErrors from './form/SelectWithErrors.vue';
 import FileUploader from './form/FileUploader.vue';
 import MultipleFilesUploader from './form/MultipleFilesUploader.vue';
+import DatetimePicker from './form/DatetimePicker.vue';
 
 export default {
   components: {
@@ -361,6 +357,7 @@ export default {
     SelectWithErrors,
     FileUploader,
     MultipleFilesUploader,
+    DatetimePicker,
   },
   data () {
     return {
