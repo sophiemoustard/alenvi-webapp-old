@@ -254,37 +254,10 @@
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row">
-            <p class="input-caption">Diplome(s) ou certificat(s)</p>
-          </div>
-          <q-field v-if="user.alenvi.administrative.certificates.length === 0">
-            <q-uploader ref="certificates" name="certificates" :url="docsUploadUrl" :headers="headers"
-              :additional-fields="[{ name: 'fileName', value: `diplomes_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
-              inverted-light hide-upload-button @add="uploadDocument($event, 'certificates')" @uploaded="refreshUser"
-              @fail="failMsg" />
-          </q-field>
-          <div v-if="user.alenvi.administrative.certificates && user.alenvi.administrative.certificates.length > 0"
-            v-for="(certificate, index) in user.alenvi.administrative.certificates" :key="index">
-            <div v-if="certificate.driveId" class="row justify-between" style="background: white; margin-bottom: 24px">
-              <div class="doc-thumbnail">
-                <custom-img :driveId="certificate.driveId" alt="diplôme" />
-              </div>
-              <div class="self-end doc-delete">
-                <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(certificate.driveId, 'certificates')" />
-                <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(certificate.link)" />
-              </div>
-            </div>
-          </div>
-          <div v-if="user.alenvi.administrative.certificates && user.alenvi.administrative.certificates.length > 0">
-            <q-collapsible v-model="collapsibleOpened" label="Ajouter diplômes" :collapseIcon="collapsibleIcon">
-              <q-uploader ref="certificates" name="certificates" :url="docsUploadUrl" :headers="headers"
-                :additional-fields="[{ name: 'fileName', value: `diplomes_${userProfile.firstname}_${userProfile.lastname}` }]"
-                hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
-                inverted-light hide-upload-button @add="uploadDocument($event, 'certificates')" @uploaded="refreshUser"
-                @fail="failMsg" />
-            </q-collapsible>
-          </div>
+          <multiple-files-uploader caption="Diplome(s) ou certificat(s)" path="administrative.certificates" alt="facture téléphone"
+            @deleteDocument="deleteDocument($event, 'certificates')" name="certificates" collapsibleLabel="Ajouter diplômes" :userProfile="userProfile"
+            :url="docsUploadUrl" additionalFieldsName="diplomes" @uploaded="refreshUser" @upload="uploadDocument($event, 'certificates')"
+          />
         </div>
       </div>
     </div>
@@ -325,7 +298,7 @@
           </div>
           <q-field :error="$v.user.alenvi.administrative.mutualFund.driveId.$error" :error-label="requiredDoc">
             <q-uploader ref="mutualFund" name="mutualFund" :headers="headers" :additional-fields="[{ name: 'fileName', value: `mutuelle_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" url="docsUploadUrl"
+              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" :url="docsUploadUrl"
               inverted-light hide-upload-button @add="uploadDocument($event, 'mutualFund')" @uploaded="refreshUser"
               @fail="failMsg" />
           </q-field>
@@ -389,20 +362,20 @@ import countries from '../data/countries.js';
 
 import SelectSector from './SelectSector';
 import SelectMentor from './SelectMentor';
-import CustomImg from './CustomImg';
 
 import InputWithErrors from './form/InputWithErrors.vue';
 import SelectWithErrors from './form/SelectWithErrors.vue';
 import FileUploader from './form/FileUploader.vue';
+import MultipleFilesUploader from './form/MultipleFilesUploader.vue';
 
 export default {
   components: {
     SelectSector,
     SelectMentor,
-    CustomImg,
     InputWithErrors,
     SelectWithErrors,
     FileUploader,
+    MultipleFilesUploader,
   },
   data () {
     return {
@@ -1090,20 +1063,6 @@ export default {
   /deep/ .bg-negative
     background: white !important
     color: inherit !important
-
-  /deep/ .q-collapsible-inner
-    & .q-item
-      font-size: 12px
-      padding-left: 0
-      padding: 8px 0px
-      &-side
-        color: $primary
-        & > .q-icon
-          font-size: 16px
-
-  /deep/ .q-collapsible-sub-item
-    padding-left: 0
-    padding: 8px 0px
 
   .picture-container
      width: 200px
