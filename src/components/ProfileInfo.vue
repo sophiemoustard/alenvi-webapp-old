@@ -715,6 +715,9 @@ export default {
     }
   },
   methods: {
+    notify (color, icon, detail) {
+      return this.$q.notify({ color, icon, detail, position: 'bottom-left', timeout: 2500 });
+    },
     mergeUser (value = null) {
       const args = [this.user.alenvi, value];
       this.user.alenvi = Object.assign({}, extend(true, ...args));
@@ -728,13 +731,7 @@ export default {
         if (this.$_.get(this.$v.user.alenvi, paths.alenvi)) {
           this.$_.get(this.$v.user.alenvi, paths.alenvi).$touch();
           if (this.$_.get(this.$v.user.alenvi, paths.alenvi).$error) {
-            return this.$q.notify({
-              color: 'secondary',
-              icon: 'warning',
-              detail: 'Champ(s) invalide(s)',
-              position: 'bottom-left',
-              timeout: 2500
-            });
+            return this.notify('secondary', 'warning', 'Champ(s) invalide(s)');
           }
         }
         if (paths.alenvi && paths.ogust) {
@@ -745,22 +742,10 @@ export default {
         } else {
           await this.updateOgustUser(paths);
         }
-        this.$q.notify({
-          color: 'positive',
-          icon: 'done',
-          detail: 'Modification enregistrée',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        this.notify('positive', 'done', 'Modification enregistrée');
       } catch (e) {
         console.error(e);
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de la modification',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        this.notify('negative', 'warning', 'Erreur lors de la modification');
       } finally {
         this.$store.commit('rh/saveUserProfile', this.user.alenvi);
         this.tmpInput = '';
@@ -812,13 +797,7 @@ export default {
         if (node) {
           node[0].$refs[refName].reset();
         }
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Fichier trop volumineux (> 5 Mo)',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        this.notify('negative', 'warning', 'Fichier trop volumineux (> 5 Mo)');
         return '';
       } else {
         const node = this.$children.filter(child => child.$refs && Object.keys(child.$refs).includes(refName));
@@ -843,22 +822,10 @@ export default {
         await this.$axios.post(this.pictureUploadUrl, data, { headers: { 'content-type': 'multipart/form-data', 'x-access-token': Cookies.get('alenvi_token') || '' } });
         await this.$store.dispatch('rh/getUserProfile', { userId: this.userProfile._id });
         this.closePictureEdition();
-        this.$q.notify({
-          color: 'positive',
-          icon: 'done',
-          detail: 'Modification enregistrée',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        this.notify('positive', 'done', 'Modification enregistrée');
       } catch (e) {
         console.error(e);
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de la modification',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        this.notify('negative', 'warning', 'Erreur lors de la modification');
       } finally {
         this.loadingImage = false;
       }
@@ -881,31 +848,13 @@ export default {
           await this.$users.updateById(payload);
         }
         await this.$store.dispatch('rh/getUserProfile', { userId: this.userProfile._id });
-        this.$q.notify({
-          color: 'positive',
-          icon: 'done',
-          detail: 'Document supprimé',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        this.notify('positive', 'done', 'Document supprimé');
       } catch (e) {
         console.error(e);
         if (e.message === '') {
-          return this.$q.notify({
-            color: 'positive',
-            icon: 'done',
-            detail: 'Suppression annulée',
-            position: 'bottom-left',
-            timeout: 2500
-          });
+          return this.notify('positive', 'done', 'Suppression annulée');
         }
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de la suppression du document',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        this.notify('negative', 'warning', 'Erreur lors de la suppression du document');
       }
     },
     async deleteImage (params) {
@@ -928,51 +877,21 @@ export default {
           }
         });
         await this.$store.dispatch('rh/getUserProfile', { userId: this.userProfile._id });
-        this.$q.notify({
-          color: 'positive',
-          icon: 'done',
-          detail: 'Photo supprimée',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        this.notify('positive', 'done', 'Photo supprimée');
       } catch (e) {
         console.error(e);
         if (e.message === '') {
-          return this.$q.notify({
-            color: 'positive',
-            icon: 'done',
-            detail: 'Suppression annulée',
-            position: 'bottom-left',
-            timeout: 2500
-          });
+          return this.notify('positive', 'done', 'Suppression annulée');
         }
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de la suppression de la photo',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        this.notify('negative', 'warning', 'Erreur lors de la suppression de la photo');
       }
     },
     async refreshUser () {
       await this.$store.dispatch('rh/getUserProfile', { userId: this.userProfile._id });
-      this.$q.notify({
-        color: 'positive',
-        icon: 'done',
-        detail: 'Document envoyé',
-        position: 'bottom-left',
-        timeout: 2500
-      });
+      this.notify('positive', 'done', 'Document envoyé');
     },
     failMsg () {
-      this.$q.notify({
-        color: 'negative',
-        icon: 'warning',
-        detail: 'Echec de l\'envoi du document',
-        position: 'bottom-left',
-        timeout: 2500
-      });
+      this.notify('negative', 'warning', 'Echec de l\'envoi du document');
     },
     groupErrors (group) {
       let j = 0;
