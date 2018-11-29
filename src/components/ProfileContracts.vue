@@ -16,7 +16,6 @@
             :visible-columns="visibleColumns"
             binary-state-sort>
             <q-td slot="body-cell-contractEmpty" slot-scope="props" :props="props">
-              <!-- <q-btn small color="secondary">{{ props.value }}</q-btn> -->
               <q-btn flat round small color="primary" @click="dlTemplate(props.row, props.row.__index)">
                 <q-icon name="file download" />
               </q-btn>
@@ -32,7 +31,6 @@
                   hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
                   hide-upload-button @add="uploadDocument($event, `signedContract_${props.row._id}`)" @uploaded="refreshUser" @fail="failMsg" />
               </div>
-              <!-- <q-btn small color="secondary">{{ props.value }}</q-btn> -->
               <q-btn v-else flat round small color="primary">
                 <a :href="props.row.link" download>
                   <q-icon name="file download" />
@@ -49,16 +47,11 @@
                   isActive: !props.value,
                   cell: props.row.__index,
                   contractIndex: index })">
-              </q-checkbox> <!-- @input="updateContractActivity({ contractId: props.row._id, isActive: props.value })" -->
+              </q-checkbox>
             </q-td>
           </q-table>
         </q-card-main>
         <q-card-actions align="end">
-          <!-- <q-btn flat round small color="primary">
-            <a :href="contract.grossHourlyRate" download>
-              <q-icon name="file download" />
-            </a>
-          </q-btn> -->
           <q-btn v-if="!contract.endDate" flat no-caps color="primary" icon="add" label="Ajouter un avenant" @click="fillVersion(contract)"/>
           <q-btn v-if="!contract.endDate" flat no-caps color="grey-6" icon="clear" label="Mettre fin au contrat" @click="fillEndContract(contract)" />
         </q-card-actions>
@@ -133,11 +126,6 @@
             </q-field>
           </div>
         </div>
-        <!-- <div class="row margin-input last">
-          <div class="col-12">
-            <q-checkbox v-model="newContract.isActive" label="Contract actif" />
-          </div>
-        </div> -->
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer le contrat" icon-right="add" color="primary" :loading="loading" @click="createNewContract" />
     </q-modal>
@@ -224,10 +212,6 @@
 
 <script>
 import { Cookies } from 'quasar';
-// import * as JSZip from 'jszip';
-// import * as JSZipUtils from 'jszip-utils';
-// import * as Docxtemplater from 'docxtemplater';
-// import saveAs from 'file-saver';
 import { required } from 'vuelidate/lib/validators';
 import { alenviAxios } from '../api/ressources/alenviAxios'
 
@@ -260,10 +244,6 @@ export default {
           label: 'Prestataire',
           value: 'Prestataire'
         },
-        // {
-        //   label: 'Mandataire',
-        //   value: 'mandataire'
-        // }
       ],
       visibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractEmpty', 'contractSigned', 'isActive'],
       columns: [
@@ -376,20 +356,8 @@ export default {
     const user = await this.$users.getById(this.getUser._id);
     this.contracts = user.administrative.contracts;
     this.newContract.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
-    // console.log('contracts', this.contracts);
   },
   methods: {
-    // async getBlob (url) {
-    //   return new Promise((resolve, reject) => {
-    //     JSZipUtils.getBinaryContent(url, (err, data) => {
-    //       if (err) {
-    //         reject(err);
-    //       } else {
-    //         resolve(data);
-    //       }
-    //     });
-    //   });
-    // },
     cardTitle (contractEndDate) {
       if (this.$moment().isBefore(contractEndDate)) {
         return {
@@ -445,7 +413,6 @@ export default {
           'salary': monthlyHours * contract.grossHourlyRate,
           'startDate': this.$moment(contract.startDate).format('DD/MM/YYYY')
         };
-        console.log(data);
         const file = await alenviAxios({
           url: `${process.env.API_HOSTNAME}/gdrive/${index === 0 ? this.getUser.company.rhConfig.templates.contract.driveId : this.getUser.company.rhConfig.templates.amendment.driveId}/generatedocx`,
           method: 'POST',
@@ -463,8 +430,6 @@ export default {
       }
     },
     uploadDocument (files, refName) {
-      console.log(refName)
-      console.log(this.$refs[refName]);
       if (files[0].size > 5000000) {
         this.$refs[refName][0].reset();
         this.$q.notify({
@@ -479,37 +444,6 @@ export default {
         this.$refs[refName][0].upload();
       }
     },
-    // async uploadDocument () {
-    //   try {
-    //     let blob = await this.getBlob('https://drive.google.com/file/d/1PR0UJyEV9CJkIQ9zCXD7amhZJIMT0ZtH/view?usp=drivesdk');
-    //     let data = new FormData();
-    //     data.append('contractId', props.row._id);
-    //     data.append('fileName', `contrat_signe_${getUser.firstname}_${getUser.lastname}`);
-    //     data.append('Content-Type', blob.type || 'application/octet-stream');
-    //     data.append(`signedContract`, blob);
-    //     await this.$alenviAxios.post(this.pictureUploadUrl, data, { headers: { 'content-type': 'multipart/form-data', 'x-access-token': Cookies.get('alenvi_token') || '' } });
-    //     await this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
-    //     this.closePictureEdition();
-    //     this.loadingImage = false;
-    //     this.$q.notify({
-    //       color: 'positive',
-    //       icon: 'done',
-    //       detail: 'Modification enregistrée',
-    //       position: 'bottom-left',
-    //       timeout: 2500
-    //     });
-    //   } catch (e) {
-    //     console.error(e);
-    //     this.loadingImage = false;
-    //     this.$q.notify({
-    //       color: 'negative',
-    //       icon: 'warning',
-    //       detail: 'Erreur lors de la modification',
-    //       position: 'bottom-left',
-    //       timeout: 2500
-    //     });
-    //   }
-    // },
     fillVersion (data) {
       this.newContractVersion.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
       this.newContractVersion.mainContractId = data._id;
@@ -518,7 +452,6 @@ export default {
     },
     async updateContractActivity (data) {
       try {
-        console.log(data);
         await this.$q.dialog({
           title: 'Confirmation',
           message: 'Es-tu sûr(e) de vouloir activer ce contrat ?',
@@ -556,38 +489,6 @@ export default {
         }
       }
     },
-    // async getDocxBlob () {
-    //   try {
-    //     const test = await this.testDocxBlob('https://drive.google.com/file/d/1qcxsH3D2sek4sA8EQWdCwiTQJq2r9Vwn/view?usp=sharing');
-    //     console.log(test);
-    //     https:// docxtemplater.com/tag-example.docx
-    //     JSZipUtils.getBinaryContent('https://drive.google.com/file/d/1qcxsH3D2sek4sA8EQWdCwiTQJq2r9Vwn/view?usp=sharing', function (error, content) {
-    //       if (error) { throw error }
-    //       console.log('test');
-    //       const zip = new JSZip(content);
-    //       const doc = new Docxtemplater().loadZip(zip);
-    //       doc.setData({
-    //         firstName: 'John',
-    //         lastName: 'Doe',
-    //         // phone: '0650769406',
-    //         description: 'New Website'
-    //       });
-    //       try {
-    //         doc.render();
-    //       } catch (e) {
-    //         console.error(e);
-    //       }
-    //       const out = doc.getZip().generate({
-    //         type: 'blob',
-    //         mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    //       });
-    //       console.log(out);
-    //       saveAs(out, 'output.docx');
-    //     });
-    //   } catch (e) {
-    //     console.error(e);
-    //   }
-    // },
     async createNewContract () {
       try {
         this.loading = true;
@@ -655,7 +556,6 @@ export default {
             creation_date: this.$moment().format('YYYYMMDD'),
             contractual_salary: Number.parseFloat(this.newContractVersion.grossHourlyRate * this.newContractVersion.weeklyHours * 4.33).toFixed(2),
             contract_hours: Number.parseFloat(this.newContractVersion.weeklyHours * 4.33).toFixed(1),
-            // origine_contract: lastActiveVersion.ogustContractId,
             source_contract: lastActiveVersion.ogustContractId
           }
         });
@@ -790,9 +690,7 @@ export default {
   /deep/ .q-uploader-pick-button
     color: $primary
     font-size: 1.5rem
-    // position: relative !important
     cursor: pointer !important
-    // background: blue
 
   .missingBasicInfo
     color: red

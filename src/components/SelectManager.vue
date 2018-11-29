@@ -39,13 +39,6 @@ export default {
   methods: {
     async getManagers () {
       try {
-        // const allManagersRaw = await this.$users.showAll({ role: 'Coach' });
-        // for (let i = 0, l = allManagersRaw.length; i < l; i++) {
-        //   this.managers.push({
-        //     label: `${allManagersRaw[i].firstname} ${allManagersRaw[i].lastname}`,
-        //     value: allManagersRaw[i]._id
-        //   });
-        // }
         const allManagers = await this.$ogust.getList('employee.manager');
         for (const k in allManagers) {
           this.managers.push({

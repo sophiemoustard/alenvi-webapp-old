@@ -12,7 +12,6 @@
         <div v-show="displayNext" class="dhx_cal_next_button relative-position" v-ripple>&nbsp;</div>
         <div v-if="!customer && $q.platform.is.desktop" class="dhx_cal_today_button relative-position" v-ripple></div>
         <div class="dhx_cal_date"></div>
-        <!-- <div v-if="!customer" class="dhx_cal_tab relative-position" v-ripple name="day_tab" style="right:204px;"></div> -->
         <div v-show="!customer && $q.platform.is.desktop" class="dhx_cal_tab relative-position" v-ripple name="three_days_tab" style="left:200px;"></div>
         <div v-if="!customer && $q.platform.is.desktop" class="dhx_cal_tab relative-position" v-ripple name="week_tab" style="right:140px;"></div>
         <div v-if="!customer && $q.platform.is.desktop" class="dhx_cal_tab relative-position" v-ripple name="month_tab" style="right:76px;"></div>
@@ -141,8 +140,6 @@ import { mapGetters } from 'vuex'
 import { required } from 'vuelidate/lib/validators';
 
 import SectorFilter from '../../components/SectorFilter'
-
-// const { viewport } = dom;
 
 const configDhtmlxScheduler = (vm) => {
   // config line mark of current time
@@ -342,9 +339,6 @@ export default {
     scheduler.attachEvent('onTemplatesReady', () => {
       // Custom week_date header format (week standard view)
       scheduler.templates.week_date = (start, end) => `${scheduler.date.date_to_str('%j %F')(start)} &ndash; ${scheduler.date.date_to_str('%j %F')(scheduler.date.add(end, -1, 'day'))}`;
-      // Custom day_scale format (day standard view)
-      // scheduler.templates.day_scale_date = date => `<div>${scheduler.date.date_to_str('%D')(date)}.</div><big>${scheduler.date.date_to_str('%j')(date)}</big>`;
-      // scheduler.templates.day_date = date => scheduler.date.date_to_str('%F %Y')(date);
       // Custom month_scale format (month standard view)
       scheduler.templates.month_scale_date = date => scheduler.date.date_to_str('%l')(date);
       // Custom week_scale format (week standard view)
@@ -356,12 +350,10 @@ export default {
       }
 
       // custom 'customer_week' view
-      // scheduler.date.customer_week_start = date => scheduler.date.date_part(new Date(date.valueOf()));
       scheduler.date.customer_week_start = date => scheduler.date.week_start(date);
       scheduler.templates.customer_week_date = scheduler.templates.week_date;
       scheduler.templates.customer_week_scale_date = scheduler.templates.week_scale_date;
       scheduler.date.add_customer_week = (date, inc) => scheduler.date.add(date, inc * 7, 'day');
-      // scheduler.date.add_customer_week = scheduler.date.add_week;
 
       // custom 'customer_three_days' view
       scheduler.date.three_days_start = date => scheduler.date.date_part(new Date(date.valueOf()));
@@ -423,12 +415,6 @@ export default {
       return true;
     });
 
-    // scheduler.addMarkedTimespan({
-    //   start_date: new Date(),
-    //   // end_date: scheduler.date.add(date, 2, 'hour'),
-    //   type: 'dhx_time_block'
-    // });
-
     responsive.initResponsive(scheduler, { customer: this.customer, mobile: this.$q.platform.is.mobile });
 
     // Scheduler initialization
@@ -447,8 +433,6 @@ export default {
     // Scheduler data parser
     scheduler.parse(this.childEvents, 'json');
 
-    // Prevent draggable events
-    // scheduler.attachEvent('onEventDrag', this.blockReadOnly);
     scheduler.showLightbox = (id) => {
       const ev = scheduler.getEvent(id);
       this.customerEventInfo.doorCode = ev.door_code;
@@ -523,7 +507,6 @@ export default {
     }, 10),
     onResize: debounce(function (size) {
       scheduler.updateView();
-      // scheduler.setCurrentView();
     }, 500),
     async updateEvent () {
       try {
@@ -541,8 +524,6 @@ export default {
           ev.end_date = this.customerEventInfo.eventTo;
           ev.dateChanged = true;
         }
-        // Sending data to child component (no need of vuex)
-        // this.$emit('eventUpdated', ev);
         if (this.personType === 'employee' && this.user.employee_id === Number(ev.id_employee, 10) && ev.dateChanged) {
           const updateServicePayload = {
             start_date: this.$moment(ev.start_date).format('YYYYMMDDHHmm'),
@@ -643,12 +624,6 @@ export default {
       this.$store.commit('calendar/toggleFilter', !this.showFilter)
     },
     applyFilter () {
-      // scheduler.filter_day = scheduler.filter_month = scheduler.filter_three_days = scheduler.filter_week = (id, event) => {
-      //   if ((this.personChosen && this.personChosen === event.id_employee) || (this.personChosen && this.personChosen === event.id_customer)) {
-      //     return true;
-      //   }
-      //   return false;
-      // }
       this.$emit('applyFilter', { personChosen: true });
     },
     closeModal () {
@@ -747,7 +722,6 @@ export default {
     overflow-y: visible;
     overflow-x: visible;
     border-top: none;
-  /*padding-top: 10px;*/;
   }
 
   .dhx_cal_header div div {

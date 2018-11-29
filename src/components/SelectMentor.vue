@@ -1,5 +1,7 @@
 <template>
-  <q-select :value="value" color="white" inverted-light :stack-label="stackLabel" ref="selectMentor" @change="updateMentor" @blur="blurHandler" :options="orderedMentors" separator />
+  <q-select :value="value" color="white" inverted-light :stack-label="stackLabel" ref="selectMentor"
+    @change="updateMentor" @blur="blurHandler" :options="orderedMentors" separator
+  />
 </template>
 
 <script>

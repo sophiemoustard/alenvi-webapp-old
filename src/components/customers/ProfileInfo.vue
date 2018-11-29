@@ -243,7 +243,6 @@ export default {
         } else {
           await this.updateOgustCustomer(paths);
         }
-        // this.$store.dispatch('rh/updateNotifications');
         this.$q.notify({
           color: 'positive',
           icon: 'done',
@@ -320,7 +319,6 @@ export default {
     waitForValidation () {
       return new Promise((resolve) => {
         const unwatch = this.$watch(() => !this.$v.customer.$pending, (notPending) => {
-          console.log('NOT PENDING', notPending);
           if (notPending) {
             resolve(!this.$v.customer.$error);
             unwatch();

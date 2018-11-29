@@ -1,7 +1,5 @@
 <template>
-  <q-search :value="value" inverted-light color="white" placeholder=" " no-icon
-    @input="inputEvent"
-    @blur="blurEvent">
+  <q-search :value="value" inverted-light color="white" placeholder=" " no-icon @input="inputEvent" @blur="blurEvent">
     <q-autocomplete @search="searchAddress" @selected="selectedAddress" />
   </q-search>
 </template>
@@ -18,16 +16,18 @@ export default {
             q: terms
           }
         });
-        const resultsList = res.data.features.sort((a, b) => b.properties.score - a.properties.score).map(result => {
-          return {
-            label: result.properties.label,
-            value: result.properties.label,
-            street: result.properties.name,
-            zipCode: result.properties.postcode,
-            city: result.properties.city,
-            location: result.geometry
-          }
-        });
+        const resultsList = res.data.features
+          .sort((a, b) => b.properties.score - a.properties.score)
+          .map(result => {
+            return {
+              label: result.properties.label,
+              value: result.properties.label,
+              street: result.properties.name,
+              zipCode: result.properties.postcode,
+              city: result.properties.city,
+              location: result.geometry
+            }
+          });
         done(resultsList);
       } catch (e) {
         console.error(e);

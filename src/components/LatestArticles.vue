@@ -8,10 +8,8 @@
     <div class="row gutter-sm">
       <div v-for="(article, index) in lastArticles" :key="index" class="col-xs-12 col-sm-4">
         <q-card class="card" flat>
-          <!-- <q-card-media> -->
           <a class="img-articles" :style="{'background-image': 'url(' + article.image.link + ')'}" :href="article.link" alt="photo article"
           />
-          <!-- </q-card-media> -->
           <q-card-title>
             {{ article.title | truncate('40') }}
           </q-card-title>
@@ -80,7 +78,6 @@ export default {
       }
 
       const found = text.match(regex);
-      // console.log(found);
 
       if (found) {
         return found[1];
@@ -144,9 +141,6 @@ export default {
   text-decoration: none
   &:hover
     color: #ff1693 !important
-
-/*.q-card-title
-  font-family: alenviTitleFont */
 
 .q-card-title
   line-height: 1.5rem;

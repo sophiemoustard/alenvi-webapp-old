@@ -48,18 +48,6 @@
             <span><q-icon name="clear" size="1rem" @click.native="opened = false" /></span>
           </div>
         </div>
-        <!-- <div class="row margin-input">
-          <div class="col-12">
-            <div class="row">
-              <p class="input-caption">Support</p>
-            </div>
-            <q-select
-              v-model="messageSupport"
-              color="white"
-              inverted-light
-              :options="msgSupportOptions"/>
-          </div>
-        </div> -->
         <div class="row margin-input">
           <div class="col-12">
             <div class="row">
@@ -92,7 +80,6 @@
 import { mapGetters } from 'vuex';
 import randomize from 'randomatic';
 
-// import { getUserStartDate } from '../helpers/getUserStartDate';
 export default {
   name: 'ProfileHeader',
   props: ['profileId', 'customer'],

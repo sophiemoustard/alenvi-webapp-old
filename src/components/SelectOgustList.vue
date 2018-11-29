@@ -13,7 +13,6 @@
 </template>
 
 <script>
-// test
 import _ from 'lodash';
 
 export default {

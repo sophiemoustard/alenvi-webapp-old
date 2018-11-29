@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <q-item v-if="tasks" tag="label" v-for="(task, index) in tasks" :key="index">
+  <div v-if="tasks">
+    <q-item tag="label" v-for="(task, index) in tasks" :key="index">
       <q-item-side>
         <q-checkbox v-model="task.check.isDone" @input="handleTask(task)" />
       </q-item-side>

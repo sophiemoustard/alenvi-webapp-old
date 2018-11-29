@@ -22,29 +22,9 @@
       </q-td>
       <q-td slot="body-cell-delete" slot-scope="props" :props="props">
         <q-btn flat round small color="grey" icon="delete" @click.native="removeAbsence(props.value, props.row.__index)" />
-        <!-- <q-icon class="cursor-pointer" color="grey" name="delete" @click.native="remove(props.value.id, props.row.__index, props.value.userId)" size="1.5rem" /> -->
       </q-td>
     </q-table>
-    <!-- <div class="row margin-input">
-      <div class="col-xs-12">
-        <div class="row justify-between">
-          <p class="input-caption">Justificatif</p>
-          <q-icon v-if="$v.newAbsence.document.$error" error-label="Champ requis" />
-        </div>
-        <div class="row justify-center">
-            <q-uploader ref="absenceReason" name="absenceReason" :url="docsUploadUrl" :headers="headers"
-              :additional-fields="[
-                { name: 'fileName', value: `justificatif_absence_${getUser.firstname}_${getUser.lastname}_${this.$moment().format('DD-MM-YYYY')}` },
-                { name: 'absenceId', value: contract._id },
-                { name: 'versionId', value: props.row._id }
-              ]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
-              hide-upload-button @add="uploadDocument($event, `signedContract_${props.row._id}`)" @uploaded="refreshUser" @fail="failMsg" />
-          </div>
-      </div>
-    </div> -->
     <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="ion-document" label="Enregistrer une absence" @click="newAbsenceModal = true" />
-    <!-- <p></p> -->
     <q-modal v-model="newAbsenceModal" :content-css="modalCssContainer">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
@@ -280,7 +260,6 @@ export default {
     try {
       const user = await this.$users.getById(this.getUser._id);
       this.absences = user.administrative.absences;
-      console.log(this.absences);
     } catch (e) {
       console.error(e);
     }
@@ -292,12 +271,11 @@ export default {
         if (this.newAbsence.endDuration) {
           this.newAbsence.endDate = this.$moment(this.newAbsence.endDate).set('hours', this.durations[this.newAbsence.endDuration].end);
         }
-        const test = await alenviAxios({
+        await alenviAxios({
           url: `${process.env.API_HOSTNAME}/users/${this.getUser._id}/absences`,
           method: 'POST',
           data: this.newAbsence
         });
-        console.log(test);
       } catch (e) {
         console.error(e);
       } finally {
@@ -329,8 +307,6 @@ export default {
       }
     },
     uploadDocument (files, refName) {
-      console.log(refName)
-      console.log(this.$refs[refName]);
       if (files[0].size > 5000000) {
         this.$refs[refName].reset();
         this.$q.notify({
@@ -342,7 +318,6 @@ export default {
         });
         return '';
       } else {
-        console.log(this.$refs);
         this.$refs[refName].upload();
       }
     },
@@ -427,8 +402,6 @@ export default {
   /deep/ .q-uploader-pick-button
     color: $primary
     font-size: 1.5rem
-    // position: relative !important
     cursor: pointer !important
-    // background: blue
 
 </style>

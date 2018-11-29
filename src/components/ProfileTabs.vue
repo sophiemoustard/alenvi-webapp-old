@@ -11,7 +11,7 @@
         :alert="tab.notification && notifications[tab.notification][profileId] ? notifications[tab.notification][profileId] : false"
         />
       <q-tab-pane class="no-border" v-for="(tab, index) in tabsContent" :key="index" :name="tab.name">
-                <!-- Dynamic component loading  -->
+      <!-- Dynamic component loading  -->
       <component :is="tab.component" />
     </q-tab-pane>
     </q-tabs>

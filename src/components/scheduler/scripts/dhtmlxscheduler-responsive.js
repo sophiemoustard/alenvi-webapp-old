@@ -27,10 +27,6 @@ export default {
       if (classic[scheduler.skin]) {
         scheduler.xy.nav_height = navHeightClassicSkin;
       }
-
-      // scheduler.templates.week_scale_date = function (date) {
-      //   return scheduler.date.date_to_str(scaleDate)(date);
-      // };
     }
 
     scheduler.attachEvent('onBeforeViewChange', function setNavbarHeight () {
