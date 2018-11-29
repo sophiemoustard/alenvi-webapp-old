@@ -18,7 +18,7 @@
           <div class="row justify-between">
             <p class="input-caption">Nom</p>
           </div>
-          <q-field>
+          <q-field :error="$v.customer.identity.lastname.$error" error-label="Champ requis">
             <q-input v-model="customer.identity.lastname" color="white" inverted-light @focus="saveTmp('identity.lastname')"
               @blur="updateUser({ alenvi: 'identity.lastname', ogust: 'last_name' })" />
           </q-field>
@@ -53,7 +53,7 @@
           <div class="row justify-between">
             <p class="input-caption">Adresse</p>
           </div>
-          <q-field :error="$v.customer.contact.address.fullAddress.$error" error-label="Adresse non valide">
+          <q-field :error="$v.customer.contact.address.fullAddress.$error" :error-label="addressError">
             <search-address v-model="customer.contact.address.fullAddress" color="white" inverted-light @focus="saveTmp('contact.address.fullAddress')"
               @blur="updateUser({ alenvi: 'contact.address', ogust: 'address' })"
               @selected="selectedAddress" />
@@ -133,6 +133,8 @@
 </template>
 
 <script>
+import { required } from 'vuelidate/lib/validators';
+
 import { extend } from '../../helpers/utils.js';
 import SearchAddress from '../../components/SearchAddress';
 import { frPhoneNumber, iban, bic, frAddress } from '../../helpers/vuelidateCustomVal';
@@ -181,19 +183,42 @@ export default {
     },
     userHelpers () {
       return this.userProfile.helpers;
+    },
+    addressError () {
+      if (!this.$v.customer.contact.address.fullAddress.required) {
+        return 'Champ requis';
+      }
+      return 'Adresse non valide';
+    },
+    ibanError () {
+      if (!this.$v.customer.payment.iban.required) {
+        return 'Champ requis';
+      } else if (!this.$v.customer.payment.iban.iban) {
+        return 'IBAN non valide';
+      }
+    },
+    bicError () {
+      if (!this.$v.customer.payment.bic.required) {
+        return 'Champ requis';
+      } else if (!this.$v.customer.payment.bic.bic) {
+        return 'BIC non valide';
+      }
     }
   },
   validations: {
     customer: {
+      identity: {
+        lastname: { required }
+      },
       contact: {
         phone: { frPhoneNumber },
         address: {
-          fullAddress: { frAddress }
+          fullAddress: { required, frAddress }
         }
       },
       payment: {
-        bic: { bic },
-        iban: { iban }
+        bic: { required, bic },
+        iban: { required, iban }
       }
     }
   },
@@ -225,16 +250,8 @@ export default {
     async updateUser (paths) {
       try {
         if (this.tmpInput === this.$_.get(this.customer, paths.alenvi)) return;
-        const isValid = await this.waitForValidation();
-        if (!isValid) {
-          return this.$q.notify({
-            color: 'secondary',
-            icon: 'warning',
-            detail: 'Champ(s) invalide(s)',
-            position: 'bottom-left',
-            timeout: 2500
-          });
-        }
+        const isValid = await this.waitForValidation(paths.alenvi);
+        if (!isValid) throw new Error('Champ(s) invalide(s)');
         if (paths.alenvi && paths.ogust) {
           await this.updateAlenviCustomer(paths.alenvi);
           await this.updateOgustCustomer(paths);
@@ -243,7 +260,6 @@ export default {
         } else {
           await this.updateOgustCustomer(paths);
         }
-        // this.$store.dispatch('rh/updateNotifications');
         this.$q.notify({
           color: 'positive',
           icon: 'done',
@@ -254,9 +270,9 @@ export default {
       } catch (e) {
         console.error(e);
         this.$q.notify({
-          color: 'negative',
+          color: e.message === 'Champ(s) invalide(s)' ? 'warning' : 'negative',
           icon: 'warning',
-          detail: 'Erreur lors de la modification',
+          detail: e.message === 'Champ(s) invalide(s)' ? e.message : 'Erreur lors de la modification',
           position: 'bottom-left',
           timeout: 2500
         });
@@ -317,15 +333,21 @@ export default {
         console.error(e);
       }
     },
-    waitForValidation () {
+    waitForValidation (path) {
       return new Promise((resolve) => {
-        const unwatch = this.$watch(() => !this.$v.customer.$pending, (notPending) => {
-          console.log('NOT PENDING', notPending);
-          if (notPending) {
-            resolve(!this.$v.customer.$error);
-            unwatch();
-          }
-        }, { immediate: true });
+        if (path === 'contact.address') {
+          const unwatch = this.$watch(() => !this.$v.customer.contact.address.$pending, (notPending) => {
+            if (notPending) {
+              if (unwatch) {
+                unwatch();
+              }
+              resolve(!this.$v.customer.contact.address.$error);
+            }
+          }, { immediate: true });
+        } else {
+          this.$_.get(this.$v.customer, path).$touch();
+          resolve(!this.$_.get(this.$v.customer, path).$error);
+        }
       })
     }
   }
