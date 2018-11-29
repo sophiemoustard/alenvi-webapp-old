@@ -45,7 +45,8 @@ export default {
           label: 'Infos',
           name: 'info',
           default: false,
-          component: ProfileInfo
+          component: ProfileInfo,
+          notification: 'profiles'
         },
         {
           label: 'Contrats',
@@ -59,11 +60,11 @@ export default {
   async mounted () {
     await this.$store.dispatch('rh/getUserProfile', { customerId: this.id });
   },
-  // watch: {
-  //   async userProfile () {
-  //     await this.$store.dispatch('rh/updateNotifications');
-  //   }
-  // },
+  watch: {
+    async userProfile () {
+      await this.$store.dispatch('rh/updateNotifications', 'customer');
+    }
+  },
   beforeDestroy () {
     this.$store.commit('rh/saveUserProfile', null);
   }

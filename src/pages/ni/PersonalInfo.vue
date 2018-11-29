@@ -80,7 +80,7 @@ export default {
   },
   watch: {
     async userProfile () {
-      await this.$store.dispatch('rh/updateNotifications');
+      await this.$store.dispatch('rh/updateNotifications', 'user');
     }
   },
   beforeDestroy () {
