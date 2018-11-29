@@ -74,7 +74,7 @@
               <q-icon v-if="$v.newAbsence.startDate.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newAbsence.startDate.$error" error-label="Champ requis">
-              <q-datetime type="date" format="DD/MM/YYYY" v-model="newAbsence.startDate" :min="$moment().startOf('month').toDate()" color="white" inverted-light popover
+              <q-datetime type="date" format="DD/MM/YYYY" v-model="newAbsence.startDate" :min="$moment().startOf('month').toISOString()" color="white" inverted-light popover
               ok-label="OK"
               cancel-label="Fermer" />
             </q-field>
@@ -98,14 +98,14 @@
               <q-icon v-if="$v.newAbsence.endDate.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newAbsence.endDate.$error" error-label="Champ requis">
-              <q-datetime type="date" format="DD/MM/YYYY" v-model="newAbsence.endDate" :min="newAbsence.startDate" color="white" inverted-light popover
+              <q-datetime :disable="!newAbsence.startDate" type="date" format="DD/MM/YYYY" v-model="newAbsence.endDate" color="white" inverted-light popover
               ok-label="OK"
-              cancel-label="Fermer" />
+              cancel-label="Fermer" /> <!-- :min="newAbsence.startDate" -->
             </q-field>
           </div>
         </div>
         <div class="row margin-input">
-          <div class="col-xs-12">
+          <div class="col-12">
             <div class="row justify-between">
               <p class="input-caption">Durée</p>
               <q-icon v-if="$v.newAbsence.endDuration.$error" name="error_outline" color="secondary" />
@@ -130,7 +130,13 @@ export default {
   data () {
     return {
       loading: false,
-      newAbsence: {},
+      newAbsence: {
+        startDate: '',
+        endDate: '',
+        startDuration: '',
+        endDuration: '',
+        reason: ''
+      },
       newAbsenceModal: false,
       modalCssContainer: {
         minWidth: '30vw'
@@ -209,7 +215,7 @@ export default {
         },
         {
           name: 'startDuration',
-          label: 'Période',
+          label: '',
           align: 'left',
           field: 'startDuration',
           sortable: true
@@ -224,7 +230,7 @@ export default {
         },
         {
           name: 'endDuration',
-          label: 'Période',
+          label: '',
           align: 'left',
           field: 'endDuration',
           format: (value) => value || '/',
@@ -303,7 +309,10 @@ export default {
       } finally {
         this.newAbsenceModal = false;
         this.$v.newAbsence.$reset();
-        this.newAbsence = {};
+        this.newAbsence = {
+          startDate: '',
+          endDate: ''
+        };
         const absencesRaw = await alenviAxios({
           url: `${process.env.API_HOSTNAME}/users/${this.getUser._id}/absences`,
           method: 'GET'

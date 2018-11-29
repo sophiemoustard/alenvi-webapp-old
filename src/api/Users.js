@@ -59,5 +59,17 @@ export default {
   async createDriveFolder (data) {
     const driveFolder = await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${data._id}/drivefolder`, data);
     return driveFolder;
+  },
+  async createContract (queries, data) {
+    const contractCreated = await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${queries.userId}/contracts`, data);
+    return contractCreated;
+  },
+  async updateContractVersion (queries, data) {
+    const versionUpdated = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${queries.userId}/contracts/${queries.mainContractId}/versions/${queries.lastActiveVersion._id}`, data);
+    return versionUpdated;
+  },
+  async createContractVersion (queries, data) {
+    const versionCreated = await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${queries.userId}/contracts/${queries.mainContractId}/versions`, data);
+    return versionCreated;
   }
 }

@@ -16,7 +16,6 @@
             :visible-columns="visibleColumns"
             binary-state-sort>
             <q-td slot="body-cell-contractEmpty" slot-scope="props" :props="props">
-              <!-- <q-btn small color="secondary">{{ props.value }}</q-btn> -->
               <q-btn flat round small color="primary" @click="dlTemplate(props.row, props.row.__index)">
                 <q-icon name="file download" />
               </q-btn>
@@ -32,7 +31,6 @@
                   hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
                   hide-upload-button @add="uploadDocument($event, `signedContract_${props.row._id}`)" @uploaded="refreshUser" @fail="failMsg" />
               </div>
-              <!-- <q-btn small color="secondary">{{ props.value }}</q-btn> -->
               <q-btn v-else flat round small color="primary">
                 <a :href="props.row.link" download>
                   <q-icon name="file download" />
@@ -49,18 +47,13 @@
                   isActive: !props.value,
                   cell: props.row.__index,
                   contractIndex: index })">
-              </q-checkbox> <!-- @input="updateContractActivity({ contractId: props.row._id, isActive: props.value })" -->
+              </q-checkbox>
             </q-td>
           </q-table>
         </q-card-main>
         <q-card-actions align="end">
-          <!-- <q-btn flat round small color="primary">
-            <a :href="contract.grossHourlyRate" download>
-              <q-icon name="file download" />
-            </a>
-          </q-btn> -->
-          <q-btn v-if="!contract.endDate" flat no-caps color="primary" icon="add" label="Ajouter un avenant" @click="fillVersion(contract)"/>
-          <q-btn v-if="!contract.endDate" flat no-caps color="grey-6" icon="clear" label="Mettre fin au contrat" @click="fillEndContract(contract)" />
+          <q-btn v-if="getActiveVersion(contract)" flat no-caps color="primary" icon="add" label="Ajouter un avenant" @click="fillVersion(contract)"/>
+          <q-btn v-if="getActiveVersion(contract)" flat no-caps color="grey-6" icon="clear" label="Mettre fin au contrat" @click="fillEndContract(contract)" />
         </q-card-actions>
       </q-card>
       <q-btn :disable="!hasBasicInfo" class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="newContractModal = true" />
@@ -133,11 +126,6 @@
             </q-field>
           </div>
         </div>
-        <!-- <div class="row margin-input last">
-          <div class="col-12">
-            <q-checkbox v-model="newContract.isActive" label="Contract actif" />
-          </div>
-        </div> -->
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer le contrat" icon-right="add" color="primary" :loading="loading" @click="createNewContract" />
     </q-modal>
@@ -175,14 +163,15 @@
             </q-field>
           </div>
         </div>
-        <div class="row margin-input">
+        <!-- use of v-if because if we don't it directly renders, so it calls :min getActiveVersion function and throw error because there is no contract selected yet -->
+        <div v-if="newContractVersionModal" class="row margin-input">
           <div class="col-12">
             <div class="row justify-between">
               <p class="input-caption">Date d'effet</p>
               <q-icon v-if="$v.newContractVersion.startDate.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newContractVersion.startDate.$error" error-label="Champ requis">
-              <q-datetime type="date" format="DD/MM/YYYY" v-model="newContractVersion.startDate" color="white" inverted-light popover
+              <q-datetime type="date" format="DD/MM/YYYY" v-model="newContractVersion.startDate" :min="getActiveVersion(contractSelected).startDate" color="white" inverted-light popover
               ok-label="OK"
               cancel-label="Fermer" />
             </q-field>
@@ -224,10 +213,6 @@
 
 <script>
 import { Cookies } from 'quasar';
-// import * as JSZip from 'jszip';
-// import * as JSZipUtils from 'jszip-utils';
-// import * as Docxtemplater from 'docxtemplater';
-// import saveAs from 'file-saver';
 import { required } from 'vuelidate/lib/validators';
 import { alenviAxios } from '../api/ressources/alenviAxios'
 
@@ -244,6 +229,7 @@ export default {
         contract: {},
       },
       contracts: [],
+      contractSelected: {},
       newContract: {
         status: '',
         weeklyHours: '',
@@ -376,20 +362,11 @@ export default {
     const user = await this.$users.getById(this.getUser._id);
     this.contracts = user.administrative.contracts;
     this.newContract.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
-    // console.log('contracts', this.contracts);
   },
   methods: {
-    // async getBlob (url) {
-    //   return new Promise((resolve, reject) => {
-    //     JSZipUtils.getBinaryContent(url, (err, data) => {
-    //       if (err) {
-    //         reject(err);
-    //       } else {
-    //         resolve(data);
-    //       }
-    //     });
-    //   });
-    // },
+    getActiveVersion (contract) {
+      return contract.versions.find(version => version.isActive);
+    },
     cardTitle (contractEndDate) {
       if (this.$moment().isBefore(contractEndDate)) {
         return {
@@ -479,41 +456,11 @@ export default {
         this.$refs[refName][0].upload();
       }
     },
-    // async uploadDocument () {
-    //   try {
-    //     let blob = await this.getBlob('https://drive.google.com/file/d/1PR0UJyEV9CJkIQ9zCXD7amhZJIMT0ZtH/view?usp=drivesdk');
-    //     let data = new FormData();
-    //     data.append('contractId', props.row._id);
-    //     data.append('fileName', `contrat_signe_${getUser.firstname}_${getUser.lastname}`);
-    //     data.append('Content-Type', blob.type || 'application/octet-stream');
-    //     data.append(`signedContract`, blob);
-    //     await this.$alenviAxios.post(this.pictureUploadUrl, data, { headers: { 'content-type': 'multipart/form-data', 'x-access-token': Cookies.get('alenvi_token') || '' } });
-    //     await this.$store.dispatch('rh/getUserProfile', this.userProfile._id);
-    //     this.closePictureEdition();
-    //     this.loadingImage = false;
-    //     this.$q.notify({
-    //       color: 'positive',
-    //       icon: 'done',
-    //       detail: 'Modification enregistrée',
-    //       position: 'bottom-left',
-    //       timeout: 2500
-    //     });
-    //   } catch (e) {
-    //     console.error(e);
-    //     this.loadingImage = false;
-    //     this.$q.notify({
-    //       color: 'negative',
-    //       icon: 'warning',
-    //       detail: 'Erreur lors de la modification',
-    //       position: 'bottom-left',
-    //       timeout: 2500
-    //     });
-    //   }
-    // },
-    fillVersion (data) {
+    fillVersion (contract) {
       this.newContractVersion.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
-      this.newContractVersion.mainContractId = data._id;
-      this.newContractVersion.versions = data.versions;
+      this.newContractVersion.mainContractId = contract._id;
+      this.newContractVersion.versions = contract.versions;
+      this.contractSelected = contract;
       this.newContractVersionModal = true;
     },
     async updateContractActivity (data) {
@@ -556,59 +503,20 @@ export default {
         }
       }
     },
-    // async getDocxBlob () {
-    //   try {
-    //     const test = await this.testDocxBlob('https://drive.google.com/file/d/1qcxsH3D2sek4sA8EQWdCwiTQJq2r9Vwn/view?usp=sharing');
-    //     console.log(test);
-    //     https:// docxtemplater.com/tag-example.docx
-    //     JSZipUtils.getBinaryContent('https://drive.google.com/file/d/1qcxsH3D2sek4sA8EQWdCwiTQJq2r9Vwn/view?usp=sharing', function (error, content) {
-    //       if (error) { throw error }
-    //       console.log('test');
-    //       const zip = new JSZip(content);
-    //       const doc = new Docxtemplater().loadZip(zip);
-    //       doc.setData({
-    //         firstName: 'John',
-    //         lastName: 'Doe',
-    //         // phone: '0650769406',
-    //         description: 'New Website'
-    //       });
-    //       try {
-    //         doc.render();
-    //       } catch (e) {
-    //         console.error(e);
-    //       }
-    //       const out = doc.getZip().generate({
-    //         type: 'blob',
-    //         mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    //       });
-    //       console.log(out);
-    //       saveAs(out, 'output.docx');
-    //     });
-    //   } catch (e) {
-    //     console.error(e);
-    //   }
-    // },
     async createNewContract () {
       try {
         this.loading = true;
-        const newOgustContract = await alenviAxios({
-          url: `${process.env.API_HOSTNAME}/ogust/contracts`,
-          method: 'POST',
-          data: {
-            id_employee: this.getUser.employee_id.toString(),
-            start_date: this.$moment(this.newContract.startDate).format('YYYYMMDD'),
-            creation_date: this.$moment().format('YYYYMMDD'),
-            contractual_salary: Number.parseFloat(this.newContract.grossHourlyRate * this.newContract.weeklyHours * 4.33).toFixed(2),
-            contract_hours: Number.parseFloat(this.newContract.weeklyHours * 4.33).toFixed(1),
-            type_employer: 'S'
-          }
-        });
-        this.newContract.ogustContractId = newOgustContract.data.data.employment.id_contract;
-        await alenviAxios({
-          url: `${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts`,
-          method: 'POST',
-          data: this.newContract
-        });
+        const payload = {
+          id_employee: this.getUser.employee_id.toString(),
+          start_date: this.$moment(this.newContract.startDate).format('YYYYMMDD'),
+          creation_date: this.$moment().format('YYYYMMDD'),
+          contractual_salary: Number.parseFloat(this.newContract.grossHourlyRate * this.newContract.weeklyHours * 4.33).toFixed(2),
+          contract_hours: Number.parseFloat(this.newContract.weeklyHours * 4.33).toFixed(1),
+          type_employer: 'S'
+        };
+        const newOgustContract = await this.$ogust.newContract(payload);
+        this.newContract.ogustContractId = newOgustContract.id_contract;
+        await this.$users.createContract({ userId: this.getUser._id }, this.newContract);
         await this.refreshUser();
         this.$q.notify({
           color: 'positive',
@@ -638,33 +546,35 @@ export default {
       try {
         this.loading = true;
         const mainContractId = this.newContractVersion.mainContractId;
-        const lastActiveVersion = this.newContractVersion.versions.find(version => version.isActive);
+        const lastActiveVersion = this.getActiveVersion(this.newContractVersion);
         delete this.newContractVersion.mainContractId;
         delete this.newContractVersion.versions;
-        await alenviAxios({
-          url: `${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${mainContractId}/versions/${lastActiveVersion._id}`,
-          method: 'PUT',
-          data: { endDate: this.$moment(this.newContractVersion.startDate).subtract(1, 'day').toDate() }
-        });
-        const newOgustContract = await alenviAxios({
-          url: `${process.env.API_HOSTNAME}/ogust/contracts`,
-          method: 'POST',
-          data: {
-            id_employee: this.getUser.employee_id.toString(),
-            start_date: this.$moment(this.newContractVersion.startDate).format('YYYYMMDD'),
-            creation_date: this.$moment().format('YYYYMMDD'),
-            contractual_salary: Number.parseFloat(this.newContractVersion.grossHourlyRate * this.newContractVersion.weeklyHours * 4.33).toFixed(2),
-            contract_hours: Number.parseFloat(this.newContractVersion.weeklyHours * 4.33).toFixed(1),
-            // origine_contract: lastActiveVersion.ogustContractId,
-            source_contract: lastActiveVersion.ogustContractId
-          }
-        });
-        this.newContractVersion.ogustContractId = newOgustContract.data.data.employment.id_contract;
-        await alenviAxios({
-          url: `${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${mainContractId}/versions`,
-          method: 'POST',
-          data: this.newContractVersion
-        });
+        let queries = {
+          userId: this.getUser._id,
+          mainContractId,
+          lastActiveVersion
+        };
+        let payload = {
+          endDate: this.$moment(this.newContractVersion.startDate).subtract(1, 'day').toDate()
+        };
+        await this.$users.updateContractVersion(queries, payload);
+        payload = {
+          id_employee: this.getUser.employee_id.toString(),
+          start_date: this.$moment(this.newContractVersion.startDate).format('YYYYMMDD'),
+          creation_date: this.$moment().format('YYYYMMDD'),
+          contractual_salary: Number.parseFloat(this.newContractVersion.grossHourlyRate * this.newContractVersion.weeklyHours * 4.33).toFixed(2),
+          contract_hours: Number.parseFloat(this.newContractVersion.weeklyHours * 4.33).toFixed(1),
+          // origine_contract: lastActiveVersion.ogustContractId,
+          source_contract: lastActiveVersion.ogustContractId
+        };
+        const newOgustContract = await this.$ogust.newContract(payload);
+        console.log(newOgustContract);
+        this.newContractVersion.ogustContractId = newOgustContract.id_contract;
+        queries = {
+          userId: this.getUser._id,
+          mainContractId
+        };
+        await this.$users.createContractVersion(queries, this.newContractVersion);
         await this.refreshUser();
         this.$q.notify({
           color: 'positive',

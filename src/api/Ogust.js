@@ -249,5 +249,9 @@ export default {
   async deleteEmployee (id) {
     const employeeDeleted = await alenviAxios.delete(`${process.env.API_HOSTNAME}/ogust/employees/${id}`);
     return employeeDeleted;
+  },
+  async newContract (data) {
+    const contractCreated = await alenviAxios.post(`${process.env.API_HOSTNAME}/ogust/contracts`, data);
+    return contractCreated.data.data.employment;
   }
 }
