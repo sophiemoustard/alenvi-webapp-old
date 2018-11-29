@@ -207,169 +207,51 @@
           </q-field>
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Carte d'identité (recto)</p>
-            <q-icon v-if="$v.user.alenvi.administrative.idCardRecto.driveId.$error" name="error_outline" color="secondary" />
-          </div>
-          <div v-if="user.alenvi.administrative.idCardRecto && user.alenvi.administrative.idCardRecto.driveId" class="row justify-between"
-            style="background: white">
-            <div class="doc-thumbnail">
-              <custom-img :driveId="user.alenvi.administrative.idCardRecto.driveId" alt="cni recto" />
-            </div>
-            <!-- <img class="doc-thumbnail" ref="`driveId-${user.alenvi.administrative.idCardRecto.driveId}`" alt="cni recto"> -->
-            <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.idCardRecto.driveId, 'administrative.idCardRecto')" />
-              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.idCardRecto.link)" />
-            </div>
-          </div>
-          <q-field v-if="!user.alenvi.administrative.idCardRecto.driveId" :error="$v.user.alenvi.administrative.idCardRecto.driveId.$error"
-            :error-label="requiredDoc">
-            <q-uploader ref="idCardRecto" name="idCardRecto" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `cni_recto_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
-              inverted-light hide-upload-button @add="uploadDocument($event, 'idCardRecto')" @uploaded="refreshUser"
-              @fail="failMsg" />
-          </q-field>
+          <file-uploader caption="Carte d'identité (recto)" path="administrative.idCardRecto" alt="cni recto" :userProfile="userProfile"
+            @delete="deleteDocument(user.alenvi.administrative.idCardRecto.driveId, 'administrative.idCardRecto')" name="idCardRecto"
+            additionalFieldsName="cni_recto" @uploaded="refreshUser" @upload="uploadDocument($event, 'idCardRecto')"
+            :error="$v.user.alenvi.administrative.idCardRecto.driveId.$error"
+          />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Carte d'identité (verso)</p>
-          </div>
-          <div v-if="user.alenvi.administrative.idCardVerso && user.alenvi.administrative.idCardVerso.driveId" class="row justify-between"
-            style="background: white">
-            <div class="doc-thumbnail">
-              <custom-img :driveId="user.alenvi.administrative.idCardVerso.driveId" alt="cni verso" />
-            </div>
-            <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.idCardVerso.driveId, 'administrative.idCardVerso')" />
-              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.idCardVerso.link)" />
-            </div>
-          </div>
-          <q-field v-if="!user.alenvi.administrative.idCardVerso.driveId">
-            <q-uploader ref="idCardVerso" name="idCardVerso" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `cni_verso_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
-              inverted-light hide-upload-button @add="uploadDocument($event, 'idCardVerso')" @uploaded="refreshUser"
-              @fail="failMsg" />
-            <!-- <q-uploader url="test" color="white" inverted-light /> -->
-          </q-field>
+          <file-uploader caption="Carte d'identité (verso)" path="administrative.idCardVerso" alt="cni verso" :userProfile="userProfile"
+            @delete="deleteDocument(user.alenvi.administrative.idCardVerso.driveId, 'administrative.idCardVerso')" name="idCardVerso"
+            additionalFieldsName="cni_verso" @uploaded="refreshUser" @upload="uploadDocument($event, 'idCardVerso')"
+          />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'pp'" class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Passeport</p>
-            <q-icon v-if="$v.user.alenvi.administrative.passport.driveId.$error" name="error_outline" color="secondary" />
-          </div>
-          <div v-if="user.alenvi.administrative.passport && user.alenvi.administrative.passport.driveId" class="row justify-between"
-            style="background: white">
-            <div class="doc-thumbnail">
-              <custom-img :driveId="user.alenvi.administrative.passport.driveId" alt="passeport" />
-            </div>
-            <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.passport.driveId, 'administrative.passport')" />
-              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.passport.link)" />
-            </div>
-          </div>
-          <q-field v-if="!user.alenvi.administrative.passport.driveId" :error="$v.user.alenvi.administrative.passport.driveId.$error"
-            :error-label="requiredDoc">
-            <q-uploader ref="passport" name="passport" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `passeport_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
-              inverted-light hide-upload-button @add="uploadDocument($event, 'passport')" @uploaded="refreshUser" @fail="failMsg" />
-            <!-- <q-uploader url="test" color="white" inverted-light /> -->
-          </q-field>
+          <file-uploader caption="Passeport" path="administrative.passport" alt="passeport" :userProfile="userProfile"
+            @delete="deleteDocument(user.alenvi.administrative.passport.driveId, 'administrative.passport')" name="passport"
+            additionalFieldsName="passport" @uploaded="refreshUser" @upload="uploadDocument($event, 'passport')"
+            :error="$v.user.alenvi.administrative.passport.driveId.$error"
+          />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Titre de séjour</p>
-            <q-icon v-if="$v.user.alenvi.administrative.residencePermitRecto.driveId.$error" name="error_outline" color="secondary" />
-          </div>
-          <div v-if="user.alenvi.administrative.residencePermitRecto && user.alenvi.administrative.residencePermitRecto.driveId"
-            class="row justify-between" style="background: white">
-            <div class="doc-thumbnail">
-              <custom-img :driveId="user.alenvi.administrative.residencePermitRecto.driveId" alt="titre de séjour (recto)" />
-            </div>
-            <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.residencePermitRecto.driveId, 'administrative.residencePermitRecto')" />
-              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.residencePermitRecto.link)" />
-            </div>
-          </div>
-          <q-field v-if="!user.alenvi.administrative.residencePermitRecto.driveId" :error="$v.user.alenvi.administrative.residencePermitRecto.driveId.$error"
-            :error-label="requiredDoc">
-            <q-uploader ref="residencePermitRecto" name="residencePermitRecto" :url="docsUploadUrl" :headers="headers"
-              :additional-fields="[{ name: 'fileName', value: `titre_de_séjour_recto_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
-              inverted-light hide-upload-button @add="uploadDocument($event, 'residencePermitRecto')" @uploaded="refreshUser"
-              @fail="failMsg" />
-            <!-- <q-uploader url="test" color="white" inverted-light /> -->
-          </q-field>
+          <file-uploader caption="Titre de séjour (recto)" path="administrative.residencePermitRecto" alt="titre de séjour (recto)" :userProfile="userProfile"
+            @delete="deleteDocument(user.alenvi.administrative.residencePermitRecto.driveId, 'administrative.residencePermitRecto')"
+            additionalFieldsName="titre_de_séjour_recto" @uploaded="refreshUser" @upload="uploadDocument($event, 'residencePermitRecto')"
+            :error="$v.user.alenvi.administrative.residencePermitRecto.driveId.$error" name="residencePermitRecto"
+          />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Titre de séjour</p>
-          </div>
-          <div v-if="user.alenvi.administrative.residencePermitVerso && user.alenvi.administrative.residencePermitVerso.driveId"
-            class="row justify-between" style="background: white">
-            <div class="doc-thumbnail">
-              <custom-img :driveId="user.alenvi.administrative.residencePermitVerso.driveId" alt="titre de séjour (verso)" />
-            </div>
-            <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.residencePermitVerso.driveId, 'administrative.residencePermitVerso')" />
-              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.residencePermitVerso.link)" />
-            </div>
-          </div>
-          <q-field v-if="!user.alenvi.administrative.residencePermitVerso.driveId">
-            <q-uploader ref="residencePermitVerso" name="residencePermitVerso" :url="docsUploadUrl" :headers="headers"
-              :additional-fields="[{ name: 'fileName', value: `titre_de_séjour_verso_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
-              inverted-light hide-upload-button @add="uploadDocument($event, 'residencePermitVerso')" @uploaded="refreshUser"
-              @fail="failMsg" />
-            <!-- <q-uploader url="test" color="white" inverted-light /> -->
-          </q-field>
+          <file-uploader caption="Titre de séjour (verso)" path="administrative.residencePermitVerso" alt="titre de séjour (verso)" name="residencePermitVerso"
+            @delete="deleteDocument(user.alenvi.administrative.residencePermitVerso.driveId, 'administrative.residencePermitVerso')" :userProfile="userProfile"
+            additionalFieldsName="titre_de_séjour_verso" @uploaded="refreshUser" @upload="uploadDocument($event, 'residencePermitVerso')"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Attestation de sécurité sociale</p>
-            <q-icon v-if="$v.user.alenvi.administrative.healthAttest.driveId.$error" name="error_outline" color="secondary" />
-          </div>
-          <div v-if="user.alenvi.administrative.healthAttest && user.alenvi.administrative.healthAttest.driveId" class="row justify-between"
-            style="background: white">
-            <div class="doc-thumbnail">
-              <custom-img :driveId="user.alenvi.administrative.healthAttest.driveId" alt="attestation secu" />
-            </div>
-            <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.healthAttest.driveId, 'administrative.healthAttest')" />
-              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.healthAttest.link)" />
-            </div>
-          </div>
-          <q-field v-if="!user.alenvi.administrative.healthAttest.driveId" :error="$v.user.alenvi.administrative.healthAttest.driveId.$error"
-            :error-label="requiredDoc">
-            <q-uploader ref="healthAttest" name="healthAttest" :url="docsUploadUrl" :headers="headers"
-              :additional-fields="[{ name: 'fileName', value: `attestation_secu_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
-              inverted-light hide-upload-button @add="uploadDocument($event, 'healthAttest')" @uploaded="refreshUser"
-              @fail="failMsg" />
-          </q-field>
+          <file-uploader caption="Attestation de sécurité sociale" path="administrative.healthAttest" alt="attestation secu" :userProfile="userProfile"
+            @delete="deleteDocument(user.alenvi.administrative.healthAttest.driveId, 'administrative.healthAttest')" name="healthAttest"
+            additionalFieldsName="attestation_secu" @uploaded="refreshUser" @upload="uploadDocument($event, 'healthAttest')"
+            :error="$v.user.alenvi.administrative.healthAttest.driveId.$error"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Facture téléphonique</p>
-            <q-icon v-if="$v.user.alenvi.administrative.phoneInvoice.driveId.$error" name="error_outline" color="secondary" />
-          </div>
-          <div v-if="user.alenvi.administrative.phoneInvoice && user.alenvi.administrative.phoneInvoice.driveId" class="row justify-between"
-            style="background: white">
-            <div class="doc-thumbnail">
-              <custom-img :driveId="user.alenvi.administrative.phoneInvoice.driveId" alt="facture téléphone" />
-            </div>
-            <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')" />
-              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.phoneInvoice.link)" />
-            </div>
-          </div>
-          <q-field v-if="!user.alenvi.administrative.phoneInvoice.driveId" :error="$v.user.alenvi.administrative.phoneInvoice.driveId.$error"
-            :error-label="requiredDoc">
-            <q-uploader ref="phoneInvoice" name="phoneInvoice" :url="docsUploadUrl" :headers="headers"
-              :additional-fields="[{ name: 'fileName', value: `facture_telephone_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
-              inverted-light hide-upload-button @add="uploadDocument($event, 'phoneInvoice')" @uploaded="refreshUser"
-              @fail="failMsg" />
-          </q-field>
+          <file-uploader caption="Facture téléphonique" path="administrative.phoneInvoice" alt="facture téléphone" :userProfile="userProfile"
+            @delete="deleteDocument(user.alenvi.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')" name="phoneInvoice"
+            additionalFieldsName="facture_telephone" @uploaded="refreshUser" @upload="uploadDocument($event, 'phoneInvoice')"
+            :error="$v.user.alenvi.administrative.phoneInvoice.driveId.$error"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
           <div class="row">
@@ -409,8 +291,7 @@
     <div class="q-mb-xl">
       <div class="row justify-between">
         <p class="text-weight-bold">Mutuelle</p>
-        <p :class="[groupErrors('mutualFund').errors > 0 ? 'group-error' : 'group-error-ok']">{{
-          groupErrors('mutualFund').msg }}</p>
+        <p :class="[groupErrors('mutualFund').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('mutualFund').msg }}</p>
       </div>
       <div class="row gutter-profile-x">
         <div class="col-xs-12">
@@ -443,8 +324,8 @@
             <q-icon v-if="$v.user.alenvi.administrative.mutualFund.driveId.$error" name="error_outline" color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.administrative.mutualFund.driveId.$error" :error-label="requiredDoc">
-            <q-uploader ref="mutualFund" name="mutualFund" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `mutuelle_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
+            <q-uploader ref="mutualFund" name="mutualFund" :headers="headers" :additional-fields="[{ name: 'fileName', value: `mutuelle_${userProfile.firstname}_${userProfile.lastname}` }]"
+              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white" url="docsUploadUrl"
               inverted-light hide-upload-button @add="uploadDocument($event, 'mutualFund')" @uploaded="refreshUser"
               @fail="failMsg" />
           </q-field>
@@ -454,8 +335,7 @@
     <div class="q-mb-xl">
       <div class="row justify-between">
         <p class="text-weight-bold">Transports</p>
-        <p :class="[groupErrors('transportInvoice').errors > 0 ? 'group-error' : 'group-error-ok']">{{
-          groupErrors('transportInvoice').msg }}</p>
+        <p :class="[groupErrors('transportInvoice').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('transportInvoice').msg }}</p>
       </div>
       <div class="row gutter-profile-x">
         <div class="col-xs-12">
@@ -470,28 +350,11 @@
           </q-field>
         </div>
         <div v-if="user.alenvi.administrative.transportInvoice.transportType === 'public'" class="col-xs-12 col-md-6">
-          <div v-if="currentUser.role.name === 'Auxiliaire'" class="row justify-between">
-            <p class="input-caption">Merci de nous transmettre ton justificatif d'abonnement</p>
-            <q-icon v-if="$v.user.alenvi.administrative.transportInvoice.driveId.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field v-if="$v.user.alenvi.administrative.transportInvoice.driveId.$error" :error="$v.user.alenvi.administrative.transportInvoice.driveId.$error"
-            :error-label="requiredDoc">
-            <q-uploader ref="transportInvoice" name="transportInvoice" :url="docsUploadUrl" :headers="headers"
-              :additional-fields="[{ name: 'fileName', value: `justif_transport_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
-              inverted-light hide-upload-button @add="uploadDocument($event, 'transportInvoice')" @uploaded="refreshUser"
-              @fail="failMsg" />
-          </q-field>
-          <div v-if="user.alenvi.administrative.transportInvoice && user.alenvi.administrative.transportInvoice.driveId"
-            class="row justify-between" style="background: white; margin-top: 24px;">
-            <div class="doc-thumbnail">
-              <custom-img :driveId="user.alenvi.administrative.transportInvoice.driveId" alt="justif transport" />
-            </div>
-            <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.transportInvoice.driveId, 'administrative.transportInvoice')" />
-              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.transportInvoice.link)" />
-            </div>
-          </div>
+          <file-uploader caption="Merci de nous transmettre ton justificatif d'abonnement" path="administrative.transportInvoice"
+            alt="justif transport" :userProfile="userProfile" additionalFieldsName="justif_transport" @upload="uploadDocument($event, 'transportInvoice')"
+            :error="$v.user.alenvi.administrative.transportInvoice.driveId.$error" :displayCaption="currentUser.role.name === 'Auxiliaire'" name="transportInvoice"
+            @delete="deleteDocument(user.alenvi.administrative.transportInvoice.driveId, 'administrative.transportInvoice')" @uploaded="refreshUser"
+          />
         </div>
       </div>
     </div>
@@ -499,24 +362,10 @@
       <p class="text-weight-bold">Visite médicale</p>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <div class="row">
-            <p class="input-caption">Certificat d'aptitude</p>
-          </div>
-          <q-uploader v-if="!user.alenvi.administrative.medicalCertificate.driveId" ref="medicalCertificate" name="medicalCertificate"
-            :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `certificat_medical_${userProfile.firstname}_${userProfile.lastname}` }]"
-            hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
-            inverted-light hide-upload-button @add="uploadDocument($event, 'medicalCertificate')" @uploaded="refreshUser"
-            @fail="failMsg" />
-          <div v-if="user.alenvi.administrative.medicalCertificate.driveId"
-            class="row justify-between" style="background: white">
-            <div class="doc-thumbnail">
-              <custom-img :driveId="user.alenvi.administrative.medicalCertificate.driveId" alt="certificat médical" />
-            </div>
-            <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.medicalCertificate.driveId, 'administrative.medicalCertificate')" />
-              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.medicalCertificate.link)" />
-            </div>
-          </div>
+          <file-uploader caption="Certificat d'aptitude" path="administrative.medicalCertificate" alt="certificat médical" :userProfile="user.alenvi"
+            @delete="deleteDocument(user.alenvi.administrative.medicalCertificate.driveId, 'administrative.medicalCertificate')" name="medicalCertificate"
+            additionalFieldsName="certificat_medical" @uploaded="refreshUser" @upload="uploadDocument($event, 'medicalCertificate')"
+          />
         </div>
       </div>
     </div>
@@ -544,6 +393,7 @@ import CustomImg from './CustomImg';
 
 import InputWithErrors from './form/InputWithErrors.vue';
 import SelectWithErrors from './form/SelectWithErrors.vue';
+import FileUploader from './form/FileUploader.vue';
 
 export default {
   components: {
@@ -552,6 +402,7 @@ export default {
     CustomImg,
     InputWithErrors,
     SelectWithErrors,
+    FileUploader,
   },
   data () {
     return {
@@ -999,7 +850,14 @@ export default {
     },
     uploadDocument (files, refName) {
       if (files[0].size > 5000000) {
-        this.$refs[refName].reset();
+        if (this.$refs[refName]) {
+          this.$refs[refName].reset();
+        } else {
+          const node = this.$children.filter(child => child.$refs && Object.keys(child.$refs).includes(refName));
+          if (node) {
+            node[0].$refs[refName].reset();
+          }
+        }
         this.$q.notify({
           color: 'negative',
           icon: 'warning',
@@ -1009,7 +867,14 @@ export default {
         });
         return '';
       } else {
-        this.$refs[refName].upload();
+        if (this.$refs[refName]) {
+          this.$refs[refName].upload();
+        } else {
+          const node = this.$children.filter(child => child.$refs && Object.keys(child.$refs).includes(refName));
+          if (node) {
+            node[0].$refs[refName].upload();
+          }
+        }
       }
     },
     async uploadImage () {
