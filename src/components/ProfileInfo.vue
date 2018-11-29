@@ -54,47 +54,47 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <input-with-errors caption="Prénom" :error="$v.user.alenvi.firstname.$error" v-model="user.alenvi.firstname"
+          <ni-input-with-errors caption="Prénom" :error="$v.user.alenvi.firstname.$error" v-model="user.alenvi.firstname"
             @myBlur="updateUser({ alenvi: 'firstname', ogust: 'first_name' })" @myFocus="saveTmp('firstname')"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <input-with-errors caption="Nom" :error="$v.user.alenvi.lastname.$error" v-model="user.alenvi.lastname"
+          <ni-input-with-errors caption="Nom" :error="$v.user.alenvi.lastname.$error" v-model="user.alenvi.lastname"
             @myBlur="updateUser({ alenvi: 'lastname', ogust: 'last_name' })" @myFocus="saveTmp('lastname')"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <select-with-errors caption="Nationalité" :error="$v.user.alenvi.administrative.identity.nationality.$error" :options="nationalitiesOptions"
+          <ni-select-with-errors caption="Nationalité" :error="$v.user.alenvi.administrative.identity.nationality.$error" :options="nationalitiesOptions"
             v-model="user.alenvi.administrative.identity.nationality" @myFocus="saveTmp('administrative.identity.nationality')"
             @myBlur="updateUser({ alenvi: 'administrative.identity.nationality', ogust: 'nationality' })"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <datetime-picker caption="Date de naissance" :error="$v.user.alenvi.administrative.identity.birthDate.$error"
+          <ni-datetime-picker caption="Date de naissance" :error="$v.user.alenvi.administrative.identity.birthDate.$error"
             v-model="user.alenvi.administrative.identity.birthDate" @myFocus="saveTmp('administrative.identity.birthDate')"
             @myBlur="updateUser({ alenvi: 'administrative.identity.birthDate', ogust: 'date_of_birth' })"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <select-with-errors caption="Pays de naissance" :error="$v.user.alenvi.administrative.identity.birthCountry.$error" :options="nationalitiesOptions"
+          <ni-select-with-errors caption="Pays de naissance" :error="$v.user.alenvi.administrative.identity.birthCountry.$error" :options="nationalitiesOptions"
             v-model="user.alenvi.administrative.identity.birthCountry" @myFocus="saveTmp('administrative.identity.birthCountry')"
             @myBlur="updateUser({ alenvi: 'administrative.identity.birthCountry', ogust: 'country_of_birth' })"
           />
         </div>
         <div v-if="this.user.alenvi.administrative.identity.birthCountry === 'FR'" class="col-xs-12 col-md-6">
-          <input-with-errors caption="Département de naissance" :error="$v.user.alenvi.administrative.identity.birthState.$error" :errorLabel="birthStateError"
+          <ni-input-with-errors caption="Département de naissance" :error="$v.user.alenvi.administrative.identity.birthState.$error" :errorLabel="birthStateError"
             v-model="user.alenvi.administrative.identity.birthState" @myBlur="updateUser({ alenvi: 'administrative.identity.birthState', ogust: 'state_of_birth' })"
             @myFocus="saveTmp('administrative.identity.birthState')"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <input-with-errors caption="Ville de naissance" :error="$v.user.alenvi.administrative.identity.birthCity.$error"
+          <ni-input-with-errors caption="Ville de naissance" :error="$v.user.alenvi.administrative.identity.birthCity.$error"
             v-model="user.alenvi.administrative.identity.birthCity" @myFocus="saveTmp('administrative.identity.birthCity')"
             @myBlur="updateUser({ alenvi: 'administrative.identity.birthCity', ogust: 'place_of_birth' })"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <input-with-errors caption="Numéro de sécurité sociale" :error="$v.user.alenvi.administrative.identity.socialSecurityNumber.$error"
+          <ni-input-with-errors caption="Numéro de sécurité sociale" :error="$v.user.alenvi.administrative.identity.socialSecurityNumber.$error"
             v-model="user.alenvi.administrative.identity.socialSecurityNumber" @myFocus="saveTmp('administrative.identity.socialSecurityNumber')"
             @myBlur="updateUser({ alenvi: 'administrative.identity.socialSecurityNumber', ogust: 'social_insurance_number' })" :errorLabel="ssnError"
           />
@@ -108,17 +108,17 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <input-with-errors caption="Numéro de téléphone" :error="$v.user.alenvi.mobilePhone.$error" :errorLabel="phoneNbrError" type="tel"
+          <ni-input-with-errors caption="Numéro de téléphone" :error="$v.user.alenvi.mobilePhone.$error" :errorLabel="phoneNbrError" type="tel"
             v-model.trim="user.alenvi.mobilePhone" @myBlur="updateUser({ alenvi: 'mobilePhone', ogust: 'mobile_phone' })" @myFocus="saveTmp('mobilePhone')"
           />
         </div>
         <div v-if="currentUser.role.name !== 'Auxiliaire'" class="col-xs-12 col-md-6">
-          <input-with-errors caption="Adresse email" :error="$v.user.alenvi.local.email.$error" :errorLabel="emailError" type="email" lowerCase disable
+          <ni-input-with-errors caption="Adresse email" :error="$v.user.alenvi.local.email.$error" :errorLabel="emailError" type="email" lowerCase disable
             v-model.trim="user.alenvi.local.email" @myBlur="updateUser({ alenvi: 'local.email', ogust: 'email' })" @myFocus="saveTmp('local.email')"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <input-with-errors caption="Adresse, numéro et rue" v-model="user.alenvi.administrative.contact.address"
+          <ni-input-with-errors caption="Adresse, numéro et rue" v-model="user.alenvi.administrative.contact.address"
             @myBlur="updateUser({ alenvi: 'administrative.contact.address', ogust: 'line' })" @myFocus="saveTmp('administrative.contact.address')"
             :error="$v.user.alenvi.administrative.contact.address.$error"
           />
@@ -130,13 +130,13 @@
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <input-with-errors caption="Code postal" :error="$v.user.alenvi.administrative.contact.zipCode.$error" :errorLabel="zipCodeError"
+          <ni-input-with-errors caption="Code postal" :error="$v.user.alenvi.administrative.contact.zipCode.$error" :errorLabel="zipCodeError"
             v-model="user.alenvi.administrative.contact.zipCode" @myFocus="saveTmp('administrative.contact.zipCode')"
             @myBlur="updateUser({ alenvi: 'administrative.contact.zipCode', ogust: 'zip' })"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <input-with-errors caption="Ville" :error="$v.user.alenvi.administrative.contact.city.$error" v-model="user.alenvi.administrative.contact.city"
+          <ni-input-with-errors caption="Ville" :error="$v.user.alenvi.administrative.contact.city.$error" v-model="user.alenvi.administrative.contact.city"
             @myBlur="updateUser({ alenvi: 'administrative.contact.city', ogust: 'city' })" @myFocus="saveTmp('administrative.contact.city')"
           />
         </div>
@@ -149,13 +149,13 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <input-with-errors caption="Prénom et nom" :error="$v.user.alenvi.administrative.emergencyContact.name.$error"
+          <ni-input-with-errors caption="Prénom et nom" :error="$v.user.alenvi.administrative.emergencyContact.name.$error"
             v-model="user.alenvi.administrative.emergencyContact.name" @myFocus="saveTmp('administrative.emergencyContact.name')"
             @myBlur="updateUser({ alenvi: 'administrative.emergencyContact.name' })"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <input-with-errors caption="Numéro de téléphone" :error="$v.user.alenvi.administrative.emergencyContact.phoneNumber.$error"
+          <ni-input-with-errors caption="Numéro de téléphone" :error="$v.user.alenvi.administrative.emergencyContact.phoneNumber.$error"
             v-model.trim="user.alenvi.administrative.emergencyContact.phoneNumber" @myFocus="saveTmp('administrative.emergencyContact.phoneNumber')"
             @myBlur="updateUser({ alenvi: 'administrative.emergencyContact.phoneNumber' })" :errorLabel="emergencyPhoneNbrError"
           />
@@ -169,13 +169,13 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <input-with-errors caption="IBAN" :error="$v.user.alenvi.administrative.payment.rib.iban.$error" :errorLabel="ibanError"
+          <ni-input-with-errors caption="IBAN" :error="$v.user.alenvi.administrative.payment.rib.iban.$error" :errorLabel="ibanError"
           v-model="user.alenvi.administrative.payment.rib.iban" @myFocus="saveTmp('administrative.payment.rib.iban')" upperCase
             @myBlur="updateUser({ alenvi: 'administrative.payment.rib.iban', ogust: 'iban_number' })"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <input-with-errors caption="BIC" :error="$v.user.alenvi.administrative.payment.rib.bic.$error" :errorLabel="bicError" upperCase
+          <ni-input-with-errors caption="BIC" :error="$v.user.alenvi.administrative.payment.rib.bic.$error" :errorLabel="bicError" upperCase
             v-model.trim="user.alenvi.administrative.payment.rib.bic" @myFocus="saveTmp('administrative.payment.rib.bic')"
             @myBlur="updateUser({ alenvi: 'administrative.payment.rib.bic', ogust: 'bic_number' })"
           />
@@ -202,54 +202,54 @@
           </q-field>
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
-          <file-uploader caption="Carte d'identité (recto)" path="administrative.idCardRecto" alt="cni recto" :userProfile="userProfile"
+          <ni-file-uploader caption="Carte d'identité (recto)" path="administrative.idCardRecto" alt="cni recto" :userProfile="userProfile"
             @delete="deleteDocument(user.alenvi.administrative.idCardRecto.driveId, 'administrative.idCardRecto')" name="idCardRecto"
             additionalFieldsName="cni_recto" @uploaded="refreshUser" @upload="uploadDocument($event, 'idCardRecto')"
             :error="$v.user.alenvi.administrative.idCardRecto.driveId.$error"
           />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
-          <file-uploader caption="Carte d'identité (verso)" path="administrative.idCardVerso" alt="cni verso" :userProfile="userProfile"
+          <ni-file-uploader caption="Carte d'identité (verso)" path="administrative.idCardVerso" alt="cni verso" :userProfile="userProfile"
             @delete="deleteDocument(user.alenvi.administrative.idCardVerso.driveId, 'administrative.idCardVerso')" name="idCardVerso"
             additionalFieldsName="cni_verso" @uploaded="refreshUser" @upload="uploadDocument($event, 'idCardVerso')"
           />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'pp'" class="col-xs-12 col-md-6">
-          <file-uploader caption="Passeport" path="administrative.passport" alt="passeport" :userProfile="userProfile"
+          <ni-file-uploader caption="Passeport" path="administrative.passport" alt="passeport" :userProfile="userProfile"
             @delete="deleteDocument(user.alenvi.administrative.passport.driveId, 'administrative.passport')" name="passport"
             additionalFieldsName="passport" @uploaded="refreshUser" @upload="uploadDocument($event, 'passport')"
             :error="$v.user.alenvi.administrative.passport.driveId.$error"
           />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
-          <file-uploader caption="Titre de séjour (recto)" path="administrative.residencePermitRecto" alt="titre de séjour (recto)" :userProfile="userProfile"
+          <ni-file-uploader caption="Titre de séjour (recto)" path="administrative.residencePermitRecto" alt="titre de séjour (recto)" :userProfile="userProfile"
             @delete="deleteDocument(user.alenvi.administrative.residencePermitRecto.driveId, 'administrative.residencePermitRecto')"
             additionalFieldsName="titre_de_séjour_recto" @uploaded="refreshUser" @upload="uploadDocument($event, 'residencePermitRecto')"
             :error="$v.user.alenvi.administrative.residencePermitRecto.driveId.$error" name="residencePermitRecto"
           />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
-          <file-uploader caption="Titre de séjour (verso)" path="administrative.residencePermitVerso" alt="titre de séjour (verso)" name="residencePermitVerso"
+          <ni-file-uploader caption="Titre de séjour (verso)" path="administrative.residencePermitVerso" alt="titre de séjour (verso)" name="residencePermitVerso"
             @delete="deleteDocument(user.alenvi.administrative.residencePermitVerso.driveId, 'administrative.residencePermitVerso')" :userProfile="userProfile"
             additionalFieldsName="titre_de_séjour_verso" @uploaded="refreshUser" @upload="uploadDocument($event, 'residencePermitVerso')"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <file-uploader caption="Attestation de sécurité sociale" path="administrative.healthAttest" alt="attestation secu" :userProfile="userProfile"
+          <ni-file-uploader caption="Attestation de sécurité sociale" path="administrative.healthAttest" alt="attestation secu" :userProfile="userProfile"
             @delete="deleteDocument(user.alenvi.administrative.healthAttest.driveId, 'administrative.healthAttest')" name="healthAttest"
             additionalFieldsName="attestation_secu" @uploaded="refreshUser" @upload="uploadDocument($event, 'healthAttest')"
             :error="$v.user.alenvi.administrative.healthAttest.driveId.$error"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <file-uploader caption="Facture téléphonique" path="administrative.phoneInvoice" alt="facture téléphone" :userProfile="userProfile"
+          <ni-file-uploader caption="Facture téléphonique" path="administrative.phoneInvoice" alt="facture téléphone" :userProfile="userProfile"
             @delete="deleteDocument(user.alenvi.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')" name="phoneInvoice"
             additionalFieldsName="facture_telephone" @uploaded="refreshUser" @upload="uploadDocument($event, 'phoneInvoice')"
             :error="$v.user.alenvi.administrative.phoneInvoice.driveId.$error"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <multiple-files-uploader caption="Diplome(s) ou certificat(s)" path="administrative.certificates" alt="facture téléphone"
+          <ni-multiple-files-uploader caption="Diplome(s) ou certificat(s)" path="administrative.certificates" alt="facture téléphone"
             @delete="deleteDocument($event, 'certificates')" name="certificates" collapsibleLabel="Ajouter diplômes" :userProfile="userProfile"
             :url="docsUploadUrl" additionalFieldsName="diplomes" @uploaded="refreshUser" @upload="uploadDocument($event, 'certificates')"
           />
@@ -276,7 +276,7 @@
           </q-field>
         </div>
         <div class="col-xs-12">
-          <file-uploader caption="Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle"
+          <ni-file-uploader caption="Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle"
             path="administrative.mutualFund" alt="justif mutuelle" :userProfile="userProfile" @upload="uploadDocument($event, 'mutualFund')"
             @delete="deleteDocument(user.alenvi.administrative.mutualFund.driveId, 'administrative.mutualFund')" name="mutualFund" @uploaded="refreshUser"
             additionalFieldsName="mutuelle" :displayUpload="user.alenvi.administrative.mutualFund.has && !user.alenvi.administrative.mutualFund.driveId"
@@ -303,7 +303,7 @@
           </q-field>
         </div>
         <div v-if="user.alenvi.administrative.transportInvoice.transportType === 'public'" class="col-xs-12 col-md-6">
-          <file-uploader caption="Merci de nous transmettre ton justificatif d'abonnement" path="administrative.transportInvoice"
+          <ni-file-uploader caption="Merci de nous transmettre ton justificatif d'abonnement" path="administrative.transportInvoice"
             alt="justif transport" :userProfile="userProfile" additionalFieldsName="justif_transport" @upload="uploadDocument($event, 'transportInvoice')"
             :error="$v.user.alenvi.administrative.transportInvoice.driveId.$error" :displayCaption="currentUser.role.name === 'Auxiliaire'" name="transportInvoice"
             @delete="deleteDocument(user.alenvi.administrative.transportInvoice.driveId, 'administrative.transportInvoice')" @uploaded="refreshUser"
@@ -315,7 +315,7 @@
       <p class="text-weight-bold">Visite médicale</p>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <file-uploader caption="Certificat d'aptitude" path="administrative.medicalCertificate" alt="certificat médical" :userProfile="user.alenvi"
+          <ni-file-uploader caption="Certificat d'aptitude" path="administrative.medicalCertificate" alt="certificat médical" :userProfile="user.alenvi"
             @delete="deleteDocument(user.alenvi.administrative.medicalCertificate.driveId, 'administrative.medicalCertificate')" name="medicalCertificate"
             additionalFieldsName="certificat_medical" @uploaded="refreshUser" @upload="uploadDocument($event, 'medicalCertificate')"
           />
@@ -353,11 +353,11 @@ export default {
   components: {
     SelectSector,
     SelectMentor,
-    InputWithErrors,
-    SelectWithErrors,
-    FileUploader,
-    MultipleFilesUploader,
-    DatetimePicker,
+    'ni-input-with-errors': InputWithErrors,
+    'ni-select-with-errors': SelectWithErrors,
+    'ni-file-uploader': FileUploader,
+    'ni-multiple-files-uploader': MultipleFilesUploader,
+    'ni-datetime-picker': DatetimePicker,
   },
   data () {
     return {
