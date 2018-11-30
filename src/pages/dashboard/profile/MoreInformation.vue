@@ -33,7 +33,7 @@
         <q-field icon="person">
           <q-input v-model="user.alenvi.lastname" float-label="Nom"/>
         </q-field>
-        <select-role v-model="user.alenvi.role.name" icon="group"/>
+        <ni-select-role v-model="user.alenvi.role.name" icon="group"/>
         <!-- Date de naissance: <input v-model="user.ogust.date_of_birth" type="date" float-label="Date de naissance"/> -->
         <q-field icon="email">
           <q-input v-model="user.alenvi.local.email" float-label="Email" />
@@ -65,14 +65,14 @@
 
 <script>
 import { required, email, sameAs, minLength, maxLength } from 'vuelidate/lib/validators'
-import SelectRole from '../../../components/SelectRole'
+import SelectRole from '../../../components/form/SelectRole'
 import SelectSector from '../../../components/form/SelectSector'
 import { Cookies } from 'quasar'
 import 'vue-croppa/dist/vue-croppa.css'
 
 export default {
   components: {
-    SelectRole,
+    'ni-select-role': SelectRole,
     'ni-select-sector': SelectSector,
   },
   data () {
