@@ -3,7 +3,7 @@
     <div class="row justify-center q-mb-xl">
       <div style="width: 700px; max-width: 90vw;">
         <p class="caption">Création de compte Alenvi et Ogust</p>
-        <select-sector v-model="selectedSector"></select-sector>
+        <ni-select-sector v-model="selectedSector" />
         <ni-select-manager v-model="selectedManager" />
         <q-field icon="phone" helper="Numéro sans délimiteur (espaces, points...)">
           <q-input :disable="!selectedSector || !selectedManager" :loading="isLoading" v-model="phoneNbr" float-label="Numéro de téléphone" @keyup.enter="handlePhone" :after="[{ icon: 'send', content: true, handler: handlePhone }]"/>
@@ -56,12 +56,12 @@
 </template>
 
 <script>
-import SelectSector from '../../../components/SelectSector';
+import SelectSector from '../../../components/form/SelectSector';
 import SelectManager from '../../../components/form/SelectManager';
 
 export default {
   components: {
-    SelectSector,
+    'ni-select-sector': SelectSector,
     'ni-select-manager': SelectManager,
   },
   data () {

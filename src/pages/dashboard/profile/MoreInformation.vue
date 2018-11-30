@@ -45,7 +45,7 @@
           <q-input v-model="user.alenvi.youtube.link" float-label="Lien vidéo"/>
         </q-field>
         <!-- <q-input v-model="user.ogust.mobile_phone" float-label="Mobile"/> -->
-        <select-sector v-if="user.alenvi.sector !== '*'" v-model="user.alenvi.sector" icon="group"/>
+        <ni-select-sector v-if="user.alenvi.sector !== '*'" v-model="user.alenvi.sector" icon="group"/>
         <br>
         <p>Changement de mot de passe</p>
         <q-field icon="ion-android-lock" helper="Entrez votre nouveau mot de passe. Il doit contenir au moins 6 caractères jusqu'à 20 maximum" :error="$v.user.credentials.password.$error"
@@ -66,14 +66,14 @@
 <script>
 import { required, email, sameAs, minLength, maxLength } from 'vuelidate/lib/validators'
 import SelectRole from '../../../components/SelectRole'
-import SelectSector from '../../../components/SelectSector'
+import SelectSector from '../../../components/form/SelectSector'
 import { Cookies } from 'quasar'
 import 'vue-croppa/dist/vue-croppa.css'
 
 export default {
   components: {
     SelectRole,
-    SelectSector
+    'ni-select-sector': SelectSector,
   },
   data () {
     return {

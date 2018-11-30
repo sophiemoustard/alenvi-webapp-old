@@ -2,7 +2,7 @@
   <q-page padding class="row justify-center">
     <div style="width: 700px; max-width: 90vw;">
     <p class="caption">Envoi de message aux utilisateurs du bot</p>
-    <select-sector v-model="selectedSector"></select-sector>
+    <ni-select-sector v-model="selectedSector" />
     <q-field icon="message">
       <q-input :disable="!selectedSector" v-model="message.content" float-label="Ecrire message" type="textarea" :after="[{ icon: 'send', content: true, handler: handleMessage }]"/>
     </q-field>
@@ -13,11 +13,11 @@
 <script>
 import _ from 'lodash'
 
-import SelectSector from '../../../components/SelectSector'
+import SelectSector from '../../../components/form/SelectSector'
 
 export default {
   components: {
-    SelectSector
+    'ni-select-sector': SelectSector,
   },
   data () {
     return {

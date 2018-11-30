@@ -154,7 +154,7 @@
               <q-icon v-if="$v.newUser.sector.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newUser.sector.$error" error-label="Champ requis">
-              <select-sector v-model="newUser.sector" @myBlur="$v.newUser.sector.$touch"/>
+              <ni-select-sector v-model="newUser.sector" @myBlur="$v.newUser.sector.$touch"/>
             </q-field>
           </div>
         </div>
@@ -188,7 +188,7 @@ import { frPhoneNumber, frZipCode } from '../../helpers/vuelidateCustomVal';
 import { clear } from '../../helpers/utils.js';
 import { userProfileValidation } from '../../helpers/userProfileValidation';
 import { taskValidation } from '../../helpers/taskValidation';
-import SelectSector from '../../components/SelectSector';
+import SelectSector from '../../components/form/SelectSector';
 import SelectManager from '../../components/form/SelectManager.vue';
 
 export default {
@@ -202,7 +202,7 @@ export default {
     title: 'Répertoire'
   },
   components: {
-    SelectSector,
+    'ni-select-sector': SelectSector,
     'ni-select-manager': SelectManager,
   },
   data () {

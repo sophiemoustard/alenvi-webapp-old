@@ -3,7 +3,7 @@
     <h4>Vue planning</h4>
     <p class="caption">Voir planning en tant que:</p>
     <p class="input-caption">Communauté</p>
-    <select-sector class="q-mb-md" @input="getEmployeesBySector" v-model="selectedSector" />
+    <ni-select-sector class="q-mb-md" @input="getEmployeesBySector" v-model="selectedSector" />
     <p class="input-caption">Auxiliaire</p>
     <q-select class="q-mb-lg" inverted-light color="white" v-model="selectedAuxiliary" :options="orderedAuxiliary" separator :disable="!selectedSector"
       @input="getEventsData" />
@@ -16,7 +16,7 @@
 import { mapMutations, mapGetters } from 'vuex'
 import 'dhtmlx-scheduler'
 
-import SelectSector from '../../../components/SelectSector'
+import SelectSector from '../../../components/form/SelectSector'
 import Scheduler from '../../../components/scheduler/Scheduler'
 
 export default {
@@ -26,7 +26,7 @@ export default {
     }
   },
   components: {
-    SelectSector,
+    'ni-select-sector': SelectSector,
     Scheduler
   },
   watch: {

@@ -3,7 +3,7 @@
     <div v-if="currentUser.role.name !== 'Auxiliaire'" class="row gutter-profile q-mb-xl">
       <div class="col-xs-12 col-md-6">
         <p class="input-caption">Communauté</p>
-        <select-sector v-model="user.alenvi.sector" @myBlur="updateUser({ alenvi: 'sector', ogust: 'sector' })" />
+        <ni-select-sector v-model="user.alenvi.sector" @myBlur="updateUser({ alenvi: 'sector', ogust: 'sector' })" />
       </div>
       <div class="col-xs-12 col-md-6">
         <p class="input-caption">Marraine/parrain</p>
@@ -340,7 +340,7 @@ import cloudinary from '../api/Cloudinary.js';
 import nationalities from '../data/nationalities.js';
 import countries from '../data/countries.js';
 
-import SelectSector from './SelectSector';
+import SelectSector from './form/SelectSector';
 import SelectMentor from './SelectMentor';
 
 import InputWithErrors from './form/InputWithErrors.vue';
@@ -351,7 +351,7 @@ import DatetimePicker from './form/DatetimePicker.vue';
 
 export default {
   components: {
-    SelectSector,
+    'ni-select-sector': SelectSector,
     SelectMentor,
     'ni-input-with-errors': InputWithErrors,
     'ni-select-with-errors': SelectWithErrors,
