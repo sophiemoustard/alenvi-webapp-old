@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import gdrive from '../api/GoogleDrive';
+import gdrive from '../../api/GoogleDrive';
 export default {
   name: 'custom-img',
   props: {
