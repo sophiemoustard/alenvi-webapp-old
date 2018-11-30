@@ -30,13 +30,13 @@
 <script>
 import { mapGetters } from 'vuex'
 
-import sideMenuCoach from '../components/sideMenuCoach'
-import sideMenuAuxiliary from '../components/sideMenuAuxiliary'
+import SideMenuCoach from '../components/SideMenuCoach'
+import SideMenuAuxiliary from '../components/SideMenuAuxiliary'
 
 export default {
   components: {
-    sideMenuCoach,
-    sideMenuAuxiliary
+    SideMenuCoach,
+    SideMenuAuxiliary
   },
   computed: {
     ...mapGetters({

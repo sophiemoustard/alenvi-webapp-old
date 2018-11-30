@@ -28,11 +28,11 @@
 <script>
 import { mapGetters } from 'vuex'
 
-import sideMenuCustomer from '../components/sideMenuCustomer'
+import SideMenuCustomer from '../components/SideMenuCustomer'
 
 export default {
   components: {
-    sideMenuCustomer
+    SideMenuCustomer
   },
   computed: {
     ...mapGetters({
