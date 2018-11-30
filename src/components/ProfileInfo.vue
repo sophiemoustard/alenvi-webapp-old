@@ -341,7 +341,6 @@ import nationalities from '../data/nationalities.js';
 import countries from '../data/countries.js';
 
 import SelectSector from './form/SelectSector';
-import SelectMentor from './SelectMentor';
 
 import InputWithErrors from './form/InputWithErrors.vue';
 import SelectWithErrors from './form/SelectWithErrors.vue';
@@ -352,7 +351,6 @@ import DatetimePicker from './form/DatetimePicker.vue';
 export default {
   components: {
     'ni-select-sector': SelectSector,
-    SelectMentor,
     'ni-input-with-errors': InputWithErrors,
     'ni-select-with-errors': SelectWithErrors,
     'ni-file-uploader': FileUploader,
