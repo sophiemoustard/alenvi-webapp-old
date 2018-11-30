@@ -51,14 +51,9 @@
         </div>
         <div class="row margin-input">
           <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Civilité</p>
-              <q-icon v-if="$v.newCustomer.identity.title.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newCustomer.identity.title.$error" error-label="Champ requis">
-              <q-select :options="civilityOptions" v-model="newCustomer.identity.title" color="white" inverted-light separator
-               @blur="$v.newCustomer.identity.title.$touch" />
-            </q-field>
+            <ni-select caption="Civilité" :error="$v.newCustomer.identity.title.$error" :options="civilityOptions"
+              v-model="newCustomer.identity.title" @myBlur="$v.newCustomer.identity.title.$touch" withBorders
+            />
           </div>
         </div>
         <div class="row margin-input">
@@ -131,6 +126,7 @@ import { frAddress } from '../../helpers/vuelidateCustomVal.js'
 import SelectOgustList from '../../components/form/SelectOgustList';
 import SearchAddress from '../../components/form/SearchAddress';
 import Input from '../../components/form/Input.vue';
+import Select from '../../components/form/Select.vue';
 
 export default {
   metaInfo: {
@@ -140,6 +136,7 @@ export default {
     'ni-select-ogust-list': SelectOgustList,
     'ni-search-address': SearchAddress,
     'ni-input': Input,
+    'ni-select': Select,
   },
   data () {
     return {

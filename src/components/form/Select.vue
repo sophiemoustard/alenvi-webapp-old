@@ -5,7 +5,9 @@
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <q-field :error="error" :error-label="errorLabel">
-      <q-select :value="value" color="white" inverted-light :options="options" @focus="focusHandler" @blur="blurHandler" @input="update" />
+      <q-select :value="value" color="white" inverted-light :options="options" @focus="focusHandler"
+        @blur="blurHandler" @input="update" :class="inputBorderClass"
+      />
     </q-field>
   </div>
 </template>
@@ -21,6 +23,7 @@ export default {
     },
     options: Array,
     value: [String, Number],
+    withBorders: { type: Boolean, default: false },
   },
   methods: {
     focusHandler () {
@@ -33,5 +36,21 @@ export default {
       this.$emit('input', value);
     },
   },
+  computed: {
+    inputBorderClass () {
+      return this.withBorders ? 'input-border' : '';
+    },
+  },
 }
 </script>
+
+<style lang="stylus" scoped>
+@import '~variables'
+
+  .input-border
+    border: 1px solid $light-grey
+
+  .bg-negative
+    background: none !important
+    color: inherit !important
+</style>
