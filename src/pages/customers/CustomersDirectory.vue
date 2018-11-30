@@ -63,21 +63,14 @@
         </div>
         <div class="row margin-input">
           <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Nom</p>
-              <q-icon v-if="$v.newCustomer.identity.lastname.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newCustomer.identity.lastname.$error" error-label="Champ requis">
-              <q-input v-model="newCustomer.identity.lastname" color="white" inverted-light @blur="$v.newCustomer.identity.lastname.$touch" />
-            </q-field>
+            <ni-input caption="Nom" :error="$v.newCustomer.identity.lastname.$error" v-model="newCustomer.identity.lastname"
+              @myBlur="$v.newCustomer.identity.lastname.$touch" withBorders
+            />
           </div>
         </div>
         <div class="row margin-input">
           <div class="col-12">
-            <p class="input-caption">Prénom</p>
-            <q-field error-label=" ">
-              <q-input v-model="newCustomer.identity.firstname" color="white" inverted-light />
-            </q-field>
+            <ni-input caption="Prénom" v-model="newCustomer.identity.firstname" withBorders />
           </div>
         </div>
         <div class="row margin-input">
@@ -137,6 +130,7 @@ import { clear } from '../../helpers/utils.js';
 import { frAddress } from '../../helpers/vuelidateCustomVal.js'
 import SelectOgustList from '../../components/form/SelectOgustList';
 import SearchAddress from '../../components/form/SearchAddress';
+import Input from '../../components/form/Input.vue';
 
 export default {
   metaInfo: {
@@ -145,6 +139,7 @@ export default {
   components: {
     'ni-select-ogust-list': SelectOgustList,
     'ni-search-address': SearchAddress,
+    'ni-input': Input,
   },
   data () {
     return {

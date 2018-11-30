@@ -6,6 +6,7 @@
     </div>
     <q-field :error="error" :error-label="errorLabel">
       <q-input
+        :class="inputBorderClass"
         :value="value"
         color="white"
         inverted-light
@@ -34,6 +35,7 @@ export default {
     disable: { type: Boolean, default: false },
     type: { type: String, default: 'text' },
     rows: { type: Number, default: 1 },
+    withBorders: { type: Boolean, default: false },
   },
   methods: {
     blurHandler (event) {
@@ -46,5 +48,21 @@ export default {
       this.$emit('input', value);
     },
   },
+  computed: {
+    inputBorderClass () {
+      return this.withBorders ? 'input-border' : '';
+    },
+  },
 }
 </script>
+
+<style lang="stylus" scoped>
+@import '~variables'
+
+  .input-border
+    border: 1px solid $light-grey
+
+  .bg-negative
+    background: none !important
+    color: inherit !important
+</style>
