@@ -10,65 +10,45 @@
       <template slot="header">
         <q-item-main :class="{'text-weight-bold': activeRoutes.administrative.highlight }" label="Administratif" />
       </template>
-      <q-item :to="{ name: 'administrative directory', query: { role: 'Auxiliaire' } }" exact>
-        <q-item-side icon="contacts" />
-        <q-item-main label="Répertoire" />
-      </q-item>
-      <q-item v-if="user.role.name === 'Admin'" :to="{ name: 'rh config', params: { id: user._id } }" exact>
-        <q-item-side icon="settings" />
-        <q-item-main label="Configuration RH" />
-      </q-item>
+      <ni-menu-item name="administrative directory" :query="{ role: 'Auxiliaire' }" icon="contacts" label="Répertoire" />
+      <ni-menu-item name="rh config" :params="{ id: user._id }" icon="settings" label="Configuration RH" :displayItem="user.role.name === 'Admin'" />
     </q-collapsible>
     <q-item-separator />
     <q-collapsible ref="planning" v-model="activeRoutes.planning.open" collapseIcon="expand_more">
       <template slot="header">
         <q-item-main :class="{'text-weight-bold': activeRoutes.planning.highlight }" label="Planning" />
       </template>
-      <q-item :to="{ name: 'view planning'}" exact>
-        <q-item-side icon="date range" />
-        <q-item-main label="Vue planning" />
-      </q-item>
-      <q-item :to="{ name: 'modification planning' }" exact>
-        <q-item-side icon="update" />
-        <q-item-main label="Modifications planning" />
-      </q-item>
-      <q-item :to="{ name: 'constrained coaches' }" exact>
-        <q-item-side icon="perm contact calendar" />
-        <q-item-main label="Coach(s) de permanence" />
-      </q-item>
+      <ni-menu-item name="view planning" icon="date range" label="Vue planning" />
+      <ni-menu-item name="modification planning" icon="update" label="Modifications planning" />
+      <ni-menu-item name="constrained coaches" icon="perm contact calendar" label="Coach(s) de permanence" />
     </q-collapsible>
     <q-item-separator />
     <q-collapsible ref="benef" v-model="activeRoutes.benef.open" collapseIcon="expand_more">
       <template slot="header">
         <q-item-main :class="{'text-weight-bold': activeRoutes.benef.highlight }" label="Bénéficiaires" />
       </template>
-      <q-item :to="{ name: 'customers directory' }" exact>
-        <q-item-side icon="contacts" />
-        <q-item-main label="Répertoire bénéficiaires" />
-      </q-item>
-      <q-item :to="{ name: 'helpers directory' }" exact>
-        <q-item-side icon="people" />
-        <q-item-main label="Aidants" />
-      </q-item>
+      <ni-menu-item name="customers directory" icon="contacts" label="Répertoire bénéficiaires" />
+      <ni-menu-item name="helpers directory" icon="people" label="Aidants" />
     </q-collapsible>
     <q-item-separator />
-    <div class="sidemenu-footer">
-      <q-item class="sidemenu-footer-border full-width">
-        <q-item-main class="sidemenu-footer-user" :label="userFirstnameUpper" />
-        <q-item-side>
-          <q-btn icon="person" big flat round dense :to="{ name: 'account info', params: { id: user._id } }" exact />
-        </q-item-side>
-      </q-item>
-    </div>
+    <ni-side-menu-footer :label="userFirstnameUpper" :userId="user._id" @myClick="connectToBotMessenger" />
   </q-list>
 </template>
 
 <script>
 import { sideMenuMixin } from '../mixins/sideMenuMixin';
+import MenuItem from './menu/MenuItem.vue';
+import SideMenuFooter from './menu/sideMenuFooter.vue';
 
 export default {
-  props: ['user'],
+  props: {
+    user: Object,
+  },
   mixins: [sideMenuMixin],
+  components: {
+    'ni-menu-item': MenuItem,
+    'ni-side-menu-footer': SideMenuFooter,
+  },
   data () {
     return {
       activeRoutes: {
@@ -90,9 +70,6 @@ export default {
   mounted () {
     this.collapsibleOpening();
   },
-  methods: {
-
-  }
 }
 </script>
 
