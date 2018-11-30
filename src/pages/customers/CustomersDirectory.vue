@@ -98,7 +98,7 @@
               <q-icon v-if="$v.ogust.method_of_payment.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.ogust.method_of_payment.$error" error-label="Champ requis">
-              <select-ogust-list v-model="ogust.method_of_payment" listType="customer.method_of_payment" color="white" inverted-light @myBlur="$v.ogust.method_of_payment.$touch" />
+              <ni-select-ogust-list v-model="ogust.method_of_payment" listType="customer.method_of_payment" color="white" inverted-light @myBlur="$v.ogust.method_of_payment.$touch" />
             </q-field>
           </div>
         </div>
@@ -109,7 +109,7 @@
               <q-icon v-if="$v.ogust.origin.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.ogust.origin.$error" error-label="Champ requis">
-              <select-ogust-list v-model="ogust.origin" listType="customer.origin" color="white" inverted-light @myBlur="$v.ogust.origin.$touch" />
+              <ni-select-ogust-list v-model="ogust.origin" listType="customer.origin" color="white" inverted-light @myBlur="$v.ogust.origin.$touch" />
             </q-field>
           </div>
         </div>
@@ -120,7 +120,7 @@
               <q-icon v-if="$v.ogust.managerId.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.ogust.managerId.$error" error-label="Champ requis">
-              <select-ogust-list v-model="ogust.managerId" @myBlur="$v.ogust.managerId.$touch" listType="customer.manager" filter />
+              <ni-select-ogust-list v-model="ogust.managerId" @myBlur="$v.ogust.managerId.$touch" listType="customer.manager" filter />
             </q-field>
           </div>
         </div>
@@ -135,9 +135,7 @@ import { required, email } from 'vuelidate/lib/validators';
 
 import { clear } from '../../helpers/utils.js';
 import { frAddress } from '../../helpers/vuelidateCustomVal.js'
-import SelectSector from '../../components/SelectSector';
-import SelectManager from '../../components/SelectManager';
-import SelectOgustList from '../../components/SelectOgustList';
+import SelectOgustList from '../../components/form/SelectOgustList';
 import SearchAddress from '../../components/form/SearchAddress';
 
 export default {
@@ -145,9 +143,7 @@ export default {
     title: 'Répertoire bénéficiaires'
   },
   components: {
-    SelectSector,
-    SelectManager,
-    SelectOgustList,
+    'ni-select-ogust-list': SelectOgustList,
     'ni-search-address': SearchAddress,
   },
   data () {
