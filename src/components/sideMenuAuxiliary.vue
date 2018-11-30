@@ -41,17 +41,7 @@
       <ni-menu-item name="team directory" :params="{ id: user._id }" icon="group" label="Répertoire" />
     </q-collapsible>
     <q-item-separator />
-    <div class="sidemenu-footer">
-      <q-item class="sidemenu-footer-border full-width">
-        <q-item-main class="sidemenu-footer-user" :label="userFirstnameUpper" />
-        <q-item-side>
-          <q-btn class="messenger-blue-text" icon="mdi-facebook-messenger" big flat round dense @click="connectToBotMessenger" />
-        </q-item-side>
-        <q-item-side>
-          <q-btn icon="person" big flat round dense :to="{ name: 'account info', params: { id: user._id } }" exact />
-        </q-item-side>
-      </q-item>
-    </div>
+    <ni-side-menu-footer :label="userFirstnameUpper" :userId="user._id" @myClick="connectToBotMessenger" isAuxiliary />
   </q-list>
 </template>
 
@@ -60,12 +50,14 @@ import { Cookies } from 'quasar';
 
 import { sideMenuMixin } from '../mixins/sideMenuMixin';
 import MenuItem from './menu/MenuItem.vue';
+import SideMenuFooter from './menu/sideMenuFooter.vue';
 
 export default {
   props: ['user'],
   mixins: [sideMenuMixin],
   components: {
     'ni-menu-item': MenuItem,
+    'ni-side-menu-footer': SideMenuFooter,
   },
   data () {
     return {

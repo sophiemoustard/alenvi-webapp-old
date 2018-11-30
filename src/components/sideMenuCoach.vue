@@ -31,20 +31,14 @@
       <ni-menu-item name="helpers directory" icon="people" label="Aidants" />
     </q-collapsible>
     <q-item-separator />
-    <div class="sidemenu-footer">
-      <q-item class="sidemenu-footer-border full-width">
-        <q-item-main class="sidemenu-footer-user" :label="userFirstnameUpper" />
-        <q-item-side>
-          <q-btn icon="person" big flat round dense :to="{ name: 'account info', params: { id: user._id } }" exact />
-        </q-item-side>
-      </q-item>
-    </div>
+    <ni-side-menu-footer :label="userFirstnameUpper" :userId="user._id" @myClick="connectToBotMessenger" />
   </q-list>
 </template>
 
 <script>
 import { sideMenuMixin } from '../mixins/sideMenuMixin';
 import MenuItem from './menu/MenuItem.vue';
+import SideMenuFooter from './menu/sideMenuFooter.vue';
 
 export default {
   props: {
@@ -53,6 +47,7 @@ export default {
   mixins: [sideMenuMixin],
   components: {
     'ni-menu-item': MenuItem,
+    'ni-side-menu-footer': SideMenuFooter,
   },
   data () {
     return {
