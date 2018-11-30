@@ -983,15 +983,17 @@ export default {
     async updateUser (paths) {
       try {
         if (this.tmpInput === this.$_.get(this.user.alenvi, paths.alenvi)) return;
-        this.$_.get(this.$v.user.alenvi, paths.alenvi).$touch();
-        if (this.$_.get(this.$v.user.alenvi, paths.alenvi).$error) {
-          return this.$q.notify({
-            color: 'secondary',
-            icon: 'warning',
-            detail: 'Champ(s) invalide(s)',
-            position: 'bottom-left',
-            timeout: 2500
-          });
+        if (this.$_.get(this.$v.user.alenvi, paths.alenvi)) {
+          this.$_.get(this.$v.user.alenvi, paths.alenvi).$touch();
+          if (this.$_.get(this.$v.user.alenvi, paths.alenvi).$error) {
+            return this.$q.notify({
+              color: 'secondary',
+              icon: 'warning',
+              detail: 'Champ(s) invalide(s)',
+              position: 'bottom-left',
+              timeout: 2500
+            });
+          }
         }
         if (paths.alenvi && paths.ogust) {
           await this.updateAlenviUser(paths.alenvi);
