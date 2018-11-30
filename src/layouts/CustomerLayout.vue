@@ -47,7 +47,7 @@ export default {
       }
     },
     layoutTitle () {
-      if (this.user.role.name === 'Client') {
+      if (this.user.role.name === 'Aidants') {
         return {
           link: { name: 'customer home' },
           content: 'Mon espace Alenvi'

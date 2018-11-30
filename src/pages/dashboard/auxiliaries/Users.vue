@@ -28,7 +28,7 @@ export default {
     async getUsers () {
       try {
         this.users = await this.$users.showAll();
-        _.remove(this.users, (o) => { return o.firstname === 'Admin' || o.firstname === 'Pigi' || o.role.name === 'Client' });
+        _.remove(this.users, (o) => { return o.firstname === 'Admin' || o.firstname === 'Pigi' || o.role.name === 'Aidants' });
       } catch (e) {
         console.error(e);
       }

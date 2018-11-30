@@ -18,7 +18,7 @@ export const sideMenuMixin = {
       this.$q.cookies.remove('user_id', {
         path: '/'
       });
-      if (this.user.role.name !== 'Client') {
+      if (this.user.role.name !== 'Aidants') {
         this.$router.replace('/login');
       }
     },
@@ -26,7 +26,7 @@ export const sideMenuMixin = {
       if (this.$q.platform.is.mobile) {
         this.$store.commit('main/setToggleDrawer', false);
       }
-      if (this.user.role.name !== 'Client') {
+      if (this.user.role.name !== 'Aidants') {
         this.$router.push({
           name: 'personal info',
           params: {

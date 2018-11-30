@@ -61,7 +61,7 @@ export default {
         this.$q.cookies.set('refresh_token', user.data.data.refreshToken, { path: '/', expires: 365, secure: process.env.NODE_ENV !== 'development' });
         this.$q.cookies.set('user_id', user.data.data.user._id, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV !== 'development' });
         await this.$store.dispatch('main/getUser', this.$q.cookies.get('user_id'));
-        // if (this.getUser.role.name === 'Client') {
+        // if (this.getUser.role.name === 'Aidants') {
         //   return this.$router.replace({ path: '/dashboard/customer/home' });
         // }
         if (this.$q.platform.is.desktop) {
@@ -72,7 +72,7 @@ export default {
           return this.$router.replace({ path: this.$route.query.from });
         }
 
-        if (this.getUser.role.name === 'Client') {
+        if (this.getUser.role.name === 'Aidants') {
           this.$router.replace({ path: '/dashboard/customer/home' });
         } else if (this.getUser.role.name === 'Auxiliaire' && !this.getUser.administrative.signup.complete) {
           this.$router.replace({ path: '/signupComplete' });

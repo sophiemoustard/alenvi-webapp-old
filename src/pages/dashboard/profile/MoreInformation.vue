@@ -109,7 +109,7 @@ export default {
   async mounted () {
     try {
       this.user.alenvi = await this.$users.getById(this.$route.params.id);
-      if (!this.user.alenvi.youtube && this.user.alenvi.role.name !== 'Client') {
+      if (!this.user.alenvi.youtube && this.user.alenvi.role.name !== 'Aidants') {
         this.user.alenvi.youtube = { location: [] };
       }
       if (this.user.alenvi.employee_id.length >= 9) {

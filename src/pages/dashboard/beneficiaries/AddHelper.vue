@@ -6,11 +6,11 @@
      <!-- <q-field icon="mail" helper="Adresse email de l'aidant">
        <q-input v-model="email" float-label="Email" :after="[{ icon: 'send', content: true, handler: handleEmail }]"/>
      </q-field> -->
-     <!-- TEST by typing the beginning of a client's name -->
+     <!-- TEST by typing the beginning of a Aidants's name -->
      <q-search inverted-light color="white" v-model="terms" placeholder="Commencez à entrer le nom d'un bénéficiaire...">
        <q-autocomplete @search="search" @selected="selected" />
      </q-search>
-     <!-- Find client's helpers on the fly -->
+     <!-- Find Aidants's helpers on the fly -->
      <q-item v-if="helpers" tag="label" v-for="(helper, index) in helpers" :key="index">
        <q-item-side>
          <q-checkbox v-model="helper.checked" :disable="helper.checked" @input="handleEmail(helper, index)"></q-checkbox>
@@ -76,7 +76,7 @@ export default {
       //   },
       //   {
       //     label: 'Nom bénéficiaire',
-      //     field: 'lastNameClient', // TODO: add all last name from clients in this object
+      //     field: 'lastNameAidants', // TODO: add all last name from Aidantss in this object
       //     width: '75px',
       //     filter: false,
       //     sort: true,
@@ -110,7 +110,7 @@ export default {
             },
             customer_id: helper.id_customer,
             lastname: helper.last_name,
-            role: 'Client'
+            role: 'Aidants'
           });
           this.$q.notify({
             color: 'positive',
@@ -176,7 +176,7 @@ export default {
         const ogustHelpers = await this.$ogust.getCustomerContacts(item.id_customer);
         const filteredOgustHelpers = _.filter(ogustHelpers, helper => helper.email);
         // console.log('ogust', filteredOgustHelpers);
-        const alenviHelpers = await this.$users.showAll({ role: 'Client' });
+        const alenviHelpers = await this.$users.showAll({ role: 'Aidants' });
         // console.log('alenvi', alenviHelpers);
         let processed = false;
         for (let k = 0, l = filteredOgustHelpers.length; k < l; k++) {

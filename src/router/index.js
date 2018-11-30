@@ -86,7 +86,7 @@ Router.beforeEach(async (to, from, next) => {
 //           store.commit('main/changeRefreshState', false);
 //           next();
 //         } else {
-//           if (store.getters['main/user'].role.name === 'Client') {
+//           if (store.getters['main/user'].role.name === 'Aidants') {
 //             store.commit('main/changeRefreshState', false);
 //             return next({ path: '/dashboard/customer/home' });
 //           }
@@ -103,7 +103,7 @@ Router.beforeEach(async (to, from, next) => {
 //       if (await checkPermission(to, store.getters['main/user'])) {
 //         store.commit('main/changeRefreshState', false);
 //         next();
-//       } else if (store.getters['main/user'].role.name === 'Client') {
+//       } else if (store.getters['main/user'].role.name === 'Aidants') {
 //         store.commit('main/changeRefreshState', false);
 //         next({ path: '/dashboard/customer/home' });
 //       } else {

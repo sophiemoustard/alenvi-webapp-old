@@ -10,11 +10,11 @@ const routes = [
         if (!store.getters['main/user'] && Cookies.get('user_id')) {
           await store.dispatch('main/getUser', Cookies.get('user_id'));
         }
-        if (store.getters['main/user'] && store.getters['main/user'].role.name === 'Client') {
+        if (store.getters['main/user'] && store.getters['main/user'].role.name === 'Aidants') {
           return next({ name: 'customer home' });
         } else if (store.getters['main/user'] && store.getters['main/user'].role.name === 'Auxiliaire') {
           return next({ name: 'auxiliary info', params: { id: store.getters['main/user']._id } });
-        } else if (store.getters['main/user'] && store.getters['main/user'].role.name !== 'Auxiliaire' && store.getters['main/user'].role.name !== 'Client') {
+        } else if (store.getters['main/user'] && store.getters['main/user'].role.name !== 'Auxiliaire' && store.getters['main/user'].role.name !== 'Aidants') {
           return next({ name: 'rh directory' });
         } else {
           next({ path: '/login' });

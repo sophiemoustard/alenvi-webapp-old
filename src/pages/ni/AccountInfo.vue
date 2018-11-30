@@ -114,7 +114,7 @@ export default {
       this.$q.cookies.remove('user_id', {
         path: '/'
       });
-      if (this.user.alenvi.role.name !== 'Client') {
+      if (this.user.alenvi.role.name !== 'Aidants') {
         this.$router.replace('/login');
       }
     }
