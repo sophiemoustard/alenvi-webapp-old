@@ -92,7 +92,7 @@
               <p class="input-caption">Adresse</p>
               <q-icon v-if="$v.newCustomer.contact.address.fullAddress.$error" name="error_outline" color="secondary" />
             </div>
-            <q-field :error="$v.newCustomer.contact.address.fullAddress.$error" error-label="Champ requis">
+            <q-field :error="$v.newCustomer.contact.address.fullAddress.$error" :error-label="addressError">
               <search-address v-model="newCustomer.contact.address.fullAddress" @selected="selectedAddress" @blur="$v.newCustomer.contact.address.fullAddress.$touch" />
             </q-field>
           </div>
@@ -140,6 +140,7 @@
 import { required, email } from 'vuelidate/lib/validators';
 
 import { clear } from '../../helpers/utils.js';
+import { frAddress } from '../../helpers/vuelidateCustomVal.js'
 // import { userProfileValidation } from '../../helpers/userProfileValidation';
 // import { taskValidation } from '../../helpers/taskValidation';
 import SelectSector from '../../components/SelectSector';
@@ -273,7 +274,7 @@ export default {
       email: { email },
       contact: {
         address: {
-          fullAddress: { required }
+          fullAddress: { required, frAddress }
         }
       },
     },
@@ -319,10 +320,11 @@ export default {
         return 'Email non valide';
       }
     },
-    fullAddress () {
-      if (!this.$v.newCustomer.contact.address.$error) {
-        return `${this.newCustomer.contact.address.street} ${this.newCustomer.contact.address.zipCode} ${this.newCustomer.contact.address.city}`
+    addressError () {
+      if (!this.$v.newCustomer.contact.address.fullAddress.required) {
+        return 'Champ requis';
       }
+      return 'Adresse non valide';
     }
   },
   methods: {
@@ -412,17 +414,6 @@ export default {
         if (this.$v.newCustomer.$error) {
           throw new Error('Invalid fields');
         }
-        const isValidAddress = await this.validateAddress();
-        if (!isValidAddress) {
-          this.isLoading = false;
-          return this.$q.notify({
-            color: 'negative',
-            icon: 'warning',
-            detail: 'Adresse complète invalide.',
-            position: 'bottom-left',
-            timeout: 2500
-          });
-        }
         const newCustomer = await this.createOgustCustomer();
         this.newCustomer.customerId = newCustomer.data.data.customer.id_customer;
         const customer = await this.$ogust.getCustomerById(this.newCustomer.customerId);
@@ -485,14 +476,6 @@ export default {
         });
         this.loading = false;
       }
-    },
-    async validateAddress () {
-      const res = await this.$axios.get('https://api-adresse.data.gouv.fr/search', {
-        params: {
-          q: this.newCustomer.contact.address.fullAddress
-        }
-      });
-      return res.data.features.length === 1 && res.data.features[0].properties.score > 0.85;
     },
     selectedAddress (item) {
       this.newCustomer.contact.address = Object.assign({}, this.newCustomer.contact.address, item);
