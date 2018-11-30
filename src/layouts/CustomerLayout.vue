@@ -8,9 +8,6 @@
         <q-toolbar-title>
           <router-link :class="{ 'router-link-active': false }" :to="layoutTitle.link">{{ layoutTitle.content }}</router-link>
         </q-toolbar-title>
-        <!-- <q-btn color="primary" flat big>
-        <q-icon name="email" />
-      </q-btn> -->
       </q-toolbar>
     </q-layout-header>
 
@@ -28,7 +25,7 @@
 <script>
 import { mapGetters } from 'vuex'
 
-import SideMenuCustomer from '../components/SideMenuCustomer'
+import SideMenuCustomer from '../components/menu/SideMenuCustomer'
 
 export default {
   components: {
@@ -75,8 +72,4 @@ export default {
     a
      color: $primary
      text-decoration: none
-    //  transition: none
-    //  &:hover
-      //  color: none
-
   </style>
