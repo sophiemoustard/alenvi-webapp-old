@@ -31,7 +31,7 @@
       <ni-menu-item name="helpers directory" icon="people" label="Aidants" />
     </q-collapsible>
     <q-item-separator />
-    <ni-side-menu-footer :label="userFirstnameUpper" :userId="user._id" @myClick="connectToBotMessenger" />
+    <ni-side-menu-footer :label="userFirstnameUpper" :userId="user._id" />
   </q-list>
 </template>
 
