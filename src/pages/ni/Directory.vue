@@ -165,7 +165,7 @@
               <q-icon v-if="$v.newUser.ogustManagerId.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newUser.ogustManagerId.$error" error-label="Champ requis">
-              <select-manager v-model="newUser.ogustManagerId" @myBlur="$v.newUser.ogustManagerId.$touch"/>
+              <ni-select-manager v-model="newUser.ogustManagerId" @myBlur="$v.newUser.ogustManagerId.$touch"/>
             </q-field>
           </div>
         </div>
@@ -189,7 +189,7 @@ import { clear } from '../../helpers/utils.js';
 import { userProfileValidation } from '../../helpers/userProfileValidation';
 import { taskValidation } from '../../helpers/taskValidation';
 import SelectSector from '../../components/SelectSector';
-import SelectManager from '../../components/SelectManager';
+import SelectManager from '../../components/form/SelectManager.vue';
 
 export default {
   props: {
@@ -203,7 +203,7 @@ export default {
   },
   components: {
     SelectSector,
-    SelectManager
+    'ni-select-manager': SelectManager,
   },
   data () {
     return {
