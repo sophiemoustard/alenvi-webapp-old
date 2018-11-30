@@ -18,10 +18,6 @@
         <q-item-side icon="settings" />
         <q-item-main label="Configuration RH" />
       </q-item>
-      <!-- <q-item>
-        <q-item-side icon="settings" />
-        <q-item-main label="Configuration RH" />
-      </q-item> -->
     </q-collapsible>
     <q-item-separator />
     <q-collapsible ref="planning" v-model="activeRoutes.planning.open" collapseIcon="expand_more">
@@ -50,27 +46,18 @@
         <q-item-side icon="contacts" />
         <q-item-main label="Répertoire bénéficiaires" />
       </q-item>
-      <q-item :to="{ name: 'add helper' }" exact>
-        <q-item-side icon="person add" />
-        <q-item-main label="Accueil aidants" />
+      <q-item :to="{ name: 'helpers directory' }" exact>
+        <q-item-side icon="people" />
+        <q-item-main label="Aidants" />
       </q-item>
     </q-collapsible>
     <q-item-separator />
     <div class="sidemenu-footer">
       <q-item class="sidemenu-footer-border full-width">
         <q-item-main class="sidemenu-footer-user" :label="userFirstnameUpper" />
-        <!-- <q-item-side>
-          <q-icon name="person" color="black" @click.native="toAccountInfo"/>
-        </q-item-side> -->
-        <!-- <q-item-side>
-          <q-icon name="settings" color="black" />
-        </q-item-side> -->
         <q-item-side>
           <q-btn icon="person" big flat round dense :to="{ name: 'account info', params: { id: user._id } }" exact />
         </q-item-side>
-        <!-- <q-item-side>
-          <q-icon name="ion-log-out" color="black" @click.native="logout" />
-        </q-item-side> -->
       </q-item>
     </div>
   </q-list>
