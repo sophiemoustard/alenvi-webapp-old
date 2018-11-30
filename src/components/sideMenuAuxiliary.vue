@@ -13,58 +13,32 @@
       <template slot="header">
         <q-item-main :class="{'text-weight-bold': activeRoutes.planning.highlight }" label="Planning" />
       </template>
-      <q-item :to="{ name: 'profile planning', params: { id: user._id }, query: { auxiliary: 'true', self: 'true' } }"
-        exact>
-        <q-item-side icon="event" />
-        <q-item-main label="Le mien" />
-      </q-item>
-      <q-item :to="{ name: 'profile planning', params: { id: user._id }, query: { auxiliary: 'true' } }" exact>
-        <q-item-side icon="face" />
-        <q-item-main label="Auxiliaires" />
-      </q-item>
-      <q-item :to="{ name: 'profile planning', params: { id: user._id }, query: { customer: 'true' } }" exact>
-        <q-item-side icon="people" />
-        <q-item-main label="Bénéficiaires" />
-      </q-item>
+      <ni-menu-item name="profile planning" :params="{ id: user._id }" :query="{ auxiliary: 'true', self: 'true' }" icon="event" label="Le mien" />
+      <ni-menu-item name="profile planning" :params="{ id: user._id }" :query="{ auxiliary: 'true' }" icon="face" label="Auxiliaires" />
+      <ni-menu-item name="profile planning" :params="{ id: user._id }" :query="{ customer: 'true' }" icon="people" label="Bénéficiaires" />
     </q-collapsible>
     <q-item-separator />
     <q-collapsible ref="benef" v-model="activeRoutes.benef.open" collapseIcon="expand_more">
       <template slot="header">
         <q-item-main :class="{'text-weight-bold': activeRoutes.benef.highlight }" label="Bénéficiaires" />
       </template>
-      <q-item :to="{ name: 'profile customers', params: { id: user._id } }" exact>
-        <q-item-side icon="account_box" />
-        <q-item-main label="Fiches" />
-      </q-item>
+      <ni-menu-item name="profile customers" :params="{ id: user._id }" icon="account_box" label="Fiches" />
     </q-collapsible>
     <q-item-separator />
     <q-collapsible ref="administrative" v-model="activeRoutes.administrative.open" collapseIcon="expand_more">
       <template slot="header">
         <q-item-main :class="{'text-weight-bold': activeRoutes.administrative.highlight }" label="Administratif" />
       </template>
-      <!-- <q-item :to="{ name: 'view planning'}" exact> -->
-      <q-item :to="{ name: 'personal info', params: { id: user._id }}" exact>
-        <q-item-side icon="person" />
-        <q-item-main label="Infos personnelles" />
-      </q-item>
-      <q-item :to="{ name: 'profile salaries', params: { id: user._id }}" exact>
-        <q-item-side icon="layers" />
-        <q-item-main label="Paye" />
-      </q-item>
-      <q-item :to="{ name: 'profile docs', params: { id: user._id }}" exact>
-        <q-item-side icon="insert_drive_file" />
-        <q-item-main label="Documents" />
-      </q-item>
+      <ni-menu-item name="personal info" :params="{ id: user._id }" icon="person" label="Infos personnelles" />
+      <ni-menu-item name="profile salaries" :params="{ id: user._id }" icon="layers" label="Paye" />
+      <ni-menu-item name="profile docs" :params="{ id: user._id }" icon="insert_drive_file" label="Documents" />
     </q-collapsible>
     <q-item-separator />
     <q-collapsible ref="team" v-model="activeRoutes.team.open" collapseIcon="expand_more">
       <template slot="header">
         <q-item-main :class="{'text-weight-bold': activeRoutes.team.highlight }" label="Equipe" />
       </template>
-      <q-item :to="{ name: 'team directory', params: { id: user._id }}" exact>
-        <q-item-side icon="group" />
-        <q-item-main label="Répertoire" />
-      </q-item>
+      <ni-menu-item name="team directory" :params="{ id: user._id }" icon="group" label="Répertoire" />
     </q-collapsible>
     <q-item-separator />
     <div class="sidemenu-footer">
@@ -84,13 +58,15 @@
 <script>
 import { Cookies } from 'quasar';
 
-import {
-  sideMenuMixin
-} from '../mixins/sideMenuMixin';
+import { sideMenuMixin } from '../mixins/sideMenuMixin';
+import MenuItem from './menu/MenuItem.vue';
 
 export default {
   props: ['user'],
   mixins: [sideMenuMixin],
+  components: {
+    'ni-menu-item': MenuItem,
+  },
   data () {
     return {
       activeRoutes: {
