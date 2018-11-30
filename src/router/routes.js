@@ -160,6 +160,16 @@ const routes = [
           parent: 'benef'
         }
       },
+      {
+        path: 'helpers',
+        name: 'helpers directory',
+        component: () => import('pages/customers/HelpersDirectory'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['profiles:read'],
+          parent: 'benef'
+        }
+      },
       // Legacy routes
       {
         path: 'old/planning',
