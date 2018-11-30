@@ -13,8 +13,7 @@
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Photo</p>
-        <p :class="[groupErrors('picture').errors > 0 ? 'group-error' : 'group-error-ok']">{{
-          groupErrors('picture').msg }}</p>
+        <p :class="[groupErrors('picture').errors > 0 ? 'group-error' : 'group-error-ok']">{{groupErrors('picture').msg }}</p>
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
@@ -55,177 +54,111 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Prénom</p>
-            <q-icon v-if="$v.user.alenvi.firstname.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.firstname.$error" :error-label="requiredField">
-            <q-input v-model="user.alenvi.firstname" color="white" inverted-light @focus="saveTmp('firstname')" @blur="updateUser({ alenvi: 'firstname', ogust: 'first_name' })" />
-          </q-field>
+          <ni-input-with-errors caption="Prénom" :error="$v.user.alenvi.firstname.$error" v-model="user.alenvi.firstname"
+            @myBlur="updateUser({ alenvi: 'firstname', ogust: 'first_name' })" @myFocus="saveTmp('firstname')"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Nom</p>
-            <q-icon v-if="$v.user.alenvi.lastname.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.lastname.$error" :error-label="requiredField">
-            <q-input v-model="user.alenvi.lastname" color="white" inverted-light @focus="saveTmp('lastname')" @blur="updateUser({ alenvi: 'lastname', ogust: 'last_name' })" />
-          </q-field>
+          <ni-input-with-errors caption="Nom" :error="$v.user.alenvi.lastname.$error" v-model="user.alenvi.lastname"
+            @myBlur="updateUser({ alenvi: 'lastname', ogust: 'last_name' })" @myFocus="saveTmp('lastname')"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Nationalité</p>
-            <q-icon v-if="$v.user.alenvi.administrative.identity.nationality.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.administrative.identity.nationality.$error" :error-label="requiredField">
-            <q-select v-model="user.alenvi.administrative.identity.nationality" color="white" inverted-light :options="nationalitiesOptions"
-              @focus="saveTmp('administrative.identity.nationality')" @blur="updateUser({ alenvi: 'administrative.identity.nationality', ogust: 'nationality' })" />
-          </q-field>
+          <ni-select-with-errors caption="Nationalité" :error="$v.user.alenvi.administrative.identity.nationality.$error" :options="nationalitiesOptions"
+            v-model="user.alenvi.administrative.identity.nationality" @myFocus="saveTmp('administrative.identity.nationality')"
+            @myBlur="updateUser({ alenvi: 'administrative.identity.nationality', ogust: 'nationality' })"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Date de naissance</p>
-            <q-icon v-if="$v.user.alenvi.administrative.identity.birthDate.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.administrative.identity.birthDate.$error" :error-label="requiredField">
-            <q-datetime type="date" format="DD/MM/YYYY" v-model="user.alenvi.administrative.identity.birthDate" color="white"
-              inverted-light popover @focus="saveTmp('administrative.identity.birthDate')" @blur="updateUser({ alenvi: 'administrative.identity.birthDate', ogust: 'date_of_birth' })"
-              ok-label="OK" cancel-label="Fermer" />
-          </q-field>
+          <ni-datetime-picker caption="Date de naissance" :error="$v.user.alenvi.administrative.identity.birthDate.$error"
+            v-model="user.alenvi.administrative.identity.birthDate" @myFocus="saveTmp('administrative.identity.birthDate')"
+            @myBlur="updateUser({ alenvi: 'administrative.identity.birthDate', ogust: 'date_of_birth' })"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Pays de naissance</p>
-            <q-icon v-if="$v.user.alenvi.administrative.identity.birthCountry.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.administrative.identity.birthCountry.$error" :error-label="requiredField">
-            <q-select v-model="user.alenvi.administrative.identity.birthCountry" :options="countriesOptions" color="white"
-              inverted-light @focus="saveTmp('administrative.identity.birthCountry')" @blur="updateUser({ alenvi: 'administrative.identity.birthCountry', ogust: 'country_of_birth' })" />
-          </q-field>
+          <ni-select-with-errors caption="Pays de naissance" :error="$v.user.alenvi.administrative.identity.birthCountry.$error" :options="nationalitiesOptions"
+            v-model="user.alenvi.administrative.identity.birthCountry" @myFocus="saveTmp('administrative.identity.birthCountry')"
+            @myBlur="updateUser({ alenvi: 'administrative.identity.birthCountry', ogust: 'country_of_birth' })"
+          />
         </div>
         <div v-if="this.user.alenvi.administrative.identity.birthCountry === 'FR'" class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Département de naissance</p>
-            <q-icon v-if="$v.user.alenvi.administrative.identity.birthState.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.administrative.identity.birthState.$error" :error-label="birthStateError">
-            <q-input v-model="user.alenvi.administrative.identity.birthState" color="white" inverted-light @focus="saveTmp('administrative.identity.birthState')"
-              @blur="updateUser({ alenvi: 'administrative.identity.birthState', ogust: 'state_of_birth' })" />
-          </q-field>
+          <ni-input-with-errors caption="Département de naissance" :error="$v.user.alenvi.administrative.identity.birthState.$error" :errorLabel="birthStateError"
+            v-model="user.alenvi.administrative.identity.birthState" @myBlur="updateUser({ alenvi: 'administrative.identity.birthState', ogust: 'state_of_birth' })"
+            @myFocus="saveTmp('administrative.identity.birthState')"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Ville de naissance</p>
-            <q-icon v-if="$v.user.alenvi.administrative.identity.birthCity.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.administrative.identity.birthCity.$error" :error-label="requiredField">
-            <q-input v-model="user.alenvi.administrative.identity.birthCity" color="white" inverted-light @focus="saveTmp('administrative.identity.birthCity')"
-              @blur="updateUser({ alenvi: 'administrative.identity.birthCity', ogust: 'place_of_birth' })" />
-          </q-field>
+          <ni-input-with-errors caption="Ville de naissance" :error="$v.user.alenvi.administrative.identity.birthCity.$error"
+            v-model="user.alenvi.administrative.identity.birthCity" @myFocus="saveTmp('administrative.identity.birthCity')"
+            @myBlur="updateUser({ alenvi: 'administrative.identity.birthCity', ogust: 'place_of_birth' })"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Numéro de sécurité sociale</p>
-            <q-icon v-if="$v.user.alenvi.administrative.identity.socialSecurityNumber.$error" name="error_outline"
-              color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.administrative.identity.socialSecurityNumber.$error" :error-label="ssnError">
-            <q-input v-model="user.alenvi.administrative.identity.socialSecurityNumber" color="white" inverted-light
-              @focus="saveTmp('administrative.identity.socialSecurityNumber')" @blur="updateUser({ alenvi: 'administrative.identity.socialSecurityNumber', ogust: 'social_insurance_number' })" />
-          </q-field>
+          <ni-input-with-errors caption="Numéro de sécurité sociale" :error="$v.user.alenvi.administrative.identity.socialSecurityNumber.$error"
+            v-model="user.alenvi.administrative.identity.socialSecurityNumber" @myFocus="saveTmp('administrative.identity.socialSecurityNumber')"
+            @myBlur="updateUser({ alenvi: 'administrative.identity.socialSecurityNumber', ogust: 'social_insurance_number' })" :errorLabel="ssnError"
+          />
         </div>
       </div>
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Contact</p>
-        <p :class="[groupErrors('contact').errors > 0 ? 'group-error' : 'group-error-ok']">{{
-          groupErrors('contact').msg }}</p>
+        <p :class="[groupErrors('contact').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('contact').msg }}</p>
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Numéro de téléphone</p>
-            <q-icon v-if="$v.user.alenvi.mobilePhone.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.mobilePhone.$error" :error-label="phoneNbrError">
-            <q-input v-model.trim="user.alenvi.mobilePhone" type="tel" color="white" inverted-light @focus="saveTmp('mobilePhone')"
-              @blur="updateUser({ alenvi: 'mobilePhone', ogust: 'mobile_phone' })" />
-          </q-field>
+          <ni-input-with-errors caption="Numéro de téléphone" :error="$v.user.alenvi.mobilePhone.$error" :errorLabel="phoneNbrError" type="tel"
+            v-model.trim="user.alenvi.mobilePhone" @myBlur="updateUser({ alenvi: 'mobilePhone', ogust: 'mobile_phone' })" @myFocus="saveTmp('mobilePhone')"
+          />
         </div>
         <div v-if="currentUser.role.name !== 'Auxiliaire'" class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Adresse email</p>
-            <q-icon v-if="$v.user.alenvi.local.email.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.local.email.$error" :error-label="emailError">
-            <q-input v-model.trim="user.alenvi.local.email" type="email" color="white" inverted-light lower-case
-              disable @focus="saveTmp('local.email')" @blur="updateUser({ alenvi: 'local.email', ogust: 'email' })" />
-          </q-field>
+          <ni-input-with-errors caption="Adresse email" :error="$v.user.alenvi.local.email.$error" :errorLabel="emailError" type="email" lowerCase disable
+            v-model.trim="user.alenvi.local.email" @myBlur="updateUser({ alenvi: 'local.email', ogust: 'email' })" @myFocus="saveTmp('local.email')"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Adresse, numéro et rue</p>
-            <q-icon v-if="$v.user.alenvi.administrative.contact.address.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.administrative.contact.address.$error" :error-label="requiredField">
-            <q-input v-model="user.alenvi.administrative.contact.address" color="white" inverted-light @focus="saveTmp('administrative.contact.address')"
-              @blur="updateUser({ alenvi: 'administrative.contact.address', ogust: 'line' })" />
-          </q-field>
+          <ni-input-with-errors caption="Adresse, numéro et rue" v-model="user.alenvi.administrative.contact.address"
+            @myBlur="updateUser({ alenvi: 'administrative.contact.address', ogust: 'line' })" @myFocus="saveTmp('administrative.contact.address')"
+            :error="$v.user.alenvi.administrative.contact.address.$error"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Complément d'adresse</p>
-          <q-input v-model="user.alenvi.administrative.contact.additionalAddress" color="white" inverted-light @focus="saveTmp('administrative.contact.addionalAddress')"
-            @blur="updateUser({ alenvi: 'administrative.contact.additionalAddress', ogust: 'supplement' })" />
+          <q-input v-model="user.alenvi.administrative.contact.additionalAddress" @focus="saveTmp('administrative.contact.addionalAddress')"
+            @blur="updateUser({ alenvi: 'administrative.contact.additionalAddress', ogust: 'supplement' })" color="white" inverted-light
+          />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Code postal</p>
-            <q-icon v-if="$v.user.alenvi.administrative.contact.zipCode.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.administrative.contact.zipCode.$error" :error-label="zipCodeError">
-            <q-input v-model="user.alenvi.administrative.contact.zipCode" color="white" inverted-light @focus="saveTmp('administrative.contact.zipCode')"
-              @blur="updateUser({ alenvi: 'administrative.contact.zipCode', ogust: 'zip' })" />
-          </q-field>
+          <ni-input-with-errors caption="Code postal" :error="$v.user.alenvi.administrative.contact.zipCode.$error" :errorLabel="zipCodeError"
+            v-model="user.alenvi.administrative.contact.zipCode" @myFocus="saveTmp('administrative.contact.zipCode')"
+            @myBlur="updateUser({ alenvi: 'administrative.contact.zipCode', ogust: 'zip' })"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Ville</p>
-            <q-icon v-if="$v.user.alenvi.administrative.contact.city.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.administrative.contact.city.$error" :error-label="requiredField">
-            <q-input v-model="user.alenvi.administrative.contact.city" color="white" inverted-light @focus="saveTmp('administrative.contact.city')"
-              @blur="updateUser({ alenvi: 'administrative.contact.city', ogust: 'city' })" />
-          </q-field>
+          <ni-input-with-errors caption="Ville" :error="$v.user.alenvi.administrative.contact.city.$error" v-model="user.alenvi.administrative.contact.city"
+            @myBlur="updateUser({ alenvi: 'administrative.contact.city', ogust: 'city' })" @myFocus="saveTmp('administrative.contact.city')"
+          />
         </div>
       </div>
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Contact d'urgence</p>
-        <p :class="[groupErrors('emergencyContact').errors > 0 ? 'group-error' : 'group-error-ok']">{{
-          groupErrors('emergencyContact').msg }}</p>
+        <p :class="[groupErrors('emergencyContact').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('emergencyContact').msg }}</p>
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Prénom et nom</p>
-            <q-icon v-if="$v.user.alenvi.administrative.emergencyContact.name.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.administrative.emergencyContact.name.$error" :error-label="requiredField">
-            <q-input v-model="user.alenvi.administrative.emergencyContact.name" color="white" inverted-light @focus="saveTmp('administrative.emergencyContact.name')"
-              @blur="updateUser({ alenvi: 'administrative.emergencyContact.name' })" />
-          </q-field>
+          <ni-input-with-errors caption="Prénom et nom" :error="$v.user.alenvi.administrative.emergencyContact.name.$error"
+            v-model="user.alenvi.administrative.emergencyContact.name" @myFocus="saveTmp('administrative.emergencyContact.name')"
+            @myBlur="updateUser({ alenvi: 'administrative.emergencyContact.name' })"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Numéro de téléphone</p>
-            <q-icon v-if="$v.user.alenvi.administrative.emergencyContact.phoneNumber.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.administrative.emergencyContact.phoneNumber.$error" :error-label="emergencyPhoneNbrError">
-            <q-input v-model.trim="user.alenvi.administrative.emergencyContact.phoneNumber" color="white"
-              inverted-light @focus="saveTmp('administrative.emergencyContact.phoneNumber')" @blur="updateUser({ alenvi: 'administrative.emergencyContact.phoneNumber' })" />
-          </q-field>
+          <ni-input-with-errors caption="Numéro de téléphone" :error="$v.user.alenvi.administrative.emergencyContact.phoneNumber.$error"
+            v-model.trim="user.alenvi.administrative.emergencyContact.phoneNumber" @myFocus="saveTmp('administrative.emergencyContact.phoneNumber')"
+            @myBlur="updateUser({ alenvi: 'administrative.emergencyContact.phoneNumber' })" :errorLabel="emergencyPhoneNbrError"
+          />
         </div>
       </div>
     </div>
@@ -236,38 +169,28 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">IBAN</p>
-            <q-icon v-if="$v.user.alenvi.administrative.payment.rib.iban.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.administrative.payment.rib.iban.$error" :error-label="ibanError">
-            <q-input upper-case v-model="user.alenvi.administrative.payment.rib.iban" color="white" inverted-light
-              @blur="updateUser({ alenvi: 'administrative.payment.rib.iban', ogust: 'iban_number' })" @focus="saveTmp('administrative.payment.rib.iban')" />
-          </q-field>
+          <ni-input-with-errors caption="IBAN" :error="$v.user.alenvi.administrative.payment.rib.iban.$error" :errorLabel="ibanError"
+          v-model="user.alenvi.administrative.payment.rib.iban" @myFocus="saveTmp('administrative.payment.rib.iban')" upperCase
+            @myBlur="updateUser({ alenvi: 'administrative.payment.rib.iban', ogust: 'iban_number' })"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">BIC</p>
-            <q-icon v-if="$v.user.alenvi.administrative.payment.rib.bic.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.administrative.payment.rib.bic.$error" :error-label="bicError">
-            <q-input v-model.trim="user.alenvi.administrative.payment.rib.bic" upper-case color="white" inverted-light
-              @blur="updateUser({ alenvi: 'administrative.payment.rib.bic', ogust: 'bic_number' })" @focus="saveTmp('administrative.payment.rib.bic')" />
-          </q-field>
+          <ni-input-with-errors caption="BIC" :error="$v.user.alenvi.administrative.payment.rib.bic.$error" :errorLabel="bicError" upperCase
+            v-model.trim="user.alenvi.administrative.payment.rib.bic" @myFocus="saveTmp('administrative.payment.rib.bic')"
+            @myBlur="updateUser({ alenvi: 'administrative.payment.rib.bic', ogust: 'bic_number' })"
+          />
         </div>
       </div>
     </div>
     <div v-if="user.alenvi.administrative.driveFolder" class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Documents</p>
-        <p :class="[groupErrors('documents').errors > 0 ? 'group-error' : 'group-error-ok']">{{
-          groupErrors('documents').msg }}</p>
+        <p :class="[groupErrors('documents').errors > 0 ? 'group-error' : 'group-error-ok']">{{groupErrors('documents').msg }}</p>
       </div>
       <div class="row gutter-profile items-stretch">
         <div class="col-xs-12">
           <div class="row justify-between">
-            <p v-if="currentUser.role.name === 'Auxiliaire'" class="input-caption">Merci de nous indiquer le type de
-              document d'identité que tu possèdes.</p>
+            <p v-if="currentUser.role.name === 'Auxiliaire'" class="input-caption">Merci de nous indiquer le type de document d'identité que tu possèdes.</p>
           </div>
           <q-field :error="$v.user.alenvi.administrative.identityDocs.$error" :error-label="requiredField">
             <q-option-group color="primary" v-model="user.alenvi.administrative.identityDocs" @input="updateUser({ alenvi: 'administrative.identityDocs' })"
@@ -279,210 +202,64 @@
           </q-field>
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Carte d'identité (recto)</p>
-            <q-icon v-if="$v.user.alenvi.administrative.idCardRecto.driveId.$error" name="error_outline" color="secondary" />
-          </div>
-          <div v-if="user.alenvi.administrative.idCardRecto && user.alenvi.administrative.idCardRecto.driveId" class="row justify-between"
-            style="background: white">
-            <div class="doc-thumbnail">
-              <custom-img :driveId="user.alenvi.administrative.idCardRecto.driveId" alt="cni recto" />
-            </div>
-            <!-- <img class="doc-thumbnail" ref="`driveId-${user.alenvi.administrative.idCardRecto.driveId}`" alt="cni recto"> -->
-            <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.idCardRecto.driveId, 'administrative.idCardRecto')" />
-              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.idCardRecto.link)" />
-            </div>
-          </div>
-          <q-field v-if="!user.alenvi.administrative.idCardRecto.driveId" :error="$v.user.alenvi.administrative.idCardRecto.driveId.$error"
-            :error-label="requiredDoc">
-            <q-uploader ref="idCardRecto" name="idCardRecto" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `cni_recto_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
-              inverted-light hide-upload-button @add="uploadDocument($event, 'idCardRecto')" @uploaded="refreshUser"
-              @fail="failMsg" />
-          </q-field>
+          <ni-file-uploader caption="Carte d'identité (recto)" path="administrative.idCardRecto" alt="cni recto" :userProfile="userProfile"
+            @delete="deleteDocument(user.alenvi.administrative.idCardRecto.driveId, 'administrative.idCardRecto')" name="idCardRecto"
+            additionalFieldsName="cni_recto" @uploaded="refreshUser" @upload="uploadDocument($event, 'idCardRecto')"
+            :error="$v.user.alenvi.administrative.idCardRecto.driveId.$error"
+          />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Carte d'identité (verso)</p>
-          </div>
-          <div v-if="user.alenvi.administrative.idCardVerso && user.alenvi.administrative.idCardVerso.driveId" class="row justify-between"
-            style="background: white">
-            <div class="doc-thumbnail">
-              <custom-img :driveId="user.alenvi.administrative.idCardVerso.driveId" alt="cni verso" />
-            </div>
-            <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.idCardVerso.driveId, 'administrative.idCardVerso')" />
-              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.idCardVerso.link)" />
-            </div>
-          </div>
-          <q-field v-if="!user.alenvi.administrative.idCardVerso.driveId">
-            <q-uploader ref="idCardVerso" name="idCardVerso" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `cni_verso_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
-              inverted-light hide-upload-button @add="uploadDocument($event, 'idCardVerso')" @uploaded="refreshUser"
-              @fail="failMsg" />
-            <!-- <q-uploader url="test" color="white" inverted-light /> -->
-          </q-field>
+          <ni-file-uploader caption="Carte d'identité (verso)" path="administrative.idCardVerso" alt="cni verso" :userProfile="userProfile"
+            @delete="deleteDocument(user.alenvi.administrative.idCardVerso.driveId, 'administrative.idCardVerso')" name="idCardVerso"
+            additionalFieldsName="cni_verso" @uploaded="refreshUser" @upload="uploadDocument($event, 'idCardVerso')"
+          />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'pp'" class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Passeport</p>
-            <q-icon v-if="$v.user.alenvi.administrative.passport.driveId.$error" name="error_outline" color="secondary" />
-          </div>
-          <div v-if="user.alenvi.administrative.passport && user.alenvi.administrative.passport.driveId" class="row justify-between"
-            style="background: white">
-            <div class="doc-thumbnail">
-              <custom-img :driveId="user.alenvi.administrative.passport.driveId" alt="passeport" />
-            </div>
-            <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.passport.driveId, 'administrative.passport')" />
-              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.passport.link)" />
-            </div>
-          </div>
-          <q-field v-if="!user.alenvi.administrative.passport.driveId" :error="$v.user.alenvi.administrative.passport.driveId.$error"
-            :error-label="requiredDoc">
-            <q-uploader ref="passport" name="passport" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `passeport_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
-              inverted-light hide-upload-button @add="uploadDocument($event, 'passport')" @uploaded="refreshUser" @fail="failMsg" />
-            <!-- <q-uploader url="test" color="white" inverted-light /> -->
-          </q-field>
+          <ni-file-uploader caption="Passeport" path="administrative.passport" alt="passeport" :userProfile="userProfile"
+            @delete="deleteDocument(user.alenvi.administrative.passport.driveId, 'administrative.passport')" name="passport"
+            additionalFieldsName="passport" @uploaded="refreshUser" @upload="uploadDocument($event, 'passport')"
+            :error="$v.user.alenvi.administrative.passport.driveId.$error"
+          />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Titre de séjour</p>
-            <q-icon v-if="$v.user.alenvi.administrative.residencePermitRecto.driveId.$error" name="error_outline" color="secondary" />
-          </div>
-          <div v-if="user.alenvi.administrative.residencePermitRecto && user.alenvi.administrative.residencePermitRecto.driveId"
-            class="row justify-between" style="background: white">
-            <div class="doc-thumbnail">
-              <custom-img :driveId="user.alenvi.administrative.residencePermitRecto.driveId" alt="titre de séjour (recto)" />
-            </div>
-            <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.residencePermitRecto.driveId, 'administrative.residencePermitRecto')" />
-              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.residencePermitRecto.link)" />
-            </div>
-          </div>
-          <q-field v-if="!user.alenvi.administrative.residencePermitRecto.driveId" :error="$v.user.alenvi.administrative.residencePermitRecto.driveId.$error"
-            :error-label="requiredDoc">
-            <q-uploader ref="residencePermitRecto" name="residencePermitRecto" :url="docsUploadUrl" :headers="headers"
-              :additional-fields="[{ name: 'fileName', value: `titre_de_séjour_recto_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
-              inverted-light hide-upload-button @add="uploadDocument($event, 'residencePermitRecto')" @uploaded="refreshUser"
-              @fail="failMsg" />
-            <!-- <q-uploader url="test" color="white" inverted-light /> -->
-          </q-field>
+          <ni-file-uploader caption="Titre de séjour (recto)" path="administrative.residencePermitRecto" alt="titre de séjour (recto)" :userProfile="userProfile"
+            @delete="deleteDocument(user.alenvi.administrative.residencePermitRecto.driveId, 'administrative.residencePermitRecto')"
+            additionalFieldsName="titre_de_séjour_recto" @uploaded="refreshUser" @upload="uploadDocument($event, 'residencePermitRecto')"
+            :error="$v.user.alenvi.administrative.residencePermitRecto.driveId.$error" name="residencePermitRecto"
+          />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Titre de séjour</p>
-          </div>
-          <div v-if="user.alenvi.administrative.residencePermitVerso && user.alenvi.administrative.residencePermitVerso.driveId"
-            class="row justify-between" style="background: white">
-            <div class="doc-thumbnail">
-              <custom-img :driveId="user.alenvi.administrative.residencePermitVerso.driveId" alt="titre de séjour (verso)" />
-            </div>
-            <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.residencePermitVerso.driveId, 'administrative.residencePermitVerso')" />
-              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.residencePermitVerso.link)" />
-            </div>
-          </div>
-          <q-field v-if="!user.alenvi.administrative.residencePermitVerso.driveId">
-            <q-uploader ref="residencePermitVerso" name="residencePermitVerso" :url="docsUploadUrl" :headers="headers"
-              :additional-fields="[{ name: 'fileName', value: `titre_de_séjour_verso_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
-              inverted-light hide-upload-button @add="uploadDocument($event, 'residencePermitVerso')" @uploaded="refreshUser"
-              @fail="failMsg" />
-            <!-- <q-uploader url="test" color="white" inverted-light /> -->
-          </q-field>
+          <ni-file-uploader caption="Titre de séjour (verso)" path="administrative.residencePermitVerso" alt="titre de séjour (verso)" name="residencePermitVerso"
+            @delete="deleteDocument(user.alenvi.administrative.residencePermitVerso.driveId, 'administrative.residencePermitVerso')" :userProfile="userProfile"
+            additionalFieldsName="titre_de_séjour_verso" @uploaded="refreshUser" @upload="uploadDocument($event, 'residencePermitVerso')"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Attestation de sécurité sociale</p>
-            <q-icon v-if="$v.user.alenvi.administrative.healthAttest.driveId.$error" name="error_outline" color="secondary" />
-          </div>
-          <div v-if="user.alenvi.administrative.healthAttest && user.alenvi.administrative.healthAttest.driveId" class="row justify-between"
-            style="background: white">
-            <div class="doc-thumbnail">
-              <custom-img :driveId="user.alenvi.administrative.healthAttest.driveId" alt="attestation secu" />
-            </div>
-            <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.healthAttest.driveId, 'administrative.healthAttest')" />
-              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.healthAttest.link)" />
-            </div>
-          </div>
-          <q-field v-if="!user.alenvi.administrative.healthAttest.driveId" :error="$v.user.alenvi.administrative.healthAttest.driveId.$error"
-            :error-label="requiredDoc">
-            <q-uploader ref="healthAttest" name="healthAttest" :url="docsUploadUrl" :headers="headers"
-              :additional-fields="[{ name: 'fileName', value: `attestation_secu_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
-              inverted-light hide-upload-button @add="uploadDocument($event, 'healthAttest')" @uploaded="refreshUser"
-              @fail="failMsg" />
-          </q-field>
+          <ni-file-uploader caption="Attestation de sécurité sociale" path="administrative.healthAttest" alt="attestation secu" :userProfile="userProfile"
+            @delete="deleteDocument(user.alenvi.administrative.healthAttest.driveId, 'administrative.healthAttest')" name="healthAttest"
+            additionalFieldsName="attestation_secu" @uploaded="refreshUser" @upload="uploadDocument($event, 'healthAttest')"
+            :error="$v.user.alenvi.administrative.healthAttest.driveId.$error"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Facture téléphonique</p>
-            <q-icon v-if="$v.user.alenvi.administrative.phoneInvoice.driveId.$error" name="error_outline" color="secondary" />
-          </div>
-          <div v-if="user.alenvi.administrative.phoneInvoice && user.alenvi.administrative.phoneInvoice.driveId" class="row justify-between"
-            style="background: white">
-            <div class="doc-thumbnail">
-              <custom-img :driveId="user.alenvi.administrative.phoneInvoice.driveId" alt="facture téléphone" />
-            </div>
-            <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')" />
-              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.phoneInvoice.link)" />
-            </div>
-          </div>
-          <q-field v-if="!user.alenvi.administrative.phoneInvoice.driveId" :error="$v.user.alenvi.administrative.phoneInvoice.driveId.$error"
-            :error-label="requiredDoc">
-            <q-uploader ref="phoneInvoice" name="phoneInvoice" :url="docsUploadUrl" :headers="headers"
-              :additional-fields="[{ name: 'fileName', value: `facture_telephone_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
-              inverted-light hide-upload-button @add="uploadDocument($event, 'phoneInvoice')" @uploaded="refreshUser"
-              @fail="failMsg" />
-          </q-field>
+          <ni-file-uploader caption="Facture téléphonique" path="administrative.phoneInvoice" alt="facture téléphone" :userProfile="userProfile"
+            @delete="deleteDocument(user.alenvi.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')" name="phoneInvoice"
+            additionalFieldsName="facture_telephone" @uploaded="refreshUser" @upload="uploadDocument($event, 'phoneInvoice')"
+            :error="$v.user.alenvi.administrative.phoneInvoice.driveId.$error"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row">
-            <p class="input-caption">Diplome(s) ou certificat(s)</p>
-          </div>
-          <q-field v-if="user.alenvi.administrative.certificates.length === 0">
-            <q-uploader ref="certificates" name="certificates" :url="docsUploadUrl" :headers="headers"
-              :additional-fields="[{ name: 'fileName', value: `diplomes_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
-              inverted-light hide-upload-button @add="uploadDocument($event, 'certificates')" @uploaded="refreshUser"
-              @fail="failMsg" />
-          </q-field>
-          <div v-if="user.alenvi.administrative.certificates && user.alenvi.administrative.certificates.length > 0"
-            v-for="(certificate, index) in user.alenvi.administrative.certificates" :key="index">
-            <div v-if="certificate.driveId" class="row justify-between" style="background: white; margin-bottom: 24px">
-              <div class="doc-thumbnail">
-                <custom-img :driveId="certificate.driveId" alt="diplôme" />
-              </div>
-              <div class="self-end doc-delete">
-                <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(certificate.driveId, 'certificates')" />
-                <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(certificate.link)" />
-              </div>
-            </div>
-          </div>
-          <div v-if="user.alenvi.administrative.certificates && user.alenvi.administrative.certificates.length > 0">
-            <q-collapsible v-model="collapsibleOpened" label="Ajouter diplômes" :collapseIcon="collapsibleIcon">
-              <q-uploader ref="certificates" name="certificates" :url="docsUploadUrl" :headers="headers"
-                :additional-fields="[{ name: 'fileName', value: `diplomes_${userProfile.firstname}_${userProfile.lastname}` }]"
-                hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
-                inverted-light hide-upload-button @add="uploadDocument($event, 'certificates')" @uploaded="refreshUser"
-                @fail="failMsg" />
-            </q-collapsible>
-          </div>
+          <ni-multiple-files-uploader caption="Diplome(s) ou certificat(s)" path="administrative.certificates" alt="facture téléphone"
+            @delete="deleteDocument($event, 'certificates')" name="certificates" collapsibleLabel="Ajouter diplômes" :userProfile="userProfile"
+            :url="docsUploadUrl" additionalFieldsName="diplomes" @uploaded="refreshUser" @upload="uploadDocument($event, 'certificates')"
+          />
         </div>
       </div>
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between">
         <p class="text-weight-bold">Mutuelle</p>
-        <p :class="[groupErrors('mutualFund').errors > 0 ? 'group-error' : 'group-error-ok']">{{
-          groupErrors('mutualFund').msg }}</p>
+        <p :class="[groupErrors('mutualFund').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('mutualFund').msg }}</p>
       </div>
       <div class="row gutter-profile-x">
         <div class="col-xs-12">
@@ -497,37 +274,21 @@
                   { label: 'Non', value: true }
                 ]" />
           </q-field>
-          <div v-if="user.alenvi.administrative.mutualFund && user.alenvi.administrative.mutualFund.driveId" class="row justify-between"
-            style="background: white; margin-top: 24px;">
-            <div class="doc-thumbnail">
-              <custom-img :driveId="user.alenvi.administrative.mutualFund.driveId" alt="justif mutuelle" />
-            </div>
-            <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.mutualFund.driveId, 'administrative.mutualFund')" />
-              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.mutualFund.link)" />
-            </div>
-          </div>
         </div>
-        <div v-if="user.alenvi.administrative.mutualFund.has && !user.alenvi.administrative.mutualFund.driveId" class="col-xs-12">
-          <div v-if="currentUser.role.name === 'Auxiliaire'" class="row justify-between">
-            <p class="input-caption">Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une
-              autre mutuelle</p>
-            <q-icon v-if="$v.user.alenvi.administrative.mutualFund.driveId.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field :error="$v.user.alenvi.administrative.mutualFund.driveId.$error" :error-label="requiredDoc">
-            <q-uploader ref="mutualFund" name="mutualFund" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `mutuelle_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
-              inverted-light hide-upload-button @add="uploadDocument($event, 'mutualFund')" @uploaded="refreshUser"
-              @fail="failMsg" />
-          </q-field>
-        </div>
+        <div class="col-xs-12">
+          <ni-file-uploader caption="Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle"
+            path="administrative.mutualFund" alt="justif mutuelle" :userProfile="userProfile" @upload="uploadDocument($event, 'mutualFund')"
+            @delete="deleteDocument(user.alenvi.administrative.mutualFund.driveId, 'administrative.mutualFund')" name="mutualFund" @uploaded="refreshUser"
+            additionalFieldsName="mutuelle" :displayUpload="user.alenvi.administrative.mutualFund.has && !user.alenvi.administrative.mutualFund.driveId"
+            :error="$v.user.alenvi.administrative.mutualFund.driveId.$error" :displayCaption="currentUser.role.name === 'Auxiliaire'"
+          />
       </div>
+        </div>
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between">
         <p class="text-weight-bold">Transports</p>
-        <p :class="[groupErrors('transportInvoice').errors > 0 ? 'group-error' : 'group-error-ok']">{{
-          groupErrors('transportInvoice').msg }}</p>
+        <p :class="[groupErrors('transportInvoice').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('transportInvoice').msg }}</p>
       </div>
       <div class="row gutter-profile-x">
         <div class="col-xs-12">
@@ -542,28 +303,11 @@
           </q-field>
         </div>
         <div v-if="user.alenvi.administrative.transportInvoice.transportType === 'public'" class="col-xs-12 col-md-6">
-          <div v-if="currentUser.role.name === 'Auxiliaire'" class="row justify-between">
-            <p class="input-caption">Merci de nous transmettre ton justificatif d'abonnement</p>
-            <q-icon v-if="$v.user.alenvi.administrative.transportInvoice.driveId.$error" name="error_outline" color="secondary" />
-          </div>
-          <q-field v-if="$v.user.alenvi.administrative.transportInvoice.driveId.$error" :error="$v.user.alenvi.administrative.transportInvoice.driveId.$error"
-            :error-label="requiredDoc">
-            <q-uploader ref="transportInvoice" name="transportInvoice" :url="docsUploadUrl" :headers="headers"
-              :additional-fields="[{ name: 'fileName', value: `justif_transport_${userProfile.firstname}_${userProfile.lastname}` }]"
-              hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
-              inverted-light hide-upload-button @add="uploadDocument($event, 'transportInvoice')" @uploaded="refreshUser"
-              @fail="failMsg" />
-          </q-field>
-          <div v-if="user.alenvi.administrative.transportInvoice && user.alenvi.administrative.transportInvoice.driveId"
-            class="row justify-between" style="background: white; margin-top: 24px;">
-            <div class="doc-thumbnail">
-              <custom-img :driveId="user.alenvi.administrative.transportInvoice.driveId" alt="justif transport" />
-            </div>
-            <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.transportInvoice.driveId, 'administrative.transportInvoice')" />
-              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.transportInvoice.link)" />
-            </div>
-          </div>
+          <ni-file-uploader caption="Merci de nous transmettre ton justificatif d'abonnement" path="administrative.transportInvoice"
+            alt="justif transport" :userProfile="userProfile" additionalFieldsName="justif_transport" @upload="uploadDocument($event, 'transportInvoice')"
+            :error="$v.user.alenvi.administrative.transportInvoice.driveId.$error" :displayCaption="currentUser.role.name === 'Auxiliaire'" name="transportInvoice"
+            @delete="deleteDocument(user.alenvi.administrative.transportInvoice.driveId, 'administrative.transportInvoice')" @uploaded="refreshUser"
+          />
         </div>
       </div>
     </div>
@@ -571,24 +315,10 @@
       <p class="text-weight-bold">Visite médicale</p>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <div class="row">
-            <p class="input-caption">Certificat d'aptitude</p>
-          </div>
-          <q-uploader v-if="!user.alenvi.administrative.medicalCertificate.driveId" ref="medicalCertificate" name="medicalCertificate"
-            :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `certificat_medical_${userProfile.firstname}_${userProfile.lastname}` }]"
-            hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" color="white"
-            inverted-light hide-upload-button @add="uploadDocument($event, 'medicalCertificate')" @uploaded="refreshUser"
-            @fail="failMsg" />
-          <div v-if="user.alenvi.administrative.medicalCertificate.driveId"
-            class="row justify-between" style="background: white">
-            <div class="doc-thumbnail">
-              <custom-img :driveId="user.alenvi.administrative.medicalCertificate.driveId" alt="certificat médical" />
-            </div>
-            <div class="self-end doc-delete">
-              <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(user.alenvi.administrative.medicalCertificate.driveId, 'administrative.medicalCertificate')" />
-              <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(user.alenvi.administrative.medicalCertificate.link)" />
-            </div>
-          </div>
+          <ni-file-uploader caption="Certificat d'aptitude" path="administrative.medicalCertificate" alt="certificat médical" :userProfile="user.alenvi"
+            @delete="deleteDocument(user.alenvi.administrative.medicalCertificate.driveId, 'administrative.medicalCertificate')" name="medicalCertificate"
+            additionalFieldsName="certificat_medical" @uploaded="refreshUser" @upload="uploadDocument($event, 'medicalCertificate')"
+          />
         </div>
       </div>
     </div>
@@ -612,13 +342,22 @@ import countries from '../data/countries.js';
 
 import SelectSector from './SelectSector';
 import SelectMentor from './SelectMentor';
-import CustomImg from './CustomImg';
+
+import InputWithErrors from './form/InputWithErrors.vue';
+import SelectWithErrors from './form/SelectWithErrors.vue';
+import FileUploader from './form/FileUploader.vue';
+import MultipleFilesUploader from './form/MultipleFilesUploader.vue';
+import DatetimePicker from './form/DatetimePicker.vue';
 
 export default {
   components: {
     SelectSector,
     SelectMentor,
-    CustomImg
+    'ni-input-with-errors': InputWithErrors,
+    'ni-select-with-errors': SelectWithErrors,
+    'ni-file-uploader': FileUploader,
+    'ni-multiple-files-uploader': MultipleFilesUploader,
+    'ni-datetime-picker': DatetimePicker,
   },
   data () {
     return {
@@ -973,6 +712,9 @@ export default {
     }
   },
   methods: {
+    notify (color, icon, detail) {
+      return this.$q.notify({ color, icon, detail, position: 'bottom-left', timeout: 2500 });
+    },
     mergeUser (value = null) {
       const args = [this.user.alenvi, value];
       this.user.alenvi = Object.assign({}, extend(true, ...args));
@@ -986,13 +728,7 @@ export default {
         if (this.$_.get(this.$v.user.alenvi, paths.alenvi)) {
           this.$_.get(this.$v.user.alenvi, paths.alenvi).$touch();
           if (this.$_.get(this.$v.user.alenvi, paths.alenvi).$error) {
-            return this.$q.notify({
-              color: 'secondary',
-              icon: 'warning',
-              detail: 'Champ(s) invalide(s)',
-              position: 'bottom-left',
-              timeout: 2500
-            });
+            return this.notify('secondary', 'warning', 'Champ(s) invalide(s)');
           }
         }
         if (paths.alenvi && paths.ogust) {
@@ -1003,23 +739,10 @@ export default {
         } else {
           await this.updateOgustUser(paths);
         }
-        // this.$store.dispatch('rh/updateNotifications');
-        this.$q.notify({
-          color: 'positive',
-          icon: 'done',
-          detail: 'Modification enregistrée',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        this.notify('positive', 'done', 'Modification enregistrée');
       } catch (e) {
         console.error(e);
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de la modification',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        this.notify('negative', 'warning', 'Erreur lors de la modification');
       } finally {
         this.$store.commit('rh/saveUserProfile', this.user.alenvi);
         this.tmpInput = '';
@@ -1067,17 +790,17 @@ export default {
     },
     uploadDocument (files, refName) {
       if (files[0].size > 5000000) {
-        this.$refs[refName].reset();
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Fichier trop volumineux (> 5 Mo)',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        const node = this.$children.filter(child => child.$refs && Object.keys(child.$refs).includes(refName));
+        if (node) {
+          node[0].$refs[refName].reset();
+        }
+        this.notify('negative', 'warning', 'Fichier trop volumineux (> 5 Mo)');
         return '';
       } else {
-        this.$refs[refName].upload();
+        const node = this.$children.filter(child => child.$refs && Object.keys(child.$refs).includes(refName));
+        if (node) {
+          node[0].$refs[refName].upload();
+        }
       }
     },
     async uploadImage () {
@@ -1096,22 +819,10 @@ export default {
         await this.$axios.post(this.pictureUploadUrl, data, { headers: { 'content-type': 'multipart/form-data', 'x-access-token': Cookies.get('alenvi_token') || '' } });
         await this.$store.dispatch('rh/getUserProfile', { userId: this.userProfile._id });
         this.closePictureEdition();
-        this.$q.notify({
-          color: 'positive',
-          icon: 'done',
-          detail: 'Modification enregistrée',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        this.notify('positive', 'done', 'Modification enregistrée');
       } catch (e) {
         console.error(e);
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de la modification',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        this.notify('negative', 'warning', 'Erreur lors de la modification');
       } finally {
         this.loadingImage = false;
       }
@@ -1134,31 +845,13 @@ export default {
           await this.$users.updateById(payload);
         }
         await this.$store.dispatch('rh/getUserProfile', { userId: this.userProfile._id });
-        this.$q.notify({
-          color: 'positive',
-          icon: 'done',
-          detail: 'Document supprimé',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        this.notify('positive', 'done', 'Document supprimé');
       } catch (e) {
         console.error(e);
         if (e.message === '') {
-          return this.$q.notify({
-            color: 'positive',
-            icon: 'done',
-            detail: 'Suppression annulée',
-            position: 'bottom-left',
-            timeout: 2500
-          });
+          return this.notify('positive', 'done', 'Suppression annulée');
         }
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de la suppression du document',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        this.notify('negative', 'warning', 'Erreur lors de la suppression du document');
       }
     },
     async deleteImage (params) {
@@ -1181,51 +874,21 @@ export default {
           }
         });
         await this.$store.dispatch('rh/getUserProfile', { userId: this.userProfile._id });
-        this.$q.notify({
-          color: 'positive',
-          icon: 'done',
-          detail: 'Photo supprimée',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        this.notify('positive', 'done', 'Photo supprimée');
       } catch (e) {
         console.error(e);
         if (e.message === '') {
-          return this.$q.notify({
-            color: 'positive',
-            icon: 'done',
-            detail: 'Suppression annulée',
-            position: 'bottom-left',
-            timeout: 2500
-          });
+          return this.notify('positive', 'done', 'Suppression annulée');
         }
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de la suppression de la photo',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        this.notify('negative', 'warning', 'Erreur lors de la suppression de la photo');
       }
     },
     async refreshUser () {
       await this.$store.dispatch('rh/getUserProfile', { userId: this.userProfile._id });
-      this.$q.notify({
-        color: 'positive',
-        icon: 'done',
-        detail: 'Document envoyé',
-        position: 'bottom-left',
-        timeout: 2500
-      });
+      this.notify('positive', 'done', 'Document envoyé');
     },
     failMsg () {
-      this.$q.notify({
-        color: 'negative',
-        icon: 'warning',
-        detail: 'Echec de l\'envoi du document',
-        position: 'bottom-left',
-        timeout: 2500
-      });
+      this.notify('negative', 'warning', 'Echec de l\'envoi du document');
     },
     groupErrors (group) {
       let j = 0;
@@ -1274,12 +937,6 @@ export default {
     & /deep/ button
       flex: 1
 
-  .doc-thumbnail
-    padding: 13px 0px 40px 12px
-
-  .doc-delete
-    padding: 0px 14px 17px 0px
-
   .group-error
     font-size: 12px
     color: $secondary
@@ -1293,20 +950,6 @@ export default {
   /deep/ .bg-negative
     background: white !important
     color: inherit !important
-
-  /deep/ .q-collapsible-inner
-    & .q-item
-      font-size: 12px
-      padding-left: 0
-      padding: 8px 0px
-      &-side
-        color: $primary
-        & > .q-icon
-          font-size: 16px
-
-  /deep/ .q-collapsible-sub-item
-    padding-left: 0
-    padding: 8px 0px
 
   .picture-container
      width: 200px
