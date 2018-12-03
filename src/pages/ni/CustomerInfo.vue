@@ -12,124 +12,42 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <div class="row">
-            <p class="input-caption">Adresse</p>
-          </div>
-          <q-field>
-            <q-input
-              v-model="customer.main_address.line"
-              disable
-              inverted-light
-              color="white" />
-          </q-field>
+          <ni-input-with-errors caption="Adresse" v-model="customer.main_address.line" disable />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row">
-            <p class="input-caption">Ville</p>
-          </div>
-          <q-field>
-            <q-input
-              v-model="customer.main_address.city"
-              disable
-              inverted-light
-              color="white" />
-          </q-field>
+          <ni-input-with-errors caption="Ville" v-model="customer.main_address.city" disable />
         </div><div class="col-xs-12 col-md-6">
-          <div class="row">
-            <p class="input-caption">Code postal</p>
-          </div>
-          <q-field>
-            <q-input
-              v-model="customer.main_address.zip"
-              disable
-              inverted-light
-              color="white" />
-          </q-field>
+          <ni-input-with-errors caption="Code postal" v-model="customer.main_address.zip" disable />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row">
-            <p class="input-caption">Code porte</p>
-          </div>
-          <q-field>
-            <q-input
-              v-model="customer.door_code"
-              inverted-light
-              color="white"
-              @focus="saveTmp('door_code')"
-              @blur="updateCustomer('door_code')" />
-          </q-field>
+          <ni-input-with-errors caption="Code porte" v-model="customer.door_code" @myFocus="saveTmp('door_code')"
+            @myBlur="updateCustomer('door_code')"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row">
-            <p class="input-caption">Code interphone</p>
-          </div>
-          <q-field>
-            <q-input
-              v-model="customer.intercom_code"
-              inverted-light
-              color="white"
-              @focus="saveTmp('intercom_code')"
-              @blur="updateCustomer('intercom_code')" />
-          </q-field>
+          <ni-input-with-errors caption="Code interphone" v-model="customer.intercom_code"
+            @myBlur="updateCustomer('intercom_code')" @myFocus="saveTmp('intercom_code')"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row">
-            <p class="input-caption">Pathologie</p>
-          </div>
-          <q-field>
-            <q-select
-              v-model="customerInfo.pathology"
-              :options="selectOptions"
-              inverted-light
-              color="white"
-              @focus="saveTmp('customerInfo')"
-              @blur="updateCustomerInfo" />
-          </q-field>
+          <ni-select-with-errors caption="Pathologie" v-model="customerInfo.pathology" :options="selectOptions"
+            @myBlur="updateCustomerInfo" @myFocus="saveTmp('customerInfo')"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row">
-            <p class="input-caption">Commentaires</p>
-          </div>
-          <q-field>
-            <q-input
-              v-model="customerInfo.comments"
-              type="textarea"
-              :rows="6"
-              inverted-light
-              color="white"
-              @focus="saveTmp('customerInfo')"
-              @blur="updateCustomerInfo" />
-          </q-field>
+          <ni-input-with-errors caption="Commentaires" v-model="customerInfo.comments" @myFocus="saveTmp('customerInfo')"
+            type="textarea" :rows="6" @myBlur="updateCustomerInfo"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row">
-            <p class="input-caption">Détails intervention</p>
-          </div>
-          <q-field>
-            <q-input
-              v-model="customerInfo.interventionDetails"
-              type="textarea"
-              :rows="6"
-              inverted-light
-              color="white"
-              @focus="saveTmp('customerInfo')"
-              @blur="updateCustomerInfo" />
-          </q-field>
+          <ni-input-with-errors caption="Détails intervention" v-model="customerInfo.interventionDetails" @myFocus="saveTmp('customerInfo')"
+            type="textarea" :rows="6" @myBlur="updateCustomerInfo"
+          />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row">
-            <p class="input-caption">Autres</p>
-          </div>
-          <q-field>
-            <q-input
-              v-model="customerInfo.misc"
-              type="textarea"
-              :rows="6"
-              inverted-light
-              color="white"
-              @focus="saveTmp('customerInfo')"
-              @blur="updateCustomerInfo" />
-          </q-field>
+          <ni-input-with-errors caption="Autres" v-model="customerInfo.misc" @myFocus="saveTmp('customerInfo')" type="textarea"
+            :rows="6" @myBlur="updateCustomerInfo"
+          />
         </div>
       </div>
     </div>
@@ -138,8 +56,15 @@
 
 <script>
 import pathologies from '../../data/pathologies';
+import { NotifyPositive, NotifyNegative } from '../../components/popup/notify';
+import InputWithErrors from '../../components/form/InputWithErrors.vue';
+import SelectWithErrors from '../../components/form/SelectWithErrors.vue';
 
 export default {
+  components: {
+    'ni-input-with-errors': InputWithErrors,
+    'ni-select-with-errors': SelectWithErrors,
+  },
   props: {
     id: String,
     customerId: String
@@ -190,13 +115,7 @@ export default {
         this.isLoaded = true;
       } catch (e) {
         console.error(e.response);
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors du chargement des données',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyNegative('Erreur lors du chargement des données');
       }
     },
     saveTmp (path) {
@@ -210,32 +129,14 @@ export default {
       try {
         if (this.$_.isEqual(this.tmpInput, this.customerInfo)) return 0;
         let data = { arrayValues: {} };
-        const infoTitles = {
-          pathology: 'NIVEAU',
-          comments: 'COMMNIV',
-          interventionDetails: 'DETAILEVE',
-          misc: 'AUTRESCOMM'
-        };
-        for (const k in infoTitles) {
-          data.arrayValues[infoTitles[k]] = this.customerInfo[k]
+        for (const k in this.infoTitles) {
+          data.arrayValues[this.infoTitles[k]] = this.customerInfo[k]
         }
         await this.$ogust.editOgustCustomerDetails(this.customerId, data);
-        this.$q.notify({
-          color: 'positive',
-          icon: 'thumb up',
-          detail: 'Modification effectuée !',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyPositive('Modification effectuée !');
       } catch (e) {
         console.error(e);
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de l\'édition de la fiche bénéficiaire :/',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyNegative('Erreur lors de l\'édition de la fiche bénéficiaire :/');
       }
     },
     async updateCustomer (path) {
@@ -244,22 +145,10 @@ export default {
         const value = this.$_.get(this.customer, path);
         const payload = this.$_.set({}, path, value);
         await this.$ogust.editOgustCustomer(this.customerId, payload);
-        this.$q.notify({
-          color: 'positive',
-          icon: 'thumb up',
-          detail: 'Modification effectuée !',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyPositive('Modification effectuée !');
       } catch (e) {
         console.error(e);
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de l\'édition de la fiche bénéficiaire :/',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyNegative('Erreur lors de l\'édition de la fiche bénéficiaire :/');
       }
     }
   }

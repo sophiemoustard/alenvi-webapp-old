@@ -100,7 +100,7 @@ export default {
         pathology: 'NIVEAU',
         comments: 'COMMNIV',
         details: 'DETAILEVE',
-        misc: 'AUTRESCOMM'
+        misc: 'AUTRESCOMM',
       };
       for (const k in infoTitles) {
         data.arrayValues[infoTitles[k]] = this.customer.followUp[k]
