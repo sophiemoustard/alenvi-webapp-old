@@ -299,6 +299,16 @@ export default {
           style: 'width: 170px'
         },
         {
+          name: 'hiringDate',
+          label: 'Embauche',
+          field: 'hiringDate',
+          align: 'left',
+          sortable: true,
+          format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : null,
+          sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
+          style: 'width: 170px'
+        },
+        {
           name: 'team',
           label: 'Equipe',
           field: 'sector',
@@ -395,11 +405,26 @@ export default {
     }
   },
   methods: {
+    getHiringDate (user) {
+      let hiringDate = null;
+      if (user.administrative && user.administrative.contracts.length > 0) {
+        const contracts = user.administrative.contracts;
+        if (contracts.length === 1) {
+          hiringDate = contracts[0].startDate;
+        } else {
+          hiringDate = this.$_.orderBy(contracts, ['startDate'], ['asc'])[0].startDate;
+        }
+      }
+
+      return hiringDate;
+    },
     async getUserList () {
       try {
         const users = await this.$users.showAll({ role: this.role });
         const sectors = await this.$ogust.getList('employee.sector');
         this.userList = users.map((user) => {
+          const hiringDate = this.getHiringDate(user);
+
           if (user.isActive) {
             const checkProfileErrors = userProfileValidation(user);
             this.$store.commit('rh/saveNotification', {
@@ -423,7 +448,8 @@ export default {
               tasksErrors: checkTasks,
               startDate: user.createdAt,
               sector: sectors[user.sector],
-              isActive: user.isActive
+              isActive: user.isActive,
+              hiringDate,
             }
           }
           return {
@@ -434,7 +460,8 @@ export default {
             },
             startDate: user.createdAt,
             sector: sectors[user.sector],
-            isActive: user.isActive
+            isActive: user.isActive,
+            hiringDate,
           }
         });
         this.tableLoading = false;
