@@ -16,7 +16,7 @@
             :visible-columns="visibleColumns"
             binary-state-sort>
             <q-td slot="body-cell-contractEmpty" slot-scope="props" :props="props">
-              <q-btn flat round small color="primary" @click="dlTemplate(props.row, props.row.__index)">
+              <q-btn flat round small color="primary" @click="dlTemplate(props.row, props.row.__index, contract.startDate)">
                 <q-icon name="file download" />
               </q-btn>
             </q-td>
@@ -171,9 +171,8 @@
               <q-icon v-if="$v.newContractVersion.startDate.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newContractVersion.startDate.$error" error-label="Champ requis">
-              <q-datetime type="date" format="DD/MM/YYYY" v-model="newContractVersion.startDate" :min="getActiveVersion(contractSelected).startDate" color="white" inverted-light popover
-              ok-label="OK"
-              cancel-label="Fermer" />
+              <q-datetime type="date" format="DD/MM/YYYY" v-model="newContractVersion.startDate" :min="getMinimalStartDate(contractSelected)" color="white" inverted-light popover
+                ok-label="OK" cancel-label="Fermer" />
             </q-field>
           </div>
         </div>
@@ -214,7 +213,7 @@
 <script>
 import { Cookies } from 'quasar';
 import { required } from 'vuelidate/lib/validators';
-import { alenviAxios } from '../api/ressources/alenviAxios'
+import { alenviAxios } from '../api/ressources/alenviAxios';
 
 export default {
   data () {
@@ -246,10 +245,6 @@ export default {
           label: 'Prestataire',
           value: 'Prestataire'
         },
-        // {
-        //   label: 'Mandataire',
-        //   value: 'mandataire'
-        // }
       ],
       visibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractEmpty', 'contractSigned', 'isActive'],
       columns: [
@@ -285,7 +280,7 @@ export default {
         },
         {
           name: 'contractEmpty',
-          label: 'Contrat vierge',
+          label: 'Contrat',
           align: 'center',
           field: 'contractEmpty',
           sortable: false
@@ -367,6 +362,13 @@ export default {
     getActiveVersion (contract) {
       return contract.versions.find(version => version.isActive);
     },
+    getLastVersion (contract) {
+      return this.$_.orderBy(contract.versions, ['startDate'], ['desc'])[0];
+    },
+    getMinimalStartDate (contract) {
+      const activeVersion = this.getActiveVersion(contract);
+      return this.$moment(activeVersion.startDate).add(1, 'd').format();
+    },
     cardTitle (contractEndDate) {
       if (this.$moment().isBefore(contractEndDate)) {
         return {
@@ -402,7 +404,7 @@ export default {
         console.error(e);
       }
     },
-    async dlTemplate (contract, index) {
+    async dlTemplate (contract, index, contractStartDate) {
       try {
         const monthlyHours = Number.parseFloat(contract.weeklyHours * 4.33).toFixed(1);
         const data = {
@@ -420,15 +422,16 @@ export default {
           'grossHourlyRate': contract.grossHourlyRate,
           'monthlyHours': monthlyHours,
           'salary': monthlyHours * contract.grossHourlyRate,
-          'startDate': this.$moment(contract.startDate).format('DD/MM/YYYY')
+          'startDate': this.$moment(contract.startDate).format('DD/MM/YYYY'),
+          'weeklyHours': contract.weeklyHours,
+          'yearlyHours': monthlyHours * 52,
+          'uploadDate': this.$moment(Date.now()).format('DD/MM/YYYY'),
+          'initialContractStartDate': this.$moment(contractStartDate).format('DD/MM/YYYY'),
         };
-        console.log(data);
-        const file = await alenviAxios({
-          url: `${process.env.API_HOSTNAME}/gdrive/${index === 0 ? this.getUser.company.rhConfig.templates.contract.driveId : this.getUser.company.rhConfig.templates.amendment.driveId}/generatedocx`,
-          method: 'POST',
-          responseType: 'blob',
-          data
-        });
+        const params = {
+          driveId: index === 0 ? this.getUser.company.rhConfig.templates.contract.driveId : this.getUser.company.rhConfig.templates.amendment.driveId,
+        };
+        const file = await this.$gdrive.generateDocx(params, data);
         const url = window.URL.createObjectURL(new Blob([file.data]));
         const link = document.createElement('a');
         link.href = url;
@@ -440,8 +443,6 @@ export default {
       }
     },
     uploadDocument (files, refName) {
-      console.log(refName)
-      console.log(this.$refs[refName]);
       if (files[0].size > 5000000) {
         this.$refs[refName][0].reset();
         this.$q.notify({
@@ -463,15 +464,29 @@ export default {
       this.contractSelected = contract;
       this.newContractVersionModal = true;
     },
+    async updateEndDateOfPreviousVersion (data) {
+      const lastActiveVersion = this.getActiveVersion(this.contracts[data.contractIndex]);
+      const lastVersion = this.getLastVersion(this.contracts[data.contractIndex]);
+
+      const queries = {
+        userId: this.getUser._id,
+        mainContractId: data.contractId,
+        lastActiveVersion
+      };
+      const payload = {
+        endDate: this.$moment(lastVersion.startDate).subtract(1, 'day').toDate()
+      };
+      await this.$users.updateContractVersion(queries, payload);
+    },
     async updateContractActivity (data) {
       try {
-        console.log(data);
         await this.$q.dialog({
           title: 'Confirmation',
           message: 'Es-tu sûr(e) de vouloir activer ce contrat ?',
           ok: true,
           cancel: 'Annuler'
         });
+        await this.updateEndDateOfPreviousVersion(data);
         await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/contracts/${data.ogustContractId}`, { status: 'V' });
         await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${data.contractId}/versions/${data.versionId}`, { 'isActive': data.isActive });
         // Update manually checkbox because it's not dynamic
@@ -483,6 +498,7 @@ export default {
             this.contracts[data.contractIndex].versions[i].isActive = false;
           }
         }
+        await this.refreshUser();
         this.$q.notify({
           color: 'positive',
           icon: 'done',
@@ -549,28 +565,17 @@ export default {
         const lastActiveVersion = this.getActiveVersion(this.newContractVersion);
         delete this.newContractVersion.mainContractId;
         delete this.newContractVersion.versions;
-        let queries = {
-          userId: this.getUser._id,
-          mainContractId,
-          lastActiveVersion
-        };
         let payload = {
-          endDate: this.$moment(this.newContractVersion.startDate).subtract(1, 'day').toDate()
-        };
-        await this.$users.updateContractVersion(queries, payload);
-        payload = {
           id_employee: this.getUser.employee_id.toString(),
           start_date: this.$moment(this.newContractVersion.startDate).format('YYYYMMDD'),
           creation_date: this.$moment().format('YYYYMMDD'),
           contractual_salary: Number.parseFloat(this.newContractVersion.grossHourlyRate * this.newContractVersion.weeklyHours * 4.33).toFixed(2),
           contract_hours: Number.parseFloat(this.newContractVersion.weeklyHours * 4.33).toFixed(1),
-          // origine_contract: lastActiveVersion.ogustContractId,
           source_contract: lastActiveVersion.ogustContractId
         };
         const newOgustContract = await this.$ogust.newContract(payload);
-        console.log(newOgustContract);
         this.newContractVersion.ogustContractId = newOgustContract.id_contract;
-        queries = {
+        const queries = {
           userId: this.getUser._id,
           mainContractId
         };
@@ -700,9 +705,7 @@ export default {
   /deep/ .q-uploader-pick-button
     color: $primary
     font-size: 1.5rem
-    // position: relative !important
     cursor: pointer !important
-    // background: blue
 
   .missingBasicInfo
     color: red
