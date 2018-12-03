@@ -171,9 +171,8 @@
               <q-icon v-if="$v.newContractVersion.startDate.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newContractVersion.startDate.$error" error-label="Champ requis">
-              <q-datetime type="date" format="DD/MM/YYYY" v-model="newContractVersion.startDate" :min="getActiveVersion(contractSelected).startDate" color="white" inverted-light popover
-              ok-label="OK"
-              cancel-label="Fermer" />
+              <q-datetime type="date" format="DD/MM/YYYY" v-model="newContractVersion.startDate" :min="getMinimalStartDate(contractSelected)" color="white" inverted-light popover
+                ok-label="OK" cancel-label="Fermer" />
             </q-field>
           </div>
         </div>
@@ -214,7 +213,7 @@
 <script>
 import { Cookies } from 'quasar';
 import { required } from 'vuelidate/lib/validators';
-import { alenviAxios } from '../api/ressources/alenviAxios'
+import { alenviAxios } from '../api/ressources/alenviAxios';
 
 export default {
   data () {
@@ -363,6 +362,13 @@ export default {
     getActiveVersion (contract) {
       return contract.versions.find(version => version.isActive);
     },
+    getLastVersion (contract) {
+      return this.$_.orderBy(contract.versions, ['startDate'], ['desc'])[0];
+    },
+    getMinimalStartDate (contract) {
+      const activeVersion = this.getActiveVersion(contract);
+      return this.$moment(activeVersion.startDate).add(1, 'd').format();
+    },
     cardTitle (contractEndDate) {
       if (this.$moment().isBefore(contractEndDate)) {
         return {
@@ -460,6 +466,20 @@ export default {
       this.contractSelected = contract;
       this.newContractVersionModal = true;
     },
+    async updateEndDateOfPreviousVersion (data) {
+      const lastActiveVersion = this.getActiveVersion(this.contracts[data.contractIndex]);
+      const lastVersion = this.getLastVersion(this.contracts[data.contractIndex]);
+
+      const queries = {
+        userId: this.getUser._id,
+        mainContractId: data.contractId,
+        lastActiveVersion
+      };
+      const payload = {
+        endDate: this.$moment(lastVersion.startDate).subtract(1, 'day').toDate()
+      };
+      await this.$users.updateContractVersion(queries, payload);
+    },
     async updateContractActivity (data) {
       try {
         await this.$q.dialog({
@@ -468,6 +488,7 @@ export default {
           ok: true,
           cancel: 'Annuler'
         });
+        await this.updateEndDateOfPreviousVersion(data);
         await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/contracts/${data.ogustContractId}`, { status: 'V' });
         await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${data.contractId}/versions/${data.versionId}`, { 'isActive': data.isActive });
         // Update manually checkbox because it's not dynamic
@@ -479,6 +500,7 @@ export default {
             this.contracts[data.contractIndex].versions[i].isActive = false;
           }
         }
+        await this.refreshUser();
         this.$q.notify({
           color: 'positive',
           icon: 'done',
@@ -545,16 +567,7 @@ export default {
         const lastActiveVersion = this.getActiveVersion(this.newContractVersion);
         delete this.newContractVersion.mainContractId;
         delete this.newContractVersion.versions;
-        let queries = {
-          userId: this.getUser._id,
-          mainContractId,
-          lastActiveVersion
-        };
         let payload = {
-          endDate: this.$moment(this.newContractVersion.startDate).subtract(1, 'day').toDate()
-        };
-        await this.$users.updateContractVersion(queries, payload);
-        payload = {
           id_employee: this.getUser.employee_id.toString(),
           start_date: this.$moment(this.newContractVersion.startDate).format('YYYYMMDD'),
           creation_date: this.$moment().format('YYYYMMDD'),
@@ -564,7 +577,7 @@ export default {
         };
         const newOgustContract = await this.$ogust.newContract(payload);
         this.newContractVersion.ogustContractId = newOgustContract.id_contract;
-        queries = {
+        const queries = {
           userId: this.getUser._id,
           mainContractId
         };
