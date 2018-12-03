@@ -246,10 +246,6 @@ export default {
           label: 'Prestataire',
           value: 'Prestataire'
         },
-        // {
-        //   label: 'Mandataire',
-        //   value: 'mandataire'
-        // }
       ],
       visibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractEmpty', 'contractSigned', 'isActive'],
       columns: [
@@ -422,7 +418,6 @@ export default {
           'salary': monthlyHours * contract.grossHourlyRate,
           'startDate': this.$moment(contract.startDate).format('DD/MM/YYYY')
         };
-        console.log(data);
         const file = await alenviAxios({
           url: `${process.env.API_HOSTNAME}/gdrive/${index === 0 ? this.getUser.company.rhConfig.templates.contract.driveId : this.getUser.company.rhConfig.templates.amendment.driveId}/generatedocx`,
           method: 'POST',
@@ -440,8 +435,6 @@ export default {
       }
     },
     uploadDocument (files, refName) {
-      console.log(refName)
-      console.log(this.$refs[refName]);
       if (files[0].size > 5000000) {
         this.$refs[refName][0].reset();
         this.$q.notify({
@@ -465,7 +458,6 @@ export default {
     },
     async updateContractActivity (data) {
       try {
-        console.log(data);
         await this.$q.dialog({
           title: 'Confirmation',
           message: 'Es-tu sûr(e) de vouloir activer ce contrat ?',
@@ -564,11 +556,9 @@ export default {
           creation_date: this.$moment().format('YYYYMMDD'),
           contractual_salary: Number.parseFloat(this.newContractVersion.grossHourlyRate * this.newContractVersion.weeklyHours * 4.33).toFixed(2),
           contract_hours: Number.parseFloat(this.newContractVersion.weeklyHours * 4.33).toFixed(1),
-          // origine_contract: lastActiveVersion.ogustContractId,
           source_contract: lastActiveVersion.ogustContractId
         };
         const newOgustContract = await this.$ogust.newContract(payload);
-        console.log(newOgustContract);
         this.newContractVersion.ogustContractId = newOgustContract.id_contract;
         queries = {
           userId: this.getUser._id,
@@ -700,9 +690,7 @@ export default {
   /deep/ .q-uploader-pick-button
     color: $primary
     font-size: 1.5rem
-    // position: relative !important
     cursor: pointer !important
-    // background: blue
 
   .missingBasicInfo
     color: red
