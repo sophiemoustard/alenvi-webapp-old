@@ -28,27 +28,27 @@
             <span><q-icon name="clear" size="1rem" @click.native="opened = false" /></span>
           </div>
         </div>
-        <ni-modal-input :error="$v.newHelper.lastname.$error" caption="Nom" @blur="$v.newHelper.lastname.$touch" errorLabel="Champ requis" />
-        <ni-modal-input :error="$v.newHelper.firstname.$error" caption="Prénom" @blur="$v.newHelper.firstname.$touch" errorLabel="Champ requis" />
-        <ni-modal-select :error="$v.newHelper.customers.$error" caption="Bénéficiaires" @blur="$v.newHelper.customers.$touch"
+        <ni-modal-input v-model="newHelper.lastname" :error="$v.newHelper.lastname.$error" caption="Nom" @blur="$v.newHelper.lastname.$touch" errorLabel="Champ requis" />
+        <ni-modal-input v-model="newHelper.firstname" :error="$v.newHelper.firstname.$error" caption="Prénom" @blur="$v.newHelper.firstname.$touch" errorLabel="Champ requis" />
+        <ni-modal-select v-model="newHelper.customers" :error="$v.newHelper.customers.$error" caption="Bénéficiaires" @blur="$v.newHelper.customers.$touch"
           errorLabel="Champ requis" :options="customers" filter filterPlaceholder="Rechercher" />
-        <ni-modal-input last :error="$v.newHelper.local.email.$error" caption="Email" @blur="$v.newHelper.local.email.$touch" errorLabel="Champ requis" />
+        <ni-modal-input v-model="newHelper.local.email" last :error="$v.newHelper.local.email.$error" caption="Email" @blur="$v.newHelper.local.email.$touch" :errorLabel="emailError" />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Ajouter une personne" icon-right="add" color="primary" :loading="loading" />
+      <q-btn no-caps class="full-width modal-btn" label="Ajouter une personne" icon-right="add" color="primary" :loading="loading" @click="submit" />
     </q-modal>
   </q-page>
 </template>
 
 <script>
+import randomize from 'randomatic';
 import { required, email } from 'vuelidate/lib/validators';
+
 import { clear } from '../../helpers/utils.js';
-import NiSelectCustomer from '../../components/customers/SelectCustomer';
 import NiModalInput from '../../components/form/ModalInput';
 import NiModalSelect from '../../components/form/ModalSelect';
 
 export default {
   components: {
-    NiSelectCustomer,
     NiModalInput,
     NiModalSelect
   },
@@ -107,7 +107,8 @@ export default {
         firstname: '',
         local: { email: '' },
         customers: ''
-      }
+      },
+      customerId: ''
     }
   },
   validations: {
@@ -123,6 +124,13 @@ export default {
   computed: {
     filteredHelpers () {
       return this.helpers.filter(helper => Object.values(helper).some(val => String(val).toLowerCase().match(new RegExp(this.searchStr, 'i'))));
+    },
+    emailError () {
+      if (!this.$v.newHelper.local.email.required) {
+        return 'Champ requis';
+      } else if (!this.$v.newHelper.local.email.email) {
+        return 'Email non valide';
+      }
     }
   },
   async mounted () {
@@ -152,23 +160,101 @@ export default {
         this.customers = customers.map(customer => {
           return {
             label: `${customer.identity.title} ${customer.identity.lastname}`,
-            value: customer._id
+            value: customer._id,
+            ogustId: customer.customerId.toString()
           }
         })
       } catch (e) {
         console.error(e);
       }
     },
+    async createOgustHelper () {
+      const payload = {
+        id_customer: this.customers.find(customer => customer.value === this.newHelper.customers[0]).ogustId,
+        last_name: this.newHelper.lastname,
+        first_name: this.newHelper.firstname,
+        email: this.newHelper.local.email
+      };
+      await this.$ogust.createContact(payload);
+    },
+    async createAlenviHelper () {
+      this.newHelper.local.password = randomize('0', 6);
+      this.newHelper.customers = [this.newHelper.customers];
+      this.newHelper.role = 'Aidants';
+      await this.$users.create(this.newHelper);
+    },
+    async sendWelcomingEmail () {
+      await this.$email.sendWelcome({
+        sender: { email: 'support@alenvi.io' },
+        receiver: {
+          email: this.newHelper.local.email,
+          password: this.newHelper.local.password
+        }
+      });
+    },
+    async submit () {
+      try {
+        this.loading = true;
+        this.$v.newHelper.$touch();
+        if (this.$v.newHelper.$error) {
+          throw new Error('Invalid fields');
+        }
+        await this.createAlenviHelper();
+        await this.createOgustHelper();
+        this.$q.notify({
+          color: 'positive',
+          icon: 'thumb up',
+          detail: 'Aidant créé',
+          position: 'bottom-right',
+          timeout: 2500
+        });
+        await this.sendWelcomingEmail();
+        this.$q.notify({
+          color: 'positive',
+          icon: 'thumb up',
+          detail: 'Email envoyé',
+          position: 'bottom-right',
+          timeout: 2500
+        });
+        await this.getHelpers();
+        this.opened = false
+      } catch (e) {
+        console.error(e);
+        if (e && e.message === 'Invalid fields') {
+          this.loading = false;
+          this.$q.notify({
+            color: 'negative',
+            icon: 'warning',
+            detail: 'Champ(s) invalide(s)',
+            position: 'bottom-left',
+            timeout: 2500
+          });
+          return;
+        }
+        if (e && e.response && e.response.status === 409) {
+          this.$q.notify({
+            color: 'negative',
+            icon: 'warning',
+            detail: 'Cet email est déjà utilisé par un compte existant',
+            position: 'bottom-left',
+            timeout: 2500
+          });
+          return;
+        }
+        this.$q.notify({
+          color: 'negative',
+          icon: 'warning',
+          detail: 'Erreur lors de la création de la fiche auxiliaire',
+          position: 'bottom-left',
+          timeout: 2500
+        });
+      } finally {
+        this.loading = false;
+      }
+    },
     resetForm () {
       this.$v.newHelper.$reset();
       this.newHelper = Object.assign({}, clear(this.newHelper));
-    },
-    // selectedCustomer (customer) {
-    //   this.newHelper.customers = customer._id;
-    // },
-    handleCustomer (event) {
-      this.customers = event;
-      this.newHelper.customers = event
     }
   }
 }
