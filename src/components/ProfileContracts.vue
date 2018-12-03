@@ -428,12 +428,10 @@ export default {
           'uploadDate': this.$moment(Date.now()).format('DD/MM/YYYY'),
           'initialContractStartDate': this.$moment(contractStartDate).format('DD/MM/YYYY'),
         };
-        const file = await alenviAxios({
-          url: `${process.env.API_HOSTNAME}/gdrive/${index === 0 ? this.getUser.company.rhConfig.templates.contract.driveId : this.getUser.company.rhConfig.templates.amendment.driveId}/generatedocx`,
-          method: 'POST',
-          responseType: 'blob',
-          data
-        });
+        const params = {
+          driveId: index === 0 ? this.getUser.company.rhConfig.templates.contract.driveId : this.getUser.company.rhConfig.templates.amendment.driveId,
+        };
+        const file = await this.$gdrive.generateDocx(params, data);
         const url = window.URL.createObjectURL(new Blob([file.data]));
         const link = document.createElement('a');
         link.href = url;

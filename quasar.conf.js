@@ -27,6 +27,7 @@ module.exports = function (ctx) {
       'vMask',
       'companies',
       'customers',
+      'googleDrive',
       process.env.NODE_ENV === 'production' ? 'vue-analytics' : null
     ],
     css: [
