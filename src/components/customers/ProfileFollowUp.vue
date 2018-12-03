@@ -35,6 +35,7 @@ import { extend } from '../../helpers/utils.js';
 import InputWithErrors from '../form/InputWithErrors.vue';
 import SelectWithErrors from '../form/SelectWithErrors.vue';
 import { NotifyPositive, NotifyNegative } from '../../components/popup/notify.js';
+import pathologies from '../../data/pathologies';
 
 export default {
   components: {
@@ -48,36 +49,7 @@ export default {
         followUp: {},
       },
       tmpInput: '',
-      selectOptions: [
-        {
-          label: '-',
-          value: '-'
-        },
-        {
-          label: 'Alzheimer',
-          value: 'Alzheimer'
-        },
-        {
-          label: 'Parkinson',
-          value: 'Parkinson'
-        },
-        {
-          label: 'Corps de Lewy',
-          value: 'Corps de Lewy'
-        },
-        {
-          label: 'Autres troubles cognitifs',
-          value: 'Autres troubles cognitifs'
-        },
-        {
-          label: 'AVC récent',
-          value: 'AVC récent'
-        },
-        {
-          label: 'Autre',
-          value: 'Autre'
-        }
-      ],
+      selectOptions: pathologies,
     };
   },
   computed: {
@@ -89,7 +61,6 @@ export default {
     const customerRaw = await this.$customers.getById(this.userProfile._id);
     const customer = customerRaw.data.data.customer;
     this.mergeUser(customer);
-    // TODO: add validations
     this.isLoaded = true;
   },
   methods: {

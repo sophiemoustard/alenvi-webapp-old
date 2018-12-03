@@ -137,6 +137,8 @@
 </template>
 
 <script>
+import pathologies from '../../data/pathologies';
+
 export default {
   props: {
     id: String,
@@ -156,36 +158,7 @@ export default {
         interventionDetails: '',
         misc: ''
       },
-      selectOptions: [
-        {
-          label: '-',
-          value: '-'
-        },
-        {
-          label: 'Alzheimer',
-          value: 'Alzheimer'
-        },
-        {
-          label: 'Parkinson',
-          value: 'Parkinson'
-        },
-        {
-          label: 'Corps de Lewy',
-          value: 'Corps de Lewy'
-        },
-        {
-          label: 'Autres troubles cognitifs',
-          value: 'Autres troubles cognitifs'
-        },
-        {
-          label: 'AVC récent',
-          value: 'AVC récent'
-        },
-        {
-          label: 'Autre',
-          value: 'Autre'
-        }
-      ],
+      selectOptions: pathologies,
       infoTitles: {
         pathology: 'NIVEAU',
         comments: 'COMMNIV',
