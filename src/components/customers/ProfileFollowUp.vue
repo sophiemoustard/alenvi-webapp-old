@@ -10,6 +10,8 @@
             @myBlur="updateUser({ alenvi: 'followUp.pathology', ogust: 'pathology' })" @myFocus="saveTmp('followUp.pathology')"
           />
         </div>
+      </div>
+      <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
           <ni-input-with-errors  caption="Commentaires" v-model="customer.followUp.comments" :rows="6" type="textarea"
             @myBlur="updateUser({ alenvi: 'followUp.comments', ogust: 'comments' })" @myFocus="saveTmp('followUp.comments')"
