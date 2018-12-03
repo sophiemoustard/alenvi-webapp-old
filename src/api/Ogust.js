@@ -233,6 +233,10 @@ export default {
     const contactUpdated = await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/contacts/${data.id_interloc}`, data);
     return contactUpdated;
   },
+  async createContact (data) {
+    const contactCreated = await alenviAxios.post(`${process.env.API_HOSTNAME}/ogust/contacts`, data);
+    return contactCreated;
+  },
   async setEmployeeBankInfo (data, ogustToken = null) {
     let employeeBankInfoRaw;
     if (ogustToken === null) {
