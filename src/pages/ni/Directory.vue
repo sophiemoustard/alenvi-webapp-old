@@ -276,7 +276,7 @@ export default {
         },
         {
           name: 'profileErrors',
-          label: 'Documents',
+          label: 'Infos',
           field: 'profileErrors',
           align: 'left',
           sortable: true,
