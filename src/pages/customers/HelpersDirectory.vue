@@ -18,115 +18,51 @@
       :loading="tableLoading">
     </q-table>
     <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Ajouter une personne" @click="opened = true" />
-    <!-- <q-modal v-model="opened" @hide="resetForm" :content-css="modalCssContainer">
+    <q-modal v-model="opened" @hide="resetForm" :content-css="modalCssContainer">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-8">
-            <h5>Créer une nouvelle <span class="text-weight-bold">fiche bénéficiaire</span></h5>
+            <h5>Ajouter une <span class="text-weight-bold">personne</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
             <span><q-icon name="clear" size="1rem" @click.native="opened = false" /></span>
           </div>
         </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Civilité</p>
-              <q-icon v-if="$v.newCustomer.identity.title.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newCustomer.identity.title.$error" error-label="Champ requis">
-              <q-select :options="civilityOptions" v-model="newCustomer.identity.title" color="white" inverted-light separator
-               @blur="$v.newCustomer.identity.title.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Nom</p>
-              <q-icon v-if="$v.newCustomer.identity.lastname.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newCustomer.identity.lastname.$error" error-label="Champ requis">
-              <q-input v-model="newCustomer.identity.lastname" color="white" inverted-light @blur="$v.newCustomer.identity.lastname.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <p class="input-caption">Prénom</p>
-            <q-field error-label=" ">
-              <q-input v-model="newCustomer.identity.firstname" color="white" inverted-light />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Email</p>
-              <q-icon v-if="$v.newCustomer.email.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newCustomer.email.$error" error-label="Champ requis">
-              <q-input v-model="newCustomer.email" color="white" inverted-light @blur="$v.newCustomer.email.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Adresse</p>
-              <q-icon v-if="$v.newCustomer.contact.address.fullAddress.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newCustomer.contact.address.fullAddress.$error" error-label="Champ requis">
-              <search-address v-model="newCustomer.contact.address.fullAddress" @selected="selectedAddress" @blur="$v.newCustomer.contact.address.fullAddress.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Mode de paiement</p>
-              <q-icon v-if="$v.ogust.method_of_payment.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.ogust.method_of_payment.$error" error-label="Champ requis">
-              <select-ogust-list v-model="ogust.method_of_payment" listType="customer.method_of_payment" color="white" inverted-light @myBlur="$v.ogust.method_of_payment.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Origine</p>
-              <q-icon v-if="$v.ogust.origin.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.ogust.origin.$error" error-label="Champ requis">
-              <select-ogust-list v-model="ogust.origin" listType="customer.origin" color="white" inverted-light @myBlur="$v.ogust.origin.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input last">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Géré par</p>
-              <q-icon v-if="$v.ogust.managerId.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.ogust.managerId.$error" error-label="Champ requis">
-              <select-ogust-list v-model="ogust.managerId" @myBlur="$v.ogust.managerId.$touch" listType="customer.manager" filter />
-            </q-field>
-          </div>
-        </div>
+        <ni-modal-input :error="$v.newHelper.lastname.$error" caption="Nom" @blur="$v.newHelper.lastname.$touch" errorLabel="Champ requis" />
+        <ni-modal-input :error="$v.newHelper.firstname.$error" caption="Prénom" @blur="$v.newHelper.firstname.$touch" errorLabel="Champ requis" />
+        <ni-modal-select :error="$v.newHelper.customers.$error" caption="Bénéficiaires" @blur="$v.newHelper.customers.$touch"
+          errorLabel="Champ requis" :options="customers" filter filterPlaceholder="Rechercher" />
+        <ni-modal-input last :error="$v.newHelper.local.email.$error" caption="Email" @blur="$v.newHelper.local.email.$touch" errorLabel="Champ requis" />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary" :loading="loading" @click="submit" />
-    </q-modal> -->
+      <q-btn no-caps class="full-width modal-btn" label="Ajouter une personne" icon-right="add" color="primary" :loading="loading" />
+    </q-modal>
   </q-page>
 </template>
 
 <script>
+import { required, email } from 'vuelidate/lib/validators';
+import { clear } from '../../helpers/utils.js';
+import NiSelectCustomer from '../../components/customers/SelectCustomer';
+import NiModalInput from '../../components/form/ModalInput';
+import NiModalSelect from '../../components/form/ModalSelect';
+
 export default {
+  components: {
+    NiSelectCustomer,
+    NiModalInput,
+    NiModalSelect
+  },
   data () {
     return {
+      loading: false,
+      opened: false,
       tableLoading: true,
       helpers: [],
       searchStr: '',
+      customers: [],
+      modalCssContainer: {
+        minWidth: '30vw'
+      },
       columns: [
         {
           name: 'name',
@@ -165,6 +101,22 @@ export default {
         descending: true,
         page: 1,
         rowsPerPage: 15
+      },
+      newHelper: {
+        lastname: '',
+        firstname: '',
+        local: { email: '' },
+        customers: ''
+      }
+    }
+  },
+  validations: {
+    newHelper: {
+      lastname: { required },
+      firstname: { required },
+      customers: { required },
+      local: {
+        email: { required, email }
       }
     }
   },
@@ -175,6 +127,7 @@ export default {
   },
   async mounted () {
     await this.getHelpers();
+    await this.getCustomers();
   },
   methods: {
     async getHelpers () {
@@ -191,6 +144,31 @@ export default {
       } finally {
         this.tableLoading = false;
       }
+    },
+    async getCustomers () {
+      try {
+        const customersRaw = await this.$customers.showAll({ isActive: true });
+        const customers = customersRaw.data.data.customers;
+        this.customers = customers.map(customer => {
+          return {
+            label: `${customer.identity.title} ${customer.identity.lastname}`,
+            value: customer._id
+          }
+        })
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    resetForm () {
+      this.$v.newHelper.$reset();
+      this.newHelper = Object.assign({}, clear(this.newHelper));
+    },
+    // selectedCustomer (customer) {
+    //   this.newHelper.customers = customer._id;
+    // },
+    handleCustomer (event) {
+      this.customers = event;
+      this.newHelper.customers = event
     }
   }
 }
@@ -253,4 +231,16 @@ export default {
     font-size: 14px
     & /deep/ .q-if-control.q-icon
       margin-right: 8px
+
+  .modal
+    &-padding
+      padding: 24px 58px 0px 58px
+    &-btn
+      border-radius: 0
+
+  .fab-add-person
+    right: 60px
+    bottom: 18px
+    font-size: 16px
+    z-index: 2
 </style>
