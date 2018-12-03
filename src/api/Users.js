@@ -28,6 +28,9 @@ export default {
     const newUser = await axios.post(`${process.env.API_HOSTNAME}/users`, data);
     return newUser;
   },
+  async deleteById (id) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/users/${id}`);
+  },
   async updateById (data, token = null) {
     let userUpdated;
     if (token === null) {
