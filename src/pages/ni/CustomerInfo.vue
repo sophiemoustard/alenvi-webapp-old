@@ -235,7 +235,6 @@ export default {
     },
     async updateCustomerInfo () {
       try {
-        console.log('info', this.customerInfo);
         if (this.$_.isEqual(this.tmpInput, this.customerInfo)) return 0;
         let data = { arrayValues: {} };
         const infoTitles = {

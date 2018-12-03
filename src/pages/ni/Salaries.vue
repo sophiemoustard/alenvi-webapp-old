@@ -1,7 +1,6 @@
 <template>
   <q-page padding class="neutral-background">
     <h4>Fiches de paie</h4>
-    <!-- <p v-if="salaries.length == 0">Aucun bulletin à afficher</p> -->
     <q-table
       :data="salaries"
       :columns="columns"
@@ -105,7 +104,6 @@ a
     padding: 8px 12px
     font-size: 16px
     & .q-item
-      // padding: 8px 16px 8px 0px
       min-height: 30px
       padding: 0
       &-main
