@@ -185,7 +185,6 @@ import { required, email, maxLength } from 'vuelidate/lib/validators';
 import randomize from 'randomatic';
 
 import { frPhoneNumber, frZipCode } from '../../helpers/vuelidateCustomVal';
-// import { getUserStartDate } from '../../../../helpers/getUserStartDate';
 import { clear } from '../../helpers/utils.js';
 import { userProfileValidation } from '../../helpers/userProfileValidation';
 import { taskValidation } from '../../helpers/taskValidation';
@@ -611,7 +610,6 @@ export default {
     & td
       padding: 8px 12px
       & .q-item
-        // padding: 8px 16px 8px 0px
         min-height: 30px
         padding: 0
         &-main

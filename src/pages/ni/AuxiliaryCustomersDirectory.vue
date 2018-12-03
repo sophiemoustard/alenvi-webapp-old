@@ -70,7 +70,6 @@ export default {
             const bArr = b.split(' ');
             return aArr[aArr.length - 1].toLowerCase() < bArr[bArr.length - 1].toLowerCase() ? -1 : 1
           },
-          // style: 'width: 500px'
         },
       ]
     }
@@ -154,7 +153,6 @@ export default {
     & td
       padding: 8px 12px
       & .q-item
-        // padding: 8px 16px 8px 0px
         min-height: 30px
         padding: 0
         &-main
