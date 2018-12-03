@@ -1,5 +1,5 @@
 <template>
-  <div :class="['row', { 'margin-input': !last }, { last: last }]">
+  <div :class="['row', 'margin-input', { last: last }]">
     <div class="col-12">
       <div class="row justify-between">
         <p class="input-caption">{{ caption }}</p>
