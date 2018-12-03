@@ -129,6 +129,7 @@
         </div>
       </div>
     </div>
+    <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Ajouter un aidant" @click="goToAddHelperPage" />
   </div>
 </template>
 
@@ -174,16 +175,17 @@ export default {
           field: '_id',
           style: 'width: 50px'
         }
-      ]
+      ],
+      userHelpers: []
     }
   },
   computed: {
     userProfile () {
       return this.$store.getters['rh/getUserProfile'];
     },
-    userHelpers () {
-      return this.userProfile.helpers;
-    },
+    // userHelpers () {
+    //   return this.userProfile.helpers;
+    // },
     addressError () {
       if (!this.$v.customer.contact.address.fullAddress.required) {
         return 'Champ requis';
@@ -230,6 +232,7 @@ export default {
     }
   },
   async mounted () {
+    await this.getUserHelpers();
     const customerRaw = await this.$customers.getById(this.userProfile._id);
     const customer = customerRaw.data.data.customer;
     this.mergeUser(customer);
@@ -246,6 +249,13 @@ export default {
     },
     saveTmp (path) {
       this.tmpInput = this.$_.get(this.customer, path)
+    },
+    async getUserHelpers () {
+      try {
+        this.userHelpers = await this.$users.showAll({ customers: this.userProfile._id });
+      } catch (e) {
+        console.error(e);
+      }
     },
     async updateUser (paths) {
       try {
@@ -325,16 +335,33 @@ export default {
       try {
         await this.$q.dialog({
           title: 'Confirmation',
-          message: 'Est-tu sûr(e) de vouloir supprimer cet aidant ?',
+          message: 'Es-tu sûr(e) de vouloir supprimer cet aidant ?',
           ok: true,
           cancel: 'Annuler'
         });
-        await this.$customers.removeHelper({ _id: this.userProfile._id, helperId });
-        this.$store.dispatch('rh/getUserProfile', { customerId: this.userProfile._id });
+        const helper = this.userHelpers.find(helper => helper._id === helperId);
+        const { ogustInterlocId } = helper;
+        await this.$ogust.deleteContact(ogustInterlocId);
+        await this.$users.deleteById(helperId);
+        await this.getUserHelpers();
       } catch (e) {
         console.error(e);
       }
     },
+    // async removeHelper (helperId) {
+    //   try {
+    //     await this.$q.dialog({
+    //       title: 'Confirmation',
+    //       message: 'Es-tu sûr(e) de vouloir supprimer cet aidant ?',
+    //       ok: true,
+    //       cancel: 'Annuler'
+    //     });
+    //     await this.$customers.removeHelper({ _id: this.userProfile._id, helperId });
+    //     this.$store.dispatch('rh/getUserProfile', { customerId: this.userProfile._id });
+    //   } catch (e) {
+    //     console.error(e);
+    //   }
+    // },
     waitForValidation (path) {
       return new Promise((resolve) => {
         if (path === 'contact.address') {
@@ -351,6 +378,9 @@ export default {
           resolve(!this.$_.get(this.$v.customer, path).$error);
         }
       })
+    },
+    goToAddHelperPage () {
+      this.$router.push({ name: 'helpers directory', query: { openmodal: true, customerid: this.userProfile._id } });
     }
   }
 }
@@ -365,4 +395,10 @@ export default {
   .bg-negative
     background: white !important
     color: inherit !important
+
+  .fab-add-person
+    right: 60px
+    bottom: 18px
+    font-size: 16px
+    z-index: 2
 </style>
