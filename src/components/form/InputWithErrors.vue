@@ -16,6 +16,7 @@
         :lower-case="lowerCase"
         :type="type"
         :disable="disable"
+        :rows="rows"
       />
     </q-field>
   </div>
@@ -32,6 +33,7 @@ export default {
     lowerCase: { type: Boolean, default: false },
     disable: { type: Boolean, default: false },
     type: { type: String, default: 'text' },
+    rows: { type: Number, default: 1 },
   },
   methods: {
     blurHandler (event) {
