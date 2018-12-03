@@ -27,6 +27,7 @@
 
 <script>
 import { required, email, sameAs, minLength, maxLength } from 'vuelidate/lib/validators'
+
 export default {
   metaInfo: {
     title: 'Mon compte'
@@ -102,18 +103,10 @@ export default {
       }
     },
     logout () {
-      this.$q.cookies.remove('alenvi_token', {
-        path: '/'
-      });
-      this.$q.cookies.remove('alenvi_token_expires_in', {
-        path: '/'
-      });
-      this.$q.cookies.remove('refresh_token', {
-        path: '/'
-      });
-      this.$q.cookies.remove('user_id', {
-        path: '/'
-      });
+      this.$q.cookies.remove('alenvi_token', { path: '/' });
+      this.$q.cookies.remove('alenvi_token_expires_in', { path: '/' });
+      this.$q.cookies.remove('refresh_token', { path: '/' });
+      this.$q.cookies.remove('user_id', { path: '/' });
       if (this.user.alenvi.role.name !== 'Aidants') {
         this.$router.replace('/login');
       }
@@ -130,8 +123,6 @@ export default {
 
   .center-account
     max-width: 40%
-    // margin-left: auto
-    // margin-right: auto
     @media screen && (max-width: 600px)
       max-width: 100%
 

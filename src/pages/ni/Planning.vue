@@ -52,9 +52,6 @@ export default {
       return this.customer;
     }
   },
-  // async mounted () {
-  //   await this.getEventsData();
-  // },
   methods: {
     async getEventsData (event) {
       try {

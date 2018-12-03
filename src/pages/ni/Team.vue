@@ -173,7 +173,6 @@ export default {
     & td
       padding: 8px 12px
       & .q-item
-        // padding: 8px 16px 8px 0px
         min-height: 30px
         padding: 0
         &-main
