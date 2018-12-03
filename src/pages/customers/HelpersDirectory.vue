@@ -46,6 +46,7 @@ import { required, email } from 'vuelidate/lib/validators';
 import { clear } from '../../helpers/utils.js';
 import NiModalInput from '../../components/form/ModalInput';
 import NiModalSelect from '../../components/form/ModalSelect';
+import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify.js';
 
 export default {
   components: {
@@ -201,53 +202,23 @@ export default {
         }
         await this.createAlenviHelper();
         await this.createOgustHelper();
-        this.$q.notify({
-          color: 'positive',
-          icon: 'thumb up',
-          detail: 'Aidant créé',
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyPositive('Aidant créé');
         await this.sendWelcomingEmail();
-        this.$q.notify({
-          color: 'positive',
-          icon: 'thumb up',
-          detail: 'Email envoyé',
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyPositive('Email envoyé');
         await this.getHelpers();
         this.opened = false
       } catch (e) {
         console.error(e);
         if (e && e.message === 'Invalid fields') {
           this.loading = false;
-          this.$q.notify({
-            color: 'negative',
-            icon: 'warning',
-            detail: 'Champ(s) invalide(s)',
-            position: 'bottom-left',
-            timeout: 2500
-          });
+          NotifyWarning('Champ(s) invalide(s)');
           return;
         }
         if (e && e.response && e.response.status === 409) {
-          this.$q.notify({
-            color: 'negative',
-            icon: 'warning',
-            detail: 'Cet email est déjà utilisé par un compte existant',
-            position: 'bottom-left',
-            timeout: 2500
-          });
+          NotifyNegative('Cet email est déjà utilisé par un compte existant');
           return;
         }
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de la création de la fiche auxiliaire',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyNegative('Erreur lors de la création de l\'aidant');
       } finally {
         this.loading = false;
       }
