@@ -404,6 +404,9 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables'
 
+  th
+    text-align: left
+
   /deep/ .bg-negative
     background: white !important
     color: inherit !important
