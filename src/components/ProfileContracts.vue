@@ -285,7 +285,7 @@ export default {
         },
         {
           name: 'contractEmpty',
-          label: 'Contrat vierge',
+          label: 'Contrat',
           align: 'center',
           field: 'contractEmpty',
           sortable: false
