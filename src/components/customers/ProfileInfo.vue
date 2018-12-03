@@ -250,8 +250,10 @@ export default {
     async updateUser (paths) {
       try {
         if (this.tmpInput === this.$_.get(this.customer, paths.alenvi)) return;
-        const isValid = await this.waitForValidation(paths.alenvi);
-        if (!isValid) throw new Error('Champ(s) invalide(s)');
+        if (this.$_.get(this.$v.customer, paths.alenvi)) {
+          const isValid = await this.waitForValidation(paths.alenvi);
+          if (!isValid) throw new Error('Champ(s) invalide(s)');
+        }
         if (paths.alenvi && paths.ogust) {
           await this.updateAlenviCustomer(paths.alenvi);
           await this.updateOgustCustomer(paths);
