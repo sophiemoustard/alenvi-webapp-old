@@ -16,7 +16,7 @@
             :visible-columns="visibleColumns"
             binary-state-sort>
             <q-td slot="body-cell-contractEmpty" slot-scope="props" :props="props">
-              <q-btn flat round small color="primary" @click="dlTemplate(props.row, props.row.__index)">
+              <q-btn flat round small color="primary" @click="dlTemplate(props.row, props.row.__index, contract.startDate)">
                 <q-icon name="file download" />
               </q-btn>
             </q-td>
@@ -398,7 +398,7 @@ export default {
         console.error(e);
       }
     },
-    async dlTemplate (contract, index) {
+    async dlTemplate (contract, index, contractStartDate) {
       try {
         const monthlyHours = Number.parseFloat(contract.weeklyHours * 4.33).toFixed(1);
         const data = {
@@ -416,7 +416,11 @@ export default {
           'grossHourlyRate': contract.grossHourlyRate,
           'monthlyHours': monthlyHours,
           'salary': monthlyHours * contract.grossHourlyRate,
-          'startDate': this.$moment(contract.startDate).format('DD/MM/YYYY')
+          'startDate': this.$moment(contract.startDate).format('DD/MM/YYYY'),
+          'weeklyHours': contract.weeklyHours,
+          'yearlyHours': monthlyHours * 52,
+          'uploadDate': this.$moment(Date.now()).format('DD/MM/YYYY'),
+          'initialContractStartDate': this.$moment(contractStartDate).format('DD/MM/YYYY'),
         };
         const file = await alenviAxios({
           url: `${process.env.API_HOSTNAME}/gdrive/${index === 0 ? this.getUser.company.rhConfig.templates.contract.driveId : this.getUser.company.rhConfig.templates.amendment.driveId}/generatedocx`,
