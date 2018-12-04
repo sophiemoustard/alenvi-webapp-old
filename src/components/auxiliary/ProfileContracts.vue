@@ -468,15 +468,17 @@ export default {
       const lastActiveVersion = this.getActiveVersion(this.contracts[data.contractIndex]);
       const lastVersion = this.getLastVersion(this.contracts[data.contractIndex]);
 
-      const queries = {
-        userId: this.getUser._id,
-        mainContractId: data.contractId,
-        lastActiveVersion
-      };
-      const payload = {
-        endDate: this.$moment(lastVersion.startDate).subtract(1, 'day').toDate()
-      };
-      await this.$users.updateContractVersion(queries, payload);
+      if (lastActiveVersion) {
+        const queries = {
+          userId: this.getUser._id,
+          mainContractId: data.contractId,
+          lastActiveVersion
+        };
+        const payload = {
+          endDate: this.$moment(lastVersion.startDate).subtract(1, 'day').toDate()
+        };
+        await this.$users.updateContractVersion(queries, payload);
+      }
     },
     async updateContractActivity (data) {
       try {
