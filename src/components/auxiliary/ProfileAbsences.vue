@@ -109,6 +109,7 @@
 import { Cookies } from 'quasar';
 import { required } from 'vuelidate/lib/validators';
 import { alenviAxios } from '../../api/ressources/alenviAxios'
+import { NotifyNegative, NotifyPositive } from '../popup/notify';
 
 export default {
   data () {
@@ -305,13 +306,7 @@ export default {
       }
     },
     failMsg () {
-      this.$q.notify({
-        color: 'negative',
-        icon: 'warning',
-        detail: 'Echec de l\'envoi du document',
-        position: 'bottom-left',
-        timeout: 2500
-      });
+      NotifyNegative('Echec de l\'envoi du document');
     },
     async refreshUser () {
       try {
@@ -324,13 +319,7 @@ export default {
     uploadDocument (files, refName) {
       if (files[0].size > 5000000) {
         this.$refs[refName].reset();
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Fichier trop volumineux (> 5 Mo)',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyNegative('Fichier trop volumineux (> 5 Mo)');
         return '';
       } else {
         this.$refs[refName].upload();
@@ -349,21 +338,9 @@ export default {
           method: 'DELETE'
         })
         this.absences.splice(cell, 1);
-        this.$q.notify({
-          color: 'positive',
-          icon: 'thumb up',
-          detail: 'Absence supprimée.',
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyPositive('Absence supprimée.');
       } catch (e) {
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de la suppression de l\'absence.',
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyNegative('Erreur lors de la suppression de l\'absence.');
         console.error(e);
       }
     }
