@@ -19,12 +19,12 @@ export default {
   props: {
     caption: String,
     error: Boolean,
-    errorLabel: String,
+    errorLabel: { type: String, default: 'Champ requis' },
     value: [String, Array],
     last: Boolean,
     options: Array,
     filter: Boolean,
-    filterPlaceholder: String
+    filterPlaceholder: String,
   },
   methods: {
     inputHandler (value) {

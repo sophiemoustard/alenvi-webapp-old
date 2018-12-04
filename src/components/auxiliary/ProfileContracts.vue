@@ -79,40 +79,15 @@
             <span><q-icon name="clear" size="1rem" @click.native="newContractModal = false" /></span>
           </div>
         </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Statut</p>
-              <q-icon v-if="$v.newContract.status.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newContract.status.$error" error-label="Champ requis">
-              <q-select :options="statusOptions" v-model="newContract.status" color="white" inverted-light separator
-               @blur="$v.newContract.status.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Volume horaire hebdomadaire</p>
-              <q-icon v-if="$v.newContract.weeklyHours.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newContract.weeklyHours.$error" error-label="Champ requis">
-              <q-input type="number" v-model="newContract.weeklyHours" color="white" suffix="hr" inverted-light @blur="$v.newContract.weeklyHours.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Taux horaire</p>
-              <q-icon v-if="$v.newContract.grossHourlyRate.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newContract.grossHourlyRate.$error" error-label="Champ requis">
-              <q-input type="number" v-model="newContract.grossHourlyRate" color="white" suffix="€" inverted-light @blur="$v.newContract.grossHourlyRate.$touch" />
-            </q-field>
-          </div>
-        </div>
+        <ni-modal-select caption="Statut" :error="$v.newContract.status.$error" :options="statusOptions" v-model="newContract.status"
+          @blur="$v.newContract.status.$touch" separator
+        />
+        <ni-modal-input caption="Volume horaire hebdomadaire" :error="$v.newContract.weeklyHours.$error" type="number" v-model="newContract.weeklyHours"
+          @blur="$v.newContract.weeklyHours.$touch" suffix="hr"
+        />
+        <ni-modal-input caption="Taux horaire" :error="$v.newContract.grossHourlyRate.$error" type="number" v-model="newContract.grossHourlyRate"
+          @blur="$v.newContract.grossHourlyRate.$touch" suffix="€"
+        />
         <div class="row margin-input">
           <div class="col-12">
             <div class="row justify-between">
@@ -141,28 +116,12 @@
             <span><q-icon name="clear" size="1rem" @click.native="newContractVersionModal = false" /></span>
           </div>
         </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Volume horaire hebdomadaire</p>
-              <q-icon v-if="$v.newContractVersion.weeklyHours.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newContractVersion.weeklyHours.$error" error-label="Champ requis">
-              <q-input type="number" v-model="newContractVersion.weeklyHours" color="white" suffix="hr" inverted-light @blur="$v.newContractVersion.weeklyHours.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Taux horaire</p>
-              <q-icon v-if="$v.newContractVersion.grossHourlyRate.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newContractVersion.grossHourlyRate.$error" error-label="Champ requis">
-              <q-input type="number" v-model="newContractVersion.grossHourlyRate" color="white" suffix="€" inverted-light @blur="$v.newContractVersion.grossHourlyRate.$touch" />
-            </q-field>
-          </div>
-        </div>
+        <ni-modal-input caption="Volume horaire hebdomadaire"  :error="$v.newContractVersion.weeklyHours.$error" v-model="newContractVersion.weeklyHours"
+          type="number" @blur="$v.newContractVersion.weeklyHours.$touch" suffix="hr"
+        />
+        <ni-modal-input caption="Taux horaire"  :error="$v.newContractVersion.grossHourlyRate.$error" v-model="newContractVersion.grossHourlyRate"
+          type="number" @blur="$v.newContractVersion.grossHourlyRate.$touch" suffix="€"
+        />
         <!-- use of v-if because if we don't it directly renders, so it calls :min getActiveVersion function and throw error because there is no contract selected yet -->
         <div v-if="newContractVersionModal" class="row margin-input">
           <div class="col-12">
@@ -198,8 +157,7 @@
             </div>
             <q-field>
               <q-datetime type="date" format="DD/MM/YYYY" v-model="endContractData.date" color="white" inverted-light popover
-              ok-label="OK"
-              cancel-label="Fermer" />
+              ok-label="OK" cancel-label="Fermer" />
             </q-field>
           </div>
         </div>
@@ -214,8 +172,14 @@
 import { Cookies } from 'quasar';
 import { required } from 'vuelidate/lib/validators';
 import { alenviAxios } from '../../api/ressources/alenviAxios';
+import ModalSelect from '../form/ModalSelect.vue';
+import ModalInput from '../form/ModalInput.vue';
 
 export default {
+  components: {
+    'ni-modal-select': ModalSelect,
+    'ni-modal-input': ModalInput,
+  },
   data () {
     return {
       loading: false,
