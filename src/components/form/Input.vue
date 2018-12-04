@@ -48,3 +48,9 @@ export default {
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+  .bg-negative
+    background: white !important
+    color: inherit !important
+</style>
