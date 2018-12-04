@@ -49,37 +49,9 @@
             <span><q-icon name="clear" size="1rem" @click.native="opened = false" /></span>
           </div>
         </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Civilité</p>
-              <q-icon v-if="$v.newCustomer.identity.title.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newCustomer.identity.title.$error" error-label="Champ requis">
-              <q-select :options="civilityOptions" v-model="newCustomer.identity.title" color="white" inverted-light separator
-               @blur="$v.newCustomer.identity.title.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Nom</p>
-              <q-icon v-if="$v.newCustomer.identity.lastname.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newCustomer.identity.lastname.$error" error-label="Champ requis">
-              <q-input v-model="newCustomer.identity.lastname" color="white" inverted-light @blur="$v.newCustomer.identity.lastname.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <p class="input-caption">Prénom</p>
-            <q-field error-label=" ">
-              <q-input v-model="newCustomer.identity.firstname" color="white" inverted-light />
-            </q-field>
-          </div>
-        </div>
+        <ni-modal-select v-model="newCustomer.identity.title" :error="$v.newCustomer.identity.title.$error" :options="civilityOptions" caption="Civilité" @blur="$v.newCustomer.identity.title.$touch" errorLabel="Champ requis" />
+        <ni-modal-input v-model="newCustomer.identity.lastname" :error="$v.newCustomer.identity.lastname.$error" caption="Nom" @blur="$v.newCustomer.identity.lastname.$touch" errorLabel="Champ requis" />
+        <ni-modal-input v-model="newCustomer.identity.firstname" caption="Prénom" />
         <div class="row margin-input">
           <div class="col-12">
             <div class="row justify-between">
@@ -137,14 +109,19 @@ import { clear } from '../../helpers/utils.js';
 import { frAddress } from '../../helpers/vuelidateCustomVal.js'
 import SelectOgustList from '../../components/form/SelectOgustList';
 import SearchAddress from '../../components/form/SearchAddress';
+import NiModalInput from '../../components/form/ModalInput';
+import NiModalSelect from '../../components/form/ModalSelect';
+import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify.js';
 
 export default {
   metaInfo: {
     title: 'Répertoire bénéficiaires'
   },
   components: {
-    'ni-select-ogust-list': SelectOgustList,
-    'ni-search-address': SearchAddress,
+    NiSelectOgustList: SelectOgustList,
+    NiSearchAddress: SearchAddress,
+    NiModalInput,
+    NiModalSelect
   },
   data () {
     return {
@@ -352,60 +329,16 @@ export default {
         this.newCustomer.contact.ogustAddressId = customer.main_address.id_address;
         this.customerCreated = await this.createAlenviCustomer();
         await this.getCustomersList();
-        this.$q.notify({
-          color: 'positive',
-          icon: 'done',
-          detail: 'Fiche auxiliaire créée',
-          position: 'bottom-left',
-          timeout: 2500
-        });
-        this.loading = false;
+        NotifyPositive('Fiche bénéficiaire créée')
         this.opened = false;
       } catch (e) {
         console.error(e);
         if (e && e.message === 'Invalid fields') {
-          this.loading = false;
-          this.$q.notify({
-            color: 'negative',
-            icon: 'warning',
-            detail: 'Champ(s) invalide(s)',
-            position: 'bottom-left',
-            timeout: 2500
-          });
+          NotifyWarning('Champ(s) invalide(s)');
           return;
         }
-        if (e && e.message === 'Existing email') {
-          this.loading = false;
-          this.$q.notify({
-            color: 'negative',
-            icon: 'warning',
-            detail: 'Cet email est déjà utilisé par un compte existant',
-            position: 'bottom-left',
-            timeout: 2500
-          });
-          return;
-        }
-        if (e && e.response) {
-          console.error(e.response);
-          if (e.response.status === 409) {
-            this.$q.notify({
-              color: 'negative',
-              icon: 'warning',
-              detail: 'Email déjà existant',
-              position: 'bottom-left',
-              timeout: 2500
-            });
-            this.loading = false;
-            return;
-          }
-        }
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de la création de la fiche auxiliaire',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyNegative('Erreur lors de la création de la fiche bénéficiaire');
+      } finally {
         this.loading = false;
       }
     },

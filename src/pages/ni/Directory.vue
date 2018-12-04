@@ -56,97 +56,14 @@
             <span><q-icon name="clear" size="1rem" @click.native="opened = false" /></span>
           </div>
         </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Civilité</p>
-              <q-icon v-if="$v.newUser.administrative.identity.title.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newUser.administrative.identity.title.$error" error-label="Champ requis">
-              <q-select :options="civilityOptions" v-model="newUser.administrative.identity.title" color="white" inverted-light separator
-               @blur="$v.newUser.administrative.identity.title.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Nom</p>
-              <q-icon v-if="$v.newUser.lastname.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newUser.lastname.$error" error-label="Champ requis">
-              <q-input v-model="newUser.lastname" color="white" inverted-light @blur="$v.newUser.lastname.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Prénom</p>
-              <q-icon v-if="$v.newUser.firstname.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newUser.firstname.$error" error-label="Champ requis">
-              <q-input v-model="newUser.firstname" color="white" inverted-light @blur="$v.newUser.firstname.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Numéro de téléphone</p>
-              <q-icon v-if="$v.newUser.mobilePhone.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newUser.mobilePhone.$error" :error-label="mobilePhoneError">
-              <q-input v-model="newUser.mobilePhone" color="white" inverted-light @blur="$v.newUser.mobilePhone.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Adresse</p>
-              <q-icon v-if="$v.newUser.administrative.contact.address.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newUser.administrative.contact.address.$error" error-label="Champ requis">
-              <q-input v-model="newUser.administrative.contact.address" color="white" inverted-light
-                @blur="$v.newUser.administrative.contact.address.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Code Postal</p>
-              <q-icon v-if="$v.newUser.administrative.contact.zipCode.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newUser.administrative.contact.zipCode.$error" :error-label="zipCodeError">
-              <q-input v-model="newUser.administrative.contact.zipCode" color="white" inverted-light
-                @blur="$v.newUser.administrative.contact.zipCode.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Ville</p>
-              <q-icon v-if="$v.newUser.administrative.contact.city.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newUser.administrative.contact.city.$error" error-label="Champ requis">
-              <q-input v-model="newUser.administrative.contact.city" color="white" inverted-light @blur="$v.newUser.administrative.contact.city.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Email</p>
-              <q-icon v-if="$v.newUser.local.email.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newUser.local.email.$error" :error-label="emailError">
-              <q-input v-model="newUser.local.email" color="white" inverted-light @blur="$v.newUser.local.email.$touch" />
-            </q-field>
-          </div>
-        </div>
+        <ni-modal-select v-model="newUser.administrative.identity.title" :error="$v.newUser.administrative.identity.title.$error" :options="civilityOptions" caption="Civilité" @blur="$v.newUser.administrative.identity.title.$touch" errorLabel="Champ requis" />
+        <ni-modal-input v-model="newUser.lastname" :error="$v.newUser.lastname.$error" caption="Nom" @blur="$v.newUser.lastname.$touch" errorLabel="Champ requis" />
+        <ni-modal-input v-model="newUser.firstname" :error="$v.newUser.firstname.$error" caption="Prénom" @blur="$v.newUser.firstname.$touch" errorLabel="Champ requis" />
+        <ni-modal-input v-model="newUser.mobilePhone" :error="$v.newUser.mobilePhone.$error" caption="Numéro de téléphone" @blur="$v.newUser.mobilePhone.$touch" :errorLabel="mobilePhoneError" />
+        <ni-modal-input v-model="newUser.administrative.contact.address" :error="$v.newUser.administrative.contact.address.$error" caption="Addresse" @blur="$v.newUser.administrative.contact.address.$touch" errorLabel="Champ requis" />
+        <ni-modal-input v-model="newUser.administrative.contact.zipCode" :error="$v.newUser.administrative.contact.zipCode.$error" caption="Code postal" @blur="$v.newUser.administrative.contact.zipCode.$touch" :errorLabel="zipCodeError" />
+        <ni-modal-input v-model="newUser.administrative.contact.city" :error="$v.newUser.administrative.contact.city.$error" caption="Ville" @blur="$v.newUser.administrative.contact.city.$touch" errorLabel="Champ requis" />
+        <ni-modal-input v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email" @blur="$v.newUser.local.email.$touch" :errorLabel="emailError" />
         <div class="row margin-input">
           <div class="col-12">
             <div class="row justify-between">
@@ -190,6 +107,9 @@ import { userProfileValidation } from '../../helpers/userProfileValidation';
 import { taskValidation } from '../../helpers/taskValidation';
 import SelectSector from '../../components/form/SelectSector';
 import SelectManager from '../../components/form/SelectManager.vue';
+import NiModalInput from '../../components/form/ModalInput';
+import NiModalSelect from '../../components/form/ModalSelect';
+import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify.js';
 
 export default {
   props: {
@@ -202,8 +122,10 @@ export default {
     title: 'Répertoire'
   },
   components: {
-    'ni-select-sector': SelectSector,
-    'ni-select-manager': SelectManager,
+    NiSelectSector: SelectSector,
+    NiSelectManager: SelectManager,
+    NiModalInput,
+    NiModalSelect
   },
   data () {
     return {
@@ -531,60 +453,27 @@ export default {
           await this.sendSms(this.userCreated.data.data.user._id);
         }
         await this.getUserList();
-        this.$q.notify({
-          color: 'positive',
-          icon: 'done',
-          detail: 'Fiche auxiliaire créée',
-          position: 'bottom-left',
-          timeout: 2500
-        });
-        this.loading = false;
+        NotifyPositive('Fiche auxiliaire créée');
         this.opened = false;
       } catch (e) {
         console.error(e);
         if (e && e.message === 'Invalid fields') {
-          this.loading = false;
-          this.$q.notify({
-            color: 'negative',
-            icon: 'warning',
-            detail: 'Champ(s) invalide(s)',
-            position: 'bottom-left',
-            timeout: 2500
-          });
+          NotifyWarning('Champ(s) invalide(s)');
           return;
         }
         if (e && e.message === 'Existing email') {
-          this.loading = false;
-          this.$q.notify({
-            color: 'negative',
-            icon: 'warning',
-            detail: 'Cet email est déjà utilisé par un compte existant',
-            position: 'bottom-left',
-            timeout: 2500
-          });
+          NotifyNegative('Cet email est déjà utilisé par un compte existant');
           return;
         }
         if (e && e.response) {
           console.error(e.response);
           if (e.response.status === 409) {
-            this.$q.notify({
-              color: 'negative',
-              icon: 'warning',
-              detail: 'Email déjà existant',
-              position: 'bottom-left',
-              timeout: 2500
-            });
-            this.loading = false;
+            NotifyNegative('Email déjà existant');
             return;
           }
         }
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de la création de la fiche auxiliaire',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyNegative('Erreur lors de la création de la fiche auxiliaire');
+      } finally {
         this.loading = false;
       }
     },
