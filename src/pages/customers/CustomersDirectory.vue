@@ -38,7 +38,7 @@
         </q-td>
       </q-tr>
     </q-table>
-    <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Ajouter une personne" @click="opened = true" />
+    <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Ajouter un bénéficiaire" @click="opened = true" />
     <q-modal v-model="opened" @hide="resetForm" :content-css="modalCssContainer">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
@@ -51,8 +51,8 @@
         </div>
         <ni-modal-select v-model="newCustomer.identity.title" :error="$v.newCustomer.identity.title.$error" :options="civilityOptions" caption="Civilité" @blur="$v.newCustomer.identity.title.$touch" errorLabel="Champ requis" />
         <ni-modal-input v-model="newCustomer.identity.lastname" :error="$v.newCustomer.identity.lastname.$error" caption="Nom" @blur="$v.newCustomer.identity.lastname.$touch" errorLabel="Champ requis" />
-        <ni-modal-input v-model="newCustomer.identity.firstname" caption="Prénom" />
-        <div class="row margin-input">
+        <ni-modal-input v-model="newCustomer.identity.firstname" errorLabel="Champs requis" caption="Prénom" />
+        <div class="row margin-input last">
           <div class="col-12">
             <div class="row justify-between">
               <p class="input-caption">Adresse</p>
@@ -60,39 +60,6 @@
             </div>
             <q-field :error="$v.newCustomer.contact.address.fullAddress.$error" :error-label="addressError">
               <ni-search-address v-model="newCustomer.contact.address.fullAddress" @selected="selectedAddress" @blur="$v.newCustomer.contact.address.fullAddress.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Mode de paiement</p>
-              <q-icon v-if="$v.ogust.method_of_payment.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.ogust.method_of_payment.$error" error-label="Champ requis">
-              <ni-select-ogust-list v-model="ogust.method_of_payment" listType="customer.method_of_payment" color="white" inverted-light @myBlur="$v.ogust.method_of_payment.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Origine</p>
-              <q-icon v-if="$v.ogust.origin.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.ogust.origin.$error" error-label="Champ requis">
-              <ni-select-ogust-list v-model="ogust.origin" listType="customer.origin" color="white" inverted-light @myBlur="$v.ogust.origin.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input last">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Géré par</p>
-              <q-icon v-if="$v.ogust.managerId.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.ogust.managerId.$error" error-label="Champ requis">
-              <ni-select-ogust-list v-model="ogust.managerId" @myBlur="$v.ogust.managerId.$touch" listType="customer.manager" filter />
             </q-field>
           </div>
         </div>
@@ -107,7 +74,6 @@ import { required, email } from 'vuelidate/lib/validators';
 
 import { clear } from '../../helpers/utils.js';
 import { frAddress } from '../../helpers/vuelidateCustomVal.js'
-import SelectOgustList from '../../components/form/SelectOgustList';
 import SearchAddress from '../../components/form/SearchAddress';
 import NiModalInput from '../../components/form/ModalInput';
 import NiModalSelect from '../../components/form/ModalSelect';
@@ -118,7 +84,6 @@ export default {
     title: 'Répertoire bénéficiaires'
   },
   components: {
-    NiSelectOgustList: SelectOgustList,
     NiSearchAddress: SearchAddress,
     NiModalInput,
     NiModalSelect
@@ -158,11 +123,6 @@ export default {
           }
         },
         isActive: true
-      },
-      ogust: {
-        managerId: '',
-        method_of_payment: '',
-        origin: ''
       },
       customersList: [],
       searchStr: '',
@@ -307,10 +267,7 @@ export default {
           line: this.newCustomer.contact.address.street,
           zip: this.newCustomer.contact.address.zipCode,
           city: this.newCustomer.contact.address.city
-        },
-        method_of_payment: this.ogust.method_of_payment,
-        origin: this.ogust.origin,
-        manager: this.ogust.managerId
+        }
       };
       const cleanPayload = this.$_.pickBy(ogustPayload);
       const newCustomer = await this.$ogust.createCustomer(cleanPayload);
