@@ -145,7 +145,6 @@
 <script>
 import { Cookies } from 'quasar';
 import { required } from 'vuelidate/lib/validators';
-import { alenviAxios } from '../../api/ressources/alenviAxios';
 import ModalSelect from '../form/ModalSelect.vue';
 import ModalInput from '../form/ModalInput.vue';
 import ModalDatetimePicker from '../form/ModalDatetimePicker.vue';
@@ -411,13 +410,30 @@ export default {
       if (lastActiveVersion) {
         const queries = {
           userId: this.getUser._id,
-          mainContractId: data.contractId,
-          lastActiveVersion
+          contractId: data.contractId,
+          versionId: lastActiveVersion._id
         };
         const payload = {
           endDate: this.$moment(lastVersion.startDate).subtract(1, 'day').toDate()
         };
         await this.$users.updateContractVersion(queries, payload);
+      }
+    },
+    async updatePreviousVersions (data) {
+      for (let i = 0, l = this.contracts[data.contractIndex].versions.length; i < l; i++) {
+        const contract = this.contracts[data.contractIndex];
+        const currentVersion = contract.versions[i];
+        if (currentVersion.isActive && currentVersion._id !== data.versionId) {
+          let payload = { status: 'T', end_date: this.$moment(data.versionStartDate).subtract(1, 'day').format('YYYYMMDD') };
+          await this.$ogust.updateContract(currentVersion.ogustContractId, payload);
+          const queries = {
+            userId: this.getUser._id,
+            contractId: contract._id,
+            versionId: currentVersion._id,
+          };
+          await this.$users.updateContractVersion(queries, { 'isActive': false });
+          currentVersion.isActive = false;
+        }
       }
     },
     async updateContractActivity (data) {
@@ -429,17 +445,16 @@ export default {
           cancel: 'Annuler'
         });
         await this.updateEndDateOfPreviousVersion(data);
-        await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/contracts/${data.ogustContractId}`, { status: 'V' });
-        await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${data.contractId}/versions/${data.versionId}`, { 'isActive': data.isActive });
+        await this.$ogust.updateContract(data.ogustContractId, { status: 'V' });
+        const queries = {
+          userId: this.getUser._id,
+          contractId: data.contractId,
+          versionId: data.versionId,
+        };
+        await this.$users.updateContractVersion(queries, { 'isActive': data.isActive });
         // Update manually checkbox because it's not dynamic
         this.sortedContracts[data.contractIndex].versions[data.cell].isActive = data.isActive;
-        for (let i = 0, l = this.contracts[data.contractIndex].versions.length; i < l; i++) {
-          if (this.contracts[data.contractIndex].versions[i].isActive && this.contracts[data.contractIndex].versions[i]._id !== data.versionId) {
-            await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/contracts/${this.contracts[data.contractIndex].versions[i].ogustContractId}`, { status: 'T', end_date: this.$moment(data.versionStartDate).subtract(1, 'day').format('YYYYMMDD') });
-            await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${this.contracts[data.contractIndex]._id}/versions/${this.contracts[data.contractIndex].versions[i]._id}`, { 'isActive': false });
-            this.contracts[data.contractIndex].versions[i].isActive = false;
-          }
-        }
+        this.updatePreviousVersions(data);
         await this.refreshUser();
         this.$q.notify({
           color: 'positive',
@@ -555,21 +570,16 @@ export default {
       try {
         this.loading = true;
         const ogustVersionId = this.endContractData.contract.versions.find(version => version.isActive).ogustContractId;
-        await alenviAxios({
-          url: `${process.env.API_HOSTNAME}/ogust/contracts/${ogustVersionId}`,
-          method: 'PUT',
-          data: {
-            status: 'T',
-            end_date: this.$moment(this.endContractData.date).format('YYYYMMDD')
-          }
-        });
-        await alenviAxios({
-          url: `${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${this.endContractData.contract._id}`,
-          method: 'PUT',
-          data: {
-            endDate: this.endContractData.date
-          }
-        });
+        const payload = {
+          status: 'T',
+          end_date: this.$moment(this.endContractData.date).format('YYYYMMDD')
+        };
+        this.$ogust.endContract(ogustVersionId, payload);
+        const queries = {
+          userId: this.getUser._id,
+          contractId: this.endContractData.contract._id,
+        };
+        this.$users.endContract(queries, { endDate: this.endContractData.date });
         await this.refreshUser();
         this.$q.notify({
           color: 'positive',
