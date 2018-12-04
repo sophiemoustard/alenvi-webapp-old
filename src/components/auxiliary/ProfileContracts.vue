@@ -148,6 +148,7 @@ import { required } from 'vuelidate/lib/validators';
 import ModalSelect from '../form/ModalSelect.vue';
 import ModalInput from '../form/ModalInput.vue';
 import ModalDatetimePicker from '../form/ModalDatetimePicker.vue';
+import { NotifyPositive, NotifyNegative } from '../popup/notify';
 
 export default {
   components: {
@@ -327,13 +328,7 @@ export default {
       }
     },
     failMsg () {
-      this.$q.notify({
-        color: 'negative',
-        icon: 'warning',
-        detail: 'Echec de l\'envoi du document',
-        position: 'bottom-left',
-        timeout: 2500
-      });
+      NotifyNegative('Echec de l\'envoi du document');
     },
     async refreshUser () {
       try {
@@ -384,13 +379,7 @@ export default {
     uploadDocument (files, refName) {
       if (files[0].size > 5000000) {
         this.$refs[refName][0].reset();
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Fichier trop volumineux (> 5 Mo)',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyNegative('Fichier trop volumineux (> 5 Mo)');
         return '';
       } else {
         this.$refs[refName][0].upload();
@@ -456,23 +445,11 @@ export default {
         this.sortedContracts[data.contractIndex].versions[data.cell].isActive = data.isActive;
         this.updatePreviousVersions(data);
         await this.refreshUser();
-        this.$q.notify({
-          color: 'positive',
-          icon: 'done',
-          detail: 'Activité du contrat changée',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyPositive('Activité du contrat changée');
       } catch (e) {
         console.error(e);
         if (e.message !== '') {
-          this.$q.notify({
-            color: 'negative',
-            icon: 'warning',
-            detail: 'Erreur lors du changement de l\'activité du contrat',
-            position: 'bottom-left',
-            timeout: 2500
-          });
+          NotifyNegative('Erreur lors du changement de l\'activité du contrat');
         }
       }
     },
@@ -491,22 +468,10 @@ export default {
         this.newContract.ogustContractId = newOgustContract.id_contract;
         await this.$users.createContract({ userId: this.getUser._id }, this.newContract);
         await this.refreshUser();
-        this.$q.notify({
-          color: 'positive',
-          icon: 'done',
-          detail: 'Contrat créé',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyPositive('Contrat créé');
       } catch (e) {
         console.error(e);
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de la création du contrat',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyNegative('Erreur lors de la création du contrat');
       } finally {
         this.loading = false;
         this.newContractModal = false;
@@ -538,22 +503,10 @@ export default {
         };
         await this.$users.createContractVersion(queries, this.newContractVersion);
         await this.refreshUser();
-        this.$q.notify({
-          color: 'positive',
-          icon: 'done',
-          detail: 'Version créée',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyPositive('Version créée');
       } catch (e) {
         console.error(e);
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de la création de la version du contrat',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyNegative('Erreur lors de la création de la version du contrat');
       } finally {
         this.loading = false;
         this.newContractVersionModal = false;
@@ -581,22 +534,10 @@ export default {
         };
         this.$users.endContract(queries, { endDate: this.endContractData.date });
         await this.refreshUser();
-        this.$q.notify({
-          color: 'positive',
-          icon: 'done',
-          detail: 'Contrat terminé',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyPositive('Contrat terminé');
       } catch (e) {
         console.error(e);
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de la mise à jour du contrat',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyNegative('Erreur lors de la mise à jour du contrat');
       } finally {
         this.loading = false;
         this.endContractModal = false;
