@@ -163,6 +163,7 @@ const routes = [
       {
         path: 'helpers',
         name: 'helpers directory',
+        props: (route) => ({ openModal: route.query.openmodal, customerId: route.query.customerid }),
         component: () => import('pages/customers/HelpersDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],

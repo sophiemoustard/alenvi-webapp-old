@@ -16,6 +16,9 @@
       :rows-per-page-options="[15, 25, 35]"
       :pagination.sync="pagination"
       :loading="tableLoading">
+      <q-td slot="body-cell-name" slot-scope="props" :props="props" style="font-size: 1rem">
+        {{ props.value }}
+      </q-td>
     </q-table>
     <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Ajouter une personne" @click="opened = true" />
     <q-modal v-model="opened" @hide="resetForm" :content-css="modalCssContainer">
@@ -52,6 +55,10 @@ export default {
   components: {
     NiModalInput,
     NiModalSelect
+  },
+  props: {
+    openModal: [Boolean, String],
+    customerId: String
   },
   data () {
     return {
@@ -108,8 +115,7 @@ export default {
         firstname: '',
         local: { email: '' },
         customers: ''
-      },
-      customerId: ''
+      }
     }
   },
   validations: {
@@ -137,6 +143,10 @@ export default {
   async mounted () {
     await this.getHelpers();
     await this.getCustomers();
+    if (this.openModal) {
+      this.opened = true;
+      this.newHelper.customers = this.customerId;
+    }
   },
   methods: {
     async getHelpers () {
@@ -171,12 +181,13 @@ export default {
     },
     async createOgustHelper () {
       const payload = {
-        id_customer: this.customers.find(customer => customer.value === this.newHelper.customers[0]).ogustId,
+        id_customer: this.customers.find(customer => customer.value === this.newHelper.customers).ogustId,
         last_name: this.newHelper.lastname,
         first_name: this.newHelper.firstname,
         email: this.newHelper.local.email
       };
-      await this.$ogust.createContact(payload);
+      const newHelper = await this.$ogust.createContact(payload);
+      return newHelper;
     },
     async createAlenviHelper () {
       this.newHelper.local.password = randomize('0', 6);
@@ -200,8 +211,9 @@ export default {
         if (this.$v.newHelper.$error) {
           throw new Error('Invalid fields');
         }
+        const newHelper = await this.createOgustHelper();
+        this.newHelper.ogustInterlocId = newHelper.data.data.contact.id_interloc;
         await this.createAlenviHelper();
-        await this.createOgustHelper();
         NotifyPositive('Aidant créé');
         await this.sendWelcomingEmail();
         NotifyPositive('Email envoyé');
