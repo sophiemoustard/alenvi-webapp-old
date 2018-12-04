@@ -1,30 +1,33 @@
 <template>
   <div>
-    <q-table :data="absences"
-      :columns="columns"
-      row-key="name"
-      binary-state-sort>
-      <q-td slot="body-cell-link" slot-scope="props" :props="props">
-        <div v-if="!props.row.link" class="row justify-center">
-          <q-uploader :ref="`absenceReason_${props.row._id}`" name="absenceReason" :url="docsUploadUrl" :headers="headers"
-            :additional-fields="[
-              { name: 'fileName', value: `justificatif_absence_${getUser.firstname}_${getUser.lastname}_${$moment().format('DD-MM-YYYY')}` },
-              { name: 'absenceId', value: props.row._id }
-            ]"
-            hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
-            hide-upload-button @add="uploadDocument($event, `absenceReason_${props.row._id}`)" @uploaded="refreshUser" @fail="failMsg" />
-        </div>
-        <q-btn v-else flat round small color="primary">
-          <a :href="props.row.link" download>
-            <q-icon name="file download" />
-          </a>
-        </q-btn>
-      </q-td>
-      <q-td slot="body-cell-delete" slot-scope="props" :props="props">
-        <q-btn flat round small color="grey" icon="delete" @click.native="removeAbsence(props.value, props.row.__index)" />
-        <!-- <q-icon class="cursor-pointer" color="grey" name="delete" @click.native="remove(props.value.id, props.row.__index, props.value.userId)" size="1.5rem" /> -->
-      </q-td>
-    </q-table>
+    <q-card style="background: white">
+      <q-card-main>
+        <q-table :data="absences" :columns="columns" row-key="name" binary-state-sort>
+          <q-td slot="body-cell-link" slot-scope="props" :props="props">
+            <div v-if="!props.row.link" class="row justify-center">
+              <q-uploader :ref="`absenceReason_${props.row._id}`" name="absenceReason" :url="docsUploadUrl" :headers="headers"
+                :additional-fields="[
+                  { name: 'fileName', value: `justificatif_absence_${getUser.firstname}_${getUser.lastname}_${$moment().format('DD-MM-YYYY')}` },
+                  { name: 'absenceId', value: props.row._id }
+                ]"
+                hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
+                hide-upload-button @add="uploadDocument($event, `absenceReason_${props.row._id}`)" @uploaded="refreshUser"
+                @fail="failMsg" />
+            </div>
+            <q-btn v-else flat round small color="primary">
+              <a :href="props.row.link" download>
+                <q-icon name="file download" />
+              </a>
+            </q-btn>
+          </q-td>
+          <q-td slot="body-cell-delete" slot-scope="props" :props="props">
+            <q-btn flat round small color="grey" icon="delete" @click.native="removeAbsence(props.value, props.row.__index)" />
+            <!-- <q-icon class="cursor-pointer" color="grey" name="delete" @click.native="remove(props.value.id, props.row.__index, props.value.userId)" size="1.5rem" /> -->
+          </q-td>
+        </q-table>
+      </q-card-main>
+    </q-card>
+
     <!-- <div class="row margin-input">
       <div class="col-xs-12">
         <div class="row justify-between">
@@ -43,7 +46,8 @@
           </div>
       </div>
     </div> -->
-    <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="ion-document" label="Enregistrer une absence" @click="newAbsenceModal = true" />
+    <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="ion-document" label="Enregistrer une absence"
+      @click="newAbsenceModal = true" />
     <!-- <p></p> -->
     <q-modal v-model="newAbsenceModal" :content-css="modalCssContainer">
       <div class="modal-padding">
@@ -52,7 +56,8 @@
             <h5>Créer une <span class="text-weight-bold">absence</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
-            <span><q-icon name="clear" size="1rem" @click.native="newAbsenceModal = false" /></span>
+            <span>
+              <q-icon name="clear" size="1rem" @click.native="newAbsenceModal = false" /></span>
           </div>
         </div>
         <div class="row margin-input">
@@ -74,9 +79,8 @@
               <q-icon v-if="$v.newAbsence.startDate.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newAbsence.startDate.$error" error-label="Champ requis">
-              <q-datetime type="date" format="DD/MM/YYYY" v-model="newAbsence.startDate" :min="$moment().startOf('month').toISOString()" color="white" inverted-light popover
-              ok-label="OK"
-              cancel-label="Fermer" />
+              <q-datetime type="date" format="DD/MM/YYYY" v-model="newAbsence.startDate" :min="$moment().startOf('month').toISOString()"
+                color="white" inverted-light popover ok-label="OK" cancel-label="Fermer" />
             </q-field>
           </div>
         </div>
@@ -87,7 +91,8 @@
               <q-icon v-if="$v.newAbsence.startDuration.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newAbsence.startDuration.$error" error-label="Champ requis">
-              <q-select :options="dateOptions" v-model="newAbsence.startDuration" color="white" inverted-light separator /> <!-- @blur="$v.newAbsenceOptionsSelected.startDateOption.$touch"  -->
+              <q-select :options="dateOptions" v-model="newAbsence.startDuration" color="white" inverted-light
+                separator /> <!-- @blur="$v.newAbsenceOptionsSelected.startDateOption.$touch"  -->
             </q-field>
           </div>
         </div>
@@ -98,9 +103,9 @@
               <q-icon v-if="$v.newAbsence.endDate.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newAbsence.endDate.$error" error-label="Champ requis">
-              <q-datetime :disable="!newAbsence.startDate" type="date" format="DD/MM/YYYY" v-model="newAbsence.endDate" color="white" inverted-light popover
-              ok-label="OK"
-              cancel-label="Fermer" /> <!-- :min="newAbsence.startDate" -->
+              <q-datetime :disable="!newAbsence.startDate" type="date" format="DD/MM/YYYY" v-model="newAbsence.endDate"
+                color="white" inverted-light popover ok-label="OK" cancel-label="Fermer" />
+              <!-- :min="newAbsence.startDate" -->
             </q-field>
           </div>
         </div>
@@ -111,7 +116,9 @@
               <q-icon v-if="$v.newAbsence.endDuration.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newAbsence.endDuration.$error" error-label="Champ requis">
-              <q-select :disable="!newAbsence.endDate || newAbsence.endDate <= newAbsence.startDate" :options="dateOptions" v-model="newAbsence.endDuration" color="white" inverted-light separator /> <!-- @blur="$v.newAbsenceOptionsSelected.startDateOption.$touch"  -->
+              <q-select :disable="!newAbsence.endDate || newAbsence.endDate <= newAbsence.startDate" :options="dateOptions"
+                v-model="newAbsence.endDuration" color="white" inverted-light separator />
+              <!-- @blur="$v.newAbsenceOptionsSelected.startDateOption.$touch"  -->
             </q-field>
           </div>
         </div>
@@ -294,9 +301,11 @@ export default {
   methods: {
     async addAbsence () {
       try {
-        this.newAbsence.startDate = this.$moment(this.newAbsence.startDate).set('hours', this.durations[this.newAbsence.startDuration].start);
-        if (this.newAbsence.endDuration) {
-          this.newAbsence.endDate = this.$moment(this.newAbsence.endDate).set('hours', this.durations[this.newAbsence.endDuration].end);
+        this.newAbsence.startDate = this.$moment(this.newAbsence.startDate).set({ hour: this.durations[this.newAbsence.startDuration].start }).toDate();
+        if (this.newAbsence.endDuration !== '') {
+          this.newAbsence.endDate = this.$moment(this.newAbsence.endDate).set({ hour: this.durations[this.newAbsence.endDuration].end }).toDate();
+        } else {
+          this.newAbsence.endDate = this.$moment(this.newAbsence.endDate).set({ hour: this.durations[this.newAbsence.startDuration].end }).toDate();
         }
         const test = await alenviAxios({
           url: `${process.env.API_HOSTNAME}/users/${this.getUser._id}/absences`,
