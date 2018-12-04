@@ -6,24 +6,24 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <ni-select-with-errors  caption="Pathologie" v-model="customer.followUp.pathology" :options="selectOptions"
+          <ni-select caption="Pathologie" v-model="customer.followUp.pathology" :options="selectOptions"
             @myBlur="updateUser({ alenvi: 'followUp.pathology', ogust: 'pathology' })" @myFocus="saveTmp('followUp.pathology')"
           />
         </div>
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <ni-input-with-errors  caption="Commentaires" v-model="customer.followUp.comments" :rows="6" type="textarea"
+          <ni-input  caption="Commentaires" v-model="customer.followUp.comments" :rows="6" type="textarea"
             @myBlur="updateUser({ alenvi: 'followUp.comments', ogust: 'comments' })" @myFocus="saveTmp('followUp.comments')"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <ni-input-with-errors  caption="Détails intervention" v-model="customer.followUp.details" :rows="6" type="textarea"
+          <ni-input  caption="Détails intervention" v-model="customer.followUp.details" :rows="6" type="textarea"
             @myBlur="updateUser({ alenvi: 'followUp.details', ogust: 'interventionDetails' })" @myFocus="saveTmp('followUp.details')"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <ni-input-with-errors  caption="Autes" v-model="customer.followUp.misc" :rows="6" type="textarea"
+          <ni-input  caption="Autes" v-model="customer.followUp.misc" :rows="6" type="textarea"
             @myBlur="updateUser({ alenvi: 'followUp.misc', ogust: 'misc' })" @myFocus="saveTmp('followUp.misc')"
           />
         </div>
@@ -34,15 +34,15 @@
 
 <script>
 import { extend } from '../../helpers/utils.js';
-import InputWithErrors from '../form/InputWithErrors.vue';
-import SelectWithErrors from '../form/SelectWithErrors.vue';
+import Input from '../form/Input.vue';
+import Select from '../form/Select.vue';
 import { NotifyPositive, NotifyNegative } from '../../components/popup/notify.js';
 import pathologies from '../../data/pathologies';
 
 export default {
   components: {
-    'ni-input-with-errors': InputWithErrors,
-    'ni-select-with-errors': SelectWithErrors,
+    'ni-input': Input,
+    'ni-select': Select,
   },
   data () {
     return {

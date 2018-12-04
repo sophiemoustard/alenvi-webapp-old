@@ -12,40 +12,40 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <ni-input-with-errors caption="Adresse" v-model="customer.main_address.line" disable />
+          <ni-input caption="Adresse" v-model="customer.main_address.line" disable />
         </div>
         <div class="col-xs-12 col-md-6">
-          <ni-input-with-errors caption="Ville" v-model="customer.main_address.city" disable />
+          <ni-input caption="Ville" v-model="customer.main_address.city" disable />
         </div><div class="col-xs-12 col-md-6">
-          <ni-input-with-errors caption="Code postal" v-model="customer.main_address.zip" disable />
+          <ni-input caption="Code postal" v-model="customer.main_address.zip" disable />
         </div>
         <div class="col-xs-12 col-md-6">
-          <ni-input-with-errors caption="Code porte" v-model="customer.door_code" @myFocus="saveTmp('door_code')"
+          <ni-input caption="Code porte" v-model="customer.door_code" @myFocus="saveTmp('door_code')"
             @myBlur="updateCustomer('door_code')"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <ni-input-with-errors caption="Code interphone" v-model="customer.intercom_code"
+          <ni-input caption="Code interphone" v-model="customer.intercom_code"
             @myBlur="updateCustomer('intercom_code')" @myFocus="saveTmp('intercom_code')"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <ni-select-with-errors caption="Pathologie" v-model="customerInfo.pathology" :options="selectOptions"
+          <ni-select caption="Pathologie" v-model="customerInfo.pathology" :options="selectOptions"
             @myBlur="updateCustomerInfo" @myFocus="saveTmp('customerInfo')"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <ni-input-with-errors caption="Commentaires" v-model="customerInfo.comments" @myFocus="saveTmp('customerInfo')"
+          <ni-input caption="Commentaires" v-model="customerInfo.comments" @myFocus="saveTmp('customerInfo')"
             type="textarea" :rows="6" @myBlur="updateCustomerInfo"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <ni-input-with-errors caption="Détails intervention" v-model="customerInfo.interventionDetails" @myFocus="saveTmp('customerInfo')"
+          <ni-input caption="Détails intervention" v-model="customerInfo.interventionDetails" @myFocus="saveTmp('customerInfo')"
             type="textarea" :rows="6" @myBlur="updateCustomerInfo"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <ni-input-with-errors caption="Autres" v-model="customerInfo.misc" @myFocus="saveTmp('customerInfo')" type="textarea"
+          <ni-input caption="Autres" v-model="customerInfo.misc" @myFocus="saveTmp('customerInfo')" type="textarea"
             :rows="6" @myBlur="updateCustomerInfo"
           />
         </div>
@@ -57,13 +57,13 @@
 <script>
 import pathologies from '../../data/pathologies';
 import { NotifyPositive, NotifyNegative } from '../../components/popup/notify';
-import InputWithErrors from '../../components/form/InputWithErrors.vue';
-import SelectWithErrors from '../../components/form/SelectWithErrors.vue';
+import Input from '../../components/form/Input.vue';
+import Select from '../../components/form/Select.vue';
 
 export default {
   components: {
-    'ni-input-with-errors': InputWithErrors,
-    'ni-select-with-errors': SelectWithErrors,
+    'ni-input': Input,
+    'ni-select': Select,
   },
   props: {
     id: String,
