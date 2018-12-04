@@ -6,12 +6,6 @@
           <q-icon name="menu" style="width: 24px; height: 24px" />
         </q-btn>
         <img style="height: 20px" src="https://res.cloudinary.com/alenvi/image/upload/v1539605431/images/business/Compani/compani_logo_1L_RVB_S.png" alt="">
-        <!-- <q-toolbar-title>
-          <router-link :class="{ 'router-link-active': false }" :to="layoutTitle.link">{{ layoutTitle.content }}</router-link>
-        </q-toolbar-title> -->
-        <!-- <q-btn color="primary" flat big>
-        <q-icon name="email" />
-      </q-btn> -->
       </q-toolbar>
     </q-layout-header>
 
@@ -30,8 +24,8 @@
 <script>
 import { mapGetters } from 'vuex'
 
-import SideMenuCoach from '../components/SideMenuCoach'
-import SideMenuAuxiliary from '../components/SideMenuAuxiliary'
+import SideMenuCoach from '../components/menu/SideMenuCoach'
+import SideMenuAuxiliary from '../components/menu/SideMenuAuxiliary'
 
 export default {
   components: {
@@ -84,8 +78,4 @@ export default {
     a
      color: $primary
      text-decoration: none
-    //  transition: none
-    //  &:hover
-      //  color: none
-
   </style>

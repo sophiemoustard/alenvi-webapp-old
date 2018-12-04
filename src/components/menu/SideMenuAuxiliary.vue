@@ -48,9 +48,9 @@
 <script>
 import { Cookies } from 'quasar';
 
-import { sideMenuMixin } from '../mixins/sideMenuMixin';
-import MenuItem from './menu/MenuItem.vue';
-import SideMenuFooter from './menu/SideMenuFooter.vue';
+import { sideMenuMixin } from '../../mixins/sideMenuMixin';
+import MenuItem from './MenuItem.vue';
+import SideMenuFooter from './SideMenuFooter.vue';
 
 export default {
   props: ['user'],

@@ -1,17 +1,8 @@
 <template>
   <q-list class="no-border">
-    <q-item to="/dashboard/customer/planning" exact>
-      <q-item-side icon="date range" />
-      <q-item-main label="Planning" />
-    </q-item>
-    <q-item to="/dashboard/customer/documents" exact>
-      <q-item-side icon="folder" />
-      <q-item-main label="Facturation" />
-    </q-item>
-    <q-item :to="{ name: 'customer profile', params: { id: user._id } }" exact>
-      <q-item-side icon="person" />
-      <q-item-main label="Mes informations" />
-    </q-item>
+    <ni-menu-item name="customer planning" icon="date range" label="Planning" />
+    <ni-menu-item name="customer documents" icon="folder" label="Facturation" />
+    <ni-menu-item name="customer profile" :params="{ id: user._id }" icon="person" label="Mes informations" />
     <q-item to="/login" @click.native="logout" replace>
       <q-item-side icon="exit to app" />
       <q-item-main label="Déconnexion" />
@@ -20,11 +11,15 @@
 </template>
 
 <script>
-import { sideMenuMixin } from '../mixins/sideMenuMixin';
+import { sideMenuMixin } from '../../mixins/sideMenuMixin';
+import MenuItem from './MenuItem.vue';
 
 export default {
   props: ['user'],
-  mixins: [sideMenuMixin]
+  mixins: [sideMenuMixin],
+  components: {
+    'ni-menu-item': MenuItem,
+  },
 }
 </script>
 
