@@ -35,7 +35,6 @@
     <div class="row justify-center">
       <div class="align-left">
         <div id="changePassword" v-if="isChangePassword">
-          <!-- <p class="caption">Mot de passe</p> -->
           <q-field :error="$v.user.credentials.password.$error"
             error-label="Le mot de passe doit contenir entre 6 et 20 caractères.">
             <q-input type="password" stack-label="Nouveau mot de passe" v-model.trim="user.credentials.password" @blur="$v.user.credentials.password.$touch" />
@@ -58,14 +57,7 @@
 <script>
 import { required, email, sameAs, minLength, maxLength } from 'vuelidate/lib/validators'
 
-import SelectSector from '../../../components/SelectSector'
-import SelectRole from '../../../components/SelectRole'
-
 export default {
-  components: {
-    SelectSector,
-    SelectRole
-  },
   metaInfo: {
     title: 'Mes informations',
   },
@@ -86,7 +78,6 @@ export default {
       isChangePassword: false,
       isEditMode: false,
       editModeButtonName: 'Modifier'
-      // changePasswordButtonName: 'Changement de mot de passe'
     }
   },
   validations: {
@@ -170,13 +161,6 @@ export default {
         console.error(e);
       }
     },
-    // activateChangePassword () {
-    // if (this.isChangePassword) {
-    //   return this.updateUser();
-    // }
-    // this.isChangePassword = true;
-    // this.changePasswordButtonName = 'Modifier mon mot de passe';
-    // },
     activateEditMode () {
       if (!this.isEditMode) {
         this.isEditMode = true;

@@ -54,7 +54,7 @@
             <p class="input-caption">Adresse</p>
           </div>
           <q-field :error="$v.customer.contact.address.fullAddress.$error" :error-label="addressError">
-            <search-address v-model="customer.contact.address.fullAddress" color="white" inverted-light @focus="saveTmp('contact.address.fullAddress')"
+            <ni-search-address v-model="customer.contact.address.fullAddress" color="white" inverted-light @focus="saveTmp('contact.address.fullAddress')"
               @blur="updateUser({ alenvi: 'contact.address', ogust: 'address' })"
               @selected="selectedAddress" />
           </q-field>
@@ -137,13 +137,13 @@
 import { required } from 'vuelidate/lib/validators';
 
 import { extend } from '../../helpers/utils.js';
-import SearchAddress from '../../components/SearchAddress';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify.js';
+import SearchAddress from '../../components/form/SearchAddress';
 import { frPhoneNumber, iban, bic, frAddress } from '../../helpers/vuelidateCustomVal';
 
 export default {
   components: {
-    SearchAddress
+    'ni-search-address': SearchAddress,
   },
   data () {
     return {

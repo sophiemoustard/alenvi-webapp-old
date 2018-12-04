@@ -6,7 +6,7 @@
     </div>
     <div v-if="document && document.driveId" class="row justify-between" style="background: white">
       <div class="doc-thumbnail">
-        <custom-img :driveId="document.driveId" :alt="alt" />
+        <ni-custom-img :driveId="document.driveId" :alt="alt" />
       </div>
       <div class="self-end doc-delete">
         <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument" />
@@ -24,11 +24,11 @@
 <script>
 import { Cookies, openURL } from 'quasar';
 
-import CustomImg from '../CustomImg';
+import CustomImg from './CustomImg';
 
 export default {
   components: {
-    CustomImg,
+    'ni-custom-img': CustomImg,
   },
   data () {
     return {

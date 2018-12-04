@@ -85,7 +85,7 @@
             <div v-if="hasContractTemplate" class="row justify-between"
             style="background: white">
               <div class="doc-thumbnail">
-                <custom-img :driveId="company.rhConfig.templates.contract.driveId" alt="template contrat" />
+                <ni-custom-img :driveId="company.rhConfig.templates.contract.driveId" alt="template contrat" />
               </div>
               <div class="self-end doc-delete">
                 <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(company.rhConfig.templates.contract.driveId, 'contract')" />
@@ -103,7 +103,7 @@
             <div v-if="hasAmendmentTemplate" class="row justify-between"
             style="background: white">
               <div class="doc-thumbnail">
-                <custom-img :driveId="company.rhConfig.templates.amendment.driveId" alt="template avenant" />
+                <ni-custom-img :driveId="company.rhConfig.templates.amendment.driveId" alt="template avenant" />
               </div>
               <div class="self-end doc-delete">
                 <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(company.rhConfig.templates.amendment.driveId, 'amendment')" />
@@ -138,11 +138,11 @@ import { required, maxValue } from 'vuelidate/lib/validators';
 
 import { posDecimals } from '../../helpers/vuelidateCustomVal';
 import gdrive from '../../api/GoogleDrive.js';
-import CustomImg from '../../components/CustomImg';
+import CustomImg from '../../components/form/CustomImg';
 
 export default {
   components: {
-    CustomImg
+    'ni-custom-img': CustomImg,
   },
   data () {
     return {

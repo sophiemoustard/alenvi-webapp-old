@@ -12,7 +12,7 @@
       v-for="(certificate, index) in documents" :key="index">
       <div v-if="certificate.driveId" class="row justify-between" style="background: white; margin-bottom: 24px">
         <div class="doc-thumbnail">
-          <custom-img :driveId="certificate.driveId" alt="diplôme" />
+          <ni-custom-img :driveId="certificate.driveId" alt="diplôme" />
         </div>
         <div class="self-end doc-delete">
           <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(certificate.driveId)" />
@@ -33,11 +33,11 @@
 <script>
 import { Cookies, openURL } from 'quasar';
 
-import CustomImg from '../CustomImg';
+import CustomImg from './CustomImg';
 
 export default {
   components: {
-    CustomImg,
+    'ni-custom-img': CustomImg,
   },
   data () {
     return {

@@ -3,17 +3,11 @@
     <div class="row justify-center q-mb-xl">
       <div style="width: 700px; max-width: 90vw;">
         <p class="caption">Création de compte Alenvi et Ogust</p>
-        <select-sector v-model="selectedSector"></select-sector>
-        <select-manager v-model="selectedManager"></select-manager>
+        <ni-select-sector v-model="selectedSector" />
+        <ni-select-manager v-model="selectedManager" />
         <q-field icon="phone" helper="Numéro sans délimiteur (espaces, points...)">
           <q-input :disable="!selectedSector || !selectedManager" :loading="isLoading" v-model="phoneNbr" float-label="Numéro de téléphone" @keyup.enter="handlePhone" :after="[{ icon: 'send', content: true, handler: handlePhone }]"/>
         </q-field>
-        <!-- <p class="caption">Envoi de code pour compte existant</p>
-        <q-field icon="phone" helper="Numéro sans délimiteur (espaces, points...)">
-          <q-input v-model="phoneNbr" float-label="Numéro de téléphone" :after="[{ icon: 'send', content: true, handler: handlePhone }]"/>
-        </q-field> -->
-        <!-- <br>
-        <q-search v-model="searchUserFromMobilePhone" :debounce="600" placeholder="Numéro auxiliaire" type="tel" stack-label="Numéro de téléphone" /> -->
         <br>
         <blockquote>
           <p>Bienvenue chez Alenvi ! :)<br>
@@ -62,18 +56,17 @@
 </template>
 
 <script>
-import SelectSector from '../../../components/SelectSector';
-import SelectManager from '../../../components/SelectManager';
+import SelectSector from '../../../components/form/SelectSector';
+import SelectManager from '../../../components/form/SelectManager';
 
 export default {
   components: {
-    SelectSector,
-    SelectManager
+    'ni-select-sector': SelectSector,
+    'ni-select-manager': SelectManager,
   },
   data () {
     return {
       phoneNbr: '',
-      // searchUserFromMobilePhone: ''
       employee: '',
       selectedSector: '',
       selectedManager: '',
@@ -122,9 +115,6 @@ export default {
     }
   },
   computed: {
-    // filteredList () {
-    //   return this.messageList.filter(message => message.body.match(/Bienvenue/));
-    // }
   },
   async mounted () {
     await this.getMessageList();
@@ -132,11 +122,6 @@ export default {
   methods: {
     async handlePhone () {
       try {
-        // const payload = {
-        //   mobile_phone: this.phoneNbr
-        // };
-        // const res = await ogust.getEmployees(payload);
-        // this.employee = res[0];
         await this.$q.dialog({
           title: 'Confirmation accueil',
           message: `Es-tu sûr de vouloir envoyer un message au ${this.phoneNbr} ?`,
@@ -154,8 +139,6 @@ export default {
           to: `+33${this.phoneNbr.substring(1)}`,
           body: `Bienvenue chez Alenvi ! :) Utilise ce code: ${code} pour pouvoir commencer ton enregistrement ici avant ton intégration: https://app.alenvi.io/signup :-)`,
         });
-        console.log('SMS envoyé =', message);
-        console.log('Auxiliaire accueilli !');
         this.isLoading = false;
         this.$q.notify({
           color: 'positive',
@@ -190,34 +173,6 @@ export default {
         this.tableLoading = false;
       }
     }
-    // async getMessageList ({ pagination }) {
-    //   try {
-    //     this.tableLoading = true;
-    //     const params = {};
-    //     params.pageSize = pagination.rowsNumber;
-    //     if (pagination.pageToken) {
-    //       params.pageToken = pagination.pageToken;
-    //     }
-    //     if (pagination.page > 1) {
-    //       params.pageNumber = pagination.page - 1;
-    //     }
-    //     const messagesListRaw = await this.$twilio.getRecords(params);
-    //     console.log(messagesListRaw);
-    //     this.pagination = pagination;
-    //     this.pagination.rowsNumber = Number(messagesListRaw.data.data.nextPage.PageSize);
-    //     console.log(this.pagination.rowsNumber);
-    //     this.pagination.page = Number(messagesListRaw.data.data.nextPage.Page) + 1;
-    //     console.log(this.pagination.page);
-    //     this.pagination.pageToken = messagesListRaw.data.data.nextPage.PageToken;
-    //     console.log(this.pagination.pageToken);
-    //     this.messageList = messagesListRaw.data.data.messageList;
-    //     console.log('MESSAGES', this.messageList);
-    //     this.tableLoading = false;
-    //   } catch (e) {
-    //     console.error(e);
-    //     this.tableLoading = false;
-    //   }
-    // }
   }
 }
 </script>

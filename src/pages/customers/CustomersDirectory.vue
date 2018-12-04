@@ -31,12 +31,6 @@
           <q-item v-if="col.name === 'name'">
             <q-item-main :label="col.value.name" />
           </q-item>
-          <!-- <template v-else-if="col.name === 'profileErrors'">
-            <q-icon v-if="notificationsProfiles[props.row.auxiliary._id] && props.row.isActive" name="error" color="secondary" size="1rem" />
-          </template>
-          <template v-else-if="col.name === 'tasksErrors'">
-            <q-icon v-if="notificationsTasks[props.row.auxiliary._id] && props.row.isActive" name="error" color="secondary" size="1rem" />
-          </template> -->
           <template v-else-if="col.name === 'active'">
             <div :class="{ activeDot: col.value, inactiveDot: !col.value }"></div>
           </template>
@@ -93,7 +87,7 @@
               <q-icon v-if="$v.newCustomer.contact.address.fullAddress.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newCustomer.contact.address.fullAddress.$error" :error-label="addressError">
-              <search-address v-model="newCustomer.contact.address.fullAddress" @selected="selectedAddress" @blur="$v.newCustomer.contact.address.fullAddress.$touch" />
+              <ni-search-address v-model="newCustomer.contact.address.fullAddress" @selected="selectedAddress" @blur="$v.newCustomer.contact.address.fullAddress.$touch" />
             </q-field>
           </div>
         </div>
@@ -104,7 +98,7 @@
               <q-icon v-if="$v.ogust.method_of_payment.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.ogust.method_of_payment.$error" error-label="Champ requis">
-              <select-ogust-list v-model="ogust.method_of_payment" listType="customer.method_of_payment" color="white" inverted-light @myBlur="$v.ogust.method_of_payment.$touch" />
+              <ni-select-ogust-list v-model="ogust.method_of_payment" listType="customer.method_of_payment" color="white" inverted-light @myBlur="$v.ogust.method_of_payment.$touch" />
             </q-field>
           </div>
         </div>
@@ -115,7 +109,7 @@
               <q-icon v-if="$v.ogust.origin.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.ogust.origin.$error" error-label="Champ requis">
-              <select-ogust-list v-model="ogust.origin" listType="customer.origin" color="white" inverted-light @myBlur="$v.ogust.origin.$touch" />
+              <ni-select-ogust-list v-model="ogust.origin" listType="customer.origin" color="white" inverted-light @myBlur="$v.ogust.origin.$touch" />
             </q-field>
           </div>
         </div>
@@ -126,7 +120,7 @@
               <q-icon v-if="$v.ogust.managerId.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.ogust.managerId.$error" error-label="Champ requis">
-              <select-ogust-list v-model="ogust.managerId" @myBlur="$v.ogust.managerId.$touch" listType="customer.manager" filter />
+              <ni-select-ogust-list v-model="ogust.managerId" @myBlur="$v.ogust.managerId.$touch" listType="customer.manager" filter />
             </q-field>
           </div>
         </div>
@@ -141,22 +135,16 @@ import { required, email } from 'vuelidate/lib/validators';
 
 import { clear } from '../../helpers/utils.js';
 import { frAddress } from '../../helpers/vuelidateCustomVal.js'
-// import { userProfileValidation } from '../../helpers/userProfileValidation';
-// import { taskValidation } from '../../helpers/taskValidation';
-import SelectSector from '../../components/SelectSector';
-import SelectManager from '../../components/SelectManager';
-import SelectOgustList from '../../components/SelectOgustList';
-import SearchAddress from '../../components/SearchAddress';
+import SelectOgustList from '../../components/form/SelectOgustList';
+import SearchAddress from '../../components/form/SearchAddress';
 
 export default {
   metaInfo: {
     title: 'Répertoire bénéficiaires'
   },
   components: {
-    SelectSector,
-    SelectManager,
-    SelectOgustList,
-    SearchAddress
+    'ni-select-ogust-list': SelectOgustList,
+    'ni-search-address': SearchAddress,
   },
   data () {
     return {
@@ -222,20 +210,6 @@ export default {
           },
           style: 'width: 350px'
         },
-        // {
-        //   name: 'profileErrors',
-        //   label: 'Documents',
-        //   field: 'profileErrors',
-        //   align: 'left',
-        //   sortable: true,
-        // },
-        // {
-        //   name: 'tasksErrors',
-        //   label: 'Tâches',
-        //   field: 'tasksErrors',
-        //   align: 'left',
-        //   sortable: true,
-        // },
         {
           name: 'startDate',
           label: 'Depuis le...',
@@ -246,14 +220,6 @@ export default {
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
           style: 'width: 170px'
         },
-        // {
-        //   name: 'team',
-        //   label: 'Equipe',
-        //   field: 'sector',
-        //   align: 'left',
-        //   sortable: true,
-        //   style: 'width: 170px'
-        // },
         {
           name: 'active',
           label: 'Actif',
@@ -300,12 +266,6 @@ export default {
     filteredCustomers () {
       return this.activeCustomerList.filter(customer => customer.customer.name.match(new RegExp(this.searchStr, 'i')));
     },
-    // notificationsProfiles () {
-    //   return this.$store.getters['rh/getNotificationsProfiles'];
-    // },
-    // notificationsTasks () {
-    //   return this.$store.getters['rh/getNotificationsTasks'];
-    // },
     zipCodeError () {
       if (!this.$v.newCustomer.contact.address.zipCode.required) {
         return 'Champ requis';
@@ -332,41 +292,13 @@ export default {
       try {
         const customersRaw = await this.$customers.showAll();
         const customers = customersRaw.data.data.customers;
-        // const sectors = await this.$ogust.getList('customer.sector');
         this.customersList = customers.map((customer) => {
-          // if (user.isActive) {
-          // const checkProfileErrors = userProfileValidation(user);
-          // this.$store.commit('rh/saveNotification', {
-          //   type: 'profiles',
-          //   _id: user._id,
-          //   exists: !!checkProfileErrors.error
-          // });
-          // const checkTasks = taskValidation(user);
-          // this.$store.commit('rh/saveNotification', {
-          //   type: 'tasks',
-          //   _id: user._id,
-          //   exists: checkTasks
-          // });
-          //   return {
-          //     auxiliary: {
-          //       _id: user._id,
-          //       name: `${user.firstname} ${user.lastname}`,
-          //       picture: user.picture ? user.picture.link : null
-          //     },
-          //     profileErrors: checkProfileErrors.error,
-          //     tasksErrors: checkTasks,
-          //     startDate: user.createdAt,
-          //     sector: sectors[user.sector],
-          //     isActive: user.isActive
-          //   }
-          // }
           return {
             customer: {
               _id: customer._id,
               name: customer.identity.firstname ? `${customer.identity.firstname} ${customer.identity.lastname}` : customer.identity.lastname,
             },
             startDate: customer.createdAt,
-            // sector: sectors[customer.sector[0]],
             isActive: customer.isActive
           }
         });
@@ -526,7 +458,6 @@ export default {
     & td
       padding: 8px 12px
       & .q-item
-        // padding: 8px 16px 8px 0px
         min-height: 30px
         padding: 0
         &-main
