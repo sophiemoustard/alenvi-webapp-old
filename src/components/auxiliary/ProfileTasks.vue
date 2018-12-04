@@ -12,7 +12,9 @@
 </template>
 
 <script>
-import { displayTask } from '../../helpers/taskValidation.js'
+import { displayTask } from '../../helpers/taskValidation.js';
+import { NotifyPositive, NotifyNegative } from '../popup/notify.js';
+
 export default {
   data () {
     return {
@@ -37,22 +39,10 @@ export default {
       try {
         await this.$users.updateTask({ user_id: this.getUser._id, task_id: task.task._id, isDone: task.check.isDone });
         this.$store.dispatch('rh/getUserProfile', { userId: this.getUser._id });
-        this.$q.notify({
-          color: 'positive',
-          icon: 'thumb up',
-          detail: 'Tâche mise à jour',
-          position: 'bottom-right',
-          duration: 2500
-        });
+        NotifyPositive('Tâche mise à jour');
       } catch (e) {
         console.error(e);
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de la mise à jour de la tâche',
-          position: 'bottom-right',
-          duration: 2500
-        });
+        NotifyNegative('Erreur lors de la mise à jour de la tâche');
       }
     }
   }

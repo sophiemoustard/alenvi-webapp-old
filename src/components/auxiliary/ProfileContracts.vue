@@ -79,53 +79,16 @@
             <span><q-icon name="clear" size="1rem" @click.native="newContractModal = false" /></span>
           </div>
         </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Statut</p>
-              <q-icon v-if="$v.newContract.status.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newContract.status.$error" error-label="Champ requis">
-              <q-select :options="statusOptions" v-model="newContract.status" color="white" inverted-light separator
-               @blur="$v.newContract.status.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Volume horaire hebdomadaire</p>
-              <q-icon v-if="$v.newContract.weeklyHours.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newContract.weeklyHours.$error" error-label="Champ requis">
-              <q-input type="number" v-model="newContract.weeklyHours" color="white" suffix="hr" inverted-light @blur="$v.newContract.weeklyHours.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Taux horaire</p>
-              <q-icon v-if="$v.newContract.grossHourlyRate.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newContract.grossHourlyRate.$error" error-label="Champ requis">
-              <q-input type="number" v-model="newContract.grossHourlyRate" color="white" suffix="€" inverted-light @blur="$v.newContract.grossHourlyRate.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Date d'effet</p>
-              <q-icon v-if="$v.newContract.startDate.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newContract.startDate.$error" error-label="Champ requis">
-              <q-datetime type="date" format="DD/MM/YYYY" v-model="newContract.startDate" color="white" inverted-light popover
-              ok-label="OK"
-              cancel-label="Fermer" />
-            </q-field>
-          </div>
-        </div>
+        <ni-modal-select caption="Statut" :error="$v.newContract.status.$error" :options="statusOptions" v-model="newContract.status"
+          @blur="$v.newContract.status.$touch" separator
+        />
+        <ni-modal-input caption="Volume horaire hebdomadaire" :error="$v.newContract.weeklyHours.$error" type="number" v-model="newContract.weeklyHours"
+          @blur="$v.newContract.weeklyHours.$touch" suffix="hr"
+        />
+        <ni-modal-input caption="Taux horaire" :error="$v.newContract.grossHourlyRate.$error" type="number" v-model="newContract.grossHourlyRate"
+          @blur="$v.newContract.grossHourlyRate.$touch" suffix="€"
+        />
+        <ni-modal-datetime-picker caption="Date d'effet" :error="$v.newContract.startDate.$error" v-model="newContract.startDate" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer le contrat" icon-right="add" color="primary" :loading="loading" @click="createNewContract" />
     </q-modal>
@@ -141,41 +104,15 @@
             <span><q-icon name="clear" size="1rem" @click.native="newContractVersionModal = false" /></span>
           </div>
         </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Volume horaire hebdomadaire</p>
-              <q-icon v-if="$v.newContractVersion.weeklyHours.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newContractVersion.weeklyHours.$error" error-label="Champ requis">
-              <q-input type="number" v-model="newContractVersion.weeklyHours" color="white" suffix="hr" inverted-light @blur="$v.newContractVersion.weeklyHours.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Taux horaire</p>
-              <q-icon v-if="$v.newContractVersion.grossHourlyRate.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newContractVersion.grossHourlyRate.$error" error-label="Champ requis">
-              <q-input type="number" v-model="newContractVersion.grossHourlyRate" color="white" suffix="€" inverted-light @blur="$v.newContractVersion.grossHourlyRate.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <!-- use of v-if because if we don't it directly renders, so it calls :min getActiveVersion function and throw error because there is no contract selected yet -->
-        <div v-if="newContractVersionModal" class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Date d'effet</p>
-              <q-icon v-if="$v.newContractVersion.startDate.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newContractVersion.startDate.$error" error-label="Champ requis">
-              <q-datetime type="date" format="DD/MM/YYYY" v-model="newContractVersion.startDate" :min="getMinimalStartDate(contractSelected)" color="white" inverted-light popover
-                ok-label="OK" cancel-label="Fermer" />
-            </q-field>
-          </div>
-        </div>
+        <ni-modal-input caption="Volume horaire hebdomadaire"  :error="$v.newContractVersion.weeklyHours.$error" v-model="newContractVersion.weeklyHours"
+          type="number" @blur="$v.newContractVersion.weeklyHours.$touch" suffix="hr"
+        />
+        <ni-modal-input caption="Taux horaire"  :error="$v.newContractVersion.grossHourlyRate.$error" v-model="newContractVersion.grossHourlyRate"
+          type="number" @blur="$v.newContractVersion.grossHourlyRate.$touch" suffix="€"
+        />
+        <ni-modal-datetime-picker caption="Date d'effet" :error="$v.newContractVersion.startDate.$error" v-model="newContractVersion.startDate"
+          :min="getMinimalStartDate(contractSelected)"
+        />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer l'avenant" icon-right="add" color="primary" :loading="loading" @click="createNewContractVersion" />
     </q-modal>
@@ -191,31 +128,27 @@
             <span><q-icon name="clear" size="1rem" @click.native="endContractModal = false" /></span>
           </div>
         </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Date de fin de contrat</p>
-            </div>
-            <q-field>
-              <q-datetime type="date" format="DD/MM/YYYY" v-model="endContractData.date" color="white" inverted-light popover
-              ok-label="OK"
-              cancel-label="Fermer" />
-            </q-field>
-          </div>
-        </div>
+        <ni-modal-datetime-picker caption="Date de fin de contrat" v-model="endContractData.date" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Mettre fin au contrat" icon-right="clear" color="primary" :loading="loading" @click="endContract" />
     </q-modal>
-
   </div>
 </template>
 
 <script>
 import { Cookies } from 'quasar';
 import { required } from 'vuelidate/lib/validators';
-import { alenviAxios } from '../../api/ressources/alenviAxios';
+import ModalSelect from '../form/ModalSelect.vue';
+import ModalInput from '../form/ModalInput.vue';
+import ModalDatetimePicker from '../form/ModalDatetimePicker.vue';
+import { NotifyPositive, NotifyNegative } from '../popup/notify';
 
 export default {
+  components: {
+    'ni-modal-select': ModalSelect,
+    'ni-modal-input': ModalInput,
+    'ni-modal-datetime-picker': ModalDatetimePicker,
+  },
   data () {
     return {
       loading: false,
@@ -360,14 +293,14 @@ export default {
   },
   methods: {
     getActiveVersion (contract) {
-      return contract.versions.find(version => version.isActive);
+      return contract.versions ? contract.versions.find(version => version.isActive) : null;
     },
     getLastVersion (contract) {
       return this.$_.orderBy(contract.versions, ['startDate'], ['desc'])[0];
     },
     getMinimalStartDate (contract) {
       const activeVersion = this.getActiveVersion(contract);
-      return this.$moment(activeVersion.startDate).add(1, 'd').format();
+      return activeVersion && this.$moment(activeVersion.startDate).add(1, 'd').format();
     },
     cardTitle (contractEndDate) {
       if (this.$moment().isBefore(contractEndDate)) {
@@ -388,13 +321,7 @@ export default {
       }
     },
     failMsg () {
-      this.$q.notify({
-        color: 'negative',
-        icon: 'warning',
-        detail: 'Echec de l\'envoi du document',
-        position: 'bottom-left',
-        timeout: 2500
-      });
+      NotifyNegative('Echec de l\'envoi du document');
     },
     async refreshUser () {
       try {
@@ -445,13 +372,7 @@ export default {
     uploadDocument (files, refName) {
       if (files[0].size > 5000000) {
         this.$refs[refName][0].reset();
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Fichier trop volumineux (> 5 Mo)',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyNegative('Fichier trop volumineux (> 5 Mo)');
         return '';
       } else {
         this.$refs[refName][0].upload();
@@ -471,13 +392,30 @@ export default {
       if (lastActiveVersion) {
         const queries = {
           userId: this.getUser._id,
-          mainContractId: data.contractId,
-          lastActiveVersion
+          contractId: data.contractId,
+          versionId: lastActiveVersion._id
         };
         const payload = {
           endDate: this.$moment(lastVersion.startDate).subtract(1, 'day').toDate()
         };
         await this.$users.updateContractVersion(queries, payload);
+      }
+    },
+    async updatePreviousVersions (data) {
+      for (let i = 0, l = this.contracts[data.contractIndex].versions.length; i < l; i++) {
+        const contract = this.contracts[data.contractIndex];
+        const currentVersion = contract.versions[i];
+        if (currentVersion.isActive && currentVersion._id !== data.versionId) {
+          let payload = { status: 'T', end_date: this.$moment(data.versionStartDate).subtract(1, 'day').format('YYYYMMDD') };
+          await this.$ogust.updateContract(currentVersion.ogustContractId, payload);
+          const queries = {
+            userId: this.getUser._id,
+            contractId: contract._id,
+            versionId: currentVersion._id,
+          };
+          await this.$users.updateContractVersion(queries, { 'isActive': false });
+          currentVersion.isActive = false;
+        }
       }
     },
     async updateContractActivity (data) {
@@ -489,35 +427,22 @@ export default {
           cancel: 'Annuler'
         });
         await this.updateEndDateOfPreviousVersion(data);
-        await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/contracts/${data.ogustContractId}`, { status: 'V' });
-        await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${data.contractId}/versions/${data.versionId}`, { 'isActive': data.isActive });
+        await this.$ogust.updateContract(data.ogustContractId, { status: 'V' });
+        const queries = {
+          userId: this.getUser._id,
+          contractId: data.contractId,
+          versionId: data.versionId,
+        };
+        await this.$users.updateContractVersion(queries, { 'isActive': data.isActive });
         // Update manually checkbox because it's not dynamic
         this.sortedContracts[data.contractIndex].versions[data.cell].isActive = data.isActive;
-        for (let i = 0, l = this.contracts[data.contractIndex].versions.length; i < l; i++) {
-          if (this.contracts[data.contractIndex].versions[i].isActive && this.contracts[data.contractIndex].versions[i]._id !== data.versionId) {
-            await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/contracts/${this.contracts[data.contractIndex].versions[i].ogustContractId}`, { status: 'T', end_date: this.$moment(data.versionStartDate).subtract(1, 'day').format('YYYYMMDD') });
-            await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${this.contracts[data.contractIndex]._id}/versions/${this.contracts[data.contractIndex].versions[i]._id}`, { 'isActive': false });
-            this.contracts[data.contractIndex].versions[i].isActive = false;
-          }
-        }
+        this.updatePreviousVersions(data);
         await this.refreshUser();
-        this.$q.notify({
-          color: 'positive',
-          icon: 'done',
-          detail: 'Activité du contrat changée',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyPositive('Activité du contrat changée');
       } catch (e) {
         console.error(e);
         if (e.message !== '') {
-          this.$q.notify({
-            color: 'negative',
-            icon: 'warning',
-            detail: 'Erreur lors du changement de l\'activité du contrat',
-            position: 'bottom-left',
-            timeout: 2500
-          });
+          NotifyNegative('Erreur lors du changement de l\'activité du contrat');
         }
       }
     },
@@ -536,22 +461,10 @@ export default {
         this.newContract.ogustContractId = newOgustContract.id_contract;
         await this.$users.createContract({ userId: this.getUser._id }, this.newContract);
         await this.refreshUser();
-        this.$q.notify({
-          color: 'positive',
-          icon: 'done',
-          detail: 'Contrat créé',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyPositive('Contrat créé');
       } catch (e) {
         console.error(e);
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de la création du contrat',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyNegative('Erreur lors de la création du contrat');
       } finally {
         this.loading = false;
         this.newContractModal = false;
@@ -583,22 +496,10 @@ export default {
         };
         await this.$users.createContractVersion(queries, this.newContractVersion);
         await this.refreshUser();
-        this.$q.notify({
-          color: 'positive',
-          icon: 'done',
-          detail: 'Version créée',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyPositive('Version créée');
       } catch (e) {
         console.error(e);
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de la création de la version du contrat',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyNegative('Erreur lors de la création de la version du contrat');
       } finally {
         this.loading = false;
         this.newContractVersionModal = false;
@@ -615,38 +516,21 @@ export default {
       try {
         this.loading = true;
         const ogustVersionId = this.endContractData.contract.versions.find(version => version.isActive).ogustContractId;
-        await alenviAxios({
-          url: `${process.env.API_HOSTNAME}/ogust/contracts/${ogustVersionId}`,
-          method: 'PUT',
-          data: {
-            status: 'T',
-            end_date: this.$moment(this.endContractData.date).format('YYYYMMDD')
-          }
-        });
-        await alenviAxios({
-          url: `${process.env.API_HOSTNAME}/users/${this.getUser._id}/contracts/${this.endContractData.contract._id}`,
-          method: 'PUT',
-          data: {
-            endDate: this.endContractData.date
-          }
-        });
+        const payload = {
+          status: 'T',
+          end_date: this.$moment(this.endContractData.date).format('YYYYMMDD')
+        };
+        this.$ogust.endContract(ogustVersionId, payload);
+        const queries = {
+          userId: this.getUser._id,
+          contractId: this.endContractData.contract._id,
+        };
+        this.$users.endContract(queries, { endDate: this.endContractData.date });
         await this.refreshUser();
-        this.$q.notify({
-          color: 'positive',
-          icon: 'done',
-          detail: 'Contrat terminé',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyPositive('Contrat terminé');
       } catch (e) {
         console.error(e);
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de la mise à jour du contrat',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyNegative('Erreur lors de la mise à jour du contrat');
       } finally {
         this.loading = false;
         this.endContractModal = false;
