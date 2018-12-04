@@ -38,7 +38,7 @@
 <script>
 import { sideMenuMixin } from '../../mixins/sideMenuMixin';
 import MenuItem from './MenuItem.vue';
-import SideMenuFooter from './sideMenuFooter.vue';
+import SideMenuFooter from './SideMenuFooter.vue';
 
 export default {
   props: {
