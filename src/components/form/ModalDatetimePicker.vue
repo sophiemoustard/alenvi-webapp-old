@@ -1,4 +1,5 @@
 <template>
+  <div class="row margin-input">
     <div class="col-12">
       <div class="row justify-between">
         <p class="input-caption">{{ caption }}</p>
@@ -10,6 +11,7 @@
         />
       </q-field>
     </div>
+  </div>
 </template>
 
 <script>
@@ -44,5 +46,10 @@ export default {
   .bg-negative
     background: none !important
     color: inherit !important
+
+  .margin-input
+    margin-bottom: 6px
+    &.last
+      margin-bottom: 24px
 
 </style>

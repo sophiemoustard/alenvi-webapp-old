@@ -88,9 +88,7 @@
         <ni-modal-input caption="Taux horaire" :error="$v.newContract.grossHourlyRate.$error" type="number" v-model="newContract.grossHourlyRate"
           @blur="$v.newContract.grossHourlyRate.$touch" suffix="€"
         />
-        <div class="row margin-input">
-          <ni-modal-datetime-picker caption="Date d'effet" :error="$v.newContract.startDate.$error" v-model="newContract.startDate" />
-        </div>
+        <ni-modal-datetime-picker caption="Date d'effet" :error="$v.newContract.startDate.$error" v-model="newContract.startDate" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer le contrat" icon-right="add" color="primary" :loading="loading" @click="createNewContract" />
     </q-modal>
@@ -112,12 +110,9 @@
         <ni-modal-input caption="Taux horaire"  :error="$v.newContractVersion.grossHourlyRate.$error" v-model="newContractVersion.grossHourlyRate"
           type="number" @blur="$v.newContractVersion.grossHourlyRate.$touch" suffix="€"
         />
-        <!-- use of v-if because if we don't it directly renders, so it calls :min getActiveVersion function and throw error because there is no contract selected yet -->
-        <div class="row margin-input">
-          <ni-modal-datetime-picker caption="Date d'effet" :error="$v.newContractVersion.startDate.$error" v-model="newContractVersion.startDate"
-            :min="getMinimalStartDate(contractSelected)"
-          />
-        </div>
+        <ni-modal-datetime-picker caption="Date d'effet" :error="$v.newContractVersion.startDate.$error" v-model="newContractVersion.startDate"
+          :min="getMinimalStartDate(contractSelected)"
+        />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer l'avenant" icon-right="add" color="primary" :loading="loading" @click="createNewContractVersion" />
     </q-modal>
@@ -133,9 +128,7 @@
             <span><q-icon name="clear" size="1rem" @click.native="endContractModal = false" /></span>
           </div>
         </div>
-        <div class="row margin-input">
-          <ni-modal-datetime-picker caption="Date de fin de contrat" v-model="endContractData.date" />
-        </div>
+        <ni-modal-datetime-picker caption="Date de fin de contrat" v-model="endContractData.date" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Mettre fin au contrat" icon-right="clear" color="primary" :loading="loading" @click="endContract" />
     </q-modal>
