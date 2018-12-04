@@ -108,7 +108,6 @@
 <script>
 import { Cookies } from 'quasar';
 import { required } from 'vuelidate/lib/validators';
-import { alenviAxios } from '../../api/ressources/alenviAxios'
 import { NotifyNegative, NotifyPositive } from '../popup/notify';
 
 export default {
@@ -268,27 +267,21 @@ export default {
     },
   },
   async mounted () {
-    try {
-      const user = await this.$users.getById(this.getUser._id);
-      this.absences = user.administrative.absences;
-    } catch (e) {
-      console.error(e);
-    }
+    this.refreshUser();
   },
   methods: {
     async addAbsence () {
       try {
-        this.newAbsence.startDate = this.$moment(this.newAbsence.startDate).set({ hour: this.durations[this.newAbsence.startDuration].start }).toDate();
+        const payload = {
+          ...this.newAbsence,
+          startDate: this.$moment(this.newAbsence.startDate).set({ hour: this.durations[this.newAbsence.startDuration].start }).toDate(),
+        };
         if (this.newAbsence.endDuration !== '') {
-          this.newAbsence.endDate = this.$moment(this.newAbsence.endDate).set({ hour: this.durations[this.newAbsence.endDuration].end }).toDate();
+          payload.endDate = this.$moment(this.newAbsence.endDate).set({ hour: this.durations[this.newAbsence.endDuration].end }).toDate();
         } else {
-          this.newAbsence.endDate = this.$moment(this.newAbsence.endDate).set({ hour: this.durations[this.newAbsence.startDuration].end }).toDate();
+          payload.endDate = this.$moment(this.newAbsence.endDate).set({ hour: this.durations[this.newAbsence.startDuration].end }).toDate();
         }
-        const test = await alenviAxios({
-          url: `${process.env.API_HOSTNAME}/users/${this.getUser._id}/absences`,
-          method: 'POST',
-          data: this.newAbsence
-        });
+        await this.$users.createAbsence(this.getUser._id, payload);
       } catch (e) {
         console.error(e);
       } finally {
@@ -298,11 +291,8 @@ export default {
           startDate: '',
           endDate: ''
         };
-        const absencesRaw = await alenviAxios({
-          url: `${process.env.API_HOSTNAME}/users/${this.getUser._id}/absences`,
-          method: 'GET'
-        })
-        this.absences = absencesRaw.data.data.absences;
+        const absencesRaw = await this.$users.getAbsences(this.getUser._id);
+        this.absences = absencesRaw;
       }
     },
     failMsg () {
@@ -332,11 +322,9 @@ export default {
           message: 'Etes-vous sûr de vouloir supprimer cette absence ?',
           ok: 'OK',
           cancel: 'Annuler'
-        })
-        await alenviAxios({
-          url: `${process.env.API_HOSTNAME}/users/${this.getUser._id}/absences/${id}`,
-          method: 'DELETE'
-        })
+        });
+        const payload = { userId: this.getUser._id, absenceId: id };
+        await this.$users.deleteAbsence(payload);
         this.absences.splice(cell, 1);
         NotifyPositive('Absence supprimée.');
       } catch (e) {

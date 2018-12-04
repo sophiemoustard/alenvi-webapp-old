@@ -74,5 +74,15 @@ export default {
   async createContractVersion (queries, data) {
     const versionCreated = await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${queries.userId}/contracts/${queries.mainContractId}/versions`, data);
     return versionCreated;
-  }
+  },
+  async createAbsence (userId, payload) {
+    await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${userId}/absences`, payload);
+  },
+  async getAbsences (userId) {
+    const absencesRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/${userId}/absences`);
+    return absencesRaw.data.data.absences;
+  },
+  async deleteAbsence (queries) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/users/${queries.userId}/absences/${queries.absenceId}`);
+  },
 }
