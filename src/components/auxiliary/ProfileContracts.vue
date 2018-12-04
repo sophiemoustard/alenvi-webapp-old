@@ -89,17 +89,7 @@
           @blur="$v.newContract.grossHourlyRate.$touch" suffix="€"
         />
         <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Date d'effet</p>
-              <q-icon v-if="$v.newContract.startDate.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newContract.startDate.$error" error-label="Champ requis">
-              <q-datetime type="date" format="DD/MM/YYYY" v-model="newContract.startDate" color="white" inverted-light popover
-              ok-label="OK"
-              cancel-label="Fermer" />
-            </q-field>
-          </div>
+          <ni-modal-datetime-picker caption="Date d'effet" :error="$v.newContract.startDate.$error" v-model="newContract.startDate" />
         </div>
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer le contrat" icon-right="add" color="primary" :loading="loading" @click="createNewContract" />
@@ -123,17 +113,10 @@
           type="number" @blur="$v.newContractVersion.grossHourlyRate.$touch" suffix="€"
         />
         <!-- use of v-if because if we don't it directly renders, so it calls :min getActiveVersion function and throw error because there is no contract selected yet -->
-        <div v-if="newContractVersionModal" class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Date d'effet</p>
-              <q-icon v-if="$v.newContractVersion.startDate.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newContractVersion.startDate.$error" error-label="Champ requis">
-              <q-datetime type="date" format="DD/MM/YYYY" v-model="newContractVersion.startDate" :min="getMinimalStartDate(contractSelected)" color="white" inverted-light popover
-                ok-label="OK" cancel-label="Fermer" />
-            </q-field>
-          </div>
+        <div class="row margin-input">
+          <ni-modal-datetime-picker caption="Date d'effet" :error="$v.newContractVersion.startDate.$error" v-model="newContractVersion.startDate"
+            :min="getMinimalStartDate(contractSelected)"
+          />
         </div>
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer l'avenant" icon-right="add" color="primary" :loading="loading" @click="createNewContractVersion" />
@@ -151,20 +134,11 @@
           </div>
         </div>
         <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Date de fin de contrat</p>
-            </div>
-            <q-field>
-              <q-datetime type="date" format="DD/MM/YYYY" v-model="endContractData.date" color="white" inverted-light popover
-              ok-label="OK" cancel-label="Fermer" />
-            </q-field>
-          </div>
+          <ni-modal-datetime-picker caption="Date de fin de contrat" v-model="endContractData.date" />
         </div>
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Mettre fin au contrat" icon-right="clear" color="primary" :loading="loading" @click="endContract" />
     </q-modal>
-
   </div>
 </template>
 
@@ -174,11 +148,13 @@ import { required } from 'vuelidate/lib/validators';
 import { alenviAxios } from '../../api/ressources/alenviAxios';
 import ModalSelect from '../form/ModalSelect.vue';
 import ModalInput from '../form/ModalInput.vue';
+import ModalDatetimePicker from '../form/ModalDatetimePicker.vue';
 
 export default {
   components: {
     'ni-modal-select': ModalSelect,
     'ni-modal-input': ModalInput,
+    'ni-modal-datetime-picker': ModalDatetimePicker,
   },
   data () {
     return {
@@ -324,14 +300,14 @@ export default {
   },
   methods: {
     getActiveVersion (contract) {
-      return contract.versions.find(version => version.isActive);
+      return contract.versions ? contract.versions.find(version => version.isActive) : null;
     },
     getLastVersion (contract) {
       return this.$_.orderBy(contract.versions, ['startDate'], ['desc'])[0];
     },
     getMinimalStartDate (contract) {
       const activeVersion = this.getActiveVersion(contract);
-      return this.$moment(activeVersion.startDate).add(1, 'd').format();
+      return activeVersion && this.$moment(activeVersion.startDate).add(1, 'd').format();
     },
     cardTitle (contractEndDate) {
       if (this.$moment().isBefore(contractEndDate)) {
