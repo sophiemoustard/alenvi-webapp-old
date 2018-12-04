@@ -131,7 +131,7 @@
 <script>
 import { Cookies } from 'quasar';
 import { required } from 'vuelidate/lib/validators';
-import { alenviAxios } from '../api/ressources/alenviAxios'
+import { alenviAxios } from '../../api/ressources/alenviAxios'
 
 export default {
   data () {

@@ -331,22 +331,22 @@ import { Cookies, openURL } from 'quasar';
 import { required, email, numeric, minLength, maxLength, requiredIf } from 'vuelidate/lib/validators';
 import 'vue-croppa/dist/vue-croppa.css'
 
-import { frPhoneNumber, iban, frZipCode, bic } from '../helpers/vuelidateCustomVal';
-import { extend } from '../helpers/utils.js';
+import { frPhoneNumber, iban, frZipCode, bic } from '../../helpers/vuelidateCustomVal';
+import { extend } from '../../helpers/utils.js';
 
-import gdrive from '../api/GoogleDrive.js';
-import cloudinary from '../api/Cloudinary.js';
+import gdrive from '../../api/GoogleDrive.js';
+import cloudinary from '../../api/Cloudinary.js';
 
-import nationalities from '../data/nationalities.js';
-import countries from '../data/countries.js';
+import nationalities from '../../data/nationalities.js';
+import countries from '../../data/countries.js';
 
-import SelectSector from './form/SelectSector';
+import SelectSector from '../form/SelectSector';
 
-import Input from './form/Input.vue';
-import Select from './form/Select.vue';
-import FileUploader from './form/FileUploader.vue';
-import MultipleFilesUploader from './form/MultipleFilesUploader.vue';
-import DatetimePicker from './form/DatetimePicker.vue';
+import Input from '../form/Input.vue';
+import Select from '../form/Select.vue';
+import FileUploader from '../form/FileUploader.vue';
+import MultipleFilesUploader from '../form/MultipleFilesUploader.vue';
+import DatetimePicker from '../form/DatetimePicker.vue';
 
 export default {
   components: {

@@ -13,11 +13,11 @@
 
 import ProfileHeader from '../../components/ProfileHeader';
 import ProfileTabs from '../../components/ProfileTabs';
-import ProfileInfo from '../../components/ProfileInfo';
-import ProfileTasks from '../../components/ProfileTasks';
-import ProfileContracts from '../../components/ProfileContracts';
-import ProfileSalaries from '../../components/ProfileSalaries';
-import ProfileAbsences from '../../components/ProfileAbsences';
+import ProfileInfo from '../../components/auxiliary/ProfileInfo';
+import ProfileTasks from '../../components/auxiliary/ProfileTasks';
+import ProfileContracts from '../../components/auxiliary/ProfileContracts';
+import ProfileSalaries from '../../components/auxiliary/ProfileSalaries';
+import ProfileAbsences from '../../components/auxiliary/ProfileAbsences';
 
 export default {
   props: ['id'],
