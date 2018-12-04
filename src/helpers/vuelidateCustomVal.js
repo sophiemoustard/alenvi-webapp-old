@@ -3,7 +3,7 @@ const axios = require('axios');
 
 export const frPhoneNumber = (value) => {
   if (!value) {
-    return false;
+    return true;
   }
   return value.split(' ').join('').match(/[0]{1}[1-7]{1}[0-9]{8}/) || false;
 };
