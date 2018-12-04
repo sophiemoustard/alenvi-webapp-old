@@ -6,22 +6,10 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Prénom</p>
-          </div>
-          <q-field>
-            <q-input v-model="customer.identity.firstname" color="white" inverted-light @focus="saveTmp('identity.firstname')"
-              @blur="updateUser({ alenvi: 'identity.firstname', ogust: 'first_name' })" />
-          </q-field>
+          <ni-input caption="Prénom" v-model="customer.identity.firstname" @myFocus="saveTmp('identity.firstname')" @myBlur="updateUser({ alenvi: 'identity.firstname', ogust: 'first_name' })" />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Nom</p>
-          </div>
-          <q-field :error="$v.customer.identity.lastname.$error" error-label="Champ requis">
-            <q-input v-model="customer.identity.lastname" color="white" inverted-light @focus="saveTmp('identity.lastname')"
-              @blur="updateUser({ alenvi: 'identity.lastname', ogust: 'last_name' })" />
-          </q-field>
+          <ni-input caption="Nom" :error="$v.customer.identity.lastname.$error" errorLabel="Champ requis" v-model="customer.identity.lastname" @myFocus="saveTmp('identity.lastname')" @myBlur="updateUser({ alenvi: 'identity.lastname', ogust: 'last_name' })" />
         </div>
         <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
@@ -41,13 +29,8 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Téléphone</p>
-          </div>
-          <q-field :error="$v.customer.contact.phone.$error" error-label="Numéro de téléphone non valide">
-            <q-input v-model.trim="customer.contact.phone" type="tel" color="white" inverted-light @focus="saveTmp('contact.phone')"
-              @blur="updateUser({ alenvi: 'contact.phone', ogust: 'mobile_phone' })" />
-          </q-field>
+          <ni-input caption="Téléphone" type="tel" :error="$v.customer.contact.phone.$error" errorLabel="Numéro de téléphone non valide"
+            v-model.trim="customer.contact.phone" @myFocus="saveTmp('contact.phone')" @blur="updateUser({ alenvi: 'contact.phone', ogust: 'mobile_phone' })" />
         </div>
         <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
@@ -60,22 +43,7 @@
           </q-field>
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Code porte</p>
-          </div>
-          <q-field>
-            <q-input v-model="customer.contact.doorCode" color="white" inverted-light @focus="saveTmp('contact.doorCode')"
-              @blur="updateUser({ alenvi: 'contact.doorCode', ogust: 'door_code' })" />
-          </q-field>
-        </div>
-        <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Code interphone</p>
-          </div>
-          <q-field>
-            <q-input v-model="customer.contact.intercomCode" color="white" inverted-light @focus="saveTmp('contact.intercomCode')"
-              @blur="updateUser({ alenvi: 'contact.intercomCode', ogust: 'intercom_code' })" />
-          </q-field>
+          <ni-input caption="Code porte" v-model="customer.contact.doorCode" @myFocus="saveTmp('contact.doorCode')" @blur="updateUser({ alenvi: 'contact.doorCode', ogust: 'door_code' })" />
         </div>
       </div>
     </div>
@@ -85,30 +53,16 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Nom associé au compte bancaire</p>
-          </div>
-          <q-field :error="$v.customer.payment.bankAccountOwner.$error" error-label="Champ requis">
-            <q-input v-model="customer.payment.bankAccountOwner" color="white" inverted-light @focus="saveTmp('payment.bankAccountOwner')"
-              @blur="updateUser({ alenvi: 'payment.bankAccountOwner', ogust: 'holder' })" />
-          </q-field>
+          <ni-input caption="Nom associé au compte bancaire" :error="$v.customer.payment.bankAccountOwner.$error" errorLabel="Champ requis"
+            v-model="customer.payment.bankAccountOwner" @myFocus="saveTmp('payment.bankAccountOwner')" @blur="updateUser({ alenvi: 'payment.bankAccountOwner', ogust: 'holder' })" />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">IBAN</p>
-          </div>
-          <q-field :error="$v.customer.payment.iban.$error" error-label="IBAN non valide">
-            <q-input v-model="customer.payment.iban" color="white" inverted-light @focus="saveTmp('payment.iban')"
-              @blur="updateUser({ alenvi: 'payment.iban', ogust: 'iban_number' })" />
-          </q-field>
+          <ni-input caption="IBAN" :error="$v.customer.payment.iban.$error" errorLabel="IBAN non valide"
+            v-model="customer.payment.iban" @myFocus="saveTmp('payment.iban')" @blur="updateUser({ alenvi: 'payment.iban', ogust: 'iban_number' })" />
         </div>
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">BIC</p>
-          </div>
-          <q-field :error="$v.customer.payment.bic.$error" error-label="BIC non valide">
-            <q-input v-model="customer.payment.bic" color="white" inverted-light @focus="saveTmp('payment.bic')" @blur="updateUser({ alenvi: 'payment.bic', ogust: 'bic_number' })" />
-          </q-field>
+          <ni-input caption="BIC" :error="$v.customer.payment.bic.$error" errorLabel="BIC non valide"
+            v-model="customer.payment.bic" @myFocus="saveTmp('payment.bic')" @blur="updateUser({ alenvi: 'payment.bic', ogust: 'bic_number' })" />
         </div>
       </div>
     </div>
@@ -129,26 +83,54 @@
         </div>
       </div>
     </div>
-    <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Ajouter un aidant" @click="goToAddHelperPage" />
+    <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Ajouter un aidant" @click="opened = true" />
+    <q-modal v-model="opened" @hide="resetForm" :content-css="modalCssContainer">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-8">
+            <h5>Ajouter une <span class="text-weight-bold">personne</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer" style="text-align: right">
+            <span><q-icon name="clear" size="1rem" @click.native="opened = false" /></span>
+          </div>
+        </div>
+        <ni-modal-input v-model="newHelper.lastname" :error="$v.newHelper.lastname.$error" caption="Nom" @blur="$v.newHelper.lastname.$touch" errorLabel="Champ requis" />
+        <ni-modal-input v-model="newHelper.firstname" :error="$v.newHelper.firstname.$error" caption="Prénom" @blur="$v.newHelper.firstname.$touch" errorLabel="Champ requis" />
+        <ni-modal-input v-model="newHelper.local.email" last :error="$v.newHelper.local.email.$error" caption="Email" @blur="$v.newHelper.local.email.$touch" :errorLabel="emailError" />
+      </div>
+      <q-btn no-caps class="full-width modal-btn" label="Ajouter un aidant" icon-right="add" color="primary" :loading="loading" @click="submit" />
+    </q-modal>
   </div>
 </template>
 
 <script>
-import { required } from 'vuelidate/lib/validators';
+import { required, email } from 'vuelidate/lib/validators';
+import randomize from 'randomatic';
 
-import { extend } from '../../helpers/utils.js';
+import { extend, clear } from '../../helpers/utils.js';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify.js';
-import SearchAddress from '../../components/form/SearchAddress';
+import SearchAddress from '../form/SearchAddress';
+import Input from '../form/Input.vue';
+import NiModalInput from '../form/ModalInput';
+import NiModalSelect from '../form/ModalSelect';
 import { frPhoneNumber, iban, bic, frAddress } from '../../helpers/vuelidateCustomVal';
 
 export default {
   components: {
-    'ni-search-address': SearchAddress,
+    NiSearchAddress: SearchAddress,
+    NiInput: Input,
+    NiModalInput,
+    NiModalSelect
   },
   data () {
     return {
+      loading: false,
+      opened: false,
       isLoaded: false,
       tmpInput: '',
+      modalCssContainer: {
+        minWidth: '30vw'
+      },
       customer: {
         identity: {},
         contact: {
@@ -170,6 +152,14 @@ export default {
           field: 'firstname'
         },
         {
+          name: 'startDate',
+          label: 'Depuis le...',
+          field: 'createdAt',
+          align: 'left',
+          format: (value) => this.$moment(value).format('DD/MM/YYYY'),
+          sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
+        },
+        {
           name: 'remove',
           label: '',
           align: 'left',
@@ -177,7 +167,12 @@ export default {
           style: 'width: 50px'
         }
       ],
-      userHelpers: []
+      userHelpers: [],
+      newHelper: {
+        lastname: '',
+        firstname: '',
+        local: { email: '' }
+      }
     }
   },
   computed: {
@@ -203,6 +198,13 @@ export default {
       } else if (!this.$v.customer.payment.bic.bic) {
         return 'BIC non valide';
       }
+    },
+    emailError () {
+      if (!this.$v.newHelper.local.email.required) {
+        return 'Champ requis';
+      } else if (!this.$v.newHelper.local.email.email) {
+        return 'Email non valide';
+      }
     }
   },
   validations: {
@@ -220,6 +222,13 @@ export default {
         bankAccountOwner: { required },
         bic: { required, bic },
         iban: { required, iban }
+      }
+    },
+    newHelper: {
+      lastname: { required },
+      firstname: { required },
+      local: {
+        email: { required, email }
       }
     }
   },
@@ -356,8 +365,65 @@ export default {
         }
       })
     },
-    goToAddHelperPage () {
-      this.$router.push({ name: 'helpers directory', query: { openmodal: true, customerid: this.userProfile._id } });
+    async createOgustHelper () {
+      const payload = {
+        id_customer: this.userProfile.customerId.toString(),
+        last_name: this.newHelper.lastname,
+        first_name: this.newHelper.firstname,
+        email: this.newHelper.local.email
+      };
+      const newHelper = await this.$ogust.createContact(payload);
+      return newHelper;
+    },
+    async createAlenviHelper () {
+      this.newHelper.local.password = randomize('0', 6);
+      this.newHelper.customers = [this.userProfile._id];
+      this.newHelper.role = 'Aidants';
+      await this.$users.create(this.newHelper);
+    },
+    async sendWelcomingEmail () {
+      await this.$email.sendWelcome({
+        sender: { email: 'support@alenvi.io' },
+        receiver: {
+          email: this.newHelper.local.email,
+          password: this.newHelper.local.password
+        }
+      });
+    },
+    async submit () {
+      try {
+        this.loading = true;
+        this.$v.newHelper.$touch();
+        if (this.$v.newHelper.$error) {
+          throw new Error('Invalid fields');
+        }
+        const newHelper = await this.createOgustHelper();
+        this.newHelper.ogustInterlocId = newHelper.data.data.contact.id_interloc;
+        await this.createAlenviHelper();
+        NotifyPositive('Aidant créé');
+        await this.sendWelcomingEmail();
+        NotifyPositive('Email envoyé');
+        await this.getUserHelpers();
+        this.opened = false
+      } catch (e) {
+        console.error(e);
+        if (e && e.message === 'Invalid fields') {
+          this.loading = false;
+          NotifyWarning('Champ(s) invalide(s)');
+          return;
+        }
+        if (e && e.response && e.response.status === 409) {
+          NotifyNegative('Cet email est déjà utilisé par un compte existant');
+          return;
+        }
+        NotifyNegative('Erreur lors de la création de l\'aidant');
+      } finally {
+        this.loading = false;
+      }
+    },
+    resetForm () {
+      this.$v.newHelper.$reset();
+      this.newHelper = Object.assign({}, clear(this.newHelper));
     }
   }
 }
@@ -369,13 +435,15 @@ export default {
     box-shadow: none
     background: white
 
-  .bg-negative
-    background: white !important
-    color: inherit !important
-
   .fab-add-person
     right: 60px
     bottom: 18px
     font-size: 16px
     z-index: 2
+
+  .modal
+    &-padding
+      padding: 24px 58px 0px 58px
+    &-btn
+      border-radius: 0
 </style>

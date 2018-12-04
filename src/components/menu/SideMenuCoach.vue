@@ -28,7 +28,6 @@
         <q-item-main :class="{'text-weight-bold': activeRoutes.benef.highlight }" label="Bénéficiaires" />
       </template>
       <ni-menu-item name="customers directory" icon="contacts" label="Répertoire bénéficiaires" />
-      <ni-menu-item name="helpers directory" icon="people" label="Aidants" />
     </q-collapsible>
     <q-item-separator />
     <ni-side-menu-footer :label="userFirstnameUpper" :userId="user._id" />
