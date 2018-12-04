@@ -88,7 +88,7 @@
           <div class="row justify-between">
             <p class="input-caption">Nom associé au compte bancaire</p>
           </div>
-          <q-field>
+          <q-field :error="$v.customer.payment.bankAccountOwner.$error" error-label="Champ requis">
             <q-input v-model="customer.payment.bankAccountOwner" color="white" inverted-light @focus="saveTmp('payment.bankAccountOwner')"
               @blur="updateUser({ alenvi: 'payment.bankAccountOwner', ogust: 'holder' })" />
           </q-field>
@@ -217,6 +217,7 @@ export default {
         }
       },
       payment: {
+        bankAccountOwner: { required },
         bic: { required, bic },
         iban: { required, iban }
       }
