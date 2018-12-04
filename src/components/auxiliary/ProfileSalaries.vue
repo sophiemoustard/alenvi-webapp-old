@@ -45,8 +45,6 @@ export default {
     },
     userLastContract () {
       return this.contracts.find(contract => contract.isActive);
-      // const moments = this.contracts.map(contract => this.$moment(contract.startDate));
-      // return this.contracts.find(contract => { return this.$moment.max(moments).toISOString() === contract.startDate });
     },
     userCurrentMonthContracts () {
       return this.contracts.filter(contract => this.$moment(contract.endDate).month() === this.$moment().month() ||
@@ -57,16 +55,13 @@ export default {
     },
     salary () {
       if (!this.userLastContract && this.userCurrentMonthContracts.length === 0) return 0;
-      // console.log('CURRENT CONTRACTS', this.userCurrentMonthContracts);
       const workingDays = this.currentWorkingDays.length;
       if (this.userCurrentMonthContracts.length > 1) {
         let salary = 0;
         for (let i = 0, l = this.userCurrentMonthContracts.length; i < l; i++) {
           const effectiveWorkingDays = this.calculateEffectiveWorkingDays(this.userCurrentMonthContracts[i]);
-          // console.log('EFF', effectiveWorkingDays);
           const { grossHourlyRate, weeklyHours } = this.userCurrentMonthContracts[i];
           salary += Number.parseFloat((effectiveWorkingDays / workingDays) * 4.33 * grossHourlyRate * weeklyHours);
-          // console.log('SALARY', Number.parseFloat((effectiveWorkingDays / workingDays) * 4.33 * grossHourlyRate * weeklyHours));
         }
         return salary.toFixed(2);
       } else {
