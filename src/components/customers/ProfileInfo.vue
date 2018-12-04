@@ -138,6 +138,7 @@ import { required } from 'vuelidate/lib/validators';
 
 import { extend } from '../../helpers/utils.js';
 import SearchAddress from '../../components/SearchAddress';
+import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify.js';
 import { frPhoneNumber, iban, bic, frAddress } from '../../helpers/vuelidateCustomVal';
 
 export default {
@@ -183,9 +184,6 @@ export default {
     userProfile () {
       return this.$store.getters['rh/getUserProfile'];
     },
-    // userHelpers () {
-    //   return this.userProfile.helpers;
-    // },
     addressError () {
       if (!this.$v.customer.contact.address.fullAddress.required) {
         return 'Champ requis';
@@ -272,22 +270,13 @@ export default {
         } else {
           await this.updateOgustCustomer(paths);
         }
-        this.$q.notify({
-          color: 'positive',
-          icon: 'done',
-          detail: 'Modification enregistrée',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyPositive('Modification enregistrée');
       } catch (e) {
         console.error(e);
-        this.$q.notify({
-          color: e.message === 'Champ(s) invalide(s)' ? 'warning' : 'negative',
-          icon: 'warning',
-          detail: e.message === 'Champ(s) invalide(s)' ? e.message : 'Erreur lors de la modification',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        if (e.message === 'Champ(s) invalide(s)') {
+          return NotifyWarning(e.message)
+        }
+        NotifyNegative('Erreur lors de la modification');
       } finally {
         this.$store.commit('rh/saveUserProfile', this.customer);
         this.tmpInput = '';
@@ -343,25 +332,12 @@ export default {
         const { ogustInterlocId } = helper;
         await this.$ogust.deleteContact(ogustInterlocId);
         await this.$users.deleteById(helperId);
+        NotifyPositive('Aidant supprimé');
         await this.getUserHelpers();
       } catch (e) {
         console.error(e);
       }
     },
-    // async removeHelper (helperId) {
-    //   try {
-    //     await this.$q.dialog({
-    //       title: 'Confirmation',
-    //       message: 'Es-tu sûr(e) de vouloir supprimer cet aidant ?',
-    //       ok: true,
-    //       cancel: 'Annuler'
-    //     });
-    //     await this.$customers.removeHelper({ _id: this.userProfile._id, helperId });
-    //     this.$store.dispatch('rh/getUserProfile', { customerId: this.userProfile._id });
-    //   } catch (e) {
-    //     console.error(e);
-    //   }
-    // },
     waitForValidation (path) {
       return new Promise((resolve) => {
         if (path === 'contact.address') {
