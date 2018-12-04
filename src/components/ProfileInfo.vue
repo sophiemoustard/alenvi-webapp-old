@@ -54,17 +54,17 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <ni-input-with-errors caption="Prénom" :error="$v.user.alenvi.firstname.$error" v-model="user.alenvi.firstname"
+          <ni-input caption="Prénom" :error="$v.user.alenvi.firstname.$error" v-model="user.alenvi.firstname"
             @myBlur="updateUser({ alenvi: 'firstname', ogust: 'first_name' })" @myFocus="saveTmp('firstname')"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <ni-input-with-errors caption="Nom" :error="$v.user.alenvi.lastname.$error" v-model="user.alenvi.lastname"
+          <ni-input caption="Nom" :error="$v.user.alenvi.lastname.$error" v-model="user.alenvi.lastname"
             @myBlur="updateUser({ alenvi: 'lastname', ogust: 'last_name' })" @myFocus="saveTmp('lastname')"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <ni-select-with-errors caption="Nationalité" :error="$v.user.alenvi.administrative.identity.nationality.$error" :options="nationalitiesOptions"
+          <ni-select caption="Nationalité" :error="$v.user.alenvi.administrative.identity.nationality.$error" :options="nationalitiesOptions"
             v-model="user.alenvi.administrative.identity.nationality" @myFocus="saveTmp('administrative.identity.nationality')"
             @myBlur="updateUser({ alenvi: 'administrative.identity.nationality', ogust: 'nationality' })"
           />
@@ -76,25 +76,25 @@
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <ni-select-with-errors caption="Pays de naissance" :error="$v.user.alenvi.administrative.identity.birthCountry.$error" :options="nationalitiesOptions"
+          <ni-select caption="Pays de naissance" :error="$v.user.alenvi.administrative.identity.birthCountry.$error" :options="nationalitiesOptions"
             v-model="user.alenvi.administrative.identity.birthCountry" @myFocus="saveTmp('administrative.identity.birthCountry')"
             @myBlur="updateUser({ alenvi: 'administrative.identity.birthCountry', ogust: 'country_of_birth' })"
           />
         </div>
         <div v-if="this.user.alenvi.administrative.identity.birthCountry === 'FR'" class="col-xs-12 col-md-6">
-          <ni-input-with-errors caption="Département de naissance" :error="$v.user.alenvi.administrative.identity.birthState.$error" :errorLabel="birthStateError"
+          <ni-input caption="Département de naissance" :error="$v.user.alenvi.administrative.identity.birthState.$error" :errorLabel="birthStateError"
             v-model="user.alenvi.administrative.identity.birthState" @myBlur="updateUser({ alenvi: 'administrative.identity.birthState', ogust: 'state_of_birth' })"
             @myFocus="saveTmp('administrative.identity.birthState')"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <ni-input-with-errors caption="Ville de naissance" :error="$v.user.alenvi.administrative.identity.birthCity.$error"
+          <ni-input caption="Ville de naissance" :error="$v.user.alenvi.administrative.identity.birthCity.$error"
             v-model="user.alenvi.administrative.identity.birthCity" @myFocus="saveTmp('administrative.identity.birthCity')"
             @myBlur="updateUser({ alenvi: 'administrative.identity.birthCity', ogust: 'place_of_birth' })"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <ni-input-with-errors caption="Numéro de sécurité sociale" :error="$v.user.alenvi.administrative.identity.socialSecurityNumber.$error"
+          <ni-input caption="Numéro de sécurité sociale" :error="$v.user.alenvi.administrative.identity.socialSecurityNumber.$error"
             v-model="user.alenvi.administrative.identity.socialSecurityNumber" @myFocus="saveTmp('administrative.identity.socialSecurityNumber')"
             @myBlur="updateUser({ alenvi: 'administrative.identity.socialSecurityNumber', ogust: 'social_insurance_number' })" :errorLabel="ssnError"
           />
@@ -108,17 +108,17 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <ni-input-with-errors caption="Numéro de téléphone" :error="$v.user.alenvi.mobilePhone.$error" :errorLabel="phoneNbrError" type="tel"
+          <ni-input caption="Numéro de téléphone" :error="$v.user.alenvi.mobilePhone.$error" :errorLabel="phoneNbrError" type="tel"
             v-model.trim="user.alenvi.mobilePhone" @myBlur="updateUser({ alenvi: 'mobilePhone', ogust: 'mobile_phone' })" @myFocus="saveTmp('mobilePhone')"
           />
         </div>
         <div v-if="currentUser.role.name !== 'Auxiliaire'" class="col-xs-12 col-md-6">
-          <ni-input-with-errors caption="Adresse email" :error="$v.user.alenvi.local.email.$error" :errorLabel="emailError" type="email" lowerCase disable
+          <ni-input caption="Adresse email" :error="$v.user.alenvi.local.email.$error" :errorLabel="emailError" type="email" lowerCase disable
             v-model.trim="user.alenvi.local.email" @myBlur="updateUser({ alenvi: 'local.email', ogust: 'email' })" @myFocus="saveTmp('local.email')"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <ni-input-with-errors caption="Adresse, numéro et rue" v-model="user.alenvi.administrative.contact.address"
+          <ni-input caption="Adresse, numéro et rue" v-model="user.alenvi.administrative.contact.address"
             @myBlur="updateUser({ alenvi: 'administrative.contact.address', ogust: 'line' })" @myFocus="saveTmp('administrative.contact.address')"
             :error="$v.user.alenvi.administrative.contact.address.$error"
           />
@@ -130,13 +130,13 @@
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <ni-input-with-errors caption="Code postal" :error="$v.user.alenvi.administrative.contact.zipCode.$error" :errorLabel="zipCodeError"
+          <ni-input caption="Code postal" :error="$v.user.alenvi.administrative.contact.zipCode.$error" :errorLabel="zipCodeError"
             v-model="user.alenvi.administrative.contact.zipCode" @myFocus="saveTmp('administrative.contact.zipCode')"
             @myBlur="updateUser({ alenvi: 'administrative.contact.zipCode', ogust: 'zip' })"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <ni-input-with-errors caption="Ville" :error="$v.user.alenvi.administrative.contact.city.$error" v-model="user.alenvi.administrative.contact.city"
+          <ni-input caption="Ville" :error="$v.user.alenvi.administrative.contact.city.$error" v-model="user.alenvi.administrative.contact.city"
             @myBlur="updateUser({ alenvi: 'administrative.contact.city', ogust: 'city' })" @myFocus="saveTmp('administrative.contact.city')"
           />
         </div>
@@ -149,13 +149,13 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <ni-input-with-errors caption="Prénom et nom" :error="$v.user.alenvi.administrative.emergencyContact.name.$error"
+          <ni-input caption="Prénom et nom" :error="$v.user.alenvi.administrative.emergencyContact.name.$error"
             v-model="user.alenvi.administrative.emergencyContact.name" @myFocus="saveTmp('administrative.emergencyContact.name')"
             @myBlur="updateUser({ alenvi: 'administrative.emergencyContact.name' })"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <ni-input-with-errors caption="Numéro de téléphone" :error="$v.user.alenvi.administrative.emergencyContact.phoneNumber.$error"
+          <ni-input caption="Numéro de téléphone" :error="$v.user.alenvi.administrative.emergencyContact.phoneNumber.$error"
             v-model.trim="user.alenvi.administrative.emergencyContact.phoneNumber" @myFocus="saveTmp('administrative.emergencyContact.phoneNumber')"
             @myBlur="updateUser({ alenvi: 'administrative.emergencyContact.phoneNumber' })" :errorLabel="emergencyPhoneNbrError"
           />
@@ -169,13 +169,13 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <ni-input-with-errors caption="IBAN" :error="$v.user.alenvi.administrative.payment.rib.iban.$error" :errorLabel="ibanError"
+          <ni-input caption="IBAN" :error="$v.user.alenvi.administrative.payment.rib.iban.$error" :errorLabel="ibanError"
           v-model="user.alenvi.administrative.payment.rib.iban" @myFocus="saveTmp('administrative.payment.rib.iban')" upperCase
             @myBlur="updateUser({ alenvi: 'administrative.payment.rib.iban', ogust: 'iban_number' })"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <ni-input-with-errors caption="BIC" :error="$v.user.alenvi.administrative.payment.rib.bic.$error" :errorLabel="bicError" upperCase
+          <ni-input caption="BIC" :error="$v.user.alenvi.administrative.payment.rib.bic.$error" :errorLabel="bicError" upperCase
             v-model.trim="user.alenvi.administrative.payment.rib.bic" @myFocus="saveTmp('administrative.payment.rib.bic')"
             @myBlur="updateUser({ alenvi: 'administrative.payment.rib.bic', ogust: 'bic_number' })"
           />
@@ -342,8 +342,8 @@ import countries from '../data/countries.js';
 
 import SelectSector from './form/SelectSector';
 
-import InputWithErrors from './form/InputWithErrors.vue';
-import SelectWithErrors from './form/SelectWithErrors.vue';
+import Input from './form/Input.vue';
+import Select from './form/Select.vue';
 import FileUploader from './form/FileUploader.vue';
 import MultipleFilesUploader from './form/MultipleFilesUploader.vue';
 import DatetimePicker from './form/DatetimePicker.vue';
@@ -351,8 +351,8 @@ import DatetimePicker from './form/DatetimePicker.vue';
 export default {
   components: {
     'ni-select-sector': SelectSector,
-    'ni-input-with-errors': InputWithErrors,
-    'ni-select-with-errors': SelectWithErrors,
+    'ni-input': Input,
+    'ni-select': Select,
     'ni-file-uploader': FileUploader,
     'ni-multiple-files-uploader': MultipleFilesUploader,
     'ni-datetime-picker': DatetimePicker,
