@@ -220,7 +220,7 @@ export default {
         },
         {
           name: 'contractSigned',
-          label: 'Contract signé',
+          label: 'Contrat signé',
           align: 'center',
           field: 'contractSigned',
           sortable: false

@@ -23,7 +23,7 @@
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <ni-input  caption="Autes" v-model="customer.followUp.misc" :rows="6" type="textarea"
+          <ni-input  caption="Autres" v-model="customer.followUp.misc" :rows="6" type="textarea"
             @myBlur="updateUser({ alenvi: 'followUp.misc', ogust: 'misc' })" @myFocus="saveTmp('followUp.misc')"
           />
         </div>
