@@ -39,66 +39,21 @@
               <q-icon name="clear" size="1rem" @click.native="newAbsenceModal = false" /></span>
           </div>
         </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Type d'absence</p>
-              <q-icon v-if="$v.newAbsence.reason.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newAbsence.reason.$error" error-label="Champ requis">
-              <q-select :options="reasonOptions" v-model="newAbsence.reason" color="white" inverted-light separator
-                @blur="$v.newAbsence.reason.$touch" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Date de départ</p>
-              <q-icon v-if="$v.newAbsence.startDate.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newAbsence.startDate.$error" error-label="Champ requis">
-              <q-datetime type="date" format="DD/MM/YYYY" v-model="newAbsence.startDate" :min="$moment().startOf('month').toISOString()"
-                color="white" inverted-light popover ok-label="OK" cancel-label="Fermer" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Durée</p>
-              <q-icon v-if="$v.newAbsence.startDuration.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newAbsence.startDuration.$error" error-label="Champ requis">
-              <q-select :options="dateOptions" v-model="newAbsence.startDuration" color="white" inverted-light
-                separator />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Date de fin</p>
-              <q-icon v-if="$v.newAbsence.endDate.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newAbsence.endDate.$error" error-label="Champ requis">
-              <q-datetime :disable="!newAbsence.startDate" type="date" format="DD/MM/YYYY" v-model="newAbsence.endDate"
-                color="white" inverted-light popover ok-label="OK" cancel-label="Fermer" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Durée</p>
-              <q-icon v-if="$v.newAbsence.endDuration.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newAbsence.endDuration.$error" error-label="Champ requis">
-              <q-select :disable="!newAbsence.endDate || newAbsence.endDate <= newAbsence.startDate" :options="dateOptions"
-                v-model="newAbsence.endDuration" color="white" inverted-light separator />
-            </q-field>
-          </div>
-        </div>
+        <ni-modal-select caption="Type d'absence" :error="$v.newAbsence.reason.$error" :options="reasonOptions" v-model="newAbsence.reason"
+          separator @blur="$v.newAbsence.reason.$touch"
+        />
+        <ni-modal-datetime-picker caption="Date de départ" :error="$v.newAbsence.startDate.$error" v-model="newAbsence.startDate"
+          :min="$moment().startOf('month').toISOString()"
+        />
+        <ni-modal-select caption="Durée" :error="$v.newAbsence.startDuration.$error" :options="dateOptions" v-model="newAbsence.startDuration"
+          separator
+        />
+        <ni-modal-datetime-picker caption="Date de fin" :error="$v.newAbsence.endDate.$error" v-model="newAbsence.endDate"
+          :disable="!newAbsence.startDate"
+        />
+        <ni-modal-select caption="Durée" :error="$v.newAbsence.endDuration.$error" :options="dateOptions" v-model="newAbsence.endDuration"
+          separator :disable="!newAbsence.endDate || newAbsence.endDate <= newAbsence.startDate"
+        />
       </div>
       <q-btn class="full-width modal-btn" no-caps label="Confirmer" color="primary" :loading="loading" @click="addAbsence" />
     </q-modal>
@@ -109,8 +64,14 @@
 import { Cookies } from 'quasar';
 import { required } from 'vuelidate/lib/validators';
 import { NotifyNegative, NotifyPositive } from '../popup/notify';
+import ModalSelect from '../form/ModalSelect.vue';
+import ModalDatetimePicker from '../form/ModalDatetimePicker.vue';
 
 export default {
+  components: {
+    'ni-modal-select': ModalSelect,
+    'ni-modal-datetime-picker': ModalDatetimePicker,
+  },
   data () {
     return {
       loading: false,

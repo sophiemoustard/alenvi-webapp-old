@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="displayInput" class="col-xs-12 col-md-6">
     <div class="row justify-between">
       <p class="input-caption">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
@@ -34,13 +34,14 @@ export default {
     disable: { type: Boolean, default: false },
     type: { type: String, default: 'text' },
     rows: { type: Number, default: 1 },
+    displayInput: { type: Boolean, default: true },
   },
   methods: {
     blurHandler (event) {
-      this.$emit('myBlur');
+      this.$emit('blur');
     },
     focusHandler (event) {
-      this.$emit('myFocus');
+      this.$emit('focus');
     },
     update (value) {
       this.$emit('input', value);

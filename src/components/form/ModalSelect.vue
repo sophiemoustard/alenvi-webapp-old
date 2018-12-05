@@ -7,7 +7,7 @@
       </div>
       <q-field :error="error" :error-label="errorLabel">
         <q-select :filter="filter" :filter-placeholder="filterPlaceholder" :value="value" color="white" inverted-light :options="options"
-          @input="inputHandler" @blur="blurHandler" />
+          @input="inputHandler" @blur="blurHandler" :disable="disable" />
       </q-field>
     </div>
   </div>
@@ -25,6 +25,7 @@ export default {
     options: Array,
     filter: Boolean,
     filterPlaceholder: String,
+    disable: { type: Boolean, default: false },
   },
   methods: {
     inputHandler (value) {

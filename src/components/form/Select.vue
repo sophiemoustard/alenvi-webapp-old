@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="col-xs-12 col-md-6">
     <div class="row justify-between">
       <p class="input-caption">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
@@ -24,10 +24,10 @@ export default {
   },
   methods: {
     focusHandler () {
-      this.$emit('myFocus');
+      this.$emit('focus');
     },
     blurHandler () {
-      this.$emit('myBlur');
+      this.$emit('blur');
     },
     update (value) {
       this.$emit('input', value);
