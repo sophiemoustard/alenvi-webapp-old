@@ -11,44 +11,27 @@
         <p class="text-weight-bold">Informations</p>
       </div>
       <div class="row gutter-profile">
-        <div class="col-xs-12 col-md-6">
-          <ni-input caption="Adresse" v-model="customer.main_address.line" disable />
-        </div>
-        <div class="col-xs-12 col-md-6">
-          <ni-input caption="Ville" v-model="customer.main_address.city" disable />
-        </div><div class="col-xs-12 col-md-6">
-          <ni-input caption="Code postal" v-model="customer.main_address.zip" disable />
-        </div>
-        <div class="col-xs-12 col-md-6">
-          <ni-input caption="Code porte" v-model="customer.door_code" @myFocus="saveTmp('door_code')"
-            @myBlur="updateCustomer('door_code')"
-          />
-        </div>
-        <div class="col-xs-12 col-md-6">
-          <ni-input caption="Code interphone" v-model="customer.intercom_code"
-            @myBlur="updateCustomer('intercom_code')" @myFocus="saveTmp('intercom_code')"
-          />
-        </div>
-        <div class="col-xs-12 col-md-6">
-          <ni-select caption="Pathologie" v-model="customerInfo.pathology" :options="selectOptions"
-            @myBlur="updateCustomerInfo" @myFocus="saveTmp('customerInfo')"
-          />
-        </div>
-        <div class="col-xs-12 col-md-6">
-          <ni-input caption="Commentaires" v-model="customerInfo.comments" @myFocus="saveTmp('customerInfo')"
-            type="textarea" :rows="6" @myBlur="updateCustomerInfo"
-          />
-        </div>
-        <div class="col-xs-12 col-md-6">
-          <ni-input caption="Détails intervention" v-model="customerInfo.interventionDetails" @myFocus="saveTmp('customerInfo')"
-            type="textarea" :rows="6" @myBlur="updateCustomerInfo"
-          />
-        </div>
-        <div class="col-xs-12 col-md-6">
-          <ni-input caption="Autres" v-model="customerInfo.misc" @myFocus="saveTmp('customerInfo')" type="textarea"
-            :rows="6" @myBlur="updateCustomerInfo"
-          />
-        </div>
+        <ni-input caption="Adresse" v-model="customer.main_address.line" disable />
+        <ni-input caption="Ville" v-model="customer.main_address.city" disable />
+        <ni-input caption="Code postal" v-model="customer.main_address.zip" disable />
+        <ni-input caption="Code porte" v-model="customer.door_code" @focus="saveTmp('door_code')"
+          @blur="updateCustomer('door_code')"
+        />
+        <ni-input caption="Code interphone" v-model="customer.intercom_code"
+          @blur="updateCustomer('intercom_code')" @focus="saveTmp('intercom_code')"
+        />
+        <ni-select caption="Pathologie" v-model="customerInfo.pathology" :options="selectOptions"
+          @blur="updateCustomerInfo" @focus="saveTmp('customerInfo')"
+        />
+        <ni-input caption="Commentaires" v-model="customerInfo.comments" @focus="saveTmp('customerInfo')"
+          type="textarea" :rows="6" @blur="updateCustomerInfo"
+        />
+        <ni-input caption="Détails intervention" v-model="customerInfo.interventionDetails" @focus="saveTmp('customerInfo')"
+          type="textarea" :rows="6" @blur="updateCustomerInfo"
+        />
+        <ni-input caption="Autres" v-model="customerInfo.misc" @focus="saveTmp('customerInfo')" type="textarea"
+          :rows="6" @blur="updateCustomerInfo"
+        />
       </div>
     </div>
   </q-page>

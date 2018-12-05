@@ -5,12 +5,8 @@
         <p class="text-weight-bold">Identité</p>
       </div>
       <div class="row gutter-profile">
-        <div class="col-xs-12 col-md-6">
-          <ni-input caption="Prénom" v-model="customer.identity.firstname" @myFocus="saveTmp('identity.firstname')" @myBlur="updateUser({ alenvi: 'identity.firstname', ogust: 'first_name' })" />
-        </div>
-        <div class="col-xs-12 col-md-6">
-          <ni-input caption="Nom" :error="$v.customer.identity.lastname.$error" errorLabel="Champ requis" v-model="customer.identity.lastname" @myFocus="saveTmp('identity.lastname')" @myBlur="updateUser({ alenvi: 'identity.lastname', ogust: 'last_name' })" />
-        </div>
+        <ni-input caption="Prénom" v-model="customer.identity.firstname" @focus="saveTmp('identity.firstname')" @blur="updateUser({ alenvi: 'identity.firstname', ogust: 'first_name' })" />
+        <ni-input caption="Nom" :error="$v.customer.identity.lastname.$error" errorLabel="Champ requis" v-model="customer.identity.lastname" @focus="saveTmp('identity.lastname')" @blur="updateUser({ alenvi: 'identity.lastname', ogust: 'last_name' })" />
         <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Date de naissance</p>
@@ -28,10 +24,8 @@
         <p class="text-weight-bold">Contact</p>
       </div>
       <div class="row gutter-profile">
-        <div class="col-xs-12 col-md-6">
-          <ni-input caption="Téléphone" type="tel" :error="$v.customer.contact.phone.$error" errorLabel="Numéro de téléphone non valide"
-            v-model.trim="customer.contact.phone" @myFocus="saveTmp('contact.phone')" @blur="updateUser({ alenvi: 'contact.phone', ogust: 'mobile_phone' })" />
-        </div>
+        <ni-input caption="Téléphone" type="tel" :error="$v.customer.contact.phone.$error" errorLabel="Numéro de téléphone non valide"
+          v-model.trim="customer.contact.phone" @focus="saveTmp('contact.phone')" @blur="updateUser({ alenvi: 'contact.phone', ogust: 'mobile_phone' })" />
         <div class="col-xs-12 col-md-6">
           <div class="row justify-between">
             <p class="input-caption">Adresse</p>
@@ -42,9 +36,7 @@
               @selected="selectedAddress" />
           </q-field>
         </div>
-        <div class="col-xs-12 col-md-6">
-          <ni-input caption="Code porte" v-model="customer.contact.doorCode" @myFocus="saveTmp('contact.doorCode')" @blur="updateUser({ alenvi: 'contact.doorCode', ogust: 'door_code' })" />
-        </div>
+        <ni-input caption="Code porte" v-model="customer.contact.doorCode" @focus="saveTmp('contact.doorCode')" @blur="updateUser({ alenvi: 'contact.doorCode', ogust: 'door_code' })" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -52,18 +44,12 @@
         <p class="text-weight-bold">Moyen de paiement</p>
       </div>
       <div class="row gutter-profile">
-        <div class="col-xs-12 col-md-6">
-          <ni-input caption="Nom associé au compte bancaire" :error="$v.customer.payment.bankAccountOwner.$error" errorLabel="Champ requis"
-            v-model="customer.payment.bankAccountOwner" @myFocus="saveTmp('payment.bankAccountOwner')" @blur="updateUser({ alenvi: 'payment.bankAccountOwner', ogust: 'holder' })" />
-        </div>
-        <div class="col-xs-12 col-md-6">
-          <ni-input caption="IBAN" :error="$v.customer.payment.iban.$error" errorLabel="IBAN non valide"
-            v-model="customer.payment.iban" @myFocus="saveTmp('payment.iban')" @blur="updateUser({ alenvi: 'payment.iban', ogust: 'iban_number' })" />
-        </div>
-        <div class="col-xs-12 col-md-6">
-          <ni-input caption="BIC" :error="$v.customer.payment.bic.$error" errorLabel="BIC non valide"
-            v-model="customer.payment.bic" @myFocus="saveTmp('payment.bic')" @blur="updateUser({ alenvi: 'payment.bic', ogust: 'bic_number' })" />
-        </div>
+        <ni-input caption="Nom associé au compte bancaire" :error="$v.customer.payment.bankAccountOwner.$error" errorLabel="Champ requis"
+          v-model="customer.payment.bankAccountOwner" @focus="saveTmp('payment.bankAccountOwner')" @blur="updateUser({ alenvi: 'payment.bankAccountOwner', ogust: 'holder' })" />
+        <ni-input caption="IBAN" :error="$v.customer.payment.iban.$error" errorLabel="IBAN non valide"
+          v-model="customer.payment.iban" @focus="saveTmp('payment.iban')" @blur="updateUser({ alenvi: 'payment.iban', ogust: 'iban_number' })" />
+        <ni-input caption="BIC" :error="$v.customer.payment.bic.$error" errorLabel="BIC non valide"
+          v-model="customer.payment.bic" @focus="saveTmp('payment.bic')" @blur="updateUser({ alenvi: 'payment.bic', ogust: 'bic_number' })" />
       </div>
     </div>
     <div class="q-mb-xl">

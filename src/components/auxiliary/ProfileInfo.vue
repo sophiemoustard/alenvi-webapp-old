@@ -53,52 +53,36 @@
           groupErrors('identity').msg }}</p>
       </div>
       <div class="row gutter-profile">
-        <div class="col-xs-12 col-md-6">
-          <ni-input caption="Prénom" :error="$v.user.alenvi.firstname.$error" v-model="user.alenvi.firstname"
-            @myBlur="updateUser({ alenvi: 'firstname', ogust: 'first_name' })" @myFocus="saveTmp('firstname')"
-          />
-        </div>
-        <div class="col-xs-12 col-md-6">
-          <ni-input caption="Nom" :error="$v.user.alenvi.lastname.$error" v-model="user.alenvi.lastname"
-            @myBlur="updateUser({ alenvi: 'lastname', ogust: 'last_name' })" @myFocus="saveTmp('lastname')"
-          />
-        </div>
-        <div class="col-xs-12 col-md-6">
-          <ni-select caption="Nationalité" :error="$v.user.alenvi.administrative.identity.nationality.$error" :options="nationalitiesOptions"
-            v-model="user.alenvi.administrative.identity.nationality" @myFocus="saveTmp('administrative.identity.nationality')"
-            @myBlur="updateUser({ alenvi: 'administrative.identity.nationality', ogust: 'nationality' })"
-          />
-        </div>
-        <div class="col-xs-12 col-md-6">
-          <ni-datetime-picker caption="Date de naissance" :error="$v.user.alenvi.administrative.identity.birthDate.$error"
-            v-model="user.alenvi.administrative.identity.birthDate" @myFocus="saveTmp('administrative.identity.birthDate')"
-            @myBlur="updateUser({ alenvi: 'administrative.identity.birthDate', ogust: 'date_of_birth' })"
-          />
-        </div>
-        <div class="col-xs-12 col-md-6">
-          <ni-select caption="Pays de naissance" :error="$v.user.alenvi.administrative.identity.birthCountry.$error" :options="nationalitiesOptions"
-            v-model="user.alenvi.administrative.identity.birthCountry" @myFocus="saveTmp('administrative.identity.birthCountry')"
-            @myBlur="updateUser({ alenvi: 'administrative.identity.birthCountry', ogust: 'country_of_birth' })"
-          />
-        </div>
-        <div v-if="this.user.alenvi.administrative.identity.birthCountry === 'FR'" class="col-xs-12 col-md-6">
-          <ni-input caption="Département de naissance" :error="$v.user.alenvi.administrative.identity.birthState.$error" :errorLabel="birthStateError"
-            v-model="user.alenvi.administrative.identity.birthState" @myBlur="updateUser({ alenvi: 'administrative.identity.birthState', ogust: 'state_of_birth' })"
-            @myFocus="saveTmp('administrative.identity.birthState')"
-          />
-        </div>
-        <div class="col-xs-12 col-md-6">
-          <ni-input caption="Ville de naissance" :error="$v.user.alenvi.administrative.identity.birthCity.$error"
-            v-model="user.alenvi.administrative.identity.birthCity" @myFocus="saveTmp('administrative.identity.birthCity')"
-            @myBlur="updateUser({ alenvi: 'administrative.identity.birthCity', ogust: 'place_of_birth' })"
-          />
-        </div>
-        <div class="col-xs-12 col-md-6">
-          <ni-input caption="Numéro de sécurité sociale" :error="$v.user.alenvi.administrative.identity.socialSecurityNumber.$error"
-            v-model="user.alenvi.administrative.identity.socialSecurityNumber" @myFocus="saveTmp('administrative.identity.socialSecurityNumber')"
-            @myBlur="updateUser({ alenvi: 'administrative.identity.socialSecurityNumber', ogust: 'social_insurance_number' })" :errorLabel="ssnError"
-          />
-        </div>
+        <ni-input caption="Prénom" :error="$v.user.alenvi.firstname.$error" v-model="user.alenvi.firstname"
+          @blur="updateUser({ alenvi: 'firstname', ogust: 'first_name' })" @focus="saveTmp('firstname')"
+        />
+        <ni-input caption="Nom" :error="$v.user.alenvi.lastname.$error" v-model="user.alenvi.lastname"
+          @blur="updateUser({ alenvi: 'lastname', ogust: 'last_name' })" @focus="saveTmp('lastname')"
+        />
+        <ni-select caption="Nationalité" :error="$v.user.alenvi.administrative.identity.nationality.$error" :options="nationalitiesOptions"
+          v-model="user.alenvi.administrative.identity.nationality" @focus="saveTmp('administrative.identity.nationality')"
+          @blur="updateUser({ alenvi: 'administrative.identity.nationality', ogust: 'nationality' })"
+        />
+        <ni-datetime-picker caption="Date de naissance" :error="$v.user.alenvi.administrative.identity.birthDate.$error"
+          v-model="user.alenvi.administrative.identity.birthDate" @focus="saveTmp('administrative.identity.birthDate')"
+          @blur="updateUser({ alenvi: 'administrative.identity.birthDate', ogust: 'date_of_birth' })"
+        />
+        <ni-select caption="Pays de naissance" :error="$v.user.alenvi.administrative.identity.birthCountry.$error" :options="nationalitiesOptions"
+          v-model="user.alenvi.administrative.identity.birthCountry" @focus="saveTmp('administrative.identity.birthCountry')"
+          @blur="updateUser({ alenvi: 'administrative.identity.birthCountry', ogust: 'country_of_birth' })"
+        />
+        <ni-input caption="Département de naissance" :error="$v.user.alenvi.administrative.identity.birthState.$error" :errorLabel="birthStateError"
+          v-model="user.alenvi.administrative.identity.birthState" @blur="updateUser({ alenvi: 'administrative.identity.birthState', ogust: 'state_of_birth' })"
+          @focus="saveTmp('administrative.identity.birthState')" :displayInput="this.user.alenvi.administrative.identity.birthCountry === 'FR'"
+        />
+        <ni-input caption="Ville de naissance" :error="$v.user.alenvi.administrative.identity.birthCity.$error"
+          v-model="user.alenvi.administrative.identity.birthCity" @focus="saveTmp('administrative.identity.birthCity')"
+          @blur="updateUser({ alenvi: 'administrative.identity.birthCity', ogust: 'place_of_birth' })"
+        />
+        <ni-input caption="Numéro de sécurité sociale" :error="$v.user.alenvi.administrative.identity.socialSecurityNumber.$error"
+          v-model="user.alenvi.administrative.identity.socialSecurityNumber" @focus="saveTmp('administrative.identity.socialSecurityNumber')"
+          @blur="updateUser({ alenvi: 'administrative.identity.socialSecurityNumber', ogust: 'social_insurance_number' })" :errorLabel="ssnError"
+        />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -107,39 +91,30 @@
         <p :class="[groupErrors('contact').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('contact').msg }}</p>
       </div>
       <div class="row gutter-profile">
-        <div class="col-xs-12 col-md-6">
-          <ni-input caption="Numéro de téléphone" :error="$v.user.alenvi.mobilePhone.$error" :errorLabel="phoneNbrError" type="tel"
-            v-model.trim="user.alenvi.mobilePhone" @myBlur="updateUser({ alenvi: 'mobilePhone', ogust: 'mobile_phone' })" @myFocus="saveTmp('mobilePhone')"
-          />
-        </div>
-        <div v-if="currentUser.role.name !== 'Auxiliaire'" class="col-xs-12 col-md-6">
-          <ni-input caption="Adresse email" :error="$v.user.alenvi.local.email.$error" :errorLabel="emailError" type="email" lowerCase disable
-            v-model.trim="user.alenvi.local.email" @myBlur="updateUser({ alenvi: 'local.email', ogust: 'email' })" @myFocus="saveTmp('local.email')"
-          />
-        </div>
-        <div class="col-xs-12 col-md-6">
-          <ni-input caption="Adresse, numéro et rue" v-model="user.alenvi.administrative.contact.address"
-            @myBlur="updateUser({ alenvi: 'administrative.contact.address', ogust: 'line' })" @myFocus="saveTmp('administrative.contact.address')"
-            :error="$v.user.alenvi.administrative.contact.address.$error"
-          />
-        </div>
+        <ni-input caption="Numéro de téléphone" :error="$v.user.alenvi.mobilePhone.$error" :errorLabel="phoneNbrError" type="tel"
+          v-model.trim="user.alenvi.mobilePhone" @blur="updateUser({ alenvi: 'mobilePhone', ogust: 'mobile_phone' })" @focus="saveTmp('mobilePhone')"
+        />
+        <ni-input caption="Adresse email" :error="$v.user.alenvi.local.email.$error" :errorLabel="emailError" type="email" lowerCase disable
+          v-model.trim="user.alenvi.local.email" @blur="updateUser({ alenvi: 'local.email', ogust: 'email' })" @focus="saveTmp('local.email')"
+          :displayInput="currentUser.role.name !== 'Auxiliaire'"
+        />
+        <ni-input caption="Adresse, numéro et rue" v-model="user.alenvi.administrative.contact.address"
+          @blur="updateUser({ alenvi: 'administrative.contact.address', ogust: 'line' })" @focus="saveTmp('administrative.contact.address')"
+          :error="$v.user.alenvi.administrative.contact.address.$error"
+        />
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Complément d'adresse</p>
           <q-input v-model="user.alenvi.administrative.contact.additionalAddress" @focus="saveTmp('administrative.contact.addionalAddress')"
             @blur="updateUser({ alenvi: 'administrative.contact.additionalAddress', ogust: 'supplement' })" color="white" inverted-light
           />
         </div>
-        <div class="col-xs-12 col-md-6">
-          <ni-input caption="Code postal" :error="$v.user.alenvi.administrative.contact.zipCode.$error" :errorLabel="zipCodeError"
-            v-model="user.alenvi.administrative.contact.zipCode" @myFocus="saveTmp('administrative.contact.zipCode')"
-            @myBlur="updateUser({ alenvi: 'administrative.contact.zipCode', ogust: 'zip' })"
-          />
-        </div>
-        <div class="col-xs-12 col-md-6">
-          <ni-input caption="Ville" :error="$v.user.alenvi.administrative.contact.city.$error" v-model="user.alenvi.administrative.contact.city"
-            @myBlur="updateUser({ alenvi: 'administrative.contact.city', ogust: 'city' })" @myFocus="saveTmp('administrative.contact.city')"
-          />
-        </div>
+        <ni-input caption="Code postal" :error="$v.user.alenvi.administrative.contact.zipCode.$error" :errorLabel="zipCodeError"
+          v-model="user.alenvi.administrative.contact.zipCode" @focus="saveTmp('administrative.contact.zipCode')"
+          @blur="updateUser({ alenvi: 'administrative.contact.zipCode', ogust: 'zip' })"
+        />
+        <ni-input caption="Ville" :error="$v.user.alenvi.administrative.contact.city.$error" v-model="user.alenvi.administrative.contact.city"
+          @blur="updateUser({ alenvi: 'administrative.contact.city', ogust: 'city' })" @focus="saveTmp('administrative.contact.city')"
+        />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -148,18 +123,14 @@
         <p :class="[groupErrors('emergencyContact').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('emergencyContact').msg }}</p>
       </div>
       <div class="row gutter-profile">
-        <div class="col-xs-12 col-md-6">
-          <ni-input caption="Prénom et nom" :error="$v.user.alenvi.administrative.emergencyContact.name.$error"
-            v-model="user.alenvi.administrative.emergencyContact.name" @myFocus="saveTmp('administrative.emergencyContact.name')"
-            @myBlur="updateUser({ alenvi: 'administrative.emergencyContact.name' })"
-          />
-        </div>
-        <div class="col-xs-12 col-md-6">
-          <ni-input caption="Numéro de téléphone" :error="$v.user.alenvi.administrative.emergencyContact.phoneNumber.$error"
-            v-model.trim="user.alenvi.administrative.emergencyContact.phoneNumber" @myFocus="saveTmp('administrative.emergencyContact.phoneNumber')"
-            @myBlur="updateUser({ alenvi: 'administrative.emergencyContact.phoneNumber' })" :errorLabel="emergencyPhoneNbrError"
-          />
-        </div>
+        <ni-input caption="Prénom et nom" :error="$v.user.alenvi.administrative.emergencyContact.name.$error"
+          v-model="user.alenvi.administrative.emergencyContact.name" @focus="saveTmp('administrative.emergencyContact.name')"
+          @blur="updateUser({ alenvi: 'administrative.emergencyContact.name' })"
+        />
+        <ni-input caption="Numéro de téléphone" :error="$v.user.alenvi.administrative.emergencyContact.phoneNumber.$error"
+          v-model.trim="user.alenvi.administrative.emergencyContact.phoneNumber" @focus="saveTmp('administrative.emergencyContact.phoneNumber')"
+          @blur="updateUser({ alenvi: 'administrative.emergencyContact.phoneNumber' })" :errorLabel="emergencyPhoneNbrError"
+        />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -168,18 +139,14 @@
         <p :class="[groupErrors('iban').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('iban').msg }}</p>
       </div>
       <div class="row gutter-profile">
-        <div class="col-xs-12 col-md-6">
-          <ni-input caption="IBAN" :error="$v.user.alenvi.administrative.payment.rib.iban.$error" :errorLabel="ibanError"
-          v-model="user.alenvi.administrative.payment.rib.iban" @myFocus="saveTmp('administrative.payment.rib.iban')" upperCase
-            @myBlur="updateUser({ alenvi: 'administrative.payment.rib.iban', ogust: 'iban_number' })"
-          />
-        </div>
-        <div class="col-xs-12 col-md-6">
-          <ni-input caption="BIC" :error="$v.user.alenvi.administrative.payment.rib.bic.$error" :errorLabel="bicError" upperCase
-            v-model.trim="user.alenvi.administrative.payment.rib.bic" @myFocus="saveTmp('administrative.payment.rib.bic')"
-            @myBlur="updateUser({ alenvi: 'administrative.payment.rib.bic', ogust: 'bic_number' })"
-          />
-        </div>
+        <ni-input caption="IBAN" :error="$v.user.alenvi.administrative.payment.rib.iban.$error" :errorLabel="ibanError"
+        v-model="user.alenvi.administrative.payment.rib.iban" @focus="saveTmp('administrative.payment.rib.iban')" upperCase
+          @blur="updateUser({ alenvi: 'administrative.payment.rib.iban', ogust: 'iban_number' })"
+        />
+        <ni-input caption="BIC" :error="$v.user.alenvi.administrative.payment.rib.bic.$error" :errorLabel="bicError" upperCase
+          v-model.trim="user.alenvi.administrative.payment.rib.bic" @focus="saveTmp('administrative.payment.rib.bic')"
+          @blur="updateUser({ alenvi: 'administrative.payment.rib.bic', ogust: 'bic_number' })"
+        />
       </div>
     </div>
     <div v-if="user.alenvi.administrative.driveFolder" class="q-mb-xl">
