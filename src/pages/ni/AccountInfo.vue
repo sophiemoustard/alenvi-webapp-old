@@ -60,7 +60,6 @@ export default {
   },
   async mounted () {
     try {
-      console.log('user', this.user.alenvi);
       this.user.alenvi = await this.$users.getById(this.$route.params.id);
       this.user.credentials.email = this.user.alenvi.local.email;
     } catch (e) {
@@ -104,7 +103,6 @@ export default {
       }
     },
     logout () {
-      console.log('MEH');
       this.$q.cookies.remove('alenvi_token', { path: '/' });
       this.$q.cookies.remove('alenvi_token_expires_in', { path: '/' });
       this.$q.cookies.remove('refresh_token', { path: '/' });
