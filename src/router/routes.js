@@ -14,7 +14,7 @@ const routes = [
           await store.dispatch('main/getUser', Cookies.get('user_id'));
         }
         if (store.getters['main/user'] && store.getters['main/user'].role.name === 'Aidants') {
-          return next({ name: 'customer home' });
+          return next({ name: 'customer planning' });
         } else if (store.getters['main/user'] && store.getters['main/user'].role.name === 'Auxiliaire') {
           return next({ name: 'profile planning', params: { id: store.getters['main/user']._id }, query: { auxiliary: 'true', self: 'true' } });
         } else if (store.getters['main/user'] && store.getters['main/user'].role.name !== 'Auxiliaire' && store.getters['main/user'].role.name !== 'Aidants') {
