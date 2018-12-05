@@ -5,28 +5,20 @@
         <p class="text-weight-bold">Informations</p>
       </div>
       <div class="row gutter-profile">
-        <div class="col-xs-12 col-md-6">
-          <ni-select caption="Pathologie" v-model="customer.followUp.pathology" :options="selectOptions"
-            @myBlur="updateUser({ alenvi: 'followUp.pathology', ogust: 'pathology' })" @myFocus="saveTmp('followUp.pathology')"
-          />
-        </div>
+        <ni-select caption="Pathologie" v-model="customer.followUp.pathology" :options="selectOptions"
+          @blur="updateUser({ alenvi: 'followUp.pathology', ogust: 'pathology' })" @focus="saveTmp('followUp.pathology')"
+        />
       </div>
       <div class="row gutter-profile">
-        <div class="col-xs-12 col-md-6">
-          <ni-input  caption="Commentaires" v-model="customer.followUp.comments" :rows="6" type="textarea"
-            @myBlur="updateUser({ alenvi: 'followUp.comments', ogust: 'comments' })" @myFocus="saveTmp('followUp.comments')"
-          />
-        </div>
-        <div class="col-xs-12 col-md-6">
-          <ni-input  caption="Détails intervention" v-model="customer.followUp.details" :rows="6" type="textarea"
-            @myBlur="updateUser({ alenvi: 'followUp.details', ogust: 'interventionDetails' })" @myFocus="saveTmp('followUp.details')"
-          />
-        </div>
-        <div class="col-xs-12 col-md-6">
-          <ni-input  caption="Autres" v-model="customer.followUp.misc" :rows="6" type="textarea"
-            @myBlur="updateUser({ alenvi: 'followUp.misc', ogust: 'misc' })" @myFocus="saveTmp('followUp.misc')"
-          />
-        </div>
+        <ni-input  caption="Commentaires" v-model="customer.followUp.comments" :rows="6" type="textarea"
+          @blur="updateUser({ alenvi: 'followUp.comments', ogust: 'comments' })" @focus="saveTmp('followUp.comments')"
+        />
+        <ni-input  caption="Détails intervention" v-model="customer.followUp.details" :rows="6" type="textarea"
+          @blur="updateUser({ alenvi: 'followUp.details', ogust: 'interventionDetails' })" @focus="saveTmp('followUp.details')"
+        />
+        <ni-input  caption="Autres" v-model="customer.followUp.misc" :rows="6" type="textarea"
+          @blur="updateUser({ alenvi: 'followUp.misc', ogust: 'misc' })" @focus="saveTmp('followUp.misc')"
+        />
       </div>
     </div>
   </div>
