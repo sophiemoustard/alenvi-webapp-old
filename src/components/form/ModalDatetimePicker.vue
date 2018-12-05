@@ -7,7 +7,7 @@
       </div>
       <q-field :error="error" :error-label="errorLabel">
         <q-datetime :value="value" type="date" format="DD/MM/YYYY" color="white" ok-label="OK" cancel-label="Fermer"
-          inverted-light popover @focus="focusHandler" @blur="blurHandler" @input="update" :min="min"
+          inverted-light popover @focus="focusHandler" @blur="blurHandler" @input="update" :min="min" :disable="disable"
         />
       </q-field>
     </div>
@@ -22,6 +22,7 @@ export default {
     errorLabel: { type: String, default: 'Champ requis' },
     value: String,
     min: { type: String, default: null },
+    disable: { type: Boolean, default: false },
   },
   methods: {
     blurHandler (event) {
