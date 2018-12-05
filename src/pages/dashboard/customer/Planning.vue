@@ -1,5 +1,6 @@
 <template>
   <q-page class="container">
+    <h5>{{ customerName }}</h5>
     <scheduler :scroll="true" :showTabCustomer="false" :customer="true" :events="events" @viewChanged="getEventsData"></scheduler>
   </q-page>
 </template>
@@ -36,12 +37,15 @@ export default {
   computed: {
     getUser () {
       return this.$store.getters['main/user'];
+    },
+    customerName () {
+      return `${this.getUser.customers[0].identity.title} ${this.getUser.customers[0].identity.lastname}`
     }
   },
   methods: {
     async getEventsData () {
       try {
-        this.personId = this.getUser.customer_id; // ID customer
+        this.personId = this.getUser.customers[0].customerId; // ID customer
         this.events = await this.$ogust.getOgustEvents(this.personId, 'customer');
       } catch (e) {
         console.error(e)
@@ -68,5 +72,8 @@ export default {
 }
 </script>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
+  h5
+    padding: 10px 0px 0px 50px
+    margin-bottom: 0px
 </style>

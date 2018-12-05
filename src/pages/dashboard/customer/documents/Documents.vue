@@ -232,9 +232,9 @@ export default {
         this.invoices = [];
         this.isDisabled = true;
         if (params) {
-          this.invoices = await this.$ogust.getCustomerInvoices(this.getUser.customer_id, { startPeriod: params.startPeriod, endPeriod: params.endPeriod });
+          this.invoices = await this.$ogust.getCustomerInvoices(this.getUser.customers[0].customerId, { startPeriod: params.startPeriod, endPeriod: params.endPeriod });
         } else {
-          this.invoices = await this.$ogust.getCustomerInvoices(this.getUser.customer_id, { year: this.year, month: this.month === 'Tous' ? '' : this.$moment().month(this.month).format('MM') }); // 276329398 // this.getUser.customer_id
+          this.invoices = await this.$ogust.getCustomerInvoices(this.getUser.customers[0].customerId, { year: this.year, month: this.month === 'Tous' ? '' : this.$moment().month(this.month).format('MM') }); // 276329398 // this.getUser.customer_id
         }
         for (let i = 0, l = Object.keys(this.invoices).length; i < l; i++) {
           this.invoices[i].invoice_date = this.$moment(this.invoices[i].invoice_date, 'YYYYMMDD').format('DD/MM/YYYY') // .format('DD/MM/YYYY') // .toDate();
@@ -251,7 +251,7 @@ export default {
     async getFiscalAttests () {
       try {
         this.fiscalAttests = [];
-        this.fiscalAttests = await this.$ogust.getCustomerFiscalAttests(this.getUser.customer_id, {}); // 235146870 // this.getUser.customer_id // year: this.year
+        this.fiscalAttests = await this.$ogust.getCustomerFiscalAttests(this.getUser.customers[0].customerId, {}); // 235146870 // this.getUser.customer_id // year: this.year
         for (let i = 0, l = Object.keys(this.fiscalAttests).length; i < l; i++) {
           this.fiscalAttests[i].period_start = this.$moment(this.fiscalAttests[i].period_start, 'YYYYMMDD').format('MM/YYYY');
           this.fiscalAttests[i].reference = this.$moment(this.fiscalAttests[i].reference, 'YYYY-M').format('YYYY');

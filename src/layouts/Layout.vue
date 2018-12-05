@@ -10,8 +10,9 @@
     </q-layout-header>
 
     <q-layout-drawer :width="250" side="left" v-model="toggleDrawer">
-      <side-menu-coach :ref="sidemenusRefs" v-if="user && user.role.name !== 'Auxiliaire'" :user="user" />
+      <side-menu-coach :ref="sidemenusRefs" v-if="user && user.role.name !== 'Auxiliaire' && user.role.name !== 'Aidants'" :user="user" />
       <side-menu-auxiliary :ref="sidemenusRefs" v-if="user && user.role.name === 'Auxiliaire'" :user="user" />
+      <side-menu-customer :ref="sidemenusRefs" v-if="user && user.role.name === 'Aidants'" :user="user" />
     </q-layout-drawer>
 
     <q-page-container>
@@ -26,11 +27,13 @@ import { mapGetters } from 'vuex'
 
 import SideMenuCoach from '../components/menu/SideMenuCoach'
 import SideMenuAuxiliary from '../components/menu/SideMenuAuxiliary'
+import SideMenuCustomer from '../components/menu/SideMenuCustomer'
 
 export default {
   components: {
     SideMenuCoach,
-    SideMenuAuxiliary
+    SideMenuAuxiliary,
+    SideMenuCustomer
   },
   computed: {
     ...mapGetters({

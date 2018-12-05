@@ -1,24 +1,53 @@
 <template>
-  <q-list class="no-border">
+  <q-list class="no-border sidemenu-alenvi sidemenu-flex">
+    <q-list-header>
+     <q-item class="justify-center">
+        <img src="https://res.cloudinary.com/alenvi/image/upload/v1539605431/images/business/Compani/compani_logo_1L_RVB_S.png" alt="Compani logo">
+      </q-item>
+    </q-list-header>
+    <q-item-separator />
     <ni-menu-item name="customer planning" icon="date range" label="Planning" />
+    <q-item-separator />
     <ni-menu-item name="customer documents" icon="folder" label="Facturation" />
-    <ni-menu-item name="customer profile" :params="{ id: user._id }" icon="person" label="Mes informations" />
-    <q-item to="/login" @click.native="logout" replace>
-      <q-item-side icon="exit to app" />
-      <q-item-main label="Déconnexion" />
-    </q-item>
+    <q-item-separator />
+    <ni-side-menu-footer :label="user.lastname" :userId="user._id" />
   </q-list>
 </template>
 
 <script>
 import { sideMenuMixin } from '../../mixins/sideMenuMixin';
 import MenuItem from './MenuItem.vue';
+import SideMenuFooter from './SideMenuFooter.vue';
 
 export default {
-  props: ['user'],
+  props: {
+    user: Object,
+  },
   mixins: [sideMenuMixin],
   components: {
     'ni-menu-item': MenuItem,
+    'ni-side-menu-footer': SideMenuFooter,
+  },
+  data () {
+    return {
+      activeRoutes: {
+        planning: {
+          open: false,
+          highlight: false
+        },
+        benef: {
+          open: false,
+          highlight: false
+        },
+        administrative: {
+          open: false,
+          highlight: false
+        }
+      }
+    }
+  },
+  mounted () {
+    this.collapsibleOpening();
   },
 }
 </script>
@@ -26,23 +55,6 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables'
 
-  .avatar-alenvi
-      width: 120px
-      height: 85px
-
-  #logout
-    cursor: pointer
-
-  #profile
-    cursor: pointer
-
-  .user-menu
-    cursor: pointer
-
-  .router-link-active
-    background: none
-    color: $primary
-
-  .router-link-active > div:nth-child(2)
-    color: $primary
+  .q-layout-drawer .q-list .router-link-active
+    color: $primary !important
 </style>
