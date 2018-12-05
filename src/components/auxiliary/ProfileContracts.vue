@@ -520,12 +520,12 @@ export default {
           status: 'T',
           end_date: this.$moment(this.endContractData.date).format('YYYYMMDD')
         };
-        this.$ogust.endContract(ogustVersionId, payload);
+        await this.$ogust.endContract(ogustVersionId, payload);
         const queries = {
           userId: this.getUser._id,
           contractId: this.endContractData.contract._id,
         };
-        this.$users.endContract(queries, { endDate: this.endContractData.date });
+        await this.$users.endContract(queries, { endDate: this.endContractData.date });
         await this.refreshUser();
         NotifyPositive('Contrat terminé');
       } catch (e) {
