@@ -347,6 +347,7 @@ import Select from '../form/Select.vue';
 import FileUploader from '../form/FileUploader.vue';
 import MultipleFilesUploader from '../form/MultipleFilesUploader.vue';
 import DatetimePicker from '../form/DatetimePicker.vue';
+import { NotifyPositive, NotifyWarning, NotifyNegative } from '../popup/notify';
 
 export default {
   components: {
@@ -367,7 +368,6 @@ export default {
       modalCssContainer: {
         minWidth: '30vw'
       },
-      collapsibleOpened: false,
       requiredField: 'Champ requis',
       requiredDoc: 'Document requis',
       disablePictureEdition: true,
@@ -689,12 +689,6 @@ export default {
         return 'BIC non valide';
       }
     },
-    collapsibleIcon () {
-      if (!this.collapsibleOpened) {
-        return 'add';
-      }
-      return 'mdi-blank-checkbox';
-    }
   },
   async mounted () {
     const user = await this.$users.getById(this.userProfile._id);
@@ -710,9 +704,6 @@ export default {
     }
   },
   methods: {
-    notify (color, icon, detail) {
-      return this.$q.notify({ color, icon, detail, position: 'bottom-left', timeout: 2500 });
-    },
     mergeUser (value = null) {
       const args = [this.user.alenvi, value];
       this.user.alenvi = Object.assign({}, extend(true, ...args));
@@ -726,7 +717,7 @@ export default {
         if (this.$_.get(this.$v.user.alenvi, paths.alenvi)) {
           this.$_.get(this.$v.user.alenvi, paths.alenvi).$touch();
           if (this.$_.get(this.$v.user.alenvi, paths.alenvi).$error) {
-            return this.notify('secondary', 'warning', 'Champ(s) invalide(s)');
+            return NotifyWarning('Champ(s) invalide(s)');
           }
         }
         if (paths.alenvi && paths.ogust) {
@@ -737,10 +728,10 @@ export default {
         } else {
           await this.updateOgustUser(paths);
         }
-        this.notify('positive', 'done', 'Modification enregistrée');
+        NotifyPositive('Modification enregistrée');
       } catch (e) {
         console.error(e);
-        this.notify('negative', 'warning', 'Erreur lors de la modification');
+        NotifyNegative('Erreur lors de la modification');
       } finally {
         this.$store.commit('rh/saveUserProfile', this.user.alenvi);
         this.tmpInput = '';
@@ -792,7 +783,7 @@ export default {
         if (node) {
           node[0].$refs[refName].reset();
         }
-        this.notify('negative', 'warning', 'Fichier trop volumineux (> 5 Mo)');
+        NotifyNegative('Fichier trop volumineux (> 5 Mo)');
         return '';
       } else {
         const node = this.$children.filter(child => child.$refs && Object.keys(child.$refs).includes(refName));
@@ -817,10 +808,10 @@ export default {
         await this.$axios.post(this.pictureUploadUrl, data, { headers: { 'content-type': 'multipart/form-data', 'x-access-token': Cookies.get('alenvi_token') || '' } });
         await this.$store.dispatch('rh/getUserProfile', { userId: this.userProfile._id });
         this.closePictureEdition();
-        this.notify('positive', 'done', 'Modification enregistrée');
+        NotifyPositive('Modification enregistrée');
       } catch (e) {
         console.error(e);
-        this.notify('negative', 'warning', 'Erreur lors de la modification');
+        NotifyNegative('Erreur lors de la modification');
       } finally {
         this.loadingImage = false;
       }
@@ -843,13 +834,13 @@ export default {
           await this.$users.updateById(payload);
         }
         await this.$store.dispatch('rh/getUserProfile', { userId: this.userProfile._id });
-        this.notify('positive', 'done', 'Document supprimé');
+        NotifyPositive('Document supprimé');
       } catch (e) {
         console.error(e);
         if (e.message === '') {
-          return this.notify('positive', 'done', 'Suppression annulée');
+          return NotifyPositive('Suppression annulée');
         }
-        this.notify('negative', 'warning', 'Erreur lors de la suppression du document');
+        NotifyNegative('Erreur lors de la suppression du document');
       }
     },
     async deleteImage (params) {
@@ -872,21 +863,21 @@ export default {
           }
         });
         await this.$store.dispatch('rh/getUserProfile', { userId: this.userProfile._id });
-        this.notify('positive', 'done', 'Photo supprimée');
+        NotifyPositive('Photo supprimée');
       } catch (e) {
         console.error(e);
         if (e.message === '') {
-          return this.notify('positive', 'done', 'Suppression annulée');
+          return NotifyPositive('Suppression annulée');
         }
-        this.notify('negative', 'warning', 'Erreur lors de la suppression de la photo');
+        NotifyNegative('Erreur lors de la suppression de la photo');
       }
     },
     async refreshUser () {
       await this.$store.dispatch('rh/getUserProfile', { userId: this.userProfile._id });
-      this.notify('positive', 'done', 'Document envoyé');
+      NotifyPositive('Document envoyé');
     },
     failMsg () {
-      this.notify('negative', 'warning', 'Echec de l\'envoi du document');
+      NotifyNegative('Echec de l\'envoi du document');
     },
     groupErrors (group) {
       let j = 0;
