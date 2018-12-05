@@ -61,6 +61,7 @@ import { mapGetters } from 'vuex';
 import randomize from 'randomatic';
 import ModalInput from './form/ModalInput.vue';
 import ModalSelect from './form/ModalSelect.vue';
+import { NotifyPositive, NotifyNegative } from './popup/notify';
 
 export default {
   name: 'ProfileHeader',
@@ -176,23 +177,11 @@ export default {
           message: this.messageComp,
           address: this.user.facebook.address
         });
-        this.$q.notify({
-          color: 'positive',
-          icon: 'thumb up',
-          detail: 'Message par Pigi bien envoyé',
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyPositive('Message par Pigi bien envoyé');
       } catch (e) {
         console.error(e);
         this.loading = false;
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de l\'envoi du message par Pigi',
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyNegative('Erreur lors de l\'envoi du message par Pigi');
       }
     },
     async sendSMS () {
@@ -201,23 +190,11 @@ export default {
           to: `+33${this.user.mobilePhone.substring(1)}`,
           body: this.messageComp,
         });
-        this.$q.notify({
-          color: 'positive',
-          icon: 'thumb up',
-          detail: 'SMS bien envoyé',
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyPositive('SMS bien envoyé');
       } catch (e) {
         console.error(e);
         this.loading = false;
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de l\'envoi du SMS',
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyNegative('Erreur lors de l\'envoi du SMS');
       }
     },
     goToDirectory () {
