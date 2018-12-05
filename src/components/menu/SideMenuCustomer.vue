@@ -6,9 +6,9 @@
       </q-item>
     </q-list-header>
     <q-item-separator />
-    <ni-menu-item name="customer planning" icon="date range" label="Planning" />
+    <ni-menu-item class="customer-menu-size" name="customer planning" icon="date range" label="Planning" />
     <q-item-separator />
-    <ni-menu-item name="customer documents" icon="folder" label="Facturation" />
+    <ni-menu-item class="customer-menu-size" name="customer documents" icon="euro_symbol" label="Facturation" />
     <q-item-separator />
     <ni-side-menu-footer :label="user.lastname" :userId="user._id" />
   </q-list>
@@ -57,4 +57,11 @@ export default {
 
   .q-layout-drawer .q-list .router-link-active
     color: $primary !important
+
+  /deep/ .customer-menu-size > .q-item-side > .q-item-icon
+    font-size: 1rem
+
+  /deep/ .customer-menu-size .q-item-main > .q-item-label
+    font-size: 1rem
+
 </style>
