@@ -48,40 +48,8 @@
             <span><q-icon name="clear" size="1rem" @click.native="opened = false" /></span>
           </div>
         </div>
-        <!-- <div class="row margin-input">
-          <div class="col-12">
-            <div class="row">
-              <p class="input-caption">Support</p>
-            </div>
-            <q-select
-              v-model="messageSupport"
-              color="white"
-              inverted-light
-              :options="msgSupportOptions"/>
-          </div>
-        </div> -->
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row">
-                <p class="input-caption">Modèle</p>
-            </div>
-            <q-select
-              v-model="typeMessage"
-              color="white"
-              inverted-light
-              :options="typeMessageOptions"/>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Message</p>
-            </div>
-            <q-input v-model="messageComp" type="textarea" rows="7"
-              color="white" inverted-light
-            />
-          </div>
-        </div>
+        <ni-modal-select caption="Modèle" :options="typeMessageOptions" v-model="typeMessage" />
+        <ni-modal-input caption="Message" v-model="messageComp" type="textarea" :rows="7" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary" :loading="loading" @click.native="sendMessage" />
     </q-modal>
@@ -91,10 +59,16 @@
 <script>
 import { mapGetters } from 'vuex';
 import randomize from 'randomatic';
+import ModalInput from './form/ModalInput.vue';
+import ModalSelect from './form/ModalSelect.vue';
+import { NotifyPositive, NotifyNegative } from './popup/notify';
 
-// import { getUserStartDate } from '../helpers/getUserStartDate';
 export default {
   name: 'ProfileHeader',
+  components: {
+    'ni-modal-input': ModalInput,
+    'ni-modal-select': ModalSelect,
+  },
   props: ['profileId', 'customer'],
   data () {
     return {
@@ -203,23 +177,11 @@ export default {
           message: this.messageComp,
           address: this.user.facebook.address
         });
-        this.$q.notify({
-          color: 'positive',
-          icon: 'thumb up',
-          detail: 'Message par Pigi bien envoyé',
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyPositive('Message par Pigi bien envoyé');
       } catch (e) {
         console.error(e);
         this.loading = false;
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de l\'envoi du message par Pigi',
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyNegative('Erreur lors de l\'envoi du message par Pigi');
       }
     },
     async sendSMS () {
@@ -228,23 +190,11 @@ export default {
           to: `+33${this.user.mobilePhone.substring(1)}`,
           body: this.messageComp,
         });
-        this.$q.notify({
-          color: 'positive',
-          icon: 'thumb up',
-          detail: 'SMS bien envoyé',
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyPositive('SMS bien envoyé');
       } catch (e) {
         console.error(e);
         this.loading = false;
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de l\'envoi du SMS',
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyNegative('Erreur lors de l\'envoi du SMS');
       }
     },
     goToDirectory () {
