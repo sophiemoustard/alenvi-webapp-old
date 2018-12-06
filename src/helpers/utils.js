@@ -12,7 +12,6 @@ export const extend = (...sources) => {
 
   // Merge the object into the extended object
   const merge = (obj) => {
-    // console.log('OBJECT', obj);
     for (const prop in obj) {
       if (obj.hasOwnProperty(prop)) {
         if (deep && Object.prototype.toString.call(obj[prop]) === '[object Object]') {

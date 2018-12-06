@@ -17,6 +17,7 @@
         :type="type"
         :disable="disable"
         :rows="rows"
+        :suffix="suffix"
       />
     </q-field>
   </div>
@@ -35,6 +36,7 @@ export default {
     type: { type: String, default: 'text' },
     rows: { type: Number, default: 1 },
     displayInput: { type: Boolean, default: true },
+    suffix: { type: String, default: '' },
   },
   methods: {
     blurHandler (event) {

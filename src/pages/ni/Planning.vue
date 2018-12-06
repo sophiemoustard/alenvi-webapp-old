@@ -10,6 +10,7 @@
 import { mapMutations, mapGetters } from 'vuex'
 import Scheduler from '../../components/scheduler/Scheduler'
 import 'dhtmlx-scheduler'
+import { NotifyWarning, NotifyNegative } from '../../components/popup/notify';
 
 export default {
   metaInfo () {
@@ -75,21 +76,9 @@ export default {
         if (e.status === 404) {
           this.events = [];
           this.$store.commit('calendar/toggleFilter', false);
-          return this.$q.notify({
-            color: 'secondary',
-            icon: 'warning',
-            detail: 'Aucune intervention dans la période demandée',
-            position: 'bottom-right',
-            timeout: 2500
-          });
+          return NotifyWarning('Aucune intervention dans la période demandée');
         }
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: "Erreur de chargement des données :/ Si le problème persiste, contacte l'équipe technique :)",
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyNegative("Erreur de chargement des données :/ Si le problème persiste, contacte l'équipe technique :)");
       }
     },
     async getFirstCustomer () {

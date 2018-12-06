@@ -13,7 +13,6 @@ import ProfileHeader from '../../components/ProfileHeader';
 import ProfileTabs from '../../components/ProfileTabs';
 import ProfileFollowUp from '../../components/customers/ProfileFollowUp'
 import ProfileInfo from '../../components/customers/ProfileInfo'
-// import ProfileContracts from '../../components/customers/ProfileContracts'
 
 export default {
   props: ['id'],
@@ -48,12 +47,6 @@ export default {
           component: ProfileInfo,
           notification: 'profiles'
         },
-        // {
-        //   label: 'Contrats',
-        //   name: 'contracts',
-        //   default: false,
-        //   component: ProfileContracts,
-        // }
       ]
     }
   },
