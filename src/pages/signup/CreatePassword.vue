@@ -139,9 +139,6 @@ export default {
         this.$router.replace({ name: 'personal info', params: { id: this.$q.cookies.get('user_id') } });
       } catch (e) {
         console.error(e);
-        if (e.response) {
-          console.log(e.response);
-        }
         NotifyNegative('Echec de la mise à jour de l\'utilisateur');
       }
     }
@@ -160,15 +157,8 @@ export default {
       padding: 0px 24px 0px 24px
     &-btn
       font-size: 16px
-      // @media screen and (min-width: 768px)
       margin-top: 20px
       margin-bottom: 24px
-      // @media screen and (max-width: 768px)
-      //   border-radius: 0
-      //   position: fixed
-      //   bottom: 0
-      //   width: 100%
-      //   z-index: 700
 
   .margin-input
     margin-bottom: 6px
@@ -179,9 +169,5 @@ export default {
   .bg-negative
     background: white !important
     color: black !important
-
-  // .neutral-background
-  //   @media screen and (max-width: 768px)
-  //     height: 85vh
 
 </style>
