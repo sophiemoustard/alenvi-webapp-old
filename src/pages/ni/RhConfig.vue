@@ -5,76 +5,39 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Contrats prestataires</p>
         <div class="row gutter-profile">
-          <div class="col-xs-12 col-md-6">
-            <p class="input-caption">Taux horaire brut par défaut</p>
-            <q-field :error="$v.company.rhConfig.providerContracts.grossHourlyRate.$error" :error-label="nbrError('providerContracts.grossHourlyRate')">
-              <q-input
-                :value="company.rhConfig.providerContracts.grossHourlyRate"
-                type="number"
-                color="white"
-                inverted-light
-                suffix="€"
-                @focus="saveTmp('rhConfig.providerContracts.grossHourlyRate')"
-                @change="updateCompany($event, 'rhConfig.providerContracts.grossHourlyRate')" />
-            </q-field>
-          </div>
+          <ni-input caption="Taux horaire brut par défaut" :error="$v.company.rhConfig.providerContracts.grossHourlyRate.$error"
+            :error-label="nbrError('providerContracts.grossHourlyRate')" type="number" v-model="company.rhConfig.providerContracts.grossHourlyRate"
+            @focus="saveTmp('rhConfig.providerContracts.grossHourlyRate')" suffix="€" @blur="updateCompany('rhConfig.providerContracts.grossHourlyRate')"
+          />
         </div>
       </div>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Contrats mandataires</p>
         <div class="row gutter-profile">
-          <div class="col-xs-12 col-md-6">
-            <p class="input-caption">Taux horaire brut par défaut</p>
-            <q-field :error="$v.company.rhConfig.agentContracts.grossHourlyRate.$error" :error-label="nbrError('agentContracts.grossHourlyRate')">
-              <q-input
-                :value="company.rhConfig.agentContracts.grossHourlyRate"
-                type="number"
-                color="white"
-                inverted-light
-                suffix="€"
-                @focus="saveTmp('rhConfig.agentContracts.grossHourlyRate')"
-                @change="updateCompany($event, 'rhConfig.agentContracts.grossHourlyRate')" />
-            </q-field>
-          </div>
+          <ni-input caption="Taux horaire brut par défaut" :error="$v.company.rhConfig.agentContracts.grossHourlyRate.$error"
+            :error-label="nbrError('agentContracts.grossHourlyRate')" type="number" v-model="company.rhConfig.agentContracts.grossHourlyRate"
+            @focus="saveTmp('rhConfig.agentContracts.grossHourlyRate')" suffix="€" @blur="updateCompany('rhConfig.agentContracts.grossHourlyRate')"
+          />
         </div>
       </div>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Remboursement téléphone</p>
         <div class="row gutter-profile">
-          <div class="col-xs-12 col-md-6">
-            <p class="input-caption">Montant du remboursement</p>
-            <q-field :error="$v.company.rhConfig.phoneSubRefunding.$error" :error-label="nbrError('phoneSubRefunding')">
-              <q-input
-                :value="company.rhConfig.phoneSubRefunding"
-                type="number"
-                color="white"
-                inverted-light
-                suffix="€"
-                @focus="saveTmp('rhConfig.phoneSubRefunding')"
-                @change="updateCompany($event, 'rhConfig.phoneSubRefunding')" />
-            </q-field>
-          </div>
+          <ni-input caption="Montant du remboursement" :error="$v.company.rhConfig.phoneSubRefunding.$error" :error-label="nbrError('phoneSubRefunding')"
+            type="number" v-model="company.rhConfig.phoneSubRefunding" @focus="saveTmp('rhConfig.phoneSubRefunding')" suffix="€"
+            @blur="updateCompany('rhConfig.phoneSubRefunding')"
+          />
         </div>
       </div>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Abonnements transports en commun</p>
         <div class="row gutter-profile">
-          <div
-            v-for="(transportSub, index) in company.rhConfig.transportSubs"
-            :key="index"
-            class="col-xs-12 col-md-6">
-            <p class="input-caption">{{ transportSub.department }}</p>
-            <q-field :error="$v.company.rhConfig.transportSubs.$each[index].$error" error-label="Champ requis">
-              <q-input
-                :value="company.rhConfig.transportSubs[index].price"
-                type="number"
-                color="white"
-                inverted-light
-                suffix="€"
-                @focus="saveTmp(`rhConfig.transportSubs[${index}].price`)"
-                @change="updateCompanyTransportSubs($event, { vuelidatePath: `rhConfig.transportSubs.$each[${index}]`, index })"/>
-            </q-field>
-          </div>
+          <template v-for="(transportSub, index) in company.rhConfig.transportSubs">
+            <ni-input :caption="transportSub.department" :error="$v.company.rhConfig.transportSubs.$each[index].$error"
+              type="number" v-model="company.rhConfig.transportSubs[index].price" @focus="saveTmp(`rhConfig.transportSubs[${index}].price`)" suffix="€"
+              @blur="updateCompanyTransportSubs({ vuelidatePath: `rhConfig.transportSubs.$each[${index}]`, index })" :key="index"
+            />
+          </template>
         </div>
       </div>
       <div class="q-mb-xl">
@@ -82,8 +45,7 @@
         <div class="row gutter-profile">
           <div class="col-xs-12 col-md-6">
             <p class="input-caption">Modèle de contrat</p>
-            <div v-if="hasContractTemplate" class="row justify-between"
-            style="background: white">
+            <div v-if="hasContractTemplate" class="row justify-between" style="background: white">
               <div class="doc-thumbnail">
                 <ni-custom-img :driveId="company.rhConfig.templates.contract.driveId" alt="template contrat" />
               </div>
@@ -100,8 +62,7 @@
           </div>
           <div class="col-xs-12 col-md-6">
             <p class="input-caption">Modèle d'avenant au contrat</p>
-            <div v-if="hasAmendmentTemplate" class="row justify-between"
-            style="background: white">
+            <div v-if="hasAmendmentTemplate" class="row justify-between" style="background: white">
               <div class="doc-thumbnail">
                 <ni-custom-img :driveId="company.rhConfig.templates.amendment.driveId" alt="template avenant" />
               </div>
@@ -140,10 +101,12 @@ import { posDecimals } from '../../helpers/vuelidateCustomVal';
 import gdrive from '../../api/GoogleDrive.js';
 import CustomImg from '../../components/form/CustomImg';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../components/popup/notify';
+import Input from '../../components/form/Input.vue';
 
 export default {
   components: {
     'ni-custom-img': CustomImg,
+    'ni-input': Input,
   },
   data () {
     return {
@@ -219,14 +182,14 @@ export default {
     saveTmp (path) {
       this.tmpInput = this.$_.get(this.company, path);
     },
-    async updateCompany (event, path) {
+    async updateCompany (path) {
       try {
-        this.$_.set(this.company, path, event);
         if (this.tmpInput === this.$_.get(this.company, path)) return;
         this.$_.get(this.$v.company, path).$touch();
         if (this.$_.get(this.$v.company, path).$error) {
           return NotifyWarning('Champ(s) invalide(s)');
         }
+
         const value = this.$_.get(this.company, path);
         const payload = this.$_.set({}, path, value);
         payload._id = this.company._id;
@@ -239,13 +202,13 @@ export default {
         this.tmpInput = '';
       }
     },
-    async updateCompanyTransportSubs (event, params) {
+    async updateCompanyTransportSubs (params) {
       try {
-        this.company.rhConfig.transportSubs[params.index].price = event;
         this.$_.get(this.$v.company, params.vuelidatePath).$touch();
         if (this.$_.get(this.$v.company, params.vuelidatePath).$error) {
           NotifyWarning('Champ(s) invalide(s)');
         }
+
         const price = this.company.rhConfig.transportSubs[params.index].price
         if (this.tmpInput === price) return;
         const payload = {
