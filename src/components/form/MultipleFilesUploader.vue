@@ -34,6 +34,7 @@
 import { Cookies, openURL } from 'quasar';
 
 import CustomImg from './CustomImg';
+import { NotifyNegative } from '../popup/notify';
 
 export default {
   components: {
@@ -67,13 +68,7 @@ export default {
       this.$emit('upload', files);
     },
     failMsg () {
-      this.$q.notify({
-        color: 'negative',
-        icon: 'warning',
-        detail: 'Echec de l\'envoi du document',
-        position: 'bottom-left',
-        timeout: 2500,
-      });
+      NotifyNegative('Echec de l\'envoi du document');
     },
     goToUrl (url) {
       url = `${url}?usp=sharing`
