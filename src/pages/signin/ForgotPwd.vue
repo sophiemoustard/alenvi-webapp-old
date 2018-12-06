@@ -23,6 +23,7 @@
 import { email, required } from 'vuelidate/lib/validators'
 
 import CompaniHeader from '../../components/CompaniHeader';
+import { NotifyPositive, NotifyNegative } from '../../components/popup/notify';
 
 export default {
   components: {
@@ -41,13 +42,7 @@ export default {
       try {
         const payload = { email: this.email.toLowerCase(), from: this.$route.query.from || 'w' };
         await this.$users.forgotPassword(payload);
-        this.$q.notify({
-          color: 'positive',
-          icon: 'thumb up',
-          detail: 'Un email a été envoyé à l\'adresse indiquée',
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyPositive('Un email a été envoyé à l\'adresse indiquée');
       } catch (e) {
         let content = '';
         if (e.response && e.response.status) {
@@ -59,13 +54,7 @@ export default {
             content = 'Erreur. Si le problème persiste, contactez le support technique';
           }
         }
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: content,
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyNegative(content);
         console.error(e.response);
       }
     }

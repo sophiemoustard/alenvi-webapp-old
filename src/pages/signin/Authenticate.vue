@@ -41,6 +41,7 @@
 import { date } from 'quasar'
 
 import CompaniHeader from '../../components/CompaniHeader';
+import { NotifyNegative } from '../../components/popup/notify';
 
 export default {
   metaInfo: {
@@ -73,7 +74,6 @@ export default {
           email: this.credentials.email.toLowerCase(),
           password: this.credentials.password
         });
-        // console.log(user);
         this.$q.cookies.set('alenvi_token', user.data.data.token, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV !== 'development' });
         this.$q.cookies.set('alenvi_token_expires_in', user.data.data.expiresIn, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV !== 'development' });
         this.$q.cookies.set('refresh_token', user.data.data.refreshToken, { path: '/', expires: 365, secure: process.env.NODE_ENV !== 'development' });
@@ -95,13 +95,7 @@ export default {
           this.$router.replace({ name: 'administrative directory', query: { role: 'Auxiliaire' } });
         }
       } catch (e) {
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Impossible de se connecter.',
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyNegative('Impossible de se connecter.');
         console.error(e);
       }
     }
@@ -118,15 +112,8 @@ export default {
       padding: 0px 24px 0px 24px
     &-btn
       font-size: 16px
-      // @media screen and (min-width: 768px)
       margin-top: 20px
       margin-bottom: 24px
-      // @media screen and (max-width: 768px)
-      //   border-radius: 0
-      //   position: fixed
-      //   bottom: 0
-      //   width: 100%
-      //   z-index: 700
 
   .margin-input
     margin-bottom: 6px
