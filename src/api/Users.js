@@ -55,18 +55,32 @@ export default {
     const check = await axios.get(`${process.env.API_HOSTNAME}/users/checkResetPassword/${resetToken}`);
     return check.data.data;
   },
-  async updateTask (data) {
-    const updatedTask = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${data.user_id}/tasks/${data.task_id}`, data)
-    return updatedTask;
-  },
   async createDriveFolder (data) {
     const driveFolder = await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${data._id}/drivefolder`, data);
     return driveFolder;
   },
+  // Tasks
+  async updateTask (data) {
+    const updatedTask = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${data.user_id}/tasks/${data.task_id}`, data)
+    return updatedTask;
+  },
+  async getTasks (userId) {
+    const tasks = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/${userId}/tasks`);
+    return tasks.data.data.tasks;
+  },
+  // Contracts
   async createContract (queries, data) {
     const contractCreated = await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${queries.userId}/contracts`, data);
     return contractCreated;
   },
+  async endContract (queries, payload) {
+    await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${queries.userId}/contracts/${queries.contractId}`, payload);
+  },
+  async getContracts (userId) {
+    const contracts = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/${userId}/contracts`);
+    return contracts.data.data.contracts;
+  },
+  // Contracts version
   async updateContractVersion (queries, data) {
     const versionUpdated = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${queries.userId}/contracts/${queries.contractId}/versions/${queries.versionId}`, data);
     return versionUpdated;
@@ -75,6 +89,7 @@ export default {
     const versionCreated = await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${queries.userId}/contracts/${queries.mainContractId}/versions`, data);
     return versionCreated;
   },
+  // Absences
   async createAbsence (userId, payload) {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${userId}/absences`, payload);
   },
@@ -84,8 +99,5 @@ export default {
   },
   async deleteAbsence (queries) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/users/${queries.userId}/absences/${queries.absenceId}`);
-  },
-  async endContract (queries, payload) {
-    await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${queries.userId}/contracts/${queries.contractId}`, payload);
   },
 }

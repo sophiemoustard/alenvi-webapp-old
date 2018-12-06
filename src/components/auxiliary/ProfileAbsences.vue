@@ -11,7 +11,7 @@
                   { name: 'absenceId', value: props.row._id }
                 ]"
                 hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
-                hide-upload-button @add="uploadDocument($event, `absenceReason_${props.row._id}`)" @uploaded="refreshUser"
+                hide-upload-button @add="uploadDocument($event, `absenceReason_${props.row._id}`)" @uploaded="refreshAbsences"
                 @fail="failMsg" />
             </div>
             <q-btn v-else flat round small color="primary">
@@ -228,7 +228,7 @@ export default {
     },
   },
   async mounted () {
-    this.refreshUser();
+    this.refreshAbsences();
   },
   methods: {
     async addAbsence () {
@@ -259,10 +259,10 @@ export default {
     failMsg () {
       NotifyNegative('Echec de l\'envoi du document');
     },
-    async refreshUser () {
+    async refreshAbsences () {
       try {
-        const user = await this.$users.getById(this.getUser._id);
-        this.absences = user.administrative.absences;
+        const absences = await this.$users.getAbsences(this.getUser._id);
+        this.absences = absences;
       } catch (e) {
         console.error(e);
       }
