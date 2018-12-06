@@ -139,6 +139,7 @@ import { required, maxValue } from 'vuelidate/lib/validators';
 import { posDecimals } from '../../helpers/vuelidateCustomVal';
 import gdrive from '../../api/GoogleDrive.js';
 import CustomImg from '../../components/form/CustomImg';
+import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../components/popup/notify';
 
 export default {
   components: {
@@ -224,35 +225,17 @@ export default {
         if (this.tmpInput === this.$_.get(this.company, path)) return;
         this.$_.get(this.$v.company, path).$touch();
         if (this.$_.get(this.$v.company, path).$error) {
-          return this.$q.notify({
-            color: 'secondary',
-            icon: 'warning',
-            detail: 'Champ(s) invalide(s)',
-            position: 'bottom-left',
-            timeout: 2500
-          });
+          return NotifyWarning('Champ(s) invalide(s)');
         }
         const value = this.$_.get(this.company, path);
         const payload = this.$_.set({}, path, value);
         payload._id = this.company._id;
         await this.$companies.updateById(payload);
-        this.$q.notify({
-          color: 'positive',
-          icon: 'done',
-          detail: 'Modification enregistrée',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyPositive('Modification enregistrée');
         this.tmpInput = '';
       } catch (e) {
         console.error(e);
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de la modification',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyNegative('Erreur lors de la modification');
         this.tmpInput = '';
       }
     },
@@ -261,13 +244,7 @@ export default {
         this.company.rhConfig.transportSubs[params.index].price = event;
         this.$_.get(this.$v.company, params.vuelidatePath).$touch();
         if (this.$_.get(this.$v.company, params.vuelidatePath).$error) {
-          return this.$q.notify({
-            color: 'secondary',
-            icon: 'warning',
-            detail: 'Champ(s) invalide(s)',
-            position: 'bottom-left',
-            timeout: 2500
-          });
+          NotifyWarning('Champ(s) invalide(s)');
         }
         const price = this.company.rhConfig.transportSubs[params.index].price
         if (this.tmpInput === price) return;
@@ -281,23 +258,11 @@ export default {
         };
         payload._id = this.company._id;
         await this.$companies.updateById(payload);
-        this.$q.notify({
-          color: 'positive',
-          icon: 'done',
-          detail: 'Modification enregistrée',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyPositive('Modification enregistrée');
         this.tmpInput = '';
       } catch (e) {
         console.error(e);
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de la modification',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyNegative('Erreur lors de la modification');
         this.tmpInput = '';
       }
     },
@@ -311,13 +276,7 @@ export default {
     uploadDocument (files, refName) {
       if (files[0].size > 5000000) {
         this.$refs[refName].reset();
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Fichier trop volumineux (> 5 Mo)',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyNegative('Fichier trop volumineux (> 5 Mo)');
         return '';
       } else {
         this.$refs[refName].upload();
@@ -325,23 +284,11 @@ export default {
     },
     async refreshUser () {
       await this.$store.dispatch('main/getUser', this.user._id);
-      this.$q.notify({
-        color: 'positive',
-        icon: 'done',
-        detail: 'Document envoyé',
-        position: 'bottom-left',
-        timeout: 2500
-      });
+      NotifyPositive('Document envoyé');
       this.company = this.user.company;
     },
     failMsg () {
-      this.$q.notify({
-        color: 'negative',
-        icon: 'warning',
-        detail: 'Echec de l\'envoi du document',
-        position: 'bottom-left',
-        timeout: 2500
-      });
+      NotifyNegative('Echec de l\'envoi du document');
     },
     async deleteDocument (driveId, type) {
       try {
@@ -366,31 +313,13 @@ export default {
         await this.$companies.updateById(payload);
         await this.$store.dispatch('main/getUser', this.user._id);
         this.company = this.user.company;
-        this.$q.notify({
-          color: 'positive',
-          icon: 'done',
-          detail: 'Document supprimé',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyPositive('Document supprimé');
       } catch (e) {
         console.error(e);
         if (e.message === '') {
-          return this.$q.notify({
-            color: 'positive',
-            icon: 'done',
-            detail: 'Suppression annulée',
-            position: 'bottom-left',
-            timeout: 2500
-          });
+          return NotifyPositive('Suppression annulée');
         }
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de la suppression du document',
-          position: 'bottom-left',
-          timeout: 2500
-        });
+        NotifyNegative('Erreur lors de la suppression du document');
       }
     },
     goToUrl (url) {
