@@ -17,29 +17,11 @@
 
 <script>
 import { date } from 'quasar';
+import { NotifyNegative } from '../../components/popup/notify';
 
 export default {
   data () {
     return {
-      // boxes: [
-      //   {
-      //     model: '',
-      //     autofocus: true
-      //   },
-      //   {
-      //     model: '',
-      //     autofocus: false
-      //   },
-      //   {
-      //     model: '',
-      //     autofocus: false
-      //   },
-      //   {
-      //     model: '',
-      //     autofocus: false
-      //   }
-      // ],
-      // code: [0, 0, 0, 0],
       code: '',
       boxesStyle: {
         style: 'color: #E2007A; height: 40px',
@@ -48,16 +30,6 @@ export default {
     }
   },
   methods: {
-    // changeBoxAndMakeCode (index, event) {
-    //   if (index !== (this.boxes.length - 1) && event.match(/[0-9]/g)) {
-    //     this.code.splice(index, 1, event);
-    //     const newIndex = index + 1;
-    //     this.$refs['box' + (newIndex + 1)][0].focus();
-    //   } else if (index === (this.boxes.length - 1) && event.match(/[0-9]/g)) {
-    //     this.$refs['box' + this.boxes.length][0].blur();
-    //     this.code.splice(index, 1, event);
-    //   }
-    // },
     async submit () {
       try {
         const activationDataRaw = await this.$activationCode.check(this.code);
@@ -66,13 +38,7 @@ export default {
         this.$q.cookies.set('signup_userId', activationDataRaw.activationData.newUserId, { path: '/', expires: date.addToDate(new Date(), { days: 1 }), secure: process.env.NODE_ENV !== 'development' });
         this.$router.replace({ path: '/createPassword' });
       } catch (e) {
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Code invalide',
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyNegative('Code invalide');
         console.error(e.response);
       }
     }

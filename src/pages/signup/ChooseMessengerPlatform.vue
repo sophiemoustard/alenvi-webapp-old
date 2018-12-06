@@ -32,6 +32,7 @@
 </template>
 
 <script>
+import { NotifyNegative, NotifyPositive } from '../../components/popup/notify';
 
 export default {
   metaInfo: {
@@ -65,28 +66,15 @@ Si tu rencontres des difficultés, contacte dès aujourd'hui la personne qui t'a
   methods: {
     async sendSMS () {
       try {
-        const message = await this.$twilio.sendSMS({
+        await this.$twilio.sendSMS({
           to: `+33${this.getUser.mobilePhone.substring(1)}`,
           body: this.message,
         });
-        console.log('SMS envoyé =', message);
         this.isLoading = false;
-        this.$q.notify({
-          color: 'positive',
-          icon: 'thumb up',
-          detail: 'SMS bien envoyé',
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyPositive('SMS bien envoyé');
       } catch (e) {
         this.isLoading = false;
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de l\'envoi du SMS',
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyNegative('Erreur lors de l\'envoi du SMS');
         console.error(e);
       }
     }
@@ -108,20 +96,8 @@ Si tu rencontres des difficultés, contacte dès aujourd'hui la personne qui t'a
       padding-bottom: 24px
     &-btn
       font-size: 16px
-      // @media screen and (min-width: 768px)
       margin-top: 24px
       margin-bottom: 24px
-      // @media screen and (max-width: 768px)
-      //   border-radius: 0
-      //   position: fixed
-      //   bottom: 0
-      //   left: 0
-      //   width: 100%
-      //   z-index: 700
-
-  // .neutral-background
-  //   @media screen and (max-width: 768px)
-  //     height: 85vh
 
   .badge
     max-width: 100%

@@ -33,6 +33,7 @@ import { sameAs, minLength, maxLength, required } from 'vuelidate/lib/validators
 
 import CompaniHeader from '../../components/CompaniHeader';
 import users from '../../api/Users'
+import { NotifyPositive, NotifyNegative } from '../../components/popup/notify';
 
 export default {
   components: {
@@ -117,22 +118,10 @@ export default {
               this.$router.replace({ path: '/login' });
             };
         }
-        this.$q.notify({
-          color: 'positive',
-          icon: 'thumb up',
-          detail,
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyPositive(detail);
         this.timeout = setTimeout(action, 2000)
       } catch (e) {
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur, si le problème persiste, contactez le support technique',
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyNegative('Erreur, si le problème persiste, contactez le support technique');
         console.error(e.response);
       }
     }
