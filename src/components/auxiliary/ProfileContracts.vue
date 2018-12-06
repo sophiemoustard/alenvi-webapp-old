@@ -29,7 +29,7 @@
                     { name: 'versionId', value: props.row._id }
                   ]"
                   hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
-                  hide-upload-button @add="uploadDocument($event, `signedContract_${props.row._id}`)" @uploaded="refreshUser" @fail="failMsg" />
+                  hide-upload-button @add="uploadDocument($event, `signedContract_${props.row._id}`)" @uploaded="refreshContracts" @fail="failMsg" />
               </div>
               <q-btn v-else flat round small color="primary">
                 <a :href="props.row.link" download>
@@ -323,10 +323,10 @@ export default {
     failMsg () {
       NotifyNegative('Echec de l\'envoi du document');
     },
-    async refreshUser () {
+    async refreshContracts () {
       try {
-        const user = await this.$users.getById(this.getUser._id);
-        this.contracts = user.administrative.contracts;
+        const contracts = await this.$users.getContracts(this.getUser._id);
+        this.contracts = contracts;
       } catch (e) {
         console.error(e);
       }
@@ -437,7 +437,7 @@ export default {
         // Update manually checkbox because it's not dynamic
         this.sortedContracts[data.contractIndex].versions[data.cell].isActive = data.isActive;
         this.updatePreviousVersions(data);
-        await this.refreshUser();
+        await this.refreshContracts();
         NotifyPositive('Activité du contrat changée');
       } catch (e) {
         console.error(e);
@@ -460,7 +460,7 @@ export default {
         const newOgustContract = await this.$ogust.newContract(payload);
         this.newContract.ogustContractId = newOgustContract.id_contract;
         await this.$users.createContract({ userId: this.getUser._id }, this.newContract);
-        await this.refreshUser();
+        await this.refreshContracts();
         NotifyPositive('Contrat créé');
       } catch (e) {
         console.error(e);
@@ -495,7 +495,7 @@ export default {
           mainContractId
         };
         await this.$users.createContractVersion(queries, this.newContractVersion);
-        await this.refreshUser();
+        await this.refreshContracts();
         NotifyPositive('Version créée');
       } catch (e) {
         console.error(e);
@@ -526,7 +526,7 @@ export default {
           contractId: this.endContractData.contract._id,
         };
         await this.$users.endContract(queries, { endDate: this.endContractData.date });
-        await this.refreshUser();
+        await this.refreshContracts();
         NotifyPositive('Contrat terminé');
       } catch (e) {
         console.error(e);
