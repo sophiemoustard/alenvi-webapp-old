@@ -58,7 +58,6 @@ const userProfileSchema = Joi.object().keys({
       link: Joi.string()
     }).when('driveFolder', { is: Joi.exist(), then: Joi.required() }),
     certificates: Joi.array(),
-    // certificates: Joi.array().when('administrative.driveFolder', { is: Joi.exist(), then: Joi.array().min(1) }),
     healthAttest: Joi.object().keys({
       driveId: Joi.string().required(),
       link: Joi.string()
