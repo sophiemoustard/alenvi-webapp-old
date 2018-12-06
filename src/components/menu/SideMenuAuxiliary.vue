@@ -3,7 +3,6 @@
   <q-list class="no-border sidemenu-alenvi sidemenu-flex">
     <q-list-header>
       <q-item class="justify-center">
-        <!-- <img src="user.picture.link" alt="Image user" class="avatar"> -->
         <img src="https://res.cloudinary.com/alenvi/image/upload/v1539605431/images/business/Compani/compani_logo_1L_RVB_S.png"
           alt="Compani logo">
       </q-item>

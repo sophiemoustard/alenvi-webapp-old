@@ -7,8 +7,8 @@
       >
     </p>
     <p class="text-faded">Le lien de réinitialisation du mot de passe a expiré.<strong>(403)</strong></p>
-    <q-btn v-if="canGoBack" color="primary" style="width:200px;" @click="goBack">Retour</q-btn><!-- @click="$router.push('/')" -->
-    <q-btn color="primary" style="width:200px;" @click="goToForgot">Recevoir un nouveau lien</q-btn><!-- @click="$router.push('/')" -->
+    <q-btn v-if="canGoBack" color="primary" style="width:200px;" @click="goBack">Retour</q-btn>
+    <q-btn color="primary" style="width:200px;" @click="goToForgot">Recevoir un nouveau lien</q-btn>
   </div>
 </template>
 

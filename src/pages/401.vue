@@ -7,7 +7,7 @@
       >
     </p>
     <p class="text-faded">Interdiction d'entrer ici !<strong> (401)</strong></p>
-    <q-btn color="primary" style="width:200px;" @click="$router.replace('/')">Accueil</q-btn><!-- @click="$router.push('/')" -->
+    <q-btn color="primary" style="width:200px;" @click="$router.replace('/')">Accueil</q-btn>
   </div>
 </template>
 
