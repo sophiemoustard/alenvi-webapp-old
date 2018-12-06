@@ -1,5 +1,4 @@
 export default {
-  //
   ogustUser: null,
   openModal: false,
   disableInput: true,
