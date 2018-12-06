@@ -287,8 +287,8 @@ export default {
     }
   },
   async mounted () {
-    const user = await this.$users.getById(this.getUser._id);
-    this.contracts = user.administrative.contracts;
+    const contracts = await this.$users.getContracts(this.getUser._id);
+    this.contracts = contracts;
     this.newContract.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
   },
   methods: {

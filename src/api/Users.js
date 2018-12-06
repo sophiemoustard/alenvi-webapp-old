@@ -88,4 +88,9 @@ export default {
   async endContract (queries, payload) {
     await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${queries.userId}/contracts/${queries.contractId}`, payload);
   },
+  async getContracts (userId) {
+    const contracts = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/${userId}/contracts`);
+    console.log(contracts);
+    return contracts.data.data.contracts;
+  },
 }
