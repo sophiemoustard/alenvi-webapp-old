@@ -64,6 +64,10 @@ export default {
     const updatedTask = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${data.user_id}/tasks/${data.task_id}`, data)
     return updatedTask;
   },
+  async getTasks (userId) {
+    const tasks = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/${userId}/tasks`);
+    return tasks.data.data.tasks;
+  },
   // Contracts
   async createContract (queries, data) {
     const contractCreated = await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${queries.userId}/contracts`, data);
@@ -74,7 +78,6 @@ export default {
   },
   async getContracts (userId) {
     const contracts = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/${userId}/contracts`);
-    console.log(contracts);
     return contracts.data.data.contracts;
   },
   // Contracts version

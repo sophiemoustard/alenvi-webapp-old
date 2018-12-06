@@ -28,8 +28,8 @@ export default {
   },
   async mounted () {
     try {
-      const user = await this.$users.getById(this.getUser._id);
-      this.tasks = user.procedure.filter(task => displayTask(task, user));
+      const tasks = await this.$users.getTasks(this.getUser._id);
+      this.tasks = tasks.filter(task => displayTask(task, this.getUser));
     } catch (e) {
       console.error(e);
     }
