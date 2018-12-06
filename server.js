@@ -6,13 +6,6 @@ const sslRedirect = require('heroku-ssl-redirect');
 
 app.use(history());
 
-// app.use((req, res, next) => {
-//   if (req.secure) {
-//     return res.redirect(['https://', req.hostname, req.url].join(''));
-//   }
-//   next();
-// });
-
 app.use(sslRedirect(['development', 'production']));
 
 app.use(express.static(path.join(__dirname, '/dist/spa-mat')));
