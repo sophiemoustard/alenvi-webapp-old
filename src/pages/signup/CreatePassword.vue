@@ -51,11 +51,11 @@
 </template>
 
 <script>
-
 import { date } from 'quasar'
 import { required, email, sameAs, minLength } from 'vuelidate/lib/validators';
 
 import CompaniHeader from '../../components/CompaniHeader';
+import { NotifyNegative } from '../../components/popup/notify';
 
 export default {
   name: 'CreatePassword',
@@ -118,18 +118,13 @@ export default {
       try {
         this.user.alenvi.isConfirmed = true;
         await this.$users.updateById(this.user.alenvi, this.alenviToken);
-        // const userInfo = await this.$users.getById(this.user.alenvi._id, this.alenviToken);
-        // this.$store.commit('main/setUser', userInfo);
         this.$q.cookies.remove('signup_token', { path: '/' });
         this.$q.cookies.remove('signup_userId', { path: '/' });
         this.$q.cookies.remove('signup_userEmail', { path: '/' });
-        // this.$router.replace('/messenger');
-        // this.$router.replace(`/ni/${this.user.alenvi._id}`);
         const user = await this.$axios.post(`${process.env.API_HOSTNAME}/users/authenticate`, {
           email: this.user.alenvi.local.email.toLowerCase(),
           password: this.user.alenvi.local.password
         });
-        // console.log(user);
         this.$q.cookies.set('alenvi_token', user.data.data.token, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV !== 'development' });
         this.$q.cookies.set('alenvi_token_expires_in', user.data.data.expiresIn, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV !== 'development' });
         this.$q.cookies.set('refresh_token', user.data.data.refreshToken, { path: '/', expires: 365, secure: process.env.NODE_ENV !== 'development' });
@@ -147,13 +142,7 @@ export default {
         if (e.response) {
           console.log(e.response);
         }
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Echec de la mise à jour de l\'utilisateur',
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyNegative('Echec de la mise à jour de l\'utilisateur');
       }
     }
   }
