@@ -26,7 +26,8 @@
 </template>
 
 <script>
-import { required, email, sameAs, minLength, maxLength } from 'vuelidate/lib/validators'
+import { required, email, sameAs, minLength, maxLength } from 'vuelidate/lib/validators';
+import { NotifyPositive, NotifyNegative } from '../../components/popup/notify';
 
 export default {
   metaInfo: {
@@ -78,25 +79,12 @@ export default {
         if (this.user.credentials.password) {
           userToSend.local.password = this.user.credentials.password
         };
-        console.log(userToSend);
         await this.$users.updateById(userToSend);
-        this.$q.notify({
-          color: 'positive',
-          icon: 'thumb up',
-          detail: 'Profil mis à jour',
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyPositive('Profil mis à jour');
         this.user.credentials.password = '';
         this.user.credentials.passwordConfirm = '';
       } catch (e) {
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de la mise à jour du profil',
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyNegative('Erreur lors de la mise à jour du profil');
         this.user.credentials.password = '';
         this.user.credentials.passwordConfirm = '';
         console.error(e);
