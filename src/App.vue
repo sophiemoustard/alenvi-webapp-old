@@ -9,7 +9,6 @@
 export default {
   name: 'App',
   metaInfo: {
-    // title: 'Webapp',
     titleTemplate: (titleChunk) => titleChunk ? `Compani - ${titleChunk}` : 'Compani',
     htmlAttrs: {
       lang: 'fr'
