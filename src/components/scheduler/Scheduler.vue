@@ -140,6 +140,7 @@ import { mapGetters } from 'vuex'
 import { required } from 'vuelidate/lib/validators';
 
 import SectorFilter from '../../components/form/SectorFilter'
+import { NotifyPositive, NotifyNegative, NotifyWarning } from '../popup/notify.js';
 
 const configDhtmlxScheduler = (vm) => {
   // config line mark of current time
@@ -417,8 +418,6 @@ export default {
 
     responsive.initResponsive(scheduler, { customer: this.customer, mobile: this.$q.platform.is.mobile });
 
-    // Scheduler initialization
-
     // Scheduler default view
     let defaultView = '';
     if (this.$q.platform.is.mobile) {
@@ -561,36 +560,18 @@ export default {
         scheduler.setCurrentView();
 
         this.closeModal();
-        this.$q.notify({
-          color: 'positive',
-          icon: 'thumb up',
-          detail: 'Ta demande a bien été enregistrée',
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyPositive('Ta demande a bien été enregistrée');
       } catch (e) {
         console.error(e);
         this.modalBtnLoading = false;
-        this.$q.notify({
-          color: 'error',
-          icon: 'warning',
-          detail: "Erreur lors de l'enregistrement",
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyNegative("Erreur lors de l'enregistrement");
       }
     },
     async declareInternHours () {
       try {
         this.$v.internHoursInfo.$touch();
         if (this.$v.internHoursInfo.$error) {
-          this.$q.notify({
-            color: 'secondary',
-            icon: 'warning',
-            detail: 'Merci de remplir tous les champs',
-            position: 'bottom-right',
-            timeout: 2500
-          });
+          NotifyWarning('Merci de remplir tous les champs');
           return 0;
         }
         this.internHoursModalBtnLoading = true
@@ -600,24 +581,12 @@ export default {
           involved: `${this.user.firstname} ${this.user.lastname}`,
         };
         await this.$planningUpdates.storePlanningupdates(this.user.employee_id, internHoursParams);
-        this.$q.notify({
-          color: 'positive',
-          icon: 'thumb up',
-          detail: 'Ta demande a bien été enregistrée',
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyPositive('Ta demande a bien été enregistrée');
         this.closeInternHoursModal();
       } catch (e) {
         console.error(e);
         this.internHoursModalBtnLoading = false
-        this.$q.notify({
-          color: 'error',
-          icon: 'secondary',
-          detail: "Erreur lors de l'envoi de la déclaration",
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyNegative("Erreur lors de l'envoi de la déclaration");
       }
     },
     displayFilter () {
