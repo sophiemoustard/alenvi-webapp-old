@@ -281,15 +281,6 @@ const routes = [
   { path: '/forgotPassword', component: () => import('pages/signin/ForgotPwd') },
   { path: '/resetPassword/:token', component: () => import('pages/signin/ResetPwd') },
   { path: '/error403Pwd', component: () => import('pages/signin/403') },
-  // { path: '/bot/authenticate', component: () => import('pages/bot/Authenticate') },
-  // { path: '/bot/editCustomerInfo', component: () => import('pages/bot/CustomerInfo') },
-  // { path: '/bot/calendar', component: () => import('pages/bot/Calendar') },
-  // {
-  //   path: '/bot/auxiliaries/:id',
-  //   name: ' bot auxiliary info',
-  //   component: () => import('pages/bot/auxiliaryInfo'),
-  //   props: (route) => ({ id: route.params.id, token: route.query.access_token })
-  // },
   { path: '/401', component: () => import('pages/401') },
   { // Always leave this as last one
     path: '*',
