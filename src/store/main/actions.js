@@ -1,7 +1,3 @@
-/*
-export const someAction = (state) => {}
- */
-
 import users from '../../api/Users';
 import redirect from '../../router/redirect';
 

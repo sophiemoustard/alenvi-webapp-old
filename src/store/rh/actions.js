@@ -1,9 +1,3 @@
-/*
-export function someAction (context) {
-}
-*/
-// import _ from 'lodash';
-
 import users from '../../api/Users'
 import customers from '../../api/Customers'
 import { userProfileValidation } from '../../helpers/userProfileValidation';
@@ -27,7 +21,6 @@ export async function getUserProfile ({ commit }, params) {
 }
 
 export async function updateNotifications ({ commit, state }, type) {
-  // const user = _.cloneDeep(state.userProfile);
   const user = state.userProfile;
   let validation;
   if (type === 'user') {

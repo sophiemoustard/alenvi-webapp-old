@@ -2,11 +2,6 @@
 <q-icon name="mdi-account-search" size="1.5rem" flat>
   <q-popover v-model="showFilter" @show="getPersonsBySector(sector)">
     <q-list link no-border style="min-width: 200px">
-      <!-- <q-list-header v-if="persons.length !== 0"> -->
-      <!-- <q-field icon="search">
-           <q-input v-model="search" placeholder="Recherche" />
-      </q-field> -->
-      <!-- </q-list-header> -->
       <q-inner-loading :visible="loading">
         <q-spinner size="50px" />
       </q-inner-loading>
@@ -14,7 +9,6 @@
         <p class="caption"><q-icon class="on-left" color="tertiary" name="warning"/>Pas de personnes disponibles.</p>
       </div>
       <q-item v-for="(person, index) in persons" :key="index">
-          <!-- <q-checkbox v-model="personsIds" :val="person.value" :label="person.label" @change="choosePersons" /> -->
           <q-radio v-model="personId" :val="person.value" :label="person.label" @input="choosePersons(person.value)" />
         </q-item>
       </q-list>
@@ -29,9 +23,7 @@ export default {
       sectors: [],
       persons: [],
       personId: '',
-      loading: false
-      // personsIds: [],
-      // search: '',
+      loading: false,
     }
   },
   computed: {
@@ -55,14 +47,8 @@ export default {
       }
       return this.ogustUser.sector;
     }
-    // filteredPersons () {
-    //   return this.persons.filter((item) => {
-    //     return item.label.match(new RegExp(`${this.search}`, 'i'));
-    //   })
-    // }
   },
   mounted () {
-    // this.personsIds.push(this.$store.state.ogustUser.id_employee);
     if (this.personType === 'employee') {
       this.personId = this.$store.state.calendar.ogustUser.id_employee;
     }

@@ -7,8 +7,8 @@
       >
     </p>
     <p class="text-faded">Désolé, il n'y a rien ici...<strong> (404)</strong></p>
-    <q-btn v-if="canGoBack" color="primary" style="width:200px;" @click="goBack">Retour</q-btn><!-- @click="$router.push('/')" -->
-    <q-btn color="primary" style="width:200px;" @click="$router.replace('/')">Accueil</q-btn><!-- @click="$router.push('/')" -->
+    <q-btn v-if="canGoBack" color="primary" style="width:200px;" @click="goBack">Retour</q-btn>
+    <q-btn color="primary" style="width:200px;" @click="$router.replace('/')">Accueil</q-btn>
   </div>
 </template>
 

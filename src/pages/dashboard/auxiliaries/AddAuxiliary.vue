@@ -51,7 +51,7 @@
           placeholder="Recherche"
           class="col-12" />
       </template>
-    </q-table> <!-- :data="filteredList" -->
+    </q-table>
   </q-page>
 </template>
 

@@ -1,7 +1,3 @@
-/*
-export const someGetter = (state) => {}
- */
-
 export const user = (state) => {
   return state.user;
 };

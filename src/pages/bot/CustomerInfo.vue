@@ -67,8 +67,8 @@
     </div>
     <div class="row justify-center">
       <div class="col-xs-12 col-sm-6">
-        <q-btn class="full-width" color="primary" @click="setModificationsOn(true)"> <!-- editCustomerInfo --> <!-- :disable="disable" -->
-          {{buttonName}} <!-- Enregistrer -->
+        <q-btn class="full-width" color="primary" @click="setModificationsOn(true)">
+          {{buttonName}}
         </q-btn>
       </div>
     </div>

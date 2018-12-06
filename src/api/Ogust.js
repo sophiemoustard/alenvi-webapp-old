@@ -5,8 +5,6 @@ import axios from 'axios'
 // For webapp requests
 import { alenviAxios } from './ressources/alenviAxios'
 
-// const process.env.API_HOSTNAME = process.env.NODE_ENV === 'production' ? 'https://alenvi-api.herokuapp.com' : 'https://alenvi-api-dev.herokuapp.com'; //'https://799e2471.ngrok.io'
-
 export default {
   async getOgustToken (token) {
     const res = await axios.get(process.env.API_HOSTNAME + '/ogust/token', { headers: { 'x-access-token': token } });
@@ -78,7 +76,6 @@ export default {
   async getOgustPerson (idPerson, personType, ogustToken = null) {
     let personRaw;
     let personData;
-    // let title;
     switch (personType) {
       case 'employee':
         personRaw = ogustToken ? await axios.get(`${process.env.API_HOSTNAME}/ogust/employees/${idPerson}`, { headers: { 'x-ogust-token': ogustToken } }) : await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/employees/${idPerson}`);
@@ -92,11 +89,6 @@ export default {
         break;
     }
     return personData;
-    // return {
-    //   title,
-    //   comment: personData.comment || '',
-    //   sector: personData.sector || '',
-    // };
   },
   async getOgustCustomerDetails (customerId, ogustToken = null) {
     let customerDetails = {};

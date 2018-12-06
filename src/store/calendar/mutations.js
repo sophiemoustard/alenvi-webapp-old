@@ -1,6 +1,3 @@
-/*
-export const someMutation = (state) => {}
- */
 export const controlModal = (state, open) => {
   state.openModal = open;
 };

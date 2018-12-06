@@ -29,7 +29,6 @@ export const can = (el, binding, vnode) => {
   if (user.role && user.role.features) {
     for (let i = 0, l = user.role.features.length; i < l; i++) {
       if (user.role.features[i].name === binding.value.feature) {
-        // el.style.display = binding.value.user.role.features[i].permission_level === 0 ? 'none' : el.style.display;
         if (user.role.features[i].permission_level === 0) {
           commentNode(el, vnode);
         }

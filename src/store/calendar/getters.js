@@ -1,6 +1,3 @@
-/*
-export const someGetter = (state) => {}
- */
 export const getOpenModal = (state) => {
   return state.openModal;
 };
