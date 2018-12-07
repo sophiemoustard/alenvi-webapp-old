@@ -13,7 +13,7 @@
             </q-table>
           </q-card-main>
           <q-card-actions align="end">
-            <q-btn no-caps flat color="primary" icon="add" label="Ajouter un service" />
+            <q-btn no-caps flat color="primary" icon="add" label="Ajouter un service" @click="newServiceModal = true" />
           </q-card-actions>
         </q-card>
       </div>
@@ -24,19 +24,58 @@
         <p class="text-weight-bold">Documents</p>
       </div>
     </div>
+
+    <!-- Service modal -->
+    <q-modal v-model="newServiceModal" :content-css="modalCssContainer">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-11">
+            <h5>Créer un <span class="text-weight-bold">service</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer" style="text-align: right">
+            <span>
+              <q-icon name="clear" size="1rem" @click.native="newServiceModal = false" /></span>
+          </div>
+        </div>
+        <ni-modal-input caption="Nom" v-model="newService.name" />
+        <ni-modal-input caption="Nature" v-model="newService.nature" />
+        <ni-modal-input caption="Montant unitaire par défaut" suffix="€" type="number" v-model="newService.defaultUnitAmount" />
+        <ni-modal-input caption="TVA" suffix="%" v-model="newService.vat" type="number" />
+        <ni-modal-input caption="Majoration dimanche/jours fériés" suffix="%" type="number" v-model="newService.holidaySurcharge" />
+        <ni-modal-input caption="Majoration soirée" suffix="%" type="number" v-model="newService.eveningSurcharge" />
+      </div>
+      <q-btn no-caps class="full-width modal-btn" label="Créer le service" icon-right="add" color="primary" :loading="loading" @click="createNewService" />
+    </q-modal>
   </q-page>
 </template>
 
 <script>
 import { NotifyNegative, NotifyPositive } from '../../components/popup/notify';
+import ModalInput from '../../components/form/ModalInput.vue';
 
 export default {
+  components: {
+    'ni-modal-input': ModalInput,
+  },
   data () {
     return {
+      loading: false,
       company: null,
       services: [
         { name: 'Toto' },
       ],
+      newServiceModal: false,
+      modalCssContainer: {
+        minWidth: '30vw'
+      },
+      newService: {
+        name: '',
+        nature: '',
+        defaultUnitAmount: '',
+        vat: '',
+        holidaySurcharge: '',
+        eveningSurcharge: '',
+      },
       columns: [
         {
           name: 'name',
@@ -54,36 +93,36 @@ export default {
         },
         {
           name: 'defaultUnitAmount',
-          label: 'Montant unitaire par défaut (€)',
-          align: 'left',
+          label: 'Montant unitaire par défaut',
+          align: 'center',
           field: 'defaultUnitAmount',
           sortable: true,
         },
         {
           name: 'vat',
-          label: 'TVA (%)',
-          align: 'left',
+          label: 'TVA',
+          align: 'center',
           field: 'vat',
           sortable: true,
         },
         {
           name: 'holidaySurcharge',
-          label: 'Majoration dimanche/jours fériés (%)',
-          align: 'left',
+          label: 'Majoration dimanche/jours fériés',
+          align: 'center',
           field: 'holidaySurcharge',
           sortable: true,
         },
         {
           name: 'eveningSurcharge',
-          label: 'Majoration soirée (%)',
-          align: 'left',
+          label: 'Majoration soirée',
+          align: 'center',
           field: 'eveningSurcharge',
           sortable: true,
         },
         {
           name: 'delete',
           label: '',
-          align: 'left',
+          align: 'center',
           field: '_id',
           sortable: true,
         },
@@ -120,7 +159,28 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du service.');
       }
-    }
+    },
+    async createNewService () {
+      try {
+        this.loading = true;
+        await this.$companies.createService(this.company._id, this.newService);
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création du service');
+      } finally {
+        this.loading = false;
+        this.newServiceModal = false;
+        this.newService = {
+          name: '',
+          nature: '',
+          defaultUnitAmount: '',
+          vat: '',
+          holidaySurcharge: '',
+          eveningSurcharge: '',
+        };
+        await this.refreshServices();
+      }
+    },
   },
 }
 </script>
@@ -128,4 +188,10 @@ export default {
 <style lang="stylus" scoped>
   .q-table-container
       box-shadow: none
+
+  .modal
+    &-padding
+      padding: 24px 58px 0px 58px
+    &-btn
+      border-radius: 0
 </style>
