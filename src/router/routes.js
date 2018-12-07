@@ -28,14 +28,24 @@ const routes = [
     },
     children: [
       {
-        path: 'config',
+        path: 'config/rh',
         name: 'rh config',
         component: () => import('pages/ni/RhConfig'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['rhconfig:edit'],
-          parent: 'administrative'
-        }
+          parent: 'configuration',
+        },
+      },
+      {
+        path: 'config/customers',
+        name: 'customers config',
+        component: () => import('pages/ni/CustomersConfig'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['rhconfig:edit'],
+          parent: 'configuration',
+        },
       },
       {
         path: 'ni',
@@ -45,8 +55,8 @@ const routes = [
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['users:list'],
-          parent: 'administrative'
-        }
+          parent: 'administrative',
+        },
       },
       {
         path: 'ni/:id',
@@ -59,8 +69,8 @@ const routes = [
             name: 'profiles:edit',
             when: (paramsId, cookieId) => paramsId === cookieId
           }, 'profiles:edit:user'],
-          parent: 'administrative'
-        }
+          parent: 'administrative',
+        },
       },
       {
         path: 'ni/:id/paye',

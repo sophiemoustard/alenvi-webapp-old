@@ -1,7 +1,7 @@
 <template>
   <q-page class="neutral-background" padding>
     <div v-if="company">
-      <h4>Configuration</h4>
+      <h4>Configuration RH</h4>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Contrats prestataires</p>
         <div class="row gutter-profile">
