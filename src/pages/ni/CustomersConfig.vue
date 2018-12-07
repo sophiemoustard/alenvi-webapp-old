@@ -6,9 +6,9 @@
         <p class="text-weight-bold">Services</p>
         <q-card style="background: white">
           <q-card-main>
-            <q-table :data="services" :columns="columns" hide-bottom :pagination.sync="pagination" binary-state-sort>
+            <q-table :data="services" :columns="columns" hide-bottom binary-state-sort>
               <q-td slot="body-cell-delete" slot-scope="props" :props="props">
-                <q-btn flat round small color="grey" icon="delete" />
+                <q-btn flat round small color="grey" icon="delete" @click.native="deleteService(props.value, props.row.__index)" />
               </q-td>
             </q-table>
           </q-card-main>
@@ -28,6 +28,8 @@
 </template>
 
 <script>
+import { NotifyNegative, NotifyPositive } from '../../components/popup/notify';
+
 export default {
   data () {
     return {
@@ -95,6 +97,30 @@ export default {
   },
   mounted () {
     this.company = this.user.company;
+    this.refreshServices();
+  },
+  methods: {
+    async refreshServices () {
+      this.services = await this.$companies.getServices(this.company._id);
+    },
+    async deleteService (serviceId, cell) {
+      try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Etes-vous sûr de vouloir supprimer ce service ?',
+          ok: 'OK',
+          cancel: 'Annuler'
+        });
+
+        const queries = { id: this.company._id, serviceId };
+        await this.$companies.deleteService(queries);
+        this.services.splice(cell, 1);
+        NotifyPositive('Absence supprimée.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression du service.');
+      }
+    }
   },
 }
 </script>
