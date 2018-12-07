@@ -37,10 +37,11 @@
               <q-icon name="clear" size="1rem" @click.native="newServiceModal = false" /></span>
           </div>
         </div>
-        <ni-modal-input caption="Nom" v-model="newService.name" />
-        <ni-modal-input caption="Nature" v-model="newService.nature" />
-        <ni-modal-input caption="Montant unitaire par défaut" suffix="€" type="number" v-model="newService.defaultUnitAmount" />
-        <ni-modal-input caption="TVA" suffix="%" v-model="newService.vat" type="number" />
+        <ni-modal-input caption="Nom" v-model="newService.name" :error="$v.newService.name.$error" @blur="$v.newService.name.$touch" />
+        <ni-modal-input caption="Nature" v-model="newService.nature" :error="$v.newService.nature.$error" @blur="$v.newService.nature.$touch" />
+        <ni-modal-input caption="Montant unitaire par défaut" suffix="€" type="number" v-model="newService.defaultUnitAmount"
+          :error="$v.newService.defaultUnitAmount.$error" @blur="$v.newService.defaultUnitAmount.$touch"/>
+        <ni-modal-input caption="TVA" suffix="%" v-model="newService.vat" type="number" :error="$v.newService.vat.$error" @blur="$v.newService.vat.$touch" />
         <ni-modal-input caption="Majoration dimanche/jours fériés" suffix="%" type="number" v-model="newService.holidaySurcharge" />
         <ni-modal-input caption="Majoration soirée" suffix="%" type="number" v-model="newService.eveningSurcharge" />
       </div>
@@ -50,6 +51,7 @@
 </template>
 
 <script>
+import { required } from 'vuelidate/lib/validators';
 import { NotifyNegative, NotifyPositive } from '../../components/popup/notify';
 import ModalInput from '../../components/form/ModalInput.vue';
 
@@ -128,6 +130,14 @@ export default {
         },
       ],
     };
+  },
+  validations: {
+    newService: {
+      name: { required },
+      nature: { required },
+      defaultUnitAmount: { required },
+      vat: { required },
+    }
   },
   computed: {
     user () {
