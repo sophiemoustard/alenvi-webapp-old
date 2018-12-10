@@ -25,13 +25,13 @@
         <div class="row gutter-profile">
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Mandat de prélèvement" path="customersConfig.templates.debitMandate" :entity="company" alt="template mandat prelevement"
-              name="debitMandate" @delete="deleteDocument(documents.debitMandate.driveId, 'debitMandate')" :upload="uploadDocument"
+              name="debitMandate" @delete="deleteDocument(documents.debitMandate.driveId, 'debitMandate', 'customersConfig')" :upload="uploadDocument"
               @uploaded="documentUploaded" :additionalValue="`modele_mandat_prelevement_${company.name}`" :url="docsUploadUrl"
             />
           </div>
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Devis" path="customersConfig.templates.quote" :entity="company" alt="template devis"
-              name="quote" @delete="deleteDocument(documents.quote.driveId, 'quote')" :upload="uploadDocument"
+              name="quote" @delete="deleteDocument(documents.quote.driveId, 'quote', 'customersConfig')" :upload="uploadDocument"
               @uploaded="documentUploaded" :additionalValue="`modele_devis_${company.name}`" :url="docsUploadUrl"
             />
           </div>
@@ -80,6 +80,7 @@ import { NotifyNegative, NotifyPositive } from '../../components/popup/notify';
 import ModalInput from '../../components/form/ModalInput.vue';
 import CustomImg from '../../components/form/CustomImg.vue';
 import FileUploader from '../../components/form/FileUploader.vue';
+import { configMixin } from '../../mixins/configMixin';
 
 export default {
   name: 'CustomersConfig',
@@ -88,6 +89,7 @@ export default {
     'ni-custom-img': CustomImg,
     'ni-file-uploader': FileUploader,
   },
+  mixins: [configMixin],
   data () {
     return {
       loading: false,
@@ -243,52 +245,6 @@ export default {
         };
         await this.refreshServices();
       }
-    },
-    uploadDocument (files, refName) {
-      if (files[0].size > 5000000) {
-        const node = this.$children[0].$children.filter(child => child.$refs && Object.keys(child.$refs).includes(refName));
-        if (node) {
-          node[0].$refs[refName].reset();
-        }
-        NotifyNegative('Fichier trop volumineux (> 5 Mo)');
-      } else {
-        const node = this.$children[0].$children.filter(child => child.$refs && Object.keys(child.$refs).includes(refName));
-        if (node) {
-          node[0].$refs[refName].upload();
-        }
-      }
-    },
-    async deleteDocument (driveId, type) {
-      try {
-        await this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
-          ok: true,
-          cancel: 'Annuler'
-        });
-        await this.$gdrive.removeFileById({ id: driveId });
-        const payload = {
-          _id: this.company._id,
-          customersConfig: {
-            templates: {
-              [type]: { driveId: null, link: null },
-            }
-          }
-        };
-        await this.$companies.updateById(payload);
-        this.refreshCompany();
-        NotifyPositive('Document supprimé');
-      } catch (e) {
-        console.error(e);
-        if (e.message === '') {
-          return NotifyPositive('Suppression annulée');
-        }
-        NotifyNegative('Erreur lors de la suppression du document');
-      }
-    },
-    documentUploaded () {
-      NotifyPositive('Document envoyé');
-      this.refreshCompany();
     },
   },
 }
