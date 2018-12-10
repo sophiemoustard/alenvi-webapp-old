@@ -30,15 +30,15 @@
                 <ni-custom-img :driveId="documents.debitMandate.driveId" alt="template mandat prelevement" />
               </div>
               <div class="self-end doc-delete">
-                <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument()" />
-                <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(company.customersConfig.templates.debitMandate.link)" />
+                <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(documents.debitMandate.driveId, 'debitMandate')" />
+                <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(documents.debitMandate.link)" />
               </div>
             </div>
             <q-field v-if="!hasMandateTemplate">
             <q-uploader ref="debitMandate" name="debitMandate" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `modele_mandat_prelevement_${company.name}` }]"
               hide-underline color="white" inverted-light
               hide-upload-button @add="uploadDocument($event, 'debitMandate')" @uploaded="documentUploaded" @fail="failMsg" />
-          </q-field>
+            </q-field>
           </div>
           <div class="col-xs-12 col-md-6">
           </div>
@@ -73,7 +73,7 @@
 
 <script>
 import { required } from 'vuelidate/lib/validators';
-import { Cookies } from 'quasar';
+import { Cookies, openURL } from 'quasar';
 import { NotifyNegative, NotifyPositive } from '../../components/popup/notify';
 import ModalInput from '../../components/form/ModalInput.vue';
 import CustomImg from '../../components/form/CustomImg.vue';
@@ -241,12 +241,42 @@ export default {
         this.$refs[refName].upload();
       }
     },
-    deleteDocument () {},
+    async deleteDocument (driveId, type) {
+      try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
+          ok: true,
+          cancel: 'Annuler'
+        });
+        await this.$gdrive.removeFileById({ id: driveId });
+        const payload = {
+          _id: this.company._id,
+          customersConfig: {
+            templates: {
+              [type]: { driveId: null, link: null },
+            }
+          }
+        };
+        await this.$companies.updateById(payload);
+        this.refreshCompany();
+        NotifyPositive('Document supprimé');
+      } catch (e) {
+        console.error(e);
+        if (e.message === '') {
+          return NotifyPositive('Suppression annulée');
+        }
+        NotifyNegative('Erreur lors de la suppression du document');
+      }
+    },
     documentUploaded () {
       NotifyPositive('Document envoyé');
       this.refreshCompany();
     },
-    goToUrl () {},
+    goToUrl (url) {
+      url = `${url}?usp=sharing`
+      openURL(url);
+    },
     failMsg () {
       NotifyNegative('Echec de l\'envoi du document');
     },
