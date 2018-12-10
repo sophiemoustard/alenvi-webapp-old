@@ -34,6 +34,16 @@
           </div>
         </div>
       </div>
+      <div class="q-mb-xl">
+        <table>
+          <th>Nom tag</th>
+          <th>Description</th>
+          <tr v-for="(templateVar, index) in varContracts" :key="index">
+            <td>{{`{${index}\}`}}</td>
+            <td>{{templateVar}}</td>
+          </tr>
+        </table>
+      </div>
     </div>
 
     <!-- Service modal -->
@@ -147,6 +157,20 @@ export default {
           sortable: true,
         },
       ],
+      varContracts: {
+        'firstname': 'Prénom',
+        'lastname': 'Nom',
+        'address': 'Adresse',
+        'city': 'Ville',
+        'zipCode': 'Code postal',
+        'ics': 'ICS',
+        'rum': 'RUM',
+        'companyName': 'Nom de l’organisation',
+        'companyAddress': 'Adresse de l\'organisation',
+        'companyCity': 'Ville de l\'organisation',
+        'companyZipCode': 'Code postal de l\'organisation',
+        'uploadDate': 'Date de l\'upload du contrat pour la date de signature',
+      },
     };
   },
   validations: {
@@ -291,4 +315,7 @@ export default {
       padding: 24px 58px 0px 58px
     &-btn
       border-radius: 0
+
+  th
+    text-align: left
 </style>
