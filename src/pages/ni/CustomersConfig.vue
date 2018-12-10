@@ -27,7 +27,7 @@
             <p class="input-caption">Mandat de prélèvement</p>
             <div v-if="hasMandateTemplate" class="row justify-between" style="background: white">
               <div class="doc-thumbnail">
-                <ni-custom-img :driveId="company.customersConfig.templates.debitMandate.driveId" alt="template mandat prelevement" />
+                <ni-custom-img :driveId="documents.debitMandate.driveId" alt="template mandat prelevement" />
               </div>
               <div class="self-end doc-delete">
                 <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument()" />
@@ -37,7 +37,7 @@
             <q-field v-if="!hasMandateTemplate">
             <q-uploader ref="debitMandate" name="debitMandate" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `modele_mandat_prelevement_${company.name}` }]"
               hide-underline color="white" inverted-light
-              hide-upload-button @add="uploadDocument()" @fail="failMsg" />
+              hide-upload-button @add="uploadDocument($event, 'debitMandate')" @uploaded="documentUploaded" @fail="failMsg" />
           </q-field>
           </div>
           <div class="col-xs-12 col-md-6">
@@ -76,15 +76,19 @@ import { required } from 'vuelidate/lib/validators';
 import { Cookies } from 'quasar';
 import { NotifyNegative, NotifyPositive } from '../../components/popup/notify';
 import ModalInput from '../../components/form/ModalInput.vue';
+import CustomImg from '../../components/form/CustomImg.vue';
 
 export default {
+  name: 'CustomersConfig',
   components: {
     'ni-modal-input': ModalInput,
+    'ni-custom-img': CustomImg,
   },
   data () {
     return {
       loading: false,
       company: null,
+      documents: null,
       services: [
         { name: 'Toto' },
       ],
@@ -178,11 +182,17 @@ export default {
   mounted () {
     this.company = this.user.company;
     this.documents = this.company.customersConfig.templates || {};
+    this.documents.folderId = this.company.rhConfig.templates.folderId;
     this.refreshServices();
   },
   methods: {
     async refreshServices () {
       this.services = await this.$companies.getServices(this.company._id);
+    },
+    async refreshCompany () {
+      await this.$store.dispatch('main/getUser', this.user._id);
+      this.company = this.user.company;
+      this.documents = this.company.customersConfig.templates || {};
     },
     async deleteService (serviceId, cell) {
       try {
@@ -223,9 +233,19 @@ export default {
         await this.refreshServices();
       }
     },
-    uploadDocument () {},
+    uploadDocument (files, refName) {
+      if (files[0].size > 5000000) {
+        this.$refs[refName].reset();
+        NotifyNegative('Fichier trop volumineux (> 5 Mo)');
+      } else {
+        this.$refs[refName].upload();
+      }
+    },
     deleteDocument () {},
-    documentUploaded () {},
+    documentUploaded () {
+      NotifyPositive('Document envoyé');
+      this.refreshCompany();
+    },
     goToUrl () {},
     failMsg () {
       NotifyNegative('Echec de l\'envoi du document');
