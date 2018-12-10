@@ -13,8 +13,8 @@
         <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(document.link)" />
       </div>
     </div>
-    <q-field v-if="document && !document.driveId && displayUpload" :error="error" :error-label="errorLabel">
-      <q-uploader :ref="name" :name="name" :url="docsUploadUrl" :headers="headers" :additional-fields="additionalFields" @fail="failMsg"
+    <q-field v-if="(!document || !document.driveId) && displayUpload" :error="error" :error-label="errorLabel">
+      <q-uploader :ref="name" :name="name" :url="url" :headers="headers" :additional-fields="additionalFields" @fail="failMsg"
         hide-underline :extensions="extensions" color="white" inverted-light hide-upload-button @add="uploadDocument" @uploaded="documentUploaded"
       />
     </q-field>
@@ -43,12 +43,11 @@ export default {
     alt: String,
     name: String,
     additionalValue: String,
-    entityUrl: String,
     entity: Object,
+    url: String,
     errorLabel: { type: String, default: 'Document requis' },
     displayUpload: { type: Boolean, default: true },
     displayCaption: { type: Boolean, default: true },
-    folderId: String,
     upload: Function,
   },
   methods: {
@@ -72,9 +71,6 @@ export default {
   computed: {
     headers () {
       return { 'x-access-token': Cookies.get('alenvi_token') || '' };
-    },
-    docsUploadUrl () {
-      return `${process.env.API_HOSTNAME}/${this.entityUrl}/${this.entity._id}/gdrive/${this.folderId}/upload`;
     },
     additionalFields () {
       return [{ name: 'fileName', value: this.additionalValue }];

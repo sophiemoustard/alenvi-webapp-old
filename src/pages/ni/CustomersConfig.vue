@@ -26,11 +26,14 @@
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Mandat de prélèvement" path="customersConfig.templates.debitMandate" :entity="company" alt="template mandat prelevement"
               name="debitMandate" @delete="deleteDocument(documents.debitMandate.driveId, 'debitMandate')" :upload="uploadDocument"
-              @uploaded="documentUploaded" :folderId="company.rhConfig.templates.folderId" :additionalValue="`modele_mandat_prelevement_${company.name}`"
-              entityUrl="companies"
+              @uploaded="documentUploaded" :additionalValue="`modele_mandat_prelevement_${company.name}`" :url="docsUploadUrl"
             />
           </div>
           <div class="col-xs-12 col-md-6">
+            <ni-file-uploader caption="Devis" path="customersConfig.templates.quote" :entity="company" alt="template devis"
+              name="quote" @delete="deleteDocument(documents.quote.driveId, 'quote')" :upload="uploadDocument"
+              @uploaded="documentUploaded" :additionalValue="`modele_devis_${company.name}`" :url="docsUploadUrl"
+            />
           </div>
         </div>
       </div>
@@ -73,7 +76,6 @@
 
 <script>
 import { required } from 'vuelidate/lib/validators';
-import { Cookies, openURL } from 'quasar';
 import { NotifyNegative, NotifyPositive } from '../../components/popup/notify';
 import ModalInput from '../../components/form/ModalInput.vue';
 import CustomImg from '../../components/form/CustomImg.vue';
@@ -185,14 +187,8 @@ export default {
     user () {
       return this.$store.getters['main/user'];
     },
-    headers () {
-      return { 'x-access-token': Cookies.get('alenvi_token') || '' }
-    },
     docsUploadUrl () {
       return `${process.env.API_HOSTNAME}/companies/${this.company._id}/gdrive/${this.documents.folderId}/upload`;
-    },
-    hasMandateTemplate () {
-      return this.documents && this.documents.debitMandate && this.documents.debitMandate.driveId;
     },
   },
   mounted () {
@@ -209,6 +205,7 @@ export default {
       await this.$store.dispatch('main/getUser', this.user._id);
       this.company = this.user.company;
       this.documents = this.company.customersConfig.templates || {};
+      this.documents.folderId = this.company.rhConfig.templates.folderId;
     },
     async deleteService (serviceId, cell) {
       try {
@@ -294,10 +291,6 @@ export default {
     documentUploaded () {
       NotifyPositive('Document envoyé');
       this.refreshCompany();
-    },
-    goToUrl (url) {
-      url = `${url}?usp=sharing`
-      openURL(url);
     },
     failMsg () {
       NotifyNegative('Echec de l\'envoi du document');
