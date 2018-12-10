@@ -172,19 +172,20 @@
           <ni-file-uploader caption="Carte d'identité (recto)" path="administrative.idCardRecto" alt="cni recto" :entity="userProfile"
             @delete="deleteDocument(user.alenvi.administrative.idCardRecto.driveId, 'administrative.idCardRecto')" name="idCardRecto"
             @uploaded="refreshUser" :upload="uploadDocument" :url="docsUploadUrl" :error="$v.user.alenvi.administrative.idCardRecto.driveId.$error"
-            :additionalValue="`cni_recto_${userProfile.firstname}_${userProfile.lastname}`"
+            :additionalValue="`cni_recto_${userProfile.firstname}_${userProfile.lastname}`" :extensions="extensions"
           />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Carte d'identité (verso)" path="administrative.idCardVerso" alt="cni verso" :entity="userProfile" :url="docsUploadUrl"
             @delete="deleteDocument(user.alenvi.administrative.idCardVerso.driveId, 'administrative.idCardVerso')" name="idCardVerso"
             @uploaded="refreshUser" :upload="uploadDocument" :additionalValue="`cni_verso_${userProfile.firstname}_${userProfile.lastname}`"
+            :extensions="extensions"
           />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'pp'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Passeport" path="administrative.passport" alt="passeport" :entity="userProfile" :upload="uploadDocument"
             @delete="deleteDocument(user.alenvi.administrative.passport.driveId, 'administrative.passport')" name="passport" :url="docsUploadUrl"
-            @uploaded="refreshUser" :error="$v.user.alenvi.administrative.passport.driveId.$error"
+            @uploaded="refreshUser" :error="$v.user.alenvi.administrative.passport.driveId.$error" :extensions="extensions"
             :additionalValue="`passport_${userProfile.firstname}_${userProfile.lastname}`"
           />
         </div>
@@ -193,26 +194,28 @@
             @delete="deleteDocument(user.alenvi.administrative.residencePermitRecto.driveId, 'administrative.residencePermitRecto')"
             @uploaded="refreshUser" :upload="uploadDocument" :url="docsUploadUrl" :error="$v.user.alenvi.administrative.residencePermitRecto.driveId.$error"
             name="residencePermitRecto" :additionalValue="`titre_de_séjour_recto_${userProfile.firstname}_${userProfile.lastname}`"
+            :extensions="extensions"
           />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Titre de séjour (verso)" path="administrative.residencePermitVerso" alt="titre de séjour (verso)" name="residencePermitVerso"
             @delete="deleteDocument(user.alenvi.administrative.residencePermitVerso.driveId, 'administrative.residencePermitVerso')" :entity="userProfile"
-            @uploaded="refreshUser" :upload="uploadDocument" :url="docsUploadUrl" :additionalValue="`titre_de_séjour_verso_${userProfile.firstname}_${userProfile.lastname}`"
+            @uploaded="refreshUser" :upload="uploadDocument" :url="docsUploadUrl" :extensions="extensions"
+            :additionalValue="`titre_de_séjour_verso_${userProfile.firstname}_${userProfile.lastname}`"
           />
         </div>
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Attestation de sécurité sociale" path="administrative.healthAttest" alt="attestation secu" :entity="userProfile"
             @delete="deleteDocument(user.alenvi.administrative.healthAttest.driveId, 'administrative.healthAttest')" name="healthAttest"
             @uploaded="refreshUser" :upload="uploadDocument" :error="$v.user.alenvi.administrative.healthAttest.driveId.$error"
-            :additionalValue="`attestation_secu_${userProfile.firstname}_${userProfile.lastname}`" :url="docsUploadUrl"
+            :additionalValue="`attestation_secu_${userProfile.firstname}_${userProfile.lastname}`" :url="docsUploadUrl" :extensions="extensions"
           />
         </div>
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Facture téléphonique" path="administrative.phoneInvoice" alt="facture téléphone" :entity="userProfile"
             @delete="deleteDocument(user.alenvi.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')" name="phoneInvoice"
             @uploaded="refreshUser" :upload="uploadDocument" :error="$v.user.alenvi.administrative.phoneInvoice.driveId.$error"
-            :additionalValue="`facture_telephone_${userProfile.firstname}_${userProfile.lastname}`" :url="docsUploadUrl"
+            :additionalValue="`facture_telephone_${userProfile.firstname}_${userProfile.lastname}`" :url="docsUploadUrl" :extensions="extensions"
           />
         </div>
         <div class="col-xs-12 col-md-6">
@@ -248,7 +251,7 @@
             @delete="deleteDocument(user.alenvi.administrative.mutualFund.driveId, 'administrative.mutualFund')" name="mutualFund" @uploaded="refreshUser"
             :displayUpload="user.alenvi.administrative.mutualFund.has && !user.alenvi.administrative.mutualFund.driveId" entityUrl="users"
             :error="$v.user.alenvi.administrative.mutualFund.driveId.$error" :displayCaption="currentUser.role.name === 'Auxiliaire'"
-            :url="docsUploadUrl" :additionalValue="`mutuelle_${userProfile.firstname}_${userProfile.lastname}`"
+            :url="docsUploadUrl" :additionalValue="`mutuelle_${userProfile.firstname}_${userProfile.lastname}`" :extensions="extensions"
           />
       </div>
         </div>
@@ -275,7 +278,7 @@
             alt="justif transport" :entity="userProfile" :upload="uploadDocument" name="transportInvoice" @uploaded="refreshUser"
             :error="$v.user.alenvi.administrative.transportInvoice.driveId.$error" :displayCaption="currentUser.role.name === 'Auxiliaire'"
             @delete="deleteDocument(user.alenvi.administrative.transportInvoice.driveId, 'administrative.transportInvoice')"
-            :url="docsUploadUrl" :additionalValue="`justif_transport_${userProfile.firstname}_${userProfile.lastname}`"
+            :url="docsUploadUrl" :additionalValue="`justif_transport_${userProfile.firstname}_${userProfile.lastname}`" :extensions="extensions"
           />
         </div>
       </div>
@@ -287,7 +290,7 @@
           <ni-file-uploader caption="Certificat d'aptitude" path="administrative.medicalCertificate" alt="certificat médical" :entity="user.alenvi"
             @delete="deleteDocument(user.alenvi.administrative.medicalCertificate.driveId, 'administrative.medicalCertificate')" name="medicalCertificate"
             @uploaded="refreshUser" :additionalValue="`certificat_medical_${userProfile.firstname}_${userProfile.lastname}`"
-            :upload="uploadDocument" :url="docsUploadUrl"
+            :upload="uploadDocument" :url="docsUploadUrl" :extensions="extensions"
           />
         </div>
       </div>
@@ -442,7 +445,8 @@ export default {
             }
           }
         }
-      }
+      },
+      extensions: 'image/jpg, image/jpeg, image/gif, image/png, application/pdf',
     }
   },
   validations () {

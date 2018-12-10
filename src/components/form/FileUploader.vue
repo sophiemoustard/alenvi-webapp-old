@@ -31,11 +31,6 @@ export default {
   components: {
     'ni-custom-img': CustomImg,
   },
-  data () {
-    return {
-      extensions: 'image/jpg, image/jpeg, image/gif, image/png, application/pdf',
-    };
-  },
   props: {
     caption: String,
     error: { type: Boolean, default: false },
@@ -49,6 +44,7 @@ export default {
     displayUpload: { type: Boolean, default: true },
     displayCaption: { type: Boolean, default: true },
     upload: Function,
+    extensions: { type: String, default: '' },
   },
   methods: {
     deleteDocument () {

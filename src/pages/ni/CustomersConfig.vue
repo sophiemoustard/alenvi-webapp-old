@@ -290,9 +290,6 @@ export default {
       NotifyPositive('Document envoyé');
       this.refreshCompany();
     },
-    failMsg () {
-      NotifyNegative('Echec de l\'envoi du document');
-    },
   },
 }
 </script>
