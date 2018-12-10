@@ -188,13 +188,12 @@ export default {
       return this.$store.getters['main/user'];
     },
     docsUploadUrl () {
-      return `${process.env.API_HOSTNAME}/companies/${this.company._id}/gdrive/${this.documents.folderId}/upload`;
+      return `${process.env.API_HOSTNAME}/companies/${this.company._id}/gdrive/${this.company.folderId}/upload`;
     },
   },
   mounted () {
     this.company = this.user.company;
     this.documents = this.company.customersConfig.templates || {};
-    this.documents.folderId = this.company.rhConfig.templates.folderId;
     this.refreshServices();
   },
   methods: {
@@ -205,7 +204,6 @@ export default {
       await this.$store.dispatch('main/getUser', this.user._id);
       this.company = this.user.company;
       this.documents = this.company.customersConfig.templates || {};
-      this.documents.folderId = this.company.rhConfig.templates.folderId;
     },
     async deleteService (serviceId, cell) {
       try {

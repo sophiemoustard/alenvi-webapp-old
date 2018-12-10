@@ -140,7 +140,7 @@ export default {
       return this.$store.getters['main/user'];
     },
     docsUploadUrl () {
-      return `${process.env.API_HOSTNAME}/companies/${this.company._id}/gdrive/${this.company.rhConfig.templates.folderId}/upload`;
+      return `${process.env.API_HOSTNAME}/companies/${this.company._id}/gdrive/${this.company.folderId}/upload`;
     },
     headers () {
       return {
