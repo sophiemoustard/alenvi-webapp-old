@@ -22,6 +22,30 @@
       </div>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Documents</p>
+        <div class="row gutter-profile">
+          <div class="col-xs-12 col-md-6">
+            <ni-file-uploader caption="Mandat de prélèvement" path="customersConfig.templates.debitMandate" :entity="company" alt="template mandat prelevement"
+              name="debitMandate" @delete="deleteDocument(documents.debitMandate.driveId, 'debitMandate', 'customersConfig')" :upload="uploadDocument"
+              @uploaded="documentUploaded" :additionalValue="`modele_mandat_prelevement_${company.name}`" :url="docsUploadUrl"
+            />
+          </div>
+          <div class="col-xs-12 col-md-6">
+            <ni-file-uploader caption="Devis" path="customersConfig.templates.quote" :entity="company" alt="template devis"
+              name="quote" @delete="deleteDocument(documents.quote.driveId, 'quote', 'customersConfig')" :upload="uploadDocument"
+              @uploaded="documentUploaded" :additionalValue="`modele_devis_${company.name}`" :url="docsUploadUrl"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="q-mb-xl">
+        <table>
+          <th>Nom tag</th>
+          <th>Description</th>
+          <tr v-for="(templateVar, index) in varContracts" :key="index">
+            <td>{{`{${index}\}`}}</td>
+            <td>{{templateVar}}</td>
+          </tr>
+        </table>
       </div>
     </div>
 
@@ -54,15 +78,23 @@
 import { required } from 'vuelidate/lib/validators';
 import { NotifyNegative, NotifyPositive } from '../../components/popup/notify';
 import ModalInput from '../../components/form/ModalInput.vue';
+import CustomImg from '../../components/form/CustomImg.vue';
+import FileUploader from '../../components/form/FileUploader.vue';
+import { configMixin } from '../../mixins/configMixin';
 
 export default {
+  name: 'CustomersConfig',
   components: {
     'ni-modal-input': ModalInput,
+    'ni-custom-img': CustomImg,
+    'ni-file-uploader': FileUploader,
   },
+  mixins: [configMixin],
   data () {
     return {
       loading: false,
       company: null,
+      documents: null,
       services: [
         { name: 'Toto' },
       ],
@@ -129,6 +161,28 @@ export default {
           sortable: true,
         },
       ],
+      varContracts: {
+        'firstname': 'Prénom',
+        'lastname': 'Nom',
+        'address': 'Adresse',
+        'city': 'Ville',
+        'zipCode': 'Code postal',
+        'ics': 'ICS',
+        'rum': 'RUM',
+        'companyName': 'Nom de l’organisation',
+        'companyAddress': 'Adresse de l\'organisation',
+        'companyCity': 'Ville de l\'organisation',
+        'companyZipCode': 'Code postal de l\'organisation',
+        'uploadDate': 'Date de l\'upload du contrat pour la date de signature',
+        'quoteNumber': 'Numéro du devis',
+        'rcs': 'RCS de l’organisation',
+        'services': 'Nom du/des services',
+        'hourlyRate': 'Tarif horaire TTC',
+        'estimatedWeeklyVolume': 'Volume hebdomadaire estimé total',
+        'sundays': 'Dont dimanche',
+        'evenings': 'Dont soir après 20h',
+        'estimatedWeeklyRate': 'Tarif hebdomadaire estimé',
+      },
     };
   },
   validations: {
@@ -143,14 +197,23 @@ export default {
     user () {
       return this.$store.getters['main/user'];
     },
+    docsUploadUrl () {
+      return `${process.env.API_HOSTNAME}/companies/${this.company._id}/gdrive/${this.company.folderId}/upload`;
+    },
   },
   mounted () {
     this.company = this.user.company;
+    this.documents = this.company.customersConfig.templates || {};
     this.refreshServices();
   },
   methods: {
     async refreshServices () {
       this.services = await this.$companies.getServices(this.company._id);
+    },
+    async refreshCompany () {
+      await this.$store.dispatch('main/getUser', this.user._id);
+      this.company = this.user.company;
+      this.documents = this.company.customersConfig.templates || {};
     },
     async deleteService (serviceId, cell) {
       try {
@@ -204,4 +267,7 @@ export default {
       padding: 24px 58px 0px 58px
     &-btn
       border-radius: 0
+
+  th
+    text-align: left
 </style>

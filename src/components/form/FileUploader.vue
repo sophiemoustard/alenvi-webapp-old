@@ -13,8 +13,8 @@
         <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(document.link)" />
       </div>
     </div>
-    <q-field v-if="document && !document.driveId && displayUpload" :error="error" :error-label="errorLabel">
-      <q-uploader :ref="name" :name="name" :url="docsUploadUrl" :headers="headers" :additional-fields="additionalFields" @fail="failMsg"
+    <q-field v-if="(!document || !document.driveId) && displayUpload" :error="error" :error-label="errorLabel">
+      <q-uploader :ref="name" :name="name" :url="url" :headers="headers" :additional-fields="additionalFields" @fail="failMsg"
         hide-underline :extensions="extensions" color="white" inverted-light hide-upload-button @add="uploadDocument" @uploaded="documentUploaded"
       />
     </q-field>
@@ -31,22 +31,20 @@ export default {
   components: {
     'ni-custom-img': CustomImg,
   },
-  data () {
-    return {
-      extensions: 'image/jpg, image/jpeg, image/gif, image/png, application/pdf',
-    };
-  },
   props: {
     caption: String,
     error: { type: Boolean, default: false },
     path: String,
     alt: String,
     name: String,
-    additionalFieldsName: String,
-    userProfile: Object,
+    additionalValue: String,
+    entity: Object,
+    url: String,
     errorLabel: { type: String, default: 'Document requis' },
     displayUpload: { type: Boolean, default: true },
     displayCaption: { type: Boolean, default: true },
+    upload: Function,
+    extensions: { type: String, default: '' },
   },
   methods: {
     deleteDocument () {
@@ -56,7 +54,7 @@ export default {
       this.$emit('uploaded');
     },
     uploadDocument (files) {
-      this.$emit('upload', files);
+      this.upload(files, this.name)
     },
     goToUrl (url) {
       url = `${url}?usp=sharing`
@@ -70,14 +68,11 @@ export default {
     headers () {
       return { 'x-access-token': Cookies.get('alenvi_token') || '' };
     },
-    docsUploadUrl () {
-      return `${process.env.API_HOSTNAME}/users/${this.userProfile._id}/gdrive/${this.userProfile.administrative.driveFolder.id}/upload`;
-    },
     additionalFields () {
-      return [{ name: 'fileName', value: `${this.additionalFieldsName}_${this.userProfile.firstname}_${this.userProfile.lastname}` }];
+      return [{ name: 'fileName', value: this.additionalValue }];
     },
     document () {
-      return this.$_.get(this.userProfile, this.path);
+      return this.$_.get(this.entity, this.path);
     },
   },
 };
