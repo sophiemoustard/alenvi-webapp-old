@@ -22,6 +22,27 @@
       </div>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Documents</p>
+        <div class="row gutter-profile">
+          <div class="col-xs-12 col-md-6">
+            <p class="input-caption">Mandat de prélèvement</p>
+            <div v-if="hasMandateTemplate" class="row justify-between" style="background: white">
+              <div class="doc-thumbnail">
+                <ni-custom-img :driveId="company.customersConfig.templates.debitMandate.driveId" alt="template mandat prelevement" />
+              </div>
+              <div class="self-end doc-delete">
+                <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument()" />
+                <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(company.customersConfig.templates.debitMandate.link)" />
+              </div>
+            </div>
+            <q-field v-if="!hasMandateTemplate">
+            <q-uploader ref="debitMandate" name="debitMandate" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `modele_mandat_prelevement_${company.name}` }]"
+              hide-underline color="white" inverted-light
+              hide-upload-button @add="uploadDocument()" @fail="failMsg" />
+          </q-field>
+          </div>
+          <div class="col-xs-12 col-md-6">
+          </div>
+        </div>
       </div>
     </div>
 
@@ -52,6 +73,7 @@
 
 <script>
 import { required } from 'vuelidate/lib/validators';
+import { Cookies } from 'quasar';
 import { NotifyNegative, NotifyPositive } from '../../components/popup/notify';
 import ModalInput from '../../components/form/ModalInput.vue';
 
@@ -143,9 +165,19 @@ export default {
     user () {
       return this.$store.getters['main/user'];
     },
+    headers () {
+      return { 'x-access-token': Cookies.get('alenvi_token') || '' }
+    },
+    docsUploadUrl () {
+      return `${process.env.API_HOSTNAME}/companies/${this.company._id}/gdrive/${this.documents.folderId}/upload`;
+    },
+    hasMandateTemplate () {
+      return this.documents && this.documents.debitMandate && this.documents.debitMandate.driveId;
+    },
   },
   mounted () {
     this.company = this.user.company;
+    this.documents = this.company.customersConfig.templates || {};
     this.refreshServices();
   },
   methods: {
@@ -190,6 +222,13 @@ export default {
         };
         await this.refreshServices();
       }
+    },
+    uploadDocument () {},
+    deleteDocument () {},
+    documentUploaded () {},
+    goToUrl () {},
+    failMsg () {
+      NotifyNegative('Echec de l\'envoi du document');
     },
   },
 }
