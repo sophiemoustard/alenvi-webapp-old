@@ -169,50 +169,57 @@
           </q-field>
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
-          <ni-file-uploader caption="Carte d'identité (recto)" path="administrative.idCardRecto" alt="cni recto" :userProfile="userProfile"
+          <ni-file-uploader caption="Carte d'identité (recto)" path="administrative.idCardRecto" alt="cni recto" :entity="userProfile"
             @delete="deleteDocument(user.alenvi.administrative.idCardRecto.driveId, 'administrative.idCardRecto')" name="idCardRecto"
-            additionalFieldsName="cni_recto" @uploaded="refreshUser" @upload="uploadDocument($event, 'idCardRecto')"
-            :error="$v.user.alenvi.administrative.idCardRecto.driveId.$error"
+            @uploaded="refreshUser" :upload="uploadDocument" entityUrl="users"
+            :error="$v.user.alenvi.administrative.idCardRecto.driveId.$error" :folderId="userProfile.administrative.driveFolder.id"
+            :additionalValue="`cni_recto_${userProfile.firstname}_${userProfile.lastname}`"
           />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
-          <ni-file-uploader caption="Carte d'identité (verso)" path="administrative.idCardVerso" alt="cni verso" :userProfile="userProfile"
+          <ni-file-uploader caption="Carte d'identité (verso)" path="administrative.idCardVerso" alt="cni verso" :entity="userProfile"
             @delete="deleteDocument(user.alenvi.administrative.idCardVerso.driveId, 'administrative.idCardVerso')" name="idCardVerso"
-            additionalFieldsName="cni_verso" @uploaded="refreshUser" @upload="uploadDocument($event, 'idCardVerso')"
+            @uploaded="refreshUser" :upload="uploadDocument" entityUrl="users"
+            :folderId="userProfile.administrative.driveFolder.id" :additionalValue="`cni_verso_${userProfile.firstname}_${userProfile.lastname}`"
           />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'pp'" class="col-xs-12 col-md-6">
-          <ni-file-uploader caption="Passeport" path="administrative.passport" alt="passeport" :userProfile="userProfile"
+          <ni-file-uploader caption="Passeport" path="administrative.passport" alt="passeport" :entity="userProfile"
             @delete="deleteDocument(user.alenvi.administrative.passport.driveId, 'administrative.passport')" name="passport"
-            additionalFieldsName="passport" @uploaded="refreshUser" @upload="uploadDocument($event, 'passport')"
+            @uploaded="refreshUser" :upload="uploadDocument" entityUrl="users"
             :error="$v.user.alenvi.administrative.passport.driveId.$error"
+            :folderId="userProfile.administrative.driveFolder.id" :additionalValue="`passport_${userProfile.firstname}_${userProfile.lastname}`"
           />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
-          <ni-file-uploader caption="Titre de séjour (recto)" path="administrative.residencePermitRecto" alt="titre de séjour (recto)" :userProfile="userProfile"
+          <ni-file-uploader caption="Titre de séjour (recto)" path="administrative.residencePermitRecto" alt="titre de séjour (recto)" :entity="userProfile"
             @delete="deleteDocument(user.alenvi.administrative.residencePermitRecto.driveId, 'administrative.residencePermitRecto')"
-            additionalFieldsName="titre_de_séjour_recto" @uploaded="refreshUser" @upload="uploadDocument($event, 'residencePermitRecto')"
+            @uploaded="refreshUser" :upload="uploadDocument" entityUrl="users"
             :error="$v.user.alenvi.administrative.residencePermitRecto.driveId.$error" name="residencePermitRecto"
+            :folderId="userProfile.administrative.driveFolder.id" :additionalValue="`titre_de_séjour_recto_${userProfile.firstname}_${userProfile.lastname}`"
           />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Titre de séjour (verso)" path="administrative.residencePermitVerso" alt="titre de séjour (verso)" name="residencePermitVerso"
-            @delete="deleteDocument(user.alenvi.administrative.residencePermitVerso.driveId, 'administrative.residencePermitVerso')" :userProfile="userProfile"
-            additionalFieldsName="titre_de_séjour_verso" @uploaded="refreshUser" @upload="uploadDocument($event, 'residencePermitVerso')"
+            @delete="deleteDocument(user.alenvi.administrative.residencePermitVerso.driveId, 'administrative.residencePermitVerso')" :entity="userProfile"
+            @uploaded="refreshUser" :upload="uploadDocument" entityUrl="users"
+            :folderId="userProfile.administrative.driveFolder.id" :additionalValue="`titre_de_séjour_verso_${userProfile.firstname}_${userProfile.lastname}`"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <ni-file-uploader caption="Attestation de sécurité sociale" path="administrative.healthAttest" alt="attestation secu" :userProfile="userProfile"
+          <ni-file-uploader caption="Attestation de sécurité sociale" path="administrative.healthAttest" alt="attestation secu" :entity="userProfile"
             @delete="deleteDocument(user.alenvi.administrative.healthAttest.driveId, 'administrative.healthAttest')" name="healthAttest"
-            additionalFieldsName="attestation_secu" @uploaded="refreshUser" @upload="uploadDocument($event, 'healthAttest')"
-            :error="$v.user.alenvi.administrative.healthAttest.driveId.$error"
+            @uploaded="refreshUser" :upload="uploadDocument"
+            :error="$v.user.alenvi.administrative.healthAttest.driveId.$error" :folderId="userProfile.administrative.driveFolder.id"
+            :additionalValue="`attestation_secu_${userProfile.firstname}_${userProfile.lastname}`" entityUrl="users"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <ni-file-uploader caption="Facture téléphonique" path="administrative.phoneInvoice" alt="facture téléphone" :userProfile="userProfile"
+          <ni-file-uploader caption="Facture téléphonique" path="administrative.phoneInvoice" alt="facture téléphone" :entity="userProfile"
             @delete="deleteDocument(user.alenvi.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')" name="phoneInvoice"
-            additionalFieldsName="facture_telephone" @uploaded="refreshUser" @upload="uploadDocument($event, 'phoneInvoice')"
-            :error="$v.user.alenvi.administrative.phoneInvoice.driveId.$error"
+            @uploaded="refreshUser" :upload="uploadDocument"
+            :error="$v.user.alenvi.administrative.phoneInvoice.driveId.$error" :folderId="userProfile.administrative.driveFolder.id"
+            :additionalValue="`facture_telephone_${userProfile.firstname}_${userProfile.lastname}`" entityUrl="users"
           />
         </div>
         <div class="col-xs-12 col-md-6">
@@ -244,10 +251,11 @@
         </div>
         <div class="col-xs-12">
           <ni-file-uploader caption="Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle"
-            path="administrative.mutualFund" alt="justif mutuelle" :userProfile="userProfile" @upload="uploadDocument($event, 'mutualFund')"
+            path="administrative.mutualFund" alt="justif mutuelle" :entity="userProfile" :upload="uploadDocument"
             @delete="deleteDocument(user.alenvi.administrative.mutualFund.driveId, 'administrative.mutualFund')" name="mutualFund" @uploaded="refreshUser"
-            additionalFieldsName="mutuelle" :displayUpload="user.alenvi.administrative.mutualFund.has && !user.alenvi.administrative.mutualFund.driveId"
+            :displayUpload="user.alenvi.administrative.mutualFund.has && !user.alenvi.administrative.mutualFund.driveId" entityUrl="users"
             :error="$v.user.alenvi.administrative.mutualFund.driveId.$error" :displayCaption="currentUser.role.name === 'Auxiliaire'"
+            :folderId="userProfile.administrative.driveFolder.id" :additionalValue="`mutuelle_${userProfile.firstname}_${userProfile.lastname}`"
           />
       </div>
         </div>
@@ -271,9 +279,10 @@
         </div>
         <div v-if="user.alenvi.administrative.transportInvoice.transportType === 'public'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Merci de nous transmettre ton justificatif d'abonnement" path="administrative.transportInvoice"
-            alt="justif transport" :userProfile="userProfile" additionalFieldsName="justif_transport" @upload="uploadDocument($event, 'transportInvoice')"
+            alt="justif transport" :entity="userProfile" :upload="uploadDocument" entityUrl="users"
             :error="$v.user.alenvi.administrative.transportInvoice.driveId.$error" :displayCaption="currentUser.role.name === 'Auxiliaire'" name="transportInvoice"
             @delete="deleteDocument(user.alenvi.administrative.transportInvoice.driveId, 'administrative.transportInvoice')" @uploaded="refreshUser"
+            :folderId="userProfile.administrative.driveFolder.id" :additionalValue="`justif_transport_${userProfile.firstname}_${userProfile.lastname}`"
           />
         </div>
       </div>
@@ -282,9 +291,10 @@
       <p class="text-weight-bold">Visite médicale</p>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <ni-file-uploader caption="Certificat d'aptitude" path="administrative.medicalCertificate" alt="certificat médical" :userProfile="user.alenvi"
+          <ni-file-uploader caption="Certificat d'aptitude" path="administrative.medicalCertificate" alt="certificat médical" :entity="user.alenvi"
             @delete="deleteDocument(user.alenvi.administrative.medicalCertificate.driveId, 'administrative.medicalCertificate')" name="medicalCertificate"
-            additionalFieldsName="certificat_medical" @uploaded="refreshUser" @upload="uploadDocument($event, 'medicalCertificate')"
+            @uploaded="refreshUser" :upload="uploadDocument" entityUrl="users"
+            :folderId="user.alenvi.administrative.driveFolder.id" :additionalValue="`certificat_medical_${userProfile.firstname}_${userProfile.lastname}`"
           />
         </div>
       </div>

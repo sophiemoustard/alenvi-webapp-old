@@ -42,11 +42,14 @@ export default {
     path: String,
     alt: String,
     name: String,
-    additionalFieldsName: String,
-    userProfile: Object,
+    additionalValue: String,
+    entityUrl: String,
+    entity: Object,
     errorLabel: { type: String, default: 'Document requis' },
     displayUpload: { type: Boolean, default: true },
     displayCaption: { type: Boolean, default: true },
+    folderId: String,
+    upload: Function,
   },
   methods: {
     deleteDocument () {
@@ -56,7 +59,7 @@ export default {
       this.$emit('uploaded');
     },
     uploadDocument (files) {
-      this.$emit('upload', files);
+      this.upload(files, this.name)
     },
     goToUrl (url) {
       url = `${url}?usp=sharing`
@@ -71,13 +74,13 @@ export default {
       return { 'x-access-token': Cookies.get('alenvi_token') || '' };
     },
     docsUploadUrl () {
-      return `${process.env.API_HOSTNAME}/users/${this.userProfile._id}/gdrive/${this.userProfile.administrative.driveFolder.id}/upload`;
+      return `${process.env.API_HOSTNAME}/${this.entityUrl}/${this.entity._id}/gdrive/${this.folderId}/upload`;
     },
     additionalFields () {
-      return [{ name: 'fileName', value: `${this.additionalFieldsName}_${this.userProfile.firstname}_${this.userProfile.lastname}` }];
+      return [{ name: 'fileName', value: this.additionalValue }];
     },
     document () {
-      return this.$_.get(this.userProfile, this.path);
+      return this.$_.get(this.entity, this.path);
     },
   },
 };

@@ -24,21 +24,11 @@
         <p class="text-weight-bold">Documents</p>
         <div class="row gutter-profile">
           <div class="col-xs-12 col-md-6">
-            <p class="input-caption">Mandat de prélèvement</p>
-            <div v-if="hasMandateTemplate" class="row justify-between" style="background: white">
-              <div class="doc-thumbnail">
-                <ni-custom-img :driveId="documents.debitMandate.driveId" alt="template mandat prelevement" />
-              </div>
-              <div class="self-end doc-delete">
-                <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(documents.debitMandate.driveId, 'debitMandate')" />
-                <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(documents.debitMandate.link)" />
-              </div>
-            </div>
-            <q-field v-if="!hasMandateTemplate">
-            <q-uploader ref="debitMandate" name="debitMandate" :url="docsUploadUrl" :headers="headers" :additional-fields="[{ name: 'fileName', value: `modele_mandat_prelevement_${company.name}` }]"
-              hide-underline color="white" inverted-light
-              hide-upload-button @add="uploadDocument($event, 'debitMandate')" @uploaded="documentUploaded" @fail="failMsg" />
-            </q-field>
+            <ni-file-uploader caption="Mandat de prélèvement" path="customersConfig.templates.debitMandate" :entity="company" alt="template mandat prelevement"
+              name="debitMandate" @delete="deleteDocument(documents.debitMandate.driveId, 'debitMandate')" :upload="uploadDocument"
+              @uploaded="documentUploaded" :folderId="company.rhConfig.templates.folderId" :additionalValue="`modele_mandat_prelevement_${company.name}`"
+              entityUrl="companies"
+            />
           </div>
           <div class="col-xs-12 col-md-6">
           </div>
@@ -77,12 +67,14 @@ import { Cookies, openURL } from 'quasar';
 import { NotifyNegative, NotifyPositive } from '../../components/popup/notify';
 import ModalInput from '../../components/form/ModalInput.vue';
 import CustomImg from '../../components/form/CustomImg.vue';
+import FileUploader from '../../components/form/FileUploader.vue';
 
 export default {
   name: 'CustomersConfig',
   components: {
     'ni-modal-input': ModalInput,
     'ni-custom-img': CustomImg,
+    'ni-file-uploader': FileUploader,
   },
   data () {
     return {
@@ -235,10 +227,16 @@ export default {
     },
     uploadDocument (files, refName) {
       if (files[0].size > 5000000) {
-        this.$refs[refName].reset();
+        const node = this.$children[0].$children.filter(child => child.$refs && Object.keys(child.$refs).includes(refName));
+        if (node) {
+          node[0].$refs[refName].reset();
+        }
         NotifyNegative('Fichier trop volumineux (> 5 Mo)');
       } else {
-        this.$refs[refName].upload();
+        const node = this.$children[0].$children.filter(child => child.$refs && Object.keys(child.$refs).includes(refName));
+        if (node) {
+          node[0].$refs[refName].upload();
+        }
       }
     },
     async deleteDocument (driveId, type) {
