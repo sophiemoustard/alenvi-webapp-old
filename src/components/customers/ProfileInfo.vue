@@ -256,7 +256,7 @@ export default {
         if (this.tmpInput === this.$_.get(this.customer, paths.alenvi)) return;
         if (this.$_.get(this.$v.customer, paths.alenvi)) {
           const isValid = await this.waitForValidation(paths.alenvi);
-          if (!isValid) throw new Error('Champ(s) invalide(s)');
+          if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
         if (paths.alenvi && paths.ogust) {
           await this.updateAlenviCustomer(paths.alenvi);
@@ -416,6 +416,9 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+  /deep/ .bg-negative
+    background: white !important
+    color: inherit !important
 
   .q-table-container
     box-shadow: none
