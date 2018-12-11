@@ -10,7 +10,7 @@
       <template slot="header">
         <q-item-main :class="{'text-weight-bold': activeRoutes.administrative.highlight }" label="Administratif" />
       </template>
-      <ni-menu-item name="administrative directory" :query="{ role: 'Auxiliaire' }" icon="contacts" label="Répertoire" />
+      <ni-menu-item name="administrative directory" icon="contacts" label="Répertoire" />
     </q-collapsible>
     <q-item-separator />
     <q-collapsible v-if="user.role.name === 'Admin'" ref="configuration" v-model="activeRoutes.configuration.open"

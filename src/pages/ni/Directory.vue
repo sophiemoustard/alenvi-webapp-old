@@ -112,12 +112,6 @@ import NiModalSelect from '../../components/form/ModalSelect';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify.js';
 
 export default {
-  props: {
-    role: {
-      type: String,
-      default: 'Auxiliaire'
-    }
-  },
   metaInfo: {
     title: 'Répertoire'
   },
@@ -342,7 +336,7 @@ export default {
     },
     async getUserList () {
       try {
-        const users = await this.$users.showAll({ role: this.role });
+        const users = await this.$users.showAll({ role: 'Auxiliaire' });
         const sectors = await this.$ogust.getList('employee.sector');
         this.userList = users.map((user) => {
           const hiringDate = this.getHiringDate(user);

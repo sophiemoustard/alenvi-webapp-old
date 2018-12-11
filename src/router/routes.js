@@ -18,7 +18,7 @@ const routes = [
         } else if (store.getters['main/user'] && store.getters['main/user'].role.name === 'Auxiliaire') {
           return next({ name: 'profile planning', params: { id: store.getters['main/user']._id }, query: { auxiliary: 'true', self: 'true' } });
         } else if (store.getters['main/user'] && store.getters['main/user'].role.name !== 'Auxiliaire' && store.getters['main/user'].role.name !== 'Aidants') {
-          return next({ name: 'administrative directory', query: { role: 'Auxiliaire' } });
+          return next({ name: 'administrative directory' });
         } else {
           next({ path: '/login' });
         }
@@ -58,10 +58,9 @@ const routes = [
         },
       },
       {
-        path: 'ni',
+        path: 'ni/auxiliaries',
         name: 'administrative directory',
         component: () => import('pages/ni/Directory'),
-        props: (route) => ({ sector: route.query.sector, role: route.query.role }),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['users:list'],
