@@ -65,12 +65,12 @@
 import { Cookies } from 'quasar';
 import { required, maxValue } from 'vuelidate/lib/validators';
 
-import { posDecimals } from '../../helpers/vuelidateCustomVal';
-import CustomImg from '../../components/form/CustomImg';
-import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../components/popup/notify';
-import Input from '../../components/form/Input.vue';
-import FileUploader from '../../components/form/FileUploader.vue';
-import { configMixin } from '../../mixins/configMixin';
+import { posDecimals } from '../../../helpers/vuelidateCustomVal';
+import CustomImg from '../../../components/form/CustomImg';
+import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
+import Input from '../../../components/form/Input.vue';
+import FileUploader from '../../../components/form/FileUploader.vue';
+import { configMixin } from '../../../mixins/configMixin';
 
 export default {
   components: {

@@ -75,15 +75,15 @@
 
 <script>
 import { required } from 'vuelidate/lib/validators';
-import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../components/popup/notify';
-import ModalInput from '../../components/form/ModalInput.vue';
-import ModalSelect from '../../components/form/ModalSelect.vue';
-import CustomImg from '../../components/form/CustomImg.vue';
-import FileUploader from '../../components/form/FileUploader.vue';
-import { configMixin } from '../../mixins/configMixin';
-import Input from '../../components/form/Input.vue';
-import SearchAddress from '../../components/form/SearchAddress.vue';
-import { frAddress } from '../../helpers/vuelidateCustomVal';
+import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
+import ModalInput from '../../../components/form/ModalInput.vue';
+import ModalSelect from '../../../components/form/ModalSelect.vue';
+import CustomImg from '../../../components/form/CustomImg.vue';
+import FileUploader from '../../../components/form/FileUploader.vue';
+import { configMixin } from '../../../mixins/configMixin';
+import Input from '../../../components/form/Input.vue';
+import SearchAddress from '../../../components/form/SearchAddress.vue';
+import { frAddress } from '../../../helpers/vuelidateCustomVal';
 
 export default {
   name: 'CustomersConfig',

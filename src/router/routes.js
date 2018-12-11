@@ -30,7 +30,7 @@ const routes = [
       {
         path: 'ni/config/rh',
         name: 'rh config',
-        component: () => import('pages/ni/RhConfig'),
+        component: () => import('pages/ni/config/RhConfig'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['rhconfig:edit'],
@@ -40,7 +40,7 @@ const routes = [
       {
         path: 'ni/config/customers',
         name: 'customers config',
-        component: () => import('pages/ni/CustomersConfig'),
+        component: () => import('pages/ni/config/CustomersConfig'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['rhconfig:edit'],
@@ -48,9 +48,9 @@ const routes = [
         },
       },
       {
-        path: 'config/tags',
+        path: 'ni/config/tags',
         name: 'tags config',
-        component: () => import('pages/ni/TagConfig'),
+        component: () => import('pages/ni/config/TagConfig'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['rhconfig:edit'],
