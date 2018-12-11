@@ -18,7 +18,12 @@
         </q-card>
       </div>
       <div class="q-mb-xl">
-        <p class="text-weight-bold">Informations</p>
+        <p class="text-weight-bold">Informations de l'organisation</p>
+        <div class="row gutter-profile">
+          <ni-input caption="Nom" v-model="company.name" @focus="saveTmp('name')" @blur="updateCompany('name')" />
+          <ni-input caption="Numéro ICS" v-model="company.ics" @focus="saveTmp('ics')" @blur="updateCompany('ics')" />
+          <ni-input caption="Numéro RCS" v-model="company.rcs" @focus="saveTmp('rcs')" @blur="updateCompany('rcs')" />
+        </div>
       </div>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Documents</p>
@@ -67,12 +72,13 @@
 
 <script>
 import { required } from 'vuelidate/lib/validators';
-import { NotifyNegative, NotifyPositive } from '../../components/popup/notify';
+import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../components/popup/notify';
 import ModalInput from '../../components/form/ModalInput.vue';
 import ModalSelect from '../../components/form/ModalSelect.vue';
 import CustomImg from '../../components/form/CustomImg.vue';
 import FileUploader from '../../components/form/FileUploader.vue';
 import { configMixin } from '../../mixins/configMixin';
+import Input from '../../components/form/Input.vue';
 
 export default {
   name: 'CustomersConfig',
@@ -81,6 +87,7 @@ export default {
     'ni-custom-img': CustomImg,
     'ni-file-uploader': FileUploader,
     'ni-modal-select': ModalSelect,
+    'ni-input': Input,
   },
   mixins: [configMixin],
   data () {
@@ -166,7 +173,12 @@ export default {
       nature: { required },
       defaultUnitAmount: { required },
       vat: { required },
-    }
+    },
+    company: {
+      ics: { required },
+      name: { required },
+      rcs: { required },
+    },
   },
   computed: {
     user () {
@@ -189,6 +201,29 @@ export default {
       await this.$store.dispatch('main/getUser', this.user._id);
       this.company = this.user.company;
       this.documents = this.company.customersConfig.templates || {};
+    },
+    saveTmp (path) {
+      this.tmpInput = this.$_.get(this.company, path);
+    },
+    async updateCompany (path) {
+      try {
+        if (this.tmpInput === this.$_.get(this.company, path)) return;
+        this.$_.get(this.$v.company, path).$touch();
+        if (this.$_.get(this.$v.company, path).$error) {
+          return NotifyWarning('Champ(s) invalide(s)');
+        }
+
+        const value = this.$_.get(this.company, path);
+        const payload = this.$_.set({}, path, value);
+        payload._id = this.company._id;
+        await this.$companies.updateById(payload);
+        NotifyPositive('Modification enregistrée');
+        this.tmpInput = '';
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modification');
+        this.tmpInput = '';
+      }
     },
     async deleteService (serviceId, cell) {
       try {
