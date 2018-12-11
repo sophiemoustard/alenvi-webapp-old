@@ -92,9 +92,9 @@ const routes = [
         }
       },
       {
-        path: 'ni/:id/planning',
+        path: 'auxiliaries/planning',
         name: 'profile planning',
-        component: () => import('pages/ni/Planning'),
+        component: () => import('pages/auxiliaries/planning/Planning'),
         props: (route) => ({ auxiliary: route.query.auxiliary || null, customer: route.query.customer || null }),
         beforeEnter: (to, from, next) => {
           if (!to.query.auxiliary && !to.query.customer) {
@@ -250,26 +250,6 @@ const routes = [
               permissions: ['duty:read'],
               parent: 'planning'
             },
-          }
-        ]
-      },
-      {
-        path: 'old/beneficiaries',
-        name: 'beneficiaries',
-        component: () => import('pages/dashboard/beneficiaries/Beneficiaries'),
-        redirect: {
-          name: 'add helper'
-        },
-        children: [
-          {
-            path: 'addHelper',
-            name: 'add helper',
-            component: () => import('pages/dashboard/beneficiaries/AddHelper'),
-            meta: {
-              cookies: ['alenvi_token', 'refresh_token'],
-              permissions: ['users:welcome:user'],
-              parent: 'benef'
-            }
           }
         ]
       }

@@ -8,9 +8,9 @@
 <script>
 /* global scheduler */
 import { mapMutations, mapGetters } from 'vuex'
-import Scheduler from '../../components/scheduler/Scheduler'
+import Scheduler from '../../../components/scheduler/Scheduler'
 import 'dhtmlx-scheduler'
-import { NotifyWarning, NotifyNegative } from '../../components/popup/notify';
+import { NotifyWarning, NotifyNegative } from '../../../components/popup/notify';
 
 export default {
   metaInfo () {
