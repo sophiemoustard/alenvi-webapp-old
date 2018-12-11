@@ -28,7 +28,7 @@ const routes = [
     },
     children: [
       {
-        path: 'config/rh',
+        path: 'ni/config/rh',
         name: 'rh config',
         component: () => import('pages/ni/RhConfig'),
         meta: {
@@ -38,7 +38,7 @@ const routes = [
         },
       },
       {
-        path: 'config/customers',
+        path: 'ni/config/customers',
         name: 'customers config',
         component: () => import('pages/ni/CustomersConfig'),
         meta: {
@@ -60,7 +60,7 @@ const routes = [
       {
         path: 'ni/auxiliaries',
         name: 'administrative directory',
-        component: () => import('pages/ni/Directory'),
+        component: () => import('pages/ni/auxiliaries/Directory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['users:list'],
@@ -68,9 +68,9 @@ const routes = [
         },
       },
       {
-        path: 'ni/:id',
+        path: 'ni/auxiliaries/:id',
         name: 'personal info',
-        component: () => import('pages/ni/PersonalInfo'),
+        component: () => import('pages/ni/auxiliaries/PersonalInfo'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
@@ -214,7 +214,7 @@ const routes = [
       },
       // Legacy routes
       {
-        path: 'old/planning',
+        path: 'ni/planning',
         name: 'planning',
         component: () => import('pages/dashboard/planning/Planning'),
         redirect: {
@@ -243,7 +243,7 @@ const routes = [
             },
           },
           {
-            path: 'constrainedCoaches',
+            path: 'permanences',
             name: 'constrained coaches',
             component: () => import('pages/dashboard/planning/ConstrainedCoaches'),
             meta: {

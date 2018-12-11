@@ -101,15 +101,15 @@
 import { required, email, maxLength } from 'vuelidate/lib/validators';
 import randomize from 'randomatic';
 
-import { frPhoneNumber, frZipCode } from '../../helpers/vuelidateCustomVal';
-import { clear } from '../../helpers/utils.js';
-import { userProfileValidation } from '../../helpers/userProfileValidation';
-import { taskValidation } from '../../helpers/taskValidation';
-import SelectSector from '../../components/form/SelectSector';
-import SelectManager from '../../components/form/SelectManager.vue';
-import NiModalInput from '../../components/form/ModalInput';
-import NiModalSelect from '../../components/form/ModalSelect';
-import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify.js';
+import { frPhoneNumber, frZipCode } from '../../../helpers/vuelidateCustomVal';
+import { clear } from '../../../helpers/utils.js';
+import { userProfileValidation } from '../../../helpers/userProfileValidation';
+import { taskValidation } from '../../../helpers/taskValidation';
+import SelectSector from '../../../components/form/SelectSector';
+import SelectManager from '../../../components/form/SelectManager.vue';
+import NiModalInput from '../../../components/form/ModalInput';
+import NiModalSelect from '../../../components/form/ModalSelect';
+import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../../components/popup/notify.js';
 
 export default {
   metaInfo: {
