@@ -38,7 +38,6 @@
 </template>
 
 <script>
-
 export default {
   metaInfo: {
     title: 'Répertoire'

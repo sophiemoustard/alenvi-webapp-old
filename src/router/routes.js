@@ -165,7 +165,7 @@ const routes = [
       {
         path: 'ni/:id/team',
         name: 'team directory',
-        component: () => import('pages/ni/Team'),
+        component: () => import('pages/auxiliaries/team/TeamDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['profiles:read'],
