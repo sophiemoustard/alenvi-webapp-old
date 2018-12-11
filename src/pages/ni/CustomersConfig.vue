@@ -21,6 +21,15 @@
         <p class="text-weight-bold">Informations de l'organisation</p>
         <div class="row gutter-profile">
           <ni-input caption="Nom" v-model="company.name" @focus="saveTmp('name')" @blur="updateCompany('name')" />
+          <div class="col-xs-12 col-md-6">
+            <div class="row justify-between">
+              <p class="input-caption">Adresse</p>
+            </div>
+            <q-field :error="$v.company.address.fullAddress.$error" :error-label="addressError">
+              <ni-search-address v-model="company.address.fullAddress" color="white" inverted-light @selected="selectedAddress"
+                @focus="saveTmp('address.fullAddress')" @blur="updateCompany('address')" />
+            </q-field>
+          </div>
           <ni-input caption="Numéro ICS" v-model="company.ics" @focus="saveTmp('ics')" @blur="updateCompany('ics')" />
           <ni-input caption="Numéro RCS" v-model="company.rcs" @focus="saveTmp('rcs')" @blur="updateCompany('rcs')" />
         </div>
@@ -79,6 +88,8 @@ import CustomImg from '../../components/form/CustomImg.vue';
 import FileUploader from '../../components/form/FileUploader.vue';
 import { configMixin } from '../../mixins/configMixin';
 import Input from '../../components/form/Input.vue';
+import SearchAddress from '../../components/form/SearchAddress.vue';
+import { frAddress } from '../../helpers/vuelidateCustomVal';
 
 export default {
   name: 'CustomersConfig',
@@ -88,6 +99,7 @@ export default {
     'ni-file-uploader': FileUploader,
     'ni-modal-select': ModalSelect,
     'ni-input': Input,
+    'ni-search-address': SearchAddress,
   },
   mixins: [configMixin],
   data () {
@@ -95,9 +107,7 @@ export default {
       loading: false,
       company: null,
       documents: null,
-      services: [
-        { name: 'Toto' },
-      ],
+      services: [],
       newServiceModal: false,
       modalCssContainer: {
         minWidth: '30vw'
@@ -178,6 +188,9 @@ export default {
       ics: { required },
       name: { required },
       rcs: { required },
+      address: {
+        fullAddress: { required, frAddress },
+      },
     },
   },
   computed: {
@@ -187,10 +200,17 @@ export default {
     docsUploadUrl () {
       return `${process.env.API_HOSTNAME}/companies/${this.company._id}/gdrive/${this.company.folderId}/upload`;
     },
+    addressError () {
+      if (!this.$v.company.address.fullAddress.required) {
+        return 'Champ requis';
+      }
+      return 'Adresse non valide';
+    },
   },
   mounted () {
     this.company = this.user.company;
     this.documents = this.company.customersConfig.templates || {};
+    this.company.address = this.company.address || {};
     this.refreshServices();
   },
   methods: {
@@ -201,6 +221,10 @@ export default {
       await this.$store.dispatch('main/getUser', this.user._id);
       this.company = this.user.company;
       this.documents = this.company.customersConfig.templates || {};
+      this.company.address = this.company.address || {};
+    },
+    selectedAddress (item) {
+      this.company.address = Object.assign({}, this.company.address, item);
     },
     saveTmp (path) {
       this.tmpInput = this.$_.get(this.company, path);
@@ -208,9 +232,9 @@ export default {
     async updateCompany (path) {
       try {
         if (this.tmpInput === this.$_.get(this.company, path)) return;
-        this.$_.get(this.$v.company, path).$touch();
-        if (this.$_.get(this.$v.company, path).$error) {
-          return NotifyWarning('Champ(s) invalide(s)');
+        if (this.$_.get(this.$v.company, path)) {
+          const isValid = await this.waitForValidation(path);
+          if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
 
         const value = this.$_.get(this.company, path);
@@ -224,6 +248,24 @@ export default {
         NotifyNegative('Erreur lors de la modification');
         this.tmpInput = '';
       }
+    },
+    waitForValidation (path) {
+      return new Promise((resolve) => {
+        if (path === 'address') {
+          const unwatch = this.$watch(() => !this.$v.company.address.$pending, (notPending) => {
+            if (notPending) {
+              if (unwatch) {
+                unwatch();
+              }
+              this.$v.company.address.fullAddress.$touch();
+              resolve(!this.$v.company.address.fullAddress.$error);
+            }
+          }, { immediate: true });
+        } else {
+          this.$_.get(this.$v.company, path).$touch();
+          resolve(!this.$_.get(this.$v.company, path).$error);
+        }
+      })
     },
     async deleteService (serviceId, cell) {
       try {
@@ -271,6 +313,10 @@ export default {
 <style lang="stylus" scoped>
   .q-table-container
       box-shadow: none
+
+  /deep/ .bg-negative
+    background: white !important
+    color: inherit !important
 
   .modal
     &-padding
