@@ -216,7 +216,7 @@ const routes = [
       {
         path: 'ni/planning',
         name: 'planning',
-        component: () => import('pages/dashboard/planning/Planning'),
+        component: () => import('pages/ni/planning/Planning'),
         redirect: {
           name: 'view planning'
         },
@@ -225,7 +225,7 @@ const routes = [
           {
             path: 'view',
             name: 'view planning',
-            component: () => import('pages/dashboard/planning/PlanningView'),
+            component: () => import('pages/ni/planning/PlanningView'),
             meta: {
               cookies: ['alenvi_token', 'refresh_token'],
               permissions: ['planning:read'],
@@ -235,7 +235,7 @@ const routes = [
           {
             path: 'modification',
             name: 'modification planning',
-            component: () => import('pages/dashboard/planning/PlanningModification'),
+            component: () => import('pages/ni/planning/PlanningModification'),
             meta: {
               cookies: ['alenvi_token', 'refresh_token'],
               permissions: ['planning:history'],
@@ -245,7 +245,7 @@ const routes = [
           {
             path: 'permanences',
             name: 'constrained coaches',
-            component: () => import('pages/dashboard/planning/ConstrainedCoaches'),
+            component: () => import('pages/ni/planning/ConstrainedCoaches'),
             meta: {
               cookies: ['alenvi_token', 'refresh_token'],
               permissions: ['duty:read'],
