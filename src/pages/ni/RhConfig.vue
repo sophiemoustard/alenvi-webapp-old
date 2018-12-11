@@ -57,16 +57,6 @@
           </div>
         </div>
       </div>
-      <div class="q-mb-xl">
-        <table>
-          <th>Nom tag</th>
-          <th>Description</th>
-          <tr v-for="(templateVar, index) in varContracts" :key="index">
-            <td>{{`{${index}\}`}}</td>
-            <td>{{templateVar}}</td>
-          </tr>
-        </table>
-      </div>
     </div>
   </q-page>
 </template>
@@ -93,27 +83,6 @@ export default {
     return {
       company: null,
       tmpInput: '',
-      varContracts: {
-        'title': 'Civilité',
-        'firstname': 'Prénom',
-        'lastname': 'Nom',
-        'address': 'Adresse',
-        'city': 'Ville',
-        'zipCode': 'Code postal',
-        'birthDate': 'Date de naissance',
-        'birthCountry': 'Pays de naissance',
-        'birthState': 'Département de naissance',
-        'nationality': 'Nationalité',
-        'SSN': 'Numéro de sécurité sociale',
-        'grossHourlyRate': 'Taux horaire brut',
-        'monthlyHours': 'Volume d\'heure mensuel (Volume d\'heures hebdomadaire * 4,33)',
-        'salary': 'Salaire mensuel (Volume d\'heures mensuel * taux horaire brut)',
-        'startDate': 'Date d\'effet du contrat / de la version',
-        'weeklyHours': 'Volume horaire hebdomadaire',
-        'yearlyHours': 'Volume horaire annuel (Volume d\'heure mensuel * 52)',
-        'uploadDate': 'Date de l\'upload du contrat pour la date de signature',
-        'initialContractStartDate': 'Date d’effet du contrat initial',
-      }
     }
   },
   computed: {
@@ -227,9 +196,6 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables'
-
-  th
-    text-align: left
 
   /deep/ .bg-negative
     background: white !important

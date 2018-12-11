@@ -37,16 +37,6 @@
           </div>
         </div>
       </div>
-      <div class="q-mb-xl">
-        <table>
-          <th>Nom tag</th>
-          <th>Description</th>
-          <tr v-for="(templateVar, index) in varContracts" :key="index">
-            <td>{{`{${index}\}`}}</td>
-            <td>{{templateVar}}</td>
-          </tr>
-        </table>
-      </div>
     </div>
 
     <!-- Service modal -->
@@ -62,7 +52,8 @@
           </div>
         </div>
         <ni-modal-input caption="Nom" v-model="newService.name" :error="$v.newService.name.$error" @blur="$v.newService.name.$touch" />
-        <ni-modal-input caption="Nature" v-model="newService.nature" :error="$v.newService.nature.$error" @blur="$v.newService.nature.$touch" />
+        <ni-modal-select caption="Nature" v-model="newService.nature" :error="$v.newService.nature.$error" @blur="$v.newService.nature.$touch"
+          :options="natureOptions" />
         <ni-modal-input caption="Montant unitaire par défaut" suffix="€" type="number" v-model="newService.defaultUnitAmount"
           :error="$v.newService.defaultUnitAmount.$error" @blur="$v.newService.defaultUnitAmount.$touch"/>
         <ni-modal-input caption="TVA" suffix="%" v-model="newService.vat" type="number" :error="$v.newService.vat.$error" @blur="$v.newService.vat.$touch" />
@@ -78,6 +69,7 @@
 import { required } from 'vuelidate/lib/validators';
 import { NotifyNegative, NotifyPositive } from '../../components/popup/notify';
 import ModalInput from '../../components/form/ModalInput.vue';
+import ModalSelect from '../../components/form/ModalSelect.vue';
 import CustomImg from '../../components/form/CustomImg.vue';
 import FileUploader from '../../components/form/FileUploader.vue';
 import { configMixin } from '../../mixins/configMixin';
@@ -88,6 +80,7 @@ export default {
     'ni-modal-input': ModalInput,
     'ni-custom-img': CustomImg,
     'ni-file-uploader': FileUploader,
+    'ni-modal-select': ModalSelect,
   },
   mixins: [configMixin],
   data () {
@@ -110,6 +103,10 @@ export default {
         holidaySurcharge: '',
         eveningSurcharge: '',
       },
+      natureOptions: [
+        { label: 'Horaire', value: 'Horaire' },
+        { label: 'Forfaitaire', value: 'Forfaitaire' },
+      ],
       columns: [
         {
           name: 'name',
@@ -127,7 +124,7 @@ export default {
         },
         {
           name: 'defaultUnitAmount',
-          label: 'Montant unitaire par défaut',
+          label: 'Montant unitaire par défaut TTC',
           align: 'center',
           field: 'defaultUnitAmount',
           sortable: true,
@@ -161,28 +158,6 @@ export default {
           sortable: true,
         },
       ],
-      varContracts: {
-        'firstname': 'Prénom',
-        'lastname': 'Nom',
-        'address': 'Adresse',
-        'city': 'Ville',
-        'zipCode': 'Code postal',
-        'ics': 'ICS',
-        'rum': 'RUM',
-        'companyName': 'Nom de l’organisation',
-        'companyAddress': 'Adresse de l\'organisation',
-        'companyCity': 'Ville de l\'organisation',
-        'companyZipCode': 'Code postal de l\'organisation',
-        'uploadDate': 'Date de l\'upload du contrat pour la date de signature',
-        'quoteNumber': 'Numéro du devis',
-        'rcs': 'RCS de l’organisation',
-        'services': 'Nom du/des services',
-        'hourlyRate': 'Tarif horaire TTC',
-        'estimatedWeeklyVolume': 'Volume hebdomadaire estimé total',
-        'sundays': 'Dont dimanche',
-        'evenings': 'Dont soir après 20h',
-        'estimatedWeeklyRate': 'Tarif hebdomadaire estimé',
-      },
     };
   },
   validations: {
@@ -267,7 +242,4 @@ export default {
       padding: 24px 58px 0px 58px
     &-btn
       border-radius: 0
-
-  th
-    text-align: left
 </style>
