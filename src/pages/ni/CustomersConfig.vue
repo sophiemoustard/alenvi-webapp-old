@@ -62,7 +62,8 @@
           </div>
         </div>
         <ni-modal-input caption="Nom" v-model="newService.name" :error="$v.newService.name.$error" @blur="$v.newService.name.$touch" />
-        <ni-modal-input caption="Nature" v-model="newService.nature" :error="$v.newService.nature.$error" @blur="$v.newService.nature.$touch" />
+        <ni-modal-select caption="Nature" v-model="newService.nature" :error="$v.newService.nature.$error" @blur="$v.newService.nature.$touch"
+          :options="natureOptions" />
         <ni-modal-input caption="Montant unitaire par défaut" suffix="€" type="number" v-model="newService.defaultUnitAmount"
           :error="$v.newService.defaultUnitAmount.$error" @blur="$v.newService.defaultUnitAmount.$touch"/>
         <ni-modal-input caption="TVA" suffix="%" v-model="newService.vat" type="number" :error="$v.newService.vat.$error" @blur="$v.newService.vat.$touch" />
@@ -78,6 +79,7 @@
 import { required } from 'vuelidate/lib/validators';
 import { NotifyNegative, NotifyPositive } from '../../components/popup/notify';
 import ModalInput from '../../components/form/ModalInput.vue';
+import ModalSelect from '../../components/form/ModalSelect.vue';
 import CustomImg from '../../components/form/CustomImg.vue';
 import FileUploader from '../../components/form/FileUploader.vue';
 import { configMixin } from '../../mixins/configMixin';
@@ -88,6 +90,7 @@ export default {
     'ni-modal-input': ModalInput,
     'ni-custom-img': CustomImg,
     'ni-file-uploader': FileUploader,
+    'ni-modal-select': ModalSelect,
   },
   mixins: [configMixin],
   data () {
@@ -110,6 +113,10 @@ export default {
         holidaySurcharge: '',
         eveningSurcharge: '',
       },
+      natureOptions: [
+        { label: 'Horaire', value: 'Horaire' },
+        { label: 'Forfaitaire', value: 'Forfaitaire' },
+      ],
       columns: [
         {
           name: 'name',
@@ -127,7 +134,7 @@ export default {
         },
         {
           name: 'defaultUnitAmount',
-          label: 'Montant unitaire par défaut',
+          label: 'Montant unitaire par défaut TTC',
           align: 'center',
           field: 'defaultUnitAmount',
           sortable: true,
