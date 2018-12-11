@@ -221,17 +221,17 @@ export default {
       this.company.address = Object.assign({}, this.company.address, item);
     },
     saveTmp (path) {
-      this.tmpInput = this.$_.get(this.company, path);
+      this.tmpInput = this.company[path];
     },
     async updateCompany (path) {
       try {
-        if (this.tmpInput === this.$_.get(this.company, path)) return;
-        if (this.$_.get(this.$v.company, path)) {
+        if (this.tmpInput === this.company[path]) return;
+        if (this.$v.company[path]) {
           const isValid = await this.waitForValidation(path);
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
 
-        const value = this.$_.get(this.company, path);
+        const value = this.company[path];
         const payload = this.$_.set({}, path, value);
         payload._id = this.company._id;
         await this.$companies.updateById(payload);
@@ -256,8 +256,8 @@ export default {
             }
           }, { immediate: true });
         } else {
-          this.$_.get(this.$v.company, path).$touch();
-          resolve(!this.$_.get(this.$v.company, path).$error);
+          this.$v.company[path].$touch();
+          resolve(!this.$v.company[path].$error);
         }
       })
     },
