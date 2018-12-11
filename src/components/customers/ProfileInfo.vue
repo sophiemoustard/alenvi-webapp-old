@@ -26,16 +26,10 @@
       <div class="row gutter-profile">
         <ni-input caption="Téléphone" type="tel" :error="$v.customer.contact.phone.$error" errorLabel="Numéro de téléphone non valide"
           v-model.trim="customer.contact.phone" @focus="saveTmp('contact.phone')" @blur="updateUser({ alenvi: 'contact.phone', ogust: 'mobile_phone' })" />
-        <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Adresse</p>
-          </div>
-          <q-field :error="$v.customer.contact.address.fullAddress.$error" :error-label="addressError">
-            <ni-search-address v-model="customer.contact.address.fullAddress" color="white" inverted-light @focus="saveTmp('contact.address.fullAddress')"
-              @blur="updateUser({ alenvi: 'contact.address', ogust: 'address' })"
-              @selected="selectedAddress" />
-          </q-field>
-        </div>
+        <ni-search-address v-model="customer.contact.address.fullAddress" color="white" inverted-light @focus="saveTmp('contact.address.fullAddress')"
+          @blur="updateUser({ alenvi: 'contact.address', ogust: 'address' })" @selected="selectedAddress" :error-label="addressError"
+          :error="$v.customer.contact.address.fullAddress.$error"
+        />
         <ni-input caption="Code porte" v-model="customer.contact.doorCode" @focus="saveTmp('contact.doorCode')" @blur="updateUser({ alenvi: 'contact.doorCode', ogust: 'door_code' })" />
       </div>
     </div>

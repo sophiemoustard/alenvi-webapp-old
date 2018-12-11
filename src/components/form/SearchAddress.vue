@@ -1,15 +1,26 @@
 <template>
-  <q-search :value="value" inverted-light color="white" placeholder=" " no-icon
-    @input="inputEvent"
-    @blur="blurEvent">
-    <q-autocomplete @search="searchAddress" @selected="selectedAddress" />
-  </q-search>
+  <div :class="{ 'col-12 col-md-6': !inModal, 'col-12': inModal }">
+    <div class="row justify-between">
+      <p class="input-caption">{{ caption }}</p>
+    </div>
+    <q-field :error="error" :error-label="errorLabel">
+      <q-search :value="value" inverted-light color="white" placeholder=" " no-icon @input="inputEvent" @blur="blurEvent" :class="{'borders': inModal}">
+        <q-autocomplete @search="searchAddress" @selected="selectedAddress" />
+      </q-search>
+    </q-field>
+  </div>
 </template>
 
 <script>
 export default {
   name: 'SearchAddress',
-  props: ['value'],
+  props: {
+    value: String,
+    caption: { type: String, default: 'Adresse' },
+    errorLabel: { type: String, default: 'Champ requis' },
+    error: { type: Boolean, default: false },
+    inModal: { type: Boolean, default: false },
+  },
   methods: {
     async searchAddress (terms, done) {
       try {
@@ -47,3 +58,14 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus" scoped>
+@import '~variables'
+
+  .borders
+    border: 1px solid $light-grey !important
+
+  .bg-negative
+    background: none !important
+    color: inherit !important
+</style>

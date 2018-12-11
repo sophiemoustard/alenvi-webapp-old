@@ -21,15 +21,9 @@
         <p class="text-weight-bold">Informations de l'organisation</p>
         <div class="row gutter-profile">
           <ni-input caption="Nom" v-model="company.name" @focus="saveTmp('name')" @blur="updateCompany('name')" />
-          <div class="col-xs-12 col-md-6">
-            <div class="row justify-between">
-              <p class="input-caption">Adresse</p>
-            </div>
-            <q-field :error="$v.company.address.fullAddress.$error" :error-label="addressError">
-              <ni-search-address v-model="company.address.fullAddress" color="white" inverted-light @selected="selectedAddress"
-                @focus="saveTmp('address.fullAddress')" @blur="updateCompany('address')" />
-            </q-field>
-          </div>
+          <ni-search-address v-model="company.address.fullAddress" color="white" inverted-light @selected="selectedAddress" :errorLabel="addressError"
+            @focus="saveTmp('address.fullAddress')" @blur="updateCompany('address')" :error="$v.company.address.fullAddress.$error"
+          />
           <ni-input caption="Numéro ICS" v-model="company.ics" @focus="saveTmp('ics')" @blur="updateCompany('ics')" />
           <ni-input caption="Numéro RCS" v-model="company.rcs" @focus="saveTmp('rcs')" @blur="updateCompany('rcs')" />
         </div>
