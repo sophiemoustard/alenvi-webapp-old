@@ -53,15 +53,9 @@
         <ni-modal-input v-model="newCustomer.identity.lastname" :error="$v.newCustomer.identity.lastname.$error" caption="Nom" @blur="$v.newCustomer.identity.lastname.$touch" errorLabel="Champ requis" />
         <ni-modal-input v-model="newCustomer.identity.firstname" errorLabel="Champs requis" caption="Prénom" />
         <div class="row margin-input last">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Adresse</p>
-              <q-icon v-if="$v.newCustomer.contact.address.fullAddress.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newCustomer.contact.address.fullAddress.$error" :error-label="addressError">
-              <ni-search-address v-model="newCustomer.contact.address.fullAddress" @selected="selectedAddress" @blur="$v.newCustomer.contact.address.fullAddress.$touch" />
-            </q-field>
-          </div>
+          <ni-search-address v-model="newCustomer.contact.address.fullAddress" @selected="selectedAddress" @blur="$v.newCustomer.contact.address.fullAddress.$touch"
+            :error="$v.newCustomer.contact.address.fullAddress.$error" :error-label="addressError" inModal
+          />
         </div>
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary" :loading="loading" @click="submit" />

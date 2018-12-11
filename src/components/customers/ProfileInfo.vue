@@ -26,16 +26,10 @@
       <div class="row gutter-profile">
         <ni-input caption="Téléphone" type="tel" :error="$v.customer.contact.phone.$error" errorLabel="Numéro de téléphone non valide"
           v-model.trim="customer.contact.phone" @focus="saveTmp('contact.phone')" @blur="updateUser({ alenvi: 'contact.phone', ogust: 'mobile_phone' })" />
-        <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Adresse</p>
-          </div>
-          <q-field :error="$v.customer.contact.address.fullAddress.$error" :error-label="addressError">
-            <ni-search-address v-model="customer.contact.address.fullAddress" color="white" inverted-light @focus="saveTmp('contact.address.fullAddress')"
-              @blur="updateUser({ alenvi: 'contact.address', ogust: 'address' })"
-              @selected="selectedAddress" />
-          </q-field>
-        </div>
+        <ni-search-address v-model="customer.contact.address.fullAddress" color="white" inverted-light @focus="saveTmp('contact.address.fullAddress')"
+          @blur="updateUser({ alenvi: 'contact.address', ogust: 'address' })" @selected="selectedAddress" :error-label="addressError"
+          :error="$v.customer.contact.address.fullAddress.$error"
+        />
         <ni-input caption="Code porte" v-model="customer.contact.doorCode" @focus="saveTmp('contact.doorCode')" @blur="updateUser({ alenvi: 'contact.doorCode', ogust: 'door_code' })" />
       </div>
     </div>
@@ -256,7 +250,7 @@ export default {
         if (this.tmpInput === this.$_.get(this.customer, paths.alenvi)) return;
         if (this.$_.get(this.$v.customer, paths.alenvi)) {
           const isValid = await this.waitForValidation(paths.alenvi);
-          if (!isValid) throw new Error('Champ(s) invalide(s)');
+          if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
         if (paths.alenvi && paths.ogust) {
           await this.updateAlenviCustomer(paths.alenvi);
@@ -416,6 +410,9 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+  /deep/ .bg-negative
+    background: white !important
+    color: inherit !important
 
   .q-table-container
     box-shadow: none
