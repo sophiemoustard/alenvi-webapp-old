@@ -82,9 +82,9 @@ const routes = [
         },
       },
       {
-        path: 'ni/:id/paye',
+        path: 'auxiliaries/paye',
         name: 'profile salaries',
-        component: () => import('pages/ni/Salaries'),
+        component: () => import('pages/auxiliaries/Salaries'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['profiles:read'],
@@ -110,9 +110,9 @@ const routes = [
         }
       },
       {
-        path: 'ni/:id/docs',
+        path: 'auxiliaries/docs',
         name: 'profile docs',
-        component: () => import('pages/ni/Documents'),
+        component: () => import('pages/auxiliaries/Documents'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['profiles:read'],
@@ -138,6 +138,20 @@ const routes = [
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['profiles:read']
         }
+      },
+      {
+        path: 'auxiliaries/:id',
+        name: 'auxiliary personal info',
+        component: () => import('pages/auxiliaries/Info'),
+        props: true,
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: [{
+            name: 'profiles:edit',
+            when: (paramsId, cookieId) => paramsId === cookieId
+          }, 'profiles:edit:user'],
+          parent: 'administrative',
+        },
       },
       {
         path: 'ni/:id/account',
