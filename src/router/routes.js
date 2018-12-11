@@ -120,9 +120,9 @@ const routes = [
         }
       },
       {
-        path: 'ni/:id/customers',
+        path: 'auxiliaries/customers',
         name: 'profile customers',
-        component: () => import('pages/ni/AuxiliaryCustomersDirectory'),
+        component: () => import('pages/auxiliaries/customers/AuxiliaryCustomersDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['profiles:read'],
@@ -130,10 +130,10 @@ const routes = [
         }
       },
       {
-        path: 'ni/:id/customers/:customerId',
+        path: 'auxiliaries/customers/:customerId',
         name: 'profile customers info',
         props: true,
-        component: () => import('pages/ni/CustomerInfo'),
+        component: () => import('pages/auxiliaries/customers/CustomerInfo'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['profiles:read']
