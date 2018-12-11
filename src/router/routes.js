@@ -237,33 +237,33 @@ const routes = [
       },
       // Customers view routes
       {
-        path: 'dashboard/customer/home',
+        path: '/customers/home',
         name: 'customer home',
-        component: () => import('pages/dashboard/customer/Home'),
+        component: () => import('pages/customers/Home'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token']
         }
       },
       {
-        path: 'dashboard/customer/planning',
+        path: 'customers/planning',
         name: 'customer planning',
-        component: () => import('pages/dashboard/customer/Planning'),
+        component: () => import('pages/customers/Planning'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token']
         }
       },
       {
-        path: 'dashboard/customer/documents',
+        path: 'customers/documents',
         name: 'customer documents',
-        component: () => import('pages/dashboard/customer/documents/Documents'),
+        component: () => import('pages/customers/Documents'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token']
         }
       },
       {
-        path: 'dashboard/customer/profile/:id',
+        path: 'customers/profile/:id',
         name: 'customer profile',
-        component: () => import('pages/dashboard/customer/Profile'),
+        component: () => import('pages/customers/Profile'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token']
         }
