@@ -27,7 +27,7 @@
 
 <script>
 import { required, email, sameAs, minLength, maxLength } from 'vuelidate/lib/validators';
-import { NotifyPositive, NotifyNegative } from '../../components/popup/notify';
+import { NotifyPositive, NotifyNegative } from '../components/popup/notify';
 
 export default {
   metaInfo: {

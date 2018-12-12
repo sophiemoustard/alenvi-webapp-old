@@ -1,6 +1,6 @@
 <template>
   <div v-if="isLoaded">
-    <div v-if="currentUser.role.name !== 'Auxiliaire'" class="row gutter-profile q-mb-xl">
+    <div v-if="mainUser.role.name !== 'Auxiliaire'" class="row gutter-profile q-mb-xl">
       <div class="col-xs-12 col-md-6">
         <p class="input-caption">Communauté</p>
         <ni-select-sector v-model="user.alenvi.sector" @myBlur="updateUser({ alenvi: 'sector', ogust: 'sector' })" />
@@ -96,7 +96,7 @@
         />
         <ni-input caption="Adresse email" :error="$v.user.alenvi.local.email.$error" :errorLabel="emailError" type="email" lowerCase disable
           v-model.trim="user.alenvi.local.email" @blur="updateUser({ alenvi: 'local.email', ogust: 'email' })" @focus="saveTmp('local.email')"
-          :displayInput="currentUser.role.name !== 'Auxiliaire'"
+          :displayInput="mainUser.role.name !== 'Auxiliaire'"
         />
         <ni-input caption="Adresse, numéro et rue" v-model="user.alenvi.administrative.contact.address"
           @blur="updateUser({ alenvi: 'administrative.contact.address', ogust: 'line' })" @focus="saveTmp('administrative.contact.address')"
@@ -157,7 +157,7 @@
       <div class="row gutter-profile items-stretch">
         <div class="col-xs-12">
           <div class="row justify-between">
-            <p v-if="currentUser.role.name === 'Auxiliaire'" class="input-caption">Merci de nous indiquer le type de document d'identité que tu possèdes.</p>
+            <p v-if="mainUser.role.name === 'Auxiliaire'" class="input-caption">Merci de nous indiquer le type de document d'identité que tu possèdes.</p>
           </div>
           <q-field :error="$v.user.alenvi.administrative.identityDocs.$error" :error-label="requiredField">
             <q-option-group color="primary" v-model="user.alenvi.administrative.identityDocs" @input="updateUser({ alenvi: 'administrative.identityDocs' })"
@@ -169,58 +169,58 @@
           </q-field>
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
-          <ni-file-uploader caption="Carte d'identité (recto)" path="administrative.idCardRecto" alt="cni recto" :entity="userProfile"
+          <ni-file-uploader caption="Carte d'identité (recto)" path="administrative.idCardRecto" alt="cni recto" :entity="currentUser"
             @delete="deleteDocument(user.alenvi.administrative.idCardRecto.driveId, 'administrative.idCardRecto')" name="idCardRecto"
             @uploaded="refreshUser" :upload="uploadDocument" :url="docsUploadUrl" :error="$v.user.alenvi.administrative.idCardRecto.driveId.$error"
-            :additionalValue="`cni_recto_${userProfile.firstname}_${userProfile.lastname}`" :extensions="extensions"
+            :additionalValue="`cni_recto_${currentUser.firstname}_${currentUser.lastname}`" :extensions="extensions"
           />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
-          <ni-file-uploader caption="Carte d'identité (verso)" path="administrative.idCardVerso" alt="cni verso" :entity="userProfile" :url="docsUploadUrl"
+          <ni-file-uploader caption="Carte d'identité (verso)" path="administrative.idCardVerso" alt="cni verso" :entity="currentUser" :url="docsUploadUrl"
             @delete="deleteDocument(user.alenvi.administrative.idCardVerso.driveId, 'administrative.idCardVerso')" name="idCardVerso"
-            @uploaded="refreshUser" :upload="uploadDocument" :additionalValue="`cni_verso_${userProfile.firstname}_${userProfile.lastname}`"
+            @uploaded="refreshUser" :upload="uploadDocument" :additionalValue="`cni_verso_${currentUser.firstname}_${currentUser.lastname}`"
             :extensions="extensions"
           />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'pp'" class="col-xs-12 col-md-6">
-          <ni-file-uploader caption="Passeport" path="administrative.passport" alt="passeport" :entity="userProfile" :upload="uploadDocument"
+          <ni-file-uploader caption="Passeport" path="administrative.passport" alt="passeport" :entity="currentUser" :upload="uploadDocument"
             @delete="deleteDocument(user.alenvi.administrative.passport.driveId, 'administrative.passport')" name="passport" :url="docsUploadUrl"
             @uploaded="refreshUser" :error="$v.user.alenvi.administrative.passport.driveId.$error" :extensions="extensions"
-            :additionalValue="`passport_${userProfile.firstname}_${userProfile.lastname}`"
+            :additionalValue="`passport_${currentUser.firstname}_${currentUser.lastname}`"
           />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
-          <ni-file-uploader caption="Titre de séjour (recto)" path="administrative.residencePermitRecto" alt="titre de séjour (recto)" :entity="userProfile"
+          <ni-file-uploader caption="Titre de séjour (recto)" path="administrative.residencePermitRecto" alt="titre de séjour (recto)" :entity="currentUser"
             @delete="deleteDocument(user.alenvi.administrative.residencePermitRecto.driveId, 'administrative.residencePermitRecto')"
             @uploaded="refreshUser" :upload="uploadDocument" :url="docsUploadUrl" :error="$v.user.alenvi.administrative.residencePermitRecto.driveId.$error"
-            name="residencePermitRecto" :additionalValue="`titre_de_séjour_recto_${userProfile.firstname}_${userProfile.lastname}`"
+            name="residencePermitRecto" :additionalValue="`titre_de_séjour_recto_${currentUser.firstname}_${currentUser.lastname}`"
             :extensions="extensions"
           />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Titre de séjour (verso)" path="administrative.residencePermitVerso" alt="titre de séjour (verso)" name="residencePermitVerso"
-            @delete="deleteDocument(user.alenvi.administrative.residencePermitVerso.driveId, 'administrative.residencePermitVerso')" :entity="userProfile"
+            @delete="deleteDocument(user.alenvi.administrative.residencePermitVerso.driveId, 'administrative.residencePermitVerso')" :entity="currentUser"
             @uploaded="refreshUser" :upload="uploadDocument" :url="docsUploadUrl" :extensions="extensions"
-            :additionalValue="`titre_de_séjour_verso_${userProfile.firstname}_${userProfile.lastname}`"
+            :additionalValue="`titre_de_séjour_verso_${currentUser.firstname}_${currentUser.lastname}`"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <ni-file-uploader caption="Attestation de sécurité sociale" path="administrative.healthAttest" alt="attestation secu" :entity="userProfile"
+          <ni-file-uploader caption="Attestation de sécurité sociale" path="administrative.healthAttest" alt="attestation secu" :entity="currentUser"
             @delete="deleteDocument(user.alenvi.administrative.healthAttest.driveId, 'administrative.healthAttest')" name="healthAttest"
             @uploaded="refreshUser" :upload="uploadDocument" :error="$v.user.alenvi.administrative.healthAttest.driveId.$error"
-            :additionalValue="`attestation_secu_${userProfile.firstname}_${userProfile.lastname}`" :url="docsUploadUrl" :extensions="extensions"
+            :additionalValue="`attestation_secu_${currentUser.firstname}_${currentUser.lastname}`" :url="docsUploadUrl" :extensions="extensions"
           />
         </div>
         <div class="col-xs-12 col-md-6">
-          <ni-file-uploader caption="Facture téléphonique" path="administrative.phoneInvoice" alt="facture téléphone" :entity="userProfile"
+          <ni-file-uploader caption="Facture téléphonique" path="administrative.phoneInvoice" alt="facture téléphone" :entity="currentUser"
             @delete="deleteDocument(user.alenvi.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')" name="phoneInvoice"
             @uploaded="refreshUser" :upload="uploadDocument" :error="$v.user.alenvi.administrative.phoneInvoice.driveId.$error"
-            :additionalValue="`facture_telephone_${userProfile.firstname}_${userProfile.lastname}`" :url="docsUploadUrl" :extensions="extensions"
+            :additionalValue="`facture_telephone_${currentUser.firstname}_${currentUser.lastname}`" :url="docsUploadUrl" :extensions="extensions"
           />
         </div>
         <div class="col-xs-12 col-md-6">
           <ni-multiple-files-uploader caption="Diplome(s) ou certificat(s)" path="administrative.certificates" alt="facture téléphone"
-            @delete="deleteDocument($event, 'certificates')" name="certificates" collapsibleLabel="Ajouter diplômes" :userProfile="userProfile"
+            @delete="deleteDocument($event, 'certificates')" name="certificates" collapsibleLabel="Ajouter diplômes" :userProfile="currentUser"
             :url="docsUploadUrl" additionalFieldsName="diplomes" @uploaded="refreshUser" @upload="uploadDocument($event, 'certificates')"
           />
         </div>
@@ -233,7 +233,7 @@
       </div>
       <div class="row gutter-profile-x">
         <div class="col-xs-12">
-          <div v-if="currentUser.role.name === 'Auxiliaire'" class="row justify-between">
+          <div v-if="mainUser.role.name === 'Auxiliaire'" class="row justify-between">
             <p class="input-caption">Veux-tu adhérer à la mutuelle d'entreprise ?</p>
             <q-icon v-if="$v.user.alenvi.administrative.mutualFund.has.$error" name="error_outline" color="secondary" />
           </div>
@@ -247,11 +247,11 @@
         </div>
         <div class="col-xs-12">
           <ni-file-uploader caption="Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle"
-            path="administrative.mutualFund" alt="justif mutuelle" :entity="userProfile" :upload="uploadDocument"
+            path="administrative.mutualFund" alt="justif mutuelle" :entity="currentUser" :upload="uploadDocument"
             @delete="deleteDocument(user.alenvi.administrative.mutualFund.driveId, 'administrative.mutualFund')" name="mutualFund" @uploaded="refreshUser"
             :displayUpload="user.alenvi.administrative.mutualFund.has && !user.alenvi.administrative.mutualFund.driveId" entityUrl="users"
-            :error="$v.user.alenvi.administrative.mutualFund.driveId.$error" :displayCaption="currentUser.role.name === 'Auxiliaire'"
-            :url="docsUploadUrl" :additionalValue="`mutuelle_${userProfile.firstname}_${userProfile.lastname}`" :extensions="extensions"
+            :error="$v.user.alenvi.administrative.mutualFund.driveId.$error" :displayCaption="mainUser.role.name === 'Auxiliaire'"
+            :url="docsUploadUrl" :additionalValue="`mutuelle_${currentUser.firstname}_${currentUser.lastname}`" :extensions="extensions"
           />
       </div>
         </div>
@@ -263,7 +263,7 @@
       </div>
       <div class="row gutter-profile-x">
         <div class="col-xs-12">
-          <div v-if="currentUser.role.name === 'Auxiliaire'" class="row justify-between">
+          <div v-if="mainUser.role.name === 'Auxiliaire'" class="row justify-between">
             <p class="input-caption">Par quel moyen comptes-tu te rendre au travail ?</p>
             <q-icon v-if="$v.user.alenvi.administrative.transportInvoice.transportType.$error" name="error_outline"
               color="secondary" />
@@ -275,10 +275,10 @@
         </div>
         <div v-if="user.alenvi.administrative.transportInvoice.transportType === 'public'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Merci de nous transmettre ton justificatif d'abonnement" path="administrative.transportInvoice"
-            alt="justif transport" :entity="userProfile" :upload="uploadDocument" name="transportInvoice" @uploaded="refreshUser"
-            :error="$v.user.alenvi.administrative.transportInvoice.driveId.$error" :displayCaption="currentUser.role.name === 'Auxiliaire'"
+            alt="justif transport" :entity="currentUser" :upload="uploadDocument" name="transportInvoice" @uploaded="refreshUser"
+            :error="$v.user.alenvi.administrative.transportInvoice.driveId.$error" :displayCaption="mainUser.role.name === 'Auxiliaire'"
             @delete="deleteDocument(user.alenvi.administrative.transportInvoice.driveId, 'administrative.transportInvoice')"
-            :url="docsUploadUrl" :additionalValue="`justif_transport_${userProfile.firstname}_${userProfile.lastname}`" :extensions="extensions"
+            :url="docsUploadUrl" :additionalValue="`justif_transport_${currentUser.firstname}_${currentUser.lastname}`" :extensions="extensions"
           />
         </div>
       </div>
@@ -289,7 +289,7 @@
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Certificat d'aptitude" path="administrative.medicalCertificate" alt="certificat médical" :entity="user.alenvi"
             @delete="deleteDocument(user.alenvi.administrative.medicalCertificate.driveId, 'administrative.medicalCertificate')" name="medicalCertificate"
-            @uploaded="refreshUser" :additionalValue="`certificat_medical_${userProfile.firstname}_${userProfile.lastname}`"
+            @uploaded="refreshUser" :additionalValue="`certificat_medical_${currentUser.firstname}_${currentUser.lastname}`"
             :upload="uploadDocument" :url="docsUploadUrl" :extensions="extensions"
           />
         </div>
@@ -578,10 +578,10 @@ export default {
       mainUser: 'main/user'
     }),
     currentUser () {
-      if (this.mainUser) {
-        return this.mainUser;
+      if (this.userProfile) {
+        return this.userProfile;
       }
-      return this.userProfile;
+      return this.mainUser;
     },
     nationalitiesOptions () {
       return ['FR', ...Object.keys(nationalities).filter(nationality => nationality !== 'FR')].map(nationality => ({ value: nationality, label: nationalities[nationality] }));
@@ -590,10 +590,10 @@ export default {
       return ['FR', ...Object.keys(countries).filter(country => country !== 'FR')].map(country => ({ value: country, label: countries[country] }));
     },
     docsUploadUrl () {
-      return `${process.env.API_HOSTNAME}/users/${this.userProfile._id}/gdrive/${this.userProfile.administrative.driveFolder.id}/upload`;
+      return `${process.env.API_HOSTNAME}/users/${this.currentUser._id}/gdrive/${this.currentUser.administrative.driveFolder.id}/upload`;
     },
     pictureUploadUrl () {
-      return `${process.env.API_HOSTNAME}/users/${this.userProfile._id}/cloudinary/upload`;
+      return `${process.env.API_HOSTNAME}/users/${this.currentUser._id}/cloudinary/upload`;
     },
     headers () {
       return {
@@ -665,13 +665,13 @@ export default {
     },
   },
   async mounted () {
-    const user = await this.$users.getById(this.userProfile._id);
+    const user = await this.$users.getById(this.currentUser._id);
     this.mergeUser(user);
     this.$v.user.alenvi.$touch();
     this.isLoaded = true;
   },
   watch: {
-    userProfile (value) {
+    currentUser (value) {
       if (!this.$_.isEqual(value, this.user.alenvi)) {
         this.mergeUser(value);
       }
@@ -717,7 +717,7 @@ export default {
         value = value.split(' ').join('');
       }
       const payload = this.$_.set({}, path, value);
-      payload._id = this.userProfile._id;
+      payload._id = this.currentUser._id;
       await this.$users.updateById(payload);
     },
     async updateOgustUser (paths) {
@@ -741,13 +741,13 @@ export default {
         } else {
           return;
         }
-        payload.id_tiers = this.userProfile.employee_id;
+        payload.id_tiers = this.currentUser.employee_id;
         await this.$ogust.setEmployeeBankInfo(payload);
       } else if (paths.ogust.match(/(city|line|supplement|zip)/i)) {
-        payload.id_address = this.userProfile.administrative.contact.addressId;
+        payload.id_address = this.currentUser.administrative.contact.addressId;
         await this.$ogust.setAddress(payload);
       } else {
-        payload.id_employee = this.userProfile.employee_id
+        payload.id_employee = this.currentUser.employee_id
         await this.$ogust.setEmployee(payload);
       }
     },
@@ -769,18 +769,18 @@ export default {
     async uploadImage () {
       try {
         if (this.hasPicture && !this.fileChosen) {
-          await cloudinary.deleteImageById({ id: this.userProfile.picture.publicId });
+          await cloudinary.deleteImageById({ id: this.currentUser.picture.publicId });
         }
         this.loadingImage = true;
         let blob = await this.croppa.promisedBlob('image/jpeg', 0.8);
         let data = new FormData();
-        data.append('_id', this.userProfile._id);
-        data.append('role', this.userProfile.role.name);
-        data.append('fileName', `photo_${this.userProfile.firstname}_${this.userProfile.lastname}`);
+        data.append('_id', this.currentUser._id);
+        data.append('role', this.currentUser.role.name);
+        data.append('fileName', `photo_${this.currentUser.firstname}_${this.currentUser.lastname}`);
         data.append('Content-Type', blob.type || 'application/octet-stream');
         data.append('picture', blob);
         await this.$axios.post(this.pictureUploadUrl, data, { headers: { 'content-type': 'multipart/form-data', 'x-access-token': Cookies.get('alenvi_token') || '' } });
-        await this.$store.dispatch('rh/getUserProfile', { userId: this.userProfile._id });
+        await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });
         this.closePictureEdition();
         NotifyPositive('Modification enregistrée');
       } catch (e) {
@@ -799,7 +799,7 @@ export default {
           cancel: 'Annuler'
         });
         await gdrive.removeFileById({ id: driveId });
-        let payload = { _id: this.userProfile._id };
+        let payload = { _id: this.currentUser._id };
         if (path === 'certificates') {
           payload = Object.assign(payload, { [`administrative.${path}`]: { driveId } });
           await this.$users.updateCertificates(payload);
@@ -807,7 +807,7 @@ export default {
           payload = this.$_.set(payload, path, { driveId: null, link: null });
           await this.$users.updateById(payload);
         }
-        await this.$store.dispatch('rh/getUserProfile', { userId: this.userProfile._id });
+        await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });
         NotifyPositive('Document supprimé');
       } catch (e) {
         console.error(e);
@@ -825,18 +825,18 @@ export default {
           ok: true,
           cancel: 'Annuler'
         });
-        if (this.userProfile.picture && this.userProfile.picture.publicId) {
-          await cloudinary.deleteImageById({ id: this.userProfile.picture.publicId });
+        if (this.currentUser.picture && this.currentUser.picture.publicId) {
+          await cloudinary.deleteImageById({ id: this.currentUser.picture.publicId });
           this.croppa.remove();
         }
         await this.$users.updateById({
-          _id: this.userProfile._id,
+          _id: this.currentUser._id,
           picture: {
             link: null,
             publicId: null
           }
         });
-        await this.$store.dispatch('rh/getUserProfile', { userId: this.userProfile._id });
+        await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });
         NotifyPositive('Photo supprimée');
       } catch (e) {
         console.error(e);
@@ -847,7 +847,7 @@ export default {
       }
     },
     async refreshUser () {
-      await this.$store.dispatch('rh/getUserProfile', { userId: this.userProfile._id });
+      await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });
       NotifyPositive('Document envoyé');
     },
     failMsg () {
@@ -886,7 +886,7 @@ export default {
       }
     },
     pictureDlLink (link) {
-      return link ? link.replace(/(\/upload)/i, `$1/fl_attachment:photo_${this.userProfile.firstname}_${this.userProfile.lastname}`) : '';
+      return link ? link.replace(/(\/upload)/i, `$1/fl_attachment:photo_${this.currentUser.firstname}_${this.currentUser.lastname}`) : '';
     }
   }
 }

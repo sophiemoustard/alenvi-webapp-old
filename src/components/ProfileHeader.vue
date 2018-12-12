@@ -201,7 +201,7 @@ export default {
       if (this.customer) {
         this.$router.push({ name: 'customers directory' });
       } else {
-        this.$router.push({ name: 'administrative directory', query: { role: 'Auxiliaire' } });
+        this.$router.push({ name: 'administrative directory' });
       }
     }
   }

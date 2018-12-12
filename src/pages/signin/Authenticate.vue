@@ -92,7 +92,7 @@ export default {
         } else if (this.getUser.role.name === 'Auxiliaire') {
           this.$router.replace({ name: 'profile planning', params: { id: this.$q.cookies.get('user_id') }, query: { auxiliary: 'true', self: 'true' } });
         } else {
-          this.$router.replace({ name: 'administrative directory', query: { role: 'Auxiliaire' } });
+          this.$router.replace({ name: 'administrative directory' });
         }
       } catch (e) {
         NotifyNegative('Impossible de se connecter.');

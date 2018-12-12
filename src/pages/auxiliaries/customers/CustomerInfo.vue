@@ -38,10 +38,10 @@
 </template>
 
 <script>
-import pathologies from '../../data/pathologies';
-import { NotifyPositive, NotifyNegative } from '../../components/popup/notify';
-import Input from '../../components/form/Input.vue';
-import Select from '../../components/form/Select.vue';
+import pathologies from '../../../data/pathologies';
+import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
+import Input from '../../../components/form/Input.vue';
+import Select from '../../../components/form/Select.vue';
 
 export default {
   components: {

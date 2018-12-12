@@ -66,12 +66,12 @@
 <script>
 import { required, email } from 'vuelidate/lib/validators';
 
-import { clear } from '../../helpers/utils.js';
-import { frAddress } from '../../helpers/vuelidateCustomVal.js'
-import SearchAddress from '../../components/form/SearchAddress';
-import NiModalInput from '../../components/form/ModalInput';
-import NiModalSelect from '../../components/form/ModalSelect';
-import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify.js';
+import { clear } from '../../../helpers/utils.js';
+import { frAddress } from '../../../helpers/vuelidateCustomVal.js'
+import SearchAddress from '../../../components/form/SearchAddress';
+import NiModalInput from '../../../components/form/ModalInput';
+import NiModalSelect from '../../../components/form/ModalSelect';
+import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../../components/popup/notify.js';
 
 export default {
   metaInfo: {
