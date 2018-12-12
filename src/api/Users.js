@@ -15,6 +15,19 @@ export default {
       console.error(e.response);
     }
   },
+  async showAllActive (params = null, token = null) {
+    try {
+      let employeeIdRaw;
+      if (token === null) {
+        employeeIdRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/active`, { params });
+      } else {
+        employeeIdRaw = await axios.get(`${process.env.API_HOSTNAME}/users/active`, { params, headers: { 'x-access-token': token } });
+      }
+      return employeeIdRaw.data.data.users;
+    } catch (e) {
+      console.error(e.response);
+    }
+  },
   async getById (id, token = null) {
     let userRaw = {};
     if (token === null) {
