@@ -10,9 +10,15 @@
       <div class="q-mb-lg">
         <p class="title">Paiement</p>
         <div class="row gutter-profile">
-          <ni-input caption="Nom associé au compte bancaire" v-model="customer.payment.bankAccountOwner" borders />
-          <ni-input caption="IBAN" v-model="customer.payment.iban" borders />
-          <ni-input caption="BIC" v-model="customer.payment.bic" borders />
+          <ni-input caption="Nom associé au compte bancaire" v-model="customer.payment.bankAccountOwner" :error="$v.customer.payment.bankAccountOwner.$error"
+            borders @focus="saveTmp('payment.bankAccountOwner')" @blur="updateCustomer('payment.bankAccountOwner')"
+          />
+          <ni-input caption="IBAN" v-model="customer.payment.iban" :error="$v.customer.payment.iban.$error" :errorLabel="ibanError" borders
+            @focus="saveTmp('payment.iban')" @blur="updateCustomer('payment.iban')"
+          />
+          <ni-input caption="BIC" v-model="customer.payment.bic" :error="$v.customer.payment.bic.$error" :errorLabel="bicError" borders
+            @focus="saveTmp('payment.bic')" @blur="updateCustomer('payment.bic')"
+          />
         </div>
       </div>
     </template>
@@ -23,7 +29,10 @@
 </template>
 
 <script>
+import { required } from 'vuelidate/lib/validators';
 import Input from '../../components/form/Input.vue';
+import { bic, iban } from '../../helpers/vuelidateCustomVal';
+import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify';
 
 export default {
   name: 'Subscriptions',
@@ -32,13 +41,39 @@ export default {
   },
   data () {
     return {
-      customer: {},
+      customer: {
+        payment: {},
+      },
+      tmpInput: null,
+    }
+  },
+  validations: {
+    customer: {
+      payment: {
+        bankAccountOwner: { required },
+        bic: { required, bic },
+        iban: { required, iban }
+      }
     }
   },
   computed: {
     helper () {
       return this.$store.getters['main/user'];
-    }
+    },
+    ibanError () {
+      if (!this.$v.customer.payment.iban.required) {
+        return 'Champ requis';
+      } else if (!this.$v.customer.payment.iban.iban) {
+        return 'IBAN non valide';
+      }
+    },
+    bicError () {
+      if (!this.$v.customer.payment.bic.required) {
+        return 'Champ requis';
+      } else if (!this.$v.customer.payment.bic.bic) {
+        return 'BIC non valide';
+      }
+    },
   },
   mounted () {
     this.getCustomer();
@@ -53,6 +88,37 @@ export default {
         this.customer = {};
       }
     },
+    saveTmp (path) {
+      this.tmpInput = this.$_.get(this.customer, path);
+    },
+    async updateCustomer (path) {
+      try {
+        if (this.tmpInput === this.$_.get(this.customer, path)) return;
+        this.$_.get(this.$v.customer, path).$touch();
+        if (this.$_.get(this.$v.customer, path).$error) {
+          return NotifyWarning('Champ(s) invalide(s)');
+        }
+
+        let value = this.$_.get(this.customer, path);
+        if (path.match(/iban/i)) {
+          value = value.split(' ').join('');
+        }
+        const payload = this.$_.set({}, path, value);
+        payload._id = this.customer._id;
+        await this.$customers.updateById(payload);
+
+        NotifyPositive('Modification enregistrée');
+      } catch (e) {
+        console.error(e);
+        if (e.message === 'Champ(s) invalide(s)') {
+          return NotifyWarning(e.message)
+        }
+        console.log(e);
+        NotifyNegative('Erreur lors de la modification');
+      } finally {
+        this.tmpInput = '';
+      }
+    }
   },
 }
 </script>
