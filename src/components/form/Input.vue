@@ -18,6 +18,7 @@
         :disable="disable"
         :rows="rows"
         :suffix="suffix"
+        :class="{'borders': borders}"
       />
     </q-field>
   </div>
@@ -37,6 +38,7 @@ export default {
     rows: { type: Number, default: 1 },
     displayInput: { type: Boolean, default: true },
     suffix: { type: String, default: '' },
+    borders: { type: Boolean, default: false },
   },
   methods: {
     blurHandler (event) {
@@ -53,7 +55,11 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+@import '~variables'
   .bg-negative
     background: white !important
     color: inherit !important
+
+  .borders
+    border: 1px solid $light-grey !important
 </style>
