@@ -82,15 +82,6 @@ const routes = [
         },
       },
       {
-        path: 'ni/:id/account',
-        name: 'account info',
-        component: () => import('pages/ni/AccountInfo'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['profiles:read', 'profiles:edit']
-        }
-      },
-      {
         path: 'ni/:id/team',
         name: 'team directory',
         component: () => import('pages/auxiliaries/team/TeamDirectory'),
@@ -266,6 +257,16 @@ const routes = [
         component: () => import('pages/customers/Profile'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token']
+        }
+      },
+      // All profiles
+      {
+        path: ':id/account',
+        name: 'account info',
+        component: () => import('pages/AccountInfo'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['profiles:read', 'profiles:edit']
         }
       },
     ]
