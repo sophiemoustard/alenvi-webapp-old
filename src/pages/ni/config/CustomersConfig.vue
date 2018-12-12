@@ -282,7 +282,8 @@ export default {
     async createNewService () {
       try {
         this.loading = true;
-        await this.$companies.createService(this.company._id, this.newService);
+        const payload = this.$_.pickBy(this.newService);
+        await this.$companies.createService(this.company._id, payload);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création du service');
