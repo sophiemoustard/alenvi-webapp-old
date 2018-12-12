@@ -1,56 +1,60 @@
 <template>
   <q-page padding>
-    <p class="test" id="invoicesTitle">Mes factures</p>
-    <div id="invoicesFilter" class="row margin-bottom">
-      <q-select v-model="year" :options="years"></q-select>&nbsp;
-      <q-select v-model="month" :options="months"></q-select>
-      <div class="on-right column justify-center">
-        <q-btn color="primary" @click="getInvoices(null)" :disabled="isDisabled">Afficher les factures</q-btn>
+    <div class="q-mb-lg">
+      <p class="title" id="invoicesTitle">Mes factures</p>
+      <div class="row q-mb-md">
+        <q-select v-model="year" :options="years"></q-select>&nbsp;
+        <q-select v-model="month" :options="months"></q-select>
+        <div class="on-right column justify-center">
+          <q-btn color="primary" @click="getInvoices(null)" :disabled="isDisabled">Afficher les factures</q-btn>
+        </div>
       </div>
+      <p v-if="invoices.length == 0">Aucune facture disponible.</p>
+      <table v-if="invoices.length != 0" class="striped-odd highlight">
+        <thead>
+          <tr>
+            <th>Date de facturation</th>
+            <th>Montant TTC</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(invoice, index) in invoices" :key="index">
+            <td>{{ invoice.invoice_date }}</td>
+            <td>{{ invoice.amount_incl_taxe }}</td>
+            <td>
+              <q-btn flat round small color="primary" @click="downloadFile(invoice.print_url, 'DL facture')">
+                <a download>
+                  <q-icon name="file download" />
+                </a>
+              </q-btn>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-    <p v-if="invoices.length == 0">Aucune facture disponible.</p>
-    <table v-if="invoices.length != 0" class="striped-odd highlight">
-      <thead>
-        <tr>
-          <th>Date de facturation</th>
-          <th>Montant TTC</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(invoice, index) in invoices" :key="index">
-          <td>{{ invoice.invoice_date }}</td>
-          <td>{{ invoice.amount_incl_taxe }}</td>
-          <td>
-            <q-btn flat round small color="primary" @click="downloadFile(invoice.print_url, 'DL facture')">
-              <a download>
-                <q-icon name="file download" />
-              </a>
-            </q-btn>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <p id="fiscalAttestTitle">Mes attestations fiscales</p>
-    <p v-if="fiscalAttests.length == 0">Aucune attestation fiscale disponible.</p>
-    <table v-if="fiscalAttests.length != 0" class="striped-odd highlight">
-      <thead>
-        <tr>
-          <th>Année</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(fiscalAttest, index) in fiscalAttests" :key="index">
-          <td>{{ fiscalAttest.reference }}</td>
-          <td>
-            <q-btn flat round small color="primary" @click="downloadFile(fiscalAttest.print_url, 'DL Attestation Fisc.')">
-              <a download>
-                <q-icon name="file download" />
-              </a>
-            </q-btn>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="q-mb-xl">
+      <p class="title" id="fiscalAttestTitle">Mes attestations fiscales</p>
+      <p v-if="fiscalAttests.length == 0">Aucune attestation fiscale disponible.</p>
+      <table v-if="fiscalAttests.length != 0" class="striped-odd highlight">
+        <thead>
+          <tr>
+            <th>Année</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(fiscalAttest, index) in fiscalAttests" :key="index">
+            <td>{{ fiscalAttest.reference }}</td>
+            <td>
+              <q-btn flat round small color="primary" @click="downloadFile(fiscalAttest.print_url, 'DL Attestation Fisc.')">
+                <a download>
+                  <q-icon name="file download" />
+                </a>
+              </q-btn>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </q-page>
 </template>
 
@@ -155,21 +159,10 @@ export default {
 
 <style lang="stylus" scoped>
 @import '~variables';
-
-.margin-bottom
-  margin-bottom: 10px
-
-#invoicesTitle
+.title
   font-size: 1.5em
   margin-bottom: 20px
 
-#fiscalAttestTitle
-  font-size: 1.5em
-  margin-top: 30px
-  margin-bottom: 20px
-
-#invoicesFilter
-  margin-bottom: 25px
 a
   color: $primary
   text-decoration: none

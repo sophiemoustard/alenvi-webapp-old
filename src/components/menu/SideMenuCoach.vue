@@ -21,7 +21,7 @@
       </template>
       <ni-menu-item name="rh config" :params="{ id: user._id }" icon="settings" label="Configuration RH" />
       <ni-menu-item name="customers config" :params="{ id: user._id }" icon="settings" label="Configuration bénéficiaires" />
-      <ni-menu-item name="tags config" :params="{ id: user._id }" icon="settings" label="Tags" />
+      <ni-menu-item name="tags config" :params="{ id: user._id }" icon="list_alt" label="Tags" />
     </q-collapsible>
     <q-item-separator />
     <q-collapsible ref="planning" v-model="activeRoutes.planning.open" collapseIcon="expand_more">
