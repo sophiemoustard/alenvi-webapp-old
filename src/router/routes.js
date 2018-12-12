@@ -155,16 +155,6 @@ const routes = [
       },
       // Auxiliary view routes
       {
-        path: 'auxiliaries/paye',
-        name: 'profile salaries',
-        component: () => import('pages/auxiliaries/Salaries'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['profiles:read'],
-          parent: 'administrative'
-        }
-      },
-      {
         path: 'auxiliaries/planning',
         name: 'profile planning',
         component: () => import('pages/auxiliaries/planning/Planning'),
@@ -180,16 +170,6 @@ const routes = [
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['planning:read'],
           parent: 'planning'
-        }
-      },
-      {
-        path: 'auxiliaries/docs',
-        name: 'profile docs',
-        component: () => import('pages/auxiliaries/Documents'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['profiles:read'],
-          parent: 'administrative'
         }
       },
       {
@@ -213,9 +193,29 @@ const routes = [
         }
       },
       {
+        path: 'auxiliaries/paye',
+        name: 'profile salaries',
+        component: () => import('pages/auxiliaries/administrative/Salaries'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['profiles:read'],
+          parent: 'administrative'
+        }
+      },
+      {
+        path: 'auxiliaries/docs',
+        name: 'profile docs',
+        component: () => import('pages/auxiliaries/administrative/Documents'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['profiles:read'],
+          parent: 'administrative'
+        }
+      },
+      {
         path: 'auxiliaries/:id',
         name: 'auxiliary personal info',
-        component: () => import('pages/auxiliaries/Info'),
+        component: () => import('pages/auxiliaries/administrative/Info'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
@@ -228,7 +228,7 @@ const routes = [
       },
       // Customers view routes
       {
-        path: '/customers/home',
+        path: 'customers/home',
         name: 'customer home',
         component: () => import('pages/customers/Home'),
         meta: {

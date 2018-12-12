@@ -9,7 +9,7 @@
 
 <script>
 
-import ProfileInfo from '../../components/auxiliary/ProfileInfo';
+import ProfileInfo from '../../../components/auxiliary/ProfileInfo';
 
 export default {
   props: ['id'],
