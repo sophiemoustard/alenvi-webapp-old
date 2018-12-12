@@ -94,7 +94,7 @@ export default {
   methods: {
     async getUserList () {
       try {
-        const users = await this.$users.showAll({ role: 'Auxiliaire', isActive: true });
+        const users = await this.$users.showAllActive({ role: 'Auxiliaire' });
         this.userList = users.map(user => ({
           auxiliary: {
             name: `${user.firstname} ${user.lastname}`,
