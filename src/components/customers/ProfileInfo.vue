@@ -64,7 +64,7 @@
           </q-table>
         </q-card-main>
         <q-card-actions align="end">
-          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un abonnement" @click="addSubscription = true"/>
+          <q-btn :disable="serviceOptions.length === 0" flat no-caps color="primary" icon="add" label="Ajouter un abonnement" @click="addSubscription = true"/>
         </q-card-actions>
       </q-card>
     </div>
@@ -278,7 +278,10 @@ export default {
         return [];
       }
 
-      return this.company.customersConfig.services.map(service => ({
+      const subscribedServices = this.subscriptions.map(subscription => subscription.service._id);
+      const availableServices = this.company.customersConfig.services.filter(service => !subscribedServices.includes(service._id));
+
+      return availableServices.map(service => ({
         label: service.name,
         value: service._id,
       }));
@@ -552,8 +555,13 @@ export default {
         await this.$customers.addSubscription(this.customer._id, this.newSubscription);
         this.resetSubscriptionForm();
         this.refreshSubscriptions();
+        this.addSubscription = false;
         NotifyPositive('Abonnement ajouté');
       } catch (e) {
+        console.error(e);
+        if (e.data.statusCode === 409) {
+          return NotifyNegative(e.data.message);
+        }
         NotifyNegative("Erreur lors de l'ajout d'un abonnement");
       } finally {
         this.loading = false;
@@ -607,6 +615,9 @@ export default {
 
   /deep/ .q-option-inner
     margin-right: 5px
+
+  /deep/ i.q-checkbox-icon
+    opacity: 1 !important
 
   .margin-input
     margin-bottom: 6px
