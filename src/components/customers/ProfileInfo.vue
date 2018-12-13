@@ -58,6 +58,12 @@
             row-key="name"
             table-style="font-size: 1rem"
             hide-bottom>
+            <q-td slot="body-cell-sundays" slot-scope="props" :props="props">
+              {{ props.value ? 'Oui' : 'Non' }}
+            </q-td>
+            <q-td slot="body-cell-evenings" slot-scope="props" :props="props">
+              {{ props.value ? 'Oui' : 'Non' }}
+            </q-td>
             <q-td slot="body-cell-remove" slot-scope="props" :props="props">
               <q-icon name="delete" size="1.2rem" color="grey" class="cursor-pointer" @click.native="removeSubscriptions(props.value)" />
             </q-td>
