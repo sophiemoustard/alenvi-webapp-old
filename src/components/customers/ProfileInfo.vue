@@ -47,12 +47,40 @@
       </div>
     </div>
     <div class="q-mb-xl">
+      <div class="row justify-between items-baseline">
+        <p class="text-weight-bold">Abonnements</p>
+      </div>
+      <q-card>
+        <q-card-main>
+          <q-table
+            :data="subscriptions"
+            :columns="subscriptionsColumns"
+            row-key="name"
+            table-style="font-size: 1rem"
+            hide-bottom>
+            <q-td slot="body-cell-sundays" slot-scope="props" :props="props">
+              {{ props.value ? 'Oui' : 'Non' }}
+            </q-td>
+            <q-td slot="body-cell-evenings" slot-scope="props" :props="props">
+              {{ props.value ? 'Oui' : 'Non' }}
+            </q-td>
+            <q-td slot="body-cell-remove" slot-scope="props" :props="props">
+              <q-icon name="delete" size="1.2rem" color="grey" class="cursor-pointer" @click.native="removeSubscriptions(props.value)" />
+            </q-td>
+          </q-table>
+        </q-card-main>
+        <q-card-actions align="end">
+          <q-btn :disable="serviceOptions.length === 0" flat no-caps color="primary" icon="add" label="Ajouter un abonnement" @click="addSubscription = true"/>
+        </q-card-actions>
+      </q-card>
+    </div>
+    <div class="q-mb-xl">
       <p class="text-weight-bold">Aidants</p>
-      <div class="row gutter-profile">
-        <div class="col-xs-12 col-md-6">
+      <q-card>
+        <q-card-main>
           <q-table
             :data="userHelpers"
-            :columns="columns"
+            :columns="helpersColumns"
             row-key="name"
             table-style="font-size: 1rem"
             hide-bottom>
@@ -60,25 +88,64 @@
               <q-icon name="delete" size="1.2rem" color="grey" class="cursor-pointer" @click.native="removeHelper(props.value)" />
             </q-td>
           </q-table>
-        </div>
-      </div>
+        </q-card-main>
+        <q-card-actions align="end">
+          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un aidant" @click="addHelper = true" />
+        </q-card-actions>
+      </q-card>
     </div>
-    <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Ajouter un aidant" @click="opened = true" />
-    <q-modal v-model="opened" @hide="resetForm" :content-css="modalCssContainer">
+
+    <!-- Add helper modal -->
+    <q-modal v-model="addHelper" @hide="resetHelperForm" :content-css="modalCssContainer">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-8">
             <h5>Ajouter une <span class="text-weight-bold">personne</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
-            <span><q-icon name="clear" size="1rem" @click.native="opened = false" /></span>
+            <span><q-icon name="clear" size="1rem" @click.native="addHelper = false" /></span>
           </div>
         </div>
-        <ni-modal-input v-model="newHelper.lastname" :error="$v.newHelper.lastname.$error" caption="Nom" @blur="$v.newHelper.lastname.$touch" errorLabel="Champ requis" />
-        <ni-modal-input v-model="newHelper.firstname" :error="$v.newHelper.firstname.$error" caption="Prénom" @blur="$v.newHelper.firstname.$touch" errorLabel="Champ requis" />
-        <ni-modal-input v-model="newHelper.local.email" last :error="$v.newHelper.local.email.$error" caption="Email" @blur="$v.newHelper.local.email.$touch" :errorLabel="emailError" />
+        <ni-modal-input v-model="newHelper.lastname" :error="$v.newHelper.lastname.$error" caption="Nom" @blur="$v.newHelper.lastname.$touch" />
+        <ni-modal-input v-model="newHelper.firstname" :error="$v.newHelper.firstname.$error" caption="Prénom" @blur="$v.newHelper.firstname.$touch" />
+        <ni-modal-input v-model="newHelper.local.email" last :error="$v.newHelper.local.email.$error" caption="Email"
+          @blur="$v.newHelper.local.email.$touch" :errorLabel="emailError" />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Ajouter un aidant" icon-right="add" color="primary" :loading="loading" @click="submit" />
+      <q-btn no-caps class="full-width modal-btn" label="Ajouter un aidant" icon-right="add" color="primary" :loading="loading" @click="submitHelper" />
+    </q-modal>
+
+    <!-- Add subscription modal -->
+    <q-modal v-model="addSubscription" @hide="resetSubscriptionForm" :content-css="modalCssContainer">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-8">
+            <h5>Ajouter un <span class="text-weight-bold">abonnement</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer" style="text-align: right">
+            <span><q-icon name="clear" size="1rem" @click.native="addSubscription = false" /></span>
+          </div>
+        </div>
+        <ni-modal-select caption="Service" :options="serviceOptions" v-model="newSubscription.service" :error="$v.newSubscription.service.$error"
+          @blur="$v.newSubscription.service.$touch"
+        />
+        <ni-modal-input v-model="newSubscription.unitTTCRate" :error="$v.newSubscription.unitTTCRate.$error" caption="Prix unitaire TTC"
+          @blur="$v.newSubscription.unitTTCRate.$touch"
+        />
+        <ni-modal-input v-model="newSubscription.estimatedWeeklyVolume" :error="$v.newSubscription.estimatedWeeklyVolume.$error"
+          caption="Volume hebdomadaire estimatif" @blur="$v.newSubscription.estimatedWeeklyVolume.$touch"
+        />
+        <div class="row margin-input">
+          <div class="col-12">
+            <q-checkbox v-model="newSubscription.sundays"> dimanches inclus</q-checkbox>
+          </div>
+        </div>
+        <div class="row margin-input last">
+          <div class="col-12">
+            <q-checkbox v-model="newSubscription.evenings"> soirées inclues</q-checkbox>
+          </div>
+        </div>
+      </div>
+      <q-btn no-caps class="full-width modal-btn" label="Ajouter un abonnement" icon-right="add" color="primary" :loading="loading" @click="submitSubscription" />
     </q-modal>
   </div>
 </template>
@@ -96,29 +163,77 @@ import NiModalSelect from '../form/ModalSelect';
 import { frPhoneNumber, iban, bic, frAddress } from '../../helpers/vuelidateCustomVal';
 
 export default {
+  name: 'ProfileInfo',
   components: {
     NiSearchAddress: SearchAddress,
     NiInput: Input,
     NiModalInput,
-    NiModalSelect
+    NiModalSelect,
   },
   data () {
     return {
       loading: false,
-      opened: false,
+      addHelper: false,
+      addSubscription: false,
       isLoaded: false,
       tmpInput: '',
       modalCssContainer: {
         minWidth: '30vw'
       },
+      subscriptions: {},
       customer: {
         identity: {},
         contact: {
           address: {}
         },
-        payment: {}
+        payment: {},
+        subscriptions: {},
       },
-      columns: [
+      subscriptionsColumns: [
+        {
+          name: 'service',
+          label: 'Service',
+          align: 'left',
+          field: row => row.service.name,
+        },
+        {
+          name: 'nature',
+          label: 'Nature du service',
+          align: 'left',
+          field: row => row.service.nature,
+        },
+        {
+          name: 'unitTTCRate',
+          label: 'Prix unitaire TTC',
+          align: 'left',
+          field: 'unitTTCRate',
+        },
+        {
+          name: 'estimatedWeeklyVolume',
+          label: 'Volume hebdomadaire estimatif',
+          align: 'left',
+          field: 'estimatedWeeklyVolume',
+        },
+        {
+          name: 'sundays',
+          label: 'dont dimanches',
+          align: 'left',
+          field: 'sundays',
+        },
+        {
+          name: 'evenings',
+          label: 'dont soirées (après 20h)',
+          align: 'left',
+          field: 'evenings',
+        },
+        {
+          name: 'remove',
+          label: '',
+          align: 'left',
+          field: '_id',
+        },
+      ],
+      helpersColumns: [
         {
           name: 'lastname',
           label: 'Nom',
@@ -152,10 +267,33 @@ export default {
         lastname: '',
         firstname: '',
         local: { email: '' }
-      }
+      },
+      newSubscription: {
+        service: '',
+        unitTTCRate: '',
+        estimatedWeeklyVolume: '',
+        evenings: false,
+        sundays: false,
+      },
     }
   },
   computed: {
+    company () {
+      return this.$store.getters['main/company'];
+    },
+    serviceOptions () {
+      if (!this.company.customersConfig || !this.company.customersConfig.services) {
+        return [];
+      }
+
+      const subscribedServices = this.subscriptions.map(subscription => subscription.service._id);
+      const availableServices = this.company.customersConfig.services.filter(service => !subscribedServices.includes(service._id));
+
+      return availableServices.map(service => ({
+        label: service.name,
+        value: service._id,
+      }));
+    },
     userProfile () {
       return this.$store.getters['rh/getUserProfile'];
     },
@@ -210,7 +348,12 @@ export default {
       local: {
         email: { required, email }
       }
-    }
+    },
+    newSubscription: {
+      service: { required },
+      unitTTCRate: { required },
+      estimatedWeeklyVolume: { required },
+    },
   },
   watch: {
     userProfile (value) {
@@ -223,6 +366,7 @@ export default {
     await this.getUserHelpers();
     const customerRaw = await this.$customers.getById(this.userProfile._id);
     const customer = customerRaw.data.data.customer;
+    this.subscriptions = customer.subscriptions;
     this.mergeUser(customer);
     this.$v.customer.$touch();
     this.isLoaded = true;
@@ -241,6 +385,13 @@ export default {
     async getUserHelpers () {
       try {
         this.userHelpers = await this.$users.showAll({ customers: this.userProfile._id });
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async refreshSubscriptions () {
+      try {
+        this.subscriptions = await this.$customers.getSubscriptions(this.customer._id);
       } catch (e) {
         console.error(e);
       }
@@ -370,7 +521,7 @@ export default {
         }
       });
     },
-    async submit () {
+    async submitHelper () {
       try {
         this.loading = true;
         this.$v.newHelper.$touch();
@@ -384,7 +535,7 @@ export default {
         await this.sendWelcomingEmail();
         NotifyPositive('Email envoyé');
         await this.getUserHelpers();
-        this.opened = false
+        this.addHelper = false
       } catch (e) {
         console.error(e);
         if (e && e.message === 'Invalid fields') {
@@ -401,28 +552,94 @@ export default {
         this.loading = false;
       }
     },
-    resetForm () {
+    async submitSubscription () {
+      try {
+        this.loading = true;
+        this.$v.newSubscription.$touch();
+        if (this.$v.newSubscription.$error) {
+          return NotifyWarning('Champ(s) invalide(s)');
+        }
+
+        await this.$customers.addSubscription(this.customer._id, this.newSubscription);
+        this.resetSubscriptionForm();
+        this.refreshSubscriptions();
+        this.addSubscription = false;
+        NotifyPositive('Abonnement ajouté');
+      } catch (e) {
+        console.error(e);
+        if (e.data.statusCode === 409) {
+          return NotifyNegative(e.data.message);
+        }
+        NotifyNegative("Erreur lors de l'ajout d'un abonnement");
+      } finally {
+        this.loading = false;
+      }
+    },
+    async removeSubscriptions (subscriptionId) {
+      try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Es-tu sûr(e) de vouloir supprimer cet abonnement ?',
+          ok: true,
+          cancel: 'Annuler'
+        });
+
+        const params = { subscriptionId, _id: this.customer._id };
+
+        await this.$customers.removeSubscription(params);
+        await this.refreshSubscriptions();
+        NotifyPositive('Abonnement supprimé');
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    resetHelperForm () {
       this.$v.newHelper.$reset();
       this.newHelper = Object.assign({}, clear(this.newHelper));
-    }
+    },
+    resetSubscriptionForm () {
+      this.$v.newSubscription.$reset();
+      this.newSubscription = {
+        service: '',
+        unitTTCRate: '',
+        estimatedWeeklyVolume: '',
+        evenings: false,
+        sundays: false,
+      };
+    },
   }
 }
 </script>
 
 <style lang="stylus" scoped>
+  @import '~variables';
+
   /deep/ .bg-negative
     background: white !important
     color: inherit !important
 
+  .q-card
+    background: white
+    width: 100%
+    margin-bottom: 20px
+
+  .q-checkbox
+    font-size: 12px
+    margin-bottom: 10px
+
+  /deep/ .q-option-inner
+    margin-right: 5px
+
+  /deep/ i.q-checkbox-icon
+    opacity: 1 !important
+
+  .margin-input
+    margin-bottom: 6px
+    &.last
+      margin-bottom: 24px
+
   .q-table-container
     box-shadow: none
-    background: white
-
-  .fab-add-person
-    right: 60px
-    bottom: 18px
-    font-size: 16px
-    z-index: 2
 
   .modal
     &-padding
