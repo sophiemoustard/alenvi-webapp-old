@@ -315,6 +315,13 @@ export default {
         console.error(e);
       }
     },
+    async getSubscriptions () {
+      try {
+        this.subscriptions = await this.$customers.getSubscriptions(this.customer._id);
+      } catch (e) {
+        console.error(e);
+      }
+    },
     async updateUser (paths) {
       try {
         if (this.tmpInput === this.$_.get(this.customer, paths.alenvi)) return;
@@ -469,6 +476,24 @@ export default {
         NotifyNegative('Erreur lors de la création de l\'aidant');
       } finally {
         this.loading = false;
+      }
+    },
+    async removeSubscriptions (subscriptionId) {
+      try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Es-tu sûr(e) de vouloir supprimer cet abonnement ?',
+          ok: true,
+          cancel: 'Annuler'
+        });
+
+        const params = { subscriptionId, _id: this.customer._id };
+
+        await this.$customers.removeSubscription(params);
+        await this.getSubscriptions();
+        NotifyPositive('Abonnement supprimé');
+      } catch (e) {
+        console.error(e);
       }
     },
     resetForm () {
