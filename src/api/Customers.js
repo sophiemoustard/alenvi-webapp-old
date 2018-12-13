@@ -20,6 +20,9 @@ export default {
     const subscriptions = await alenviAxios.get(`${process.env.API_HOSTNAME}/customers/${id}/subscriptions`);
     return subscriptions.data.data.subscriptions;
   },
+  async addSubscription (id, data) {
+    return alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${id}/subscriptions`, data);
+  },
   async removeSubscription (params) {
     return alenviAxios.delete(`${process.env.API_HOSTNAME}/customers/${params._id}/subscriptions/${params.subscriptionId}`);
   }

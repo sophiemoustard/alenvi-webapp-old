@@ -64,7 +64,7 @@
           </q-table>
         </q-card-main>
         <q-card-actions align="end">
-          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un abonnement" @click="addSubscriptions()"/>
+          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un abonnement" @click="addSubscription = true"/>
         </q-card-actions>
       </q-card>
     </div>
@@ -85,22 +85,59 @@
         </div>
       </div>
     </div>
-    <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Ajouter un aidant" @click="opened = true" />
-    <q-modal v-model="opened" @hide="resetForm" :content-css="modalCssContainer">
+    <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Ajouter un aidant" @click="addHelper = true" />
+
+    <!-- Add helper modal -->
+    <q-modal v-model="addHelper" @hide="resetHelperForm" :content-css="modalCssContainer">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-8">
             <h5>Ajouter une <span class="text-weight-bold">personne</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
-            <span><q-icon name="clear" size="1rem" @click.native="opened = false" /></span>
+            <span><q-icon name="clear" size="1rem" @click.native="addHelper = false" /></span>
           </div>
         </div>
-        <ni-modal-input v-model="newHelper.lastname" :error="$v.newHelper.lastname.$error" caption="Nom" @blur="$v.newHelper.lastname.$touch" errorLabel="Champ requis" />
-        <ni-modal-input v-model="newHelper.firstname" :error="$v.newHelper.firstname.$error" caption="Prénom" @blur="$v.newHelper.firstname.$touch" errorLabel="Champ requis" />
-        <ni-modal-input v-model="newHelper.local.email" last :error="$v.newHelper.local.email.$error" caption="Email" @blur="$v.newHelper.local.email.$touch" :errorLabel="emailError" />
+        <ni-modal-input v-model="newHelper.lastname" :error="$v.newHelper.lastname.$error" caption="Nom" @blur="$v.newHelper.lastname.$touch" />
+        <ni-modal-input v-model="newHelper.firstname" :error="$v.newHelper.firstname.$error" caption="Prénom" @blur="$v.newHelper.firstname.$touch" />
+        <ni-modal-input v-model="newHelper.local.email" last :error="$v.newHelper.local.email.$error" caption="Email"
+          @blur="$v.newHelper.local.email.$touch" :errorLabel="emailError" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter un aidant" icon-right="add" color="primary" :loading="loading" @click="submitHelper" />
+    </q-modal>
+
+    <!-- Add subscription modal -->
+    <q-modal v-model="addSubscription" @hide="resetSubscriptionForm" :content-css="modalCssContainer">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-8">
+            <h5>Ajouter un <span class="text-weight-bold">abonnement</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer" style="text-align: right">
+            <span><q-icon name="clear" size="1rem" @click.native="addSubscription = false" /></span>
+          </div>
+        </div>
+        <ni-modal-select caption="Service" :options="serviceOptions" v-model="newSubscription.service" :error="$v.newSubscription.service.$error"
+          @blur="$v.newSubscription.service.$touch"
+        />
+        <ni-modal-input v-model="newSubscription.unitTTCRate" :error="$v.newSubscription.unitTTCRate.$error" caption="Prix unitaire TTC"
+          @blur="$v.newSubscription.unitTTCRate.$touch"
+        />
+        <ni-modal-input v-model="newSubscription.estimatedWeeklyVolume" :error="$v.newSubscription.estimatedWeeklyVolume.$error"
+          caption="Volume hebdomadaire estimatif" @blur="$v.newSubscription.estimatedWeeklyVolume.$touch"
+        />
+        <div class="row margin-input">
+          <div class="col-12">
+            <q-checkbox v-model="newSubscription.sundays"> dimanches inclus</q-checkbox>
+          </div>
+        </div>
+        <div class="row margin-input last">
+          <div class="col-12">
+            <q-checkbox v-model="newSubscription.evenings"> soirées inclues</q-checkbox>
+          </div>
+        </div>
+      </div>
+      <q-btn no-caps class="full-width modal-btn" label="Ajouter un abonnement" icon-right="add" color="primary" :loading="loading" @click="submitSubscription" />
     </q-modal>
   </div>
 </template>
@@ -123,12 +160,13 @@ export default {
     NiSearchAddress: SearchAddress,
     NiInput: Input,
     NiModalInput,
-    NiModalSelect
+    NiModalSelect,
   },
   data () {
     return {
       loading: false,
-      opened: false,
+      addHelper: false,
+      addSubscription: false,
       isLoaded: false,
       tmpInput: '',
       modalCssContainer: {
@@ -221,10 +259,30 @@ export default {
         lastname: '',
         firstname: '',
         local: { email: '' }
-      }
+      },
+      newSubscription: {
+        service: '',
+        unitTTCRate: '',
+        estimatedWeeklyVolume: '',
+        evenings: false,
+        sundays: false,
+      },
     }
   },
   computed: {
+    company () {
+      return this.$store.getters['main/company'];
+    },
+    serviceOptions () {
+      if (!this.company.customersConfig || !this.company.customersConfig.services) {
+        return [];
+      }
+
+      return this.company.customersConfig.services.map(service => ({
+        label: service.name,
+        value: service._id,
+      }));
+    },
     userProfile () {
       return this.$store.getters['rh/getUserProfile'];
     },
@@ -279,7 +337,12 @@ export default {
       local: {
         email: { required, email }
       }
-    }
+    },
+    newSubscription: {
+      service: { required },
+      unitTTCRate: { required },
+      estimatedWeeklyVolume: { required },
+    },
   },
   watch: {
     userProfile (value) {
@@ -315,7 +378,7 @@ export default {
         console.error(e);
       }
     },
-    async getSubscriptions () {
+    async refreshSubscriptions () {
       try {
         this.subscriptions = await this.$customers.getSubscriptions(this.customer._id);
       } catch (e) {
@@ -461,7 +524,7 @@ export default {
         await this.sendWelcomingEmail();
         NotifyPositive('Email envoyé');
         await this.getUserHelpers();
-        this.opened = false
+        this.addHelper = false
       } catch (e) {
         console.error(e);
         if (e && e.message === 'Invalid fields') {
@@ -478,6 +541,24 @@ export default {
         this.loading = false;
       }
     },
+    async submitSubscription () {
+      try {
+        this.loading = true;
+        this.$v.newSubscription.$touch();
+        if (this.$v.newSubscription.$error) {
+          return NotifyWarning('Champ(s) invalide(s)');
+        }
+
+        await this.$customers.addSubscription(this.customer._id, this.newSubscription);
+        this.resetSubscriptionForm();
+        this.refreshSubscriptions();
+        NotifyPositive('Abonnement ajouté');
+      } catch (e) {
+        NotifyNegative("Erreur lors de l'ajout d'un abonnement");
+      } finally {
+        this.loading = false;
+      }
+    },
     async removeSubscriptions (subscriptionId) {
       try {
         await this.$q.dialog({
@@ -490,21 +571,27 @@ export default {
         const params = { subscriptionId, _id: this.customer._id };
 
         await this.$customers.removeSubscription(params);
-        await this.getSubscriptions();
+        await this.refreshSubscriptions();
         NotifyPositive('Abonnement supprimé');
       } catch (e) {
         console.error(e);
       }
     },
-    resetForm () {
+    resetHelperForm () {
       this.$v.newHelper.$reset();
       this.newHelper = Object.assign({}, clear(this.newHelper));
-    }
+    },
+    resetSubscriptionForm () {
+      this.$v.newSubscription.$reset();
+      this.newSubscription = Object.assign({}, clear(this.newSubscription));
+    },
   }
 }
 </script>
 
 <style lang="stylus" scoped>
+  @import '~variables';
+
   /deep/ .bg-negative
     background: white !important
     color: inherit !important
@@ -513,6 +600,18 @@ export default {
     background: white
     width: 100%
     margin-bottom: 20px
+
+  .q-checkbox
+    font-size: 12px
+    margin-bottom: 10px
+
+  /deep/ .q-option-inner
+    margin-right: 5px
+
+  .margin-input
+    margin-bottom: 6px
+    &.last
+      margin-bottom: 24px
 
   .q-table-container
     box-shadow: none
