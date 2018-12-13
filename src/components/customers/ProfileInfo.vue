@@ -599,7 +599,13 @@ export default {
     },
     resetSubscriptionForm () {
       this.$v.newSubscription.$reset();
-      this.newSubscription = Object.assign({}, clear(this.newSubscription));
+      this.newSubscription = {
+        service: '',
+        unitTTCRate: '',
+        estimatedWeeklyVolume: '',
+        evenings: false,
+        sundays: false,
+      };
     },
   }
 }
