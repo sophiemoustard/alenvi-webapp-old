@@ -47,12 +47,34 @@
       </div>
     </div>
     <div class="q-mb-xl">
+      <div class="row justify-between items-baseline">
+        <p class="text-weight-bold">Abonnements</p>
+      </div>
+      <q-card>
+        <q-card-main>
+          <q-table
+            :data="subscriptions"
+            :columns="subscriptionsColumns"
+            row-key="name"
+            table-style="font-size: 1rem"
+            hide-bottom>
+            <q-td slot="body-cell-remove" slot-scope="props" :props="props">
+              <q-icon name="delete" size="1.2rem" color="grey" class="cursor-pointer" @click.native="removeSubscriptions(props.value)" />
+            </q-td>
+          </q-table>
+        </q-card-main>
+        <q-card-actions align="end">
+          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un abonnement" @click="addSubscriptions()"/>
+        </q-card-actions>
+      </q-card>
+    </div>
+    <div class="q-mb-xl">
       <p class="text-weight-bold">Aidants</p>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
           <q-table
             :data="userHelpers"
-            :columns="columns"
+            :columns="helpersColumns"
             row-key="name"
             table-style="font-size: 1rem"
             hide-bottom>
@@ -78,7 +100,7 @@
         <ni-modal-input v-model="newHelper.firstname" :error="$v.newHelper.firstname.$error" caption="Prénom" @blur="$v.newHelper.firstname.$touch" errorLabel="Champ requis" />
         <ni-modal-input v-model="newHelper.local.email" last :error="$v.newHelper.local.email.$error" caption="Email" @blur="$v.newHelper.local.email.$touch" :errorLabel="emailError" />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Ajouter un aidant" icon-right="add" color="primary" :loading="loading" @click="submit" />
+      <q-btn no-caps class="full-width modal-btn" label="Ajouter un aidant" icon-right="add" color="primary" :loading="loading" @click="submitHelper" />
     </q-modal>
   </div>
 </template>
@@ -96,6 +118,7 @@ import NiModalSelect from '../form/ModalSelect';
 import { frPhoneNumber, iban, bic, frAddress } from '../../helpers/vuelidateCustomVal';
 
 export default {
+  name: 'ProfileInfo',
   components: {
     NiSearchAddress: SearchAddress,
     NiInput: Input,
@@ -111,14 +134,60 @@ export default {
       modalCssContainer: {
         minWidth: '30vw'
       },
+      subscriptions: {},
       customer: {
         identity: {},
         contact: {
           address: {}
         },
-        payment: {}
+        payment: {},
+        subscriptions: {},
       },
-      columns: [
+      subscriptionsColumns: [
+        {
+          name: 'service',
+          label: 'Service',
+          align: 'left',
+          field: row => row.service.name,
+        },
+        {
+          name: 'nature',
+          label: 'Nature du service',
+          align: 'left',
+          field: row => row.service.nature,
+        },
+        {
+          name: 'unitTTCRate',
+          label: 'Prix unitaire TTC',
+          align: 'left',
+          field: 'unitTTCRate',
+        },
+        {
+          name: 'estimatedWeeklyVolume',
+          label: 'Volume hebdomadaire estimatif',
+          align: 'left',
+          field: 'estimatedWeeklyVolume',
+        },
+        {
+          name: 'sundays',
+          label: 'dont dimanches',
+          align: 'left',
+          field: 'sundays',
+        },
+        {
+          name: 'evenings',
+          label: 'dont soirées (après 20h)',
+          align: 'left',
+          field: 'evenings',
+        },
+        {
+          name: 'remove',
+          label: '',
+          align: 'left',
+          field: '_id',
+        },
+      ],
+      helpersColumns: [
         {
           name: 'lastname',
           label: 'Nom',
@@ -223,6 +292,7 @@ export default {
     await this.getUserHelpers();
     const customerRaw = await this.$customers.getById(this.userProfile._id);
     const customer = customerRaw.data.data.customer;
+    this.subscriptions = customer.subscriptions;
     this.mergeUser(customer);
     this.$v.customer.$touch();
     this.isLoaded = true;
@@ -370,7 +440,7 @@ export default {
         }
       });
     },
-    async submit () {
+    async submitHelper () {
       try {
         this.loading = true;
         this.$v.newHelper.$touch();
@@ -414,9 +484,14 @@ export default {
     background: white !important
     color: inherit !important
 
+  .q-card
+    background: white
+    width: 100%
+    margin-bottom: 20px
+
   .q-table-container
     box-shadow: none
-    background: white
+    // background: white
 
   .fab-add-person
     right: 60px
