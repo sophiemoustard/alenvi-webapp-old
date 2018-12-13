@@ -209,7 +209,8 @@ export default {
   },
   methods: {
     async refreshServices () {
-      this.services = await this.$companies.getServices(this.company._id);
+      await this.$store.dispatch('main/getUser', this.user._id);
+      this.services = this.user.company.customersConfig.services;
     },
     async refreshCompany () {
       await this.$store.dispatch('main/getUser', this.user._id);
@@ -299,6 +300,7 @@ export default {
           eveningSurcharge: '',
         };
         await this.refreshServices();
+        this.$v.newService.$reset();
       }
     },
   },
