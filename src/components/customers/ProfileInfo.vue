@@ -76,8 +76,8 @@
     </div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Aidants</p>
-      <div class="row gutter-profile">
-        <div class="col-xs-12 col-md-6">
+      <q-card>
+        <q-card-main>
           <q-table
             :data="userHelpers"
             :columns="helpersColumns"
@@ -88,10 +88,12 @@
               <q-icon name="delete" size="1.2rem" color="grey" class="cursor-pointer" @click.native="removeHelper(props.value)" />
             </q-td>
           </q-table>
-        </div>
-      </div>
+        </q-card-main>
+        <q-card-actions align="end">
+          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un aidant" @click="addHelper = true" />
+        </q-card-actions>
+      </q-card>
     </div>
-    <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Ajouter un aidant" @click="addHelper = true" />
 
     <!-- Add helper modal -->
     <q-modal v-model="addHelper" @hide="resetHelperForm" :content-css="modalCssContainer">
@@ -632,13 +634,6 @@ export default {
 
   .q-table-container
     box-shadow: none
-    // background: white
-
-  .fab-add-person
-    right: 60px
-    bottom: 18px
-    font-size: 16px
-    z-index: 2
 
   .modal
     &-padding
