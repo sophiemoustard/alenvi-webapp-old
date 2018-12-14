@@ -37,7 +37,7 @@
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Moyen de paiement</p>
       </div>
-      <div class="row gutter-profile">
+      <div class="row gutter-profile q-mb-lg">
         <ni-input caption="Nom associé au compte bancaire" :error="$v.customer.payment.bankAccountOwner.$error" errorLabel="Champ requis"
           v-model="customer.payment.bankAccountOwner" @focus="saveTmp('payment.bankAccountOwner')" @blur="updateUser({ alenvi: 'payment.bankAccountOwner', ogust: 'holder' })" />
         <ni-input caption="IBAN" :error="$v.customer.payment.iban.$error" errorLabel="IBAN non valide"
@@ -45,6 +45,25 @@
         <ni-input caption="BIC" :error="$v.customer.payment.bic.$error" errorLabel="BIC non valide"
           v-model="customer.payment.bic" @focus="saveTmp('payment.bic')" @blur="updateUser({ alenvi: 'payment.bic', ogust: 'bic_number' })" />
       </div>
+      <q-card>
+        <q-card-title>Mandats de prélèvement</q-card-title>
+        <q-card-main>
+          <q-table :columns="mandateColumns" :data="mandates" hide-bottom >
+            <q-td slot="body-cell-emptyMandate" slot-scope="props" :props="props">
+              <q-btn flat round small color="primary" @click="dlTemplate()">
+                <q-icon name="file download" />
+              </q-btn>
+            </q-td>
+            <q-td slot="body-cell-signedMandate" slot-scope="props" :props="props">
+              <div class="row justify-between">
+                <q-uploader :ref="`signedMandate_${props.row._id}`" name="signedMandate" :url="docsUploadUrl" :headers="headers"
+                  :additional-fields="[]" hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
+                  hide-upload-button @add="uploadDocument()" @uploaded="refreshCustomer" @fail="failMsg" />
+              </div>
+            </q-td>
+          </q-table>
+        </q-card-main>
+      </q-card>
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
@@ -151,6 +170,7 @@
 </template>
 
 <script>
+import { Cookies } from 'quasar';
 import { required, email } from 'vuelidate/lib/validators';
 import randomize from 'randomatic';
 
@@ -275,9 +295,38 @@ export default {
         evenings: false,
         sundays: false,
       },
+      mandateColumns: [
+        {
+          name: 'rum',
+          label: 'RUM',
+          align: 'left',
+          field: 'rum',
+        },
+        {
+          name: 'emptyMandate',
+          label: 'Mandat',
+          align: 'left',
+          field: 'emptyMandate',
+        },
+        {
+          name: 'signedMandate',
+          label: 'Mandat signé',
+          align: 'left',
+          field: 'signedMandate',
+        },
+      ],
+      mandates: [],
     }
   },
   computed: {
+    docsUploadUrl () {
+      return `${process.env.API_HOSTNAME}`;
+    },
+    headers () {
+      return {
+        'x-access-token': Cookies.get('alenvi_token') || ''
+      }
+    },
     company () {
       return this.$store.getters['main/company'];
     },
@@ -364,11 +413,7 @@ export default {
   },
   async mounted () {
     await this.getUserHelpers();
-    const customerRaw = await this.$customers.getById(this.userProfile._id);
-    const customer = customerRaw.data.data.customer;
-    this.subscriptions = customer.subscriptions;
-    this.mergeUser(customer);
-    this.$v.customer.$touch();
+    await this.refreshCustomer();
     this.isLoaded = true;
   },
   methods: {
@@ -388,6 +433,14 @@ export default {
       } catch (e) {
         console.error(e);
       }
+    },
+    async refreshCustomer () {
+      const customerRaw = await this.$customers.getById(this.userProfile._id);
+      const customer = customerRaw.data.data.customer;
+      this.subscriptions = customer.subscriptions;
+      this.mandates = customer.payment.mandates;
+      this.mergeUser(customer);
+      this.$v.customer.$touch();
     },
     async refreshSubscriptions () {
       try {
@@ -607,6 +660,10 @@ export default {
         sundays: false,
       };
     },
+    dlTemplate () {},
+    failMsg () {
+      NotifyNegative('Echec de l\'envoi du document');
+    },
   }
 }
 </script>
@@ -627,6 +684,9 @@ export default {
     font-size: 12px
     margin-bottom: 10px
 
+  /deep/ .q-card-title
+    font-size: 16px
+
   /deep/ .q-option-inner
     margin-right: 5px
 
@@ -646,4 +706,15 @@ export default {
       padding: 24px 58px 0px 58px
     &-btn
       border-radius: 0
+
+  /deep/ .q-uploader .q-if-inner
+    display: none
+
+  /deep/ .q-uploader input
+    cursor: pointer !important
+
+  /deep/ .q-uploader-pick-button
+    color: $primary
+    font-size: 1.5rem
+    cursor: pointer !important
 </style>
