@@ -54,12 +54,18 @@
                 <q-icon name="file download" />
               </q-btn>
             </q-td>
+            <q-td slot="body-cell-signed" slot-scope="props" :props="props">
+              <div :class="[{ activeDot: props.value, inactiveDot: !props.value }]" />
+            </q-td>
             <q-td slot="body-cell-signedMandate" slot-scope="props" :props="props">
               <div class="row justify-between">
                 <q-uploader :ref="`signedMandate_${props.row._id}`" name="signedMandate" :url="docsUploadUrl" :headers="headers"
                   :additional-fields="[]" hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
                   hide-upload-button @add="uploadDocument()" @uploaded="refreshCustomer" @fail="failMsg" />
               </div>
+            </q-td>
+            <q-td slot="body-cell-signedAt" slot-scope="props" :props="props">
+              <ni-datetime-picker v-model="customer.payment.mandates[props.row.__index].signedAt" />
             </q-td>
           </q-table>
         </q-card-main>
@@ -71,12 +77,7 @@
       </div>
       <q-card>
         <q-card-main>
-          <q-table
-            :data="subscriptions"
-            :columns="subscriptionsColumns"
-            row-key="name"
-            table-style="font-size: 1rem"
-            hide-bottom>
+          <q-table :data="subscriptions" :columns="subscriptionsColumns" row-key="name" table-style="font-size: 1rem" hide-bottom>
             <q-td slot="body-cell-sundays" slot-scope="props" :props="props">
               {{ props.value ? 'Oui' : 'Non' }}
             </q-td>
@@ -97,12 +98,7 @@
       <p class="text-weight-bold">Aidants</p>
       <q-card>
         <q-card-main>
-          <q-table
-            :data="userHelpers"
-            :columns="helpersColumns"
-            row-key="name"
-            table-style="font-size: 1rem"
-            hide-bottom>
+          <q-table :data="userHelpers" :columns="helpersColumns" row-key="name" table-style="font-size: 1rem" hide-bottom>
             <q-td slot="body-cell-remove" slot-scope="props" :props="props">
               <q-icon name="delete" size="1.2rem" color="grey" class="cursor-pointer" @click.native="removeHelper(props.value)" />
             </q-td>
@@ -181,6 +177,7 @@ import Input from '../form/Input.vue';
 import NiModalInput from '../form/ModalInput';
 import NiModalSelect from '../form/ModalSelect';
 import { frPhoneNumber, iban, bic, frAddress } from '../../helpers/vuelidateCustomVal';
+import DatetimePicker from '../form/DatetimePicker';
 
 export default {
   name: 'ProfileInfo',
@@ -189,6 +186,7 @@ export default {
     NiInput: Input,
     NiModalInput,
     NiModalSelect,
+    'ni-datetime-picker': DatetimePicker,
   },
   data () {
     return {
@@ -314,6 +312,18 @@ export default {
           align: 'left',
           field: 'signedMandate',
         },
+        {
+          name: 'signed',
+          label: 'Signé',
+          align: 'left',
+          field: 'signedAt',
+        },
+        {
+          name: 'signedAt',
+          label: 'Date de signature',
+          align: 'left',
+          field: 'signedAt',
+        },
       ],
       mandates: [],
     }
@@ -437,9 +447,12 @@ export default {
     async refreshCustomer () {
       const customerRaw = await this.$customers.getById(this.userProfile._id);
       const customer = customerRaw.data.data.customer;
-      this.subscriptions = customer.subscriptions;
-      this.mandates = customer.payment.mandates;
       this.mergeUser(customer);
+
+      this.subscriptions = customer.subscriptions;
+      this.mandates = customer.payment ? customer.payment.mandates : [];
+
+      this.$store.commit('rh/saveUserProfile', this.customer);
       this.$v.customer.$touch();
     },
     async refreshSubscriptions () {
@@ -472,7 +485,7 @@ export default {
         }
         NotifyNegative('Erreur lors de la modification');
       } finally {
-        this.$store.commit('rh/saveUserProfile', this.customer);
+        this.refreshCustomer();
         this.tmpInput = '';
       }
     },
@@ -707,6 +720,9 @@ export default {
     &-btn
       border-radius: 0
 
+  /deep/ .q-datetime-input
+    border: 1px solid $light-grey;
+
   /deep/ .q-uploader .q-if-inner
     display: none
 
@@ -717,4 +733,18 @@ export default {
     color: $primary
     font-size: 1.5rem
     cursor: pointer !important
+
+  .activeDot
+    background: $tertiary
+    width: 9px
+    height: 9px
+    border-radius: 50%
+    display: inline-block
+
+  .inactiveDot
+    background: $secondary
+    width: 9px
+    height: 9px
+    border-radius: 50%
+    display: inline-block
 </style>
