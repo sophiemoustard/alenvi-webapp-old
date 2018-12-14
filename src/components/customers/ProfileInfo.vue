@@ -48,9 +48,9 @@
       <q-card>
         <q-card-title>Mandats de prélèvement</q-card-title>
         <q-card-main>
-          <q-table :columns="mandateColumns" :data="mandates" hide-bottom >
+          <q-table :columns="mandateColumns" :data="mandates" hide-bottom :pagination.sync="pagination" :visible-columns="visibleColumns">
             <q-td slot="body-cell-emptyMandate" slot-scope="props" :props="props">
-              <q-btn flat round small color="primary" @click="dlTemplate()">
+              <q-btn v-if="props.row.__index == 1" flat round small color="primary" @click="dlTemplate()">
                 <q-icon name="file download" />
               </q-btn>
             </q-td>
@@ -293,6 +293,7 @@ export default {
         evenings: false,
         sundays: false,
       },
+      visibleColumns: ['rum', 'emptyMandate', 'signedMandate', 'signed', 'signedAt'],
       mandateColumns: [
         {
           name: 'rum',
@@ -324,8 +325,21 @@ export default {
           align: 'left',
           field: 'signedAt',
         },
+        {
+          name: 'createdAt',
+          label: '',
+          field: 'createdAt',
+          align: 'left',
+          sortable: true,
+          format: (value) => this.$moment(value).format('DD/MM/YYYY'),
+          sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
+        },
       ],
       mandates: [],
+      pagination: {
+        sortBy: 'createdAt',
+        descending: true,
+      },
     }
   },
   computed: {
@@ -673,7 +687,7 @@ export default {
         sundays: false,
       };
     },
-    dlTemplate () {},
+    async dlTemplate () {},
     failMsg () {
       NotifyNegative('Echec de l\'envoi du document');
     },
