@@ -3,6 +3,15 @@
     <template v-if="customer !== {}">
       <div class="q-mb-lg">
         <p class="title">Services</p>
+          <q-card v-if="customer.subscriptions" class="contract-card">
+            <q-table
+              :data="customer.subscriptions"
+              :columns="columns"
+              row-key="name"
+              hide-bottom
+              binary-state-sort>
+            </q-table>
+          </q-card>
       </div>
       <div class="q-mb-lg">
         <p class="title">Devis</p>
@@ -45,6 +54,29 @@ export default {
         payment: {},
       },
       tmpInput: null,
+      columns: [
+        {
+          name: 'name',
+          label: 'Nom',
+          align: 'left',
+          field: row => row.service.name,
+          sortable: true
+        },
+        {
+          name: 'nature',
+          label: 'Nature',
+          align: 'left',
+          field: row => row.service.nature,
+          sortable: true
+        },
+        {
+          name: 'ttcRate',
+          label: 'Taux horaire TTC',
+          align: 'left',
+          field: 'unitTTCRate',
+          sortable: true
+        }
+      ]
     }
   },
   validations: {
@@ -83,6 +115,29 @@ export default {
       try {
         const customerRaw = await this.$customers.getById(this.helper.customers[0]._id);
         this.customer = customerRaw.data.data.customer;
+        this.customer.subscriptions = [
+          {
+            service: {
+              name: 'Test',
+              nature: 'Horaire'
+            },
+            unitTTCRate: 10,
+            estimatedWeeklyVolume: 0,
+            evenings: false,
+            sundays: false,
+          },
+          {
+            service: {
+              name: 'Test 2',
+              nature: 'Forfaitaire'
+            },
+            unitTTCRate: 0,
+            estimatedWeeklyVolume: 10,
+            evenings: true,
+            sundays: true,
+          }
+        ]
+        console.log(this.customer);
       } catch (e) {
         console.error(e);
         this.customer = {};
@@ -124,7 +179,14 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.title
-  font-size: 1.5em
-  margin-bottom: 20px
+  @import '~variables';
+  .title
+    font-size: 1.5em
+    margin-bottom: 20px
+  .contract-card
+    background: white
+    width: 100%
+    margin-bottom: 20px
+  .q-table-container
+    box-shadow: none
 </style>
