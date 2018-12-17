@@ -25,5 +25,12 @@ export default {
   },
   async removeSubscription (params) {
     return alenviAxios.delete(`${process.env.API_HOSTNAME}/customers/${params._id}/subscriptions/${params.subscriptionId}`);
-  }
+  },
+  async getMandates (id) {
+    const mandates = alenviAxios.get(`${process.env.API_HOSTNAME}/customers/${id}/mandates`);
+    return mandates.data.data.mandates;
+  },
+  async updateMandate (params, data) {
+    return alenviAxios.put(`${process.env.API_HOSTNAME}/customers/${params._id}/mandates/${params.mandateId}`, data);
+  },
 }

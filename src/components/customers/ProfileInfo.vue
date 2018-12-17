@@ -43,9 +43,10 @@
       <q-card>
         <q-card-title>Mandats de prélèvement</q-card-title>
         <q-card-main>
-          <q-table :columns="mandateColumns" :data="customer.payment.mandates" hide-bottom :pagination.sync="pagination" :visible-columns="visibleColumns">
+          <q-table :columns="mandateColumns" :data="customer.payment.mandates" hide-bottom :pagination.sync="pagination" :visible-columns="visibleColumns"
+            binary-state-sort>
             <q-td slot="body-cell-emptyMandate" slot-scope="props" :props="props">
-              <q-btn v-if="props.row.__index == 1" flat round small color="primary" @click="dlTemplate()">
+              <q-btn v-if="customer.payment.mandates && props.row.__index == customer.payment.mandates.length - 1" flat round small color="primary" @click="dlTemplate()">
                 <q-icon name="file download" />
               </q-btn>
             </q-td>
@@ -60,7 +61,9 @@
               </div>
             </q-td>
             <q-td slot="body-cell-signedAt" slot-scope="props" :props="props">
-              <ni-datetime-picker v-model="customer.payment.mandates[props.row.__index].signedAt" withBorders />
+              <ni-datetime-picker v-model="customer.payment.mandates[props.row.__index].signedAt" withBorders @blur="updateSignedAt(props.row)"
+                @focus="saveTmpSignedAt(props.row.__index)"
+              />
             </q-td>
           </q-table>
         </q-card-main>
@@ -198,7 +201,9 @@ export default {
         contact: {
           address: {}
         },
-        payment: {},
+        payment: {
+          mandates: [],
+        },
         subscriptions: [],
       },
       subscriptionsColumns: [
@@ -332,6 +337,7 @@ export default {
       pagination: {
         sortBy: 'createdAt',
         descending: true,
+        rowsPerPage: 0,
       },
     }
   },
@@ -444,6 +450,9 @@ export default {
     saveTmp (path) {
       this.tmpInput = this.$_.get(this.customer, path)
     },
+    saveTmpSignedAt (index) {
+      this.tmpInput = this.customer.payment.mandates[index].signedAt;
+    },
     async getUserHelpers () {
       try {
         this.userHelpers = await this.$users.showAll({ customers: this.userProfile._id });
@@ -461,6 +470,16 @@ export default {
         console.error(e);
       }
     },
+    async refreshMandates () {
+      try {
+        this.customer.mandates = await this.$customers.getMandates(this.customer._id);
+
+        this.$store.commit('rh/saveUserProfile', this.customer);
+        this.$v.customer.$touch();
+      } catch (e) {
+        console.error(e);
+      }
+    },
     async refreshCustomer () {
       const customerRaw = await this.$customers.getById(this.userProfile._id);
       const customer = customerRaw.data.data.customer;
@@ -468,6 +487,21 @@ export default {
 
       this.$store.commit('rh/saveUserProfile', this.customer);
       this.$v.customer.$touch();
+    },
+    async updateSignedAt (mandate) {
+      try {
+        if (!mandate.signedAt || this.tmpInput === mandate.signedAt) return;
+        const params = {
+          _id: this.customer._id,
+          mandateId: mandate._id,
+        };
+        await this.$customers.updateMandate(params, mandate);
+        this.refreshMandates();
+        NotifyPositive('Modification enregistrée');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modification');
+      }
     },
     async updateUser (paths) {
       try {
