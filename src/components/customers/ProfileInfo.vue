@@ -48,7 +48,7 @@
       <q-card>
         <q-card-title>Mandats de prélèvement</q-card-title>
         <q-card-main>
-          <q-table :columns="mandateColumns" :data="mandates" hide-bottom :pagination.sync="pagination" :visible-columns="visibleColumns">
+          <q-table :columns="mandateColumns" :data="customer.payment.mandates" hide-bottom :pagination.sync="pagination" :visible-columns="visibleColumns">
             <q-td slot="body-cell-emptyMandate" slot-scope="props" :props="props">
               <q-btn v-if="props.row.__index == 1" flat round small color="primary" @click="dlTemplate()">
                 <q-icon name="file download" />
@@ -77,7 +77,7 @@
       </div>
       <q-card>
         <q-card-main>
-          <q-table :data="subscriptions" :columns="subscriptionsColumns" row-key="name" table-style="font-size: 1rem" hide-bottom>
+          <q-table :data="customer.subscriptions" :columns="subscriptionsColumns" row-key="name" table-style="font-size: 1rem" hide-bottom>
             <q-td slot="body-cell-sundays" slot-scope="props" :props="props">
               {{ props.value ? 'Oui' : 'Non' }}
             </q-td>
@@ -198,14 +198,13 @@ export default {
       modalCssContainer: {
         minWidth: '30vw'
       },
-      subscriptions: {},
       customer: {
         identity: {},
         contact: {
           address: {}
         },
         payment: {},
-        subscriptions: {},
+        subscriptions: [],
       },
       subscriptionsColumns: [
         {
@@ -335,7 +334,6 @@ export default {
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
         },
       ],
-      mandates: [],
       pagination: {
         sortBy: 'createdAt',
         descending: true,
@@ -359,7 +357,7 @@ export default {
         return [];
       }
 
-      const subscribedServices = this.subscriptions.map(subscription => subscription.service._id);
+      const subscribedServices = this.customer.subscriptions.map(subscription => subscription.service._id);
       const availableServices = this.company.customersConfig.services.filter(service => !subscribedServices.includes(service._id));
 
       return availableServices.map(service => ({
@@ -458,23 +456,23 @@ export default {
         console.error(e);
       }
     },
+    async refreshSubscriptions () {
+      try {
+        this.customer.subscriptions = await this.$customers.getSubscriptions(this.customer._id);
+
+        this.$store.commit('rh/saveUserProfile', this.customer);
+        this.$v.customer.$touch();
+      } catch (e) {
+        console.error(e);
+      }
+    },
     async refreshCustomer () {
       const customerRaw = await this.$customers.getById(this.userProfile._id);
       const customer = customerRaw.data.data.customer;
       this.mergeUser(customer);
 
-      this.subscriptions = customer.subscriptions;
-      this.mandates = customer.payment ? customer.payment.mandates : [];
-
       this.$store.commit('rh/saveUserProfile', this.customer);
       this.$v.customer.$touch();
-    },
-    async refreshSubscriptions () {
-      try {
-        this.subscriptions = await this.$customers.getSubscriptions(this.customer._id);
-      } catch (e) {
-        console.error(e);
-      }
     },
     async updateUser (paths) {
       try {
@@ -492,6 +490,11 @@ export default {
           await this.updateOgustCustomer(paths);
         }
         NotifyPositive('Modification enregistrée');
+        if (paths.alenvi.match(/iban/i)) {
+          this.refreshCustomer();
+        }
+
+        this.$store.commit('rh/saveUserProfile', this.customer);
       } catch (e) {
         console.error(e);
         if (e.message === 'Champ(s) invalide(s)') {
@@ -499,7 +502,6 @@ export default {
         }
         NotifyNegative('Erreur lors de la modification');
       } finally {
-        this.refreshCustomer();
         this.tmpInput = '';
       }
     },
