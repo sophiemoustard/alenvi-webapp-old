@@ -3,15 +3,16 @@
     <template v-if="customer !== {}">
       <div class="q-mb-lg">
         <p class="title">Services</p>
-          <q-card v-if="customer.subscriptions" class="contract-card">
-            <q-table
-              :data="customer.subscriptions"
-              :columns="columns"
-              row-key="name"
-              hide-bottom
-              binary-state-sort>
-            </q-table>
-          </q-card>
+        <p v-if="customer.subscriptions.length === 0">Aucun service souscrit.</p>
+        <q-card v-if="customer.subscriptions.length > 0" class="contract-card">
+          <q-table
+            :data="customer.subscriptions"
+            :columns="columns"
+            row-key="name"
+            hide-bottom
+            binary-state-sort>
+          </q-table>
+        </q-card>
       </div>
       <div class="q-mb-lg">
         <p class="title">Devis</p>
@@ -115,29 +116,6 @@ export default {
       try {
         const customerRaw = await this.$customers.getById(this.helper.customers[0]._id);
         this.customer = customerRaw.data.data.customer;
-        this.customer.subscriptions = [
-          {
-            service: {
-              name: 'Test',
-              nature: 'Horaire'
-            },
-            unitTTCRate: 10,
-            estimatedWeeklyVolume: 0,
-            evenings: false,
-            sundays: false,
-          },
-          {
-            service: {
-              name: 'Test 2',
-              nature: 'Forfaitaire'
-            },
-            unitTTCRate: 0,
-            estimatedWeeklyVolume: 10,
-            evenings: true,
-            sundays: true,
-          }
-        ]
-        console.log(this.customer);
       } catch (e) {
         console.error(e);
         this.customer = {};
