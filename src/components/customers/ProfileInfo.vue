@@ -176,6 +176,7 @@ import NiModalInput from '../form/ModalInput';
 import NiModalSelect from '../form/ModalSelect';
 import { frPhoneNumber, iban, bic, frAddress } from '../../helpers/vuelidateCustomVal';
 import DatetimePicker from '../form/DatetimePicker';
+import { downloadFile } from '../../helpers/downloadFile';
 
 export default {
   name: 'ProfileInfo',
@@ -732,16 +733,9 @@ export default {
           'companyName': this.company.name,
           'companyAddress': this.company.address.fullAddress,
         };
-        const params = {
-          driveId: this.company.customersConfig.templates.debitMandate.driveId,
-        };
-        const file = await this.$gdrive.generateDocx(params, data);
-        const url = window.URL.createObjectURL(new Blob([file.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', 'contrat.docx');
-        document.body.appendChild(link);
-        link.click();
+        const params = { driveId: this.company.customersConfig.templates.debitMandate.driveId };
+
+        await downloadFile(params, data);
       } catch (e) {
         console.error(e);
       }

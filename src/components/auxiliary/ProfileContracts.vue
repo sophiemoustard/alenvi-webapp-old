@@ -142,6 +142,7 @@ import ModalSelect from '../form/ModalSelect.vue';
 import ModalInput from '../form/ModalInput.vue';
 import ModalDatetimePicker from '../form/ModalDatetimePicker.vue';
 import { NotifyPositive, NotifyNegative } from '../popup/notify';
+import { downloadFile } from '../../helpers/downloadFile';
 
 export default {
   components: {
@@ -358,13 +359,8 @@ export default {
         const params = {
           driveId: index === 0 ? this.getUser.company.rhConfig.templates.contract.driveId : this.getUser.company.rhConfig.templates.amendment.driveId,
         };
-        const file = await this.$gdrive.generateDocx(params, data);
-        const url = window.URL.createObjectURL(new Blob([file.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', 'contrat.docx');
-        document.body.appendChild(link);
-        link.click();
+
+        await downloadFile(params, data);
       } catch (e) {
         console.error(e);
       }
