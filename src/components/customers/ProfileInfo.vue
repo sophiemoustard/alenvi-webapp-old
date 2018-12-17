@@ -8,14 +8,9 @@
         <ni-input caption="Prénom" v-model="customer.identity.firstname" @focus="saveTmp('identity.firstname')" @blur="updateUser({ alenvi: 'identity.firstname', ogust: 'first_name' })" />
         <ni-input caption="Nom" :error="$v.customer.identity.lastname.$error" errorLabel="Champ requis" v-model="customer.identity.lastname" @focus="saveTmp('identity.lastname')" @blur="updateUser({ alenvi: 'identity.lastname', ogust: 'last_name' })" />
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Date de naissance</p>
-          </div>
-          <q-field>
-            <q-datetime type="date" format="DD/MM/YYYY" v-model="customer.identity.birthDate" color="white"
-              inverted-light popover @focus="saveTmp('identity.birthDate')" @blur="updateUser({ alenvi: 'identity.birthDate', ogust: 'date_of_birth' })"
-              ok-label="OK" cancel-label="Fermer" />
-          </q-field>
+          <ni-datetime-picker v-model="customer.identity.birthDate" @focus="saveTmp('identity.birthDate')" caption="Date de naissance"
+            @blur="updateUser({ alenvi: 'identity.birthDate', ogust: 'date_of_birth' })"
+          />
         </div>
       </div>
     </div>
@@ -65,7 +60,7 @@
               </div>
             </q-td>
             <q-td slot="body-cell-signedAt" slot-scope="props" :props="props">
-              <ni-datetime-picker v-model="customer.payment.mandates[props.row.__index].signedAt" />
+              <ni-datetime-picker v-model="customer.payment.mandates[props.row.__index].signedAt" withBorders />
             </q-td>
           </q-table>
         </q-card-main>
@@ -735,9 +730,6 @@ export default {
       padding: 24px 58px 0px 58px
     &-btn
       border-radius: 0
-
-  /deep/ .q-datetime-input
-    border: 1px solid $light-grey;
 
   /deep/ .q-uploader .q-if-inner
     display: none

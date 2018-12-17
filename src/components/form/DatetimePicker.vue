@@ -6,7 +6,7 @@
     </div>
     <q-field :error="error" :error-label="errorLabel">
       <q-datetime :value="value" type="date" format="DD/MM/YYYY" color="white" ok-label="OK" cancel-label="Fermer"
-        inverted-light popover @focus="focusHandler" @blur="blurHandler" @input="update"
+        inverted-light popover @focus="focusHandler" @blur="blurHandler" @input="update" :class="{border: withBorders}"
       />
     </q-field>
   </div>
@@ -18,6 +18,7 @@ export default {
     caption: String,
     error: Boolean,
     errorLabel: { type: String, default: 'Champ requis' },
+    withBorders: { type: Boolean, default: false },
     value: String,
   },
   methods: {
@@ -33,3 +34,10 @@ export default {
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+@import '~variables';
+
+  .border
+    border: 1px solid $light-grey;
+</style>
