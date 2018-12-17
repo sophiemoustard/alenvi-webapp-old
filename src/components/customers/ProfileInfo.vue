@@ -46,7 +46,7 @@
           <q-table :columns="mandateColumns" :data="customer.payment.mandates" hide-bottom :pagination.sync="pagination" :visible-columns="visibleColumns"
             binary-state-sort>
             <q-td slot="body-cell-emptyMandate" slot-scope="props" :props="props">
-              <q-btn v-if="customer.payment.mandates && props.row.__index == customer.payment.mandates.length - 1" flat round small color="primary" @click="dlTemplate()">
+              <q-btn v-if="customer.payment.mandates && props.row.__index == customer.payment.mandates.length - 1" flat round small color="primary" @click="downloadMandate(props.row)">
                 <q-icon name="file download" />
               </q-btn>
             </q-td>
@@ -718,7 +718,34 @@ export default {
         sundays: false,
       };
     },
-    async dlTemplate () {},
+    async downloadMandate (doc) {
+      try {
+        const data = {
+          'customerFirstname': this.customer.identity.firstname,
+          'customerLastname': this.customer.identity.lastname,
+          'customerAddress': this.customer.contact.address.fullAddress,
+          'uploadDate': this.$moment(Date.now()).format('DD/MM/YYYY'),
+          'ics': this.company.ics,
+          'rum': doc.rum,
+          'bic': this.customer.payment.bic,
+          'iban': this.customer.payment.iban,
+          'companyName': this.company.name,
+          'companyAddress': this.company.address.fullAddress,
+        };
+        const params = {
+          driveId: this.company.customersConfig.templates.debitMandate.driveId,
+        };
+        const file = await this.$gdrive.generateDocx(params, data);
+        const url = window.URL.createObjectURL(new Blob([file.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'contrat.docx');
+        document.body.appendChild(link);
+        link.click();
+      } catch (e) {
+        console.error(e);
+      }
+    },
     failMsg () {
       NotifyNegative('Echec de l\'envoi du document');
     },
