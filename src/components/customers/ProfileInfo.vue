@@ -37,7 +37,7 @@
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Moyen de paiement</p>
       </div>
-      <div class="row gutter-profile">
+      <div class="row gutter-profile q-mb-lg">
         <ni-input caption="Nom associé au compte bancaire" :error="$v.customer.payment.bankAccountOwner.$error" errorLabel="Champ requis"
           v-model="customer.payment.bankAccountOwner" @focus="saveTmp('payment.bankAccountOwner')" @blur="updateUser({ alenvi: 'payment.bankAccountOwner', ogust: 'holder' })" />
         <ni-input caption="IBAN" :error="$v.customer.payment.iban.$error" errorLabel="IBAN non valide"
@@ -45,6 +45,31 @@
         <ni-input caption="BIC" :error="$v.customer.payment.bic.$error" errorLabel="BIC non valide"
           v-model="customer.payment.bic" @focus="saveTmp('payment.bic')" @blur="updateUser({ alenvi: 'payment.bic', ogust: 'bic_number' })" />
       </div>
+      <q-card>
+        <q-card-title>Mandats de prélèvement</q-card-title>
+        <q-card-main>
+          <q-table :columns="mandateColumns" :data="mandates" hide-bottom :pagination.sync="pagination" :visible-columns="visibleColumns">
+            <q-td slot="body-cell-emptyMandate" slot-scope="props" :props="props">
+              <q-btn v-if="props.row.__index == 1" flat round small color="primary" @click="dlTemplate()">
+                <q-icon name="file download" />
+              </q-btn>
+            </q-td>
+            <q-td slot="body-cell-signed" slot-scope="props" :props="props">
+              <div :class="[{ activeDot: props.value, inactiveDot: !props.value }]" />
+            </q-td>
+            <q-td slot="body-cell-signedMandate" slot-scope="props" :props="props">
+              <div class="row justify-between">
+                <q-uploader :ref="`signedMandate_${props.row._id}`" name="signedMandate" :url="docsUploadUrl" :headers="headers"
+                  :additional-fields="[]" hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
+                  hide-upload-button @add="uploadDocument()" @uploaded="refreshCustomer" @fail="failMsg" />
+              </div>
+            </q-td>
+            <q-td slot="body-cell-signedAt" slot-scope="props" :props="props">
+              <ni-datetime-picker v-model="customer.payment.mandates[props.row.__index].signedAt" />
+            </q-td>
+          </q-table>
+        </q-card-main>
+      </q-card>
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
@@ -52,12 +77,7 @@
       </div>
       <q-card>
         <q-card-main>
-          <q-table
-            :data="subscriptions"
-            :columns="subscriptionsColumns"
-            row-key="name"
-            table-style="font-size: 1rem"
-            hide-bottom>
+          <q-table :data="subscriptions" :columns="subscriptionsColumns" row-key="name" table-style="font-size: 1rem" hide-bottom>
             <q-td slot="body-cell-sundays" slot-scope="props" :props="props">
               {{ props.value ? 'Oui' : 'Non' }}
             </q-td>
@@ -78,12 +98,7 @@
       <p class="text-weight-bold">Aidants</p>
       <q-card>
         <q-card-main>
-          <q-table
-            :data="userHelpers"
-            :columns="helpersColumns"
-            row-key="name"
-            table-style="font-size: 1rem"
-            hide-bottom>
+          <q-table :data="userHelpers" :columns="helpersColumns" row-key="name" table-style="font-size: 1rem" hide-bottom>
             <q-td slot="body-cell-remove" slot-scope="props" :props="props">
               <q-icon name="delete" size="1.2rem" color="grey" class="cursor-pointer" @click.native="removeHelper(props.value)" />
             </q-td>
@@ -151,6 +166,7 @@
 </template>
 
 <script>
+import { Cookies } from 'quasar';
 import { required, email } from 'vuelidate/lib/validators';
 import randomize from 'randomatic';
 
@@ -161,6 +177,7 @@ import Input from '../form/Input.vue';
 import NiModalInput from '../form/ModalInput';
 import NiModalSelect from '../form/ModalSelect';
 import { frPhoneNumber, iban, bic, frAddress } from '../../helpers/vuelidateCustomVal';
+import DatetimePicker from '../form/DatetimePicker';
 
 export default {
   name: 'ProfileInfo',
@@ -169,6 +186,7 @@ export default {
     NiInput: Input,
     NiModalInput,
     NiModalSelect,
+    'ni-datetime-picker': DatetimePicker,
   },
   data () {
     return {
@@ -275,9 +293,64 @@ export default {
         evenings: false,
         sundays: false,
       },
+      visibleColumns: ['rum', 'emptyMandate', 'signedMandate', 'signed', 'signedAt'],
+      mandateColumns: [
+        {
+          name: 'rum',
+          label: 'RUM',
+          align: 'left',
+          field: 'rum',
+        },
+        {
+          name: 'emptyMandate',
+          label: 'Mandat',
+          align: 'left',
+          field: 'emptyMandate',
+        },
+        {
+          name: 'signedMandate',
+          label: 'Mandat signé',
+          align: 'left',
+          field: 'signedMandate',
+        },
+        {
+          name: 'signed',
+          label: 'Signé',
+          align: 'left',
+          field: 'signedAt',
+        },
+        {
+          name: 'signedAt',
+          label: 'Date de signature',
+          align: 'left',
+          field: 'signedAt',
+        },
+        {
+          name: 'createdAt',
+          label: '',
+          field: 'createdAt',
+          align: 'left',
+          sortable: true,
+          format: (value) => this.$moment(value).format('DD/MM/YYYY'),
+          sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
+        },
+      ],
+      mandates: [],
+      pagination: {
+        sortBy: 'createdAt',
+        descending: true,
+      },
     }
   },
   computed: {
+    docsUploadUrl () {
+      return `${process.env.API_HOSTNAME}`;
+    },
+    headers () {
+      return {
+        'x-access-token': Cookies.get('alenvi_token') || ''
+      }
+    },
     company () {
       return this.$store.getters['main/company'];
     },
@@ -364,11 +437,7 @@ export default {
   },
   async mounted () {
     await this.getUserHelpers();
-    const customerRaw = await this.$customers.getById(this.userProfile._id);
-    const customer = customerRaw.data.data.customer;
-    this.subscriptions = customer.subscriptions;
-    this.mergeUser(customer);
-    this.$v.customer.$touch();
+    await this.refreshCustomer();
     this.isLoaded = true;
   },
   methods: {
@@ -388,6 +457,17 @@ export default {
       } catch (e) {
         console.error(e);
       }
+    },
+    async refreshCustomer () {
+      const customerRaw = await this.$customers.getById(this.userProfile._id);
+      const customer = customerRaw.data.data.customer;
+      this.mergeUser(customer);
+
+      this.subscriptions = customer.subscriptions;
+      this.mandates = customer.payment ? customer.payment.mandates : [];
+
+      this.$store.commit('rh/saveUserProfile', this.customer);
+      this.$v.customer.$touch();
     },
     async refreshSubscriptions () {
       try {
@@ -419,7 +499,7 @@ export default {
         }
         NotifyNegative('Erreur lors de la modification');
       } finally {
-        this.$store.commit('rh/saveUserProfile', this.customer);
+        this.refreshCustomer();
         this.tmpInput = '';
       }
     },
@@ -607,6 +687,10 @@ export default {
         sundays: false,
       };
     },
+    async dlTemplate () {},
+    failMsg () {
+      NotifyNegative('Echec de l\'envoi du document');
+    },
   }
 }
 </script>
@@ -627,6 +711,9 @@ export default {
     font-size: 12px
     margin-bottom: 10px
 
+  /deep/ .q-card-title
+    font-size: 16px
+
   /deep/ .q-option-inner
     margin-right: 5px
 
@@ -646,4 +733,32 @@ export default {
       padding: 24px 58px 0px 58px
     &-btn
       border-radius: 0
+
+  /deep/ .q-datetime-input
+    border: 1px solid $light-grey;
+
+  /deep/ .q-uploader .q-if-inner
+    display: none
+
+  /deep/ .q-uploader input
+    cursor: pointer !important
+
+  /deep/ .q-uploader-pick-button
+    color: $primary
+    font-size: 1.5rem
+    cursor: pointer !important
+
+  .activeDot
+    background: $tertiary
+    width: 9px
+    height: 9px
+    border-radius: 50%
+    display: inline-block
+
+  .inactiveDot
+    background: $secondary
+    width: 9px
+    height: 9px
+    border-radius: 50%
+    display: inline-block
 </style>
