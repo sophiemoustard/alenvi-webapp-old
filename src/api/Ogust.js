@@ -260,4 +260,13 @@ export default {
   async endContract (ogustVersionId, payload) {
     await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/contracts/${ogustVersionId}`, payload);
   },
+  async createSepaInfo (payload) {
+    await alenviAxios.post(`${process.env.API_HOSTNAME}/ogust/sepaInfo`, payload);
+  },
+  async getSepaInfo (payload) {
+    await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/sepaInfo`, payload);
+  },
+  async getSepaInfoById (id, payload) {
+    await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/sepaInfo/id`, payload);
+  }
 }
