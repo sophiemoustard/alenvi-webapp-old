@@ -35,8 +35,8 @@
             </q-td>
             <q-td slot="body-cell-sign" slot-scope="props" :props="props">
               <p v-if="props.row.signedAt">Devis et CG signés le {{$moment(props.row.signedAt).format('DD/MM/YYYY')}}</p>
-              <q-btn v-else color="primary">
-                <a href=""></a>Signer le devis et les CG
+              <q-btn v-else color="primary" @click="newESignModal = true">
+                Signer le devis et les CG
               </q-btn>
             </q-td>
           </q-table>
@@ -56,6 +56,38 @@
           />
         </div>
       </div>
+      <q-modal v-model="newESignModal" :content-css="modalCssContainer">
+        <div class="modal-padding">
+          <!-- <div class="row justify-between items-baseline">
+            <div class="col-11">
+              <h5>Signer mon <span class="text-weight-bold">devis</span></h5>
+            </div>
+            <div class="col-1 cursor-pointer" style="text-align: right">
+              <span>
+                <q-icon name="clear" size="1rem" @click.native="newESignModal = false" /></span>
+            </div>
+          </div> -->
+          <div class="iframe-container">
+            <iframe src="https://companitest.eversign.com/document/932691d9cb6d4b909d97a4e67646d4ff-9e28d3a1c7894f9498cb5d917ce76725/sign" frameborder="0"></iframe>
+          </div>
+          <!-- <ni-modal-select caption="Type d'absence" :error="$v.newAbsence.reason.$error" :options="reasonOptions" v-model="newAbsence.reason"
+            separator @blur="$v.newAbsence.reason.$touch"
+          />
+          <ni-modal-datetime-picker caption="Date de départ" :error="$v.newAbsence.startDate.$error" v-model="newAbsence.startDate"
+            :min="$moment().startOf('month').toISOString()"
+          />
+          <ni-modal-select caption="Durée" :error="$v.newAbsence.startDuration.$error" :options="dateOptions" v-model="newAbsence.startDuration"
+            separator
+          />
+          <ni-modal-datetime-picker caption="Date de fin" :error="$v.newAbsence.endDate.$error" v-model="newAbsence.endDate"
+            :disable="!newAbsence.startDate"
+          />
+          <ni-modal-select caption="Durée" :error="$v.newAbsence.endDuration.$error" :options="dateOptions" v-model="newAbsence.endDuration"
+            separator :disable="!newAbsence.endDate || newAbsence.endDate <= newAbsence.startDate"
+          /> -->
+        </div>
+        <!-- <q-btn class="full-width modal-btn" no-caps label="Confirmer" color="primary" :loading="loading" @click="addAbsence" /> -->
+      </q-modal>
     </template>
     <template v-else>
       <p>Vous n'avez pas de bénéficiaire.</p>
@@ -82,6 +114,11 @@ export default {
         quotes: []
       },
       tmpInput: null,
+      newESignModal: false,
+      modalCssContainer: {
+        minWidth: '80vw',
+        minHeight: '90vh'
+      },
       columnsSubs: [
         {
           name: 'name',
@@ -167,8 +204,25 @@ export default {
       }
     },
   },
-  mounted () {
-    this.getCustomer();
+  async mounted () {
+    try {
+      await this.getCustomer();
+      const test = await this.$esign.requestSignature({
+        type: 'devis',
+        customer: {
+          name: this.customer.identity.lastname,
+          email: this.customer.email
+        },
+        fileId: '1dWQ6hqH_9PgNhw30fKKVroQBG-WTA5Ek',
+        fields: {
+          title: this.customer.identity.title,
+          lastname: this.customer.identity.lastname
+        }
+      });
+      console.log('test', test);
+    } catch (e) {
+      console.error(e);
+    }
   },
   methods: {
     async getCustomer () {
@@ -252,4 +306,21 @@ export default {
   a
     color: $primary
     text-decoration: none
+  .modal
+    &-padding
+      padding: 24px 58px 0px 58px
+    &-btn
+      border-radius: 0
+  .iframe-container
+    overflow: hidden
+    padding-top: 60%
+    position: relative
+
+  .iframe-container iframe
+    border: 0
+    height: 100%
+    left: 0
+    position: absolute
+    top: 0
+    width: 100%
 </style>
