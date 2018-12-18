@@ -8,14 +8,9 @@
         <ni-input caption="Prénom" v-model="customer.identity.firstname" @focus="saveTmp('identity.firstname')" @blur="updateUser({ alenvi: 'identity.firstname', ogust: 'first_name' })" />
         <ni-input caption="Nom" :error="$v.customer.identity.lastname.$error" errorLabel="Champ requis" v-model="customer.identity.lastname" @focus="saveTmp('identity.lastname')" @blur="updateUser({ alenvi: 'identity.lastname', ogust: 'last_name' })" />
         <div class="col-xs-12 col-md-6">
-          <div class="row justify-between">
-            <p class="input-caption">Date de naissance</p>
-          </div>
-          <q-field>
-            <q-datetime type="date" format="DD/MM/YYYY" v-model="customer.identity.birthDate" color="white"
-              inverted-light popover @focus="saveTmp('identity.birthDate')" @blur="updateUser({ alenvi: 'identity.birthDate', ogust: 'date_of_birth' })"
-              ok-label="OK" cancel-label="Fermer" />
-          </q-field>
+          <ni-datetime-picker v-model="customer.identity.birthDate" @focus="saveTmp('identity.birthDate')" caption="Date de naissance"
+            @blur="updateUser({ alenvi: 'identity.birthDate', ogust: 'date_of_birth' })"
+          />
         </div>
       </div>
     </div>
@@ -48,9 +43,10 @@
       <q-card>
         <q-card-title>Mandats de prélèvement</q-card-title>
         <q-card-main>
-          <q-table :columns="mandateColumns" :data="mandates" hide-bottom :pagination.sync="pagination" :visible-columns="visibleColumns">
+          <q-table :columns="mandateColumns" :data="customer.payment.mandates" hide-bottom :pagination.sync="pagination" :visible-columns="visibleColumns"
+            binary-state-sort>
             <q-td slot="body-cell-emptyMandate" slot-scope="props" :props="props">
-              <q-btn v-if="props.row.__index == 1" flat round small color="primary" @click="dlTemplate()">
+              <q-btn v-if="customer.payment.mandates && props.row.__index == customer.payment.mandates.length - 1" flat round small color="primary" @click="dlTemplate()">
                 <q-icon name="file download" />
               </q-btn>
             </q-td>
@@ -65,7 +61,9 @@
               </div>
             </q-td>
             <q-td slot="body-cell-signedAt" slot-scope="props" :props="props">
-              <ni-datetime-picker v-model="customer.payment.mandates[props.row.__index].signedAt" />
+              <ni-datetime-picker v-model="customer.payment.mandates[props.row.__index].signedAt" withBorders @blur="updateSignedAt(props.row)"
+                @focus="saveTmpSignedAt(props.row.__index)"
+              />
             </q-td>
           </q-table>
         </q-card-main>
@@ -77,7 +75,7 @@
       </div>
       <q-card>
         <q-card-main>
-          <q-table :data="subscriptions" :columns="subscriptionsColumns" row-key="name" table-style="font-size: 1rem" hide-bottom>
+          <q-table :data="customer.subscriptions" :columns="subscriptionsColumns" row-key="name" table-style="font-size: 1rem" hide-bottom>
             <q-td slot="body-cell-sundays" slot-scope="props" :props="props">
               {{ props.value ? 'Oui' : 'Non' }}
             </q-td>
@@ -198,14 +196,15 @@ export default {
       modalCssContainer: {
         minWidth: '30vw'
       },
-      subscriptions: {},
       customer: {
         identity: {},
         contact: {
           address: {}
         },
-        payment: {},
-        subscriptions: {},
+        payment: {
+          mandates: [],
+        },
+        subscriptions: [],
       },
       subscriptionsColumns: [
         {
@@ -335,10 +334,10 @@ export default {
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
         },
       ],
-      mandates: [],
       pagination: {
         sortBy: 'createdAt',
         descending: true,
+        rowsPerPage: 0,
       },
     }
   },
@@ -359,7 +358,7 @@ export default {
         return [];
       }
 
-      const subscribedServices = this.subscriptions.map(subscription => subscription.service._id);
+      const subscribedServices = this.customer.subscriptions.map(subscription => subscription.service._id);
       const availableServices = this.company.customersConfig.services.filter(service => !subscribedServices.includes(service._id));
 
       return availableServices.map(service => ({
@@ -451,9 +450,32 @@ export default {
     saveTmp (path) {
       this.tmpInput = this.$_.get(this.customer, path)
     },
+    saveTmpSignedAt (index) {
+      this.tmpInput = this.customer.payment.mandates[index].signedAt;
+    },
     async getUserHelpers () {
       try {
         this.userHelpers = await this.$users.showAll({ customers: this.userProfile._id });
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async refreshSubscriptions () {
+      try {
+        this.customer.subscriptions = await this.$customers.getSubscriptions(this.customer._id);
+
+        this.$store.commit('rh/saveUserProfile', this.customer);
+        this.$v.customer.$touch();
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async refreshMandates () {
+      try {
+        this.customer.mandates = await this.$customers.getMandates(this.customer._id);
+
+        this.$store.commit('rh/saveUserProfile', this.customer);
+        this.$v.customer.$touch();
       } catch (e) {
         console.error(e);
       }
@@ -463,17 +485,22 @@ export default {
       const customer = customerRaw.data.data.customer;
       this.mergeUser(customer);
 
-      this.subscriptions = customer.subscriptions;
-      this.mandates = customer.payment ? customer.payment.mandates : [];
-
       this.$store.commit('rh/saveUserProfile', this.customer);
       this.$v.customer.$touch();
     },
-    async refreshSubscriptions () {
+    async updateSignedAt (mandate) {
       try {
-        this.subscriptions = await this.$customers.getSubscriptions(this.customer._id);
+        if (!mandate.signedAt || this.tmpInput === mandate.signedAt) return;
+        const params = {
+          _id: this.customer._id,
+          mandateId: mandate._id,
+        };
+        await this.$customers.updateMandate(params, mandate);
+        this.refreshMandates();
+        NotifyPositive('Modification enregistrée');
       } catch (e) {
         console.error(e);
+        NotifyNegative('Erreur lors de la modification');
       }
     },
     async updateUser (paths) {
@@ -492,6 +519,11 @@ export default {
           await this.updateOgustCustomer(paths);
         }
         NotifyPositive('Modification enregistrée');
+        if (paths.alenvi.match(/iban/i)) {
+          this.refreshCustomer();
+        }
+
+        this.$store.commit('rh/saveUserProfile', this.customer);
       } catch (e) {
         console.error(e);
         if (e.message === 'Champ(s) invalide(s)') {
@@ -499,7 +531,6 @@ export default {
         }
         NotifyNegative('Erreur lors de la modification');
       } finally {
-        this.refreshCustomer();
         this.tmpInput = '';
       }
     },
@@ -733,9 +764,6 @@ export default {
       padding: 24px 58px 0px 58px
     &-btn
       border-radius: 0
-
-  /deep/ .q-datetime-input
-    border: 1px solid $light-grey;
 
   /deep/ .q-uploader .q-if-inner
     display: none
