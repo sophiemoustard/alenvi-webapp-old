@@ -32,7 +32,7 @@ export default {
         'rcs': 'RCS de l’organisation',
         'services': 'Liste des services',
         'serviceName': 'Nom du service',
-        'hourlyRate': 'Tarif horaire TTC',
+        'unitTTCRate': 'Tarif horaire TTC',
         'estimatedWeeklyVolume': 'Volume hebdomadaire estimé total',
         'sundays': 'Dont dimanche',
         'evenings': 'Dont soir après 20h',

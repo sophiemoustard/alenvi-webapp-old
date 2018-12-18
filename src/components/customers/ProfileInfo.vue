@@ -811,6 +811,30 @@ export default {
         console.error(e);
       }
     },
+    async downloadQuote (doc) {
+      const subscriptions = this.customer.subscriptions.map(subscription => ({
+        serviceName: subscription.service.name,
+        unitTTCRate: subscription.unitTTCRate,
+        estimatedWeeklyVolume: subscription.estimatedWeeklyVolume,
+        sundays: subscription.sundays,
+        evenings: subscription.evenings,
+        estimatedWeeklyRate: subscription.unitTTCRate * subscription.estimatedWeeklyVolume,
+      }));
+
+      const data = {
+        'quoteNumber': doc.quoteNumber,
+        'customerFirstname': this.customer.identity.firstname,
+        'customerLastname': this.customer.identity.lastname,
+        'customerAddress': this.customer.contact.address.fullAddress,
+        'companyName': this.company.name,
+        'companyAddress': this.company.address.fullAddress,
+        'rcs': this.company.rcs,
+        'services': subscriptions,
+        'uploadDate': this.$moment(Date.now()).format('DD/MM/YYYY'),
+      }
+      const params = { driveId: this.company.customersConfig.templates.quote.driveId };
+      await downloadDocxFile(params, data, 'devis.docx');
+    },
     async generateQuote () {
       try {
         const subscriptions = this.customer.subscriptions.map(subscription => ({
