@@ -7,7 +7,7 @@
         <q-card v-if="customer.subscriptions.length > 0" class="contract-card">
           <q-table
             :data="customer.subscriptions"
-            :columns="columns"
+            :columns="columnsSubs"
             row-key="name"
             hide-bottom
             binary-state-sort>
@@ -16,6 +16,31 @@
       </div>
       <div class="q-mb-lg">
         <p class="title">Devis</p>
+        <p v-if="customer.quotes.length === 0">Aucun devis.</p>
+        <q-card v-if="customer.quotes.length > 0" class="contract-card">
+          <q-table
+            :data="customer.quotes"
+            :columns="columnsQuotes"
+            row-key="name"
+            hide-bottom
+            :visible-columns="visibleColumnsQuotes"
+            binary-state-sort>
+            <q-td slot="body-cell-document" slot-scope="props" :props="props">
+              <q-btn v-if="props.row.signedAt" flat round small color="primary">
+                <a :href="props.row.drive.link" download>
+                  <q-icon name="file download" />
+                </a>
+              </q-btn>
+              <p v-else>/</p>
+            </q-td>
+            <q-td slot="body-cell-sign" slot-scope="props" :props="props">
+              <p v-if="props.row.signedAt">Devis et CG signés le {{$moment(props.row.signedAt).format('DD/MM/YYYY')}}</p>
+              <q-btn v-else color="primary">
+                <a href=""></a>Signer le devis et les CG
+              </q-btn>
+            </q-td>
+          </q-table>
+        </q-card>
       </div>
       <div class="q-mb-lg">
         <p class="title">Paiement</p>
@@ -53,9 +78,11 @@ export default {
     return {
       customer: {
         payment: {},
+        subscriptions: [],
+        quotes: []
       },
       tmpInput: null,
-      columns: [
+      columnsSubs: [
         {
           name: 'name',
           label: 'Nom',
@@ -77,7 +104,39 @@ export default {
           field: row => `${row.unitTTCRate}€`,
           sortable: true
         }
-      ]
+      ],
+      columnsQuotes: [
+        {
+          name: 'number',
+          label: 'Numéro devis',
+          align: 'left',
+          field: 'quoteNumber',
+          sortable: true
+        },
+        {
+          name: 'document',
+          label: 'Document',
+          align: 'left',
+          field: row => row.drive.link,
+          sortable: true
+        },
+        {
+          name: 'sign',
+          label: 'Signature',
+          align: 'left',
+          field: 'signedAt',
+          sortable: true
+        },
+        {
+          name: 'createdAt',
+          align: 'left',
+          field: 'createdAt',
+          sortable: true,
+          format: (value) => this.$moment(value).format('DD/MM/YYYY'),
+          sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate())
+        }
+      ],
+      visibleColumnsQuotes: ['number', 'document', 'sign']
     }
   },
   validations: {
@@ -116,6 +175,29 @@ export default {
       try {
         const customerRaw = await this.$customers.getById(this.helper.customers[0]._id);
         this.customer = customerRaw.data.data.customer;
+        // this.customer.quotes = [
+        //   {
+        //     quoteNumber: '5552224424223',
+        //     idEverSign: 'eFJ211200k',
+        //     drive: {
+        //       driveId: '1212312321',
+        //       link: 'https://www.readersdigest.ca/wp-content/uploads/sites/14/2011/01/4-ways-cheer-up-depressed-cat.jpg'
+        //     },
+        //     signedAt: this.$moment().add(-1, 'days').toDate(),
+        //     createdAt: this.$moment().add(-1, 'days').toDate()
+        //   },
+        //   {
+        //     quoteNumber: '5552224424242',
+        //     idEverSign: 'eFJ2112kkO',
+        //     drive: {
+        //       driveId: '12213321321321',
+        //       link: 'https://www.readersdigest.ca/wp-content/uploads/sites/14/2011/01/4-ways-cheer-up-depressed-cat.jpg'
+        //     },
+        //     signedAt: this.$moment().toDate(),
+        //     createdAt: this.$moment().toDate()
+        //   }
+        // ]
+        console.log(this.customer);
       } catch (e) {
         console.error(e);
         this.customer = {};
@@ -167,4 +249,7 @@ export default {
     margin-bottom: 20px
   .q-table-container
     box-shadow: none
+  a
+    color: $primary
+    text-decoration: none
 </style>
