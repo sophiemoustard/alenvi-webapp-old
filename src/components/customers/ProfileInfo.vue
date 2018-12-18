@@ -793,16 +793,16 @@ export default {
     async downloadMandate (doc) {
       try {
         const data = {
-          'customerFirstname': this.customer.identity.firstname,
-          'customerLastname': this.customer.identity.lastname,
-          'customerAddress': this.customer.contact.address.fullAddress,
-          'uploadDate': this.$moment(Date.now()).format('DD/MM/YYYY'),
-          'ics': this.company.ics,
-          'rum': doc.rum,
-          'bic': this.customer.payment.bic,
-          'iban': this.customer.payment.iban,
-          'companyName': this.company.name,
-          'companyAddress': this.company.address.fullAddress,
+          customerFirstname: this.customer.identity.firstname,
+          customerLastname: this.customer.identity.lastname,
+          customerAddress: this.customer.contact.address.fullAddress,
+          uploadDate: this.$moment(Date.now()).format('DD/MM/YYYY'),
+          ics: this.company.ics,
+          rum: doc.rum,
+          bic: this.customer.payment.bic,
+          iban: this.customer.payment.iban,
+          companyName: this.company.name,
+          companyAddress: this.company.address.fullAddress,
         };
         const params = { driveId: this.company.customersConfig.templates.debitMandate.driveId };
 
@@ -825,15 +825,15 @@ export default {
         }));
 
         const data = {
-          'quoteNumber': doc.quoteNumber,
-          'customerFirstname': this.customer.identity.firstname,
-          'customerLastname': this.customer.identity.lastname,
-          'customerAddress': this.customer.contact.address.fullAddress,
-          'companyName': this.company.name,
-          'companyAddress': this.company.address.fullAddress,
-          'rcs': this.company.rcs,
-          'subscriptions': subscriptions,
-          'uploadDate': this.$moment(Date.now()).format('DD/MM/YYYY'),
+          quoteNumber: doc.quoteNumber,
+          customerFirstname: this.customer.identity.firstname,
+          customerLastname: this.customer.identity.lastname,
+          customerAddress: this.customer.contact.address.fullAddress,
+          companyName: this.company.name,
+          companyAddress: this.company.address.fullAddress,
+          rcs: this.company.rcs,
+          subscriptions,
+          uploadDate: this.$moment(Date.now()).format('DD/MM/YYYY'),
         }
         const params = { driveId: this.company.customersConfig.templates.quote.driveId };
         await downloadDocxFile(params, data, 'devis.docx');
