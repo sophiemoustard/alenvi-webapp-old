@@ -58,35 +58,10 @@
       </div>
       <q-modal v-model="newESignModal" :content-css="modalCssContainer">
         <div class="modal-padding">
-          <!-- <div class="row justify-between items-baseline">
-            <div class="col-11">
-              <h5>Signer mon <span class="text-weight-bold">devis</span></h5>
-            </div>
-            <div class="col-1 cursor-pointer" style="text-align: right">
-              <span>
-                <q-icon name="clear" size="1rem" @click.native="newESignModal = false" /></span>
-            </div>
-          </div> -->
           <div class="iframe-container">
             <iframe src="https://companitest.eversign.com/document/932691d9cb6d4b909d97a4e67646d4ff-9e28d3a1c7894f9498cb5d917ce76725/sign" frameborder="0"></iframe>
           </div>
-          <!-- <ni-modal-select caption="Type d'absence" :error="$v.newAbsence.reason.$error" :options="reasonOptions" v-model="newAbsence.reason"
-            separator @blur="$v.newAbsence.reason.$touch"
-          />
-          <ni-modal-datetime-picker caption="Date de départ" :error="$v.newAbsence.startDate.$error" v-model="newAbsence.startDate"
-            :min="$moment().startOf('month').toISOString()"
-          />
-          <ni-modal-select caption="Durée" :error="$v.newAbsence.startDuration.$error" :options="dateOptions" v-model="newAbsence.startDuration"
-            separator
-          />
-          <ni-modal-datetime-picker caption="Date de fin" :error="$v.newAbsence.endDate.$error" v-model="newAbsence.endDate"
-            :disable="!newAbsence.startDate"
-          />
-          <ni-modal-select caption="Durée" :error="$v.newAbsence.endDuration.$error" :options="dateOptions" v-model="newAbsence.endDuration"
-            separator :disable="!newAbsence.endDate || newAbsence.endDate <= newAbsence.startDate"
-          /> -->
         </div>
-        <!-- <q-btn class="full-width modal-btn" no-caps label="Confirmer" color="primary" :loading="loading" @click="addAbsence" /> -->
       </q-modal>
     </template>
     <template v-else>
@@ -229,28 +204,6 @@ export default {
       try {
         const customerRaw = await this.$customers.getById(this.helper.customers[0]._id);
         this.customer = customerRaw.data.data.customer;
-        // this.customer.quotes = [
-        //   {
-        //     quoteNumber: '5552224424223',
-        //     idEverSign: 'eFJ211200k',
-        //     drive: {
-        //       driveId: '1212312321',
-        //       link: 'https://www.readersdigest.ca/wp-content/uploads/sites/14/2011/01/4-ways-cheer-up-depressed-cat.jpg'
-        //     },
-        //     signedAt: this.$moment().add(-1, 'days').toDate(),
-        //     createdAt: this.$moment().add(-1, 'days').toDate()
-        //   },
-        //   {
-        //     quoteNumber: '5552224424242',
-        //     idEverSign: 'eFJ2112kkO',
-        //     drive: {
-        //       driveId: '12213321321321',
-        //       link: 'https://www.readersdigest.ca/wp-content/uploads/sites/14/2011/01/4-ways-cheer-up-depressed-cat.jpg'
-        //     },
-        //     signedAt: this.$moment().toDate(),
-        //     createdAt: this.$moment().toDate()
-        //   }
-        // ]
         console.log(this.customer);
       } catch (e) {
         console.error(e);
