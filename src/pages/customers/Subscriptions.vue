@@ -1,5 +1,5 @@
 <template>
-  <q-page padding>
+  <q-page padding class="neutral-background">
     <template v-if="customer !== {}">
       <div class="q-mb-lg">
         <p class="title">Services</p>
@@ -21,12 +21,12 @@
         <p class="title">Paiement</p>
         <div class="row gutter-profile">
           <ni-input caption="Nom associé au compte bancaire" v-model="customer.payment.bankAccountOwner" :error="$v.customer.payment.bankAccountOwner.$error"
-            borders @focus="saveTmp('payment.bankAccountOwner')" @blur="updateCustomer('payment.bankAccountOwner')"
+            @focus="saveTmp('payment.bankAccountOwner')" @blur="updateCustomer('payment.bankAccountOwner')"
           />
-          <ni-input caption="IBAN" v-model="customer.payment.iban" :error="$v.customer.payment.iban.$error" :errorLabel="ibanError" borders
+          <ni-input caption="IBAN" v-model="customer.payment.iban" :error="$v.customer.payment.iban.$error" :errorLabel="ibanError"
             @focus="saveTmp('payment.iban')" @blur="updateCustomer('payment.iban')"
           />
-          <ni-input caption="BIC" v-model="customer.payment.bic" :error="$v.customer.payment.bic.$error" :errorLabel="bicError" borders
+          <ni-input caption="BIC" v-model="customer.payment.bic" :error="$v.customer.payment.bic.$error" :errorLabel="bicError"
             @focus="saveTmp('payment.bic')" @blur="updateCustomer('payment.bic')"
           />
         </div>

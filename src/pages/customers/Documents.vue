@@ -1,5 +1,5 @@
 <template>
-  <q-page padding>
+  <q-page padding class="neutral-background">
     <div class="q-mb-lg">
       <p class="title" id="invoicesTitle">Mes factures</p>
       <div class="row q-mb-md">
