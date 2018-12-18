@@ -33,4 +33,11 @@ export default {
   async updateMandate (params, data) {
     return alenviAxios.put(`${process.env.API_HOSTNAME}/customers/${params._id}/mandates/${params.mandateId}`, data);
   },
+  async getQuotes (id) {
+    const quotes = await alenviAxios.get(`${process.env.API_HOSTNAME}/customers/${id}/quotes`);
+    return quotes.data.data.quotes;
+  },
+  async addQuote (id, data) {
+    return alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${id}/quotes`, data);
+  },
 }

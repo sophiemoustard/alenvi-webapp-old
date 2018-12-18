@@ -43,7 +43,7 @@
       <q-card>
         <q-card-title>Mandats de prélèvement</q-card-title>
         <q-card-main>
-          <q-table :columns="mandateColumns" :data="customer.payment.mandates" hide-bottom :pagination.sync="pagination" :visible-columns="visibleColumns"
+          <q-table :columns="mandateColumns" :data="customer.payment.mandates" hide-bottom :pagination.sync="pagination" :visible-columns="visibleMandateColumns"
             binary-state-sort>
             <q-td slot="body-cell-emptyMandate" slot-scope="props" :props="props">
               <q-btn v-if="customer.payment.mandates && props.row.__index == customer.payment.mandates.length - 1" flat round small color="primary" @click="downloadMandate(props.row)">
@@ -55,9 +55,10 @@
             </q-td>
             <q-td slot="body-cell-signedMandate" slot-scope="props" :props="props">
               <div class="row justify-between">
-                <q-uploader :ref="`signedMandate_${props.row._id}`" name="signedMandate" :url="docsUploadUrl" :headers="headers"
-                  :additional-fields="[]" hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
-                  hide-upload-button @add="uploadDocument()" @uploaded="refreshCustomer" @fail="failMsg" />
+                <q-uploader :ref="`signedMandate_${props.row._id}`" name="signedMandate" :url="docsUploadUrl" :headers="headers" hide-underline
+                  extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" hide-upload-button @add="uploadDocument()"
+                  @uploaded="refreshMandates" @fail="failMsg"
+                />
               </div>
             </q-td>
             <q-td slot="body-cell-signedAt" slot-scope="props" :props="props">
@@ -91,6 +92,35 @@
           <q-btn :disable="serviceOptions.length === 0" flat no-caps color="primary" icon="add" label="Ajouter un abonnement" @click="addSubscription = true"/>
         </q-card-actions>
       </q-card>
+      <div class="q-mb-xl">
+        <div class="row justify-between items-baseline">
+          <p class="text-weight-bold">Devis</p>
+        </div>
+        <q-card>
+          <q-card-main>
+            <q-table :data="customer.quotes" :columns="quoteColumns" row-key="name" table-style="font-size: 1rem" hide-bottom :pagination.sync="pagination"
+              :visible-columns="visibleQuoteColumns" binary-state-sort
+            >
+              <q-td slot="body-cell-emptyQuote" slot-scope="props" :props="props">
+                <q-btn flat round small color="primary" @click="downloadQuote(props.row)">
+                  <q-icon name="file download" />
+                </q-btn>
+              </q-td>
+              <q-td slot="body-cell-signedQuote" slot-scope="props" :props="props">
+                <div class="row justify-between">
+                  <q-uploader :ref="`signedQuote_${props.row._id}`" name="signedQuote" hide-underline :url="docsUploadUrl" :headers="headers"
+                    extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" hide-upload-button @add="uploadDocument()"
+                    @uploaded="refreshCustomer" @fail="failMsg"
+                  />
+                </div>
+              </q-td>
+            </q-table>
+          </q-card-main>
+          <q-card-actions align="end">
+            <q-btn :disabled="this.customer.subscriptions.length === 0" flat no-caps color="primary" icon="add" label="Générer un devis" @click="generateQuote"/>
+          </q-card-actions>
+        </q-card>
+      </div>
     </div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Aidants</p>
@@ -206,6 +236,7 @@ export default {
           mandates: [],
         },
         subscriptions: [],
+        quotes: [],
       },
       subscriptionsColumns: [
         {
@@ -280,6 +311,35 @@ export default {
           style: 'width: 50px'
         }
       ],
+      quoteColumns: [
+        {
+          name: 'quoteNumber',
+          label: 'Numéro du devis',
+          align: 'left',
+          field: 'quoteNumber',
+        },
+        {
+          name: 'emptyQuote',
+          label: 'Devis',
+          align: 'left',
+          field: 'emptyQuote',
+        },
+        {
+          name: 'signedQuote',
+          label: 'Devis signé',
+          align: 'left',
+          field: 'signedQuote',
+        },
+        {
+          name: 'createdAt',
+          label: '',
+          field: 'createdAt',
+          align: 'left',
+          sortable: true,
+          format: (value) => this.$moment(value).format('DD/MM/YYYY'),
+          sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
+        },
+      ],
       userHelpers: [],
       newHelper: {
         lastname: '',
@@ -293,7 +353,8 @@ export default {
         evenings: false,
         sundays: false,
       },
-      visibleColumns: ['rum', 'emptyMandate', 'signedMandate', 'signed', 'signedAt'],
+      visibleMandateColumns: ['rum', 'emptyMandate', 'signedMandate', 'signed', 'signedAt'],
+      visibleQuoteColumns: ['quoteNumber', 'emptyQuote', 'signedQuote'],
       mandateColumns: [
         {
           name: 'rum',
@@ -337,7 +398,7 @@ export default {
       ],
       pagination: {
         sortBy: 'createdAt',
-        descending: true,
+        ascending: true,
         rowsPerPage: 0,
       },
     }
@@ -474,6 +535,16 @@ export default {
     async refreshMandates () {
       try {
         this.customer.mandates = await this.$customers.getMandates(this.customer._id);
+
+        this.$store.commit('rh/saveUserProfile', this.customer);
+        this.$v.customer.$touch();
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async refreshQuotes () {
+      try {
+        this.customer.quotes = await this.$customers.getQuotes(this.customer._id);
 
         this.$store.commit('rh/saveUserProfile', this.customer);
         this.$v.customer.$touch();
@@ -722,22 +793,72 @@ export default {
     async downloadMandate (doc) {
       try {
         const data = {
-          'customerFirstname': this.customer.identity.firstname,
-          'customerLastname': this.customer.identity.lastname,
-          'customerAddress': this.customer.contact.address.fullAddress,
-          'uploadDate': this.$moment(Date.now()).format('DD/MM/YYYY'),
-          'ics': this.company.ics,
-          'rum': doc.rum,
-          'bic': this.customer.payment.bic,
-          'iban': this.customer.payment.iban,
-          'companyName': this.company.name,
-          'companyAddress': this.company.address.fullAddress,
+          customerFirstname: this.customer.identity.firstname,
+          customerLastname: this.customer.identity.lastname,
+          customerAddress: this.customer.contact.address.fullAddress,
+          uploadDate: this.$moment(Date.now()).format('DD/MM/YYYY'),
+          ics: this.company.ics,
+          rum: doc.rum,
+          bic: this.customer.payment.bic,
+          iban: this.customer.payment.iban,
+          companyName: this.company.name,
+          companyAddress: this.company.address.fullAddress,
         };
         const params = { driveId: this.company.customersConfig.templates.debitMandate.driveId };
 
         await downloadDocxFile(params, data, 'mandat.docx');
+        NotifyPositive('Mandat téléchargé.');
       } catch (e) {
         console.error(e);
+        NotifyNegative('Erreur lors du téléchargement du mandat.');
+      }
+    },
+    async downloadQuote (doc) {
+      try {
+        const subscriptions = this.customer.subscriptions.map(subscription => ({
+          serviceName: subscription.service.name,
+          unitTTCRate: subscription.unitTTCRate,
+          estimatedWeeklyVolume: subscription.estimatedWeeklyVolume,
+          sundays: subscription.sundays,
+          evenings: subscription.evenings,
+          estimatedWeeklyRate: subscription.unitTTCRate * subscription.estimatedWeeklyVolume,
+        }));
+
+        const data = {
+          quoteNumber: doc.quoteNumber,
+          customerFirstname: this.customer.identity.firstname,
+          customerLastname: this.customer.identity.lastname,
+          customerAddress: this.customer.contact.address.fullAddress,
+          companyName: this.company.name,
+          companyAddress: this.company.address.fullAddress,
+          rcs: this.company.rcs,
+          subscriptions,
+          uploadDate: this.$moment(Date.now()).format('DD/MM/YYYY'),
+        }
+        const params = { driveId: this.company.customersConfig.templates.quote.driveId };
+        await downloadDocxFile(params, data, 'devis.docx');
+        NotifyPositive('Devis téléchargé.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors du téléchargement du devis.');
+      }
+    },
+    async generateQuote () {
+      try {
+        const subscriptions = this.customer.subscriptions.map(subscription => ({
+          serviceName: subscription.service.name,
+          unitTTCRate: subscription.unitTTCRate,
+          estimatedWeeklyVolume: subscription.estimatedWeeklyVolume,
+          sundays: subscription.sundays,
+          evenings: subscription.evenings,
+        }));
+        const payload = { subscriptions };
+        await this.$customers.addQuote(this.customer._id, payload);
+        await this.refreshQuotes();
+        NotifyPositive('Devis généré');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la génération du devis');
       }
     },
     failMsg () {
