@@ -142,7 +142,7 @@ import ModalSelect from '../form/ModalSelect.vue';
 import ModalInput from '../form/ModalInput.vue';
 import ModalDatetimePicker from '../form/ModalDatetimePicker.vue';
 import { NotifyPositive, NotifyNegative } from '../popup/notify';
-import { downloadFile } from '../../helpers/downloadFile';
+import { downloadDocxFile } from '../../helpers/downloadFile';
 
 export default {
   components: {
@@ -360,7 +360,7 @@ export default {
           driveId: index === 0 ? this.getUser.company.rhConfig.templates.contract.driveId : this.getUser.company.rhConfig.templates.amendment.driveId,
         };
 
-        await downloadFile(params, data);
+        await downloadDocxFile(params, data, 'contrat.docx');
       } catch (e) {
         console.error(e);
       }

@@ -176,7 +176,7 @@ import NiModalInput from '../form/ModalInput';
 import NiModalSelect from '../form/ModalSelect';
 import { frPhoneNumber, iban, bic, frAddress } from '../../helpers/vuelidateCustomVal';
 import DatetimePicker from '../form/DatetimePicker';
-import { downloadFile } from '../../helpers/downloadFile';
+import { downloadDocxFile } from '../../helpers/downloadFile';
 
 export default {
   name: 'ProfileInfo',
@@ -735,7 +735,7 @@ export default {
         };
         const params = { driveId: this.company.customersConfig.templates.debitMandate.driveId };
 
-        await downloadFile(params, data);
+        await downloadDocxFile(params, data, 'mandat.docx');
       } catch (e) {
         console.error(e);
       }
