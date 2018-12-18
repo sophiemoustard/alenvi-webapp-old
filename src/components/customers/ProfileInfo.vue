@@ -54,12 +54,20 @@
               <div :class="[{ activeDot: props.value, inactiveDot: !props.value }]" />
             </q-td>
             <q-td slot="body-cell-signedMandate" slot-scope="props" :props="props">
-              <div class="row justify-between">
+              <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-between">
                 <q-uploader :ref="`signedMandate_${props.row._id}`" name="signedMandate" :url="docsUploadUrl" :headers="headers" hide-underline
-                  extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" hide-upload-button @add="uploadDocument()"
-                  @uploaded="refreshMandates" @fail="failMsg"
+                  extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" hide-upload-button @add="uploadDocument($event, `signedMandate_${props.row._id}`)"
+                  @uploaded="refreshMandates" @fail="failMsg" :additional-fields="[
+                    { name: 'mandateId', value: props.row._id },
+                    { name: 'fileName', value: `mandat_signe_${customer.identity.firstname}_${customer.identity.lastname}` }
+                  ]"
                 />
               </div>
+              <q-btn v-else flat round small color="primary">
+                <a :href="props.row.link" download>
+                  <q-icon name="file download" />
+                </a>
+              </q-btn>
             </q-td>
             <q-td slot="body-cell-signedAt" slot-scope="props" :props="props">
               <ni-datetime-picker v-model="customer.payment.mandates[props.row.__index].signedAt" withBorders @blur="updateSignedAt(props.row)"
@@ -110,7 +118,7 @@
             <q-td slot="body-cell-signedQuote" slot-scope="props" :props="props">
               <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-between">
                 <q-uploader :ref="`signedQuote_${props.row._id}`" name="signedQuote" hide-underline :url="docsUploadUrl" :headers="headers"
-                  extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" hide-upload-button @add="uploadQuote($event, `signedQuote_${props.row._id}`)"
+                  extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" hide-upload-button @add="uploadDocument($event, `signedQuote_${props.row._id}`)"
                   @uploaded="refreshQuotes" @fail="failMsg" :additional-fields="[
                     { name: 'quoteId', value: props.row._id },
                     { name: 'fileName', value: `devis_signe_${customer.identity.firstname}_${customer.identity.lastname}` }
@@ -542,7 +550,7 @@ export default {
     },
     async refreshMandates () {
       try {
-        this.customer.mandates = await this.$customers.getMandates(this.customer._id);
+        this.customer.payment.mandates = await this.$customers.getMandates(this.customer._id);
 
         this.$store.commit('rh/saveUserProfile', this.customer);
         this.$v.customer.$touch();
@@ -821,7 +829,7 @@ export default {
         NotifyNegative('Erreur lors du téléchargement du mandat.');
       }
     },
-    async uploadQuote (files, refName) {
+    async uploadDocument (files, refName) {
       if (files[0].size > 5000000) {
         this.$refs[refName].reset();
         NotifyNegative('Fichier trop volumineux (> 5 Mo)');
