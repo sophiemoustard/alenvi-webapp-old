@@ -92,35 +92,43 @@
           <q-btn :disable="serviceOptions.length === 0" flat no-caps color="primary" icon="add" label="Ajouter un abonnement" @click="addSubscription = true"/>
         </q-card-actions>
       </q-card>
-      <div class="q-mb-xl">
-        <div class="row justify-between items-baseline">
-          <p class="text-weight-bold">Devis</p>
-        </div>
-        <q-card>
-          <q-card-main>
-            <q-table :data="customer.quotes" :columns="quoteColumns" row-key="name" table-style="font-size: 1rem" hide-bottom :pagination.sync="pagination"
-              :visible-columns="visibleQuoteColumns" binary-state-sort
-            >
-              <q-td slot="body-cell-emptyQuote" slot-scope="props" :props="props">
-                <q-btn flat round small color="primary" @click="downloadQuote(props.row)">
-                  <q-icon name="file download" />
-                </q-btn>
-              </q-td>
-              <q-td slot="body-cell-signedQuote" slot-scope="props" :props="props">
-                <div class="row justify-between">
-                  <q-uploader :ref="`signedQuote_${props.row._id}`" name="signedQuote" hide-underline :url="docsUploadUrl" :headers="headers"
-                    extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" hide-upload-button @add="uploadDocument()"
-                    @uploaded="refreshCustomer" @fail="failMsg"
-                  />
-                </div>
-              </q-td>
-            </q-table>
-          </q-card-main>
-          <q-card-actions align="end">
-            <q-btn :disabled="this.customer.subscriptions.length === 0" flat no-caps color="primary" icon="add" label="Générer un devis" @click="generateQuote"/>
-          </q-card-actions>
-        </q-card>
+    </div>
+    <div class="q-mb-xl">
+      <div class="row justify-between items-baseline">
+        <p class="text-weight-bold">Devis</p>
       </div>
+      <q-card>
+        <q-card-main>
+          <q-table :data="customer.quotes" :columns="quoteColumns" row-key="name" table-style="font-size: 1rem" hide-bottom :pagination.sync="pagination"
+            :visible-columns="visibleQuoteColumns" binary-state-sort
+          >
+            <q-td slot="body-cell-emptyQuote" slot-scope="props" :props="props">
+              <q-btn flat round small color="primary" @click="downloadQuote(props.row)">
+                <q-icon name="file download" />
+              </q-btn>
+            </q-td>
+            <q-td slot="body-cell-signedQuote" slot-scope="props" :props="props">
+              <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-between">
+                <q-uploader :ref="`signedQuote_${props.row._id}`" name="signedQuote" hide-underline :url="docsUploadUrl" :headers="headers"
+                  extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" hide-upload-button @add="uploadQuote($event, `signedQuote_${props.row._id}`)"
+                  @uploaded="refreshQuotes" @fail="failMsg" :additional-fields="[
+                    { name: 'quoteId', value: props.row._id },
+                    { name: 'fileName', value: `devis_signe_${customer.identity.firstname}_${customer.identity.lastname}` }
+                  ]"
+                />
+              </div>
+              <q-btn v-else flat round small color="primary">
+                <a :href="props.row.link" download>
+                  <q-icon name="file download" />
+                </a>
+              </q-btn>
+            </q-td>
+          </q-table>
+        </q-card-main>
+        <q-card-actions align="end">
+          <q-btn :disabled="this.customer.subscriptions.length === 0" flat no-caps color="primary" icon="add" label="Générer un devis" @click="generateQuote"/>
+        </q-card-actions>
+      </q-card>
     </div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Aidants</p>
@@ -405,7 +413,7 @@ export default {
   },
   computed: {
     docsUploadUrl () {
-      return `${process.env.API_HOSTNAME}`;
+      return `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.id}/upload`;
     },
     headers () {
       return {
@@ -811,6 +819,15 @@ export default {
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement du mandat.');
+      }
+    },
+    async uploadQuote (files, refName) {
+      if (files[0].size > 5000000) {
+        this.$refs[refName].reset();
+        NotifyNegative('Fichier trop volumineux (> 5 Mo)');
+        return '';
+      } else {
+        this.$refs[refName].upload();
       }
     },
     async downloadQuote (doc) {
