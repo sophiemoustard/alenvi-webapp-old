@@ -72,7 +72,7 @@ export default {
         },
         {
           name: 'ttcRate',
-          label: 'Taux horaire TTC',
+          label: 'Prix unitaire TTC',
           align: 'left',
           field: 'unitTTCRate',
           sortable: true
