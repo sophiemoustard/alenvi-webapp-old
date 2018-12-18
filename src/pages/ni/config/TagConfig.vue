@@ -30,7 +30,7 @@ export default {
         'uploadDate': 'Date de l\'upload du contrat pour la date de signature',
         'quoteNumber': 'Numéro du devis',
         'rcs': 'RCS de l’organisation',
-        'services': 'Liste des services',
+        'subscriptions': 'Liste des services souscrits',
         'serviceName': 'Nom du service',
         'unitTTCRate': 'Tarif horaire TTC',
         'estimatedWeeklyVolume': 'Volume hebdomadaire estimé total',
