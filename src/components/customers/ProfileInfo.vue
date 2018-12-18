@@ -64,7 +64,7 @@
                 />
               </div>
               <q-btn v-else flat round small color="primary">
-                <a :href="props.row.link" download>
+                <a :href="props.row.drive.link" download>
                   <q-icon name="file download" />
                 </a>
               </q-btn>
@@ -126,7 +126,7 @@
                 />
               </div>
               <q-btn v-else flat round small color="primary">
-                <a :href="props.row.link" download>
+                <a :href="props.row.drive.link" download>
                   <q-icon name="file download" />
                 </a>
               </q-btn>
@@ -956,4 +956,8 @@ export default {
     height: 9px
     border-radius: 50%
     display: inline-block
+
+  a
+    color: $primary
+    text-decoration: none
 </style>
