@@ -117,7 +117,7 @@
             </q-table>
           </q-card-main>
           <q-card-actions align="end">
-            <q-btn flat no-caps color="primary" icon="add" label="Générer un devis" @click="generateQuote()"/>
+            <q-btn :disabled="this.customer.subscriptions.length === 0" flat no-caps color="primary" icon="add" label="Générer un devis" @click="generateQuote"/>
           </q-card-actions>
         </q-card>
       </div>
@@ -542,6 +542,16 @@ export default {
         console.error(e);
       }
     },
+    async refreshQuotes () {
+      try {
+        this.customer.quotes = await this.$customers.getQuotes(this.customer._id);
+
+        this.$store.commit('rh/saveUserProfile', this.customer);
+        this.$v.customer.$touch();
+      } catch (e) {
+        console.error(e);
+      }
+    },
     async refreshCustomer () {
       const customerRaw = await this.$customers.getById(this.userProfile._id);
       const customer = customerRaw.data.data.customer;
@@ -799,6 +809,24 @@ export default {
         await downloadDocxFile(params, data, 'mandat.docx');
       } catch (e) {
         console.error(e);
+      }
+    },
+    async generateQuote () {
+      try {
+        const subscriptions = this.customer.subscriptions.map(subscription => ({
+          serviceName: subscription.service.name,
+          unitTTCRate: subscription.unitTTCRate,
+          estimatedWeeklyVolume: subscription.estimatedWeeklyVolume,
+          sundays: subscription.sundays,
+          evenings: subscription.evenings,
+        }));
+        const payload = { subscriptions };
+        await this.$customers.addQuote(this.customer._id, payload);
+        await this.refreshQuotes();
+        NotifyPositive('Devis généré');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la génération du devis');
       }
     },
     failMsg () {
