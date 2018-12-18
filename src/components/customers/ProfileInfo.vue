@@ -80,7 +80,7 @@
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
-        <p class="text-weight-bold">Abonnements</p>
+        <p class="text-weight-bold">Souscriptions</p>
       </div>
       <q-card>
         <q-card-main>
@@ -97,7 +97,7 @@
           </q-table>
         </q-card-main>
         <q-card-actions align="end">
-          <q-btn :disable="serviceOptions.length === 0" flat no-caps color="primary" icon="add" label="Ajouter un abonnement" @click="addSubscription = true"/>
+          <q-btn :disable="serviceOptions.length === 0" flat no-caps color="primary" icon="add" label="Ajouter une souscription" @click="addSubscription = true"/>
         </q-card-actions>
       </q-card>
     </div>
