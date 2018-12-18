@@ -398,7 +398,7 @@ export default {
       ],
       pagination: {
         sortBy: 'createdAt',
-        descending: true,
+        ascending: true,
         rowsPerPage: 0,
       },
     }
