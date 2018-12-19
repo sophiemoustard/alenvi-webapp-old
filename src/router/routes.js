@@ -253,7 +253,7 @@ const routes = [
       },
       {
         path: 'customers/subscriptions',
-        name: 'customer subscriptions',
+        name: 'customer subscription',
         component: () => import('pages/customers/Subscriptions'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token']

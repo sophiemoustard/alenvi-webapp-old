@@ -30,74 +30,18 @@
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
-        <p class="text-weight-bold">Moyen de paiement</p>
-      </div>
-      <div class="row gutter-profile q-mb-lg">
-        <ni-input caption="Nom associé au compte bancaire" :error="$v.customer.payment.bankAccountOwner.$error" errorLabel="Champ requis"
-          v-model="customer.payment.bankAccountOwner" @focus="saveTmp('payment.bankAccountOwner')" @blur="updateUser({ alenvi: 'payment.bankAccountOwner', ogust: 'holder' })" />
-        <ni-input caption="IBAN" :error="$v.customer.payment.iban.$error" errorLabel="IBAN non valide"
-          v-model="customer.payment.iban" @focus="saveTmp('payment.iban')" @blur="updateUser({ alenvi: 'payment.iban', ogust: 'iban_number' })" />
-        <ni-input caption="BIC" :error="$v.customer.payment.bic.$error" errorLabel="BIC non valide"
-          v-model="customer.payment.bic" @focus="saveTmp('payment.bic')" @blur="updateUser({ alenvi: 'payment.bic', ogust: 'bic_number' })" />
-      </div>
-      <q-card>
-        <q-card-title>Mandats de prélèvement</q-card-title>
-        <q-card-main>
-          <q-table :columns="mandateColumns" :data="customer.payment.mandates" hide-bottom :pagination.sync="pagination" :visible-columns="visibleMandateColumns"
-            binary-state-sort>
-            <q-td slot="body-cell-emptyMandate" slot-scope="props" :props="props">
-              <q-btn v-if="customer.payment.mandates && props.row.__index == customer.payment.mandates.length - 1" flat round small color="primary" @click="downloadMandate(props.row)">
-                <q-icon name="file download" />
-              </q-btn>
-            </q-td>
-            <q-td slot="body-cell-signed" slot-scope="props" :props="props">
-              <div :class="[{ activeDot: props.value, inactiveDot: !props.value }]" />
-            </q-td>
-            <q-td slot="body-cell-signedMandate" slot-scope="props" :props="props">
-              <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-between">
-                <q-uploader :ref="`signedMandate_${props.row._id}`" name="signedMandate" :url="docsUploadUrl" :headers="headers" hide-underline
-                  extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" hide-upload-button @add="uploadDocument($event, `signedMandate_${props.row._id}`)"
-                  @uploaded="refreshMandates" @fail="failMsg" :additional-fields="[
-                    { name: 'mandateId', value: props.row._id },
-                    { name: 'fileName', value: `mandat_signe_${customer.identity.firstname}_${customer.identity.lastname}` }
-                  ]"
-                />
-              </div>
-              <q-btn v-else flat round small color="primary">
-                <a :href="props.row.drive.link" download>
-                  <q-icon name="file download" />
-                </a>
-              </q-btn>
-            </q-td>
-            <q-td slot="body-cell-signedAt" slot-scope="props" :props="props">
-              <ni-datetime-picker v-model="customer.payment.mandates[props.row.__index].signedAt" withBorders @blur="updateSignedAt(props.row)"
-                @focus="saveTmpSignedAt(props.row.__index)"
-              />
-            </q-td>
-          </q-table>
-        </q-card-main>
-      </q-card>
-    </div>
-    <div class="q-mb-xl">
-      <div class="row justify-between items-baseline">
-        <p class="text-weight-bold">Abonnements</p>
+        <p class="text-weight-bold">Souscriptions</p>
       </div>
       <q-card>
         <q-card-main>
           <q-table :data="customer.subscriptions" :columns="subscriptionsColumns" row-key="name" table-style="font-size: 1rem" hide-bottom>
-            <q-td slot="body-cell-sundays" slot-scope="props" :props="props">
-              {{ props.value ? 'Oui' : 'Non' }}
-            </q-td>
-            <q-td slot="body-cell-evenings" slot-scope="props" :props="props">
-              {{ props.value ? 'Oui' : 'Non' }}
-            </q-td>
             <q-td slot="body-cell-remove" slot-scope="props" :props="props">
               <q-icon name="delete" size="1.2rem" color="grey" class="cursor-pointer" @click.native="removeSubscriptions(props.value)" />
             </q-td>
           </q-table>
         </q-card-main>
         <q-card-actions align="end">
-          <q-btn :disable="serviceOptions.length === 0" flat no-caps color="primary" icon="add" label="Ajouter un abonnement" @click="addSubscription = true"/>
+          <q-btn :disable="serviceOptions.length === 0" flat no-caps color="primary" icon="add" label="Ajouter une souscription" @click="addSubscription = true"/>
         </q-card-actions>
       </q-card>
     </div>
@@ -153,6 +97,56 @@
         </q-card-actions>
       </q-card>
     </div>
+    <div class="q-mb-xl">
+      <div class="row justify-between items-baseline">
+        <p class="text-weight-bold">Moyen de paiement</p>
+      </div>
+      <div class="row gutter-profile q-mb-lg">
+        <ni-input caption="Nom associé au compte bancaire" :error="$v.customer.payment.bankAccountOwner.$error" errorLabel="Champ requis"
+          v-model="customer.payment.bankAccountOwner" @focus="saveTmp('payment.bankAccountOwner')" @blur="updateUser({ alenvi: 'payment.bankAccountOwner', ogust: 'holder' })" />
+        <ni-input caption="IBAN" :error="$v.customer.payment.iban.$error" errorLabel="IBAN non valide"
+          v-model="customer.payment.iban" @focus="saveTmp('payment.iban')" @blur="updateUser({ alenvi: 'payment.iban', ogust: 'iban_number' })" />
+        <ni-input caption="BIC" :error="$v.customer.payment.bic.$error" errorLabel="BIC non valide"
+          v-model="customer.payment.bic" @focus="saveTmp('payment.bic')" @blur="updateUser({ alenvi: 'payment.bic', ogust: 'bic_number' })" />
+      </div>
+      <q-card>
+        <q-card-title>Mandats de prélèvement</q-card-title>
+        <q-card-main>
+          <q-table :columns="mandateColumns" :data="customer.payment.mandates" hide-bottom :pagination.sync="pagination" :visible-columns="visibleMandateColumns"
+            binary-state-sort>
+            <q-td slot="body-cell-emptyMandate" slot-scope="props" :props="props">
+              <q-btn v-if="customer.payment.mandates && props.row.__index == customer.payment.mandates.length - 1" flat round small color="primary" @click="downloadMandate(props.row)">
+                <q-icon name="file download" />
+              </q-btn>
+            </q-td>
+            <q-td slot="body-cell-signed" slot-scope="props" :props="props">
+              <div :class="[{ activeDot: props.value, inactiveDot: !props.value }]" />
+            </q-td>
+            <q-td slot="body-cell-signedMandate" slot-scope="props" :props="props">
+              <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-between">
+                <q-uploader :ref="`signedMandate_${props.row._id}`" name="signedMandate" :url="docsUploadUrl" :headers="headers" hide-underline
+                  extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" hide-upload-button @add="uploadDocument($event, `signedMandate_${props.row._id}`)"
+                  @uploaded="refreshMandates" @fail="failMsg" :additional-fields="[
+                    { name: 'mandateId', value: props.row._id },
+                    { name: 'fileName', value: `mandat_signe_${customer.identity.firstname}_${customer.identity.lastname}` }
+                  ]"
+                />
+              </div>
+              <q-btn v-else flat round small color="primary">
+                <a :href="props.row.drive.link" download>
+                  <q-icon name="file download" />
+                </a>
+              </q-btn>
+            </q-td>
+            <q-td slot="body-cell-signedAt" slot-scope="props" :props="props">
+              <ni-datetime-picker v-model="customer.payment.mandates[props.row.__index].signedAt" withBorders @blur="updateSignedAt(props.row)"
+                @focus="saveTmpSignedAt(props.row.__index)"
+              />
+            </q-td>
+          </q-table>
+        </q-card-main>
+      </q-card>
+    </div>
 
     <!-- Add helper modal -->
     <q-modal v-model="addHelper" @hide="resetHelperForm" :content-css="modalCssContainer">
@@ -193,16 +187,8 @@
         <ni-modal-input v-model="newSubscription.estimatedWeeklyVolume" :error="$v.newSubscription.estimatedWeeklyVolume.$error"
           caption="Volume hebdomadaire estimatif" @blur="$v.newSubscription.estimatedWeeklyVolume.$touch"
         />
-        <div class="row margin-input">
-          <div class="col-12">
-            <q-checkbox v-model="newSubscription.sundays"> dimanches inclus</q-checkbox>
-          </div>
-        </div>
-        <div class="row margin-input last">
-          <div class="col-12">
-            <q-checkbox v-model="newSubscription.evenings"> soirées inclues</q-checkbox>
-          </div>
-        </div>
+        <ni-modal-input v-model="newSubscription.sundays" caption="Dont dimanche" />
+        <ni-modal-input v-model="newSubscription.evenings" caption="Dont soirée" last />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter un abonnement" icon-right="add" color="primary" :loading="loading" @click="submitSubscription" />
     </q-modal>
@@ -270,25 +256,25 @@ export default {
         {
           name: 'unitTTCRate',
           label: 'Prix unitaire TTC',
-          align: 'left',
-          field: 'unitTTCRate',
+          align: 'center',
+          field: row => `${row.unitTTCRate}€`,
         },
         {
           name: 'estimatedWeeklyVolume',
           label: 'Volume hebdomadaire estimatif',
-          align: 'left',
+          align: 'center',
           field: 'estimatedWeeklyVolume',
         },
         {
           name: 'sundays',
           label: 'dont dimanches',
-          align: 'left',
+          align: 'center',
           field: 'sundays',
         },
         {
           name: 'evenings',
           label: 'dont soirées (après 20h)',
-          align: 'left',
+          align: 'center',
           field: 'evenings',
         },
         {
@@ -366,8 +352,6 @@ export default {
         service: '',
         unitTTCRate: '',
         estimatedWeeklyVolume: '',
-        evenings: false,
-        sundays: false,
       },
       visibleMandateColumns: ['rum', 'emptyMandate', 'signedMandate', 'signed', 'signedAt'],
       visibleQuoteColumns: ['quoteNumber', 'emptyQuote', 'signedQuote'],
@@ -802,8 +786,6 @@ export default {
         service: '',
         unitTTCRate: '',
         estimatedWeeklyVolume: '',
-        evenings: false,
-        sundays: false,
       };
     },
     async downloadMandate (doc) {
@@ -840,14 +822,24 @@ export default {
     },
     async downloadQuote (doc) {
       try {
-        const subscriptions = this.customer.subscriptions.map(subscription => ({
-          serviceName: subscription.service.name,
-          unitTTCRate: subscription.unitTTCRate,
-          estimatedWeeklyVolume: subscription.estimatedWeeklyVolume,
-          sundays: subscription.sundays,
-          evenings: subscription.evenings,
-          estimatedWeeklyRate: subscription.unitTTCRate * subscription.estimatedWeeklyVolume,
-        }));
+        const subscriptions = this.customer.subscriptions.map(subscription => {
+          let estimatedWeeklyRate = subscription.unitTTCRate * subscription.estimatedWeeklyVolume;
+          if (subscription.sundays && subscription.service.holidaySurcharge) {
+            estimatedWeeklyRate += subscription.sundays * subscription.unitTTCRate * subscription.service.holidaySurcharge / 100;
+          }
+          if (subscription.evenings && subscription.service.eveningSurcharge) {
+            estimatedWeeklyRate += subscription.evenings * subscription.unitTTCRate * subscription.service.eveningSurcharge / 100;
+          }
+
+          return {
+            serviceName: subscription.service.name,
+            unitTTCRate: subscription.unitTTCRate,
+            estimatedWeeklyVolume: subscription.estimatedWeeklyVolume,
+            sundays: subscription.sundays || 0,
+            evenings: subscription.evenings || 0,
+            estimatedWeeklyRate,
+          }
+        });
 
         const data = {
           quoteNumber: doc.quoteNumber,

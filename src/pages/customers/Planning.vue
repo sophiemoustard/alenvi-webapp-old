@@ -1,5 +1,5 @@
 <template>
-  <q-page class="container">
+  <q-page padding class="neutral-background container">
     <h5>{{ customerName }}</h5>
     <scheduler :scroll="true" :showTabCustomer="false" :customer="true" :events="events" @viewChanged="getEventsData"></scheduler>
   </q-page>

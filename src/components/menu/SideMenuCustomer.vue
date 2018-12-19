@@ -10,7 +10,7 @@
     <q-item-separator />
     <ni-menu-item class="customer-menu-size" name="customer documents" icon="euro_symbol" label="Facturation" />
     <q-item-separator />
-    <ni-menu-item class="customer-menu-size" name="customer subscriptions" icon="playlist_add" label="Abonnements" />
+    <ni-menu-item class="customer-menu-size" name="customer subscription" icon="playlist_add" label="Abonnement" />
     <q-item-separator />
     <ni-side-menu-footer :label="user.lastname" :userId="user._id" />
   </q-list>

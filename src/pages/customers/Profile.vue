@@ -1,5 +1,5 @@
 <template>
-  <q-page padding>
+  <q-page padding class="neutral-background">
     <div class="row justify-center">
       <h5>Votre profil</h5>
     </div>

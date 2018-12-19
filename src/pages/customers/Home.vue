@@ -1,5 +1,5 @@
 <template>
-  <q-page padding>
+  <q-page padding class="neutral-background">
     <h4 id="main-title" class="text-center">Bienvenue sur votre espace d'accompagnement privé Alenvi !</h4>
     <div class="row justify-center gutter-xl">
       <div class="cursor-pointer" @click="goTo({ name: 'customer planning' })">
