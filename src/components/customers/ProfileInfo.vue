@@ -179,7 +179,7 @@
           </div>
         </div>
         <ni-modal-select caption="Service" :options="serviceOptions" v-model="newSubscription.service" :error="$v.newSubscription.service.$error"
-          @blur="$v.newSubscription.service.$touch"
+          @blur="$v.newSubscription.service.$touch" @input="updateUnitTTCRate"
         />
         <ni-modal-input v-model="newSubscription.unitTTCRate" :error="$v.newSubscription.unitTTCRate.$error" caption="Prix unitaire TTC"
           @blur="$v.newSubscription.unitTTCRate.$touch"
@@ -502,6 +502,12 @@ export default {
     this.isLoaded = true;
   },
   methods: {
+    updateUnitTTCRate () {
+      if (this.newSubscription.service !== '') {
+        const selectedService = this.company.customersConfig.services.find(service => service._id === this.newSubscription.service);
+        this.newSubscription.unitTTCRate = selectedService.defaultUnitAmount;
+      }
+    },
     mergeUser (value = null) {
       const args = [this.customer, value];
       this.customer = Object.assign({}, extend(true, ...args));
