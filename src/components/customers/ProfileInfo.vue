@@ -822,14 +822,24 @@ export default {
     },
     async downloadQuote (doc) {
       try {
-        const subscriptions = this.customer.subscriptions.map(subscription => ({
-          serviceName: subscription.service.name,
-          unitTTCRate: subscription.unitTTCRate,
-          estimatedWeeklyVolume: subscription.estimatedWeeklyVolume,
-          sundays: subscription.sundays || 0,
-          evenings: subscription.evenings || 0,
-          estimatedWeeklyRate: subscription.unitTTCRate * subscription.estimatedWeeklyVolume,
-        }));
+        const subscriptions = this.customer.subscriptions.map(subscription => {
+          let estimatedWeeklyRate = subscription.unitTTCRate * subscription.estimatedWeeklyVolume;
+          if (subscription.sundays && subscription.service.holidaySurcharge) {
+            estimatedWeeklyRate += subscription.sundays * subscription.unitTTCRate * subscription.service.holidaySurcharge / 100;
+          }
+          if (subscription.evenings && subscription.service.eveningSurcharge) {
+            estimatedWeeklyRate += subscription.evenings * subscription.unitTTCRate * subscription.service.eveningSurcharge / 100;
+          }
+
+          return {
+            serviceName: subscription.service.name,
+            unitTTCRate: subscription.unitTTCRate,
+            estimatedWeeklyVolume: subscription.estimatedWeeklyVolume,
+            sundays: subscription.sundays || 0,
+            evenings: subscription.evenings || 0,
+            estimatedWeeklyRate,
+          }
+        });
 
         const data = {
           quoteNumber: doc.quoteNumber,
