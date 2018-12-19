@@ -271,7 +271,7 @@ export default {
           name: 'unitTTCRate',
           label: 'Prix unitaire TTC',
           align: 'left',
-          field: 'unitTTCRate',
+          field: row => `${row.unitTTCRate}€`,
         },
         {
           name: 'estimatedWeeklyVolume',

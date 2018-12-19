@@ -74,7 +74,7 @@ export default {
           name: 'ttcRate',
           label: 'Prix unitaire TTC',
           align: 'left',
-          field: 'unitTTCRate',
+          field: row => `${row.unitTTCRate}€`,
           sortable: true
         }
       ]
