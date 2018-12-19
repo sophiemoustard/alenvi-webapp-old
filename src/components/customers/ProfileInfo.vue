@@ -188,7 +188,7 @@
           caption="Volume hebdomadaire estimatif" @blur="$v.newSubscription.estimatedWeeklyVolume.$touch"
         />
         <ni-modal-input v-model="newSubscription.sundays" caption="Dont dimanche" />
-        <ni-modal-input v-model="newSubscription.evenings" caption="Dont soirée" />
+        <ni-modal-input v-model="newSubscription.evenings" caption="Dont soirée" last />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter un abonnement" icon-right="add" color="primary" :loading="loading" @click="submitSubscription" />
     </q-modal>
