@@ -62,7 +62,7 @@
         <ni-modal-input caption="Nom" v-model="newService.name" :error="$v.newService.name.$error" @blur="$v.newService.name.$touch" />
         <ni-modal-select caption="Nature" v-model="newService.nature" :error="$v.newService.nature.$error" @blur="$v.newService.nature.$touch"
           :options="natureOptions" />
-        <ni-modal-input caption="Montant unitaire par défaut TTC" suffix="€" type="number" v-model="newService.defaultUnitAmount"
+        <ni-modal-input caption="Prix unitaire par défaut TTC" suffix="€" type="number" v-model="newService.defaultUnitAmount"
           :error="$v.newService.defaultUnitAmount.$error" @blur="$v.newService.defaultUnitAmount.$touch"/>
         <ni-modal-input caption="TVA" suffix="%" v-model="newService.vat" type="number" :error="$v.newService.vat.$error" @blur="$v.newService.vat.$touch" />
         <ni-modal-input caption="Majoration dimanche/jours fériés" suffix="%" type="number" v-model="newService.holidaySurcharge" />
@@ -135,7 +135,7 @@ export default {
         },
         {
           name: 'defaultUnitAmount',
-          label: 'Montant unitaire par défaut TTC',
+          label: 'Prix unitaire par défaut TTC',
           align: 'center',
           field: row => `${row.defaultUnitAmount}€`,
           sortable: true,
