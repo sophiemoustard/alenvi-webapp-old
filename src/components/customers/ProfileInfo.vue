@@ -85,12 +85,6 @@
       <q-card>
         <q-card-main>
           <q-table :data="customer.subscriptions" :columns="subscriptionsColumns" row-key="name" table-style="font-size: 1rem" hide-bottom>
-            <q-td slot="body-cell-sundays" slot-scope="props" :props="props">
-              {{ props.value ? 'Oui' : 'Non' }}
-            </q-td>
-            <q-td slot="body-cell-evenings" slot-scope="props" :props="props">
-              {{ props.value ? 'Oui' : 'Non' }}
-            </q-td>
             <q-td slot="body-cell-remove" slot-scope="props" :props="props">
               <q-icon name="delete" size="1.2rem" color="grey" class="cursor-pointer" @click.native="removeSubscriptions(props.value)" />
             </q-td>
@@ -193,16 +187,8 @@
         <ni-modal-input v-model="newSubscription.estimatedWeeklyVolume" :error="$v.newSubscription.estimatedWeeklyVolume.$error"
           caption="Volume hebdomadaire estimatif" @blur="$v.newSubscription.estimatedWeeklyVolume.$touch"
         />
-        <div class="row margin-input">
-          <div class="col-12">
-            <q-checkbox v-model="newSubscription.sundays"> dimanches inclus</q-checkbox>
-          </div>
-        </div>
-        <div class="row margin-input last">
-          <div class="col-12">
-            <q-checkbox v-model="newSubscription.evenings"> soirées inclues</q-checkbox>
-          </div>
-        </div>
+        <ni-modal-input v-model="newSubscription.sundays" caption="Dont dimanche" />
+        <ni-modal-input v-model="newSubscription.evenings" caption="Dont soirée" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter un abonnement" icon-right="add" color="primary" :loading="loading" @click="submitSubscription" />
     </q-modal>
@@ -270,25 +256,25 @@ export default {
         {
           name: 'unitTTCRate',
           label: 'Prix unitaire TTC',
-          align: 'left',
+          align: 'center',
           field: row => `${row.unitTTCRate}€`,
         },
         {
           name: 'estimatedWeeklyVolume',
           label: 'Volume hebdomadaire estimatif',
-          align: 'left',
+          align: 'center',
           field: 'estimatedWeeklyVolume',
         },
         {
           name: 'sundays',
           label: 'dont dimanches',
-          align: 'left',
+          align: 'center',
           field: 'sundays',
         },
         {
           name: 'evenings',
           label: 'dont soirées (après 20h)',
-          align: 'left',
+          align: 'center',
           field: 'evenings',
         },
         {
@@ -366,8 +352,6 @@ export default {
         service: '',
         unitTTCRate: '',
         estimatedWeeklyVolume: '',
-        evenings: false,
-        sundays: false,
       },
       visibleMandateColumns: ['rum', 'emptyMandate', 'signedMandate', 'signed', 'signedAt'],
       visibleQuoteColumns: ['quoteNumber', 'emptyQuote', 'signedQuote'],
@@ -802,8 +786,6 @@ export default {
         service: '',
         unitTTCRate: '',
         estimatedWeeklyVolume: '',
-        evenings: false,
-        sundays: false,
       };
     },
     async downloadMandate (doc) {
@@ -844,8 +826,8 @@ export default {
           serviceName: subscription.service.name,
           unitTTCRate: subscription.unitTTCRate,
           estimatedWeeklyVolume: subscription.estimatedWeeklyVolume,
-          sundays: subscription.sundays,
-          evenings: subscription.evenings,
+          sundays: subscription.sundays || 0,
+          evenings: subscription.evenings || 0,
           estimatedWeeklyRate: subscription.unitTTCRate * subscription.estimatedWeeklyVolume,
         }));
 
