@@ -172,7 +172,7 @@
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-8">
-            <h5>Ajouter un <span class="text-weight-bold">abonnement</span></h5>
+            <h5>Ajouter un <span class="text-weight-bold">souscription</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
             <span><q-icon name="clear" size="1rem" @click.native="addSubscription = false" /></span>
@@ -185,10 +185,10 @@
           @blur="$v.newSubscription.unitTTCRate.$touch"
         />
         <ni-modal-input v-model="newSubscription.estimatedWeeklyVolume" :error="$v.newSubscription.estimatedWeeklyVolume.$error"
-          caption="Volume hebdomadaire estimatif" @blur="$v.newSubscription.estimatedWeeklyVolume.$touch"
+          caption="Volume hebdomadaire estimatif (h)" @blur="$v.newSubscription.estimatedWeeklyVolume.$touch"
         />
-        <ni-modal-input v-model="newSubscription.sundays" caption="Dont dimanche" />
-        <ni-modal-input v-model="newSubscription.evenings" caption="Dont soirée" last />
+        <ni-modal-input v-model="newSubscription.sundays" caption="Dont dimanche (h)" />
+        <ni-modal-input v-model="newSubscription.evenings" caption="Dont soirée (h)" last />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter un abonnement" icon-right="add" color="primary" :loading="loading" @click="submitSubscription" />
     </q-modal>
@@ -263,19 +263,19 @@ export default {
           name: 'estimatedWeeklyVolume',
           label: 'Volume hebdomadaire estimatif',
           align: 'center',
-          field: 'estimatedWeeklyVolume',
+          field: row => row.service.nature === 'Horaire' ? `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume,
         },
         {
           name: 'sundays',
           label: 'dont dimanches',
           align: 'center',
-          field: 'sundays',
+          field: row => row.service.nature === 'Horaire' ? `${row.sundays}h` : row.sundays,
         },
         {
           name: 'evenings',
           label: 'dont soirées (après 20h)',
           align: 'center',
-          field: 'evenings',
+          field: row => row.service.nature === 'Horaire' ? `${row.evenings}h` : row.evenings,
         },
         {
           name: 'remove',
