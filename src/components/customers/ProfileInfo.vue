@@ -179,16 +179,16 @@
           </div>
         </div>
         <ni-modal-select caption="Service" :options="serviceOptions" v-model="newSubscription.service" :error="$v.newSubscription.service.$error"
-          @blur="$v.newSubscription.service.$touch" @input="updateUnitTTCRate"
+          @blur="$v.newSubscription.service.$touch" @input="updateNewSubscription"
         />
         <ni-modal-input v-model="newSubscription.unitTTCRate" :error="$v.newSubscription.unitTTCRate.$error" caption="Prix unitaire TTC"
           @blur="$v.newSubscription.unitTTCRate.$touch"
         />
         <ni-modal-input v-model="newSubscription.estimatedWeeklyVolume" :error="$v.newSubscription.estimatedWeeklyVolume.$error"
-          caption="Volume hebdomadaire estimatif (h)" @blur="$v.newSubscription.estimatedWeeklyVolume.$touch"
+          caption="Volume hebdomadaire estimatif" @blur="$v.newSubscription.estimatedWeeklyVolume.$touch"
         />
-        <ni-modal-input v-model="newSubscription.sundays" caption="Dont dimanche (h)" />
-        <ni-modal-input v-model="newSubscription.evenings" caption="Dont soirée (h)" last />
+        <ni-modal-input v-if="newSubscription.nature !== 'Forfaitaire'" v-model="newSubscription.sundays" caption="Dont dimanche (h)" />
+        <ni-modal-input v-if="newSubscription.nature !== 'Forfaitaire'" v-model="newSubscription.evenings" caption="Dont soirée (h)" last />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter un abonnement" icon-right="add" color="primary" :loading="loading" @click="submitSubscription" />
     </q-modal>
@@ -269,13 +269,13 @@ export default {
           name: 'sundays',
           label: 'dont dimanches',
           align: 'center',
-          field: row => row.service.nature === 'Horaire' ? `${row.sundays}h` : row.sundays,
+          field: row => row.service.nature === 'Horaire' && row.sundays ? `${row.sundays}h` : row.sundays,
         },
         {
           name: 'evenings',
           label: 'dont soirées (après 20h)',
           align: 'center',
-          field: row => row.service.nature === 'Horaire' ? `${row.evenings}h` : row.evenings,
+          field: row => row.service.nature === 'Horaire' && row.evenings ? `${row.evenings}h` : row.evenings,
         },
         {
           name: 'remove',
@@ -502,10 +502,11 @@ export default {
     this.isLoaded = true;
   },
   methods: {
-    updateUnitTTCRate () {
+    updateNewSubscription () {
       if (this.newSubscription.service !== '') {
         const selectedService = this.company.customersConfig.services.find(service => service._id === this.newSubscription.service);
         this.newSubscription.unitTTCRate = selectedService.defaultUnitAmount;
+        this.newSubscription.nature = selectedService.nature;
       }
     },
     mergeUser (value = null) {
