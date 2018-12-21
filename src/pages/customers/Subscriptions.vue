@@ -35,7 +35,7 @@
             </q-td>
             <q-td slot="body-cell-sign" slot-scope="props" :props="props">
               <p v-if="props.row.signedAt">Devis et CG signés le {{$moment(props.row.signedAt).format('DD/MM/YYYY')}}</p>
-              <q-btn v-else color="primary" @click="newESignModal = true">
+              <q-btn v-else color="primary" @click="preOpenESignModal({ ref: props.row.name, type: 'quote', _id: props.row._id })">
                 Signer le devis et les CG
               </q-btn>
             </q-td>
@@ -59,7 +59,7 @@
       <q-modal v-model="newESignModal" :content-css="modalCssContainer">
         <div class="modal-padding">
           <div class="iframe-container">
-            <iframe src="https://companitest.eversign.com/document/932691d9cb6d4b909d97a4e67646d4ff-9e28d3a1c7894f9498cb5d917ce76725/sign" frameborder="0"></iframe>
+            <iframe :src="embeddedUrl" frameborder="0"></iframe>
           </div>
         </div>
       </q-modal>
@@ -90,6 +90,7 @@ export default {
       },
       tmpInput: null,
       newESignModal: false,
+      embeddedUrl: '',
       modalCssContainer: {
         minWidth: '80vw',
         minHeight: '90vh'
@@ -146,6 +147,10 @@ export default {
           sortable: true,
           format: (value) => this.$moment(value).format('DD/MM/YYYY'),
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate())
+        },
+        {
+          name: '_id',
+          field: '_id',
         }
       ],
       visibleColumnsQuotes: ['number', 'document', 'sign']
@@ -179,25 +184,8 @@ export default {
       }
     },
   },
-  async mounted () {
-    try {
-      await this.getCustomer();
-      const test = await this.$esign.requestSignature({
-        type: 'devis',
-        customer: {
-          name: this.customer.identity.lastname,
-          email: this.customer.email
-        },
-        fileId: '1dWQ6hqH_9PgNhw30fKKVroQBG-WTA5Ek',
-        fields: {
-          title: this.customer.identity.title,
-          lastname: this.customer.identity.lastname
-        }
-      });
-      console.log('test', test);
-    } catch (e) {
-      console.error(e);
-    }
+  mounted () {
+    this.getCustomer();
   },
   methods: {
     async getCustomer () {
@@ -239,6 +227,30 @@ export default {
         NotifyNegative('Erreur lors de la modification');
       } finally {
         this.tmpInput = '';
+      }
+    },
+    async preOpenESignModal (data) {
+      try {
+        const test = await this.$esign.requestSignature({
+          ref: data.ref,
+          type: data.type,
+          customer: {
+            name: this.customer.identity.lastname,
+            email: this.customer.email
+          },
+          fileId: '1dWQ6hqH_9PgNhw30fKKVroQBG-WTA5Ek', // Future company's template id
+          fields: {
+            title: this.customer.identity.title,
+            lastname: this.customer.identity.lastname
+          },
+          redirect: `${window.location.href}?${data.type}Id=${data._id}&type=${data.type}&signed=true`,
+          redirectDecline: `${window.location.href}&signed=false}`
+        });
+        this.embeddedUrl = test.data.signatureRequest.embeddedUrl;
+        console.log(test);
+        this.newESignModal = true;
+      } catch (e) {
+        console.error(e);
       }
     }
   },
