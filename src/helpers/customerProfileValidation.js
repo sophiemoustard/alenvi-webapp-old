@@ -12,7 +12,14 @@ const customerProfileSchema = Joi.object().keys({
   payment: {
     iban: Joi.string().required(),
     bic: Joi.string().required()
-  }
+  },
+  subscriptions: Joi.array().min(1),
+  mandates: Joi.array().items(Joi.object().keys({
+    signedAt: Joi.date().required()
+  })),
+  quotes: Joi.array().items(Joi.object({
+    signedAt: Joi.date().required()
+  }))
 });
 
 export const customerProfileValidation = (profile, options = {}) => {
