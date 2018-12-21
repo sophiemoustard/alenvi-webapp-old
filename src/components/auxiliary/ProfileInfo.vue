@@ -323,6 +323,7 @@ import DatetimePicker from '../form/DatetimePicker.vue';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../popup/notify';
 
 export default {
+  name: 'ProfileInfo',
   components: {
     'ni-select-sector': SelectSector,
     'ni-input': Input,
@@ -718,6 +719,12 @@ export default {
       }
       const payload = this.$_.set({}, path, value);
       payload._id = this.currentUser._id;
+
+      if (path.match(/birthCountry/i) && value !== 'FR') {
+        this.user.alenvi.administrative.identity.birthState = '99';
+        payload.administrative.identity.birthState = '99';
+      }
+
       await this.$users.updateById(payload);
     },
     async updateOgustUser (paths) {
@@ -748,6 +755,10 @@ export default {
         await this.$ogust.setAddress(payload);
       } else {
         payload.id_employee = this.currentUser.employee_id
+
+        if (paths.ogust.match(/country_of_birth/i) && value !== 'FR') {
+          payload.state_of_birth = '99';
+        }
         await this.$ogust.setEmployee(payload);
       }
     },
