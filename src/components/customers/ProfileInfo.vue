@@ -75,6 +75,9 @@
                 </a>
               </q-btn>
             </q-td>
+            <q-td slot="body-cell-signed" slot-scope="props" :props="props">
+              <div :class="[{ activeDot: props.value, inactiveDot: !props.value }]" />
+            </q-td>
           </q-table>
         </q-card-main>
         <q-card-actions align="end">
@@ -333,6 +336,12 @@ export default {
           field: 'signedQuote',
         },
         {
+          name: 'signed',
+          label: 'Signé',
+          align: 'left',
+          field: row => row.drive && row.drive.id,
+        },
+        {
           name: 'createdAt',
           label: '',
           field: 'createdAt',
@@ -354,7 +363,7 @@ export default {
         estimatedWeeklyVolume: '',
       },
       visibleMandateColumns: ['rum', 'emptyMandate', 'signedMandate', 'signed', 'signedAt'],
-      visibleQuoteColumns: ['quoteNumber', 'emptyQuote', 'signedQuote'],
+      visibleQuoteColumns: ['quoteNumber', 'emptyQuote', 'signedQuote', 'signed'],
       mandateColumns: [
         {
           name: 'rum',
@@ -798,10 +807,9 @@ export default {
     async downloadMandate (doc) {
       try {
         const data = {
-          customerFirstname: this.customer.identity.firstname,
-          customerLastname: this.customer.identity.lastname,
+          bankAccountOwner: this.customer.payment.bankAccountOwner,
           customerAddress: this.customer.contact.address.fullAddress,
-          uploadDate: this.$moment(Date.now()).format('DD/MM/YYYY'),
+          downloadDate: this.$moment(Date.now()).format('DD/MM/YYYY'),
           ics: this.company.ics,
           rum: doc.rum,
           bic: this.customer.payment.bic,
@@ -857,7 +865,7 @@ export default {
           companyAddress: this.company.address.fullAddress,
           rcs: this.company.rcs,
           subscriptions,
-          uploadDate: this.$moment(Date.now()).format('DD/MM/YYYY'),
+          downloadDate: this.$moment(Date.now()).format('DD/MM/YYYY'),
         }
         const params = { driveId: this.company.customersConfig.templates.quote.driveId };
         await downloadDocxFile(params, data, 'devis.docx');
