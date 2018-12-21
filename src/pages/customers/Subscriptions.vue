@@ -7,7 +7,7 @@
         <q-card v-if="customer.subscriptions.length > 0" class="contract-card">
           <q-table
             :data="customer.subscriptions"
-            :columns="columns"
+            :columns="columnsSubs"
             row-key="name"
             hide-bottom
             binary-state-sort>
@@ -16,6 +16,31 @@
       </div>
       <div class="q-mb-lg">
         <p class="title">Devis</p>
+        <p v-if="customer.quotes.length === 0">Aucun devis.</p>
+        <q-card v-if="customer.quotes.length > 0" class="contract-card">
+          <q-table
+            :data="customer.quotes"
+            :columns="columnsQuotes"
+            row-key="name"
+            hide-bottom
+            :visible-columns="visibleColumnsQuotes"
+            binary-state-sort>
+            <q-td slot="body-cell-document" slot-scope="props" :props="props">
+              <q-btn v-if="props.row.signedAt" flat round small color="primary">
+                <a :href="props.row.drive.link" download>
+                  <q-icon name="file download" />
+                </a>
+              </q-btn>
+              <p v-else>/</p>
+            </q-td>
+            <q-td slot="body-cell-sign" slot-scope="props" :props="props">
+              <p v-if="props.row.signedAt">Devis et CG signés le {{$moment(props.row.signedAt).format('DD/MM/YYYY')}}</p>
+              <q-btn v-else color="primary" @click="preOpenESignModal({ ref: props.row.name, type: 'quote', _id: props.row._id })">
+                Signer le devis et les CG
+              </q-btn>
+            </q-td>
+          </q-table>
+        </q-card>
       </div>
       <div class="q-mb-lg">
         <p class="title">Paiement</p>
@@ -31,6 +56,13 @@
           />
         </div>
       </div>
+      <q-modal v-model="newESignModal" :content-css="modalCssContainer">
+        <div class="modal-padding">
+          <div class="iframe-container">
+            <iframe :src="embeddedUrl" frameborder="0"></iframe>
+          </div>
+        </div>
+      </q-modal>
     </template>
     <template v-else>
       <p>Vous n'avez pas de bénéficiaire.</p>
@@ -53,9 +85,17 @@ export default {
     return {
       customer: {
         payment: {},
+        subscriptions: [],
+        quotes: []
       },
       tmpInput: null,
-      columns: [
+      newESignModal: false,
+      embeddedUrl: '',
+      modalCssContainer: {
+        minWidth: '80vw',
+        minHeight: '90vh'
+      },
+      columnsSubs: [
         {
           name: 'name',
           label: 'Nom',
@@ -77,7 +117,43 @@ export default {
           field: row => `${row.unitTTCRate}€`,
           sortable: true
         }
-      ]
+      ],
+      columnsQuotes: [
+        {
+          name: 'number',
+          label: 'Numéro devis',
+          align: 'left',
+          field: 'quoteNumber',
+          sortable: true
+        },
+        {
+          name: 'document',
+          label: 'Document',
+          align: 'left',
+          field: row => row.drive.link,
+          sortable: true
+        },
+        {
+          name: 'sign',
+          label: 'Signature',
+          align: 'left',
+          field: 'signedAt',
+          sortable: true
+        },
+        {
+          name: 'createdAt',
+          align: 'left',
+          field: 'createdAt',
+          sortable: true,
+          format: (value) => this.$moment(value).format('DD/MM/YYYY'),
+          sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate())
+        },
+        {
+          name: '_id',
+          field: '_id',
+        }
+      ],
+      visibleColumnsQuotes: ['number', 'document', 'sign']
     }
   },
   validations: {
@@ -116,6 +192,7 @@ export default {
       try {
         const customerRaw = await this.$customers.getById(this.helper.customers[0]._id);
         this.customer = customerRaw.data.data.customer;
+        console.log(this.customer);
       } catch (e) {
         console.error(e);
         this.customer = {};
@@ -151,6 +228,30 @@ export default {
       } finally {
         this.tmpInput = '';
       }
+    },
+    async preOpenESignModal (data) {
+      try {
+        const test = await this.$esign.requestSignature({
+          ref: data.ref,
+          type: data.type,
+          customer: {
+            name: this.customer.identity.lastname,
+            email: this.customer.email
+          },
+          fileId: '1dWQ6hqH_9PgNhw30fKKVroQBG-WTA5Ek', // Future company's template id
+          fields: {
+            title: this.customer.identity.title,
+            lastname: this.customer.identity.lastname
+          },
+          redirect: `${window.location.href}?${data.type}Id=${data._id}&type=${data.type}&signed=true`,
+          redirectDecline: `${window.location.href}&signed=false}`
+        });
+        this.embeddedUrl = test.data.signatureRequest.embeddedUrl;
+        console.log(test);
+        this.newESignModal = true;
+      } catch (e) {
+        console.error(e);
+      }
     }
   },
 }
@@ -167,4 +268,24 @@ export default {
     margin-bottom: 20px
   .q-table-container
     box-shadow: none
+  a
+    color: $primary
+    text-decoration: none
+  .modal
+    &-padding
+      padding: 24px 58px 0px 58px
+    &-btn
+      border-radius: 0
+  .iframe-container
+    overflow: hidden
+    padding-top: 60%
+    position: relative
+
+  .iframe-container iframe
+    border: 0
+    height: 100%
+    left: 0
+    position: absolute
+    top: 0
+    width: 100%
 </style>
