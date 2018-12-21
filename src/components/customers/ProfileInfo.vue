@@ -75,6 +75,9 @@
                 </a>
               </q-btn>
             </q-td>
+            <q-td slot="body-cell-signed" slot-scope="props" :props="props">
+              <div :class="[{ activeDot: props.value, inactiveDot: !props.value }]" />
+            </q-td>
           </q-table>
         </q-card-main>
         <q-card-actions align="end">
@@ -333,6 +336,12 @@ export default {
           field: 'signedQuote',
         },
         {
+          name: 'signed',
+          label: 'Signé',
+          align: 'left',
+          field: row => row.drive && row.drive.id,
+        },
+        {
           name: 'createdAt',
           label: '',
           field: 'createdAt',
@@ -354,7 +363,7 @@ export default {
         estimatedWeeklyVolume: '',
       },
       visibleMandateColumns: ['rum', 'emptyMandate', 'signedMandate', 'signed', 'signedAt'],
-      visibleQuoteColumns: ['quoteNumber', 'emptyQuote', 'signedQuote'],
+      visibleQuoteColumns: ['quoteNumber', 'emptyQuote', 'signedQuote', 'signed'],
       mandateColumns: [
         {
           name: 'rum',
