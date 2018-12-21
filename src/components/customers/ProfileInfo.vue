@@ -798,10 +798,9 @@ export default {
     async downloadMandate (doc) {
       try {
         const data = {
-          customerFirstname: this.customer.identity.firstname,
-          customerLastname: this.customer.identity.lastname,
+          bankAccountOwner: this.customer.payment.bankAccountOwner,
           customerAddress: this.customer.contact.address.fullAddress,
-          uploadDate: this.$moment(Date.now()).format('DD/MM/YYYY'),
+          downloadDate: this.$moment(Date.now()).format('DD/MM/YYYY'),
           ics: this.company.ics,
           rum: doc.rum,
           bic: this.customer.payment.bic,
@@ -857,7 +856,7 @@ export default {
           companyAddress: this.company.address.fullAddress,
           rcs: this.company.rcs,
           subscriptions,
-          uploadDate: this.$moment(Date.now()).format('DD/MM/YYYY'),
+          downloadDate: this.$moment(Date.now()).format('DD/MM/YYYY'),
         }
         const params = { driveId: this.company.customersConfig.templates.quote.driveId };
         await downloadDocxFile(params, data, 'devis.docx');
