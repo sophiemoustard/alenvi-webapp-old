@@ -249,6 +249,7 @@ export default {
     async createAlenviCustomer () {
       const payload = this.$_.pickBy(this.newCustomer);
       const newCustomer = await this.$customers.create(payload);
+      await this.$customers.createDriveFolder(newCustomer.data.data.customer._id);
       return newCustomer;
     },
     async createOgustCustomer () {
