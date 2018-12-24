@@ -16,7 +16,6 @@ module.exports = function (ctx) {
       'customers',
       'googleDrive',
       'email',
-      'esign',
       'features',
       'lodash',
       'messages',
