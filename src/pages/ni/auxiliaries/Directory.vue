@@ -372,7 +372,7 @@ export default {
             auxiliary: {
               _id: user._id,
               name: `${user.firstname} ${user.lastname}`,
-              picture: user.picture.link
+              picture: user.picture ? user.picture.link : null
             },
             startDate: user.createdAt,
             sector: sectors[user.sector],
