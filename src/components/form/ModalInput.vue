@@ -6,7 +6,7 @@
         <q-icon v-if="error" name="error_outline" color="secondary" />
       </div>
       <q-field :error="error" :error-label="errorLabel">
-        <q-input :value="value" color="white" inverted-light @input="inputHandler" @blur="blurHandler" :suffix="suffix" :type="type" :rows="rows" />
+        <q-input :value="value" color="white" inverted-light @input="inputHandler" @blur="blurHandler" :suffix="suffix" :type="type" :rows="rows" :readonly="readOnly" />
       </q-field>
     </div>
   </div>
@@ -24,6 +24,7 @@ export default {
     suffix: { type: String, default: '' },
     type: { type: String, default: 'text' },
     rows: { type: Number, default: 1 },
+    readOnly: Boolean
   },
   methods: {
     inputHandler (value) {

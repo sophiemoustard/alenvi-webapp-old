@@ -14,6 +14,13 @@
           </q-table>
         </q-card>
         <p class="nota-bene">* intègre les éventuelles majorations soir / weekend</p>
+        <div v-if="customer.subscriptions && customer.subscriptions.length > 0" class="row">
+          <div class="col-xs-12 row items-center no-wrap">
+            <q-checkbox v-model="customer.hasAgreedConditions" class="q-mr-sm" @input="confirmAgreement" />
+            <span>J'accepte les conditions d’abonnement présentées ci-dessus ainsi que les <a href="#cgs" @click.prevent="cgsModal = true">conditions générales de services
+          Alenvi</a>.<span class="text-weight-thin text-italic"> {{ agreement }}</span></span>
+          </div>
+        </div>
       </div>
       <div class="q-mb-lg">
         <p class="title">Devis</p>
@@ -64,6 +71,19 @@
           </div>
         </div>
       </q-modal>
+      <q-modal v-model="cgsModal" :content-css="modalCssContainer">
+        <div class="modal-padding">
+          <div class="row justify-between items-baseline">
+            <div class="col-8">
+              <h5>Conditions générales de services Alenvi</h5>
+            </div>
+            <div class="col-1 cursor-pointer" style="text-align: right">
+              <span><q-icon name="clear" size="1rem" @click.native="cgsModal = false" /></span>
+            </div>
+          </div>
+          <ni-modal-input v-model="cgs" readOnly type="textarea" />
+        </div>
+      </q-modal>
     </template>
     <template v-else>
       <p>Vous n'avez pas de bénéficiaire.</p>
@@ -74,16 +94,22 @@
 <script>
 import { required } from 'vuelidate/lib/validators';
 import Input from '../../components/form/Input.vue';
+import NiModalInput from '../../components/form/ModalInput';
 import { bic, iban } from '../../helpers/vuelidateCustomVal';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify';
+import cgs from '../../data/cgs.js';
 
 export default {
   name: 'Subscriptions',
   components: {
     'ni-input': Input,
+    NiModalInput
   },
   data () {
     return {
+      cgs,
+      cgsModal: false,
+      agreed: false,
       customer: {
         payment: {},
         subscriptions: [],
@@ -198,6 +224,21 @@ export default {
         return 'BIC non valide';
       }
     },
+    lastSubscriptionHistory () {
+      if (this.customer.subscriptionsHistory && this.customer.subscriptionsHistory.length > 1) {
+        const history = this.customer.subscriptionsHistory;
+        return history.sort((a, b) => new Date(b.approvalDate) - new Date(a.approvalDate))[0];
+      }
+      if (this.customer.subscriptionsHistory && this.customer.subscriptionsHistory.length === 1) {
+        return this.customer.subscriptionsHistory[0];
+      }
+    },
+    agreement () {
+      if (this.lastSubscriptionHistory && this.customer.hasAgreedConditions) {
+        return `(Accepté le ${this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} par ${this.lastSubscriptionHistory.helper.title}
+          ${this.lastSubscriptionHistory.helper.firstname} ${this.lastSubscriptionHistory.helper.lastname})`;
+      }
+    }
   },
   mounted () {
     this.getCustomer();
@@ -218,7 +259,6 @@ export default {
       try {
         const customerRaw = await this.$customers.getById(this.helper.customers[0]._id);
         this.customer = customerRaw.data.data.customer;
-        console.log(this.customer);
       } catch (e) {
         console.error(e);
         this.customer = {};
@@ -277,6 +317,33 @@ export default {
         this.newESignModal = true;
       } catch (e) {
         console.error(e);
+      }
+    },
+    async confirmAgreement () {
+      try {
+        if (this.customer.hasAgreedConditions) {
+          const subscriptions = this.customer.subscriptions.map(subscription => {
+            const obj = {
+              service: subscription.service.name,
+              unitTTCRate: subscription.unitTTCRate,
+              estimatedWeeklyVolume: subscription.estimatedWeeklyVolume
+            };
+            if (subscription.evenings) obj.evenings = subscription.evenings;
+            if (subscription.sundays) obj.sundays = subscription.sundays;
+            return obj;
+          });
+          const { birthDate, ...helperIdentity } = this.customer.identity;
+          const payload = {
+            subscriptions,
+            helper: helperIdentity
+          };
+          await this.$customers.addSubscriptionHistory(this.customer._id, payload);
+          await this.$store.dispatch('main/getUser', this.helper._id)
+          NotifyPositive('Abonnement validé');
+        }
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la validation de votre abonnement');
       }
     }
   },
