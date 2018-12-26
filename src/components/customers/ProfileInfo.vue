@@ -185,13 +185,13 @@
           @blur="$v.newSubscription.service.$touch" @input="updateNewSubscription"
         />
         <ni-modal-input v-model="newSubscription.unitTTCRate" :error="$v.newSubscription.unitTTCRate.$error" caption="Prix unitaire TTC"
-          @blur="$v.newSubscription.unitTTCRate.$touch"
+          @blur="$v.newSubscription.unitTTCRate.$touch" type="number"
         />
         <ni-modal-input v-model="newSubscription.estimatedWeeklyVolume" :error="$v.newSubscription.estimatedWeeklyVolume.$error"
-          caption="Volume hebdomadaire estimatif" @blur="$v.newSubscription.estimatedWeeklyVolume.$touch"
+          caption="Volume hebdomadaire estimatif" @blur="$v.newSubscription.estimatedWeeklyVolume.$touch" type="number"
         />
-        <ni-modal-input v-if="newSubscription.nature !== 'Forfaitaire'" v-model="newSubscription.sundays" caption="Dont dimanche (h)" />
-        <ni-modal-input v-if="newSubscription.nature !== 'Forfaitaire'" v-model="newSubscription.evenings" caption="Dont soirée (h)" last />
+        <ni-modal-input v-if="newSubscription.nature !== 'Forfaitaire'" v-model="newSubscription.sundays" caption="Dont dimanche (h)" type="number" />
+        <ni-modal-input v-if="newSubscription.nature !== 'Forfaitaire'" v-model="newSubscription.evenings" caption="Dont soirée (h)" last type="number" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter un abonnement" icon-right="add" color="primary" :loading="loading" @click="submitSubscription" />
     </q-modal>
@@ -758,6 +758,7 @@ export default {
         if (this.$v.newSubscription.$error) {
           return NotifyWarning('Champ(s) invalide(s)');
         }
+        if (this.newSubscription.nature) delete this.newSubscription.nature;
 
         await this.$customers.addSubscription(this.customer._id, this.newSubscription);
         this.resetSubscriptionForm();

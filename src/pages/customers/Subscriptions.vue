@@ -13,6 +13,7 @@
             binary-state-sort>
           </q-table>
         </q-card>
+        <p class="nota-bene">* intègre les éventuelles majorations soir / weekend</p>
       </div>
       <div class="q-mb-lg">
         <p class="title">Devis</p>
@@ -113,8 +114,22 @@ export default {
         {
           name: 'ttcRate',
           label: 'Prix unitaire TTC',
-          align: 'left',
+          align: 'center',
           field: row => `${row.unitTTCRate}€`,
+          sortable: true
+        },
+        {
+          name: 'estimatedWeeklyVolume',
+          label: 'Volume hebdomadaire',
+          align: 'center',
+          field: row => row.service.nature === 'Horaire' ? `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume,
+          sortable: true
+        },
+        {
+          name: 'weeklyRate',
+          label: 'Coût hebdomadaire*',
+          align: 'center',
+          field: row => `${this.getWeeklyRate(row)}€`,
           sortable: true
         }
       ],
@@ -188,6 +203,17 @@ export default {
     this.getCustomer();
   },
   methods: {
+    getWeeklyRate (subscription) {
+      let estimatedWeeklyRate = subscription.unitTTCRate * subscription.estimatedWeeklyVolume;
+      if (subscription.sundays && subscription.service.holidaySurcharge) {
+        estimatedWeeklyRate += subscription.sundays * subscription.unitTTCRate * subscription.service.holidaySurcharge / 100;
+      }
+      if (subscription.evenings && subscription.service.eveningSurcharge) {
+        estimatedWeeklyRate += subscription.evenings * subscription.unitTTCRate * subscription.service.eveningSurcharge / 100;
+      }
+
+      return estimatedWeeklyRate;
+    },
     async getCustomer () {
       try {
         const customerRaw = await this.$customers.getById(this.helper.customers[0]._id);
@@ -262,10 +288,13 @@ export default {
   .title
     font-size: 1.5em
     margin-bottom: 20px
+  .nota-bene
+    font-size: 0.8em
+    margin-bottom: 20px
   .contract-card
     background: white
     width: 100%
-    margin-bottom: 20px
+    margin-bottom: 10px
   .q-table-container
     box-shadow: none
   a
