@@ -16,7 +16,7 @@
         <p class="nota-bene">* intègre les éventuelles majorations soir / weekend</p>
         <div v-if="customer.subscriptions && customer.subscriptions.length > 0" class="row">
           <div class="col-xs-12 row items-center no-wrap">
-            <q-checkbox v-model="customer.hasAgreedConditions" class="q-mr-sm" @input="confirmAgreement" />
+            <q-checkbox v-model="customer.subscriptionsAccepted" class="q-mr-sm" @input="confirmAgreement" />
             <span>J'accepte les conditions d’abonnement présentées ci-dessus ainsi que les <a href="#cgs" @click.prevent="cgsModal = true">conditions générales de services
           Alenvi</a>.<span class="text-weight-thin text-italic"> {{ agreement }}</span></span>
           </div>
@@ -234,7 +234,7 @@ export default {
       }
     },
     agreement () {
-      if (this.lastSubscriptionHistory && this.customer.hasAgreedConditions) {
+      if (this.lastSubscriptionHistory && this.customer.subscriptionsAccepted) {
         return `(Accepté le ${this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} par ${this.lastSubscriptionHistory.helper.title}
           ${this.lastSubscriptionHistory.helper.firstname} ${this.lastSubscriptionHistory.helper.lastname})`;
       }
@@ -321,7 +321,7 @@ export default {
     },
     async confirmAgreement () {
       try {
-        if (this.customer.hasAgreedConditions) {
+        if (this.customer.subscriptionsAccepted) {
           const subscriptions = this.customer.subscriptions.map(subscription => {
             const obj = {
               service: subscription.service.name,

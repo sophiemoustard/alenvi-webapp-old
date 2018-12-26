@@ -24,7 +24,7 @@ export default {
     suffix: { type: String, default: '' },
     type: { type: String, default: 'text' },
     rows: { type: Number, default: 1 },
-    readOnly: Boolean
+    readOnly: { type: Boolean, default: false }
   },
   methods: {
     inputHandler (value) {
