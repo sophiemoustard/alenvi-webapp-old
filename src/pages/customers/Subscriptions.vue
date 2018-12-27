@@ -22,7 +22,7 @@
           </div>
         </div>
       </div>
-      <div class="q-mb-lg">
+      <!-- <div class="q-mb-lg">
         <p class="title">Devis</p>
         <p v-if="customer.quotes.length === 0">Aucun devis.</p>
         <q-card v-if="customer.quotes.length > 0" class="contract-card">
@@ -49,7 +49,7 @@
             </q-td>
           </q-table>
         </q-card>
-      </div>
+      </div> -->
       <div class="q-mb-lg">
         <p class="title">Paiement</p>
         <div class="row gutter-profile">
@@ -63,6 +63,26 @@
             @focus="saveTmp('payment.bic')" @blur="updateCustomer('payment.bic')"
           />
         </div>
+        <p v-if="customer.payment.mandates.length === 0">Aucun mandat.</p>
+        <q-card v-if="customer.payment.mandates.length > 0" class="contract-card">
+          <q-card-title>Mandats de prélèvement</q-card-title>
+          <q-card-main>
+            <q-table
+              :data="customer.payment.mandates"
+              :columns="columnsMandates"
+              row-key="name"
+              hide-bottom
+              :visible-columns="visibleColumnsMandates"
+              binary-state-sort>
+              <q-td slot="body-cell-sign" slot-scope="props" :props="props">
+                <p v-if="props.row.signedAt">Mandat signé le {{$moment(props.row.signedAt).format('DD/MM/YYYY')}}</p>
+                <q-btn v-else color="primary" @click="preOpenESignModal({ _id: props.row._id })">
+                  Signer
+                </q-btn>
+              </q-td>
+            </q-table>
+          </q-card-main>
+        </q-card>
       </div>
       <q-modal v-model="newESignModal" :content-css="modalCssContainer">
         <div class="modal-padding">
@@ -159,20 +179,12 @@ export default {
           sortable: true
         }
       ],
-      columnsQuotes: [
+      columnsMandates: [
         {
-          name: 'number',
-          label: 'Numéro devis',
+          name: 'rum',
+          label: 'RUM',
           align: 'left',
-          field: 'quoteNumber',
-          sortable: true
-        },
-        {
-          name: 'document',
-          label: 'Document',
-          align: 'left',
-          field: row => row.drive.link,
-          sortable: true
+          field: 'rum'
         },
         {
           name: 'sign',
@@ -194,7 +206,7 @@ export default {
           field: '_id',
         }
       ],
-      visibleColumnsQuotes: ['number', 'document', 'sign']
+      visibleColumnsMandates: ['rum', 'sign']
     }
   },
   validations: {
@@ -259,6 +271,9 @@ export default {
       try {
         const customerRaw = await this.$customers.getById(this.helper.customers[0]._id);
         this.customer = customerRaw.data.data.customer;
+        console.log(this.customer);
+        const test = await this.$customers.getMandates(this.customer._id);
+        console.log(test);
       } catch (e) {
         console.error(e);
         this.customer = {};
@@ -297,9 +312,9 @@ export default {
     },
     async preOpenESignModal (data) {
       try {
-        const test = await this.$esign.requestSignature({
-          ref: data.ref,
-          type: data.type,
+        // const test = await this.$customer.generateMandateSignatureRequest({_id: data.} {
+        // });
+        const test = await this.$customers.requestSignature({
           customer: {
             name: this.customer.identity.lastname,
             email: this.customer.email
