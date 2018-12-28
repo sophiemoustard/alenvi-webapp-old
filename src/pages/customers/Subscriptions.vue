@@ -286,7 +286,8 @@ export default {
     },
     async preOpenESignModal (data) {
       try {
-        const test = await this.$customers.generateMandateSignatureRequest({mandateId: data._id, _id: this.customer._id}, {
+        this.$q.loading.show({ message: 'Contact du support de signature en ligne...' });
+        const sign = await this.$customers.generateMandateSignatureRequest({mandateId: data._id, _id: this.customer._id}, {
           customer: {
             name: this.customer.identity.lastname,
             email: this.customer.email
@@ -296,27 +297,17 @@ export default {
             title: this.customer.identity.title,
             lastname: this.customer.identity.lastname
           },
-          redirect: `${window.location.href}&signed=true`,
-          redirectDecline: `${window.location.href}&signed=false}`
+          redirect: `${window.location.href}&signed=false`,
+          redirectDecline: `${window.location.href}&signed=false`
         });
-        // const test = await this.$customers.requestSignature({
-        //   customer: {
-        //     name: this.customer.identity.lastname,
-        //     email: this.customer.email
-        //   },
-        //   fileId: '1dWQ6hqH_9PgNhw30fKKVroQBG-WTA5Ek', // Future company's template id
-        //   fields: {
-        //     title: this.customer.identity.title,
-        //     lastname: this.customer.identity.lastname
-        //   },
-        //   redirect: `${window.location.href}?${data.type}Id=${data._id}&type=${data.type}&signed=true`,
-        //   redirectDecline: `${window.location.href}&signed=false}`
-        // });
-        this.embeddedUrl = test.data.signatureRequest.embeddedUrl;
-        console.log(test);
+        this.$q.loading.hide();
+        this.embeddedUrl = sign.data.data.signatureRequest.embeddedUrl;
         this.newESignModal = true;
       } catch (e) {
         console.error(e);
+        this.$q.loading.hide();
+        this.newESignModal = false;
+        NotifyNegative('Erreur lors de la requête de signature en ligne du mandat');
       }
     },
     async confirmAgreement () {
