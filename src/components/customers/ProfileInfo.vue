@@ -175,7 +175,7 @@
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-8">
-            <h5>Ajouter un <span class="text-weight-bold">souscription</span></h5>
+            <h5>Ajouter une <span class="text-weight-bold">souscription</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
             <span><q-icon name="clear" size="1rem" @click.native="addSubscription = false" /></span>
@@ -193,7 +193,7 @@
         <ni-modal-input v-if="newSubscription.nature !== 'Forfaitaire'" v-model="newSubscription.sundays" caption="Dont dimanche (h)" type="number" />
         <ni-modal-input v-if="newSubscription.nature !== 'Forfaitaire'" v-model="newSubscription.evenings" caption="Dont soirée (h)" last type="number" />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Ajouter un abonnement" icon-right="add" color="primary" :loading="loading" @click="submitSubscription" />
+      <q-btn no-caps class="full-width modal-btn" label="Ajouter une souscription" icon-right="add" color="primary" :loading="loading" @click="submitSubscription" />
     </q-modal>
   </div>
 </template>
