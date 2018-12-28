@@ -22,34 +22,6 @@
           </div>
         </div>
       </div>
-      <!-- <div class="q-mb-lg">
-        <p class="title">Devis</p>
-        <p v-if="customer.quotes.length === 0">Aucun devis.</p>
-        <q-card v-if="customer.quotes.length > 0" class="contract-card">
-          <q-table
-            :data="customer.quotes"
-            :columns="columnsQuotes"
-            row-key="name"
-            hide-bottom
-            :visible-columns="visibleColumnsQuotes"
-            binary-state-sort>
-            <q-td slot="body-cell-document" slot-scope="props" :props="props">
-              <q-btn v-if="props.row.signedAt" flat round small color="primary">
-                <a :href="props.row.drive.link" download>
-                  <q-icon name="file download" />
-                </a>
-              </q-btn>
-              <p v-else>/</p>
-            </q-td>
-            <q-td slot="body-cell-sign" slot-scope="props" :props="props">
-              <p v-if="props.row.signedAt">Devis et CG signés le {{$moment(props.row.signedAt).format('DD/MM/YYYY')}}</p>
-              <q-btn v-else color="primary" @click="preOpenESignModal({ ref: props.row.name, type: 'quote', _id: props.row._id })">
-                Signer le devis et les CG
-              </q-btn>
-            </q-td>
-          </q-table>
-        </q-card>
-      </div> -->
       <div class="q-mb-lg">
         <p class="title">Paiement</p>
         <div class="row gutter-profile">
@@ -131,7 +103,9 @@ export default {
       cgsModal: false,
       agreed: false,
       customer: {
-        payment: {},
+        payment: {
+          mandates: []
+        },
         subscriptions: [],
         quotes: []
       },
@@ -312,21 +286,32 @@ export default {
     },
     async preOpenESignModal (data) {
       try {
-        // const test = await this.$customer.generateMandateSignatureRequest({_id: data.} {
-        // });
-        const test = await this.$customers.requestSignature({
+        const test = await this.$customers.generateMandateSignatureRequest({mandateId: data._id, _id: this.customer._id}, {
           customer: {
             name: this.customer.identity.lastname,
             email: this.customer.email
           },
-          fileId: '1dWQ6hqH_9PgNhw30fKKVroQBG-WTA5Ek', // Future company's template id
+          fileId: this.helper.company.rhConfig.templates.contract.driveId,
           fields: {
             title: this.customer.identity.title,
             lastname: this.customer.identity.lastname
           },
-          redirect: `${window.location.href}?${data.type}Id=${data._id}&type=${data.type}&signed=true`,
+          redirect: `${window.location.href}&signed=true`,
           redirectDecline: `${window.location.href}&signed=false}`
         });
+        // const test = await this.$customers.requestSignature({
+        //   customer: {
+        //     name: this.customer.identity.lastname,
+        //     email: this.customer.email
+        //   },
+        //   fileId: '1dWQ6hqH_9PgNhw30fKKVroQBG-WTA5Ek', // Future company's template id
+        //   fields: {
+        //     title: this.customer.identity.title,
+        //     lastname: this.customer.identity.lastname
+        //   },
+        //   redirect: `${window.location.href}?${data.type}Id=${data._id}&type=${data.type}&signed=true`,
+        //   redirectDecline: `${window.location.href}&signed=false}`
+        // });
         this.embeddedUrl = test.data.signatureRequest.embeddedUrl;
         console.log(test);
         this.newESignModal = true;
