@@ -44,6 +44,12 @@
           <q-btn :disable="serviceOptions.length === 0" flat no-caps color="primary" icon="add" label="Ajouter une souscription" @click="addSubscription = true"/>
         </q-card-actions>
       </q-card>
+      <div v-if="customer.subscriptions && customer.subscriptions.length > 0" class="row">
+          <div class="col-xs-12 row no-wrap">
+            <q-checkbox v-model="customer.subscriptionsAccepted" disable class="q-mr-sm" />
+            <span>Validation en ligne des souscriptions par l'aidant<span class="text-weight-thin text-italic"> {{ acceptedByHelper }}</span></span>
+          </div>
+      </div>
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
@@ -212,6 +218,7 @@ import NiModalSelect from '../form/ModalSelect';
 import { frPhoneNumber, iban, bic, frAddress } from '../../helpers/vuelidateCustomVal';
 import DatetimePicker from '../form/DatetimePicker';
 import { downloadDocxFile } from '../../helpers/downloadFile';
+import { customerMixin } from '../../mixins/customerMixin.js';
 
 export default {
   name: 'ProfileInfo',
@@ -222,6 +229,7 @@ export default {
     NiModalSelect,
     'ni-datetime-picker': DatetimePicker,
   },
+  mixins: [customerMixin],
   data () {
     return {
       loading: false,
@@ -465,6 +473,11 @@ export default {
         return 'Champ requis';
       } else if (!this.$v.newHelper.local.email.email) {
         return 'Email non valide';
+      }
+    },
+    acceptedByHelper () {
+      if (this.lastSubscriptionHistory && this.customer.subscriptionsAccepted) {
+        return `${this.acceptedBy}`;
       }
     }
   },
