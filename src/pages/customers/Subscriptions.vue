@@ -98,6 +98,7 @@ import NiModalInput from '../../components/form/ModalInput';
 import { bic, iban } from '../../helpers/vuelidateCustomVal';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify';
 import cgs from '../../data/cgs.js';
+import { customerMixin } from '../../mixins/customerMixin.js';
 
 export default {
   name: 'Subscriptions',
@@ -105,6 +106,7 @@ export default {
     'ni-input': Input,
     NiModalInput
   },
+  mixins: [customerMixin],
   data () {
     return {
       cgs,
@@ -224,19 +226,9 @@ export default {
         return 'BIC non valide';
       }
     },
-    lastSubscriptionHistory () {
-      if (this.customer.subscriptionsHistory && this.customer.subscriptionsHistory.length > 1) {
-        const history = this.customer.subscriptionsHistory;
-        return history.sort((a, b) => new Date(b.approvalDate) - new Date(a.approvalDate))[0];
-      }
-      if (this.customer.subscriptionsHistory && this.customer.subscriptionsHistory.length === 1) {
-        return this.customer.subscriptionsHistory[0];
-      }
-    },
     agreement () {
       if (this.lastSubscriptionHistory && this.customer.subscriptionsAccepted) {
-        return `(Accepté le ${this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} par ${this.lastSubscriptionHistory.helper.title}
-          ${this.lastSubscriptionHistory.helper.firstname} ${this.lastSubscriptionHistory.helper.lastname})`;
+        return `(Accepté le ${this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} par ${this.acceptedBy}`;
       }
     }
   },
