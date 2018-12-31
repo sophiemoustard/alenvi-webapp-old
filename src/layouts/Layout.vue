@@ -47,12 +47,6 @@ export default {
         this.$store.commit('main/setToggleDrawer', !this.toggleDrawer)
       }
     },
-    layoutTitle () {
-      return {
-        link: { name: 'administrative directory' },
-        content: 'Administratif'
-      };
-    },
     sidemenusRefs () {
       if (this.user && this.user.role.name !== 'Auxiliaire') {
         return 'defaultMenu';
