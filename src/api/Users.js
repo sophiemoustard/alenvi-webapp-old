@@ -2,39 +2,24 @@ import { alenviAxios } from './ressources/alenviAxios'
 import axios from 'axios'
 
 export default {
-  async showAll (params = null, token = null) {
+  async showAll (params = null) {
     try {
-      let employeeIdRaw;
-      if (token === null) {
-        employeeIdRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users`, { params });
-      } else {
-        employeeIdRaw = await axios.get(`${process.env.API_HOSTNAME}/users`, { params, headers: { 'x-access-token': token } });
-      }
+      const employeeIdRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users`, { params });
       return employeeIdRaw.data.data.users;
     } catch (e) {
       console.error(e.response);
     }
   },
-  async showAllActive (params = null, token = null) {
+  async showAllActive (params = null) {
     try {
-      let employeeIdRaw;
-      if (token === null) {
-        employeeIdRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/active`, { params });
-      } else {
-        employeeIdRaw = await axios.get(`${process.env.API_HOSTNAME}/users/active`, { params, headers: { 'x-access-token': token } });
-      }
+      const employeeIdRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/active`, { params });
       return employeeIdRaw.data.data.users;
     } catch (e) {
       console.error(e.response);
     }
   },
-  async getById (id, token = null) {
-    let userRaw = {};
-    if (token === null) {
-      userRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/${id}`);
-    } else {
-      userRaw = await axios.get(`${process.env.API_HOSTNAME}/users/${id}`, { headers: { 'x-access-token': token } });
-    }
+  async getById (id) {
+    const userRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/${id}`);
     return userRaw.data.data.user;
   },
   async create (data) {
