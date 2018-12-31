@@ -245,9 +245,6 @@ export default {
       try {
         const customerRaw = await this.$customers.getById(this.helper.customers[0]._id);
         this.customer = customerRaw.data.data.customer;
-        console.log(this.customer);
-        const test = await this.$customers.getMandates(this.customer._id);
-        console.log(test);
       } catch (e) {
         console.error(e);
         this.customer = {};
@@ -278,7 +275,6 @@ export default {
         if (e.message === 'Champ(s) invalide(s)') {
           return NotifyWarning(e.message)
         }
-        console.log(e);
         NotifyNegative('Erreur lors de la modification');
       } finally {
         this.tmpInput = '';
