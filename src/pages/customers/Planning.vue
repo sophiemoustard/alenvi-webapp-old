@@ -26,7 +26,6 @@ export default {
     }
   },
   mounted () {
-    // this.getEventsData();
     this.$moment.locale('fr');
   },
   watch: {
@@ -45,7 +44,7 @@ export default {
   methods: {
     async getEventsData () {
       try {
-        this.personId = this.getUser.customers[0].customerId; // ID customer
+        this.personId = this.getUser.customers[0].customerId;
         this.events = await this.$ogust.getOgustEvents(this.personId, 'customer');
       } catch (e) {
         console.error(e)

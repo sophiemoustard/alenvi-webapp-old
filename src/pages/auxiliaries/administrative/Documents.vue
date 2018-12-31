@@ -33,10 +33,10 @@ export default {
       user: {},
       documents: [],
       pagination: {
-        sortBy: 'title', // String, column "name" property value
+        sortBy: 'title',
         descending: false,
         page: 1,
-        rowsPerPage: 10 // current rows per page being displayed
+        rowsPerPage: 10
       },
       columns: [
         {

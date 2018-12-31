@@ -122,10 +122,10 @@ export default {
       searchStr: '',
       activeCustomers: true,
       pagination: {
-        sortBy: 'startDate', // String, column "name" property value
+        sortBy: 'startDate',
         descending: true,
         page: 1,
-        rowsPerPage: 15 // current rows per page being displayed
+        rowsPerPage: 15
       },
       columns: [
         {
