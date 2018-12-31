@@ -228,14 +228,6 @@ const routes = [
       },
       // Customers view routes
       {
-        path: 'customers/home',
-        name: 'customer home',
-        component: () => import('pages/customers/Home'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token']
-        }
-      },
-      {
         path: 'customers/planning',
         name: 'customer planning',
         component: () => import('pages/customers/Planning'),
@@ -255,14 +247,6 @@ const routes = [
         path: 'customers/subscriptions',
         name: 'customer subscription',
         component: () => import('pages/customers/Subscriptions'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token']
-        }
-      },
-      {
-        path: 'customers/profile/:id',
-        name: 'customer profile',
-        component: () => import('pages/customers/Profile'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token']
         }
