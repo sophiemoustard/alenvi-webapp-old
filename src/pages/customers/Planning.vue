@@ -10,6 +10,7 @@
 import 'dhtmlx-scheduler'
 
 import Scheduler from '../../components/scheduler/Scheduler'
+import { NotifyNegative } from '../../components/popup/notify';
 
 export default {
   components: {
@@ -49,21 +50,9 @@ export default {
       } catch (e) {
         console.error(e)
         if (e.status === 404) {
-          this.$q.notify({
-            color: 'negative',
-            icon: 'warning',
-            detail: 'Aucune intervention dans la période demandée.',
-            position: 'bottom-right',
-            timeout: 2500
-          });
+          NotifyNegative('Aucune intervention dans la période demandée.');
         } else {
-          this.$q.notify({
-            color: 'negative',
-            icon: 'warning',
-            detail: "Erreur de chargement des données :/ Si le problème persiste, contactez l'équipe technique : support@alenvi.io :)",
-            position: 'bottom-right',
-            timeout: 2500
-          });
+          NotifyNegative('Erreur de chargement des données :/ Si le problème persiste, contactez l\'équipe technique : support@alenvi.io :)');
         }
       }
     }
