@@ -41,10 +41,10 @@ export default {
       isChecked: false,
       filter: '',
       pagination: {
-        sortBy: 'date', // String, column "name" property value
+        sortBy: 'date',
         descending: true,
         page: 1,
-        rowsPerPage: 30 // current rows per page being displayed
+        rowsPerPage: 30
       },
       columns: [
         {

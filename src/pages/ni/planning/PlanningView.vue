@@ -29,11 +29,6 @@ export default {
     'ni-select-sector': SelectSector,
     Scheduler
   },
-  watch: {
-    events (value) {
-      console.log(value);
-    }
-  },
   data () {
     return {
       events: null,

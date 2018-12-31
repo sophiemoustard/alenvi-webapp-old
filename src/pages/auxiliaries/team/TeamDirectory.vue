@@ -49,10 +49,10 @@ export default {
       searchStr: '',
       activeUsers: true,
       pagination: {
-        sortBy: 'name', // String, column "name" property value
+        sortBy: 'name',
         descending: false,
         page: 1,
-        rowsPerPage: 15 // current rows per page being displayed
+        rowsPerPage: 15
       },
       columns: [
         {

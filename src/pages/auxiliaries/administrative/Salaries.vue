@@ -33,10 +33,10 @@ export default {
       user: {},
       salaries: [],
       pagination: {
-        sortBy: 'periodStart', // String, column "name" property value
+        sortBy: 'periodStart',
         descending: true,
         page: 1,
-        rowsPerPage: 10 // current rows per page being displayed
+        rowsPerPage: 10
       },
       columns: [
         {
