@@ -34,6 +34,8 @@
 </template>
 
 <script>
+import { NotifyNegative, NotifyPositive } from '../../../components/popup/notify';
+
 export default {
   data () {
     return {
@@ -201,21 +203,9 @@ export default {
         await this.$planningUpdates.updatePlanningUpdatesStatus(updateId, payload);
         this.planningUpdatesList[cell].checkedBy = payload.checkBy ? `${this.user.firstname} ${this.user.lastname.substring(0, 1)}.` : '-';
         this.planningUpdatesList[cell].checkedAt = payload.checkedAt ? new Date() : '';
-        this.$q.notify({
-          color: 'positive',
-          icon: 'thumb up',
-          detail: 'Modification traitée.',
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyPositive('Modification traitée.');
       } catch (e) {
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de la validation de la modification.',
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyNegative('Erreur lors de la validation de la modification.');
         this.planningUpdatesList[cell].check.checked = !this.planningUpdatesList[cell].check.checked;
         console.error(e);
       }
@@ -230,13 +220,7 @@ export default {
         }).then(async () => {
           await this.$planningUpdates.removePlanningUpdateById(id, { userId });
           this.planningUpdatesList.splice(cell, 1);
-          this.$q.notify({
-            color: 'positive',
-            icon: 'thumb up',
-            detail: 'Demande de modification supprimée.',
-            position: 'bottom-right',
-            timeout: 2500
-          });
+          NotifyPositive('Demande de modification supprimée.');
         }).catch(() => {
           this.$q.notify({
             color: 'info',
@@ -247,13 +231,7 @@ export default {
           });
         })
       } catch (e) {
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de la suppression de la demande de modification.',
-          position: 'bottom-right',
-          timeout: 2500
-        });
+        NotifyNegative('Erreur lors de la suppression de la demande de modification.');
         console.error(e);
       }
     },

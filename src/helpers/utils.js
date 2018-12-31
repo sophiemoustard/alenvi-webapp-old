@@ -1,5 +1,4 @@
 export const extend = (...sources) => {
-  // Variables
   const extended = {};
   let deep = false;
   let i = 0;
@@ -25,7 +24,6 @@ export const extend = (...sources) => {
     }
   };
 
-    // Loop through each object and conduct a merge
   for (; i < sources.length; i++) {
     merge(sources[i]);
   }

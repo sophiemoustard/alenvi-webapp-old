@@ -1,10 +1,7 @@
 require('dotenv').config();
 
-// Configuration for your app
-
 module.exports = function (ctx) {
   return {
-    // app plugins (/src/plugins)
     plugins: [
       'i18n',
       'axios',
@@ -35,7 +32,7 @@ module.exports = function (ctx) {
     ],
     extras: [
       ctx.theme.mat ? 'roboto-font' : null,
-      'material-icons', // optional, you are not bound to it
+      'material-icons',
       'ionicons',
       'mdi',
       'fontawesome'
@@ -45,10 +42,7 @@ module.exports = function (ctx) {
       scopeHoisting: true,
       vueRouterMode: 'history',
       publicPath: '/',
-      // vueCompiler: true,
       gzip: true,
-      // analyze: true,
-      // extractCSS: false,
       useNotifier: false,
       extendWebpack (cfg) {
         cfg.module.rules.push({
@@ -72,11 +66,8 @@ module.exports = function (ctx) {
       }
     },
     devServer: {
-      // https: true,
-      // port: 8080,
-      open: true // opens browser window automatically
+      open: true
     },
-    // framework: 'all' --- includes everything; for dev only!
     framework: {
       i18n: 'fr',
       components: [
@@ -137,17 +128,13 @@ module.exports = function (ctx) {
       directives: [
         'Ripple'
       ],
-      // Quasar plugins
       plugins: [
         'Notify',
         'Cookies',
         'Loading',
         'Dialog'
       ]
-      // iconSet: ctx.theme.mat ? 'material-icons' : 'ionicons'
-      // i18n: 'de' // Quasar language
     },
-    // animations: 'all' --- includes all animations
     animations: [
       'fadeIn',
       'fadeOut'
@@ -156,12 +143,7 @@ module.exports = function (ctx) {
       pwa: false
     },
     pwa: {
-      // workboxPluginMode: 'InjectManifest',
-      // workboxOptions: {},
       manifest: {
-        // name: 'Quasar App',
-        // short_name: 'Quasar-PWA',
-        // description: 'Best PWA App in town!',
         display: 'standalone',
         orientation: 'portrait',
         background_color: '#ffffff',

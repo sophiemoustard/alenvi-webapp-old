@@ -1,5 +1,4 @@
 <template>
-  <!-- If we are another role than customer -->
   <q-list class="no-border sidemenu-alenvi sidemenu-flex">
     <q-list-header>
       <q-item class="justify-center">

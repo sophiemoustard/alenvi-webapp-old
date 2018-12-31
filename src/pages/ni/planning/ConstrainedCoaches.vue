@@ -14,6 +14,7 @@
 </template>
 
 <script>
+import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
 
 export default {
   data () {
@@ -41,22 +42,10 @@ export default {
     async handleConstrainedCoach (coach) {
       try {
         await this.$users.updateById({ _id: coach._id, isConstrained: coach.isConstrained });
-        this.$q.notify({
-          color: 'positive',
-          icon: 'thumb up',
-          detail: 'Coachs de permanence mis à jour',
-          position: 'bottom-right',
-          duration: 2500
-        });
+        NotifyPositive('Coachs de permanence mis à jour');
       } catch (e) {
         console.error(e);
-        this.$q.notify({
-          color: 'negative',
-          icon: 'warning',
-          detail: 'Erreur lors de la mise à jour des coachs de permanence',
-          position: 'bottom-right',
-          duration: 2500
-        });
+        NotifyNegative('Erreur lors de la mise à jour des coachs de permanence');
       }
     }
   }
