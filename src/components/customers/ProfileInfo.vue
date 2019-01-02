@@ -862,10 +862,11 @@ export default {
 
           return {
             serviceName: subscription.service.name,
+            serviceNature: subscription.service.nature,
             unitTTCRate: subscription.unitTTCRate,
             estimatedWeeklyVolume: subscription.estimatedWeeklyVolume,
-            sundays: subscription.sundays || 0,
-            evenings: subscription.evenings || 0,
+            sundays: subscription.sundays || '',
+            evenings: subscription.evenings || '',
             estimatedWeeklyRate,
           }
         });
