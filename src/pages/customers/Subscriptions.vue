@@ -44,11 +44,12 @@
               :columns="columnsMandates"
               row-key="name"
               hide-bottom
+              :pagination.sync="pagination"
               :visible-columns="visibleColumnsMandates"
               binary-state-sort>
               <q-td slot="body-cell-sign" slot-scope="props" :props="props">
                 <p v-if="props.row.signedAt">Mandat signé le {{$moment(props.row.signedAt).format('DD/MM/YYYY')}}</p>
-                <q-btn v-else color="primary" @click="preOpenESignModal({ _id: props.row._id })">
+                <q-btn v-else color="primary" @click="preOpenESignModal({ _id: props.row._id, rum: props.row.rum })">
                   Signer
                 </q-btn>
               </q-td>
@@ -56,8 +57,13 @@
           </q-card-main>
         </q-card>
       </div>
-      <q-modal v-model="newESignModal" :content-css="modalCssContainer">
+      <q-modal v-model="newESignModal" @hide="checkMandates" :content-css="modalCssContainer">
         <div class="modal-padding">
+          <div class="row justify-end">
+            <div class="col-1 cursor-pointer" style="text-align: right">
+              <span><q-icon name="clear" size="1rem" @click.native="newESignModal = false" /></span>
+            </div>
+        </div>
           <div class="iframe-container">
             <iframe :src="embeddedUrl" frameborder="0"></iframe>
           </div>
@@ -91,6 +97,7 @@ import { bic, iban } from '../../helpers/vuelidateCustomVal';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify';
 import cgs from '../../data/docs/cgs2018.txt';
 import { customerMixin } from '../../mixins/customerMixin.js';
+import esign from '../../api/Esign.js';
 
 export default {
   name: 'Subscriptions',
@@ -182,7 +189,12 @@ export default {
           field: '_id',
         }
       ],
-      visibleColumnsMandates: ['rum', 'sign']
+      visibleColumnsMandates: ['rum', 'sign'],
+      pagination: {
+        sortBy: 'createdAt',
+        ascending: true,
+        rowsPerPage: 0,
+      }
     }
   },
   validations: {
@@ -218,8 +230,9 @@ export default {
       }
     }
   },
-  mounted () {
-    this.getCustomer();
+  async mounted () {
+    await this.getCustomer();
+    await this.checkMandates();
   },
   methods: {
     formatNumber (number) {
@@ -263,7 +276,8 @@ export default {
         const payload = this.$_.set({}, path, value);
         payload._id = this.customer._id;
         await this.$customers.updateById(payload);
-
+        await this.$store.dispatch('main/getUser', this.helper._id);
+        await this.getCustomer();
         NotifyPositive('Modification enregistrée');
       } catch (e) {
         console.error(e);
@@ -278,19 +292,28 @@ export default {
     async preOpenESignModal (data) {
       try {
         this.$q.loading.show({ message: 'Contact du support de signature en ligne...' });
-        const sign = await this.$customers.generateMandateSignatureRequest({mandateId: data._id, _id: this.customer._id}, {
+        const sign = await this.$customers.generateMandateSignatureRequest({ mandateId: data._id, _id: this.customer._id }, {
           customer: {
             name: this.customer.identity.lastname,
             email: this.customer.email
           },
-          fileId: this.helper.company.rhConfig.templates.contract.driveId,
+          fileId: this.helper.company.customersConfig.templates.debitMandate.driveId,
           fields: {
-            title: this.customer.identity.title,
-            lastname: this.customer.identity.lastname
+            customerFirstname: this.customer.identity.firstname,
+            customerLastname: this.customer.identity.lastname,
+            customerAddress: this.customer.contact.address.fullAddress,
+            ics: this.helper.company.ics,
+            rum: data.rum,
+            bic: this.customer.payment.bic,
+            iban: this.customer.payment.iban,
+            companyName: this.helper.company.name,
+            companyAddress: this.helper.company.address.fullAddress,
+            downloadDate: this.$moment().format('DD/MM/YYYY')
           },
-          redirect: `${window.location.href}&signed=false`,
-          redirectDecline: `${window.location.href}&signed=false`
+          redirect: `${process.env.COMPANI_HOSTNAME}/docsigned?signed=true`,
+          redirectDecline: `${process.env.COMPANI_HOSTNAME}/docsigned?signed=false`
         });
+        await this.getCustomer();
         this.$q.loading.hide();
         this.embeddedUrl = sign.data.data.signatureRequest.embeddedUrl;
         this.newESignModal = true;
@@ -326,6 +349,30 @@ export default {
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la validation de votre abonnement');
+      }
+    },
+    async checkMandates () {
+      try {
+        if (this.customer.payment.mandates.length === 0) return;
+        const mandates = this.customer.payment.mandates.filter(mandate => !mandate.drive && mandate.everSignId);
+        if (mandates.length === 0) return;
+        for (const mandate of mandates) {
+          const hasSigned = await this.hasSignedDoc(mandate.everSignId);
+          if (hasSigned) {
+            await this.$customers.saveSignedDoc({ _id: this.customer._id, mandateId: mandate._id });
+          }
+        }
+        await this.getCustomer();
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async hasSignedDoc (docId) {
+      try {
+        const docRaw = await esign.getDocument(docId);
+        return docRaw.data.data.document.log.some(el => el.event === 'document_signed');
+      } catch (e) {
+        console.error(e);
       }
     }
   },

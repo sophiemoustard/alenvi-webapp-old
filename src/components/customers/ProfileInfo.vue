@@ -725,6 +725,7 @@ export default {
       this.newHelper.local.password = randomize('0', 6);
       this.newHelper.customers = [this.userProfile._id];
       this.newHelper.role = 'Aidants';
+      this.newHelper.company = 'Alenvi';
       await this.$users.create(this.newHelper);
     },
     async sendWelcomingEmail () {

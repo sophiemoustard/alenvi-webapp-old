@@ -48,5 +48,8 @@ export default {
   },
   async generateMandateSignatureRequest (params, data) {
     return alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${params._id}/mandates/${params.mandateId}/esign`, data);
+  },
+  async saveSignedDoc (params, data) {
+    return alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${params._id}/mandates/${params.mandateId}/savesigneddoc`, data);
   }
 }
