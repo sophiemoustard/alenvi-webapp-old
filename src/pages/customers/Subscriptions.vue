@@ -89,7 +89,7 @@ import Input from '../../components/form/Input.vue';
 import NiModalInput from '../../components/form/ModalInput';
 import { bic, iban } from '../../helpers/vuelidateCustomVal';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify';
-import cgs from '../../data/cgs.js';
+import cgs from '../../data/docs/cgs2018.txt';
 import { customerMixin } from '../../mixins/customerMixin.js';
 
 export default {
@@ -214,7 +214,7 @@ export default {
     },
     agreement () {
       if (this.lastSubscriptionHistory && this.customer.subscriptionsAccepted) {
-        return `(Accepté le ${this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} par ${this.acceptedBy}`;
+        return `(Accepté le ${this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} par ${this.acceptedBy})`;
       }
     }
   },
@@ -317,7 +317,7 @@ export default {
             helper: helperIdentity
           };
           await this.$customers.addSubscriptionHistory(this.customer._id, payload);
-          await this.$store.dispatch('main/getUser', this.helper._id)
+          await this.getCustomer();
           NotifyPositive('Abonnement validé');
         }
       } catch (e) {
