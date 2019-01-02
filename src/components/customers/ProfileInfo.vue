@@ -801,7 +801,7 @@ export default {
 
         await this.$customers.removeSubscription(params);
         await this.refreshSubscriptions();
-        NotifyPositive('Souscription supprimé');
+        NotifyPositive('Souscription supprimée');
       } catch (e) {
         console.error(e);
       }
