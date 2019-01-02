@@ -826,8 +826,8 @@ export default {
           downloadDate: this.$moment(Date.now()).format('DD/MM/YYYY'),
           ics: this.company.ics,
           rum: doc.rum,
-          bic: this.customer.payment.bic,
-          iban: this.customer.payment.iban,
+          bic: this.customer.payment.bic || '',
+          iban: this.customer.payment.iban || '',
           companyName: this.company.name,
           companyAddress: this.company.address.fullAddress,
         };
