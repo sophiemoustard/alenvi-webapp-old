@@ -23,34 +23,6 @@
         </div>
       </div>
       <div class="q-mb-lg">
-        <p class="title">Devis</p>
-        <p v-if="customer.quotes.length === 0">Aucun devis.</p>
-        <q-card v-if="customer.quotes.length > 0" class="contract-card">
-          <q-table
-            :data="customer.quotes"
-            :columns="columnsQuotes"
-            row-key="name"
-            hide-bottom
-            :visible-columns="visibleColumnsQuotes"
-            binary-state-sort>
-            <q-td slot="body-cell-document" slot-scope="props" :props="props">
-              <q-btn v-if="props.row.signedAt" flat round small color="primary">
-                <a :href="props.row.drive.link" download>
-                  <q-icon name="file download" />
-                </a>
-              </q-btn>
-              <p v-else>/</p>
-            </q-td>
-            <q-td slot="body-cell-sign" slot-scope="props" :props="props">
-              <p v-if="props.row.signedAt">Devis et CG signés le {{$moment(props.row.signedAt).format('DD/MM/YYYY')}}</p>
-              <q-btn v-else color="primary" @click="preOpenESignModal({ ref: props.row.name, type: 'quote', _id: props.row._id })">
-                Signer le devis et les CG
-              </q-btn>
-            </q-td>
-          </q-table>
-        </q-card>
-      </div>
-      <div class="q-mb-lg">
         <p class="title">Paiement</p>
         <div class="row gutter-profile">
           <ni-input caption="Nom associé au compte bancaire" v-model="customer.payment.bankAccountOwner" :error="$v.customer.payment.bankAccountOwner.$error"
@@ -63,6 +35,26 @@
             @focus="saveTmp('payment.bic')" @blur="updateCustomer('payment.bic')"
           />
         </div>
+        <p v-if="customer.payment.mandates.length === 0">Aucun mandat.</p>
+        <q-card v-if="customer.payment.mandates.length > 0" class="contract-card">
+          <q-card-title>Mandats de prélèvement</q-card-title>
+          <q-card-main>
+            <q-table
+              :data="customer.payment.mandates"
+              :columns="columnsMandates"
+              row-key="name"
+              hide-bottom
+              :visible-columns="visibleColumnsMandates"
+              binary-state-sort>
+              <q-td slot="body-cell-sign" slot-scope="props" :props="props">
+                <p v-if="props.row.signedAt">Mandat signé le {{$moment(props.row.signedAt).format('DD/MM/YYYY')}}</p>
+                <q-btn v-else color="primary" @click="preOpenESignModal({ _id: props.row._id })">
+                  Signer
+                </q-btn>
+              </q-td>
+            </q-table>
+          </q-card-main>
+        </q-card>
       </div>
       <q-modal v-model="newESignModal" :content-css="modalCssContainer">
         <div class="modal-padding">
@@ -113,7 +105,9 @@ export default {
       cgsModal: false,
       agreed: false,
       customer: {
-        payment: {},
+        payment: {
+          mandates: []
+        },
         subscriptions: [],
         quotes: []
       },
@@ -161,20 +155,12 @@ export default {
           sortable: true
         }
       ],
-      columnsQuotes: [
+      columnsMandates: [
         {
-          name: 'number',
-          label: 'Numéro devis',
+          name: 'rum',
+          label: 'RUM',
           align: 'left',
-          field: 'quoteNumber',
-          sortable: true
-        },
-        {
-          name: 'document',
-          label: 'Document',
-          align: 'left',
-          field: row => row.drive.link,
-          sortable: true
+          field: 'rum'
         },
         {
           name: 'sign',
@@ -196,7 +182,7 @@ export default {
           field: '_id',
         }
       ],
-      visibleColumnsQuotes: ['number', 'document', 'sign']
+      visibleColumnsMandates: ['rum', 'sign']
     }
   },
   validations: {
@@ -281,7 +267,6 @@ export default {
         if (e.message === 'Champ(s) invalide(s)') {
           return NotifyWarning(e.message)
         }
-        console.log(e);
         NotifyNegative('Erreur lors de la modification');
       } finally {
         this.tmpInput = '';
@@ -289,26 +274,28 @@ export default {
     },
     async preOpenESignModal (data) {
       try {
-        const test = await this.$esign.requestSignature({
-          ref: data.ref,
-          type: data.type,
+        this.$q.loading.show({ message: 'Contact du support de signature en ligne...' });
+        const sign = await this.$customers.generateMandateSignatureRequest({mandateId: data._id, _id: this.customer._id}, {
           customer: {
             name: this.customer.identity.lastname,
             email: this.customer.email
           },
-          fileId: '1dWQ6hqH_9PgNhw30fKKVroQBG-WTA5Ek', // Future company's template id
+          fileId: this.helper.company.rhConfig.templates.contract.driveId,
           fields: {
             title: this.customer.identity.title,
             lastname: this.customer.identity.lastname
           },
-          redirect: `${window.location.href}?${data.type}Id=${data._id}&type=${data.type}&signed=true`,
-          redirectDecline: `${window.location.href}&signed=false}`
+          redirect: `${window.location.href}&signed=false`,
+          redirectDecline: `${window.location.href}&signed=false`
         });
-        this.embeddedUrl = test.data.signatureRequest.embeddedUrl;
-        console.log(test);
+        this.$q.loading.hide();
+        this.embeddedUrl = sign.data.data.signatureRequest.embeddedUrl;
         this.newESignModal = true;
       } catch (e) {
         console.error(e);
+        this.$q.loading.hide();
+        this.newESignModal = false;
+        NotifyNegative('Erreur lors de la requête de signature en ligne du mandat');
       }
     },
     async confirmAgreement () {
