@@ -47,7 +47,7 @@
       <div v-if="customer.subscriptions && customer.subscriptions.length > 0" class="row">
           <div class="col-xs-12 row no-wrap">
             <q-checkbox v-model="customer.subscriptionsAccepted" disable class="q-mr-sm" />
-            <span>Validation en ligne des souscriptions par l'aidant<span class="text-weight-thin text-italic"> {{ acceptedByHelper }}</span></span>
+            <span>Validation en ligne des souscriptions<span class="text-weight-thin text-italic"> {{ acceptedByHelper }}</span></span>
           </div>
       </div>
     </div>
@@ -477,7 +477,7 @@ export default {
     },
     acceptedByHelper () {
       if (this.lastSubscriptionHistory && this.customer.subscriptionsAccepted) {
-        return `${this.acceptedBy}`;
+        return `le ${this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} par ${this.acceptedBy}`;
       }
     }
   },
