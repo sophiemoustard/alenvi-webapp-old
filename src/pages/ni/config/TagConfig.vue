@@ -33,6 +33,7 @@ export default {
         rcs: 'RCS de l’organisation',
         subscriptions: 'Liste des services souscrits',
         serviceName: 'Nom du service',
+        serviceNature: 'Nature du service',
         unitTTCRate: 'Tarif horaire TTC',
         estimatedWeeklyVolume: 'Volume hebdomadaire estimé total',
         sundays: 'Dont dimanche',
