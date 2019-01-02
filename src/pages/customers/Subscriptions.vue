@@ -137,7 +137,7 @@ export default {
           name: 'ttcRate',
           label: 'Prix unitaire TTC',
           align: 'center',
-          field: row => `${row.unitTTCRate}€`,
+          field: row => `${this.formatNumber(row.unitTTCRate)}€`,
           sortable: true
         },
         {
@@ -222,6 +222,9 @@ export default {
     this.getCustomer();
   },
   methods: {
+    formatNumber (number) {
+      return parseFloat(Math.round(number * 100) / 100).toFixed(1)
+    },
     getWeeklyRate (subscription) {
       let estimatedWeeklyRate = subscription.unitTTCRate * subscription.estimatedWeeklyVolume;
       if (subscription.sundays && subscription.service.holidaySurcharge) {
