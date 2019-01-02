@@ -295,19 +295,18 @@ export default {
         const sign = await this.$customers.generateMandateSignatureRequest({ mandateId: data._id, _id: this.customer._id }, {
           customer: {
             name: this.customer.identity.lastname,
-            email: this.customer.email
+            email: this.helper.local.email
           },
           fileId: this.helper.company.customersConfig.templates.debitMandate.driveId,
           fields: {
-            customerFirstname: this.customer.identity.firstname,
-            customerLastname: this.customer.identity.lastname,
-            customerAddress: this.customer.contact.address.fullAddress,
-            ics: this.helper.company.ics,
-            rum: data.rum,
-            bic: this.customer.payment.bic,
-            iban: this.customer.payment.iban,
-            companyName: this.helper.company.name,
-            companyAddress: this.helper.company.address.fullAddress,
+            bankAccountOwner: this.customer.payment.bankAccountOwner || '',
+            customerAddress: this.customer.contact.address.fullAddress || '',
+            ics: this.helper.company.ics || '',
+            rum: data.rum || '',
+            bic: this.customer.payment.bic || '',
+            iban: this.customer.payment.iban || '',
+            companyName: this.helper.company.name || '',
+            companyAddress: this.helper.company.address.fullAddress || '',
             downloadDate: this.$moment().format('DD/MM/YYYY')
           },
           redirect: `${process.env.COMPANI_HOSTNAME}/docsigned?signed=true`,
@@ -356,12 +355,15 @@ export default {
         if (this.customer.payment.mandates.length === 0) return;
         const mandates = this.customer.payment.mandates.filter(mandate => !mandate.drive && mandate.everSignId);
         if (mandates.length === 0) return;
+        const hasSignedPromises = [];
         for (const mandate of mandates) {
           const hasSigned = await this.hasSignedDoc(mandate.everSignId);
           if (hasSigned) {
-            await this.$customers.saveSignedDoc({ _id: this.customer._id, mandateId: mandate._id });
+            hasSignedPromises.push(this.$customers.saveSignedDoc({ _id: this.customer._id, mandateId: mandate._id }),
+              this.$ogust.createSepaInfo({ id_tiers: this.customer.customerId, rum: mandate.rum, signature_date: this.$moment().format('YYYYMMDD') }));
           }
         }
+        await Promise.all(hasSignedPromises);
         await this.getCustomer();
       } catch (e) {
         console.error(e);
