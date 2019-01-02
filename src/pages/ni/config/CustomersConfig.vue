@@ -8,7 +8,7 @@
           <q-card-main>
             <q-table :data="services" :columns="columns" hide-bottom binary-state-sort>
               <q-td slot="body-cell-delete" slot-scope="props" :props="props">
-                <q-btn flat round small color="grey" icon="delete" @click.native="deleteService(props.value, props.row.__index)" />
+                <q-btn disable flat round small color="grey" icon="delete" @click.native="deleteService(props.value, props.row.__index)" />
               </q-td>
             </q-table>
           </q-card-main>
