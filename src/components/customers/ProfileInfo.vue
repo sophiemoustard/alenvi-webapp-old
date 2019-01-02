@@ -777,13 +777,13 @@ export default {
         this.resetSubscriptionForm();
         this.refreshSubscriptions();
         this.addSubscription = false;
-        NotifyPositive('Abonnement ajouté');
+        NotifyPositive('Souscription ajoutée');
       } catch (e) {
         console.error(e);
         if (e.data.statusCode === 409) {
           return NotifyNegative(e.data.message);
         }
-        NotifyNegative("Erreur lors de l'ajout d'un abonnement");
+        NotifyNegative("Erreur lors de l'ajout d'un souscription");
       } finally {
         this.loading = false;
       }
@@ -792,7 +792,7 @@ export default {
       try {
         await this.$q.dialog({
           title: 'Confirmation',
-          message: 'Es-tu sûr(e) de vouloir supprimer cet abonnement ?',
+          message: 'Es-tu sûr(e) de vouloir supprimer cette souscription ?',
           ok: true,
           cancel: 'Annuler'
         });
@@ -801,7 +801,7 @@ export default {
 
         await this.$customers.removeSubscription(params);
         await this.refreshSubscriptions();
-        NotifyPositive('Abonnement supprimé');
+        NotifyPositive('Souscription supprimé');
       } catch (e) {
         console.error(e);
       }
