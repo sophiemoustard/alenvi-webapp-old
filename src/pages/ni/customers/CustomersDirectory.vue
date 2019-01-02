@@ -34,6 +34,9 @@
           <template v-else-if="col.name === 'active'">
             <div :class="{ activeDot: col.value, inactiveDot: !col.value }"></div>
           </template>
+          <template v-else-if="col.name === 'info'">
+            <q-icon v-if="props.row.missingInfo" name="error" color="secondary" size="1rem" />
+          </template>
           <template v-else>{{ col.value }}</template>
         </q-td>
       </q-tr>
@@ -72,6 +75,7 @@ import SearchAddress from '../../../components/form/SearchAddress';
 import NiModalInput from '../../../components/form/ModalInput';
 import NiModalSelect from '../../../components/form/ModalSelect';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../../components/popup/notify.js';
+import { customerProfileValidation } from '../../../helpers/customerProfileValidation.js';
 
 export default {
   metaInfo: {
@@ -152,6 +156,14 @@ export default {
           style: 'width: 170px'
         },
         {
+          name: 'info',
+          label: 'Infos',
+          field: 'missingInfo',
+          align: 'left',
+          sortable: true,
+          style: 'width: 30px'
+        },
+        {
           name: 'active',
           label: 'Actif',
           field: 'isActive',
@@ -224,7 +236,7 @@ export default {
         const customersRaw = await this.$customers.showAll();
         const customers = customersRaw.data.data.customers;
         this.customersList = customers.map((customer) => {
-          return {
+          const formattedCustomer = {
             customer: {
               _id: customer._id,
               name: customer.identity.firstname ? `${customer.identity.firstname} ${customer.identity.lastname}` : customer.identity.lastname,
@@ -232,6 +244,10 @@ export default {
             startDate: customer.createdAt,
             isActive: customer.isActive
           }
+          if (customer.isActive) {
+            formattedCustomer.missingInfo = customerProfileValidation(customer).error !== null;
+          }
+          return formattedCustomer;
         });
         this.tableLoading = false;
       } catch (e) {
