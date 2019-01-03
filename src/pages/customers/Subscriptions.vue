@@ -36,7 +36,7 @@
           />
         </div>
         <p v-if="customer.payment.mandates.length === 0">Aucun mandat.</p>
-        <q-card v-if="customer.payment.mandates.length > 0 || (customer.payment.iban && customer.payment.rib)" class="contract-card">
+        <q-card v-if="customer.payment.mandates.length > 0 && customer.payment.iban && customer.payment.rib" class="contract-card">
           <q-card-title>Mandats de prélèvement</q-card-title>
           <q-card-main>
             <q-table
