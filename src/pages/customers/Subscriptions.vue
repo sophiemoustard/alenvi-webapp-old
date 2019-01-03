@@ -156,7 +156,7 @@ export default {
         },
         {
           name: 'weeklyRate',
-          label: 'Coût hebdomadaire*',
+          label: 'Coût hebdomadaire TTC*',
           align: 'center',
           field: row => `${this.formatNumber(this.getWeeklyRate(row))}€`,
           sortable: true
