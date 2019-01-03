@@ -51,8 +51,10 @@ module.exports = function (ctx) {
           loader: 'eslint-loader',
           exclude: /(node_modules|quasar)/
         }, {
-          test: /\.txt$/,
-          use: 'raw-loader'
+          test: /\.(html)$/,
+          use: {
+            loader: 'html-loader'
+          }
         })
       },
       env: {

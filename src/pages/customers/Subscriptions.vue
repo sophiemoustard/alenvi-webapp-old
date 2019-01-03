@@ -79,7 +79,7 @@
               <span><q-icon name="clear" size="1rem" @click.native="cgsModal = false" /></span>
             </div>
           </div>
-          <ni-modal-input v-model="cgs" readOnly type="textarea" />
+          <div v-html="cgs" class="cgs-container q-pa-sm"></div>
         </div>
       </q-modal>
     </template>
@@ -95,7 +95,7 @@ import Input from '../../components/form/Input.vue';
 import NiModalInput from '../../components/form/ModalInput';
 import { bic, iban } from '../../helpers/vuelidateCustomVal';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify';
-import cgs from '../../data/docs/cgs2018.txt';
+import cgs from '../../statics/CGS.html';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import esign from '../../api/Esign.js';
 
@@ -418,4 +418,8 @@ export default {
     position: absolute
     top: 0
     width: 100%
+
+  .cgs-container
+    border: 1px solid $light-grey
+    border-radius: 2px
 </style>
