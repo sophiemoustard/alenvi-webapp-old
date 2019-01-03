@@ -268,7 +268,7 @@ export default {
           name: 'unitTTCRate',
           label: 'Prix unitaire TTC',
           align: 'center',
-          field: row => `${row.unitTTCRate}€`,
+          field: row => `${this.formatNumber(row.unitTTCRate)}€`,
         },
         {
           name: 'estimatedWeeklyVolume',
@@ -524,6 +524,9 @@ export default {
     this.isLoaded = true;
   },
   methods: {
+    formatNumber (number) {
+      return parseFloat(Math.round(number * 100) / 100).toFixed(1)
+    },
     updateNewSubscription () {
       if (this.newSubscription.service !== '') {
         const selectedService = this.company.customersConfig.services.find(service => service._id === this.newSubscription.service);
@@ -863,11 +866,11 @@ export default {
           return {
             serviceName: subscription.service.name,
             serviceNature: subscription.service.nature,
-            unitTTCRate: subscription.unitTTCRate,
-            estimatedWeeklyVolume: subscription.estimatedWeeklyVolume,
+            unitTTCRate: subscription.unitTTCRate ? `${this.formatNumber(subscription.unitTTCRate)}€` : '',
+            weeklyVolume: subscription.estimatedWeeklyVolume,
             sundays: subscription.sundays || '',
             evenings: subscription.evenings || '',
-            estimatedWeeklyRate,
+            weeklyRate: estimatedWeeklyRate ? `${this.formatNumber(estimatedWeeklyRate)}€` : '',
           }
         });
 
