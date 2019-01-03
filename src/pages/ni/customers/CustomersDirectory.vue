@@ -161,6 +161,7 @@ export default {
           field: 'missingInfo',
           align: 'left',
           sortable: true,
+          sort: (a, b) => a - b,
           style: 'width: 30px'
         },
         {
@@ -246,6 +247,8 @@ export default {
           }
           if (customer.isActive) {
             formattedCustomer.missingInfo = customerProfileValidation(customer).error !== null;
+            if (customer._id === '5bfd3a8d37512632d99fa6eb') console.log('val', customerProfileValidation(customer).error)
+            if (customer._id === '5bfd3a8d37512632d99fa6eb') console.log('customer', customer)
           }
           return formattedCustomer;
         });
