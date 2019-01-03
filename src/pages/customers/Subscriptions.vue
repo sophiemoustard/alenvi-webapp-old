@@ -15,9 +15,9 @@
         </q-card>
         <p class="nota-bene">* intègre les éventuelles majorations soir / dimanche</p>
         <div v-if="customer.subscriptions && customer.subscriptions.length > 0" class="row">
-          <div class="col-xs-12 row items-center no-wrap">
+          <div class="col-xs-12">
             <q-checkbox v-model="customer.subscriptionsAccepted" class="q-mr-sm" @input="confirmAgreement" />
-            <span>J'accepte les conditions d’abonnement présentées ci-dessus ainsi que les <a href="#cgs" @click.prevent="cgsModal = true">conditions générales de services
+            <span style="vertical-align: middle">J'accepte les conditions d’abonnement présentées ci-dessus ainsi que les <a href="#cgs" @click.prevent="cgsModal = true">conditions générales de services
           Alenvi</a>.<span class="text-weight-thin text-italic"> {{ agreement }}</span></span>
           </div>
         </div>
@@ -79,7 +79,9 @@
               <span><q-icon name="clear" size="1rem" @click.native="cgsModal = false" /></span>
             </div>
           </div>
-          <div v-html="cgs" class="cgs-container q-pa-sm"></div>
+          <div class="iframe-container">
+            <iframe src="statics/CGS.html" frameborder="0"></iframe>
+          </div>
         </div>
       </q-modal>
     </template>
@@ -95,7 +97,6 @@ import Input from '../../components/form/Input.vue';
 import NiModalInput from '../../components/form/ModalInput';
 import { bic, iban } from '../../helpers/vuelidateCustomVal';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify';
-import cgs from '../../statics/CGS.html';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import esign from '../../api/Esign.js';
 
@@ -108,7 +109,6 @@ export default {
   mixins: [customerMixin],
   data () {
     return {
-      cgs,
       cgsModal: false,
       agreed: false,
       customer: {
@@ -122,8 +122,8 @@ export default {
       newESignModal: false,
       embeddedUrl: '',
       modalCssContainer: {
-        minWidth: '80vw',
-        minHeight: '90vh'
+        minWidth: '60vw',
+        minHeight: '70vh'
       },
       columnsSubs: [
         {
