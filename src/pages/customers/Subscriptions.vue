@@ -336,10 +336,13 @@ export default {
             if (subscription.sundays) obj.sundays = subscription.sundays;
             return obj;
           });
-          const { birthDate, ...helperIdentity } = this.customer.identity;
           const payload = {
             subscriptions,
-            helper: helperIdentity
+            helper: {
+              firstname: this.helper.firstname || '',
+              lastname: this.helper.lastname || '',
+              title: this.helper.administrative && this.helper.administrative.identity ? this.helper.administrative.identity.title : ''
+            }
           };
           await this.$customers.addSubscriptionHistory(this.customer._id, payload);
           await this.getCustomer();
