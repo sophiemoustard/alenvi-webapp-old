@@ -161,6 +161,7 @@ export default {
           field: 'missingInfo',
           align: 'left',
           sortable: true,
+          sort: (a, b) => a - b,
           style: 'width: 30px'
         },
         {
