@@ -278,7 +278,7 @@ export default {
         },
         {
           name: 'sundays',
-          label: 'dont dimanches',
+          label: 'dont dimanche',
           align: 'center',
           field: row => row.service.nature === 'Horaire' && row.sundays ? `${row.sundays}h` : row.sundays,
         },
@@ -725,7 +725,7 @@ export default {
       this.newHelper.local.password = randomize('0', 6);
       this.newHelper.customers = [this.userProfile._id];
       this.newHelper.role = 'Aidants';
-      this.newHelper.company = 'Alenvi';
+      this.newHelper.company = this.company.name;
       await this.$users.create(this.newHelper);
     },
     async sendWelcomingEmail () {

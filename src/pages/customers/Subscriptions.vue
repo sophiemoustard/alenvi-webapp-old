@@ -13,7 +13,7 @@
             binary-state-sort>
           </q-table>
         </q-card>
-        <p class="nota-bene">* intègre les éventuelles majorations soir / weekend</p>
+        <p class="nota-bene">* intègre les éventuelles majorations soir / dimanche</p>
         <div v-if="customer.subscriptions && customer.subscriptions.length > 0" class="row">
           <div class="col-xs-12 row items-center no-wrap">
             <q-checkbox v-model="customer.subscriptionsAccepted" class="q-mr-sm" @input="confirmAgreement" />
@@ -158,7 +158,7 @@ export default {
           name: 'weeklyRate',
           label: 'Coût hebdomadaire*',
           align: 'center',
-          field: row => `${this.getWeeklyRate(row)}€`,
+          field: row => `${this.formatNumber(this.getWeeklyRate(row))}€`,
           sortable: true
         }
       ],
