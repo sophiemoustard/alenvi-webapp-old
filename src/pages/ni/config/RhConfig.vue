@@ -73,6 +73,7 @@ import FileUploader from '../../../components/form/FileUploader.vue';
 import { configMixin } from '../../../mixins/configMixin';
 
 export default {
+  name: 'RhConfig',
   components: {
     'ni-custom-img': CustomImg,
     'ni-input': Input,

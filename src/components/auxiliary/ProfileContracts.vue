@@ -335,18 +335,15 @@ export default {
     async dlTemplate (contract, index, contractStartDate) {
       try {
         const monthlyHours = Number.parseFloat(contract.weeklyHours * 4.33).toFixed(1);
+        const { identity, contact } = this.getUser.administrative
         const data = {
-          'title': this.getUser.administrative.identity.title,
-          'firstname': this.getUser.firstname,
-          'lastname': this.getUser.lastname,
-          'address': this.getUser.administrative.contact.address,
-          'city': this.getUser.administrative.contact.city,
-          'zipCode': this.getUser.administrative.contact.zipCode,
-          'birthDate': this.$moment(this.getUser.administrative.identity.birthDate).format('DD/MM/YYYY'),
-          'birthCountry': this.getUser.administrative.identity.birthCountry,
-          'birthState': this.getUser.administrative.identity.birthState,
-          'nationality': this.getUser.administrative.identity.nationality,
-          'SSN': this.getUser.administrative.identity.socialSecurityNumber,
+          'auxiliaryTitle': identity.title,
+          'auxiliaryFirstname': this.getUser.firstname,
+          'auxiliaryLastname': this.getUser.lastname,
+          'auxiliaryAddress': `${contact.address} ${contact.zipCode} ${contact.city}`,
+          'auxiliaryBirthDate': this.$moment(identity.birthDate).format('DD/MM/YYYY'),
+          'auxiliaryNationality': identity.nationality,
+          'auxiliarySSN': identity.socialSecurityNumber,
           'grossHourlyRate': contract.grossHourlyRate,
           'monthlyHours': monthlyHours,
           'salary': monthlyHours * contract.grossHourlyRate,
