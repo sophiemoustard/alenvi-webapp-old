@@ -23,6 +23,7 @@
     "file-saver": "^2.0.0-rc.4",
     "heroku-ssl-redirect": "0.0.4",
     "ibantools": "^2.0.0",
+    "iframe-resizer": "^3.6.3",
     "joi": "^13.6.0",
     "jszip": "^2.6.1",
     "jszip-utils": "0.0.2",

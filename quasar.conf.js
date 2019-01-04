@@ -19,6 +19,7 @@ module.exports = function (ctx) {
       'moment',
       'ogust',
       'planningUpdates',
+      'resize',
       'roles',
       'twilio',
       'vue-croppa',
