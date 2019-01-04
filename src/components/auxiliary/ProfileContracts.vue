@@ -39,7 +39,7 @@
                 </q-btn>
               </q-td>
               <q-td slot="body-cell-isActive" slot-scope="props" :props="props">
-                <q-checkbox :disable="props.value || $moment().isAfter(props.row.endDate)" :value="props.value"
+                <q-checkbox :disable="props.value || (props.row && 'endDate' in props.row)" :value="props.value"
                   @input="updateContractActivity({
                     contractId: contract._id,
                     versionId: props.row._id,
@@ -58,7 +58,7 @@
           </q-card-actions>
         </q-card>
       </template>
-      <q-btn :disable="!hasBasicInfo" class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="newContractModal = true" />
+      <q-btn :disable="!hasBasicInfo || hasActiveContract" class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="newContractModal = true" />
       <div v-if="!hasBasicInfo" class="missingBasicInfo">
         <p>/!\ Il manque une ou des information(s) importante(s) pour pouvoir créer un nouveau contrat parmi:</p>
         <ul>
@@ -92,7 +92,8 @@
         />
         <ni-modal-datetime-picker caption="Date d'effet" :error="$v.newContract.startDate.$error" v-model="newContract.startDate" />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Créer le contrat" icon-right="add" color="primary" :loading="loading" @click="createNewContract" />
+      <q-btn no-caps class="full-width modal-btn" label="Créer le contrat" icon-right="add" color="primary"
+        :loading="loading" @click="createNewContract" />
     </q-modal>
 
     <!-- New version modal -->
@@ -289,6 +290,15 @@ export default {
         return true;
       }
       return false;
+    },
+    hasActiveContract () {
+      if (this.contracts.length === 0) return false;
+      for (let i = 0; i < this.contracts.length; i++) {
+        const activeVersion = this.contracts[i].versions.find(version => version.isActive);
+        if (activeVersion) return true;
+      }
+
+      return false;
     }
   },
   async mounted () {
@@ -323,7 +333,7 @@ export default {
         }
       } else {
         return {
-          msg: 'Contrat actif',
+          msg: 'Contrat en cours',
           color: 'green'
         }
       }
@@ -436,7 +446,7 @@ export default {
         await this.$users.updateContractVersion(queries, { 'isActive': data.isActive });
         // Update manually checkbox because it's not dynamic
         this.sortedContracts[data.contractIndex].versions[data.cell].isActive = data.isActive;
-        this.updatePreviousVersions(data);
+        await this.updatePreviousVersions(data);
         await this.refreshContracts();
         NotifyPositive('Activité du contrat changée');
       } catch (e) {
