@@ -323,7 +323,7 @@ export default {
         }
       } else {
         return {
-          msg: 'Contrat actif',
+          msg: 'Contrat en cours',
           color: 'green'
         }
       }
