@@ -10,7 +10,19 @@
             :columns="columnsSubs"
             row-key="name"
             hide-bottom
-            binary-state-sort>
+            binary-state-sort
+            class="table-responsive">
+            <q-tr
+              slot="body"
+              slot-scope="props"
+              :props="props">
+              <q-td v-for="col in props.cols"
+                :key="col.name"
+                :data-label="col.label"
+                :props="props">
+                <template>{{ col.value }}</template>
+              </q-td>
+            </q-tr>
           </q-table>
         </q-card>
         <p class="nota-bene">* intègre les éventuelles majorations soir / dimanche</p>
@@ -35,9 +47,9 @@
             @focus="saveTmp('payment.bic')" @blur="updateCustomer('payment.bic')"
           />
         </div>
+        <p class="title">Mandats de prélèvement</p>
         <p v-if="customer.payment.mandates.length === 0">Aucun mandat.</p>
         <q-card v-if="customer.payment.mandates.length > 0 && customer.payment.iban && customer.payment.bic" class="contract-card">
-          <q-card-title>Mandats de prélèvement</q-card-title>
           <q-card-main>
             <q-table
               :data="customer.payment.mandates"
@@ -46,8 +58,10 @@
               hide-bottom
               :pagination.sync="pagination"
               :visible-columns="visibleColumnsMandates"
-              binary-state-sort>
-              <q-td slot="body-cell-sign" slot-scope="props" :props="props">
+              binary-state-sort
+              class="table-responsive">
+              <q-td slot="body-cell-rum" slot-scope="props" :props="props" :data-label="props.col.label">{{ props.value }}</q-td>
+              <q-td slot="body-cell-sign" slot-scope="props" :props="props" :data-label="props.col.label">
                 <p class="no-margin" v-if="props.row.signedAt">Mandat signé le {{$moment(props.row.signedAt).format('DD/MM/YYYY')}}</p>
                 <q-btn v-else color="primary" @click="preOpenESignModal({ _id: props.row._id, rum: props.row.rum })">
                   Signer
@@ -237,6 +251,7 @@ export default {
   async mounted () {
     await this.getCustomer();
     await this.checkMandates();
+    console.log('mobile', this.$q.platform.is.mobile);
   },
   methods: {
     formatNumber (number) {
@@ -426,4 +441,8 @@ export default {
   .cgs-container
     border: 1px solid $light-grey
     border-radius: 2px
+
+  .q-card-container
+    padding: 0
+
 </style>
