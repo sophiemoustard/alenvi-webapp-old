@@ -524,9 +524,6 @@ export default {
     this.isLoaded = true;
   },
   methods: {
-    goToUrl (url) {
-      window.open(url, '_blank');
-    },
     formatNumber (number) {
       return parseFloat(Math.round(number * 100) / 100).toFixed(1)
     },

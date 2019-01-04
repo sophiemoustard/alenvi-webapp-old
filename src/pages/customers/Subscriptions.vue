@@ -174,7 +174,6 @@ export default {
           label: 'Signature',
           align: 'left',
           field: 'signedAt',
-          sortable: false
         },
         {
           name: 'createdAt',
