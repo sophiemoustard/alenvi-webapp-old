@@ -50,6 +50,9 @@ module.exports = function (ctx) {
           test: /\.(js|vue)$/,
           loader: 'eslint-loader',
           exclude: /(node_modules|quasar)/
+        }, {
+          test: /\.(html)$/,
+          use: { loader: 'html-loader' }
         })
       },
       env: {
@@ -111,6 +114,7 @@ module.exports = function (ctx) {
         'QTabPane',
         'QRouteTab',
         'QModal',
+        'QModalLayout',
         'QAutocomplete',
         'QScrollObservable',
         'QResizeObservable',

@@ -84,19 +84,13 @@
         </div>
       </q-modal>
       <q-modal v-model="cgsModal" :content-css="cgsModalCssContainer">
-        <div class="modal-padding">
-          <div class="row justify-between items-baseline">
-            <div class="col-8">
-              <h5>Conditions générales de services Alenvi</h5>
-            </div>
-            <div class="col-1 cursor-pointer" style="text-align: right">
-              <span><q-icon name="clear" size="1rem" @click.native="cgsModal = false" /></span>
-            </div>
-          </div>
-          <div class="iframe-container">
-            <iframe src="statics/CGS.html" frameborder="0"></iframe>
-          </div>
-        </div>
+        <q-modal-layout>
+          <q-toolbar class="no-shadow row justify-between toolbar-padding" color="black" inverted slot="header">
+            <h5 class="no-margin">Conditions Générales de Service Alenvi</h5>
+            <q-icon class="cursor-pointer" name="clear" size="1rem" @click.native="cgsModal = false" />
+          </q-toolbar>
+          <div v-html="cgs" class="modal-padding"></div>
+        </q-modal-layout>
       </q-modal>
     </template>
     <template v-else>
@@ -113,6 +107,7 @@ import { bic, iban } from '../../helpers/vuelidateCustomVal';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import esign from '../../api/Esign.js';
+import cgs from '../../statics/CGS.html';
 
 export default {
   name: 'Subscriptions',
@@ -123,6 +118,7 @@ export default {
   mixins: [customerMixin],
   data () {
     return {
+      cgs,
       cgsModal: false,
       agreed: false,
       customer: {
@@ -136,12 +132,12 @@ export default {
       newESignModal: false,
       embeddedUrl: '',
       modalCssContainer: {
-        minWidth: '60vw',
-        minHeight: '70vh'
+        minWidth: '80vw',
+        minHeight: '90vh'
       },
       cgsModalCssContainer: {
-        minWidth: '80vw',
-        minHeight: '90vh',
+        maxWidth: '60vw',
+        minHeight: '70vh',
         overflow: 'hidden'
       },
       columnsSubs: [
@@ -420,11 +416,20 @@ export default {
   a
     color: $primary
     text-decoration: none
-  .modal
-    &-padding
-      padding: 24px 58px 0px 58px
-    &-btn
-      border-radius: 0
+
+  .modal-padding
+    padding: 24px 58px 0px 58px
+
+  .toolbar-padding
+    padding: 20px 58px
+
+  /deep/ .q-layout-header
+    box-shadow: none
+
+  .iframe-container
+    overflow: hidden
+    padding-top: 60%
+    position: relative
 
   .modal-padding-esign
     height: 100%
@@ -433,10 +438,6 @@ export default {
     height: 90%
     position: absolute
     width: 100%
-
-  .cgs-container
-    border: 1px solid $light-grey
-    border-radius: 2px
 
   .q-card-container
     padding: 0
