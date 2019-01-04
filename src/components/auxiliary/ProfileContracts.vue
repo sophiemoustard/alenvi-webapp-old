@@ -58,7 +58,7 @@
           </q-card-actions>
         </q-card>
       </template>
-      <q-btn :disable="!hasBasicInfo" class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="newContractModal = true" />
+      <q-btn :disable="!hasBasicInfo || hasActiveContract" class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="newContractModal = true" />
       <div v-if="!hasBasicInfo" class="missingBasicInfo">
         <p>/!\ Il manque une ou des information(s) importante(s) pour pouvoir créer un nouveau contrat parmi:</p>
         <ul>
@@ -92,7 +92,8 @@
         />
         <ni-modal-datetime-picker caption="Date d'effet" :error="$v.newContract.startDate.$error" v-model="newContract.startDate" />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Créer le contrat" icon-right="add" color="primary" :loading="loading" @click="createNewContract" />
+      <q-btn no-caps class="full-width modal-btn" label="Créer le contrat" icon-right="add" color="primary"
+        :loading="loading" @click="createNewContract" />
     </q-modal>
 
     <!-- New version modal -->
@@ -288,6 +289,15 @@ export default {
       this.getUser.administrative.contact.city) {
         return true;
       }
+      return false;
+    },
+    hasActiveContract () {
+      if (this.contracts.length === 0) return false;
+      for (let i = 0; i < this.contracts.length; i++) {
+        const activeVersion = this.contracts[i].versions.find(version => version.isActive);
+        if (activeVersion) return true;
+      }
+
       return false;
     }
   },
