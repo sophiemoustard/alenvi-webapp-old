@@ -52,46 +52,6 @@
       </div>
     </div>
     <div class="q-mb-xl">
-      <div class="row justify-between items-baseline">
-        <p class="text-weight-bold">Devis</p>
-      </div>
-      <q-card>
-        <q-card-main>
-          <q-table :data="customer.quotes" :columns="quoteColumns" row-key="name" table-style="font-size: 1rem" hide-bottom :pagination.sync="pagination"
-            :visible-columns="visibleQuoteColumns" binary-state-sort
-          >
-            <q-td slot="body-cell-emptyQuote" slot-scope="props" :props="props">
-              <q-btn flat round small color="primary" @click="downloadQuote(props.row)">
-                <q-icon name="file download" />
-              </q-btn>
-            </q-td>
-            <q-td slot="body-cell-signedQuote" slot-scope="props" :props="props">
-              <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-between">
-                <q-uploader :ref="`signedQuote_${props.row._id}`" name="signedQuote" hide-underline :url="docsUploadUrl" :headers="headers"
-                  extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" hide-upload-button @add="uploadDocument($event, `signedQuote_${props.row._id}`)"
-                  @uploaded="refreshQuotes" @fail="failMsg" :additional-fields="[
-                    { name: 'quoteId', value: props.row._id },
-                    { name: 'fileName', value: `devis_signe_${customer.identity.firstname}_${customer.identity.lastname}` }
-                  ]"
-                />
-              </div>
-              <q-btn v-else flat round small color="primary">
-                <a :href="props.row.drive.link" download target="_blank">
-                  <q-icon name="file download" />
-                </a>
-              </q-btn>
-            </q-td>
-            <q-td slot="body-cell-signed" slot-scope="props" :props="props">
-              <div :class="[{ activeDot: props.value, inactiveDot: !props.value }]" />
-            </q-td>
-          </q-table>
-        </q-card-main>
-        <q-card-actions align="end">
-          <q-btn :disabled="this.customer.subscriptions.length === 0" flat no-caps color="primary" icon="add" label="Générer un devis" @click="generateQuote"/>
-        </q-card-actions>
-      </q-card>
-    </div>
-    <div class="q-mb-xl">
       <p class="text-weight-bold">Aidants</p>
       <q-card>
         <q-card-main>
@@ -154,6 +114,46 @@
             </q-td>
           </q-table>
         </q-card-main>
+      </q-card>
+    </div>
+    <div class="q-mb-xl">
+      <div class="row justify-between items-baseline">
+        <p class="text-weight-bold">Devis</p>
+      </div>
+      <q-card>
+        <q-card-main>
+          <q-table :data="customer.quotes" :columns="quoteColumns" row-key="name" table-style="font-size: 1rem" hide-bottom :pagination.sync="pagination"
+            :visible-columns="visibleQuoteColumns" binary-state-sort
+          >
+            <q-td slot="body-cell-emptyQuote" slot-scope="props" :props="props">
+              <q-btn flat round small color="primary" @click="downloadQuote(props.row)">
+                <q-icon name="file download" />
+              </q-btn>
+            </q-td>
+            <q-td slot="body-cell-signedQuote" slot-scope="props" :props="props">
+              <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-between">
+                <q-uploader :ref="`signedQuote_${props.row._id}`" name="signedQuote" hide-underline :url="docsUploadUrl" :headers="headers"
+                  extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" hide-upload-button @add="uploadDocument($event, `signedQuote_${props.row._id}`)"
+                  @uploaded="refreshQuotes" @fail="failMsg" :additional-fields="[
+                    { name: 'quoteId', value: props.row._id },
+                    { name: 'fileName', value: `devis_signe_${customer.identity.firstname}_${customer.identity.lastname}` }
+                  ]"
+                />
+              </div>
+              <q-btn v-else flat round small color="primary">
+                <a :href="props.row.drive.link" download>
+                  <q-icon name="file download" />
+                </a>
+              </q-btn>
+            </q-td>
+            <q-td slot="body-cell-signed" slot-scope="props" :props="props">
+              <div :class="[{ activeDot: props.value, inactiveDot: !props.value }]" />
+            </q-td>
+          </q-table>
+        </q-card-main>
+        <q-card-actions align="end">
+          <q-btn :disabled="this.customer.subscriptions.length === 0" flat no-caps color="primary" icon="add" label="Générer un devis" @click="generateQuote"/>
+        </q-card-actions>
       </q-card>
     </div>
 
