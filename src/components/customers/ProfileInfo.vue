@@ -933,7 +933,6 @@ export default {
 
   .q-checkbox
     font-size: 12px
-    margin-bottom: 10px
 
   /deep/ .q-card-title
     font-size: 16px
