@@ -39,7 +39,7 @@
                 </q-btn>
               </q-td>
               <q-td slot="body-cell-isActive" slot-scope="props" :props="props">
-                <q-checkbox :disable="props.value || $moment().isAfter(props.row.endDate)" :value="props.value"
+                <q-checkbox :disable="props.value || (props.row && 'endDate' in props.row)" :value="props.value"
                   @input="updateContractActivity({
                     contractId: contract._id,
                     versionId: props.row._id,
