@@ -17,7 +17,7 @@ import ProfileInfo from '../../../components/auxiliary/ProfileInfo';
 import ProfileTasks from '../../../components/auxiliary/ProfileTasks';
 import ProfileContracts from '../../../components/auxiliary/ProfileContracts';
 import ProfileSalaries from '../../../components/auxiliary/ProfileSalaries';
-import ProfileAbsences from '../../../components/auxiliary/ProfileAbsences';
+// import ProfileAbsences from '../../../components/auxiliary/ProfileAbsences';
 
 export default {
   props: ['id'],
@@ -66,12 +66,12 @@ export default {
           default: false,
           component: ProfileSalaries,
         },
-        {
-          label: 'Absences',
-          name: 'absences',
-          default: false,
-          component: ProfileAbsences,
-        },
+        // {
+        //   label: 'Absences',
+        //   name: 'absences',
+        //   default: false,
+        //   component: ProfileAbsences,
+        // },
       ]
     }
   },
