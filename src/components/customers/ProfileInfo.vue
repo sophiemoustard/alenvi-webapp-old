@@ -45,9 +45,9 @@
         </q-card-actions>
       </q-card>
       <div v-if="customer.subscriptions && customer.subscriptions.length > 0" class="row">
-          <div class="col-xs-12 row no-wrap">
+          <div class="col-xs-12">
             <q-checkbox v-model="customer.subscriptionsAccepted" disable class="q-mr-sm" />
-            <span>Validation en ligne des souscriptions<span class="text-weight-thin text-italic"> {{ acceptedByHelper }}</span></span>
+            <span style="vertical-align: middle">Validation en ligne des souscriptions<span class="text-weight-thin text-italic"> {{ acceptedByHelper }}</span></span>
           </div>
       </div>
     </div>
