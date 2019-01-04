@@ -366,7 +366,7 @@ export default {
           'salary': monthlyHours * contract.grossHourlyRate,
           'startDate': this.$moment(contract.startDate).format('DD/MM/YYYY'),
           'weeklyHours': contract.weeklyHours,
-          'yearlyHours': monthlyHours * 52,
+          'yearlyHours': contract.weeklyHours * 52,
           'uploadDate': this.$moment(Date.now()).format('DD/MM/YYYY'),
           'initialContractStartDate': this.$moment(contractStartDate).format('DD/MM/YYYY'),
         };
