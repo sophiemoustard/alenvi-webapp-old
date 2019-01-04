@@ -76,9 +76,7 @@
           <q-toolbar class="no-shadow row justify-end toolbar-padding" color="black" inverted slot="header">
             <q-icon class="cursor-pointer" name="clear" size="1rem" @click.native="newESignModal = false" />
           </q-toolbar>
-          <div class="iframe-container">
-            <iframe :src="embeddedUrl" frameborder="0"></iframe>
-          </div>
+          <iframe :src="embeddedUrl" frameborder="0" id="eversign" v-resize></iframe>
         </q-modal-layout>
       </q-modal>
       <q-modal v-model="cgsModal" :content-css="cgsModalCssContainer">
@@ -98,7 +96,6 @@
 </template>
 
 <script>
-import { openURL } from 'quasar';
 import { required } from 'vuelidate/lib/validators';
 import Input from '../../components/form/Input.vue';
 import NiModalInput from '../../components/form/ModalInput';
@@ -328,11 +325,7 @@ export default {
         await this.getCustomer();
         this.$q.loading.hide();
         this.embeddedUrl = sign.data.data.signatureRequest.embeddedUrl;
-        if (this.$q.platform.is.mobile) {
-          openURL(this.embeddedUrl);
-        } else {
-          this.newESignModal = true;
-        }
+        this.newESignModal = true;
       } catch (e) {
         console.error(e);
         this.$q.loading.hide();
@@ -428,18 +421,10 @@ export default {
   /deep/ .q-layout-header
     box-shadow: none
 
-  .iframe-container
-    overflow: hidden
-    padding-top: 60%
-    position: relative
-
-  .iframe-container iframe
-   border: 0;
-   height: 100%;
-   left: 0;
-   position: absolute;
-   top: 0;
-   width: 100%;
+  iframe
+    width: 1px
+    min-width: 100%
+    height: 100%
 
   .q-card-container
     padding: 0
