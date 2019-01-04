@@ -150,6 +150,7 @@ export default {
           email: '',
           password: ''
         },
+        company: '',
         sector: '',
         administrative: {
           contact: {
@@ -280,6 +281,9 @@ export default {
     currentUser () {
       return this.$store.getters['main/user'];
     },
+    company () {
+      return this.$store.getters['main/company'];
+    },
     activeUserList () {
       if (this.activeUsers) {
         return this.userList.filter(user => user.isActive);
@@ -397,6 +401,7 @@ export default {
       this.newUser.local.password = randomize('*', 10);
       this.newUser.role = 'Auxiliaire';
       this.newUser.ogustManagerId = this.currentUser._id;
+      this.newUser.company = this.company.name;
       const newUser = await this.$users.create(this.newUser);
       await this.$users.createDriveFolder({ _id: newUser.data.data.user._id });
       return newUser;
