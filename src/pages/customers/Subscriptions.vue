@@ -69,7 +69,7 @@
           </div>
         </div>
       </q-modal>
-      <q-modal v-model="cgsModal" :content-css="modalCssContainer">
+      <q-modal v-model="cgsModal" :content-css="cgsModalCssContainer">
         <div class="modal-padding">
           <div class="row justify-between items-baseline">
             <div class="col-8">
@@ -124,6 +124,10 @@ export default {
       modalCssContainer: {
         minWidth: '60vw',
         minHeight: '70vh'
+      },
+      cgsModalCssContainer: {
+        minWidth: '80vw',
+        minHeight: '90vh'
       },
       columnsSubs: [
         {
