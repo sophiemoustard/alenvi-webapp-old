@@ -136,7 +136,7 @@ export default {
         minHeight: '90vh'
       },
       cgsModalCssContainer: {
-        maxWidth: '60vw',
+        minWidth: '60vw',
         minHeight: '70vh',
         overflow: 'hidden'
       },
