@@ -36,7 +36,7 @@ export const displayTask = (task, user = null) => {
     }
   }
   if (task.task.name.match(/inscription mutuelle/i)) {
-    if (!user.administrative.mutualFund.has) {
+    if (!user.administrative.mutualFund || !user.administrative.mutualFund.has) {
       return true;
     }
     return false;
