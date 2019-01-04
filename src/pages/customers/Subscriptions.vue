@@ -72,16 +72,14 @@
         </q-card>
       </div>
       <q-modal v-model="newESignModal" @hide="checkMandates" :content-css="modalCssContainer">
-        <div class="modal-padding-esign">
-          <div class="row justify-end">
-            <div class="col-1 cursor-pointer" style="text-align: right; padding: 24px 58px 24px 58px">
-              <span><q-icon name="clear" size="1rem" @click.native="newESignModal = false" /></span>
-            </div>
-        </div>
+        <q-modal-layout>
+          <q-toolbar class="no-shadow row justify-end toolbar-padding" color="black" inverted slot="header">
+            <q-icon class="cursor-pointer" name="clear" size="1rem" @click.native="newESignModal = false" />
+          </q-toolbar>
           <div class="iframe-container">
             <iframe :src="embeddedUrl" frameborder="0"></iframe>
           </div>
-        </div>
+        </q-modal-layout>
       </q-modal>
       <q-modal v-model="cgsModal" :content-css="cgsModalCssContainer">
         <q-modal-layout>
@@ -100,6 +98,7 @@
 </template>
 
 <script>
+import { openURL } from 'quasar';
 import { required } from 'vuelidate/lib/validators';
 import Input from '../../components/form/Input.vue';
 import NiModalInput from '../../components/form/ModalInput';
@@ -329,7 +328,11 @@ export default {
         await this.getCustomer();
         this.$q.loading.hide();
         this.embeddedUrl = sign.data.data.signatureRequest.embeddedUrl;
-        this.newESignModal = true;
+        if (this.$q.platform.is.mobile) {
+          openURL(this.embeddedUrl);
+        } else {
+          this.newESignModal = true;
+        }
       } catch (e) {
         console.error(e);
         this.$q.loading.hide();
@@ -430,13 +433,13 @@ export default {
     padding-top: 60%
     position: relative
 
-  .modal-padding-esign
-    height: 100%
-
-  iframe
-    height: 90%
-    position: absolute
-    width: 100%
+  .iframe-container iframe
+   border: 0;
+   height: 100%;
+   left: 0;
+   position: absolute;
+   top: 0;
+   width: 100%;
 
   .q-card-container
     padding: 0
