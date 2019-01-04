@@ -58,9 +58,9 @@
         </q-card>
       </div>
       <q-modal v-model="newESignModal" @hide="checkMandates" :content-css="modalCssContainer">
-        <div class="modal-padding">
+        <div class="modal-padding-esign">
           <div class="row justify-end">
-            <div class="col-1 cursor-pointer" style="text-align: right">
+            <div class="col-1 cursor-pointer" style="text-align: right; padding: 24px 58px 24px 58px">
               <span><q-icon name="clear" size="1rem" @click.native="newESignModal = false" /></span>
             </div>
         </div>
@@ -410,17 +410,13 @@ export default {
       padding: 24px 58px 0px 58px
     &-btn
       border-radius: 0
-  .iframe-container
-    overflow: hidden
-    padding-top: 60%
-    position: relative
 
-  .iframe-container iframe
-    border: 0
+  .modal-padding-esign
     height: 100%
-    left: 0
+
+  iframe
+    height: 90%
     position: absolute
-    top: 0
     width: 100%
 
   .cgs-container
