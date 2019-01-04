@@ -1,62 +1,64 @@
 <template>
   <div>
     <div class="row">
-      <q-card v-if="contracts" v-for="(contract, index) in sortedContracts" :key="index" class="contract-card">
-        <q-card-title :style="{ color: cardTitle(contract.endDate).color }">
-          {{ cardTitle(contract.endDate).msg }}
-        </q-card-title>
-        <q-card-main>
-          <p>Statut: {{ contract.status }}</p>
-          <q-table
-            :data="contract.versions"
-            :columns="columns"
-            row-key="name"
-            :pagination.sync="pagination"
-            hide-bottom
-            :visible-columns="visibleColumns"
-            binary-state-sort>
-            <q-td slot="body-cell-contractEmpty" slot-scope="props" :props="props">
-              <q-btn flat round small color="primary" @click="dlTemplate(props.row, props.row.__index, contract.startDate)">
-                <q-icon name="file download" />
-              </q-btn>
-            </q-td>
-            <q-td slot="body-cell-contractSigned" slot-scope="props" :props="props">
-              <div v-if="!props.row.link" class="row justify-center">
-                <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :url="docsUploadUrl" :headers="headers"
-                  :additional-fields="[
-                    { name: 'fileName', value: `contrat_signe_${getUser.firstname}_${getUser.lastname}` },
-                    { name: 'contractId', value: contract._id },
-                    { name: 'versionId', value: props.row._id }
-                  ]"
-                  hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
-                  hide-upload-button @add="uploadDocument($event, `signedContract_${props.row._id}`)" @uploaded="refreshContracts" @fail="failMsg" />
-              </div>
-              <q-btn v-else flat round small color="primary">
-                <a :href="props.row.link" download>
+      <template v-if="contracts">
+        <q-card v-for="(contract, index) in sortedContracts" :key="index" class="contract-card">
+          <q-card-title :style="{ color: cardTitle(contract.endDate).color }">
+            {{ cardTitle(contract.endDate).msg }}
+          </q-card-title>
+          <q-card-main>
+            <p>Statut: {{ contract.status }}</p>
+            <q-table
+              :data="contract.versions"
+              :columns="columns"
+              row-key="name"
+              :pagination.sync="pagination"
+              hide-bottom
+              :visible-columns="visibleColumns"
+              binary-state-sort>
+              <q-td slot="body-cell-contractEmpty" slot-scope="props" :props="props">
+                <q-btn flat round small color="primary" @click="dlTemplate(props.row, props.row.__index, contract.startDate)">
                   <q-icon name="file download" />
-                </a>
-              </q-btn>
-            </q-td>
-            <q-td slot="body-cell-isActive" slot-scope="props" :props="props">
-              <q-checkbox :disable="props.value || $moment().isAfter(props.row.endDate)" :value="props.value"
-                @input="updateContractActivity({
-                  contractId: contract._id,
-                  versionId: props.row._id,
-                  ogustContractId: props.row.ogustContractId,
-                  versionStartDate: props.row.startDate,
-                  isActive: !props.value,
-                  cell: props.row.__index,
-                  contractIndex: index })">
-              </q-checkbox>
-            </q-td>
-          </q-table>
-        </q-card-main>
-        <q-card-actions align="end">
-          <q-btn v-if="getActiveVersion(contract)" flat no-caps color="primary" icon="add" label="Ajouter un avenant" @click="fillVersion(contract)"/>
-          <q-btn v-if="getActiveVersion(contract)" flat no-caps color="grey-6" icon="clear" label="Mettre fin au contrat" @click="fillEndContract(contract)" />
-        </q-card-actions>
-      </q-card>
-      <q-btn :disable="!hasBasicInfo" class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="newContractModal = true" />
+                </q-btn>
+              </q-td>
+              <q-td slot="body-cell-contractSigned" slot-scope="props" :props="props">
+                <div v-if="!props.row.link" class="row justify-center">
+                  <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :url="docsUploadUrl" :headers="headers"
+                    :additional-fields="[
+                      { name: 'fileName', value: `contrat_signe_${getUser.firstname}_${getUser.lastname}` },
+                      { name: 'contractId', value: contract._id },
+                      { name: 'versionId', value: props.row._id }
+                    ]"
+                    hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
+                    hide-upload-button @add="uploadDocument($event, `signedContract_${props.row._id}`)" @uploaded="refreshContracts" @fail="failMsg" />
+                </div>
+                <q-btn v-else flat round small color="primary">
+                  <a :href="props.row.link" download>
+                    <q-icon name="file download" />
+                  </a>
+                </q-btn>
+              </q-td>
+              <q-td slot="body-cell-isActive" slot-scope="props" :props="props">
+                <q-checkbox :disable="props.value || (props.row && 'endDate' in props.row)" :value="props.value"
+                  @input="updateContractActivity({
+                    contractId: contract._id,
+                    versionId: props.row._id,
+                    ogustContractId: props.row.ogustContractId,
+                    versionStartDate: props.row.startDate,
+                    isActive: !props.value,
+                    cell: props.row.__index,
+                    contractIndex: index })">
+                </q-checkbox>
+              </q-td>
+            </q-table>
+          </q-card-main>
+          <q-card-actions align="end">
+            <q-btn v-if="getActiveVersion(contract)" flat no-caps color="primary" icon="add" label="Ajouter un avenant" @click="fillVersion(contract)"/>
+            <q-btn v-if="getActiveVersion(contract)" flat no-caps color="grey-6" icon="clear" label="Mettre fin au contrat" @click="fillEndContract(contract)" />
+          </q-card-actions>
+        </q-card>
+      </template>
+      <q-btn :disable="!hasBasicInfo || hasActiveContract" class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="newContractModal = true" />
       <div v-if="!hasBasicInfo" class="missingBasicInfo">
         <p>/!\ Il manque une ou des information(s) importante(s) pour pouvoir créer un nouveau contrat parmi:</p>
         <ul>
@@ -90,7 +92,8 @@
         />
         <ni-modal-datetime-picker caption="Date d'effet" :error="$v.newContract.startDate.$error" v-model="newContract.startDate" />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Créer le contrat" icon-right="add" color="primary" :loading="loading" @click="createNewContract" />
+      <q-btn no-caps class="full-width modal-btn" label="Créer le contrat" icon-right="add" color="primary"
+        :loading="loading" @click="createNewContract" />
     </q-modal>
 
     <!-- New version modal -->
@@ -143,8 +146,10 @@ import ModalInput from '../form/ModalInput.vue';
 import ModalDatetimePicker from '../form/ModalDatetimePicker.vue';
 import { NotifyPositive, NotifyNegative } from '../popup/notify';
 import { downloadDocxFile } from '../../helpers/downloadFile';
+import nationalities from '../../data/nationalities.js';
 
 export default {
+  name: 'ProfileContracts',
   components: {
     'ni-modal-select': ModalSelect,
     'ni-modal-input': ModalInput,
@@ -285,6 +290,15 @@ export default {
         return true;
       }
       return false;
+    },
+    hasActiveContract () {
+      if (this.contracts.length === 0) return false;
+      for (let i = 0; i < this.contracts.length; i++) {
+        const activeVersion = this.contracts[i].versions.find(version => version.isActive);
+        if (activeVersion) return true;
+      }
+
+      return false;
     }
   },
   async mounted () {
@@ -293,6 +307,9 @@ export default {
     this.newContract.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
   },
   methods: {
+    getFullNationality (nationality) {
+      return nationalities[nationality];
+    },
     getActiveVersion (contract) {
       return contract.versions ? contract.versions.find(version => version.isActive) : null;
     },
@@ -316,7 +333,7 @@ export default {
         }
       } else {
         return {
-          msg: 'Contrat actif',
+          msg: 'Contrat en cours',
           color: 'green'
         }
       }
@@ -335,18 +352,15 @@ export default {
     async dlTemplate (contract, index, contractStartDate) {
       try {
         const monthlyHours = Number.parseFloat(contract.weeklyHours * 4.33).toFixed(1);
+        const { identity, contact } = this.getUser.administrative
         const data = {
-          'title': this.getUser.administrative.identity.title,
-          'firstname': this.getUser.firstname,
-          'lastname': this.getUser.lastname,
-          'address': this.getUser.administrative.contact.address,
-          'city': this.getUser.administrative.contact.city,
-          'zipCode': this.getUser.administrative.contact.zipCode,
-          'birthDate': this.$moment(this.getUser.administrative.identity.birthDate).format('DD/MM/YYYY'),
-          'birthCountry': this.getUser.administrative.identity.birthCountry,
-          'birthState': this.getUser.administrative.identity.birthState,
-          'nationality': this.getUser.administrative.identity.nationality,
-          'SSN': this.getUser.administrative.identity.socialSecurityNumber,
+          'auxiliaryTitle': identity.title,
+          'auxiliaryFirstname': this.getUser.firstname,
+          'auxiliaryLastname': this.getUser.lastname,
+          'auxiliaryAddress': `${contact.address} ${contact.zipCode} ${contact.city}`,
+          'auxiliaryBirthDate': this.$moment(identity.birthDate).format('DD/MM/YYYY'),
+          'auxiliaryNationality': this.getFullNationality(identity.nationality),
+          'auxiliarySSN': identity.socialSecurityNumber,
           'grossHourlyRate': contract.grossHourlyRate,
           'monthlyHours': monthlyHours,
           'salary': monthlyHours * contract.grossHourlyRate,
@@ -432,7 +446,7 @@ export default {
         await this.$users.updateContractVersion(queries, { 'isActive': data.isActive });
         // Update manually checkbox because it's not dynamic
         this.sortedContracts[data.contractIndex].versions[data.cell].isActive = data.isActive;
-        this.updatePreviousVersions(data);
+        await this.updatePreviousVersions(data);
         await this.refreshContracts();
         NotifyPositive('Activité du contrat changée');
       } catch (e) {
