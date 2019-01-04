@@ -76,7 +76,7 @@
                 />
               </div>
               <q-btn v-else flat round small color="primary">
-                <a :href="props.row.drive.link" download>
+                <a :href="props.row.drive.link" download target="_blank">
                   <q-icon name="file download" />
                 </a>
               </q-btn>
@@ -142,7 +142,7 @@
                 />
               </div>
               <q-btn v-else flat round small color="primary">
-                <a :href="props.row.drive.link" download>
+                <a :href="props.row.drive.link" download target="_blank">
                   <q-icon name="file download" />
                 </a>
               </q-btn>
@@ -779,7 +779,7 @@ export default {
 
         await this.$customers.addSubscription(this.customer._id, this.newSubscription);
         this.resetSubscriptionForm();
-        this.refreshSubscriptions();
+        await this.refreshCustomer();
         this.addSubscription = false;
         NotifyPositive('Souscription ajoutée');
       } catch (e) {
@@ -804,7 +804,7 @@ export default {
         const params = { subscriptionId, _id: this.customer._id };
 
         await this.$customers.removeSubscription(params);
-        await this.refreshSubscriptions();
+        await this.refreshCustomer();
         NotifyPositive('Souscription supprimée');
       } catch (e) {
         console.error(e);

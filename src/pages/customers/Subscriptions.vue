@@ -48,7 +48,7 @@
               :visible-columns="visibleColumnsMandates"
               binary-state-sort>
               <q-td slot="body-cell-sign" slot-scope="props" :props="props">
-                <p v-if="props.row.signedAt">Mandat signé le {{$moment(props.row.signedAt).format('DD/MM/YYYY')}}</p>
+                <p class="no-margin" v-if="props.row.signedAt">Mandat signé le {{$moment(props.row.signedAt).format('DD/MM/YYYY')}}</p>
                 <q-btn v-else color="primary" @click="preOpenESignModal({ _id: props.row._id, rum: props.row.rum })">
                   Signer
                 </q-btn>
@@ -178,7 +178,6 @@ export default {
           label: 'Signature',
           align: 'left',
           field: 'signedAt',
-          sortable: true
         },
         {
           name: 'createdAt',
