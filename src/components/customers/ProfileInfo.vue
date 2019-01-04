@@ -84,7 +84,7 @@
           <q-table :columns="mandateColumns" :data="customer.payment.mandates" hide-bottom :pagination.sync="pagination" :visible-columns="visibleMandateColumns"
             binary-state-sort>
             <q-td slot="body-cell-emptyMandate" slot-scope="props" :props="props">
-              <q-btn v-if="customer.payment.mandates && props.row.__index == customer.payment.mandates.length - 1" flat round small color="primary" @click="downloadMandate(props.row)">
+              <q-btn v-if="customer.payment.mandates && props.row.__index == 0" flat round small color="primary" @click="downloadMandate(props.row)">
                 <q-icon name="file download" />
               </q-btn>
             </q-td>
