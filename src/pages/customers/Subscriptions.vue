@@ -96,7 +96,6 @@
 </template>
 
 <script>
-// import { openURL } from 'quasar';
 import { required } from 'vuelidate/lib/validators';
 import Input from '../../components/form/Input.vue';
 import NiModalInput from '../../components/form/ModalInput';
