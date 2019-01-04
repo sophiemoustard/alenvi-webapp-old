@@ -145,8 +145,10 @@ import ModalInput from '../form/ModalInput.vue';
 import ModalDatetimePicker from '../form/ModalDatetimePicker.vue';
 import { NotifyPositive, NotifyNegative } from '../popup/notify';
 import { downloadDocxFile } from '../../helpers/downloadFile';
+import nationalities from '../../data/nationalities.js';
 
 export default {
+  name: 'ProfileContracts',
   components: {
     'ni-modal-select': ModalSelect,
     'ni-modal-input': ModalInput,
@@ -295,6 +297,9 @@ export default {
     this.newContract.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
   },
   methods: {
+    getFullNationality (nationality) {
+      return nationalities[nationality];
+    },
     getActiveVersion (contract) {
       return contract.versions ? contract.versions.find(version => version.isActive) : null;
     },
@@ -344,7 +349,7 @@ export default {
           'auxiliaryLastname': this.getUser.lastname,
           'auxiliaryAddress': `${contact.address} ${contact.zipCode} ${contact.city}`,
           'auxiliaryBirthDate': this.$moment(identity.birthDate).format('DD/MM/YYYY'),
-          'auxiliaryNationality': identity.nationality,
+          'auxiliaryNationality': this.getFullNationality(identity.nationality),
           'auxiliarySSN': identity.socialSecurityNumber,
           'grossHourlyRate': contract.grossHourlyRate,
           'monthlyHours': monthlyHours,
