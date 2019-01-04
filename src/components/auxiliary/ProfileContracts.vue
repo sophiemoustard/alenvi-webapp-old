@@ -446,7 +446,7 @@ export default {
         await this.$users.updateContractVersion(queries, { 'isActive': data.isActive });
         // Update manually checkbox because it's not dynamic
         this.sortedContracts[data.contractIndex].versions[data.cell].isActive = data.isActive;
-        this.updatePreviousVersions(data);
+        await this.updatePreviousVersions(data);
         await this.refreshContracts();
         NotifyPositive('Activité du contrat changée');
       } catch (e) {
