@@ -282,8 +282,7 @@ export default {
       return contracts.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
     },
     hasBasicInfo () {
-      if (this.getUser.administrative && this.getUser.administrative.identity &&
-      this.getUser.lastname &&
+      if (this.getUser.administrative && this.getUser.administrative.identity && this.getUser.lastname &&
       this.getUser.administrative.identity.birthDate && this.getUser.administrative.identity.nationality &&
       this.getUser.administrative.contact.address && this.getUser.administrative.contact.zipCode &&
       this.getUser.administrative.contact.city) {

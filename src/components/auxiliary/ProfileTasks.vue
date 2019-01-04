@@ -1,13 +1,15 @@
 <template>
   <div>
-    <q-item v-if="tasks" tag="label" v-for="(task, index) in tasks" :key="index">
-      <q-item-side>
-        <q-checkbox v-model="task.check.isDone" @input="handleTask(task)" />
-      </q-item-side>
-      <q-item-main>
-        <q-item-tile label>{{ task.task.name }}</q-item-tile>
-      </q-item-main>
-    </q-item>
+    <template v-if="tasks">
+      <q-item tag="label" v-for="(task, index) in tasks" :key="index">
+        <q-item-side>
+          <q-checkbox v-model="task.check.isDone" @input="handleTask(task)" />
+        </q-item-side>
+        <q-item-main>
+          <q-item-tile label>{{ task.task.name }}</q-item-tile>
+        </q-item-main>
+      </q-item>
+    </template>
   </div>
 </template>
 

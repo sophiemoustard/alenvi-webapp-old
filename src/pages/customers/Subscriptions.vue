@@ -247,7 +247,6 @@ export default {
   async mounted () {
     await this.getCustomer();
     await this.checkMandates();
-    console.log('mobile', this.$q.platform.is.mobile);
   },
   methods: {
     formatNumber (number) {
