@@ -76,9 +76,7 @@
           <q-toolbar class="no-shadow row justify-end toolbar-padding" color="black" inverted slot="header">
             <q-icon class="cursor-pointer" name="clear" size="1rem" @click.native="newESignModal = false" />
           </q-toolbar>
-          <div style="height: 680px">
-            <iframe :src="embeddedUrl" frameborder="0" id="eversign" v-resize></iframe>
-          </div>
+          <iframe :src="embeddedUrl" frameborder="0" id="eversign"></iframe>
         </q-modal-layout>
       </q-modal>
       <q-modal v-model="cgsModal" :content-css="cgsModalCssContainer">
@@ -423,10 +421,15 @@ export default {
   /deep/ .q-layout-header
     box-shadow: none
 
-  iframe
-    width: 1px
-    min-width: 100%
-    height: 100%
+  #eversign
+    position: absolute;
+    height: 100%;
+    width: 100%
+
+  // iframe
+  //   width: 1px
+  //   min-width: 100%
+  //   height: 100%
 
   .q-card-container
     padding: 0
