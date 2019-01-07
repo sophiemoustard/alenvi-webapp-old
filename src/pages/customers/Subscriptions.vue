@@ -76,7 +76,7 @@
           <q-toolbar class="no-shadow row justify-end toolbar-padding" color="black" inverted slot="header">
             <q-icon class="cursor-pointer" name="clear" size="1rem" @click.native="newESignModal = false" />
           </q-toolbar>
-          <iframe :src="embeddedUrl" frameborder="0" :class="iframeClass" id="eversign" v-resize></iframe>
+          <iframe :src="embeddedUrl" frameborder="0" class="iframe-normal"></iframe>
         </q-modal-layout>
       </q-modal>
       <q-modal v-model="cgsModal" :content-css="cgsModalCssContainer">
@@ -325,13 +325,17 @@ export default {
             companyAddress: this.helper.company.address.fullAddress || '',
             downloadDate: this.$moment().format('DD/MM/YYYY')
           },
-          redirect: `${process.env.COMPANI_HOSTNAME}/docsigned?signed=true`,
-          redirectDecline: `${process.env.COMPANI_HOSTNAME}/docsigned?signed=false`
+          redirect: `${process.env.COMPANI_HOSTNAME}/customers/subscriptions`,
+          redirectDecline: `${process.env.COMPANI_HOSTNAME}/customers/subscriptions`
         });
         await this.getCustomer();
         this.$q.loading.hide();
         this.embeddedUrl = sign.data.data.signatureRequest.embeddedUrl;
-        this.newESignModal = true;
+        if (this.$q.platform.is.mobile) {
+          window.location.href = this.embeddedUrl;
+        } else {
+          this.newESignModal = true;
+        }
       } catch (e) {
         console.error(e);
         this.$q.loading.hide();
@@ -426,11 +430,6 @@ export default {
 
   /deep/ .q-layout-header
     box-shadow: none
-
-  .iframe-resize
-    width: 1px
-    min-width: 100%
-    height: 100%
 
   .iframe-normal
     position: absolute
