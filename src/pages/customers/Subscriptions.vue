@@ -76,7 +76,7 @@
           <q-toolbar class="no-shadow row justify-end toolbar-padding" color="black" inverted slot="header">
             <q-icon class="cursor-pointer" name="clear" size="1rem" @click.native="newESignModal = false" />
           </q-toolbar>
-          <div style="height: 100vh">
+          <div style="height: 680px">
             <iframe :src="embeddedUrl" frameborder="0" id="eversign" v-resize></iframe>
           </div>
         </q-modal-layout>
