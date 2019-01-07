@@ -239,11 +239,17 @@ export default {
         return `(Accepté le ${this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} par ${this.acceptedBy})`;
       }
     },
-    iframeClass () {
+    esignRedirection () {
       if (this.$q.platform.is.desktop) {
-        return 'iframe-normal'
+        return {
+          redirect: `${process.env.COMPANI_HOSTNAME}/docsigned?signed=true`,
+          redirectDecline: `${process.env.COMPANI_HOSTNAME}/docsigned?signed=false`
+        }
       }
-      return 'iframe-resize'
+      return {
+        redirect: `${process.env.COMPANI_HOSTNAME}/customers/subscriptions`,
+        redirectDecline: `${process.env.COMPANI_HOSTNAME}/customers/subscriptions`
+      }
     }
   },
   async mounted () {
@@ -325,8 +331,7 @@ export default {
             companyAddress: this.helper.company.address.fullAddress || '',
             downloadDate: this.$moment().format('DD/MM/YYYY')
           },
-          redirect: `${process.env.COMPANI_HOSTNAME}/customers/subscriptions`,
-          redirectDecline: `${process.env.COMPANI_HOSTNAME}/customers/subscriptions`
+          ...this.esignRedirection
         });
         await this.getCustomer();
         this.$q.loading.hide();
