@@ -25,7 +25,7 @@
             </q-tr>
           </q-table>
         </q-card>
-        <p class="nota-bene">* intègre les éventuelles majorations soir / dimanche</p>
+        <p v-if="customer.subscriptions.length === 0" class="nota-bene">* intègre les éventuelles majorations soir / dimanche</p>
         <div v-if="customer.subscriptions && customer.subscriptions.length > 0" class="row">
           <div class="col-xs-12">
             <q-checkbox v-model="customer.subscriptionsAccepted" class="q-mr-sm" @input="confirmAgreement" />
@@ -76,7 +76,7 @@
           <q-toolbar class="no-shadow row justify-end toolbar-padding" color="black" inverted slot="header">
             <q-icon class="cursor-pointer" name="clear" size="1rem" @click.native="newESignModal = false" />
           </q-toolbar>
-          <iframe :src="embeddedUrl" frameborder="0" id="eversign"></iframe>
+          <iframe :src="embeddedUrl" frameborder="0" :scrolling="$q.platform.is.desktop ? 'yes': 'no'" id="eversign"></iframe>
         </q-modal-layout>
       </q-modal>
       <q-modal v-model="cgsModal" :content-css="cgsModalCssContainer">
