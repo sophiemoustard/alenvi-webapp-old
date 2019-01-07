@@ -1,7 +1,7 @@
 <template>
   <div class="fixed-center">
     <p>
-      <img src="https://res.cloudinary.com/alenvi/image/upload/v1539605431/images/business/Compani/compani_logo_1L_RVB_S.png" alt="Logo Compani" style="max-width: 250px">
+      <img src="https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_texte_rose_1000.png" alt="Logo Compani" style="max-width: 250px">
     </p>
     <p>{{ acknowledgement }}</p>
   </div>

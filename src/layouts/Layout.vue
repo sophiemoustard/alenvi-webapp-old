@@ -5,7 +5,7 @@
         <q-btn color="primary" flat round dense big @click="toggleLeft">
           <q-icon name="menu" style="width: 24px; height: 24px" />
         </q-btn>
-        <img style="height: 20px" src="https://res.cloudinary.com/alenvi/image/upload/v1539605431/images/business/Compani/compani_logo_1L_RVB_S.png" alt="">
+        <img style="height: 20px" src="https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_texte_rose_1000.png" alt="">
       </q-toolbar>
     </q-layout-header>
 
