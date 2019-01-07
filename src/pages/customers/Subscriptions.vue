@@ -76,7 +76,7 @@
           <q-toolbar class="no-shadow row justify-end toolbar-padding" color="black" inverted slot="header">
             <q-icon class="cursor-pointer" name="clear" size="1rem" @click.native="newESignModal = false" />
           </q-toolbar>
-          <iframe :src="embeddedUrl" frameborder="0" :scrolling="$q.platform.is.desktop ? 'yes': 'no'" id="eversign"></iframe>
+          <iframe :src="embeddedUrl" frameborder="0" :class="iframeClass" v-resize></iframe>
         </q-modal-layout>
       </q-modal>
       <q-modal v-model="cgsModal" :content-css="cgsModalCssContainer">
@@ -238,6 +238,12 @@ export default {
       if (this.lastSubscriptionHistory && this.customer.subscriptionsAccepted) {
         return `(Accepté le ${this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} par ${this.acceptedBy})`;
       }
+    },
+    iframeClass () {
+      if (this.$q.platform.is.desktop) {
+        return 'iframe-normal'
+      }
+      return 'iframe-resize'
     }
   },
   async mounted () {
@@ -426,10 +432,15 @@ export default {
     height: 100%;
     width: 100%
 
-  // iframe
-  //   width: 1px
-  //   min-width: 100%
-  //   height: 100%
+  .iframe-resize
+    width: 1px
+    min-width: 100%
+    height: 100%
+
+  .iframe-normal
+    position: absolute
+    width: 100%
+    height:100%
 
   .q-card-container
     padding: 0
