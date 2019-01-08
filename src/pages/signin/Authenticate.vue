@@ -42,6 +42,7 @@ import { date } from 'quasar'
 
 import CompaniHeader from '../../components/CompaniHeader';
 import { NotifyNegative } from '../../components/popup/notify';
+import io from 'socket.io-client';
 
 export default {
   metaInfo: {
@@ -59,13 +60,22 @@ export default {
       credentials: {
         email: '',
         password: ''
-      }
+      },
+      socket: io('localhost:3000')
     }
   },
   computed: {
     getUser () {
       return this.$store.getters['main/user'];
     }
+  },
+  mounted () {
+    this.socket.emit('SEND_MESSAGE', {
+      'user': 'testtt'
+    });
+    this.socket.on('MESSAGE', (data) => {
+      console.log(data);
+    });
   },
   methods: {
     async submit () {
