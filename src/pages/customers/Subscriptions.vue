@@ -25,7 +25,7 @@
             </q-tr>
           </q-table>
         </q-card>
-        <p v-if="customer.subscriptions.length === 0" class="nota-bene">* intègre les éventuelles majorations soir / dimanche</p>
+        <p v-if="customer.subscriptions.length > 0" class="nota-bene">* intègre les éventuelles majorations soir / dimanche</p>
         <div v-if="customer.subscriptions && customer.subscriptions.length > 0" class="row">
           <div class="col-xs-12">
             <q-checkbox v-model="customer.subscriptionsAccepted" class="q-mr-sm" @input="confirmAgreement" />
