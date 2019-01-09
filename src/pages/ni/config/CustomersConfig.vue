@@ -252,13 +252,12 @@ export default {
               if (unwatch) {
                 unwatch();
               }
-              this.$v.company.address.fullAddress.$touch();
               resolve(!this.$v.company.address.fullAddress.$error);
             }
           }, { immediate: true });
         } else {
-          this.$v.company[path].$touch();
-          resolve(!this.$v.company[path].$error);
+          this.$_.get(this.$v.company, path).$touch();
+          resolve(!this.$_.get(this.$v.company, path).$error);
         }
       })
     },
