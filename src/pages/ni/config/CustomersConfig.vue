@@ -252,7 +252,6 @@ export default {
               if (unwatch) {
                 unwatch();
               }
-              this.$v.company.address.fullAddress.$touch();
               resolve(!this.$v.company.address.fullAddress.$error);
             }
           }, { immediate: true });
