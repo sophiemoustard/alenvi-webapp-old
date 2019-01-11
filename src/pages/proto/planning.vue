@@ -3,6 +3,11 @@
     <p class="input-caption">Communauté</p>
     <ni-select-sector class="q-mb-md" @input="getEmployeesBySector" v-model="selectedSector" />
     <div class="planning-container full-width q-pa-md">
+      <div class="row justify-between items-center q-mb-md">
+        <q-btn icon="chevron_left" flat round @click="goToPreviousWeek"></q-btn>
+        <span>{{ timelineTitle }}</span>
+        <q-btn icon="chevron_right" flat round @click="goToNextWeek"></q-btn>
+      </div>
       <table style="width: 100%">
         <tr>
           <td></td>
@@ -73,15 +78,22 @@ export default {
     daysHeader () {
       return this.days.map(day => this.$moment(day).format('dddd DD/MM'));
     },
-    endOfWeek () {
-      return this.$moment(this.startOfWeek).add(6, 'd');
+    // endOfWeek () {
+    //   return this.$moment(this.startOfWeek).add(6, 'd');
+    // },
+    timelineTitle () {
+      return `${this.$moment(this.startOfWeek).format('DD/MM')} - ${this.$moment(this.endOfWeek).format('DD/MM')}`;
+    }
+  },
+  watch: {
+    startOfWeek (value) {
+      this.endOfWeek = this.$moment(value).add(6, 'd');
     }
   },
   async mounted () {
     this.startOfWeek = this.$moment().startOf('week');
+    this.getTimelineDays();
     await this.getEvents();
-    const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
-    this.days = Array.from(range.by('days'));
   },
   methods: {
     getAuxiliaryEvents (auxiliary, dayIndex) {
@@ -100,11 +112,23 @@ export default {
     async getEmployeesBySector () {
       this.auxiliaries = await this.$users.showAllActive({ sector: this.selectedSector });
     },
+    goToPreviousWeek () {
+      this.startOfWeek.subtract(7, 'd');
+      this.getTimelineDays();
+      this.getEvents();
+    },
+    goToNextWeek () {
+      this.startOfWeek.add(7, 'd');
+      this.getTimelineDays();
+      this.getEvents();
+    },
+    getTimelineDays () {
+      const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
+      this.days = Array.from(range.by('days'));
+    },
     async getEvents () {
       try {
-        const startDate = this.startOfWeek;
-        const endDate = this.endOfWeek;
-        this.events = await this.$events.list({ startDate: startDate.format('YYYYMMDD'), endDate: endDate.format('YYYYMMDD') });
+        this.events = await this.$events.list({ startDate: this.startOfWeek.format('YYYYMMDD'), endDate: this.endOfWeek.format('YYYYMMDD') });
       } catch (e) {
         console.error(e);
       }
