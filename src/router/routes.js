@@ -272,6 +272,9 @@ const routes = [
       return next();
     }
   },
+  {
+    path: '/proto-planning', component: () => import('pages/proto/planning')
+  },
   { path: '/enterCode', component: () => import('pages/signup/EnterCode') },
   { path: '/messenger', component: () => import('pages/signup/ChooseMessengerPlatform') },
   { path: '/createPassword',
