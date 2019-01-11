@@ -261,6 +261,13 @@ const routes = [
           permissions: ['profiles:read', 'profiles:edit']
         }
       },
+      {
+        path: '/proto-planning',
+        component: () => import('pages/proto/planning'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token']
+        }
+      }
     ]
   },
   {
@@ -271,9 +278,6 @@ const routes = [
       if (Cookies.get('refresh_token')) return next({ path: '/' });
       return next();
     }
-  },
-  {
-    path: '/proto-planning', component: () => import('pages/proto/planning')
   },
   { path: '/enterCode', component: () => import('pages/signup/EnterCode') },
   { path: '/messenger', component: () => import('pages/signup/ChooseMessengerPlatform') },
