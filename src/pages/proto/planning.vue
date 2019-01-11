@@ -5,7 +5,7 @@
     <div class="planning-container full-width q-pa-md">
       <div class="row justify-between items-center q-mb-md">
         <q-btn icon="chevron_left" flat round @click="goToPreviousWeek"></q-btn>
-        <span>{{ timelineTitle }}</span>
+        <span>{{ timelineTitle() }}</span>
         <q-btn icon="chevron_right" flat round @click="goToNextWeek"></q-btn>
       </div>
       <table style="width: 100%">
@@ -78,17 +78,6 @@ export default {
     daysHeader () {
       return this.days.map(day => this.$moment(day).format('dddd DD/MM'));
     },
-    // endOfWeek () {
-    //   return this.$moment(this.startOfWeek).add(6, 'd');
-    // },
-    timelineTitle () {
-      return `${this.$moment(this.startOfWeek).format('DD/MM')} - ${this.$moment(this.endOfWeek).format('DD/MM')}`;
-    }
-  },
-  watch: {
-    startOfWeek (value) {
-      this.endOfWeek = this.$moment(value).add(6, 'd');
-    }
   },
   async mounted () {
     this.startOfWeek = this.$moment().startOf('week');
@@ -96,6 +85,12 @@ export default {
     await this.getEvents();
   },
   methods: {
+    endOfWeek () {
+      return this.$moment(this.startOfWeek).add(6, 'd');
+    },
+    timelineTitle () {
+      return `${this.$moment(this.startOfWeek).format('DD/MM')} - ${this.$moment(this.endOfWeek()).format('DD/MM')}`;
+    },
     getAuxiliaryEvents (auxiliary, dayIndex) {
       return this.events
         .filter(event => event.auxiliary._id === auxiliary._id)
@@ -128,7 +123,7 @@ export default {
     },
     async getEvents () {
       try {
-        this.events = await this.$events.list({ startDate: this.startOfWeek.format('YYYYMMDD'), endDate: this.endOfWeek.format('YYYYMMDD') });
+        this.events = await this.$events.list({ startDate: this.startOfWeek.format('YYYYMMDD'), endDate: this.endOfWeek().format('YYYYMMDD') });
       } catch (e) {
         console.error(e);
       }
