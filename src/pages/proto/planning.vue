@@ -8,12 +8,12 @@
             {{day}}
           </td>
         </tr>
-        <tr v-for="(auxiliary, index) in auxiliaries" :key="index">
+        <tr class="auxiliaries-row" v-for="(auxiliary, index) in auxiliaries" :key="index">
           <td>
             {{auxiliary.firstname}} {{auxiliary.lastname}}
           </td>
-          <td v-for="(day, dayIndex) in days" :key="dayIndex">
-            <div class="row" v-for="(event, eventIndex) in getAuxiliaryEvents(auxiliary, dayIndex)" :key="eventIndex">
+          <td v-for="(day, dayIndex) in days" :key="dayIndex" valign="top">
+            <div class="row cursor-pointer" v-for="(event, eventIndex) in getAuxiliaryEvents(auxiliary, dayIndex)" :key="eventIndex" @click="openEditionModal(event)">
               <div class="col-12 event">
                 <p class="no-margin">{{ getEventHours(event) }}</p>
                 <p class="no-margin">{{ event.customer.identity.title }} {{ event.customer.identity.lastname }}</p>
@@ -23,6 +23,24 @@
         </tr>
       </table>
     </div>
+
+    <q-modal v-model="editionModal">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-11">
+            <h5>Edition d'un <span class="text-weight-bold">evenement</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer" style="text-align: right">
+            <span>
+              <q-icon name="clear" size="1rem" @click.native="editionModal = false" /></span>
+          </div>
+        </div>
+        <ni-modal-input caption="Type de l'évènement" v-model="editedEvent.type"/>
+        <ni-modal-datetime-picker caption="Date de début" v-model="editedEvent.startDate" disable />
+        <ni-modal-datetime-picker caption="Date de fin" v-model="editedEvent.endDate" disable />
+      </div>
+      <q-btn class="full-width modal-btn" no-caps label="Confirmer" color="primary" />
+    </q-modal>
   </q-page>
 </template>
 
@@ -30,75 +48,28 @@
 import moment from 'moment';
 moment.locale('fr');
 import { extendMoment } from 'moment-range';
+import { events } from './events';
+import { auxiliaries } from './auxiliaries';
+import ModalDatetimePicker from '../../components/form/ModalDatetimePicker.vue';
+import ModalInput from '../../components/form/ModalInput.vue';
 
 const momentRange = extendMoment(moment);
 
 export default {
+  components: {
+    'ni-modal-datetime-picker': ModalDatetimePicker,
+    'ni-modal-input': ModalInput,
+  },
   data () {
     return {
       startOfWeek: momentRange().startOf('week'),
       endOfWeek: momentRange().endOf('week'),
       days: this.$moment.weekdays(),
-      auxiliaries: [
-        {
-          _id: '1',
-          firstname: 'Cassandra',
-          lastname: 'Delajoie'
-        },
-        {
-          _id: '2',
-          firstname: 'Alain',
-          lastname: 'Deloin'
-        }
-      ],
-      events: [
-        {
-          type: 'Intervention',
-          startDate: this.$moment().add(3, 'hour').toDate(),
-          endDate: this.$moment().add(4, 'hour').toDate(),
-          auxiliary: {
-            _id: '1'
-          },
-          customer: {
-            identity: {
-              title: 'Mme',
-              firstname: 'Madeleine',
-              lastname: 'Proust'
-            }
-          }
-        },
-        {
-          type: 'Intervention',
-          startDate: this.$moment().toDate(),
-          endDate: this.$moment().add(1, 'hour').toDate(),
-          auxiliary: {
-            _id: '1'
-          },
-          customer: {
-            identity: {
-              title: 'Mme',
-              firstname: 'Madeleine',
-              lastname: 'Proust'
-            }
-          }
-        },
-        {
-          type: 'Intervention',
-          startDate: this.$moment().add(1, 'day').toDate(),
-          endDate: this.$moment().add(4, 'hour').toDate(),
-          auxiliary: {
-            _id: '2',
-          },
-          customer: {
-            identity: {
-              title: 'Mme',
-              firstname: 'Mimi',
-              lastname: 'Cracra'
-            }
-          }
-        }
-      ],
-      maxDays: 7
+      auxiliaries,
+      events,
+      maxDays: 7,
+      editedEvent: {},
+      editionModal: false,
     }
   },
   computed: {
@@ -119,6 +90,10 @@ export default {
     },
     getEventHours (event) {
       return `${moment(event.startDate).format('HH:mm')} - ${moment(event.endDate).format('HH:mm')}`
+    },
+    openEditionModal (event) {
+      this.editedEvent = event;
+      this.editionModal = true
     }
   }
 }
@@ -136,4 +111,11 @@ export default {
     border: 1px solid black
     padding: 2px
     margin-bottom: 3px
+  .auxiliaries-row
+    height: 100px
+  .modal
+    &-padding
+      padding: 24px 58px 0px 58px
+    &-btn
+      border-radius: 0
 </style>
