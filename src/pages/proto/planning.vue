@@ -3,7 +3,7 @@
     <table>
       <tr>
         <td></td>
-        <td v-for="(day, index) in days" :key="index">
+        <td v-for="(day, index) in daysHeader" :key="index">
           {{day}}
         </td>
       </tr>
@@ -11,8 +11,8 @@
         <td>
           {{auxiliary.firstname}} {{auxiliary.lastname}}
         </td>
-        <td v-for="(day, index) in days" :key="index">
-          <div class="row" v-for="(event, index) in getAuxiliaryEvents(auxiliary)" :key="index">
+        <td v-for="(day, dayIndex) in days" :key="dayIndex">
+          <div class="row" v-for="(event, eventIndex) in getAuxiliaryEvents(auxiliary, dayIndex)" :key="eventIndex">
             <p class="col-12">
               {{ event.customer.identity.lastname }}
             </p>
@@ -53,7 +53,6 @@ export default {
           type: 'Intervention',
           startDate: this.$moment().toDate(),
           endDate: this.$moment().add(1, 'hour').toDate(),
-          // title: 'Test',
           auxiliary: {
             _id: '1'
           },
@@ -66,9 +65,8 @@ export default {
         },
         {
           type: 'Intervention',
-          startDate: this.$moment().add(3, 'hours').toDate(),
+          startDate: this.$moment().add(1, 'day').toDate(),
           endDate: this.$moment().add(4, 'hour').toDate(),
-          // title: 'Test',
           auxiliary: {
             _id: '2',
           },
@@ -83,14 +81,20 @@ export default {
       maxDays: 7
     }
   },
+  computed: {
+    daysHeader () {
+      return this.days.map(day => moment(day).format('dddd DD/MM'));
+    }
+  },
   mounted () {
     const range = momentRange.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
-    this.days = Array.from(range.by('days')).map(day => moment(day).format('dddd DD/MM'));
-    // console.log('moment range', test);
+    this.days = Array.from(range.by('days'));
   },
   methods: {
-    getAuxiliaryEvents (auxiliary) {
-      return this.events.filter(event => event.auxiliary._id === auxiliary._id);
+    getAuxiliaryEvents (auxiliary, dayIndex) {
+      return this.events
+        .filter(event => event.auxiliary._id === auxiliary._id)
+        .filter(event => moment(event.startDate).isSame(this.days[dayIndex], 'day'));
     }
   }
 }
