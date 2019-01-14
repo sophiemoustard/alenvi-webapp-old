@@ -38,7 +38,7 @@
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
-            <h5>Création d'un <span class="text-weight-bold">evenement</span></h5>
+            <h5>Création d'un <span class="text-weight-bold">évènement</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
             <span>
@@ -49,16 +49,14 @@
           <q-btn-toggle v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions" />
         </div>
         <ni-modal-select caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions" :error="$v.newEvent.auxiliary.$error" />
-        <div v-if="newEvent.type === INTERVENTION">
           <ni-modal-datetime-picker caption="Date de debut" v-model="newEvent.startDate" type="datetime" :error="$v.newEvent.startDate.$error" />
           <ni-modal-datetime-picker caption="Date de fin" v-model="newEvent.endDate" type="datetime" :error="$v.newEvent.endDate.$error" />
+        <div v-if="newEvent.type === INTERVENTION">
           <ni-modal-select caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions" :error="$v.newEvent.customer.$error" />
           <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions" :error="$v.newEvent.subscription.$error" />
         </div>
         <div v-if="newEvent.type === ABSENCE">
-          <ni-modal-datetime-picker caption="Date de debut" v-model="newEvent.startDate" type="date" :error="$v.newEvent.startDate.$error" />
-          <ni-modal-datetime-picker caption="Date de fin" v-model="newEvent.endDate" type="date" :error="$v.newEvent.endDate.$error" />
-          <ni-modal-select caption="Raison" v-model="newEvent.subType" :options="absenceOptions" :error="$v.newEvent.subType.$error" />
+          <ni-modal-select caption="Type d'absence" v-model="newEvent.subType" :options="absenceOptions" :error="$v.newEvent.subType.$error" />
         </div>
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary" @click="createEvent" />
