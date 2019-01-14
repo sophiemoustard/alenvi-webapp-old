@@ -20,12 +20,12 @@ const customerProfileSchema = Joi.object().keys({
     }))
   },
   subscriptions: Joi.array().min(1).required(),
-  subscriptionsAccepted: Joi.boolean().when('quotes', { is: Joi.array().length(0), then: Joi.valid(true) }),
+  subscriptionsAccepted: Joi.boolean().when('quotes', { is: Joi.array().items(Joi.object({ drive: Joi.object().required() })), then: Joi.valid(false), otherwise: Joi.valid(true) }),
   quotes: Joi.array().items(Joi.object({
     drive: Joi.object().keys({
       id: Joi.string(),
       link: Joi.string()
-    }).when('quotes', { is: Joi.array().min(1), then: Joi.required() })
+    }).when('subscriptionsAccepted', { is: Joi.valid(true), then: Joi.optional(), otherwise: Joi.required() })
   }))
 });
 
