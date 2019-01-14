@@ -32,7 +32,7 @@
     </div>
 
     <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="ion-document" label="Ajouter un évènement"
-      @click="creationModal = true" />
+      @click="creationModal = true" :disable="auxiliaries.length === 0" />
 
     <q-modal v-model="creationModal">
       <div class="modal-padding">
@@ -49,8 +49,8 @@
           <q-btn-toggle v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions" />
         </div>
         <ni-modal-select caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions" :error="$v.newEvent.auxiliary.$error" />
-          <ni-modal-datetime-picker caption="Date de debut" v-model="newEvent.startDate" type="datetime" :error="$v.newEvent.startDate.$error" />
-          <ni-modal-datetime-picker caption="Date de fin" v-model="newEvent.endDate" type="datetime" :error="$v.newEvent.endDate.$error" />
+        <ni-modal-datetime-picker caption="Date de debut" v-model="newEvent.startDate" type="datetime" :error="$v.newEvent.startDate.$error" />
+        <ni-modal-datetime-picker caption="Date de fin" v-model="newEvent.endDate" type="datetime" :error="$v.newEvent.endDate.$error" />
         <div v-if="newEvent.type === INTERVENTION">
           <ni-modal-select caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions" :error="$v.newEvent.customer.$error" />
           <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions" :error="$v.newEvent.subscription.$error" />
