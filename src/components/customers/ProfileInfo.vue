@@ -825,7 +825,7 @@ export default {
     async downloadMandate (doc) {
       try {
         const data = {
-          bankAccountOwner: this.customer.payment.bankAccountOwner,
+          bankAccountOwner: this.customer.payment.bankAccountOwner || '',
           customerAddress: this.customer.contact.address.fullAddress,
           downloadDate: this.$moment(Date.now()).format('DD/MM/YYYY'),
           ics: this.company.ics,
