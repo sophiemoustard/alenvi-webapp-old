@@ -46,14 +46,14 @@
           </div>
         </div>
         <div class="row" style="margin-bottom: 20px">
-          <q-btn-toggle v-model="createdEvent.type" toggle-color="primary" :options="eventTypeOptions" />
+          <q-btn-toggle v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions" />
         </div>
-        <div v-if="createdEvent.type === INTERVENTION">
-          <ni-modal-datetime-picker caption="Date de debut" v-model="createdEvent.startDate" type="datetime" />
-          <ni-modal-datetime-picker caption="Date de fin" v-model="createdEvent.endDate" type="datetime" />
-          <ni-modal-select caption="Auxiliaire" v-model="createdEvent.auxiliary" :options="auxiliariesOptions" />
-          <ni-modal-select caption="Bénéficiaire" v-model="createdEvent.customer" :options="customersOptions" />
-          <ni-modal-select caption="Service" v-model="createdEvent.subscription" :options="customerSubscriptionsOptions" />
+        <div v-if="newEvent.type === INTERVENTION">
+          <ni-modal-datetime-picker caption="Date de debut" v-model="newEvent.startDate" type="datetime" :error="$v.newEvent.startDate.$error" />
+          <ni-modal-datetime-picker caption="Date de fin" v-model="newEvent.endDate" type="datetime" :error="$v.newEvent.endDate.$error" />
+          <ni-modal-select caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions" :error="$v.newEvent.auxiliary.$error" />
+          <ni-modal-select caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions" :error="$v.newEvent.customer.$error" />
+          <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions" :error="$v.newEvent.subscription.$error" />
         </div>
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary" @click="createEvent" />
@@ -80,12 +80,13 @@
 </template>
 
 <script>
+import { required, requiredIf } from 'vuelidate/lib/validators';
 import ModalDatetimePicker from '../../components/form/ModalDatetimePicker.vue';
 import ModalSelect from '../../components/form/ModalSelect';
 import SelectSector from '../../components/form/SelectSector';
 import ModalInput from '../../components/form/ModalInput.vue';
 import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR } from '../../data/constants';
-import { NotifyPositive, NotifyNegative } from '../../components/popup/notify';
+import { NotifyPositive, NotifyNegative, NotifyWarning } from '../../components/popup/notify';
 
 export default {
   name: 'PlanningManager',
@@ -108,7 +109,7 @@ export default {
       editedEvent: {},
       editionModal: false,
       creationModal: false,
-      createdEvent: {
+      newEvent: {
         type: INTERVENTION,
         startDate: '',
         endDate: '',
@@ -124,6 +125,20 @@ export default {
         {label: 'Indisponibilité', value: UNAVAILABILITY}
       ]
     }
+  },
+  validations: {
+    newEvent: {
+      type: { required },
+      startDate: { required },
+      endDate: { required },
+      auxiliary: { required },
+      customer: { required: requiredIf((item) => {
+        return item.type === INTERVENTION;
+      }) },
+      subscription: { required: requiredIf((item) => {
+        return item.type === INTERVENTION;
+      }) },
+    },
   },
   computed: {
     daysHeader () {
@@ -142,8 +157,8 @@ export default {
       }));
     },
     customerSubscriptionsOptions () {
-      if (!this.createdEvent.customer) return [];
-      const customer = this.customers.find(customer => customer._id === this.createdEvent.customer);
+      if (!this.newEvent.customer) return [];
+      const customer = this.customers.find(customer => customer._id === this.newEvent.customer);
 
       return !customer.subscriptions || customer.subscriptions.length === 0 ? [] : customer.subscriptions.map(sub => ({
         label: sub.service.name,
@@ -194,6 +209,17 @@ export default {
       const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
       this.days = Array.from(range.by('days'));
     },
+    resetCreationForm () {
+      this.$v.newEvent.$reset();
+      this.newEvent = {
+        type: INTERVENTION,
+        startDate: '',
+        endDate: '',
+        auxiliary: '',
+        customer: '',
+        subscription: '',
+      };
+    },
     async getEvents () {
       try {
         this.events = await this.$events.list({ startDate: this.startOfWeek.format('YYYYMMDD'), endDate: this.endOfWeek().format('YYYYMMDD') });
@@ -210,28 +236,24 @@ export default {
     },
     async createEvent () {
       try {
+        this.$v.newEvent.$touch();
+        if (this.$v.newEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
+
         this.loading = true;
-        this.createdEvent.sector = this.selectedSector;
-        if (this.createdEvent.type === INTERVENTION) {
-          const option = this.customerSubscriptionsOptions.find(option => option.value === this.createdEvent.subscription);
-          this.createdEvent.subType = option.label;
+        this.newEvent.sector = this.selectedSector;
+        if (this.newEvent.type === INTERVENTION) {
+          const option = this.customerSubscriptionsOptions.find(option => option.value === this.newEvent.subscription);
+          this.newEvent.subType = option.label;
         }
 
-        const payload = this.$_.pickBy(this.createdEvent);
+        const payload = this.$_.pickBy(this.newEvent);
         await this.$events.create(payload);
         NotifyPositive('Évènement créé');
 
         await this.getEvents();
         this.creationModal = false;
         this.loading = false;
-        this.createdEvent = {
-          type: INTERVENTION,
-          startDate: '',
-          endDate: '',
-          auxiliary: '',
-          customer: '',
-          subscription: '',
-        };
+        this.resetCreationForm();
       } catch (e) {
         NotifyNegative('Erreur lors de la création de l\'évènement');
         this.loading = false;
