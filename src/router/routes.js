@@ -261,6 +261,13 @@ const routes = [
           permissions: ['profiles:read', 'profiles:edit']
         }
       },
+      {
+        path: '/proto-planning',
+        component: () => import('pages/proto/planning'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token']
+        }
+      }
     ]
   },
   {

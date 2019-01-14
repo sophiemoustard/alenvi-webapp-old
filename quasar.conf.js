@@ -26,6 +26,7 @@ module.exports = function (ctx) {
       'vMask',
       'users',
       'vuelidate',
+      'events',
       process.env.NODE_ENV === 'production' ? 'vue-analytics' : null
     ],
     css: [

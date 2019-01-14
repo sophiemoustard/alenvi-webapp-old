@@ -20,7 +20,7 @@ export default {
     caption: String,
     error: Boolean,
     errorLabel: { type: String, default: 'Champ requis' },
-    value: String,
+    value: [String, Date],
     min: { type: String, default: null },
     disable: { type: Boolean, default: false },
   },
