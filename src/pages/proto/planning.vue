@@ -48,12 +48,17 @@
         <div class="row" style="margin-bottom: 20px">
           <q-btn-toggle v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions" />
         </div>
+        <ni-modal-select caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions" :error="$v.newEvent.auxiliary.$error" />
         <div v-if="newEvent.type === INTERVENTION">
           <ni-modal-datetime-picker caption="Date de debut" v-model="newEvent.startDate" type="datetime" :error="$v.newEvent.startDate.$error" />
           <ni-modal-datetime-picker caption="Date de fin" v-model="newEvent.endDate" type="datetime" :error="$v.newEvent.endDate.$error" />
-          <ni-modal-select caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions" :error="$v.newEvent.auxiliary.$error" />
           <ni-modal-select caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions" :error="$v.newEvent.customer.$error" />
           <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions" :error="$v.newEvent.subscription.$error" />
+        </div>
+        <div v-if="newEvent.type === ABSENCE">
+          <ni-modal-datetime-picker caption="Date de debut" v-model="newEvent.startDate" type="date" :error="$v.newEvent.startDate.$error" />
+          <ni-modal-datetime-picker caption="Date de fin" v-model="newEvent.endDate" type="date" :error="$v.newEvent.endDate.$error" />
+          <ni-modal-select caption="Raison" v-model="newEvent.subType" :options="absenceOptions" :error="$v.newEvent.subType.$error" />
         </div>
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary" @click="createEvent" />
@@ -85,7 +90,7 @@ import ModalDatetimePicker from '../../components/form/ModalDatetimePicker.vue';
 import ModalSelect from '../../components/form/ModalSelect';
 import SelectSector from '../../components/form/SelectSector';
 import ModalInput from '../../components/form/ModalInput.vue';
-import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR } from '../../data/constants';
+import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, ABSENCE_TYPE } from '../../data/constants';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../../components/popup/notify';
 
 export default {
@@ -111,27 +116,34 @@ export default {
       creationModal: false,
       newEvent: {
         type: INTERVENTION,
+        subType: '',
         startDate: '',
         endDate: '',
         auxiliary: '',
         customer: '',
         subscription: '',
+        sector: '',
       },
       INTERVENTION: INTERVENTION,
+      UNAVAILABILITY: UNAVAILABILITY,
+      ABSENCE,
       eventTypeOptions: [
         {label: 'Intervention', value: INTERVENTION},
         {label: 'Absence', value: ABSENCE},
         {label: 'Heure interne', value: INTERNAL_HOUR},
         {label: 'Indisponibilité', value: UNAVAILABILITY}
-      ]
+      ],
+      absenceOptions: ABSENCE_TYPE,
     }
   },
   validations: {
     newEvent: {
       type: { required },
+      subType: { required },
       startDate: { required },
       endDate: { required },
       auxiliary: { required },
+      sector: { required },
       customer: { required: requiredIf((item) => {
         return item.type === INTERVENTION;
       }) },
@@ -213,6 +225,7 @@ export default {
       this.$v.newEvent.$reset();
       this.newEvent = {
         type: INTERVENTION,
+        subType: '',
         startDate: '',
         endDate: '',
         auxiliary: '',
@@ -236,15 +249,15 @@ export default {
     },
     async createEvent () {
       try {
-        this.$v.newEvent.$touch();
-        if (this.$v.newEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        this.loading = true;
         this.newEvent.sector = this.selectedSector;
         if (this.newEvent.type === INTERVENTION) {
           const option = this.customerSubscriptionsOptions.find(option => option.value === this.newEvent.subscription);
           this.newEvent.subType = option.label;
         }
+        this.$v.newEvent.$touch();
+        if (this.$v.newEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        this.loading = true;
 
         const payload = this.$_.pickBy(this.newEvent);
         await this.$events.create(payload);
