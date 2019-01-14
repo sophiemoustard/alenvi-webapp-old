@@ -31,7 +31,31 @@
       </table>
     </div>
 
-    <q-modal v-model="editionModal">
+    <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="ion-document" label="Ajouter un évènement"
+      @click="creationModal = true" />
+
+    <q-modal v-model="creationModal">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-11">
+            <h5>Création d'un <span class="text-weight-bold">evenement</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer" style="text-align: right">
+            <span>
+              <q-icon name="clear" size="1rem" @click.native="creationModal = false" /></span>
+          </div>
+        </div>
+        <div class="row" style="margin-bottom: 20px">
+          <q-btn-toggle v-model="createdEvent.type" toggle-color="primary" :options="eventTypeOptions" />
+        </div>
+        <div v-if="createdEvent.type === INTERVENTION">
+          <ni-modal-select caption="Auxiliaire" v-model="createdEvent.auxiliary" :options="auxiliariesOptions"/>
+        </div>
+      </div>
+      <q-btn class="full-width modal-btn" no-caps label="Confirmer" color="primary" />
+    </q-modal>
+
+     <q-modal v-model="editionModal">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -53,30 +77,53 @@
 
 <script>
 import ModalDatetimePicker from '../../components/form/ModalDatetimePicker.vue';
+import ModalSelect from '../../components/form/ModalSelect';
 import SelectSector from '../../components/form/SelectSector';
 import ModalInput from '../../components/form/ModalInput.vue';
+import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR } from '../../data/constants';
 
 export default {
+  name: 'PlanningManager',
   components: {
     'ni-modal-datetime-picker': ModalDatetimePicker,
     'ni-modal-input': ModalInput,
     'ni-select-sector': SelectSector,
+    'ni-modal-select': ModalSelect,
   },
   data () {
     return {
       selectedSector: '',
       startOfWeek: '',
       days: [],
-      auxiliaries: {},
+      auxiliaries: [],
       events: [],
       maxDays: 7,
       editedEvent: {},
       editionModal: false,
+      creationModal: false,
+      createdEvent: {
+        type: INTERVENTION,
+        startDate: '',
+        endDate: '',
+      },
+      INTERVENTION: INTERVENTION,
+      eventTypeOptions: [
+        {label: 'Intervention', value: INTERVENTION},
+        {label: 'Absence', value: ABSENCE},
+        {label: 'Heure interne', value: INTERNAL_HOUR},
+        {label: 'Indisponibilité', value: UNAVAILABILITY}
+      ]
     }
   },
   computed: {
     daysHeader () {
       return this.days.map(day => this.$moment(day).format('dddd DD/MM'));
+    },
+    auxiliariesOptions () {
+      return this.auxiliaries.length === 0 ? [] : this.auxiliaries.map(aux => ({
+        label: `${aux.firstname || ''} ${aux.lastname}`,
+        value: aux._id,
+      }));
     },
   },
   async mounted () {
@@ -145,8 +192,6 @@ export default {
     border: 1px solid black
     padding: 2px
     margin-bottom: 3px
-    // &-cell
-    //   width: 200px
   .auxiliaries-row
     height: 100px
   .modal
@@ -154,4 +199,13 @@ export default {
       padding: 24px 58px 0px 58px
     &-btn
       border-radius: 0
+  .fab-add-person
+    right: 60px
+    bottom: 18px
+    font-size: 16px
+    z-index: 2
+  .margin-input
+    margin-bottom: 6px
+    &.last
+      margin-bottom: 24px
 </style>
