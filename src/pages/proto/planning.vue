@@ -56,7 +56,7 @@
           <ni-modal-select caption="Service" v-model="createdEvent.subscription" :options="customerSubscriptionsOptions" />
         </div>
       </div>
-      <q-btn class="full-width modal-btn" no-caps label="Confirmer" color="primary" />
+      <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary" @click="createEvent" />
     </q-modal>
 
      <q-modal v-model="editionModal">
@@ -74,7 +74,7 @@
         <ni-modal-datetime-picker caption="Date de début" v-model="editedEvent.startDate" disable />
         <ni-modal-datetime-picker caption="Date de fin" v-model="editedEvent.endDate" disable />
       </div>
-      <q-btn class="full-width modal-btn" no-caps label="Confirmer" color="primary" />
+      <q-btn class="full-width modal-btn" no-caps color="primary" />
     </q-modal>
   </q-page>
 </template>
@@ -85,6 +85,7 @@ import ModalSelect from '../../components/form/ModalSelect';
 import SelectSector from '../../components/form/SelectSector';
 import ModalInput from '../../components/form/ModalInput.vue';
 import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR } from '../../data/constants';
+import { NotifyPositive, NotifyNegative } from '../../components/popup/notify';
 
 export default {
   name: 'PlanningManager',
@@ -96,6 +97,7 @@ export default {
   },
   data () {
     return {
+      loading: false,
       selectedSector: '',
       startOfWeek: '',
       days: [],
@@ -205,7 +207,36 @@ export default {
       } catch (e) {
         console.error(e);
       }
-    }
+    },
+    async createEvent () {
+      try {
+        this.loading = true;
+        this.createdEvent.sector = this.selectedSector;
+        if (this.createdEvent.type === INTERVENTION) {
+          const option = this.customerSubscriptionsOptions.find(option => option.value === this.createdEvent.subscription);
+          this.createdEvent.subType = option.label;
+        }
+
+        const payload = this.$_.pickBy(this.createdEvent);
+        await this.$events.create(payload);
+        NotifyPositive('Évènement créé');
+
+        await this.getEvents();
+        this.creationModal = false;
+        this.loading = false;
+        this.createdEvent = {
+          type: INTERVENTION,
+          startDate: '',
+          endDate: '',
+          auxiliary: '',
+          customer: '',
+          subscription: '',
+        };
+      } catch (e) {
+        NotifyNegative('Erreur lors de la création de l\'évènement');
+        this.loading = false;
+      }
+    },
   }
 }
 </script>
