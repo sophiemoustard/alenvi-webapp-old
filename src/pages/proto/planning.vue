@@ -52,6 +52,7 @@
           <ni-modal-datetime-picker caption="Date de debut" v-model="createdEvent.startDate" type="datetime" />
           <ni-modal-datetime-picker caption="Date de fin" v-model="createdEvent.endDate" type="datetime" />
           <ni-modal-select caption="Auxiliaire" v-model="createdEvent.auxiliary" :options="auxiliariesOptions" />
+          <ni-modal-select caption="Bénéficiaire" v-model="createdEvent.customer" :options="customersOptions" />
         </div>
       </div>
       <q-btn class="full-width modal-btn" no-caps label="Confirmer" color="primary" />
@@ -98,6 +99,7 @@ export default {
       startOfWeek: '',
       days: [],
       auxiliaries: [],
+      customers: [],
       events: [],
       maxDays: 7,
       editedEvent: {},
@@ -127,11 +129,18 @@ export default {
         value: aux._id,
       }));
     },
+    customersOptions () {
+      return this.customers.length === 0 ? [] : this.customers.map(customer => ({
+        label: `${customer.identity.firstname || ''} ${customer.identity.lastname}`,
+        value: customer._id,
+      }));
+    },
   },
   async mounted () {
     this.startOfWeek = this.$moment().startOf('week');
     this.getTimelineDays();
     await this.getEvents();
+    await this.getCustomers();
   },
   methods: {
     endOfWeek () {
@@ -173,6 +182,13 @@ export default {
     async getEvents () {
       try {
         this.events = await this.$events.list({ startDate: this.startOfWeek.format('YYYYMMDD'), endDate: this.endOfWeek().format('YYYYMMDD') });
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async getCustomers () {
+      try {
+        this.customers = await this.$customers.showAll();
       } catch (e) {
         console.error(e);
       }
