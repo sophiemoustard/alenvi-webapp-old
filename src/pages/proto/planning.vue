@@ -53,6 +53,7 @@
           <ni-modal-datetime-picker caption="Date de fin" v-model="createdEvent.endDate" type="datetime" />
           <ni-modal-select caption="Auxiliaire" v-model="createdEvent.auxiliary" :options="auxiliariesOptions" />
           <ni-modal-select caption="Bénéficiaire" v-model="createdEvent.customer" :options="customersOptions" />
+          <ni-modal-select caption="Service" v-model="createdEvent.subscription" :options="customerSubscriptionsOptions" />
         </div>
       </div>
       <q-btn class="full-width modal-btn" no-caps label="Confirmer" color="primary" />
@@ -109,6 +110,9 @@ export default {
         type: INTERVENTION,
         startDate: '',
         endDate: '',
+        auxiliary: '',
+        customer: '',
+        subscription: '',
       },
       INTERVENTION: INTERVENTION,
       eventTypeOptions: [
@@ -133,6 +137,15 @@ export default {
       return this.customers.length === 0 ? [] : this.customers.map(customer => ({
         label: `${customer.identity.firstname || ''} ${customer.identity.lastname}`,
         value: customer._id,
+      }));
+    },
+    customerSubscriptionsOptions () {
+      if (!this.createdEvent.customer) return [];
+      const customer = this.customers.find(customer => customer._id === this.createdEvent.customer);
+
+      return !customer.subscriptions || customer.subscriptions.length === 0 ? [] : customer.subscriptions.map(sub => ({
+        label: sub.service.name,
+        value: sub._id,
       }));
     },
   },
