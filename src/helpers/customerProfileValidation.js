@@ -20,12 +20,12 @@ const customerProfileSchema = Joi.object().keys({
     }))
   },
   subscriptions: Joi.array().min(1).required(),
-  subscriptionsAccepted: Joi.boolean().when('quotes', { is: Joi.array().items(Joi.object({ drive: Joi.object().required() })), then: Joi.valid(false), otherwise: Joi.valid(true) }),
+  subscriptionsAccepted: Joi.boolean().when('quotes', { is: Joi.array().length(0), then: Joi.valid(true) }),
   quotes: Joi.array().items(Joi.object({
     drive: Joi.object().keys({
       id: Joi.string(),
       link: Joi.string()
-    }).when('subscriptionsAccepted', { is: Joi.valid(true), then: Joi.optional(), otherwise: Joi.required() })
+    }).when('quotes', { is: Joi.array().min(1), then: Joi.required() })
   }))
 });
 
@@ -35,8 +35,11 @@ export const customerProfileValidation = (profile, options = {}) => {
   if (profileCopy.payment) {
     profileCopy.payment.mandates = getCustomerLastMandateOrQuote(profile.payment.mandates);
   }
-  if (profileCopy.quotes) {
+  if (profileCopy.quotes && !profileCopy.subscriptionsAccepted) {
     profileCopy.quotes = getCustomerLastMandateOrQuote(profileCopy.quotes);
+  } else {
+    profileCopy.quotes = [];
   }
+  console.log('VAL', Joi.validate(profileCopy, customerProfileSchema, options));
   return Joi.validate(profileCopy, customerProfileSchema, options);
 };
