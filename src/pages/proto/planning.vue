@@ -49,7 +49,9 @@
           <q-btn-toggle v-model="createdEvent.type" toggle-color="primary" :options="eventTypeOptions" />
         </div>
         <div v-if="createdEvent.type === INTERVENTION">
-          <ni-modal-select caption="Auxiliaire" v-model="createdEvent.auxiliary" :options="auxiliariesOptions"/>
+          <ni-modal-datetime-picker caption="Date de debut" v-model="createdEvent.startDate" type="datetime" />
+          <ni-modal-datetime-picker caption="Date de fin" v-model="createdEvent.endDate" type="datetime" />
+          <ni-modal-select caption="Auxiliaire" v-model="createdEvent.auxiliary" :options="auxiliariesOptions" />
         </div>
       </div>
       <q-btn class="full-width modal-btn" no-caps label="Confirmer" color="primary" />
