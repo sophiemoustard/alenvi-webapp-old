@@ -55,12 +55,14 @@
 import ModalDatetimePicker from '../../components/form/ModalDatetimePicker.vue';
 import SelectSector from '../../components/form/SelectSector';
 import ModalInput from '../../components/form/ModalInput.vue';
+import Draggable from 'vuedraggable';
 
 export default {
   components: {
     'ni-modal-datetime-picker': ModalDatetimePicker,
     'ni-modal-input': ModalInput,
     'ni-select-sector': SelectSector,
+    'draggable': Draggable
   },
   data () {
     return {
