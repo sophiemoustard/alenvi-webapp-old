@@ -7,7 +7,7 @@
           <q-card-main>
             <q-table :data="internalHours" :columns="internalHoursColumns" hide-bottom binary-state-sort :pagination.sync="pagination">
               <q-td slot="body-cell-default" slot-scope="props" :props="props">
-                <q-checkbox :value="props.value" />
+                <q-checkbox :disable="props.value" :value="props.value" @input="updateDefaultInternalHour(props.row._id)" />
               </q-td>
               <q-td slot="body-cell-delete" slot-scope="props" :props="props">
                 <q-btn :disable="props.row.default" flat round small color="grey" icon="delete" @click="deleteInternalHour(props.value, props.row.__index)" />
@@ -302,6 +302,15 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression d\'une heure interne.');
       }
+    },
+    async updateDefaultInternalHour (internalHourId) {
+      const defaultInternalHour = this.internalHours.find(internalHour => internalHour.default);
+      const params = { id: this.company._id, internalHourId: defaultInternalHour._id };
+      await this.$companies.updateInternalHour(params, { default: false });
+
+      params.internalHourId = internalHourId;
+      await this.$companies.updateInternalHour(params, { default: true });
+      await this.refreshInternalHours();
     },
   }
 }
