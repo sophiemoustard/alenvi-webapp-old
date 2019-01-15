@@ -62,7 +62,7 @@
           <ni-modal-select caption="Type d'absence" v-model="newEvent.subType" :options="absenceOptions" :error="$v.newEvent.subType.$error" />
           <ni-file-uploader caption="Justificatif d'absence" path="attachment" :entity="newEvent" alt="justificatif absence" name="proofOfAbsence"
             :url="docsUploadUrl" @uploaded="documentUploaded" :additionalValue="additionalValue" :key="uploaderKey" :disable="!selectedAuxiliary._id"
-            @delete="deleteDocument(newEvent.attachment.driveId)" />
+            @delete="deleteDocument(newEvent.attachment.driveId)" withBorders />
         </div>
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary" @click="createEvent"
