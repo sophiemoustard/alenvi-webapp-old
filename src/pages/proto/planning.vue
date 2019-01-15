@@ -61,7 +61,8 @@
         <div v-if="newEvent.type === ABSENCE">
           <ni-modal-select caption="Type d'absence" v-model="newEvent.subType" :options="absenceOptions" :error="$v.newEvent.subType.$error" />
           <ni-file-uploader caption="Justificatif d'absence" path="attachment" :entity="newEvent" alt="justificatif absence" name="proofOfAbsence"
-            :url="docsUploadUrl" @uploaded="documentUploaded" :additionalValue="additionalValue" :key="uploaderKey" :disable="!selectedAuxiliary._id" />
+            :url="docsUploadUrl" @uploaded="documentUploaded" :additionalValue="additionalValue" :key="uploaderKey" :disable="!selectedAuxiliary._id"
+            @delete="deleteDocument(newEvent.attachment.driveId)" />
         </div>
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary" @click="createEvent"
@@ -327,7 +328,27 @@ export default {
     },
     rerenderUploader () {
       this.uploaderKey += 1;
-    }
+    },
+    async deleteDocument (driveId) {
+      try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
+          ok: true,
+          cancel: 'Annuler'
+        });
+        await this.$gdrive.removeFileById({ id: driveId });
+        NotifyPositive('Document supprimé');
+        this.$_.unset(this.newEvent, 'attachment');
+        this.rerenderUploader();
+      } catch (e) {
+        console.error(e);
+        if (e.message === '') {
+          return NotifyPositive('Suppression annulée');
+        }
+        NotifyNegative('Erreur lors de la suppression du document');
+      }
+    },
   }
 }
 </script>
