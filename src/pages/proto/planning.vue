@@ -1,5 +1,11 @@
 <template>
   <q-page padding class="neutral-background">
+    <div id="div1" class="mydiv" @drop="drop" @dragover.prevent>
+      <img src="https://cdn.sstatic.net/Sites/stackoverflow/company/img/logos/so/so-logo.png?v=9c558ec15d8a" draggable @dragstart="drag" id="drag1" width="88" height="31">
+    </div>
+    <div id="div2" class="mydiv" @drop="drop" @dragover.prevent></div>
+    <div id="div3" class="mydiv" @drop="drop" @dragover.prevent></div>
+    <div id="div4" class="mydiv" @drop="drop" @dragover.prevent></div>
     <p class="input-caption">Communauté</p>
     <ni-select-sector class="q-mb-md" @input="getEmployeesBySector" v-model="selectedSector" />
     <div class="planning-container full-width q-pa-md">
@@ -9,25 +15,27 @@
         <q-btn icon="chevron_right" flat round @click="goToNextWeek"></q-btn>
       </div>
       <table style="width: 100%">
-        <tr>
-          <td></td>
-          <td class="capitalize" v-for="(day, index) in daysHeader" :key="index">
-            {{day}}
-          </td>
-        </tr>
-        <tr class="auxiliaries-row" v-for="(auxiliary, index) in auxiliaries" :key="index">
-          <td>
-            {{auxiliary.firstname}} {{auxiliary.lastname}}
-          </td>
-          <td v-for="(day, dayIndex) in days" :key="dayIndex" valign="top" class="event-cell">
-            <div class="row cursor-pointer" v-for="(event, eventIndex) in getAuxiliaryEvents(auxiliary, dayIndex)" :key="eventIndex" @click="openEditionModal(event)">
-              <div class="col-12 event">
-                <p class="no-margin">{{ getEventHours(event) }}</p>
-                <p class="no-margin">{{ event.customer.identity.title }} {{ event.customer.identity.lastname }}</p>
+        <tbody>
+          <tr>
+            <td></td>
+            <td class="capitalize" v-for="(day, index) in daysHeader" :key="index">
+              {{day}}
+            </td>
+          </tr>
+          <tr class="auxiliaries-row" v-for="(auxiliary, index) in auxiliaries" :key="index">
+            <td>
+              {{auxiliary.firstname}} {{auxiliary.lastname}}
+            </td>
+            <td @drop="drop" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top" class="event-cell">
+              <div class="row cursor-pointer" v-for="(event, eventIndex) in getAuxiliaryEvents(auxiliary, dayIndex)" :key="eventIndex" @click="openEditionModal(event)">
+                <div class="col-12 event" draggable @dragstart="drag">
+                  <p class="no-margin">{{ getEventHours(event) }}</p>
+                  <!-- <p class="no-margin">{{ event.customer.identity.title }} {{ event.customer.identity.lastname }}</p> -->
+                </div>
               </div>
-            </div>
-          </td>
-        </tr>
+            </td>
+          </tr>
+        </tbody>
       </table>
     </div>
 
@@ -55,14 +63,16 @@
 import ModalDatetimePicker from '../../components/form/ModalDatetimePicker.vue';
 import SelectSector from '../../components/form/SelectSector';
 import ModalInput from '../../components/form/ModalInput.vue';
-import Draggable from 'vuedraggable';
+// import Draggable from 'vuedraggable';
+import { Container, Draggable } from 'vue-smooth-dnd';
 
 export default {
   components: {
     'ni-modal-datetime-picker': ModalDatetimePicker,
     'ni-modal-input': ModalInput,
     'ni-select-sector': SelectSector,
-    'draggable': Draggable
+    Container,
+    Draggable
   },
   data () {
     return {
@@ -129,6 +139,23 @@ export default {
       } catch (e) {
         console.error(e);
       }
+    },
+    // Drag & drop
+    drag (event) {
+      event.dataTransfer.setData('text', event.target.id);
+      event.target.style.color = 'green';
+      console.log('drag event =', event);
+    },
+    drop (event) {
+      console.log('drop event =', event);
+      // event.stopPropagation();
+      event.preventDefault();
+      const data = event.dataTransfer.getData('text');
+      console.log('data=', data);
+      event.target.appendChild(document.getElementById(data));
+    },
+    onDrop (res) {
+      console.log(res);
     }
   }
 }
@@ -137,7 +164,7 @@ export default {
 <style lang="stylus" scoped>
   table
     border-collapse: collapse
-    table-layout: fixed
+    // table-layout: fixed
   td
     border: 1px solid black
     padding: 5px
@@ -156,4 +183,13 @@ export default {
       padding: 24px 58px 0px 58px
     &-btn
       border-radius: 0
+
+  .mydiv
+    float: left
+    width: 100px
+    height: 35px
+    margin: 10px
+    padding: 10px
+    border: 1px solid black
+
 </style>
