@@ -1,6 +1,25 @@
 <template>
   <q-page class="neutral-background" padding>
     <div v-if="company">
+      <div class="q-mb-xl">
+        <p class="text-weight-bold">Heures internes</p>
+        <q-card style="background: white">
+          <q-card-main>
+            <q-table :data="internalHours" :columns="internalHoursColumns" hide-bottom binary-state-sort :pagination.sync="pagination">
+              <q-td slot="body-cell-default" slot-scope="props" :props="props">
+                <q-checkbox :disable="props.value" :value="props.value" @input="updateDefaultInternalHour(props.row._id)" />
+              </q-td>
+              <q-td slot="body-cell-delete" slot-scope="props" :props="props">
+                <q-btn :disable="props.row.default" flat round small color="grey" icon="delete" @click="deleteInternalHour(props.value, props.row.__index)" />
+              </q-td>
+            </q-table>
+          </q-card-main>
+          <q-card-actions align="end">
+            <q-btn no-caps flat color="primary" icon="add" label="Ajouter une heure interne" @click="newInternalHourModal = true"
+              :disable="internalHours.length >= MAX_INTERNAL_HOURS_NUMBER" />
+          </q-card-actions>
+        </q-card>
+      </div>
       <h4>Configuration RH</h4>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Contrats prestataires</p>
@@ -58,6 +77,23 @@
         </div>
       </div>
     </div>
+
+     <!-- Service modal -->
+    <q-modal v-model="newInternalHourModal" :content-css="modalCssContainer">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-11">
+            <h5>Créer une <span class="text-weight-bold">heure interne</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer" style="text-align: right">
+            <span>
+              <q-icon name="clear" size="1rem" @click.native="newInternalHourModal = false" /></span>
+          </div>
+        </div>
+        <ni-modal-input caption="Nom" v-model="newInternalHour.name" :error="$v.newInternalHour.name.$error" @blur="$v.newInternalHour.name.$touch" />
+      </div>
+      <q-btn no-caps class="full-width modal-btn" label="Créer le service" icon-right="add" color="primary" :loading="loading" @click="createInternalHour" />
+    </q-modal>
   </q-page>
 </template>
 
@@ -69,6 +105,7 @@ import { posDecimals } from '../../../helpers/vuelidateCustomVal';
 import CustomImg from '../../../components/form/CustomImg';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
 import Input from '../../../components/form/Input.vue';
+import ModalInput from '../../../components/form/ModalInput.vue';
 import FileUploader from '../../../components/form/FileUploader.vue';
 import { configMixin } from '../../../mixins/configMixin';
 
@@ -77,13 +114,42 @@ export default {
   components: {
     'ni-custom-img': CustomImg,
     'ni-input': Input,
+    'ni-modal-input': ModalInput,
     'ni-file-uploader': FileUploader,
   },
   mixins: [configMixin],
   data () {
     return {
+      MAX_INTERNAL_HOURS_NUMBER: 9,
       company: null,
       tmpInput: '',
+      internalHours: [],
+      internalHoursColumns: [
+        {
+          name: 'name',
+          label: 'Nom',
+          align: 'left',
+          field: 'name',
+        },
+        {
+          name: 'default',
+          label: 'Type par défaut',
+          align: 'left',
+          field: 'default',
+        },
+        {
+          name: 'delete',
+          label: '',
+          align: 'center',
+          field: '_id',
+          sortable: true,
+        },
+      ],
+      newInternalHourModal: false,
+      newInternalHour: { name: '' },
+      loading: false,
+      modalCssContainer: { minWidth: '30vw' },
+      pagination: { rowsPerPage: 0 },
     }
   },
   computed: {
@@ -118,9 +184,12 @@ export default {
         transportSubs: {
           $each: {
             price: { required, posDecimals, maxValue: maxValue(999) }
-          }
-        }
-      }
+          },
+        },
+      },
+    },
+    newInternalHour: {
+      name: { required },
     }
   },
   mounted () {
@@ -128,6 +197,7 @@ export default {
     if (!this.company.rhConfig.templates) {
       this.company.rhConfig.templates = {};
     }
+    this.internalHours = this.company.rhConfig && this.company.rhConfig.internalHours ? this.company.rhConfig.internalHours : [];
   },
   methods: {
     saveTmp (path) {
@@ -191,12 +261,66 @@ export default {
       await this.$store.dispatch('main/getUser', this.user._id);
       this.company = this.user.company;
     },
+    async refreshInternalHours () {
+      this.internalHours = await this.$companies.getInternalHours(this.company._id);
+    },
+    async createInternalHour () {
+      try {
+        this.$v.newInternalHour.$touch();
+        if (this.$v.newInternalHour.$error) return;
+
+        this.loading = true;
+        const payload = this.$_.pickBy(this.newInternalHour);
+        await this.$companies.createInternalHour(this.company._id, payload);
+        NotifyPositive('Heure interne créée');
+
+        this.newInternalHourModal = false;
+        this.newInternalHour = { name: '' };
+        await this.refreshInternalHours();
+        this.$v.newInternalHour.$reset();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création de l\'heure interne');
+      } finally {
+        this.loading = false;
+      }
+    },
+    async deleteInternalHour (internalHourId, cell) {
+      try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Etes-vous sûr de vouloir supprimer cette heure interne ?',
+          ok: 'OK',
+          cancel: 'Annuler'
+        });
+
+        const queries = { id: this.company._id, internalHourId };
+        await this.$companies.deleteInternalHour(queries);
+        this.internalHours.splice(cell, 1);
+        NotifyPositive('Heure interne supprimée.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression d\'une heure interne.');
+      }
+    },
+    async updateDefaultInternalHour (internalHourId) {
+      const defaultInternalHour = this.internalHours.find(internalHour => internalHour.default);
+      const params = { id: this.company._id, internalHourId: defaultInternalHour._id };
+      await this.$companies.updateInternalHour(params, { default: false });
+
+      params.internalHourId = internalHourId;
+      await this.$companies.updateInternalHour(params, { default: true });
+      await this.refreshInternalHours();
+    },
   }
 }
 </script>
 
 <style lang="stylus" scoped>
   @import '~variables'
+
+  .q-table-container
+      box-shadow: none
 
   /deep/ .bg-negative
     background: white !important
@@ -207,4 +331,10 @@ export default {
 
   .doc-delete
     padding: 0px 14px 17px 0px
+
+  .modal
+    &-padding
+      padding: 24px 58px 0px 58px
+    &-btn
+      border-radius: 0
 </style>

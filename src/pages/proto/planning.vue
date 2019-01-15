@@ -216,7 +216,6 @@ export default {
   async mounted () {
     this.startOfWeek = this.$moment().startOf('week');
     this.getTimelineDays();
-    await this.getEvents();
     await this.getCustomers();
   },
   methods: {

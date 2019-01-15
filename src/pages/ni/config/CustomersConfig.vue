@@ -6,7 +6,7 @@
         <p class="text-weight-bold">Services</p>
         <q-card style="background: white">
           <q-card-main>
-            <q-table :data="services" :columns="columns" hide-bottom binary-state-sort>
+            <q-table :data="services" :columns="columns" hide-bottom binary-state-sort :pagination.sync="pagination">
               <q-td slot="body-cell-delete" slot-scope="props" :props="props">
                 <q-btn disable flat round small color="grey" icon="delete" @click.native="deleteService(props.value, props.row.__index)" />
               </q-td>
@@ -169,6 +169,7 @@ export default {
           sortable: true,
         },
       ],
+      pagination: { rowsPerPage: 0 },
     };
   },
   validations: {
@@ -273,7 +274,7 @@ export default {
         const queries = { id: this.company._id, serviceId };
         await this.$companies.deleteService(queries);
         this.services.splice(cell, 1);
-        NotifyPositive('Absence supprimée.');
+        NotifyPositive('Service supprimée.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du service.');
@@ -284,6 +285,7 @@ export default {
         this.loading = true;
         const payload = this.$_.pickBy(this.newService);
         await this.$companies.createService(this.company._id, payload);
+        NotifyPositive('Service créé.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création du service');
