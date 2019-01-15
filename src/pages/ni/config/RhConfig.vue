@@ -1,6 +1,24 @@
 <template>
   <q-page class="neutral-background" padding>
     <div v-if="company">
+      <div class="q-mb-xl">
+        <p class="text-weight-bold">Heures internes</p>
+        <q-card style="background: white">
+          <q-card-main>
+            <q-table :data="internalHours" :columns="internalHoursColumns" hide-bottom binary-state-sort>
+              <q-td slot="body-cell-default" slot-scope="props" :props="props">
+                <q-checkbox :value="props.value" />
+              </q-td>
+              <q-td slot="body-cell-delete" slot-scope="props" :props="props">
+                <q-btn disable flat round small color="grey" icon="delete" />
+              </q-td>
+            </q-table>
+          </q-card-main>
+          <q-card-actions align="end">
+            <q-btn no-caps flat color="primary" icon="add" label="Ajouter une heure interne" />
+          </q-card-actions>
+        </q-card>
+      </div>
       <h4>Configuration RH</h4>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Contrats prestataires</p>
@@ -84,6 +102,28 @@ export default {
     return {
       company: null,
       tmpInput: '',
+      internalHours: [],
+      internalHoursColumns: [
+        {
+          name: 'name',
+          label: 'Nom',
+          align: 'left',
+          field: 'name',
+        },
+        {
+          name: 'default',
+          label: 'Type par défaut',
+          align: 'left',
+          field: 'default',
+        },
+        {
+          name: 'delete',
+          label: '',
+          align: 'center',
+          field: '_id',
+          sortable: true,
+        },
+      ]
     }
   },
   computed: {
@@ -128,6 +168,7 @@ export default {
     if (!this.company.rhConfig.templates) {
       this.company.rhConfig.templates = {};
     }
+    this.internalHours = this.company.rhConfig && this.company.rhConfig.internalHours ? this.company.rhConfig.internalHours : [];
   },
   methods: {
     saveTmp (path) {
@@ -197,6 +238,9 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables'
+
+  .q-table-container
+      box-shadow: none
 
   /deep/ .bg-negative
     background: white !important
