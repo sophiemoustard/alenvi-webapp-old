@@ -14,8 +14,9 @@
       </div>
     </div>
     <q-field v-if="(!document || !document.driveId) && displayUpload" :error="error" :error-label="errorLabel">
-      <q-uploader :ref="name" :name="name" :url="url" :headers="headers" :additional-fields="additionalFields" @fail="failMsg"
+      <q-uploader :ref="name" :name="name" :url="url" :headers="headers" :additional-fields="additionalFields" @fail="failMsg" :disable="disable"
         hide-underline :extensions="extensions" color="white" inverted-light hide-upload-button @add="uploadDocument" @uploaded="documentUploaded"
+        :class="{border: withBorders}"
       />
     </q-field>
   </div>
@@ -43,18 +44,25 @@ export default {
     errorLabel: { type: String, default: 'Document requis' },
     displayUpload: { type: Boolean, default: true },
     displayCaption: { type: Boolean, default: true },
-    upload: Function,
+    disable: { type: Boolean, default: false },
+    withBorders: { type: Boolean, default: false },
     extensions: { type: String, default: '' },
   },
   methods: {
     deleteDocument () {
       this.$emit('delete');
     },
-    documentUploaded () {
-      this.$emit('uploaded');
+    documentUploaded (file, xhr) {
+      this.$emit('uploaded', { file, xhr });
     },
     uploadDocument (files) {
-      this.upload(files, this.name)
+      if (files[0].size > 5000000) {
+        this.$refs[this.name].reset();
+        NotifyNegative('Fichier trop volumineux (> 5 Mo)');
+        return '';
+      } else {
+        this.$refs[this.name].upload();
+      }
     },
     goToUrl (url) {
       url = `${url}?usp=sharing`
@@ -79,6 +87,12 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+  @import '~variables';
+
+  .border
+    border: 1px solid $light-grey;
+    border-radius: 3px;
+
   .doc-thumbnail
     padding: 13px 0px 40px 12px
 

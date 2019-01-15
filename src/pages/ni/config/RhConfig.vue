@@ -45,13 +45,13 @@
         <div class="row gutter-profile">
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Modèle de contrat" path="rhConfig.templates.contract" :entity="company" alt="template contrat"
-              name="contract" @delete="deleteDocument(company.rhConfig.templates.contract.driveId, 'contract', 'rhConfig')" :upload="uploadDocument"
+              name="contract" @delete="deleteDocument(company.rhConfig.templates.contract.driveId, 'contract', 'rhConfig')"
               @uploaded="documentUploaded" :additionalValue="`modele_contrat_${company.name}`" :url="docsUploadUrl"
             />
           </div>
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Modèle d'avenant au contrat" path="rhConfig.templates.amendment" :entity="company" alt="template avenant"
-              name="amendment" @delete="deleteDocument(company.rhConfig.templates.amendment.driveId, 'amendment', 'rhConfig')" :upload="uploadDocument"
+              name="amendment" @delete="deleteDocument(company.rhConfig.templates.amendment.driveId, 'amendment', 'rhConfig')"
               @uploaded="documentUploaded" :additionalValue="`modele_avenant_${company.name}`" :url="docsUploadUrl"
             />
           </div>

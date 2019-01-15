@@ -33,13 +33,13 @@
         <div class="row gutter-profile">
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Mandat de prélèvement" path="customersConfig.templates.debitMandate" :entity="company" alt="template mandat prelevement"
-              name="debitMandate" @delete="deleteDocument(documents.debitMandate.driveId, 'debitMandate', 'customersConfig')" :upload="uploadDocument"
+              name="debitMandate" @delete="deleteDocument(documents.debitMandate.driveId, 'debitMandate', 'customersConfig')"
               @uploaded="documentUploaded" :additionalValue="`modele_mandat_prelevement_${company.name}`" :url="docsUploadUrl"
             />
           </div>
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Devis" path="customersConfig.templates.quote" :entity="company" alt="template devis"
-              name="quote" @delete="deleteDocument(documents.quote.driveId, 'quote', 'customersConfig')" :upload="uploadDocument"
+              name="quote" @delete="deleteDocument(documents.quote.driveId, 'quote', 'customersConfig')"
               @uploaded="documentUploaded" :additionalValue="`modele_devis_${company.name}`" :url="docsUploadUrl"
             />
           </div>
