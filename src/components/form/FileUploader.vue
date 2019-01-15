@@ -14,7 +14,7 @@
       </div>
     </div>
     <q-field v-if="(!document || !document.driveId) && displayUpload" :error="error" :error-label="errorLabel">
-      <q-uploader :ref="name" :name="name" :url="url" :headers="headers" :additional-fields="additionalFields" @fail="failMsg"
+      <q-uploader :ref="name" :name="name" :url="url" :headers="headers" :additional-fields="additionalFields" @fail="failMsg" :disable="disable"
         hide-underline :extensions="extensions" color="white" inverted-light hide-upload-button @add="uploadDocument" @uploaded="documentUploaded"
       />
     </q-field>
@@ -43,6 +43,7 @@ export default {
     errorLabel: { type: String, default: 'Document requis' },
     displayUpload: { type: Boolean, default: true },
     displayCaption: { type: Boolean, default: true },
+    disable: { type: Boolean, default: false },
     extensions: { type: String, default: '' },
   },
   methods: {
