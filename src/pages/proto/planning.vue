@@ -26,7 +26,7 @@
                 <p v-if="event.type === INTERVENTION" class="no-margin">{{ event.customer.identity.title }} {{ event.customer.identity.lastname }}</p>
                 <p v-if="event.type === ABSENCE">{{ displayAbsenceType(event.subType) }}</p>
                 <p v-if="event.type === UNAVAILABILITY">Indisponibilité</p>
-                <p v-if="event.type === INTERNAL_HOUR">Heure interne</p>
+                <p v-if="event.type === INTERNAL_HOUR">{{ event.subType }}</p>
               </div>
             </div>
           </td>
@@ -54,16 +54,19 @@
         <ni-modal-select caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions" :error="$v.newEvent.auxiliary.$error" />
         <ni-modal-datetime-picker caption="Date de debut" v-model="newEvent.startDate" type="datetime" :error="$v.newEvent.startDate.$error" />
         <ni-modal-datetime-picker caption="Date de fin" v-model="newEvent.endDate" type="datetime" :error="$v.newEvent.endDate.$error" />
-        <div v-if="newEvent.type === INTERVENTION">
+        <template v-if="newEvent.type === INTERVENTION">
           <ni-modal-select caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions" :error="$v.newEvent.customer.$error" />
           <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions" :error="$v.newEvent.subscription.$error" />
-        </div>
-        <div v-if="newEvent.type === ABSENCE">
+        </template>
+        <template v-if="newEvent.type === ABSENCE">
           <ni-modal-select caption="Type d'absence" v-model="newEvent.subType" :options="absenceOptions" :error="$v.newEvent.subType.$error" />
           <ni-file-uploader caption="Justificatif d'absence" path="attachment" :entity="newEvent" alt="justificatif absence" name="proofOfAbsence"
             :url="docsUploadUrl" @uploaded="documentUploaded" :additionalValue="additionalValue" :key="uploaderKey" :disable="!selectedAuxiliary._id"
             @delete="deleteDocument(newEvent.attachment.driveId)" withBorders />
-        </div>
+        </template>
+        <template v-if="newEvent.type === INTERNAL_HOUR">
+          <ni-modal-select caption="Type d'heure interne" v-model="newEvent.internalHour" :options="internalHourOptions" :error="$v.newEvent.internalHour.$error" />
+        </template>
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary" @click="createEvent"
         :disable="disableCreationButton"/>
@@ -141,6 +144,7 @@ export default {
         {label: 'Heure interne', value: INTERNAL_HOUR},
         {label: 'Indisponibilité', value: UNAVAILABILITY}
       ],
+      internalHourOptions: [],
       absenceOptions: ABSENCE_TYPE,
       uploaderKey: 0,
     }
@@ -149,7 +153,7 @@ export default {
     newEvent: {
       type: { required },
       subType: { required: requiredIf((item) => {
-        return item.type === INTERVENTION || item.type === ABSENCE;
+        return item.type !== UNAVAILABILITY;
       }) },
       startDate: { required },
       endDate: { required },
@@ -160,6 +164,9 @@ export default {
       }) },
       subscription: { required: requiredIf((item) => {
         return item.type === INTERVENTION;
+      }) },
+      internalHour: { required: requiredIf((item) => {
+        return item.type === INTERNAL_HOUR;
       }) },
     },
   },
@@ -196,6 +203,7 @@ export default {
         case INTERVENTION:
           return !this.newEvent.auxiliary || !this.newEvent.customer || !this.newEvent.subscription || !this.newEvent.startDate || !this.newEvent.endDate;
         case INTERNAL_HOUR:
+          return !this.newEvent.auxiliary || !this.newEvent.startDate || !this.newEvent.endDate || !this.newEvent.internalHour;
         case UNAVAILABILITY:
         default:
           return !this.newEvent.auxiliary || !this.newEvent.startDate || !this.newEvent.endDate;
@@ -217,8 +225,20 @@ export default {
     this.startOfWeek = this.$moment().startOf('week');
     this.getTimelineDays();
     await this.getCustomers();
+    this.setInternalHourOptions();
   },
   methods: {
+    setInternalHourOptions () {
+      const user = this.$store.getters['main/user'];
+      if (!user || !user.company || !user.company.rhConfig || !user.company.rhConfig.internalHours) {
+        this.internalHourOptions = [];
+      } else {
+        this.internalHourOptions = user.company.rhConfig.internalHours.map(hour => ({
+          label: hour.name,
+          value: hour._id,
+        }));
+      }
+    },
     displayAbsenceType (value) {
       const absence = ABSENCE_TYPE.find(abs => abs.value === value);
       return !absence ? '' : absence.label;
@@ -292,22 +312,26 @@ export default {
     },
     async createEvent () {
       try {
+        console.log('je passe ici');
         this.newEvent.sector = this.selectedSector;
-        if (this.newEvent.type === INTERVENTION) {
-          const option = this.customerSubscriptionsOptions.find(option => option.value === this.newEvent.subscription);
-          this.newEvent.subType = option.label;
-        }
-        if (this.newEvent.type === UNAVAILABILITY) {
-          this.newEvent.subType = UNAVAILABILITY;
-        }
-        if (this.newEvent.type === INTERNAL_HOUR) {
-          this.newEvent.subType = INTERNAL_HOUR;
+        switch (this.newEvent.type) {
+          case (INTERVENTION):
+            let option = this.customerSubscriptionsOptions.find(option => option.value === this.newEvent.subscription);
+            this.newEvent.subType = option.label;
+            break;
+          case (UNAVAILABILITY):
+            this.newEvent.subType = UNAVAILABILITY;
+            break;
+          case (INTERNAL_HOUR):
+            option = this.internalHourOptions.find(option => option.value === this.newEvent.internalHour);
+            this.newEvent.subType = option.label;
+            break;
+          default:
         }
         this.$v.newEvent.$touch();
         if (this.$v.newEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-
         const payload = this.$_.pickBy(this.newEvent);
         await this.$events.create(payload);
         NotifyPositive('Évènement créé');
