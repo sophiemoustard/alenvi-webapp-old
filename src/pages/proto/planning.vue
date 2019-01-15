@@ -23,7 +23,10 @@
             <div class="row cursor-pointer" v-for="(event, eventIndex) in getAuxiliaryEvents(auxiliary, dayIndex)" :key="eventIndex" @click="openEditionModal(event)">
               <div class="col-12 event">
                 <p class="no-margin">{{ getEventHours(event) }}</p>
-                <p class="no-margin">{{ event.customer.identity.title }} {{ event.customer.identity.lastname }}</p>
+                <p v-if="event.type === INTERVENTION" class="no-margin">{{ event.customer.identity.title }} {{ event.customer.identity.lastname }}</p>
+                <p v-if="event.type === ABSENCE">{{ displayAbsenceType(event.subType) }}</p>
+                <p v-if="event.type === UNAVAILABILITY">Indisponibilité</p>
+                <p v-if="event.type === INTERNAL_HOUR">Heure interne</p>
               </div>
             </div>
           </td>
@@ -31,7 +34,38 @@
       </table>
     </div>
 
-    <q-modal v-model="editionModal">
+    <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="ion-document" label="Ajouter un évènement"
+      @click="creationModal = true" :disable="auxiliaries.length === 0" />
+
+    <q-modal v-model="creationModal">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-11">
+            <h5>Création d'un <span class="text-weight-bold">évènement</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer" style="text-align: right">
+            <span>
+              <q-icon name="clear" size="1rem" @click.native="creationModal = false" /></span>
+          </div>
+        </div>
+        <div class="row" style="margin-bottom: 20px">
+          <q-btn-toggle v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions" @input="resetCreationForm(newEvent.type)"/>
+        </div>
+        <ni-modal-select caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions" :error="$v.newEvent.auxiliary.$error" />
+        <ni-modal-datetime-picker caption="Date de debut" v-model="newEvent.startDate" type="datetime" :error="$v.newEvent.startDate.$error" />
+        <ni-modal-datetime-picker caption="Date de fin" v-model="newEvent.endDate" type="datetime" :error="$v.newEvent.endDate.$error" />
+        <div v-if="newEvent.type === INTERVENTION">
+          <ni-modal-select caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions" :error="$v.newEvent.customer.$error" />
+          <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions" :error="$v.newEvent.subscription.$error" />
+        </div>
+        <div v-if="newEvent.type === ABSENCE">
+          <ni-modal-select caption="Type d'absence" v-model="newEvent.subType" :options="absenceOptions" :error="$v.newEvent.subType.$error" />
+        </div>
+      </div>
+      <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary" @click="createEvent" :disable="disableCreationButton"/>
+    </q-modal>
+
+     <q-modal v-model="editionModal">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -46,45 +80,132 @@
         <ni-modal-datetime-picker caption="Date de début" v-model="editedEvent.startDate" disable />
         <ni-modal-datetime-picker caption="Date de fin" v-model="editedEvent.endDate" disable />
       </div>
-      <q-btn class="full-width modal-btn" no-caps label="Confirmer" color="primary" />
+      <q-btn class="full-width modal-btn" no-caps color="primary" />
     </q-modal>
   </q-page>
 </template>
 
 <script>
+import { required, requiredIf } from 'vuelidate/lib/validators';
 import ModalDatetimePicker from '../../components/form/ModalDatetimePicker.vue';
+import ModalSelect from '../../components/form/ModalSelect';
 import SelectSector from '../../components/form/SelectSector';
 import ModalInput from '../../components/form/ModalInput.vue';
+import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, ABSENCE_TYPE } from '../../data/constants';
+import { NotifyPositive, NotifyNegative, NotifyWarning } from '../../components/popup/notify';
 
 export default {
+  name: 'PlanningManager',
   components: {
     'ni-modal-datetime-picker': ModalDatetimePicker,
     'ni-modal-input': ModalInput,
     'ni-select-sector': SelectSector,
+    'ni-modal-select': ModalSelect,
   },
   data () {
     return {
+      loading: false,
       selectedSector: '',
       startOfWeek: '',
       days: [],
-      auxiliaries: {},
+      auxiliaries: [],
+      customers: [],
       events: [],
       maxDays: 7,
       editedEvent: {},
       editionModal: false,
+      creationModal: false,
+      newEvent: {
+        type: INTERVENTION,
+        subType: '',
+        startDate: '',
+        endDate: '',
+        auxiliary: '',
+        customer: '',
+        subscription: '',
+        sector: '',
+      },
+      INTERVENTION,
+      UNAVAILABILITY,
+      ABSENCE,
+      INTERNAL_HOUR,
+      eventTypeOptions: [
+        {label: 'Intervention', value: INTERVENTION},
+        {label: 'Absence', value: ABSENCE},
+        {label: 'Heure interne', value: INTERNAL_HOUR},
+        {label: 'Indisponibilité', value: UNAVAILABILITY}
+      ],
+      absenceOptions: ABSENCE_TYPE,
     }
+  },
+  validations: {
+    newEvent: {
+      type: { required },
+      subType: { required: requiredIf((item) => {
+        return item.type === INTERVENTION || item.type === ABSENCE;
+      }) },
+      startDate: { required },
+      endDate: { required },
+      auxiliary: { required },
+      sector: { required },
+      customer: { required: requiredIf((item) => {
+        return item.type === INTERVENTION;
+      }) },
+      subscription: { required: requiredIf((item) => {
+        return item.type === INTERVENTION;
+      }) },
+    },
   },
   computed: {
     daysHeader () {
       return this.days.map(day => this.$moment(day).format('dddd DD/MM'));
     },
+    auxiliariesOptions () {
+      return this.auxiliaries.length === 0 ? [] : this.auxiliaries.map(aux => ({
+        label: `${aux.firstname || ''} ${aux.lastname}`,
+        value: aux._id,
+      }));
+    },
+    customersOptions () {
+      return this.customers.length === 0 ? [] : this.customers.map(customer => ({
+        label: `${customer.identity.firstname || ''} ${customer.identity.lastname}`,
+        value: customer._id,
+      }));
+    },
+    customerSubscriptionsOptions () {
+      if (!this.newEvent.customer) return [];
+      const customer = this.customers.find(customer => customer._id === this.newEvent.customer);
+
+      return !customer.subscriptions || customer.subscriptions.length === 0 ? [] : customer.subscriptions.map(sub => ({
+        label: sub.service.name,
+        value: sub._id,
+      }));
+    },
+    disableCreationButton () {
+      if (!this.newEvent.type) return true;
+      switch (this.newEvent.type) {
+        case ABSENCE:
+          return !this.newEvent.auxiliary || !this.newEvent.subType || !this.newEvent.startDate || !this.newEvent.endDate;
+        case INTERVENTION:
+          return !this.newEvent.auxiliary || !this.newEvent.customer || !this.newEvent.subscription || !this.newEvent.startDate || !this.newEvent.endDate;
+        case INTERNAL_HOUR:
+        case UNAVAILABILITY:
+        default:
+          return !this.newEvent.auxiliary || !this.newEvent.startDate || !this.newEvent.endDate;
+      }
+    }
   },
   async mounted () {
     this.startOfWeek = this.$moment().startOf('week');
     this.getTimelineDays();
     await this.getEvents();
+    await this.getCustomers();
   },
   methods: {
+    displayAbsenceType (value) {
+      const absence = ABSENCE_TYPE.find(abs => abs.value === value);
+      return !absence ? '' : absence.label;
+    },
     endOfWeek () {
       return this.$moment(this.startOfWeek).add(6, 'd');
     },
@@ -121,13 +242,63 @@ export default {
       const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
       this.days = Array.from(range.by('days'));
     },
+    resetCreationForm (type = INTERVENTION) {
+      this.$v.newEvent.$reset();
+      this.newEvent = {
+        type,
+        subType: '',
+        startDate: '',
+        endDate: '',
+        auxiliary: '',
+        customer: '',
+        subscription: '',
+      };
+    },
     async getEvents () {
       try {
         this.events = await this.$events.list({ startDate: this.startOfWeek.format('YYYYMMDD'), endDate: this.endOfWeek().format('YYYYMMDD') });
       } catch (e) {
         console.error(e);
       }
-    }
+    },
+    async getCustomers () {
+      try {
+        this.customers = await this.$customers.showAll();
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async createEvent () {
+      try {
+        this.newEvent.sector = this.selectedSector;
+        if (this.newEvent.type === INTERVENTION) {
+          const option = this.customerSubscriptionsOptions.find(option => option.value === this.newEvent.subscription);
+          this.newEvent.subType = option.label;
+        }
+        if (this.newEvent.type === UNAVAILABILITY) {
+          this.newEvent.subType = UNAVAILABILITY;
+        }
+        if (this.newEvent.type === INTERNAL_HOUR) {
+          this.newEvent.subType = INTERNAL_HOUR;
+        }
+        this.$v.newEvent.$touch();
+        if (this.$v.newEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        this.loading = true;
+
+        const payload = this.$_.pickBy(this.newEvent);
+        await this.$events.create(payload);
+        NotifyPositive('Évènement créé');
+
+        await this.getEvents();
+        this.creationModal = false;
+        this.loading = false;
+        this.resetCreationForm();
+      } catch (e) {
+        NotifyNegative('Erreur lors de la création de l\'évènement');
+        this.loading = false;
+      }
+    },
   }
 }
 </script>
@@ -145,8 +316,6 @@ export default {
     border: 1px solid black
     padding: 2px
     margin-bottom: 3px
-    // &-cell
-    //   width: 200px
   .auxiliaries-row
     height: 100px
   .modal
@@ -154,4 +323,13 @@ export default {
       padding: 24px 58px 0px 58px
     &-btn
       border-radius: 0
+  .fab-add-person
+    right: 60px
+    bottom: 18px
+    font-size: 16px
+    z-index: 2
+  .margin-input
+    margin-bottom: 6px
+    &.last
+      margin-bottom: 24px
 </style>

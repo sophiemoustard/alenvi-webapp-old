@@ -5,7 +5,8 @@
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <q-field :error="error" :error-label="errorLabel">
-      <q-select :value="value" color="white" inverted-light :options="options" @focus="focusHandler" @blur="blurHandler" @input="update" />
+      <q-select :value="value" color="white" inverted-light :options="options" @focus="focusHandler" @blur="blurHandler" @input="update"
+        filter filter-placeholder="Rechercher" />
     </q-field>
   </div>
 </template>

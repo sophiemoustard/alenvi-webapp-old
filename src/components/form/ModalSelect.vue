@@ -23,8 +23,8 @@ export default {
     value: [String, Array],
     last: Boolean,
     options: Array,
-    filter: Boolean,
-    filterPlaceholder: String,
+    filter: { type: Boolean, default: true },
+    filterPlaceholder: { type: String, default: 'Rechercher' },
     disable: { type: Boolean, default: false },
   },
   methods: {

@@ -234,8 +234,7 @@ export default {
   methods: {
     async getCustomersList () {
       try {
-        const customersRaw = await this.$customers.showAll();
-        const customers = customersRaw.data.data.customers;
+        const customers = await this.$customers.showAll();
         this.customersList = customers.map((customer) => {
           const formattedCustomer = {
             customer: {

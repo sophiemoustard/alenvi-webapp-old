@@ -2,7 +2,8 @@ import { alenviAxios } from './ressources/alenviAxios'
 
 export default {
   async showAll (params) {
-    return alenviAxios.get(`${process.env.API_HOSTNAME}/customers`, { params });
+    const customersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/customers`, { params });
+    return customersRaw.data.data.customers;
   },
   async getById (id) {
     return alenviAxios.get(`${process.env.API_HOSTNAME}/customers/${id}`);

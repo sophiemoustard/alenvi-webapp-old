@@ -6,7 +6,7 @@
         <q-icon v-if="error" name="error_outline" color="secondary" />
       </div>
       <q-field :error="error" :error-label="errorLabel">
-        <q-datetime :value="value" type="date" format="DD/MM/YYYY" color="white" ok-label="OK" cancel-label="Fermer"
+        <q-datetime :value="value" :type="type" :format="format" color="white" ok-label="OK" cancel-label="Fermer"
           inverted-light popover @focus="focusHandler" @blur="blurHandler" @input="update" :min="min" :disable="disable"
         />
       </q-field>
@@ -21,8 +21,14 @@ export default {
     error: Boolean,
     errorLabel: { type: String, default: 'Champ requis' },
     value: [String, Date],
+    type: { type: String, default: 'date' },
     min: { type: String, default: null },
     disable: { type: Boolean, default: false },
+  },
+  computed: {
+    format () {
+      return this.type === 'datetime' ? 'DD/MM/YYYY HH:mm' : 'DD/MM/YYYY';
+    },
   },
   methods: {
     blurHandler (event) {
