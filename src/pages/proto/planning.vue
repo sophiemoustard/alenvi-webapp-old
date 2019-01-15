@@ -245,6 +245,7 @@ export default {
     },
     async getEmployeesBySector () {
       this.auxiliaries = await this.$users.showAllActive({ sector: this.selectedSector });
+      await this.getEvents();
     },
     goToPreviousWeek () {
       this.startOfWeek.subtract(7, 'd');
@@ -274,7 +275,11 @@ export default {
     },
     async getEvents () {
       try {
-        this.events = await this.$events.list({ startDate: this.startOfWeek.format('YYYYMMDD'), endDate: this.endOfWeek().format('YYYYMMDD') });
+        this.events = await this.$events.list({
+          startDate: this.startOfWeek.format('YYYYMMDD'),
+          endDate: this.endOfWeek().format('YYYYMMDD'),
+          sector: this.selectedSector,
+        });
       } catch (e) {
         console.error(e);
       }
