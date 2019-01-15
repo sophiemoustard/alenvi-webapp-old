@@ -49,8 +49,8 @@ export default {
     deleteDocument () {
       this.$emit('delete');
     },
-    documentUploaded () {
-      this.$emit('uploaded');
+    documentUploaded (file, xhr) {
+      this.$emit('uploaded', { file, xhr });
     },
     uploadDocument (files) {
       if (files[0].size > 5000000) {

@@ -60,6 +60,8 @@
         </div>
         <div v-if="newEvent.type === ABSENCE">
           <ni-modal-select caption="Type d'absence" v-model="newEvent.subType" :options="absenceOptions" :error="$v.newEvent.subType.$error" />
+          <ni-file-uploader caption="Justificatif d'absence" path="attachment" :entity="newEvent" alt="justificatif absence" name="proofOfAbsence"
+            :url="docsUploadUrl" @uploaded="documentUploaded" :additionalValue="additionalValue" :key="uploaderKey" />
         </div>
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary" @click="createEvent" :disable="disableCreationButton"/>
@@ -91,6 +93,7 @@ import ModalDatetimePicker from '../../components/form/ModalDatetimePicker.vue';
 import ModalSelect from '../../components/form/ModalSelect';
 import SelectSector from '../../components/form/SelectSector';
 import ModalInput from '../../components/form/ModalInput.vue';
+import FileUploader from '../../components/form/FileUploader';
 import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, ABSENCE_TYPE } from '../../data/constants';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../../components/popup/notify';
 
@@ -101,6 +104,7 @@ export default {
     'ni-modal-input': ModalInput,
     'ni-select-sector': SelectSector,
     'ni-modal-select': ModalSelect,
+    'ni-file-uploader': FileUploader,
   },
   data () {
     return {
@@ -136,6 +140,7 @@ export default {
         {label: 'Indisponibilité', value: UNAVAILABILITY}
       ],
       absenceOptions: ABSENCE_TYPE,
+      uploaderKey: 0,
     }
   },
   validations: {
@@ -193,6 +198,17 @@ export default {
         default:
           return !this.newEvent.auxiliary || !this.newEvent.startDate || !this.newEvent.endDate;
       }
+    },
+    docsUploadUrl () {
+      return !this.selectedAuxiliary._id
+        ? ''
+        : `${process.env.API_HOSTNAME}/events/${this.selectedAuxiliary._id}/gdrive/${this.selectedAuxiliary.administrative.driveFolder.id}/upload`;
+    },
+    selectedAuxiliary () {
+      return this.newEvent.auxiliary === '' ? {} : this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
+    },
+    additionalValue () {
+      return !this.selectedAuxiliary._id ? '' : `justificatif_absence_${this.selectedAuxiliary.lastname}`;
     }
   },
   async mounted () {
@@ -299,6 +315,18 @@ export default {
         this.loading = false;
       }
     },
+    documentUploaded (uploadedInfo) {
+      if (!uploadedInfo.xhr || !uploadedInfo.xhr.response) return;
+
+      const json = JSON.parse(uploadedInfo.xhr.response);
+      if (!json || !json.data || !json.data.payload) return;
+
+      this.newEvent.attachment = { ...json.data.payload.attachment }
+      this.rerenderUploader();
+    },
+    rerenderUploader () {
+      this.uploaderKey += 1;
+    }
   }
 }
 </script>
