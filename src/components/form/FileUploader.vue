@@ -43,7 +43,6 @@ export default {
     errorLabel: { type: String, default: 'Document requis' },
     displayUpload: { type: Boolean, default: true },
     displayCaption: { type: Boolean, default: true },
-    upload: Function,
     extensions: { type: String, default: '' },
   },
   methods: {
@@ -54,7 +53,13 @@ export default {
       this.$emit('uploaded');
     },
     uploadDocument (files) {
-      this.upload(files, this.name)
+      if (files[0].size > 5000000) {
+        this.$refs[this.name].reset();
+        NotifyNegative('Fichier trop volumineux (> 5 Mo)');
+        return '';
+      } else {
+        this.$refs[this.name].upload();
+      }
     },
     goToUrl (url) {
       url = `${url}?usp=sharing`

@@ -171,14 +171,14 @@
         <div v-if="user.alenvi.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Carte d'identité (recto)" path="administrative.idCardRecto" alt="cni recto" :entity="currentUser"
             @delete="deleteDocument(user.alenvi.administrative.idCardRecto.driveId, 'administrative.idCardRecto')" name="idCardRecto"
-            @uploaded="refreshUser" :upload="uploadDocument" :url="docsUploadUrl" :error="$v.user.alenvi.administrative.idCardRecto.driveId.$error"
+            @uploaded="refreshUser" :url="docsUploadUrl" :error="$v.user.alenvi.administrative.idCardRecto.driveId.$error"
             :additionalValue="`cni_recto_${currentUser.firstname}_${currentUser.lastname}`" :extensions="extensions"
           />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Carte d'identité (verso)" path="administrative.idCardVerso" alt="cni verso" :entity="currentUser" :url="docsUploadUrl"
             @delete="deleteDocument(user.alenvi.administrative.idCardVerso.driveId, 'administrative.idCardVerso')" name="idCardVerso"
-            @uploaded="refreshUser" :upload="uploadDocument" :additionalValue="`cni_verso_${currentUser.firstname}_${currentUser.lastname}`"
+            @uploaded="refreshUser" :additionalValue="`cni_verso_${currentUser.firstname}_${currentUser.lastname}`"
             :extensions="extensions"
           />
         </div>
@@ -192,7 +192,7 @@
         <div v-if="user.alenvi.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Titre de séjour (recto)" path="administrative.residencePermitRecto" alt="titre de séjour (recto)" :entity="currentUser"
             @delete="deleteDocument(user.alenvi.administrative.residencePermitRecto.driveId, 'administrative.residencePermitRecto')"
-            @uploaded="refreshUser" :upload="uploadDocument" :url="docsUploadUrl" :error="$v.user.alenvi.administrative.residencePermitRecto.driveId.$error"
+            @uploaded="refreshUser" :url="docsUploadUrl" :error="$v.user.alenvi.administrative.residencePermitRecto.driveId.$error"
             name="residencePermitRecto" :additionalValue="`titre_de_séjour_recto_${currentUser.firstname}_${currentUser.lastname}`"
             :extensions="extensions"
           />
@@ -200,21 +200,21 @@
         <div v-if="user.alenvi.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Titre de séjour (verso)" path="administrative.residencePermitVerso" alt="titre de séjour (verso)" name="residencePermitVerso"
             @delete="deleteDocument(user.alenvi.administrative.residencePermitVerso.driveId, 'administrative.residencePermitVerso')" :entity="currentUser"
-            @uploaded="refreshUser" :upload="uploadDocument" :url="docsUploadUrl" :extensions="extensions"
+            @uploaded="refreshUser" :url="docsUploadUrl" :extensions="extensions"
             :additionalValue="`titre_de_séjour_verso_${currentUser.firstname}_${currentUser.lastname}`"
           />
         </div>
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Attestation de sécurité sociale" path="administrative.healthAttest" alt="attestation secu" :entity="currentUser"
             @delete="deleteDocument(user.alenvi.administrative.healthAttest.driveId, 'administrative.healthAttest')" name="healthAttest"
-            @uploaded="refreshUser" :upload="uploadDocument" :error="$v.user.alenvi.administrative.healthAttest.driveId.$error"
+            @uploaded="refreshUser" :error="$v.user.alenvi.administrative.healthAttest.driveId.$error"
             :additionalValue="`attestation_secu_${currentUser.firstname}_${currentUser.lastname}`" :url="docsUploadUrl" :extensions="extensions"
           />
         </div>
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Facture téléphonique" path="administrative.phoneInvoice" alt="facture téléphone" :entity="currentUser"
             @delete="deleteDocument(user.alenvi.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')" name="phoneInvoice"
-            @uploaded="refreshUser" :upload="uploadDocument" :error="$v.user.alenvi.administrative.phoneInvoice.driveId.$error"
+            @uploaded="refreshUser" :error="$v.user.alenvi.administrative.phoneInvoice.driveId.$error"
             :additionalValue="`facture_telephone_${currentUser.firstname}_${currentUser.lastname}`" :url="docsUploadUrl" :extensions="extensions"
           />
         </div>
@@ -275,7 +275,7 @@
         </div>
         <div v-if="user.alenvi.administrative.transportInvoice.transportType === 'public'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Merci de nous transmettre ton justificatif d'abonnement" path="administrative.transportInvoice"
-            alt="justif transport" :entity="currentUser" :upload="uploadDocument" name="transportInvoice" @uploaded="refreshUser"
+            alt="justif transport" :entity="currentUser" name="transportInvoice" @uploaded="refreshUser"
             :error="$v.user.alenvi.administrative.transportInvoice.driveId.$error" :displayCaption="mainUser.role.name === 'Auxiliaire'"
             @delete="deleteDocument(user.alenvi.administrative.transportInvoice.driveId, 'administrative.transportInvoice')"
             :url="docsUploadUrl" :additionalValue="`justif_transport_${currentUser.firstname}_${currentUser.lastname}`" :extensions="extensions"
@@ -290,7 +290,7 @@
           <ni-file-uploader caption="Certificat d'aptitude" path="administrative.medicalCertificate" alt="certificat médical" :entity="user.alenvi"
             @delete="deleteDocument(user.alenvi.administrative.medicalCertificate.driveId, 'administrative.medicalCertificate')" name="medicalCertificate"
             @uploaded="refreshUser" :additionalValue="`certificat_medical_${currentUser.firstname}_${currentUser.lastname}`"
-            :upload="uploadDocument" :url="docsUploadUrl" :extensions="extensions"
+            :url="docsUploadUrl" :extensions="extensions"
           />
         </div>
       </div>
@@ -300,7 +300,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import { Cookies, openURL } from 'quasar';
+import { Cookies } from 'quasar';
 import { required, email, numeric, minLength, maxLength, requiredIf } from 'vuelidate/lib/validators';
 import 'vue-croppa/dist/vue-croppa.css'
 
@@ -596,11 +596,6 @@ export default {
     pictureUploadUrl () {
       return `${process.env.API_HOSTNAME}/users/${this.currentUser._id}/cloudinary/upload`;
     },
-    headers () {
-      return {
-        'x-access-token': Cookies.get('alenvi_token') || ''
-      }
-    },
     hasPicture () {
       return !this.user.alenvi.picture || (this.user.alenvi.picture && !this.user.alenvi.picture.link) ? null : this.user.alenvi.picture.link;
     },
@@ -762,21 +757,6 @@ export default {
         await this.$ogust.setEmployee(payload);
       }
     },
-    uploadDocument (files, refName) {
-      if (files[0].size > 5000000) {
-        const node = this.$children.filter(child => child.$refs && Object.keys(child.$refs).includes(refName));
-        if (node) {
-          node[0].$refs[refName].reset();
-        }
-        NotifyNegative('Fichier trop volumineux (> 5 Mo)');
-        return '';
-      } else {
-        const node = this.$children.filter(child => child.$refs && Object.keys(child.$refs).includes(refName));
-        if (node) {
-          node[0].$refs[refName].upload();
-        }
-      }
-    },
     async uploadImage () {
       try {
         if (this.hasPicture && !this.fileChosen) {
@@ -861,9 +841,6 @@ export default {
       await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });
       NotifyPositive('Document envoyé');
     },
-    failMsg () {
-      NotifyNegative('Echec de l\'envoi du document');
-    },
     groupErrors (group) {
       let j = 0;
       const groupName = `${group}Group`;
@@ -876,10 +853,6 @@ export default {
         errors: j,
         msg: j > 0 ? `${j} information(s) manquante(s)` : 'Informations complètes'
       }
-    },
-    goToUrl (url) {
-      url = `${url}?usp=sharing`
-      openURL(url);
     },
     choosePicture () {
       this.fileChosen = true;
