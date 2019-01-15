@@ -48,8 +48,8 @@
           />
         </div>
         <p class="title">Mandats de prélèvement</p>
-        <p v-if="customer.payment.mandates.length === 0">Aucun mandat.</p>
-        <q-card v-if="customer.payment.mandates.length > 0 && customer.payment.iban && customer.payment.bic" class="contract-card">
+        <p v-if="customer.payment.mandates.length === 0 || !isValidPayment">Aucun mandat.</p>
+        <q-card v-if="isValidPayment && customer.payment.mandates.length > 0" class="contract-card">
           <q-card-main>
             <q-table
               :data="customer.payment.mandates"
@@ -250,6 +250,9 @@ export default {
         redirect: `${process.env.COMPANI_HOSTNAME}/customers/subscriptions`,
         redirectDecline: `${process.env.COMPANI_HOSTNAME}/customers/subscriptions`
       }
+    },
+    isValidPayment () {
+      return this.$v.customer.payment.bic.bic && this.$v.customer.payment.iban.iban
     }
   },
   async mounted () {
@@ -290,17 +293,19 @@ export default {
         if (this.$_.get(this.$v.customer, path).$error) {
           return NotifyWarning('Champ(s) invalide(s)');
         }
-
         let value = this.$_.get(this.customer, path);
-        if (path.match(/iban/i)) {
-          value = value.split(' ').join('');
-        }
-        const payload = this.$_.set({}, path, value);
+        let payload = this.$_.set({}, path, value);
         payload._id = this.customer._id;
         await this.$customers.updateById(payload);
         await this.$store.dispatch('main/getUser', this.helper._id);
         await this.getCustomer();
         NotifyPositive('Modification enregistrée');
+        if (path === 'payment.iban') {
+          this.$v.customer.payment.bic.$touch();
+          if (!this.$v.customer.payment.bic.required) {
+            return NotifyWarning('Merci de renseigner votre BIC');
+          }
+        }
       } catch (e) {
         console.error(e);
         if (e.message === 'Champ(s) invalide(s)') {
