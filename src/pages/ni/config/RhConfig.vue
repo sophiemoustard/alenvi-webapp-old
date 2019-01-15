@@ -10,7 +10,7 @@
                 <q-checkbox :value="props.value" />
               </q-td>
               <q-td slot="body-cell-delete" slot-scope="props" :props="props">
-                <q-btn disable flat round small color="grey" icon="delete" />
+                <q-btn :disable="props.row.default" flat round small color="grey" icon="delete" @click="deleteInternalHour(props.value, props.row.__index)" />
               </q-td>
             </q-table>
           </q-card-main>
@@ -231,6 +231,24 @@ export default {
     async refreshCompany () {
       await this.$store.dispatch('main/getUser', this.user._id);
       this.company = this.user.company;
+    },
+    async deleteInternalHour (internalHourId, cell) {
+      try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Etes-vous sûr de vouloir supprimer cette heure interne ?',
+          ok: 'OK',
+          cancel: 'Annuler'
+        });
+
+        const queries = { id: this.company._id, internalHourId };
+        await this.$companies.deleteInternalHour(queries);
+        this.internalHours.splice(cell, 1);
+        NotifyPositive('Absence supprimée.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression du service.');
+      }
     },
   }
 }

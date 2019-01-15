@@ -16,4 +16,7 @@ export default {
   async deleteService (queries) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/companies/${queries.id}/services/${queries.serviceId}`);
   },
+  async deleteInternalHour (queries) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/companies/${queries.id}/internalHours/${queries.internalHourId}`);
+  },
 }
