@@ -40,6 +40,5 @@ export const customerProfileValidation = (profile, options = {}) => {
   } else {
     profileCopy.quotes = [];
   }
-  console.log('VAL', Joi.validate(profileCopy, customerProfileSchema, options));
   return Joi.validate(profileCopy, customerProfileSchema, options);
 };
