@@ -15,7 +15,7 @@
             </q-table>
           </q-card-main>
           <q-card-actions align="end">
-            <q-btn no-caps flat color="primary" icon="add" label="Ajouter une heure interne" />
+            <q-btn no-caps flat color="primary" icon="add" label="Ajouter une heure interne" @click="newInternalHourModal = true" />
           </q-card-actions>
         </q-card>
       </div>
@@ -76,6 +76,23 @@
         </div>
       </div>
     </div>
+
+     <!-- Service modal -->
+    <q-modal v-model="newInternalHourModal" :content-css="modalCssContainer">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-11">
+            <h5>Créer une <span class="text-weight-bold">heure interne</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer" style="text-align: right">
+            <span>
+              <q-icon name="clear" size="1rem" @click.native="newInternalHourModal = false" /></span>
+          </div>
+        </div>
+        <ni-modal-input caption="Nom" v-model="newInternalHour.name" :error="$v.newInternalHour.name.$error" @blur="$v.newInternalHour.name.$touch" />
+      </div>
+      <q-btn no-caps class="full-width modal-btn" label="Créer le service" icon-right="add" color="primary" :loading="loading" @click="createInternalHour" />
+    </q-modal>
   </q-page>
 </template>
 
@@ -87,6 +104,7 @@ import { posDecimals } from '../../../helpers/vuelidateCustomVal';
 import CustomImg from '../../../components/form/CustomImg';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
 import Input from '../../../components/form/Input.vue';
+import ModalInput from '../../../components/form/ModalInput.vue';
 import FileUploader from '../../../components/form/FileUploader.vue';
 import { configMixin } from '../../../mixins/configMixin';
 
@@ -95,6 +113,7 @@ export default {
   components: {
     'ni-custom-img': CustomImg,
     'ni-input': Input,
+    'ni-modal-input': ModalInput,
     'ni-file-uploader': FileUploader,
   },
   mixins: [configMixin],
@@ -123,7 +142,11 @@ export default {
           field: '_id',
           sortable: true,
         },
-      ]
+      ],
+      newInternalHourModal: false,
+      newInternalHour: { name: '' },
+      loading: false,
+      modalCssContainer: { minWidth: '30vw' },
     }
   },
   computed: {
@@ -158,9 +181,12 @@ export default {
         transportSubs: {
           $each: {
             price: { required, posDecimals, maxValue: maxValue(999) }
-          }
-        }
-      }
+          },
+        },
+      },
+    },
+    newInternalHour: {
+      name: { required },
     }
   },
   mounted () {
@@ -232,6 +258,30 @@ export default {
       await this.$store.dispatch('main/getUser', this.user._id);
       this.company = this.user.company;
     },
+    async refreshInternalHours () {
+      this.internalHours = await this.$companies.getInternalHours(this.company._id);
+    },
+    async createInternalHour () {
+      try {
+        this.$v.newInternalHour.$touch();
+        if (this.$v.newInternalHour.$error) return;
+
+        this.loading = true;
+        const payload = this.$_.pickBy(this.newInternalHour);
+        await this.$companies.createInternalHour(this.company._id, payload);
+        NotifyPositive('Heure interne créée');
+
+        this.newInternalHourModal = false;
+        this.newInternalHour = { name: '' };
+        await this.refreshInternalHours();
+        this.$v.newInternalHour.$reset();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création de l\'heure interne');
+      } finally {
+        this.loading = false;
+      }
+    },
     async deleteInternalHour (internalHourId, cell) {
       try {
         await this.$q.dialog({
@@ -269,4 +319,10 @@ export default {
 
   .doc-delete
     padding: 0px 14px 17px 0px
+
+  .modal
+    &-padding
+      padding: 24px 58px 0px 58px
+    &-btn
+      border-radius: 0
 </style>
