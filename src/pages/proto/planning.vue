@@ -23,7 +23,10 @@
             <div class="row cursor-pointer" v-for="(event, eventIndex) in getAuxiliaryEvents(auxiliary, dayIndex)" :key="eventIndex" @click="openEditionModal(event)">
               <div class="col-12 event">
                 <p class="no-margin">{{ getEventHours(event) }}</p>
-                <p class="no-margin">{{ event.customer.identity.title }} {{ event.customer.identity.lastname }}</p>
+                <p v-if="event.type === INTERVENTION" class="no-margin">{{ event.customer.identity.title }} {{ event.customer.identity.lastname }}</p>
+                <p v-if="event.type === ABSENCE">{{ displayAbsenceType(event.subType) }}</p>
+                <p v-if="event.type === UNAVAILABILITY">Indisponibilité</p>
+                <p v-if="event.type === INTERNAL_HOUR">Heure interne</p>
               </div>
             </div>
           </td>
@@ -46,7 +49,7 @@
           </div>
         </div>
         <div class="row" style="margin-bottom: 20px">
-          <q-btn-toggle v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions" />
+          <q-btn-toggle v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions" @input="resetCreationForm(newEvent.type)"/>
         </div>
         <ni-modal-select caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions" :error="$v.newEvent.auxiliary.$error" />
         <ni-modal-datetime-picker caption="Date de debut" v-model="newEvent.startDate" type="datetime" :error="$v.newEvent.startDate.$error" />
@@ -59,7 +62,7 @@
           <ni-modal-select caption="Type d'absence" v-model="newEvent.subType" :options="absenceOptions" :error="$v.newEvent.subType.$error" />
         </div>
       </div>
-      <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary" @click="createEvent" />
+      <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary" @click="createEvent" :disable="disableCreationButton"/>
     </q-modal>
 
      <q-modal v-model="editionModal">
@@ -122,9 +125,10 @@ export default {
         subscription: '',
         sector: '',
       },
-      INTERVENTION: INTERVENTION,
-      UNAVAILABILITY: UNAVAILABILITY,
+      INTERVENTION,
+      UNAVAILABILITY,
       ABSENCE,
+      INTERNAL_HOUR,
       eventTypeOptions: [
         {label: 'Intervention', value: INTERVENTION},
         {label: 'Absence', value: ABSENCE},
@@ -137,7 +141,9 @@ export default {
   validations: {
     newEvent: {
       type: { required },
-      subType: { required },
+      subType: { required: requiredIf((item) => {
+        return item.type === INTERVENTION || item.type === ABSENCE;
+      }) },
       startDate: { required },
       endDate: { required },
       auxiliary: { required },
@@ -175,6 +181,19 @@ export default {
         value: sub._id,
       }));
     },
+    disableCreationButton () {
+      if (!this.newEvent.type) return true;
+      switch (this.newEvent.type) {
+        case ABSENCE:
+          return !this.newEvent.auxiliary || !this.newEvent.subType || !this.newEvent.startDate || !this.newEvent.endDate;
+        case INTERVENTION:
+          return !this.newEvent.auxiliary || !this.newEvent.customer || !this.newEvent.subscription || !this.newEvent.startDate || !this.newEvent.endDate;
+        case INTERNAL_HOUR:
+        case UNAVAILABILITY:
+        default:
+          return !this.newEvent.auxiliary || !this.newEvent.startDate || !this.newEvent.endDate;
+      }
+    }
   },
   async mounted () {
     this.startOfWeek = this.$moment().startOf('week');
@@ -183,6 +202,10 @@ export default {
     await this.getCustomers();
   },
   methods: {
+    displayAbsenceType (value) {
+      const absence = ABSENCE_TYPE.find(abs => abs.value === value);
+      return !absence ? '' : absence.label;
+    },
     endOfWeek () {
       return this.$moment(this.startOfWeek).add(6, 'd');
     },
@@ -219,10 +242,10 @@ export default {
       const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
       this.days = Array.from(range.by('days'));
     },
-    resetCreationForm () {
+    resetCreationForm (type = INTERVENTION) {
       this.$v.newEvent.$reset();
       this.newEvent = {
-        type: INTERVENTION,
+        type,
         subType: '',
         startDate: '',
         endDate: '',
@@ -251,6 +274,12 @@ export default {
         if (this.newEvent.type === INTERVENTION) {
           const option = this.customerSubscriptionsOptions.find(option => option.value === this.newEvent.subscription);
           this.newEvent.subType = option.label;
+        }
+        if (this.newEvent.type === UNAVAILABILITY) {
+          this.newEvent.subType = UNAVAILABILITY;
+        }
+        if (this.newEvent.type === INTERNAL_HOUR) {
+          this.newEvent.subType = INTERNAL_HOUR;
         }
         this.$v.newEvent.$touch();
         if (this.$v.newEvent.$error) return NotifyWarning('Champ(s) invalide(s)');

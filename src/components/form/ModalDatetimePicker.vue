@@ -27,7 +27,7 @@ export default {
   },
   computed: {
     format () {
-      return this.type === 'datetime' ? 'DD/MM/YYYY hh:mm' : 'DD/MM/YYYY';
+      return this.type === 'datetime' ? 'DD/MM/YYYY HH:mm' : 'DD/MM/YYYY';
     },
   },
   methods: {
