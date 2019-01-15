@@ -5,7 +5,7 @@
         <p class="text-weight-bold">Heures internes</p>
         <q-card style="background: white">
           <q-card-main>
-            <q-table :data="internalHours" :columns="internalHoursColumns" hide-bottom binary-state-sort>
+            <q-table :data="internalHours" :columns="internalHoursColumns" hide-bottom binary-state-sort :pagination.sync="pagination">
               <q-td slot="body-cell-default" slot-scope="props" :props="props">
                 <q-checkbox :value="props.value" />
               </q-td>
@@ -15,7 +15,8 @@
             </q-table>
           </q-card-main>
           <q-card-actions align="end">
-            <q-btn no-caps flat color="primary" icon="add" label="Ajouter une heure interne" @click="newInternalHourModal = true" />
+            <q-btn no-caps flat color="primary" icon="add" label="Ajouter une heure interne" @click="newInternalHourModal = true"
+              :disable="internalHours.length >= MAX_INTERNAL_HOURS_NUMBER" />
           </q-card-actions>
         </q-card>
       </div>
@@ -119,6 +120,7 @@ export default {
   mixins: [configMixin],
   data () {
     return {
+      MAX_INTERNAL_HOURS_NUMBER: 9,
       company: null,
       tmpInput: '',
       internalHours: [],
@@ -147,6 +149,7 @@ export default {
       newInternalHour: { name: '' },
       loading: false,
       modalCssContainer: { minWidth: '30vw' },
+      pagination: { rowsPerPage: 0 },
     }
   },
   computed: {
@@ -294,10 +297,10 @@ export default {
         const queries = { id: this.company._id, internalHourId };
         await this.$companies.deleteInternalHour(queries);
         this.internalHours.splice(cell, 1);
-        NotifyPositive('Absence supprimée.');
+        NotifyPositive('Heure interne supprimée.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la suppression du service.');
+        NotifyNegative('Erreur lors de la suppression d\'une heure interne.');
       }
     },
   }
