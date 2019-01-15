@@ -4,7 +4,7 @@ export const NotifyPositive = (detail) => Notify.create({
   color: 'positive',
   icon: 'thumb up',
   detail,
-  position: 'bottom-right',
+  position: 'bottom-left',
   timeout: 2500
 });
 

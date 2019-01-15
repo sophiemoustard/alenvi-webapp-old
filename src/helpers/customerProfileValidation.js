@@ -35,8 +35,10 @@ export const customerProfileValidation = (profile, options = {}) => {
   if (profileCopy.payment) {
     profileCopy.payment.mandates = getCustomerLastMandateOrQuote(profile.payment.mandates);
   }
-  if (profileCopy.quotes) {
+  if (profileCopy.quotes && !profileCopy.subscriptionsAccepted) {
     profileCopy.quotes = getCustomerLastMandateOrQuote(profileCopy.quotes);
+  } else {
+    profileCopy.quotes = [];
   }
   return Joi.validate(profileCopy, customerProfileSchema, options);
 };
