@@ -6,7 +6,7 @@
         <p class="text-weight-bold">Services</p>
         <q-card style="background: white">
           <q-card-main>
-            <q-table :data="services" :columns="columns" hide-bottom binary-state-sort :pagination.sync="pagination">
+            <q-table :data="services" :columns="serviceColumns" hide-bottom binary-state-sort :pagination.sync="pagination">
               <q-td slot="body-cell-delete" slot-scope="props" :props="props">
                 <q-btn disable flat round small color="grey" icon="delete" @click.native="deleteService(props.value, props.row.__index)" />
               </q-td>
@@ -183,9 +183,7 @@ export default {
       documents: null,
       services: [],
       newServiceModal: false,
-      modalCssContainer: {
-        minWidth: '30vw'
-      },
+      modalCssContainer: { minWidth: '30vw' },
       newService: {
         name: '',
         nature: '',
@@ -198,12 +196,12 @@ export default {
         { label: 'Horaire', value: 'Horaire' },
         { label: 'Forfaitaire', value: 'Forfaitaire' },
       ],
-      columns: [
+      serviceColumns: [
         {
           name: 'name',
           label: 'Nom',
           align: 'left',
-          field: 'name',
+          field: row => row.lastVersion.name,
           sortable: true,
         },
         {
@@ -217,28 +215,28 @@ export default {
           name: 'defaultUnitAmount',
           label: 'Prix unitaire par défaut TTC',
           align: 'center',
-          field: row => `${row.defaultUnitAmount}€`,
+          field: row => `${row.lastVersion.defaultUnitAmount}€`,
           sortable: true,
         },
         {
           name: 'vat',
           label: 'TVA',
           align: 'center',
-          field: row => `${row.vat}%`,
+          field: row => `${row.lastVersion.vat}%`,
           sortable: true,
         },
         {
           name: 'holidaySurcharge',
           label: 'Majoration dimanche/jours fériés',
           align: 'center',
-          field: row => row.holidaySurcharge && `${row.holidaySurcharge}%`,
+          field: row => row.lastVersion.holidaySurcharge && `${row.lastVersion.holidaySurcharge}%`,
           sortable: true,
         },
         {
           name: 'eveningSurcharge',
           label: 'Majoration soirée',
           align: 'center',
-          field: row => row.eveningSurcharge && `${row.eveningSurcharge}%`,
+          field: row => row.lastVersion.eveningSurcharge && `${row.lastVersion.eveningSurcharge}%`,
           sortable: true,
         },
         {
@@ -404,9 +402,17 @@ export default {
     this.refreshThirdPartyPayers();
   },
   methods: {
+    getServiceLastVersion (service) {
+      if (!service.versions || service.versions.length === 0) return {};
+
+      return service.versions.sort((a, b) => b.createdAt - a.createdAt)[0];
+    },
     async refreshServices () {
       await this.$store.dispatch('main/getUser', this.user._id);
-      this.services = this.user.company.customersConfig.services;
+      this.services = this.user.company.customersConfig.services.map(service => ({
+        ...service,
+        lastVersion: this.getServiceLastVersion(service),
+      }));
     },
     async refreshCompany () {
       await this.$store.dispatch('main/getUser', this.user._id);
@@ -501,10 +507,18 @@ export default {
         NotifyNegative('Erreur lors de la suppression du tiers payeur.');
       }
     },
+    formatCreatedService () {
+      const { nature, name, defaultUnitAmount, vat, eveningSurcharge, holidaySurcharge } = this.newService;
+      return {
+        nature,
+        versions: [{ name, defaultUnitAmount, vat, eveningSurcharge, holidaySurcharge }],
+      }
+    },
     async createNewService () {
       try {
         this.loading = true;
-        const payload = this.$_.pickBy(this.newService);
+        let payload = this.formatCreatedService();
+        payload = this.$_.pickBy(payload);
         await this.$companies.createService(this.company._id, payload);
         NotifyPositive('Service créé.');
       } catch (e) {
