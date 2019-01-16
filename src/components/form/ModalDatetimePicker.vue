@@ -7,7 +7,7 @@
       </div>
       <q-field :error="error" :error-label="errorLabel">
         <q-datetime :value="value" :type="type" :format="format" color="white" ok-label="OK" cancel-label="Fermer"
-          inverted-light popover @focus="focusHandler" @blur="blurHandler" @input="update" :min="min" :disable="disable"
+          inverted-light popover @focus="focusHandler" @blur="blurHandler" @input="update" :min="min" :max="max" :disable="disable"
         />
       </q-field>
     </div>
@@ -23,6 +23,7 @@ export default {
     value: [String, Date],
     type: { type: String, default: 'date' },
     min: { type: String, default: null },
+    max: { type: String, default: null },
     disable: { type: Boolean, default: false },
   },
   computed: {

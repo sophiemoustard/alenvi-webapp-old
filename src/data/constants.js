@@ -13,3 +13,11 @@ export const ABSENCE_TYPE = [
   { label: 'Naissance', value: 'birth' },
   { label: 'Décès', value: 'death' },
 ];
+export const MORNING = [{ name: 'morning', startHour: 8, endHour: 14 }];
+export const AFTERNOON = [{ name: 'afternoon', startHour: 14, endHour: 20 }];
+export const ALL_DAY = [{ name: 'afternoon', startHour: 8, endHour: 20 }];
+export const DATE_OPTIONS = [
+  { label: 'Matinée', value: MORNING },
+  { label: 'Après-midi', value: AFTERNOON },
+  { label: 'Journée entière', value: ALL_DAY },
+];

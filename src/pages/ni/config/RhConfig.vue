@@ -300,6 +300,10 @@ export default {
         NotifyPositive('Heure interne supprimée.');
       } catch (e) {
         console.error(e);
+
+        if (e.message === '') {
+          return NotifyWarning('Suppression annulée');
+        }
         NotifyNegative('Erreur lors de la suppression d\'une heure interne.');
       }
     },
