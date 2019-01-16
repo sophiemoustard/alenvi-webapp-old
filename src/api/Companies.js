@@ -13,6 +13,10 @@ export default {
     const services = await alenviAxios.post(`${process.env.API_HOSTNAME}/companies/${id}/services`, payload);
     return services.data.data.services;
   },
+  async updateService (params, payload) {
+    const services = await alenviAxios.put(`${process.env.API_HOSTNAME}/companies/${params.id}/services/${params.serviceId}`, payload);
+    return services.data.data.services;
+  },
   async deleteService (queries) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/companies/${queries.id}/services/${queries.serviceId}`);
   },

@@ -8,7 +8,10 @@
           <q-card-main>
             <q-table :data="services" :columns="serviceColumns" hide-bottom binary-state-sort :pagination.sync="pagination">
               <q-td slot="body-cell-delete" slot-scope="props" :props="props">
-                <q-btn disable flat round small color="grey" icon="delete" @click.native="deleteService(props.value, props.row.__index)" />
+                <q-btn disable flat round small color="grey" icon="delete" @click="deleteService(props.value, props.row.__index)" />
+              </q-td>
+              <q-td slot="body-cell-edit" slot-scope="props" :props="props">
+                <q-btn flat round small color="grey" icon="edit" @click.native="startEdition(props.value)" />
               </q-td>
             </q-table>
           </q-card-main>
@@ -71,8 +74,8 @@
       </div>
     </div>
 
-    <!-- Service modal -->
-    <q-modal v-model="newServiceModal" :content-css="modalCssContainer">
+    <!-- Service creation modal -->
+    <q-modal v-model="newServiceModal" :content-css="modalCssContainer" @hide="resetCreationServiceData">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -92,7 +95,33 @@
         <ni-modal-input caption="Majoration dimanche/jours fériés" suffix="%" type="number" v-model="newService.holidaySurcharge" />
         <ni-modal-input caption="Majoration soirée" suffix="%" type="number" v-model="newService.eveningSurcharge" />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Créer le service" icon-right="add" color="primary" :loading="loading" @click="createNewService" />
+      <q-btn no-caps class="full-width modal-btn" label="Créer le service" icon-right="add" color="primary" :loading="loading" @click="createNewService"
+        :disable="disableCreationButton" />
+    </q-modal>
+
+    <!-- Service edition modal -->
+    <q-modal v-model="serviceEditionModal" :content-css="modalCssContainer" @hide="resetEditionServiceData">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-11">
+            <h5>Éditer un <span class="text-weight-bold">service</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer" style="text-align: right">
+            <span>
+              <q-icon name="clear" size="1rem" @click.native="serviceEditionModal = false" /></span>
+          </div>
+        </div>
+        <ni-modal-datetime-picker caption="Date d'effet" v-model="editedService.startDate" :error="$v.editedService.startDate.$error"
+          @blur="$v.editedService.startDate.$touch" />
+        <ni-modal-input caption="Nom" v-model="editedService.name" :error="$v.editedService.name.$error" @blur="$v.editedService.name.$touch" />
+        <ni-modal-input caption="Prix unitaire par défaut TTC" suffix="€" type="number" v-model="editedService.defaultUnitAmount"
+          :error="$v.editedService.defaultUnitAmount.$error" @blur="$v.editedService.defaultUnitAmount.$touch"/>
+        <ni-modal-input caption="TVA" suffix="%" v-model="editedService.vat" type="number" :error="$v.editedService.vat.$error" @blur="$v.editedService.vat.$touch" />
+        <ni-modal-input caption="Majoration dimanche/jours fériés" suffix="%" type="number" v-model="editedService.holidaySurcharge" />
+        <ni-modal-input caption="Majoration soirée" suffix="%" type="number" v-model="editedService.eveningSurcharge" />
+      </div>
+      <q-btn no-caps class="full-width modal-btn" label="Editer le service" icon-right="add" color="primary" :loading="loading" @click="updateService"
+        :disable="disableEditionButton" />
     </q-modal>
 
     <!-- Third party payers modal -->
@@ -154,6 +183,7 @@ import { required } from 'vuelidate/lib/validators';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
 import ModalInput from '../../../components/form/ModalInput.vue';
 import ModalSelect from '../../../components/form/ModalSelect.vue';
+import ModalDatetimePicker from '../../../components/form/ModalDatetimePicker.vue';
 import CustomImg from '../../../components/form/CustomImg.vue';
 import FileUploader from '../../../components/form/FileUploader.vue';
 import ImageUploader from '../../../components/form/ImageUploader.vue';
@@ -173,6 +203,7 @@ export default {
     'ni-modal-select': ModalSelect,
     'ni-input': Input,
     'ni-search-address': SearchAddress,
+    'ni-modal-datetime-picker': ModalDatetimePicker,
   },
   mixins: [configMixin],
   data () {
@@ -183,10 +214,19 @@ export default {
       documents: null,
       services: [],
       newServiceModal: false,
+      serviceEditionModal: false,
       modalCssContainer: { minWidth: '30vw' },
       newService: {
         name: '',
         nature: '',
+        defaultUnitAmount: '',
+        vat: '',
+        holidaySurcharge: '',
+        eveningSurcharge: '',
+      },
+      editedService: {
+        name: '',
+        startDate: '',
         defaultUnitAmount: '',
         vat: '',
         holidaySurcharge: '',
@@ -241,6 +281,13 @@ export default {
         },
         {
           name: 'delete',
+          label: '',
+          align: 'center',
+          field: '_id',
+          sortable: true,
+        },
+        {
+          name: 'edit',
           label: '',
           align: 'center',
           field: '_id',
@@ -329,6 +376,12 @@ export default {
       defaultUnitAmount: { required },
       vat: { required },
     },
+    editedService: {
+      name: { required },
+      startDate: { required },
+      defaultUnitAmount: { required },
+      vat: { required },
+    },
     company: {
       ics: { required },
       name: { required },
@@ -363,10 +416,13 @@ export default {
       return `${process.env.API_HOSTNAME}/cloudinary/image/upload`;
     },
     addressError () {
-      if (!this.$v.company.address.fullAddress.required) {
-        return 'Champ requis';
-      }
-      return 'Adresse non valide';
+      return !this.$v.company.address.fullAddress.required ? 'Champ requis' : 'Adresse non valide';
+    },
+    disableEditionButton () {
+      return !this.editedService.name || !this.editedService.startDate || !this.editedService.defaultUnitAmount || !this.editedService.vat;
+    },
+    disableCreationButton () {
+      return !this.newService.name || !this.newService.nature || !this.newService.defaultUnitAmount || !this.newService.vat;
     },
     thirdPartyPayersAddFields () {
       return [{
@@ -405,7 +461,7 @@ export default {
     getServiceLastVersion (service) {
       if (!service.versions || service.versions.length === 0) return {};
 
-      return service.versions.sort((a, b) => b.createdAt - a.createdAt)[0];
+      return service.versions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
     },
     async refreshServices () {
       await this.$store.dispatch('main/getUser', this.user._id);
@@ -509,34 +565,86 @@ export default {
     },
     formatCreatedService () {
       const { nature, name, defaultUnitAmount, vat, eveningSurcharge, holidaySurcharge } = this.newService;
-      return {
-        nature,
-        versions: [{ name, defaultUnitAmount, vat, eveningSurcharge, holidaySurcharge }],
-      }
+      const formattedService = { nature, versions: [{ name, defaultUnitAmount, vat }] }
+
+      if (eveningSurcharge) formattedService.versions[0].eveningSurcharge = eveningSurcharge;
+      if (holidaySurcharge) formattedService.versions[0].holidaySurcharge = holidaySurcharge;
+
+      return formattedService;
+    },
+    resetCreationServiceData () {
+      this.newServiceModal = false;
+      this.newService = {
+        name: '',
+        nature: '',
+        defaultUnitAmount: '',
+        vat: '',
+        holidaySurcharge: '',
+        eveningSurcharge: '',
+      };
+      this.$v.newService.$reset();
+    },
+    resetEditionServiceData () {
+      this.serviceEditionModal = false;
+      this.editedService = {
+        name: '',
+        startDate: '',
+        defaultUnitAmount: '',
+        vat: '',
+        holidaySurcharge: '',
+        eveningSurcharge: '',
+      };
+      this.$v.newService.$reset();
     },
     async createNewService () {
       try {
+        if (this.$v.newService.$error) return NotifyWarning('Champ(s) invalide(s)');
+
         this.loading = true;
-        let payload = this.formatCreatedService();
-        payload = this.$_.pickBy(payload);
+        const payload = this.formatCreatedService();
         await this.$companies.createService(this.company._id, payload);
         NotifyPositive('Service créé.');
+        this.resetCreationServiceData();
+        await this.refreshServices();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création du service.');
       } finally {
         this.loading = false;
-        this.newServiceModal = false;
-        this.newService = {
-          name: '',
-          nature: '',
-          defaultUnitAmount: '',
-          vat: '',
-          holidaySurcharge: '',
-          eveningSurcharge: '',
-        };
+      }
+    },
+    startEdition (id) {
+      const selectedService = this.services.find(service => service._id === id);
+      const { name, defaultUnitAmount, vat, holidaySurcharge, eveningSurcharge } = selectedService.lastVersion;
+      this.editedService = {
+        _id: selectedService._id,
+        name: name || '',
+        startDate: '',
+        defaultUnitAmount: defaultUnitAmount || '',
+        vat: vat || '',
+        holidaySurcharge: holidaySurcharge || '',
+        eveningSurcharge: eveningSurcharge || '',
+      };
+
+      this.serviceEditionModal = true;
+    },
+    async updateService () {
+      try {
+        if (this.$v.editedService.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        this.loading = true;
+        const serviceId = this.editedService._id;
+        const payload = this.$_.pickBy(this.editedService);
+        delete payload._id;
+        await this.$companies.updateService({ id: this.company._id, serviceId }, payload);
+        NotifyPositive('Service modifié');
+        this.resetEditionServiceData();
         await this.refreshServices();
-        this.$v.newService.$reset();
+      } catch (e) {
+        console.error(e)
+        NotifyNegative('Erreur lors de la modification du service');
+      } finally {
+        this.loading = false;
       }
     },
     async createNewThirdPartyPayer () {
