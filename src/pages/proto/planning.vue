@@ -24,9 +24,9 @@
               <div class="col-12 event">
                 <p class="no-margin">{{ getEventHours(event) }}</p>
                 <p v-if="event.type === INTERVENTION" class="no-margin">{{ event.customer.identity.title }} {{ event.customer.identity.lastname }}</p>
-                <p v-if="event.type === ABSENCE">{{ displayAbsenceType(event.subType) }}</p>
+                <p v-if="event.type === ABSENCE">{{ displayAbsenceType(event.absence) }}</p>
                 <p v-if="event.type === UNAVAILABILITY">Indisponibilité</p>
-                <p v-if="event.type === INTERNAL_HOUR">{{ event.subType }}</p>
+                <p v-if="event.type === INTERNAL_HOUR">{{ event.internalHour.name }}</p>
               </div>
             </div>
           </td>
@@ -59,7 +59,7 @@
           <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions" :error="$v.newEvent.subscription.$error" />
         </template>
         <template v-if="newEvent.type === ABSENCE">
-          <ni-modal-select caption="Type d'absence" v-model="newEvent.subType" :options="absenceOptions" :error="$v.newEvent.subType.$error" />
+          <ni-modal-select caption="Type d'absence" v-model="newEvent.absence" :options="absenceOptions" :error="$v.newEvent.absence.$error" />
           <ni-file-uploader caption="Justificatif d'absence" path="attachment" :entity="newEvent" alt="justificatif absence" name="proofOfAbsence"
             :url="docsUploadUrl" @uploaded="documentUploaded" :additionalValue="additionalValue" :key="uploaderKey" :disable="!selectedAuxiliary._id"
             @delete="deleteDocument(newEvent.attachment.driveId)" withBorders />
@@ -126,13 +126,14 @@ export default {
       creationModal: false,
       newEvent: {
         type: INTERVENTION,
-        subType: '',
         startDate: '',
         endDate: '',
         auxiliary: '',
         customer: '',
         subscription: '',
         sector: '',
+        internalHour: '',
+        absence: '',
       },
       INTERVENTION,
       UNAVAILABILITY,
@@ -152,9 +153,6 @@ export default {
   validations: {
     newEvent: {
       type: { required },
-      subType: { required: requiredIf((item) => {
-        return item.type !== UNAVAILABILITY;
-      }) },
       startDate: { required },
       endDate: { required },
       auxiliary: { required },
@@ -167,6 +165,9 @@ export default {
       }) },
       internalHour: { required: requiredIf((item) => {
         return item.type === INTERNAL_HOUR;
+      }) },
+      absence: { required: requiredIf((item) => {
+        return item.type === ABSENCE;
       }) },
     },
   },
@@ -199,7 +200,7 @@ export default {
       if (!this.newEvent.type) return true;
       switch (this.newEvent.type) {
         case ABSENCE:
-          return !this.newEvent.auxiliary || !this.newEvent.subType || !this.newEvent.startDate || !this.newEvent.endDate;
+          return !this.newEvent.auxiliary || !this.newEvent.absence || !this.newEvent.startDate || !this.newEvent.endDate;
         case INTERVENTION:
           return !this.newEvent.auxiliary || !this.newEvent.customer || !this.newEvent.subscription || !this.newEvent.startDate || !this.newEvent.endDate;
         case INTERNAL_HOUR:
@@ -284,7 +285,6 @@ export default {
       this.$v.newEvent.$reset();
       this.newEvent = {
         type,
-        subType: '',
         startDate: '',
         endDate: '',
         auxiliary: '',
@@ -313,20 +313,6 @@ export default {
     async createEvent () {
       try {
         this.newEvent.sector = this.selectedSector;
-        switch (this.newEvent.type) {
-          case (INTERVENTION):
-            let option = this.customerSubscriptionsOptions.find(option => option.value === this.newEvent.subscription);
-            this.newEvent.subType = option.label;
-            break;
-          case (UNAVAILABILITY):
-            this.newEvent.subType = UNAVAILABILITY;
-            break;
-          case (INTERNAL_HOUR):
-            option = this.internalHourOptions.find(option => option.value === this.newEvent.internalHour);
-            this.newEvent.subType = option.label;
-            break;
-          default:
-        }
         this.$v.newEvent.$touch();
         if (this.$v.newEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
 
