@@ -145,7 +145,7 @@ export default {
         {label: 'Heure interne', value: INTERNAL_HOUR},
         {label: 'Indisponibilité', value: UNAVAILABILITY}
       ],
-      internalHourOptions: [],
+      internalHours: [],
       absenceOptions: ABSENCE_TYPE,
       uploaderKey: 0,
     }
@@ -220,24 +220,25 @@ export default {
     },
     additionalValue () {
       return !this.selectedAuxiliary._id ? '' : `justificatif_absence_${this.selectedAuxiliary.lastname}`;
-    }
+    },
+    internalHourOptions () {
+      return this.internalHours.map(hour => ({
+        label: hour.name,
+        value: hour._id,
+      }));
+    },
   },
   async mounted () {
     this.startOfWeek = this.$moment().startOf('week');
     this.getTimelineDays();
     await this.getCustomers();
-    this.setInternalHourOptions();
+    this.setInternalHours();
   },
   methods: {
-    setInternalHourOptions () {
+    setInternalHours () {
       const user = this.$store.getters['main/user'];
-      if (!user || !user.company || !user.company.rhConfig || !user.company.rhConfig.internalHours) {
-        this.internalHourOptions = [];
-      } else {
-        this.internalHourOptions = user.company.rhConfig.internalHours.map(hour => ({
-          label: hour.name,
-          value: hour._id,
-        }));
+      if (user && user.company && user.company.rhConfig && user.company.rhConfig.internalHours) {
+        this.internalHours = user.company.rhConfig.internalHours;
       }
     },
     displayAbsenceType (value) {
@@ -315,6 +316,11 @@ export default {
         this.newEvent.sector = this.selectedSector;
         this.$v.newEvent.$touch();
         if (this.$v.newEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        if (this.newEvent.type === INTERNAL_HOUR) {
+          const internalHour = this.internalHours.find(hour => hour._id === this.newEvent.internalHour);
+          this.newEvent.internalHour = internalHour;
+        }
 
         this.loading = true;
         const payload = this.$_.pickBy(this.newEvent);
