@@ -317,13 +317,14 @@ export default {
         this.$v.newEvent.$touch();
         if (this.$v.newEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
 
+        let payload = { ...this.newEvent }
         if (this.newEvent.type === INTERNAL_HOUR) {
           const internalHour = this.internalHours.find(hour => hour._id === this.newEvent.internalHour);
-          this.newEvent.internalHour = internalHour;
+          payload.internalHour = internalHour;
         }
 
         this.loading = true;
-        const payload = this.$_.pickBy(this.newEvent);
+        payload = this.$_.pickBy(payload);
         await this.$events.create(payload);
         NotifyPositive('Évènement créé');
 
