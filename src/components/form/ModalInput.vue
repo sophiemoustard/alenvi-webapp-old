@@ -2,7 +2,7 @@
   <div :class="['row', 'margin-input', { last: last }]">
     <div class="col-12">
       <div class="row justify-between">
-        <p class="input-caption">{{ caption }}</p>
+        <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
         <q-icon v-if="error" name="error_outline" color="secondary" />
       </div>
       <q-field :error="error" :error-label="errorLabel">
@@ -24,7 +24,8 @@ export default {
     suffix: { type: String, default: '' },
     type: { type: String, default: 'text' },
     rows: { type: Number, default: 1 },
-    readOnly: { type: Boolean, default: false }
+    readOnly: { type: Boolean, default: false },
+    requiredField: { type: Boolean, default: false }
   },
   methods: {
     inputHandler (value) {
@@ -51,4 +52,7 @@ export default {
     margin-bottom: 6px
     &.last
       margin-bottom: 24px
+
+  .required::after
+    content: ' *'
 </style>
