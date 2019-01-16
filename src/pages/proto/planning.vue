@@ -321,7 +321,7 @@ export default {
       try {
         this.events = await this.$events.list({
           startDate: this.startOfWeek.format('YYYYMMDD'),
-          endDate: this.endOfWeek().format('YYYYMMDD'),
+          endStartDate: this.endOfWeek().format('YYYYMMDD'),
           sector: this.selectedSector,
         });
       } catch (e) {
