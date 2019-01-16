@@ -175,6 +175,12 @@ export default {
     daysHeader () {
       return this.days.map(day => this.$moment(day).format('dddd DD/MM'));
     },
+    minEndDate () {
+      return this.$moment(this.newEvent.startDate).toISOString()
+    },
+    maxEndDate () {
+      return this.$moment(this.newEvent.startDate).hours(23).minutes(59).toISOString();
+    },
     auxiliariesOptions () {
       return this.auxiliaries.length === 0 ? [] : this.auxiliaries.map(aux => ({
         label: `${aux.firstname || ''} ${aux.lastname}`,
