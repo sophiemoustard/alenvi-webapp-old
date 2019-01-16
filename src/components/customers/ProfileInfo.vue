@@ -441,7 +441,7 @@ export default {
       const availableServices = this.company.customersConfig.services.filter(service => !subscribedServices.includes(service._id));
 
       return availableServices.map(service => ({
-        label: service.name,
+        label: this.getServiceLastVersion(service).name,
         value: service._id,
       }));
     },
@@ -524,6 +524,11 @@ export default {
     this.isLoaded = true;
   },
   methods: {
+    getServiceLastVersion (service) {
+      if (!service.versions || service.versions.length === 0) return {};
+
+      return service.versions.sort((a, b) => b.createdAt - a.createdAt)[0];
+    },
     formatNumber (number) {
       return parseFloat(Math.round(number * 100) / 100).toFixed(1)
     },
