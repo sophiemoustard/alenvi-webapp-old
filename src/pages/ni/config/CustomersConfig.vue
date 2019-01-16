@@ -45,6 +45,30 @@
           </div>
         </div>
       </div>
+      <div class="q-mb-xl">
+        <p class="text-weight-bold">Tiers payeurs</p>
+        <q-card style="background: white">
+          <q-card-main>
+            <q-table :data="thirdPartyPayersList" :columns="thirdPartyPayersColumns" hide-bottom binary-state-sort :pagination.sync="pagination">
+              <q-td slot="body-cell-identity" slot-scope="props" :props="props">
+                <q-item>
+                  <q-item-side :avatar="getAvatar(props.value.logo)" />
+                  <q-item-main :label="props.value.name" />
+                </q-item>
+              </q-td>
+              <q-td slot="body-cell-delete" slot-scope="props" :props="props">
+                <q-btn flat round small color="grey" icon="delete" @click="deleteThirdPartyPayer(props.value, props.row.__index)" />
+              </q-td>
+              <q-td slot="body-cell-edit" slot-scope="props" :props="props">
+                <q-btn flat round small color="grey" icon="edit" @click="openThirdPartyPayerUpdateModal(props.value)" />
+              </q-td>
+            </q-table>
+          </q-card-main>
+          <q-card-actions align="end">
+            <q-btn no-caps flat color="primary" icon="add" label="Ajouter un tiers payeur" @click="newThirdPartyPayersModal = true" />
+          </q-card-actions>
+        </q-card>
+      </div>
     </div>
 
     <!-- Service modal -->
@@ -70,6 +94,58 @@
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer le service" icon-right="add" color="primary" :loading="loading" @click="createNewService" />
     </q-modal>
+
+    <!-- Third party payers modal -->
+    <q-modal v-model="newThirdPartyPayersModal" :content-css="modalCssContainer" @hide="resetThirdPartyPayerModalData">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-11">
+            <h5>Ajouter un <span class="text-weight-bold">tiers payeur</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer" style="text-align: right">
+            <span>
+              <q-icon name="clear" size="1rem" @click.native="newThirdPartyPayersModal = false" /></span>
+          </div>
+        </div>
+        <ni-modal-input caption="Nom" v-model="newThirdPartyPayer.name" :error="$v.newThirdPartyPayer.name.$error" @blur="$v.newThirdPartyPayer.name.$touch" requiredField />
+        <ni-search-address v-model="newThirdPartyPayer.address.fullAddress" @selected="selectedThirdPartyPayerAddress" @blur="$v.newThirdPartyPayer.address.fullAddress.$touch"
+            :error="$v.newThirdPartyPayer.address.fullAddress.$error" error-label="Adresse invalide" inModal
+          />
+        <ni-modal-input caption="Email" v-model.trim="newThirdPartyPayer.email" />
+        <ni-modal-input caption="Prix unitaire TTC par défaut" suffix="€" type="number" v-model="newThirdPartyPayer.unitTTCPrice"
+          :error="$v.newThirdPartyPayer.unitTTCPrice.$error" error-label="Le prix unitaire doit être positif"/>
+        <ni-modal-select v-model="newThirdPartyPayer.billingMode" :options="billingModeOptions" caption="Facturation" :filter="false" />
+        <ni-image-uploader caption="Logo" path="logo" :entity="newThirdPartyPayer" alt="logo" name="picture"
+          :url="logoUploadUrl" @uploaded="imageUploaded($event, 'create')" :additional-fields="thirdPartyPayersAddFields" @delete="deleteImageById(newThirdPartyPayer.logo.publicId)" withBorders />
+      </div>
+      <q-btn no-caps class="full-width modal-btn" label="Ajouter le tiers payeur" icon-right="add" color="primary" :loading="thirdPartyPayerLoading" @click="createNewThirdPartyPayer" />
+    </q-modal>
+
+    <!-- Third party payers update modal -->
+    <q-modal v-model="thirdPartyPayersUpdateModal" :content-css="modalCssContainer" @hide="resetThirdPartyPayerUpdateModalData">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-11">
+            <h5>Editer un <span class="text-weight-bold">tiers payeur</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer" style="text-align: right">
+            <span>
+              <q-icon name="clear" size="1rem" @click.native="updatingThirdPartyPayersModal = false" /></span>
+          </div>
+        </div>
+        <ni-modal-input caption="Nom" v-model="updatingThirdPartyPayer.name" :error="$v.updatingThirdPartyPayer.name.$error" @blur="$v.updatingThirdPartyPayer.name.$touch" requiredField />
+        <ni-search-address v-model="updatingThirdPartyPayer.address.fullAddress" @selected="selectedThirdPartyPayerAddress" @blur="$v.updatingThirdPartyPayer.address.fullAddress.$touch"
+            :error="$v.updatingThirdPartyPayer.address.fullAddress.$error" error-label="Adresse invalide" inModal
+          />
+        <ni-modal-input caption="Email" v-model.trim="updatingThirdPartyPayer.email" />
+        <ni-modal-input caption="Prix unitaire TTC par défaut" suffix="€" type="number" v-model="updatingThirdPartyPayer.unitTTCPrice"
+          :error="$v.updatingThirdPartyPayer.unitTTCPrice.$error" error-label="Le prix unitaire doit être positif"/>
+        <ni-modal-select v-model="updatingThirdPartyPayer.billingMode" :options="billingModeOptions" caption="Facturation" :filter="false" />
+        <ni-image-uploader caption="Logo" path="logo" :entity="updatingThirdPartyPayer" alt="logo" name="picture"
+          :url="logoUploadUrl" @uploaded="imageUploaded($event, 'update')" :additional-fields="thirdPartyPayersAddFields" @delete="deleteImageById(updatingThirdPartyPayer.logo.publicId)" withBorders />
+      </div>
+      <q-btn no-caps class="full-width modal-btn" label="Editer le tiers payeur" icon-right="add" color="primary" :loading="thirdPartyPayerLoading" @click="updateThirdPartyPayer" />
+    </q-modal>
   </q-page>
 </template>
 
@@ -80,10 +156,12 @@ import ModalInput from '../../../components/form/ModalInput.vue';
 import ModalSelect from '../../../components/form/ModalSelect.vue';
 import CustomImg from '../../../components/form/CustomImg.vue';
 import FileUploader from '../../../components/form/FileUploader.vue';
+import ImageUploader from '../../../components/form/ImageUploader.vue';
 import { configMixin } from '../../../mixins/configMixin';
 import Input from '../../../components/form/Input.vue';
 import SearchAddress from '../../../components/form/SearchAddress.vue';
-import { frAddress } from '../../../helpers/vuelidateCustomVal';
+import { frAddress, posDecimals } from '../../../helpers/vuelidateCustomVal';
+import cloudinary from '../../../api/Cloudinary.js';
 
 export default {
   name: 'CustomersConfig',
@@ -91,6 +169,7 @@ export default {
     'ni-modal-input': ModalInput,
     'ni-custom-img': CustomImg,
     'ni-file-uploader': FileUploader,
+    'ni-image-uploader': ImageUploader,
     'ni-modal-select': ModalSelect,
     'ni-input': Input,
     'ni-search-address': SearchAddress,
@@ -99,6 +178,7 @@ export default {
   data () {
     return {
       loading: false,
+      thirdPartyPayerLoading: false,
       company: null,
       documents: null,
       services: [],
@@ -170,6 +250,78 @@ export default {
         },
       ],
       pagination: { rowsPerPage: 0 },
+      thirdPartyPayers: [],
+      thirdPartyPayersColumns: [
+        {
+          name: 'identity',
+          label: 'Nom',
+          field: 'identity',
+          align: 'left',
+          sortable: true
+        },
+        {
+          name: 'address',
+          label: 'Adresse',
+          align: 'left',
+          field: row => row.address.fullAddress
+        },
+        {
+          name: 'email',
+          label: 'Email',
+          field: 'email',
+          align: 'left'
+        },
+        {
+          name: 'unitTTCprice',
+          label: 'Prix unitaire TTC par défaut',
+          field: 'unitTTCPrice',
+          format: val => val ? `${val} €` : '',
+          align: 'left'
+        },
+        {
+          name: 'billingMode',
+          label: 'Facturation (directe/indirecte)',
+          field: 'billingMode',
+          align: 'left'
+        },
+        {
+          name: 'edit',
+          label: '',
+          align: 'center',
+          field: '_id',
+        },
+        {
+          name: 'delete',
+          label: '',
+          align: 'center',
+          field: '_id',
+        }
+      ],
+      newThirdPartyPayersModal: false,
+      newThirdPartyPayer: {
+        name: '',
+        email: '',
+        address: {},
+        unitTTCPrice: 0,
+        logo: {},
+        billingMode: ''
+      },
+      billingModeOptions: [
+        {
+          label: 'Indirecte',
+          value: 'indirecte'
+        },
+        {
+          label: 'Directe',
+          value: 'directe'
+        }
+      ],
+      thirdPartyPayersUpdateModal: false,
+      thirdPartyPayersUpdateLoading: false,
+      updatingThirdPartyPayer: {
+        address: {},
+        logo: {}
+      }
     };
   },
   validations: {
@@ -187,6 +339,20 @@ export default {
         fullAddress: { required, frAddress },
       },
     },
+    newThirdPartyPayer: {
+      name: { required },
+      address: {
+        fullAddress: { frAddress }
+      },
+      unitTTCPrice: { posDecimals }
+    },
+    updatingThirdPartyPayer: {
+      name: { required },
+      address: {
+        fullAddress: { frAddress }
+      },
+      unitTTCPrice: { posDecimals }
+    }
   },
   computed: {
     user () {
@@ -195,18 +361,47 @@ export default {
     docsUploadUrl () {
       return `${process.env.API_HOSTNAME}/companies/${this.company._id}/gdrive/${this.company.folderId}/upload`;
     },
+    logoUploadUrl () {
+      return `${process.env.API_HOSTNAME}/cloudinary/image/upload`;
+    },
     addressError () {
       if (!this.$v.company.address.fullAddress.required) {
         return 'Champ requis';
       }
       return 'Adresse non valide';
     },
+    thirdPartyPayersAddFields () {
+      return [{
+        name: 'role',
+        value: 'ThirdPartyPayers'
+      }, {
+        name: 'fileName',
+        value: `logo_${this.newThirdPartyPayer.name}`
+      }]
+    },
+    thirdPartyPayersList () {
+      return this.thirdPartyPayers.map(thirdPartyPayer => {
+        const { address, email, unitTTCPrice, billingMode, name, logo } = thirdPartyPayer;
+        return {
+          _id: thirdPartyPayer._id,
+          identity: {
+            name,
+            logo: logo && logo.link ? logo.link : null
+          },
+          address,
+          email,
+          unitTTCPrice,
+          billingMode
+        }
+      });
+    }
   },
   mounted () {
     this.company = this.user.company;
     this.documents = this.company.customersConfig.templates || {};
     this.company.address = this.company.address || {};
     this.refreshServices();
+    this.refreshThirdPartyPayers();
   },
   methods: {
     async refreshServices () {
@@ -219,8 +414,16 @@ export default {
       this.documents = this.company.customersConfig.templates || {};
       this.company.address = this.company.address || {};
     },
+    async refreshThirdPartyPayers () {
+      await this.$store.dispatch('main/getUser', this.user._id);
+      this.thirdPartyPayers = this.user.company.customersConfig.thirdPartyPayers;
+      console.log('third', this.thirdPartyPayers);
+    },
     selectedAddress (item) {
       this.company.address = Object.assign({}, this.company.address, item);
+    },
+    selectedThirdPartyPayerAddress (item) {
+      this.newThirdPartyPayer.address = Object.assign({}, this.newThirdPartyPayer.address, this.$_.omit(item, ['location']));
     },
     saveTmp (path) {
       this.tmpInput = this.company[path];
@@ -274,10 +477,28 @@ export default {
         const queries = { id: this.company._id, serviceId };
         await this.$companies.deleteService(queries);
         this.services.splice(cell, 1);
-        NotifyPositive('Service supprimée.');
+        NotifyPositive('Service supprimé.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du service.');
+      }
+    },
+    async deleteThirdPartyPayer (thirdPartyPayerId, cell) {
+      try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Etes-vous sûr de vouloir supprimer ce tiers payeur ?',
+          ok: 'OK',
+          cancel: 'Annuler'
+        });
+
+        const queries = { id: this.company._id, thirdPartyPayerId };
+        await this.$companies.deleteThirdPartyPayer(queries);
+        this.thirdPartyPayers.splice(cell, 1);
+        NotifyPositive('Tiers payeur supprimé.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression du tiers payeur.');
       }
     },
     async createNewService () {
@@ -288,7 +509,7 @@ export default {
         NotifyPositive('Service créé.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création du service');
+        NotifyNegative('Erreur lors de la création du service.');
       } finally {
         this.loading = false;
         this.newServiceModal = false;
@@ -304,7 +525,110 @@ export default {
         this.$v.newService.$reset();
       }
     },
-  },
+    async createNewThirdPartyPayer () {
+      try {
+        this.thirdPartyPayerLoading = true;
+        if (this.$v.newThirdPartyPayer.$error) {
+          this.thirdPartyPayerLoading = false;
+          return NotifyWarning('Champ(s) invalide(s)');
+        }
+        const payload = this.$_.pickBy(this.newThirdPartyPayer);
+        await this.$companies.createThirdPartyPayer(this.company._id, payload);
+        await this.refreshThirdPartyPayers();
+        NotifyPositive('Tiers payeur créé.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création du tiers payeur.');
+      } finally {
+        this.newThirdPartyPayersModal = false;
+        this.thirdPartyPayerLoading = false;
+      }
+    },
+    openThirdPartyPayerUpdateModal (thirdPartyPayerId) {
+      this.thirdPartyPayersUpdateModal = true;
+      const currentThirdPartyPayer = this.thirdPartyPayers.find(thirdPartyPayer => thirdPartyPayer._id === thirdPartyPayerId);
+      const { name, address, email, unitTTCPrice, billingMode, logo } = currentThirdPartyPayer;
+      this.updatingThirdPartyPayer = {
+        _id: currentThirdPartyPayer._id,
+        name,
+        address,
+        email,
+        unitTTCPrice,
+        billingMode,
+        logo
+      };
+    },
+    async updateThirdPartyPayer () {
+      try {
+        this.thirdPartyPayerUpdateLoading = true;
+        if (this.$v.updatingThirdPartyPayer.$error) {
+          this.thirdPartyPayerUpdateLoading = false;
+          return NotifyWarning('Champ(s) invalide(s)');
+        }
+        const thirdPartyPayerId = this.updatingThirdPartyPayer._id;
+        delete this.updatingThirdPartyPayer._id;
+        const payload = this.$_.pickBy(this.updatingThirdPartyPayer);
+        await this.$companies.updateThirdPartyPayer({ id: this.company._id, thirdPartyPayerId }, payload);
+        await this.refreshThirdPartyPayers();
+        NotifyPositive('Tiers payeur créé.');
+      } catch (e) {
+        NotifyNegative('Erreur lors de la modification du tiers payeur.');
+        console.error(e);
+      } finally {
+        this.thirdPartyPayerUpdateLoading = false;
+        this.thirdPartyPayersUpdateModal = false;
+      }
+    },
+    async deleteImageById (imageId) {
+      try {
+        await cloudinary.deleteImageById({ id: imageId });
+        this.newThirdPartyPayer.logo = {};
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression de l\'image');
+      }
+    },
+    resetThirdPartyPayerModalData () {
+      this.$v.newThirdPartyPayer.$reset();
+      this.newThirdPartyPayer = {
+        name: '',
+        email: '',
+        address: {},
+        unitTTCPrice: 0,
+        logo: {},
+        billingMode: ''
+      }
+    },
+    resetThirdPartyPayerUpdateModalData () {
+      this.$v.updatingThirdPartyPayer.$reset();
+      this.updatingThirdPartyPayer = {
+        logo: {},
+        address: {}
+      }
+    },
+    imageUploaded (data, type) {
+      const response = JSON.parse(data.xhr.response);
+      switch (type) {
+        case 'create':
+          this.newThirdPartyPayer.logo = {
+            publicId: response.data.picture.public_id,
+            link: response.data.picture.secure_url
+          };
+          break;
+        case 'update':
+          this.updatingThirdPartyPayer.logo = {
+            publicId: response.data.picture.public_id,
+            link: response.data.picture.secure_url
+          };
+          break;
+        default:
+          break;
+      }
+    },
+    getAvatar (link) {
+      return link || 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/images/users/default_avatar.png';
+    }
+  }
 }
 </script>
 
