@@ -278,7 +278,7 @@ export default {
           line: this.newCustomer.contact.address.street,
           zip: this.newCustomer.contact.address.zipCode,
           city: this.newCustomer.contact.address.city
-        }
+        },
       };
       const cleanPayload = this.$_.pickBy(ogustPayload);
       const newCustomer = await this.$ogust.createCustomer(cleanPayload);
