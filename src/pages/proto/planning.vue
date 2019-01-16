@@ -312,7 +312,6 @@ export default {
     },
     async createEvent () {
       try {
-        console.log('je passe ici');
         this.newEvent.sector = this.selectedSector;
         switch (this.newEvent.type) {
           case (INTERVENTION):
