@@ -27,8 +27,8 @@
               {{auxiliary.firstname}} {{auxiliary.lastname}}
             </td>
             <td @drop="drop" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top" class="event-cell">
-              <div class="row cursor-pointer" v-for="(event, eventIndex) in getAuxiliaryEvents(auxiliary, dayIndex)" :key="eventIndex" @click="openEditionModal(event)">
-                <div class="col-12 event" draggable @dragstart="drag">
+              <div :id="`${eventIndex}`" draggable @dragstart="drag" class="row cursor-pointer" v-for="(event, eventIndex) in getAuxiliaryEvents(auxiliary, dayIndex)" :key="eventIndex" @click="openEditionModal(event)">
+                <div class="col-12 event">
                   <p class="no-margin">{{ getEventHours(event) }}</p>
                   <p v-if="event.type === INTERVENTION" class="no-margin">{{ event.customer.identity.title }} {{ event.customer.identity.lastname }}</p>
                   <p v-if="event.type === ABSENCE">{{ displayAbsenceType(event.absence) }}</p>
