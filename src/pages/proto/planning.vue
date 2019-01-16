@@ -52,13 +52,22 @@
           <q-btn-toggle v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions" @input="resetCreationForm(newEvent.type)"/>
         </div>
         <ni-modal-select caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions" :error="$v.newEvent.auxiliary.$error" />
-        <ni-modal-datetime-picker caption="Date de debut" v-model="newEvent.startDate" type="datetime" :error="$v.newEvent.startDate.$error" />
-        <ni-modal-datetime-picker caption="Date de fin" v-model="newEvent.endDate" type="datetime" :error="$v.newEvent.endDate.$error" />
+        <template v-if="newEvent.type !== ABSENCE">
+          <ni-modal-datetime-picker caption="Date de debut" v-model="newEvent.startDate" type="datetime" :error="$v.newEvent.startDate.$error" />
+          <ni-modal-datetime-picker caption="Date de fin" v-model="newEvent.endDate" type="datetime" :error="$v.newEvent.endDate.$error"
+            :min="minEndDate" :max="maxEndDate" />
+        </template>
         <template v-if="newEvent.type === INTERVENTION">
           <ni-modal-select caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions" :error="$v.newEvent.customer.$error" />
           <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions" :error="$v.newEvent.subscription.$error" />
         </template>
         <template v-if="newEvent.type === ABSENCE">
+          <ni-modal-datetime-picker caption="Date de debut" v-model="newEvent.startDate" type="date" :error="$v.newEvent.startDate.$error" />
+          <ni-modal-select caption="Durée" :error="$v.newEvent.startDuration.$error" :options="dateOptions" v-model="newEvent.startDuration"
+            separator />
+          <ni-modal-datetime-picker caption="Date de fin" v-model="newEvent.endDate" type="date" :error="$v.newEvent.endDate.$error" />
+          <ni-modal-select caption="Durée" :error="$v.newEvent.endDuration.$error" :options="dateOptions" v-model="newEvent.endDuration"
+            separator />
           <ni-modal-select caption="Type d'absence" v-model="newEvent.absence" :options="absenceOptions" :error="$v.newEvent.absence.$error" />
           <ni-file-uploader caption="Justificatif d'absence" path="attachment" :entity="newEvent" alt="justificatif absence" name="proofOfAbsence"
             :url="docsUploadUrl" @uploaded="documentUploaded" :additionalValue="additionalValue" :key="uploaderKey" :disable="!selectedAuxiliary._id"
@@ -99,7 +108,7 @@ import ModalSelect from '../../components/form/ModalSelect';
 import SelectSector from '../../components/form/SelectSector';
 import ModalInput from '../../components/form/ModalInput.vue';
 import FileUploader from '../../components/form/FileUploader';
-import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, ABSENCE_TYPE } from '../../data/constants';
+import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, ABSENCE_TYPE, DATE_OPTIONS } from '../../data/constants';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../../components/popup/notify';
 
 export default {
@@ -127,7 +136,9 @@ export default {
       newEvent: {
         type: INTERVENTION,
         startDate: '',
+        startDuration: '',
         endDate: '',
+        endDuration: '',
         auxiliary: '',
         customer: '',
         subscription: '',
@@ -147,6 +158,7 @@ export default {
       ],
       internalHours: [],
       absenceOptions: ABSENCE_TYPE,
+      dateOptions: DATE_OPTIONS,
       uploaderKey: 0,
     }
   },
@@ -154,7 +166,13 @@ export default {
     newEvent: {
       type: { required },
       startDate: { required },
+      startDuration: { required: requiredIf((item) => {
+        return item.type === ABSENCE;
+      }) },
       endDate: { required },
+      endDuration: { required: requiredIf((item) => {
+        return item.type === ABSENCE;
+      }) },
       auxiliary: { required },
       sector: { required },
       customer: { required: requiredIf((item) => {
@@ -327,6 +345,17 @@ export default {
         if (this.newEvent.type === INTERNAL_HOUR) {
           const internalHour = this.internalHours.find(hour => hour._id === this.newEvent.internalHour);
           payload.internalHour = internalHour;
+        }
+        if (this.newEvent.type === ABSENCE) {
+          payload.startDate = this.$moment(this.newEvent.startDate).hours(this.newEvent.startDuration[0].startHour).toISOString();
+          if (this.newEvent.endDuration !== '') {
+            payload.endDate = this.$moment(this.newEvent.endDate).hours(this.newEvent.endDuration[0].endHour).toISOString();
+          } else {
+            payload.endDate = this.$moment(this.newEvent.endDate).hours(this.newEvent.startDuration[0].endHour).toISOString();
+          }
+
+          this.$_.unset(payload, 'startDuration');
+          this.$_.unset(payload, 'endDuration');
         }
 
         this.loading = true;
