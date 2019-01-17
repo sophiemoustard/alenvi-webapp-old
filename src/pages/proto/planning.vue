@@ -27,7 +27,7 @@
               {{auxiliary.firstname}} {{auxiliary.lastname}}
             </td>
             <td @drop="drop" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top" class="event-cell">
-              <div :id="`${eventIndex}`" draggable @dragstart="drag" class="row cursor-pointer" v-for="(event, eventIndex) in getAuxiliaryEvents(auxiliary, dayIndex)" :key="eventIndex" @click="openEditionModal(event)">
+              <div :id="Math.random().toString(36).substr(2, 5)" draggable @dragstart="drag" class="row cursor-pointer" v-for="(event, eventIndex) in getAuxiliaryEvents(auxiliary, dayIndex)" :key="eventIndex" @click="openEditionModal(event)">
                 <div class="col-12 event">
                   <p class="no-margin">{{ getEventHours(event) }}</p>
                   <p v-if="event.type === INTERVENTION" class="no-margin">{{ event.customer.identity.title }} {{ event.customer.identity.lastname }}</p>
@@ -327,6 +327,7 @@ export default {
     },
     async getEvents () {
       try {
+<<<<<<< HEAD
         this.events = await this.$events.list({
           startDate: this.startOfWeek.format('YYYYMMDD'),
           endStartDate: this.endOfWeek().format('YYYYMMDD'),
@@ -404,6 +405,9 @@ export default {
         NotifyPositive('Document supprimé');
         this.$_.unset(this.newEvent, 'attachment');
         this.rerenderUploader();
+=======
+        this.events = await this.$events.list({ startDate: this.startOfWeek.format('YYYYMMDD'), endStartDate: this.endOfWeek().format('YYYYMMDD') });
+>>>>>>> Resolve drag and drop bugs if id is the same for two tds
       } catch (e) {
         console.error(e);
         if (e.message === '') {
@@ -415,15 +419,16 @@ export default {
     // Drag & drop
     drag (event) {
       event.dataTransfer.setData('text', event.target.id);
-      event.target.style.color = 'green';
+      console.log('id event =', event.target.id);
       console.log('drag event =', event);
     },
     drop (event) {
+      console.log('id event =', event.target.id);
       console.log('drop event =', event);
       // event.stopPropagation();
       event.preventDefault();
       const data = event.dataTransfer.getData('text');
-      console.log('data=', data);
+      console.log('data =', data);
       event.target.appendChild(document.getElementById(data));
     }
   }
