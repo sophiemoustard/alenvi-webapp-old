@@ -294,7 +294,7 @@ export default {
           payload.bic_number = this.customer.payment.bic;
           payload.iban_number = this.customer.payment.iban;
           payload.id_tiers = this.customer.customerId;
-          await this.$ogust.setEmployeeBankInfo(payload);
+          await this.$ogust.setBankInfo(payload);
         }
       } else {
         await this.$ogust.editOgustCustomer(this.userProfile.customerId, payload);
