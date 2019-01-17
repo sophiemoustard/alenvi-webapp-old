@@ -130,7 +130,7 @@
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
             <span>
-              <q-icon name="clear" size="1rem" @click.native="updatingThirdPartyPayersModal = false" /></span>
+              <q-icon name="clear" size="1rem" @click.native="thirdPartyPayersUpdateModal = false" /></span>
           </div>
         </div>
         <ni-modal-input caption="Nom" v-model="updatingThirdPartyPayer.name" :error="$v.updatingThirdPartyPayer.name.$error" @blur="$v.updatingThirdPartyPayer.name.$touch" requiredField />
@@ -275,7 +275,7 @@ export default {
           name: 'unitTTCprice',
           label: 'Prix unitaire TTC par défaut',
           field: 'unitTTCPrice',
-          format: val => val ? `${val} €` : '',
+          format: val => val ? `${val}€` : '',
           align: 'left'
         },
         {
@@ -302,7 +302,7 @@ export default {
         name: '',
         email: '',
         address: {},
-        unitTTCPrice: 0,
+        unitTTCPrice: '',
         logo: {},
         billingMode: ''
       },
@@ -417,7 +417,6 @@ export default {
     async refreshThirdPartyPayers () {
       await this.$store.dispatch('main/getUser', this.user._id);
       this.thirdPartyPayers = this.user.company.customersConfig.thirdPartyPayers;
-      console.log('third', this.thirdPartyPayers);
     },
     selectedAddress (item) {
       this.company.address = Object.assign({}, this.company.address, item);
@@ -498,6 +497,7 @@ export default {
         NotifyPositive('Tiers payeur supprimé.');
       } catch (e) {
         console.error(e);
+        if (e.message === '') return NotifyPositive('Suppression annulée')
         NotifyNegative('Erreur lors de la suppression du tiers payeur.');
       }
     },
@@ -527,11 +527,10 @@ export default {
     },
     async createNewThirdPartyPayer () {
       try {
-        this.thirdPartyPayerLoading = true;
         if (this.$v.newThirdPartyPayer.$error) {
-          this.thirdPartyPayerLoading = false;
           return NotifyWarning('Champ(s) invalide(s)');
         }
+        this.thirdPartyPayerLoading = true;
         const payload = this.$_.pickBy(this.newThirdPartyPayer);
         await this.$companies.createThirdPartyPayer(this.company._id, payload);
         await this.refreshThirdPartyPayers();
@@ -560,17 +559,16 @@ export default {
     },
     async updateThirdPartyPayer () {
       try {
-        this.thirdPartyPayerUpdateLoading = true;
         if (this.$v.updatingThirdPartyPayer.$error) {
-          this.thirdPartyPayerUpdateLoading = false;
           return NotifyWarning('Champ(s) invalide(s)');
         }
+        this.thirdPartyPayerUpdateLoading = true;
         const thirdPartyPayerId = this.updatingThirdPartyPayer._id;
         delete this.updatingThirdPartyPayer._id;
         const payload = this.$_.pickBy(this.updatingThirdPartyPayer);
         await this.$companies.updateThirdPartyPayer({ id: this.company._id, thirdPartyPayerId }, payload);
         await this.refreshThirdPartyPayers();
-        NotifyPositive('Tiers payeur créé.');
+        NotifyPositive('Tiers payeur modifié.');
       } catch (e) {
         NotifyNegative('Erreur lors de la modification du tiers payeur.');
         console.error(e);
@@ -594,7 +592,7 @@ export default {
         name: '',
         email: '',
         address: {},
-        unitTTCPrice: 0,
+        unitTTCPrice: '',
         logo: {},
         billingMode: ''
       }
