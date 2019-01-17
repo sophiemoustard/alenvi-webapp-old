@@ -115,7 +115,7 @@
           </div>
         </div>
         <ni-modal-datetime-picker caption="Date d'effet" v-model="editedService.startDate" :error="$v.editedService.startDate.$error"
-          @blur="$v.editedService.startDate.$touch" />
+          @blur="$v.editedService.startDate.$touch" :min="minStartDate" />
         <ni-modal-input caption="Nom" v-model="editedService.name" :error="$v.editedService.name.$error" @blur="$v.editedService.name.$touch" />
         <ni-modal-input caption="Prix unitaire par défaut TTC" suffix="€" type="number" v-model="editedService.defaultUnitAmount"
           :error="$v.editedService.defaultUnitAmount.$error" @blur="$v.editedService.defaultUnitAmount.$touch"/>
@@ -481,7 +481,10 @@ export default {
           billingMode
         }
       });
-    }
+    },
+    minStartDate () {
+      return this.selectedService ? this.$moment(this.selectedService.startDate).toISOString() : '';
+    },
   },
   mounted () {
     this.company = this.user.company;
@@ -652,7 +655,7 @@ export default {
     },
     startEdition (id) {
       const selectedService = this.services.find(service => service._id === id);
-      const { name, defaultUnitAmount, vat, holidaySurcharge, eveningSurcharge } = selectedService.lastVersion;
+      const { name, defaultUnitAmount, vat, holidaySurcharge, eveningSurcharge } = selectedService;
       this.editedService = {
         _id: selectedService._id,
         name: name || '',
