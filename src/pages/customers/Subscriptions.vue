@@ -38,13 +38,13 @@
         <p class="title">Paiement</p>
         <div class="row gutter-profile">
           <ni-input caption="Nom associé au compte bancaire" v-model="customer.payment.bankAccountOwner" :error="$v.customer.payment.bankAccountOwner.$error"
-            @focus="saveTmp('payment.bankAccountOwner')" @blur="updateCustomer('payment.bankAccountOwner')"
+            @focus="saveTmp('payment.bankAccountOwner')" @blur="updateCustomer({ alenvi: 'payment.bankAccountOwner', ogust: 'holder' })"
           />
           <ni-input caption="IBAN" v-model="customer.payment.iban" :error="$v.customer.payment.iban.$error" :errorLabel="ibanError"
-            @focus="saveTmp('payment.iban')" @blur="updateCustomer('payment.iban')"
+            @focus="saveTmp('payment.iban')" @blur="updateCustomer({ alenvi: 'payment.iban', ogust: 'iban_number' })"
           />
           <ni-input caption="BIC" v-model="customer.payment.bic" :error="$v.customer.payment.bic.$error" :errorLabel="bicError"
-            @focus="saveTmp('payment.bic')" @blur="updateCustomer('payment.bic')"
+            @focus="saveTmp('payment.bic')" @blur="updateCustomer({ alenvi: 'payment.bic', ogust: 'bic_number' })"
           />
         </div>
         <p class="title">Mandats de prélèvement</p>
@@ -286,21 +286,45 @@ export default {
     saveTmp (path) {
       this.tmpInput = this.$_.get(this.customer, path);
     },
-    async updateCustomer (path) {
+    async updateOgustCustomer (paths) {
+      let value = this.$_.get(this.customer, paths.alenvi);
+      const payload = this.$_.set({}, paths.ogust, value);
+      if (paths.ogust.match(/((iban|bic)_number)|holder/i)) {
+        if (this.customer.payment && this.customer.payment.bankAccountOwner && this.customer.payment.iban && this.customer.payment.bic) {
+          payload.bic_number = this.customer.payment.bic;
+          payload.iban_number = this.customer.payment.iban;
+          payload.id_tiers = this.customer.customerId;
+          await this.$ogust.setEmployeeBankInfo(payload);
+        }
+      } else {
+        await this.$ogust.editOgustCustomer(this.userProfile.customerId, payload);
+      }
+    },
+    async updateAlenviCustomer (path) {
+      const value = this.$_.get(this.customer, path);
+      const payload = this.$_.set({}, path, value);
+      payload._id = this.customer._id;
+      await this.$customers.updateById(payload);
+    },
+    async updateCustomer (paths) {
       try {
-        if (this.tmpInput === this.$_.get(this.customer, path)) return;
-        this.$_.get(this.$v.customer, path).$touch();
-        if (this.$_.get(this.$v.customer, path).$error) {
+        if (this.tmpInput === this.$_.get(this.customer, paths.alenvi)) return;
+        this.$_.get(this.$v.customer, paths.alenvi).$touch();
+        if (this.$_.get(this.$v.customer, paths.alenvi).$error) {
           return NotifyWarning('Champ(s) invalide(s)');
         }
-        let value = this.$_.get(this.customer, path);
-        let payload = this.$_.set({}, path, value);
-        payload._id = this.customer._id;
-        await this.$customers.updateById(payload);
+        if (paths.alenvi && paths.ogust) {
+          await this.updateAlenviCustomer(paths.alenvi);
+          await this.updateOgustCustomer(paths);
+        } else if (paths.alenvi) {
+          await this.updateAlenviCustomer(paths.alenvi);
+        } else {
+          await this.updateOgustCustomer(paths);
+        }
         await this.$store.dispatch('main/getUser', this.helper._id);
         await this.getCustomer();
         NotifyPositive('Modification enregistrée');
-        if (path === 'payment.iban') {
+        if (paths.alenvi === 'payment.iban') {
           this.$v.customer.payment.bic.$touch();
           if (!this.$v.customer.payment.bic.required) {
             return NotifyWarning('Merci de renseigner votre BIC');
