@@ -204,6 +204,7 @@ import { configMixin } from '../../../mixins/configMixin';
 import Input from '../../../components/form/Input.vue';
 import SearchAddress from '../../../components/form/SearchAddress.vue';
 import { frAddress, posDecimals } from '../../../helpers/vuelidateCustomVal';
+import { BILLING_DIRECT, BILLING_INDIRECT } from '../../../data/constants.js';
 
 export default {
   name: 'CustomersConfig',
@@ -271,7 +272,7 @@ export default {
         },
         {
           name: 'defaultUnitAmount',
-          label: 'Prix unitaire par défaut TTC',
+          label: 'Prix unitaire TTC par défaut',
           align: 'center',
           field: row => `${row.defaultUnitAmount}€`,
         },
@@ -342,7 +343,7 @@ export default {
         },
         {
           name: 'billingMode',
-          label: 'Facturation (directe/indirecte)',
+          label: 'Facturation',
           field: 'billingMode',
           align: 'left'
         },
@@ -368,8 +369,8 @@ export default {
         billingMode: ''
       },
       billingModeOptions: [
-        { label: 'Indirecte', value: 'indirecte' },
-        { label: 'Directe', value: 'directe' },
+        { label: 'Indirecte', value: BILLING_INDIRECT },
+        { label: 'Directe', value: BILLING_DIRECT },
       ],
       thirdPartyPayerEditionModal: false,
       editedThirdPartyPayer: {
