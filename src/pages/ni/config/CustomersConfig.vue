@@ -505,8 +505,8 @@ export default {
     async refreshServices () {
       await this.$store.dispatch('main/getUser', this.user._id);
       this.services = this.user.company.customersConfig.services.map(service => ({
-        ...service,
         ...this.getServiceLastVersion(service),
+        ...service,
       }));
     },
     async refreshCompany () {
