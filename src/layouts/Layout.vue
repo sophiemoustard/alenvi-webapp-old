@@ -9,11 +9,14 @@
       </q-toolbar>
     </q-layout-header>
 
-    <q-layout-drawer :width="250" side="left" v-model="toggleDrawer">
+    <q-btn v-if="toggleDrawer" flat round icon="chevron_left" @click="toggleLeft" class="chevron chevron-left" />
+    <q-btn v-else flat round icon="view_headline" @click="toggleLeft" class="chevron chevron-right" />
+    <q-layout-drawer v-if="toggleDrawer" :width="250" side="left" v-model="toggleDrawer">
       <side-menu-coach :ref="sidemenusRefs" v-if="user && user.role.name !== 'Auxiliaire' && user.role.name !== 'Aidants'" :user="user" />
       <side-menu-auxiliary :ref="sidemenusRefs" v-if="user && user.role.name === 'Auxiliaire'" :user="user" />
       <side-menu-customer :ref="sidemenusRefs" v-if="user && user.role.name === 'Aidants'" :user="user" />
     </q-layout-drawer>
+    <q-layout-drawer v-else :width="0" side="left"></q-layout-drawer>
 
     <q-page-container>
       <router-view :key="$route.fullPath"/>
@@ -70,9 +73,27 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables'
 
+  .chevron
+    background-color: white
+    border: 1px solid $light-grey
+    top: 5px
+    position: fixed
+    height: 2em;
+    width: 2em;
+    z-index: 10000
+    &-left
+      left: 235px
+    &-right
+      left: 15px
+
   .q-toolbar
     color: $primary
     a
      color: $primary
      text-decoration: none
+
+  .q-btn
+    color: $dark-grey
+    &:hover
+      color: $primary
   </style>
