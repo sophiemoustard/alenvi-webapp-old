@@ -92,7 +92,7 @@
         </div>
         <ni-modal-input caption="Nom" v-model="newInternalHour.name" :error="$v.newInternalHour.name.$error" @blur="$v.newInternalHour.name.$touch" />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Créer le service" icon-right="add" color="primary" :loading="loading" @click="createInternalHour" />
+      <q-btn no-caps class="full-width modal-btn" label="Créer l'heure interne" icon-right="add" color="primary" :loading="loading" @click="createInternalHour" />
     </q-modal>
   </q-page>
 </template>
@@ -302,7 +302,7 @@ export default {
         console.error(e);
 
         if (e.message === '') {
-          return NotifyWarning('Suppression annulée');
+          return NotifyPositive('Suppression annulée');
         }
         NotifyNegative('Erreur lors de la suppression d\'une heure interne.');
       }
