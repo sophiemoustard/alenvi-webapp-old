@@ -302,7 +302,7 @@ export default {
         console.error(e);
 
         if (e.message === '') {
-          return NotifyWarning('Suppression annulée');
+          return NotifyPositive('Suppression annulée');
         }
         NotifyNegative('Erreur lors de la suppression d\'une heure interne.');
       }

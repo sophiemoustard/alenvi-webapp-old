@@ -6,12 +6,15 @@
         <p class="text-weight-bold">Services</p>
         <q-card style="background: white">
           <q-card-main>
-            <q-table :data="services" :columns="serviceColumns" hide-bottom binary-state-sort :pagination.sync="pagination">
-              <q-td slot="body-cell-delete" slot-scope="props" :props="props">
-                <q-btn disable flat round small color="grey" icon="delete" @click="deleteService(props.value, props.row.__index)" />
+            <q-table :data="services" :columns="serviceColumns" hide-bottom binary-state-sort :pagination.sync="pagination" :visibleColumns="visibleColumns">
+              <q-td slot="body-cell-history" slot-scope="props" :props="props">
+                <q-btn flat round small color="grey" icon="history" @click.native="showHistory(props.value)" />
               </q-td>
               <q-td slot="body-cell-edit" slot-scope="props" :props="props">
                 <q-btn flat round small color="grey" icon="edit" @click.native="startEdition(props.value)" />
+              </q-td>
+              <q-td slot="body-cell-delete" slot-scope="props" :props="props">
+                <q-btn disable flat round small color="grey" icon="delete" @click="deleteService(props.value, props.row.__index)" />
               </q-td>
             </q-table>
           </q-card-main>
@@ -124,7 +127,24 @@
         :disable="disableEditionButton" />
     </q-modal>
 
-    <!-- Third party payers modal -->
+    <!-- Service history modal -->
+    <q-modal v-model="serviceHistoryModal" :content-css="modalCssContainer" @hide="resetServiceHistoryData">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-11">
+            <h5>Historique du service <span class="text-weight-bold">{{selectedService.name}}</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer" style="text-align: right">
+            <span>
+              <q-icon name="clear" size="1rem" @click.native="serviceHistoryModal = false" /></span>
+          </div>
+        </div>
+        <q-table class="q-mb-xl" :data="selectedService.versions" :columns="serviceColumns" hide-bottom binary-state-sort :pagination.sync="paginationHistory"
+          :visibleColumns="visibleHistoryColumns" />
+      </div>
+    </q-modal>
+
+    <!-- Third party payers creation modal -->
     <q-modal v-model="newThirdPartyPayersModal" :content-css="modalCssContainer" @hide="resetThirdPartyPayerModalData">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
@@ -150,7 +170,7 @@
       <q-btn no-caps class="full-width modal-btn" label="Ajouter le tiers payeur" icon-right="add" color="primary" :loading="thirdPartyPayerLoading" @click="createNewThirdPartyPayer" />
     </q-modal>
 
-    <!-- Third party payers update modal -->
+    <!-- Third party payers edition modal -->
     <q-modal v-model="thirdPartyPayersUpdateModal" :content-css="modalCssContainer" @hide="resetThirdPartyPayerUpdateModalData">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
@@ -215,6 +235,8 @@ export default {
       services: [],
       newServiceModal: false,
       serviceEditionModal: false,
+      serviceHistoryModal: false,
+      selectedService: [],
       modalCssContainer: { minWidth: '30vw' },
       newService: {
         name: '',
@@ -236,62 +258,68 @@ export default {
         { label: 'Horaire', value: 'Horaire' },
         { label: 'Forfaitaire', value: 'Forfaitaire' },
       ],
+      visibleColumns: ['name', 'nature', 'defaultUnitAmount', 'vat', 'holidaySurcharge', 'eveningSurcharge', 'delete', 'edit', 'history'],
+      visibleHistoryColumns: ['startDate', 'name', 'defaultUnitAmount', 'vat', 'holidaySurcharge', 'eveningSurcharge'],
       serviceColumns: [
+        {
+          name: 'startDate',
+          label: 'Date d\'effet',
+          align: 'left',
+          field: row => row.startDate ? this.$moment(row.startDate).format('DD/MM/YYYY') : '',
+        },
         {
           name: 'name',
           label: 'Nom',
           align: 'left',
-          field: row => row.lastVersion.name,
-          sortable: true,
+          field: 'name',
         },
         {
           name: 'nature',
           label: 'Nature',
           align: 'left',
-          field: 'nature',
-          sortable: true,
+          field: 'nature'
         },
         {
           name: 'defaultUnitAmount',
           label: 'Prix unitaire par défaut TTC',
           align: 'center',
-          field: row => `${row.lastVersion.defaultUnitAmount}€`,
-          sortable: true,
+          field: row => `${row.defaultUnitAmount}€`,
         },
         {
           name: 'vat',
           label: 'TVA',
           align: 'center',
-          field: row => `${row.lastVersion.vat}%`,
-          sortable: true,
+          field: row => `${row.vat}%`,
         },
         {
           name: 'holidaySurcharge',
           label: 'Majoration dimanche/jours fériés',
           align: 'center',
-          field: row => row.lastVersion.holidaySurcharge && `${row.lastVersion.holidaySurcharge}%`,
-          sortable: true,
+          field: row => row.holidaySurcharge && `${row.holidaySurcharge}%`,
         },
         {
           name: 'eveningSurcharge',
           label: 'Majoration soirée',
           align: 'center',
-          field: row => row.lastVersion.eveningSurcharge && `${row.lastVersion.eveningSurcharge}%`,
-          sortable: true,
+          field: row => row.eveningSurcharge && `${row.eveningSurcharge}%`,
         },
         {
-          name: 'delete',
+          name: 'history',
           label: '',
           align: 'center',
           field: '_id',
-          sortable: true,
         },
         {
           name: 'edit',
           label: '',
           align: 'center',
           field: '_id',
-          sortable: true,
+        },
+        {
+          name: 'delete',
+          label: '',
+          align: 'center',
+          field: '_id',
         },
       ],
       pagination: { rowsPerPage: 0 },
@@ -366,7 +394,12 @@ export default {
       updatingThirdPartyPayer: {
         address: {},
         logo: {}
-      }
+      },
+      paginationHistory: {
+        rowsPerPage: 0,
+        sortBy: 'startDate',
+        descending: true,
+      },
     };
   },
   validations: {
@@ -461,13 +494,13 @@ export default {
     getServiceLastVersion (service) {
       if (!service.versions || service.versions.length === 0) return {};
 
-      return service.versions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+      return service.versions.sort((a, b) => new Date(b.startDate) - new Date(a.startDate))[0];
     },
     async refreshServices () {
       await this.$store.dispatch('main/getUser', this.user._id);
       this.services = this.user.company.customersConfig.services.map(service => ({
         ...service,
-        lastVersion: this.getServiceLastVersion(service),
+        ...this.getServiceLastVersion(service),
       }));
     },
     async refreshCompany () {
@@ -595,6 +628,10 @@ export default {
         eveningSurcharge: '',
       };
       this.$v.newService.$reset();
+    },
+    resetServiceHistoryData () {
+      this.serviceHistoryModal = false;
+      this.selectedService = [];
     },
     async createNewService () {
       try {
@@ -747,8 +784,12 @@ export default {
     },
     getAvatar (link) {
       return link || 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/images/users/default_avatar.png';
+    },
+    showHistory (id) {
+      this.selectedService = this.services.find(ser => ser._id === id);
+      this.serviceHistoryModal = true;
     }
-  }
+  },
 }
 </script>
 
