@@ -661,7 +661,7 @@ export default {
           payload.bic_number = this.customer.payment.bic;
           payload.iban_number = this.customer.payment.iban;
           payload.id_tiers = this.userProfile.customerId;
-          await this.$ogust.setEmployeeBankInfo(payload);
+          await this.$ogust.setBankInfo(payload);
         }
       } else if (paths.ogust === 'address') {
         const { street, zipCode, city } = payload.address;
