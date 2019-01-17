@@ -744,7 +744,7 @@ export default {
           return;
         }
         payload.id_tiers = this.currentUser.employee_id;
-        await this.$ogust.setEmployeeBankInfo(payload);
+        await this.$ogust.setBankInfo(payload);
       } else if (paths.ogust.match(/(city|line|supplement|zip)/i)) {
         payload.id_address = this.currentUser.administrative.contact.addressId;
         await this.$ogust.setAddress(payload);
