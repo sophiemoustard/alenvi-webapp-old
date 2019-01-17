@@ -476,7 +476,8 @@ export default {
       });
     },
     minStartDate () {
-      return this.selectedService ? this.$moment(this.selectedService.startDate).toISOString() : '';
+      const selectedService = this.services.find(ser => ser._id === this.editedService._id);
+      return selectedService ? this.$moment(selectedService.startDate).add(1, 'd').toISOString() : '';
     },
   },
   mounted () {
@@ -621,7 +622,7 @@ export default {
         holidaySurcharge: '',
         eveningSurcharge: '',
       };
-      this.$v.newService.$reset();
+      this.$v.editedService.$reset();
     },
     async updateService () {
       try {
