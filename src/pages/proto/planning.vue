@@ -404,6 +404,7 @@ export default {
         NotifyPositive('Document supprimé');
         this.$_.unset(this.newEvent, 'attachment');
         this.rerenderUploader();
+        this.events = await this.$events.list({ startDate: this.startOfWeek.format('YYYYMMDD'), endStartDate: this.endOfWeek().format('YYYYMMDD') });
       } catch (e) {
         console.error(e);
         if (e.message === '') {
