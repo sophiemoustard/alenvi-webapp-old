@@ -55,13 +55,8 @@
         <p class="text-weight-bold">Tiers payeurs</p>
         <q-card style="background: white">
           <q-card-main>
-            <q-table :data="thirdPartyPayersList" :columns="thirdPartyPayersColumns" hide-bottom binary-state-sort :pagination.sync="pagination">
-              <q-td slot="body-cell-identity" slot-scope="props" :props="props">
-                <q-item>
-                  <q-item-side :avatar="getAvatar(props.value.logo)" />
-                  <q-item-main :label="props.value.name" />
-                </q-item>
-              </q-td>
+            <q-table :data="thirdPartyPayers" :columns="thirdPartyPayersColumns" hide-bottom binary-state-sort :pagination.sync="pagination">
+              <q-td slot="body-cell-billingMode" slot-scope="props" :props="props" class="capitalize">{{ props.value }}</q-td>
               <q-td slot="body-cell-delete" slot-scope="props" :props="props" class="action-column">
                 <q-btn flat round small color="grey" icon="delete" @click="deleteThirdPartyPayer(props.value, props.row.__index)" />
               </q-td>
@@ -165,9 +160,6 @@
         <ni-modal-input caption="Prix unitaire TTC par défaut" suffix="€" type="number" v-model="newThirdPartyPayer.unitTTCPrice"
           :error="$v.newThirdPartyPayer.unitTTCPrice.$error" error-label="Le prix unitaire doit être positif"/>
         <ni-modal-select v-model="newThirdPartyPayer.billingMode" :options="billingModeOptions" caption="Facturation" :filter="false" />
-        <ni-image-uploader caption="Logo" path="logo" :entity="newThirdPartyPayer" alt="logo" name="picture"
-          :url="logoUploadUrl" @uploaded="imageUploaded($event, 'create')" :additional-fields="thirdPartyPayersAddFields" withBorders
-          @delete="deleteImageById(newThirdPartyPayer.logo.publicId)" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter le tiers payeur" icon-right="add" color="primary" :loading="loading"
         @click="createNewThirdPartyPayer" />
@@ -194,8 +186,6 @@
         <ni-modal-input caption="Prix unitaire TTC par défaut" suffix="€" type="number" v-model="editedThirdPartyPayer.unitTTCPrice"
           :error="$v.editedThirdPartyPayer.unitTTCPrice.$error" error-label="Le prix unitaire doit être positif"/>
         <ni-modal-select v-model="editedThirdPartyPayer.billingMode" :options="billingModeOptions" caption="Facturation" :filter="false" />
-        <ni-image-uploader caption="Logo" path="logo" :entity="editedThirdPartyPayer" alt="logo" name="picture" @uploaded="imageUploaded($event, 'update')"
-          :url="logoUploadUrl" :additional-fields="thirdPartyPayersAddFields" @delete="deleteImageById(editedThirdPartyPayer.logo.publicId)" withBorders />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Editer le tiers payeur" icon-right="add" color="primary" :loading="loading" @click="updateThirdPartyPayer" />
     </q-modal>
@@ -210,12 +200,10 @@ import ModalSelect from '../../../components/form/ModalSelect.vue';
 import ModalDatetimePicker from '../../../components/form/ModalDatetimePicker.vue';
 import CustomImg from '../../../components/form/CustomImg.vue';
 import FileUploader from '../../../components/form/FileUploader.vue';
-import ImageUploader from '../../../components/form/ImageUploader.vue';
 import { configMixin } from '../../../mixins/configMixin';
 import Input from '../../../components/form/Input.vue';
 import SearchAddress from '../../../components/form/SearchAddress.vue';
 import { frAddress, posDecimals } from '../../../helpers/vuelidateCustomVal';
-import cloudinary from '../../../api/Cloudinary.js';
 
 export default {
   name: 'CustomersConfig',
@@ -223,7 +211,6 @@ export default {
     'ni-modal-input': ModalInput,
     'ni-custom-img': CustomImg,
     'ni-file-uploader': FileUploader,
-    'ni-image-uploader': ImageUploader,
     'ni-modal-select': ModalSelect,
     'ni-input': Input,
     'ni-search-address': SearchAddress,
@@ -330,7 +317,7 @@ export default {
         {
           name: 'identity',
           label: 'Nom',
-          field: 'identity',
+          field: 'name',
           align: 'left',
           sortable: true
         },
@@ -378,7 +365,6 @@ export default {
         email: '',
         address: {},
         unitTTCPrice: '',
-        logo: {},
         billingMode: ''
       },
       billingModeOptions: [
@@ -388,7 +374,6 @@ export default {
       thirdPartyPayerEditionModal: false,
       editedThirdPartyPayer: {
         address: {},
-        logo: {}
       },
       pagination: { rowsPerPage: 0 },
       paginationHistory: {
@@ -441,9 +426,6 @@ export default {
     docsUploadUrl () {
       return `${process.env.API_HOSTNAME}/companies/${this.company._id}/gdrive/${this.company.folderId}/upload`;
     },
-    logoUploadUrl () {
-      return `${process.env.API_HOSTNAME}/cloudinary/image/upload`;
-    },
     addressError () {
       return !this.$v.company.address.fullAddress.required ? 'Champ requis' : 'Adresse non valide';
     },
@@ -458,22 +440,6 @@ export default {
         { name: 'role', value: 'ThirdPartyPayers' },
         { name: 'fileName', value: `logo_${this.newThirdPartyPayer.name}` }
       ];
-    },
-    thirdPartyPayersList () {
-      return this.thirdPartyPayers.map(thirdPartyPayer => {
-        const { address, email, unitTTCPrice, billingMode, name, logo } = thirdPartyPayer;
-        return {
-          _id: thirdPartyPayer._id,
-          identity: {
-            name,
-            logo: logo && logo.link ? logo.link : null
-          },
-          address,
-          email,
-          unitTTCPrice,
-          billingMode
-        }
-      });
     },
     minStartDate () {
       const selectedService = this.services.find(ser => ser._id === this.editedService._id);
@@ -674,7 +640,7 @@ export default {
     openThirdPartyPayerEditionModal (thirdPartyPayerId) {
       this.thirdPartyPayerEditionModal = true;
       const currentThirdPartyPayer = this.thirdPartyPayers.find(thirdPartyPayer => thirdPartyPayer._id === thirdPartyPayerId);
-      const { name, address, email, unitTTCPrice, billingMode, logo } = currentThirdPartyPayer;
+      const { name, address, email, unitTTCPrice, billingMode } = currentThirdPartyPayer;
       this.editedThirdPartyPayer = {
         _id: currentThirdPartyPayer._id,
         name,
@@ -682,7 +648,6 @@ export default {
         email,
         unitTTCPrice,
         billingMode,
-        logo
       };
     },
     resetThirdPartyPayerEditionData () {
@@ -716,7 +681,6 @@ export default {
     resetThirdPartyPayerUpdateModalData () {
       this.$v.editedThirdPartyPayer.$reset();
       this.editedThirdPartyPayer = {
-        logo: {},
         address: {}
       }
     },
@@ -757,40 +721,8 @@ export default {
         if (e.message === '') return NotifyPositive('Suppression annulée')
         NotifyNegative('Erreur lors de la suppression du tiers payeur.');
       }
-    },
-    // Image
-    async deleteImageById (imageId) {
-      try {
-        await cloudinary.deleteImageById({ id: imageId });
-        this.newThirdPartyPayer.logo = {};
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la suppression de l\'image');
-      }
-    },
-    imageUploaded (data, type) {
-      const response = JSON.parse(data.xhr.response);
-      switch (type) {
-        case 'create':
-          this.newThirdPartyPayer.logo = {
-            publicId: response.data.picture.public_id,
-            link: response.data.picture.secure_url
-          };
-          break;
-        case 'update':
-          this.editedThirdPartyPayer.logo = {
-            publicId: response.data.picture.public_id,
-            link: response.data.picture.secure_url
-          };
-          break;
-        default:
-          break;
-      }
-    },
-    getAvatar (link) {
-      return link || 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/images/users/default_avatar.png';
-    },
-  },
+    }
+  }
 }
 </script>
 
