@@ -846,8 +846,8 @@ export default {
         if (this.$v.editedSubscription.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        const subscriptionId = this.editedSubscription._id
-        const payload = this.editedSubscription;
+        const subscriptionId = this.editedSubscription._id;
+        const payload = this.$_.pickBy(this.editedSubscription);
         delete payload._id;
         delete payload.nature;
         await this.$customers.updateSubscription({ _id: this.customer._id, subscriptionId }, payload);
