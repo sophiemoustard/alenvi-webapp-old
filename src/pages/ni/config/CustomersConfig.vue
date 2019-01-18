@@ -639,7 +639,7 @@ export default {
       this.editedThirdPartyPayer = {
         _id: currentThirdPartyPayer._id,
         name,
-        address,
+        address: address || {},
         email,
         unitTTCPrice,
         billingMode,
