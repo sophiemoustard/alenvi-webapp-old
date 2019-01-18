@@ -34,17 +34,21 @@
       </div>
       <q-card>
         <q-card-main>
-          <q-table :data="customer.subscriptions" :columns="subscriptionsColumns" row-key="name" table-style="font-size: 1rem" hide-bottom>
-            <q-td slot="body-cell-remove" slot-scope="props" :props="props">
-              <q-icon name="delete" size="1.2rem" color="grey" class="cursor-pointer" @click.native="removeSubscriptions(props.value)" />
+          <q-table :data="subscriptions" :columns="subscriptionsColumns" row-key="name" table-style="font-size: 1rem" hide-bottom>
+            <q-td slot="body-cell-actions" slot-scope="props" :props="props" class="action-column">
+              <div class="row no-wrap">
+                  <q-btn flat round small color="grey" icon="history" @click.native="showHistory(props.value)" />
+                  <q-btn flat round small color="grey" icon="edit" @click.native="startEdition(props.value)" />
+                  <q-btn flat round small color="grey" icon="delete" @click.native="removeSubscriptions(props.value)" />
+                </div>
             </q-td>
           </q-table>
         </q-card-main>
         <q-card-actions align="end">
-          <q-btn :disable="serviceOptions.length === 0" flat no-caps color="primary" icon="add" label="Ajouter une souscription" @click="addSubscription = true"/>
+          <q-btn :disable="serviceOptions.length === 0" flat no-caps color="primary" icon="add" label="Ajouter une souscription" @click="subscriptionCreationModal = true"/>
         </q-card-actions>
       </q-card>
-      <div v-if="customer.subscriptions && customer.subscriptions.length > 0" class="row">
+      <div v-if="subscriptions && subscriptions.length > 0" class="row">
           <div class="col-xs-12">
             <q-checkbox v-model="customer.subscriptionsAccepted" disable class="q-mr-sm" />
             <span style="vertical-align: middle">Validation en ligne des souscriptions<span class="text-weight-thin text-italic"> {{ acceptedByHelper }}</span></span>
@@ -56,7 +60,7 @@
       <q-card>
         <q-card-main>
           <q-table :data="userHelpers" :columns="helpersColumns" row-key="name" table-style="font-size: 1rem" hide-bottom>
-            <q-td slot="body-cell-remove" slot-scope="props" :props="props">
+            <q-td slot="body-cell-remove" slot-scope="props" :props="props" class="action-column">
               <q-icon name="delete" size="1.2rem" color="grey" class="cursor-pointer" @click.native="removeHelper(props.value)" />
             </q-td>
           </q-table>
@@ -152,7 +156,7 @@
           </q-table>
         </q-card-main>
         <q-card-actions align="end">
-          <q-btn :disabled="this.customer.subscriptions.length === 0" flat no-caps color="primary" icon="add" label="Générer un devis" @click="generateQuote"/>
+          <q-btn :disabled="this.subscriptions.length === 0" flat no-caps color="primary" icon="add" label="Générer un devis" @click="generateQuote"/>
         </q-card-actions>
       </q-card>
     </div>
@@ -176,15 +180,15 @@
       <q-btn no-caps class="full-width modal-btn" label="Ajouter un aidant" icon-right="add" color="primary" :loading="loading" @click="submitHelper" />
     </q-modal>
 
-    <!-- Add subscription modal -->
-    <q-modal v-model="addSubscription" @hide="resetSubscriptionForm" :content-css="modalCssContainer">
+    <!-- Subscription creation modal -->
+    <q-modal v-model="subscriptionCreationModal" @hide="resetCreationSubscriptionData" :content-css="modalCssContainer">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-8">
             <h5>Ajouter une <span class="text-weight-bold">souscription</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
-            <span><q-icon name="clear" size="1rem" @click.native="addSubscription = false" /></span>
+            <span><q-icon name="clear" size="1rem" @click.native="subscriptionCreationModal = false" /></span>
           </div>
         </div>
         <ni-modal-select caption="Service" :options="serviceOptions" v-model="newSubscription.service" :error="$v.newSubscription.service.$error"
@@ -199,7 +203,49 @@
         <ni-modal-input v-if="newSubscription.nature !== 'Forfaitaire'" v-model="newSubscription.sundays" caption="Dont dimanche (h)" type="number" />
         <ni-modal-input v-if="newSubscription.nature !== 'Forfaitaire'" v-model="newSubscription.evenings" caption="Dont soirée (h)" last type="number" />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Ajouter une souscription" icon-right="add" color="primary" :loading="loading" @click="submitSubscription" />
+      <q-btn no-caps class="full-width modal-btn" label="Ajouter une souscription" icon-right="add" color="primary" :loading="loading"
+        @click="submitSubscription" />
+    </q-modal>
+
+    <!-- Subscription edition modal -->
+    <q-modal v-model="subscriptionEditionModal" :content-css="modalCssContainer" @hide="resetEditionSubscriptionData">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-11">
+            <h5>Editer la <span class="text-weight-bold">souscription</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer" style="text-align: right">
+            <span>
+              <q-icon name="clear" size="1rem" @click.native="subscriptionEditionModal = false" /></span>
+          </div>
+        </div>
+        <ni-datetime-picker v-model="editedSubscription.startDate" :error="$v.editedSubscription.startDate.$error" caption="Dated'effet"
+          @blur="$v.editedSubscription.startDate.$touch" :min="minStartDate" />
+        <ni-modal-input v-model="editedSubscription.unitTTCRate" :error="$v.editedSubscription.unitTTCRate.$error" caption="Prix unitaire TTC"
+          @blur="$v.editedSubscription.unitTTCRate.$touch" type="number" />
+        <ni-modal-input v-model="editedSubscription.estimatedWeeklyVolume" :error="$v.editedSubscription.estimatedWeeklyVolume.$error"
+          caption="Volume hebdomadaire estimatif" @blur="$v.editedSubscription.estimatedWeeklyVolume.$touch" type="number" />
+        <ni-modal-input v-if="editedSubscription.nature !== 'Forfaitaire'" v-model="editedSubscription.sundays" caption="Dont dimanche (h)" type="number" />
+        <ni-modal-input v-if="editedSubscription.nature !== 'Forfaitaire'" v-model="editedSubscription.evenings" caption="Dont soirée (h)" last type="number" />
+      </div>
+      <q-btn no-caps class="full-width modal-btn" label="Editer la souscription" icon-right="add" color="primary" :loading="loading" @click="updateSubscription" />
+    </q-modal>
+
+    <!-- Subscription history modal -->
+    <q-modal v-model="subscriptionHistoryModal" :content-css="modalCssContainer" @hide="resetSubscriptionHistoryData">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-11">
+            <h5>Historique de la souscription <span class="text-weight-bold">{{selectedSubscription.service && selectedSubscription.service.name}}</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer" style="text-align: right">
+            <span>
+              <q-icon name="clear" size="1rem" @click.native="subscriptionHistoryModal = false" /></span>
+          </div>
+        </div>
+        <q-table class="q-mb-xl" :data="selectedSubscription.versions" :columns="subscriptionHistoryColumns" hide-bottom binary-state-sort
+          :pagination.sync="paginationHistory" />
+      </div>
     </q-modal>
   </div>
 </template>
@@ -216,7 +262,7 @@ import Input from '../form/Input.vue';
 import NiModalInput from '../form/ModalInput';
 import NiModalSelect from '../form/ModalSelect';
 import { frPhoneNumber, iban, bic, frAddress } from '../../helpers/vuelidateCustomVal';
-import DatetimePicker from '../form/DatetimePicker';
+import DatetimePicker from '../form/ModalDatetimePicker';
 import { downloadDocxFile } from '../../helpers/downloadFile';
 import { customerMixin } from '../../mixins/customerMixin.js';
 
@@ -234,12 +280,12 @@ export default {
     return {
       loading: false,
       addHelper: false,
-      addSubscription: false,
+      subscriptionCreationModal: false,
+      subscriptionEditionModal: false,
+      subscriptionHistoryModal: false,
       isLoaded: false,
       tmpInput: '',
-      modalCssContainer: {
-        minWidth: '30vw'
-      },
+      modalCssContainer: { minWidth: '30vw' },
       customer: {
         identity: {},
         contact: {
@@ -251,6 +297,8 @@ export default {
         subscriptions: [],
         quotes: [],
       },
+      subscriptions: [],
+      selectedSubscription: [],
       subscriptionsColumns: [
         {
           name: 'service',
@@ -277,22 +325,49 @@ export default {
           field: row => row.service.nature === 'Horaire' ? `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume,
         },
         {
-          name: 'sundays',
-          label: 'dont dimanche',
+          name: 'weeklyRate',
+          label: 'Coût hebdomadaire TTC',
           align: 'center',
-          field: row => row.service.nature === 'Horaire' && row.sundays ? `${row.sundays}h` : row.sundays,
+          field: row => `${this.computeWeeklyRate(row)}€`,
         },
         {
-          name: 'evenings',
-          label: 'dont soirées (après 20h)',
-          align: 'center',
-          field: row => row.service.nature === 'Horaire' && row.evenings ? `${row.evenings}h` : row.evenings,
-        },
-        {
-          name: 'remove',
+          name: 'actions',
           label: '',
           align: 'left',
           field: '_id',
+        },
+      ],
+      subscriptionHistoryColumns: [
+        {
+          name: 'startDate',
+          label: 'Date d\'effet',
+          align: 'left',
+          field: row => row.startDate ? this.$moment(row.startDate).format('DD/MM/YYYY') : '',
+        },
+        {
+          name: 'unitTTCRate',
+          label: 'Prix unitaire TTC',
+          align: 'center',
+          field: row => `${this.formatNumber(row.unitTTCRate)}€`,
+        },
+        {
+          name: 'estimatedWeeklyVolume',
+          label: 'Volume hebdomadaire estimatif',
+          align: 'center',
+          field: row => this.selectedSubscription.service && this.selectedSubscription.service.nature === 'Horaire'
+            ? `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume,
+        },
+        {
+          name: 'evenings',
+          label: 'dont dimanche',
+          align: 'center',
+          field: 'evenings',
+        },
+        {
+          name: 'sundays',
+          label: 'dont soirées',
+          align: 'center',
+          field: 'sundays',
         },
       ],
       helpersColumns: [
@@ -370,6 +445,7 @@ export default {
         unitTTCRate: '',
         estimatedWeeklyVolume: '',
       },
+      editedSubscription: {},
       visibleMandateColumns: ['rum', 'emptyMandate', 'signedMandate', 'signed', 'signedAt'],
       visibleQuoteColumns: ['quoteNumber', 'emptyQuote', 'signedQuote', 'signed'],
       mandateColumns: [
@@ -418,6 +494,11 @@ export default {
         ascending: true,
         rowsPerPage: 0,
       },
+      paginationHistory: {
+        rowsPerPage: 0,
+        sortBy: 'startDate',
+        descending: true,
+      },
     }
   },
   computed: {
@@ -437,7 +518,7 @@ export default {
         return [];
       }
 
-      const subscribedServices = this.customer.subscriptions.map(subscription => subscription.service._id);
+      const subscribedServices = this.subscriptions.map(subscription => subscription.service._id);
       const availableServices = this.company.customersConfig.services.filter(service => !subscribedServices.includes(service._id));
 
       return availableServices.map(service => ({
@@ -479,7 +560,11 @@ export default {
       if (this.lastSubscriptionHistory && this.customer.subscriptionsAccepted) {
         return `le ${this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} par ${this.acceptedBy}`;
       }
-    }
+    },
+    minStartDate () {
+      const selectedSubscription = this.subscriptions.find(sub => sub._id === this.editedSubscription._id);
+      return selectedSubscription ? this.$moment(selectedSubscription.startDate).add(1, 'd').toISOString() : '';
+    },
   },
   validations: {
     customer: {
@@ -510,6 +595,11 @@ export default {
       unitTTCRate: { required },
       estimatedWeeklyVolume: { required },
     },
+    editedSubscription: {
+      startDate: { required },
+      unitTTCRate: { required },
+      estimatedWeeklyVolume: { required },
+    },
   },
   watch: {
     userProfile (value) {
@@ -527,17 +617,26 @@ export default {
     getServiceLastVersion (service) {
       if (!service.versions || service.versions.length === 0) return {};
 
-      return service.versions.sort((a, b) => b.createdAt - a.createdAt)[0];
+      return service.versions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+    },
+    getSubscriptionLastVersion (subscription) {
+      if (!subscription.versions || subscription.versions.length === 0) return {};
+
+      return subscription.versions.sort((a, b) => new Date(b.startDate) - new Date(a.startDate))[0]
+    },
+    computeWeeklyRate (subscription) {
+      let weeklyRate = subscription.unitTTCRate * subscription.estimatedWeeklyVolume;
+      if (subscription.sundays && subscription.service.holidaySurcharge) {
+        weeklyRate += subscription.sundays * subscription.unitTTCRate * subscription.service.holidaySurcharge / 100;
+      }
+      if (subscription.evenings && subscription.service.eveningSurcharge) {
+        weeklyRate += subscription.evenings * subscription.unitTTCRate * subscription.service.eveningSurcharge / 100;
+      }
+
+      return weeklyRate;
     },
     formatNumber (number) {
       return parseFloat(Math.round(number * 100) / 100).toFixed(1)
-    },
-    updateNewSubscription () {
-      if (this.newSubscription.service !== '') {
-        const selectedService = this.company.customersConfig.services.find(service => service._id === this.newSubscription.service);
-        this.newSubscription.unitTTCRate = selectedService.defaultUnitAmount;
-        this.newSubscription.nature = selectedService.nature;
-      }
     },
     mergeUser (value = null) {
       const args = [this.customer, value];
@@ -552,6 +651,7 @@ export default {
     saveTmpSignedAt (index) {
       this.tmpInput = this.customer.payment.mandates[index].signedAt;
     },
+    // Refresh data
     async getUserHelpers () {
       try {
         this.userHelpers = await this.$users.showAll({ customers: this.userProfile._id });
@@ -561,7 +661,10 @@ export default {
     },
     async refreshSubscriptions () {
       try {
-        this.customer.subscriptions = await this.$customers.getSubscriptions(this.customer._id);
+        this.subscriptions = this.customer.subscriptions.map(sub => ({
+          ...this.getSubscriptionLastVersion(sub),
+          ...sub,
+        }))
 
         this.$store.commit('rh/saveUserProfile', this.customer);
         this.$v.customer.$touch();
@@ -593,25 +696,12 @@ export default {
       const customerRaw = await this.$customers.getById(this.userProfile._id);
       const customer = customerRaw.data.data.customer;
       this.mergeUser(customer);
+      await this.refreshSubscriptions();
 
       this.$store.commit('rh/saveUserProfile', this.customer);
       this.$v.customer.$touch();
     },
-    async updateSignedAt (mandate) {
-      try {
-        if (!mandate.signedAt || this.tmpInput === mandate.signedAt) return;
-        const params = {
-          _id: this.customer._id,
-          mandateId: mandate._id,
-        };
-        await this.$customers.updateMandate(params, mandate);
-        this.refreshMandates();
-        NotifyPositive('Modification enregistrée');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la modification');
-      }
-    },
+    // Customer
     async updateUser (paths) {
       try {
         if (this.tmpInput === this.$_.get(this.customer, paths.alenvi)) return;
@@ -619,25 +709,16 @@ export default {
           const isValid = await this.waitForValidation(paths.alenvi);
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
-        if (paths.alenvi && paths.ogust) {
-          await this.updateAlenviCustomer(paths.alenvi);
-          await this.updateOgustCustomer(paths);
-        } else if (paths.alenvi) {
-          await this.updateAlenviCustomer(paths.alenvi);
-        } else {
-          await this.updateOgustCustomer(paths);
-        }
+        if (paths.alenvi) await this.updateAlenviCustomer(paths.alenvi);
+        if (paths.ogust) await this.updateOgustCustomer(paths);
+
         NotifyPositive('Modification enregistrée');
-        if (paths.alenvi.match(/iban/i)) {
-          this.refreshCustomer();
-        }
+        if (paths.alenvi.match(/iban/i)) this.refreshCustomer();
 
         this.$store.commit('rh/saveUserProfile', this.customer);
       } catch (e) {
         console.error(e);
-        if (e.message === 'Champ(s) invalide(s)') {
-          return NotifyWarning(e.message)
-        }
+        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message)
         NotifyNegative('Erreur lors de la modification');
       } finally {
         this.tmpInput = '';
@@ -645,21 +726,17 @@ export default {
     },
     async updateAlenviCustomer (path) {
       let value = this.$_.get(this.customer, path);
-      if (path.match(/iban/i)) {
-        value = value.split(' ').join('');
-      }
+      if (path.match(/iban/i)) value = value.split(' ').join('');
+
       const payload = this.$_.set({}, path, value);
       payload._id = this.userProfile._id;
       await this.$customers.updateById(payload);
     },
     async updateOgustCustomer (paths) {
       let value = this.$_.get(this.customer, paths.alenvi);
-      if (paths.ogust.match(/date_of_birth/i)) {
-        value = this.$moment(value).format('YYYYMMDD');
-      }
-      if (paths.ogust.match(/iban_number/i)) {
-        value = value.split(' ').join('');
-      }
+      if (paths.ogust.match(/date_of_birth/i)) value = this.$moment(value).format('YYYYMMDD');
+      if (paths.ogust.match(/iban_number/i)) value = value.split(' ').join('');
+
       const payload = this.$_.set({}, paths.ogust, value);
       if (paths.ogust.match(/((iban|bic)_number)|holder/i)) {
         if (this.customer.payment && this.customer.payment.bankAccountOwner && this.customer.payment.iban && this.customer.payment.bic) {
@@ -681,24 +758,6 @@ export default {
         await this.$ogust.editOgustCustomer(this.userProfile.customerId, payload);
       }
     },
-    async removeHelper (helperId) {
-      try {
-        await this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Es-tu sûr(e) de vouloir supprimer cet aidant ?',
-          ok: true,
-          cancel: 'Annuler'
-        });
-        const helper = this.userHelpers.find(helper => helper._id === helperId);
-        const { ogustInterlocId } = helper;
-        await this.$ogust.deleteContact(ogustInterlocId);
-        await this.$users.deleteById(helperId);
-        NotifyPositive('Aidant supprimé');
-        await this.getUserHelpers();
-      } catch (e) {
-        console.error(e);
-      }
-    },
     waitForValidation (path) {
       return new Promise((resolve) => {
         if (path === 'contact.address') {
@@ -715,6 +774,122 @@ export default {
           resolve(!this.$_.get(this.$v.customer, path).$error);
         }
       })
+    },
+    // Subscriptions
+    formatCreatedSubscription () {
+      const { service, unitTTCRate, estimatedWeeklyVolume, sundays, evenings } = this.newSubscription;
+      const formattedService = { service, versions: [{ unitTTCRate, estimatedWeeklyVolume }] }
+
+      if (sundays) formattedService.versions[0].sundays = sundays;
+      if (evenings) formattedService.versions[0].evenings = evenings;
+
+      return formattedService;
+    },
+    resetCreationSubscriptionData () {
+      this.$v.newSubscription.$reset();
+      this.newSubscription = {
+        service: '',
+        unitTTCRate: '',
+        estimatedWeeklyVolume: '',
+      };
+    },
+    updateNewSubscription () {
+      if (this.newSubscription.service !== '') {
+        const selectedService = this.company.customersConfig.services.find(service => service._id === this.newSubscription.service);
+        this.newSubscription.unitTTCRate = selectedService.defaultUnitAmount;
+        this.newSubscription.nature = selectedService.nature;
+      }
+    },
+    async submitSubscription () {
+      try {
+        this.$v.newSubscription.$touch();
+        if (this.$v.newSubscription.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        this.loading = true;
+        const payload = this.formatCreatedSubscription();
+        await this.$customers.addSubscription(this.customer._id, payload);
+        this.resetCreationSubscriptionData();
+        await this.refreshCustomer();
+        this.subscriptionCreationModal = false;
+        NotifyPositive('Souscription ajoutée');
+      } catch (e) {
+        console.error(e);
+        if (e.data.statusCode === 409) return NotifyNegative(e.data.message);
+        NotifyNegative("Erreur lors de l'ajout d'un souscription");
+      } finally {
+        this.loading = false;
+      }
+    },
+    startEdition (id) {
+      const selectedSubscription = this.subscriptions.find(sub => sub._id === id);
+      const { _id, service, unitTTCRate, estimatedWeeklyVolume, evenings, sundays } = selectedSubscription;
+      this.editedSubscription = {
+        _id,
+        nature: service.nature,
+        unitTTCRate,
+        estimatedWeeklyVolume,
+        evenings,
+        sundays,
+        startDate: '',
+      };
+
+      this.subscriptionEditionModal = true;
+    },
+    resetEditionSubscriptionData () {
+      this.subscriptionEditionModal = false;
+      this.editedSubscription = {};
+      this.$v.editedSubscription.$reset();
+    },
+    async updateSubscription () {
+      try {
+        this.$v.editedSubscription.$touch();
+        if (this.$v.editedSubscription.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        this.loading = true;
+        const subscriptionId = this.editedSubscription._id
+        const payload = this.editedSubscription;
+        delete payload._id;
+        delete payload.nature;
+        await this.$customers.updateSubscription({ _id: this.customer._id, subscriptionId }, payload);
+        this.resetEditionSubscriptionData();
+        this.refreshCustomer();
+        NotifyPositive('Souscription modifiée');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative("Erreur lors de la modification d'un souscription")
+      } finally {
+        this.loading = false;
+      }
+    },
+    async removeSubscriptions (subscriptionId) {
+      try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Es-tu sûr(e) de vouloir supprimer cette souscription ?',
+          ok: true,
+          cancel: 'Annuler'
+        });
+
+        const params = { subscriptionId, _id: this.customer._id };
+        await this.$customers.removeSubscription(params);
+        await this.refreshCustomer();
+        NotifyPositive('Souscription supprimée');
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    showHistory (id) {
+      this.selectedSubscription = this.subscriptions.find(sub => sub._id === id);
+      this.subscriptionHistoryModal = true;
+    },
+    resetSubscriptionHistoryData () {
+      this.subscriptionHistoryModal = false;
+      this.selectedSubscription = [];
+    },
+    // Helpers
+    resetHelperForm () {
+      this.$v.newHelper.$reset();
+      this.newHelper = Object.assign({}, clear(this.newHelper));
     },
     async createOgustHelper () {
       const payload = {
@@ -746,9 +921,8 @@ export default {
       try {
         this.loading = true;
         this.$v.newHelper.$touch();
-        if (this.$v.newHelper.$error) {
-          throw new Error('Invalid fields');
-        }
+        if (this.$v.newHelper.$error) throw new Error('Invalid fields');
+
         const newHelper = await this.createOgustHelper();
         this.newHelper.ogustInterlocId = newHelper.data.data.contact.id_interloc;
         await this.createAlenviHelper();
@@ -759,73 +933,46 @@ export default {
         this.addHelper = false
       } catch (e) {
         console.error(e);
-        if (e && e.message === 'Invalid fields') {
-          this.loading = false;
-          NotifyWarning('Champ(s) invalide(s)');
-          return;
-        }
-        if (e && e.response && e.response.status === 409) {
-          NotifyNegative('Cet email est déjà utilisé par un compte existant');
-          return;
-        }
+        if (e && e.message === 'Invalid fields') return NotifyWarning('Champ(s) invalide(s)');
+        if (e && e.response && e.response.status === 409) return NotifyNegative('Cet email est déjà utilisé par un compte existant');
         NotifyNegative('Erreur lors de la création de l\'aidant');
       } finally {
         this.loading = false;
       }
     },
-    async submitSubscription () {
-      try {
-        this.loading = true;
-        this.$v.newSubscription.$touch();
-        if (this.$v.newSubscription.$error) {
-          return NotifyWarning('Champ(s) invalide(s)');
-        }
-        if (this.newSubscription.nature) delete this.newSubscription.nature;
-
-        await this.$customers.addSubscription(this.customer._id, this.newSubscription);
-        this.resetSubscriptionForm();
-        await this.refreshCustomer();
-        this.addSubscription = false;
-        NotifyPositive('Souscription ajoutée');
-      } catch (e) {
-        console.error(e);
-        if (e.data.statusCode === 409) {
-          return NotifyNegative(e.data.message);
-        }
-        NotifyNegative("Erreur lors de l'ajout d'un souscription");
-      } finally {
-        this.loading = false;
-      }
-    },
-    async removeSubscriptions (subscriptionId) {
+    async removeHelper (helperId) {
       try {
         await this.$q.dialog({
           title: 'Confirmation',
-          message: 'Es-tu sûr(e) de vouloir supprimer cette souscription ?',
+          message: 'Es-tu sûr(e) de vouloir supprimer cet aidant ?',
           ok: true,
           cancel: 'Annuler'
         });
-
-        const params = { subscriptionId, _id: this.customer._id };
-
-        await this.$customers.removeSubscription(params);
-        await this.refreshCustomer();
-        NotifyPositive('Souscription supprimée');
+        const helper = this.userHelpers.find(helper => helper._id === helperId);
+        const { ogustInterlocId } = helper;
+        await this.$ogust.deleteContact(ogustInterlocId);
+        await this.$users.deleteById(helperId);
+        NotifyPositive('Aidant supprimé');
+        await this.getUserHelpers();
       } catch (e) {
         console.error(e);
       }
     },
-    resetHelperForm () {
-      this.$v.newHelper.$reset();
-      this.newHelper = Object.assign({}, clear(this.newHelper));
-    },
-    resetSubscriptionForm () {
-      this.$v.newSubscription.$reset();
-      this.newSubscription = {
-        service: '',
-        unitTTCRate: '',
-        estimatedWeeklyVolume: '',
-      };
+    // Mandates
+    async updateSignedAt (mandate) {
+      try {
+        if (!mandate.signedAt || this.tmpInput === mandate.signedAt) return;
+        const params = {
+          _id: this.customer._id,
+          mandateId: mandate._id,
+        };
+        await this.$customers.updateMandate(params, mandate);
+        this.refreshMandates();
+        NotifyPositive('Modification enregistrée');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modification');
+      }
     },
     async downloadMandate (doc) {
       try {
@@ -849,25 +996,23 @@ export default {
         NotifyNegative('Erreur lors du téléchargement du mandat.');
       }
     },
+    // Documents
     async uploadDocument (files, refName) {
       if (files[0].size > 5000000) {
         this.$refs[refName].reset();
-        NotifyNegative('Fichier trop volumineux (> 5 Mo)');
-        return '';
+        return NotifyNegative('Fichier trop volumineux (> 5 Mo)');
       } else {
         this.$refs[refName].upload();
       }
     },
+    failMsg () {
+      NotifyNegative('Echec de l\'envoi du document');
+    },
+    // Quotes
     async downloadQuote (doc) {
       try {
-        const subscriptions = this.customer.subscriptions.map(subscription => {
-          let estimatedWeeklyRate = subscription.unitTTCRate * subscription.estimatedWeeklyVolume;
-          if (subscription.sundays && subscription.service.holidaySurcharge) {
-            estimatedWeeklyRate += subscription.sundays * subscription.unitTTCRate * subscription.service.holidaySurcharge / 100;
-          }
-          if (subscription.evenings && subscription.service.eveningSurcharge) {
-            estimatedWeeklyRate += subscription.evenings * subscription.unitTTCRate * subscription.service.eveningSurcharge / 100;
-          }
+        const subscriptions = this.subscriptions.map(subscription => {
+          let estimatedWeeklyRate = this.computeWeeklyRate(subscription);
 
           return {
             serviceName: subscription.service.name,
@@ -901,7 +1046,7 @@ export default {
     },
     async generateQuote () {
       try {
-        const subscriptions = this.customer.subscriptions.map(subscription => ({
+        const subscriptions = this.subscriptions.map(subscription => ({
           serviceName: subscription.service.name,
           unitTTCRate: subscription.unitTTCRate,
           estimatedWeeklyVolume: subscription.estimatedWeeklyVolume,
@@ -916,9 +1061,6 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la génération du devis');
       }
-    },
-    failMsg () {
-      NotifyNegative('Echec de l\'envoi du document');
     },
   }
 }
@@ -990,4 +1132,8 @@ export default {
   a
     color: $primary
     text-decoration: none
+
+  .action-column
+    padding-left: 0px
+    padding-right: 0px
 </style>

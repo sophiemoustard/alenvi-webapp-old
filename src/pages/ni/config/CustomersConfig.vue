@@ -7,14 +7,12 @@
         <q-card style="background: white">
           <q-card-main>
             <q-table :data="services" :columns="serviceColumns" hide-bottom binary-state-sort :pagination.sync="pagination" :visibleColumns="visibleColumns">
-              <q-td slot="body-cell-history" slot-scope="props" :props="props" class="action-column">
-                <q-btn flat round small color="grey" icon="history" @click.native="showHistory(props.value)" />
-              </q-td>
-              <q-td slot="body-cell-edit" slot-scope="props" :props="props" class="action-column">
-                <q-btn flat round small color="grey" icon="edit" @click.native="startEdition(props.value)" />
-              </q-td>
-              <q-td slot="body-cell-delete" slot-scope="props" :props="props" class="action-column">
-                <q-btn disable flat round small color="grey" icon="delete" @click="deleteService(props.value, props.row.__index)" />
+              <q-td slot="body-cell-actions" slot-scope="props" :props="props" class="action-column">
+                <div class="row no-wrap">
+                  <q-btn flat round small color="grey" icon="history" @click.native="showHistory(props.value)" />
+                  <q-btn flat round small color="grey" icon="edit" @click.native="startEdition(props.value)" />
+                  <q-btn disable flat round small color="grey" icon="delete" @click="deleteService(props.value, props.row.__index)" />
+                </div>
               </q-td>
             </q-table>
           </q-card-main>
@@ -57,11 +55,11 @@
           <q-card-main>
             <q-table :data="thirdPartyPayers" :columns="thirdPartyPayersColumns" hide-bottom binary-state-sort :pagination.sync="pagination">
               <q-td slot="body-cell-billingMode" slot-scope="props" :props="props" class="capitalize">{{ props.value }}</q-td>
-              <q-td slot="body-cell-delete" slot-scope="props" :props="props" class="action-column">
-                <q-btn flat round small color="grey" icon="delete" @click="deleteThirdPartyPayer(props.value, props.row.__index)" />
-              </q-td>
-              <q-td slot="body-cell-edit" slot-scope="props" :props="props" class="action-column">
-                <q-btn flat round small color="grey" icon="edit" @click="openThirdPartyPayerEditionModal(props.value)" />
+              <q-td slot="body-cell-actions" slot-scope="props" :props="props" class="action-column">
+                <div class="row no-wrap">
+                  <q-btn flat round small color="grey" icon="delete" @click="deleteThirdPartyPayer(props.value, props.row.__index)" />
+                  <q-btn flat round small color="grey" icon="edit" @click="openThirdPartyPayerEditionModal(props.value)" />
+                </div>
               </q-td>
             </q-table>
           </q-card-main>
@@ -102,7 +100,7 @@
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
-            <h5>Éditer un <span class="text-weight-bold">service</span></h5>
+            <h5>Éditer le <span class="text-weight-bold">service</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
             <span>
@@ -170,7 +168,7 @@
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
-            <h5>Editer un <span class="text-weight-bold">tiers payeur</span></h5>
+            <h5>Editer le <span class="text-weight-bold">tiers payeur</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
             <span>
@@ -227,7 +225,7 @@ export default {
       serviceCreationModal: false,
       serviceEditionModal: false,
       serviceHistoryModal: false,
-      selectedService: [],
+      selectedService: {},
       modalCssContainer: { minWidth: '30vw' },
       newService: {
         name: '',
@@ -249,7 +247,7 @@ export default {
         { label: 'Horaire', value: 'Horaire' },
         { label: 'Forfaitaire', value: 'Forfaitaire' },
       ],
-      visibleColumns: ['name', 'nature', 'defaultUnitAmount', 'vat', 'holidaySurcharge', 'eveningSurcharge', 'delete', 'edit', 'history'],
+      visibleColumns: ['name', 'nature', 'defaultUnitAmount', 'vat', 'holidaySurcharge', 'eveningSurcharge', 'actions'],
       visibleHistoryColumns: ['startDate', 'name', 'defaultUnitAmount', 'vat', 'holidaySurcharge', 'eveningSurcharge'],
       serviceColumns: [
         {
@@ -295,19 +293,7 @@ export default {
           field: row => row.eveningSurcharge && `${row.eveningSurcharge}%`,
         },
         {
-          name: 'history',
-          label: '',
-          align: 'center',
-          field: '_id',
-        },
-        {
-          name: 'edit',
-          label: '',
-          align: 'center',
-          field: '_id',
-        },
-        {
-          name: 'delete',
+          name: 'actions',
           label: '',
           align: 'center',
           field: '_id',
@@ -348,17 +334,11 @@ export default {
           align: 'left'
         },
         {
-          name: 'edit',
+          name: 'actions',
           label: '',
           align: 'center',
           field: '_id',
         },
-        {
-          name: 'delete',
-          label: '',
-          align: 'center',
-          field: '_id',
-        }
       ],
       thirdPartyPayerCreationModal: false,
       newThirdPartyPayer: {
@@ -629,7 +609,7 @@ export default {
     },
     resetServiceHistoryData () {
       this.serviceHistoryModal = false;
-      this.selectedService = [];
+      this.selectedService = {};
     },
     // Third party payers
     openThirdPartyPayerEditionModal (thirdPartyPayerId) {
