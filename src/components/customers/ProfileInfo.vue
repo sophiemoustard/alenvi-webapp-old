@@ -237,9 +237,7 @@ export default {
       addSubscription: false,
       isLoaded: false,
       tmpInput: '',
-      modalCssContainer: {
-        minWidth: '30vw'
-      },
+      modalCssContainer: { minWidth: '30vw' },
       customer: {
         identity: {},
         contact: {
@@ -532,13 +530,6 @@ export default {
     formatNumber (number) {
       return parseFloat(Math.round(number * 100) / 100).toFixed(1)
     },
-    updateNewSubscription () {
-      if (this.newSubscription.service !== '') {
-        const selectedService = this.company.customersConfig.services.find(service => service._id === this.newSubscription.service);
-        this.newSubscription.unitTTCRate = selectedService.defaultUnitAmount;
-        this.newSubscription.nature = selectedService.nature;
-      }
-    },
     mergeUser (value = null) {
       const args = [this.customer, value];
       this.customer = Object.assign({}, extend(true, ...args));
@@ -552,6 +543,7 @@ export default {
     saveTmpSignedAt (index) {
       this.tmpInput = this.customer.payment.mandates[index].signedAt;
     },
+    // Refresh data
     async getUserHelpers () {
       try {
         this.userHelpers = await this.$users.showAll({ customers: this.userProfile._id });
@@ -593,25 +585,12 @@ export default {
       const customerRaw = await this.$customers.getById(this.userProfile._id);
       const customer = customerRaw.data.data.customer;
       this.mergeUser(customer);
+      await this.refreshSubscriptions();
 
       this.$store.commit('rh/saveUserProfile', this.customer);
       this.$v.customer.$touch();
     },
-    async updateSignedAt (mandate) {
-      try {
-        if (!mandate.signedAt || this.tmpInput === mandate.signedAt) return;
-        const params = {
-          _id: this.customer._id,
-          mandateId: mandate._id,
-        };
-        await this.$customers.updateMandate(params, mandate);
-        this.refreshMandates();
-        NotifyPositive('Modification enregistrée');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la modification');
-      }
-    },
+    // Customer
     async updateUser (paths) {
       try {
         if (this.tmpInput === this.$_.get(this.customer, paths.alenvi)) return;
@@ -619,25 +598,16 @@ export default {
           const isValid = await this.waitForValidation(paths.alenvi);
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
-        if (paths.alenvi && paths.ogust) {
-          await this.updateAlenviCustomer(paths.alenvi);
-          await this.updateOgustCustomer(paths);
-        } else if (paths.alenvi) {
-          await this.updateAlenviCustomer(paths.alenvi);
-        } else {
-          await this.updateOgustCustomer(paths);
-        }
+        if (paths.alenvi) await this.updateAlenviCustomer(paths.alenvi);
+        if (paths.ogust) await this.updateOgustCustomer(paths);
+
         NotifyPositive('Modification enregistrée');
-        if (paths.alenvi.match(/iban/i)) {
-          this.refreshCustomer();
-        }
+        if (paths.alenvi.match(/iban/i)) this.refreshCustomer();
 
         this.$store.commit('rh/saveUserProfile', this.customer);
       } catch (e) {
         console.error(e);
-        if (e.message === 'Champ(s) invalide(s)') {
-          return NotifyWarning(e.message)
-        }
+        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message)
         NotifyNegative('Erreur lors de la modification');
       } finally {
         this.tmpInput = '';
@@ -645,21 +615,17 @@ export default {
     },
     async updateAlenviCustomer (path) {
       let value = this.$_.get(this.customer, path);
-      if (path.match(/iban/i)) {
-        value = value.split(' ').join('');
-      }
+      if (path.match(/iban/i)) value = value.split(' ').join('');
+
       const payload = this.$_.set({}, path, value);
       payload._id = this.userProfile._id;
       await this.$customers.updateById(payload);
     },
     async updateOgustCustomer (paths) {
       let value = this.$_.get(this.customer, paths.alenvi);
-      if (paths.ogust.match(/date_of_birth/i)) {
-        value = this.$moment(value).format('YYYYMMDD');
-      }
-      if (paths.ogust.match(/iban_number/i)) {
-        value = value.split(' ').join('');
-      }
+      if (paths.ogust.match(/date_of_birth/i)) value = this.$moment(value).format('YYYYMMDD');
+      if (paths.ogust.match(/iban_number/i)) value = value.split(' ').join('');
+
       const payload = this.$_.set({}, paths.ogust, value);
       if (paths.ogust.match(/((iban|bic)_number)|holder/i)) {
         if (this.customer.payment && this.customer.payment.bankAccountOwner && this.customer.payment.iban && this.customer.payment.bic) {
@@ -681,24 +647,6 @@ export default {
         await this.$ogust.editOgustCustomer(this.userProfile.customerId, payload);
       }
     },
-    async removeHelper (helperId) {
-      try {
-        await this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Es-tu sûr(e) de vouloir supprimer cet aidant ?',
-          ok: true,
-          cancel: 'Annuler'
-        });
-        const helper = this.userHelpers.find(helper => helper._id === helperId);
-        const { ogustInterlocId } = helper;
-        await this.$ogust.deleteContact(ogustInterlocId);
-        await this.$users.deleteById(helperId);
-        NotifyPositive('Aidant supprimé');
-        await this.getUserHelpers();
-      } catch (e) {
-        console.error(e);
-      }
-    },
     waitForValidation (path) {
       return new Promise((resolve) => {
         if (path === 'contact.address') {
@@ -715,6 +663,73 @@ export default {
           resolve(!this.$_.get(this.$v.customer, path).$error);
         }
       })
+    },
+    // Subscriptions
+    formatCreatedSubscription () {
+      const { service, unitTTCRate, estimatedWeeklyVolume, sundays, evenings } = this.newSubscription;
+      const formattedService = { service, versions: [{ unitTTCRate, estimatedWeeklyVolume }] }
+
+      if (sundays) formattedService.versions[0].sundays = sundays;
+      if (evenings) formattedService.versions[0].evenings = evenings;
+
+      return formattedService;
+    },
+    resetSubscriptionForm () {
+      this.$v.newSubscription.$reset();
+      this.newSubscription = {
+        service: '',
+        unitTTCRate: '',
+        estimatedWeeklyVolume: '',
+      };
+    },
+    updateNewSubscription () {
+      if (this.newSubscription.service !== '') {
+        const selectedService = this.company.customersConfig.services.find(service => service._id === this.newSubscription.service);
+        this.newSubscription.unitTTCRate = selectedService.defaultUnitAmount;
+        this.newSubscription.nature = selectedService.nature;
+      }
+    },
+    async submitSubscription () {
+      try {
+        this.$v.newSubscription.$touch();
+        if (this.$v.newSubscription.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        this.loading = true;
+        const payload = this.formatCreatedSubscription();
+        await this.$customers.addSubscription(this.customer._id, payload);
+        this.resetSubscriptionForm();
+        await this.refreshCustomer();
+        this.addSubscription = false;
+        NotifyPositive('Souscription ajoutée');
+      } catch (e) {
+        console.error(e);
+        if (e.data.statusCode === 409) return NotifyNegative(e.data.message);
+        NotifyNegative("Erreur lors de l'ajout d'un souscription");
+      } finally {
+        this.loading = false;
+      }
+    },
+    async removeSubscriptions (subscriptionId) {
+      try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Es-tu sûr(e) de vouloir supprimer cette souscription ?',
+          ok: true,
+          cancel: 'Annuler'
+        });
+
+        const params = { subscriptionId, _id: this.customer._id };
+        await this.$customers.removeSubscription(params);
+        await this.refreshCustomer();
+        NotifyPositive('Souscription supprimée');
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    // Helpers
+    resetHelperForm () {
+      this.$v.newHelper.$reset();
+      this.newHelper = Object.assign({}, clear(this.newHelper));
     },
     async createOgustHelper () {
       const payload = {
@@ -746,9 +761,8 @@ export default {
       try {
         this.loading = true;
         this.$v.newHelper.$touch();
-        if (this.$v.newHelper.$error) {
-          throw new Error('Invalid fields');
-        }
+        if (this.$v.newHelper.$error) throw new Error('Invalid fields');
+
         const newHelper = await this.createOgustHelper();
         this.newHelper.ogustInterlocId = newHelper.data.data.contact.id_interloc;
         await this.createAlenviHelper();
@@ -759,73 +773,46 @@ export default {
         this.addHelper = false
       } catch (e) {
         console.error(e);
-        if (e && e.message === 'Invalid fields') {
-          this.loading = false;
-          NotifyWarning('Champ(s) invalide(s)');
-          return;
-        }
-        if (e && e.response && e.response.status === 409) {
-          NotifyNegative('Cet email est déjà utilisé par un compte existant');
-          return;
-        }
+        if (e && e.message === 'Invalid fields') return NotifyWarning('Champ(s) invalide(s)');
+        if (e && e.response && e.response.status === 409) return NotifyNegative('Cet email est déjà utilisé par un compte existant');
         NotifyNegative('Erreur lors de la création de l\'aidant');
       } finally {
         this.loading = false;
       }
     },
-    async submitSubscription () {
-      try {
-        this.loading = true;
-        this.$v.newSubscription.$touch();
-        if (this.$v.newSubscription.$error) {
-          return NotifyWarning('Champ(s) invalide(s)');
-        }
-        if (this.newSubscription.nature) delete this.newSubscription.nature;
-
-        await this.$customers.addSubscription(this.customer._id, this.newSubscription);
-        this.resetSubscriptionForm();
-        await this.refreshCustomer();
-        this.addSubscription = false;
-        NotifyPositive('Souscription ajoutée');
-      } catch (e) {
-        console.error(e);
-        if (e.data.statusCode === 409) {
-          return NotifyNegative(e.data.message);
-        }
-        NotifyNegative("Erreur lors de l'ajout d'un souscription");
-      } finally {
-        this.loading = false;
-      }
-    },
-    async removeSubscriptions (subscriptionId) {
+    async removeHelper (helperId) {
       try {
         await this.$q.dialog({
           title: 'Confirmation',
-          message: 'Es-tu sûr(e) de vouloir supprimer cette souscription ?',
+          message: 'Es-tu sûr(e) de vouloir supprimer cet aidant ?',
           ok: true,
           cancel: 'Annuler'
         });
-
-        const params = { subscriptionId, _id: this.customer._id };
-
-        await this.$customers.removeSubscription(params);
-        await this.refreshCustomer();
-        NotifyPositive('Souscription supprimée');
+        const helper = this.userHelpers.find(helper => helper._id === helperId);
+        const { ogustInterlocId } = helper;
+        await this.$ogust.deleteContact(ogustInterlocId);
+        await this.$users.deleteById(helperId);
+        NotifyPositive('Aidant supprimé');
+        await this.getUserHelpers();
       } catch (e) {
         console.error(e);
       }
     },
-    resetHelperForm () {
-      this.$v.newHelper.$reset();
-      this.newHelper = Object.assign({}, clear(this.newHelper));
-    },
-    resetSubscriptionForm () {
-      this.$v.newSubscription.$reset();
-      this.newSubscription = {
-        service: '',
-        unitTTCRate: '',
-        estimatedWeeklyVolume: '',
-      };
+    // Mandates
+    async updateSignedAt (mandate) {
+      try {
+        if (!mandate.signedAt || this.tmpInput === mandate.signedAt) return;
+        const params = {
+          _id: this.customer._id,
+          mandateId: mandate._id,
+        };
+        await this.$customers.updateMandate(params, mandate);
+        this.refreshMandates();
+        NotifyPositive('Modification enregistrée');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modification');
+      }
     },
     async downloadMandate (doc) {
       try {
@@ -916,9 +903,6 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la génération du devis');
       }
-    },
-    failMsg () {
-      NotifyNegative('Echec de l\'envoi du document');
     },
   }
 }
