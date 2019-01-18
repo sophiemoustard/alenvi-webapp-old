@@ -1,11 +1,11 @@
 <template>
   <q-page padding class="neutral-background">
-    <div id="div1" class="mydiv" @drop="drop" @dragover.prevent>
+    <!-- <div id="div1" class="mydiv" @drop="drop" @dragover.prevent>
       <img src="https://cdn.sstatic.net/Sites/stackoverflow/company/img/logos/so/so-logo.png?v=9c558ec15d8a" draggable @dragstart="drag" id="drag1" width="88" height="31">
     </div>
     <div id="div2" class="mydiv" @drop="drop" @dragover.prevent></div>
     <div id="div3" class="mydiv" @drop="drop" @dragover.prevent></div>
-    <div id="div4" class="mydiv" @drop="drop" @dragover.prevent></div>
+    <div id="div4" class="mydiv" @drop="drop" @dragover.prevent></div> -->
     <p class="input-caption">Communauté</p>
     <ni-select-sector class="q-mb-md" @input="getEmployeesBySector" v-model="selectedSector" />
     <div class="planning-container full-width q-pa-md">
@@ -63,16 +63,12 @@
 import ModalDatetimePicker from '../../components/form/ModalDatetimePicker.vue';
 import SelectSector from '../../components/form/SelectSector';
 import ModalInput from '../../components/form/ModalInput.vue';
-// import Draggable from 'vuedraggable';
-import { Container, Draggable } from 'vue-smooth-dnd';
 
 export default {
   components: {
     'ni-modal-datetime-picker': ModalDatetimePicker,
     'ni-modal-input': ModalInput,
     'ni-select-sector': SelectSector,
-    Container,
-    Draggable
   },
   data () {
     return {
