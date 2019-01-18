@@ -286,6 +286,7 @@ export default {
     saveTmp (path) {
       this.tmpInput = this.$_.get(this.customer, path);
     },
+    // Customer
     async updateOgustCustomer (paths) {
       let value = this.$_.get(this.customer, paths.alenvi);
       const payload = this.$_.set({}, paths.ogust, value);
@@ -340,6 +341,38 @@ export default {
         this.tmpInput = '';
       }
     },
+    // Subscriptions
+    async confirmAgreement () {
+      try {
+        if (this.customer.subscriptionsAccepted) {
+          const subscriptions = this.customer.subscriptions.map(subscription => {
+            const obj = {
+              service: subscription.service.name,
+              unitTTCRate: subscription.unitTTCRate,
+              estimatedWeeklyVolume: subscription.estimatedWeeklyVolume
+            };
+            if (subscription.evenings) obj.evenings = subscription.evenings;
+            if (subscription.sundays) obj.sundays = subscription.sundays;
+            return obj;
+          });
+          const payload = {
+            subscriptions,
+            helper: {
+              firstname: this.helper.firstname || '',
+              lastname: this.helper.lastname || '',
+              title: this.helper.administrative && this.helper.administrative.identity ? this.helper.administrative.identity.title : ''
+            }
+          };
+          await this.$customers.addSubscriptionHistory(this.customer._id, payload);
+          await this.getCustomer();
+          NotifyPositive('Abonnement validé');
+        }
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la validation de votre abonnement');
+      }
+    },
+    // Mandate
     async preOpenESignModal (data) {
       try {
         this.$q.loading.show({ message: 'Contact du support de signature en ligne...' });
@@ -375,36 +408,6 @@ export default {
         this.$q.loading.hide();
         this.newESignModal = false;
         NotifyNegative('Erreur lors de la requête de signature en ligne du mandat');
-      }
-    },
-    async confirmAgreement () {
-      try {
-        if (this.customer.subscriptionsAccepted) {
-          const subscriptions = this.customer.subscriptions.map(subscription => {
-            const obj = {
-              service: subscription.service.name,
-              unitTTCRate: subscription.unitTTCRate,
-              estimatedWeeklyVolume: subscription.estimatedWeeklyVolume
-            };
-            if (subscription.evenings) obj.evenings = subscription.evenings;
-            if (subscription.sundays) obj.sundays = subscription.sundays;
-            return obj;
-          });
-          const payload = {
-            subscriptions,
-            helper: {
-              firstname: this.helper.firstname || '',
-              lastname: this.helper.lastname || '',
-              title: this.helper.administrative && this.helper.administrative.identity ? this.helper.administrative.identity.title : ''
-            }
-          };
-          await this.$customers.addSubscriptionHistory(this.customer._id, payload);
-          await this.getCustomer();
-          NotifyPositive('Abonnement validé');
-        }
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la validation de votre abonnement');
       }
     },
     async checkMandates () {
