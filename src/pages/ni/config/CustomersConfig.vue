@@ -225,7 +225,7 @@ export default {
       serviceCreationModal: false,
       serviceEditionModal: false,
       serviceHistoryModal: false,
-      selectedService: [],
+      selectedService: {},
       modalCssContainer: { minWidth: '30vw' },
       newService: {
         name: '',
@@ -609,7 +609,7 @@ export default {
     },
     resetServiceHistoryData () {
       this.serviceHistoryModal = false;
-      this.selectedService = [];
+      this.selectedService = {};
     },
     // Third party payers
     openThirdPartyPayerEditionModal (thirdPartyPayerId) {

@@ -35,13 +35,17 @@
       <q-card>
         <q-card-main>
           <q-table :data="subscriptions" :columns="subscriptionsColumns" row-key="name" table-style="font-size: 1rem" hide-bottom>
-            <q-td slot="body-cell-remove" slot-scope="props" :props="props" class="action-column">
-              <q-icon name="delete" size="1.2rem" color="grey" class="cursor-pointer" @click.native="removeSubscriptions(props.value)" />
+            <q-td slot="body-cell-actions" slot-scope="props" :props="props" class="action-column">
+              <div class="row no-wrap">
+                  <q-btn flat round small color="grey" icon="history" @click.native="showHistory(props.value)" />
+                  <q-btn flat round small color="grey" icon="edit" @click.native="startEdition(props.value)" />
+                  <q-btn flat round small color="grey" icon="delete" @click.native="removeSubscriptions(props.value)" />
+                </div>
             </q-td>
           </q-table>
         </q-card-main>
         <q-card-actions align="end">
-          <q-btn :disable="serviceOptions.length === 0" flat no-caps color="primary" icon="add" label="Ajouter une souscription" @click="addSubscription = true"/>
+          <q-btn :disable="serviceOptions.length === 0" flat no-caps color="primary" icon="add" label="Ajouter une souscription" @click="subscriptionCreationModal = true"/>
         </q-card-actions>
       </q-card>
       <div v-if="subscriptions && subscriptions.length > 0" class="row">
@@ -177,14 +181,14 @@
     </q-modal>
 
     <!-- Add subscription modal -->
-    <q-modal v-model="addSubscription" @hide="resetSubscriptionForm" :content-css="modalCssContainer">
+    <q-modal v-model="subscriptionCreationModal" @hide="resetSubscriptionForm" :content-css="modalCssContainer">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-8">
             <h5>Ajouter une <span class="text-weight-bold">souscription</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
-            <span><q-icon name="clear" size="1rem" @click.native="addSubscription = false" /></span>
+            <span><q-icon name="clear" size="1rem" @click.native="subscriptionCreationModal = false" /></span>
           </div>
         </div>
         <ni-modal-select caption="Service" :options="serviceOptions" v-model="newSubscription.service" :error="$v.newSubscription.service.$error"
@@ -200,6 +204,23 @@
         <ni-modal-input v-if="newSubscription.nature !== 'Forfaitaire'" v-model="newSubscription.evenings" caption="Dont soirée (h)" last type="number" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter une souscription" icon-right="add" color="primary" :loading="loading" @click="submitSubscription" />
+    </q-modal>
+
+    <!-- Subscription history modal -->
+    <q-modal v-model="subscriptionHistoryModal" :content-css="modalCssContainer" @hide="resetSubscriptionHistoryData">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-11">
+            <h5>Historique de la souscription <span class="text-weight-bold">{{selectedSubscription.service && selectedSubscription.service.name}}</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer" style="text-align: right">
+            <span>
+              <q-icon name="clear" size="1rem" @click.native="subscriptionHistoryModal = false" /></span>
+          </div>
+        </div>
+        <q-table class="q-mb-xl" :data="selectedSubscription.versions" :columns="subscriptionsHistoryColumns" hide-bottom binary-state-sort
+          :pagination.sync="paginationHistory" />
+      </div>
     </q-modal>
   </div>
 </template>
@@ -234,7 +255,8 @@ export default {
     return {
       loading: false,
       addHelper: false,
-      addSubscription: false,
+      subscriptionCreationModal: false,
+      subscriptionHistoryModal: false,
       isLoaded: false,
       tmpInput: '',
       modalCssContainer: { minWidth: '30vw' },
@@ -250,6 +272,7 @@ export default {
         quotes: [],
       },
       subscriptions: [],
+      selectedSubscription: [],
       subscriptionsColumns: [
         {
           name: 'service',
@@ -276,16 +299,49 @@ export default {
           field: row => row.service.nature === 'Horaire' ? `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume,
         },
         {
-          name: 'sundays',
+          name: 'weeklyRate',
           label: 'Coût hebdomadaire TTC',
           align: 'center',
           field: row => `${this.computeWeeklyRate(row)}€`,
         },
         {
-          name: 'remove',
+          name: 'actions',
           label: '',
           align: 'left',
           field: '_id',
+        },
+      ],
+      subscriptionsHistoryColumns: [
+        {
+          name: 'startDate',
+          label: 'Date d\'effet',
+          align: 'left',
+          field: row => row.startDate ? this.$moment(row.startDate).format('DD/MM/YYYY') : '',
+        },
+        {
+          name: 'unitTTCRate',
+          label: 'Prix unitaire TTC',
+          align: 'center',
+          field: row => `${this.formatNumber(row.unitTTCRate)}€`,
+        },
+        {
+          name: 'estimatedWeeklyVolume',
+          label: 'Volume hebdomadaire estimatif',
+          align: 'center',
+          field: row => this.selectedSubscription.service && this.selectedSubscription.service.nature === 'Horaire'
+            ? `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume,
+        },
+        {
+          name: 'evenings',
+          label: 'dont dimanche',
+          align: 'center',
+          field: 'evenings',
+        },
+        {
+          name: 'sundays',
+          label: 'dont soirées',
+          align: 'center',
+          field: 'sundays',
         },
       ],
       helpersColumns: [
@@ -410,6 +466,11 @@ export default {
         sortBy: 'createdAt',
         ascending: true,
         rowsPerPage: 0,
+      },
+      paginationHistory: {
+        rowsPerPage: 0,
+        sortBy: 'startDate',
+        descending: true,
       },
     }
   },
@@ -713,7 +774,7 @@ export default {
         await this.$customers.addSubscription(this.customer._id, payload);
         this.resetSubscriptionForm();
         await this.refreshCustomer();
-        this.addSubscription = false;
+        this.subscriptionCreationModal = false;
         NotifyPositive('Souscription ajoutée');
       } catch (e) {
         console.error(e);
@@ -739,6 +800,14 @@ export default {
       } catch (e) {
         console.error(e);
       }
+    },
+    showHistory (id) {
+      this.selectedSubscription = this.subscriptions.find(sub => sub._id === id);
+      this.subscriptionHistoryModal = true;
+    },
+    resetSubscriptionHistoryData () {
+      this.subscriptionHistoryModal = false;
+      this.selectedSubscription = [];
     },
     // Helpers
     resetHelperForm () {
