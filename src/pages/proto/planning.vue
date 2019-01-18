@@ -1,11 +1,11 @@
 <template>
   <q-page padding class="neutral-background">
-    <div id="div1" class="mydiv" @drop="drop" @dragover.prevent>
+    <!-- <div id="div1" class="mydiv" @drop="drop" @dragover.prevent>
       <img src="https://cdn.sstatic.net/Sites/stackoverflow/company/img/logos/so/so-logo.png?v=9c558ec15d8a" draggable @dragstart="drag" id="drag1" width="88" height="31">
     </div>
     <div id="div2" class="mydiv" @drop="drop" @dragover.prevent></div>
     <div id="div3" class="mydiv" @drop="drop" @dragover.prevent></div>
-    <div id="div4" class="mydiv" @drop="drop" @dragover.prevent></div>
+    <div id="div4" class="mydiv" @drop="drop" @dragover.prevent></div> -->
     <p class="input-caption">Communauté</p>
     <ni-select-sector class="q-mb-md" @input="getEmployeesBySector" v-model="selectedSector" />
     <div class="planning-container full-width q-pa-md">
@@ -327,7 +327,6 @@ export default {
     },
     async getEvents () {
       try {
-<<<<<<< HEAD
         this.events = await this.$events.list({
           startDate: this.startOfWeek.format('YYYYMMDD'),
           endStartDate: this.endOfWeek().format('YYYYMMDD'),
@@ -405,9 +404,6 @@ export default {
         NotifyPositive('Document supprimé');
         this.$_.unset(this.newEvent, 'attachment');
         this.rerenderUploader();
-=======
-        this.events = await this.$events.list({ startDate: this.startOfWeek.format('YYYYMMDD'), endStartDate: this.endOfWeek().format('YYYYMMDD') });
->>>>>>> Resolve drag and drop bugs if id is the same for two tds
       } catch (e) {
         console.error(e);
         if (e.message === '') {
