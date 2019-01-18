@@ -232,7 +232,7 @@ export default {
   async deleteContact (id) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/ogust/contacts/${id}`);
   },
-  async setEmployeeBankInfo (data, ogustToken = null) {
+  async setBankInfo (data, ogustToken = null) {
     let employeeBankInfoRaw;
     if (ogustToken === null) {
       employeeBankInfoRaw = await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/bankInfo`, data);
