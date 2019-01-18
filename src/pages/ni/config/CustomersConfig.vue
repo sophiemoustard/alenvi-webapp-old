@@ -151,7 +151,7 @@
         </div>
         <ni-modal-input caption="Nom" v-model="newThirdPartyPayer.name" :error="$v.newThirdPartyPayer.name.$error" @blur="$v.newThirdPartyPayer.name.$touch"
           requiredField />
-        <ni-search-address v-model="newThirdPartyPayer.address.fullAddress" @selected="selectedThirdPartyPayerAddress" error-label="Adresse invalide" inModal
+        <ni-search-address v-model="newThirdPartyPayer.address.fullAddress" @selected="selectedThirdPartyPayerCreationAddress" error-label="Adresse invalide" inModal
           @blur="$v.newThirdPartyPayer.address.fullAddress.$touch" :error="$v.newThirdPartyPayer.address.fullAddress.$error"
           />
         <ni-modal-input caption="Email" v-model.trim="newThirdPartyPayer.email" />
@@ -177,7 +177,7 @@
         </div>
         <ni-modal-input caption="Nom" v-model="editedThirdPartyPayer.name" :error="$v.editedThirdPartyPayer.name.$error"
           @blur="$v.editedThirdPartyPayer.name.$touch" requiredField />
-        <ni-search-address v-model="editedThirdPartyPayer.address.fullAddress" @selected="selectedThirdPartyPayerAddress" error-label="Adresse invalide"
+        <ni-search-address v-model="editedThirdPartyPayer.address.fullAddress" @selected="selectedThirdPartyPayerEditionAddress" error-label="Adresse invalide"
           @blur="$v.editedThirdPartyPayer.address.fullAddress.$touch" :error="$v.editedThirdPartyPayer.address.fullAddress.$error" inModal
           />
         <ni-modal-input caption="Email" v-model.trim="editedThirdPartyPayer.email" />
@@ -437,7 +437,10 @@ export default {
     selectedAddress (item) {
       this.company.address = Object.assign({}, this.company.address, item);
     },
-    selectedThirdPartyPayerAddress (item) {
+    selectedThirdPartyPayerEditionAddress (item) {
+      this.editedThirdPartyPayer.address = Object.assign({}, this.editedThirdPartyPayer.address, this.$_.omit(item, ['location']));
+    },
+    selectedThirdPartyPayerCreationAddress (item) {
       this.newThirdPartyPayer.address = Object.assign({}, this.newThirdPartyPayer.address, this.$_.omit(item, ['location']));
     },
     saveTmp (path) {
@@ -619,7 +622,7 @@ export default {
       this.editedThirdPartyPayer = {
         _id: currentThirdPartyPayer._id,
         name,
-        address: address || {},
+        address: { ...address } || {},
         email,
         unitTTCPrice,
         billingMode,
@@ -666,6 +669,7 @@ export default {
         const thirdPartyPayerId = this.editedThirdPartyPayer._id;
         delete this.editedThirdPartyPayer._id;
         const payload = this.$_.pickBy(this.editedThirdPartyPayer);
+        if (payload.address && !payload.address.fullAddress) delete payload.address.fullAddress;
         await this.$companies.updateThirdPartyPayer({ id: this.company._id, thirdPartyPayerId }, payload);
         await this.refreshThirdPartyPayers();
         NotifyPositive('Tiers payeur modifié.');

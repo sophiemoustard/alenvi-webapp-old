@@ -34,7 +34,7 @@ export const posDecimals = (value) => {
 }
 
 export const frAddress = async (value) => {
-  if (!value) return false;
+  if (!value) return true;
   const res = await axios.get('https://api-adresse.data.gouv.fr/search', {
     params: {
       q: value,

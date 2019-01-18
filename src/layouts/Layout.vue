@@ -63,8 +63,11 @@ export default {
     }
   },
   beforeRouteUpdate (to, from, next) {
-    this.$refs[this.sidemenusRefs].collapsibleClosing(to, from);
-    this.$refs[this.sidemenusRefs].collapsibleEntering(to);
+    if (this.toggleDrawer) {
+      this.$refs[this.sidemenusRefs].collapsibleClosing(to, from);
+      this.$refs[this.sidemenusRefs].collapsibleEntering(to);
+    }
+
     next();
   }
 }
