@@ -35,7 +35,7 @@
       <q-card>
         <q-card-main>
           <q-table :data="subscriptions" :columns="subscriptionsColumns" row-key="name" table-style="font-size: 1rem" hide-bottom>
-            <q-td slot="body-cell-remove" slot-scope="props" :props="props">
+            <q-td slot="body-cell-remove" slot-scope="props" :props="props" class="action-column">
               <q-icon name="delete" size="1.2rem" color="grey" class="cursor-pointer" @click.native="removeSubscriptions(props.value)" />
             </q-td>
           </q-table>
@@ -56,7 +56,7 @@
       <q-card>
         <q-card-main>
           <q-table :data="userHelpers" :columns="helpersColumns" row-key="name" table-style="font-size: 1rem" hide-bottom>
-            <q-td slot="body-cell-remove" slot-scope="props" :props="props">
+            <q-td slot="body-cell-remove" slot-scope="props" :props="props" class="action-column">
               <q-icon name="delete" size="1.2rem" color="grey" class="cursor-pointer" @click.native="removeHelper(props.value)" />
             </q-td>
           </q-table>
@@ -277,15 +277,9 @@ export default {
         },
         {
           name: 'sundays',
-          label: 'dont dimanche',
+          label: 'Coût hebdomadaire TTC',
           align: 'center',
-          field: row => row.service.nature === 'Horaire' && row.sundays ? `${row.sundays}h` : row.sundays,
-        },
-        {
-          name: 'evenings',
-          label: 'dont soirées (après 20h)',
-          align: 'center',
-          field: row => row.service.nature === 'Horaire' && row.evenings ? `${row.evenings}h` : row.evenings,
+          field: row => `${this.computeWeeklyRate(row)}€`,
         },
         {
           name: 'remove',
@@ -532,6 +526,17 @@ export default {
       if (!subscription.versions || subscription.versions.length === 0) return {};
 
       return subscription.versions.sort((a, b) => new Date(b.startDate) - new Date(a.startDate))[0]
+    },
+    computeWeeklyRate (subscription) {
+      let weeklyRate = subscription.unitTTCRate * subscription.estimatedWeeklyVolume;
+      if (subscription.sundays && subscription.service.holidaySurcharge) {
+        weeklyRate += subscription.sundays * subscription.unitTTCRate * subscription.service.holidaySurcharge / 100;
+      }
+      if (subscription.evenings && subscription.service.eveningSurcharge) {
+        weeklyRate += subscription.evenings * subscription.unitTTCRate * subscription.service.eveningSurcharge / 100;
+      }
+
+      return weeklyRate;
     },
     formatNumber (number) {
       return parseFloat(Math.round(number * 100) / 100).toFixed(1)
@@ -861,13 +866,7 @@ export default {
     async downloadQuote (doc) {
       try {
         const subscriptions = this.subscriptions.map(subscription => {
-          let estimatedWeeklyRate = subscription.unitTTCRate * subscription.estimatedWeeklyVolume;
-          if (subscription.sundays && subscription.service.holidaySurcharge) {
-            estimatedWeeklyRate += subscription.sundays * subscription.unitTTCRate * subscription.service.holidaySurcharge / 100;
-          }
-          if (subscription.evenings && subscription.service.eveningSurcharge) {
-            estimatedWeeklyRate += subscription.evenings * subscription.unitTTCRate * subscription.service.eveningSurcharge / 100;
-          }
+          let estimatedWeeklyRate = this.computeWeeklyRate(subscription);
 
           return {
             serviceName: subscription.service.name,
@@ -987,4 +986,8 @@ export default {
   a
     color: $primary
     text-decoration: none
+
+  .action-column
+    padding-left: 0px
+    padding-right: 0px
 </style>
