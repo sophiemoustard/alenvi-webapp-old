@@ -34,7 +34,7 @@
       </div>
       <q-card>
         <q-card-main>
-          <q-table :data="customer.subscriptions" :columns="subscriptionsColumns" row-key="name" table-style="font-size: 1rem" hide-bottom>
+          <q-table :data="subscriptions" :columns="subscriptionsColumns" row-key="name" table-style="font-size: 1rem" hide-bottom>
             <q-td slot="body-cell-remove" slot-scope="props" :props="props">
               <q-icon name="delete" size="1.2rem" color="grey" class="cursor-pointer" @click.native="removeSubscriptions(props.value)" />
             </q-td>
@@ -44,7 +44,7 @@
           <q-btn :disable="serviceOptions.length === 0" flat no-caps color="primary" icon="add" label="Ajouter une souscription" @click="addSubscription = true"/>
         </q-card-actions>
       </q-card>
-      <div v-if="customer.subscriptions && customer.subscriptions.length > 0" class="row">
+      <div v-if="subscriptions && subscriptions.length > 0" class="row">
           <div class="col-xs-12">
             <q-checkbox v-model="customer.subscriptionsAccepted" disable class="q-mr-sm" />
             <span style="vertical-align: middle">Validation en ligne des souscriptions<span class="text-weight-thin text-italic"> {{ acceptedByHelper }}</span></span>
@@ -152,7 +152,7 @@
           </q-table>
         </q-card-main>
         <q-card-actions align="end">
-          <q-btn :disabled="this.customer.subscriptions.length === 0" flat no-caps color="primary" icon="add" label="Générer un devis" @click="generateQuote"/>
+          <q-btn :disabled="this.subscriptions.length === 0" flat no-caps color="primary" icon="add" label="Générer un devis" @click="generateQuote"/>
         </q-card-actions>
       </q-card>
     </div>
@@ -249,6 +249,7 @@ export default {
         subscriptions: [],
         quotes: [],
       },
+      subscriptions: [],
       subscriptionsColumns: [
         {
           name: 'service',
@@ -435,7 +436,7 @@ export default {
         return [];
       }
 
-      const subscribedServices = this.customer.subscriptions.map(subscription => subscription.service._id);
+      const subscribedServices = this.subscriptions.map(subscription => subscription.service._id);
       const availableServices = this.company.customersConfig.services.filter(service => !subscribedServices.includes(service._id));
 
       return availableServices.map(service => ({
@@ -525,7 +526,12 @@ export default {
     getServiceLastVersion (service) {
       if (!service.versions || service.versions.length === 0) return {};
 
-      return service.versions.sort((a, b) => b.createdAt - a.createdAt)[0];
+      return service.versions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+    },
+    getSubscriptionLastVersion (subscription) {
+      if (!subscription.versions || subscription.versions.length === 0) return {};
+
+      return subscription.versions.sort((a, b) => new Date(b.startDate) - new Date(a.startDate))[0]
     },
     formatNumber (number) {
       return parseFloat(Math.round(number * 100) / 100).toFixed(1)
@@ -553,7 +559,10 @@ export default {
     },
     async refreshSubscriptions () {
       try {
-        this.customer.subscriptions = await this.$customers.getSubscriptions(this.customer._id);
+        this.subscriptions = this.customer.subscriptions.map(sub => ({
+          ...this.getSubscriptionLastVersion(sub),
+          ...sub,
+        }))
 
         this.$store.commit('rh/saveUserProfile', this.customer);
         this.$v.customer.$touch();
@@ -836,18 +845,22 @@ export default {
         NotifyNegative('Erreur lors du téléchargement du mandat.');
       }
     },
+    // Documents
     async uploadDocument (files, refName) {
       if (files[0].size > 5000000) {
         this.$refs[refName].reset();
-        NotifyNegative('Fichier trop volumineux (> 5 Mo)');
-        return '';
+        return NotifyNegative('Fichier trop volumineux (> 5 Mo)');
       } else {
         this.$refs[refName].upload();
       }
     },
+    failMsg () {
+      NotifyNegative('Echec de l\'envoi du document');
+    },
+    // Quotes
     async downloadQuote (doc) {
       try {
-        const subscriptions = this.customer.subscriptions.map(subscription => {
+        const subscriptions = this.subscriptions.map(subscription => {
           let estimatedWeeklyRate = subscription.unitTTCRate * subscription.estimatedWeeklyVolume;
           if (subscription.sundays && subscription.service.holidaySurcharge) {
             estimatedWeeklyRate += subscription.sundays * subscription.unitTTCRate * subscription.service.holidaySurcharge / 100;
@@ -888,7 +901,7 @@ export default {
     },
     async generateQuote () {
       try {
-        const subscriptions = this.customer.subscriptions.map(subscription => ({
+        const subscriptions = this.subscriptions.map(subscription => ({
           serviceName: subscription.service.name,
           unitTTCRate: subscription.unitTTCRate,
           estimatedWeeklyVolume: subscription.estimatedWeeklyVolume,
