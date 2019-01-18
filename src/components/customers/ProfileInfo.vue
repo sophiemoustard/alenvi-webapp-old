@@ -269,6 +269,7 @@ import { frPhoneNumber, iban, bic, frAddress } from '../../helpers/vuelidateCust
 import DatetimePicker from '../form/ModalDatetimePicker';
 import { downloadDocxFile } from '../../helpers/downloadFile';
 import { customerMixin } from '../../mixins/customerMixin.js';
+import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
 
 export default {
   name: 'ProfileInfo',
@@ -279,7 +280,7 @@ export default {
     NiModalSelect,
     'ni-datetime-picker': DatetimePicker,
   },
-  mixins: [customerMixin],
+  mixins: [customerMixin, subscriptionMixin],
   data () {
     return {
       loading: false,
@@ -332,7 +333,7 @@ export default {
           name: 'weeklyRate',
           label: 'Coût hebdomadaire TTC',
           align: 'center',
-          field: row => `${this.computeWeeklyRate(row)}€`,
+          field: row => `${this.formatNumber(this.computeWeeklyRate(row))}€`,
         },
         {
           name: 'actions',
@@ -623,25 +624,6 @@ export default {
 
       return service.versions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
     },
-    getSubscriptionLastVersion (subscription) {
-      if (!subscription.versions || subscription.versions.length === 0) return {};
-
-      return subscription.versions.sort((a, b) => new Date(b.startDate) - new Date(a.startDate))[0]
-    },
-    computeWeeklyRate (subscription) {
-      let weeklyRate = subscription.unitTTCRate * subscription.estimatedWeeklyVolume;
-      if (subscription.sundays && subscription.service.holidaySurcharge) {
-        weeklyRate += subscription.sundays * subscription.unitTTCRate * subscription.service.holidaySurcharge / 100;
-      }
-      if (subscription.evenings && subscription.service.eveningSurcharge) {
-        weeklyRate += subscription.evenings * subscription.unitTTCRate * subscription.service.eveningSurcharge / 100;
-      }
-
-      return weeklyRate;
-    },
-    formatNumber (number) {
-      return parseFloat(Math.round(number * 100) / 100).toFixed(1)
-    },
     mergeUser (value = null) {
       const args = [this.customer, value];
       this.customer = Object.assign({}, extend(true, ...args));
@@ -659,19 +641,6 @@ export default {
     async getUserHelpers () {
       try {
         this.userHelpers = await this.$users.showAll({ customers: this.userProfile._id });
-      } catch (e) {
-        console.error(e);
-      }
-    },
-    async refreshSubscriptions () {
-      try {
-        this.subscriptions = this.customer.subscriptions.map(sub => ({
-          ...this.getSubscriptionLastVersion(sub),
-          ...sub,
-        }))
-
-        this.$store.commit('rh/saveUserProfile', this.customer);
-        this.$v.customer.$touch();
       } catch (e) {
         console.error(e);
       }

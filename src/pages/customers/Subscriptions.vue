@@ -3,10 +3,10 @@
     <template v-if="customer !== {}">
       <div class="q-mb-lg">
         <p class="title">Services</p>
-        <p v-if="customer.subscriptions.length === 0">Aucun service souscrit.</p>
-        <q-card v-if="customer.subscriptions.length > 0" class="contract-card">
+        <p v-if="subscriptions.length === 0">Aucun service souscrit.</p>
+        <q-card v-if="subscriptions.length > 0" class="contract-card">
           <q-table
-            :data="customer.subscriptions"
+            :data="subscriptions"
             :columns="columnsSubs"
             row-key="name"
             hide-bottom
@@ -25,8 +25,8 @@
             </q-tr>
           </q-table>
         </q-card>
-        <p v-if="customer.subscriptions.length > 0" class="nota-bene">* intègre les éventuelles majorations soir / dimanche</p>
-        <div v-if="customer.subscriptions && customer.subscriptions.length > 0" class="row">
+        <p v-if="subscriptions.length > 0" class="nota-bene">* intègre les éventuelles majorations soir / dimanche</p>
+        <div v-if="subscriptions && subscriptions.length > 0" class="row">
           <div class="col-xs-12">
             <q-checkbox v-model="customer.subscriptionsAccepted" class="q-mr-sm" @input="confirmAgreement" />
             <span style="vertical-align: middle">J'accepte les conditions d’abonnement présentées ci-dessus ainsi que les <a href="#cgs" @click.prevent="cgsModal = true">conditions générales de services
@@ -102,6 +102,7 @@ import NiModalInput from '../../components/form/ModalInput';
 import { bic, iban } from '../../helpers/vuelidateCustomVal';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify';
 import { customerMixin } from '../../mixins/customerMixin.js';
+import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
 import esign from '../../api/Esign.js';
 import cgs from '../../statics/CGS.html';
 
@@ -111,7 +112,7 @@ export default {
     'ni-input': Input,
     NiModalInput
   },
-  mixins: [customerMixin],
+  mixins: [customerMixin, subscriptionMixin],
   data () {
     return {
       cgs,
@@ -169,7 +170,7 @@ export default {
           name: 'weeklyRate',
           label: 'Coût hebdomadaire TTC*',
           align: 'center',
-          field: row => `${this.formatNumber(this.getWeeklyRate(row))}€`,
+          field: row => `${this.formatNumber(this.computeWeeklyRate(row))}€`,
           sortable: true
         }
       ],
@@ -260,24 +261,11 @@ export default {
     await this.checkMandates();
   },
   methods: {
-    formatNumber (number) {
-      return parseFloat(Math.round(number * 100) / 100).toFixed(1)
-    },
-    getWeeklyRate (subscription) {
-      let estimatedWeeklyRate = subscription.unitTTCRate * subscription.estimatedWeeklyVolume;
-      if (subscription.sundays && subscription.service.holidaySurcharge) {
-        estimatedWeeklyRate += subscription.sundays * subscription.unitTTCRate * subscription.service.holidaySurcharge / 100;
-      }
-      if (subscription.evenings && subscription.service.eveningSurcharge) {
-        estimatedWeeklyRate += subscription.evenings * subscription.unitTTCRate * subscription.service.eveningSurcharge / 100;
-      }
-
-      return estimatedWeeklyRate;
-    },
     async getCustomer () {
       try {
         const customerRaw = await this.$customers.getById(this.helper.customers[0]._id);
         this.customer = customerRaw.data.data.customer;
+        this.refreshSubscriptions();
       } catch (e) {
         console.error(e);
         this.customer = {};
