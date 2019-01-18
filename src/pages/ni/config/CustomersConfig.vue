@@ -316,7 +316,7 @@ export default {
       thirdPartyPayers: [],
       thirdPartyPayersColumns: [
         {
-          name: 'identity',
+          name: 'name',
           label: 'Nom',
           field: 'name',
           align: 'left',
@@ -326,7 +326,7 @@ export default {
           name: 'address',
           label: 'Adresse',
           align: 'left',
-          field: row => row.address.fullAddress
+          field: row => row.address ? row.address.fullAddress : '',
         },
         {
           name: 'email',
@@ -435,12 +435,6 @@ export default {
     },
     disableCreationButton () {
       return !this.newService.name || !this.newService.nature || !this.newService.defaultUnitAmount || !this.newService.vat;
-    },
-    thirdPartyPayersAddFields () {
-      return [
-        { name: 'role', value: 'ThirdPartyPayers' },
-        { name: 'fileName', value: `logo_${this.newThirdPartyPayer.name}` }
-      ];
     },
     minStartDate () {
       const selectedService = this.services.find(ser => ser._id === this.editedService._id);
@@ -658,7 +652,6 @@ export default {
         email: '',
         address: {},
         unitTTCPrice: '',
-        logo: {},
         billingMode: ''
       }
     },
