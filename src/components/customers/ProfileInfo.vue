@@ -244,7 +244,11 @@
           </div>
         </div>
         <q-table class="q-mb-xl" :data="selectedSubscription.versions" :columns="subscriptionHistoryColumns" hide-bottom binary-state-sort
-          :pagination.sync="paginationHistory" />
+          :pagination.sync="paginationHistory">
+          <q-td slot="body-cell-startDate" slot-scope="props" :props="props">
+            {{ $moment(props.value).format('DD/MM/YYYY') }}
+          </q-td>
+        </q-table>
       </div>
     </q-modal>
   </div>
@@ -343,7 +347,7 @@ export default {
           name: 'startDate',
           label: 'Date d\'effet',
           align: 'left',
-          field: row => row.startDate ? this.$moment(row.startDate).format('DD/MM/YYYY') : '',
+          field: 'startDate',
         },
         {
           name: 'unitTTCRate',
