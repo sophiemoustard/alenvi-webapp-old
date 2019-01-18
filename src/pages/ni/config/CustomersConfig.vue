@@ -100,7 +100,7 @@
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
-            <h5>Éditer un <span class="text-weight-bold">service</span></h5>
+            <h5>Éditer le <span class="text-weight-bold">service</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
             <span>
@@ -168,7 +168,7 @@
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
-            <h5>Editer un <span class="text-weight-bold">tiers payeur</span></h5>
+            <h5>Editer le <span class="text-weight-bold">tiers payeur</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
             <span>

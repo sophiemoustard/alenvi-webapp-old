@@ -24,6 +24,9 @@ export default {
   async addSubscription (id, data) {
     return alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${id}/subscriptions`, data);
   },
+  async updateSubscription (params, data) {
+    return alenviAxios.put(`${process.env.API_HOSTNAME}/customers/${params._id}/subscriptions/${params.subscriptionId}`, data);
+  },
   async removeSubscription (params) {
     return alenviAxios.delete(`${process.env.API_HOSTNAME}/customers/${params._id}/subscriptions/${params.subscriptionId}`);
   },

@@ -180,8 +180,8 @@
       <q-btn no-caps class="full-width modal-btn" label="Ajouter un aidant" icon-right="add" color="primary" :loading="loading" @click="submitHelper" />
     </q-modal>
 
-    <!-- Add subscription modal -->
-    <q-modal v-model="subscriptionCreationModal" @hide="resetSubscriptionForm" :content-css="modalCssContainer">
+    <!-- Subscription creation modal -->
+    <q-modal v-model="subscriptionCreationModal" @hide="resetCreationSubscriptionData" :content-css="modalCssContainer">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-8">
@@ -203,7 +203,32 @@
         <ni-modal-input v-if="newSubscription.nature !== 'Forfaitaire'" v-model="newSubscription.sundays" caption="Dont dimanche (h)" type="number" />
         <ni-modal-input v-if="newSubscription.nature !== 'Forfaitaire'" v-model="newSubscription.evenings" caption="Dont soirée (h)" last type="number" />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Ajouter une souscription" icon-right="add" color="primary" :loading="loading" @click="submitSubscription" />
+      <q-btn no-caps class="full-width modal-btn" label="Ajouter une souscription" icon-right="add" color="primary" :loading="loading"
+        @click="submitSubscription" />
+    </q-modal>
+
+    <!-- Subscription edition modal -->
+    <q-modal v-model="subscriptionEditionModal" :content-css="modalCssContainer" @hide="resetEditionSubscriptionData">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-11">
+            <h5>Editer la <span class="text-weight-bold">souscription</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer" style="text-align: right">
+            <span>
+              <q-icon name="clear" size="1rem" @click.native="subscriptionEditionModal = false" /></span>
+          </div>
+        </div>
+        <ni-datetime-picker v-model="editedSubscription.startDate" :error="$v.editedSubscription.startDate.$error" caption="Dated'effet"
+          @blur="$v.editedSubscription.startDate.$touch" :min="minStartDate" />
+        <ni-modal-input v-model="editedSubscription.unitTTCRate" :error="$v.editedSubscription.unitTTCRate.$error" caption="Prix unitaire TTC"
+          @blur="$v.editedSubscription.unitTTCRate.$touch" type="number" />
+        <ni-modal-input v-model="editedSubscription.estimatedWeeklyVolume" :error="$v.editedSubscription.estimatedWeeklyVolume.$error"
+          caption="Volume hebdomadaire estimatif" @blur="$v.editedSubscription.estimatedWeeklyVolume.$touch" type="number" />
+        <ni-modal-input v-if="editedSubscription.nature !== 'Forfaitaire'" v-model="editedSubscription.sundays" caption="Dont dimanche (h)" type="number" />
+        <ni-modal-input v-if="editedSubscription.nature !== 'Forfaitaire'" v-model="editedSubscription.evenings" caption="Dont soirée (h)" last type="number" />
+      </div>
+      <q-btn no-caps class="full-width modal-btn" label="Editer la souscription" icon-right="add" color="primary" :loading="loading" @click="updateSubscription" />
     </q-modal>
 
     <!-- Subscription history modal -->
@@ -218,7 +243,7 @@
               <q-icon name="clear" size="1rem" @click.native="subscriptionHistoryModal = false" /></span>
           </div>
         </div>
-        <q-table class="q-mb-xl" :data="selectedSubscription.versions" :columns="subscriptionsHistoryColumns" hide-bottom binary-state-sort
+        <q-table class="q-mb-xl" :data="selectedSubscription.versions" :columns="subscriptionHistoryColumns" hide-bottom binary-state-sort
           :pagination.sync="paginationHistory" />
       </div>
     </q-modal>
@@ -237,7 +262,7 @@ import Input from '../form/Input.vue';
 import NiModalInput from '../form/ModalInput';
 import NiModalSelect from '../form/ModalSelect';
 import { frPhoneNumber, iban, bic, frAddress } from '../../helpers/vuelidateCustomVal';
-import DatetimePicker from '../form/DatetimePicker';
+import DatetimePicker from '../form/ModalDatetimePicker';
 import { downloadDocxFile } from '../../helpers/downloadFile';
 import { customerMixin } from '../../mixins/customerMixin.js';
 
@@ -256,6 +281,7 @@ export default {
       loading: false,
       addHelper: false,
       subscriptionCreationModal: false,
+      subscriptionEditionModal: false,
       subscriptionHistoryModal: false,
       isLoaded: false,
       tmpInput: '',
@@ -311,7 +337,7 @@ export default {
           field: '_id',
         },
       ],
-      subscriptionsHistoryColumns: [
+      subscriptionHistoryColumns: [
         {
           name: 'startDate',
           label: 'Date d\'effet',
@@ -419,6 +445,7 @@ export default {
         unitTTCRate: '',
         estimatedWeeklyVolume: '',
       },
+      editedSubscription: {},
       visibleMandateColumns: ['rum', 'emptyMandate', 'signedMandate', 'signed', 'signedAt'],
       visibleQuoteColumns: ['quoteNumber', 'emptyQuote', 'signedQuote', 'signed'],
       mandateColumns: [
@@ -533,7 +560,14 @@ export default {
       if (this.lastSubscriptionHistory && this.customer.subscriptionsAccepted) {
         return `le ${this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} par ${this.acceptedBy}`;
       }
-    }
+    },
+    minStartDate () {
+      console.log(this.editedSubscription)
+      const selectedSubscription = this.subscriptions.find(sub => sub._id === this.editedSubscription._id);
+      console.log(selectedSubscription);
+      console.log(selectedSubscription && this.$moment(selectedSubscription.startDate).add(1, 'd').toISOString());
+      return selectedSubscription ? this.$moment(selectedSubscription.startDate).add(1, 'd').toISOString() : '';
+    },
   },
   validations: {
     customer: {
@@ -561,6 +595,11 @@ export default {
     },
     newSubscription: {
       service: { required },
+      unitTTCRate: { required },
+      estimatedWeeklyVolume: { required },
+    },
+    editedSubscription: {
+      startDate: { required },
       unitTTCRate: { required },
       estimatedWeeklyVolume: { required },
     },
@@ -749,7 +788,7 @@ export default {
 
       return formattedService;
     },
-    resetSubscriptionForm () {
+    resetCreationSubscriptionData () {
       this.$v.newSubscription.$reset();
       this.newSubscription = {
         service: '',
@@ -772,7 +811,7 @@ export default {
         this.loading = true;
         const payload = this.formatCreatedSubscription();
         await this.$customers.addSubscription(this.customer._id, payload);
-        this.resetSubscriptionForm();
+        this.resetCreationSubscriptionData();
         await this.refreshCustomer();
         this.subscriptionCreationModal = false;
         NotifyPositive('Souscription ajoutée');
@@ -780,6 +819,47 @@ export default {
         console.error(e);
         if (e.data.statusCode === 409) return NotifyNegative(e.data.message);
         NotifyNegative("Erreur lors de l'ajout d'un souscription");
+      } finally {
+        this.loading = false;
+      }
+    },
+    startEdition (id) {
+      const selectedSubscription = this.subscriptions.find(sub => sub._id === id);
+      const { _id, service, unitTTCRate, estimatedWeeklyVolume, evenings, sundays } = selectedSubscription;
+      this.editedSubscription = {
+        _id,
+        nature: service.nature,
+        unitTTCRate,
+        estimatedWeeklyVolume,
+        evenings,
+        sundays,
+        startDate: '',
+      };
+
+      this.subscriptionEditionModal = true;
+    },
+    resetEditionSubscriptionData () {
+      this.subscriptionEditionModal = false;
+      this.editedSubscription = {};
+      this.$v.editedSubscription.$reset();
+    },
+    async updateSubscription () {
+      try {
+        this.$v.editedSubscription.$touch();
+        if (this.$v.editedSubscription.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        this.loading = true;
+        const subscriptionId = this.editedSubscription._id
+        const payload = this.editedSubscription;
+        delete payload._id;
+        delete payload.nature;
+        await this.$customers.updateSubscription({ _id: this.customer._id, subscriptionId }, payload);
+        this.resetEditionSubscriptionData();
+        this.refreshCustomer();
+        NotifyPositive('Souscription modifiée');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative("Erreur lors de la modification d'un souscription")
       } finally {
         this.loading = false;
       }
