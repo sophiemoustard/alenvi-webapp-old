@@ -21,3 +21,7 @@ export const DATE_OPTIONS = [
   { label: 'Après-midi', value: AFTERNOON },
   { label: 'Journée entière', value: ALL_DAY },
 ];
+
+// THIRD PARTY PAYERS
+export const BILLING_INDIRECT = 'indirecte';
+export const BILLING_DIRECT = 'directe';
