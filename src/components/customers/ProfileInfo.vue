@@ -562,10 +562,7 @@ export default {
       }
     },
     minStartDate () {
-      console.log(this.editedSubscription)
       const selectedSubscription = this.subscriptions.find(sub => sub._id === this.editedSubscription._id);
-      console.log(selectedSubscription);
-      console.log(selectedSubscription && this.$moment(selectedSubscription.startDate).add(1, 'd').toISOString());
       return selectedSubscription ? this.$moment(selectedSubscription.startDate).add(1, 'd').toISOString() : '';
     },
   },

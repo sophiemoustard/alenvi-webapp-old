@@ -80,7 +80,7 @@ export default {
     position: fixed
     height: 2em;
     width: 2em;
-    z-index: 10000
+    z-index: 5000
     &-left
       left: 235px
     &-right
