@@ -668,8 +668,10 @@ export default {
         this.loading = true;
         const thirdPartyPayerId = this.editedThirdPartyPayer._id;
         delete this.editedThirdPartyPayer._id;
-        const payload = this.$_.pickBy(this.editedThirdPartyPayer);
-        if (payload.address && !payload.address.fullAddress) delete payload.address.fullAddress;
+        const payload = this.editedThirdPartyPayer;
+        if (payload.address && !payload.address.fullAddress) {
+          payload.address = {};
+        }
         await this.$companies.updateThirdPartyPayer({ id: this.company._id, thirdPartyPayerId }, payload);
         await this.refreshThirdPartyPayers();
         NotifyPositive('Tiers payeur modifié.');
