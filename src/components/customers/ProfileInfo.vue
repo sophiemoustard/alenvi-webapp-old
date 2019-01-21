@@ -82,8 +82,12 @@
         <ni-input caption="BIC" :error="$v.customer.payment.bic.$error" errorLabel="BIC non valide"
           v-model="customer.payment.bic" @focus="saveTmp('payment.bic')" @blur="updateUser({ alenvi: 'payment.bic', ogust: 'bic_number' })" />
       </div>
+    </div>
+    <div class="q-mb-xl">
+      <div class="row justify-between items-baseline">
+        <p class="text-weight-bold">Mandats de prélèvement</p>
+      </div>
       <q-card>
-        <q-card-title>Mandats de prélèvement</q-card-title>
         <q-card-main>
           <q-table :columns="mandateColumns" :data="customer.payment.mandates" hide-bottom :pagination.sync="pagination" :visible-columns="visibleMandateColumns"
             binary-state-sort>
