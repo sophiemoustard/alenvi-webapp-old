@@ -149,10 +149,12 @@ export default {
       event.preventDefault();
       const data = event.dataTransfer.getData('text');
       console.log('data =', data);
-      event.target.appendChild(document.getElementById(data));
-    },
-    onDrop (res) {
-      console.log(res);
+      if (event.target.nodeName === 'TD') {
+        event.target.appendChild(document.getElementById(data));
+      }
+      if (event.target.nodeName === 'P') {
+        event.target.parentNode.parentNode.parentNode.appendChild(document.getElementById(data));
+      }
     }
   }
 }
