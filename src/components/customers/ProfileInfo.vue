@@ -34,14 +34,19 @@
       </div>
       <q-card>
         <q-card-main>
-          <q-table :data="subscriptions" :columns="subscriptionsColumns" row-key="name" table-style="font-size: 1rem" hide-bottom>
-            <q-td slot="body-cell-actions" slot-scope="props" :props="props" class="action-column">
-              <div class="row no-wrap">
-                  <q-btn flat round small color="grey" icon="history" @click.native="showHistory(props.value)" />
-                  <q-btn flat round small color="grey" icon="edit" @click.native="startEdition(props.value)" />
-                  <q-btn flat round small color="grey" icon="delete" @click.native="removeSubscriptions(props.value)" />
-                </div>
-            </q-td>
+          <q-table :data="subscriptions" :columns="subscriptionsColumns" row-key="name" table-style="font-size: 1rem" hide-bottom class="table-responsive">
+            <q-tr slot="body" slot-scope="props" :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+                <template v-if="col.name === 'actions'">
+                  <div class="row no-wrap">
+                    <q-btn flat round small color="grey" icon="history" @click.native="showHistory(col.value)" />
+                    <q-btn flat round small color="grey" icon="edit" @click.native="startEdition(col.value)" />
+                    <q-btn flat round small color="grey" icon="delete" @click.native="removeSubscriptions(col.value)" />
+                  </div>
+                </template>
+                <template v-else>{{ col.value }}</template>
+              </q-td>
+            </q-tr>
           </q-table>
         </q-card-main>
         <q-card-actions align="end">
@@ -247,11 +252,14 @@
               <q-icon name="clear" size="1rem" @click.native="subscriptionHistoryModal = false" /></span>
           </div>
         </div>
-        <q-table class="q-mb-xl" :data="selectedSubscription.versions" :columns="subscriptionHistoryColumns" hide-bottom binary-state-sort
+        <q-table class="q-mb-xl table-responsive" :data="selectedSubscription.versions" :columns="subscriptionHistoryColumns" hide-bottom binary-state-sort
           :pagination.sync="paginationHistory">
-          <q-td slot="body-cell-startDate" slot-scope="props" :props="props">
-            {{ $moment(props.value).format('DD/MM/YYYY') }}
-          </q-td>
+          <q-tr slot="body" slot-scope="props" :props="props">
+            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+              <template v-if="col.name === 'startDate'"> {{ $moment(col.value).format('DD/MM/YYYY') }} </template>
+              <template v-else>{{ col.value }}</template>
+            </q-td>
+          </q-tr>
         </q-table>
       </div>
     </q-modal>
@@ -1027,12 +1035,6 @@ export default {
 
   .q-table-container
     box-shadow: none
-
-  .modal
-    &-padding
-      padding: 24px 58px 0px 58px
-    &-btn
-      border-radius: 0
 
   /deep/ .q-uploader .q-if-inner
     display: none

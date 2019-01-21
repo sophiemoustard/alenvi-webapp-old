@@ -300,12 +300,6 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables';
 
-  .modal
-    &-padding
-      padding: 24px 58px 0px 58px
-    &-btn
-      border-radius: 0
-
   .margin-input
     margin-bottom: 6px
     &.last

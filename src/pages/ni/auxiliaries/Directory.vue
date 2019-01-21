@@ -582,12 +582,6 @@ export default {
     font-size: 16px
     z-index: 2
 
-  .modal
-    &-padding
-      padding: 24px 58px 0px 58px
-    &-btn
-      border-radius: 0
-
   .q-if-inverted
     border: 1px solid $light-grey
 

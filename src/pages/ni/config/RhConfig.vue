@@ -335,10 +335,4 @@ export default {
 
   .doc-delete
     padding: 0px 14px 17px 0px
-
-  .modal
-    &-padding
-      padding: 24px 58px 0px 58px
-    &-btn
-      border-radius: 0
 </style>

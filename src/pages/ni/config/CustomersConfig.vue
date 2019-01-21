@@ -714,12 +714,6 @@ export default {
     background: white !important
     color: inherit !important
 
-  .modal
-    &-padding
-      padding: 24px 58px 0px 58px
-    &-btn
-      border-radius: 0
-
   .action-column
     padding-left: 0px
     padding-right: 0px

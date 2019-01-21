@@ -423,11 +423,6 @@ export default {
     margin-bottom: 3px
   .auxiliaries-row
     height: 100px
-  .modal
-    &-padding
-      padding: 24px 58px 0px 58px
-    &-btn
-      border-radius: 0
   .fab-add-person
     right: 60px
     bottom: 18px

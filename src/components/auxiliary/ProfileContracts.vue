@@ -557,12 +557,6 @@ export default {
     width: 100%
     margin-bottom: 20px
 
-  .modal
-    &-padding
-      padding: 24px 58px 0px 58px
-    &-btn
-      border-radius: 0
-
   .margin-input
     margin-bottom: 6px
     &.last

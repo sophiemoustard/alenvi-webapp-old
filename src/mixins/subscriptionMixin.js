@@ -19,7 +19,7 @@ export const subscriptionMixin = {
         },
         {
           name: 'estimatedWeeklyVolume',
-          label: 'Volume hebdomadaire estimatif',
+          label: 'Volume hebdomadaire',
           align: 'center',
           field: row => this.selectedSubscription.service && this.selectedSubscription.service.nature === 'Horaire'
             ? `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume,

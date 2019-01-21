@@ -466,9 +466,6 @@ export default {
     color: $primary
     text-decoration: none
 
-  .modal-padding
-    padding: 24px 58px 0px 58px
-
   .toolbar-padding
     padding: 20px 58px
 
