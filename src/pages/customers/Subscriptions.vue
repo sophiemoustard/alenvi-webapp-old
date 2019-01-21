@@ -49,7 +49,7 @@
               <q-td slot="body-cell-rum" slot-scope="props" :props="props" :data-label="props.col.label">{{ props.value }}</q-td>
               <q-td slot="body-cell-sign" slot-scope="props" :props="props" :data-label="props.col.label">
                 <p class="no-margin" v-if="props.row.signedAt">Mandat signé le {{$moment(props.row.signedAt).format('DD/MM/YYYY')}}</p>
-                <q-btn v-else color="primary" @click="preOpenESignModal({ _id: props.row._id, rum: props.row.rum })">
+                <q-btn v-else-if="props.row.__index === customer.payment.mandates.length - 1" color="primary" @click="preOpenESignModal(props)">
                   Signer
                 </q-btn>
               </q-td>

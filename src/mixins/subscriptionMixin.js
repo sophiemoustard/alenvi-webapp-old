@@ -26,13 +26,13 @@ export const subscriptionMixin = {
         },
         {
           name: 'evenings',
-          label: 'dont dimanche',
+          label: 'dont soirées',
           align: 'center',
           field: 'evenings',
         },
         {
           name: 'sundays',
-          label: 'dont soirées',
+          label: 'dont dimanche',
           align: 'center',
           field: 'sundays',
         },
