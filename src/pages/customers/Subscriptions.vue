@@ -348,13 +348,15 @@ export default {
       try {
         if (this.customer.subscriptionsAccepted) {
           const subscriptions = this.customer.subscriptions.map(subscription => {
+            const lastVersion = this.getSubscriptionLastVersion(subscription);
             const obj = {
               service: subscription.service.name,
-              unitTTCRate: subscription.unitTTCRate,
-              estimatedWeeklyVolume: subscription.estimatedWeeklyVolume
+              unitTTCRate: lastVersion.unitTTCRate,
+              estimatedWeeklyVolume: lastVersion.estimatedWeeklyVolume,
+              startDate: lastVersion.startDate,
             };
-            if (subscription.evenings) obj.evenings = subscription.evenings;
-            if (subscription.sundays) obj.sundays = subscription.sundays;
+            if (lastVersion.evenings) obj.evenings = lastVersion.evenings;
+            if (lastVersion.sundays) obj.sundays = lastVersion.sundays;
             return obj;
           });
           const payload = {
@@ -372,6 +374,7 @@ export default {
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la validation de votre abonnement');
+        this.customer.subscriptionsAccepted = !this.customer.subscriptionsAccepted
       }
     },
     // Mandate
