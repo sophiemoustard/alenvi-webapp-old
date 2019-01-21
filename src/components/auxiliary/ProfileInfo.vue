@@ -183,7 +183,7 @@
           />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'pp'" class="col-xs-12 col-md-6">
-          <ni-file-uploader caption="Passeport" path="administrative.passport" alt="passeport" :entity="currentUser" :upload="uploadDocument"
+          <ni-file-uploader caption="Passeport" path="administrative.passport" alt="passeport" :entity="currentUser"
             @delete="deleteDocument(user.alenvi.administrative.passport.driveId, 'administrative.passport')" name="passport" :url="docsUploadUrl"
             @uploaded="refreshUser" :error="$v.user.alenvi.administrative.passport.driveId.$error" :extensions="extensions"
             :additionalValue="`passport_${currentUser.firstname}_${currentUser.lastname}`"
@@ -221,7 +221,7 @@
         <div class="col-xs-12 col-md-6">
           <ni-multiple-files-uploader caption="Diplome(s) ou certificat(s)" path="administrative.certificates" alt="facture téléphone"
             @delete="deleteDocument($event, 'certificates')" name="certificates" collapsibleLabel="Ajouter diplômes" :userProfile="currentUser"
-            :url="docsUploadUrl" additionalFieldsName="diplomes" @uploaded="refreshUser" @upload="uploadDocument($event, 'certificates')"
+            :url="docsUploadUrl" additionalFieldsName="diplomes" @uploaded="refreshUser"
           />
         </div>
       </div>
@@ -247,7 +247,7 @@
         </div>
         <div class="col-xs-12">
           <ni-file-uploader caption="Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle"
-            path="administrative.mutualFund" alt="justif mutuelle" :entity="currentUser" :upload="uploadDocument"
+            path="administrative.mutualFund" alt="justif mutuelle" :entity="currentUser"
             @delete="deleteDocument(user.alenvi.administrative.mutualFund.driveId, 'administrative.mutualFund')" name="mutualFund" @uploaded="refreshUser"
             :displayUpload="user.alenvi.administrative.mutualFund.has && !user.alenvi.administrative.mutualFund.driveId" entityUrl="users"
             :error="$v.user.alenvi.administrative.mutualFund.driveId.$error" :displayCaption="mainUser.role.name === 'Auxiliaire'"

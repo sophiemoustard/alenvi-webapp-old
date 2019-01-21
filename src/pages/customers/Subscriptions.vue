@@ -28,6 +28,11 @@
         </div>
       </div>
       <div class="q-mb-lg">
+        <p class="title">Justificatifs APA ou autres financements</p>
+        <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement" @uploaded="getCustomer" name="financialCertificates"
+          collapsibleLabel="Ajouter un certificat" :userProfile="customer" :url="docsUploadUrl" />
+      </div>
+      <div class="q-mb-lg">
         <p class="title">Paiement</p>
         <div class="row gutter-profile">
           <ni-input caption="Nom associé au compte bancaire" v-model="customer.payment.bankAccountOwner" :error="$v.customer.payment.bankAccountOwner.$error"
@@ -111,6 +116,7 @@
 import { required } from 'vuelidate/lib/validators';
 import Input from '../../components/form/Input.vue';
 import NiModalInput from '../../components/form/ModalInput';
+import MultipleFilesUploader from '../../components/form/MultipleFilesUploader.vue';
 import { bic, iban } from '../../helpers/vuelidateCustomVal';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify';
 import { customerMixin } from '../../mixins/customerMixin.js';
@@ -122,6 +128,7 @@ export default {
   name: 'Subscriptions',
   components: {
     'ni-input': Input,
+    'ni-multiple-files-uploader': MultipleFilesUploader,
     NiModalInput
   },
   mixins: [customerMixin, subscriptionMixin],
@@ -133,7 +140,8 @@ export default {
       customer: {
         payment: { mandates: [] },
         subscriptions: [],
-        quotes: []
+        quotes: [],
+        financialCertificates: [],
       },
       tmpInput: null,
       newESignModal: false,
@@ -227,7 +235,10 @@ export default {
     },
     isValidPayment () {
       return this.$v.customer.payment.bic.bic && this.$v.customer.payment.iban.iban
-    }
+    },
+    docsUploadUrl () {
+      return this.customer.driveFolder ? `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.id}/upload` : '';
+    },
   },
   async mounted () {
     await this.getCustomer();
