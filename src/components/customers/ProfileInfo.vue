@@ -287,7 +287,6 @@ export default {
       addHelper: false,
       subscriptionCreationModal: false,
       subscriptionEditionModal: false,
-      subscriptionHistoryModal: false,
       isLoaded: false,
       tmpInput: '',
       modalCssContainer: { minWidth: '30vw' },
@@ -340,39 +339,6 @@ export default {
           label: '',
           align: 'left',
           field: '_id',
-        },
-      ],
-      subscriptionHistoryColumns: [
-        {
-          name: 'startDate',
-          label: 'Date d\'effet',
-          align: 'left',
-          field: 'startDate',
-        },
-        {
-          name: 'unitTTCRate',
-          label: 'Prix unitaire TTC',
-          align: 'center',
-          field: row => `${this.formatNumber(row.unitTTCRate)}€`,
-        },
-        {
-          name: 'estimatedWeeklyVolume',
-          label: 'Volume hebdomadaire estimatif',
-          align: 'center',
-          field: row => this.selectedSubscription.service && this.selectedSubscription.service.nature === 'Horaire'
-            ? `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume,
-        },
-        {
-          name: 'evenings',
-          label: 'dont dimanche',
-          align: 'center',
-          field: 'evenings',
-        },
-        {
-          name: 'sundays',
-          label: 'dont soirées',
-          align: 'center',
-          field: 'sundays',
         },
       ],
       helpersColumns: [
@@ -498,11 +464,6 @@ export default {
         sortBy: 'createdAt',
         ascending: true,
         rowsPerPage: 0,
-      },
-      paginationHistory: {
-        rowsPerPage: 0,
-        sortBy: 'startDate',
-        descending: true,
       },
     }
   },
@@ -850,14 +811,6 @@ export default {
       } catch (e) {
         console.error(e);
       }
-    },
-    showHistory (id) {
-      this.selectedSubscription = this.subscriptions.find(sub => sub._id === id);
-      this.subscriptionHistoryModal = true;
-    },
-    resetSubscriptionHistoryData () {
-      this.subscriptionHistoryModal = false;
-      this.selectedSubscription = [];
     },
     // Helpers
     resetHelperForm () {

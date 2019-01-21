@@ -8,7 +8,12 @@
           <q-table :data="subscriptions" :columns="columnsSubs" row-key="name" hide-bottom binary-state-sort class="table-responsive">
             <q-tr slot="body" slot-scope="props" :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-                <template>{{ col.value }}</template>
+                <template v-if="col.name === 'actions'">
+                  <div class="row no-wrap">
+                    <q-btn flat round small color="grey" icon="history" @click.native="showHistory(col.value)" />
+                  </div>
+                </template>
+                <template v-else>{{ col.value }}</template>
               </q-td>
             </q-tr>
           </q-table>
@@ -73,6 +78,30 @@
     <template v-else>
       <p>Vous n'avez pas de bénéficiaire.</p>
     </template>
+
+    <!-- Subscription history modal -->
+    <q-modal v-model="subscriptionHistoryModal" :content-css="modalCssContainer" @hide="resetSubscriptionHistoryData">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-11">
+            <h5>Historique de la souscription <span class="text-weight-bold">{{selectedSubscription.service && selectedSubscription.service.name}}</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer" style="text-align: right">
+            <span>
+              <q-icon name="clear" size="1rem" @click.native="subscriptionHistoryModal = false" /></span>
+          </div>
+        </div>
+        <q-table class="q-mb-xl table-responsive" :data="selectedSubscription.versions" :columns="subscriptionHistoryColumns" hide-bottom binary-state-sort
+          :pagination.sync="paginationHistory">
+          <q-tr slot="body" slot-scope="props" :props="props">
+            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+              <template v-if="col.name === 'startDate'"> {{ $moment(col.value).format('DD/MM/YYYY') }} </template>
+              <template v-else>{{ col.value }}</template>
+            </q-td>
+          </q-tr>
+        </q-table>
+      </div>
+    </q-modal>
   </q-page>
 </template>
 
@@ -100,9 +129,7 @@ export default {
       cgsModal: false,
       agreed: false,
       customer: {
-        payment: {
-          mandates: []
-        },
+        payment: { mandates: [] },
         subscriptions: [],
         quotes: []
       },
@@ -153,6 +180,12 @@ export default {
           align: 'center',
           field: row => `${this.formatNumber(this.computeWeeklyRate(row))}€`,
           sortable: true
+        },
+        {
+          name: 'actions',
+          align: 'center',
+          label: '',
+          field: '_id',
         }
       ],
       columnsMandates: [
