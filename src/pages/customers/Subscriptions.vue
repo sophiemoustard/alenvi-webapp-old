@@ -2,10 +2,10 @@
   <q-page padding class="neutral-background">
     <template v-if="customer !== {}">
       <div class="q-mb-lg">
-        <p class="title">Services</p>
+        <p class="title">Souscriptions</p>
         <p v-if="subscriptions.length === 0">Aucun service souscrit.</p>
         <q-card v-if="subscriptions.length > 0" class="contract-card">
-          <q-table :data="subscriptions" :columns="columnsSubs" row-key="name" hide-bottom binary-state-sort class="table-responsive">
+          <q-table :data="subscriptions" :columns="subscriptionsColumns" row-key="name" hide-bottom binary-state-sort class="table-responsive">
             <q-tr slot="body" slot-scope="props" :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
                 <template v-if="col.name === 'actions'">
@@ -147,49 +147,6 @@ export default {
         minHeight: '70vh',
         overflow: 'hidden'
       },
-      columnsSubs: [
-        {
-          name: 'name',
-          label: 'Nom',
-          align: 'left',
-          field: row => row.service.name,
-          sortable: true
-        },
-        {
-          name: 'nature',
-          label: 'Nature',
-          align: 'left',
-          field: row => row.service.nature,
-          sortable: true
-        },
-        {
-          name: 'ttcRate',
-          label: 'Prix unitaire TTC',
-          align: 'center',
-          field: row => `${this.formatNumber(row.unitTTCRate)}€`,
-          sortable: true
-        },
-        {
-          name: 'estimatedWeeklyVolume',
-          label: 'Volume hebdomadaire',
-          align: 'center',
-          field: row => row.service.nature === 'Horaire' ? `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume,
-          sortable: true
-        },
-        {
-          name: 'weeklyRate',
-          label: 'Coût hebdomadaire TTC*',
-          align: 'center',
-          field: row => `${this.formatNumber(this.computeWeeklyRate(row))}€`,
-          sortable: true
-        },
-        {
-          name: 'actions',
-          align: 'center',
-          label: '',
-          field: '_id',
-        }
-      ],
       columnsMandates: [
         {
           name: 'rum',

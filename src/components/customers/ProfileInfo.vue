@@ -315,44 +315,6 @@ export default {
       },
       subscriptions: [],
       selectedSubscription: [],
-      subscriptionsColumns: [
-        {
-          name: 'service',
-          label: 'Service',
-          align: 'left',
-          field: row => row.service.name,
-        },
-        {
-          name: 'nature',
-          label: 'Nature du service',
-          align: 'left',
-          field: row => row.service.nature,
-        },
-        {
-          name: 'unitTTCRate',
-          label: 'Prix unitaire TTC',
-          align: 'center',
-          field: row => `${this.formatNumber(row.unitTTCRate)}€`,
-        },
-        {
-          name: 'estimatedWeeklyVolume',
-          label: 'Volume hebdomadaire estimatif',
-          align: 'center',
-          field: row => row.service.nature === 'Horaire' ? `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume,
-        },
-        {
-          name: 'weeklyRate',
-          label: 'Coût hebdomadaire TTC',
-          align: 'center',
-          field: row => `${this.formatNumber(this.computeWeeklyRate(row))}€`,
-        },
-        {
-          name: 'actions',
-          label: '',
-          align: 'left',
-          field: '_id',
-        },
-      ],
       helpersColumns: [
         {
           name: 'lastname',
