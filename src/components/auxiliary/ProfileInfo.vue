@@ -902,10 +902,4 @@ export default {
      width: 200px
      height: 200px
      background: $neutral
-
-  .modal
-    &-padding
-      padding: 24px 58px 0px 58px
-    &-btn
-      border-radius: 0
 </style>

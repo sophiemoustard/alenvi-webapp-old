@@ -254,12 +254,6 @@ export default {
     border-radius: 50%
     background: white
 
-  .modal
-    &-padding
-      padding: 24px 58px 0px 58px
-    &-btn
-      border-radius: 0
-
   .q-if-inverted
     border: 1px solid $light-grey
 

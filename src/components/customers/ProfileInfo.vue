@@ -34,14 +34,19 @@
       </div>
       <q-card>
         <q-card-main>
-          <q-table :data="subscriptions" :columns="subscriptionsColumns" row-key="name" table-style="font-size: 1rem" hide-bottom>
-            <q-td slot="body-cell-actions" slot-scope="props" :props="props" class="action-column">
-              <div class="row no-wrap">
-                  <q-btn flat round small color="grey" icon="history" @click.native="showHistory(props.value)" />
-                  <q-btn flat round small color="grey" icon="edit" @click.native="startEdition(props.value)" />
-                  <q-btn flat round small color="grey" icon="delete" @click.native="removeSubscriptions(props.value)" />
-                </div>
-            </q-td>
+          <q-table :data="subscriptions" :columns="subscriptionsColumns" row-key="name" table-style="font-size: 1rem" hide-bottom class="table-responsive">
+            <q-tr slot="body" slot-scope="props" :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+                <template v-if="col.name === 'actions'">
+                  <div class="row no-wrap">
+                    <q-btn flat round small color="grey" icon="history" @click.native="showHistory(col.value)" />
+                    <q-btn flat round small color="grey" icon="edit" @click.native="startEdition(col.value)" />
+                    <q-btn flat round small color="grey" icon="delete" @click.native="removeSubscriptions(col.value)" />
+                  </div>
+                </template>
+                <template v-else>{{ col.value }}</template>
+              </q-td>
+            </q-tr>
           </q-table>
         </q-card-main>
         <q-card-actions align="end">
@@ -82,8 +87,12 @@
         <ni-input caption="BIC" :error="$v.customer.payment.bic.$error" errorLabel="BIC non valide"
           v-model="customer.payment.bic" @focus="saveTmp('payment.bic')" @blur="updateUser({ alenvi: 'payment.bic', ogust: 'bic_number' })" />
       </div>
+    </div>
+    <div class="q-mb-xl">
+      <div class="row justify-between items-baseline">
+        <p class="text-weight-bold">Mandats de prélèvement</p>
+      </div>
       <q-card>
-        <q-card-title>Mandats de prélèvement</q-card-title>
         <q-card-main>
           <q-table :columns="mandateColumns" :data="customer.payment.mandates" hide-bottom :pagination.sync="pagination" :visible-columns="visibleMandateColumns"
             binary-state-sort>
@@ -243,11 +252,14 @@
               <q-icon name="clear" size="1rem" @click.native="subscriptionHistoryModal = false" /></span>
           </div>
         </div>
-        <q-table class="q-mb-xl" :data="selectedSubscription.versions" :columns="subscriptionHistoryColumns" hide-bottom binary-state-sort
+        <q-table class="q-mb-xl table-responsive" :data="selectedSubscription.versions" :columns="subscriptionHistoryColumns" hide-bottom binary-state-sort
           :pagination.sync="paginationHistory">
-          <q-td slot="body-cell-startDate" slot-scope="props" :props="props">
-            {{ $moment(props.value).format('DD/MM/YYYY') }}
-          </q-td>
+          <q-tr slot="body" slot-scope="props" :props="props">
+            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+              <template v-if="col.name === 'startDate'"> {{ $moment(col.value).format('DD/MM/YYYY') }} </template>
+              <template v-else>{{ col.value }}</template>
+            </q-td>
+          </q-tr>
         </q-table>
       </div>
     </q-modal>
@@ -269,6 +281,7 @@ import { frPhoneNumber, iban, bic, frAddress } from '../../helpers/vuelidateCust
 import DatetimePicker from '../form/ModalDatetimePicker';
 import { downloadDocxFile } from '../../helpers/downloadFile';
 import { customerMixin } from '../../mixins/customerMixin.js';
+import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
 
 export default {
   name: 'ProfileInfo',
@@ -279,14 +292,13 @@ export default {
     NiModalSelect,
     'ni-datetime-picker': DatetimePicker,
   },
-  mixins: [customerMixin],
+  mixins: [customerMixin, subscriptionMixin],
   data () {
     return {
       loading: false,
       addHelper: false,
       subscriptionCreationModal: false,
       subscriptionEditionModal: false,
-      subscriptionHistoryModal: false,
       isLoaded: false,
       tmpInput: '',
       modalCssContainer: { minWidth: '30vw' },
@@ -303,77 +315,6 @@ export default {
       },
       subscriptions: [],
       selectedSubscription: [],
-      subscriptionsColumns: [
-        {
-          name: 'service',
-          label: 'Service',
-          align: 'left',
-          field: row => row.service.name,
-        },
-        {
-          name: 'nature',
-          label: 'Nature du service',
-          align: 'left',
-          field: row => row.service.nature,
-        },
-        {
-          name: 'unitTTCRate',
-          label: 'Prix unitaire TTC',
-          align: 'center',
-          field: row => `${this.formatNumber(row.unitTTCRate)}€`,
-        },
-        {
-          name: 'estimatedWeeklyVolume',
-          label: 'Volume hebdomadaire estimatif',
-          align: 'center',
-          field: row => row.service.nature === 'Horaire' ? `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume,
-        },
-        {
-          name: 'weeklyRate',
-          label: 'Coût hebdomadaire TTC',
-          align: 'center',
-          field: row => `${this.computeWeeklyRate(row)}€`,
-        },
-        {
-          name: 'actions',
-          label: '',
-          align: 'left',
-          field: '_id',
-        },
-      ],
-      subscriptionHistoryColumns: [
-        {
-          name: 'startDate',
-          label: 'Date d\'effet',
-          align: 'left',
-          field: 'startDate',
-        },
-        {
-          name: 'unitTTCRate',
-          label: 'Prix unitaire TTC',
-          align: 'center',
-          field: row => `${this.formatNumber(row.unitTTCRate)}€`,
-        },
-        {
-          name: 'estimatedWeeklyVolume',
-          label: 'Volume hebdomadaire estimatif',
-          align: 'center',
-          field: row => this.selectedSubscription.service && this.selectedSubscription.service.nature === 'Horaire'
-            ? `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume,
-        },
-        {
-          name: 'evenings',
-          label: 'dont dimanche',
-          align: 'center',
-          field: 'evenings',
-        },
-        {
-          name: 'sundays',
-          label: 'dont soirées',
-          align: 'center',
-          field: 'sundays',
-        },
-      ],
       helpersColumns: [
         {
           name: 'lastname',
@@ -498,11 +439,6 @@ export default {
         ascending: true,
         rowsPerPage: 0,
       },
-      paginationHistory: {
-        rowsPerPage: 0,
-        sortBy: 'startDate',
-        descending: true,
-      },
     }
   },
   computed: {
@@ -623,25 +559,6 @@ export default {
 
       return service.versions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
     },
-    getSubscriptionLastVersion (subscription) {
-      if (!subscription.versions || subscription.versions.length === 0) return {};
-
-      return subscription.versions.sort((a, b) => new Date(b.startDate) - new Date(a.startDate))[0]
-    },
-    computeWeeklyRate (subscription) {
-      let weeklyRate = subscription.unitTTCRate * subscription.estimatedWeeklyVolume;
-      if (subscription.sundays && subscription.service.holidaySurcharge) {
-        weeklyRate += subscription.sundays * subscription.unitTTCRate * subscription.service.holidaySurcharge / 100;
-      }
-      if (subscription.evenings && subscription.service.eveningSurcharge) {
-        weeklyRate += subscription.evenings * subscription.unitTTCRate * subscription.service.eveningSurcharge / 100;
-      }
-
-      return weeklyRate;
-    },
-    formatNumber (number) {
-      return parseFloat(Math.round(number * 100) / 100).toFixed(1)
-    },
     mergeUser (value = null) {
       const args = [this.customer, value];
       this.customer = Object.assign({}, extend(true, ...args));
@@ -659,19 +576,6 @@ export default {
     async getUserHelpers () {
       try {
         this.userHelpers = await this.$users.showAll({ customers: this.userProfile._id });
-      } catch (e) {
-        console.error(e);
-      }
-    },
-    async refreshSubscriptions () {
-      try {
-        this.subscriptions = this.customer.subscriptions.map(sub => ({
-          ...this.getSubscriptionLastVersion(sub),
-          ...sub,
-        }))
-
-        this.$store.commit('rh/saveUserProfile', this.customer);
-        this.$v.customer.$touch();
       } catch (e) {
         console.error(e);
       }
@@ -881,14 +785,6 @@ export default {
       } catch (e) {
         console.error(e);
       }
-    },
-    showHistory (id) {
-      this.selectedSubscription = this.subscriptions.find(sub => sub._id === id);
-      this.subscriptionHistoryModal = true;
-    },
-    resetSubscriptionHistoryData () {
-      this.subscriptionHistoryModal = false;
-      this.selectedSubscription = [];
     },
     // Helpers
     resetHelperForm () {
@@ -1101,12 +997,6 @@ export default {
 
   .q-table-container
     box-shadow: none
-
-  .modal
-    &-padding
-      padding: 24px 58px 0px 58px
-    &-btn
-      border-radius: 0
 
   /deep/ .q-uploader .q-if-inner
     display: none

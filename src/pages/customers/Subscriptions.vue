@@ -2,31 +2,24 @@
   <q-page padding class="neutral-background">
     <template v-if="customer !== {}">
       <div class="q-mb-lg">
-        <p class="title">Services</p>
-        <p v-if="customer.subscriptions.length === 0">Aucun service souscrit.</p>
-        <q-card v-if="customer.subscriptions.length > 0" class="contract-card">
-          <q-table
-            :data="customer.subscriptions"
-            :columns="columnsSubs"
-            row-key="name"
-            hide-bottom
-            binary-state-sort
-            class="table-responsive">
-            <q-tr
-              slot="body"
-              slot-scope="props"
-              :props="props">
-              <q-td v-for="col in props.cols"
-                :key="col.name"
-                :data-label="col.label"
-                :props="props">
-                <template>{{ col.value }}</template>
+        <p class="title">Souscriptions</p>
+        <p v-if="subscriptions.length === 0">Aucun service souscrit.</p>
+        <q-card v-if="subscriptions.length > 0" class="contract-card">
+          <q-table :data="subscriptions" :columns="subscriptionsColumns" row-key="name" hide-bottom binary-state-sort class="table-responsive">
+            <q-tr slot="body" slot-scope="props" :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+                <template v-if="col.name === 'actions'">
+                  <div class="row no-wrap">
+                    <q-btn flat round small color="grey" icon="history" @click.native="showHistory(col.value)" />
+                  </div>
+                </template>
+                <template v-else>{{ col.value }}</template>
               </q-td>
             </q-tr>
           </q-table>
         </q-card>
-        <p v-if="customer.subscriptions.length > 0" class="nota-bene">* intègre les éventuelles majorations soir / dimanche</p>
-        <div v-if="customer.subscriptions && customer.subscriptions.length > 0" class="row">
+        <p v-if="subscriptions.length > 0" class="nota-bene">* intègre le financement et les éventuelles majorations soir / dimanche</p>
+        <div v-if="subscriptions && subscriptions.length > 0" class="row">
           <div class="col-xs-12">
             <q-checkbox v-model="customer.subscriptionsAccepted" class="q-mr-sm" @input="confirmAgreement" />
             <span style="vertical-align: middle">J'accepte les conditions d’abonnement présentées ci-dessus ainsi que les <a href="#cgs" @click.prevent="cgsModal = true">conditions générales de services
@@ -47,23 +40,18 @@
             @focus="saveTmp('payment.bic')" @blur="updateCustomer({ alenvi: 'payment.bic', ogust: 'bic_number' })"
           />
         </div>
+      </div>
+      <div class="q-mb-lg">
         <p class="title">Mandats de prélèvement</p>
         <p v-if="customer.payment.mandates.length === 0 || !isValidPayment">Aucun mandat.</p>
         <q-card v-if="isValidPayment && customer.payment.mandates.length > 0" class="contract-card">
           <q-card-main>
-            <q-table
-              :data="customer.payment.mandates"
-              :columns="columnsMandates"
-              row-key="name"
-              hide-bottom
-              :pagination.sync="pagination"
-              :visible-columns="visibleColumnsMandates"
-              binary-state-sort
-              class="table-responsive">
+            <q-table :data="customer.payment.mandates" :columns="columnsMandates" row-key="name" hide-bottom :pagination.sync="pagination"
+              :visible-columns="visibleColumnsMandates" binary-state-sort class="table-responsive">
               <q-td slot="body-cell-rum" slot-scope="props" :props="props" :data-label="props.col.label">{{ props.value }}</q-td>
               <q-td slot="body-cell-sign" slot-scope="props" :props="props" :data-label="props.col.label">
                 <p class="no-margin" v-if="props.row.signedAt">Mandat signé le {{$moment(props.row.signedAt).format('DD/MM/YYYY')}}</p>
-                <q-btn v-else color="primary" @click="preOpenESignModal({ _id: props.row._id, rum: props.row.rum })">
+                <q-btn v-else-if="props.row.__index === customer.payment.mandates.length - 1" color="primary" @click="preOpenESignModal(props)">
                   Signer
                 </q-btn>
               </q-td>
@@ -92,6 +80,30 @@
     <template v-else>
       <p>Vous n'avez pas de bénéficiaire.</p>
     </template>
+
+    <!-- Subscription history modal -->
+    <q-modal v-model="subscriptionHistoryModal" :content-css="modalCssContainer" @hide="resetSubscriptionHistoryData">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-11">
+            <h5>Historique de la souscription <span class="text-weight-bold">{{selectedSubscription.service && selectedSubscription.service.name}}</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer" style="text-align: right">
+            <span>
+              <q-icon name="clear" size="1rem" @click.native="subscriptionHistoryModal = false" /></span>
+          </div>
+        </div>
+        <q-table class="q-mb-xl table-responsive" :data="selectedSubscription.versions" :columns="subscriptionHistoryColumns" hide-bottom binary-state-sort
+          :pagination.sync="paginationHistory">
+          <q-tr slot="body" slot-scope="props" :props="props">
+            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+              <template v-if="col.name === 'startDate'"> {{ $moment(col.value).format('DD/MM/YYYY') }} </template>
+              <template v-else>{{ col.value }}</template>
+            </q-td>
+          </q-tr>
+        </q-table>
+      </div>
+    </q-modal>
   </q-page>
 </template>
 
@@ -102,6 +114,7 @@ import NiModalInput from '../../components/form/ModalInput';
 import { bic, iban } from '../../helpers/vuelidateCustomVal';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify';
 import { customerMixin } from '../../mixins/customerMixin.js';
+import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
 import esign from '../../api/Esign.js';
 import cgs from '../../statics/CGS.html';
 
@@ -111,16 +124,14 @@ export default {
     'ni-input': Input,
     NiModalInput
   },
-  mixins: [customerMixin],
+  mixins: [customerMixin, subscriptionMixin],
   data () {
     return {
       cgs,
       cgsModal: false,
       agreed: false,
       customer: {
-        payment: {
-          mandates: []
-        },
+        payment: { mandates: [] },
         subscriptions: [],
         quotes: []
       },
@@ -136,43 +147,6 @@ export default {
         minHeight: '70vh',
         overflow: 'hidden'
       },
-      columnsSubs: [
-        {
-          name: 'name',
-          label: 'Nom',
-          align: 'left',
-          field: row => row.service.name,
-          sortable: true
-        },
-        {
-          name: 'nature',
-          label: 'Nature',
-          align: 'left',
-          field: row => row.service.nature,
-          sortable: true
-        },
-        {
-          name: 'ttcRate',
-          label: 'Prix unitaire TTC',
-          align: 'center',
-          field: row => `${this.formatNumber(row.unitTTCRate)}€`,
-          sortable: true
-        },
-        {
-          name: 'estimatedWeeklyVolume',
-          label: 'Volume hebdomadaire',
-          align: 'center',
-          field: row => row.service.nature === 'Horaire' ? `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume,
-          sortable: true
-        },
-        {
-          name: 'weeklyRate',
-          label: 'Coût hebdomadaire TTC*',
-          align: 'center',
-          field: row => `${this.formatNumber(this.getWeeklyRate(row))}€`,
-          sortable: true
-        }
-      ],
       columnsMandates: [
         {
           name: 'rum',
@@ -260,24 +234,11 @@ export default {
     await this.checkMandates();
   },
   methods: {
-    formatNumber (number) {
-      return parseFloat(Math.round(number * 100) / 100).toFixed(1)
-    },
-    getWeeklyRate (subscription) {
-      let estimatedWeeklyRate = subscription.unitTTCRate * subscription.estimatedWeeklyVolume;
-      if (subscription.sundays && subscription.service.holidaySurcharge) {
-        estimatedWeeklyRate += subscription.sundays * subscription.unitTTCRate * subscription.service.holidaySurcharge / 100;
-      }
-      if (subscription.evenings && subscription.service.eveningSurcharge) {
-        estimatedWeeklyRate += subscription.evenings * subscription.unitTTCRate * subscription.service.eveningSurcharge / 100;
-      }
-
-      return estimatedWeeklyRate;
-    },
     async getCustomer () {
       try {
         const customerRaw = await this.$customers.getById(this.helper.customers[0]._id);
         this.customer = customerRaw.data.data.customer;
+        this.refreshSubscriptions();
       } catch (e) {
         console.error(e);
         this.customer = {};
@@ -286,6 +247,7 @@ export default {
     saveTmp (path) {
       this.tmpInput = this.$_.get(this.customer, path);
     },
+    // Customer
     async updateOgustCustomer (paths) {
       let value = this.$_.get(this.customer, paths.alenvi);
       const payload = this.$_.set({}, paths.ogust, value);
@@ -340,6 +302,41 @@ export default {
         this.tmpInput = '';
       }
     },
+    // Subscriptions
+    async confirmAgreement () {
+      try {
+        if (this.customer.subscriptionsAccepted) {
+          const subscriptions = this.customer.subscriptions.map(subscription => {
+            const lastVersion = this.getSubscriptionLastVersion(subscription);
+            const obj = {
+              service: subscription.service.name,
+              unitTTCRate: lastVersion.unitTTCRate,
+              estimatedWeeklyVolume: lastVersion.estimatedWeeklyVolume,
+              startDate: lastVersion.startDate,
+            };
+            if (lastVersion.evenings) obj.evenings = lastVersion.evenings;
+            if (lastVersion.sundays) obj.sundays = lastVersion.sundays;
+            return obj;
+          });
+          const payload = {
+            subscriptions,
+            helper: {
+              firstname: this.helper.firstname || '',
+              lastname: this.helper.lastname || '',
+              title: this.helper.administrative && this.helper.administrative.identity ? this.helper.administrative.identity.title : ''
+            }
+          };
+          await this.$customers.addSubscriptionHistory(this.customer._id, payload);
+          await this.getCustomer();
+          NotifyPositive('Abonnement validé');
+        }
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la validation de votre abonnement');
+        this.customer.subscriptionsAccepted = !this.customer.subscriptionsAccepted
+      }
+    },
+    // Mandate
     async preOpenESignModal (data) {
       try {
         this.$q.loading.show({ message: 'Contact du support de signature en ligne...' });
@@ -375,36 +372,6 @@ export default {
         this.$q.loading.hide();
         this.newESignModal = false;
         NotifyNegative('Erreur lors de la requête de signature en ligne du mandat');
-      }
-    },
-    async confirmAgreement () {
-      try {
-        if (this.customer.subscriptionsAccepted) {
-          const subscriptions = this.customer.subscriptions.map(subscription => {
-            const obj = {
-              service: subscription.service.name,
-              unitTTCRate: subscription.unitTTCRate,
-              estimatedWeeklyVolume: subscription.estimatedWeeklyVolume
-            };
-            if (subscription.evenings) obj.evenings = subscription.evenings;
-            if (subscription.sundays) obj.sundays = subscription.sundays;
-            return obj;
-          });
-          const payload = {
-            subscriptions,
-            helper: {
-              firstname: this.helper.firstname || '',
-              lastname: this.helper.lastname || '',
-              title: this.helper.administrative && this.helper.administrative.identity ? this.helper.administrative.identity.title : ''
-            }
-          };
-          await this.$customers.addSubscriptionHistory(this.customer._id, payload);
-          await this.getCustomer();
-          NotifyPositive('Abonnement validé');
-        }
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la validation de votre abonnement');
       }
     },
     async checkMandates () {
@@ -455,9 +422,6 @@ export default {
   a
     color: $primary
     text-decoration: none
-
-  .modal-padding
-    padding: 24px 58px 0px 58px
 
   .toolbar-padding
     padding: 20px 58px
