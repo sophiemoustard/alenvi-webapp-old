@@ -5,27 +5,15 @@
         <p class="title">Services</p>
         <p v-if="subscriptions.length === 0">Aucun service souscrit.</p>
         <q-card v-if="subscriptions.length > 0" class="contract-card">
-          <q-table
-            :data="subscriptions"
-            :columns="columnsSubs"
-            row-key="name"
-            hide-bottom
-            binary-state-sort
-            class="table-responsive">
-            <q-tr
-              slot="body"
-              slot-scope="props"
-              :props="props">
-              <q-td v-for="col in props.cols"
-                :key="col.name"
-                :data-label="col.label"
-                :props="props">
+          <q-table :data="subscriptions" :columns="columnsSubs" row-key="name" hide-bottom binary-state-sort class="table-responsive">
+            <q-tr slot="body" slot-scope="props" :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
                 <template>{{ col.value }}</template>
               </q-td>
             </q-tr>
           </q-table>
         </q-card>
-        <p v-if="subscriptions.length > 0" class="nota-bene">* intègre les éventuelles majorations soir / dimanche</p>
+        <p v-if="subscriptions.length > 0" class="nota-bene">* intègre le financement et les éventuelles majorations soir / dimanche</p>
         <div v-if="subscriptions && subscriptions.length > 0" class="row">
           <div class="col-xs-12">
             <q-checkbox v-model="customer.subscriptionsAccepted" class="q-mr-sm" @input="confirmAgreement" />
@@ -51,15 +39,8 @@
         <p v-if="customer.payment.mandates.length === 0 || !isValidPayment">Aucun mandat.</p>
         <q-card v-if="isValidPayment && customer.payment.mandates.length > 0" class="contract-card">
           <q-card-main>
-            <q-table
-              :data="customer.payment.mandates"
-              :columns="columnsMandates"
-              row-key="name"
-              hide-bottom
-              :pagination.sync="pagination"
-              :visible-columns="visibleColumnsMandates"
-              binary-state-sort
-              class="table-responsive">
+            <q-table :data="customer.payment.mandates" :columns="columnsMandates" row-key="name" hide-bottom :pagination.sync="pagination"
+              :visible-columns="visibleColumnsMandates" binary-state-sort class="table-responsive">
               <q-td slot="body-cell-rum" slot-scope="props" :props="props" :data-label="props.col.label">{{ props.value }}</q-td>
               <q-td slot="body-cell-sign" slot-scope="props" :props="props" :data-label="props.col.label">
                 <p class="no-margin" v-if="props.row.signedAt">Mandat signé le {{$moment(props.row.signedAt).format('DD/MM/YYYY')}}</p>
