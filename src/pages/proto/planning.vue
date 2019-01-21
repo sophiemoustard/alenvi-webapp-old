@@ -1,11 +1,5 @@
 <template>
   <q-page padding class="neutral-background">
-    <!-- <div id="div1" class="mydiv" @drop="drop" @dragover.prevent>
-      <img src="https://cdn.sstatic.net/Sites/stackoverflow/company/img/logos/so/so-logo.png?v=9c558ec15d8a" draggable @dragstart="drag" id="drag1" width="88" height="31">
-    </div>
-    <div id="div2" class="mydiv" @drop="drop" @dragover.prevent></div>
-    <div id="div3" class="mydiv" @drop="drop" @dragover.prevent></div>
-    <div id="div4" class="mydiv" @drop="drop" @dragover.prevent></div> -->
     <p class="input-caption">Communauté</p>
     <ni-select-sector class="q-mb-md" @input="getEmployeesBySector" v-model="selectedSector" />
     <div class="planning-container full-width q-pa-md">
@@ -30,7 +24,7 @@
               <div :id="Math.random().toString(36).substr(2, 5)" draggable @dragstart="drag" class="row cursor-pointer" v-for="(event, eventIndex) in getAuxiliaryEvents(auxiliary, dayIndex)" :key="eventIndex" @click="openEditionModal(event)">
                 <div class="col-12 event">
                   <p class="no-margin">{{ getEventHours(event) }}</p>
-                  <!-- <p class="no-margin">{{ event.customer.identity.title }} {{ event.customer.identity.lastname }}</p> -->
+                  <p class="no-margin">{{ event.customer.identity.title }} {{ event.customer.identity.lastname }}</p>
                 </div>
               </div>
             </td>
@@ -139,16 +133,10 @@ export default {
     // Drag & drop
     drag (event) {
       event.dataTransfer.setData('text', event.target.id);
-      console.log('id event =', event.target.id);
-      console.log('drag event =', event);
     },
     drop (event) {
-      console.log('id event =', event.target.id);
-      console.log('drop event =', event);
-      // event.stopPropagation();
       event.preventDefault();
       const data = event.dataTransfer.getData('text');
-      console.log('data =', data);
       if (event.target.nodeName === 'TD') {
         event.target.appendChild(document.getElementById(data));
       }
@@ -163,7 +151,6 @@ export default {
 <style lang="stylus" scoped>
   table
     border-collapse: collapse
-    // table-layout: fixed
   td
     border: 1px solid black
     padding: 5px
@@ -173,8 +160,6 @@ export default {
     border: 1px solid black
     padding: 2px
     margin-bottom: 3px
-    // &-cell
-    //   width: 200px
   .auxiliaries-row
     height: 100px
   .modal
