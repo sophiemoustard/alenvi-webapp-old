@@ -9,18 +9,14 @@
       </q-toolbar>
     </q-layout-header>
 
-    <template v-if="!this.$q.platform.is.mobile">
-      <q-btn v-if="toggleDrawer " flat round icon="chevron_left" @click="toggleLeft" class="chevron chevron-left" />
-      <q-btn v-else flat round icon="view_headline" @click="toggleLeft" class="chevron chevron-right" />
-    </template>
+    <q-btn v-if="toggleDrawer" flat round icon="chevron_left" @click="toggleLeft" class="chevron chevron-left" />
+    <q-btn v-else flat round icon="view_headline" @click="toggleLeft" class="chevron chevron-right" />
     <q-layout-drawer v-if="toggleDrawer" :width="250" side="left" v-model="toggleDrawer">
       <side-menu-coach :ref="sidemenusRefs" v-if="user && user.role.name !== 'Auxiliaire' && user.role.name !== 'Aidants'" :user="user" />
       <side-menu-auxiliary :ref="sidemenusRefs" v-if="user && user.role.name === 'Auxiliaire'" :user="user" />
       <side-menu-customer :ref="sidemenusRefs" v-if="user && user.role.name === 'Aidants'" :user="user" />
     </q-layout-drawer>
-    <template v-else>
-      <q-layout-drawer v-if="!this.$q.platform.is.mobile" :width="0" side="left" class="hidden-menu"></q-layout-drawer>
-    </template>
+    <q-layout-drawer v-else :width="0" side="left" class="hidden-menu"></q-layout-drawer>
 
     <q-page-container>
       <router-view :key="$route.fullPath"/>
@@ -92,6 +88,8 @@ export default {
       left: 235px
     &-right
       left: 15px
+    @media (max-width: 767px)
+      display: none
 
   .q-toolbar
     color: $primary
@@ -103,4 +101,8 @@ export default {
     color: $dark-grey
     &:hover
       color: $primary
+
+  .hidden-menu
+    @media (max-width: 767px)
+      display: none
   </style>
