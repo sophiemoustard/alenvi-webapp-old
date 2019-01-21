@@ -66,13 +66,13 @@ export const subscriptionMixin = {
           name: 'evenings',
           label: 'dont soirées',
           align: 'center',
-          field: 'evenings',
+          field: row => row.evenings ? `${row.evenings}h` : '',
         },
         {
           name: 'sundays',
           label: 'dont dimanche',
           align: 'center',
-          field: 'sundays',
+          field: row => row.sundays ? `${row.sundays}h` : '',
         },
       ],
       paginationHistory: {
