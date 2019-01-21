@@ -8,18 +8,19 @@
         hide-underline :extensions="extensions" color="white" inverted-light hide-upload-button @add="uploadDocument" @fail="failMsg"
       />
     </q-field>
-    <div v-if="documents && documents.length > 0"
-      v-for="(certificate, index) in documents" :key="index">
-      <div v-if="certificate.driveId" class="row justify-between" style="background: white; margin-bottom: 24px">
-        <div class="doc-thumbnail">
-          <ni-custom-img :driveId="certificate.driveId" alt="diplôme" />
-        </div>
-        <div class="self-end doc-delete">
-          <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(certificate.driveId)" />
-          <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(certificate.link)" />
+    <template v-if="documents && documents.length > 0">
+      <div v-for="(certificate, index) in documents" :key="index">
+        <div v-if="certificate.driveId" class="row justify-between" style="background: white; margin-bottom: 24px">
+          <div class="doc-thumbnail">
+            <ni-custom-img :driveId="certificate.driveId" alt="diplôme" />
+          </div>
+          <div class="self-end doc-delete">
+            <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(certificate.driveId)" />
+            <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(certificate.link)" />
+          </div>
         </div>
       </div>
-    </div>
+    </template>
     <div v-if="documents && documents.length > 0">
       <q-collapsible v-model="collapsibleOpened" :label="collapsibleLabel" :collapseIcon="collapsibleIcon">
         <q-uploader :ref="name" :name="name" :url="url" :headers="headers" :additional-fields="additionalFields" @uploaded="documentUploaded"
