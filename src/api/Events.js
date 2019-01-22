@@ -12,8 +12,8 @@ export default {
   async deleteById (id) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/events/${id}`);
   },
-  async updateById (data, token = null) {
-    const event = await alenviAxios.put(`${process.env.API_HOSTNAME}/events/${data._id}`, data);
+  async updateById (id, payload) {
+    const event = await alenviAxios.put(`${process.env.API_HOSTNAME}/events/${id}`, payload);
     return event.data.data.event;
   },
 };

@@ -120,7 +120,7 @@
           <ni-modal-select caption="Type d'heure interne" v-model="editedEvent.internalHour" :options="internalHourOptions" :error="$v.editedEvent.internalHour.$error" />
         </template>
       </div>
-      <q-btn class="full-width modal-btn" no-caps color="primary" :loading="loading" label="Editer l'évènement" />
+      <q-btn class="full-width modal-btn" no-caps color="primary" :loading="loading" label="Editer l'évènement" @click="updateEvent" />
     </q-modal>
   </q-page>
 </template>
@@ -384,31 +384,35 @@ export default {
         subscription: '',
       };
     },
+    getPayload (event) {
+      const { _id, ...eventData } = event;
+      let payload = { ...eventData }
+      if (event.type === INTERNAL_HOUR) {
+        const internalHour = this.internalHours.find(hour => hour._id === event.internalHour);
+        payload.internalHour = internalHour;
+      }
+      if (event.type === ABSENCE) {
+        payload.startDate = this.$moment(event.startDate).hours(event.startDuration[0].startHour).toISOString();
+        if (event.endDuration !== '') {
+          payload.endDate = this.$moment(event.endDate).hours(event.endDuration[0].endHour).toISOString();
+        } else {
+          payload.endDate = this.$moment(event.endDate).hours(event.startDuration[0].endHour).toISOString();
+        }
+
+        this.$_.unset(payload, 'startDuration');
+        this.$_.unset(payload, 'endDuration');
+      }
+
+      return this.$_.pickBy(payload)
+    },
     async createEvent () {
       try {
         this.newEvent.sector = this.selectedSector;
         this.$v.newEvent.$touch();
         if (this.$v.newEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        let payload = { ...this.newEvent }
-        if (this.newEvent.type === INTERNAL_HOUR) {
-          const internalHour = this.internalHours.find(hour => hour._id === this.newEvent.internalHour);
-          payload.internalHour = internalHour;
-        }
-        if (this.newEvent.type === ABSENCE) {
-          payload.startDate = this.$moment(this.newEvent.startDate).hours(this.newEvent.startDuration[0].startHour).toISOString();
-          if (this.newEvent.endDuration !== '') {
-            payload.endDate = this.$moment(this.newEvent.endDate).hours(this.newEvent.endDuration[0].endHour).toISOString();
-          } else {
-            payload.endDate = this.$moment(this.newEvent.endDate).hours(this.newEvent.startDuration[0].endHour).toISOString();
-          }
-
-          this.$_.unset(payload, 'startDuration');
-          this.$_.unset(payload, 'endDuration');
-        }
-
         this.loading = true;
-        payload = this.$_.pickBy(payload);
+        const payload = this.getPayload(this.newEvent);
         await this.$events.create(payload);
         NotifyPositive('Évènement créé');
 
@@ -445,26 +449,53 @@ export default {
       return { startDuration, endDuration };
     },
     openEditionModal (event) {
+      const { createdAt, updatedAt, ...eventData } = event;
       const auxiliary = event.auxiliary._id;
       switch (event.type) {
         case INTERVENTION:
           const subscription = event.subscription._id;
-          this.editedEvent = { ...event, auxiliary, subscription };
+          this.editedEvent = { ...eventData, auxiliary, subscription };
           break;
         case INTERNAL_HOUR:
           const internalHour = event.internalHour._id;
-          this.editedEvent = { ...event, auxiliary, internalHour };
+          this.editedEvent = { ...eventData, auxiliary, internalHour };
           break;
         case ABSENCE:
           const { startDuration, endDuration } = this.getAbsenceDurations(event);
-          this.editedEvent = { ...event, auxiliary, startDuration, endDuration };
+          this.editedEvent = { ...eventData, auxiliary, startDuration, endDuration };
           break;
         case UNAVAILABILITY:
-          this.editedEvent = { ...event, auxiliary };
+          this.editedEvent = { ...eventData, auxiliary };
           break;
       }
 
       this.editionModal = true
+    },
+    resetEditionForm () {
+      this.$v.editedEvent.$reset();
+      this.editedEvent = { subscription: {} };
+    },
+    async updateEvent () {
+      try {
+        this.editedEvent.sector = this.selectedSector;
+        this.$v.editedEvent.$touch();
+        if (this.$v.editedEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        this.loading = true;
+        const payload = this.getPayload(this.editedEvent);
+        delete payload.customer;
+        delete payload.type;
+        await this.$events.updateById(this.editedEvent._id, payload);
+        NotifyPositive('Évènement modifié');
+
+        await this.getEvents();
+        this.editionModal = false;
+        this.resetEditionForm();
+      } catch (e) {
+        NotifyNegative('Erreur lors de l\'édition de l\'évènement');
+      } finally {
+        this.loading = false;
+      }
     },
     // Event files
     documentUploaded (uploadedInfo) {
