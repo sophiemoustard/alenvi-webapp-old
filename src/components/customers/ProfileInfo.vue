@@ -64,10 +64,15 @@
       <p class="text-weight-bold">Aidants</p>
       <q-card>
         <q-card-main>
-          <q-table :data="userHelpers" :columns="helpersColumns" row-key="name" table-style="font-size: 1rem" hide-bottom>
-            <q-td slot="body-cell-remove" slot-scope="props" :props="props" class="action-column">
-              <q-icon name="delete" size="1.2rem" color="grey" class="cursor-pointer" @click.native="removeHelper(props.value)" />
-            </q-td>
+          <q-table :data="userHelpers" :columns="helpersColumns" row-key="name" table-style="font-size: 1rem" hide-bottom class="table-responsive">
+            <q-tr slot="body" slot-scope="props" :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+                <template v-if="col.name === 'actions'">
+                  <q-icon name="delete" size="1.2rem" color="grey" class="cursor-pointer" @click.native="removeHelper(col.value)" />
+                </template>
+                <template v-else>{{ col.value }}</template>
+              </q-td>
+            </q-tr>
           </q-table>
         </q-card-main>
         <q-card-actions align="end">
@@ -337,7 +342,7 @@ export default {
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
         },
         {
-          name: 'remove',
+          name: 'actions',
           label: '',
           align: 'left',
           field: '_id',
