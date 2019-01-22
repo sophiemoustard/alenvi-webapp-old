@@ -30,7 +30,7 @@
       <div class="q-mb-lg">
         <p class="title">Justificatifs APA ou autres financements</p>
         <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement" @uploaded="getCustomer" name="financialCertificates"
-          collapsibleLabel="Ajouter un certificat" :userProfile="customer" :url="docsUploadUrl" />
+          collapsibleLabel="Ajouter un certificat" :userProfile="customer" :url="docsUploadUrl" @delete="deleteDocument($event)"/>
       </div>
       <div class="q-mb-lg">
         <p class="title">Paiement</p>
@@ -123,6 +123,7 @@ import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
 import esign from '../../api/Esign.js';
 import cgs from '../../statics/CGS.html';
+import gdrive from '../../api/GoogleDrive.js';
 
 export default {
   name: 'Subscriptions',
@@ -345,6 +346,28 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la validation de votre abonnement');
         this.customer.subscriptionsAccepted = !this.customer.subscriptionsAccepted
+      }
+    },
+    // Financial certificates
+    async deleteDocument (driveId) {
+      try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
+          ok: true,
+          cancel: 'Annuler'
+        });
+        await gdrive.removeFileById({ id: driveId });
+
+        const payload = { 'financialCertificates': { driveId } };
+        await this.$customers.updateCertificates(this.customer._id, payload);
+        this.getCustomer();
+        NotifyPositive('Document supprimé');
+      } catch (e) {
+        console.error(e);
+        if (e.message === '') return NotifyPositive('Suppression annulée');
+
+        NotifyNegative('Erreur lors de la suppression du document');
       }
     },
     // Mandate
