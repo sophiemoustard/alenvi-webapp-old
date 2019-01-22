@@ -1,16 +1,16 @@
 <template>
   <div>
-    <div class="row">
+    <div class="row" v-if="caption">
       <p class="input-caption">{{ caption }}</p>
     </div>
-    <q-field v-if="documents.length === 0">
+    <div v-if="documents.length === 0" class="row gutter-profile">
       <q-uploader :ref="name" :name="name" :url="url" :headers="headers"  @uploaded="documentUploaded" :additional-fields="additionalFields"
-        hide-underline :extensions="extensions" color="white" inverted-light hide-upload-button @add="uploadDocument" @fail="failMsg"
+        hide-underline :extensions="extensions" color="white" inverted-light hide-upload-button @add="uploadDocument" @fail="failMsg" class="col-xs-12 col-md-6"
       />
-    </q-field>
+    </div>
     <div class="row gutter-profile" v-if="documents && documents.length > 0">
       <div class="col-xs-12 col-md-6" v-for="(certificate, index) in documents" :key="index">
-        <div v-if="certificate.driveId" class="justify-between row" style="background: white; margin-bottom: 24px">
+        <div v-if="certificate.driveId" class="justify-between row" style="background: white">
           <div class="doc-thumbnail">
             <ni-custom-img :driveId="certificate.driveId" alt="diplôme" />
           </div>
@@ -87,7 +87,7 @@ export default {
       return { 'x-access-token': Cookies.get('alenvi_token') || '' };
     },
     collapsibleIcon () {
-      return !this.collapsibleOpened ? 'add' : 'mdi-checkbox-blank';
+      return !this.collapsibleOpened ? 'add' : 'mdi-close';
     },
     additionalFields () {
       return [{ name: 'fileName', value: `${this.additionalFieldsName}_${this.userProfile.firstname}_${this.userProfile.lastname}` }];

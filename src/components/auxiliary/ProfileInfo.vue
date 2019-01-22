@@ -218,12 +218,12 @@
             :additionalValue="`facture_telephone_${currentUser.firstname}_${currentUser.lastname}`" :url="docsUploadUrl" :extensions="extensions"
           />
         </div>
-        <div class="col-xs-12 col-md-6">
-          <ni-multiple-files-uploader caption="Diplome(s) ou certificat(s)" path="administrative.certificates" alt="facture téléphone"
-            @delete="deleteDocument($event, 'certificates')" name="certificates" collapsibleLabel="Ajouter diplômes" :userProfile="currentUser"
-            :url="docsUploadUrl" additionalFieldsName="diplomes" @uploaded="refreshUser"
-          />
-        </div>
+      </div>
+      <div class="q-mt-lg">
+        <ni-multiple-files-uploader caption="Diplome(s) ou certificat(s)" path="administrative.certificates" alt="facture téléphone"
+          @delete="deleteDocument($event, 'certificates')" name="certificates" collapsibleLabel="Ajouter diplômes" :userProfile="currentUser"
+          :url="docsUploadUrl" additionalFieldsName="diplomes" @uploaded="refreshUser"
+        />
       </div>
     </div>
     <div class="q-mb-xl">

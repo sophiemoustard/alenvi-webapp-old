@@ -144,6 +144,7 @@ export default {
         subscriptions: [],
         quotes: [],
         financialCertificates: [],
+        identity: {},
       },
       tmpInput: null,
       newESignModal: false,
