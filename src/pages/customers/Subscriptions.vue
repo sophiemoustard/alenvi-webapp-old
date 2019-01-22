@@ -30,7 +30,8 @@
       <div class="q-mb-lg">
         <p class="title">Justificatifs APA ou autres financements</p>
         <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement" @uploaded="getCustomer" name="financialCertificates"
-          collapsibleLabel="Ajouter un certificat" :userProfile="customer" :url="docsUploadUrl" @delete="deleteDocument($event)"/>
+          collapsibleLabel="Ajouter un certificat" :userProfile="customerUploadData" :url="docsUploadUrl" @delete="deleteDocument($event)"
+          additionalFieldsName="financialCertificate" />
       </div>
       <div class="q-mb-lg">
         <p class="title">Paiement</p>
@@ -240,6 +241,13 @@ export default {
     docsUploadUrl () {
       return this.customer.driveFolder ? `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.id}/upload` : '';
     },
+    customerUploadData () {
+      return {
+        firstname: this.customer.identity.firstname || '',
+        lastname: this.customer.identity.lastname || '',
+        financialCertificates: this.customer.financialCertificates,
+      }
+    }
   },
   async mounted () {
     await this.getCustomer();
