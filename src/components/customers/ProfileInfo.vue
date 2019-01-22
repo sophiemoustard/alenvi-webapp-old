@@ -38,7 +38,7 @@
             <q-tr slot="body" slot-scope="props" :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
                 <template v-if="col.name === 'actions'">
-                  <div class="row no-wrap">
+                  <div class="row no-wrap table-actions">
                     <q-btn flat round small color="grey" icon="history" @click.native="showHistory(col.value)" />
                     <q-btn flat round small color="grey" icon="edit" @click.native="startEdition(col.value)" />
                     <q-btn flat round small color="grey" icon="delete" @click.native="removeSubscriptions(col.value)" />
@@ -64,10 +64,15 @@
       <p class="text-weight-bold">Aidants</p>
       <q-card>
         <q-card-main>
-          <q-table :data="userHelpers" :columns="helpersColumns" row-key="name" table-style="font-size: 1rem" hide-bottom>
-            <q-td slot="body-cell-remove" slot-scope="props" :props="props" class="action-column">
-              <q-icon name="delete" size="1.2rem" color="grey" class="cursor-pointer" @click.native="removeHelper(props.value)" />
-            </q-td>
+          <q-table :data="userHelpers" :columns="helpersColumns" row-key="name" table-style="font-size: 1rem" hide-bottom class="table-responsive">
+            <q-tr slot="body" slot-scope="props" :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+                <template v-if="col.name === 'actions'">
+                  <q-icon name="delete" size="1.2rem" color="grey" class="cursor-pointer" @click.native="removeHelper(col.value)" />
+                </template>
+                <template v-else>{{ col.value }}</template>
+              </q-td>
+            </q-tr>
           </q-table>
         </q-card-main>
         <q-card-actions align="end">
@@ -95,36 +100,41 @@
       <q-card>
         <q-card-main>
           <q-table :columns="mandateColumns" :data="customer.payment.mandates" hide-bottom :pagination.sync="pagination" :visible-columns="visibleMandateColumns"
-            binary-state-sort>
-            <q-td slot="body-cell-emptyMandate" slot-scope="props" :props="props">
-              <q-btn v-if="customer.payment.mandates && props.row.__index == 0" flat round small color="primary" @click="downloadMandate(props.row)">
-                <q-icon name="file download" />
-              </q-btn>
-            </q-td>
-            <q-td slot="body-cell-signed" slot-scope="props" :props="props">
-              <div :class="[{ activeDot: props.value, inactiveDot: !props.value }]" />
-            </q-td>
-            <q-td slot="body-cell-signedMandate" slot-scope="props" :props="props">
-              <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-between">
-                <q-uploader :ref="`signedMandate_${props.row._id}`" name="signedMandate" :url="docsUploadUrl" :headers="headers" hide-underline
-                  extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" hide-upload-button @add="uploadDocument($event, `signedMandate_${props.row._id}`)"
-                  @uploaded="refreshMandates" @fail="failMsg" :additional-fields="[
-                    { name: 'mandateId', value: props.row._id },
-                    { name: 'fileName', value: `mandat_signe_${customer.identity.firstname}_${customer.identity.lastname}` }
-                  ]"
-                />
-              </div>
-              <q-btn v-else flat round small color="primary">
-                <a :href="props.row.drive.link" download target="_blank">
-                  <q-icon name="file download" />
-                </a>
-              </q-btn>
-            </q-td>
-            <q-td slot="body-cell-signedAt" slot-scope="props" :props="props">
-              <ni-datetime-picker v-model="customer.payment.mandates[props.row.__index].signedAt" withBorders @blur="updateSignedAt(props.row)"
-                @focus="saveTmpSignedAt(props.row.__index)"
-              />
-            </q-td>
+            binary-state-sort class="table-responsive">
+            <q-tr slot="body" slot-scope="props" :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+                <template v-if="col.name === 'emptyMandate'">
+                  <q-btn v-if="customer.payment.mandates && props.row.__index == 0" flat round small color="primary" @click="downloadMandate(props.row)">
+                    <q-icon name="file download" />
+                  </q-btn>
+                </template>
+                <template v-else-if="col.name === 'signed'">
+                  <div :class="[{ activeDot: col.value, inactiveDot: !col.value }]" />
+                </template>
+                <template v-else-if="col.name === 'signedMandate'">
+                  <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-between uploader-responsive">
+                    <q-uploader :ref="`signedMandate_${props.row._id}`" name="signedMandate" :url="docsUploadUrl" :headers="headers" hide-underline
+                      extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" hide-upload-button @add="uploadDocument($event, `signedMandate_${props.row._id}`)"
+                      @uploaded="refreshMandates" @fail="failMsg" :additional-fields="[
+                        { name: 'mandateId', value: props.row._id },
+                        { name: 'fileName', value: `mandat_signe_${customer.identity.firstname}_${customer.identity.lastname}` }
+                      ]"
+                    />
+                  </div>
+                  <q-btn v-else flat round small color="primary">
+                    <a :href="props.row.drive.link" download target="_blank">
+                      <q-icon name="file download" />
+                    </a>
+                  </q-btn>
+                </template>
+                <template v-else-if="col.name === 'signedAt'">
+                  <ni-datetime-picker v-model="customer.payment.mandates[props.row.__index].signedAt" withBorders @blur="updateSignedAt(props.row)"
+                    @focus="saveTmpSignedAt(props.row.__index)"
+                  />
+                </template>
+                <template v-else>{{ col.value}}</template>
+              </q-td>
+            </q-tr>
           </q-table>
         </q-card-main>
       </q-card>
@@ -136,32 +146,37 @@
       <q-card>
         <q-card-main>
           <q-table :data="customer.quotes" :columns="quoteColumns" row-key="name" table-style="font-size: 1rem" hide-bottom :pagination.sync="pagination"
-            :visible-columns="visibleQuoteColumns" binary-state-sort
+            :visible-columns="visibleQuoteColumns" binary-state-sort class="table-responsive"
           >
-            <q-td slot="body-cell-emptyQuote" slot-scope="props" :props="props">
-              <q-btn flat round small color="primary" @click="downloadQuote(props.row)">
-                <q-icon name="file download" />
-              </q-btn>
-            </q-td>
-            <q-td slot="body-cell-signedQuote" slot-scope="props" :props="props">
-              <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-between">
-                <q-uploader :ref="`signedQuote_${props.row._id}`" name="signedQuote" hide-underline :url="docsUploadUrl" :headers="headers"
-                  extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" hide-upload-button @add="uploadDocument($event, `signedQuote_${props.row._id}`)"
-                  @uploaded="refreshQuotes" @fail="failMsg" :additional-fields="[
-                    { name: 'quoteId', value: props.row._id },
-                    { name: 'fileName', value: `devis_signe_${customer.identity.firstname}_${customer.identity.lastname}` }
-                  ]"
-                />
-              </div>
-              <q-btn v-else flat round small color="primary">
-                <a :href="props.row.drive.link" download>
-                  <q-icon name="file download" />
-                </a>
-              </q-btn>
-            </q-td>
-            <q-td slot="body-cell-signed" slot-scope="props" :props="props">
-              <div :class="[{ activeDot: props.value, inactiveDot: !props.value }]" />
-            </q-td>
+            <q-tr slot="body" slot-scope="props" :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+                <template v-if="col.name === 'emptyQuote'">
+                  <q-btn flat round small color="primary" @click="downloadQuote(props.row)">
+                    <q-icon name="file download" />
+                  </q-btn>
+                </template>
+                <template v-else-if="col.name === 'signedQuote'">
+                  <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-between uploader-responsive">
+                    <q-uploader :ref="`signedQuote_${props.row._id}`" name="signedQuote" hide-underline :url="docsUploadUrl" :headers="headers"
+                      extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" hide-upload-button @add="uploadDocument($event, `signedQuote_${props.row._id}`)"
+                      @uploaded="refreshQuotes" @fail="failMsg" :additional-fields="[
+                        { name: 'quoteId', value: props.row._id },
+                        { name: 'fileName', value: `devis_signe_${customer.identity.firstname}_${customer.identity.lastname}` }
+                      ]"
+                    />
+                  </div>
+                  <q-btn v-else flat round small color="primary">
+                    <a :href="props.row.drive.link" download>
+                      <q-icon name="file download" />
+                    </a>
+                  </q-btn>
+                </template>
+                <template v-else-if="col.name === 'signed'">
+                  <div :class="[{ activeDot: col.value, inactiveDot: !col.value }]" />
+                </template>
+                <template v-else->{{ col.value }}</template>
+              </q-td>
+            </q-tr>
           </q-table>
         </q-card-main>
         <q-card-actions align="end">
@@ -337,7 +352,7 @@ export default {
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
         },
         {
-          name: 'remove',
+          name: 'actions',
           label: '',
           align: 'left',
           field: '_id',
@@ -1022,6 +1037,7 @@ export default {
     height: 9px
     border-radius: 50%
     display: inline-block
+    margin: 0 3px
 
   a
     color: $primary
