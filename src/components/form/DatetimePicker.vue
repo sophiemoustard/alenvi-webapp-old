@@ -1,6 +1,6 @@
 <template>
   <div class="col-xs-12 col-md-6">
-    <div class="row justify-between">
+    <div v-if="caption" class="row justify-between">
       <p class="input-caption">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
@@ -15,7 +15,7 @@
 <script>
 export default {
   props: {
-    caption: String,
+    caption: { type: String, default: '' },
     error: Boolean,
     errorLabel: { type: String, default: 'Champ requis' },
     withBorders: { type: Boolean, default: false },

@@ -100,36 +100,41 @@
       <q-card>
         <q-card-main>
           <q-table :columns="mandateColumns" :data="customer.payment.mandates" hide-bottom :pagination.sync="pagination" :visible-columns="visibleMandateColumns"
-            binary-state-sort>
-            <q-td slot="body-cell-emptyMandate" slot-scope="props" :props="props">
-              <q-btn v-if="customer.payment.mandates && props.row.__index == 0" flat round small color="primary" @click="downloadMandate(props.row)">
-                <q-icon name="file download" />
-              </q-btn>
-            </q-td>
-            <q-td slot="body-cell-signed" slot-scope="props" :props="props">
-              <div :class="[{ activeDot: props.value, inactiveDot: !props.value }]" />
-            </q-td>
-            <q-td slot="body-cell-signedMandate" slot-scope="props" :props="props">
-              <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-between">
-                <q-uploader :ref="`signedMandate_${props.row._id}`" name="signedMandate" :url="docsUploadUrl" :headers="headers" hide-underline
-                  extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" hide-upload-button @add="uploadDocument($event, `signedMandate_${props.row._id}`)"
-                  @uploaded="refreshMandates" @fail="failMsg" :additional-fields="[
-                    { name: 'mandateId', value: props.row._id },
-                    { name: 'fileName', value: `mandat_signe_${customer.identity.firstname}_${customer.identity.lastname}` }
-                  ]"
-                />
-              </div>
-              <q-btn v-else flat round small color="primary">
-                <a :href="props.row.drive.link" download target="_blank">
-                  <q-icon name="file download" />
-                </a>
-              </q-btn>
-            </q-td>
-            <q-td slot="body-cell-signedAt" slot-scope="props" :props="props">
-              <ni-datetime-picker v-model="customer.payment.mandates[props.row.__index].signedAt" withBorders @blur="updateSignedAt(props.row)"
-                @focus="saveTmpSignedAt(props.row.__index)"
-              />
-            </q-td>
+            binary-state-sort class="table-responsive">
+            <q-tr slot="body" slot-scope="props" :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+                <template v-if="col.name === 'emptyMandate'">
+                  <q-btn v-if="customer.payment.mandates && props.row.__index == 0" flat round small color="primary" @click="downloadMandate(props.row)">
+                    <q-icon name="file download" />
+                  </q-btn>
+                </template>
+                <template v-else-if="col.name === 'signed'">
+                  <div :class="[{ activeDot: col.value, inactiveDot: !col.value }]" />
+                </template>
+                <template v-else-if="col.name === 'signedMandate'">
+                  <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-between" style="display: inline-table">
+                    <q-uploader :ref="`signedMandate_${props.row._id}`" name="signedMandate" :url="docsUploadUrl" :headers="headers" hide-underline
+                      extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" hide-upload-button @add="uploadDocument($event, `signedMandate_${props.row._id}`)"
+                      @uploaded="refreshMandates" @fail="failMsg" :additional-fields="[
+                        { name: 'mandateId', value: props.row._id },
+                        { name: 'fileName', value: `mandat_signe_${customer.identity.firstname}_${customer.identity.lastname}` }
+                      ]"
+                    />
+                  </div>
+                  <q-btn v-else flat round small color="primary">
+                    <a :href="props.row.drive.link" download target="_blank">
+                      <q-icon name="file download" />
+                    </a>
+                  </q-btn>
+                </template>
+                <template v-else-if="col.name === 'signedAt'">
+                  <ni-datetime-picker v-model="customer.payment.mandates[props.row.__index].signedAt" withBorders @blur="updateSignedAt(props.row)"
+                    @focus="saveTmpSignedAt(props.row.__index)"
+                  />
+                </template>
+                <template v-else>{{ col.value}}</template>
+              </q-td>
+            </q-tr>
           </q-table>
         </q-card-main>
       </q-card>
@@ -1027,6 +1032,7 @@ export default {
     height: 9px
     border-radius: 50%
     display: inline-block
+    margin: 0 3px
 
   a
     color: $primary
