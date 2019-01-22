@@ -164,6 +164,7 @@ export default {
       editedEvent: {
         subscription: {},
         location: {},
+        attachment: {},
         customer: '',
       },
       editionModal: false,
@@ -181,6 +182,7 @@ export default {
         internalHour: '',
         absence: '',
         location: {},
+        attachment: {},
       },
       INTERVENTION,
       UNAVAILABILITY,
@@ -289,8 +291,10 @@ export default {
         ? ''
         : `${process.env.API_HOSTNAME}/events/${this.selectedAuxiliary._id}/gdrive/${this.selectedAuxiliary.administrative.driveFolder.id}/upload`;
     },
-    selectedAuxiliary () {
-      return this.newEvent.auxiliary === '' ? {} : this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
+    selectedAuxiliary (action) {
+      if (this.creationModal && this.newEvent.auxiliary !== '') return this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
+      if (this.editionModal && this.editedEvent.auxiliary !== '') return this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
+      return {};
     },
     additionalValue () {
       return !this.selectedAuxiliary._id ? '' : `justificatif_absence_${this.selectedAuxiliary.lastname}`;
@@ -408,6 +412,7 @@ export default {
         internalHour: '',
         absence: '',
         location: {},
+        attachment: {},
       };
     },
     getPayload (event) {
@@ -490,7 +495,7 @@ export default {
           break;
         case ABSENCE:
           const { startDuration, endDuration } = this.getAbsenceDurations(event);
-          this.editedEvent = { location: {}, ...eventData, auxiliary, startDuration, endDuration };
+          this.editedEvent = { location: {}, attachment: {}, ...eventData, auxiliary, startDuration, endDuration };
           break;
         case UNAVAILABILITY:
           this.editedEvent = { location: {}, ...eventData, auxiliary };
@@ -535,11 +540,8 @@ export default {
       const json = JSON.parse(uploadedInfo.xhr.response);
       if (!json || !json.data || !json.data.payload) return;
 
-      this.newEvent.attachment = { ...json.data.payload.attachment }
-      this.rerenderUploader();
-    },
-    rerenderUploader () {
-      this.uploaderKey += 1;
+      if (this.creationModal) this.newEvent.attachment = { ...json.data.payload.attachment }
+      if (this.editionModal) this.editedEvent.attachment = { ...json.data.payload.attachment }
     },
     async deleteDocument (driveId) {
       try {
@@ -550,9 +552,9 @@ export default {
           cancel: 'Annuler'
         });
         await this.$gdrive.removeFileById({ id: driveId });
+        if (this.creationModal) this.newEvent.attachment = {};
+        if (this.editionModal) this.editedEvent.attachment = {};
         NotifyPositive('Document supprimé');
-        this.$_.unset(this.newEvent, 'attachment');
-        this.rerenderUploader();
       } catch (e) {
         console.error(e);
         if (e.message === '') {
