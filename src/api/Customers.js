@@ -59,4 +59,17 @@ export default {
   async updateCertificates (id, payload) {
     return alenviAxios.put(`${process.env.API_HOSTNAME}/customers/${id}/certificates`, payload);
   },
+  async getFundings (id) {
+    const subscriptions = await alenviAxios.get(`${process.env.API_HOSTNAME}/customers/${id}/fundings`);
+    return subscriptions.data.data.fundings;
+  },
+  async addFunding (id, payload) {
+    return alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${id}/fundings`, payload);
+  },
+  async updateFunding (params, payload) {
+    return alenviAxios.put(`${process.env.API_HOSTNAME}/customers/${params._id}/fundings/${params.fundingId}`, payload);
+  },
+  async removeFunding (params) {
+    return alenviAxios.delete(`${process.env.API_HOSTNAME}/customers/${params._id}/fundings/${params.fundingId}`);
+  }
 }

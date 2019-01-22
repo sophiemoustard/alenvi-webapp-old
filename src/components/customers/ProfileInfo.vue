@@ -135,6 +135,32 @@
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
+        <p class="text-weight-bold">Financements</p>
+      </div>
+      <q-card>
+        <q-card-main>
+          <q-table :data="fundings" :columns="fundingColumns" row-key="name" table-style="font-size: 1rem" hide-bottom class="table-responsive">
+            <q-tr slot="body" slot-scope="props" :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+                <template v-if="col.name === 'actions'">
+                  <div class="row no-wrap table-actions">
+                    <q-btn flat round small color="grey" icon="history" @click.native="showFundingHistory(col.value)" />
+                    <q-btn flat round small color="grey" icon="edit" @click.native="startEdition(col.value)" />
+                    <q-btn flat round small color="grey" icon="delete" @click.native="removeSubscriptions(col.value)" />
+                  </div>
+                </template>
+                <template v-else>{{ col.value }}</template>
+              </q-td>
+            </q-tr>
+          </q-table>
+        </q-card-main>
+        <q-card-actions align="end">
+          <q-btn :disable="serviceOptions.length === 0" flat no-caps color="primary" icon="add" label="Ajouter un financement" @click="subscriptionCreationModal = true"/>
+        </q-card-actions>
+      </q-card>
+    </div>
+    <div class="q-mb-xl">
+      <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Devis</p>
       </div>
       <q-card>
@@ -263,6 +289,29 @@
           :pagination.sync="paginationHistory">
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+              <template>{{ col.value }}</template>
+            </q-td>
+          </q-tr>
+        </q-table>
+      </div>
+    </q-modal>
+
+    <!-- Funding history modal -->
+    <q-modal v-model="fundingHistoryModal" :content-css="modalCssContainer" @hide="resetFundingHistoryData">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-11">
+            <h5>Historique du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer }}</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer" style="text-align: right">
+            <span>
+              <q-icon name="clear" size="1rem" @click.native="fundingHistoryModal = false" /></span>
+          </div>
+        </div>
+        <q-table class="q-mb-xl table-grid" :data="selectedFunding.versions" :columns="fundingHistoryColumns" hide-bottom binary-state-sort
+          :pagination.sync="paginationFundingHistory" :visible-columns="fundingHistoryRows">
+          <q-tr slot="body" slot-scope="props" :props="props">
+            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
               <template v-if="col.name === 'startDate'"> {{ $moment(col.value).format('DD/MM/YYYY') }} </template>
               <template v-else>{{ col.value }}</template>
             </q-td>
@@ -289,6 +338,7 @@ import DatetimePicker from '../form/ModalDatetimePicker';
 import { downloadDocxFile } from '../../helpers/downloadFile';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
+import { days } from '../../data/days.js';
 
 export default {
   name: 'ProfileInfo',
@@ -441,6 +491,132 @@ export default {
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
         },
       ],
+      fundingColumns: [
+        {
+          name: 'thirdPartyPayer',
+          label: 'Tiers payeur',
+          align: 'left',
+          field: 'thirdPartyPayer',
+        },
+        {
+          name: 'folderNumber',
+          label: 'Numéro de dossier',
+          align: 'left',
+          field: 'folderNumber',
+        },
+        {
+          name: 'nature',
+          label: 'Nature',
+          align: 'left',
+          format: (value) => this.$_.capitalize(value),
+          field: 'nature',
+        },
+        {
+          name: 'start',
+          label: 'Début',
+          align: 'left',
+          format: (value) => this.$moment(value).format('DD/MM/YYYY'),
+          field: 'startDate',
+        },
+        {
+          name: 'end',
+          label: 'Fin',
+          align: 'left',
+          format: (value) => this.$moment(value).format('DD/MM/YYYY'),
+          field: 'endDate',
+        },
+        {
+          name: 'actions',
+          label: '',
+          align: 'left',
+          field: '_id',
+        },
+      ],
+      fundings: [],
+      selectedFunding: {},
+      fundingHistoryModal: false,
+      fundingHistoryColumns: [
+        {
+          name: 'start',
+          label: 'Date d\'effet',
+          align: 'left',
+          format: (value) => this.$moment(value).format('DD/MM/YYYY'),
+          field: 'startDate',
+        },
+        {
+          name: 'thirdPartyPayer',
+          label: 'Tiers payeur',
+          align: 'left',
+          field: 'thirdPartyPayer',
+        },
+        {
+          name: 'folderNumber',
+          label: 'Numéro de dossier',
+          align: 'left',
+          field: 'folderNumber',
+        },
+        {
+          name: 'end',
+          label: 'Fin',
+          align: 'left',
+          format: (value) => this.$moment(value).format('DD/MM/YYYY'),
+          field: 'endDate',
+        },
+        {
+          name: 'frequency',
+          label: 'Fréquence',
+          align: 'left',
+          format: (value) => this.$_.capitalize(value),
+          field: 'frequency',
+        },
+        {
+          name: 'amountTTC',
+          label: 'Montant forfaitaire TTC',
+          align: 'left',
+          format: (value) => `${value}€`,
+          field: 'amountTTC'
+        },
+        {
+          name: 'unitPriceTTC',
+          label: 'Prix unitaire TTC',
+          align: 'left',
+          format: (value) => `${value}€`,
+          field: 'unitPriceTTC',
+        },
+        {
+          name: 'careHours',
+          label: 'Heures de prise en charge',
+          align: 'left',
+          format: (value) => `${value}h`,
+          field: 'careHours',
+        },
+        {
+          name: 'customerParticipationRate',
+          label: 'Tx. participation bénéficiaire',
+          align: 'left',
+          format: (value) => `${value}%`,
+          field: 'customerParticipationRate',
+        },
+        {
+          name: 'careDays',
+          label: 'Jours de prise en charge',
+          align: 'left',
+          format: (value) => value.map(day => days[day]).join(', '),
+          field: 'careDays',
+        },
+        {
+          name: 'subscriptions',
+          label: 'Souscriptions',
+          align: 'left',
+          format: (value) => value.map(sub => sub.name).join(', '),
+          field: 'subscriptions',
+        }
+      ],
+      paginationFundingHistory: {
+        rowsPerPage: 0,
+        sortBy: 'startDate',
+        descending: true,
+      },
       pagination: {
         sortBy: 'createdAt',
         ascending: true,
@@ -512,6 +688,12 @@ export default {
       const selectedSubscription = this.subscriptions.find(sub => sub._id === this.editedSubscription._id);
       return selectedSubscription ? this.$moment(selectedSubscription.startDate).add(1, 'd').toISOString() : '';
     },
+    fundingHistoryRows () {
+      if (this.selectedFunding.nature === 'forfaitaire') {
+        return ['start', 'thirdPartyPayer', 'folderNumber', 'nature', 'frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'subscriptions'];
+      }
+      return ['start', 'thirdPartyPayer', 'folderNumber', 'nature', 'frequency', 'unitPriceTTC', 'careHours', 'customerParticipationRate', 'careDays', 'subscriptions'];
+    }
   },
   validations: {
     customer: {
@@ -612,6 +794,7 @@ export default {
       const customer = customerRaw.data.data.customer;
       this.mergeUser(customer);
       await this.refreshSubscriptions();
+      await this.refreshFundings();
 
       this.$store.commit('rh/saveUserProfile', this.customer);
       this.$v.customer.$touch();
@@ -969,6 +1152,33 @@ export default {
         NotifyNegative('Erreur lors de la génération du devis');
       }
     },
+    // Fundings
+    getFundingLastVersion (funding) {
+      if (!funding.versions || funding.versions.length === 0) return {};
+
+      return funding.versions.sort((a, b) => new Date(b.startDate) - new Date(a.startDate))[0]
+    },
+    refreshFundings () {
+      try {
+        this.fundings = this.customer.fundings.map(fund => ({
+          ...this.getFundingLastVersion(fund),
+          ...fund,
+        }))
+
+        this.$store.commit('rh/saveUserProfile', this.customer);
+        this.$v.customer.$touch();
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    showFundingHistory (id) {
+      this.selectedFunding = this.fundings.find(sub => sub._id === id);
+      this.fundingHistoryModal = true;
+    },
+    resetFundingHistoryData () {
+      this.fundingHistoryModal = false;
+      this.selectedFunding = {};
+    }
   }
 }
 </script>
