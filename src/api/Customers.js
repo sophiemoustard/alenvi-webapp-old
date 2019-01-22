@@ -55,5 +55,8 @@ export default {
   },
   async saveSignedDoc (params, data) {
     return alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${params._id}/mandates/${params.mandateId}/savesigneddoc`, data);
-  }
+  },
+  async updateCertificates (id, payload) {
+    return alenviAxios.put(`${process.env.API_HOSTNAME}/customers/${id}/certificates`, payload);
+  },
 }

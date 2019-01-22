@@ -28,6 +28,12 @@
         </div>
       </div>
       <div class="q-mb-lg">
+        <p class="title">Justificatifs APA ou autres financements</p>
+        <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement" @uploaded="documentUploaded" name="financialCertificates"
+          collapsibleLabel="Ajouter un justificatif" :userProfile="customerUploadData" :url="docsUploadUrl" @delete="deleteDocument($event)"
+          additionalFieldsName="financialCertificate" />
+      </div>
+      <div class="q-mb-lg">
         <p class="title">Paiement</p>
         <div class="row gutter-profile">
           <ni-input caption="Nom associé au compte bancaire" v-model="customer.payment.bankAccountOwner" :error="$v.customer.payment.bankAccountOwner.$error"
@@ -111,17 +117,20 @@
 import { required } from 'vuelidate/lib/validators';
 import Input from '../../components/form/Input.vue';
 import NiModalInput from '../../components/form/ModalInput';
+import MultipleFilesUploader from '../../components/form/MultipleFilesUploader.vue';
 import { bic, iban } from '../../helpers/vuelidateCustomVal';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
 import esign from '../../api/Esign.js';
 import cgs from '../../statics/CGS.html';
+import gdrive from '../../api/GoogleDrive.js';
 
 export default {
   name: 'Subscriptions',
   components: {
     'ni-input': Input,
+    'ni-multiple-files-uploader': MultipleFilesUploader,
     NiModalInput
   },
   mixins: [customerMixin, subscriptionMixin],
@@ -133,7 +142,9 @@ export default {
       customer: {
         payment: { mandates: [] },
         subscriptions: [],
-        quotes: []
+        quotes: [],
+        financialCertificates: [],
+        identity: {},
       },
       tmpInput: null,
       newESignModal: false,
@@ -227,6 +238,16 @@ export default {
     },
     isValidPayment () {
       return this.$v.customer.payment.bic.bic && this.$v.customer.payment.iban.iban
+    },
+    docsUploadUrl () {
+      return this.customer.driveFolder ? `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.id}/upload` : '';
+    },
+    customerUploadData () {
+      return {
+        firstname: this.customer.identity.firstname || '',
+        lastname: this.customer.identity.lastname || '',
+        financialCertificates: this.customer.financialCertificates,
+      }
     }
   },
   async mounted () {
@@ -335,6 +356,32 @@ export default {
         NotifyNegative('Erreur lors de la validation de votre abonnement');
         this.customer.subscriptionsAccepted = !this.customer.subscriptionsAccepted
       }
+    },
+    // Financial certificates
+    async deleteDocument (driveId) {
+      try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
+          ok: true,
+          cancel: 'Annuler'
+        });
+        await gdrive.removeFileById({ id: driveId });
+
+        const payload = { 'financialCertificates': { driveId } };
+        await this.$customers.updateCertificates(this.customer._id, payload);
+        this.getCustomer();
+        NotifyPositive('Document supprimé');
+      } catch (e) {
+        console.error(e);
+        if (e.message === '') return NotifyPositive('Suppression annulée');
+
+        NotifyNegative('Erreur lors de la suppression du document');
+      }
+    },
+    async documentUploaded () {
+      await this.getCustomer();
+      NotifyPositive('Document ajouté');
     },
     // Mandate
     async preOpenESignModal (data) {
