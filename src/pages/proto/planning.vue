@@ -398,7 +398,6 @@ export default {
         NotifyPositive('Document supprimé');
         this.$_.unset(this.newEvent, 'attachment');
         this.rerenderUploader();
-        this.events = await this.$events.list({ startDate: this.startOfWeek.format('YYYYMMDD'), endStartDate: this.endOfWeek().format('YYYYMMDD') });
       } catch (e) {
         console.error(e);
         if (e.message === '') {
@@ -428,6 +427,7 @@ export default {
 <style lang="stylus" scoped>
   table
     border-collapse: collapse
+    table-layout: fixed
   td
     border: 1px solid black
     padding: 5px
