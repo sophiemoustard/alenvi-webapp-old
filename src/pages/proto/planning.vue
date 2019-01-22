@@ -132,7 +132,7 @@ import ModalSelect from '../../components/form/ModalSelect';
 import SelectSector from '../../components/form/SelectSector';
 import ModalInput from '../../components/form/ModalInput.vue';
 import FileUploader from '../../components/form/FileUploader';
-import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, ABSENCE_TYPE, DATE_OPTIONS } from '../../data/constants';
+import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, ABSENCE_TYPE, DATE_OPTIONS, MORNING, AFTERNOON, ALL_DAY } from '../../data/constants';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../../components/popup/notify';
 
 export default {
@@ -345,7 +345,23 @@ export default {
           this.editedEvent = { ...event, auxiliary, internalHour };
           break;
         case ABSENCE:
-          this.editedEvent = { ...event, auxiliary };
+          let startDuration;
+          let endDuration;
+          const startHour = this.$moment(event.startDate).hours();
+          const endHour = this.$moment(event.endDate).hours();
+
+          if (this.$moment(event.startDate).isSame(this.$moment(event.endDate), 'days')) {
+            if (startHour === MORNING[0].startHour && endHour === MORNING[0].endHour) startDuration = MORNING;
+            else if (startHour === AFTERNOON[0].startHour && endHour === AFTERNOON[0].endHour) startDuration = AFTERNOON;
+            else startDuration = ALL_DAY;
+          } else {
+            if (startHour === AFTERNOON[0].startHour) startDuration = AFTERNOON;
+            else startDuration = ALL_DAY;
+
+            if (endHour === MORNING[0].endHour) endDuration = MORNING;
+            else endDuration = ALL_DAY;
+          }
+          this.editedEvent = { ...event, auxiliary, startDuration, endDuration };
           break;
         case UNAVAILABILITY:
           this.editedEvent = { ...event, auxiliary };
