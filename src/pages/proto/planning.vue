@@ -297,82 +297,12 @@ export default {
     this.setInternalHours();
   },
   methods: {
-    customerSubscriptionsOptions (customerId) {
-      if (!customerId) return [];
-      const selectedCustomer = this.customers.find(customer => customer._id === customerId);
-
-      return !selectedCustomer || !selectedCustomer.subscriptions || selectedCustomer.subscriptions.length === 0
-        ? []
-        : selectedCustomer.subscriptions.map(sub => ({
-          label: sub.service.name,
-          value: sub._id,
-        }));
-    },
-    setInternalHours () {
-      const user = this.$store.getters['main/user'];
-      if (user && user.company && user.company.rhConfig && user.company.rhConfig.internalHours) {
-        this.internalHours = user.company.rhConfig.internalHours;
-      }
-    },
-    displayAbsenceType (value) {
-      const absence = ABSENCE_TYPE.find(abs => abs.value === value);
-      return !absence ? '' : absence.label;
-    },
+    // Table
     endOfWeek () {
       return this.$moment(this.startOfWeek).add(6, 'd');
     },
     timelineTitle () {
       return `${this.$moment(this.startOfWeek).format('DD/MM')} - ${this.$moment(this.endOfWeek()).format('DD/MM')}`;
-    },
-    getAuxiliaryEvents (auxiliary, dayIndex) {
-      return this.events
-        .filter(event => event.auxiliary._id === auxiliary._id)
-        .filter(event => this.$moment(event.startDate).isSame(this.days[dayIndex], 'day'))
-        .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-    },
-    getEventHours (event) {
-      return `${this.$moment(event.startDate).format('HH:mm')} - ${this.$moment(event.endDate).format('HH:mm')}`
-    },
-    openEditionModal (event) {
-      const auxiliary = event.auxiliary._id;
-      switch (event.type) {
-        case INTERVENTION:
-          const subscription = event.subscription._id;
-          this.editedEvent = { ...event, auxiliary, subscription };
-          break;
-        case INTERNAL_HOUR:
-          const internalHour = event.internalHour._id;
-          this.editedEvent = { ...event, auxiliary, internalHour };
-          break;
-        case ABSENCE:
-          let startDuration;
-          let endDuration;
-          const startHour = this.$moment(event.startDate).hours();
-          const endHour = this.$moment(event.endDate).hours();
-
-          if (this.$moment(event.startDate).isSame(this.$moment(event.endDate), 'days')) {
-            if (startHour === MORNING[0].startHour && endHour === MORNING[0].endHour) startDuration = MORNING;
-            else if (startHour === AFTERNOON[0].startHour && endHour === AFTERNOON[0].endHour) startDuration = AFTERNOON;
-            else startDuration = ALL_DAY;
-          } else {
-            if (startHour === AFTERNOON[0].startHour) startDuration = AFTERNOON;
-            else startDuration = ALL_DAY;
-
-            if (endHour === MORNING[0].endHour) endDuration = MORNING;
-            else endDuration = ALL_DAY;
-          }
-          this.editedEvent = { ...event, auxiliary, startDuration, endDuration };
-          break;
-        case UNAVAILABILITY:
-          this.editedEvent = { ...event, auxiliary };
-          break;
-      }
-
-      this.editionModal = true
-    },
-    async getEmployeesBySector () {
-      this.auxiliaries = await this.$users.showAllActive({ sector: this.selectedSector });
-      await this.getEvents();
     },
     goToPreviousWeek () {
       this.startOfWeek.subtract(7, 'd');
@@ -388,17 +318,21 @@ export default {
       const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
       this.days = Array.from(range.by('days'));
     },
-    resetCreationForm (type = INTERVENTION) {
-      this.$v.newEvent.$reset();
-      this.newEvent = {
-        type,
-        startDate: '',
-        endDate: '',
-        auxiliary: '',
-        customer: '',
-        subscription: '',
-      };
+    // Event display
+    getAuxiliaryEvents (auxiliary, dayIndex) {
+      return this.events
+        .filter(event => event.auxiliary._id === auxiliary._id)
+        .filter(event => this.$moment(event.startDate).isSame(this.days[dayIndex], 'day'))
+        .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
     },
+    getEventHours (event) {
+      return `${this.$moment(event.startDate).format('HH:mm')} - ${this.$moment(event.endDate).format('HH:mm')}`
+    },
+    displayAbsenceType (value) {
+      const absence = ABSENCE_TYPE.find(abs => abs.value === value);
+      return !absence ? '' : absence.label;
+    },
+    // Refresh data
     async getEvents () {
       try {
         this.events = await this.$events.list({
@@ -416,6 +350,39 @@ export default {
       } catch (e) {
         console.error(e);
       }
+    },
+    async getEmployeesBySector () {
+      this.auxiliaries = await this.$users.showAllActive({ sector: this.selectedSector });
+      await this.getEvents();
+    },
+    setInternalHours () {
+      const user = this.$store.getters['main/user'];
+      if (user && user.company && user.company.rhConfig && user.company.rhConfig.internalHours) {
+        this.internalHours = user.company.rhConfig.internalHours;
+      }
+    },
+    // Event creation
+    customerSubscriptionsOptions (customerId) {
+      if (!customerId) return [];
+      const selectedCustomer = this.customers.find(customer => customer._id === customerId);
+
+      return !selectedCustomer || !selectedCustomer.subscriptions || selectedCustomer.subscriptions.length === 0
+        ? []
+        : selectedCustomer.subscriptions.map(sub => ({
+          label: sub.service.name,
+          value: sub._id,
+        }));
+    },
+    resetCreationForm (type = INTERVENTION) {
+      this.$v.newEvent.$reset();
+      this.newEvent = {
+        type,
+        startDate: '',
+        endDate: '',
+        auxiliary: '',
+        customer: '',
+        subscription: '',
+      };
     },
     async createEvent () {
       try {
@@ -454,6 +421,52 @@ export default {
         this.loading = false;
       }
     },
+    // Event edition
+    getAbsenceDurations (event) {
+      let startDuration;
+      let endDuration;
+
+      if (event.type !== ABSENCE) return { startDuration, endDuration }
+
+      const startHour = this.$moment(event.startDate).hours();
+      const endHour = this.$moment(event.endDate).hours();
+      if (this.$moment(event.startDate).isSame(this.$moment(event.endDate), 'days')) {
+        if (startHour === MORNING[0].startHour && endHour === MORNING[0].endHour) startDuration = MORNING;
+        else if (startHour === AFTERNOON[0].startHour && endHour === AFTERNOON[0].endHour) startDuration = AFTERNOON;
+        else startDuration = ALL_DAY;
+      } else {
+        if (startHour === AFTERNOON[0].startHour) startDuration = AFTERNOON;
+        else startDuration = ALL_DAY;
+
+        if (endHour === MORNING[0].endHour) endDuration = MORNING;
+        else endDuration = ALL_DAY;
+      }
+
+      return { startDuration, endDuration };
+    },
+    openEditionModal (event) {
+      const auxiliary = event.auxiliary._id;
+      switch (event.type) {
+        case INTERVENTION:
+          const subscription = event.subscription._id;
+          this.editedEvent = { ...event, auxiliary, subscription };
+          break;
+        case INTERNAL_HOUR:
+          const internalHour = event.internalHour._id;
+          this.editedEvent = { ...event, auxiliary, internalHour };
+          break;
+        case ABSENCE:
+          const { startDuration, endDuration } = this.getAbsenceDurations(event);
+          this.editedEvent = { ...event, auxiliary, startDuration, endDuration };
+          break;
+        case UNAVAILABILITY:
+          this.editedEvent = { ...event, auxiliary };
+          break;
+      }
+
+      this.editionModal = true
+    },
+    // Event files
     documentUploaded (uploadedInfo) {
       if (!uploadedInfo.xhr || !uploadedInfo.xhr.response) return;
 
