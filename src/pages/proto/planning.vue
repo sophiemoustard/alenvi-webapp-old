@@ -39,6 +39,7 @@
     <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="ion-document" label="Ajouter un évènement"
       @click="creationModal = true" :disable="auxiliaries.length === 0" />
 
+    <!-- Event creation modal -->
     <q-modal v-model="creationModal">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
@@ -86,11 +87,12 @@
         :disable="disableCreationButton"/>
     </q-modal>
 
-     <q-modal v-model="editionModal">
+    <!-- Event edition modal -->
+    <q-modal v-model="editionModal">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
-            <h5>Edition d'un <span class="text-weight-bold">evenement</span></h5>
+            <h5>{{ editionModalTitle }}</h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
             <span>
@@ -309,7 +311,23 @@ export default {
       if (!this.$v.newEvent.location.fullAddress.required) return 'Champ requis';
 
       return 'Adresse non valide';
-    }
+    },
+    editionModalTitle () {
+      if (!this.editedEvent.type) return '';
+
+      switch (this.editedEvent.type) {
+        case INTERVENTION:
+          const customer = this.customers.find(customer => customer._id === this.editedEvent.customer._id);
+          const subscription = customer.subscriptions.find(sub => sub._id === this.editedEvent.subscription);
+          return `Edition de l'intervention ${subscription.service.name} chez ${customer.identity.title} ${customer.identity.lastname}`;
+        case ABSENCE:
+          return 'Edition de l\'abscence';
+        case INTERNAL_HOUR:
+          return 'Edition de l\'heure interne';
+        case UNAVAILABILITY:
+          return 'Edition de l\'indisponibilité';
+      }
+    },
   },
   async mounted () {
     this.startOfWeek = this.$moment().startOf('week');
