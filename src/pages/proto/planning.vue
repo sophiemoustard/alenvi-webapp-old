@@ -61,7 +61,7 @@
         </template>
         <template v-if="newEvent.type === INTERVENTION">
           <ni-modal-select caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions" :error="$v.newEvent.customer.$error" />
-          <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions(newEvent.customer._id)"
+          <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions(newEvent.customer)"
             :error="$v.newEvent.subscription.$error" />
         </template>
         <template v-if="newEvent.type === ABSENCE">
@@ -79,6 +79,8 @@
         <template v-if="newEvent.type === INTERNAL_HOUR">
           <ni-modal-select caption="Type d'heure interne" v-model="newEvent.internalHour" :options="internalHourOptions" :error="$v.newEvent.internalHour.$error" />
         </template>
+        <ni-search-address v-model="newEvent.location.fullAddress" @selected="selectedAddress" @blur="$v.newEvent.location.fullAddress.$touch"
+          :error="$v.newEvent.location.fullAddress.$error" :error-label="addressError" inModal/>
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary" @click="createEvent"
         :disable="disableCreationButton"/>
@@ -101,7 +103,7 @@
           <ni-modal-datetime-picker caption="Date de fin" v-model="editedEvent.endDate" type="datetime" />
         </template>
         <template v-if="editedEvent.type === INTERVENTION">
-          <ni-modal-select caption="Service" v-model="editedEvent.subscription" :options="customerSubscriptionsOptions(editedEvent.customer._id)"
+          <ni-modal-select caption="Service" v-model="editedEvent.subscription" :options="customerSubscriptionsOptions(editedEvent.customer)"
             :error="$v.editedEvent.subscription.$error" />
         </template>
         <template v-if="editedEvent.type === ABSENCE">
@@ -119,6 +121,8 @@
         <template v-if="editedEvent.type === INTERNAL_HOUR">
           <ni-modal-select caption="Type d'heure interne" v-model="editedEvent.internalHour" :options="internalHourOptions" :error="$v.editedEvent.internalHour.$error" />
         </template>
+        <ni-search-address v-model="editedEvent.location.fullAddress" @selected="selectedAddress" @blur="$v.editedEvent.location.fullAddress.$touch"
+          :error="$v.editedEvent.location.fullAddress.$error" :error-label="addressError" inModal/>
       </div>
       <q-btn class="full-width modal-btn" no-caps color="primary" :loading="loading" label="Editer l'évènement" @click="updateEvent" />
     </q-modal>
@@ -127,11 +131,13 @@
 
 <script>
 import { required, requiredIf } from 'vuelidate/lib/validators';
+import { frAddress } from '../../helpers/vuelidateCustomVal.js'
 import ModalDatetimePicker from '../../components/form/ModalDatetimePicker.vue';
 import ModalSelect from '../../components/form/ModalSelect';
 import SelectSector from '../../components/form/SelectSector';
 import ModalInput from '../../components/form/ModalInput.vue';
 import FileUploader from '../../components/form/FileUploader';
+import SearchAddress from '../../components/form/SearchAddress';
 import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, ABSENCE_TYPE, DATE_OPTIONS, MORNING, AFTERNOON, ALL_DAY } from '../../data/constants';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../../components/popup/notify';
 
@@ -143,6 +149,7 @@ export default {
     'ni-select-sector': SelectSector,
     'ni-modal-select': ModalSelect,
     'ni-file-uploader': FileUploader,
+    'ni-search-address': SearchAddress,
   },
   data () {
     return {
@@ -155,7 +162,9 @@ export default {
       events: [],
       maxDays: 7,
       editedEvent: {
-        subscription: {}
+        subscription: {},
+        location: {},
+        customer: '',
       },
       editionModal: false,
       creationModal: false,
@@ -171,6 +180,7 @@ export default {
         sector: '',
         internalHour: '',
         absence: '',
+        location: {},
       },
       INTERVENTION,
       UNAVAILABILITY,
@@ -213,6 +223,7 @@ export default {
       absence: { required: requiredIf((item) => {
         return item.type === ABSENCE;
       }) },
+      location: { fullAddress: { frAddress } },
     },
     editedEvent: {
       startDate: { required },
@@ -234,6 +245,7 @@ export default {
       absence: { required: requiredIf((item) => {
         return item.type === ABSENCE;
       }) },
+      location: { fullAddress: { frAddress } },
     },
   },
   computed: {
@@ -289,6 +301,11 @@ export default {
         value: hour._id,
       }));
     },
+    addressError () {
+      if (!this.$v.newEvent.location.fullAddress.required) return 'Champ requis';
+
+      return 'Adresse non valide';
+    }
   },
   async mounted () {
     this.startOfWeek = this.$moment().startOf('week');
@@ -362,6 +379,9 @@ export default {
       }
     },
     // Event creation
+    selectedAddress (item) {
+      this.newEvent.location = Object.assign({}, this.newEvent.location, item);
+    },
     customerSubscriptionsOptions (customerId) {
       if (!customerId) return [];
       const selectedCustomer = this.customers.find(customer => customer._id === customerId);
@@ -378,10 +398,16 @@ export default {
       this.newEvent = {
         type,
         startDate: '',
+        startDuration: '',
         endDate: '',
+        endDuration: '',
         auxiliary: '',
         customer: '',
         subscription: '',
+        sector: '',
+        internalHour: '',
+        absence: '',
+        location: {},
       };
     },
     getPayload (event) {
@@ -403,6 +429,8 @@ export default {
         this.$_.unset(payload, 'endDuration');
       }
 
+      if (event.location && event.location.fullAddress) delete payload.location.location;
+
       return this.$_.pickBy(payload)
     },
     async createEvent () {
@@ -414,12 +442,12 @@ export default {
         this.loading = true;
         const payload = this.getPayload(this.newEvent);
         await this.$events.create(payload);
-        NotifyPositive('Évènement créé');
 
         await this.getEvents();
         this.creationModal = false;
         this.loading = false;
         this.resetCreationForm();
+        NotifyPositive('Évènement créé');
       } catch (e) {
         NotifyNegative('Erreur lors de la création de l\'évènement');
         this.loading = false;
@@ -454,18 +482,18 @@ export default {
       switch (event.type) {
         case INTERVENTION:
           const subscription = event.subscription._id;
-          this.editedEvent = { ...eventData, auxiliary, subscription };
+          this.editedEvent = { location: {}, ...eventData, auxiliary, subscription };
           break;
         case INTERNAL_HOUR:
           const internalHour = event.internalHour._id;
-          this.editedEvent = { ...eventData, auxiliary, internalHour };
+          this.editedEvent = { location: {}, ...eventData, auxiliary, internalHour };
           break;
         case ABSENCE:
           const { startDuration, endDuration } = this.getAbsenceDurations(event);
-          this.editedEvent = { ...eventData, auxiliary, startDuration, endDuration };
+          this.editedEvent = { location: {}, ...eventData, auxiliary, startDuration, endDuration };
           break;
         case UNAVAILABILITY:
-          this.editedEvent = { ...eventData, auxiliary };
+          this.editedEvent = { location: {}, ...eventData, auxiliary };
           break;
       }
 
@@ -473,7 +501,10 @@ export default {
     },
     resetEditionForm () {
       this.$v.editedEvent.$reset();
-      this.editedEvent = { subscription: {} };
+      this.editedEvent = {
+        subscription: {},
+        location: {},
+      };
     },
     async updateEvent () {
       try {
