@@ -61,7 +61,8 @@
         </template>
         <template v-if="newEvent.type === INTERVENTION">
           <ni-modal-select caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions" :error="$v.newEvent.customer.$error" />
-          <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions" :error="$v.newEvent.subscription.$error" />
+          <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions(newEvent.customer._id)"
+            :error="$v.newEvent.subscription.$error" />
         </template>
         <template v-if="newEvent.type === ABSENCE">
           <ni-modal-datetime-picker caption="Date de debut" v-model="newEvent.startDate" type="date" :error="$v.newEvent.startDate.$error" />
@@ -94,11 +95,32 @@
               <q-icon name="clear" size="1rem" @click.native="editionModal = false" /></span>
           </div>
         </div>
-        <ni-modal-input caption="Type de l'évènement" v-model="editedEvent.type"/>
-        <ni-modal-datetime-picker caption="Date de début" v-model="editedEvent.startDate" disable />
-        <ni-modal-datetime-picker caption="Date de fin" v-model="editedEvent.endDate" disable />
+        <ni-modal-select caption="Auxiliaire" v-model="editedEvent.auxiliary" :options="auxiliariesOptions" :error="$v.editedEvent.auxiliary.$error" />
+        <template v-if="editedEvent.type !== ABSENCE">
+          <ni-modal-datetime-picker caption="Date de début" v-model="editedEvent.startDate" type="datetime"/>
+          <ni-modal-datetime-picker caption="Date de fin" v-model="editedEvent.endDate" type="datetime" />
+        </template>
+        <template v-if="editedEvent.type === INTERVENTION">
+          <ni-modal-select caption="Service" v-model="editedEvent.subscription" :options="customerSubscriptionsOptions(editedEvent.customer._id)"
+            :error="$v.editedEvent.subscription.$error" />
+        </template>
+        <template v-if="editedEvent.type === ABSENCE">
+          <ni-modal-datetime-picker caption="Date de debut" v-model="editedEvent.startDate" type="date" :error="$v.editedEvent.startDate.$error" />
+          <ni-modal-select caption="Durée" :error="$v.editedEvent.startDuration.$error" :options="dateOptions" v-model="editedEvent.startDuration"
+            separator />
+          <ni-modal-datetime-picker caption="Date de fin" v-model="editedEvent.endDate" type="date" :error="$v.editedEvent.endDate.$error" />
+          <ni-modal-select caption="Durée" :error="$v.editedEvent.endDuration.$error" :options="dateOptions" v-model="editedEvent.endDuration"
+            separator />
+          <ni-modal-select caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions" :error="$v.editedEvent.absence.$error" />
+          <ni-file-uploader caption="Justificatif d'absence" path="attachment" :entity="editedEvent" alt="justificatif absence" name="proofOfAbsence"
+            :url="docsUploadUrl" @uploaded="documentUploaded" :additionalValue="additionalValue" :key="uploaderKey" :disable="!selectedAuxiliary._id"
+            @delete="deleteDocument(editedEvent.attachment.driveId)" withBorders />
+        </template>
+        <template v-if="editedEvent.type === INTERNAL_HOUR">
+          <ni-modal-select caption="Type d'heure interne" v-model="editedEvent.internalHour" :options="internalHourOptions" :error="$v.editedEvent.internalHour.$error" />
+        </template>
       </div>
-      <q-btn class="full-width modal-btn" no-caps color="primary" />
+      <q-btn class="full-width modal-btn" no-caps color="primary" :loading="loading" label="Editer l'évènement" />
     </q-modal>
   </q-page>
 </template>
@@ -132,7 +154,9 @@ export default {
       customers: [],
       events: [],
       maxDays: 7,
-      editedEvent: {},
+      editedEvent: {
+        subscription: {}
+      },
       editionModal: false,
       creationModal: false,
       newEvent: {
@@ -190,6 +214,27 @@ export default {
         return item.type === ABSENCE;
       }) },
     },
+    editedEvent: {
+      startDate: { required },
+      startDuration: { required: requiredIf((item) => {
+        return item.type === ABSENCE;
+      }) },
+      endDate: { required },
+      endDuration: { required: requiredIf((item) => {
+        return item.type === ABSENCE;
+      }) },
+      auxiliary: { required },
+      sector: { required },
+      subscription: { required: requiredIf((item) => {
+        return item.type === INTERVENTION;
+      }) },
+      internalHour: { required: requiredIf((item) => {
+        return item.type === INTERNAL_HOUR;
+      }) },
+      absence: { required: requiredIf((item) => {
+        return item.type === ABSENCE;
+      }) },
+    },
   },
   computed: {
     daysHeader () {
@@ -211,15 +256,6 @@ export default {
       return this.customers.length === 0 ? [] : this.customers.map(customer => ({
         label: `${customer.identity.firstname || ''} ${customer.identity.lastname}`,
         value: customer._id,
-      }));
-    },
-    customerSubscriptionsOptions () {
-      if (!this.newEvent.customer) return [];
-      const customer = this.customers.find(customer => customer._id === this.newEvent.customer);
-
-      return !customer.subscriptions || customer.subscriptions.length === 0 ? [] : customer.subscriptions.map(sub => ({
-        label: sub.service.name,
-        value: sub._id,
       }));
     },
     disableCreationButton () {
@@ -261,6 +297,17 @@ export default {
     this.setInternalHours();
   },
   methods: {
+    customerSubscriptionsOptions (customerId) {
+      if (!customerId) return [];
+      const selectedCustomer = this.customers.find(customer => customer._id === customerId);
+
+      return !selectedCustomer || !selectedCustomer.subscriptions || selectedCustomer.subscriptions.length === 0
+        ? []
+        : selectedCustomer.subscriptions.map(sub => ({
+          label: sub.service.name,
+          value: sub._id,
+        }));
+    },
     setInternalHours () {
       const user = this.$store.getters['main/user'];
       if (user && user.company && user.company.rhConfig && user.company.rhConfig.internalHours) {
@@ -287,7 +334,24 @@ export default {
       return `${this.$moment(event.startDate).format('HH:mm')} - ${this.$moment(event.endDate).format('HH:mm')}`
     },
     openEditionModal (event) {
-      this.editedEvent = event;
+      const auxiliary = event.auxiliary._id;
+      switch (event.type) {
+        case INTERVENTION:
+          const subscription = event.subscription._id;
+          this.editedEvent = { ...event, auxiliary, subscription };
+          break;
+        case INTERNAL_HOUR:
+          const internalHour = event.internalHour._id;
+          this.editedEvent = { ...event, auxiliary, internalHour };
+          break;
+        case ABSENCE:
+          this.editedEvent = { ...event, auxiliary };
+          break;
+        case UNAVAILABILITY:
+          this.editedEvent = { ...event, auxiliary };
+          break;
+      }
+
       this.editionModal = true
     },
     async getEmployeesBySector () {
