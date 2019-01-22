@@ -99,6 +99,9 @@
               <q-icon name="clear" size="1rem" @click.native="editionModal = false" /></span>
           </div>
         </div>
+        <div class="row" style="margin-bottom: 20px">
+          <q-btn-toggle v-model="editionType" toggle-color="primary" :options="editionTypeOptions"/>
+        </div>
         <ni-modal-select caption="Auxiliaire" v-model="editedEvent.auxiliary" :options="auxiliariesOptions" :error="$v.editedEvent.auxiliary.$error" />
         <template v-if="editedEvent.type !== ABSENCE">
           <ni-modal-datetime-picker caption="Date de début" v-model="editedEvent.startDate" type="datetime"/>
@@ -140,7 +143,7 @@ import SelectSector from '../../components/form/SelectSector';
 import ModalInput from '../../components/form/ModalInput.vue';
 import FileUploader from '../../components/form/FileUploader';
 import SearchAddress from '../../components/form/SearchAddress';
-import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, ABSENCE_TYPE, DATE_OPTIONS, MORNING, AFTERNOON, ALL_DAY } from '../../data/constants';
+import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, ABSENCE_TYPE, DATE_OPTIONS, MORNING, AFTERNOON, ALL_DAY, EDITION, CANCELLATION, DELETION } from '../../data/constants';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../../components/popup/notify';
 
 export default {
@@ -195,6 +198,12 @@ export default {
         {label: 'Absence', value: ABSENCE},
         {label: 'Heure interne', value: INTERNAL_HOUR},
         {label: 'Indisponibilité', value: UNAVAILABILITY}
+      ],
+      editionType: EDITION,
+      editionTypeOptions: [
+        {label: 'Edition', value: EDITION},
+        {label: 'Annulation', value: CANCELLATION},
+        {label: 'Suppression', value: DELETION},
       ],
       internalHours: [],
       absenceOptions: ABSENCE_TYPE,
