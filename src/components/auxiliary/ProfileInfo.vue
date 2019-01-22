@@ -221,7 +221,7 @@
       </div>
       <div class="q-mt-lg">
         <ni-multiple-files-uploader caption="Diplome(s) ou certificat(s)" path="administrative.certificates" alt="facture téléphone"
-          @delete="deleteDocument($event, 'certificates')" name="certificates" collapsibleLabel="Ajouter diplômes" :userProfile="currentUser"
+          @delete="deleteDocument($event, 'certificates')" name="certificates" collapsibleLabel="Ajouter un diplôme" :userProfile="currentUser"
           :url="docsUploadUrl" additionalFieldsName="diplomes" @uploaded="refreshUser"
         />
       </div>

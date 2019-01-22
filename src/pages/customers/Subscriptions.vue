@@ -29,8 +29,8 @@
       </div>
       <div class="q-mb-lg">
         <p class="title">Justificatifs APA ou autres financements</p>
-        <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement" @uploaded="getCustomer" name="financialCertificates"
-          collapsibleLabel="Ajouter un certificat" :userProfile="customerUploadData" :url="docsUploadUrl" @delete="deleteDocument($event)"
+        <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement" @uploaded="documentUploaded" name="financialCertificates"
+          collapsibleLabel="Ajouter un justificatif" :userProfile="customerUploadData" :url="docsUploadUrl" @delete="deleteDocument($event)"
           additionalFieldsName="financialCertificate" />
       </div>
       <div class="q-mb-lg">
@@ -378,6 +378,10 @@ export default {
 
         NotifyNegative('Erreur lors de la suppression du document');
       }
+    },
+    async documentUploaded () {
+      await this.getCustomer();
+      NotifyPositive('Document ajouté');
     },
     // Mandate
     async preOpenESignModal (data) {
