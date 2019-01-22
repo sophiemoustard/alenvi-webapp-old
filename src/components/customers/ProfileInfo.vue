@@ -112,7 +112,7 @@
                   <div :class="[{ activeDot: col.value, inactiveDot: !col.value }]" />
                 </template>
                 <template v-else-if="col.name === 'signedMandate'">
-                  <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-between" style="display: inline-table">
+                  <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-between uploader-responsive">
                     <q-uploader :ref="`signedMandate_${props.row._id}`" name="signedMandate" :url="docsUploadUrl" :headers="headers" hide-underline
                       extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" hide-upload-button @add="uploadDocument($event, `signedMandate_${props.row._id}`)"
                       @uploaded="refreshMandates" @fail="failMsg" :additional-fields="[
@@ -146,32 +146,37 @@
       <q-card>
         <q-card-main>
           <q-table :data="customer.quotes" :columns="quoteColumns" row-key="name" table-style="font-size: 1rem" hide-bottom :pagination.sync="pagination"
-            :visible-columns="visibleQuoteColumns" binary-state-sort
+            :visible-columns="visibleQuoteColumns" binary-state-sort class="table-responsive"
           >
-            <q-td slot="body-cell-emptyQuote" slot-scope="props" :props="props">
-              <q-btn flat round small color="primary" @click="downloadQuote(props.row)">
-                <q-icon name="file download" />
-              </q-btn>
-            </q-td>
-            <q-td slot="body-cell-signedQuote" slot-scope="props" :props="props">
-              <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-between">
-                <q-uploader :ref="`signedQuote_${props.row._id}`" name="signedQuote" hide-underline :url="docsUploadUrl" :headers="headers"
-                  extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" hide-upload-button @add="uploadDocument($event, `signedQuote_${props.row._id}`)"
-                  @uploaded="refreshQuotes" @fail="failMsg" :additional-fields="[
-                    { name: 'quoteId', value: props.row._id },
-                    { name: 'fileName', value: `devis_signe_${customer.identity.firstname}_${customer.identity.lastname}` }
-                  ]"
-                />
-              </div>
-              <q-btn v-else flat round small color="primary">
-                <a :href="props.row.drive.link" download>
-                  <q-icon name="file download" />
-                </a>
-              </q-btn>
-            </q-td>
-            <q-td slot="body-cell-signed" slot-scope="props" :props="props">
-              <div :class="[{ activeDot: props.value, inactiveDot: !props.value }]" />
-            </q-td>
+            <q-tr slot="body" slot-scope="props" :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+                <template v-if="col.name === 'emptyQuote'">
+                  <q-btn flat round small color="primary" @click="downloadQuote(props.row)">
+                    <q-icon name="file download" />
+                  </q-btn>
+                </template>
+                <template v-else-if="col.name === 'signedQuote'">
+                  <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-between uploader-responsive">
+                    <q-uploader :ref="`signedQuote_${props.row._id}`" name="signedQuote" hide-underline :url="docsUploadUrl" :headers="headers"
+                      extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" hide-upload-button @add="uploadDocument($event, `signedQuote_${props.row._id}`)"
+                      @uploaded="refreshQuotes" @fail="failMsg" :additional-fields="[
+                        { name: 'quoteId', value: props.row._id },
+                        { name: 'fileName', value: `devis_signe_${customer.identity.firstname}_${customer.identity.lastname}` }
+                      ]"
+                    />
+                  </div>
+                  <q-btn v-else flat round small color="primary">
+                    <a :href="props.row.drive.link" download>
+                      <q-icon name="file download" />
+                    </a>
+                  </q-btn>
+                </template>
+                <template v-else-if="col.name === 'signed'">
+                  <div :class="[{ activeDot: col.value, inactiveDot: !col.value }]" />
+                </template>
+                <template v-else->{{ col.value }}</template>
+              </q-td>
+            </q-tr>
           </q-table>
         </q-card-main>
         <q-card-actions align="end">
