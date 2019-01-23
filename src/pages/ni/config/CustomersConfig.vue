@@ -5,17 +5,21 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Services</p>
         <q-card style="background: white">
-          <q-card-main>
-            <q-table :data="services" :columns="serviceColumns" hide-bottom binary-state-sort :pagination.sync="pagination" :visibleColumns="visibleColumns">
-              <q-td slot="body-cell-actions" slot-scope="props" :props="props" class="action-column">
-                <div class="row no-wrap">
-                  <q-btn flat round small color="grey" icon="history" @click.native="showHistory(props.value)" />
-                  <q-btn flat round small color="grey" icon="edit" @click.native="startEdition(props.value)" />
-                  <q-btn disable flat round small color="grey" icon="delete" @click="deleteService(props.value, props.row.__index)" />
-                </div>
+          <q-table :data="services" :columns="serviceColumns" hide-bottom binary-state-sort :pagination.sync="pagination" :visibleColumns="visibleColumns"
+            class="table-responsive">
+            <q-tr slot="body" slot-scope="props" :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+                <template v-if="col.name === 'actions'">
+                  <div class="row no-wrap table-actions">
+                    <q-btn flat round small color="grey" icon="history" @click.native="showHistory(col.value)" />
+                    <q-btn flat round small color="grey" icon="edit" @click.native="startEdition(col.value)" />
+                    <q-btn disable flat round small color="grey" icon="delete" @click="deleteService(col.value, props.row.__index)" />
+                  </div>
+                </template>
+                <template v-else>{{ col.value }}</template>
               </q-td>
-            </q-table>
-          </q-card-main>
+            </q-tr>
+          </q-table>
           <q-card-actions align="end">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter un service" @click="serviceCreationModal = true" />
           </q-card-actions>
