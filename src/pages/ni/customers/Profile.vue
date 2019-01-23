@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="neutral-background">
     <div v-if="userProfile">
-      <profile-header :customer="true" :profileId="id" class="header-margin" />
+      <profile-header :customer="true" :profileId="id" class="header" />
       <profile-tabs :profileId="id" :tabsContent="tabsContent" />
     </div>
   </q-page>

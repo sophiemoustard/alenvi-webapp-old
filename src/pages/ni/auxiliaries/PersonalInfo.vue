@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="neutral-background">
     <div v-if="userProfile">
-      <profile-header v-if="currentUser.role.name !== 'Auxiliaire'" :profileId="id" class="header-margin" />
+      <profile-header v-if="currentUser.role.name !== 'Auxiliaire'" :profileId="id" class="header" />
       <profile-tabs v-if="currentUser.role.name !== 'Auxiliaire'" :profileId="id" :tabsContent="tabsContent" />
       <h4 v-if="currentUser.role.name === 'Auxiliaire'">Informations personnelles</h4>
       <profile-info v-if="currentUser.role.name === 'Auxiliaire'" />
@@ -90,10 +90,4 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  @import '~variables'
-
-  .header-margin
-    margin-bottom: 60px
-    @media (max-width: 768px)
-      margin-bottom: 40px
 </style>

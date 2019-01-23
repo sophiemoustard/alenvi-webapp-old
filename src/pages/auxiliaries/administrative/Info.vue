@@ -28,10 +28,4 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  @import '~variables'
-
-  .header-margin
-    margin-bottom: 60px
-    @media (max-width: 768px)
-      margin-bottom: 40px
 </style>
