@@ -39,7 +39,8 @@
     <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="ion-document" label="Ajouter un évènement"
       @click="creationModal = true" :disable="auxiliaries.length === 0" />
 
-    <q-modal v-model="creationModal">
+    <!-- Event creation modal -->
+    <q-modal v-model="creationModal" :content-css="modalCssContainer">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -50,9 +51,7 @@
               <q-icon name="clear" size="1rem" @click.native="creationModal = false" /></span>
           </div>
         </div>
-        <div class="row" style="margin-bottom: 20px">
-          <q-btn-toggle v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions" @input="resetCreationForm(newEvent.type)"/>
-        </div>
+        <q-btn-toggle no-wrap v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions" @input="resetCreationForm(newEvent.type)" />
         <ni-modal-select caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions" :error="$v.newEvent.auxiliary.$error" />
         <template v-if="newEvent.type !== ABSENCE">
           <ni-modal-datetime-picker caption="Date de debut" v-model="newEvent.startDate" type="datetime" :error="$v.newEvent.startDate.$error" />
@@ -61,7 +60,8 @@
         </template>
         <template v-if="newEvent.type === INTERVENTION">
           <ni-modal-select caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions" :error="$v.newEvent.customer.$error" />
-          <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions" :error="$v.newEvent.subscription.$error" />
+          <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions(newEvent.customer)"
+            :error="$v.newEvent.subscription.$error" />
         </template>
         <template v-if="newEvent.type === ABSENCE">
           <ni-modal-datetime-picker caption="Date de debut" v-model="newEvent.startDate" type="date" :error="$v.newEvent.startDate.$error" />
@@ -78,39 +78,79 @@
         <template v-if="newEvent.type === INTERNAL_HOUR">
           <ni-modal-select caption="Type d'heure interne" v-model="newEvent.internalHour" :options="internalHourOptions" :error="$v.newEvent.internalHour.$error" />
         </template>
+        <ni-search-address v-model="newEvent.location.fullAddress" @selected="selectedAddress" @blur="$v.newEvent.location.fullAddress.$touch"
+          :error="$v.newEvent.location.fullAddress.$error" :error-label="addressError" inModal/>
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary" @click="createEvent"
         :disable="disableCreationButton"/>
     </q-modal>
 
-     <q-modal v-model="editionModal">
+    <!-- Event edition modal -->
+    <q-modal v-model="editionModal" :content-css="modalCssContainer">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
-            <h5>Edition d'un <span class="text-weight-bold">evenement</span></h5>
+            <h5>{{ editionModalTitle }}</h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
             <span>
               <q-icon name="clear" size="1rem" @click.native="editionModal = false" /></span>
           </div>
         </div>
-        <ni-modal-input caption="Type de l'évènement" v-model="editedEvent.type"/>
-        <ni-modal-datetime-picker caption="Date de début" v-model="editedEvent.startDate" disable />
-        <ni-modal-datetime-picker caption="Date de fin" v-model="editedEvent.endDate" disable />
+        <q-btn-toggle no-wrap v-model="editionType" toggle-color="primary" :options="editionTypeOptions" />
+        <template v-if="editionType === EDITION">
+          <ni-modal-select caption="Auxiliaire" v-model="editedEvent.auxiliary" :options="auxiliariesOptions" :error="$v.editedEvent.auxiliary.$error" />
+          <template v-if="editedEvent.type !== ABSENCE">
+            <ni-modal-datetime-picker caption="Date de début" v-model="editedEvent.startDate" type="datetime"/>
+            <ni-modal-datetime-picker caption="Date de fin" v-model="editedEvent.endDate" type="datetime" />
+          </template>
+          <template v-if="editedEvent.type === INTERVENTION">
+            <ni-modal-select caption="Service" v-model="editedEvent.subscription" :options="customerSubscriptionsOptions(editedEvent.customer)"
+              :error="$v.editedEvent.subscription.$error" />
+          </template>
+          <template v-if="editedEvent.type === ABSENCE">
+            <ni-modal-datetime-picker caption="Date de debut" v-model="editedEvent.startDate" type="date" :error="$v.editedEvent.startDate.$error" />
+            <ni-modal-select caption="Durée" :error="$v.editedEvent.startDuration.$error" :options="dateOptions" v-model="editedEvent.startDuration"
+              separator />
+            <ni-modal-datetime-picker caption="Date de fin" v-model="editedEvent.endDate" type="date" :error="$v.editedEvent.endDate.$error" />
+            <ni-modal-select caption="Durée" :error="$v.editedEvent.endDuration.$error" :options="dateOptions" v-model="editedEvent.endDuration"
+              separator />
+            <ni-modal-select caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions" :error="$v.editedEvent.absence.$error" />
+            <ni-file-uploader caption="Justificatif d'absence" path="attachment" :entity="editedEvent" alt="justificatif absence" name="proofOfAbsence"
+              :url="docsUploadUrl" @uploaded="documentUploaded" :additionalValue="additionalValue" :key="uploaderKey" :disable="!selectedAuxiliary._id"
+              @delete="deleteDocument(editedEvent.attachment.driveId)" withBorders />
+          </template>
+          <template v-if="editedEvent.type === INTERNAL_HOUR">
+            <ni-modal-select caption="Type d'heure interne" v-model="editedEvent.internalHour" :options="internalHourOptions" :error="$v.editedEvent.internalHour.$error" />
+          </template>
+          <ni-search-address v-model="editedEvent.location.fullAddress" @selected="selectedAddress" @blur="$v.editedEvent.location.fullAddress.$touch"
+            :error="$v.editedEvent.location.fullAddress.$error" :error-label="addressError" inModal/>
+        </template>
+        <template v-else-if="editionType === CANCELLATION">
+        </template>
+        <template v-else-if="editionType === DELETION">
+        </template>
       </div>
-      <q-btn class="full-width modal-btn" no-caps color="primary" />
+      <q-btn v-if="editionType === EDITION" class="full-width modal-btn" no-caps color="primary" :loading="loading" label="Editer l'évènement"
+        @click="updateEvent" />
+      <q-btn v-if="editionType === CANCELLATION" class="full-width modal-btn" no-caps color="primary" :loading="loading" label="Annuler l'évènement"
+        @click="cancelEvent" />
+      <q-btn v-if="editionType === DELETION" class="full-width modal-btn" no-caps color="primary" :loading="loading" label="Supprimer l'évènement"
+        @click="deleteEvent" />
     </q-modal>
   </q-page>
 </template>
 
 <script>
 import { required, requiredIf } from 'vuelidate/lib/validators';
+import { frAddress } from '../../helpers/vuelidateCustomVal.js'
 import ModalDatetimePicker from '../../components/form/ModalDatetimePicker.vue';
 import ModalSelect from '../../components/form/ModalSelect';
 import SelectSector from '../../components/form/SelectSector';
 import ModalInput from '../../components/form/ModalInput.vue';
 import FileUploader from '../../components/form/FileUploader';
-import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, ABSENCE_TYPE, DATE_OPTIONS } from '../../data/constants';
+import SearchAddress from '../../components/form/SearchAddress';
+import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, ABSENCE_TYPE, DATE_OPTIONS, MORNING, AFTERNOON, ALL_DAY, EDITION, CANCELLATION, DELETION } from '../../data/constants';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../../components/popup/notify';
 
 export default {
@@ -121,9 +161,11 @@ export default {
     'ni-select-sector': SelectSector,
     'ni-modal-select': ModalSelect,
     'ni-file-uploader': FileUploader,
+    'ni-search-address': SearchAddress,
   },
   data () {
     return {
+      modalCssContainer: { width: '45vw' },
       loading: false,
       selectedSector: '',
       startOfWeek: '',
@@ -132,7 +174,12 @@ export default {
       customers: [],
       events: [],
       maxDays: 7,
-      editedEvent: {},
+      editedEvent: {
+        subscription: {},
+        location: {},
+        attachment: {},
+        customer: '',
+      },
       editionModal: false,
       creationModal: false,
       newEvent: {
@@ -147,16 +194,27 @@ export default {
         sector: '',
         internalHour: '',
         absence: '',
+        location: {},
+        attachment: {},
       },
       INTERVENTION,
       UNAVAILABILITY,
       ABSENCE,
       INTERNAL_HOUR,
+      EDITION,
+      DELETION,
+      CANCELLATION,
       eventTypeOptions: [
         {label: 'Intervention', value: INTERVENTION},
         {label: 'Absence', value: ABSENCE},
         {label: 'Heure interne', value: INTERNAL_HOUR},
         {label: 'Indisponibilité', value: UNAVAILABILITY}
+      ],
+      editionType: EDITION,
+      editionTypeOptions: [
+        {label: 'Edition', value: EDITION},
+        {label: 'Annulation', value: CANCELLATION},
+        {label: 'Suppression', value: DELETION},
       ],
       internalHours: [],
       absenceOptions: ABSENCE_TYPE,
@@ -189,6 +247,29 @@ export default {
       absence: { required: requiredIf((item) => {
         return item.type === ABSENCE;
       }) },
+      location: { fullAddress: { frAddress } },
+    },
+    editedEvent: {
+      startDate: { required },
+      startDuration: { required: requiredIf((item) => {
+        return item.type === ABSENCE;
+      }) },
+      endDate: { required },
+      endDuration: { required: requiredIf((item) => {
+        return item.type === ABSENCE;
+      }) },
+      auxiliary: { required },
+      sector: { required },
+      subscription: { required: requiredIf((item) => {
+        return item.type === INTERVENTION;
+      }) },
+      internalHour: { required: requiredIf((item) => {
+        return item.type === INTERNAL_HOUR;
+      }) },
+      absence: { required: requiredIf((item) => {
+        return item.type === ABSENCE;
+      }) },
+      location: { fullAddress: { frAddress } },
     },
   },
   computed: {
@@ -213,15 +294,6 @@ export default {
         value: customer._id,
       }));
     },
-    customerSubscriptionsOptions () {
-      if (!this.newEvent.customer) return [];
-      const customer = this.customers.find(customer => customer._id === this.newEvent.customer);
-
-      return !customer.subscriptions || customer.subscriptions.length === 0 ? [] : customer.subscriptions.map(sub => ({
-        label: sub.service.name,
-        value: sub._id,
-      }));
-    },
     disableCreationButton () {
       if (!this.newEvent.type) return true;
       switch (this.newEvent.type) {
@@ -241,8 +313,10 @@ export default {
         ? ''
         : `${process.env.API_HOSTNAME}/events/${this.selectedAuxiliary._id}/gdrive/${this.selectedAuxiliary.administrative.driveFolder.id}/upload`;
     },
-    selectedAuxiliary () {
-      return this.newEvent.auxiliary === '' ? {} : this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
+    selectedAuxiliary (action) {
+      if (this.creationModal && this.newEvent.auxiliary !== '') return this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
+      if (this.editionModal && this.editedEvent.auxiliary !== '') return this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
+      return {};
     },
     additionalValue () {
       return !this.selectedAuxiliary._id ? '' : `justificatif_absence_${this.selectedAuxiliary.lastname}`;
@@ -253,6 +327,27 @@ export default {
         value: hour._id,
       }));
     },
+    addressError () {
+      if (!this.$v.newEvent.location.fullAddress.required) return 'Champ requis';
+
+      return 'Adresse non valide';
+    },
+    editionModalTitle () {
+      if (!this.editedEvent.type) return '';
+
+      switch (this.editedEvent.type) {
+        case INTERVENTION:
+          const customer = this.customers.find(customer => customer._id === this.editedEvent.customer._id);
+          const subscription = customer.subscriptions.find(sub => sub._id === this.editedEvent.subscription);
+          return `Edition de l'intervention ${subscription.service.name} chez ${customer.identity.title} ${customer.identity.lastname}`;
+        case ABSENCE:
+          return 'Edition de l\'abscence';
+        case INTERNAL_HOUR:
+          return 'Edition de l\'heure interne';
+        case UNAVAILABILITY:
+          return 'Edition de l\'indisponibilité';
+      }
+    },
   },
   async mounted () {
     this.startOfWeek = this.$moment().startOf('week');
@@ -261,38 +356,12 @@ export default {
     this.setInternalHours();
   },
   methods: {
-    setInternalHours () {
-      const user = this.$store.getters['main/user'];
-      if (user && user.company && user.company.rhConfig && user.company.rhConfig.internalHours) {
-        this.internalHours = user.company.rhConfig.internalHours;
-      }
-    },
-    displayAbsenceType (value) {
-      const absence = ABSENCE_TYPE.find(abs => abs.value === value);
-      return !absence ? '' : absence.label;
-    },
+    // Table
     endOfWeek () {
       return this.$moment(this.startOfWeek).add(6, 'd');
     },
     timelineTitle () {
       return `${this.$moment(this.startOfWeek).format('DD/MM')} - ${this.$moment(this.endOfWeek()).format('DD/MM')}`;
-    },
-    getAuxiliaryEvents (auxiliary, dayIndex) {
-      return this.events
-        .filter(event => event.auxiliary._id === auxiliary._id)
-        .filter(event => this.$moment(event.startDate).isSame(this.days[dayIndex], 'day'))
-        .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-    },
-    getEventHours (event) {
-      return `${this.$moment(event.startDate).format('HH:mm')} - ${this.$moment(event.endDate).format('HH:mm')}`
-    },
-    openEditionModal (event) {
-      this.editedEvent = event;
-      this.editionModal = true
-    },
-    async getEmployeesBySector () {
-      this.auxiliaries = await this.$users.showAllActive({ sector: this.selectedSector });
-      await this.getEvents();
     },
     goToPreviousWeek () {
       this.startOfWeek.subtract(7, 'd');
@@ -308,17 +377,21 @@ export default {
       const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
       this.days = Array.from(range.by('days'));
     },
-    resetCreationForm (type = INTERVENTION) {
-      this.$v.newEvent.$reset();
-      this.newEvent = {
-        type,
-        startDate: '',
-        endDate: '',
-        auxiliary: '',
-        customer: '',
-        subscription: '',
-      };
+    // Event display
+    getAuxiliaryEvents (auxiliary, dayIndex) {
+      return this.events
+        .filter(event => event.auxiliary._id === auxiliary._id)
+        .filter(event => this.$moment(event.startDate).isSame(this.days[dayIndex], 'day'))
+        .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
     },
+    getEventHours (event) {
+      return `${this.$moment(event.startDate).format('HH:mm')} - ${this.$moment(event.endDate).format('HH:mm')}`
+    },
+    displayAbsenceType (value) {
+      const absence = ABSENCE_TYPE.find(abs => abs.value === value);
+      return !absence ? '' : absence.label;
+    },
+    // Refresh data
     async getEvents () {
       try {
         this.events = await this.$events.list({
@@ -337,54 +410,200 @@ export default {
         console.error(e);
       }
     },
+    async getEmployeesBySector () {
+      this.auxiliaries = await this.$users.showAllActive({ sector: this.selectedSector });
+      await this.getEvents();
+    },
+    setInternalHours () {
+      const user = this.$store.getters['main/user'];
+      if (user && user.company && user.company.rhConfig && user.company.rhConfig.internalHours) {
+        this.internalHours = user.company.rhConfig.internalHours;
+      }
+    },
+    // Event creation
+    selectedAddress (item) {
+      this.newEvent.location = Object.assign({}, this.newEvent.location, item);
+    },
+    customerSubscriptionsOptions (customerId) {
+      if (!customerId) return [];
+      const selectedCustomer = this.customers.find(customer => customer._id === customerId);
+
+      return !selectedCustomer || !selectedCustomer.subscriptions || selectedCustomer.subscriptions.length === 0
+        ? []
+        : selectedCustomer.subscriptions.map(sub => ({
+          label: sub.service.name,
+          value: sub._id,
+        }));
+    },
+    resetCreationForm (type = INTERVENTION) {
+      this.$v.newEvent.$reset();
+      this.newEvent = {
+        type,
+        startDate: '',
+        startDuration: '',
+        endDate: '',
+        endDuration: '',
+        auxiliary: '',
+        customer: '',
+        subscription: '',
+        sector: '',
+        internalHour: '',
+        absence: '',
+        location: {},
+        attachment: {},
+      };
+    },
+    getPayload (event) {
+      const { _id, ...eventData } = event;
+      let payload = { ...eventData }
+      if (event.type === INTERNAL_HOUR) {
+        const internalHour = this.internalHours.find(hour => hour._id === event.internalHour);
+        payload.internalHour = internalHour;
+      }
+      if (event.type === ABSENCE) {
+        payload.startDate = this.$moment(event.startDate).hours(event.startDuration[0].startHour).toISOString();
+        if (event.endDuration !== '') {
+          payload.endDate = this.$moment(event.endDate).hours(event.endDuration[0].endHour).toISOString();
+        } else {
+          payload.endDate = this.$moment(event.endDate).hours(event.startDuration[0].endHour).toISOString();
+        }
+
+        this.$_.unset(payload, 'startDuration');
+        this.$_.unset(payload, 'endDuration');
+      }
+
+      if (event.location && event.location.fullAddress) delete payload.location.location;
+
+      return this.$_.pickBy(payload)
+    },
     async createEvent () {
       try {
         this.newEvent.sector = this.selectedSector;
         this.$v.newEvent.$touch();
         if (this.$v.newEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        let payload = { ...this.newEvent }
-        if (this.newEvent.type === INTERNAL_HOUR) {
-          const internalHour = this.internalHours.find(hour => hour._id === this.newEvent.internalHour);
-          payload.internalHour = internalHour;
-        }
-        if (this.newEvent.type === ABSENCE) {
-          payload.startDate = this.$moment(this.newEvent.startDate).hours(this.newEvent.startDuration[0].startHour).toISOString();
-          if (this.newEvent.endDuration !== '') {
-            payload.endDate = this.$moment(this.newEvent.endDate).hours(this.newEvent.endDuration[0].endHour).toISOString();
-          } else {
-            payload.endDate = this.$moment(this.newEvent.endDate).hours(this.newEvent.startDuration[0].endHour).toISOString();
-          }
-
-          this.$_.unset(payload, 'startDuration');
-          this.$_.unset(payload, 'endDuration');
-        }
-
         this.loading = true;
-        payload = this.$_.pickBy(payload);
+        const payload = this.getPayload(this.newEvent);
         await this.$events.create(payload);
-        NotifyPositive('Évènement créé');
 
         await this.getEvents();
         this.creationModal = false;
         this.loading = false;
         this.resetCreationForm();
+        NotifyPositive('Évènement créé');
       } catch (e) {
         NotifyNegative('Erreur lors de la création de l\'évènement');
         this.loading = false;
       }
     },
+    // Event edition
+    getAbsenceDurations (event) {
+      let startDuration;
+      let endDuration;
+
+      if (event.type !== ABSENCE) return { startDuration, endDuration }
+
+      const startHour = this.$moment(event.startDate).hours();
+      const endHour = this.$moment(event.endDate).hours();
+      if (this.$moment(event.startDate).isSame(this.$moment(event.endDate), 'days')) {
+        if (startHour === MORNING[0].startHour && endHour === MORNING[0].endHour) startDuration = MORNING;
+        else if (startHour === AFTERNOON[0].startHour && endHour === AFTERNOON[0].endHour) startDuration = AFTERNOON;
+        else startDuration = ALL_DAY;
+      } else {
+        if (startHour === AFTERNOON[0].startHour) startDuration = AFTERNOON;
+        else startDuration = ALL_DAY;
+
+        if (endHour === MORNING[0].endHour) endDuration = MORNING;
+        else endDuration = ALL_DAY;
+      }
+
+      return { startDuration, endDuration };
+    },
+    openEditionModal (event) {
+      const { createdAt, updatedAt, ...eventData } = event;
+      const auxiliary = event.auxiliary._id;
+      switch (event.type) {
+        case INTERVENTION:
+          const subscription = event.subscription._id;
+          this.editedEvent = { location: {}, ...eventData, auxiliary, subscription };
+          break;
+        case INTERNAL_HOUR:
+          const internalHour = event.internalHour._id;
+          this.editedEvent = { location: {}, ...eventData, auxiliary, internalHour };
+          break;
+        case ABSENCE:
+          const { startDuration, endDuration } = this.getAbsenceDurations(event);
+          this.editedEvent = { location: {}, attachment: {}, ...eventData, auxiliary, startDuration, endDuration };
+          break;
+        case UNAVAILABILITY:
+          this.editedEvent = { location: {}, ...eventData, auxiliary };
+          break;
+      }
+
+      this.editionModal = true
+    },
+    resetEditionForm () {
+      this.editionType = EDITION;
+      this.$v.editedEvent.$reset();
+      this.editedEvent = {
+        subscription: {},
+        location: {},
+      };
+    },
+    async updateEvent () {
+      try {
+        this.editedEvent.sector = this.selectedSector;
+        this.$v.editedEvent.$touch();
+        if (this.$v.editedEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        this.loading = true;
+        const payload = this.getPayload(this.editedEvent);
+        delete payload.customer;
+        delete payload.type;
+        await this.$events.updateById(this.editedEvent._id, payload);
+        NotifyPositive('Évènement modifié');
+
+        await this.getEvents();
+        this.editionModal = false;
+        this.resetEditionForm();
+      } catch (e) {
+        NotifyNegative('Erreur lors de l\'édition de l\'évènement');
+      } finally {
+        this.loading = false;
+      }
+    },
+    // Event cancellation
+    async cancelEvent () {},
+    // Event deletion
+    async deleteEvent () {
+      try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Etes-vous sûr de vouloir supprimer cet évènement ?',
+          ok: 'OK',
+          cancel: 'Annuler'
+        });
+
+        await this.$events.deleteById(this.editedEvent._id);
+        await this.getEvents();
+        this.editionModal = false;
+        this.resetEditionForm();
+        NotifyPositive('Service supprimé.');
+      } catch (e) {
+        console.error(e);
+        if (e.message === '') return NotifyPositive('Suppression annulée');
+        NotifyNegative('Erreur lors de la suppression du service.');
+      }
+    },
+    // Event files
     documentUploaded (uploadedInfo) {
       if (!uploadedInfo.xhr || !uploadedInfo.xhr.response) return;
 
       const json = JSON.parse(uploadedInfo.xhr.response);
       if (!json || !json.data || !json.data.payload) return;
 
-      this.newEvent.attachment = { ...json.data.payload.attachment }
-      this.rerenderUploader();
-    },
-    rerenderUploader () {
-      this.uploaderKey += 1;
+      if (this.creationModal) this.newEvent.attachment = { ...json.data.payload.attachment }
+      if (this.editionModal) this.editedEvent.attachment = { ...json.data.payload.attachment }
     },
     async deleteDocument (driveId) {
       try {
@@ -395,9 +614,9 @@ export default {
           cancel: 'Annuler'
         });
         await this.$gdrive.removeFileById({ id: driveId });
+        if (this.creationModal) this.newEvent.attachment = {};
+        if (this.editionModal) this.editedEvent.attachment = {};
         NotifyPositive('Document supprimé');
-        this.$_.unset(this.newEvent, 'attachment');
-        this.rerenderUploader();
       } catch (e) {
         console.error(e);
         if (e.message === '') {

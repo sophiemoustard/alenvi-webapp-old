@@ -21,6 +21,9 @@ export const DATE_OPTIONS = [
   { label: 'Après-midi', value: AFTERNOON },
   { label: 'Journée entière', value: ALL_DAY },
 ];
+export const EDITION = 'edition';
+export const DELETION = 'deletion';
+export const CANCELLATION = 'cancellation';
 
 // THIRD PARTY PAYERS
 export const BILLING_INDIRECT = 'indirecte';
