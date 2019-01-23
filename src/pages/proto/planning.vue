@@ -105,7 +105,7 @@
             <ni-modal-datetime-picker caption="Date de fin" v-model="editedEvent.endDate" type="datetime" />
           </template>
           <template v-if="editedEvent.type === INTERVENTION">
-            <ni-modal-select caption="Service" v-model="editedEvent.subscription" :options="customerSubscriptionsOptions(editedEvent.customer)"
+            <ni-modal-select caption="Service" v-model="editedEvent.subscription" :options="customerSubscriptionsOptions(editedEvent.customer._id)"
               :error="$v.editedEvent.subscription.$error" />
           </template>
           <template v-if="editedEvent.type === ABSENCE">
@@ -584,6 +584,7 @@ export default {
           cancel: 'Annuler'
         });
 
+        this.loading = true
         await this.$events.deleteById(this.editedEvent._id);
         await this.getEvents();
         this.editionModal = false;
@@ -593,6 +594,8 @@ export default {
         console.error(e);
         if (e.message === '') return NotifyPositive('Suppression annulée');
         NotifyNegative('Erreur lors de la suppression du service.');
+      } finally {
+        this.loading = false
       }
     },
     // Event files
