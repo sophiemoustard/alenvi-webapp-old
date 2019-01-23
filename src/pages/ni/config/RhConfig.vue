@@ -4,16 +4,19 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Heures internes</p>
         <q-card style="background: white">
-          <q-card-main>
-            <q-table :data="internalHours" :columns="internalHoursColumns" hide-bottom binary-state-sort :pagination.sync="pagination">
-              <q-td slot="body-cell-default" slot-scope="props" :props="props">
-                <q-checkbox :disable="props.value" :value="props.value" @input="updateDefaultInternalHour(props.row._id)" />
+          <q-table :data="internalHours" :columns="internalHoursColumns" hide-bottom binary-state-sort :pagination.sync="pagination" class="table-responsive">
+            <q-tr slot="body" slot-scope="props" :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+                <template v-if="col.name === 'default'">
+                  <q-checkbox :disable="col.value" :value="col.value" @input="updateDefaultInternalHour(props.row._id)" />
+                </template>
+                <template v-else-if="col.name === 'actions'">
+                  <q-btn :disable="props.row.default" flat round small color="grey" icon="delete" @click="deleteInternalHour(col.value, props.row.__index)" />
+                </template>
+                <template v-else>{{ col.value }}</template>
               </q-td>
-              <q-td slot="body-cell-delete" slot-scope="props" :props="props">
-                <q-btn :disable="props.row.default" flat round small color="grey" icon="delete" @click="deleteInternalHour(props.value, props.row.__index)" />
-              </q-td>
-            </q-table>
-          </q-card-main>
+            </q-tr>
+          </q-table>
           <q-card-actions align="end">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter une heure interne" @click="newInternalHourModal = true"
               :disable="internalHours.length >= MAX_INTERNAL_HOURS_NUMBER" />
@@ -138,7 +141,7 @@ export default {
           field: 'default',
         },
         {
-          name: 'delete',
+          name: 'actions',
           label: '',
           align: 'center',
           field: '_id',
