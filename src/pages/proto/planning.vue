@@ -40,7 +40,7 @@
       @click="creationModal = true" :disable="auxiliaries.length === 0" />
 
     <!-- Event creation modal -->
-    <q-modal v-model="creationModal">
+    <q-modal v-model="creationModal" :content-css="modalCssContainer">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -51,9 +51,7 @@
               <q-icon name="clear" size="1rem" @click.native="creationModal = false" /></span>
           </div>
         </div>
-        <div class="row" style="margin-bottom: 20px">
-          <q-btn-toggle v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions" @input="resetCreationForm(newEvent.type)"/>
-        </div>
+        <q-btn-toggle v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions" @input="resetCreationForm(newEvent.type)" />
         <ni-modal-select caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions" :error="$v.newEvent.auxiliary.$error" />
         <template v-if="newEvent.type !== ABSENCE">
           <ni-modal-datetime-picker caption="Date de debut" v-model="newEvent.startDate" type="datetime" :error="$v.newEvent.startDate.$error" />
@@ -88,7 +86,7 @@
     </q-modal>
 
     <!-- Event edition modal -->
-    <q-modal v-model="editionModal">
+    <q-modal v-model="editionModal" :content-css="modalCssContainer">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -99,9 +97,7 @@
               <q-icon name="clear" size="1rem" @click.native="editionModal = false" /></span>
           </div>
         </div>
-        <div class="row" style="margin-bottom: 20px">
-          <q-btn-toggle v-model="editionType" toggle-color="primary" :options="editionTypeOptions"/>
-        </div>
+        <q-btn-toggle v-model="editionType" toggle-color="primary" :options="editionTypeOptions" />
         <ni-modal-select caption="Auxiliaire" v-model="editedEvent.auxiliary" :options="auxiliariesOptions" :error="$v.editedEvent.auxiliary.$error" />
         <template v-if="editedEvent.type !== ABSENCE">
           <ni-modal-datetime-picker caption="Date de début" v-model="editedEvent.startDate" type="datetime"/>
@@ -158,6 +154,7 @@ export default {
   },
   data () {
     return {
+      modalCssContainer: { width: '45vw' },
       loading: false,
       selectedSector: '',
       startOfWeek: '',
