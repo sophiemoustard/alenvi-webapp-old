@@ -142,8 +142,12 @@
               <q-icon name="clear" size="1rem" @click.native="serviceHistoryModal = false" /></span>
           </div>
         </div>
-        <q-table class="q-mb-xl" :data="selectedService.versions" :columns="serviceColumns" hide-bottom binary-state-sort :pagination.sync="paginationHistory"
-          :visibleColumns="visibleHistoryColumns" />
+        <q-table class="q-mb-xl table-responsive" :data="selectedService.versions" :columns="serviceColumns" hide-bottom binary-state-sort :pagination.sync="paginationHistory"
+          :visibleColumns="visibleHistoryColumns">
+          <q-tr slot="body" slot-scope="props" :props="props">
+            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">{{ col.value }}</q-td>
+          </q-tr>
+        </q-table>
       </div>
     </q-modal>
 
