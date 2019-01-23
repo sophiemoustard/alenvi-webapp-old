@@ -56,17 +56,23 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Tiers payeurs</p>
         <q-card style="background: white">
-          <q-card-main>
-            <q-table :data="thirdPartyPayers" :columns="thirdPartyPayersColumns" hide-bottom binary-state-sort :pagination.sync="pagination">
-              <q-td slot="body-cell-billingMode" slot-scope="props" :props="props" class="capitalize">{{ props.value }}</q-td>
-              <q-td slot="body-cell-actions" slot-scope="props" :props="props" class="action-column">
-                <div class="row no-wrap">
-                  <q-btn flat round small color="grey" icon="delete" @click="deleteThirdPartyPayer(props.value, props.row.__index)" />
-                  <q-btn flat round small color="grey" icon="edit" @click="openThirdPartyPayerEditionModal(props.value)" />
-                </div>
+          <q-table :data="thirdPartyPayers" :columns="thirdPartyPayersColumns" hide-bottom binary-state-sort :pagination.sync="pagination"
+            class="table-responsive">
+            <q-tr slot="body" slot-scope="props" :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+                <template v-if="col.name === 'billingMode'">
+                  <div class="capitalize">{{ col.value }}</div>
+                </template>
+                <template v-else-if="col.name === 'actions'">
+                  <div class="row no-wrap table-actions">
+                    <q-btn flat round small color="grey" icon="delete" @click="deleteThirdPartyPayer(col.value, props.row.__index)" />
+                    <q-btn flat round small color="grey" icon="edit" @click="openThirdPartyPayerEditionModal(col.value)" />
+                  </div>
+                </template>
+                <template v-else>{{ col.value}}</template>
               </q-td>
-            </q-table>
-          </q-card-main>
+            </q-tr>
+          </q-table>
           <q-card-actions align="end">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter un tiers payeur" @click="thirdPartyPayerCreationModal = true" />
           </q-card-actions>
