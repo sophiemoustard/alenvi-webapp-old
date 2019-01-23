@@ -525,7 +525,7 @@ export default {
   },
   methods: {
     formatNumber (number) {
-      return parseFloat(Math.round(number * 100) / 100).toFixed(1)
+      return parseFloat(Math.round(number * 100) / 100).toFixed(2)
     },
     updateNewSubscription () {
       if (this.newSubscription.service !== '') {
