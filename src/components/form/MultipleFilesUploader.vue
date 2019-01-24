@@ -63,6 +63,7 @@ export default {
       this.$emit('delete', documentId);
     },
     documentUploaded () {
+      this.$refs[this.name].reset();
       this.$emit('uploaded');
     },
     failMsg () {
