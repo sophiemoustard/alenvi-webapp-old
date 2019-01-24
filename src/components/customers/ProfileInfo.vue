@@ -97,7 +97,7 @@
         <q-table :columns="mandateColumns" :data="customer.payment.mandates" hide-bottom :pagination.sync="pagination" :visible-columns="visibleMandateColumns"
           binary-state-sort class="table-responsive mandate-table">
           <q-tr slot="body" slot-scope="props" :props="props">
-            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
               <template v-if="col.name === 'emptyMandate'">
                 <q-btn v-if="customer.payment.mandates && props.row.__index == 0" flat round small color="primary" @click="downloadMandate(props.row)">
                   <q-icon name="file download" />
@@ -123,9 +123,10 @@
                 </q-btn>
               </template>
               <template v-else-if="col.name === 'signedAt'">
-                <ni-datetime-picker v-model="customer.payment.mandates[props.row.__index].signedAt" withBorders @blur="updateSignedAt(props.row)"
-                  @focus="saveTmpSignedAt(props.row.__index)"
-                />
+                <div class="datetime">
+                  <ni-datetime-picker v-model="customer.payment.mandates[props.row.__index].signedAt" withBorders @blur="updateSignedAt(props.row)"
+                    @focus="saveTmpSignedAt(props.row.__index)" inModal />
+                </div>
               </template>
               <template v-else>{{ col.value}}</template>
             </q-td>
@@ -260,7 +261,7 @@
           </div>
         </div>
         <ni-datetime-picker v-model="editedSubscription.startDate" :error="$v.editedSubscription.startDate.$error" caption="Dated'effet"
-          @blur="$v.editedSubscription.startDate.$touch" :min="minStartDate" />
+          @blur="$v.editedSubscription.startDate.$touch" :min="minStartDate" inModal />
         <ni-modal-input v-model="editedSubscription.unitTTCRate" :error="$v.editedSubscription.unitTTCRate.$error" caption="Prix unitaire TTC"
           @blur="$v.editedSubscription.unitTTCRate.$touch" type="number" />
         <ni-modal-input v-model="editedSubscription.estimatedWeeklyVolume" :error="$v.editedSubscription.estimatedWeeklyVolume.$error"
@@ -415,7 +416,7 @@ import NiModalInput from '../form/ModalInput';
 import NiModalSelect from '../form/ModalSelect';
 import NiOptionGroup from '../form/OptionGroup';
 import { frPhoneNumber, iban, bic, frAddress } from '../../helpers/vuelidateCustomVal';
-import DatetimePicker from '../form/ModalDatetimePicker';
+import DatetimePicker from '../form/DatetimePicker';
 import { downloadDocxFile } from '../../helpers/downloadFile';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
