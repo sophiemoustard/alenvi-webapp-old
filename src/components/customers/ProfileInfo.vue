@@ -787,6 +787,7 @@ export default {
   async mounted () {
     await this.getUserHelpers();
     await this.refreshCustomer();
+    console.log('funding options', this.fundingOptions);
     this.isLoaded = true;
   },
   methods: {
