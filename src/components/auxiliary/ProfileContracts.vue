@@ -8,48 +8,47 @@
           </q-card-title>
           <q-card-main>
             <p>Statut: {{ contract.status }}</p>
-            <q-table
-              :data="contract.versions"
-              :columns="columns"
-              row-key="name"
-              :pagination.sync="pagination"
-              hide-bottom
-              :visible-columns="visibleColumns"
-              binary-state-sort>
-              <q-td slot="body-cell-contractEmpty" slot-scope="props" :props="props">
-                <q-btn flat round small color="primary" @click="dlTemplate(props.row, props.row.__index, contract.startDate)">
-                  <q-icon name="file download" />
-                </q-btn>
-              </q-td>
-              <q-td slot="body-cell-contractSigned" slot-scope="props" :props="props">
-                <div v-if="!props.row.link" class="row justify-center">
-                  <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :url="docsUploadUrl" :headers="headers"
-                    :additional-fields="[
-                      { name: 'fileName', value: `contrat_signe_${getUser.firstname}_${getUser.lastname}` },
-                      { name: 'contractId', value: contract._id },
-                      { name: 'versionId', value: props.row._id }
-                    ]"
-                    hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
-                    hide-upload-button @add="uploadDocument($event, `signedContract_${props.row._id}`)" @uploaded="refreshContracts" @fail="failMsg" />
-                </div>
-                <q-btn v-else flat round small color="primary">
-                  <a :href="props.row.link" download>
-                    <q-icon name="file download" />
-                  </a>
-                </q-btn>
-              </q-td>
-              <q-td slot="body-cell-isActive" slot-scope="props" :props="props">
-                <q-checkbox :disable="props.value || (props.row && 'endDate' in props.row)" :value="props.value"
-                  @input="updateContractActivity({
-                    contractId: contract._id,
-                    versionId: props.row._id,
-                    ogustContractId: props.row.ogustContractId,
-                    versionStartDate: props.row.startDate,
-                    isActive: !props.value,
-                    cell: props.row.__index,
-                    contractIndex: index })">
-                </q-checkbox>
-              </q-td>
+            <q-table :data="contract.versions" :columns="columns" row-key="name" :pagination.sync="pagination" hide-bottom :visible-columns="visibleColumns"
+              binary-state-sort class="table-responsive">
+              <tr slot="body" slot-scope="props" :props="props">
+                <td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+                  <template v-if="col.name === 'contractEmpty'">
+                    <q-btn flat round small color="primary" @click="dlTemplate(props.row, props.row.__index, contract.startDate)">
+                      <q-icon name="file download" />
+                    </q-btn>
+                  </template>
+                  <template v-else-if="col.name === 'contractSigned'">
+                    <div v-if="!props.row.link" class="row justify-center uploader-responsive">
+                      <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :url="docsUploadUrl" :headers="headers"
+                        :additional-fields="[
+                          { name: 'fileName', value: `contrat_signe_${getUser.firstname}_${getUser.lastname}` },
+                          { name: 'contractId', value: contract._id },
+                          { name: 'versionId', value: props.row._id }
+                        ]"
+                        hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
+                        hide-upload-button @add="uploadDocument($event, `signedContract_${props.row._id}`)" @uploaded="refreshContracts" @fail="failMsg" />
+                    </div>
+                    <q-btn v-else flat round small color="primary">
+                      <a :href="props.row.link" download>
+                        <q-icon name="file download" />
+                      </a>
+                    </q-btn>
+                  </template>
+                  <template v-else-if="col.name === 'isActive'">
+                    <q-checkbox :disable="col.value || (props.row && 'endDate' in props.row)" :value="col.value"
+                      @input="updateContractActivity({
+                        contractId: contract._id,
+                        versionId: props.row._id,
+                        ogustContractId: props.row.ogustContractId,
+                        versionStartDate: props.row.startDate,
+                        isActive: !col.value,
+                        cell: props.row.__index,
+                        contractIndex: index })">
+                    </q-checkbox>
+                  </template>
+                  <template v-else>{{ col.value }}</template>
+                </td>
+              </tr>
             </q-table>
           </q-card-main>
           <q-card-actions align="end">

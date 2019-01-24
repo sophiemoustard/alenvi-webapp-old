@@ -51,18 +51,16 @@
         <p class="title">Mandats de prélèvement</p>
         <p v-if="customer.payment.mandates.length === 0 || !isValidPayment">Aucun mandat.</p>
         <q-card v-if="isValidPayment && customer.payment.mandates.length > 0" class="contract-card">
-          <q-card-main>
-            <q-table :data="customer.payment.mandates" :columns="columnsMandates" row-key="name" hide-bottom :pagination.sync="pagination"
-              :visible-columns="visibleColumnsMandates" binary-state-sort class="table-responsive">
-              <q-td slot="body-cell-rum" slot-scope="props" :props="props" :data-label="props.col.label">{{ props.value }}</q-td>
-              <q-td slot="body-cell-sign" slot-scope="props" :props="props" :data-label="props.col.label">
-                <p class="no-margin" v-if="props.row.signedAt">Mandat signé le {{$moment(props.row.signedAt).format('DD/MM/YYYY')}}</p>
-                <q-btn v-else-if="props.row.__index === customer.payment.mandates.length - 1" color="primary" @click="preOpenESignModal(props)">
-                  Signer
-                </q-btn>
-              </q-td>
-            </q-table>
-          </q-card-main>
+          <q-table :data="customer.payment.mandates" :columns="columnsMandates" row-key="name" hide-bottom :pagination.sync="pagination"
+            :visible-columns="visibleColumnsMandates" binary-state-sort class="table-responsive">
+            <q-td slot="body-cell-rum" slot-scope="props" :props="props" :data-label="props.col.label">{{ props.value }}</q-td>
+            <q-td slot="body-cell-sign" slot-scope="props" :props="props" :data-label="props.col.label">
+              <p class="no-margin" v-if="props.row.signedAt">Mandat signé le {{$moment(props.row.signedAt).format('DD/MM/YYYY')}}</p>
+              <q-btn v-else-if="props.row.__index === customer.payment.mandates.length - 1" color="primary" @click="preOpenESignModal(props)">
+                Signer
+              </q-btn>
+            </q-td>
+          </q-table>
         </q-card>
       </div>
       <q-modal v-model="newESignModal" @hide="checkMandates" :content-css="modalCssContainer">

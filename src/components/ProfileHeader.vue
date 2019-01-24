@@ -1,19 +1,19 @@
 <template>
   <div>
     <div class="row col-xs-12 q-mb-md">
-      <div class="row items-baseline col-xs-12 col-md-10">
+      <div :class="[customer ? 'col-xs-12': 'col-xs-8', 'row', 'items-baseline', 'col-md-10']">
         <div class="row">
           <q-icon v-if="isExternalUser" class="on-left cursor-pointer self-center" size="1rem" name="arrow_back" color="primary" @click.native="goToDirectory" />
           <h4 v-if="!customer">{{ user.firstname }} {{ user.lastname }}</h4>
           <h4 v-else>{{ user.identity.firstname }} {{ user.identity.lastname }}</h4>
         </div>
       </div>
-      <div v-if="!customer" class="row custom-justify-end col-xs-12 col-md-2">
+      <div v-if="!customer" class="row custom-justify-end col-xs-4 col-md-2">
         <img :src="hasPicture" alt="Img user" class="avatar">
       </div>
     </div>
     <div class="row col-xs-12 profile-info">
-      <div class="pl-lg col-xs-12 col-md-6">
+      <div :class="[customer ? 'col-xs-12': 'col-xs-6', 'pl-lg', 'col-md-6', 'profile-info-item']">
         <div class="row items-center">
           <div class="row items-center justify-center on-left" style="width: 17px; height: 17px">
             <div :class="[{ activeDot: user.isActive, inactiveDot: !user.isActive }]" />
@@ -25,7 +25,7 @@
           <div>Depuis le {{ userStartDate }} ({{ userRelativeStartDate }})</div>
         </div>
       </div>
-      <div v-if="!customer" class="pl-lg col-xs-12 col-md-6 row">
+      <div v-if="!customer" class="pl-lg col-xs-6 col-md-6 row profile-info-item">
         <div class="relative-position" style="width: 37px;">
           <q-icon size="36px" name="phone_iphone" color="grey-2" />
           <q-icon v-if="!user.isConfirmed" class="chip-icon" name="cancel" color="secondary" size="16px" />

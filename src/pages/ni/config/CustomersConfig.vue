@@ -5,17 +5,21 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Services</p>
         <q-card style="background: white">
-          <q-card-main>
-            <q-table :data="services" :columns="serviceColumns" hide-bottom binary-state-sort :pagination.sync="pagination" :visibleColumns="visibleColumns">
-              <q-td slot="body-cell-actions" slot-scope="props" :props="props" class="action-column">
-                <div class="row no-wrap">
-                  <q-btn flat round small color="grey" icon="history" @click.native="showHistory(props.value)" />
-                  <q-btn flat round small color="grey" icon="edit" @click.native="startEdition(props.value)" />
-                  <q-btn disable flat round small color="grey" icon="delete" @click="deleteService(props.value, props.row.__index)" />
-                </div>
+          <q-table :data="services" :columns="serviceColumns" hide-bottom binary-state-sort :pagination.sync="pagination" :visibleColumns="visibleColumns"
+            class="table-responsive">
+            <q-tr slot="body" slot-scope="props" :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+                <template v-if="col.name === 'actions'">
+                  <div class="row no-wrap table-actions">
+                    <q-btn flat round small color="grey" icon="history" @click.native="showHistory(col.value)" />
+                    <q-btn flat round small color="grey" icon="edit" @click.native="startEdition(col.value)" />
+                    <q-btn disable flat round small color="grey" icon="delete" @click="deleteService(col.value, props.row.__index)" />
+                  </div>
+                </template>
+                <template v-else>{{ col.value }}</template>
               </q-td>
-            </q-table>
-          </q-card-main>
+            </q-tr>
+          </q-table>
           <q-card-actions align="end">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter un service" @click="serviceCreationModal = true" />
           </q-card-actions>
@@ -52,17 +56,23 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Tiers payeurs</p>
         <q-card style="background: white">
-          <q-card-main>
-            <q-table :data="thirdPartyPayers" :columns="thirdPartyPayersColumns" hide-bottom binary-state-sort :pagination.sync="pagination">
-              <q-td slot="body-cell-billingMode" slot-scope="props" :props="props" class="capitalize">{{ props.value }}</q-td>
-              <q-td slot="body-cell-actions" slot-scope="props" :props="props" class="action-column">
-                <div class="row no-wrap">
-                  <q-btn flat round small color="grey" icon="delete" @click="deleteThirdPartyPayer(props.value, props.row.__index)" />
-                  <q-btn flat round small color="grey" icon="edit" @click="openThirdPartyPayerEditionModal(props.value)" />
-                </div>
+          <q-table :data="thirdPartyPayers" :columns="thirdPartyPayersColumns" hide-bottom binary-state-sort :pagination.sync="pagination"
+            class="table-responsive">
+            <q-tr slot="body" slot-scope="props" :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+                <template v-if="col.name === 'billingMode'">
+                  <div class="capitalize">{{ col.value }}</div>
+                </template>
+                <template v-else-if="col.name === 'actions'">
+                  <div class="row no-wrap table-actions">
+                    <q-btn flat round small color="grey" icon="delete" @click="deleteThirdPartyPayer(col.value, props.row.__index)" />
+                    <q-btn flat round small color="grey" icon="edit" @click="openThirdPartyPayerEditionModal(col.value)" />
+                  </div>
+                </template>
+                <template v-else>{{ col.value}}</template>
               </q-td>
-            </q-table>
-          </q-card-main>
+            </q-tr>
+          </q-table>
           <q-card-actions align="end">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter un tiers payeur" @click="thirdPartyPayerCreationModal = true" />
           </q-card-actions>
@@ -132,8 +142,12 @@
               <q-icon name="clear" size="1rem" @click.native="serviceHistoryModal = false" /></span>
           </div>
         </div>
-        <q-table class="q-mb-xl" :data="selectedService.versions" :columns="serviceColumns" hide-bottom binary-state-sort :pagination.sync="paginationHistory"
-          :visibleColumns="visibleHistoryColumns" />
+        <q-table class="q-mb-xl table-responsive" :data="selectedService.versions" :columns="serviceColumns" hide-bottom binary-state-sort :pagination.sync="paginationHistory"
+          :visibleColumns="visibleHistoryColumns">
+          <q-tr slot="body" slot-scope="props" :props="props">
+            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">{{ col.value }}</q-td>
+          </q-tr>
+        </q-table>
       </div>
     </q-modal>
 
