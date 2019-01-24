@@ -357,7 +357,7 @@
           </div>
         </div>
         <ni-modal-select caption="Tiers payeur" :options="fundingTppOptions" v-model="newFunding.thirdPartyPayer" :error="$v.newFunding.thirdPartyPayer.$error"
-          @blur="$v.newFunding.thirdPartyPayer.$touch"
+          @blur="$v.newFunding.thirdPartyPayer.$touch" requiredField
         />
         <ni-modal-input v-model="newFunding.folderNumber" caption="Numéro de dossier" />
         <ni-option-group v-model="newFunding.subscriptions" :options="fundingSubscriptionsOptions" caption="Souscriptions" type="checkbox" />
