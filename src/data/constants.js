@@ -28,3 +28,21 @@ export const CANCELLATION = 'cancellation';
 // THIRD PARTY PAYERS
 export const BILLING_INDIRECT = 'indirecte';
 export const BILLING_DIRECT = 'directe';
+
+// CUSTOMER FUNDING
+
+export const MONTHLY = 'mensuelle';
+export const WEEKLY = 'hebdomadaire';
+export const ONCE = 'une seule fois';
+export const ONE_TIME = 'forfaitaire';
+export const HOURLY = 'horaire';
+
+export const FUNDING_FREQ_OPTIONS = [
+  { label: 'Mensuelle', value: MONTHLY },
+  { label: 'Hebdomadaire', value: WEEKLY },
+  { label: 'Une seule fois', value: ONCE }
+];
+export const FUNDING_NATURE_OPTIONS = [
+  { label: 'Horaire', value: HOURLY },
+  { label: 'Forfaitaire', value: ONE_TIME }
+];

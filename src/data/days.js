@@ -5,5 +5,6 @@ export const days = [
   'Jeudi',
   'Vendredi',
   'Samedi',
-  'Dimanche'
+  'Dimanche',
+  'Jours fériés'
 ];
