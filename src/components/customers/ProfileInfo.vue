@@ -159,6 +159,12 @@
         </q-card-actions>
       </q-card>
     </div>
+    <div class="q-mb-lg">
+      <p class="text-weight-bold">Justificatifs APA ou autres financements</p>
+      <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement" @uploaded="documentUploaded" name="financialCertificates"
+        collapsibleLabel="Ajouter un justificatif" :userProfile="customerUploadData" :url="docsUploadUrl" @delete="deleteDocument($event)"
+        additionalFieldsName="financialCertificate" />
+    </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Devis</p>
@@ -358,10 +364,11 @@
         />
         <ni-modal-input v-model="newFunding.folderNumber" caption="Numéro de dossier" />
         <ni-option-group v-model="newFunding.services" :options="fundingServicesOptions" caption="Souscriptions" type="checkbox" />
-        <ni-datetime-picker v-model="newFunding.startDate" caption="Date de début de prise en charge" :min="fundingMinStartDate" />
+        <ni-datetime-picker v-model="newFunding.startDate" caption="Date de début de prise en charge" :min="fundingMinStartDate" inModal />
         <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="newFunding.frequency" />
-        <ni-datetime-picker v-if="isOneTimeFundingFrequency" v-model="newFunding.endDate" caption="Fin de prise en charge" :min="$moment(this.newFunding.startDate).add(1, 'day').toISOString()" />
-        <ni-modal-select caption="Nature" :options="fundingNatureOptions" v-model="newFunding.nature" />
+        <ni-datetime-picker v-if="isOneTimeFundingFrequency" v-model="newFunding.endDate" caption="Fin de prise en charge"
+          :min="$moment(this.newFunding.startDate).add(1, 'day').toISOString()" inModal />
+        <ni-modal-select caption="Nature" :options="fundingNatureOptions" v-model="newFunding.nature" inModal />
         <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.unitTTCPrice" caption="Prix unitaire TTC" type="number" />
         <ni-modal-input v-if="isOneTimeFundingNature" v-model="newFunding.amountTTC" caption="Montant forfaitaire TTC" type="number" />
         <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.careHours" caption="Heures prises en charge" type="number" suffix="h" />
@@ -388,9 +395,10 @@
         />
         <ni-modal-input v-model="newFunding.folderNumber" caption="Numéro de dossier" />
         <ni-option-group v-model="newFunding.services" :options="fundingServicesOptions" caption="Souscriptions" type="checkbox" />
-        <ni-datetime-picker v-model="newFunding.startDate" caption="Date de début de prise en charge" :min="fundingMinStartDate" />
+        <ni-datetime-picker v-model="newFunding.startDate" caption="Date de début de prise en charge" :min="fundingMinStartDate" inModal />
         <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="newFunding.frequency" />
-        <ni-datetime-picker v-if="isOneTimeFundingFrequency" v-model="newFunding.endDate" caption="Fin de prise en charge" :min="$moment(this.newFunding.startDate).add(1, 'day').toISOString()" />
+        <ni-datetime-picker v-if="isOneTimeFundingFrequency" v-model="newFunding.endDate" caption="Fin de prise en charge"
+          :min="$moment(this.newFunding.startDate).add(1, 'day').toISOString()" inModal />
         <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.unitTTCPrice" caption="Prix unitaire TTC" type="number" />
         <ni-modal-input v-if="isOneTimeFundingNature" v-model="newFunding.amountTTC" caption="Montant forfaitaire TTC" type="number" />
         <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.careHours" caption="Heures prises en charge" type="number" suffix="h" />
@@ -415,6 +423,7 @@ import Input from '../form/Input.vue';
 import NiModalInput from '../form/ModalInput';
 import NiModalSelect from '../form/ModalSelect';
 import NiOptionGroup from '../form/OptionGroup';
+import MultipleFilesUploader from '../form/MultipleFilesUploader.vue';
 import { frPhoneNumber, iban, bic, frAddress } from '../../helpers/vuelidateCustomVal';
 import DatetimePicker from '../form/DatetimePicker';
 import { downloadDocxFile } from '../../helpers/downloadFile';
@@ -422,6 +431,7 @@ import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
 import { days } from '../../data/days.js';
 import { FUNDING_FREQ_OPTIONS, FUNDING_NATURE_OPTIONS, ONCE, ONE_TIME } from '../../data/constants.js';
+import { financialCretificatesMixin } from '../../mixins/financialCretificatesMixin.js';
 
 export default {
   name: 'ProfileInfo',
@@ -431,9 +441,10 @@ export default {
     NiModalInput,
     NiModalSelect,
     'ni-datetime-picker': DatetimePicker,
-    NiOptionGroup
+    NiOptionGroup,
+    'ni-multiple-files-uploader': MultipleFilesUploader,
   },
-  mixins: [customerMixin, subscriptionMixin],
+  mixins: [customerMixin, subscriptionMixin, financialCretificatesMixin],
   data () {
     return {
       days,
