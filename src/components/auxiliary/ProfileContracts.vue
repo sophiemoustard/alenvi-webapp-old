@@ -578,17 +578,6 @@ export default {
     color: $primary
     text-decoration: none
 
-  /deep/ .q-uploader .q-if-inner
-    display: none
-
-  /deep/ .q-uploader input
-    cursor: pointer !important
-
-  /deep/ .q-uploader-pick-button
-    color: $primary
-    font-size: 1.5rem
-    cursor: pointer !important
-
   .missingBasicInfo
     color: red
     background: white

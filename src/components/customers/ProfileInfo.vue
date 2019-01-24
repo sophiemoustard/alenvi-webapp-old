@@ -1516,17 +1516,6 @@ export default {
     &.last
       margin-bottom: 24px
 
-  /deep/ .q-uploader .q-if-inner
-    display: none
-
-  /deep/ .q-uploader input
-    cursor: pointer !important
-
-  /deep/ .q-uploader-pick-button
-    color: $primary
-    font-size: 1.5rem
-    cursor: pointer !important
-
   .activeDot
     background: $tertiary
     width: 9px
