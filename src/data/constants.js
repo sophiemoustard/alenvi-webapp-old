@@ -26,16 +26,16 @@ export const DELETION = 'deletion';
 export const CANCELLATION = 'cancellation';
 
 // THIRD PARTY PAYERS
-export const BILLING_INDIRECT = 'indirecte';
-export const BILLING_DIRECT = 'directe';
+export const BILLING_INDIRECT = 'indirect';
+export const BILLING_DIRECT = 'direct';
 
 // CUSTOMER FUNDING
 
-export const MONTHLY = 'mensuelle';
-export const WEEKLY = 'hebdomadaire';
-export const ONCE = 'une seule fois';
-export const ONE_TIME = 'forfaitaire';
-export const HOURLY = 'horaire';
+export const MONTHLY = 'monthly';
+export const WEEKLY = 'weekly';
+export const ONCE = 'once';
+export const ONE_TIME = 'one_time';
+export const HOURLY = 'hourly';
 
 export const FUNDING_FREQ_OPTIONS = [
   { label: 'Mensuelle', value: MONTHLY },

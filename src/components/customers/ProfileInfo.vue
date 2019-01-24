@@ -848,13 +848,13 @@ export default {
       return selectedSubscription ? this.$moment(selectedSubscription.startDate).add(1, 'd').toISOString() : '';
     },
     fundingHistoryVisibleColumns () {
-      if (this.selectedFunding.nature === 'forfaitaire') {
+      if (this.selectedFunding.nature === 'one_time') {
         return ['start', 'thirdPartyPayer', 'folderNumber', 'nature', 'frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'subscriptions'];
       }
       return ['start', 'thirdPartyPayer', 'folderNumber', 'nature', 'frequency', 'unitPriceTTC', 'careHours', 'customerParticipationRate', 'careDays', 'subscriptions'];
     },
     fundingDetailsVisibleColumns () {
-      if (this.selectedFunding.nature === 'forfaitaire') {
+      if (this.selectedFunding.nature === 'one_time') {
         return ['frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'subscriptions'];
       }
       return ['frequency', 'unitPriceTTC', 'careHours', 'customerParticipationRate', 'careDays', 'subscriptions'];
