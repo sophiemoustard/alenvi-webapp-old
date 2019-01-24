@@ -661,7 +661,7 @@ export default {
           name: 'amountTTC',
           label: 'Montant forfaitaire TTC',
           align: 'left',
-          format: (value) => `${value}€`,
+          format: (value) => value ? `${value}€` : '',
           field: 'amountTTC'
         },
         {
