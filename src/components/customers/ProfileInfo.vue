@@ -893,7 +893,6 @@ export default {
     },
     fundingMinStartDate () {
       if (this.newFunding.subscriptions.length > 0) {
-        console.log(this.fundings);
         const latestFunding = this.fundings
           .filter(funding => funding.subscriptions.some(sub => this.newFunding.subscriptions.includes(sub._id)))
           .sort((a, b) => new Date(b) - new Date(a))[0];
@@ -949,7 +948,6 @@ export default {
   async mounted () {
     await this.getUserHelpers();
     await this.refreshCustomer();
-    console.log('funding options', this.fundingOptions);
     this.isLoaded = true;
   },
   methods: {
