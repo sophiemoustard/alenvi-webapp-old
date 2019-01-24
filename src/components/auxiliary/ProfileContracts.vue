@@ -191,7 +191,6 @@ export default {
           label: 'Volume horaire hebdomadaire',
           align: 'left',
           field: 'weeklyHours',
-          sortable: true
         },
         {
           name: 'startDate',
@@ -199,7 +198,6 @@ export default {
           align: 'left',
           field: 'startDate',
           format: (value) => this.$moment(value).format('DD/MM/YYYY'),
-          sortable: true,
         },
         {
           name: 'endDate',
@@ -207,35 +205,30 @@ export default {
           align: 'left',
           field: 'endDate',
           format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : '∞',
-          sortable: true
         },
         {
           name: 'grossHourlyRate',
           label: 'Taux horaire',
           align: 'left',
           field: 'grossHourlyRate',
-          sortable: true,
         },
         {
           name: 'contractEmpty',
           label: 'Contrat',
-          align: 'center',
+          align: 'left',
           field: 'contractEmpty',
-          sortable: false
         },
         {
           name: 'contractSigned',
           label: 'Contrat signé',
           align: 'center',
           field: 'contractSigned',
-          sortable: false
         },
         {
           name: 'isActive',
           label: 'Actif',
           align: 'left',
           field: 'isActive',
-          sortable: false
         },
         {
           name: 'ogustContractId',

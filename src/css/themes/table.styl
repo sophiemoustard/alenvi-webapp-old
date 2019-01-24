@@ -1,15 +1,40 @@
 
+.q-table-container
+    box-shadow: none
+
 .table-responsive
-  td
-    .datetime
-      margin: 0
-      .q-field-bottom
-        display: none
+  table
+    table-layout: fixed
+
+    th
+      white-space: normal;
+      padding: 10px 20px;
+      vertical-align: middle;
+
+    td
+      padding: 4px 20px;
+
+      .datetime
+        margin: 0
+        .q-field-bottom
+          display: none
+      
+    .email
+      word-break: break-all
+
+    .uploader-responsive
+      justify-content: center
+
+    .table-actions
+      min-width: 20px;
+      justify-content: center;
 
   @media screen and (min-width: 768px)
-    margin: .625em
+    .q-table-middle
+      margin: 10px;
 
   @media screen and (max-width: 767px)
+    margin: .625em
     table
       border: 0
 

@@ -479,29 +479,39 @@ export default {
   methods: {
     handleScroll: debounce(function (scroll) {
       const headerToFix = document.getElementsByClassName('dhx_cal_header')[0];
-      if (scroll.position >= 60 && this.width >= 768) {
-        if (this.customer && !this.$q.platform.is.mobile && this.toggleDrawer) {
-          headerToFix.classList.add('header-fixed-customer');
-          this.$refs.cal_header.style.left = `350px`
-        } else if (this.customer && !this.$q.platform.is.mobile && !this.toggleDrawer) {
-          headerToFix.classList.add('header-fixed-customer');
-        } else if (!this.customer && !this.$q.platform.is.mobile && this.toggleDrawer) {
-          headerToFix.classList.add('header-fixed');
-          this.$refs.cal_header.style.left = scheduler.getState().mode === 'month' ? '250px' : `300px`;
+      if (this.customer) {
+        if (this.width >= 768) {
+          if (scroll.position > 150) {
+            headerToFix.classList.add('header-fixed');
+
+            if (this.toggleDrawer) this.$refs.cal_header.style.left = '364px';
+            else this.$refs.cal_header.style.left = `114px`;
+          } else {
+            headerToFix.classList.remove('header-fixed');
+            this.$refs.cal_header.style.left = `50px`
+          }
         } else {
-          headerToFix.classList.add('header-fixed');
+          if (scroll.position > 115) {
+            headerToFix.classList.add('header-fixed-mobile');
+            this.$refs.cal_header.style.left = `58px`;
+          } else {
+            headerToFix.classList.remove('header-fixed-mobile');
+            this.$refs.cal_header.style.left = `50px`
+          }
         }
-      } else if (scroll.position >= 71 && this.width < 768) {
-        headerToFix.classList.add('header-fixed-customer');
-      } else if (scroll.position >= 131 && this.width < 768) {
-        headerToFix.classList.add('header-fixed');
-      } else if (scroll.position === 0 && !this.customer && this.toggleDrawer) {
-        this.$refs.cal_header.style.left = scheduler.getState().mode !== 'month' ? '50px' : `-1px`
-        headerToFix.classList.remove('header-fixed');
       } else {
-        this.$refs.cal_header.style.left = scheduler.getState().mode === 'month' ? this.$refs.cal_header.style.left : `50px`
-        headerToFix.classList.remove('header-fixed');
-        headerToFix.classList.remove('header-fixed-customer');
+        if (this.width >= 768) {
+          if (scroll.position > 110) {
+            headerToFix.classList.add('header-fixed');
+            if (this.toggleDrawer) this.$refs.cal_header.style.left = scheduler.getState().mode !== 'month' ? `300px` : '249px';
+          } else {
+            headerToFix.classList.remove('header-fixed');
+            this.$refs.cal_header.style.left = scheduler.getState().mode !== 'month' ? `50px` : '-1px'
+          }
+        } else {
+          if (scroll.position > 100) headerToFix.classList.add('header-fixed-mobile');
+          else headerToFix.classList.remove('header-fixed-mobile');
+        }
       }
     }, 10),
     onResize: debounce(function (size) {
@@ -789,8 +799,8 @@ export default {
     top: 0px !important;
   }
 
-  .header-fixed-customer {
-    top: 52px !important;
+  .header-fixed-mobile {
+    top: 50px !important;
     position: fixed;
   }
 
