@@ -144,6 +144,7 @@
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
+                    <q-btn flat round small color="grey" icon="remove_red_eye" @click.native="showFundingDetails(col.value)" />
                     <q-btn flat round small color="grey" icon="history" @click.native="showFundingHistory(col.value)" />
                     <q-btn flat round small color="grey" icon="edit" @click.native="startFundingEdition(col.value)" />
                     <q-btn flat round small color="grey" icon="delete" @click.native="removeFunding(col.value)" />
@@ -296,6 +297,30 @@
       </div>
     </q-modal>
 
+    <!-- Funding details modal -->
+    <q-modal v-model="fundingDetailsModal" :content-css="modalCssContainer">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-11">
+            <h5>Détail du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer }}</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer" style="text-align: right">
+            <span>
+              <q-icon name="clear" size="1rem" @click.native="fundingDetailsModal = false" /></span>
+          </div>
+        </div>
+        <q-table class="q-mb-xl table-grid" :data="fundings" :columns="fundingDetailsColumns" hide-bottom binary-state-sort
+           :visible-columns="fundingDetailsVisibleColumns" :rows-per-page-options="[0]">
+          <q-tr slot="body" slot-scope="props" :props="props">
+            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+              <template v-if="col.name === 'startDate'"> {{ $moment(col.value).format('DD/MM/YYYY') }} </template>
+              <template v-else>{{ col.value }}</template>
+            </q-td>
+          </q-tr>
+        </q-table>
+      </div>
+    </q-modal>
+
     <!-- Funding history modal -->
     <q-modal v-model="fundingHistoryModal" :content-css="modalCssContainer" @hide="resetFundingHistoryData">
       <div class="modal-padding">
@@ -309,7 +334,7 @@
           </div>
         </div>
         <q-table class="q-mb-xl table-grid" :data="selectedFunding.versions" :columns="fundingHistoryColumns" hide-bottom binary-state-sort
-          :pagination.sync="paginationFundingHistory" :visible-columns="fundingHistoryRows">
+          :pagination.sync="paginationFundingHistory" :visible-columns="fundingHistoryVisibleColumns">
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
               <template v-if="col.name === 'startDate'"> {{ $moment(col.value).format('DD/MM/YYYY') }} </template>
@@ -697,7 +722,59 @@ export default {
       fundingNatureOptions: FUNDING_NATURE_OPTIONS,
       fundingCreationModal: false,
       fundingEditionModal: false,
-      editedFunding: {},
+      fundingDetailsModal: false,
+      fundingDetailsColumns: [
+        {
+          name: 'frequency',
+          label: 'Fréquence',
+          align: 'left',
+          format: (value) => this.$_.capitalize(value),
+          field: 'frequency',
+        },
+        {
+          name: 'amountTTC',
+          label: 'Montant forfaitaire TTC',
+          align: 'left',
+          format: (value) => `${value}€`,
+          field: 'amountTTC'
+        },
+        {
+          name: 'unitTTCPrice',
+          label: 'Prix unitaire TTC',
+          align: 'left',
+          format: (value) => `${value}€`,
+          field: 'unitTTCPrice',
+        },
+        {
+          name: 'careHours',
+          label: 'Heures de prise en charge',
+          align: 'left',
+          format: (value) => `${value}h`,
+          field: 'careHours',
+        },
+        {
+          name: 'customerParticipationRate',
+          label: 'Tx. participation bénéficiaire',
+          align: 'left',
+          format: (value) => value ? `${value}%` : '0%',
+          field: 'customerParticipationRate',
+        },
+        {
+          name: 'careDays',
+          label: 'Jours de prise en charge',
+          align: 'left',
+          format: (value) => value.map(day => days[day]).join(', '),
+          field: 'careDays',
+        },
+        {
+          name: 'subscriptions',
+          label: 'Souscriptions',
+          align: 'left',
+          format: (value) => value.map(sub => sub.name).join(', '),
+          field: 'subscriptions',
+        }
+      ],
+      // editedFunding: {},
       pagination: {
         sortBy: 'createdAt',
         ascending: true,
@@ -769,11 +846,17 @@ export default {
       const selectedSubscription = this.subscriptions.find(sub => sub._id === this.editedSubscription._id);
       return selectedSubscription ? this.$moment(selectedSubscription.startDate).add(1, 'd').toISOString() : '';
     },
-    fundingHistoryRows () {
+    fundingHistoryVisibleColumns () {
       if (this.selectedFunding.nature === 'forfaitaire') {
         return ['start', 'thirdPartyPayer', 'folderNumber', 'nature', 'frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'subscriptions'];
       }
       return ['start', 'thirdPartyPayer', 'folderNumber', 'nature', 'frequency', 'unitPriceTTC', 'careHours', 'customerParticipationRate', 'careDays', 'subscriptions'];
+    },
+    fundingDetailsVisibleColumns () {
+      if (this.selectedFunding.nature === 'forfaitaire') {
+        return ['frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'subscriptions'];
+      }
+      return ['frequency', 'unitPriceTTC', 'careHours', 'customerParticipationRate', 'careDays', 'subscriptions'];
     },
     fundingTppOptions () {
       if (!this.company.customersConfig || !this.company.customersConfig.thirdPartyPayers) {
@@ -1368,6 +1451,10 @@ export default {
       } catch (e) {
         console.error(e);
       }
+    },
+    showFundingDetails (id) {
+      this.selectedFunding = this.fundings.find(sub => sub._id === id);
+      this.fundingDetailsModal = true;
     }
     // startFundingEdition (id) {
     //   this.editedFunding = this.fundings.find(fund => fund._id === id);
