@@ -29,9 +29,7 @@
       </div>
     </div>
     <div class="q-mb-xl">
-      <div class="row justify-between items-baseline">
-        <p class="text-weight-bold">Souscriptions</p>
-      </div>
+      <p class="text-weight-bold">Souscriptions</p>
       <q-card>
         <q-table :data="subscriptions" :columns="subscriptionsColumns" row-key="name" table-style="font-size: 1rem" hide-bottom class="table-responsive">
           <q-tr slot="body" slot-scope="props" :props="props">
@@ -65,7 +63,9 @@
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
               <template v-if="col.name === 'actions'">
-                <q-icon name="delete" size="1.2rem" color="grey" class="cursor-pointer" @click.native="removeHelper(col.value)" />
+                <div class="row no-wrap table-actions">
+                  <q-btn flat round small color="grey" icon="delete" @click.native="removeHelper(col.value)" />
+                </div>
               </template>
               <template v-else>{{ col.value }}</template>
             </q-td>
@@ -95,7 +95,7 @@
       </div>
       <q-card>
         <q-table :columns="mandateColumns" :data="customer.payment.mandates" hide-bottom :pagination.sync="pagination" :visible-columns="visibleMandateColumns"
-          binary-state-sort class="table-responsive">
+          binary-state-sort class="table-responsive mandate-table">
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
               <template v-if="col.name === 'emptyMandate'">
@@ -139,8 +139,7 @@
       </div>
       <q-card>
         <q-table :data="customer.quotes" :columns="quoteColumns" row-key="name" table-style="font-size: 1rem" hide-bottom :pagination.sync="pagination"
-          :visible-columns="visibleQuoteColumns" binary-state-sort class="table-responsive"
-        >
+          :visible-columns="visibleQuoteColumns" binary-state-sort class="table-responsive" >
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
               <template v-if="col.name === 'emptyQuote'">
@@ -348,7 +347,6 @@ export default {
           label: '',
           align: 'left',
           field: '_id',
-          style: 'width: 50px'
         }
       ],
       quoteColumns: [
@@ -361,19 +359,19 @@ export default {
         {
           name: 'emptyQuote',
           label: 'Devis',
-          align: 'left',
+          align: 'center',
           field: 'emptyQuote',
         },
         {
           name: 'signedQuote',
           label: 'Devis signé',
-          align: 'left',
+          align: 'center',
           field: 'signedQuote',
         },
         {
           name: 'signed',
           label: 'Signé',
-          align: 'left',
+          align: 'center',
           field: row => row.drive && row.drive.id,
         },
         {
@@ -410,19 +408,19 @@ export default {
         {
           name: 'emptyMandate',
           label: 'Mandat',
-          align: 'left',
+          align: 'center',
           field: 'emptyMandate',
         },
         {
           name: 'signedMandate',
           label: 'Mandat signé',
-          align: 'left',
+          align: 'center',
           field: 'signedMandate',
         },
         {
           name: 'signed',
           label: 'Signé',
-          align: 'left',
+          align: 'center',
           field: 'signedAt',
         },
         {
@@ -1002,9 +1000,6 @@ export default {
     &.last
       margin-bottom: 24px
 
-  .q-table-container
-    box-shadow: none
-
   /deep/ .q-uploader .q-if-inner
     display: none
 
@@ -1035,7 +1030,9 @@ export default {
     color: $primary
     text-decoration: none
 
-  .action-column
-    padding-left: 0px
-    padding-right: 0px
+  .mandate-table
+    /deep/ .q-table
+      margin: 10px 0px
+    td
+      word-break: break-all
 </style>

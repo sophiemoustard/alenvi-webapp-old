@@ -9,7 +9,7 @@
             <q-tr slot="body" slot-scope="props" :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
                 <template v-if="col.name === 'actions'">
-                  <div class="row no-wrap">
+                  <div class="row no-wrap table-actions">
                     <q-btn flat round small color="grey" icon="history" @click.native="showHistory(col.value)" />
                   </div>
                 </template>

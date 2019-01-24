@@ -105,4 +105,8 @@ export default {
   .hidden-menu
     @media (max-width: 767px)
       display: none
+
+  @media (max-width: 991px) and (min-width: 768px)
+    /deep/ .layout-padding
+      padding-left: 3em !important;
   </style>

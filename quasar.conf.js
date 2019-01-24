@@ -111,6 +111,7 @@ module.exports = function (ctx) {
         'QSearch',
         'QTd',
         'QTr',
+        'QTh',
         'QTabs',
         'QTab',
         'QTabPane',

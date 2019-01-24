@@ -59,7 +59,7 @@
           <q-table :data="thirdPartyPayers" :columns="thirdPartyPayersColumns" hide-bottom binary-state-sort :pagination.sync="pagination"
             class="table-responsive">
             <q-tr slot="body" slot-scope="props" :props="props">
-              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
                 <template v-if="col.name === 'billingMode'">
                   <div class="capitalize">{{ col.value }}</div>
                 </template>
@@ -296,7 +296,7 @@ export default {
         },
         {
           name: 'holidaySurcharge',
-          label: 'Majoration dimanche/jours fériés',
+          label: 'Majoration dimanche / jours fériés',
           align: 'center',
           field: row => row.holidaySurcharge && `${row.holidaySurcharge}%`,
         },
@@ -339,7 +339,7 @@ export default {
           label: 'Prix unitaire TTC par défaut',
           field: 'unitTTCPrice',
           format: val => val ? `${val}€` : '',
-          align: 'left'
+          align: 'center'
         },
         {
           name: 'billingMode',
@@ -727,8 +727,4 @@ export default {
   /deep/ .bg-negative
     background: white !important
     color: inherit !important
-
-  .action-column
-    padding-left: 0px
-    padding-right: 0px
 </style>
