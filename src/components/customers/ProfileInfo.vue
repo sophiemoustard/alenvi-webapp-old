@@ -298,7 +298,7 @@
     </q-modal>
 
     <!-- Funding details modal -->
-    <q-modal v-model="fundingDetailsModal" :content-css="modalCssContainer">
+    <q-modal v-model="fundingDetailsModal" :content-css="modalCssContainer" @hide="resetFundingDetailsData">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -309,7 +309,7 @@
               <q-icon name="clear" size="1rem" @click.native="fundingDetailsModal = false" /></span>
           </div>
         </div>
-        <q-table class="q-mb-xl table-grid" :data="fundings" :columns="fundingDetailsColumns" hide-bottom binary-state-sort
+        <q-table class="q-mb-xl table-grid" :data="fundingDetailsData" :columns="fundingDetailsColumns" hide-bottom binary-state-sort
            :visible-columns="fundingDetailsVisibleColumns" :rows-per-page-options="[0]">
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
@@ -350,7 +350,7 @@
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-8">
-            <h5>Ajouter une <span class="text-weight-bold">financement</span></h5>
+            <h5>Ajouter un <span class="text-weight-bold">financement</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
             <span><q-icon name="clear" size="1rem" @click.native="fundingCreationModal = false" /></span>
@@ -371,7 +371,7 @@
         <ni-modal-input v-model="newFunding.customerParticipationRate" caption="Heures prises en charge" type="number" suffix="%" />
         <ni-option-group v-model="newFunding.careDays" :options="daysOptions" caption="Jours pris en charge" type="checkbox" inline />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Ajouter une souscription" icon-right="add" color="primary" :loading="loading"
+      <q-btn no-caps class="full-width modal-btn" label="Ajouter un financement" icon-right="add" color="primary" :loading="loading"
         @click="submitFunding" />
     </q-modal>
 
@@ -774,6 +774,7 @@ export default {
           field: 'subscriptions',
         }
       ],
+      fundingDetailsData: [],
       // editedFunding: {},
       pagination: {
         sortBy: 'createdAt',
@@ -896,7 +897,7 @@ export default {
         const latestFunding = this.fundings
           .filter(funding => funding.subscriptions.some(sub => this.newFunding.subscriptions.includes(sub._id)))
           .sort((a, b) => new Date(b) - new Date(a))[0];
-        return latestFunding ? this.$moment(latestFunding.endDate).add(1, 'day').toISOString() : '';
+        return latestFunding && latestFunding.endDate ? this.$moment(latestFunding.endDate).add(1, 'day').toISOString() : '';
       }
     }
   },
@@ -1454,7 +1455,13 @@ export default {
     },
     showFundingDetails (id) {
       this.selectedFunding = this.fundings.find(sub => sub._id === id);
+      this.fundingDetailsData.push(this.selectedFunding);
       this.fundingDetailsModal = true;
+    },
+    resetFundingDetailsData () {
+      this.fundingDetailsModal = false;
+      this.selectedFunding = {};
+      this.fundingDetailsData = []
     }
     // startFundingEdition (id) {
     //   this.editedFunding = this.fundings.find(fund => fund._id === id);
