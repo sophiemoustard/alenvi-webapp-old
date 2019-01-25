@@ -42,7 +42,7 @@
       @click="creationModal = true" :disable="auxiliaries.length === 0" />
 
     <!-- Event creation modal -->
-    <q-modal v-model="creationModal" :content-css="modalCssContainer">
+    <q-modal v-model="creationModal" :content-css="modalCssContainer" @hide="resetCreationForm(false)">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -53,7 +53,7 @@
               <q-icon name="clear" size="1rem" @click.native="creationModal = false" /></span>
           </div>
         </div>
-        <q-btn-toggle no-wrap v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions" @input="resetCreationForm(newEvent.type)" />
+        <q-btn-toggle no-wrap v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions" @input="resetCreationForm(true, newEvent.type)" />
         <ni-modal-select caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions" :error="$v.newEvent.auxiliary.$error" />
         <template v-if="newEvent.type !== ABSENCE">
           <ni-datetime-picker caption="Date de debut" v-model="newEvent.startDate" type="datetime" :error="$v.newEvent.startDate.$error" inModal />
@@ -448,15 +448,15 @@ export default {
       };
       this.creationModal = true;
     },
-    resetCreationForm (type = INTERVENTION) {
+    resetCreationForm (partialReset, type = INTERVENTION) {
       this.$v.newEvent.$reset();
       this.newEvent = {
         type,
-        startDate: '',
+        startDate: partialReset ? this.newEvent.startDate : '',
         startDuration: '',
-        endDate: '',
+        endDate: partialReset ? this.newEvent.endDate : '',
         endDuration: '',
-        auxiliary: '',
+        auxiliary: partialReset ? this.newEvent.auxiliary : '',
         customer: '',
         subscription: '',
         sector: '',
@@ -502,7 +502,7 @@ export default {
         await this.getEvents();
         this.creationModal = false;
         this.loading = false;
-        this.resetCreationForm();
+        this.resetCreationForm(false);
         NotifyPositive('Évènement créé');
       } catch (e) {
         NotifyNegative('Erreur lors de la création de l\'évènement');
