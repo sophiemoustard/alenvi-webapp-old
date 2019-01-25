@@ -87,7 +87,7 @@
     </template>
 
     <!-- Subscription history modal -->
-    <q-modal v-model="subscriptionHistoryModal" :content-css="modalCssContainer" @hide="resetSubscriptionHistoryData">
+    <q-modal v-model="subscriptionHistoryModal" :content-css="modalSubsCssContainer" @hide="resetSubscriptionHistoryData">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -111,7 +111,7 @@
     </q-modal>
 
     <!-- Funding modal -->
-    <q-modal v-model="fundingModal" :content-css="modalCssContainer" @hide="resetFundingData">
+    <q-modal v-model="fundingModal" :content-css="modalSubsCssContainer" @hide="resetFundingData">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -123,12 +123,7 @@
             </span>
           </div>
         </div>
-        <div v-if="Object.keys(selectedFunding).length > 0" class="q-mb-md">
-          <p>Tiers-payeur: {{ selectedFunding.thirdPartyPayer }}</p>
-          <p>Dossier: {{ selectedFunding.folderNumber }}</p>
-          <p>Début de prise en charge: {{ selectedFunding.startDate ? $moment(selectedFunding.startDate).format('DD/MM/YYYY') : '' }}</p>
-        </div>
-        <q-table class="q-mb-xl table-grid" :data="fundingData" :columns="columnsFunding" hide-bottom binary-state-sort
+        <q-table class="q-mb-xl table-grid" :data="fundingData" :columns="fundingColumns" hide-bottom binary-state-sort
           :rows-per-page-options="[0]" :visible-columns="fundingVisibleColumns">
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
@@ -154,8 +149,6 @@ import { financialCertificatesMixin } from '../../mixins/financialCertificatesMi
 import { fundingMixin } from '../../mixins/fundingMixin.js';
 import esign from '../../api/Esign.js';
 import cgs from '../../statics/CGS.html';
-import { days } from '../../data/days.js';
-import { FUNDING_FREQ_OPTIONS } from '../../data/constants.js';
 
 export default {
   name: 'Subscriptions',
@@ -184,6 +177,7 @@ export default {
         minWidth: '80vw',
         minHeight: '90vh'
       },
+      modalSubsCssContainer: { minWidth: '30vw' },
       cgsModalCssContainer: {
         minWidth: '60vw',
         minHeight: '70vh',
@@ -218,67 +212,6 @@ export default {
       visibleColumnsMandates: ['rum', 'sign'],
       fundingModal: false,
       fundingData: [],
-      columnsFunding: [
-        {
-          name: 'end',
-          label: 'Fin de prise en charge',
-          align: 'left',
-          format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : '∞',
-          field: 'endDate',
-        },
-        {
-          name: 'frequency',
-          label: 'Fréquence',
-          align: 'left',
-          format: (value) => {
-            const freq = FUNDING_FREQ_OPTIONS.find(option => option.value === value);
-            return freq ? this.$_.capitalize(freq.label) : ''
-          },
-          field: 'frequency',
-        },
-        {
-          name: 'amountTTC',
-          label: 'Montant forfaitaire TTC',
-          align: 'left',
-          format: (value) => value ? `${value}€` : '',
-          field: 'amountTTC'
-        },
-        {
-          name: 'unitTTCPrice',
-          label: 'Prix unitaire TTC',
-          align: 'left',
-          format: (value) => value ? `${value}€` : '',
-          field: 'unitTTCPrice',
-        },
-        {
-          name: 'careHours',
-          label: 'Heures de prise en charge',
-          align: 'left',
-          format: (value) => value ? `${value}h` : '',
-          field: 'careHours',
-        },
-        {
-          name: 'customerParticipationRate',
-          label: 'Tx. participation bénéficiaire',
-          align: 'left',
-          format: (value) => value ? `${value}%` : '0%',
-          field: 'customerParticipationRate',
-        },
-        {
-          name: 'careDays',
-          label: 'Jours de prise en charge',
-          align: 'left',
-          format: (value) => value && value.length > 0 ? value.map(day => days[day]).join(', ') : '',
-          field: 'careDays',
-        },
-        {
-          name: 'services',
-          label: 'Souscriptions',
-          align: 'left',
-          format: (value) => value && value.length > 0 ? value.map(sub => sub.name).join(', ') : '',
-          field: 'services',
-        }
-      ],
       pagination: {
         sortBy: 'createdAt',
         ascending: true,
@@ -338,9 +271,9 @@ export default {
     },
     fundingVisibleColumns () {
       if (this.selectedFunding.nature === 'one_time') {
-        return ['nature', 'frequency', 'amountTTC', 'customerParticipationRate', 'careDays'];
+        return ['thirdPartyPayer', 'folderNumber', 'start', 'end', 'nature', 'frequency', 'amountTTC', 'customerParticipationRate', 'careDays'];
       }
-      return ['nature', 'frequency', 'unitTTCPrice', 'careHours', 'customerParticipationRate', 'careDays'];
+      return ['thirdPartyPayer', 'folderNumber', 'start', 'end', 'nature', 'frequency', 'unitTTCPrice', 'careHours', 'customerParticipationRate', 'careDays'];
     }
   },
   async mounted () {
