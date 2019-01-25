@@ -20,9 +20,10 @@
             <td>
               {{auxiliary.firstname}} {{auxiliary.lastname}}
             </td>
-            <td @drop="drop(dayIndex, auxiliary)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top" class="event-cell">
+            <td @drop="drop(dayIndex, auxiliary)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top" class="event-cell"
+              @click="openCreationModal(auxiliary, dayIndex)">
               <div :id="Math.random().toString(36).substr(2, 5)" draggable @dragstart="drag(dayIndex, event)" class="row cursor-pointer"
-              v-for="(event, eventIndex) in getAuxiliaryEvents(auxiliary, dayIndex)" :key="eventIndex" @click="openEditionModal(event)">
+                v-for="(event, eventIndex) in getAuxiliaryEvents(auxiliary, dayIndex)" :key="eventIndex" @click="openEditionModal(event)">
                 <div class="col-12 event">
                   <p class="no-margin">{{ getEventHours(event) }}</p>
                   <p v-if="event.type === INTERVENTION" class="no-margin">{{ event.customer.identity.title }} {{ event.customer.identity.lastname }}</p>
@@ -436,6 +437,16 @@ export default {
           label: sub.service.name,
           value: sub._id,
         }));
+    },
+    openCreationModal (auxiliary, dayIndex) {
+      const selectedDay = this.days[dayIndex];
+      this.newEvent = {
+        ...this.newEvent,
+        auxiliary: auxiliary._id,
+        startDate: selectedDay.hours(8).toISOString(),
+        endDate: selectedDay.hours(20).toISOString(),
+      };
+      this.creationModal = true;
     },
     resetCreationForm (type = INTERVENTION) {
       this.$v.newEvent.$reset();
