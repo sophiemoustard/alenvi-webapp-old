@@ -9,13 +9,13 @@
         <q-btn icon="chevron_right" flat round @click="goToNextWeek"></q-btn>
       </div>
       <table style="width: 100%">
+        <thead>
+          <td></td>
+          <td class="capitalize" v-for="(day, index) in daysHeader" :key="index">
+            {{day}}
+          </td>
+        </thead>
         <tbody>
-          <tr>
-            <td></td>
-            <td class="capitalize" v-for="(day, index) in daysHeader" :key="index">
-              {{day}}
-            </td>
-          </tr>
           <tr class="auxiliaries-row" v-for="(auxiliary, index) in auxiliaries" :key="index">
             <td>
               {{auxiliary.firstname}} {{auxiliary.lastname}}
@@ -37,9 +37,6 @@
         </tbody>
       </table>
     </div>
-
-    <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="ion-document" label="Ajouter un évènement"
-      @click="creationModal = true" :disable="auxiliaries.length === 0" />
 
     <!-- Event creation modal -->
     <q-modal v-model="creationModal" :content-css="modalCssContainer" @hide="resetCreationForm(false)">
