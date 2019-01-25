@@ -139,7 +139,7 @@
         <p class="text-weight-bold">Financements</p>
       </div>
       <q-card>
-        <q-table :data="fundings" :columns="fundingColumns" row-key="name" table-style="font-size: 1rem" hide-bottom class="table-responsive">
+        <q-table :data="fundings" :columns="fundingColumns" :visible-columns="fundingVisibleColumns" row-key="name" table-style="font-size: 1rem" hide-bottom class="table-responsive">
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
               <template v-if="col.name === 'actions'">
@@ -313,7 +313,7 @@
               <q-icon name="clear" size="1rem" @click.native="fundingDetailsModal = false" /></span>
           </div>
         </div>
-        <q-table class="q-mb-xl table-grid" :data="fundingDetailsData" :columns="fundingDetailsColumns" hide-bottom binary-state-sort
+        <q-table class="q-mb-xl table-grid" :data="fundingDetailsData" :columns="fundingColumns" hide-bottom binary-state-sort
            :visible-columns="fundingDetailsVisibleColumns" :rows-per-page-options="[0]">
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
@@ -336,7 +336,7 @@
               <q-icon name="clear" size="1rem" @click.native="fundingHistoryModal = false" /></span>
           </div>
         </div>
-        <q-table class="q-mb-xl table-grid" :data="selectedFunding.versions" :columns="fundingHistoryColumns" hide-bottom binary-state-sort
+        <q-table class="q-mb-xl table-grid" :data="selectedFunding.versions" :columns="fundingColumns" hide-bottom binary-state-sort
           :pagination.sync="paginationFundingHistory" :visible-columns="fundingHistoryVisibleColumns">
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
@@ -432,6 +432,7 @@ import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
 import { days } from '../../data/days.js';
 import { FUNDING_FREQ_OPTIONS, FUNDING_NATURE_OPTIONS, ONCE, ONE_TIME } from '../../data/constants.js';
 import { financialCertificatesMixin } from '../../mixins/financialCertificatesMixin.js';
+import { fundingMixin } from '../../mixins/fundingMixin.js';
 
 export default {
   name: 'ProfileInfo',
@@ -444,7 +445,7 @@ export default {
     NiOptionGroup,
     'ni-multiple-files-uploader': MultipleFilesUploader,
   },
-  mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin],
+  mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin, fundingMixin],
   data () {
     return {
       days,
@@ -587,130 +588,8 @@ export default {
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
         },
       ],
-      fundingColumns: [
-        {
-          name: 'thirdPartyPayer',
-          label: 'Tiers payeur',
-          align: 'left',
-          field: 'thirdPartyPayer',
-        },
-        {
-          name: 'folderNumber',
-          label: 'Numéro de dossier',
-          align: 'left',
-          field: 'folderNumber',
-        },
-        {
-          name: 'nature',
-          label: 'Nature',
-          align: 'left',
-          format: (value) => {
-            const nature = FUNDING_NATURE_OPTIONS.find(option => option.value === value);
-            return nature ? this.$_.capitalize(nature.label) : ''
-          },
-          field: 'nature',
-        },
-        {
-          name: 'start',
-          label: 'Début',
-          align: 'left',
-          format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : '',
-          field: 'startDate',
-        },
-        {
-          name: 'end',
-          label: 'Fin',
-          align: 'left',
-          format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : '∞',
-          field: 'endDate',
-        },
-        {
-          name: 'actions',
-          label: '',
-          align: 'left',
-          field: '_id',
-        },
-      ],
-      fundings: [],
-      selectedFunding: {},
+      fundingVisibleColumns: ['thirdPartyPayer', 'folderNumber', 'nature', 'start', 'end', 'actions'],
       fundingHistoryModal: false,
-      fundingHistoryColumns: [
-        {
-          name: 'start',
-          label: 'Date d\'effet',
-          align: 'left',
-          format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : '',
-          field: 'startDate',
-        },
-        {
-          name: 'thirdPartyPayer',
-          label: 'Tiers payeur',
-          align: 'left',
-          field: 'thirdPartyPayer',
-        },
-        {
-          name: 'folderNumber',
-          label: 'Numéro de dossier',
-          align: 'left',
-          field: 'folderNumber',
-        },
-        {
-          name: 'end',
-          label: 'Fin',
-          align: 'left',
-          format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : '',
-          field: 'endDate',
-        },
-        {
-          name: 'frequency',
-          label: 'Fréquence',
-          align: 'left',
-          format: (value) => this.$_.capitalize(value),
-          field: 'frequency',
-        },
-        {
-          name: 'amountTTC',
-          label: 'Montant forfaitaire TTC',
-          align: 'left',
-          format: (value) => value ? `${value}€` : '',
-          field: 'amountTTC'
-        },
-        {
-          name: 'unitTTCPrice',
-          label: 'Prix unitaire TTC',
-          align: 'left',
-          format: (value) => value ? `${value}€` : '',
-          field: 'unitTTCPrice',
-        },
-        {
-          name: 'careHours',
-          label: 'Heures de prise en charge',
-          align: 'left',
-          format: (value) => value ? `${value}h` : '',
-          field: 'careHours',
-        },
-        {
-          name: 'customerParticipationRate',
-          label: 'Tx. participation bénéficiaire',
-          align: 'left',
-          format: (value) => value ? `${value}%` : '0%',
-          field: 'customerParticipationRate',
-        },
-        {
-          name: 'careDays',
-          label: 'Jours de prise en charge',
-          align: 'left',
-          format: (value) => value && value.length > 0 ? value.map(day => days[day]).join(', ') : '',
-          field: 'careDays',
-        },
-        {
-          name: 'services',
-          label: 'Souscriptions',
-          align: 'left',
-          format: (value) => value && value.length > 0 ? value.map(sub => sub.name).join(', ') : '',
-          field: 'services',
-        }
-      ],
       paginationFundingHistory: {
         rowsPerPage: 0,
         sortBy: 'startDate',
@@ -734,57 +613,6 @@ export default {
       fundingCreationModal: false,
       fundingEditionModal: false,
       fundingDetailsModal: false,
-      fundingDetailsColumns: [
-        {
-          name: 'frequency',
-          label: 'Fréquence',
-          align: 'left',
-          format: (value) => this.$_.capitalize(value),
-          field: 'frequency',
-        },
-        {
-          name: 'amountTTC',
-          label: 'Montant forfaitaire TTC',
-          align: 'left',
-          format: (value) => value ? `${value}€` : '',
-          field: 'amountTTC'
-        },
-        {
-          name: 'unitTTCPrice',
-          label: 'Prix unitaire TTC',
-          align: 'left',
-          format: (value) => value ? `${value}€` : '',
-          field: 'unitTTCPrice',
-        },
-        {
-          name: 'careHours',
-          label: 'Heures de prise en charge',
-          align: 'left',
-          format: (value) => value ? `${value}h` : '',
-          field: 'careHours',
-        },
-        {
-          name: 'customerParticipationRate',
-          label: 'Tx. participation bénéficiaire',
-          align: 'left',
-          format: (value) => value ? `${value}%` : '0%',
-          field: 'customerParticipationRate',
-        },
-        {
-          name: 'careDays',
-          label: 'Jours de prise en charge',
-          align: 'left',
-          format: (value) => value && value.length > 0 ? value.map(day => days[day]).join(', ') : '',
-          field: 'careDays',
-        },
-        {
-          name: 'services',
-          label: 'Souscriptions',
-          align: 'left',
-          format: (value) => value && value.length > 0 ? value.map(sub => sub.name).join(', ') : '',
-          field: 'services',
-        }
-      ],
       fundingDetailsData: [],
       // editedFunding: {},
       pagination: {
@@ -860,15 +688,15 @@ export default {
     },
     fundingHistoryVisibleColumns () {
       if (this.selectedFunding.nature === 'one_time') {
-        return ['start', 'thirdPartyPayer', 'folderNumber', 'nature', 'frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'services'];
+        return ['start', 'thirdPartyPayer', 'folderNumber', 'frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'services'];
       }
-      return ['start', 'thirdPartyPayer', 'folderNumber', 'nature', 'frequency', 'unitPriceTTC', 'careHours', 'customerParticipationRate', 'careDays', 'services'];
+      return ['start', 'thirdPartyPayer', 'folderNumber', 'frequency', 'unitTTCPrice', 'careHours', 'customerParticipationRate', 'careDays', 'services'];
     },
     fundingDetailsVisibleColumns () {
       if (this.selectedFunding.nature === 'one_time') {
         return ['frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'services'];
       }
-      return ['frequency', 'unitPriceTTC', 'careHours', 'customerParticipationRate', 'careDays', 'services'];
+      return ['frequency', 'unitTTCPrice', 'careHours', 'customerParticipationRate', 'careDays', 'services'];
     },
     fundingTppOptions () {
       if (!this.company.customersConfig || !this.company.customersConfig.thirdPartyPayers) {
@@ -1372,24 +1200,6 @@ export default {
       }
     },
     // Fundings
-    getFundingLastVersion (funding) {
-      if (!funding.versions || funding.versions.length === 0) return {};
-
-      return funding.versions.sort((a, b) => new Date(b.startDate) - new Date(a.startDate))[0]
-    },
-    refreshFundings () {
-      try {
-        this.fundings = this.customer.fundings.map(fund => ({
-          ...this.getFundingLastVersion(fund),
-          ...fund,
-        }))
-
-        this.$store.commit('rh/saveUserProfile', this.customer);
-        this.$v.customer.$touch();
-      } catch (e) {
-        console.error(e);
-      }
-    },
     showFundingHistory (id) {
       this.selectedFunding = this.fundings.find(sub => sub._id === id);
       this.fundingHistoryModal = true;

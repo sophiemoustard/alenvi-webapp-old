@@ -10,7 +10,8 @@
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
-                    <q-btn flat round small color="grey" icon="history" @click.native="showHistory(col.value)" />
+                    <q-btn flat round small color="grey" icon="history" @click="showHistory(col.value)" />
+                    <q-btn :disable="!hasFunding(col.value)" flat round small color="grey" icon="monetization_on" @click="showFunding(col.value)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -86,7 +87,7 @@
     </template>
 
     <!-- Subscription history modal -->
-    <q-modal v-model="subscriptionHistoryModal" :content-css="modalCssContainer" @hide="resetSubscriptionHistoryData">
+    <q-modal v-model="subscriptionHistoryModal" :content-css="modalSubsCssContainer" @hide="resetSubscriptionHistoryData">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -108,6 +109,30 @@
         </q-table>
       </div>
     </q-modal>
+
+    <!-- Funding modal -->
+    <q-modal v-model="fundingModal" :content-css="modalSubsCssContainer" @hide="resetFundingData">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-11">
+            <h5 class="text-weight-bold">Financement</h5>
+          </div>
+          <div class="col-1 cursor-pointer" style="text-align: right">
+            <span>
+              <q-icon name="clear" size="1rem" @click.native="fundingModal = false" />
+            </span>
+          </div>
+        </div>
+        <q-table class="q-mb-xl table-grid" :data="fundingData" :columns="fundingColumns" hide-bottom binary-state-sort
+          :rows-per-page-options="[0]" :visible-columns="fundingVisibleColumns">
+          <q-tr slot="body" slot-scope="props" :props="props">
+            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+              <template>{{ col.value }}</template>
+            </q-td>
+          </q-tr>
+        </q-table>
+      </div>
+    </q-modal>
   </q-page>
 </template>
 
@@ -121,6 +146,7 @@ import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
 import { financialCertificatesMixin } from '../../mixins/financialCertificatesMixin.js';
+import { fundingMixin } from '../../mixins/fundingMixin.js';
 import esign from '../../api/Esign.js';
 import cgs from '../../statics/CGS.html';
 
@@ -131,7 +157,7 @@ export default {
     'ni-multiple-files-uploader': MultipleFilesUploader,
     NiModalInput
   },
-  mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin],
+  mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin, fundingMixin],
   data () {
     return {
       cgs,
@@ -151,6 +177,7 @@ export default {
         minWidth: '80vw',
         minHeight: '90vh'
       },
+      modalSubsCssContainer: { minWidth: '30vw' },
       cgsModalCssContainer: {
         minWidth: '60vw',
         minHeight: '70vh',
@@ -183,6 +210,8 @@ export default {
         }
       ],
       visibleColumnsMandates: ['rum', 'sign'],
+      fundingModal: false,
+      fundingData: [],
       pagination: {
         sortBy: 'createdAt',
         ascending: true,
@@ -240,6 +269,12 @@ export default {
     docsUploadUrl () {
       return this.customer.driveFolder ? `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.id}/upload` : '';
     },
+    fundingVisibleColumns () {
+      if (this.selectedFunding.nature === 'one_time') {
+        return ['thirdPartyPayer', 'folderNumber', 'start', 'end', 'nature', 'frequency', 'amountTTC', 'customerParticipationRate', 'careDays'];
+      }
+      return ['thirdPartyPayer', 'folderNumber', 'start', 'end', 'nature', 'frequency', 'unitTTCPrice', 'careHours', 'customerParticipationRate', 'careDays'];
+    }
   },
   async mounted () {
     await this.refreshCustomer();
@@ -251,6 +286,7 @@ export default {
         const customerRaw = await this.$customers.getById(this.helper.customers[0]._id);
         this.customer = customerRaw.data.data.customer;
         this.refreshSubscriptions();
+        this.refreshFundings();
       } catch (e) {
         console.error(e);
         this.customer = {};
@@ -412,6 +448,26 @@ export default {
       } catch (e) {
         console.error(e);
       }
+    },
+    getSubscriptionServiceId (subscriptionId) {
+      const subscription = this.subscriptions.find(sub => sub._id === subscriptionId);
+      if (!subscription) return undefined;
+      return subscription.service._id;
+    },
+    hasFunding (subscriptionId) {
+      const serviceId = this.getSubscriptionServiceId(subscriptionId);
+      if (!serviceId) return;
+      return this.fundings.find(fund => fund.services.some(service => service._id === serviceId));
+    },
+    showFunding (subscriptionId) {
+      this.selectedFunding = this.hasFunding(subscriptionId);
+      this.fundingData.push(this.selectedFunding);
+      this.fundingModal = true;
+    },
+    resetFundingData () {
+      this.selectedFunding = {};
+      this.fundingData = [];
+      this.fundingModal = false;
     }
   },
 }
