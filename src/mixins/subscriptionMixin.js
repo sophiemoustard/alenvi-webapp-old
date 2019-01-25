@@ -31,7 +31,7 @@ export const subscriptionMixin = {
         },
         {
           name: 'weeklyRate',
-          label: 'Coût hebdomadaire TTC',
+          label: 'Coût hebdomadaire TTC *',
           align: 'center',
           field: row => `${this.formatNumber(this.computeWeeklyRate(row))}€`,
         },

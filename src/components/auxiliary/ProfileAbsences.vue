@@ -42,14 +42,14 @@
         <ni-modal-select caption="Type d'absence" :error="$v.newAbsence.reason.$error" :options="reasonOptions" v-model="newAbsence.reason"
           separator @blur="$v.newAbsence.reason.$touch"
         />
-        <ni-modal-datetime-picker caption="Date de départ" :error="$v.newAbsence.startDate.$error" v-model="newAbsence.startDate"
-          :min="$moment().startOf('month').toISOString()"
+        <ni-datetime-picker caption="Date de départ" :error="$v.newAbsence.startDate.$error" v-model="newAbsence.startDate"
+          :min="$moment().startOf('month').toISOString()" inModal
         />
         <ni-modal-select caption="Durée" :error="$v.newAbsence.startDuration.$error" :options="dateOptions" v-model="newAbsence.startDuration"
           separator
         />
-        <ni-modal-datetime-picker caption="Date de fin" :error="$v.newAbsence.endDate.$error" v-model="newAbsence.endDate"
-          :disable="!newAbsence.startDate"
+        <ni-datetime-picker caption="Date de fin" :error="$v.newAbsence.endDate.$error" v-model="newAbsence.endDate"
+          :disable="!newAbsence.startDate" inModal
         />
         <ni-modal-select caption="Durée" :error="$v.newAbsence.endDuration.$error" :options="dateOptions" v-model="newAbsence.endDuration"
           separator :disable="!newAbsence.endDate || newAbsence.endDate <= newAbsence.startDate"
@@ -65,12 +65,12 @@ import { Cookies } from 'quasar';
 import { required } from 'vuelidate/lib/validators';
 import { NotifyNegative, NotifyPositive } from '../popup/notify';
 import ModalSelect from '../form/ModalSelect.vue';
-import ModalDatetimePicker from '../form/ModalDatetimePicker.vue';
+import DatetimePicker from '../form/DatetimePicker.vue';
 
 export default {
   components: {
     'ni-modal-select': ModalSelect,
-    'ni-modal-datetime-picker': ModalDatetimePicker,
+    'ni-datetime-picker': DatetimePicker,
   },
   data () {
     return {
@@ -327,16 +327,4 @@ export default {
   a
     color: $primary
     text-decoration: none
-
-  /deep/ .q-uploader .q-if-inner
-    display: none
-
-  /deep/ .q-uploader input
-    cursor: pointer !important
-
-  /deep/ .q-uploader-pick-button
-    color: $primary
-    font-size: 1.5rem
-    cursor: pointer !important
-
 </style>

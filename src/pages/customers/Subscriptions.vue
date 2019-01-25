@@ -120,9 +120,9 @@ import { bic, iban } from '../../helpers/vuelidateCustomVal';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
+import { financialCertificatesMixin } from '../../mixins/financialCertificatesMixin.js';
 import esign from '../../api/Esign.js';
 import cgs from '../../statics/CGS.html';
-import gdrive from '../../api/GoogleDrive.js';
 
 export default {
   name: 'Subscriptions',
@@ -131,7 +131,7 @@ export default {
     'ni-multiple-files-uploader': MultipleFilesUploader,
     NiModalInput
   },
-  mixins: [customerMixin, subscriptionMixin],
+  mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin],
   data () {
     return {
       cgs,
@@ -240,20 +240,13 @@ export default {
     docsUploadUrl () {
       return this.customer.driveFolder ? `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.id}/upload` : '';
     },
-    customerUploadData () {
-      return {
-        firstname: this.customer.identity.firstname || '',
-        lastname: this.customer.identity.lastname || '',
-        financialCertificates: this.customer.financialCertificates,
-      }
-    }
   },
   async mounted () {
-    await this.getCustomer();
+    await this.refreshCustomer();
     await this.checkMandates();
   },
   methods: {
-    async getCustomer () {
+    async refreshCustomer () {
       try {
         const customerRaw = await this.$customers.getById(this.helper.customers[0]._id);
         this.customer = customerRaw.data.data.customer;
@@ -303,7 +296,7 @@ export default {
           await this.updateOgustCustomer(paths);
         }
         await this.$store.dispatch('main/getUser', this.helper._id);
-        await this.getCustomer();
+        await this.refreshCustomer();
         NotifyPositive('Modification enregistrée');
         if (paths.alenvi === 'payment.iban') {
           this.$v.customer.payment.bic.$touch();
@@ -346,7 +339,7 @@ export default {
             }
           };
           await this.$customers.addSubscriptionHistory(this.customer._id, payload);
-          await this.getCustomer();
+          await this.refreshCustomer();
           NotifyPositive('Abonnement validé');
         }
       } catch (e) {
@@ -354,32 +347,6 @@ export default {
         NotifyNegative('Erreur lors de la validation de votre abonnement');
         this.customer.subscriptionsAccepted = !this.customer.subscriptionsAccepted
       }
-    },
-    // Financial certificates
-    async deleteDocument (driveId) {
-      try {
-        await this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
-          ok: true,
-          cancel: 'Annuler'
-        });
-        await gdrive.removeFileById({ id: driveId });
-
-        const payload = { 'financialCertificates': { driveId } };
-        await this.$customers.updateCertificates(this.customer._id, payload);
-        this.getCustomer();
-        NotifyPositive('Document supprimé');
-      } catch (e) {
-        console.error(e);
-        if (e.message === '') return NotifyPositive('Suppression annulée');
-
-        NotifyNegative('Erreur lors de la suppression du document');
-      }
-    },
-    async documentUploaded () {
-      await this.getCustomer();
-      NotifyPositive('Document ajouté');
     },
     // Mandate
     async preOpenESignModal (data) {
@@ -404,7 +371,7 @@ export default {
           },
           ...this.esignRedirection
         });
-        await this.getCustomer();
+        await this.refreshCustomer();
         this.$q.loading.hide();
         this.embeddedUrl = sign.data.data.signatureRequest.embeddedUrl;
         if (this.$q.platform.is.mobile) {
@@ -433,7 +400,7 @@ export default {
           }
         }
         await Promise.all(hasSignedPromises);
-        await this.getCustomer();
+        await this.refreshCustomer();
       } catch (e) {
         console.error(e);
       }

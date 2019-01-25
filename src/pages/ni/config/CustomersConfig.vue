@@ -117,8 +117,8 @@
               <q-icon name="clear" size="1rem" @click.native="serviceEditionModal = false" /></span>
           </div>
         </div>
-        <ni-modal-datetime-picker caption="Date d'effet" v-model="editedService.startDate" :error="$v.editedService.startDate.$error"
-          @blur="$v.editedService.startDate.$touch" :min="minStartDate" />
+        <ni-datetime-picker caption="Date d'effet" v-model="editedService.startDate" :error="$v.editedService.startDate.$error"
+          @blur="$v.editedService.startDate.$touch" :min="minStartDate" inModal />
         <ni-modal-input caption="Nom" v-model="editedService.name" :error="$v.editedService.name.$error" @blur="$v.editedService.name.$touch" />
         <ni-modal-input caption="Prix unitaire par défaut TTC" suffix="€" type="number" v-model="editedService.defaultUnitAmount"
           :error="$v.editedService.defaultUnitAmount.$error" @blur="$v.editedService.defaultUnitAmount.$touch"/>
@@ -209,7 +209,7 @@ import { required } from 'vuelidate/lib/validators';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
 import ModalInput from '../../../components/form/ModalInput.vue';
 import ModalSelect from '../../../components/form/ModalSelect.vue';
-import ModalDatetimePicker from '../../../components/form/ModalDatetimePicker.vue';
+import DatetimePicker from '../../../components/form/DatetimePicker.vue';
 import CustomImg from '../../../components/form/CustomImg.vue';
 import FileUploader from '../../../components/form/FileUploader.vue';
 import { configMixin } from '../../../mixins/configMixin';
@@ -227,7 +227,7 @@ export default {
     'ni-modal-select': ModalSelect,
     'ni-input': Input,
     'ni-search-address': SearchAddress,
-    'ni-modal-datetime-picker': ModalDatetimePicker,
+    'ni-datetime-picker': DatetimePicker,
   },
   mixins: [configMixin],
   data () {

@@ -12,7 +12,7 @@
       <div class="col-xs-12 col-md-6" v-for="(certificate, index) in documents" :key="index">
         <div v-if="certificate.driveId" class="justify-between row" style="background: white">
           <div class="doc-thumbnail">
-            <ni-custom-img :driveId="certificate.driveId" alt="diplôme" />
+            <ni-custom-img :driveId="certificate.driveId" alt="diplôme" :key="certificate.driveId" />
           </div>
           <div class="self-end doc-delete">
             <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(certificate.driveId)" />
@@ -62,8 +62,9 @@ export default {
     deleteDocument (documentId) {
       this.$emit('delete', documentId);
     },
-    documentUploaded () {
+    documentUploaded (file) {
       this.$emit('uploaded');
+      this.$refs[this.name].reset();
     },
     failMsg () {
       NotifyNegative('Echec de l\'envoi du document');
@@ -94,7 +95,7 @@ export default {
     },
     documents () {
       return this.$_.get(this.userProfile, this.path);
-    }
+    },
   },
 };
 </script>

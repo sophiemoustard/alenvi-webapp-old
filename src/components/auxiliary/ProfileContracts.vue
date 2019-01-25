@@ -89,7 +89,7 @@
         <ni-modal-input caption="Taux horaire" :error="$v.newContract.grossHourlyRate.$error" type="number" v-model="newContract.grossHourlyRate"
           @blur="$v.newContract.grossHourlyRate.$touch" suffix="€"
         />
-        <ni-modal-datetime-picker caption="Date d'effet" :error="$v.newContract.startDate.$error" v-model="newContract.startDate" />
+        <ni-datetime-picker caption="Date d'effet" :error="$v.newContract.startDate.$error" v-model="newContract.startDate" inModal />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer le contrat" icon-right="add" color="primary"
         :loading="loading" @click="createNewContract" />
@@ -112,8 +112,8 @@
         <ni-modal-input caption="Taux horaire"  :error="$v.newContractVersion.grossHourlyRate.$error" v-model="newContractVersion.grossHourlyRate"
           type="number" @blur="$v.newContractVersion.grossHourlyRate.$touch" suffix="€"
         />
-        <ni-modal-datetime-picker caption="Date d'effet" :error="$v.newContractVersion.startDate.$error" v-model="newContractVersion.startDate"
-          :min="getMinimalStartDate(contractSelected)"
+        <ni-datetime-picker caption="Date d'effet" :error="$v.newContractVersion.startDate.$error" v-model="newContractVersion.startDate"
+          :min="getMinimalStartDate(contractSelected)" inModal
         />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer l'avenant" icon-right="add" color="primary" :loading="loading" @click="createNewContractVersion" />
@@ -130,7 +130,7 @@
             <span><q-icon name="clear" size="1rem" @click.native="endContractModal = false" /></span>
           </div>
         </div>
-        <ni-modal-datetime-picker caption="Date de fin de contrat" v-model="endContractData.date" />
+        <ni-datetime-picker caption="Date de fin de contrat" v-model="endContractData.date" inModal />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Mettre fin au contrat" icon-right="clear" color="primary" :loading="loading" @click="endContract" />
     </q-modal>
@@ -142,7 +142,7 @@ import { Cookies } from 'quasar';
 import { required } from 'vuelidate/lib/validators';
 import ModalSelect from '../form/ModalSelect.vue';
 import ModalInput from '../form/ModalInput.vue';
-import ModalDatetimePicker from '../form/ModalDatetimePicker.vue';
+import DatetimePicker from '../form/DatetimePicker.vue';
 import { NotifyPositive, NotifyNegative } from '../popup/notify';
 import { downloadDocxFile } from '../../helpers/downloadFile';
 import nationalities from '../../data/nationalities.js';
@@ -152,7 +152,7 @@ export default {
   components: {
     'ni-modal-select': ModalSelect,
     'ni-modal-input': ModalInput,
-    'ni-modal-datetime-picker': ModalDatetimePicker,
+    'ni-datetime-picker': DatetimePicker,
   },
   data () {
     return {
@@ -576,17 +576,6 @@ export default {
   a
     color: $primary
     text-decoration: none
-
-  /deep/ .q-uploader .q-if-inner
-    display: none
-
-  /deep/ .q-uploader input
-    cursor: pointer !important
-
-  /deep/ .q-uploader-pick-button
-    color: $primary
-    font-size: 1.5rem
-    cursor: pointer !important
 
   .missingBasicInfo
     color: red

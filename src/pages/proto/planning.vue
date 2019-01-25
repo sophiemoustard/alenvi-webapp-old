@@ -54,8 +54,8 @@
         <q-btn-toggle no-wrap v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions" @input="resetCreationForm(newEvent.type)" />
         <ni-modal-select caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions" :error="$v.newEvent.auxiliary.$error" />
         <template v-if="newEvent.type !== ABSENCE">
-          <ni-modal-datetime-picker caption="Date de debut" v-model="newEvent.startDate" type="datetime" :error="$v.newEvent.startDate.$error" />
-          <ni-modal-datetime-picker caption="Date de fin" v-model="newEvent.endDate" type="datetime" :error="$v.newEvent.endDate.$error"
+          <ni-datetime-picker caption="Date de debut" v-model="newEvent.startDate" type="datetime" :error="$v.newEvent.startDate.$error" inModal />
+          <ni-datetime-picker caption="Date de fin" v-model="newEvent.endDate" type="datetime" :error="$v.newEvent.endDate.$error" inModal
             :min="minEndDate" :max="maxEndDate" />
         </template>
         <template v-if="newEvent.type === INTERVENTION">
@@ -64,10 +64,10 @@
             :error="$v.newEvent.subscription.$error" />
         </template>
         <template v-if="newEvent.type === ABSENCE">
-          <ni-modal-datetime-picker caption="Date de debut" v-model="newEvent.startDate" type="date" :error="$v.newEvent.startDate.$error" />
+          <ni-datetime-picker caption="Date de debut" v-model="newEvent.startDate" type="date" :error="$v.newEvent.startDate.$error" inModal />
           <ni-modal-select caption="Durée" :error="$v.newEvent.startDuration.$error" :options="dateOptions" v-model="newEvent.startDuration"
             separator />
-          <ni-modal-datetime-picker caption="Date de fin" v-model="newEvent.endDate" type="date" :error="$v.newEvent.endDate.$error" />
+          <ni-datetime-picker caption="Date de fin" v-model="newEvent.endDate" type="date" :error="$v.newEvent.endDate.$error" inModal />
           <ni-modal-select caption="Durée" :error="$v.newEvent.endDuration.$error" :options="dateOptions" v-model="newEvent.endDuration"
             separator />
           <ni-modal-select caption="Type d'absence" v-model="newEvent.absence" :options="absenceOptions" :error="$v.newEvent.absence.$error" />
@@ -101,18 +101,18 @@
         <template v-if="editionType === EDITION">
           <ni-modal-select caption="Auxiliaire" v-model="editedEvent.auxiliary" :options="auxiliariesOptions" :error="$v.editedEvent.auxiliary.$error" />
           <template v-if="editedEvent.type !== ABSENCE">
-            <ni-modal-datetime-picker caption="Date de début" v-model="editedEvent.startDate" type="datetime"/>
-            <ni-modal-datetime-picker caption="Date de fin" v-model="editedEvent.endDate" type="datetime" />
+            <ni-datetime-picker caption="Date de début" v-model="editedEvent.startDate" type="datetime" inModal />
+            <ni-datetime-picker caption="Date de fin" v-model="editedEvent.endDate" type="datetime" inModal />
           </template>
           <template v-if="editedEvent.type === INTERVENTION">
             <ni-modal-select caption="Service" v-model="editedEvent.subscription" :options="customerSubscriptionsOptions(editedEvent.customer._id)"
               :error="$v.editedEvent.subscription.$error" />
           </template>
           <template v-if="editedEvent.type === ABSENCE">
-            <ni-modal-datetime-picker caption="Date de debut" v-model="editedEvent.startDate" type="date" :error="$v.editedEvent.startDate.$error" />
+            <ni-datetime-picker caption="Date de debut" v-model="editedEvent.startDate" type="date" :error="$v.editedEvent.startDate.$error" inModal />
             <ni-modal-select caption="Durée" :error="$v.editedEvent.startDuration.$error" :options="dateOptions" v-model="editedEvent.startDuration"
               separator />
-            <ni-modal-datetime-picker caption="Date de fin" v-model="editedEvent.endDate" type="date" :error="$v.editedEvent.endDate.$error" />
+            <ni-datetime-picker caption="Date de fin" v-model="editedEvent.endDate" type="date" :error="$v.editedEvent.endDate.$error" inModal />
             <ni-modal-select caption="Durée" :error="$v.editedEvent.endDuration.$error" :options="dateOptions" v-model="editedEvent.endDuration"
               separator />
             <ni-modal-select caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions" :error="$v.editedEvent.absence.$error" />
@@ -144,7 +144,7 @@
 <script>
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { frAddress } from '../../helpers/vuelidateCustomVal.js'
-import ModalDatetimePicker from '../../components/form/ModalDatetimePicker.vue';
+import DatetimePicker from '../../components/form/DatetimePicker.vue';
 import ModalSelect from '../../components/form/ModalSelect';
 import SelectSector from '../../components/form/SelectSector';
 import ModalInput from '../../components/form/ModalInput.vue';
@@ -156,7 +156,7 @@ import { NotifyPositive, NotifyNegative, NotifyWarning } from '../../components/
 export default {
   name: 'PlanningManager',
   components: {
-    'ni-modal-datetime-picker': ModalDatetimePicker,
+    'ni-datetime-picker': DatetimePicker,
     'ni-modal-input': ModalInput,
     'ni-select-sector': SelectSector,
     'ni-modal-select': ModalSelect,

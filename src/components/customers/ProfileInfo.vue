@@ -97,7 +97,7 @@
         <q-table :columns="mandateColumns" :data="customer.payment.mandates" hide-bottom :pagination.sync="pagination" :visible-columns="visibleMandateColumns"
           binary-state-sort class="table-responsive mandate-table">
           <q-tr slot="body" slot-scope="props" :props="props">
-            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
               <template v-if="col.name === 'emptyMandate'">
                 <q-btn v-if="customer.payment.mandates && props.row.__index == 0" flat round small color="primary" @click="downloadMandate(props.row)">
                   <q-icon name="file download" />
@@ -123,9 +123,10 @@
                 </q-btn>
               </template>
               <template v-else-if="col.name === 'signedAt'">
-                <ni-datetime-picker v-model="customer.payment.mandates[props.row.__index].signedAt" withBorders @blur="updateSignedAt(props.row)"
-                  @focus="saveTmpSignedAt(props.row.__index)"
-                />
+                <div class="datetime">
+                  <ni-datetime-picker v-model="customer.payment.mandates[props.row.__index].signedAt" withBorders @blur="updateSignedAt(props.row)"
+                    @focus="saveTmpSignedAt(props.row.__index)" inModal />
+                </div>
               </template>
               <template v-else>{{ col.value}}</template>
             </q-td>
@@ -157,6 +158,12 @@
           <q-btn flat no-caps color="primary" icon="add" label="Ajouter un financement" @click="fundingCreationModal = true"/>
         </q-card-actions>
       </q-card>
+    </div>
+    <div class="q-mb-lg">
+      <p class="text-weight-bold">Justificatifs APA ou autres financements</p>
+      <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement" @uploaded="documentUploaded" name="financialCertificates"
+        collapsibleLabel="Ajouter un justificatif" :userProfile="customerUploadData" :url="docsUploadUrl" @delete="deleteDocument($event)"
+        additionalFieldsName="financialCertificate" />
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
@@ -260,7 +267,7 @@
           </div>
         </div>
         <ni-datetime-picker v-model="editedSubscription.startDate" :error="$v.editedSubscription.startDate.$error" caption="Dated'effet"
-          @blur="$v.editedSubscription.startDate.$touch" :min="minStartDate" />
+          @blur="$v.editedSubscription.startDate.$touch" :min="minStartDate" inModal />
         <ni-modal-input v-model="editedSubscription.unitTTCRate" :error="$v.editedSubscription.unitTTCRate.$error" caption="Prix unitaire TTC"
           @blur="$v.editedSubscription.unitTTCRate.$touch" type="number" />
         <ni-modal-input v-model="editedSubscription.estimatedWeeklyVolume" :error="$v.editedSubscription.estimatedWeeklyVolume.$error"
@@ -357,10 +364,11 @@
         />
         <ni-modal-input v-model="newFunding.folderNumber" caption="Numéro de dossier" />
         <ni-option-group v-model="newFunding.services" :options="fundingServicesOptions" caption="Souscriptions" type="checkbox" />
-        <ni-datetime-picker v-model="newFunding.startDate" caption="Date de début de prise en charge" :min="fundingMinStartDate" />
+        <ni-datetime-picker v-model="newFunding.startDate" caption="Date de début de prise en charge" :min="fundingMinStartDate" inModal />
         <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="newFunding.frequency" />
-        <ni-datetime-picker v-if="isOneTimeFundingFrequency" v-model="newFunding.endDate" caption="Fin de prise en charge" :min="$moment(this.newFunding.startDate).add(1, 'day').toISOString()" />
-        <ni-modal-select caption="Nature" :options="fundingNatureOptions" v-model="newFunding.nature" />
+        <ni-datetime-picker v-if="isOneTimeFundingFrequency" v-model="newFunding.endDate" caption="Fin de prise en charge"
+          :min="$moment(this.newFunding.startDate).add(1, 'day').toISOString()" inModal />
+        <ni-modal-select caption="Nature" :options="fundingNatureOptions" v-model="newFunding.nature" inModal />
         <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.unitTTCPrice" caption="Prix unitaire TTC" type="number" />
         <ni-modal-input v-if="isOneTimeFundingNature" v-model="newFunding.amountTTC" caption="Montant forfaitaire TTC" type="number" />
         <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.careHours" caption="Heures prises en charge" type="number" suffix="h" />
@@ -387,9 +395,10 @@
         />
         <ni-modal-input v-model="newFunding.folderNumber" caption="Numéro de dossier" />
         <ni-option-group v-model="newFunding.services" :options="fundingServicesOptions" caption="Souscriptions" type="checkbox" />
-        <ni-datetime-picker v-model="newFunding.startDate" caption="Date de début de prise en charge" :min="fundingMinStartDate" />
+        <ni-datetime-picker v-model="newFunding.startDate" caption="Date de début de prise en charge" :min="fundingMinStartDate" inModal />
         <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="newFunding.frequency" />
-        <ni-datetime-picker v-if="isOneTimeFundingFrequency" v-model="newFunding.endDate" caption="Fin de prise en charge" :min="$moment(this.newFunding.startDate).add(1, 'day').toISOString()" />
+        <ni-datetime-picker v-if="isOneTimeFundingFrequency" v-model="newFunding.endDate" caption="Fin de prise en charge"
+          :min="$moment(this.newFunding.startDate).add(1, 'day').toISOString()" inModal />
         <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.unitTTCPrice" caption="Prix unitaire TTC" type="number" />
         <ni-modal-input v-if="isOneTimeFundingNature" v-model="newFunding.amountTTC" caption="Montant forfaitaire TTC" type="number" />
         <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.careHours" caption="Heures prises en charge" type="number" suffix="h" />
@@ -414,13 +423,15 @@ import Input from '../form/Input.vue';
 import NiModalInput from '../form/ModalInput';
 import NiModalSelect from '../form/ModalSelect';
 import NiOptionGroup from '../form/OptionGroup';
+import MultipleFilesUploader from '../form/MultipleFilesUploader.vue';
 import { frPhoneNumber, iban, bic, frAddress } from '../../helpers/vuelidateCustomVal';
-import DatetimePicker from '../form/ModalDatetimePicker';
+import DatetimePicker from '../form/DatetimePicker';
 import { downloadDocxFile } from '../../helpers/downloadFile';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
 import { days } from '../../data/days.js';
 import { FUNDING_FREQ_OPTIONS, FUNDING_NATURE_OPTIONS, ONCE, ONE_TIME } from '../../data/constants.js';
+import { financialCertificatesMixin } from '../../mixins/financialCertificatesMixin.js';
 
 export default {
   name: 'ProfileInfo',
@@ -430,9 +441,10 @@ export default {
     NiModalInput,
     NiModalSelect,
     'ni-datetime-picker': DatetimePicker,
-    NiOptionGroup
+    NiOptionGroup,
+    'ni-multiple-files-uploader': MultipleFilesUploader,
   },
-  mixins: [customerMixin, subscriptionMixin],
+  mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin],
   data () {
     return {
       days,
@@ -453,6 +465,7 @@ export default {
         },
         subscriptions: [],
         quotes: [],
+        financialCertificates: [],
       },
       subscriptions: [],
       selectedSubscription: [],
@@ -1503,17 +1516,6 @@ export default {
     margin-bottom: 6px
     &.last
       margin-bottom: 24px
-
-  /deep/ .q-uploader .q-if-inner
-    display: none
-
-  /deep/ .q-uploader input
-    cursor: pointer !important
-
-  /deep/ .q-uploader-pick-button
-    color: $primary
-    font-size: 1.5rem
-    cursor: pointer !important
 
   .activeDot
     background: $tertiary
