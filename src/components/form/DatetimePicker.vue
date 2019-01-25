@@ -1,5 +1,4 @@
 <template>
-  <!-- <div class="row margin-input datetime"> -->
   <div :class="[inModal ? 'col-12' : 'col-xs-12 col-md-6']">
     <div v-if="caption" class="row justify-between">
       <p class="input-caption">{{ caption }}</p>
@@ -11,7 +10,6 @@
       />
     </q-field>
   </div>
-  <!-- </div> -->
 </template>
 
 <script>

@@ -120,7 +120,7 @@ import { bic, iban } from '../../helpers/vuelidateCustomVal';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
-import { financialCretificatesMixin } from '../../mixins/financialCretificatesMixin.js';
+import { financialCertificatesMixin } from '../../mixins/financialCertificatesMixin.js';
 import esign from '../../api/Esign.js';
 import cgs from '../../statics/CGS.html';
 
@@ -131,7 +131,7 @@ export default {
     'ni-multiple-files-uploader': MultipleFilesUploader,
     NiModalInput
   },
-  mixins: [customerMixin, subscriptionMixin, financialCretificatesMixin],
+  mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin],
   data () {
     return {
       cgs,

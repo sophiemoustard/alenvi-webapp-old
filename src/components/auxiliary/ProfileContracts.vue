@@ -57,8 +57,7 @@
           </q-card-actions>
         </q-card>
       </template>
-      <!-- <q-btn :disable="!hasBasicInfo || hasActiveContract" class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="newContractModal = true" /> -->
-      <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="newContractModal = true" />
+      <q-btn :disable="!hasBasicInfo || hasActiveContract" class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="newContractModal = true" />
       <div v-if="!hasBasicInfo" class="missingBasicInfo">
         <p>/!\ Il manque une ou des information(s) importante(s) pour pouvoir créer un nouveau contrat parmi:</p>
         <ul>

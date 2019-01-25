@@ -431,7 +431,7 @@ import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
 import { days } from '../../data/days.js';
 import { FUNDING_FREQ_OPTIONS, FUNDING_NATURE_OPTIONS, ONCE, ONE_TIME } from '../../data/constants.js';
-import { financialCretificatesMixin } from '../../mixins/financialCretificatesMixin.js';
+import { financialCertificatesMixin } from '../../mixins/financialCertificatesMixin.js';
 
 export default {
   name: 'ProfileInfo',
@@ -444,7 +444,7 @@ export default {
     NiOptionGroup,
     'ni-multiple-files-uploader': MultipleFilesUploader,
   },
-  mixins: [customerMixin, subscriptionMixin, financialCretificatesMixin],
+  mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin],
   data () {
     return {
       days,

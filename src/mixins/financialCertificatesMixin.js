@@ -1,7 +1,7 @@
 import { NotifyPositive, NotifyNegative } from '../components/popup/notify';
 import gdrive from '../api/GoogleDrive.js';
 
-export const financialCretificatesMixin = {
+export const financialCertificatesMixin = {
   data () {
     return {};
   },
