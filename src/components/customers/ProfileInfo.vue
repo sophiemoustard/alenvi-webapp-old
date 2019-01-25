@@ -432,6 +432,7 @@ import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
 import { days } from '../../data/days.js';
 import { FUNDING_FREQ_OPTIONS, FUNDING_NATURE_OPTIONS, ONCE, ONE_TIME } from '../../data/constants.js';
 import { financialCertificatesMixin } from '../../mixins/financialCertificatesMixin.js';
+import { fundingMixin } from '../../mixins/fundingMixin.js';
 
 export default {
   name: 'ProfileInfo',
@@ -444,7 +445,7 @@ export default {
     NiOptionGroup,
     'ni-multiple-files-uploader': MultipleFilesUploader,
   },
-  mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin],
+  mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin, fundingMixin],
   data () {
     return {
       days,
@@ -631,8 +632,6 @@ export default {
           field: '_id',
         },
       ],
-      fundings: [],
-      selectedFunding: {},
       fundingHistoryModal: false,
       fundingHistoryColumns: [
         {
@@ -665,7 +664,10 @@ export default {
           name: 'frequency',
           label: 'Fréquence',
           align: 'left',
-          format: (value) => this.$_.capitalize(value),
+          format: (value) => {
+            const freq = FUNDING_FREQ_OPTIONS.find(option => option.value === value);
+            return freq ? this.$_.capitalize(freq.label) : ''
+          },
           field: 'frequency',
         },
         {
@@ -739,7 +741,10 @@ export default {
           name: 'frequency',
           label: 'Fréquence',
           align: 'left',
-          format: (value) => this.$_.capitalize(value),
+          format: (value) => {
+            const freq = FUNDING_FREQ_OPTIONS.find(option => option.value === value);
+            return freq ? this.$_.capitalize(freq.label) : ''
+          },
           field: 'frequency',
         },
         {
@@ -862,13 +867,13 @@ export default {
       if (this.selectedFunding.nature === 'one_time') {
         return ['start', 'thirdPartyPayer', 'folderNumber', 'nature', 'frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'services'];
       }
-      return ['start', 'thirdPartyPayer', 'folderNumber', 'nature', 'frequency', 'unitPriceTTC', 'careHours', 'customerParticipationRate', 'careDays', 'services'];
+      return ['start', 'thirdPartyPayer', 'folderNumber', 'nature', 'frequency', 'unitTTCPrice', 'careHours', 'customerParticipationRate', 'careDays', 'services'];
     },
     fundingDetailsVisibleColumns () {
       if (this.selectedFunding.nature === 'one_time') {
         return ['frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'services'];
       }
-      return ['frequency', 'unitPriceTTC', 'careHours', 'customerParticipationRate', 'careDays', 'services'];
+      return ['frequency', 'unitTTCPrice', 'careHours', 'customerParticipationRate', 'careDays', 'services'];
     },
     fundingTppOptions () {
       if (!this.company.customersConfig || !this.company.customersConfig.thirdPartyPayers) {
@@ -1372,24 +1377,6 @@ export default {
       }
     },
     // Fundings
-    getFundingLastVersion (funding) {
-      if (!funding.versions || funding.versions.length === 0) return {};
-
-      return funding.versions.sort((a, b) => new Date(b.startDate) - new Date(a.startDate))[0]
-    },
-    refreshFundings () {
-      try {
-        this.fundings = this.customer.fundings.map(fund => ({
-          ...this.getFundingLastVersion(fund),
-          ...fund,
-        }))
-
-        this.$store.commit('rh/saveUserProfile', this.customer);
-        this.$v.customer.$touch();
-      } catch (e) {
-        console.error(e);
-      }
-    },
     showFundingHistory (id) {
       this.selectedFunding = this.fundings.find(sub => sub._id === id);
       this.fundingHistoryModal = true;
