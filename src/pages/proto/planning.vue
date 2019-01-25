@@ -410,12 +410,12 @@ export default {
     // Drag & drop
     drag (dayIndex, scheduleEvent) {
       event.dataTransfer.setData('text', event.target.id);
+      // We have source and position saving
       this.beingDragged = scheduleEvent;
       this.beingDragged.dayIndex = dayIndex;
     },
     drop (toDayIndex, toAuxiliary) {
-      // const auxiliaryEvents = this.getAuxiliaryEvents(toAuxiliary, toDayIndex);
-      // this.events.push(this.beingDragged);
+      // We have destination in data, source as well as source position
       const data = event.dataTransfer.getData('text');
       if (event.target.nodeName === 'TD') {
         event.target.appendChild(document.getElementById(data));
