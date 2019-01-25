@@ -9,26 +9,27 @@
         <q-btn icon="chevron_right" flat round @click="goToNextWeek"></q-btn>
       </div>
       <table style="width: 100%">
+        <thead>
+          <td></td>
+          <td class="capitalize" v-for="(day, index) in daysHeader" :key="index">
+            {{day}}
+          </td>
+        </thead>
         <tbody>
-          <tr>
-            <td></td>
-            <td class="capitalize" v-for="(day, index) in daysHeader" :key="index">
-              {{day}}
-            </td>
-          </tr>
           <tr class="auxiliaries-row" v-for="(auxiliary, index) in auxiliaries" :key="index">
             <td>
               {{auxiliary.firstname}} {{auxiliary.lastname}}
             </td>
-            <td @drop="drop(dayIndex, auxiliary)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top" class="event-cell">
+            <td @drop="drop(dayIndex, auxiliary)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top" class="event-cell"
+              @click="openCreationModal(dayIndex, auxiliary)">
               <div :id="Math.random().toString(36).substr(2, 5)" draggable @dragstart="drag(dayIndex, event)" class="row cursor-pointer"
-              v-for="(event, eventIndex) in getAuxiliaryEvents(auxiliary, dayIndex)" :key="eventIndex" @click="openEditionModal(event)">
+                v-for="(event, eventIndex) in getAuxiliaryEvents(auxiliary, dayIndex)" :key="eventIndex" @click.stop="openEditionModal(event)">
                 <div class="col-12 event">
                   <p class="no-margin">{{ getEventHours(event) }}</p>
                   <p v-if="event.type === INTERVENTION" class="no-margin">{{ event.customer.identity.title }} {{ event.customer.identity.lastname }}</p>
-                  <p v-if="event.type === ABSENCE">{{ displayAbsenceType(event.absence) }}</p>
-                  <p v-if="event.type === UNAVAILABILITY">Indisponibilité</p>
-                  <p v-if="event.type === INTERNAL_HOUR">{{ event.internalHour.name }}</p>
+                  <p v-if="event.type === ABSENCE" class="no-margin">{{ displayAbsenceType(event.absence) }}</p>
+                  <p v-if="event.type === UNAVAILABILITY" class="no-margin">Indisponibilité</p>
+                  <p v-if="event.type === INTERNAL_HOUR" class="no-margin">{{ event.internalHour.name }}</p>
                 </div>
               </div>
             </td>
@@ -37,11 +38,8 @@
       </table>
     </div>
 
-    <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="ion-document" label="Ajouter un évènement"
-      @click="creationModal = true" :disable="auxiliaries.length === 0" />
-
     <!-- Event creation modal -->
-    <q-modal v-model="creationModal" :content-css="modalCssContainer">
+    <q-modal v-model="creationModal" :content-css="modalCssContainer" @hide="resetCreationForm(false)">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -52,7 +50,7 @@
               <q-icon name="clear" size="1rem" @click.native="creationModal = false" /></span>
           </div>
         </div>
-        <q-btn-toggle no-wrap v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions" @input="resetCreationForm(newEvent.type)" />
+        <q-btn-toggle no-wrap v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions" @input="resetCreationForm(true, newEvent.type)" />
         <ni-modal-select caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions" :error="$v.newEvent.auxiliary.$error" />
         <template v-if="newEvent.type !== ABSENCE">
           <ni-datetime-picker caption="Date de debut" v-model="newEvent.startDate" type="datetime" :error="$v.newEvent.startDate.$error" inModal />
@@ -437,15 +435,25 @@ export default {
           value: sub._id,
         }));
     },
-    resetCreationForm (type = INTERVENTION) {
+    openCreationModal (dayIndex, auxiliary) {
+      const selectedDay = this.days[dayIndex];
+      this.newEvent = {
+        ...this.newEvent,
+        auxiliary: auxiliary._id,
+        startDate: selectedDay.hours(8).toISOString(),
+        endDate: selectedDay.hours(20).toISOString(),
+      };
+      this.creationModal = true;
+    },
+    resetCreationForm (partialReset, type = INTERVENTION) {
       this.$v.newEvent.$reset();
       this.newEvent = {
         type,
-        startDate: '',
+        startDate: partialReset ? this.newEvent.startDate : '',
         startDuration: '',
-        endDate: '',
+        endDate: partialReset ? this.newEvent.endDate : '',
         endDuration: '',
-        auxiliary: '',
+        auxiliary: partialReset ? this.newEvent.auxiliary : '',
         customer: '',
         subscription: '',
         sector: '',
@@ -491,7 +499,7 @@ export default {
         await this.getEvents();
         this.creationModal = false;
         this.loading = false;
-        this.resetCreationForm();
+        this.resetCreationForm(false);
         NotifyPositive('Évènement créé');
       } catch (e) {
         NotifyNegative('Erreur lors de la création de l\'évènement');
@@ -521,20 +529,20 @@ export default {
 
       return { startDuration, endDuration };
     },
-    openEditionModal (event) {
-      const { createdAt, updatedAt, ...eventData } = event;
-      const auxiliary = event.auxiliary._id;
-      switch (event.type) {
+    openEditionModal (editedEvent) {
+      const { createdAt, updatedAt, ...eventData } = editedEvent;
+      const auxiliary = editedEvent.auxiliary._id;
+      switch (editedEvent.type) {
         case INTERVENTION:
-          const subscription = event.subscription._id;
+          const subscription = editedEvent.subscription._id;
           this.editedEvent = { location: {}, ...eventData, auxiliary, subscription };
           break;
         case INTERNAL_HOUR:
-          const internalHour = event.internalHour._id;
+          const internalHour = editedEvent.internalHour._id;
           this.editedEvent = { location: {}, ...eventData, auxiliary, internalHour };
           break;
         case ABSENCE:
-          const { startDuration, endDuration } = this.getAbsenceDurations(event);
+          const { startDuration, endDuration } = this.getAbsenceDurations(editedEvent);
           this.editedEvent = { location: {}, attachment: {}, ...eventData, auxiliary, startDuration, endDuration };
           break;
         case UNAVAILABILITY:
