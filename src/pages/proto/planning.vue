@@ -532,20 +532,21 @@ export default {
 
       return { startDuration, endDuration };
     },
-    openEditionModal (event) {
-      const { createdAt, updatedAt, ...eventData } = event;
-      const auxiliary = event.auxiliary._id;
-      switch (event.type) {
+    openEditionModal (editedEvent) {
+      event.stopPropagation();
+      const { createdAt, updatedAt, ...eventData } = editedEvent;
+      const auxiliary = editedEvent.auxiliary._id;
+      switch (editedEvent.type) {
         case INTERVENTION:
-          const subscription = event.subscription._id;
+          const subscription = editedEvent.subscription._id;
           this.editedEvent = { location: {}, ...eventData, auxiliary, subscription };
           break;
         case INTERNAL_HOUR:
-          const internalHour = event.internalHour._id;
+          const internalHour = editedEvent.internalHour._id;
           this.editedEvent = { location: {}, ...eventData, auxiliary, internalHour };
           break;
         case ABSENCE:
-          const { startDuration, endDuration } = this.getAbsenceDurations(event);
+          const { startDuration, endDuration } = this.getAbsenceDurations(editedEvent);
           this.editedEvent = { location: {}, attachment: {}, ...eventData, auxiliary, startDuration, endDuration };
           break;
         case UNAVAILABILITY:
