@@ -65,7 +65,7 @@
                 </template>
                 <template v-else-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
-                    <q-btn flat round small color="grey" icon="delete" @click="deleteThirdPartyPayer(col.value, props.row.__index)" />
+                    <q-btn :disable="isTppUsedInFundings(props.row.__index)" flat round small color="grey" icon="delete" @click="deleteThirdPartyPayer(col.value, props.row.__index)" />
                     <q-btn flat round small color="grey" icon="edit" @click="openThirdPartyPayerEditionModal(col.value)" />
                   </div>
                 </template>
@@ -715,6 +715,9 @@ export default {
         if (e.message === '') return NotifyPositive('Suppression annulée')
         NotifyNegative('Erreur lors de la suppression du tiers payeur.');
       }
+    },
+    isTppUsedInFundings (tppIndex) {
+      return this.thirdPartyPayers[tppIndex].isUsedInFundings;
     }
   }
 }
