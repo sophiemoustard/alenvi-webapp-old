@@ -10,14 +10,14 @@
       </div>
       <table style="width: 100%">
         <thead>
-          <td></td>
-          <td class="capitalize" v-for="(day, index) in daysHeader" :key="index">
+          <th></th>
+          <th class="capitalize" v-for="(day, index) in daysHeader" :key="index">
             {{day}}
-          </td>
+          </th>
         </thead>
         <tbody>
           <tr class="auxiliaries-row" v-for="(auxiliary, index) in auxiliaries" :key="index">
-            <td>
+            <td class="event-cell" valign="top">
               {{auxiliary.firstname}} {{auxiliary.lastname}}
             </td>
             <td @drop="drop(dayIndex, auxiliary)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top" class="event-cell"
@@ -274,7 +274,7 @@ export default {
   },
   computed: {
     daysHeader () {
-      return this.days.map(day => this.$moment(day).format('dddd DD/MM'));
+      return this.days.map(day => this.$moment(day).format('dd DD'));
     },
     minEndDate () {
       return this.$moment(this.newEvent.startDate).toISOString()
@@ -381,7 +381,16 @@ export default {
     getAuxiliaryEvents (auxiliary, dayIndex) {
       return this.events
         .filter(event => event.auxiliary._id === auxiliary._id)
-        .filter(event => this.$moment(event.startDate).isSame(this.days[dayIndex], 'day'))
+        .filter(event =>
+          this.$moment(this.days[dayIndex]).isSameOrAfter(event.startDate, 'day') && this.$moment(this.days[dayIndex]).isSameOrBefore(event.endDate, 'day')
+        )
+        .map((event) => {
+          let dayEvent = { ...event };
+          if (!this.$moment(this.days[dayIndex]).isSame(event.startDate, 'day')) dayEvent.startDate = this.$moment(event.startDate).hour(8).toISOString();
+          if (!this.$moment(this.days[dayIndex]).isSame(event.endDate, 'day')) dayEvent.endDate = this.$moment(event.endDate).hour(20).toISOString();
+
+          return dayEvent;
+        })
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
     },
     getEventHours (event) {
@@ -660,12 +669,26 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+  @import '~variables';
   table
-    border-collapse: collapse
-    table-layout: fixed
+    border-collapse: collapse;
+    table-layout: fixed;
+    border-style: hidden;
+
+  td, th
+    border-left: 1px solid $light-grey;
+    border-right: 1px solid $light-grey;
+
   td
-    border: 1px solid black
-    padding: 5px
+    padding: 5px 10px;
+
+    &:before
+      content: "";
+      display: block;
+      margin: 0 auto 5px;
+      width: 80%;
+      border-bottom: 1px solid $light-grey;
+
   .planning-container
     background: white
   .event
