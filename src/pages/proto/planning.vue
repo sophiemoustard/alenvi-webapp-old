@@ -21,7 +21,7 @@
               {{auxiliary.firstname}} {{auxiliary.lastname}}
             </td>
             <td @drop="drop(dayIndex, auxiliary)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top" class="event-cell"
-              @click="openCreationModal(auxiliary, dayIndex)">
+              @click="openCreationModal(dayIndex, auxiliary)">
               <div :id="Math.random().toString(36).substr(2, 5)" draggable @dragstart="drag(dayIndex, event)" class="row cursor-pointer"
                 v-for="(event, eventIndex) in getAuxiliaryEvents(auxiliary, dayIndex)" :key="eventIndex" @click.stop="openEditionModal(event)">
                 <div class="col-12 event">
@@ -435,7 +435,7 @@ export default {
           value: sub._id,
         }));
     },
-    openCreationModal (auxiliary, dayIndex) {
+    openCreationModal (dayIndex, auxiliary) {
       const selectedDay = this.days[dayIndex];
       this.newEvent = {
         ...this.newEvent,
