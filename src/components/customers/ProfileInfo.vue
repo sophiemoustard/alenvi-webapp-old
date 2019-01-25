@@ -465,6 +465,7 @@ export default {
         },
         subscriptions: [],
         quotes: [],
+        financialCertificates: [],
       },
       subscriptions: [],
       selectedSubscription: [],

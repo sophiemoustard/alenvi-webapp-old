@@ -62,9 +62,9 @@ export default {
     deleteDocument (documentId) {
       this.$emit('delete', documentId);
     },
-    documentUploaded () {
-      this.$refs[this.name].reset();
+    documentUploaded (file) {
       this.$emit('uploaded');
+      this.$refs[this.name].reset();
     },
     failMsg () {
       NotifyNegative('Echec de l\'envoi du document');
@@ -95,7 +95,7 @@ export default {
     },
     documents () {
       return this.$_.get(this.userProfile, this.path);
-    }
+    },
   },
 };
 </script>
