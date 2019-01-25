@@ -381,7 +381,16 @@ export default {
     getAuxiliaryEvents (auxiliary, dayIndex) {
       return this.events
         .filter(event => event.auxiliary._id === auxiliary._id)
-        .filter(event => this.$moment(event.startDate).isSame(this.days[dayIndex], 'day'))
+        .filter(event =>
+          this.$moment(this.days[dayIndex]).isSameOrAfter(event.startDate, 'day') && this.$moment(this.days[dayIndex]).isSameOrBefore(event.endDate, 'day')
+        )
+        .map((event) => {
+          let dayEvent = { ...event };
+          if (!this.$moment(this.days[dayIndex]).isSame(event.startDate, 'day')) dayEvent.startDate = this.$moment(event.startDate).hour(8).toISOString();
+          if (!this.$moment(this.days[dayIndex]).isSame(event.endDate, 'day')) dayEvent.endDate = this.$moment(event.endDate).hour(20).toISOString();
+
+          return dayEvent;
+        })
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
     },
     getEventHours (event) {
