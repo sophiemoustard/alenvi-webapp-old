@@ -220,7 +220,7 @@
           </div>
         </div>
         <ni-modal-input v-model="newHelper.lastname" :error="$v.newHelper.lastname.$error" caption="Nom" @blur="$v.newHelper.lastname.$touch" />
-        <ni-modal-input v-model="newHelper.firstname" :error="$v.newHelper.firstname.$error" caption="Prénom" @blur="$v.newHelper.firstname.$touch" />
+        <ni-modal-input v-model="newHelper.firstname" caption="Prénom" />
         <ni-modal-input v-model="newHelper.local.email" last :error="$v.newHelper.local.email.$error" caption="Email"
           @blur="$v.newHelper.local.email.$touch" :errorLabel="emailError" />
       </div>
@@ -764,7 +764,6 @@ export default {
     },
     newHelper: {
       lastname: { required },
-      firstname: { required },
       local: {
         email: { required, email }
       }
@@ -1041,7 +1040,7 @@ export default {
         first_name: this.newHelper.firstname,
         email: this.newHelper.local.email
       };
-      const newHelper = await this.$ogust.createContact(payload);
+      const newHelper = await this.$ogust.createContact(this.$_.pickBy(payload));
       return newHelper;
     },
     async createAlenviHelper () {
@@ -1049,7 +1048,8 @@ export default {
       this.newHelper.customers = [this.userProfile._id];
       this.newHelper.role = 'Aidants';
       this.newHelper.company = this.company.name;
-      await this.$users.create(this.newHelper);
+      const payload = this.$_.pickBy(this.newHelper)
+      await this.$users.create(payload);
     },
     async sendWelcomingEmail () {
       await this.$email.sendWelcome({
