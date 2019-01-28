@@ -562,12 +562,6 @@ export default {
       &:hover
         background: rgba(255, 255, 255, 0.5)
 
-  .fab-add-person
-    right: 60px
-    bottom: 18px
-    font-size: 16px
-    z-index: 2
-
   /deep/ .q-option .q-option-label
     font-size: 14px
 

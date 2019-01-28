@@ -555,12 +555,6 @@ export default {
   .q-table-container
     box-shadow: none
 
-  .fab-add-person
-    right: 60px
-    bottom: 18px
-    font-size: 16px
-    z-index: 2
-
   a
     color: $primary
     text-decoration: none
