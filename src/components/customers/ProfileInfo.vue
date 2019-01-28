@@ -61,7 +61,7 @@
       <q-card>
         <q-table :data="userHelpers" :columns="helpersColumns" row-key="name" table-style="font-size: 1rem" hide-bottom class="table-responsive">
           <q-tr slot="body" slot-scope="props" :props="props">
-            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
               <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions">
                   <q-btn flat round small color="grey" icon="delete" @click.native="removeHelper(col.value)" />
@@ -141,7 +141,7 @@
       <q-card>
         <q-table :data="fundings" :columns="fundingColumns" :visible-columns="fundingVisibleColumns" row-key="name" table-style="font-size: 1rem" hide-bottom class="table-responsive">
           <q-tr slot="body" slot-scope="props" :props="props">
-            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
               <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions">
                   <q-btn flat round small color="grey" icon="remove_red_eye" @click.native="showFundingDetails(col.value)" />
@@ -482,6 +482,12 @@ export default {
           label: 'Prénom',
           align: 'left',
           field: 'firstname'
+        },
+        {
+          name: 'email',
+          label: 'Email',
+          align: 'left',
+          field: row => row.local ? row.local.email : '',
         },
         {
           name: 'startDate',
