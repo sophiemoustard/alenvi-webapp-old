@@ -562,20 +562,6 @@ export default {
       &:hover
         background: rgba(255, 255, 255, 0.5)
 
-  .activeDot
-    background: $tertiary
-    width: 9px
-    height: 9px
-    border-radius: 50%
-    display: inline-block
-
-  .inactiveDot
-    background: $primary-dark
-    width: 9px
-    height: 9px
-    border-radius: 50%
-    display: inline-block
-
   .fab-add-person
     right: 60px
     bottom: 18px

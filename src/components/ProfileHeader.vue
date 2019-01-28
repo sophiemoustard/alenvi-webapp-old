@@ -219,20 +219,6 @@ export default {
     height: 59px
     border: 1px solid #979797
 
-  .activeDot
-    background: $tertiary
-    width: 9px
-    height: 9px
-    border-radius: 50%
-    display: inline-block
-
-  .inactiveDot
-    background: $primary-dark
-    width: 9px
-    height: 9px
-    border-radius: 50%
-    display: inline-block
-
   .pl-lg
     padding-left: 28px
 

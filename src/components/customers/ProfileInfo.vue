@@ -1325,21 +1325,6 @@ export default {
     &.last
       margin-bottom: 24px
 
-  .activeDot
-    background: $tertiary
-    width: 9px
-    height: 9px
-    border-radius: 50%
-    display: inline-block
-
-  .inactiveDot
-    background: $secondary
-    width: 9px
-    height: 9px
-    border-radius: 50%
-    display: inline-block
-    margin: 0 3px
-
   a
     color: $primary
     text-decoration: none
