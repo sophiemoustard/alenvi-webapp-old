@@ -22,7 +22,7 @@
             </td>
             <td @drop="drop(day, auxiliary)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top" class="event-cell"
               @click="openCreationModal(dayIndex, auxiliary)">
-              <div :id="Math.random().toString(36).substr(2, 5)" draggable @dragstart="drag(dayIndex, event)" class="row cursor-pointer"
+              <div :id="Math.random().toString(36).substr(2, 5)" draggable @dragstart="drag(dayIndex, event._id)" class="row cursor-pointer"
                 v-for="(event, eventIndex) in getAuxiliaryEvents(auxiliary, dayIndex)" :key="eventIndex" @click.stop="openEditionModal(event)">
                 <div class="col-12 event">
                   <p class="no-margin">{{ getEventHours(event) }}</p>
@@ -648,10 +648,10 @@ export default {
       }
     },
     // Drag & drop
-    drag (dayIndex, scheduleEvent) {
+    drag (dayIndex, idEvent) {
       event.dataTransfer.setData('text', event.target.id);
       // We have source and position saving
-      this.beingDragged = scheduleEvent;
+      this.beingDragged = this.events.find(ev => ev._id === idEvent);
       this.beingDragged.dayIndex = dayIndex;
     },
     async drop (toDay, toAuxiliary) {
@@ -663,18 +663,21 @@ export default {
         if (event.target.nodeName === 'P') {
           event.target.parentNode.parentNode.parentNode.appendChild(document.getElementById(data));
         }
+        const daysRepeating = this.$moment(this.beingDragged.endDate).diff(this.$moment(this.beingDragged.startDate), 'days');
         await this.$events.updateById(this.beingDragged._id, {
-          startDate: this.$moment(toDay).hours(this.$moment(this.beingDragged.startDate).hours()).minutes(this.$moment(this.beingDragged.startDate).minutes()).toISOString(),
-          endDate: this.$moment(toDay).hours(this.$moment(this.beingDragged.endDate).hours()).minutes(this.$moment(this.beingDragged.endDate).minutes()).toISOString(),
+          startDate: this.$moment(toDay).hours(this.$moment(this.beingDragged.startDate).hours())
+            .minutes(this.$moment(this.beingDragged.startDate).minutes()).toISOString(),
+          endDate: this.$moment(toDay).add(daysRepeating, 'days').hours(this.$moment(this.beingDragged.endDate).hours())
+            .minutes(this.$moment(this.beingDragged.endDate).minutes()).toISOString(),
           auxiliary: toAuxiliary._id
         });
         NotifyPositive('Évènement modifié');
-        await this.getEvents();
       } catch (e) {
         console.error(e);
         NotifyNegative('Problème lors de la modification de l\'évènement');
       } finally {
         this.beingDragged = {};
+        await this.getEvents();
       }
     },
   }
