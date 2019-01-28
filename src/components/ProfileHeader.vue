@@ -240,11 +240,6 @@ export default {
     border-radius: 50%
     background: white
 
-  .margin-input
-    margin-bottom: 6px
-    &.last
-      margin-bottom: 24px
-
   .input-caption
     margin-bottom: 4px
 

@@ -402,11 +402,6 @@ export default {
     font-size: 16px
     z-index: 2
 
-  .margin-input
-    margin-bottom: 6px
-    &.last
-      margin-bottom: 24px
-
   /deep/ .q-option .q-option-label
     font-size: 14px
 

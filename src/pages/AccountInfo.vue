@@ -107,9 +107,4 @@ export default {
     max-width: 40%
     @media screen && (max-width: 600px)
       max-width: 100%
-
-  .margin-input
-    margin-bottom: 6px
-    &.last
-      margin-bottom: 24px
 </style>

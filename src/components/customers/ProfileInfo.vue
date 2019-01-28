@@ -1316,11 +1316,6 @@ export default {
   /deep/ i.q-checkbox-icon
     opacity: 1 !important
 
-  .margin-input
-    margin-bottom: 6px
-    &.last
-      margin-bottom: 24px
-
   a
     color: $primary
     text-decoration: none

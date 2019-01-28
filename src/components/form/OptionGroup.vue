@@ -40,11 +40,6 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables'
-  .margin-input
-    margin-bottom: 6px
-    &.last
-      margin-bottom: 24px
-
   .required::after
     content: ' *'
 </style>

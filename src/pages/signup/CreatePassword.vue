@@ -159,9 +159,4 @@ export default {
       font-size: 16px
       margin-top: 20px
       margin-bottom: 24px
-
-  .margin-input
-    margin-bottom: 6px
-    &.last
-      margin-bottom: 24px
 </style>

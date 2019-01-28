@@ -549,11 +549,6 @@ export default {
     width: 100%
     margin-bottom: 20px
 
-  .margin-input
-    margin-bottom: 6px
-    &.last
-      margin-bottom: 24px
-
   .q-field-bottom
     padding-top: 2px
 

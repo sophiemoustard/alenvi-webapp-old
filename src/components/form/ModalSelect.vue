@@ -42,9 +42,4 @@ export default {
   @import '~variables'
   .q-if-inverted
     border: 1px solid $light-grey
-
-  .margin-input
-    margin-bottom: 6px
-    &.last
-      margin-bottom: 24px
 </style>
