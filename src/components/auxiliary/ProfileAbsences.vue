@@ -312,9 +312,6 @@ export default {
   .q-field-bottom
     padding-top: 2px
 
-  .q-if-inverted
-    border: 1px solid $light-grey
-
   .q-table-container
     box-shadow: none
 

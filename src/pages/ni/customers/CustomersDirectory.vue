@@ -416,9 +416,6 @@ export default {
     font-size: 16px
     z-index: 2
 
-  .q-if-inverted
-    border: 1px solid $light-grey
-
   .bg-negative
     background: none !important
     color: inherit !important

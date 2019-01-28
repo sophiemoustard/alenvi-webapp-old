@@ -254,9 +254,6 @@ export default {
     border-radius: 50%
     background: white
 
-  .q-if-inverted
-    border: 1px solid $light-grey
-
   .margin-input
     margin-bottom: 6px
     &.last

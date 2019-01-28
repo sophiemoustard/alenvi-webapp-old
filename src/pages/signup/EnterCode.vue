@@ -64,7 +64,6 @@ export default {
       height: 50px
 
   .q-if-inverted
-    border: 1px solid $light-grey
     padding: 0
 
   .q-card-actions
