@@ -104,16 +104,4 @@ export default {
     justify-content: flex-end
     @media (max-width: 767px)
       justify-content: flex-start
-
-  .btn-icon
-    &-disabled
-      color: $light-grey
-    &-enabled
-      color: $primary
-
-  .btn-directory.q-btn /deep/
-    box-shadow: none
-    &.q-focusable:focus > .q-focus-helper
-      background: transparent
-      box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5)
 </style>

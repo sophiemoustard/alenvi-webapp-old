@@ -127,18 +127,6 @@ export default {
   .input-caption
     margin-bottom: 4px
 
-  .btn-icon
-    &-disabled
-      color: $light-grey
-    &-enabled
-      color: $primary
-
-  .btn-directory.q-btn /deep/
-    box-shadow: none
-    &.q-focusable:focus > .q-focus-helper
-      background: transparent
-      box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5)
-
   .datatable-team-row
     background: $white
     &:hover
