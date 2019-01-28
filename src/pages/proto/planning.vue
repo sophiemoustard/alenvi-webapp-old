@@ -20,7 +20,7 @@
             <td class="event-cell" valign="top">
               {{auxiliary.firstname}} {{auxiliary.lastname}}
             </td>
-            <td @drop="drop(dayIndex, auxiliary)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top" class="event-cell"
+            <td @drop="drop(day, auxiliary)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top" class="event-cell"
               @click="openCreationModal(dayIndex, auxiliary)">
               <div :id="Math.random().toString(36).substr(2, 5)" draggable @dragstart="drag(dayIndex, event)" class="row cursor-pointer"
                 v-for="(event, eventIndex) in getAuxiliaryEvents(auxiliary, dayIndex)" :key="eventIndex" @click.stop="openEditionModal(event)">
@@ -654,9 +654,8 @@ export default {
       this.beingDragged = scheduleEvent;
       this.beingDragged.dayIndex = dayIndex;
     },
-    async drop (toDayIndex, toAuxiliary) {
+    async drop (toDay, toAuxiliary) {
       try {
-        // We have destination in data, source as well as source position
         const data = event.dataTransfer.getData('text');
         if (event.target.nodeName === 'TD') {
           event.target.appendChild(document.getElementById(data));
@@ -665,12 +664,15 @@ export default {
           event.target.parentNode.parentNode.parentNode.appendChild(document.getElementById(data));
         }
         await this.$events.updateById(this.beingDragged._id, {
+          startDate: this.$moment(toDay).hours(this.$moment(this.beingDragged.startDate).hours()).minutes(this.$moment(this.beingDragged.startDate).minutes()).toISOString(),
+          endDate: this.$moment(toDay).hours(this.$moment(this.beingDragged.endDate).hours()).minutes(this.$moment(this.beingDragged.endDate).minutes()).toISOString(),
           auxiliary: toAuxiliary._id
         });
         NotifyPositive('Évènement modifié');
         await this.getEvents();
       } catch (e) {
         console.error(e);
+        NotifyNegative('Problème lors de la modification de l\'évènement');
       }
     },
   }
