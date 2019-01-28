@@ -11,23 +11,11 @@
         <q-toggle v-model="activeUsers" color="primary" label="Actifs" />
       </div>
     </div>
-    <q-table
-      :data="filteredUsers"
-      :columns="columns"
-      row-key="name"
-      binary-state-sort
-      :rows-per-page-options="[15, 25, 35]"
-      :pagination.sync="pagination"
-      :loading="tableLoading">
-      <q-tr
-        slot="body"
-        slot-scope="props"
-        :props="props"
-        :class="['datatable-row', { 'datatable-row-inactive': !props.row.isActive }]"
+    <q-table :data="filteredUsers" :columns="columns" row-key="name" binary-state-sort :rows-per-page-options="[15, 25, 35]"
+      :pagination.sync="pagination" :loading="tableLoading" class="people-list">
+      <q-tr slot="body" slot-scope="props" :props="props" :class="['datatable-row', { 'datatable-row-inactive': !props.row.isActive }]"
         @click.native="goToUserProfile(props.row.auxiliary._id)">
-        <q-td v-for="col in props.cols"
-          :key="col.name"
-          :props="props">
+        <q-td v-for="col in props.cols" :key="col.name" :props="props">
           <q-item v-if="col.name === 'name'">
             <q-item-side :avatar="getAvatar(col.value.picture)" />
             <q-item-main :label="col.value.name" />
@@ -501,60 +489,6 @@ export default {
       background: transparent
       box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5)
 
-  /deep/ .q-table
-    border-spacing: 0 12px
-    border-collapse: separate
-    &-horizontal-separator tbody td
-      border: none
-    & thead
-      border: none
-      & tr
-        height: 48px
-    & th
-      padding: 0px 12px
-      &.sortable:hover .q-icon, &.sorted .q-icon
-        color: $primary
-    & td
-      padding: 8px 12px
-      & .q-item
-        min-height: 30px
-        padding: 0
-        &-main
-          flex: 0 1 auto
-        & .q-item-side
-          min-width: 30px
-          max-height: 30px
-          & .q-item-avatar
-            width: 29px
-            height: 29px
-            border: 1px solid #979797
-        & .q-item-section + .q-item-section
-          margin-left: 20px
-    &-container
-      & .q-table-bottom
-        padding-left: 12px
-      & .q-table-nodata > i
-        display: none
-
-  .datatable-row
-    cursor: pointer
-    background: $white
-    &:hover
-      background: $white
-      box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.2)
-      & td
-        border-top: 1px solid $light-grey
-        border-bottom: 1px solid $light-grey
-        &:first-child
-          border-left: 1px solid $light-grey
-        &:last-child
-          border-right: 1px solid $light-grey
-    &-inactive
-      background: rgba(255, 255, 255, 0.5)
-      &:hover
-        background: rgba(255, 255, 255, 0.5)
-
   /deep/ .q-option .q-option-label
     font-size: 14px
-
 </style>

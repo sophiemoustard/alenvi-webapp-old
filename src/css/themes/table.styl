@@ -46,6 +46,15 @@
 .q-table-container
     box-shadow: none
 
+.q-table tbody td
+  white-space: normal
+  @media (max-width: 767px)
+    font-size: 14px
+
+.q-table th
+  @media (max-width: 767px)
+    font-size: 13px
+
 .table-responsive
   table
     table-layout: fixed
@@ -135,3 +144,57 @@
           display: inline-table
           .q-btn
             margin: 0 5px
+
+.people-list
+  .q-table
+    border-spacing: 0 12px
+    border-collapse: separate
+    &-horizontal-separator tbody td
+      border: none
+    & thead
+      border: none
+      & tr
+        height: 48px
+    & th
+      padding: 0px 12px
+      &.sortable:hover .q-icon, &.sorted .q-icon
+        color: $primary
+    & td
+      padding: 8px 12px
+      & .q-item
+        min-height: 30px
+        padding: 0
+        &-main
+          flex: 0 1 auto
+        & .q-item-side
+          min-width: 30px
+          max-height: 30px
+          & .q-item-avatar
+            width: 29px
+            height: 29px
+            border: 1px solid #979797
+        & .q-item-section + .q-item-section
+          margin-left: 20px
+    &-container
+      & .q-table-bottom
+        padding-left: 12px
+      & .q-table-nodata > i
+        display: none
+
+.datatable-row
+  cursor: pointer
+  background: $white
+  &:hover
+    background: $white !important
+    box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.2)
+    & td
+      border-top: 1px solid $light-grey
+      border-bottom: 1px solid $light-grey
+      &:first-child
+        border-left: 1px solid $light-grey
+      &:last-child
+        border-right: 1px solid $light-grey
+  &-inactive
+    background: rgba(255, 255, 255, 0.5)
+    &:hover
+      background: rgba(255, 255, 255, 0.5)
