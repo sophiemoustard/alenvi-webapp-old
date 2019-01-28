@@ -392,7 +392,7 @@
         <ni-option-group v-model="editedFunding.services" :options="fundingServicesOptions" caption="Souscriptions" type="checkbox" />
         <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="editedFunding.frequency" />
         <ni-datetime-picker v-if="isOneTimeEditedFundingFrequency" v-model="editedFunding.endDate" caption="Fin de prise en charge"
-          :min="$moment(this.editedFunding.endDate).add(1, 'day').toISOString()" inModal />
+          :min="$moment(editedFunding.endDate).add(1, 'day').toISOString()" inModal />
         <ni-modal-input v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.unitTTCPrice" caption="Prix unitaire TTC" type="number" />
         <ni-modal-input v-if="isOneTimeEditedFundingNature" v-model="editedFunding.amountTTC" caption="Montant forfaitaire TTC" type="number" />
         <ni-modal-input v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.careHours" caption="Heures prises en charge" type="number" suffix="h" />
