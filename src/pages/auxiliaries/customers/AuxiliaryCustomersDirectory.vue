@@ -128,9 +128,6 @@ export default {
     & /deep/ .q-if-control.q-icon
       margin-right: 8px
 
-  .q-table-container
-    box-shadow: none
-
   .btn-directory.q-btn /deep/
     box-shadow: none
     &.q-focusable:focus > .q-focus-helper

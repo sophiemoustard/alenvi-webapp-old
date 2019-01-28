@@ -303,9 +303,6 @@ export default {
   .q-field-bottom
     padding-top: 2px
 
-  .q-table-container
-    box-shadow: none
-
   a
     color: $primary
     text-decoration: none

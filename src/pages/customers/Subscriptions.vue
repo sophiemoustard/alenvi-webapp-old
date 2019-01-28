@@ -485,8 +485,6 @@ export default {
     background: white
     width: 100%
     margin-bottom: 10px
-  .q-table-container
-    box-shadow: none
   a
     color: $primary
     text-decoration: none

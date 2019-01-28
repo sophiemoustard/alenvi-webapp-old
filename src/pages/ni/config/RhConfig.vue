@@ -326,9 +326,6 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables'
 
-  .q-table-container
-      box-shadow: none
-
   .doc-thumbnail
     padding: 13px 0px 40px 12px
 

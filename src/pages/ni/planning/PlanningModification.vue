@@ -254,8 +254,4 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  @import '~variables'
-
-  .q-table-container
-    background: $white
 </style>

@@ -500,9 +500,6 @@ export default {
     &-enabled
       color: $primary
 
-  .q-table-container
-    box-shadow: none
-
   .btn-directory.q-btn /deep/
     box-shadow: none
     &.q-focusable:focus > .q-focus-helper

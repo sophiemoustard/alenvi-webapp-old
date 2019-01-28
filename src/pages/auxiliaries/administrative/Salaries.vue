@@ -82,9 +82,6 @@ a
   color: $primary
   text-decoration: none
 
-.q-table-container
-  box-shadow: none
-
 /deep/ .q-table
   border-spacing: 0 12px
   border-collapse: separate
