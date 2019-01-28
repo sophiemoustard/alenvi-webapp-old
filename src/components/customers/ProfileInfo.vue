@@ -123,10 +123,8 @@
                 </q-btn>
               </template>
               <template v-else-if="col.name === 'signedAt'">
-                <div class="datetime">
-                  <ni-datetime-picker v-model="customer.payment.mandates[props.row.__index].signedAt" withBorders @blur="updateSignedAt(props.row)"
-                    @focus="saveTmpSignedAt(props.row.__index)" inModal />
-                </div>
+                <ni-datetime-picker v-model="customer.payment.mandates[props.row.__index].signedAt" withBorders @blur="updateSignedAt(props.row)"
+                  @focus="saveTmpSignedAt(props.row.__index)" inModal class="datetime" />
               </template>
               <template v-else>{{ col.value}}</template>
             </q-td>
