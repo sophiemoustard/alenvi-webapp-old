@@ -61,7 +61,7 @@
       <q-card>
         <q-table :data="userHelpers" :columns="helpersColumns" row-key="name" table-style="font-size: 1rem" hide-bottom class="table-responsive">
           <q-tr slot="body" slot-scope="props" :props="props">
-            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
               <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions">
                   <q-btn flat round small color="grey" icon="delete" @click.native="removeHelper(col.value)" />
@@ -141,7 +141,7 @@
       <q-card>
         <q-table :data="fundings" :columns="fundingColumns" :visible-columns="fundingVisibleColumns" row-key="name" table-style="font-size: 1rem" hide-bottom class="table-responsive">
           <q-tr slot="body" slot-scope="props" :props="props">
-            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
               <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions">
                   <q-btn flat round small color="grey" icon="remove_red_eye" @click.native="showFundingDetails(col.value)" />
@@ -220,7 +220,7 @@
           </div>
         </div>
         <ni-modal-input v-model="newHelper.lastname" :error="$v.newHelper.lastname.$error" caption="Nom" @blur="$v.newHelper.lastname.$touch" />
-        <ni-modal-input v-model="newHelper.firstname" :error="$v.newHelper.firstname.$error" caption="Prénom" @blur="$v.newHelper.firstname.$touch" />
+        <ni-modal-input v-model="newHelper.firstname" caption="Prénom" />
         <ni-modal-input v-model="newHelper.local.email" last :error="$v.newHelper.local.email.$error" caption="Email"
           @blur="$v.newHelper.local.email.$touch" :errorLabel="emailError" />
       </div>
@@ -482,6 +482,12 @@ export default {
           label: 'Prénom',
           align: 'left',
           field: 'firstname'
+        },
+        {
+          name: 'email',
+          label: 'Email',
+          align: 'left',
+          field: row => row.local ? row.local.email : '',
         },
         {
           name: 'startDate',
@@ -758,7 +764,6 @@ export default {
     },
     newHelper: {
       lastname: { required },
-      firstname: { required },
       local: {
         email: { required, email }
       }
@@ -1035,7 +1040,7 @@ export default {
         first_name: this.newHelper.firstname,
         email: this.newHelper.local.email
       };
-      const newHelper = await this.$ogust.createContact(payload);
+      const newHelper = await this.$ogust.createContact(this.$_.pickBy(payload));
       return newHelper;
     },
     async createAlenviHelper () {
@@ -1043,7 +1048,8 @@ export default {
       this.newHelper.customers = [this.userProfile._id];
       this.newHelper.role = 'Aidants';
       this.newHelper.company = this.company.name;
-      await this.$users.create(this.newHelper);
+      const payload = this.$_.pickBy(this.newHelper)
+      await this.$users.create(payload);
     },
     async sendWelcomingEmail () {
       await this.$email.sendWelcome({
