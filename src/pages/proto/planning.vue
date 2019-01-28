@@ -654,14 +654,23 @@ export default {
       this.beingDragged = scheduleEvent;
       this.beingDragged.dayIndex = dayIndex;
     },
-    drop (toDayIndex, toAuxiliary) {
-      // We have destination in data, source as well as source position
-      const data = event.dataTransfer.getData('text');
-      if (event.target.nodeName === 'TD') {
-        event.target.appendChild(document.getElementById(data));
-      }
-      if (event.target.nodeName === 'P') {
-        event.target.parentNode.parentNode.parentNode.appendChild(document.getElementById(data));
+    async drop (toDayIndex, toAuxiliary) {
+      try {
+        // We have destination in data, source as well as source position
+        const data = event.dataTransfer.getData('text');
+        if (event.target.nodeName === 'TD') {
+          event.target.appendChild(document.getElementById(data));
+        }
+        if (event.target.nodeName === 'P') {
+          event.target.parentNode.parentNode.parentNode.appendChild(document.getElementById(data));
+        }
+        await this.$events.updateById(this.beingDragged._id, {
+          auxiliary: toAuxiliary._id
+        });
+        NotifyPositive('Évènement modifié');
+        await this.getEvents();
+      } catch (e) {
+        console.error(e);
       }
     },
   }
