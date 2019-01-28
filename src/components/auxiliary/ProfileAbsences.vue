@@ -305,10 +305,6 @@ export default {
     &.last
       margin-bottom: 24px
 
-  .bg-negative
-    background: none !important
-    color: inherit !important
-
   .q-field-bottom
     padding-top: 2px
 

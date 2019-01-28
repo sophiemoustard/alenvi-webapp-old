@@ -137,8 +137,4 @@ export default {
 
   .margin-input
     margin-bottom: 10px
-
-  .bg-negative
-    background: white !important
-    color: inherit !important
 </style>

@@ -40,11 +40,6 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables'
-
-  .bg-negative
-    background: none !important
-    color: inherit !important
-
   .margin-input
     margin-bottom: 6px
     &.last

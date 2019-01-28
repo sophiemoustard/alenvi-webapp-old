@@ -120,11 +120,6 @@ export default {
     &.last
       margin-bottom: 24px
 
-  // disable Quasar default input error colors
-  .bg-negative
-    background: white !important
-    color: black !important
-
   .neutral-background
     @media screen and (max-width: 768px)
       height: 85vh

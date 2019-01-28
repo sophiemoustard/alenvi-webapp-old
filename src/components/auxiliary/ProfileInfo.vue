@@ -894,10 +894,6 @@ export default {
   .croppa-container
     background-color: white
 
-  /deep/ .bg-negative
-    background: white !important
-    color: inherit !important
-
   .picture-container
      width: 200px
      height: 200px

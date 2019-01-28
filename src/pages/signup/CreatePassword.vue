@@ -164,10 +164,4 @@ export default {
     margin-bottom: 6px
     &.last
       margin-bottom: 24px
-
-  // disable Quasar default input error colors
-  .bg-negative
-    background: white !important
-    color: black !important
-
 </style>

@@ -651,10 +651,6 @@ export default {
   .q-datetime .q-datetime-content .modal-buttons .q-btn .q-btn-inner > div
     color: $primary !important;
 
-  .bg-negative
-    background: none !important
-    color: inherit !important
-
 </style>
 
 <style lang="css">

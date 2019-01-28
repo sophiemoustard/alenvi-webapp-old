@@ -43,10 +43,6 @@ export default {
   .q-if-inverted
     border: 1px solid $light-grey
 
-  .bg-negative
-    background: none !important
-    color: inherit !important
-
   .margin-input
     margin-bottom: 6px
     &.last

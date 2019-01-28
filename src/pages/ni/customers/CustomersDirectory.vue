@@ -402,10 +402,6 @@ export default {
     font-size: 16px
     z-index: 2
 
-  .bg-negative
-    background: none !important
-    color: inherit !important
-
   .margin-input
     margin-bottom: 6px
     &.last

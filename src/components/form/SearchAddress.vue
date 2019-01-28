@@ -64,8 +64,4 @@ export default {
 
   .borders
     border: 1px solid $light-grey !important
-
-  .bg-negative
-    background: none !important
-    color: inherit !important
 </style>

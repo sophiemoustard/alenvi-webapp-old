@@ -329,10 +329,6 @@ export default {
   .q-table-container
       box-shadow: none
 
-  /deep/ .bg-negative
-    background: white !important
-    color: inherit !important
-
   .doc-thumbnail
     padding: 13px 0px 40px 12px
 

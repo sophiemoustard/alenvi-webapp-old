@@ -557,10 +557,6 @@ export default {
   .q-field-bottom
     padding-top: 2px
 
-  .bg-negative
-    background: none !important
-    color: inherit !important
-
   .q-table-container
     box-shadow: none
 

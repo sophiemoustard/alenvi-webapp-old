@@ -1296,10 +1296,6 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables';
 
-  /deep/ .bg-negative
-    background: white !important
-    color: inherit !important
-
   .q-card
     background: white
     width: 100%
