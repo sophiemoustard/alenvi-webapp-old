@@ -23,7 +23,7 @@
             <td @drop="drop(day, auxiliary)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top" class="event-cell"
               @click="openCreationModal(dayIndex, auxiliary)">
               <div :id="Math.random().toString(36).substr(2, 5)" draggable @dragstart="drag(dayIndex, event._id)" class="row cursor-pointer"
-                v-for="(event, eventIndex) in getAuxiliaryEvents(auxiliary, dayIndex)" :key="eventIndex" @click.stop="openEditionModal(event)">
+                v-for="(event, eventIndex) in getOneDayAuxiliaryEvents(auxiliary, days[dayIndex])" :key="eventIndex" @click.stop="openEditionModal(event._id)">
                 <div class="col-12 event">
                   <p class="no-margin">{{ getEventHours(event) }}</p>
                   <p v-if="event.type === INTERVENTION" class="no-margin">{{ event.customer.identity.title }} {{ event.customer.identity.lastname }}</p>
@@ -85,7 +85,7 @@
     </q-modal>
 
     <!-- Event edition modal -->
-    <q-modal v-model="editionModal" :content-css="modalCssContainer">
+    <q-modal v-model="editionModal" :content-css="modalCssContainer" @hide="resetEditionForm()">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -378,18 +378,27 @@ export default {
       this.days = Array.from(range.by('days'));
     },
     // Event display
-    getAuxiliaryEvents (auxiliary, dayIndex) {
+    getOneDayAuxiliaryEvents (auxiliary, day) {
       return this.events
         .filter(event => event.auxiliary._id === auxiliary._id)
         .filter(event =>
-          this.$moment(this.days[dayIndex]).isSameOrAfter(event.startDate, 'day') && this.$moment(this.days[dayIndex]).isSameOrBefore(event.endDate, 'day')
+          this.$moment(day).isSameOrAfter(event.startDate, 'day') && this.$moment(day).isSameOrBefore(event.endDate, 'day')
         )
         .map((event) => {
           let dayEvent = { ...event };
-          if (!this.$moment(this.days[dayIndex]).isSame(event.startDate, 'day')) dayEvent.startDate = this.$moment(event.startDate).hour(8).toISOString();
-          if (!this.$moment(this.days[dayIndex]).isSame(event.endDate, 'day')) dayEvent.endDate = this.$moment(event.endDate).hour(20).toISOString();
+          if (!this.$moment(day).isSame(event.startDate, 'day')) dayEvent.startDate = this.$moment(day).hour(8).toISOString();
+          if (!this.$moment(day).isSame(event.endDate, 'day')) dayEvent.endDate = this.$moment(day).hour(20).toISOString();
 
           return dayEvent;
+        })
+        .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+    },
+    getAuxiliaryEventsBetweenDates (auxiliaryId, startDate, endDate) {
+      return this.events
+        .filter(event => event.auxiliary._id === auxiliaryId)
+        .filter(event => {
+          return this.$moment(event.startDate).isBetween(startDate, endDate, 'minutes', '()') ||
+            this.$moment(startDate).isBetween(event.startDate, event.endDate, 'minutes', '()')
         })
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
     },
@@ -444,6 +453,14 @@ export default {
           value: sub._id,
         }));
     },
+    hasConflicts (scheduledEvent, auxiliaryId) {
+      const auxiliaryEvents = this.getAuxiliaryEventsBetweenDates(auxiliaryId, scheduledEvent.startDate, scheduledEvent.endDate);
+      return auxiliaryEvents.some(ev => {
+        if (scheduledEvent._id && scheduledEvent._id === ev._id) return false;
+        return this.$moment(scheduledEvent.startDate).isBetween(ev.startDate, ev.endDate, 'minutes', '[]') ||
+          this.$moment(ev.startDate).isBetween(scheduledEvent.startDate, scheduledEvent.endDate, 'minutes', '[]');
+      });
+    },
     openCreationModal (dayIndex, auxiliary) {
       const selectedDay = this.days[dayIndex];
       this.newEvent = {
@@ -473,8 +490,7 @@ export default {
       };
     },
     getPayload (event) {
-      const { _id, ...eventData } = event;
-      let payload = { ...eventData }
+      let payload = { ...event }
       if (event.type === INTERNAL_HOUR) {
         const internalHour = this.internalHours.find(hour => hour._id === event.internalHour);
         payload.internalHour = internalHour;
@@ -503,6 +519,11 @@ export default {
 
         this.loading = true;
         const payload = this.getPayload(this.newEvent);
+
+        if (this.hasConflicts(payload, payload.auxiliary, payload.startDate)) {
+          return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
+        }
+
         await this.$events.create(payload);
 
         await this.getEvents();
@@ -538,7 +559,8 @@ export default {
 
       return { startDuration, endDuration };
     },
-    openEditionModal (editedEvent) {
+    openEditionModal (eventId) {
+      const editedEvent = this.events.find(ev => ev._id === eventId);
       const { createdAt, updatedAt, ...eventData } = editedEvent;
       const auxiliary = editedEvent.auxiliary._id;
       switch (editedEvent.type) {
@@ -577,8 +599,14 @@ export default {
 
         this.loading = true;
         const payload = this.getPayload(this.editedEvent);
+
+        if (this.hasConflicts(payload, payload.auxiliary, payload.startDate)) {
+          return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
+        }
+
         delete payload.customer;
         delete payload.type;
+        delete payload._id
         await this.$events.updateById(this.editedEvent._id, payload);
         NotifyPositive('Évènement modifié');
 
