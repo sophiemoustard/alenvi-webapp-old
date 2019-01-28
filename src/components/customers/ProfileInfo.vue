@@ -309,6 +309,12 @@ export default {
           field: 'firstname'
         },
         {
+          name: 'email',
+          label: 'Email',
+          align: 'left',
+          field: row => row.local ? row.local.email : '',
+        },
+        {
           name: 'startDate',
           label: 'Depuis le...',
           field: 'createdAt',
