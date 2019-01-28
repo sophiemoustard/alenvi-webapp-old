@@ -40,19 +40,6 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables'
-
-  .q-if-inverted
-    border: 1px solid $light-grey
-
-  .bg-negative
-    background: none !important
-    color: inherit !important
-
-  .margin-input
-    margin-bottom: 6px
-    &.last
-      margin-bottom: 24px
-
   .required::after
     content: ' *'
 </style>

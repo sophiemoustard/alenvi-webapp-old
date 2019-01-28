@@ -138,9 +138,6 @@ export default {
   &:hover
     color: #ff1693 !important
 
-/*.q-card-title
-  font-family: alenviTitleFont */
-
 .q-card-title
   line-height: 1.5rem;
 

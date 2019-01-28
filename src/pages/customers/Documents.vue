@@ -162,8 +162,4 @@ export default {
 .title
   font-size: 1.5em
   margin-bottom: 20px
-
-a
-  color: $primary
-  text-decoration: none
 </style>

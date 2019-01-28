@@ -298,33 +298,4 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  @import '~variables';
-
-  .margin-input
-    margin-bottom: 6px
-    &.last
-      margin-bottom: 24px
-
-  .bg-negative
-    background: none !important
-    color: inherit !important
-
-  .q-field-bottom
-    padding-top: 2px
-
-  .q-if-inverted
-    border: 1px solid $light-grey
-
-  .q-table-container
-    box-shadow: none
-
-  .fab-add-person
-    right: 60px
-    bottom: 18px
-    font-size: 16px
-    z-index: 2
-
-  a
-    color: $primary
-    text-decoration: none
 </style>

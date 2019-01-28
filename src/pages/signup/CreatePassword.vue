@@ -159,15 +159,4 @@ export default {
       font-size: 16px
       margin-top: 20px
       margin-bottom: 24px
-
-  .margin-input
-    margin-bottom: 6px
-    &.last
-      margin-bottom: 24px
-
-  // disable Quasar default input error colors
-  .bg-negative
-    background: white !important
-    color: black !important
-
 </style>

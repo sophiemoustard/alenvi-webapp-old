@@ -108,6 +108,9 @@ export default {
 
   .doc-delete
     padding: 0px 14px 17px 0px
+    .q-btn
+      @media screen and (max-width: 767px)
+        margin: 0px 5px
 
   /deep/ .q-collapsible-inner
     & .q-item

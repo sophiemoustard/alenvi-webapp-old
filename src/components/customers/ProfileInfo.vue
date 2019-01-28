@@ -123,10 +123,8 @@
                 </q-btn>
               </template>
               <template v-else-if="col.name === 'signedAt'">
-                <div class="datetime">
-                  <ni-datetime-picker v-model="customer.payment.mandates[props.row.__index].signedAt" withBorders @blur="updateSignedAt(props.row)"
-                    @focus="saveTmpSignedAt(props.row.__index)" inModal />
-                </div>
+                <ni-datetime-picker v-model="customer.payment.mandates[props.row.__index].signedAt" withBorders @blur="updateSignedAt(props.row)"
+                  @focus="saveTmpSignedAt(props.row.__index)" inModal class="datetime" />
               </template>
               <template v-else>{{ col.value}}</template>
             </q-td>
@@ -1304,10 +1302,6 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables';
 
-  /deep/ .bg-negative
-    background: white !important
-    color: inherit !important
-
   .q-card
     background: white
     width: 100%
@@ -1315,9 +1309,6 @@ export default {
 
   .q-checkbox
     font-size: 12px
-
-  /deep/ .q-card-title
-    font-size: 16px
 
   /deep/ .q-option-inner
     margin-right: 5px
@@ -1327,26 +1318,6 @@ export default {
 
   /deep/ i.q-checkbox-icon
     opacity: 1 !important
-
-  .margin-input
-    margin-bottom: 6px
-    &.last
-      margin-bottom: 24px
-
-  .activeDot
-    background: $tertiary
-    width: 9px
-    height: 9px
-    border-radius: 50%
-    display: inline-block
-
-  .inactiveDot
-    background: $secondary
-    width: 9px
-    height: 9px
-    border-radius: 50%
-    display: inline-block
-    margin: 0 3px
 
   a
     color: $primary

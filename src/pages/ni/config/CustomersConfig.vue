@@ -724,10 +724,4 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  .q-table-container
-      box-shadow: none
-
-  /deep/ .bg-negative
-    background: white !important
-    color: inherit !important
 </style>

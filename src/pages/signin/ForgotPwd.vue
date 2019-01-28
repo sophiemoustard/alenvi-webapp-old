@@ -66,9 +66,4 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  @import '~variables'
-
-  .bg-negative
-    background: white !important
-    color: inherit !important
 </style>

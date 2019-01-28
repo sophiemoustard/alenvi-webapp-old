@@ -549,34 +549,6 @@ export default {
     width: 100%
     margin-bottom: 20px
 
-  .margin-input
-    margin-bottom: 6px
-    &.last
-      margin-bottom: 24px
-
-  .q-field-bottom
-    padding-top: 2px
-
-  .q-if-inverted
-    border: 1px solid $light-grey
-
-  .bg-negative
-    background: none !important
-    color: inherit !important
-
-  .q-table-container
-    box-shadow: none
-
-  .fab-add-person
-    right: 60px
-    bottom: 18px
-    font-size: 16px
-    z-index: 2
-
-  a
-    color: $primary
-    text-decoration: none
-
   .missingBasicInfo
     color: red
     background: white

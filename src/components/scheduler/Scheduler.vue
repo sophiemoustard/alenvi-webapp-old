@@ -645,18 +645,11 @@ export default {
   .custom-field
     margin: 16px 0
 
-  .q-if-inverted
-    border: 1px solid #D0D0D0;
-
   .margin-input
     margin-bottom: 6px;
 
   .q-datetime .q-datetime-content .modal-buttons .q-btn .q-btn-inner > div
     color: $primary !important;
-
-  .bg-negative
-    background: none !important
-    color: inherit !important
 
 </style>
 

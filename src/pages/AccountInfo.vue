@@ -103,17 +103,8 @@ export default {
 
 <style lang="stylus" scoped>
 
-  /deep/ .bg-negative
-    background: white !important
-    color: inherit !important
-
   .center-account
     max-width: 40%
     @media screen && (max-width: 600px)
       max-width: 100%
-
-  .margin-input
-    margin-bottom: 6px
-    &.last
-      margin-bottom: 24px
 </style>

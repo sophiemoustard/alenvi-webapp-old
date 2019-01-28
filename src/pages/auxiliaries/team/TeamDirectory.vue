@@ -8,18 +8,9 @@
         <q-search class="no-border input-search" v-model="searchStr" placeholder="Rechercher un profil" color="white" inverted-light />
       </div>
     </div>
-    <q-table
-      :data="filteredUsers"
-      :columns="columns"
-      row-key="name"
-      :rows-per-page-options="[15, 25, 35]"
-      :pagination.sync="pagination"
-      :loading="tableLoading">
-      <q-tr
-        slot="body"
-        slot-scope="props"
-        :props="props"
-        class="datatable-row">
+    <q-table :data="filteredUsers" :columns="columns" row-key="name" :rows-per-page-options="[15, 25, 35]" :pagination.sync="pagination"
+      :loading="tableLoading" class="people-list">
+      <q-tr slot="body" slot-scope="props" :props="props" class="datatable-team-row">
         <q-td v-for="col in props.cols"
           :key="col.name"
           :props="props">
@@ -136,62 +127,7 @@ export default {
   .input-caption
     margin-bottom: 4px
 
-  .input-search
-    font-size: 14px
-    & /deep/ .q-if-control.q-icon
-      margin-right: 8px
-
-  .btn-icon
-    &-disabled
-      color: $light-grey
-    &-enabled
-      color: $primary
-
-  .q-table-container
-    box-shadow: none
-
-  .btn-directory.q-btn /deep/
-    box-shadow: none
-    &.q-focusable:focus > .q-focus-helper
-      background: transparent
-      box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5)
-
-  /deep/ .q-table
-    border-spacing: 0 12px
-    border-collapse: separate
-    &-horizontal-separator tbody td
-      border: none
-    & thead
-      border: none
-      & tr
-        height: 48px
-    & th
-      padding: 0px 12px
-      &.sortable:hover .q-icon, &.sorted .q-icon
-        color: $primary
-    & td
-      padding: 8px 12px
-      & .q-item
-        min-height: 30px
-        padding: 0
-        &-main
-          flex: 0 1 auto
-        & .q-item-side
-          min-width: 30px
-          max-height: 30px
-          & .q-item-avatar
-            width: 29px
-            height: 29px
-            border: 1px solid #979797
-        & .q-item-section + .q-item-section
-          margin-left: 20px
-    &-container
-      & .q-table-bottom
-        padding-left: 12px
-      & .q-table-nodata > i
-        display: none
-
-  .datatable-row
+  .datatable-team-row
     background: $white
     &:hover
       background: $white

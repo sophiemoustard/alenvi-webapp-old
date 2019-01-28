@@ -56,10 +56,6 @@ export default {
 
 <style lang="stylus" scoped>
 @import '~variables'
-  .bg-negative
-    background: white !important
-    color: inherit !important
-
   .borders
     border: 1px solid $light-grey !important
 </style>

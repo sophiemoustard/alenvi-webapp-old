@@ -697,13 +697,4 @@ export default {
     margin-bottom: 3px
   .auxiliaries-row
     height: 100px
-  .fab-add-person
-    right: 60px
-    bottom: 18px
-    font-size: 16px
-    z-index: 2
-  .margin-input
-    margin-bottom: 6px
-    &.last
-      margin-bottom: 24px
 </style>
