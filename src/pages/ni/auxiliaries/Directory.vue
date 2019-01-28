@@ -489,11 +489,6 @@ export default {
   .input-caption
     margin-bottom: 4px
 
-  .input-search
-    font-size: 14px
-    & /deep/ .q-if-control.q-icon
-      margin-right: 8px
-
   .btn-icon
     &-disabled
       color: $light-grey

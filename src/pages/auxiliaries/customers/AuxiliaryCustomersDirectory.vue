@@ -123,11 +123,6 @@ export default {
     &-enabled
       color: $primary
 
-  .input-search
-    font-size: 14px
-    & /deep/ .q-if-control.q-icon
-      margin-right: 8px
-
   .btn-directory.q-btn /deep/
     box-shadow: none
     &.q-focusable:focus > .q-focus-helper
