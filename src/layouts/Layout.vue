@@ -93,9 +93,6 @@ export default {
 
   .q-toolbar
     color: $primary
-    a
-     color: $primary
-     text-decoration: none
 
   .q-btn
     color: $dark-grey

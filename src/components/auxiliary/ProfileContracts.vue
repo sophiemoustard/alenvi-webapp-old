@@ -552,10 +552,6 @@ export default {
   .q-field-bottom
     padding-top: 2px
 
-  a
-    color: $primary
-    text-decoration: none
-
   .missingBasicInfo
     color: red
     background: white

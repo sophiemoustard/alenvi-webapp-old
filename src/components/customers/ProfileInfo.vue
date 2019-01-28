@@ -1304,9 +1304,6 @@ export default {
   .q-checkbox
     font-size: 12px
 
-  /deep/ .q-card-title
-    font-size: 16px
-
   /deep/ .q-option-inner
     margin-right: 5px
 

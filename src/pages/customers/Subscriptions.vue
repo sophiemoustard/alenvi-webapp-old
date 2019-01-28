@@ -485,9 +485,6 @@ export default {
     background: white
     width: 100%
     margin-bottom: 10px
-  a
-    color: $primary
-    text-decoration: none
 
   .toolbar-padding
     padding: 20px 58px
