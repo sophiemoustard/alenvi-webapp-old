@@ -549,9 +549,6 @@ export default {
     width: 100%
     margin-bottom: 20px
 
-  .q-field-bottom
-    padding-top: 2px
-
   .missingBasicInfo
     color: red
     background: white

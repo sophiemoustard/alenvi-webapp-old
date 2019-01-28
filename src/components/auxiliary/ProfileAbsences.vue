@@ -298,8 +298,4 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  @import '~variables';
-
-  .q-field-bottom
-    padding-top: 2px
 </style>

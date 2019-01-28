@@ -391,7 +391,4 @@ export default {
   /deep/ .q-option .q-option-label
     font-size: 14px
 
-  .q-field-bottom
-    padding-top: 2px
-
 </style>
