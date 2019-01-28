@@ -673,6 +673,8 @@ export default {
       } catch (e) {
         console.error(e);
         NotifyNegative('Problème lors de la modification de l\'évènement');
+      } finally {
+        this.beingDragged = {};
       }
     },
   }
