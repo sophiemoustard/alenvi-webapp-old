@@ -301,7 +301,7 @@ export default {
     },
     minEndContractDate () {
       if (this.endContractModal) {
-        return this.$moment(this.endContractData.contract.startDate).add(1, 'day').toISOString();
+        return this.$moment().toISOString();
       }
       return '';
     }
