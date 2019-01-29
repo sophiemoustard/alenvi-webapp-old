@@ -15,10 +15,17 @@ export const fundingMixin = {
           field: 'startDate',
         },
         {
+          name: 'effectiveDate',
+          label: "Date d'effet",
+          align: 'left',
+          field: 'effectiveDate',
+        },
+        {
           name: 'thirdPartyPayer',
           label: 'Tiers payeur',
           align: 'left',
           field: 'thirdPartyPayer',
+          format: (value) => value ? value.name : '',
         },
         {
           name: 'nature',
@@ -40,7 +47,7 @@ export const fundingMixin = {
           name: 'end',
           label: 'Date de fin de prise en charge',
           align: 'left',
-          format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : '',
+          format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : '∞',
           field: 'endDate',
         },
         {
@@ -118,7 +125,7 @@ export const fundingMixin = {
     getFundingLastVersion (funding) {
       if (!funding.versions || funding.versions.length === 0) return {};
 
-      return funding.versions.sort((a, b) => new Date(b.startDate) - new Date(a.startDate))[0]
+      return funding.versions.sort((a, b) => new Date(b.effectiveDate) - new Date(a.effectiveDate))[0]
     },
     careDaysFormat (value) {
       if (value && value.length > 0) {

@@ -137,7 +137,7 @@
         <p class="text-weight-bold">Financements</p>
       </div>
       <q-card>
-        <q-table :data="fundings" :columns="fundingColumns" :visible-columns="fundingVisibleColumns" row-key="name" table-style="font-size: 1rem" hide-bottom class="table-responsive">
+        <q-table :data="fundings" :columns="fundingColumns" :visible-columns="fundingVisibleColumns" :rows-per-page-options="[0]" row-key="name" table-style="font-size: 1rem" hide-bottom class="table-responsive">
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
               <template v-if="col.name === 'actions'">
@@ -300,11 +300,11 @@
     </q-modal>
 
     <!-- Funding details modal -->
-    <q-modal v-model="fundingDetailsModal" :content-css="modalCssContainer" @hide="resetFundingDetailsData">
+    <q-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingDetailsModal" :content-css="modalCssContainer" @hide="resetFundingDetailsData">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
-            <h5>Détail du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer }}</span></h5>
+            <h5>Détail du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
             <span>
@@ -323,11 +323,11 @@
     </q-modal>
 
     <!-- Funding history modal -->
-    <q-modal v-model="fundingHistoryModal" :content-css="modalCssContainer" @hide="resetFundingHistoryData">
+    <q-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingHistoryModal" :content-css="modalCssContainer" @hide="resetFundingHistoryData">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
-            <h5>Historique du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer }}</span></h5>
+            <h5>Historique du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
             <span>
@@ -338,7 +338,7 @@
           :pagination.sync="paginationFundingHistory" :visible-columns="fundingHistoryVisibleColumns">
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-              <template v-if="col.name === 'startDate'"> {{ $moment(col.value).format('DD/MM/YYYY') }} </template>
+              <template v-if="col.name === 'effectiveDate'">{{ $moment(col.value).format('DD/MM/YYYY') }}</template>
               <template v-else>{{ col.value }}</template>
             </q-td>
           </q-tr>
@@ -370,7 +370,7 @@
         <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.unitTTCPrice" caption="Prix unitaire TTC" type="number" />
         <ni-modal-input v-if="isOneTimeFundingNature" v-model="newFunding.amountTTC" caption="Montant forfaitaire TTC" type="number" />
         <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.careHours" caption="Heures prises en charge" type="number" suffix="h" />
-        <ni-modal-input v-model="newFunding.customerParticipationRate" caption="Heures prises en charge" type="number" suffix="%" />
+        <ni-modal-input v-model="newFunding.customerParticipationRate" caption="Taux de participation du bénéficiaire" type="number" suffix="%" />
         <ni-option-group v-model="newFunding.careDays" :options="daysOptions" caption="Jours pris en charge" type="checkbox" inline />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter un financement" icon-right="add" color="primary" :loading="loading"
@@ -378,34 +378,31 @@
     </q-modal>
 
     <!-- Funding edition modal -->
-    <!-- <q-modal v-model="fundingEditionModal" @hide="resetEditionFundingData" :content-css="modalCssContainer">
+    <q-modal v-if="Object.keys(editedFunding).length > 0" v-model="fundingEditionModal" @hide="resetEditionFundingData" :content-css="modalCssContainer">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-8">
-            <h5>Ajouter une <span class="text-weight-bold">financement</span></h5>
+            <h5>Modifier un <span class="text-weight-bold">financement</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
-            <span><q-icon name="clear" size="1rem" @click.native="fundingCreationModal = false" /></span>
+            <span><q-icon name="clear" size="1rem" @click.native="fundingEditionModal = false" /></span>
           </div>
         </div>
-        <ni-modal-select caption="Tiers payeur" :options="fundingTppOptions" v-model="newFunding.thirdPartyPayer" :error="$v.newFunding.thirdPartyPayer.$error"
-          @blur="$v.newFunding.thirdPartyPayer.$touch"
-        />
-        <ni-modal-input v-model="newFunding.folderNumber" caption="Numéro de dossier" />
-        <ni-option-group v-model="newFunding.services" :options="fundingServicesOptions" caption="Souscriptions" type="checkbox" />
-        <ni-datetime-picker v-model="newFunding.startDate" caption="Date de début de prise en charge" :min="fundingMinStartDate" inModal />
-        <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="newFunding.frequency" />
-        <ni-datetime-picker v-if="isOneTimeFundingFrequency" v-model="newFunding.endDate" caption="Fin de prise en charge"
-          :min="$moment(this.newFunding.startDate).add(1, 'day').toISOString()" inModal />
-        <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.unitTTCPrice" caption="Prix unitaire TTC" type="number" />
-        <ni-modal-input v-if="isOneTimeFundingNature" v-model="newFunding.amountTTC" caption="Montant forfaitaire TTC" type="number" />
-        <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.careHours" caption="Heures prises en charge" type="number" suffix="h" />
-        <ni-modal-input v-model="newFunding.customerParticipationRate" caption="Heures prises en charge" type="number" suffix="%" />
-        <ni-option-group v-model="newFunding.careDays" :options="daysOptions" caption="Jours pris en charge" type="checkbox" inline />
+        <ni-option-group v-model="editedFunding.services" :options="fundingServicesOptions" caption="Souscriptions" type="checkbox" />
+        <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="editedFunding.frequency" />
+        <ni-datetime-picker v-if="isOneTimeEditedFundingFrequency" v-model="editedFunding.endDate" caption="Fin de prise en charge"
+          :min="$moment(editedFunding.endDate).add(1, 'day').toISOString()" inModal />
+        <ni-modal-input v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.unitTTCPrice" caption="Prix unitaire TTC" type="number" />
+        <ni-modal-input v-if="isOneTimeEditedFundingNature" v-model="editedFunding.amountTTC" caption="Montant forfaitaire TTC" type="number" />
+        <ni-modal-input v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.careHours" caption="Heures prises en charge" type="number" suffix="h" />
+        <ni-modal-input v-model="editedFunding.customerParticipationRate" caption="Taux de participation du bénéficiaire" type="number" suffix="%" />
+        <ni-option-group v-model="editedFunding.careDays" :options="daysOptions" caption="Jours pris en charge" type="checkbox" inline />
+        <ni-datetime-picker v-model="editedFunding.effectiveDate" caption="Date d'effet" :min="editedFundingMinStartDate" inModal
+          @blur="$v.editedFunding.effectiveDate.$touch" :error="$v.editedFunding.effectiveDate.$error" class="last" />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Ajouter une souscription" icon-right="add" color="primary" :loading="loading"
-        @click="submitFunding" />
-    </q-modal> -->
+      <q-btn no-caps class="full-width modal-btn" label="Modifier un financement" icon-right="add" color="primary" :loading="loading"
+        @click="editFunding" />
+    </q-modal>
   </div>
 </template>
 
@@ -596,7 +593,7 @@ export default {
       fundingHistoryModal: false,
       paginationFundingHistory: {
         rowsPerPage: 0,
-        sortBy: 'startDate',
+        sortBy: 'effectiveDate',
         descending: true,
       },
       newFunding: {
@@ -609,7 +606,7 @@ export default {
         amountTTC: '',
         unitTTCPrice: '',
         customerParticipationRate: 0,
-        careDays: [],
+        careDays: [0, 1, 2, 3, 4, 5, 6, 7],
         services: []
       },
       fundingFreqOptions: FUNDING_FREQ_OPTIONS,
@@ -618,7 +615,7 @@ export default {
       fundingEditionModal: false,
       fundingDetailsModal: false,
       fundingDetailsData: [],
-      // editedFunding: {},
+      editedFunding: {},
       pagination: {
         sortBy: 'createdAt',
         ascending: true,
@@ -692,9 +689,9 @@ export default {
     },
     fundingHistoryVisibleColumns () {
       if (this.selectedFunding.nature === 'one_time') {
-        return ['start', 'thirdPartyPayer', 'folderNumber', 'frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'services'];
+        return ['effectiveDate', 'end', 'frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'services'];
       }
-      return ['start', 'thirdPartyPayer', 'folderNumber', 'frequency', 'unitTTCPrice', 'careHours', 'customerParticipationRate', 'careDays', 'services'];
+      return ['effectiveDate', 'end', 'frequency', 'unitTTCPrice', 'careHours', 'customerParticipationRate', 'careDays', 'services'];
     },
     fundingDetailsVisibleColumns () {
       if (this.selectedFunding.nature === 'one_time') {
@@ -718,6 +715,12 @@ export default {
     isOneTimeFundingNature () {
       return this.newFunding.nature === ONE_TIME;
     },
+    isOneTimeEditedFundingFrequency () {
+      return this.editedFunding.frequency === ONCE;
+    },
+    isOneTimeEditedFundingNature () {
+      return this.editedFunding.nature === ONE_TIME;
+    },
     daysOptions () {
       return days.map((day, i) => {
         return {
@@ -738,7 +741,15 @@ export default {
       if (this.newFunding.services.length > 0) {
         const latestFunding = this.fundings
           .filter(funding => funding.services.some(sub => this.newFunding.services.includes(sub._id)))
-          .sort((a, b) => new Date(b) - new Date(a))[0];
+          .sort((a, b) => new Date(b.endDate) - new Date(a.endDate))[0];
+        return latestFunding && latestFunding.endDate ? this.$moment(latestFunding.endDate).add(1, 'day').toISOString() : '';
+      }
+    },
+    editedFundingMinStartDate () {
+      if (Object.keys(this.editedFunding).length > 0 && this.editedFunding.services.length > 0) {
+        const latestFunding = this.fundings
+          .filter(funding => funding.services.some(sub => this.editedFunding.services.includes(sub._id)))
+          .sort((a, b) => new Date(b.endDate) - new Date(a.endDate))[0];
         return latestFunding && latestFunding.endDate ? this.$moment(latestFunding.endDate).add(1, 'day').toISOString() : '';
       }
     }
@@ -778,6 +789,9 @@ export default {
     },
     newFunding: {
       thirdPartyPayer: { required }
+    },
+    editedFunding: {
+      effectiveDate: { required }
     }
   },
   watch: {
@@ -1224,15 +1238,18 @@ export default {
         amountTTC: '',
         unitTTCPrice: '',
         customerParticipationRate: 0,
-        careDays: [],
+        careDays: [0, 1, 2, 3, 4, 5, 6, 7],
         services: []
       };
     },
     formatCreatedFunding () {
       const cleanPayload = this.$_.pickBy(this.newFunding);
-      const { nature, ...version } = cleanPayload;
+      const { nature, thirdPartyPayer, startDate, folderNumber, ...version } = cleanPayload;
       return {
         nature,
+        thirdPartyPayer,
+        startDate,
+        folderNumber,
         versions: [{...version}]
       };
     },
@@ -1285,16 +1302,48 @@ export default {
       this.fundingDetailsModal = false;
       this.selectedFunding = {};
       this.fundingDetailsData = []
+    },
+    startFundingEdition (id) {
+      this.editedFunding = Object.assign({}, this.fundings.find(fund => fund._id === id), { effectiveDate: '' });
+      this.editedFunding.effectiveDate = '';
+      this.editedFunding.services = this.editedFunding.services.map(service => service._id);
+      this.fundingEditionModal = true;
+    },
+    resetEditionFundingData () {
+      this.fundingEditionModal = false;
+      this.editedFunding = {};
+      this.$v.editedFunding.$reset();
+    },
+    async editFunding () {
+      try {
+        this.$v.editedFunding.$touch();
+        if (this.$v.editedFunding.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.loading = true;
+        const { services, endDate, frequency, amountTTC, unitTTCPrice, careHours, careDays, customerParticipationRate, effectiveDate } = this.editedFunding;
+        const payload = {
+          services,
+          endDate,
+          frequency,
+          amountTTC,
+          unitTTCPrice,
+          careHours,
+          careDays,
+          customerParticipationRate,
+          effectiveDate
+        };
+        const cleanPayload = this.$_.pickBy(payload);
+        await this.$customers.updateFunding({ _id: this.customer._id, fundingId: this.editedFunding._id }, cleanPayload);
+        this.resetEditionFundingData();
+        await this.refreshCustomer();
+        NotifyPositive('Financement modifié');
+      } catch (e) {
+        console.error(e);
+        if (e.data.statusCode === 409) return NotifyNegative(e.data.message);
+        NotifyNegative("Erreur lors de la modification d'un financement");
+      } finally {
+        this.loading = false;
+      }
     }
-    // startFundingEdition (id) {
-    //   this.editedFunding = this.fundings.find(fund => fund._id === id);
-    //   this.fundingEditionModal = true;
-    // },
-    // resetEditionFundingData () {
-    //   this.fundingEditionModal = false;
-    //   this.editedFunding = {};
-    //   this.$v.editedFunding.$reset();
-    // }
   }
 }
 </script>
