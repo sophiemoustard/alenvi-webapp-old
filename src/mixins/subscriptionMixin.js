@@ -1,4 +1,5 @@
 import { getLastVersion } from '../helpers/utils';
+import { MONTHLY, ONE_TIME, ONCE } from '../data/constants';
 
 export const subscriptionMixin = {
   data () {
@@ -35,7 +36,7 @@ export const subscriptionMixin = {
           name: 'weeklyRate',
           label: 'Coût hebdomadaire TTC *',
           align: 'center',
-          field: row => `${this.formatNumber(this.computeWeeklyRate(row))}€`,
+          field: row => `${this.formatNumber(this.computeWeeklyRate(row, this.getMatchingFunding(row)))}€`,
         },
         {
           name: 'actions',
@@ -88,7 +89,7 @@ export const subscriptionMixin = {
     formatNumber (number) {
       return parseFloat(Math.round(number * 100) / 100).toFixed(2)
     },
-    computeWeeklyRate (subscription) {
+    computeWeeklyRate (subscription, funding) {
       let weeklyRate = subscription.unitTTCRate * subscription.estimatedWeeklyVolume;
       if (subscription.sundays && subscription.service.holidaySurcharge) {
         weeklyRate += subscription.sundays * subscription.unitTTCRate * subscription.service.holidaySurcharge / 100;
@@ -97,7 +98,27 @@ export const subscriptionMixin = {
         weeklyRate += subscription.evenings * subscription.unitTTCRate * subscription.service.eveningSurcharge / 100;
       }
 
-      return weeklyRate;
+      let fundingReduction = 0;
+      if (funding !== {} || funding !== undefined) {
+        if (funding.frequency !== ONCE) {
+          if (funding.nature === ONE_TIME) {
+            fundingReduction = funding.frequency === MONTHLY ? funding.amountTTC / 4.33 : funding.amountTTC;
+          } else {
+            const refundedHours = Math.min(
+              funding.frequency === MONTHLY ? funding.careHours / 4.33 : funding.careHours,
+              subscription.estimatedWeeklyVolume,
+            );
+            fundingReduction = refundedHours * funding.unitTTCPrice;
+          }
+
+          fundingReduction = fundingReduction * (1 - funding.customerParticipationRate / 100);
+        }
+      }
+
+      return weeklyRate - fundingReduction;
+    },
+    getMatchingFunding (subscription) {
+      return this.fundings.find(fd => fd.services.some(ser => ser._id === subscription.service._id));
     },
     showHistory (id) {
       this.selectedSubscription = this.subscriptions.find(sub => sub._id === id);

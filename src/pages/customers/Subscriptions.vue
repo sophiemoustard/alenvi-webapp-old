@@ -358,7 +358,7 @@ export default {
       try {
         if (this.customer.subscriptionsAccepted) {
           const subscriptions = this.customer.subscriptions.map(subscription => {
-            const lastVersion = this.getSubscriptionLastVersion(subscription);
+            const lastVersion = this.getLastVersion(subscription);
             const obj = {
               service: subscription.service.name,
               unitTTCRate: lastVersion.unitTTCRate,
