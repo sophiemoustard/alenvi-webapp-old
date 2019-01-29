@@ -151,7 +151,7 @@ export default {
           field: 'startDate',
           align: 'left',
           sortable: true,
-          format: (value) => this.$moment(value).format('DD/MM/YYYY'),
+          format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : 'N/A',
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
           style: 'width: 170px'
         },
