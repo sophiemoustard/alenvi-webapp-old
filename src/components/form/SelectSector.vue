@@ -65,3 +65,9 @@ export default {
   }
 };
 </script>
+
+<style lang="stylus" scoped>
+  @import '~variables'
+  .q-if-inverted
+    border: 1px solid $light-grey
+</style>
