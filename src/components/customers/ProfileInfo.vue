@@ -397,7 +397,7 @@
         <ni-modal-input v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.careHours" caption="Heures prises en charge" type="number" suffix="h" />
         <ni-modal-input v-model="editedFunding.customerParticipationRate" caption="Taux de participation du bénéficiaire" type="number" suffix="%" />
         <ni-option-group v-model="editedFunding.careDays" :options="daysOptions" caption="Jours pris en charge" type="checkbox" inline />
-        <ni-datetime-picker v-model="editedFunding.effectiveDate" caption="Date d'effet" :min="editedFundingMinStartDate" inModal
+        <ni-datetime-picker v-model="editedFunding.effectiveDate" caption="Date d'effet" :min="editedFundingMinEffectiveDate" inModal
           @blur="$v.editedFunding.effectiveDate.$touch" :error="$v.editedFunding.effectiveDate.$error" class="last" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Modifier un financement" icon-right="add" color="primary" :loading="loading"
@@ -589,7 +589,7 @@ export default {
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
         },
       ],
-      fundingVisibleColumns: ['thirdPartyPayer', 'folderNumber', 'nature', 'start', 'end', 'actions'],
+      fundingVisibleColumns: ['thirdPartyPayer', 'folderNumber', 'nature', 'start', 'endDate', 'actions'],
       fundingHistoryModal: false,
       paginationFundingHistory: {
         rowsPerPage: 0,
@@ -687,9 +687,9 @@ export default {
     },
     fundingHistoryVisibleColumns () {
       if (this.selectedFunding.nature === 'one_time') {
-        return ['effectiveDate', 'end', 'frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'services'];
+        return ['effectiveDate', 'endDate', 'frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'services'];
       }
-      return ['effectiveDate', 'end', 'frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays', 'services'];
+      return ['effectiveDate', 'endDate', 'frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays', 'services'];
     },
     fundingDetailsVisibleColumns () {
       if (this.selectedFunding.nature === 'one_time') {
@@ -738,12 +738,12 @@ export default {
         return latestFunding && latestFunding.endDate ? this.$moment(latestFunding.endDate).add(1, 'day').toISOString() : '';
       }
     },
-    editedFundingMinStartDate () {
+    editedFundingMinEffectiveDate () {
       if (Object.keys(this.editedFunding).length > 0 && this.editedFunding.services.length > 0) {
         const latestFunding = this.fundings
           .filter(funding => funding.services.some(sub => this.editedFunding.services.includes(sub._id)))
           .sort((a, b) => new Date(b.endDate) - new Date(a.endDate))[0];
-        return latestFunding && latestFunding.endDate ? this.$moment(latestFunding.endDate).add(1, 'day').toISOString() : '';
+        return latestFunding && latestFunding.endDate ? this.$moment(latestFunding.endDate).add(1, 'day').toISOString() : this.$moment(latestFunding.effectiveDate).add(1, 'day').toISOString();
       }
     }
   },
