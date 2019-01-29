@@ -1368,4 +1368,7 @@ export default {
       margin: 10px 0px
     td
       word-break: break-all
+
+  .inactiveDot
+    background: $secondary
 </style>
