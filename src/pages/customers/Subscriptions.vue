@@ -273,7 +273,7 @@ export default {
       if (this.selectedFunding.nature === 'one_time') {
         return ['thirdPartyPayer', 'folderNumber', 'start', 'end', 'nature', 'frequency', 'amountTTC', 'customerParticipationRate', 'careDays'];
       }
-      return ['thirdPartyPayer', 'folderNumber', 'start', 'end', 'nature', 'frequency', 'unitTTCPrice', 'careHours', 'customerParticipationRate', 'careDays'];
+      return ['thirdPartyPayer', 'folderNumber', 'start', 'end', 'nature', 'frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays'];
     }
   },
   async mounted () {
@@ -287,6 +287,9 @@ export default {
         this.customer = customerRaw.data.data.customer;
         this.refreshSubscriptions();
         this.refreshFundings();
+
+        this.$store.commit('rh/saveUserProfile', this.customer);
+        this.$v.customer.$touch();
       } catch (e) {
         console.error(e);
         this.customer = {};
@@ -355,7 +358,7 @@ export default {
       try {
         if (this.customer.subscriptionsAccepted) {
           const subscriptions = this.customer.subscriptions.map(subscription => {
-            const lastVersion = this.getSubscriptionLastVersion(subscription);
+            const lastVersion = this.getLastVersion(subscription);
             const obj = {
               service: subscription.service.name,
               unitTTCRate: lastVersion.unitTTCRate,

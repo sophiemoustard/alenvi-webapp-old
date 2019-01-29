@@ -1,5 +1,6 @@
 import { days } from '../data/days';
 import { FUNDING_FREQ_OPTIONS, FUNDING_NATURE_OPTIONS } from '../data/constants.js';
+import { getLastVersion } from '../helpers/utils';
 
 export const fundingMixin = {
   data () {
@@ -8,7 +9,7 @@ export const fundingMixin = {
       selectedFunding: {},
       fundingColumns: [
         {
-          name: 'start',
+          name: 'startDate',
           label: 'Date de début de prise en charge',
           align: 'left',
           format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : '',
@@ -44,7 +45,7 @@ export const fundingMixin = {
           field: 'folderNumber',
         },
         {
-          name: 'end',
+          name: 'endDate',
           label: 'Date de fin de prise en charge',
           align: 'left',
           format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : '∞',
@@ -65,11 +66,11 @@ export const fundingMixin = {
           field: 'amountTTC'
         },
         {
-          name: 'unitTTCPrice',
+          name: 'unitTTCRate',
           label: 'Prix unitaire TTC',
           align: 'left',
           format: (value) => value ? `${value}€` : '',
-          field: 'unitTTCPrice',
+          field: 'unitTTCRate',
         },
         {
           name: 'careHours',
@@ -111,21 +112,14 @@ export const fundingMixin = {
   methods: {
     refreshFundings () {
       try {
-        this.fundings = this.customer.fundings.map(fund => ({
-          ...this.getFundingLastVersion(fund),
-          ...fund,
-        }))
-
-        this.$store.commit('rh/saveUserProfile', this.customer);
-        this.$v.customer.$touch();
+        const { fundings } = this.customer;
+        this.fundings = fundings ? fundings.map(fund => {
+          const { versions } = fund;
+          return { ...getLastVersion(versions, 'effectiveDate'), ...fund };
+        }) : [];
       } catch (e) {
         console.error(e);
       }
-    },
-    getFundingLastVersion (funding) {
-      if (!funding.versions || funding.versions.length === 0) return {};
-
-      return funding.versions.sort((a, b) => new Date(b.effectiveDate) - new Date(a.effectiveDate))[0]
     },
     careDaysFormat (value) {
       if (value && value.length > 0) {

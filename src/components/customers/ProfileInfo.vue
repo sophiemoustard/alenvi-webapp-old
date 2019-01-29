@@ -367,7 +367,7 @@
         <ni-datetime-picker v-if="isOneTimeFundingFrequency" v-model="newFunding.endDate" caption="Fin de prise en charge"
           :min="$moment(this.newFunding.startDate).add(1, 'day').toISOString()" inModal />
         <ni-modal-select caption="Nature" :options="fundingNatureOptions" v-model="newFunding.nature" inModal />
-        <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.unitTTCPrice" caption="Prix unitaire TTC" type="number" />
+        <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.unitTTCRate" caption="Prix unitaire TTC" type="number" />
         <ni-modal-input v-if="isOneTimeFundingNature" v-model="newFunding.amountTTC" caption="Montant forfaitaire TTC" type="number" />
         <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.careHours" caption="Heures prises en charge" type="number" suffix="h" />
         <ni-modal-input v-model="newFunding.customerParticipationRate" caption="Taux de participation du bénéficiaire" type="number" suffix="%" />
@@ -392,7 +392,7 @@
         <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="editedFunding.frequency" />
         <ni-datetime-picker v-if="isOneTimeEditedFundingFrequency" v-model="editedFunding.endDate" caption="Fin de prise en charge"
           :min="$moment(editedFunding.endDate).add(1, 'day').toISOString()" inModal />
-        <ni-modal-input v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.unitTTCPrice" caption="Prix unitaire TTC" type="number" />
+        <ni-modal-input v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.unitTTCRate" caption="Prix unitaire TTC" type="number" />
         <ni-modal-input v-if="isOneTimeEditedFundingNature" v-model="editedFunding.amountTTC" caption="Montant forfaitaire TTC" type="number" />
         <ni-modal-input v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.careHours" caption="Heures prises en charge" type="number" suffix="h" />
         <ni-modal-input v-model="editedFunding.customerParticipationRate" caption="Taux de participation du bénéficiaire" type="number" suffix="%" />
@@ -604,7 +604,7 @@ export default {
         endDate: '',
         nature: '',
         amountTTC: '',
-        unitTTCPrice: '',
+        unitTTCRate: '',
         customerParticipationRate: 0,
         careDays: [0, 1, 2, 3, 4, 5, 6, 7],
         services: []
@@ -625,20 +625,18 @@ export default {
   },
   computed: {
     docsUploadUrl () {
+      if (!this.customer.driveFolder) return '';
+
       return `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.id}/upload`;
     },
     headers () {
-      return {
-        'x-access-token': Cookies.get('alenvi_token') || ''
-      }
+      return { 'x-access-token': Cookies.get('alenvi_token') || '' };
     },
     company () {
       return this.$store.getters['main/company'];
     },
     serviceOptions () {
-      if (!this.company.customersConfig || !this.company.customersConfig.services) {
-        return [];
-      }
+      if (!this.company.customersConfig || !this.company.customersConfig.services) return [];
 
       const subscribedServices = this.subscriptions.map(subscription => subscription.service._id);
       const availableServices = this.company.customersConfig.services.filter(service => !subscribedServices.includes(service._id));
@@ -691,18 +689,16 @@ export default {
       if (this.selectedFunding.nature === 'one_time') {
         return ['effectiveDate', 'end', 'frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'services'];
       }
-      return ['effectiveDate', 'end', 'frequency', 'unitTTCPrice', 'careHours', 'customerParticipationRate', 'careDays', 'services'];
+      return ['effectiveDate', 'end', 'frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays', 'services'];
     },
     fundingDetailsVisibleColumns () {
       if (this.selectedFunding.nature === 'one_time') {
         return ['frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'services'];
       }
-      return ['frequency', 'unitTTCPrice', 'careHours', 'customerParticipationRate', 'careDays', 'services'];
+      return ['frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays', 'services'];
     },
     fundingTppOptions () {
-      if (!this.company.customersConfig || !this.company.customersConfig.thirdPartyPayers) {
-        return [];
-      }
+      if (!this.company.customersConfig || !this.company.customersConfig.thirdPartyPayers) return [];
 
       return this.company.customersConfig.thirdPartyPayers.map(tpp => ({
         label: tpp.name,
@@ -722,19 +718,16 @@ export default {
       return this.editedFunding.nature === ONE_TIME;
     },
     daysOptions () {
-      return days.map((day, i) => {
-        return {
-          label: day !== 'Jours fériés' ? day.slice(0, 2) : day,
-          value: i
-        }
-      });
+      return days.map((day, i) => ({
+        label: day !== 'Jours fériés' ? day.slice(0, 2) : day,
+        value: i
+      }));
     },
     fundingServicesOptions () {
-      const options = this.subscriptions
-        .map(service => ({
-          label: service.service.name,
-          value: service.service._id,
-        }))
+      const options = this.subscriptions.map(sub => ({
+        label: sub.service.name,
+        value: sub.service._id,
+      }));
       return options;
     },
     fundingMinStartDate () {
@@ -1236,7 +1229,7 @@ export default {
         endDate: '',
         nature: '',
         amountTTC: '',
-        unitTTCPrice: '',
+        unitTTCRate: '',
         customerParticipationRate: 0,
         careDays: [0, 1, 2, 3, 4, 5, 6, 7],
         services: []
@@ -1319,13 +1312,13 @@ export default {
         this.$v.editedFunding.$touch();
         if (this.$v.editedFunding.$error) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
-        const { services, endDate, frequency, amountTTC, unitTTCPrice, careHours, careDays, customerParticipationRate, effectiveDate } = this.editedFunding;
+        const { services, endDate, frequency, amountTTC, unitTTCRate, careHours, careDays, customerParticipationRate, effectiveDate } = this.editedFunding;
         const payload = {
           services,
           endDate,
           frequency,
           amountTTC,
-          unitTTCPrice,
+          unitTTCRate,
           careHours,
           careDays,
           customerParticipationRate,
@@ -1377,4 +1370,7 @@ export default {
       margin: 10px 0px
     td
       word-break: break-all
+
+  .inactiveDot
+    background: $secondary
 </style>
