@@ -1,3 +1,5 @@
+import { getLastVersion } from '../helpers/utils';
+
 export const subscriptionMixin = {
   data () {
     return {
@@ -86,11 +88,6 @@ export const subscriptionMixin = {
     formatNumber (number) {
       return parseFloat(Math.round(number * 100) / 100).toFixed(2)
     },
-    getSubscriptionLastVersion (subscription) {
-      if (!subscription.versions || subscription.versions.length === 0) return {};
-
-      return subscription.versions.sort((a, b) => new Date(b.startDate) - new Date(a.startDate))[0]
-    },
     computeWeeklyRate (subscription) {
       let weeklyRate = subscription.unitTTCRate * subscription.estimatedWeeklyVolume;
       if (subscription.sundays && subscription.service.holidaySurcharge) {
@@ -112,13 +109,12 @@ export const subscriptionMixin = {
     },
     refreshSubscriptions () {
       try {
-        this.subscriptions = this.customer.subscriptions.map(sub => ({
-          ...this.getSubscriptionLastVersion(sub),
-          ...sub,
-        }))
+        const { subscriptions } = this.customer;
+        this.subscriptions = subscriptions.map(sub => {
+          const { versions } = sub;
 
-        this.$store.commit('rh/saveUserProfile', this.customer);
-        this.$v.customer.$touch();
+          return { ...getLastVersion(versions, 'startDate'), ...sub }
+        });
       } catch (e) {
         console.error(e);
       }

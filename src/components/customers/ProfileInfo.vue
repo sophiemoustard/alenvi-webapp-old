@@ -628,17 +628,13 @@ export default {
       return `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.id}/upload`;
     },
     headers () {
-      return {
-        'x-access-token': Cookies.get('alenvi_token') || ''
-      }
+      return { 'x-access-token': Cookies.get('alenvi_token') || '' };
     },
     company () {
       return this.$store.getters['main/company'];
     },
     serviceOptions () {
-      if (!this.company.customersConfig || !this.company.customersConfig.services) {
-        return [];
-      }
+      if (!this.company.customersConfig || !this.company.customersConfig.services) return [];
 
       const subscribedServices = this.subscriptions.map(subscription => subscription.service._id);
       const availableServices = this.company.customersConfig.services.filter(service => !subscribedServices.includes(service._id));
@@ -700,9 +696,7 @@ export default {
       return ['frequency', 'unitTTCPrice', 'careHours', 'customerParticipationRate', 'careDays', 'services'];
     },
     fundingTppOptions () {
-      if (!this.company.customersConfig || !this.company.customersConfig.thirdPartyPayers) {
-        return [];
-      }
+      if (!this.company.customersConfig || !this.company.customersConfig.thirdPartyPayers) return [];
 
       return this.company.customersConfig.thirdPartyPayers.map(tpp => ({
         label: tpp.name,
@@ -722,19 +716,16 @@ export default {
       return this.editedFunding.nature === ONE_TIME;
     },
     daysOptions () {
-      return days.map((day, i) => {
-        return {
-          label: day !== 'Jours fériés' ? day.slice(0, 2) : day,
-          value: i
-        }
-      });
+      return days.map((day, i) => ({
+        label: day !== 'Jours fériés' ? day.slice(0, 2) : day,
+        value: i
+      }));
     },
     fundingServicesOptions () {
-      const options = this.subscriptions
-        .map(service => ({
-          label: service.service.name,
-          value: service.service._id,
-        }))
+      const options = this.subscriptions.map(sub => ({
+        label: sub.service.name,
+        value: sub.service._id,
+      }));
       return options;
     },
     fundingMinStartDate () {

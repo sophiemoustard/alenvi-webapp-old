@@ -287,6 +287,9 @@ export default {
         this.customer = customerRaw.data.data.customer;
         this.refreshSubscriptions();
         this.refreshFundings();
+
+        this.$store.commit('rh/saveUserProfile', this.customer);
+        this.$v.customer.$touch();
       } catch (e) {
         console.error(e);
         this.customer = {};
