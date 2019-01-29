@@ -303,20 +303,17 @@ export default {
       return activeVersion && this.$moment(activeVersion.startDate).add(1, 'd').format();
     },
     cardTitle (contractEndDate) {
+      if (!contractEndDate) return { msg: 'Contrat en cours', color: 'green' };
+
       if (this.$moment().isBefore(contractEndDate)) {
         return {
           msg: `Le contrat se termine le ${this.$moment(contractEndDate).format('DD MMMM YYYY')}`,
           color: 'orange'
         }
-      } else if (this.$moment().isAfter(contractEndDate)) {
+      } else {
         return {
           msg: `Contrat terminé le: ${this.$moment(contractEndDate).format('DD MMMM YYYY')}`,
           color: 'red'
-        }
-      } else {
-        return {
-          msg: 'Contrat en cours',
-          color: 'green'
         }
       }
     },
