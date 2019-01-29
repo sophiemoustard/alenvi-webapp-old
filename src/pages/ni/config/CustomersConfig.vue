@@ -169,8 +169,8 @@
           @blur="$v.newThirdPartyPayer.address.fullAddress.$touch" :error="$v.newThirdPartyPayer.address.fullAddress.$error"
           />
         <ni-modal-input caption="Email" v-model.trim="newThirdPartyPayer.email" />
-        <ni-modal-input caption="Prix unitaire TTC par défaut" suffix="€" type="number" v-model="newThirdPartyPayer.unitTTCPrice"
-          :error="$v.newThirdPartyPayer.unitTTCPrice.$error" error-label="Le prix unitaire doit être positif"/>
+        <ni-modal-input caption="Prix unitaire TTC par défaut" suffix="€" type="number" v-model="newThirdPartyPayer.unitTTCRate"
+          :error="$v.newThirdPartyPayer.unitTTCRate.$error" error-label="Le prix unitaire doit être positif"/>
         <ni-modal-select v-model="newThirdPartyPayer.billingMode" :options="billingModeOptions" caption="Facturation" :filter="false" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter le tiers payeur" icon-right="add" color="primary" :loading="loading"
@@ -195,8 +195,8 @@
           @blur="$v.editedThirdPartyPayer.address.fullAddress.$touch" :error="$v.editedThirdPartyPayer.address.fullAddress.$error" inModal
           />
         <ni-modal-input caption="Email" v-model.trim="editedThirdPartyPayer.email" />
-        <ni-modal-input caption="Prix unitaire TTC par défaut" suffix="€" type="number" v-model="editedThirdPartyPayer.unitTTCPrice"
-          :error="$v.editedThirdPartyPayer.unitTTCPrice.$error" error-label="Le prix unitaire doit être positif"/>
+        <ni-modal-input caption="Prix unitaire TTC par défaut" suffix="€" type="number" v-model="editedThirdPartyPayer.unitTTCRate"
+          :error="$v.editedThirdPartyPayer.unitTTCRate.$error" error-label="Le prix unitaire doit être positif"/>
         <ni-modal-select v-model="editedThirdPartyPayer.billingMode" :options="billingModeOptions" caption="Facturation" :filter="false" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Editer le tiers payeur" icon-right="add" color="primary" :loading="loading" @click="updateThirdPartyPayer" />
@@ -335,9 +335,9 @@ export default {
           align: 'left'
         },
         {
-          name: 'unitTTCprice',
+          name: 'unitTTCRate',
           label: 'Prix unitaire TTC par défaut',
-          field: 'unitTTCPrice',
+          field: 'unitTTCRate',
           format: val => val ? `${val}€` : '',
           align: 'center'
         },
@@ -359,7 +359,7 @@ export default {
         name: '',
         email: '',
         address: {},
-        unitTTCPrice: '',
+        unitTTCRate: '',
         billingMode: ''
       },
       billingModeOptions: [
@@ -404,14 +404,14 @@ export default {
       address: {
         fullAddress: { frAddress }
       },
-      unitTTCPrice: { posDecimals }
+      unitTTCRate: { posDecimals }
     },
     editedThirdPartyPayer: {
       name: { required },
       address: {
         fullAddress: { frAddress }
       },
-      unitTTCPrice: { posDecimals }
+      unitTTCRate: { posDecimals }
     }
   },
   computed: {
@@ -632,13 +632,13 @@ export default {
     openThirdPartyPayerEditionModal (thirdPartyPayerId) {
       this.thirdPartyPayerEditionModal = true;
       const currentThirdPartyPayer = this.thirdPartyPayers.find(thirdPartyPayer => thirdPartyPayer._id === thirdPartyPayerId);
-      const { name, address, email, unitTTCPrice, billingMode } = currentThirdPartyPayer;
+      const { name, address, email, unitTTCRate, billingMode } = currentThirdPartyPayer;
       this.editedThirdPartyPayer = {
         _id: currentThirdPartyPayer._id,
         name,
         address: { ...address } || {},
         email,
-        unitTTCPrice,
+        unitTTCRate,
         billingMode,
       };
     },
@@ -648,7 +648,7 @@ export default {
         name: '',
         email: '',
         address: {},
-        unitTTCPrice: '',
+        unitTTCRate: '',
         billingMode: ''
       }
     },

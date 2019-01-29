@@ -66,11 +66,11 @@ export const fundingMixin = {
           field: 'amountTTC'
         },
         {
-          name: 'unitTTCPrice',
+          name: 'unitTTCRate',
           label: 'Prix unitaire TTC',
           align: 'left',
           format: (value) => value ? `${value}€` : '',
-          field: 'unitTTCPrice',
+          field: 'unitTTCRate',
         },
         {
           name: 'careHours',

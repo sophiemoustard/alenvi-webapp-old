@@ -108,7 +108,7 @@ export const subscriptionMixin = {
               funding.frequency === MONTHLY ? funding.careHours / 4.33 : funding.careHours,
               subscription.estimatedWeeklyVolume,
             );
-            fundingReduction = refundedHours * funding.unitTTCPrice;
+            fundingReduction = refundedHours * funding.unitTTCRate;
           }
 
           fundingReduction = fundingReduction * (1 - funding.customerParticipationRate / 100);

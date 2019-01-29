@@ -273,7 +273,7 @@ export default {
       if (this.selectedFunding.nature === 'one_time') {
         return ['thirdPartyPayer', 'folderNumber', 'start', 'end', 'nature', 'frequency', 'amountTTC', 'customerParticipationRate', 'careDays'];
       }
-      return ['thirdPartyPayer', 'folderNumber', 'start', 'end', 'nature', 'frequency', 'unitTTCPrice', 'careHours', 'customerParticipationRate', 'careDays'];
+      return ['thirdPartyPayer', 'folderNumber', 'start', 'end', 'nature', 'frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays'];
     }
   },
   async mounted () {
