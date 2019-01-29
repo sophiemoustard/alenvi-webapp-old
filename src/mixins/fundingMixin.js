@@ -113,10 +113,10 @@ export const fundingMixin = {
     refreshFundings () {
       try {
         const { fundings } = this.customer;
-        this.fundings = fundings.map(fund => {
+        this.fundings = fundings ? fundings.map(fund => {
           const { versions } = fund;
           return { ...getLastVersion(versions, 'effectiveDate'), ...fund };
-        });
+        }) : [];
       } catch (e) {
         console.error(e);
       }

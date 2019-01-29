@@ -131,11 +131,11 @@ export const subscriptionMixin = {
     refreshSubscriptions () {
       try {
         const { subscriptions } = this.customer;
-        this.subscriptions = subscriptions.map(sub => {
+        this.subscriptions = subscriptions ? subscriptions.map(sub => {
           const { versions } = sub;
 
           return { ...getLastVersion(versions, 'startDate'), ...sub }
-        });
+        }) : [];
       } catch (e) {
         console.error(e);
       }

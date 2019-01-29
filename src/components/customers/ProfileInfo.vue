@@ -625,6 +625,8 @@ export default {
   },
   computed: {
     docsUploadUrl () {
+      if (!this.customer.driveFolder) return '';
+
       return `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.id}/upload`;
     },
     headers () {
