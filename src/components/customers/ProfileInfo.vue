@@ -745,8 +745,8 @@ export default {
       if (Object.keys(this.editedFunding).length > 0 && this.editedFunding.services.length > 0) {
         const latestFunding = this.fundings
           .filter(funding => funding.services.some(sub => this.editedFunding.services.includes(sub._id)))
-          .sort((a, b) => new Date(b.effectiveDate) - new Date(a.effectiveDate))[0];
-        return latestFunding && latestFunding.effectiveDate ? this.$moment(latestFunding.effectiveDate).add(1, 'day').toISOString() : '';
+          .sort((a, b) => new Date(b.endDate) - new Date(a.endDate))[0];
+        return latestFunding && latestFunding.endDate ? this.$moment(latestFunding.endDate).add(1, 'day').toISOString() : '';
       }
     }
   },
