@@ -648,10 +648,10 @@ export default {
       }
     },
     // Drag & drop
-    drag (dayIndex, idEvent) {
+    drag (dayIndex, eventId) {
       event.dataTransfer.setData('text', event.target.id);
       // We have source and position saving
-      this.beingDragged = this.events.find(ev => ev._id === idEvent);
+      this.beingDragged = this.events.find(ev => ev._id === eventId);
       this.beingDragged.dayIndex = dayIndex;
     },
     async drop (toDay, toAuxiliary) {
@@ -663,11 +663,11 @@ export default {
         if (event.target.nodeName === 'P') {
           event.target.parentNode.parentNode.parentNode.appendChild(document.getElementById(data));
         }
-        const daysRepeating = this.$moment(this.beingDragged.endDate).diff(this.$moment(this.beingDragged.startDate), 'days');
+        const daysBetween = this.$moment(this.beingDragged.endDate).diff(this.$moment(this.beingDragged.startDate), 'days');
         await this.$events.updateById(this.beingDragged._id, {
           startDate: this.$moment(toDay).hours(this.$moment(this.beingDragged.startDate).hours())
             .minutes(this.$moment(this.beingDragged.startDate).minutes()).toISOString(),
-          endDate: this.$moment(toDay).add(daysRepeating, 'days').hours(this.$moment(this.beingDragged.endDate).hours())
+          endDate: this.$moment(toDay).add(daysBetween, 'days').hours(this.$moment(this.beingDragged.endDate).hours())
             .minutes(this.$moment(this.beingDragged.endDate).minutes()).toISOString(),
           auxiliary: toAuxiliary._id
         });
