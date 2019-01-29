@@ -18,7 +18,6 @@ export const fundingMixin = {
           name: 'effectiveDate',
           label: "Date d'effet",
           align: 'left',
-          format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : '',
           field: 'effectiveDate',
         },
         {
@@ -126,7 +125,7 @@ export const fundingMixin = {
     getFundingLastVersion (funding) {
       if (!funding.versions || funding.versions.length === 0) return {};
 
-      return funding.versions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0]
+      return funding.versions.sort((a, b) => new Date(b.effectiveDate) - new Date(a.effectiveDate))[0]
     },
     careDaysFormat (value) {
       if (value && value.length > 0) {

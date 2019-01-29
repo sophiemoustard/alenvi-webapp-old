@@ -139,7 +139,7 @@
         <p class="text-weight-bold">Financements</p>
       </div>
       <q-card>
-        <q-table :data="fundings" :columns="fundingColumns" :visible-columns="fundingVisibleColumns" row-key="name" table-style="font-size: 1rem" hide-bottom class="table-responsive">
+        <q-table :data="fundings" :columns="fundingColumns" :visible-columns="fundingVisibleColumns" :rows-per-page-options="[0]" row-key="name" table-style="font-size: 1rem" hide-bottom class="table-responsive">
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
               <template v-if="col.name === 'actions'">
@@ -340,7 +340,8 @@
           :pagination.sync="paginationFundingHistory" :visible-columns="fundingHistoryVisibleColumns">
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-              <template>{{ col.value }}</template>
+              <template v-if="col.name === 'effectiveDate'">{{ $moment(col.value).format('DD/MM/YYYY') }}</template>
+              <template v-else>{{ col.value }}</template>
             </q-td>
           </q-tr>
         </q-table>
@@ -396,13 +397,13 @@
         <ni-modal-input v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.unitTTCPrice" caption="Prix unitaire TTC" type="number" />
         <ni-modal-input v-if="isOneTimeEditedFundingNature" v-model="editedFunding.amountTTC" caption="Montant forfaitaire TTC" type="number" />
         <ni-modal-input v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.careHours" caption="Heures prises en charge" type="number" suffix="h" />
-        <ni-modal-input v-model="editedFunding.customerParticipationRate" caption="Heures prises en charge" type="number" suffix="%" />
+        <ni-modal-input v-model="editedFunding.customerParticipationRate" caption="Taux de participation du bénéficiaire" type="number" suffix="%" />
         <ni-option-group v-model="editedFunding.careDays" :options="daysOptions" caption="Jours pris en charge" type="checkbox" inline />
         <ni-datetime-picker v-model="editedFunding.effectiveDate" caption="Date d'effet" :min="editedFundingMinStartDate" inModal
           @blur="$v.editedFunding.effectiveDate.$touch" :error="$v.editedFunding.effectiveDate.$error" class="last" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Modifier un financement" icon-right="add" color="primary" :loading="loading"
-        @click="editFunding(editedFunding._id)" />
+        @click="editFunding" />
     </q-modal>
   </div>
 </template>
@@ -601,7 +602,7 @@ export default {
         amountTTC: '',
         unitTTCPrice: '',
         customerParticipationRate: 0,
-        careDays: [],
+        careDays: [0, 1, 2, 3, 4, 5, 6, 7],
         services: []
       },
       fundingFreqOptions: FUNDING_FREQ_OPTIONS,
@@ -1233,7 +1234,7 @@ export default {
         amountTTC: '',
         unitTTCPrice: '',
         customerParticipationRate: 0,
-        careDays: [],
+        careDays: [0, 1, 2, 3, 4, 5, 6, 7],
         services: []
       };
     },
@@ -1309,7 +1310,7 @@ export default {
       this.editedFunding = {};
       this.$v.editedFunding.$reset();
     },
-    async editFunding (id) {
+    async editFunding () {
       try {
         this.$v.editedFunding.$touch();
         if (this.$v.editedFunding.$error) return NotifyWarning('Champ(s) invalide(s)');
@@ -1327,10 +1328,9 @@ export default {
           effectiveDate
         };
         const cleanPayload = this.$_.pickBy(payload);
-        await this.$customers.updateFunding({ _id: this.customer._id, fundingId: id }, cleanPayload);
+        await this.$customers.updateFunding({ _id: this.customer._id, fundingId: this.editedFunding._id }, cleanPayload);
         this.resetEditionFundingData();
         await this.refreshCustomer();
-        this.fundingCreationModal = false;
         NotifyPositive('Financement modifié');
       } catch (e) {
         console.error(e);

@@ -467,7 +467,6 @@ export default {
         ...this.getServiceLastVersion(service),
         ...service,
       }));
-      console.log('services', this.services);
     },
     async refreshCompany () {
       await this.$store.dispatch('main/getUser', this.user._id);
