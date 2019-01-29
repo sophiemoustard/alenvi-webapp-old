@@ -6,51 +6,49 @@
           <q-card-title :style="{ color: cardTitle(contract.endDate).color }">
             {{ cardTitle(contract.endDate).msg }}
           </q-card-title>
-          <q-card-main>
-            <p>Statut: {{ contract.status }}</p>
-            <q-table :data="contract.versions" :columns="columns" row-key="name" :pagination.sync="pagination" hide-bottom :visible-columns="visibleColumns"
-              binary-state-sort class="table-responsive">
-              <tr slot="body" slot-scope="props" :props="props">
-                <td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-                  <template v-if="col.name === 'contractEmpty'">
-                    <q-btn flat round small color="primary" @click="dlTemplate(props.row, props.row.__index, contract.startDate)">
+          <p class="card-sub-title">Statut: {{ contract.status }}</p>
+          <q-table :data="contract.versions" :columns="columns" row-key="name" :pagination.sync="pagination" hide-bottom :visible-columns="visibleColumns"
+            binary-state-sort class="table-responsive">
+            <tr slot="body" slot-scope="props" :props="props">
+              <td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+                <template v-if="col.name === 'contractEmpty'">
+                  <q-btn flat round small color="primary" @click="dlTemplate(props.row, props.row.__index, contract.startDate)">
+                    <q-icon name="file download" />
+                  </q-btn>
+                </template>
+                <template v-else-if="col.name === 'contractSigned'">
+                  <div v-if="!props.row.link" class="row justify-center uploader-responsive">
+                    <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :url="docsUploadUrl" :headers="headers"
+                      :additional-fields="[
+                        { name: 'fileName', value: `contrat_signe_${getUser.firstname}_${getUser.lastname}` },
+                        { name: 'contractId', value: contract._id },
+                        { name: 'versionId', value: props.row._id }
+                      ]"
+                      hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
+                      hide-upload-button @add="uploadDocument($event, `signedContract_${props.row._id}`)" @uploaded="refreshContracts" @fail="failMsg" />
+                  </div>
+                  <q-btn v-else flat round small color="primary">
+                    <a :href="props.row.link" download>
                       <q-icon name="file download" />
-                    </q-btn>
-                  </template>
-                  <template v-else-if="col.name === 'contractSigned'">
-                    <div v-if="!props.row.link" class="row justify-center uploader-responsive">
-                      <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :url="docsUploadUrl" :headers="headers"
-                        :additional-fields="[
-                          { name: 'fileName', value: `contrat_signe_${getUser.firstname}_${getUser.lastname}` },
-                          { name: 'contractId', value: contract._id },
-                          { name: 'versionId', value: props.row._id }
-                        ]"
-                        hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
-                        hide-upload-button @add="uploadDocument($event, `signedContract_${props.row._id}`)" @uploaded="refreshContracts" @fail="failMsg" />
-                    </div>
-                    <q-btn v-else flat round small color="primary">
-                      <a :href="props.row.link" download>
-                        <q-icon name="file download" />
-                      </a>
-                    </q-btn>
-                  </template>
-                  <template v-else-if="col.name === 'isActive'">
-                    <q-checkbox :disable="col.value || (props.row && 'endDate' in props.row)" :value="col.value"
-                      @input="updateContractActivity({
-                        contractId: contract._id,
-                        versionId: props.row._id,
-                        ogustContractId: props.row.ogustContractId,
-                        versionStartDate: props.row.startDate,
-                        isActive: !col.value,
-                        cell: props.row.__index,
-                        contractIndex: index })">
-                    </q-checkbox>
-                  </template>
-                  <template v-else>{{ col.value }}</template>
-                </td>
-              </tr>
-            </q-table>
-          </q-card-main>
+                    </a>
+                  </q-btn>
+                </template>
+                <template v-else-if="col.name === 'isActive'">
+                  <q-checkbox :disable="col.value || (props.row && 'endDate' in props.row)" :value="col.value"
+                    @input="updateContractActivity({
+                      contractId: contract._id,
+                      versionId: props.row._id,
+                      ogustContractId: props.row.ogustContractId,
+                      versionStartDate: props.row.startDate,
+                      isActive: !col.value,
+                      cell: props.row.__index,
+                      contractIndex: index })">
+                  </q-checkbox>
+                </template>
+                <template v-else>{{ col.value }}</template>
+              </td>
+            </tr>
+          </q-table>
           <q-card-actions align="end">
             <q-btn v-if="getActiveVersion(contract)" flat no-caps color="primary" icon="add" label="Ajouter un avenant" @click="fillVersion(contract)"/>
             <q-btn v-if="getActiveVersion(contract)" flat no-caps color="grey-6" icon="clear" label="Mettre fin au contrat" @click="fillEndContract(contract)" />
@@ -81,18 +79,14 @@
           </div>
         </div>
         <ni-modal-select caption="Statut" :error="$v.newContract.status.$error" :options="statusOptions" v-model="newContract.status"
-          @blur="$v.newContract.status.$touch" separator
-        />
+          @blur="$v.newContract.status.$touch" separator />
         <ni-modal-input caption="Volume horaire hebdomadaire" :error="$v.newContract.weeklyHours.$error" type="number" v-model="newContract.weeklyHours"
-          @blur="$v.newContract.weeklyHours.$touch" suffix="hr"
-        />
+          @blur="$v.newContract.weeklyHours.$touch" suffix="hr" />
         <ni-modal-input caption="Taux horaire" :error="$v.newContract.grossHourlyRate.$error" type="number" v-model="newContract.grossHourlyRate"
-          @blur="$v.newContract.grossHourlyRate.$touch" suffix="€"
-        />
+          @blur="$v.newContract.grossHourlyRate.$touch" suffix="€" />
         <ni-datetime-picker caption="Date d'effet" :error="$v.newContract.startDate.$error" v-model="newContract.startDate" inModal />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Créer le contrat" icon-right="add" color="primary"
-        :loading="loading" @click="createNewContract" />
+      <q-btn no-caps class="full-width modal-btn" label="Créer le contrat" icon-right="add" color="primary" :loading="loading" @click="createNewContract" />
     </q-modal>
 
     <!-- New version modal -->
@@ -107,14 +101,11 @@
           </div>
         </div>
         <ni-modal-input caption="Volume horaire hebdomadaire"  :error="$v.newContractVersion.weeklyHours.$error" v-model="newContractVersion.weeklyHours"
-          type="number" @blur="$v.newContractVersion.weeklyHours.$touch" suffix="hr"
-        />
+          type="number" @blur="$v.newContractVersion.weeklyHours.$touch" suffix="hr" />
         <ni-modal-input caption="Taux horaire"  :error="$v.newContractVersion.grossHourlyRate.$error" v-model="newContractVersion.grossHourlyRate"
-          type="number" @blur="$v.newContractVersion.grossHourlyRate.$touch" suffix="€"
-        />
+          type="number" @blur="$v.newContractVersion.grossHourlyRate.$touch" suffix="€" />
         <ni-datetime-picker caption="Date d'effet" :error="$v.newContractVersion.startDate.$error" v-model="newContractVersion.startDate"
-          :min="getMinimalStartDate(contractSelected)" inModal
-        />
+          :min="getMinimalStartDate(contractSelected)" inModal />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer l'avenant" icon-right="add" color="primary" :loading="loading" @click="createNewContractVersion" />
     </q-modal>
@@ -555,5 +546,9 @@ export default {
     padding: 10px
     margin-left: auto
     margin-right: auto
+
+  .card-sub-title
+    margin:  0 10px 10px
+    font-size: 14px
 
 </style>
