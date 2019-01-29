@@ -121,7 +121,7 @@
             <span><q-icon name="clear" size="1rem" @click.native="endContractModal = false" /></span>
           </div>
         </div>
-        <ni-datetime-picker caption="Date de fin de contrat" v-model="endContractData.date" inModal />
+        <ni-datetime-picker caption="Date de fin de contrat" v-model="endContractData.date" :min="minEndContractDate" inModal />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Mettre fin au contrat" icon-right="clear" color="primary" :loading="loading" @click="endContract" />
     </q-modal>
@@ -281,6 +281,12 @@ export default {
       }
 
       return false;
+    },
+    minEndContractDate () {
+      if (this.endContractModal) {
+        return this.$moment(this.endContractData.contract.startDate).add(1, 'day').toISOString();
+      }
+      return '';
     }
   },
   async mounted () {
