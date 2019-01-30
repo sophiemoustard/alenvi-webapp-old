@@ -99,7 +99,7 @@ export const subscriptionMixin = {
       }
 
       let fundingReduction = 0;
-      if (funding !== {} || funding !== undefined) {
+      if (funding && funding !== {}) {
         if (funding.frequency !== ONCE) {
           if (funding.nature === ONE_TIME) {
             fundingReduction = funding.frequency === MONTHLY ? funding.amountTTC / 4.33 : funding.amountTTC;
