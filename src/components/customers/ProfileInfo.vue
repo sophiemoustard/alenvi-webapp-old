@@ -362,10 +362,11 @@
           @blur="$v.newFunding.thirdPartyPayer.$touch" requiredField
         />
         <ni-modal-input v-model="newFunding.folderNumber" caption="Numéro de dossier" />
-        <ni-option-group v-model="newFunding.services" :options="fundingServicesOptions()" caption="Souscriptions" type="checkbox" @blur="$v.newFunding.services.$touch" :error="$v.newFunding.services.$error"/>
+        <ni-option-group v-model="newFunding.services" :options="fundingServicesOptions()" caption="Souscriptions" type="checkbox"
+          @blur="$v.newFunding.services.$touch" :error="$v.newFunding.services.$error" requiredField />
         <ni-datetime-picker v-model="newFunding.startDate" caption="Date de début de prise en charge" :min="fundingMinStartDate" inModal />
         <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="newFunding.frequency" />
-        <ni-datetime-picker v-if="isOneTimeFundingFrequency" v-model="newFunding.endDate" caption="Fin de prise en charge"
+        <ni-datetime-picker v-model="newFunding.endDate" caption="Fin de prise en charge"
           :min="$moment(this.newFunding.startDate).add(1, 'day').toISOString()" inModal />
         <ni-modal-select caption="Nature" :options="fundingNatureOptions" v-model="newFunding.nature" inModal />
         <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.unitTTCRate" caption="Prix unitaire TTC" type="number" />
@@ -383,25 +384,25 @@
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-8">
-            <h5>Modifier un <span class="text-weight-bold">financement</span></h5>
+            <h5>Modifier le <span class="text-weight-bold">financement</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
             <span><q-icon name="clear" size="1rem" @click.native="fundingEditionModal = false" /></span>
           </div>
         </div>
-        <ni-option-group v-model="editedFunding.services" :options="fundingServicesOptions(editedFunding._id)" caption="Souscriptions" type="checkbox" @blur="$v.editedFunding.services.$touch" :error="$v.editedFunding.services.$error" />
+        <ni-option-group v-model="editedFunding.services" :options="fundingServicesOptions(editedFunding._id)" caption="Souscriptions" type="checkbox"
+          @blur="$v.editedFunding.services.$touch" :error="$v.editedFunding.services.$error" requiredField />
         <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="editedFunding.frequency" />
-        <ni-datetime-picker v-if="isOneTimeEditedFundingFrequency" v-model="editedFunding.endDate" caption="Fin de prise en charge"
-          :min="editedFundingMinEffectiveDate" inModal />
+        <ni-datetime-picker v-model="editedFunding.endDate" caption="Fin de prise en charge" :min="editedFundingMinEffectiveDate" inModal />
         <ni-modal-input v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.unitTTCRate" caption="Prix unitaire TTC" type="number" />
         <ni-modal-input v-if="isOneTimeEditedFundingNature" v-model="editedFunding.amountTTC" caption="Montant forfaitaire TTC" type="number" />
         <ni-modal-input v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.careHours" caption="Nb. heures prises en charge" type="number" suffix="h" />
         <ni-modal-input v-model="editedFunding.customerParticipationRate" caption="Taux de participation du bénéficiaire" type="number" suffix="%" />
         <ni-option-group v-model="editedFunding.careDays" :options="daysOptions" caption="Jours pris en charge" type="checkbox" inline />
-        <ni-datetime-picker v-model="editedFunding.effectiveDate" caption="Date d'effet" :min="editedFundingMinEffectiveDate" inModal
-          @blur="$v.editedFunding.effectiveDate.$touch" :error="$v.editedFunding.effectiveDate.$error" class="last" />
+        <ni-datetime-picker v-model="editedFunding.effectiveDate" caption="Date d'effet" :max="editedFundingMaxEffectiveDate" :min="editedFundingMinEffectiveDate" inModal
+          @blur="$v.editedFunding.effectiveDate.$touch" :error="$v.editedFunding.effectiveDate.$error" class="last" requiredField />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Modifier un financement" icon-right="add" color="primary" :loading="loading"
+      <q-btn no-caps class="full-width modal-btn" label="Modifier le financement" icon-right="add" color="primary" :loading="loading"
         @click="editFunding" />
     </q-modal>
   </div>
@@ -738,6 +739,12 @@ export default {
           .sort((a, b) => new Date(b.effectiveDate) - new Date(a.effectiveDate))[0];
         return latestFunding && latestFunding.endDate ? this.$moment(latestFunding.endDate).add(1, 'day').toISOString() : this.$moment(latestFunding.effectiveDate).add(1, 'day').toISOString();
       }
+    },
+    editedFundingMaxEffectiveDate () {
+      if (this.editedFunding && this.editedFunding.endDate) {
+        return this.$moment(this.editedFunding.endDate).subtract(1, 'day').toISOString();
+      }
+      return '';
     }
   },
   validations: {
@@ -1325,7 +1332,8 @@ export default {
           frequency,
           careDays,
           customerParticipationRate,
-          effectiveDate
+          effectiveDate,
+          endDate
         };
         if (this.editedFunding.nature === ONE_TIME) {
           payload.amountTTC = amountTTC;
@@ -1333,9 +1341,6 @@ export default {
         if (this.editedFunding.nature === HOURLY) {
           payload.unitTTCRate = unitTTCRate;
           payload.careHours = careHours;
-        }
-        if (this.editedFunding.frequency === ONCE) {
-          payload.endDate = endDate;
         }
         const cleanPayload = this.$_.pickBy(payload);
         await this.$customers.updateFunding({ _id: this.customer._id, fundingId: this.editedFunding._id }, cleanPayload);
