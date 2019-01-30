@@ -28,7 +28,7 @@
     </q-card>
     <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="ion-document" label="Enregistrer une absence"
       @click="newAbsenceModal = true" />
-    <q-modal v-model="newAbsenceModal" :content-css="modalCssContainer">
+    <q-modal v-model="newAbsenceModal" content-classes="modal-container-sm">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -83,9 +83,6 @@ export default {
         reason: ''
       },
       newAbsenceModal: false,
-      modalCssContainer: {
-        minWidth: '30vw'
-      },
       absences: [],
       reasonOptions: [
         {

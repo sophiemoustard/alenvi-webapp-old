@@ -37,8 +37,9 @@
         </div>
       </div>
     </div>
+
     <!-- Modal envoi message -->
-    <q-modal v-model="opened" :content-css="modalCssContainer">
+    <q-modal v-model="opened" content-classes="modal-container-sm">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-8">
@@ -78,22 +79,10 @@ export default {
       typeMessage: 'PM',
       messageSupport: 'sms',
       typeMessageOptions: [
-        {
-          label: 'Pièces manquantes',
-          value: 'PM',
-        },
-        {
-          label: 'Envoi code d\'activation',
-          value: 'CA'
-        },
-        {
-          label: 'Autres',
-          value: 'Autres'
-        }
+        { label: 'Pièces manquantes', value: 'PM' },
+        { label: 'Envoi code d\'activation', value: 'CA' },
+        { label: 'Autres', value: 'Autres' }
       ],
-      modalCssContainer: {
-        minWidth: '30vw'
-      }
     }
   },
   mounted () {

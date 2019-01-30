@@ -68,7 +68,7 @@
     </div>
 
     <!-- New contract modal -->
-    <q-modal v-model="newContractModal" :content-css="modalCssContainer">
+    <q-modal v-model="newContractModal" content-classes="modal-container-sm">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -90,7 +90,7 @@
     </q-modal>
 
     <!-- New version modal -->
-    <q-modal v-model="newContractVersionModal" :content-css="modalCssContainer">
+    <q-modal v-model="newContractVersionModal" content-classes="modal-container-sm">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -111,7 +111,7 @@
     </q-modal>
 
     <!-- End contract modal -->
-    <q-modal v-model="endContractModal" :content-css="modalCssContainer">
+    <q-modal v-model="endContractModal" content-classes="modal-container-sm">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -230,9 +230,6 @@ export default {
           required: false
         }
       ],
-      modalCssContainer: {
-        minWidth: '30vw'
-      },
     }
   },
   validations: {

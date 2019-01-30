@@ -39,7 +39,7 @@
     </div>
 
     <!-- Event creation modal -->
-    <q-modal v-model="creationModal" :content-css="modalCssContainer" @hide="resetCreationForm(false)">
+    <q-modal v-model="creationModal" content-classes="modal-container-md" @hide="resetCreationForm(false)">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -85,7 +85,7 @@
     </q-modal>
 
     <!-- Event edition modal -->
-    <q-modal v-model="editionModal" :content-css="modalCssContainer" @hide="resetEditionForm()">
+    <q-modal v-model="editionModal" content-classes="modal-container-md" @hide="resetEditionForm()">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -164,7 +164,6 @@ export default {
   },
   data () {
     return {
-      modalCssContainer: { width: '45vw' },
       loading: false,
       beingDragged: {},
       selectedSector: '',
