@@ -81,7 +81,7 @@
     </div>
 
     <!-- Service creation modal -->
-    <q-modal v-model="serviceCreationModal" :content-css="modalCssContainer" @hide="resetCreationServiceData">
+    <q-modal v-model="serviceCreationModal" content-classes="modal-container-sm" @hide="resetCreationServiceData">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -106,7 +106,7 @@
     </q-modal>
 
     <!-- Service edition modal -->
-    <q-modal v-model="serviceEditionModal" :content-css="modalCssContainer" @hide="resetEditionServiceData">
+    <q-modal v-model="serviceEditionModal" content-classes="modal-container-sm" @hide="resetEditionServiceData">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -131,7 +131,7 @@
     </q-modal>
 
     <!-- Service history modal -->
-    <q-modal v-model="serviceHistoryModal" :content-css="modalCssContainer" @hide="resetServiceHistoryData">
+    <q-modal v-model="serviceHistoryModal" content-classes="modal-container-sm" @hide="resetServiceHistoryData">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -152,7 +152,7 @@
     </q-modal>
 
     <!-- Third party payers creation modal -->
-    <q-modal v-model="thirdPartyPayerCreationModal" :content-css="modalCssContainer" @hide="resetThirdPartyPayerEditionData">
+    <q-modal v-model="thirdPartyPayerCreationModal" content-classes="modal-container-sm" @hide="resetThirdPartyPayerEditionData">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -178,7 +178,7 @@
     </q-modal>
 
     <!-- Third party payers edition modal -->
-    <q-modal v-model="thirdPartyPayerEditionModal" :content-css="modalCssContainer" @hide="resetThirdPartyPayerUpdateModalData">
+    <q-modal v-model="thirdPartyPayerEditionModal" content-classes="modal-container-sm" @hide="resetThirdPartyPayerUpdateModalData">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -240,7 +240,6 @@ export default {
       serviceEditionModal: false,
       serviceHistoryModal: false,
       selectedService: {},
-      modalCssContainer: { minWidth: '30vw' },
       newService: {
         name: '',
         nature: '',

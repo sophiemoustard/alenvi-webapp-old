@@ -339,9 +339,6 @@ export default {
         { label: 'Voiture personnelle', value: 'private', ogustValue: 'V' },
         { label: 'Aucun', value: 'none', ogustValue: 'P' }
       ],
-      modalCssContainer: {
-        minWidth: '30vw'
-      },
       requiredField: 'Champ requis',
       requiredDoc: 'Document requis',
       disablePictureEdition: true,

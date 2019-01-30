@@ -207,7 +207,7 @@
     </div>
 
     <!-- Add helper modal -->
-    <q-modal v-model="addHelper" @hide="resetHelperForm" :content-css="modalCssContainer">
+    <q-modal v-model="addHelper" @hide="resetHelperForm" content-classes="modal-container-sm">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-8">
@@ -226,7 +226,7 @@
     </q-modal>
 
     <!-- Subscription creation modal -->
-    <q-modal v-model="subscriptionCreationModal" @hide="resetCreationSubscriptionData" :content-css="modalCssContainer">
+    <q-modal v-model="subscriptionCreationModal" @hide="resetCreationSubscriptionData" content-classes="modal-container-sm">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-8">
@@ -253,7 +253,7 @@
     </q-modal>
 
     <!-- Subscription edition modal -->
-    <q-modal v-model="subscriptionEditionModal" :content-css="modalCssContainer" @hide="resetEditionSubscriptionData">
+    <q-modal v-model="subscriptionEditionModal" content-classes="modal-container-sm" @hide="resetEditionSubscriptionData">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -277,7 +277,7 @@
     </q-modal>
 
     <!-- Subscription history modal -->
-    <q-modal v-model="subscriptionHistoryModal" :content-css="modalCssContainer" @hide="resetSubscriptionHistoryData">
+    <q-modal v-model="subscriptionHistoryModal" content-classes="modal-container-sm" @hide="resetSubscriptionHistoryData">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -292,7 +292,8 @@
           :pagination.sync="paginationHistory">
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-              <template>{{ col.value }}</template>
+              <template v-if="col.name === 'startDate'"> {{ $moment(col.value).format('DD/MM/YYYY') }} </template>
+              <template v-else>{{ col.value }}</template>
             </q-td>
           </q-tr>
         </q-table>
@@ -300,7 +301,7 @@
     </q-modal>
 
     <!-- Funding details modal -->
-    <q-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingDetailsModal" :content-css="modalCssContainer" @hide="resetFundingDetailsData">
+    <q-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingDetailsModal" content-classes="modal-container-sm" @hide="resetFundingDetailsData">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -323,7 +324,7 @@
     </q-modal>
 
     <!-- Funding history modal -->
-    <q-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingHistoryModal" :content-css="modalCssContainer" @hide="resetFundingHistoryData">
+    <q-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingHistoryModal" content-classes="modal-container-sm" @hide="resetFundingHistoryData">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -347,7 +348,7 @@
     </q-modal>
 
     <!-- Funding creation modal -->
-    <q-modal v-model="fundingCreationModal" @hide="resetCreationFundingData" @show="checkAll" :content-css="modalCssContainer">
+    <q-modal v-model="fundingCreationModal" @hide="resetCreationFundingData" @show="checkAll" content-classes="modal-container-sm">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-8">
@@ -378,7 +379,7 @@
     </q-modal>
 
     <!-- Funding edition modal -->
-    <q-modal v-if="Object.keys(editedFunding).length > 0" v-model="fundingEditionModal" @hide="resetEditionFundingData" :content-css="modalCssContainer">
+    <q-modal v-if="Object.keys(editedFunding).length > 0" v-model="fundingEditionModal" @hide="resetEditionFundingData" content-classes="modal-container-sm">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-8">
@@ -450,7 +451,6 @@ export default {
       subscriptionEditionModal: false,
       isLoaded: false,
       tmpInput: '',
-      modalCssContainer: { minWidth: '30vw' },
       customer: {
         identity: {},
         contact: {

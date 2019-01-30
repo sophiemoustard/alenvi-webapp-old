@@ -82,7 +82,7 @@
     </div>
 
      <!-- Service modal -->
-    <q-modal v-model="newInternalHourModal" :content-css="modalCssContainer">
+    <q-modal v-model="newInternalHourModal" content-classes="modal-container-sm">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -151,7 +151,6 @@ export default {
       newInternalHourModal: false,
       newInternalHour: { name: '' },
       loading: false,
-      modalCssContainer: { minWidth: '30vw' },
       pagination: { rowsPerPage: 0 },
     }
   },

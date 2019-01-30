@@ -57,37 +57,41 @@
             <q-td slot="body-cell-rum" slot-scope="props" :props="props" :data-label="props.col.label">{{ props.value }}</q-td>
             <q-td slot="body-cell-sign" slot-scope="props" :props="props" :data-label="props.col.label">
               <p class="no-margin" v-if="props.row.signedAt">Mandat signé le {{$moment(props.row.signedAt).format('DD/MM/YYYY')}}</p>
-              <q-btn v-else-if="props.row.__index === customer.payment.mandates.length - 1" color="primary" @click="preOpenESignModal(props)">
+              <q-btn v-else-if="props.row.__index === customer.payment.mandates.length - 1" color="primary" @click="preOpenESignModal(props.row)">
                 Signer
               </q-btn>
             </q-td>
           </q-table>
         </q-card>
       </div>
-      <q-modal v-model="newESignModal" @hide="checkMandates" :content-css="modalCssContainer">
-        <q-modal-layout>
-          <q-toolbar class="no-shadow row justify-end toolbar-padding" color="black" inverted slot="header">
-            <q-icon class="cursor-pointer" name="clear" size="1rem" @click.native="newESignModal = false" />
-          </q-toolbar>
-          <iframe :src="embeddedUrl" frameborder="0" class="iframe-normal"></iframe>
-        </q-modal-layout>
-      </q-modal>
-      <q-modal v-model="cgsModal" :content-css="cgsModalCssContainer">
-        <q-modal-layout>
-          <q-toolbar class="no-shadow row justify-between toolbar-padding" color="black" inverted slot="header">
-            <h5 class="no-margin">Conditions Générales de Service Alenvi</h5>
-            <q-icon class="cursor-pointer" name="clear" size="1rem" @click.native="cgsModal = false" />
-          </q-toolbar>
-          <div v-html="cgs" class="modal-padding"></div>
-        </q-modal-layout>
-      </q-modal>
     </template>
     <template v-else>
       <p>Vous n'avez pas de bénéficiaire.</p>
     </template>
 
+    <!-- Mandate signature modal -->
+    <q-modal v-model="newESignModal" @hide="checkMandates" content-classes="e-sign-modal-container">
+      <q-modal-layout>
+        <q-toolbar class="no-shadow row justify-end toolbar-padding" color="black" inverted slot="header">
+          <q-icon class="cursor-pointer" name="clear" size="1rem" @click.native="newESignModal = false" />
+        </q-toolbar>
+        <iframe :src="embeddedUrl" frameborder="0" class="iframe-normal"></iframe>
+      </q-modal-layout>
+    </q-modal>
+
+    <!-- CSG modal -->
+    <q-modal v-model="cgsModal" content-classes="csg-modal-container">
+      <q-modal-layout>
+        <q-toolbar class="no-shadow row justify-between toolbar-padding" color="black" inverted slot="header">
+          <h5 class="no-margin">Conditions Générales de Service Alenvi</h5>
+          <q-icon class="cursor-pointer" name="clear" size="1rem" @click.native="cgsModal = false" />
+        </q-toolbar>
+        <div v-html="cgs" class="modal-padding"></div>
+      </q-modal-layout>
+    </q-modal>
+
     <!-- Subscription history modal -->
-    <q-modal v-model="subscriptionHistoryModal" :content-css="modalSubsCssContainer" @hide="resetSubscriptionHistoryData">
+    <q-modal v-model="subscriptionHistoryModal" content-classes="modal-container-sm" @hide="resetSubscriptionHistoryData">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -111,7 +115,7 @@
     </q-modal>
 
     <!-- Funding modal -->
-    <q-modal v-model="fundingModal" :content-css="modalSubsCssContainer" @hide="resetFundingData">
+    <q-modal v-model="fundingModal" content-classes="modal-container-sm" @hide="resetFundingData">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -142,6 +146,7 @@ import Input from '../../components/form/Input.vue';
 import NiModalInput from '../../components/form/ModalInput';
 import MultipleFilesUploader from '../../components/form/MultipleFilesUploader.vue';
 import { bic, iban } from '../../helpers/vuelidateCustomVal';
+import { getLastVersion } from '../../helpers/utils';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
@@ -173,16 +178,6 @@ export default {
       tmpInput: null,
       newESignModal: false,
       embeddedUrl: '',
-      modalCssContainer: {
-        minWidth: '80vw',
-        minHeight: '90vh'
-      },
-      modalSubsCssContainer: { minWidth: '30vw' },
-      cgsModalCssContainer: {
-        minWidth: '60vw',
-        minHeight: '70vh',
-        overflow: 'hidden'
-      },
       columnsMandates: [
         {
           name: 'rum',
@@ -358,7 +353,7 @@ export default {
       try {
         if (this.customer.subscriptionsAccepted) {
           const subscriptions = this.customer.subscriptions.map(subscription => {
-            const lastVersion = this.getLastVersion(subscription);
+            const lastVersion = getLastVersion(subscription.versions);
             const obj = {
               service: subscription.service.name,
               unitTTCRate: lastVersion.unitTTCRate,
@@ -503,4 +498,13 @@ export default {
   .q-card-container
     padding: 0
 
+  /deep/ .e-sign-modal-container
+    min-width: 80vw
+    min-height: 90vh
+
+  /deep/ .csg-modal-container
+    min-width: 60vw
+    max-width: 60vw
+    min-height: 70vh
+    overflow: hidden
 </style>
