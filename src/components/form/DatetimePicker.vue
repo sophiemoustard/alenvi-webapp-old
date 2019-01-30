@@ -1,7 +1,7 @@
 <template>
   <div :class="[inModal ? 'col-12' : 'col-xs-12 col-md-6']">
     <div v-if="caption" class="row justify-between">
-      <p class="input-caption">{{ caption }}</p>
+      <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <q-field :error="error" :error-label="errorLabel">
@@ -24,6 +24,7 @@ export default {
     max: { type: String, default: null },
     disable: { type: Boolean, default: false },
     inModal: { type: Boolean, default: false },
+    requiredField: { type: Boolean, default: false }
   },
   computed: {
     format () {

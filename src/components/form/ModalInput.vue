@@ -43,6 +43,4 @@ export default {
   .q-if-inverted
     border: 1px solid $light-grey
 
-  .required::after
-    content: ' *'
 </style>

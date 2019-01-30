@@ -361,7 +361,8 @@
           @blur="$v.newFunding.thirdPartyPayer.$touch" requiredField
         />
         <ni-modal-input v-model="newFunding.folderNumber" caption="Numéro de dossier" />
-        <ni-option-group v-model="newFunding.services" :options="fundingServicesOptions()" caption="Souscriptions" type="checkbox" @blur="$v.newFunding.services.$touch" :error="$v.newFunding.services.$error"/>
+        <ni-option-group v-model="newFunding.services" :options="fundingServicesOptions()" caption="Souscriptions" type="checkbox"
+          @blur="$v.newFunding.services.$touch" :error="$v.newFunding.services.$error" requiredField />
         <ni-datetime-picker v-model="newFunding.startDate" caption="Date de début de prise en charge" :min="fundingMinStartDate" inModal />
         <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="newFunding.frequency" />
         <ni-datetime-picker v-if="isOneTimeFundingFrequency" v-model="newFunding.endDate" caption="Fin de prise en charge"
@@ -388,7 +389,8 @@
             <span><q-icon name="clear" size="1rem" @click.native="fundingEditionModal = false" /></span>
           </div>
         </div>
-        <ni-option-group v-model="editedFunding.services" :options="fundingServicesOptions(editedFunding._id)" caption="Souscriptions" type="checkbox" @blur="$v.editedFunding.services.$touch" :error="$v.editedFunding.services.$error" />
+        <ni-option-group v-model="editedFunding.services" :options="fundingServicesOptions(editedFunding._id)" caption="Souscriptions" type="checkbox"
+          @blur="$v.editedFunding.services.$touch" :error="$v.editedFunding.services.$error" requiredField />
         <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="editedFunding.frequency" />
         <ni-datetime-picker v-if="isOneTimeEditedFundingFrequency" v-model="editedFunding.endDate" caption="Fin de prise en charge"
           :min="editedFundingMinEffectiveDate" inModal />
@@ -398,7 +400,7 @@
         <ni-modal-input v-model="editedFunding.customerParticipationRate" caption="Taux de participation du bénéficiaire" type="number" suffix="%" />
         <ni-option-group v-model="editedFunding.careDays" :options="daysOptions" caption="Jours pris en charge" type="checkbox" inline />
         <ni-datetime-picker v-model="editedFunding.effectiveDate" caption="Date d'effet" :min="editedFundingMinEffectiveDate" inModal
-          @blur="$v.editedFunding.effectiveDate.$touch" :error="$v.editedFunding.effectiveDate.$error" class="last" />
+          @blur="$v.editedFunding.effectiveDate.$touch" :error="$v.editedFunding.effectiveDate.$error" class="last" requiredField />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Modifier un financement" icon-right="add" color="primary" :loading="loading"
         @click="editFunding" />
