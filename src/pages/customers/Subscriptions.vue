@@ -498,12 +498,12 @@ export default {
     padding: 0
 
   /deep/ .e-sign-modal-container
-    min-width: '80vw'
-    min-height: '90vh'
+    min-width: 80vw
+    min-height: 90vh
 
   /deep/ .csg-modal-container
-    min-width: '60vw'
-    max-width: '60vw'
-    min-height: '70vh'
+    min-width: 60vw
+    max-width: 60vw
+    min-height: 70vh
     overflow: 'hidden'
 </style>

@@ -292,7 +292,8 @@
           :pagination.sync="paginationHistory">
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-              <template>{{ col.value }}</template>
+              <template v-if="col.name === 'startDate'"> {{ $moment(col.value).format('DD/MM/YYYY') }} </template>
+              <template v-else>{{ col.value }}</template>
             </q-td>
           </q-tr>
         </q-table>
