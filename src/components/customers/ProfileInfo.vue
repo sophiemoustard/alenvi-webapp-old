@@ -359,8 +359,7 @@
           </div>
         </div>
         <ni-modal-select caption="Tiers payeur" :options="fundingTppOptions" v-model="newFunding.thirdPartyPayer" :error="$v.newFunding.thirdPartyPayer.$error"
-          @blur="$v.newFunding.thirdPartyPayer.$touch" requiredField
-        />
+          @blur="$v.newFunding.thirdPartyPayer.$touch" requiredField />
         <ni-modal-input v-model="newFunding.folderNumber" caption="Numéro de dossier" />
         <ni-option-group v-model="newFunding.services" :options="fundingServicesOptions()" caption="Souscriptions" type="checkbox"
           @blur="$v.newFunding.services.$touch" :error="$v.newFunding.services.$error" requiredField />
@@ -368,7 +367,8 @@
         <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="newFunding.frequency" />
         <ni-datetime-picker v-model="newFunding.endDate" caption="Fin de prise en charge"
           :min="$moment(this.newFunding.startDate).add(1, 'day').toISOString()" inModal />
-        <ni-modal-select caption="Nature" :options="fundingNatureOptions" v-model="newFunding.nature" inModal />
+        <ni-modal-select caption="Nature" :options="fundingNatureOptions" v-model="newFunding.nature" inModal
+          @blur="$v.newFunding.nature.$touch" :error="$v.newFunding.nature.$error" requiredField />
         <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.unitTTCRate" caption="Prix unitaire TTC" type="number" />
         <ni-modal-input v-if="isOneTimeFundingNature" v-model="newFunding.amountTTC" caption="Montant forfaitaire TTC" type="number" />
         <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.careHours" caption="Nb. heures prises en charge" type="number" suffix="h" />
@@ -782,7 +782,8 @@ export default {
     },
     newFunding: {
       thirdPartyPayer: { required },
-      services: { required }
+      services: { required },
+      nature: { required }
     },
     editedFunding: {
       effectiveDate: { required },
