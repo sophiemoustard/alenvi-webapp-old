@@ -154,6 +154,7 @@ import { financialCertificatesMixin } from '../../mixins/financialCertificatesMi
 import { fundingMixin } from '../../mixins/fundingMixin.js';
 import esign from '../../api/Esign.js';
 import cgs from '../../statics/CGS.html';
+import { FIXED } from '../../data/constants';
 
 export default {
   name: 'Subscriptions',
@@ -265,7 +266,7 @@ export default {
       return this.customer.driveFolder ? `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.id}/upload` : '';
     },
     fundingVisibleColumns () {
-      if (this.selectedFunding.nature === 'one_time') {
+      if (this.selectedFunding.nature === FIXED) {
         return ['thirdPartyPayer', 'folderNumber', 'startDate', 'frequency', 'amountTTC', 'customerParticipationRate'];
       }
       return ['thirdPartyPayer', 'folderNumber', 'startDate', 'frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate'];

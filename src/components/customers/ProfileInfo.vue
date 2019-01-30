@@ -359,8 +359,7 @@
           </div>
         </div>
         <ni-modal-select caption="Tiers payeur" :options="fundingTppOptions" v-model="newFunding.thirdPartyPayer" :error="$v.newFunding.thirdPartyPayer.$error"
-          @blur="$v.newFunding.thirdPartyPayer.$touch" requiredField
-        />
+          @blur="$v.newFunding.thirdPartyPayer.$touch" requiredField />
         <ni-modal-input v-model="newFunding.folderNumber" caption="Numéro de dossier" />
         <ni-option-group v-model="newFunding.services" :options="fundingServicesOptions()" caption="Souscriptions" type="checkbox"
           @blur="$v.newFunding.services.$touch" :error="$v.newFunding.services.$error" requiredField />
@@ -368,7 +367,8 @@
         <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="newFunding.frequency" />
         <ni-datetime-picker v-model="newFunding.endDate" caption="Fin de prise en charge"
           :min="$moment(this.newFunding.startDate).add(1, 'day').toISOString()" inModal />
-        <ni-modal-select caption="Nature" :options="fundingNatureOptions" v-model="newFunding.nature" inModal />
+        <ni-modal-select caption="Nature" :options="fundingNatureOptions" v-model="newFunding.nature" inModal
+          @blur="$v.newFunding.nature.$touch" :error="$v.newFunding.nature.$error" requiredField />
         <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.unitTTCRate" caption="Prix unitaire TTC" type="number" />
         <ni-modal-input v-if="isOneTimeFundingNature" v-model="newFunding.amountTTC" caption="Montant forfaitaire TTC" type="number" />
         <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.careHours" caption="Nb. heures prises en charge" type="number" suffix="h" />
@@ -427,7 +427,7 @@ import { downloadDocxFile } from '../../helpers/downloadFile';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
 import { days } from '../../data/days.js';
-import { FUNDING_FREQ_OPTIONS, FUNDING_NATURE_OPTIONS, ONCE, ONE_TIME, HOURLY } from '../../data/constants.js';
+import { FUNDING_FREQ_OPTIONS, FUNDING_NATURE_OPTIONS, ONCE, FIXED, HOURLY } from '../../data/constants.js';
 import { financialCertificatesMixin } from '../../mixins/financialCertificatesMixin.js';
 import { fundingMixin } from '../../mixins/fundingMixin.js';
 
@@ -687,13 +687,13 @@ export default {
       return selectedSubscription ? this.$moment(selectedSubscription.startDate).add(1, 'd').toISOString() : '';
     },
     fundingHistoryVisibleColumns () {
-      if (this.selectedFunding.nature === 'one_time') {
+      if (this.selectedFunding.nature === 'fixed') {
         return ['effectiveDate', 'endDate', 'frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'services'];
       }
       return ['effectiveDate', 'endDate', 'frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays', 'services'];
     },
     fundingDetailsVisibleColumns () {
-      if (this.selectedFunding.nature === 'one_time') {
+      if (this.selectedFunding.nature === 'fixed') {
         return ['frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'services'];
       }
       return ['frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays', 'services'];
@@ -710,13 +710,13 @@ export default {
       return this.newFunding.frequency === ONCE;
     },
     isOneTimeFundingNature () {
-      return this.newFunding.nature === ONE_TIME;
+      return this.newFunding.nature === FIXED;
     },
     isOneTimeEditedFundingFrequency () {
       return this.editedFunding.frequency === ONCE;
     },
     isOneTimeEditedFundingNature () {
-      return this.editedFunding.nature === ONE_TIME;
+      return this.editedFunding.nature === FIXED;
     },
     daysOptions () {
       return days.map((day, i) => ({
@@ -782,7 +782,8 @@ export default {
     },
     newFunding: {
       thirdPartyPayer: { required },
-      services: { required }
+      services: { required },
+      nature: { required }
     },
     editedFunding: {
       effectiveDate: { required },
@@ -1335,7 +1336,7 @@ export default {
           effectiveDate,
           endDate
         };
-        if (this.editedFunding.nature === ONE_TIME) {
+        if (this.editedFunding.nature === FIXED) {
           payload.amountTTC = amountTTC;
         }
         if (this.editedFunding.nature === HOURLY) {

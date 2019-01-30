@@ -34,7 +34,7 @@ export const BILLING_DIRECT = 'direct';
 export const MONTHLY = 'monthly';
 export const WEEKLY = 'weekly';
 export const ONCE = 'once';
-export const ONE_TIME = 'one_time';
+export const FIXED = 'fixed';
 export const HOURLY = 'hourly';
 
 export const FUNDING_FREQ_OPTIONS = [
@@ -44,5 +44,5 @@ export const FUNDING_FREQ_OPTIONS = [
 ];
 export const FUNDING_NATURE_OPTIONS = [
   { label: 'Horaire', value: HOURLY },
-  { label: 'Forfaitaire', value: ONE_TIME }
+  { label: 'Forfaitaire', value: 'fixed' }
 ];
