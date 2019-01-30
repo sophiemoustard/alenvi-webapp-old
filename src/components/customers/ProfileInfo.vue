@@ -153,7 +153,7 @@
           </q-tr>
         </q-table>
         <q-card-actions align="end">
-          <q-btn :disable="fundingCreationServicesOptions.length === 0" flat no-caps color="primary" icon="add" label="Ajouter un financement" @click="fundingCreationModal = true"/>
+          <q-btn :disable="fundingServicesOptions().length === 0" flat no-caps color="primary" icon="add" label="Ajouter un financement" @click="fundingCreationModal = true"/>
         </q-card-actions>
       </q-card>
     </div>
@@ -361,7 +361,7 @@
           @blur="$v.newFunding.thirdPartyPayer.$touch" requiredField
         />
         <ni-modal-input v-model="newFunding.folderNumber" caption="Numéro de dossier" />
-        <ni-option-group v-model="newFunding.services" :options="fundingCreationServicesOptions" caption="Souscriptions" type="checkbox" @blur="$v.newFunding.services.$touch" :error="$v.newFunding.services.$error"/>
+        <ni-option-group v-model="newFunding.services" :options="fundingServicesOptions()" caption="Souscriptions" type="checkbox" @blur="$v.newFunding.services.$touch" :error="$v.newFunding.services.$error"/>
         <ni-datetime-picker v-model="newFunding.startDate" caption="Date de début de prise en charge" :min="fundingMinStartDate" inModal />
         <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="newFunding.frequency" />
         <ni-datetime-picker v-if="isOneTimeFundingFrequency" v-model="newFunding.endDate" caption="Fin de prise en charge"
@@ -388,7 +388,7 @@
             <span><q-icon name="clear" size="1rem" @click.native="fundingEditionModal = false" /></span>
           </div>
         </div>
-        <ni-option-group v-model="editedFunding.services" :options="fundingEditionServicesOptions" caption="Souscriptions" type="checkbox" @blur="$v.editedFunding.services.$touch" :error="$v.editedFunding.services.$error" />
+        <ni-option-group v-model="editedFunding.services" :options="fundingServicesOptions(editedFunding._id)" caption="Souscriptions" type="checkbox" @blur="$v.editedFunding.services.$touch" :error="$v.editedFunding.services.$error" />
         <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="editedFunding.frequency" />
         <ni-datetime-picker v-if="isOneTimeEditedFundingFrequency" v-model="editedFunding.endDate" caption="Fin de prise en charge"
           :min="editedFundingMinEffectiveDate" inModal />
@@ -722,30 +722,6 @@ export default {
         label: day !== 'Jours fériés' ? day.slice(0, 2) : day,
         value: i
       }));
-    },
-    fundingCreationServicesOptions () {
-      const fundingServices = this.fundings.map(funding => ({ ...funding, services: funding.services.map(service => service._id) }));
-      return this.subscriptions
-        .filter(sub => {
-          if (fundingServices.some(funding => funding.services.includes(sub.service._id) && !funding.endDate)) {
-            return false;
-          } else if (!fundingServices.some(funding => funding.services.includes(sub.service._id))) {
-            return true;
-          } else {
-            return true;
-          }
-        })
-        .map(sub => ({
-          label: sub.service.name,
-          value: sub.service._id,
-        }));
-    },
-    fundingEditionServicesOptions () {
-      return this.subscriptions
-        .map(sub => ({
-          label: sub.service.name,
-          value: sub.service._id,
-        }))
     },
     fundingMinStartDate () {
       if (this.newFunding.services.length > 0) {
@@ -1230,6 +1206,18 @@ export default {
       }
     },
     // Fundings
+    fundingServicesOptions (fundingId = null) {
+      let fundingServices = this.fundings.map(funding => ({ ...funding, services: funding.services.map(service => service._id) }));
+      if (fundingId) {
+        fundingServices = fundingServices.filter(funding => funding._id !== fundingId);
+      }
+      return this.subscriptions
+        .filter(sub => !fundingServices.some(funding => funding.services.includes(sub.service._id) && !funding.endDate))
+        .map(sub => ({
+          label: sub.service.name,
+          value: sub.service._id,
+        }));
+    },
     showFundingHistory (id) {
       this.selectedFunding = this.fundings.find(sub => sub._id === id);
       this.fundingHistoryModal = true;
@@ -1286,7 +1274,7 @@ export default {
       }
     },
     checkAll () {
-      this.newFunding.services.push(...this.fundingCreationServicesOptions.map(sub => sub.value));
+      this.newFunding.services.push(...this.fundingServicesOptions().map(sub => sub.value));
     },
     async removeFunding (fundingId) {
       try {
