@@ -11,7 +11,7 @@
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
                     <q-btn flat round small color="grey" icon="history" @click="showHistory(col.value)" />
-                    <q-btn :disable="!hasFunding(col.value)" flat round small color="grey" icon="monetization_on" @click="showFunding(col.value)" />
+                    <q-btn :disable="!hasFunding(col.value)" flat round small color="grey" icon="mdi-calculator" @click="showFunding(col.value)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -271,9 +271,9 @@ export default {
     },
     fundingVisibleColumns () {
       if (this.selectedFunding.nature === 'one_time') {
-        return ['thirdPartyPayer', 'folderNumber', 'start', 'end', 'nature', 'frequency', 'amountTTC', 'customerParticipationRate', 'careDays'];
+        return ['thirdPartyPayer', 'folderNumber', 'startDate', 'frequency', 'amountTTC', 'customerParticipationRate'];
       }
-      return ['thirdPartyPayer', 'folderNumber', 'start', 'end', 'nature', 'frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays'];
+      return ['thirdPartyPayer', 'folderNumber', 'startDate', 'frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate'];
     }
   },
   async mounted () {

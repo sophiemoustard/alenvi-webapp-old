@@ -74,7 +74,7 @@ export const fundingMixin = {
         },
         {
           name: 'careHours',
-          label: 'Heures de prise en charge',
+          label: 'Nb. heures de prise en charge',
           align: 'left',
           format: (value) => value ? `${value}h` : '',
           field: 'careHours',
