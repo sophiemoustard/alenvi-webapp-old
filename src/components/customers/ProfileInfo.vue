@@ -427,7 +427,7 @@ import { downloadDocxFile } from '../../helpers/downloadFile';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
 import { days } from '../../data/days.js';
-import { FUNDING_FREQ_OPTIONS, FUNDING_NATURE_OPTIONS, ONCE, ONE_TIME, HOURLY } from '../../data/constants.js';
+import { FUNDING_FREQ_OPTIONS, FUNDING_NATURE_OPTIONS, ONCE, FIXED, HOURLY } from '../../data/constants.js';
 import { financialCertificatesMixin } from '../../mixins/financialCertificatesMixin.js';
 import { fundingMixin } from '../../mixins/fundingMixin.js';
 
@@ -687,13 +687,13 @@ export default {
       return selectedSubscription ? this.$moment(selectedSubscription.startDate).add(1, 'd').toISOString() : '';
     },
     fundingHistoryVisibleColumns () {
-      if (this.selectedFunding.nature === 'one_time') {
+      if (this.selectedFunding.nature === 'fixed') {
         return ['effectiveDate', 'endDate', 'frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'services'];
       }
       return ['effectiveDate', 'endDate', 'frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays', 'services'];
     },
     fundingDetailsVisibleColumns () {
-      if (this.selectedFunding.nature === 'one_time') {
+      if (this.selectedFunding.nature === 'fixed') {
         return ['frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'services'];
       }
       return ['frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays', 'services'];
@@ -710,13 +710,13 @@ export default {
       return this.newFunding.frequency === ONCE;
     },
     isOneTimeFundingNature () {
-      return this.newFunding.nature === ONE_TIME;
+      return this.newFunding.nature === FIXED;
     },
     isOneTimeEditedFundingFrequency () {
       return this.editedFunding.frequency === ONCE;
     },
     isOneTimeEditedFundingNature () {
-      return this.editedFunding.nature === ONE_TIME;
+      return this.editedFunding.nature === FIXED;
     },
     daysOptions () {
       return days.map((day, i) => ({
@@ -1336,7 +1336,7 @@ export default {
           effectiveDate,
           endDate
         };
-        if (this.editedFunding.nature === ONE_TIME) {
+        if (this.editedFunding.nature === FIXED) {
           payload.amountTTC = amountTTC;
         }
         if (this.editedFunding.nature === HOURLY) {

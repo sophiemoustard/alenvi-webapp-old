@@ -1,5 +1,5 @@
 import { getLastVersion } from '../helpers/utils';
-import { MONTHLY, ONE_TIME, ONCE, HOURLY } from '../data/constants';
+import { MONTHLY, FIXED, ONCE, HOURLY } from '../data/constants';
 
 export const subscriptionMixin = {
   data () {
@@ -101,7 +101,7 @@ export const subscriptionMixin = {
       let fundingReduction = 0;
       if (this.isCompleteFunding(funding)) {
         if (funding.frequency !== ONCE) {
-          if (funding.nature === ONE_TIME) {
+          if (funding.nature === FIXED) {
             fundingReduction = funding.frequency === MONTHLY ? funding.amountTTC / 4.33 : funding.amountTTC;
           } else {
             const refundedHours = Math.min(
@@ -120,7 +120,7 @@ export const subscriptionMixin = {
     isCompleteFunding (funding) {
       if (!funding || funding === {}) return false;
       if (!(funding.frequency && funding.nature && funding.customerParticipationRate)) return false;
-      if (funding.nature === ONE_TIME && !funding.amountTTC) return false;
+      if (funding.nature === FIXED && !funding.amountTTC) return false;
       if (funding.nature === HOURLY && (!funding.unitTTCRate || !funding.careHours)) return false;
       return true;
     },
