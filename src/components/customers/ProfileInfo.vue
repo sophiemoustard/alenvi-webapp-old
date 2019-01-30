@@ -351,7 +351,7 @@
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-8">
-            <h5>Ajouter un <span class="text-weight-bold">financement</span></h5>
+            <h5>Ajouter le <span class="text-weight-bold">financement</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
             <span><q-icon name="clear" size="1rem" @click.native="fundingCreationModal = false" /></span>
@@ -374,7 +374,7 @@
         <ni-modal-input v-model="newFunding.customerParticipationRate" caption="Taux de participation du bénéficiaire" type="number" suffix="%" />
         <ni-option-group v-model="newFunding.careDays" :options="daysOptions" caption="Jours pris en charge" type="checkbox" inline />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Ajouter un financement" icon-right="add" color="primary" :loading="loading"
+      <q-btn no-caps class="full-width modal-btn" label="Ajouter le financement" icon-right="add" color="primary" :loading="loading"
         @click="submitFunding" />
     </q-modal>
 
@@ -383,7 +383,7 @@
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-8">
-            <h5>Modifier un <span class="text-weight-bold">financement</span></h5>
+            <h5>Modifier le <span class="text-weight-bold">financement</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
             <span><q-icon name="clear" size="1rem" @click.native="fundingEditionModal = false" /></span>
@@ -401,7 +401,7 @@
         <ni-datetime-picker v-model="editedFunding.effectiveDate" caption="Date d'effet" :max="editedFundingMaxEffectiveDate" :min="editedFundingMinEffectiveDate" inModal
           @blur="$v.editedFunding.effectiveDate.$touch" :error="$v.editedFunding.effectiveDate.$error" class="last" requiredField />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Modifier un financement" icon-right="add" color="primary" :loading="loading"
+      <q-btn no-caps class="full-width modal-btn" label="Modifier le financement" icon-right="add" color="primary" :loading="loading"
         @click="editFunding" />
     </q-modal>
   </div>
