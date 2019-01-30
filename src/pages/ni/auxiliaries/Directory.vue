@@ -59,7 +59,7 @@
               <q-icon v-if="$v.newUser.sector.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newUser.sector.$error" error-label="Champ requis">
-              <ni-select-sector v-model="newUser.sector" @myBlur="$v.newUser.sector.$touch"/>
+              <ni-select-sector v-model="newUser.sector" @myBlur="$v.newUser.sector.$touch" inModal />
             </q-field>
           </div>
         </div>
@@ -70,7 +70,7 @@
               <q-icon v-if="$v.newUser.ogustManagerId.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newUser.ogustManagerId.$error" error-label="Champ requis">
-              <ni-select-manager v-model="newUser.ogustManagerId" @myBlur="$v.newUser.ogustManagerId.$touch"/>
+              <ni-select-manager v-model="newUser.ogustManagerId" @myBlur="$v.newUser.ogustManagerId.$touch" inModal/>
             </q-field>
           </div>
         </div>

@@ -1,22 +1,18 @@
 <template>
-  <q-select color="white"
-    inverted-light
-    :value="value"
-    ref="selectManager"
-    @change="updateManager"
-    :options="orderedManagers"
-    :error="errorProp"
-    @blur="blurHandler"
-    filter
-    filter-placeholder="Rechercher"
-    separator />
+  <q-select color="white" inverted-light :value="value" ref="selectManager" @change="updateManager" :options="orderedManagers"
+    :error="myError" @blur="blurHandler" filter filter-placeholder="Rechercher" separator :class="{border: inModal}" />
 </template>
 
 <script>
 import _ from 'lodash';
 
 export default {
-  props: ['value', 'icon', 'myError'],
+  props: {
+    value: String,
+    icon: String,
+    myError: { type: String, default: null },
+    inModal: { type: Boolean, default: false },
+  },
   data () {
     return {
       managers: []
@@ -29,12 +25,6 @@ export default {
     orderedManagers () {
       return _.sortBy(this.managers, ['label']);
     },
-    errorProp () {
-      if (this.myError) {
-        return this.myError
-      }
-      return null
-    }
   },
   methods: {
     async getManagers () {
@@ -62,6 +52,6 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables'
-  .q-if-inverted
+  .border
     border: 1px solid $light-grey
 </style>

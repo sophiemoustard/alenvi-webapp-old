@@ -1,17 +1,6 @@
 <template>
-  <q-select
-    :value="value"
-    color="white"
-    :error="errorProp"
-    inverted-light
-    :stack-label="stackLabel"
-    ref="selectSector"
-    @change="updateSector"
-    :options="orderedSectors"
-    @blur="blurHandler"
-    filter
-    filter-placeholder="Rechercher"
-    separator />
+  <q-select :value="value" color="white" :error="myError" inverted-light :stack-label="stackLabel" ref="selectSector" @change="updateSector"
+    :options="orderedSectors" @blur="blurHandler" filter filter-placeholder="Rechercher" separator :class="{border: inModal}" />
 </template>
 
 <script>
@@ -19,7 +8,12 @@ import _ from 'lodash';
 
 export default {
   name: 'SelectSector',
-  props: ['value', 'icon', 'stackLabel', 'myError'],
+  props: {
+    value: String,
+    stackLabel: String,
+    myError: { type: String, default: null },
+    inModal: { type: Boolean, default: false },
+  },
   data () {
     return {
       sectors: []
@@ -32,12 +26,6 @@ export default {
     orderedSectors () {
       return _.sortBy(this.sectors, ['value']);
     },
-    errorProp () {
-      if (this.myError) {
-        return this.myError
-      }
-      return null
-    }
   },
   methods: {
     async getSectors () {
@@ -68,6 +56,6 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables'
-  .q-if-inverted
+  .border
     border: 1px solid $light-grey
 </style>
