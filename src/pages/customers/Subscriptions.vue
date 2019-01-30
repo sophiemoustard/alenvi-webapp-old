@@ -146,6 +146,7 @@ import Input from '../../components/form/Input.vue';
 import NiModalInput from '../../components/form/ModalInput';
 import MultipleFilesUploader from '../../components/form/MultipleFilesUploader.vue';
 import { bic, iban } from '../../helpers/vuelidateCustomVal';
+import { getLastVersion } from '../../helpers/utils';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
@@ -352,7 +353,7 @@ export default {
       try {
         if (this.customer.subscriptionsAccepted) {
           const subscriptions = this.customer.subscriptions.map(subscription => {
-            const lastVersion = this.getLastVersion(subscription);
+            const lastVersion = getLastVersion(subscription.versions);
             const obj = {
               service: subscription.service.name,
               unitTTCRate: lastVersion.unitTTCRate,
