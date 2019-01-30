@@ -284,7 +284,8 @@ export default {
     },
     minEndContractDate () {
       if (this.endContractModal) {
-        return this.$moment().toISOString();
+        const activeVersion = this.getActiveVersion(this.endContractData.contract);
+        return this.$moment(activeVersion.startDate).add(1, 'day').toISOString();
       }
       return '';
     }
