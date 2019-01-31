@@ -44,18 +44,19 @@
             <span><q-icon name="clear" size="1rem" @click.native="opened = false" /></span>
           </div>
         </div>
-        <ni-modal-select v-model="newUser.administrative.identity.title" :error="$v.newUser.administrative.identity.title.$error" :options="civilityOptions" caption="Civilité" @blur="$v.newUser.administrative.identity.title.$touch" errorLabel="Champ requis" />
-        <ni-modal-input v-model="newUser.lastname" :error="$v.newUser.lastname.$error" caption="Nom" @blur="$v.newUser.lastname.$touch" errorLabel="Champ requis" />
-        <ni-modal-input v-model="newUser.firstname" :error="$v.newUser.firstname.$error" caption="Prénom" @blur="$v.newUser.firstname.$touch" errorLabel="Champ requis" />
-        <ni-modal-input v-model="newUser.mobilePhone" :error="$v.newUser.mobilePhone.$error" caption="Numéro de téléphone" @blur="$v.newUser.mobilePhone.$touch" :errorLabel="mobilePhoneError" />
-        <ni-modal-input v-model="newUser.administrative.contact.address" :error="$v.newUser.administrative.contact.address.$error" caption="Addresse" @blur="$v.newUser.administrative.contact.address.$touch" errorLabel="Champ requis" />
-        <ni-modal-input v-model="newUser.administrative.contact.zipCode" :error="$v.newUser.administrative.contact.zipCode.$error" caption="Code postal" @blur="$v.newUser.administrative.contact.zipCode.$touch" :errorLabel="zipCodeError" />
-        <ni-modal-input v-model="newUser.administrative.contact.city" :error="$v.newUser.administrative.contact.city.$error" caption="Ville" @blur="$v.newUser.administrative.contact.city.$touch" errorLabel="Champ requis" />
-        <ni-modal-input v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email" @blur="$v.newUser.local.email.$touch" :errorLabel="emailError" />
+        <ni-modal-select v-model="newUser.administrative.identity.title" :error="$v.newUser.administrative.identity.title.$error" :options="civilityOptions" caption="Civilité"
+          @blur="$v.newUser.administrative.identity.title.$touch" errorLabel="Champ requis" requiredField />
+        <ni-modal-input v-model="newUser.lastname" :error="$v.newUser.lastname.$error" caption="Nom" @blur="$v.newUser.lastname.$touch" errorLabel="Champ requis" requiredField />
+        <ni-modal-input v-model="newUser.firstname" :error="$v.newUser.firstname.$error" caption="Prénom" @blur="$v.newUser.firstname.$touch" errorLabel="Champ requis" requiredField />
+        <ni-modal-input v-model="newUser.mobilePhone" :error="$v.newUser.mobilePhone.$error" caption="Numéro de téléphone" @blur="$v.newUser.mobilePhone.$touch" :errorLabel="mobilePhoneError" requiredField />
+        <ni-modal-input v-model="newUser.administrative.contact.address" :error="$v.newUser.administrative.contact.address.$error" caption="Addresse" @blur="$v.newUser.administrative.contact.address.$touch" errorLabel="Champ requis" requiredField />
+        <ni-modal-input v-model="newUser.administrative.contact.zipCode" :error="$v.newUser.administrative.contact.zipCode.$error" caption="Code postal" @blur="$v.newUser.administrative.contact.zipCode.$touch" :errorLabel="zipCodeError" requiredField />
+        <ni-modal-input v-model="newUser.administrative.contact.city" :error="$v.newUser.administrative.contact.city.$error" caption="Ville" @blur="$v.newUser.administrative.contact.city.$touch" errorLabel="Champ requis" requiredField />
+        <ni-modal-input v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email" @blur="$v.newUser.local.email.$touch" :errorLabel="emailError" requiredField />
         <div class="row margin-input">
           <div class="col-12">
             <div class="row justify-between">
-              <p class="input-caption">Communauté</p>
+              <p class="input-caption required">Communauté</p>
               <q-icon v-if="$v.newUser.sector.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newUser.sector.$error" error-label="Champ requis">
@@ -66,7 +67,7 @@
         <div class="row margin-input last">
           <div class="col-12">
             <div class="row justify-between">
-              <p class="input-caption">Géré par</p>
+              <p class="input-caption required">Géré par</p>
               <q-icon v-if="$v.newUser.ogustManagerId.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newUser.ogustManagerId.$error" error-label="Champ requis">

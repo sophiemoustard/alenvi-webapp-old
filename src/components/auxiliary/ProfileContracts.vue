@@ -84,12 +84,12 @@
           </div>
         </div>
         <ni-modal-select caption="Statut" :error="$v.newContract.status.$error" :options="statusOptions" v-model="newContract.status"
-          @blur="$v.newContract.status.$touch" separator />
+          @blur="$v.newContract.status.$touch" separator requiredField />
         <ni-modal-input caption="Volume horaire hebdomadaire" :error="$v.newContract.weeklyHours.$error" type="number" v-model="newContract.weeklyHours"
-          @blur="$v.newContract.weeklyHours.$touch" suffix="hr" />
+          @blur="$v.newContract.weeklyHours.$touch" suffix="hr" requiredField />
         <ni-modal-input caption="Taux horaire" :error="$v.newContract.grossHourlyRate.$error" type="number" v-model="newContract.grossHourlyRate"
-          @blur="$v.newContract.grossHourlyRate.$touch" suffix="€" />
-        <ni-datetime-picker caption="Date d'effet" :error="$v.newContract.startDate.$error" v-model="newContract.startDate" inModal />
+          @blur="$v.newContract.grossHourlyRate.$touch" suffix="€" requiredField />
+        <ni-datetime-picker caption="Date d'effet" :error="$v.newContract.startDate.$error" v-model="newContract.startDate" inModal requiredField />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer le contrat" icon-right="add" color="primary" :loading="loading" @click="createNewContract" />
     </q-modal>
@@ -106,11 +106,11 @@
           </div>
         </div>
         <ni-modal-input caption="Volume horaire hebdomadaire"  :error="$v.newContractVersion.weeklyHours.$error" v-model="newContractVersion.weeklyHours"
-          type="number" @blur="$v.newContractVersion.weeklyHours.$touch" suffix="hr" />
+          type="number" @blur="$v.newContractVersion.weeklyHours.$touch" suffix="hr" requiredField />
         <ni-modal-input caption="Taux horaire"  :error="$v.newContractVersion.grossHourlyRate.$error" v-model="newContractVersion.grossHourlyRate"
-          type="number" @blur="$v.newContractVersion.grossHourlyRate.$touch" suffix="€" />
+          type="number" @blur="$v.newContractVersion.grossHourlyRate.$touch" suffix="€" requiredField />
         <ni-datetime-picker caption="Date d'effet" :error="$v.newContractVersion.startDate.$error" v-model="newContractVersion.startDate"
-          :min="getMinimalStartDate(contractSelected)" inModal />
+          :min="getMinimalStartDate(contractSelected)" inModal requiredField />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer l'avenant" icon-right="add" color="primary" :loading="loading" @click="createNewContractVersion" />
     </q-modal>

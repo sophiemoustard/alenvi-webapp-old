@@ -40,8 +40,8 @@
             <span><q-icon name="clear" size="1rem" @click.native="opened = false" /></span>
           </div>
         </div>
-        <ni-modal-select v-model="newCustomer.identity.title" :error="$v.newCustomer.identity.title.$error" :options="civilityOptions" caption="Civilité" @blur="$v.newCustomer.identity.title.$touch" errorLabel="Champ requis" />
-        <ni-modal-input v-model="newCustomer.identity.lastname" :error="$v.newCustomer.identity.lastname.$error" caption="Nom" @blur="$v.newCustomer.identity.lastname.$touch" errorLabel="Champ requis" />
+        <ni-modal-select v-model="newCustomer.identity.title" :error="$v.newCustomer.identity.title.$error" :options="civilityOptions" caption="Civilité" @blur="$v.newCustomer.identity.title.$touch" errorLabel="Champ requis" requiredField />
+        <ni-modal-input v-model="newCustomer.identity.lastname" :error="$v.newCustomer.identity.lastname.$error" caption="Nom" @blur="$v.newCustomer.identity.lastname.$touch" errorLabel="Champ requis" requiredField />
         <ni-modal-input v-model="newCustomer.identity.firstname" errorLabel="Champs requis" caption="Prénom" />
         <div class="row margin-input last">
           <ni-search-address v-model="newCustomer.contact.address.fullAddress" @selected="selectedAddress" @blur="$v.newCustomer.contact.address.fullAddress.$touch"
@@ -165,11 +165,6 @@ export default {
           fullAddress: { required, frAddress }
         }
       },
-    },
-    ogust: {
-      managerId: { required },
-      method_of_payment: { required },
-      origin: { required }
     }
   },
   async mounted () {

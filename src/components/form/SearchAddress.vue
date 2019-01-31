@@ -1,7 +1,7 @@
 <template>
   <div :class="{ 'col-12 col-md-6': !inModal, 'col-12': inModal }">
     <div class="row justify-between">
-      <p class="input-caption">{{ caption }}</p>
+      <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
     </div>
     <q-field :error="error" :error-label="errorLabel">
       <q-search :value="value" inverted-light color="white" placeholder=" " no-icon @input="inputEvent" @blur="blurEvent" :class="{'borders': inModal}">
@@ -20,6 +20,7 @@ export default {
     errorLabel: { type: String, default: 'Champ requis' },
     error: { type: Boolean, default: false },
     inModal: { type: Boolean, default: false },
+    requiredField: { type: Boolean, default: false }
   },
   methods: {
     async searchAddress (terms, done) {
