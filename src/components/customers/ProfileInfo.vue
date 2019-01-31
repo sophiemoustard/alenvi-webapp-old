@@ -364,7 +364,7 @@
           @blur="$v.newFunding.services.$touch" :error="$v.newFunding.services.$error" requiredField />
         <ni-datetime-picker v-model="newFunding.startDate" caption="Date de début de prise en charge" :min="newFundingMinStartDate" inModal
           @blur="$v.newFunding.startDate.$touch" :error="$v.newFunding.startDate.$error" requiredField />
-        <ni-datetime-picker v-model="newFunding.endDate" :min="$moment(this.newFunding.startDate).add(1, 'day').toISOString()" inModal
+        <ni-datetime-picker v-model="newFunding.endDate" :min="$moment(newFunding.startDate).add(1, 'day').toISOString()" inModal
           caption="Date de fin de prise en charge" />
         <ni-modal-input v-model="newFunding.folderNumber" caption="Numéro de dossier" />
         <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="newFunding.frequency" @blur="$v.newFunding.frequency.$touch"
@@ -399,7 +399,8 @@
         </div>
         <ni-datetime-picker v-model="editedFunding.startDate" caption="Date de début de prise en charge" :max="editedFundingMaxStartDate" class="last"
           :min="editedFundingMinStartDate" inModal @blur="$v.editedFunding.startDate.$touch" :error="$v.editedFunding.startDate.$error" requiredField />
-        <ni-datetime-picker v-model="editedFunding.endDate" caption="Date de fin de prise en charge" :min="editedFundingMinStartDate" inModal />
+        <ni-datetime-picker v-model="editedFunding.endDate" caption="Date de fin de prise en charge" inModal
+          :min="$moment(editedFunding.startDate).add(1, 'day').toISOString()" />
         <ni-modal-input v-model="editedFunding.folderNumber" caption="Numéro de dossier" />
         <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="editedFunding.frequency" @blur="$v.editedFunding.frequency.$touch"
           :error="$v.editedFunding.frequency.$error" requiredField />
@@ -439,7 +440,7 @@ import { downloadDocxFile } from '../../helpers/downloadFile';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
 import { days } from '../../data/days.js';
-import { FUNDING_FREQ_OPTIONS, FUNDING_NATURE_OPTIONS, ONCE, FIXED, HOURLY } from '../../data/constants.js';
+import { FUNDING_FREQ_OPTIONS, FUNDING_NATURE_OPTIONS, FIXED, HOURLY } from '../../data/constants.js';
 import { financialCertificatesMixin } from '../../mixins/financialCertificatesMixin.js';
 import { fundingMixin } from '../../mixins/fundingMixin.js';
 
@@ -718,14 +719,8 @@ export default {
         value: tpp._id,
       }));
     },
-    isOneTimeFundingFrequency () {
-      return this.newFunding.frequency === ONCE;
-    },
     isOneTimeFundingNature () {
       return this.newFunding.nature === FIXED;
-    },
-    isOneTimeEditedFundingFrequency () {
-      return this.editedFunding.frequency === ONCE;
     },
     isOneTimeEditedFundingNature () {
       return this.editedFunding.nature === FIXED;
