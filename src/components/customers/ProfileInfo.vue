@@ -362,18 +362,25 @@
           @blur="$v.newFunding.thirdPartyPayer.$touch" requiredField />
         <ni-option-group v-model="newFunding.services" :options="fundingServicesOptions()" caption="Souscriptions" type="checkbox"
           @blur="$v.newFunding.services.$touch" :error="$v.newFunding.services.$error" requiredField />
-        <ni-datetime-picker v-model="newFunding.startDate" caption="Date de début de prise en charge" :min="newFundingMinStartDate" inModal />
+        <ni-datetime-picker v-model="newFunding.startDate" caption="Date de début de prise en charge" :min="newFundingMinStartDate" inModal
+          @blur="$v.newFunding.startDate.$touch" :error="$v.newFunding.startDate.$error" requiredField />
         <ni-datetime-picker v-model="newFunding.endDate" :min="$moment(this.newFunding.startDate).add(1, 'day').toISOString()" inModal
           caption="Date de fin de prise en charge" />
         <ni-modal-input v-model="newFunding.folderNumber" caption="Numéro de dossier" />
-        <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="newFunding.frequency" />
+        <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="newFunding.frequency" @blur="$v.newFunding.frequency.$touch"
+          :error="$v.newFunding.frequency.$error" requiredField />
         <ni-modal-select caption="Nature" :options="fundingNatureOptions" v-model="newFunding.nature" inModal :error="$v.newFunding.nature.$error"
           @blur="$v.newFunding.nature.$touch" requiredField />
-        <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.unitTTCRate" caption="Prix unitaire TTC" type="number" />
-        <ni-modal-input v-if="isOneTimeFundingNature" v-model="newFunding.amountTTC" caption="Montant forfaitaire TTC" type="number" />
-        <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.careHours" caption="Nb. heures prises en charge" type="number" suffix="h" />
-        <ni-modal-input v-model="newFunding.customerParticipationRate" caption="Taux de participation du bénéficiaire" type="number" suffix="%" />
-        <ni-option-group v-model="newFunding.careDays" :options="daysOptions" caption="Jours pris en charge" type="checkbox" inline />
+        <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.unitTTCRate" caption="Prix unitaire TTC" type="number"
+          @blur="$v.newFunding.unitTTCRate.$touch" :error="$v.newFunding.unitTTCRate.$error" requiredField />
+        <ni-modal-input v-if="isOneTimeFundingNature" v-model="newFunding.amountTTC" caption="Montant forfaitaire TTC" type="number"
+          @blur="$v.newFunding.amountTTC.$touch" :error="$v.newFunding.amountTTC.$error" requiredField />
+        <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.careHours" caption="Nb. heures prises en charge" type="number" suffix="h"
+          @blur="$v.newFunding.careHours.$touch" :error="$v.newFunding.careHours.$error" requiredField />
+        <ni-modal-input v-model="newFunding.customerParticipationRate" caption="Taux de participation du bénéficiaire" type="number" suffix="%"
+          @blur="$v.newFunding.customerParticipationRate.$touch" :error="$v.newFunding.customerParticipationRate.$error" requiredField />
+        <ni-option-group v-model="newFunding.careDays" :options="daysOptions" caption="Jours pris en charge" type="checkbox" inline
+          @blur="$v.newFunding.careDays.$touch" :error="$v.newFunding.careDays.$error" requiredField />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter un financement" icon-right="add" color="primary" :loading="loading"
         @click="submitFunding" />
@@ -394,12 +401,18 @@
           :min="editedFundingMinStartDate" inModal @blur="$v.editedFunding.startDate.$touch" :error="$v.editedFunding.startDate.$error" requiredField />
         <ni-datetime-picker v-model="editedFunding.endDate" caption="Date de fin de prise en charge" :min="editedFundingMinStartDate" inModal />
         <ni-modal-input v-model="editedFunding.folderNumber" caption="Numéro de dossier" />
-        <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="editedFunding.frequency" />
-        <ni-modal-input v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.unitTTCRate" caption="Prix unitaire TTC" type="number" />
-        <ni-modal-input v-if="isOneTimeEditedFundingNature" v-model="editedFunding.amountTTC" caption="Montant forfaitaire TTC" type="number" />
-        <ni-modal-input v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.careHours" caption="Nb. heures prises en charge" type="number" suffix="h" />
-        <ni-modal-input v-model="editedFunding.customerParticipationRate" caption="Taux de participation du bénéficiaire" type="number" suffix="%" />
-        <ni-option-group v-model="editedFunding.careDays" :options="daysOptions" caption="Jours pris en charge" type="checkbox" inline />
+        <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="editedFunding.frequency" @blur="$v.editedFunding.frequency.$touch"
+          :error="$v.editedFunding.frequency.$error" requiredField />
+        <ni-modal-input v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.unitTTCRate" caption="Prix unitaire TTC" type="number"
+          @blur="$v.editedFunding.unitTTCRate.$touch" :error="$v.editedFunding.unitTTCRate.$error" requiredField />
+        <ni-modal-input v-if="isOneTimeEditedFundingNature" v-model="editedFunding.amountTTC" caption="Montant forfaitaire TTC" type="number"
+          @blur="$v.editedFunding.amountTTC.$touch" :error="$v.editedFunding.amountTTC.$error" requiredField />
+        <ni-modal-input v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.careHours" caption="Nb. heures prises en charge" type="number"
+          @blur="$v.editedFunding.careHours.$touch" :error="$v.editedFunding.careHours.$error" requiredField suffix="h" />
+        <ni-modal-input v-model="editedFunding.customerParticipationRate" caption="Taux de participation du bénéficiaire" type="number" suffix="%"
+          @blur="$v.editedFunding.customerParticipationRate.$touch" :error="$v.editedFunding.customerParticipationRate.$error" requiredField />
+        <ni-option-group v-model="editedFunding.careDays" :options="daysOptions" caption="Jours pris en charge" type="checkbox" inline
+          @blur="$v.editedFunding.careDays.$touch" :error="$v.editedFunding.careDays.$error" requiredField />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Modifier le financement" icon-right="add" color="primary" :loading="loading"
         @click="editFunding" />
@@ -409,7 +422,7 @@
 
 <script>
 import { Cookies } from 'quasar';
-import { required, email } from 'vuelidate/lib/validators';
+import { required, email, requiredIf } from 'vuelidate/lib/validators';
 import randomize from 'randomatic';
 
 import { extend, clear } from '../../helpers/utils.js';
@@ -780,11 +793,35 @@ export default {
     newFunding: {
       thirdPartyPayer: { required },
       services: { required },
-      nature: { required }
+      nature: { required },
+      frequency: { required },
+      amountTTC: { required: requiredIf((item) => {
+        return item.nature === FIXED;
+      }) },
+      unitTTCRate: { required: requiredIf((item) => {
+        return item.nature === HOURLY;
+      }) },
+      careHours: { required: requiredIf((item) => {
+        return item.nature === HOURLY;
+      }) },
+      careDays: { required },
+      startDate: { required },
+      customerParticipationRate: { required },
     },
     editedFunding: {
+      frequency: { required },
+      amountTTC: { required: requiredIf((item) => {
+        return item.nature === FIXED;
+      }) },
+      unitTTCRate: { required: requiredIf((item) => {
+        return item.nature === HOURLY;
+      }) },
+      careHours: { required: requiredIf((item) => {
+        return item.nature === HOURLY;
+      }) },
+      careDays: { required },
       startDate: { required },
-      services: { required }
+      customerParticipationRate: { required },
     }
   },
   watch: {
