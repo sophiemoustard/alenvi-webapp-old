@@ -16,12 +16,6 @@ export const fundingMixin = {
           field: 'startDate',
         },
         {
-          name: 'effectiveDate',
-          label: "Date d'effet",
-          align: 'left',
-          field: 'effectiveDate',
-        },
-        {
           name: 'thirdPartyPayer',
           label: 'Tiers payeur',
           align: 'left',
@@ -115,7 +109,7 @@ export const fundingMixin = {
         const { fundings } = this.customer;
         this.fundings = fundings ? fundings.map(fund => {
           const { versions } = fund;
-          return { ...getLastVersion(versions, 'effectiveDate'), ...fund };
+          return { ...getLastVersion(versions, 'createdAt'), ...fund };
         }) : [];
       } catch (e) {
         console.error(e);
