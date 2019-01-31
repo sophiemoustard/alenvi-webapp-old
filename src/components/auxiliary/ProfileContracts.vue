@@ -304,7 +304,7 @@ export default {
     },
     getMinimalStartDate (contract) {
       const activeVersion = this.getActiveVersion(contract);
-      return activeVersion && this.$moment(activeVersion.startDate).add(1, 'd').format();
+      return activeVersion ? this.$moment(activeVersion.startDate).toISOString() : '';
     },
     cardTitle (contractEndDate) {
       if (!contractEndDate) return { msg: 'Contrat en cours', color: 'green' };
@@ -389,7 +389,7 @@ export default {
           versionId: lastActiveVersion._id
         };
         const payload = {
-          endDate: this.$moment(lastVersion.startDate).subtract(1, 'day').toDate()
+          endDate: this.$moment(lastVersion.startDate).toDate()
         };
         await this.$users.updateContractVersion(queries, payload);
       }
