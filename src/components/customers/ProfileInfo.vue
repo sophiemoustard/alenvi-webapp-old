@@ -35,7 +35,7 @@
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
               <template v-if="col.name === 'actions'">
-                <div class="row no-wrap table-actions">
+                <div class="row no-wrap table-actions table-actions-margin">
                   <q-btn flat round small color="grey" icon="history" @click.native="showHistory(col.value)" />
                   <q-btn flat round small color="grey" icon="edit" @click.native="startEdition(col.value)" />
                   <q-btn flat round small color="grey" icon="delete" @click.native="removeSubscriptions(col.value)" />
@@ -63,7 +63,7 @@
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
               <template v-if="col.name === 'actions'">
-                <div class="row no-wrap table-actions">
+                <div class="row no-wrap table-actions table-actions-margin">
                   <q-btn flat round small color="grey" icon="delete" @click.native="removeHelper(col.value)" />
                 </div>
               </template>
@@ -141,7 +141,7 @@
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
               <template v-if="col.name === 'actions'">
-                <div class="row no-wrap table-actions">
+                <div class="row no-wrap table-actions table-actions-margin">
                   <q-btn flat round small color="grey" icon="remove_red_eye" @click.native="showFundingDetails(col.value)" />
                   <q-btn flat round small color="grey" icon="history" @click.native="showFundingHistory(col.value)" />
                   <q-btn flat round small color="grey" icon="edit" @click.native="startFundingEdition(col.value)" />
