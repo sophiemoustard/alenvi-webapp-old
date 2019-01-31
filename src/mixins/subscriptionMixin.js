@@ -115,7 +115,7 @@ export const subscriptionMixin = {
         }
       }
 
-      return weeklyRate - fundingReduction;
+      return Math.max(weeklyRate - fundingReduction, 0);
     },
     isCompleteFunding (funding) {
       if (!funding || funding === {}) return false;
@@ -125,7 +125,10 @@ export const subscriptionMixin = {
       return true;
     },
     getMatchingFunding (subscription) {
-      return this.fundings.find(fd => fd.services.some(ser => ser._id === subscription.service._id));
+      return this.fundings.find(fd =>
+        fd.services.some(ser => ser._id === subscription.service._id) &&
+        (fd.endDate ? this.$moment().isBetween(fd.startDate, fd.endDate) : this.$moment().isSameOrAfter(fd.startDate))
+      );
     },
     showHistory (id) {
       this.selectedSubscription = this.subscriptions.find(sub => sub._id === id);
