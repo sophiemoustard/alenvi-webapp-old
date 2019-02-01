@@ -150,8 +150,17 @@ const routes = [
               permissions: ['duty:read'],
               parent: 'planning'
             },
-          }
+          },
         ]
+      },
+      {
+        path: 'ni/planning/auxiliaries',
+        name: 'auxiliaries plannning',
+        component: () => import('pages/ni/planning/AuxiliaryPlanning'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'planning'
+        },
       },
       // Auxiliary view routes
       {
@@ -259,13 +268,6 @@ const routes = [
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['profiles:read', 'profiles:edit']
-        }
-      },
-      {
-        path: '/proto-planning',
-        component: () => import('pages/proto/planning'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token']
         }
       }
     ]
