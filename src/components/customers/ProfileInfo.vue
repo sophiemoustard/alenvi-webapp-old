@@ -237,13 +237,13 @@
           </div>
         </div>
         <ni-modal-select caption="Service" :options="serviceOptions" v-model="newSubscription.service" :error="$v.newSubscription.service.$error"
-          @blur="$v.newSubscription.service.$touch" @input="updateNewSubscription"
+          @blur="$v.newSubscription.service.$touch" @input="updateNewSubscription" requiredField
         />
         <ni-modal-input v-model="newSubscription.unitTTCRate" :error="$v.newSubscription.unitTTCRate.$error" caption="Prix unitaire TTC"
-          @blur="$v.newSubscription.unitTTCRate.$touch" type="number"
+          @blur="$v.newSubscription.unitTTCRate.$touch" type="number" requiredField
         />
         <ni-modal-input v-model="newSubscription.estimatedWeeklyVolume" :error="$v.newSubscription.estimatedWeeklyVolume.$error"
-          caption="Volume hebdomadaire estimatif" @blur="$v.newSubscription.estimatedWeeklyVolume.$touch" type="number"
+          caption="Volume hebdomadaire estimatif" @blur="$v.newSubscription.estimatedWeeklyVolume.$touch" type="number" requiredField
         />
         <ni-modal-input v-if="newSubscription.nature !== 'Forfaitaire'" v-model="newSubscription.sundays" caption="Dont dimanche (h)" type="number" />
         <ni-modal-input v-if="newSubscription.nature !== 'Forfaitaire'" v-model="newSubscription.evenings" caption="Dont soirée (h)" last type="number" />
@@ -265,11 +265,11 @@
           </div>
         </div>
         <ni-datetime-picker v-model="editedSubscription.startDate" :error="$v.editedSubscription.startDate.$error" caption="Dated'effet"
-          @blur="$v.editedSubscription.startDate.$touch" :min="minStartDate" inModal />
+          @blur="$v.editedSubscription.startDate.$touch" :min="minStartDate" requiredField inModal />
         <ni-modal-input v-model="editedSubscription.unitTTCRate" :error="$v.editedSubscription.unitTTCRate.$error" caption="Prix unitaire TTC"
-          @blur="$v.editedSubscription.unitTTCRate.$touch" type="number" />
+          @blur="$v.editedSubscription.unitTTCRate.$touch" type="number" requiredField />
         <ni-modal-input v-model="editedSubscription.estimatedWeeklyVolume" :error="$v.editedSubscription.estimatedWeeklyVolume.$error"
-          caption="Volume hebdomadaire estimatif" @blur="$v.editedSubscription.estimatedWeeklyVolume.$touch" type="number" />
+          caption="Volume hebdomadaire estimatif" @blur="$v.editedSubscription.estimatedWeeklyVolume.$touch" type="number" requiredField />
         <ni-modal-input v-if="editedSubscription.nature !== 'Forfaitaire'" v-model="editedSubscription.sundays" caption="Dont dimanche (h)" type="number" />
         <ni-modal-input v-if="editedSubscription.nature !== 'Forfaitaire'" v-model="editedSubscription.evenings" caption="Dont soirée (h)" last type="number" />
       </div>

@@ -5,7 +5,8 @@
         <p class="title">Souscriptions</p>
         <p v-if="subscriptions.length === 0">Aucun service souscrit.</p>
         <q-card v-if="subscriptions.length > 0" class="contract-card">
-          <q-table :data="subscriptions" :columns="subscriptionsColumns" row-key="name" hide-bottom binary-state-sort class="table-responsive">
+          <q-table :data="subscriptions" :columns="subscriptionsColumns" row-key="name" hide-bottom binary-state-sort
+            class="table-responsive">
             <q-tr slot="body" slot-scope="props" :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
                 <template v-if="col.name === 'actions'">
@@ -19,44 +20,44 @@
             </q-tr>
           </q-table>
         </q-card>
-        <p v-if="subscriptions.length > 0" class="nota-bene">* intègre le financement et les éventuelles majorations soir / dimanche</p>
+        <p v-if="subscriptions.length > 0" class="nota-bene">* intègre le financement et les éventuelles majorations
+          soir / dimanche</p>
         <div v-if="subscriptions && subscriptions.length > 0" class="row">
           <div class="col-xs-12">
             <q-checkbox v-model="customer.subscriptionsAccepted" class="q-mr-sm" @input="confirmAgreement" />
-            <span style="vertical-align: middle">J'accepte les conditions d’abonnement présentées ci-dessus ainsi que les <a href="#cgs" @click.prevent="cgsModal = true">conditions générales de services
-          Alenvi</a>.<span class="text-weight-thin text-italic"> {{ agreement }}</span></span>
+            <span style="vertical-align: middle">J'accepte les conditions d’abonnement présentées ci-dessus ainsi que
+              les <a href="#cgs" @click.prevent="cgsModal = true">conditions générales de services
+                Alenvi</a>.<span class="text-weight-thin text-italic"> {{ agreement }}</span></span>
           </div>
         </div>
       </div>
       <div class="q-mb-lg">
         <p class="title">Justificatifs APA ou autres financements</p>
-        <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement" @uploaded="documentUploaded" name="financialCertificates"
-          collapsibleLabel="Ajouter un justificatif" :userProfile="customerUploadData" :url="docsUploadUrl" @delete="deleteDocument($event)"
-          additionalFieldsName="financialCertificate" />
+        <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement" @uploaded="documentUploaded"
+          name="financialCertificates" collapsibleLabel="Ajouter un justificatif" :userProfile="customerUploadData"
+          :url="docsUploadUrl" @delete="deleteDocument($event)" additionalFieldsName="financialCertificate" />
       </div>
       <div class="q-mb-lg">
         <p class="title">Paiement</p>
         <div class="row gutter-profile">
           <ni-input caption="Nom associé au compte bancaire" v-model="customer.payment.bankAccountOwner" :error="$v.customer.payment.bankAccountOwner.$error"
-            @focus="saveTmp('payment.bankAccountOwner')" @blur="updateCustomer({ alenvi: 'payment.bankAccountOwner', ogust: 'holder' })"
-          />
+            @focus="saveTmp('payment.bankAccountOwner')" @blur="updateCustomer({ alenvi: 'payment.bankAccountOwner', ogust: 'holder' })" />
           <ni-input caption="IBAN" v-model="customer.payment.iban" :error="$v.customer.payment.iban.$error" :errorLabel="ibanError"
-            @focus="saveTmp('payment.iban')" @blur="updateCustomer({ alenvi: 'payment.iban', ogust: 'iban_number' })"
-          />
+            @focus="saveTmp('payment.iban')" @blur="updateCustomer({ alenvi: 'payment.iban', ogust: 'iban_number' })" />
           <ni-input caption="BIC" v-model="customer.payment.bic" :error="$v.customer.payment.bic.$error" :errorLabel="bicError"
-            @focus="saveTmp('payment.bic')" @blur="updateCustomer({ alenvi: 'payment.bic', ogust: 'bic_number' })"
-          />
+            @focus="saveTmp('payment.bic')" @blur="updateCustomer({ alenvi: 'payment.bic', ogust: 'bic_number' })" />
         </div>
       </div>
       <div class="q-mb-lg">
         <p class="title">Mandats de prélèvement</p>
         <p v-if="customer.payment.mandates.length === 0 || !isValidPayment">Aucun mandat.</p>
         <q-card v-if="isValidPayment && customer.payment.mandates.length > 0" class="contract-card">
-          <q-table :data="customer.payment.mandates" :columns="columnsMandates" row-key="name" hide-bottom :pagination.sync="pagination"
-            :visible-columns="visibleColumnsMandates" binary-state-sort class="table-responsive">
+          <q-table :data="customer.payment.mandates" :columns="columnsMandates" row-key="name" hide-bottom
+            :pagination.sync="pagination" :visible-columns="visibleColumnsMandates" binary-state-sort class="table-responsive">
             <q-td slot="body-cell-rum" slot-scope="props" :props="props" :data-label="props.col.label">{{ props.value }}</q-td>
             <q-td slot="body-cell-sign" slot-scope="props" :props="props" :data-label="props.col.label">
-              <p class="no-margin" v-if="props.row.signedAt">Mandat signé le {{$moment(props.row.signedAt).format('DD/MM/YYYY')}}</p>
+              <p class="no-margin" v-if="props.row.signedAt">Mandat signé le
+                {{$moment(props.row.signedAt).format('DD/MM/YYYY')}}</p>
               <q-btn v-else-if="props.row.__index === customer.payment.mandates.length - 1" color="primary" @click="preOpenESignModal(props.row)">
                 Signer
               </q-btn>
@@ -95,15 +96,16 @@
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
-            <h5>Historique de la souscription <span class="text-weight-bold">{{selectedSubscription.service && selectedSubscription.service.name}}</span></h5>
+            <h5>Historique de la souscription <span class="text-weight-bold">{{selectedSubscription.service &&
+                selectedSubscription.service.name}}</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
             <span>
               <q-icon name="clear" size="1rem" @click.native="subscriptionHistoryModal = false" /></span>
           </div>
         </div>
-        <q-table class="q-mb-xl table-responsive" :data="selectedSubscription.versions" :columns="subscriptionHistoryColumns" hide-bottom binary-state-sort
-          :pagination.sync="paginationHistory">
+        <q-table class="q-mb-xl table-responsive" :data="selectedSubscription.versions" :columns="subscriptionHistoryColumns"
+          hide-bottom binary-state-sort :pagination.sync="paginationHistory">
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
               <template v-if="col.name === 'startDate'"> {{ $moment(col.value).format('DD/MM/YYYY') }} </template>

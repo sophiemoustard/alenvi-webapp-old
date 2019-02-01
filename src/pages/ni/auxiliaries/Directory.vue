@@ -5,7 +5,8 @@
         <h4 class="no-margin">Répertoire</h4>
       </div>
       <div class="col-xs-12 col-md-5">
-        <q-search class="no-border input-search" v-model="searchStr" placeholder="Rechercher un profil" color="white" inverted-light />
+        <q-search class="no-border input-search" v-model="searchStr" placeholder="Rechercher un profil" color="white"
+          inverted-light />
       </div>
       <div class="col-xs-12 col-md-2 row justify-end">
         <q-toggle v-model="activeUsers" color="primary" label="Actifs" />
@@ -21,10 +22,12 @@
             <q-item-main :label="col.value.name" />
           </q-item>
           <template v-else-if="col.name === 'profileErrors'">
-            <q-icon v-if="notificationsProfiles[props.row.auxiliary._id] && props.row.isActive" name="error" color="secondary" size="1rem" />
+            <q-icon v-if="notificationsProfiles[props.row.auxiliary._id] && props.row.isActive" name="error" color="secondary"
+              size="1rem" />
           </template>
           <template v-else-if="col.name === 'tasksErrors'">
-            <q-icon v-if="notificationsTasks[props.row.auxiliary._id] && props.row.isActive" name="error" color="secondary" size="1rem" />
+            <q-icon v-if="notificationsTasks[props.row.auxiliary._id] && props.row.isActive" name="error" color="secondary"
+              size="1rem" />
           </template>
           <template v-else-if="col.name === 'active'">
             <div :class="{ activeDot: col.value, inactiveDot: !col.value }"></div>
@@ -41,21 +44,33 @@
             <h5>Créer une nouvelle <span class="text-weight-bold">fiche auxiliaire</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
-            <span><q-icon name="clear" size="1rem" @click.native="opened = false" /></span>
+            <span>
+              <q-icon name="clear" size="1rem" @click.native="opened = false" /></span>
           </div>
         </div>
-        <ni-modal-select v-model="newUser.administrative.identity.title" :error="$v.newUser.administrative.identity.title.$error" :options="civilityOptions" caption="Civilité" @blur="$v.newUser.administrative.identity.title.$touch" errorLabel="Champ requis" />
-        <ni-modal-input v-model="newUser.lastname" :error="$v.newUser.lastname.$error" caption="Nom" @blur="$v.newUser.lastname.$touch" errorLabel="Champ requis" />
-        <ni-modal-input v-model="newUser.firstname" :error="$v.newUser.firstname.$error" caption="Prénom" @blur="$v.newUser.firstname.$touch" errorLabel="Champ requis" />
-        <ni-modal-input v-model="newUser.mobilePhone" :error="$v.newUser.mobilePhone.$error" caption="Numéro de téléphone" @blur="$v.newUser.mobilePhone.$touch" :errorLabel="mobilePhoneError" />
-        <ni-modal-input v-model="newUser.administrative.contact.address" :error="$v.newUser.administrative.contact.address.$error" caption="Addresse" @blur="$v.newUser.administrative.contact.address.$touch" errorLabel="Champ requis" />
-        <ni-modal-input v-model="newUser.administrative.contact.zipCode" :error="$v.newUser.administrative.contact.zipCode.$error" caption="Code postal" @blur="$v.newUser.administrative.contact.zipCode.$touch" :errorLabel="zipCodeError" />
-        <ni-modal-input v-model="newUser.administrative.contact.city" :error="$v.newUser.administrative.contact.city.$error" caption="Ville" @blur="$v.newUser.administrative.contact.city.$touch" errorLabel="Champ requis" />
-        <ni-modal-input v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email" @blur="$v.newUser.local.email.$touch" :errorLabel="emailError" />
+        <ni-modal-select v-model="newUser.administrative.identity.title" :error="$v.newUser.administrative.identity.title.$error"
+          :options="civilityOptions" caption="Civilité" @blur="$v.newUser.administrative.identity.title.$touch"
+          errorLabel="Champ requis" requiredField />
+        <ni-modal-input v-model="newUser.lastname" :error="$v.newUser.lastname.$error" caption="Nom" @blur="$v.newUser.lastname.$touch"
+          errorLabel="Champ requis" requiredField />
+        <ni-modal-input v-model="newUser.firstname" :error="$v.newUser.firstname.$error" caption="Prénom" @blur="$v.newUser.firstname.$touch"
+          errorLabel="Champ requis" requiredField />
+        <ni-modal-input v-model="newUser.mobilePhone" :error="$v.newUser.mobilePhone.$error" caption="Numéro de téléphone"
+          @blur="$v.newUser.mobilePhone.$touch" :errorLabel="mobilePhoneError" requiredField />
+        <ni-modal-input v-model="newUser.administrative.contact.address" :error="$v.newUser.administrative.contact.address.$error"
+          caption="Addresse" @blur="$v.newUser.administrative.contact.address.$touch" errorLabel="Champ requis"
+          requiredField />
+        <ni-modal-input v-model="newUser.administrative.contact.zipCode" :error="$v.newUser.administrative.contact.zipCode.$error"
+          caption="Code postal" @blur="$v.newUser.administrative.contact.zipCode.$touch" :errorLabel="zipCodeError"
+          requiredField />
+        <ni-modal-input v-model="newUser.administrative.contact.city" :error="$v.newUser.administrative.contact.city.$error"
+          caption="Ville" @blur="$v.newUser.administrative.contact.city.$touch" errorLabel="Champ requis" requiredField />
+        <ni-modal-input v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email" @blur="$v.newUser.local.email.$touch"
+          :errorLabel="emailError" requiredField />
         <div class="row margin-input">
           <div class="col-12">
             <div class="row justify-between">
-              <p class="input-caption">Communauté</p>
+              <p class="input-caption required">Communauté</p>
               <q-icon v-if="$v.newUser.sector.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newUser.sector.$error" error-label="Champ requis">
@@ -66,11 +81,11 @@
         <div class="row margin-input last">
           <div class="col-12">
             <div class="row justify-between">
-              <p class="input-caption">Géré par</p>
+              <p class="input-caption required">Géré par</p>
               <q-icon v-if="$v.newUser.ogustManagerId.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newUser.ogustManagerId.$error" error-label="Champ requis">
-              <ni-select-manager v-model="newUser.ogustManagerId" @myBlur="$v.newUser.ogustManagerId.$touch" inModal/>
+              <ni-select-manager v-model="newUser.ogustManagerId" @myBlur="$v.newUser.ogustManagerId.$touch" inModal />
             </q-field>
           </div>
         </div>
@@ -80,7 +95,8 @@
           </div>
         </div>
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary" :loading="loading" @click="submit" />
+      <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary" :loading="loading"
+        @click="submit" />
     </q-modal>
   </q-page>
 </template>
