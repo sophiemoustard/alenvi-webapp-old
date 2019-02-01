@@ -19,7 +19,7 @@
               {{person.firstname}} {{person.lastname}}
             </td>
             <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top" class="event-cell"
-              @click="openCreationModal(dayIndex, person)">
+              @click="$emit('createEvent', { dayIndex, person })">
               <div :id="Math.random().toString(36).substr(2, 5)" draggable @dragstart="drag(dayIndex, event._id)" class="row cursor-pointer"
                 v-for="(event, eventIndex) in getOneDayAuxiliaryEvents(person, days[dayIndex])" :key="eventIndex" @click.stop="openEditionModal(event._id)">
                 <div class="col-12 event">
@@ -35,52 +35,6 @@
         </tbody>
       </table>
     </div>
-
-    <!-- Event creation modal -->
-    <q-modal v-model="creationModal" content-classes="modal-container-md" @hide="resetCreationForm(false)">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5>Création d'un <span class="text-weight-bold">évènement</span></h5>
-          </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
-            <span>
-              <q-icon name="clear" size="1rem" @click.native="creationModal = false" /></span>
-          </div>
-        </div>
-        <q-btn-toggle no-wrap v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions" @input="resetCreationForm(true, newEvent.type)" />
-        <ni-modal-select caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions" :error="$v.newEvent.auxiliary.$error" />
-        <template v-if="newEvent.type !== ABSENCE">
-          <ni-datetime-picker caption="Date de debut" v-model="newEvent.startDate" type="datetime" :error="$v.newEvent.startDate.$error" inModal />
-          <ni-datetime-picker caption="Date de fin" v-model="newEvent.endDate" type="datetime" :error="$v.newEvent.endDate.$error" inModal
-            :min="minEndDate" :max="maxEndDate" />
-        </template>
-        <template v-if="newEvent.type === INTERVENTION">
-          <ni-modal-select caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions" :error="$v.newEvent.customer.$error" />
-          <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions(newEvent.customer)"
-            :error="$v.newEvent.subscription.$error" />
-        </template>
-        <template v-if="newEvent.type === ABSENCE">
-          <ni-datetime-picker caption="Date de debut" v-model="newEvent.startDate" type="date" :error="$v.newEvent.startDate.$error" inModal />
-          <ni-modal-select caption="Durée" :error="$v.newEvent.startDuration.$error" :options="dateOptions" v-model="newEvent.startDuration"
-            separator />
-          <ni-datetime-picker caption="Date de fin" v-model="newEvent.endDate" type="date" :error="$v.newEvent.endDate.$error" inModal />
-          <ni-modal-select caption="Durée" :error="$v.newEvent.endDuration.$error" :options="dateOptions" v-model="newEvent.endDuration"
-            separator />
-          <ni-modal-select caption="Type d'absence" v-model="newEvent.absence" :options="absenceOptions" :error="$v.newEvent.absence.$error" />
-          <ni-file-uploader caption="Justificatif d'absence" path="attachment" :entity="newEvent" alt="justificatif absence" name="proofOfAbsence"
-            :url="docsUploadUrl" @uploaded="documentUploaded" :additionalValue="additionalValue" :key="uploaderKey" :disable="!selectedAuxiliary._id"
-            @delete="deleteDocument(newEvent.attachment.driveId)" withBorders />
-        </template>
-        <template v-if="newEvent.type === INTERNAL_HOUR">
-          <ni-modal-select caption="Type d'heure interne" v-model="newEvent.internalHour" :options="internalHourOptions" :error="$v.newEvent.internalHour.$error" />
-        </template>
-        <ni-search-address v-model="newEvent.location.fullAddress" @selected="selectedAddress" @blur="$v.newEvent.location.fullAddress.$touch"
-          :error="$v.newEvent.location.fullAddress.$error" :error-label="addressError" inModal/>
-      </div>
-      <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary" @click="createEvent"
-        :disable="disableCreationButton"/>
-    </q-modal>
 
     <!-- Event edition modal -->
     <q-modal v-model="editionModal" content-classes="modal-container-md" @hide="resetEditionForm()">
@@ -140,7 +94,7 @@
 
 <script>
 import { required, requiredIf } from 'vuelidate/lib/validators';
-import { frAddress } from '../../helpers/vuelidateCustomVal.js'
+import { frAddress } from '../../helpers/vuelidateCustomVal.js';
 import DatetimePicker from '../../components/form/DatetimePicker.vue';
 import ModalSelect from '../../components/form/ModalSelect';
 import SearchAddress from '../../components/form/SearchAddress';
@@ -178,22 +132,6 @@ export default {
         customer: '',
       },
       editionModal: false,
-      creationModal: false,
-      newEvent: {
-        type: INTERVENTION,
-        startDate: '',
-        startDuration: '',
-        endDate: '',
-        endDuration: '',
-        auxiliary: '',
-        customer: '',
-        subscription: '',
-        sector: '',
-        internalHour: '',
-        absence: '',
-        location: {},
-        attachment: {},
-      },
       INTERVENTION,
       UNAVAILABILITY,
       ABSENCE,
@@ -201,12 +139,6 @@ export default {
       EDITION,
       DELETION,
       CANCELLATION,
-      eventTypeOptions: [
-        {label: 'Intervention', value: INTERVENTION},
-        {label: 'Absence', value: ABSENCE},
-        {label: 'Heure interne', value: INTERNAL_HOUR},
-        {label: 'Indisponibilité', value: UNAVAILABILITY}
-      ],
       editionType: EDITION,
       editionTypeOptions: [
         {label: 'Edition', value: EDITION},
@@ -220,32 +152,6 @@ export default {
     }
   },
   validations: {
-    newEvent: {
-      type: { required },
-      startDate: { required },
-      startDuration: { required: requiredIf((item) => {
-        return item.type === ABSENCE;
-      }) },
-      endDate: { required },
-      endDuration: { required: requiredIf((item) => {
-        return item.type === ABSENCE;
-      }) },
-      auxiliary: { required },
-      sector: { required },
-      customer: { required: requiredIf((item) => {
-        return item.type === INTERVENTION;
-      }) },
-      subscription: { required: requiredIf((item) => {
-        return item.type === INTERVENTION;
-      }) },
-      internalHour: { required: requiredIf((item) => {
-        return item.type === INTERNAL_HOUR;
-      }) },
-      absence: { required: requiredIf((item) => {
-        return item.type === ABSENCE;
-      }) },
-      location: { fullAddress: { frAddress } },
-    },
     editedEvent: {
       startDate: { required },
       startDuration: { required: requiredIf((item) => {
@@ -273,12 +179,6 @@ export default {
     daysHeader () {
       return this.days.map(day => this.$moment(day).format('dd DD'));
     },
-    minEndDate () {
-      return this.$moment(this.newEvent.startDate).toISOString()
-    },
-    maxEndDate () {
-      return this.$moment(this.newEvent.startDate).hours(23).minutes(59).toISOString();
-    },
     auxiliariesOptions () {
       return this.persons.length === 0 ? [] : this.persons.map(aux => ({
         label: `${aux.firstname || ''} ${aux.lastname}`,
@@ -290,20 +190,6 @@ export default {
         label: `${customer.identity.firstname || ''} ${customer.identity.lastname}`,
         value: customer._id,
       }));
-    },
-    disableCreationButton () {
-      if (!this.newEvent.type) return true;
-      switch (this.newEvent.type) {
-        case ABSENCE:
-          return !this.newEvent.auxiliary || !this.newEvent.absence || !this.newEvent.startDate || !this.newEvent.endDate;
-        case INTERVENTION:
-          return !this.newEvent.auxiliary || !this.newEvent.customer || !this.newEvent.subscription || !this.newEvent.startDate || !this.newEvent.endDate;
-        case INTERNAL_HOUR:
-          return !this.newEvent.auxiliary || !this.newEvent.startDate || !this.newEvent.endDate || !this.newEvent.internalHour;
-        case UNAVAILABILITY:
-        default:
-          return !this.newEvent.auxiliary || !this.newEvent.startDate || !this.newEvent.endDate;
-      }
     },
     docsUploadUrl () {
       return !this.selectedAuxiliary._id
@@ -325,7 +211,7 @@ export default {
       }));
     },
     addressError () {
-      if (!this.$v.newEvent.location.fullAddress.required) return 'Champ requis';
+      if (!this.$v.editedEvent.location.fullAddress.required) return 'Champ requis';
 
       return 'Adresse non valide';
     },
@@ -349,10 +235,12 @@ export default {
   async mounted () {
     this.startOfWeek = this.$moment().startOf('week');
     this.getTimelineDays();
-    this.setInternalHours();
     this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
   },
   methods: {
+    selectedAddress (item) {
+      this.editedEvent.location = Object.assign({}, this.newEvent.location, item);
+    },
     // Table
     endOfWeek () {
       return this.$moment(this.startOfWeek).add(6, 'd');
@@ -390,15 +278,6 @@ export default {
         })
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
     },
-    getAuxiliaryEventsBetweenDates (auxiliaryId, startDate, endDate) {
-      return this.events
-        .filter(event => event.auxiliary._id === auxiliaryId)
-        .filter(event => {
-          return this.$moment(event.startDate).isBetween(startDate, endDate, 'minutes', '()') ||
-            this.$moment(startDate).isBetween(event.startDate, event.endDate, 'minutes', '()')
-        })
-        .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-    },
     getEventHours (event) {
       return `${this.$moment(event.startDate).format('HH:mm')} - ${this.$moment(event.endDate).format('HH:mm')}`
     },
@@ -406,110 +285,7 @@ export default {
       const absence = ABSENCE_TYPE.find(abs => abs.value === value);
       return !absence ? '' : absence.label;
     },
-    setInternalHours () {
-      const user = this.$store.getters['main/user'];
-      if (user && user.company && user.company.rhConfig && user.company.rhConfig.internalHours) {
-        this.internalHours = user.company.rhConfig.internalHours;
-      }
-    },
     // Event creation
-    selectedAddress (item) {
-      this.newEvent.location = Object.assign({}, this.newEvent.location, item);
-    },
-    customerSubscriptionsOptions (customerId) {
-      if (!customerId) return [];
-      const selectedCustomer = this.customers.find(customer => customer._id === customerId);
-
-      return !selectedCustomer || !selectedCustomer.subscriptions || selectedCustomer.subscriptions.length === 0
-        ? []
-        : selectedCustomer.subscriptions.map(sub => ({
-          label: sub.service.name,
-          value: sub._id,
-        }));
-    },
-    hasConflicts (scheduledEvent, auxiliaryId) {
-      const auxiliaryEvents = this.getAuxiliaryEventsBetweenDates(auxiliaryId, scheduledEvent.startDate, scheduledEvent.endDate);
-      return auxiliaryEvents.some(ev => {
-        if (scheduledEvent._id && scheduledEvent._id === ev._id) return false;
-        return this.$moment(scheduledEvent.startDate).isBetween(ev.startDate, ev.endDate, 'minutes', '[]') ||
-          this.$moment(ev.startDate).isBetween(scheduledEvent.startDate, scheduledEvent.endDate, 'minutes', '[]');
-      });
-    },
-    openCreationModal (dayIndex, auxiliary) {
-      const selectedDay = this.days[dayIndex];
-      this.newEvent = {
-        ...this.newEvent,
-        auxiliary: auxiliary._id,
-        startDate: selectedDay.hours(8).toISOString(),
-        endDate: selectedDay.hours(20).toISOString(),
-      };
-      this.creationModal = true;
-    },
-    resetCreationForm (partialReset, type = INTERVENTION) {
-      this.$v.newEvent.$reset();
-      this.newEvent = {
-        type,
-        startDate: partialReset ? this.newEvent.startDate : '',
-        startDuration: '',
-        endDate: partialReset ? this.newEvent.endDate : '',
-        endDuration: '',
-        auxiliary: partialReset ? this.newEvent.auxiliary : '',
-        customer: '',
-        subscription: '',
-        sector: '',
-        internalHour: '',
-        absence: '',
-        location: {},
-        attachment: {},
-      };
-    },
-    getPayload (event) {
-      let payload = { ...event }
-      if (event.type === INTERNAL_HOUR) {
-        const internalHour = this.internalHours.find(hour => hour._id === event.internalHour);
-        payload.internalHour = internalHour;
-      }
-      if (event.type === ABSENCE) {
-        payload.startDate = this.$moment(event.startDate).hours(event.startDuration[0].startHour).toISOString();
-        if (event.endDuration !== '') {
-          payload.endDate = this.$moment(event.endDate).hours(event.endDuration[0].endHour).toISOString();
-        } else {
-          payload.endDate = this.$moment(event.endDate).hours(event.startDuration[0].endHour).toISOString();
-        }
-
-        this.$_.unset(payload, 'startDuration');
-        this.$_.unset(payload, 'endDuration');
-      }
-
-      if (event.location && event.location.fullAddress) delete payload.location.location;
-
-      return this.$_.pickBy(payload)
-    },
-    async createEvent () {
-      try {
-        this.newEvent.sector = this.selectedSector;
-        this.$v.newEvent.$touch();
-        if (this.$v.newEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        this.loading = true;
-        const payload = this.getPayload(this.newEvent);
-
-        if (this.hasConflicts(payload, payload.auxiliary, payload.startDate)) {
-          return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
-        }
-
-        await this.$events.create(payload);
-
-        this.$emit('refreshEvents');
-        this.creationModal = false;
-        this.loading = false;
-        this.resetCreationForm(false);
-        NotifyPositive('Évènement créé');
-      } catch (e) {
-        NotifyNegative('Erreur lors de la création de l\'évènement');
-        this.loading = false;
-      }
-    },
     // Event edition
     getAbsenceDurations (event) {
       let startDuration;
@@ -695,6 +471,25 @@ export default {
 
   td, th
     border-left: 1px solid $light-grey;
+    border-right: 1px solid $light-grey;
+
+  td
+    padding: 5px 10px;
+
+    &:before
+      content: "";
+      display: block;
+      margin: 0 auto 5px;
+      width: 80%;
+      border-bottom: 1px solid $light-grey;
+
+  .planning-container
+    background: white
+  .event
+    border: 1px solid black
+    padding: 2px
+    margin-bottom: 3px
+  .auxiliaries-row
     border-right: 1px solid $light-grey;
 
   td
