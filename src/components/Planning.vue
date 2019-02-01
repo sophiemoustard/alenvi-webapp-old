@@ -36,8 +36,8 @@
 </template>
 
 <script>
-import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, ABSENCE_TYPE } from '../../data/constants';
-import { NotifyNegative } from '../../components/popup/notify';
+import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, ABSENCE_TYPE } from '../data/constants';
+import { NotifyNegative } from './popup/notify';
 
 export default {
   name: 'PlanningManager',

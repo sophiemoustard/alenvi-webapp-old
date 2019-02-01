@@ -117,7 +117,7 @@
 <script>
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { frAddress } from '../../../helpers/vuelidateCustomVal.js'
-import Planning from '../../proto/planning.vue';
+import Planning from '../../../components/Planning.vue';
 import SelectSector from '../../../components/form/SelectSector';
 import DatetimePicker from '../../../components/form/DatetimePicker.vue';
 import ModalSelect from '../../../components/form/ModalSelect';
