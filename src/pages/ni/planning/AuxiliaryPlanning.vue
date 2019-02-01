@@ -307,7 +307,8 @@ export default {
   methods: {
     // Dates
     async updateStartOfWeek (vEvent) {
-      this.startOfWeek = vEvent.startOfWeek;
+      const { startOfWeek } = vEvent;
+      this.startOfWeek = startOfWeek;
 
       const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
       this.days = Array.from(range.by('days'));
@@ -538,14 +539,15 @@ export default {
       const { toDay, toPerson, draggedObject } = vEvent;
       const daysBetween = this.$moment(draggedObject.endDate).diff(this.$moment(draggedObject.startDate), 'days');
 
-      await this.$events.updateById(draggedObject._id, {
+      const updatedEvent = await this.$events.updateById(draggedObject._id, {
         startDate: this.$moment(toDay).hours(this.$moment(draggedObject.startDate).hours())
           .minutes(this.$moment(draggedObject.startDate).minutes()).toISOString(),
         endDate: this.$moment(toDay).add(daysBetween, 'days').hours(this.$moment(draggedObject.endDate).hours())
           .minutes(this.$moment(draggedObject.endDate).minutes()).toISOString(),
         auxiliary: toPerson._id
       });
-      await this.getEvents();
+
+      this.events = this.events.map(event => (event._id === updatedEvent._id) ? updatedEvent : event);
     },
     // Event cancellation
     async cancelEvent () {},

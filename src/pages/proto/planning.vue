@@ -117,14 +117,14 @@ export default {
     },
     // Drag & drop
     drag (vEvent, dayIndex, eventId) {
-      vEvent.dataTransfer.setData('text', vEvent.target.id);
+      vEvent.dataTransfer.setData('id', vEvent.target.id);
       // We have source and position saving
       this.draggedObject = this.events.find(ev => ev._id === eventId);
       this.draggedObject.dayIndex = dayIndex;
     },
     async drop (vEvent, toDay, toPerson) {
       try {
-        const data = vEvent.dataTransfer.getData('text');
+        const data = vEvent.dataTransfer.getData('id');
         if (vEvent.target.nodeName === 'TD') {
           vEvent.target.appendChild(document.getElementById(data));
         }
