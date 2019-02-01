@@ -150,6 +150,15 @@ const routes = [
               permissions: ['duty:read'],
               parent: 'planning'
             },
+          },
+          {
+            path: 'auxiliaries',
+            name: 'auxiliaries plannning',
+            component: () => import('pages/ni/planning/AuxiliaryPlanning'),
+            meta: {
+              cookies: ['alenvi_token', 'refresh_token'],
+              parent: 'planning'
+            },
           }
         ]
       },

@@ -1,7 +1,5 @@
 <template>
-  <q-page padding class="neutral-background">
-    <p class="input-caption">Communauté</p>
-    <ni-select-sector class="q-mb-md" @input="getEmployeesBySector" v-model="selectedSector" />
+  <div>
     <div class="planning-container full-width q-pa-md">
       <div class="row justify-between items-center q-mb-md">
         <q-btn icon="chevron_left" flat round @click="goToPreviousWeek"></q-btn>
@@ -16,14 +14,14 @@
           </th>
         </thead>
         <tbody>
-          <tr class="auxiliaries-row" v-for="(auxiliary, index) in auxiliaries" :key="index">
+          <tr class="auxiliaries-row" v-for="(person, index) in persons" :key="index">
             <td class="event-cell" valign="top">
-              {{auxiliary.firstname}} {{auxiliary.lastname}}
+              {{person.firstname}} {{person.lastname}}
             </td>
-            <td @drop="drop(day, auxiliary)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top" class="event-cell"
-              @click="openCreationModal(dayIndex, auxiliary)">
+            <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top" class="event-cell"
+              @click="openCreationModal(dayIndex, person)">
               <div :id="Math.random().toString(36).substr(2, 5)" draggable @dragstart="drag(dayIndex, event._id)" class="row cursor-pointer"
-                v-for="(event, eventIndex) in getOneDayAuxiliaryEvents(auxiliary, days[dayIndex])" :key="eventIndex" @click.stop="openEditionModal(event._id)">
+                v-for="(event, eventIndex) in getOneDayAuxiliaryEvents(person, days[dayIndex])" :key="eventIndex" @click.stop="openEditionModal(event._id)">
                 <div class="col-12 event">
                   <p class="no-margin">{{ getEventHours(event) }}</p>
                   <p v-if="event.type === INTERVENTION" class="no-margin">{{ event.customer.identity.title }} {{ event.customer.identity.lastname }}</p>
@@ -137,7 +135,7 @@
       <q-btn v-if="editionType === DELETION" class="full-width modal-btn" no-caps color="primary" :loading="loading" label="Supprimer l'évènement"
         @click="deleteEvent" />
     </q-modal>
-  </q-page>
+  </div>
 </template>
 
 <script>
@@ -145,10 +143,9 @@ import { required, requiredIf } from 'vuelidate/lib/validators';
 import { frAddress } from '../../helpers/vuelidateCustomVal.js'
 import DatetimePicker from '../../components/form/DatetimePicker.vue';
 import ModalSelect from '../../components/form/ModalSelect';
-import SelectSector from '../../components/form/SelectSector';
+import SearchAddress from '../../components/form/SearchAddress';
 import ModalInput from '../../components/form/ModalInput.vue';
 import FileUploader from '../../components/form/FileUploader';
-import SearchAddress from '../../components/form/SearchAddress';
 import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, ABSENCE_TYPE, DATE_OPTIONS, MORNING, AFTERNOON, ALL_DAY, EDITION, CANCELLATION, DELETION } from '../../data/constants';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../../components/popup/notify';
 
@@ -157,21 +154,22 @@ export default {
   components: {
     'ni-datetime-picker': DatetimePicker,
     'ni-modal-input': ModalInput,
-    'ni-select-sector': SelectSector,
+    'ni-search-address': SearchAddress,
     'ni-modal-select': ModalSelect,
     'ni-file-uploader': FileUploader,
-    'ni-search-address': SearchAddress,
+  },
+  props: {
+    events: { type: Array, default: () => [] },
+    customers: { type: Array, default: () => [] },
+    persons: { type: Array, default: () => [] },
   },
   data () {
     return {
       loading: false,
       beingDragged: {},
-      selectedSector: '',
       startOfWeek: '',
       days: [],
       auxiliaries: [],
-      customers: [],
-      events: [],
       maxDays: 7,
       editedEvent: {
         subscription: {},
@@ -282,7 +280,7 @@ export default {
       return this.$moment(this.newEvent.startDate).hours(23).minutes(59).toISOString();
     },
     auxiliariesOptions () {
-      return this.auxiliaries.length === 0 ? [] : this.auxiliaries.map(aux => ({
+      return this.persons.length === 0 ? [] : this.persons.map(aux => ({
         label: `${aux.firstname || ''} ${aux.lastname}`,
         value: aux._id,
       }));
@@ -313,8 +311,8 @@ export default {
         : `${process.env.API_HOSTNAME}/events/${this.selectedAuxiliary._id}/gdrive/${this.selectedAuxiliary.administrative.driveFolder.id}/upload`;
     },
     selectedAuxiliary (action) {
-      if (this.creationModal && this.newEvent.auxiliary !== '') return this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
-      if (this.editionModal && this.editedEvent.auxiliary !== '') return this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
+      if (this.creationModal && this.newEvent.auxiliary !== '') return this.persons.find(aux => aux._id === this.newEvent.auxiliary);
+      if (this.editionModal && this.editedEvent.auxiliary !== '') return this.persons.find(aux => aux._id === this.editedEvent.auxiliary);
       return {};
     },
     additionalValue () {
@@ -351,8 +349,8 @@ export default {
   async mounted () {
     this.startOfWeek = this.$moment().startOf('week');
     this.getTimelineDays();
-    await this.getCustomers();
     this.setInternalHours();
+    this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
   },
   methods: {
     // Table
@@ -365,12 +363,12 @@ export default {
     goToPreviousWeek () {
       this.startOfWeek.subtract(7, 'd');
       this.getTimelineDays();
-      this.getEvents();
+      this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
     },
     goToNextWeek () {
       this.startOfWeek.add(7, 'd');
       this.getTimelineDays();
-      this.getEvents();
+      this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
     },
     getTimelineDays () {
       const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
@@ -407,29 +405,6 @@ export default {
     displayAbsenceType (value) {
       const absence = ABSENCE_TYPE.find(abs => abs.value === value);
       return !absence ? '' : absence.label;
-    },
-    // Refresh data
-    async getEvents () {
-      try {
-        this.events = await this.$events.list({
-          startDate: this.startOfWeek.format('YYYYMMDD'),
-          endStartDate: this.endOfWeek().format('YYYYMMDD'),
-          sector: this.selectedSector,
-        });
-      } catch (e) {
-        console.error(e);
-      }
-    },
-    async getCustomers () {
-      try {
-        this.customers = await this.$customers.showAll();
-      } catch (e) {
-        console.error(e);
-      }
-    },
-    async getEmployeesBySector () {
-      this.auxiliaries = await this.$users.showAllActive({ sector: this.selectedSector });
-      await this.getEvents();
     },
     setInternalHours () {
       const user = this.$store.getters['main/user'];
@@ -525,7 +500,7 @@ export default {
 
         await this.$events.create(payload);
 
-        await this.getEvents();
+        this.$emit('refreshEvents');
         this.creationModal = false;
         this.loading = false;
         this.resetCreationForm(false);
@@ -609,7 +584,7 @@ export default {
         await this.$events.updateById(this.editedEvent._id, payload);
         NotifyPositive('Évènement modifié');
 
-        await this.getEvents();
+        this.$emit('refreshEvents');
         this.editionModal = false;
         this.resetEditionForm();
       } catch (e) {
@@ -632,7 +607,7 @@ export default {
 
         this.loading = true
         await this.$events.deleteById(this.editedEvent._id);
-        await this.getEvents();
+        this.$emit('refreshEvents');
         this.editionModal = false;
         this.resetEditionForm();
         NotifyPositive('Service supprimé.');
@@ -704,7 +679,7 @@ export default {
         NotifyNegative('Problème lors de la modification de l\'évènement');
       } finally {
         this.beingDragged = {};
-        await this.getEvents();
+        this.$emit('refreshEvents');
       }
     },
   }
