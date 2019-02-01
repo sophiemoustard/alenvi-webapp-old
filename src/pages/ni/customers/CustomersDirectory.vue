@@ -42,10 +42,10 @@
         </div>
         <ni-modal-select v-model="newCustomer.identity.title" :error="$v.newCustomer.identity.title.$error" :options="civilityOptions" caption="Civilité" @blur="$v.newCustomer.identity.title.$touch" errorLabel="Champ requis" requiredField />
         <ni-modal-input v-model="newCustomer.identity.lastname" :error="$v.newCustomer.identity.lastname.$error" caption="Nom" @blur="$v.newCustomer.identity.lastname.$touch" errorLabel="Champ requis" requiredField />
-        <ni-modal-input v-model="newCustomer.identity.firstname" errorLabel="Champs requis" caption="Prénom" />
+        <ni-modal-input v-model="newCustomer.identity.firstname" caption="Prénom" />
         <div class="row margin-input last">
           <ni-search-address v-model="newCustomer.contact.address.fullAddress" @selected="selectedAddress" @blur="$v.newCustomer.contact.address.fullAddress.$touch"
-            :error="$v.newCustomer.contact.address.fullAddress.$error" :error-label="addressError" inModal />
+            :error="$v.newCustomer.contact.address.fullAddress.$error" :error-label="addressError" inModal requiredField />
         </div>
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary" :loading="loading" @click="submit" />
