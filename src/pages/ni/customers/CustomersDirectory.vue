@@ -5,7 +5,8 @@
         <h4 class="no-margin">Répertoire bénéficiaires</h4>
       </div>
       <div class="col-xs-12 col-md-5">
-        <q-search class="no-border input-search" v-model="searchStr" placeholder="Rechercher un profil" color="white" inverted-light />
+        <q-search class="no-border input-search" v-model="searchStr" placeholder="Rechercher un profil" color="white"
+          inverted-light />
       </div>
       <div class="col-xs-12 col-md-2 row justify-end">
         <q-toggle v-model="activeCustomers" color="primary" label="Actifs" />
@@ -29,7 +30,8 @@
         </q-td>
       </q-tr>
     </q-table>
-    <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Ajouter un bénéficiaire" @click="opened = true" />
+    <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Ajouter un bénéficiaire"
+      @click="opened = true" />
     <q-modal v-model="opened" @hide="resetForm" content-classes="modal-container-sm">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
@@ -37,18 +39,23 @@
             <h5>Créer une nouvelle <span class="text-weight-bold">fiche bénéficiaire</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
-            <span><q-icon name="clear" size="1rem" @click.native="opened = false" /></span>
+            <span>
+              <q-icon name="clear" size="1rem" @click.native="opened = false" /></span>
           </div>
         </div>
-        <ni-modal-select v-model="newCustomer.identity.title" :error="$v.newCustomer.identity.title.$error" :options="civilityOptions" caption="Civilité" @blur="$v.newCustomer.identity.title.$touch" errorLabel="Champ requis" requiredField />
-        <ni-modal-input v-model="newCustomer.identity.lastname" :error="$v.newCustomer.identity.lastname.$error" caption="Nom" @blur="$v.newCustomer.identity.lastname.$touch" errorLabel="Champ requis" requiredField />
+        <ni-modal-select v-model="newCustomer.identity.title" :error="$v.newCustomer.identity.title.$error" :options="civilityOptions"
+          caption="Civilité" @blur="$v.newCustomer.identity.title.$touch" errorLabel="Champ requis" requiredField />
+        <ni-modal-input v-model="newCustomer.identity.lastname" :error="$v.newCustomer.identity.lastname.$error"
+          caption="Nom" @blur="$v.newCustomer.identity.lastname.$touch" errorLabel="Champ requis" requiredField />
         <ni-modal-input v-model="newCustomer.identity.firstname" caption="Prénom" />
         <div class="row margin-input last">
           <ni-search-address v-model="newCustomer.contact.address.fullAddress" @selected="selectedAddress" @blur="$v.newCustomer.contact.address.fullAddress.$touch"
-            :error="$v.newCustomer.contact.address.fullAddress.$error" :error-label="addressError" inModal requiredField />
+            :error="$v.newCustomer.contact.address.fullAddress.$error" :error-label="addressError" inModal
+            requiredField />
         </div>
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary" :loading="loading" @click="submit" />
+      <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary" :loading="loading"
+        @click="submit" />
     </q-modal>
   </q-page>
 </template>
