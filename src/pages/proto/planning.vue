@@ -9,22 +9,20 @@
       <table style="width: 100%">
         <thead>
           <th></th>
-          <th class="capitalize" v-for="(day, index) in daysHeader" :key="index">
-            {{day}}
-          </th>
+          <th class="capitalize" v-for="(day, index) in daysHeader" :key="index">{{day}}</th>
         </thead>
         <tbody>
-          <tr class="auxiliaries-row" v-for="(person, index) in persons" :key="index">
-            <td class="event-cell" valign="top">
-              {{person.firstname}} {{person.lastname}}
-            </td>
-            <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top" class="event-cell"
-              @click="$emit('createEvent', { dayIndex, person })">
+          <tr class="person-row" v-for="(person, index) in persons" :key="index">
+            <td class="event-cell" valign="top">{{person.firstname}} {{person.lastname}}</td>
+            <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
+              class="event-cell" @click="$emit('createEvent', { dayIndex, person })">
               <div :id="Math.random().toString(36).substr(2, 5)" draggable @dragstart="drag(dayIndex, event._id)" class="row cursor-pointer"
-                v-for="(event, eventIndex) in getOneDayAuxiliaryEvents(person, days[dayIndex])" :key="eventIndex" @click.stop="$emit('editEvent', event._id)">
+                v-for="(event, eventIndex) in getOneDayAuxiliaryEvents(person, days[dayIndex])" :key="eventIndex"
+                @click.stop="$emit('editEvent', event._id)">
                 <div class="col-12 event">
                   <p class="no-margin">{{ getEventHours(event) }}</p>
-                  <p v-if="event.type === INTERVENTION" class="no-margin">{{ event.customer.identity.title }} {{ event.customer.identity.lastname }}</p>
+                  <p v-if="event.type === INTERVENTION" class="no-margin">{{ event.customer.identity.title }} {{
+                    event.customer.identity.lastname }}</p>
                   <p v-if="event.type === ABSENCE" class="no-margin">{{ displayAbsenceType(event.absence) }}</p>
                   <p v-if="event.type === UNAVAILABILITY" class="no-margin">Indisponibilité</p>
                   <p v-if="event.type === INTERNAL_HOUR" class="no-margin">{{ event.internalHour.name }}</p>
@@ -39,23 +37,11 @@
 </template>
 
 <script>
-import DatetimePicker from '../../components/form/DatetimePicker.vue';
-import ModalSelect from '../../components/form/ModalSelect';
-import SearchAddress from '../../components/form/SearchAddress';
-import ModalInput from '../../components/form/ModalInput.vue';
-import FileUploader from '../../components/form/FileUploader';
 import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, ABSENCE_TYPE } from '../../data/constants';
 import { NotifyPositive, NotifyNegative } from '../../components/popup/notify';
 
 export default {
   name: 'PlanningManager',
-  components: {
-    'ni-datetime-picker': DatetimePicker,
-    'ni-modal-input': ModalInput,
-    'ni-search-address': SearchAddress,
-    'ni-modal-select': ModalSelect,
-    'ni-file-uploader': FileUploader,
-  },
   props: {
     events: { type: Array, default: () => [] },
     customers: { type: Array, default: () => [] },
@@ -72,7 +58,6 @@ export default {
       UNAVAILABILITY,
       ABSENCE,
       INTERNAL_HOUR,
-      uploaderKey: 0,
     }
   },
   computed: {
@@ -183,31 +168,14 @@ export default {
 
   .planning-container
     background: white
+
   .event
     border: 1px solid black
     padding: 2px
     margin-bottom: 3px
-  .auxiliaries-row
+
+  .person-row
     border-right: 1px solid $light-grey;
+    height: 100px;
 
-  td
-    padding: 5px 10px;
-
-    &:before
-      content: "";
-      display: block;
-      margin: 0 auto 5px;
-      width: 80%;
-      border-bottom: 1px solid $light-grey;
-
-  .planning-container
-    background: white
-
-  .event
-    border: 1px solid black
-    padding: 2px
-    margin-bottom: 3px
-
-  .auxiliaries-row
-    height: 100px
 </style>

@@ -42,8 +42,7 @@
           <ni-modal-select caption="Type d'absence" v-model="newEvent.absence" :options="absenceOptions" :error="$v.newEvent.absence.$error" />
           <ni-file-uploader caption="Justificatif d'absence" path="attachment" :entity="newEvent" alt="justificatif absence"
             name="proofOfAbsence" :url="docsUploadUrl" @uploaded="documentUploaded" :additionalValue="additionalValue"
-            :key="uploaderKey" :disable="!selectedAuxiliary._id" @delete="deleteDocument(newEvent.attachment.driveId)"
-            withBorders />
+            :disable="!selectedAuxiliary._id" @delete="deleteDocument(newEvent.attachment.driveId)" withBorders />
         </template>
         <template v-if="newEvent.type === INTERNAL_HOUR">
           <ni-modal-select caption="Type d'heure interne" v-model="newEvent.internalHour" :options="internalHourOptions"
@@ -91,8 +90,7 @@
             <ni-modal-select caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions" :error="$v.editedEvent.absence.$error" />
             <ni-file-uploader caption="Justificatif d'absence" path="attachment" :entity="editedEvent" alt="justificatif absence"
               name="proofOfAbsence" :url="docsUploadUrl" @uploaded="documentUploaded" :additionalValue="additionalValue"
-              :key="uploaderKey" :disable="!selectedAuxiliary._id" @delete="deleteDocument(editedEvent.attachment.driveId)"
-              withBorders />
+              :disable="!selectedAuxiliary._id" @delete="deleteDocument(editedEvent.attachment.driveId)" withBorders />
           </template>
           <template v-if="editedEvent.type === INTERNAL_HOUR">
             <ni-modal-select caption="Type d'heure interne" v-model="editedEvent.internalHour" :options="internalHourOptions"
@@ -181,7 +179,6 @@ export default {
         {label: 'Heure interne', value: INTERNAL_HOUR},
         {label: 'Indisponibilité', value: UNAVAILABILITY}
       ],
-      uploaderKey: 0,
       // Event edition
       editionModal: false,
       editedEvent: {
