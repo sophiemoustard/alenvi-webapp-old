@@ -137,7 +137,7 @@ export default {
       this.beingDragged = this.events.find(ev => ev._id === eventId);
       this.beingDragged.dayIndex = dayIndex;
     },
-    async drop (toDay, toAuxiliary) {
+    async drop (toDay, toPerson) {
       try {
         const data = event.dataTransfer.getData('text');
         if (event.target.nodeName === 'TD') {
@@ -146,14 +146,7 @@ export default {
         if (event.target.nodeName === 'P') {
           event.target.parentNode.parentNode.parentNode.appendChild(document.getElementById(data));
         }
-        const daysBetween = this.$moment(this.beingDragged.endDate).diff(this.$moment(this.beingDragged.startDate), 'days');
-        await this.$events.updateById(this.beingDragged._id, {
-          startDate: this.$moment(toDay).hours(this.$moment(this.beingDragged.startDate).hours())
-            .minutes(this.$moment(this.beingDragged.startDate).minutes()).toISOString(),
-          endDate: this.$moment(toDay).add(daysBetween, 'days').hours(this.$moment(this.beingDragged.endDate).hours())
-            .minutes(this.$moment(this.beingDragged.endDate).minutes()).toISOString(),
-          auxiliary: toAuxiliary._id
-        });
+        this.$emit('onDrop', { toDay, toPerson, draggedObject: this.beingDragged });
         NotifyPositive('Évènement modifié');
       } catch (e) {
         console.error(e);

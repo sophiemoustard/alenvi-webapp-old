@@ -3,7 +3,7 @@
     <p class="input-caption">Communauté</p>
     <ni-select-sector class="q-mb-md" @input="getEmployeesBySector" v-model="selectedSector" />
     <ni-planning-manager @refreshEvents="getEvents" :events="events" :customers="customers" :persons="auxiliaries"
-      @updateStartOfWeek="updateStartOfWeek" @createEvent="openCreationModal" @editEvent="openEditionModal" />
+      @updateStartOfWeek="updateStartOfWeek" @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop" />
 
     <!-- Event creation modal -->
     <q-modal v-model="creationModal" content-classes="modal-container-md" @hide="resetCreationForm(false)">
@@ -557,6 +557,18 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+    async updateEventOnDrop (vEvent) {
+      const { toDay, toPerson, draggedObject } = vEvent;
+      const daysBetween = this.$moment(draggedObject.endDate).diff(this.$moment(draggedObject.startDate), 'days');
+
+      await this.$events.updateById(draggedObject._id, {
+        startDate: this.$moment(toDay).hours(this.$moment(draggedObject.startDate).hours())
+          .minutes(this.$moment(draggedObject.startDate).minutes()).toISOString(),
+        endDate: this.$moment(toDay).add(daysBetween, 'days').hours(this.$moment(draggedObject.endDate).hours())
+          .minutes(this.$moment(draggedObject.endDate).minutes()).toISOString(),
+        auxiliary: toPerson._id
+      });
     },
     // Event cancellation
     async cancelEvent () {},
