@@ -676,14 +676,14 @@ export default {
     },
     // Drag & drop
     drag (dayIndex, eventId) {
-      event.dataTransfer.setData('text', event.target.id);
+      event.dataTransfer.setData('id', event.target.id);
       // We have source and position saving
       this.beingDragged = this.events.find(ev => ev._id === eventId);
       this.beingDragged.dayIndex = dayIndex;
     },
     async drop (toDay, toAuxiliary) {
       try {
-        const data = event.dataTransfer.getData('text');
+        const data = event.dataTransfer.getData('id');
         if (event.target.nodeName === 'TD') {
           event.target.appendChild(document.getElementById(data));
         }
@@ -704,6 +704,7 @@ export default {
         NotifyNegative('Problème lors de la modification de l\'évènement');
       } finally {
         this.beingDragged = {};
+        this.events = [];
         await this.getEvents();
       }
     },
