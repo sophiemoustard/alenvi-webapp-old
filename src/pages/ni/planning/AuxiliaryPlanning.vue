@@ -145,23 +145,7 @@ export default {
       customers: [],
       auxiliaries: [],
       startDate: '',
-      // Event Creation
-      creationModal: false,
-      newEvent: {
-        type: INTERVENTION,
-        startDate: '',
-        startDuration: '',
-        endDate: '',
-        endDuration: '',
-        auxiliary: '',
-        customer: '',
-        subscription: '',
-        sector: '',
-        internalHour: '',
-        absence: '',
-        location: {},
-        attachment: {},
-      },
+      // Event options
       INTERVENTION,
       UNAVAILABILITY,
       ABSENCE,
@@ -179,6 +163,23 @@ export default {
         {label: 'Heure interne', value: INTERNAL_HOUR},
         {label: 'Indisponibilité', value: UNAVAILABILITY}
       ],
+      // Event Creation
+      creationModal: false,
+      newEvent: {
+        type: INTERVENTION,
+        startDate: '',
+        startDuration: '',
+        endDate: '',
+        endDuration: '',
+        auxiliary: '',
+        customer: '',
+        subscription: '',
+        sector: '',
+        internalHour: '',
+        absence: '',
+        location: {},
+        attachment: {},
+      },
       // Event edition
       editionModal: false,
       editedEvent: {
@@ -198,49 +199,27 @@ export default {
     newEvent: {
       type: { required },
       startDate: { required },
-      startDuration: { required: requiredIf((item) => {
-        return item.type === ABSENCE;
-      }) },
+      startDuration: { required: requiredIf((item) => item.type === ABSENCE) },
       endDate: { required },
-      endDuration: { required: requiredIf((item) => {
-        return item.type === ABSENCE;
-      }) },
+      endDuration: { required: requiredIf((item) => item.type === ABSENCE) },
       auxiliary: { required },
       sector: { required },
-      customer: { required: requiredIf((item) => {
-        return item.type === INTERVENTION;
-      }) },
-      subscription: { required: requiredIf((item) => {
-        return item.type === INTERVENTION;
-      }) },
-      internalHour: { required: requiredIf((item) => {
-        return item.type === INTERNAL_HOUR;
-      }) },
-      absence: { required: requiredIf((item) => {
-        return item.type === ABSENCE;
-      }) },
+      customer: { required: requiredIf((item) => item.type === INTERVENTION) },
+      subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
+      internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
+      absence: { required: requiredIf((item) => item.type === ABSENCE) },
       location: { fullAddress: { frAddress } },
     },
     editedEvent: {
       startDate: { required },
-      startDuration: { required: requiredIf((item) => {
-        return item.type === ABSENCE;
-      }) },
+      startDuration: { required: requiredIf((item) => item.type === ABSENCE) },
       endDate: { required },
-      endDuration: { required: requiredIf((item) => {
-        return item.type === ABSENCE;
-      }) },
+      endDuration: { required: requiredIf((item) => item.type === ABSENCE) },
       auxiliary: { required },
       sector: { required },
-      subscription: { required: requiredIf((item) => {
-        return item.type === INTERVENTION;
-      }) },
-      internalHour: { required: requiredIf((item) => {
-        return item.type === INTERNAL_HOUR;
-      }) },
-      absence: { required: requiredIf((item) => {
-        return item.type === ABSENCE;
-      }) },
+      subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
+      internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
+      absence: { required: requiredIf((item) => item.type === ABSENCE) },
       location: { fullAddress: { frAddress } },
     },
   },
@@ -566,6 +545,7 @@ export default {
           .minutes(this.$moment(draggedObject.endDate).minutes()).toISOString(),
         auxiliary: toPerson._id
       });
+      await this.getEvents();
     },
     // Event cancellation
     async cancelEvent () {},

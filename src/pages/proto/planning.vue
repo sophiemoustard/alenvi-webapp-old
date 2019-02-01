@@ -14,9 +14,9 @@
         <tbody>
           <tr class="person-row" v-for="(person, index) in persons" :key="index">
             <td class="event-cell" valign="top">{{person.firstname}} {{person.lastname}}</td>
-            <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
+            <td @drop="drop($event, day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
               class="event-cell" @click="$emit('createEvent', { dayIndex, person })">
-              <div :id="Math.random().toString(36).substr(2, 5)" draggable @dragstart="drag(dayIndex, event._id)" class="row cursor-pointer"
+              <div :id="Math.random().toString(36).substr(2, 5)" draggable @dragstart="drag($event, dayIndex, event._id)" class="row cursor-pointer"
                 v-for="(event, eventIndex) in getOneDayAuxiliaryEvents(person, days[dayIndex])" :key="eventIndex"
                 @click.stop="$emit('editEvent', event._id)">
                 <div class="col-12 event">
@@ -50,7 +50,7 @@ export default {
   data () {
     return {
       loading: false,
-      beingDragged: {},
+      draggedObject: {},
       startOfWeek: '',
       days: [],
       maxDays: 7,
@@ -116,31 +116,30 @@ export default {
       return !absence ? '' : absence.label;
     },
     // Drag & drop
-    drag (dayIndex, eventId) {
-      event.dataTransfer.setData('text', event.target.id);
+    drag (vEvent, dayIndex, eventId) {
+      vEvent.dataTransfer.setData('text', vEvent.target.id);
       // We have source and position saving
-      this.beingDragged = this.events.find(ev => ev._id === eventId);
-      this.beingDragged.dayIndex = dayIndex;
+      this.draggedObject = this.events.find(ev => ev._id === eventId);
+      this.draggedObject.dayIndex = dayIndex;
     },
-    async drop (toDay, toPerson) {
+    async drop (vEvent, toDay, toPerson) {
       try {
-        const data = event.dataTransfer.getData('text');
-        if (event.target.nodeName === 'TD') {
-          event.target.appendChild(document.getElementById(data));
+        const data = vEvent.dataTransfer.getData('text');
+        if (vEvent.target.nodeName === 'TD') {
+          vEvent.target.appendChild(document.getElementById(data));
         }
-        if (event.target.nodeName === 'P') {
-          event.target.parentNode.parentNode.parentNode.appendChild(document.getElementById(data));
+        if (vEvent.target.nodeName === 'P') {
+          vEvent.target.parentNode.parentNode.parentNode.appendChild(document.getElementById(data));
         }
-        this.$emit('onDrop', { toDay, toPerson, draggedObject: this.beingDragged });
+        this.$emit('onDrop', { toDay, toPerson, draggedObject: this.draggedObject });
         NotifyPositive('Évènement modifié');
       } catch (e) {
         console.error(e);
         NotifyNegative('Problème lors de la modification de l\'évènement');
       } finally {
-        this.beingDragged = {};
-        this.$emit('refreshEvents');
+        this.draggedObject = {};
       }
-    },
+    }
   }
 }
 </script>
