@@ -388,8 +388,8 @@ export default {
         attachment: {},
       };
     },
-    hasConflicts (scheduledEvent, auxiliaryId) {
-      const auxiliaryEvents = this.getAuxiliaryEventsBetweenDates(auxiliaryId, scheduledEvent.startDate, scheduledEvent.endDate);
+    hasConflicts (scheduledEvent) {
+      const auxiliaryEvents = this.getAuxiliaryEventsBetweenDates(scheduledEvent.auxiliaryId, scheduledEvent.startDate, scheduledEvent.endDate);
       return auxiliaryEvents.some(ev => {
         if (scheduledEvent._id && scheduledEvent._id === ev._id) return false;
         return this.$moment(scheduledEvent.startDate).isBetween(ev.startDate, ev.endDate, 'minutes', '[]') ||
@@ -402,8 +402,7 @@ export default {
         .filter(event => {
           return this.$moment(event.startDate).isBetween(startDate, endDate, 'minutes', '()') ||
             this.$moment(startDate).isBetween(event.startDate, event.endDate, 'minutes', '()')
-        })
-        .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+        });
     },
     getPayload (event) {
       let payload = { ...event }
@@ -436,7 +435,7 @@ export default {
         this.loading = true;
         const payload = this.getPayload(this.newEvent);
 
-        if (this.hasConflicts(payload, payload.auxiliary, payload.startDate)) {
+        if (this.hasConflicts(payload)) {
           return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
         }
 
@@ -516,7 +515,7 @@ export default {
         this.loading = true;
         const payload = this.getPayload(this.editedEvent);
 
-        if (this.hasConflicts(payload, payload.auxiliary, payload.startDate)) {
+        if (this.hasConflicts(payload)) {
           return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
         }
 
@@ -539,15 +538,22 @@ export default {
       const { toDay, toPerson, draggedObject } = vEvent;
       const daysBetween = this.$moment(draggedObject.endDate).diff(this.$moment(draggedObject.startDate), 'days');
 
-      const updatedEvent = await this.$events.updateById(draggedObject._id, {
+      const payload = {
         startDate: this.$moment(toDay).hours(this.$moment(draggedObject.startDate).hours())
           .minutes(this.$moment(draggedObject.startDate).minutes()).toISOString(),
         endDate: this.$moment(toDay).add(daysBetween, 'days').hours(this.$moment(draggedObject.endDate).hours())
           .minutes(this.$moment(draggedObject.endDate).minutes()).toISOString(),
         auxiliary: toPerson._id
-      });
+      };
 
+      if (this.hasConflicts(payload)) {
+        return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
+      }
+
+      const updatedEvent = await this.$events.updateById(draggedObject._id, payload);
       this.events = this.events.map(event => (event._id === updatedEvent._id) ? updatedEvent : event);
+
+      NotifyPositive('Évènement modifié');
     },
     // Event cancellation
     async cancelEvent () {},

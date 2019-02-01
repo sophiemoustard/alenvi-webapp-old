@@ -14,12 +14,11 @@
         <tbody>
           <tr class="person-row" v-for="(person, index) in persons" :key="index">
             <td class="event-cell" valign="top">{{person.firstname}} {{person.lastname}}</td>
-            <td @drop="drop($event, day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
-              class="event-cell" @click="$emit('createEvent', { dayIndex, person })">
-              <div :id="Math.random().toString(36).substr(2, 5)" draggable @dragstart="drag($event, dayIndex, event._id)" class="row cursor-pointer"
-                v-for="(event, eventIndex) in getOneDayAuxiliaryEvents(person, days[dayIndex])" :key="eventIndex"
-                @click.stop="$emit('editEvent', event._id)">
-                <div class="col-12 event">
+            <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
+              class="event-cell" @click="$emit('createEvent', { dayIndex, person })" >
+              <template v-for="(event, eventIndex) in getOneDayAuxiliaryEvents(person, days[dayIndex])">
+                <div :id="event._id" draggable @dragstart="drag(event._id)" class="row cursor-pointer col-12 event"
+                  :key="eventIndex" @click.stop="$emit('editEvent', event._id)">
                   <p class="no-margin">{{ getEventHours(event) }}</p>
                   <p v-if="event.type === INTERVENTION" class="no-margin">{{ event.customer.identity.title }} {{
                     event.customer.identity.lastname }}</p>
@@ -27,7 +26,7 @@
                   <p v-if="event.type === UNAVAILABILITY" class="no-margin">Indisponibilité</p>
                   <p v-if="event.type === INTERNAL_HOUR" class="no-margin">{{ event.internalHour.name }}</p>
                 </div>
-              </div>
+              </template>
             </td>
           </tr>
         </tbody>
@@ -38,7 +37,7 @@
 
 <script>
 import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, ABSENCE_TYPE } from '../../data/constants';
-import { NotifyPositive, NotifyNegative } from '../../components/popup/notify';
+import { NotifyNegative } from '../../components/popup/notify';
 
 export default {
   name: 'PlanningManager',
@@ -116,23 +115,12 @@ export default {
       return !absence ? '' : absence.label;
     },
     // Drag & drop
-    drag (vEvent, dayIndex, eventId) {
-      vEvent.dataTransfer.setData('id', vEvent.target.id);
-      // We have source and position saving
+    drag (eventId) {
       this.draggedObject = this.events.find(ev => ev._id === eventId);
-      this.draggedObject.dayIndex = dayIndex;
     },
-    async drop (vEvent, toDay, toPerson) {
+    async drop (toDay, toPerson) {
       try {
-        const data = vEvent.dataTransfer.getData('id');
-        if (vEvent.target.nodeName === 'TD') {
-          vEvent.target.appendChild(document.getElementById(data));
-        }
-        if (vEvent.target.nodeName === 'P') {
-          vEvent.target.parentNode.parentNode.parentNode.appendChild(document.getElementById(data));
-        }
         this.$emit('onDrop', { toDay, toPerson, draggedObject: this.draggedObject });
-        NotifyPositive('Évènement modifié');
       } catch (e) {
         console.error(e);
         NotifyNegative('Problème lors de la modification de l\'évènement');
