@@ -1,7 +1,7 @@
 export const sideMenuMixin = {
   computed: {
     userFirstnameUpper () {
-      return this.user.firstname.toUpperCase();
+      return this.user.identity.firstname.toUpperCase();
     }
   },
   methods: {

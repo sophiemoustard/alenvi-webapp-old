@@ -244,7 +244,7 @@ export default {
     },
     auxiliariesOptions () {
       return this.auxiliaries.length === 0 ? [] : this.auxiliaries.map(aux => ({
-        label: `${aux.firstname || ''} ${aux.lastname}`,
+        label: `${aux.identity.firstname || ''} ${aux.identity.lastname}`,
         value: aux._id,
       }));
     },
@@ -275,7 +275,7 @@ export default {
       }
     },
     additionalValue () {
-      return !this.selectedAuxiliary._id ? '' : `justificatif_absence_${this.selectedAuxiliary.lastname}`;
+      return !this.selectedAuxiliary._id ? '' : `justificatif_absence_${this.selectedAuxiliary.identity.lastname}`;
     },
     docsUploadUrl () {
       return !this.selectedAuxiliary._id
@@ -389,7 +389,7 @@ export default {
       };
     },
     hasConflicts (scheduledEvent) {
-      const auxiliaryEvents = this.getAuxiliaryEventsBetweenDates(scheduledEvent.auxiliaryId, scheduledEvent.startDate, scheduledEvent.endDate);
+      const auxiliaryEvents = this.getAuxiliaryEventsBetweenDates(scheduledEvent.auxiliary, scheduledEvent.startDate, scheduledEvent.endDate);
       return auxiliaryEvents.some(ev => {
         if (scheduledEvent._id && scheduledEvent._id === ev._id) return false;
         return this.$moment(scheduledEvent.startDate).isBetween(ev.startDate, ev.endDate, 'minutes', '[]') ||

@@ -44,7 +44,7 @@ export default {
       return this.user.administrative.phoneInvoice.driveId;
     },
     userLastContract () {
-      return this.contracts.find(contract => contract.isActive);
+      return this.contracts.find(contract => contract.isActive) || {};
     },
     userCurrentMonthContracts () {
       return this.contracts.filter(contract => this.$moment(contract.endDate).month() === this.$moment().month() ||
@@ -67,6 +67,8 @@ export default {
       } else {
         const effectiveWorkingDays = this.calculateEffectiveWorkingDays(this.userLastContract);
         const { grossHourlyRate, weeklyHours } = this.userLastContract;
+        if (!effectiveWorkingDays || !grossHourlyRate || !workingDays) return '0.00';
+
         return Number.parseFloat((effectiveWorkingDays / workingDays) * 4.33 * grossHourlyRate * weeklyHours).toFixed(2);
       }
     }
@@ -88,6 +90,7 @@ export default {
     calculateEffectiveWorkingDays (contract) {
       const workingDays = this.currentWorkingDays.length;
       let effectiveWorkingDays = 0;
+
       if (contract.endDate && this.isCurrentMonthContract(contract)) {
         effectiveWorkingDays = moment(contract.startDate).businessDiff(moment(contract.endDate));
       } else if (contract.startDate && contract.isActive && this.isCurrentMonthContract(contract)) {
@@ -109,7 +112,7 @@ export default {
       switch (type) {
         case 'transport':
           if (this.user.administrative.transportInvoice.transportType !== 'public') return 'Non concerné(e)';
-          const currentSub = this.company.rhConfig.transportSubs.find(sub => sub.department === this.user.administrative.contact.zipCode.substring(0, 2));
+          const currentSub = this.company.rhConfig.transportSubs.find(sub => sub.department === this.user.contact.zipCode.substring(0, 2));
           refundAmount = currentSub.price;
           break;
         case 'phone':

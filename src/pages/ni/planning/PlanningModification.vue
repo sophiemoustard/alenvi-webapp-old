@@ -1,36 +1,22 @@
 <template>
-    <div style="max-width: 90vw;">
-      <h4>Modifications planning</h4>
-      <q-table
-        title="Récapitulatif des modifications planning"
-        :data="planningUpdatesList"
-        :columns="columns"
-        row-key="name"
-        :rows-per-page-options="[30, 40, 50]"
-        :pagination.sync="pagination"
-        :filter="filter"
-        dense
-        rows-per-page-label="Lignes"
-        :pagination-label="paginationLabel"
-        no-data-label="Données non disponibles"
-        no-results-label="Pas de résultats">
-        <template slot="top" slot-scope="props">
-          <q-search
-            hide-underline
-            color="primary"
-            v-model="filter"
-            clearable
-            placeholder="Recherche"
-            class="col-6" />
-        </template>
-        <q-td slot="body-cell-check" slot-scope="props" :props="props">
-          <q-checkbox v-model="props.value.checked" @input="process(props.value.id, props.value.checked, props.row.__index)" val="props.value.checked"></q-checkbox>
-        </q-td>
-        <q-td slot="body-cell-remove" slot-scope="props" :props="props">
-          <q-icon class="cursor-pointer" color="grey" name="delete" @click.native="remove(props.value.id, props.row.__index, props.value.userId)" size="1.5rem" />
-        </q-td>
-      </q-table>
-    </div>
+  <div style="max-width: 90vw;">
+    <h4>Modifications planning</h4>
+    <q-table title="Récapitulatif des modifications planning" :data="planningUpdatesList" :columns="columns" row-key="name"
+      :rows-per-page-options="[30, 40, 50]" :pagination.sync="pagination" :filter="filter" dense rows-per-page-label="Lignes"
+      :pagination-label="paginationLabel" no-data-label="Données non disponibles" no-results-label="Pas de résultats">
+      <template slot="top" slot-scope="props">
+        <q-search hide-underline color="primary" v-model="filter" clearable placeholder="Recherche" class="col-6" />
+      </template>
+      <q-td slot="body-cell-check" slot-scope="props" :props="props">
+        <q-checkbox v-model="props.value.checked" @input="process(props.value.id, props.value.checked, props.row.__index)"
+          val="props.value.checked"></q-checkbox>
+      </q-td>
+      <q-td slot="body-cell-remove" slot-scope="props" :props="props">
+        <q-icon class="cursor-pointer" color="grey" name="delete" @click.native="remove(props.value.id, props.row.__index, props.value.userId)"
+          size="1.5rem" />
+      </q-td>
+    </q-table>
+  </div>
 </template>
 
 <script>
@@ -175,20 +161,21 @@ export default {
           for (let j = 0, k = planningUpdatesList[i].planningModification.length; j < k; j++) {
             orderedPlanningUpdatesList.push({
               date: planningUpdatesList[i].planningModification[j].createdAt,
-              author: `${planningUpdatesList[i].firstname} ${planningUpdatesList[i].lastname}`,
+              author: `${planningUpdatesList[i].identity.firstname} ${planningUpdatesList[i].identity.lastname}`,
               content: planningUpdatesList[i].planningModification[j].content || '-',
               involved: planningUpdatesList[i].planningModification[j].involved,
               sector: sectors[planningUpdatesList[i].sector],
               type: planningUpdatesList[i].planningModification[j].modificationType,
               check: { id: planningUpdatesList[i].planningModification[j]._id, checked: planningUpdatesList[i].planningModification[j].check.isChecked },
-              checkedBy: planningUpdatesList[i].planningModification[j].check.checkBy ? `${planningUpdatesList[i].planningModification[j].check.checkBy.firstname} ${planningUpdatesList[i].planningModification[j].check.checkBy.lastname.substring(0, 1)}.` : '-',
+              checkedBy: planningUpdatesList[i].planningModification[j].check.checkBy
+                ? `${planningUpdatesList[i].planningModification[j].check.checkBy.identity.firstname} ${planningUpdatesList[i].planningModification[j].check.checkBy.identity.lastname.substring(0, 1)}.`
+                : '-',
               checkedAt: planningUpdatesList[i].planningModification[j].check.checkedAt || '',
               remove: { id: planningUpdatesList[i].planningModification[j]._id, userId: planningUpdatesList[i]._id }
             });
           }
         }
         this.planningUpdatesList = orderedPlanningUpdatesList;
-        // this.planningUpdatesList = _.sortBy(orderedPlanningUpdatesList, ['date']).reverse();
       } catch (e) {
         console.error(e);
       }
@@ -201,7 +188,7 @@ export default {
           checkedAt: isChecked ? new Date() : null
         }
         await this.$planningUpdates.updatePlanningUpdatesStatus(updateId, payload);
-        this.planningUpdatesList[cell].checkedBy = payload.checkBy ? `${this.user.firstname} ${this.user.lastname.substring(0, 1)}.` : '-';
+        this.planningUpdatesList[cell].checkedBy = payload.checkBy ? `${this.user.identity.firstname} ${this.user.identity.lastname.substring(0, 1)}.` : '-';
         this.planningUpdatesList[cell].checkedAt = payload.checkedAt ? new Date() : '';
         NotifyPositive('Modification traitée.');
       } catch (e) {
@@ -238,7 +225,7 @@ export default {
     async getUserById (id) {
       try {
         const user = await this.$users.getById(id);
-        return `${user.firstname} ${user.lastname.substring(0, 1)}.`
+        return `${user.identity.firstname} ${user.identity.lastname.substring(0, 1)}.`
       } catch (e) {
         console.error(e);
       }

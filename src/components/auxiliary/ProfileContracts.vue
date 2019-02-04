@@ -22,7 +22,7 @@
                   <div v-if="!props.row.link" class="row justify-center table-actions">
                     <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :url="docsUploadUrl"
                       :headers="headers" :additional-fields="[
-                        { name: 'fileName', value: `contrat_signe_${getUser.firstname}_${getUser.lastname}` },
+                        { name: 'fileName', value: `contrat_signe_${getUser.identity.firstname}_${getUser.identity.lastname}` },
                         { name: 'contractId', value: contract._id },
                         { name: 'versionId', value: props.row._id }
                       ]"
@@ -277,10 +277,8 @@ export default {
       return contracts.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
     },
     hasBasicInfo () {
-      if (this.getUser.administrative && this.getUser.administrative.identity && this.getUser.lastname &&
-      this.getUser.administrative.identity.birthDate && this.getUser.administrative.identity.nationality &&
-      this.getUser.administrative.contact.address && this.getUser.administrative.contact.zipCode &&
-      this.getUser.administrative.contact.city) {
+      if (this.getUser.identity && this.getUser.identity.lastname && this.getUser.identity.birthDate && this.getUser.identity.nationality &&
+        this.getUser.contact && this.getUser.contact.address && this.getUser.contact.zipCode && this.getUser.contact.city) {
         return true;
       }
       return false;
@@ -350,11 +348,11 @@ export default {
     async dlTemplate (contract, index, contractStartDate) {
       try {
         const monthlyHours = Number.parseFloat(contract.weeklyHours * 4.33).toFixed(1);
-        const { identity, contact } = this.getUser.administrative
+        const { identity, contact } = this.getUser
         const data = {
           'auxiliaryTitle': identity.title,
-          'auxiliaryFirstname': this.getUser.firstname,
-          'auxiliaryLastname': this.getUser.lastname,
+          'auxiliaryFirstname': identity.firstname,
+          'auxiliaryLastname': identity.lastname,
           'auxiliaryAddress': `${contact.address} ${contact.zipCode} ${contact.city}`,
           'auxiliaryBirthDate': this.$moment(identity.birthDate).format('DD/MM/YYYY'),
           'auxiliaryNationality': this.getFullNationality(identity.nationality),

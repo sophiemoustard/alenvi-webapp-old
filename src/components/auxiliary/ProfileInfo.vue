@@ -53,35 +53,35 @@
           groupErrors('identity').msg }}</p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="Prénom" :error="$v.user.alenvi.firstname.$error" v-model="user.alenvi.firstname"
-          @blur="updateUser({ alenvi: 'firstname', ogust: 'first_name' })" @focus="saveTmp('firstname')"
+        <ni-input caption="Prénom" :error="$v.user.alenvi.identity.firstname.$error" v-model="user.alenvi.identity.firstname"
+          @blur="updateUser({ alenvi: 'identity.firstname', ogust: 'first_name' })" @focus="saveTmp('identity.firstname')"
         />
-        <ni-input caption="Nom" :error="$v.user.alenvi.lastname.$error" v-model="user.alenvi.lastname"
-          @blur="updateUser({ alenvi: 'lastname', ogust: 'last_name' })" @focus="saveTmp('lastname')"
+        <ni-input caption="Nom" :error="$v.user.alenvi.identity.lastname.$error" v-model="user.alenvi.identity.lastname"
+          @blur="updateUser({ alenvi: 'identity.lastname', ogust: 'last_name' })" @focus="saveTmp('identity.lastname')"
         />
-        <ni-select caption="Nationalité" :error="$v.user.alenvi.administrative.identity.nationality.$error" :options="nationalitiesOptions"
-          v-model="user.alenvi.administrative.identity.nationality" @focus="saveTmp('administrative.identity.nationality')"
-          @blur="updateUser({ alenvi: 'administrative.identity.nationality', ogust: 'nationality' })"
+        <ni-select caption="Nationalité" :error="$v.user.alenvi.identity.nationality.$error" :options="nationalitiesOptions"
+          v-model="user.alenvi.identity.nationality" @focus="saveTmp('identity.nationality')"
+          @blur="updateUser({ alenvi: 'identity.nationality', ogust: 'nationality' })"
         />
-        <ni-datetime-picker caption="Date de naissance" :error="$v.user.alenvi.administrative.identity.birthDate.$error"
-          v-model="user.alenvi.administrative.identity.birthDate" @focus="saveTmp('administrative.identity.birthDate')"
-          @blur="updateUser({ alenvi: 'administrative.identity.birthDate', ogust: 'date_of_birth' })"
+        <ni-datetime-picker caption="Date de naissance" :error="$v.user.alenvi.identity.birthDate.$error"
+          v-model="user.alenvi.identity.birthDate" @focus="saveTmp('identity.birthDate')"
+          @blur="updateUser({ alenvi: 'identity.birthDate', ogust: 'date_of_birth' })"
         />
-        <ni-select caption="Pays de naissance" :error="$v.user.alenvi.administrative.identity.birthCountry.$error" :options="nationalitiesOptions"
-          v-model="user.alenvi.administrative.identity.birthCountry" @focus="saveTmp('administrative.identity.birthCountry')"
-          @blur="updateUser({ alenvi: 'administrative.identity.birthCountry', ogust: 'country_of_birth' })"
+        <ni-select caption="Pays de naissance" :error="$v.user.alenvi.identity.birthCountry.$error" :options="nationalitiesOptions"
+          v-model="user.alenvi.identity.birthCountry" @focus="saveTmp('identity.birthCountry')"
+          @blur="updateUser({ alenvi: 'identity.birthCountry', ogust: 'country_of_birth' })"
         />
-        <ni-input caption="Département de naissance" :error="$v.user.alenvi.administrative.identity.birthState.$error" :errorLabel="birthStateError"
-          v-model="user.alenvi.administrative.identity.birthState" @blur="updateUser({ alenvi: 'administrative.identity.birthState', ogust: 'state_of_birth' })"
-          @focus="saveTmp('administrative.identity.birthState')" :displayInput="this.user.alenvi.administrative.identity.birthCountry === 'FR'"
+        <ni-input caption="Département de naissance" :error="$v.user.alenvi.identity.birthState.$error" :errorLabel="birthStateError"
+          v-model="user.alenvi.identity.birthState" @blur="updateUser({ alenvi: 'identity.birthState', ogust: 'state_of_birth' })"
+          @focus="saveTmp('identity.birthState')" :displayInput="this.user.alenvi.identity.birthCountry === 'FR'"
         />
-        <ni-input caption="Ville de naissance" :error="$v.user.alenvi.administrative.identity.birthCity.$error"
-          v-model="user.alenvi.administrative.identity.birthCity" @focus="saveTmp('administrative.identity.birthCity')"
-          @blur="updateUser({ alenvi: 'administrative.identity.birthCity', ogust: 'place_of_birth' })"
+        <ni-input caption="Ville de naissance" :error="$v.user.alenvi.identity.birthCity.$error"
+          v-model="user.alenvi.identity.birthCity" @focus="saveTmp('identity.birthCity')"
+          @blur="updateUser({ alenvi: 'identity.birthCity', ogust: 'place_of_birth' })"
         />
-        <ni-input caption="Numéro de sécurité sociale" :error="$v.user.alenvi.administrative.identity.socialSecurityNumber.$error"
-          v-model="user.alenvi.administrative.identity.socialSecurityNumber" @focus="saveTmp('administrative.identity.socialSecurityNumber')"
-          @blur="updateUser({ alenvi: 'administrative.identity.socialSecurityNumber', ogust: 'social_insurance_number' })" :errorLabel="ssnError"
+        <ni-input caption="Numéro de sécurité sociale" :error="$v.user.alenvi.identity.socialSecurityNumber.$error"
+          v-model="user.alenvi.identity.socialSecurityNumber" @focus="saveTmp('identity.socialSecurityNumber')"
+          @blur="updateUser({ alenvi: 'identity.socialSecurityNumber', ogust: 'social_insurance_number' })" :errorLabel="ssnError"
         />
       </div>
     </div>
@@ -92,29 +92,23 @@
       </div>
       <div class="row gutter-profile">
         <ni-input caption="Numéro de téléphone" :error="$v.user.alenvi.mobilePhone.$error" :errorLabel="phoneNbrError" type="tel"
-          v-model.trim="user.alenvi.mobilePhone" @blur="updateUser({ alenvi: 'mobilePhone', ogust: 'mobile_phone' })" @focus="saveTmp('mobilePhone')"
-        />
+          v-model.trim="user.alenvi.mobilePhone" @blur="updateUser({ alenvi: 'mobilePhone', ogust: 'mobile_phone' })" @focus="saveTmp('mobilePhone')" />
         <ni-input caption="Adresse email" :error="$v.user.alenvi.local.email.$error" :errorLabel="emailError" type="email" lowerCase disable
           v-model.trim="user.alenvi.local.email" @blur="updateUser({ alenvi: 'local.email', ogust: 'email' })" @focus="saveTmp('local.email')"
-          :displayInput="mainUser.role.name !== 'Auxiliaire'"
-        />
-        <ni-input caption="Adresse, numéro et rue" v-model="user.alenvi.administrative.contact.address"
-          @blur="updateUser({ alenvi: 'administrative.contact.address', ogust: 'line' })" @focus="saveTmp('administrative.contact.address')"
-          :error="$v.user.alenvi.administrative.contact.address.$error"
-        />
+          :displayInput="mainUser.role.name !== 'Auxiliaire'" />
+        <ni-input caption="Adresse, numéro et rue" v-model="user.alenvi.contact.address"
+          @blur="updateUser({ alenvi: 'contact.address', ogust: 'line' })" @focus="saveTmp('contact.address')"
+          :error="$v.user.alenvi.contact.address.$error" />
         <div class="col-xs-12 col-md-6">
           <p class="input-caption">Complément d'adresse</p>
-          <q-input v-model="user.alenvi.administrative.contact.additionalAddress" @focus="saveTmp('administrative.contact.addionalAddress')"
-            @blur="updateUser({ alenvi: 'administrative.contact.additionalAddress', ogust: 'supplement' })" color="white" inverted-light
-          />
+          <q-input v-model="user.alenvi.contact.additionalAddress" @focus="saveTmp('contact.addionalAddress')"
+            @blur="updateUser({ alenvi: 'contact.additionalAddress', ogust: 'supplement' })" color="white" inverted-light />
         </div>
-        <ni-input caption="Code postal" :error="$v.user.alenvi.administrative.contact.zipCode.$error" :errorLabel="zipCodeError"
-          v-model="user.alenvi.administrative.contact.zipCode" @focus="saveTmp('administrative.contact.zipCode')"
-          @blur="updateUser({ alenvi: 'administrative.contact.zipCode', ogust: 'zip' })"
-        />
-        <ni-input caption="Ville" :error="$v.user.alenvi.administrative.contact.city.$error" v-model="user.alenvi.administrative.contact.city"
-          @blur="updateUser({ alenvi: 'administrative.contact.city', ogust: 'city' })" @focus="saveTmp('administrative.contact.city')"
-        />
+        <ni-input caption="Code postal" :error="$v.user.alenvi.contact.zipCode.$error" :errorLabel="zipCodeError"
+          v-model="user.alenvi.contact.zipCode" @focus="saveTmp('contact.zipCode')"
+          @blur="updateUser({ alenvi: 'contact.zipCode', ogust: 'zip' })" />
+        <ni-input caption="Ville" :error="$v.user.alenvi.contact.city.$error" v-model="user.alenvi.contact.city"
+          @blur="updateUser({ alenvi: 'contact.city', ogust: 'city' })" @focus="saveTmp('contact.city')" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -172,13 +166,13 @@
           <ni-file-uploader caption="Carte d'identité (recto)" path="administrative.idCardRecto" alt="cni recto" :entity="currentUser"
             @delete="deleteDocument(user.alenvi.administrative.idCardRecto.driveId, 'administrative.idCardRecto')" name="idCardRecto"
             @uploaded="refreshUser" :url="docsUploadUrl" :error="$v.user.alenvi.administrative.idCardRecto.driveId.$error"
-            :additionalValue="`cni_recto_${currentUser.firstname}_${currentUser.lastname}`" :extensions="extensions"
+            :additionalValue="`cni_recto_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" :extensions="extensions"
           />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Carte d'identité (verso)" path="administrative.idCardVerso" alt="cni verso" :entity="currentUser" :url="docsUploadUrl"
             @delete="deleteDocument(user.alenvi.administrative.idCardVerso.driveId, 'administrative.idCardVerso')" name="idCardVerso"
-            @uploaded="refreshUser" :additionalValue="`cni_verso_${currentUser.firstname}_${currentUser.lastname}`"
+            @uploaded="refreshUser" :additionalValue="`cni_verso_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
             :extensions="extensions"
           />
         </div>
@@ -186,14 +180,14 @@
           <ni-file-uploader caption="Passeport" path="administrative.passport" alt="passeport" :entity="currentUser"
             @delete="deleteDocument(user.alenvi.administrative.passport.driveId, 'administrative.passport')" name="passport" :url="docsUploadUrl"
             @uploaded="refreshUser" :error="$v.user.alenvi.administrative.passport.driveId.$error" :extensions="extensions"
-            :additionalValue="`passport_${currentUser.firstname}_${currentUser.lastname}`"
+            :additionalValue="`passport_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
           />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Titre de séjour (recto)" path="administrative.residencePermitRecto" alt="titre de séjour (recto)" :entity="currentUser"
             @delete="deleteDocument(user.alenvi.administrative.residencePermitRecto.driveId, 'administrative.residencePermitRecto')"
             @uploaded="refreshUser" :url="docsUploadUrl" :error="$v.user.alenvi.administrative.residencePermitRecto.driveId.$error"
-            name="residencePermitRecto" :additionalValue="`titre_de_séjour_recto_${currentUser.firstname}_${currentUser.lastname}`"
+            name="residencePermitRecto" :additionalValue="`titre_de_séjour_recto_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
             :extensions="extensions"
           />
         </div>
@@ -201,21 +195,21 @@
           <ni-file-uploader caption="Titre de séjour (verso)" path="administrative.residencePermitVerso" alt="titre de séjour (verso)" name="residencePermitVerso"
             @delete="deleteDocument(user.alenvi.administrative.residencePermitVerso.driveId, 'administrative.residencePermitVerso')" :entity="currentUser"
             @uploaded="refreshUser" :url="docsUploadUrl" :extensions="extensions"
-            :additionalValue="`titre_de_séjour_verso_${currentUser.firstname}_${currentUser.lastname}`"
+            :additionalValue="`titre_de_séjour_verso_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
           />
         </div>
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Attestation de sécurité sociale" path="administrative.healthAttest" alt="attestation secu" :entity="currentUser"
             @delete="deleteDocument(user.alenvi.administrative.healthAttest.driveId, 'administrative.healthAttest')" name="healthAttest"
             @uploaded="refreshUser" :error="$v.user.alenvi.administrative.healthAttest.driveId.$error"
-            :additionalValue="`attestation_secu_${currentUser.firstname}_${currentUser.lastname}`" :url="docsUploadUrl" :extensions="extensions"
+            :additionalValue="`attestation_secu_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" :url="docsUploadUrl" :extensions="extensions"
           />
         </div>
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Facture téléphonique" path="administrative.phoneInvoice" alt="facture téléphone" :entity="currentUser"
             @delete="deleteDocument(user.alenvi.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')" name="phoneInvoice"
             @uploaded="refreshUser" :error="$v.user.alenvi.administrative.phoneInvoice.driveId.$error"
-            :additionalValue="`facture_telephone_${currentUser.firstname}_${currentUser.lastname}`" :url="docsUploadUrl" :extensions="extensions"
+            :additionalValue="`facture_telephone_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" :url="docsUploadUrl" :extensions="extensions"
           />
         </div>
       </div>
@@ -251,7 +245,7 @@
             @delete="deleteDocument(user.alenvi.administrative.mutualFund.driveId, 'administrative.mutualFund')" name="mutualFund" @uploaded="refreshUser"
             :displayUpload="user.alenvi.administrative.mutualFund.has && !user.alenvi.administrative.mutualFund.driveId" entityUrl="users"
             :error="$v.user.alenvi.administrative.mutualFund.driveId.$error" :displayCaption="mainUser.role.name === 'Auxiliaire'"
-            :url="docsUploadUrl" :additionalValue="`mutuelle_${currentUser.firstname}_${currentUser.lastname}`" :extensions="extensions"
+            :url="docsUploadUrl" :additionalValue="`mutuelle_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" :extensions="extensions"
           />
       </div>
         </div>
@@ -278,8 +272,8 @@
             alt="justif transport" :entity="currentUser" name="transportInvoice" @uploaded="refreshUser"
             :error="$v.user.alenvi.administrative.transportInvoice.driveId.$error" :displayCaption="mainUser.role.name === 'Auxiliaire'"
             @delete="deleteDocument(user.alenvi.administrative.transportInvoice.driveId, 'administrative.transportInvoice')"
-            :url="docsUploadUrl" :additionalValue="`justif_transport_${currentUser.firstname}_${currentUser.lastname}`" :extensions="extensions"
-          />
+            :url="docsUploadUrl" :additionalValue="`justif_transport_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
+            :extensions="extensions" />
         </div>
       </div>
     </div>
@@ -289,7 +283,7 @@
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Certificat d'aptitude" path="administrative.medicalCertificate" alt="certificat médical" :entity="user.alenvi"
             @delete="deleteDocument(user.alenvi.administrative.medicalCertificate.driveId, 'administrative.medicalCertificate')" name="medicalCertificate"
-            @uploaded="refreshUser" :additionalValue="`certificat_medical_${currentUser.firstname}_${currentUser.lastname}`"
+            @uploaded="refreshUser" :additionalValue="`certificat_medical_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
             :url="docsUploadUrl" :extensions="extensions"
           />
         </div>
@@ -353,19 +347,19 @@ export default {
         'user.alenvi.picture.link'
       ],
       identityGroup: [
-        'user.alenvi.firstname',
-        'user.alenvi.lastname',
-        'user.alenvi.administrative.identity.nationality',
-        'user.alenvi.administrative.identity.birthDate',
-        'user.alenvi.administrative.identity.birthCountry',
-        'user.alenvi.administrative.identity.birthState',
-        'user.alenvi.administrative.identity.birthCity',
-        'user.alenvi.administrative.identity.socialSecurityNumber'
+        'user.alenvi.identity.firstname',
+        'user.alenvi.identity.lastname',
+        'user.alenvi.identity.nationality',
+        'user.alenvi.identity.birthDate',
+        'user.alenvi.identity.birthCountry',
+        'user.alenvi.identity.birthState',
+        'user.alenvi.identity.birthCity',
+        'user.alenvi.identity.socialSecurityNumber'
       ],
       contactGroup: [
-        'user.alenvi.administrative.contact.address',
-        'user.alenvi.administrative.contact.zipCode',
-        'user.alenvi.administrative.contact.city'
+        'user.alenvi.contact.address',
+        'user.alenvi.contact.zipCode',
+        'user.alenvi.contact.city'
       ],
       emergencyContactGroup: [
         'user.alenvi.administrative.emergencyContact.name',
@@ -400,6 +394,20 @@ export default {
           picture: {
             link: ''
           },
+          identity: {
+            nationality: '',
+            birthDate: '',
+            birthCountry: '',
+            birthState: '',
+            birthCity: '',
+            socialSecurityNumber: ''
+          },
+          contact: {
+            address: '',
+            additionalAddress: '',
+            zipCode: '',
+            city: ''
+          },
           administrative: {
             emergencyContact: {
               name: '',
@@ -427,20 +435,6 @@ export default {
                 bic: ''
               }
             },
-            identity: {
-              nationality: '',
-              birthDate: '',
-              birthCountry: '',
-              birthState: '',
-              birthCity: '',
-              socialSecurityNumber: ''
-            },
-            contact: {
-              address: '',
-              additionalAddress: '',
-              zipCode: '',
-              city: ''
-            }
           }
         }
       },
@@ -452,8 +446,6 @@ export default {
       identityType: { required },
       user: {
         alenvi: {
-          firstname: { required },
-          lastname: { required },
           local: {
             email: { required, email }
           },
@@ -467,37 +459,39 @@ export default {
           },
           sector: { required },
           mentorId: { required },
+          identity: {
+            firstname: { required },
+            lastname: { required },
+            nationality: { required },
+            birthDate: { required },
+            birthCountry: { required },
+            birthState: {
+              required: requiredIf(() => {
+                return this.user.alenvi.identity.birthCountry === 'FR';
+              }),
+              numeric,
+              minLength: minLength(2),
+              maxLength: maxLength(3)
+            },
+            birthCity: { required },
+            socialSecurityNumber: {
+              required,
+              numeric,
+              minLength: minLength(15),
+              maxLength: maxLength(15)
+            }
+          },
+          contact: {
+            address: { required },
+            zipCode: {
+              required,
+              frZipCode,
+              maxLength: maxLength(5)
+            },
+            city: { required }
+          },
           administrative: {
-            identity: {
-              nationality: { required },
-              birthDate: { required },
-              birthCountry: { required },
-              birthState: {
-                required: requiredIf(() => {
-                  return this.user.alenvi.administrative.identity.birthCountry === 'FR';
-                }),
-                numeric,
-                minLength: minLength(2),
-                maxLength: maxLength(3)
-              },
-              birthCity: { required },
-              socialSecurityNumber: {
-                required,
-                numeric,
-                minLength: minLength(15),
-                maxLength: maxLength(15)
-              }
-            },
             identityDocs: { required },
-            contact: {
-              address: { required },
-              zipCode: {
-                required,
-                frZipCode,
-                maxLength: maxLength(5)
-              },
-              city: { required }
-            },
             emergencyContact: {
               name: { required },
               phoneNumber: {
@@ -547,15 +541,11 @@ export default {
             },
             transportInvoice: {
               transportType: { required },
-              driveId: { required: requiredIf((item) => {
-                return item.transportType === 'public'
-              }) }
+              driveId: { required: requiredIf(item => item.transportType === 'public') }
             },
             mutualFund: {
               has: { required },
-              driveId: { required: requiredIf((item) => {
-                return item.has
-              })}
+              driveId: { required: requiredIf(item => item.has) }
             }
           }
         }
@@ -597,20 +587,20 @@ export default {
       return !this.user.alenvi.picture || (this.user.alenvi.picture && !this.user.alenvi.picture.link) ? null : this.user.alenvi.picture.link;
     },
     birthStateError () {
-      if (!this.$v.user.alenvi.administrative.identity.birthState.required) {
+      if (!this.$v.user.alenvi.identity.birthState.required) {
         return 'Champ requis';
-      } else if (!this.$v.user.alenvi.administrative.identity.birthState.minLength ||
-      !this.$v.user.alenvi.administrative.identity.birthState.maxLength ||
-      !this.$v.user.alenvi.administrative.identity.birthState.numeric) {
+      } else if (!this.$v.user.alenvi.identity.birthState.minLength ||
+      !this.$v.user.alenvi.identity.birthState.maxLength ||
+      !this.$v.user.alenvi.identity.birthState.numeric) {
         return 'Departement non valide';
       }
     },
     ssnError () {
-      if (!this.$v.user.alenvi.administrative.identity.socialSecurityNumber.required) {
+      if (!this.$v.user.alenvi.identity.socialSecurityNumber.required) {
         return 'Champ requis';
-      } else if (!this.$v.user.alenvi.administrative.identity.socialSecurityNumber.minLength ||
-      !this.$v.user.alenvi.administrative.identity.socialSecurityNumber.maxLength ||
-      !this.$v.user.alenvi.administrative.identity.socialSecurityNumber.numeric) {
+      } else if (!this.$v.user.alenvi.identity.socialSecurityNumber.minLength ||
+      !this.$v.user.alenvi.identity.socialSecurityNumber.maxLength ||
+      !this.$v.user.alenvi.identity.socialSecurityNumber.numeric) {
         return 'Numéro de sécurité sociale non valide';
       }
     },
@@ -629,9 +619,9 @@ export default {
       }
     },
     zipCodeError () {
-      if (!this.$v.user.alenvi.administrative.contact.zipCode.required) {
+      if (!this.$v.user.alenvi.contact.zipCode.required) {
         return 'Champ requis';
-      } else if (!this.$v.user.alenvi.administrative.contact.zipCode.frZipCode || !this.$v.user.alenvi.administrative.contact.zipCode.maxLength) {
+      } else if (!this.$v.user.alenvi.contact.zipCode.frZipCode || !this.$v.user.alenvi.contact.zipCode.maxLength) {
         return 'Code postal non valide';
       }
     },
@@ -713,8 +703,8 @@ export default {
       payload._id = this.currentUser._id;
 
       if (path.match(/birthCountry/i) && value !== 'FR') {
-        this.user.alenvi.administrative.identity.birthState = '99';
-        payload.administrative.identity.birthState = '99';
+        this.user.alenvi.identity.birthState = '99';
+        payload.identity.birthState = '99';
       }
 
       await this.$users.updateById(payload);
@@ -743,7 +733,7 @@ export default {
         payload.id_tiers = this.currentUser.employee_id;
         await this.$ogust.setBankInfo(payload);
       } else if (paths.ogust.match(/(city|line|supplement|zip)/i)) {
-        payload.id_address = this.currentUser.administrative.contact.addressId;
+        payload.id_address = this.currentUser.contact.addressId;
         await this.$ogust.setAddress(payload);
       } else {
         payload.id_employee = this.currentUser.employee_id
@@ -764,7 +754,7 @@ export default {
         let data = new FormData();
         data.append('_id', this.currentUser._id);
         data.append('role', this.currentUser.role.name);
-        data.append('fileName', `photo_${this.currentUser.firstname}_${this.currentUser.lastname}`);
+        data.append('fileName', `photo_${this.currentUser.identity.firstname}_${this.currentUser.identity.lastname}`);
         data.append('Content-Type', blob.type || 'application/octet-stream');
         data.append('picture', blob);
         await this.$axios.post(this.pictureUploadUrl, data, { headers: { 'content-type': 'multipart/form-data', 'x-access-token': Cookies.get('alenvi_token') || '' } });
@@ -867,7 +857,7 @@ export default {
       }
     },
     pictureDlLink (link) {
-      return link ? link.replace(/(\/upload)/i, `$1/fl_attachment:photo_${this.currentUser.firstname}_${this.currentUser.lastname}`) : '';
+      return link ? link.replace(/(\/upload)/i, `$1/fl_attachment:photo_${this.currentUser.identity.firstname}_${this.currentUser.identity.lastname}`) : '';
     }
   }
 }

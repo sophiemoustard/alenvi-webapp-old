@@ -4,8 +4,7 @@
       <div :class="[customer ? 'col-xs-12': 'col-xs-8', 'row', 'items-baseline', 'col-md-10']">
         <div class="row">
           <q-icon v-if="isExternalUser" class="on-left cursor-pointer self-center" size="1rem" name="arrow_back" color="primary" @click.native="goToDirectory" />
-          <h4 v-if="!customer">{{ user.firstname }} {{ user.lastname }}</h4>
-          <h4 v-else>{{ user.identity.firstname }} {{ user.identity.lastname }}</h4>
+          <h4>{{ user.identity.firstname }} {{ user.identity.lastname }}</h4>
         </div>
       </div>
       <div v-if="!customer" class="row custom-justify-end col-xs-4 col-md-2">
@@ -136,7 +135,7 @@ export default {
     messageComp: {
       get () {
         if (this.typeMessage === 'PM') {
-          return `Bonjour ${this.user.firstname},\nIl manque encore des informations et documents importants pour compléter ton dossier.\nClique ici pour compléter ton profil: ${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/ni/${this.user._id}\nSi tu rencontres des difficultés, n’hésite pas à t’adresser à ton/ta coach ou ta marraine.`;
+          return `Bonjour ${this.user.identity.firstname},\nIl manque encore des informations et documents importants pour compléter ton dossier.\nClique ici pour compléter ton profil: ${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/ni/${this.user._id}\nSi tu rencontres des difficultés, n’hésite pas à t’adresser à ton/ta coach ou ta marraine.`;
         } else if (this.typeMessage === 'CA') {
           return `Bienvenue chez Alenvi ! :)\nUtilise ce code: ${this.activationCode} pour pouvoir commencer ton enregistrement sur Compani avant ton intégration: ${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/enterCode :-)`
         }

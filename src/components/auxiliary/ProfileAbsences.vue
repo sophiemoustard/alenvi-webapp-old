@@ -7,7 +7,7 @@
             <div v-if="!props.row.link" class="row justify-center">
               <q-uploader :ref="`absenceReason_${props.row._id}`" name="absenceReason" :url="docsUploadUrl" :headers="headers"
                 :additional-fields="[
-                  { name: 'fileName', value: `justificatif_absence_${getUser.firstname}_${getUser.lastname}_${$moment().format('DD-MM-YYYY')}` },
+                  { name: 'fileName', value: `justificatif_absence_${getUser.identity.firstname}_${getUser.identity.lastname}_${$moment().format('DD-MM-YYYY')}` },
                   { name: 'absenceId', value: props.row._id }
                 ]"
                 hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"

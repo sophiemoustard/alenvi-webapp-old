@@ -91,7 +91,7 @@ export default {
       return !this.collapsibleOpened ? 'add' : 'mdi-close';
     },
     additionalFields () {
-      return [{ name: 'fileName', value: `${this.additionalFieldsName}_${this.userProfile.firstname}_${this.userProfile.lastname}` }];
+      return [{ name: 'fileName', value: `${this.additionalFieldsName}_${this.userProfile.identity.firstname}_${this.userProfile.identity.lastname}` }];
     },
     documents () {
       return this.$_.get(this.userProfile, this.path);

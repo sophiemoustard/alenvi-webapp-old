@@ -12,7 +12,7 @@
     <q-item-separator />
     <ni-menu-item class="customer-menu-size" name="customer subscription" icon="playlist_add" label="Abonnement" />
     <q-item-separator />
-    <ni-side-menu-footer :label="user.lastname" :userId="user._id" />
+    <ni-side-menu-footer :label="user.identity.lastname" :userId="user._id" />
   </q-list>
 </template>
 

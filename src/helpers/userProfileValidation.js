@@ -1,9 +1,23 @@
 import Joi from 'joi';
 
 const userProfileSchema = Joi.object().keys({
-  firstname: Joi.string().required(),
-  lastname: Joi.string().required(),
   mobilePhone: Joi.string(),
+  identity: Joi.object().keys({
+    firstname: Joi.string().required(),
+    lastname: Joi.string().required(),
+    nationality: Joi.string().required(),
+    birthDate: Joi.string().required(),
+    birthCountry: Joi.string().required(),
+    birthState: Joi.string().required(),
+    birthCity: Joi.string().required(),
+    socialSecurityNumber: Joi.number().required()
+  }),
+  contact: Joi.object().keys({
+    address: Joi.string().required(),
+    additionalAddress: Joi.string().allow('', null),
+    zipCode: Joi.string().required(),
+    city: Joi.string().required()
+  }),
   local: {
     email: Joi.string().required()
   },
@@ -13,20 +27,6 @@ const userProfileSchema = Joi.object().keys({
   administrative: Joi.object().keys({
     driveFolder: Joi.object().keys({
       id: Joi.string()
-    }),
-    identity: Joi.object().keys({
-      nationality: Joi.string().required(),
-      birthDate: Joi.string().required(),
-      birthCountry: Joi.string().required(),
-      birthState: Joi.string().required(),
-      birthCity: Joi.string().required(),
-      socialSecurityNumber: Joi.number().required()
-    }),
-    contact: Joi.object().keys({
-      address: Joi.string().required(),
-      additionalAddress: Joi.string().allow('', null),
-      zipCode: Joi.string().required(),
-      city: Joi.string().required()
     }),
     emergencyContact: Joi.object().keys({
       name: Joi.string().required(),

@@ -88,7 +88,7 @@ export default {
         const users = await this.$users.showAllActive({ role: 'Auxiliaire' });
         this.userList = users.map(user => ({
           auxiliary: {
-            name: `${user.firstname} ${user.lastname}`,
+            name: `${user.identity.firstname} ${user.identity.lastname}`,
             picture: user.picture ? user.picture.link : null
           },
           phone: user.mobilePhone
