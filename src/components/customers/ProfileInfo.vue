@@ -1074,7 +1074,7 @@ export default {
       const payload = {
         id_customer: this.userProfile.customerId.toString(),
         last_name: this.newHelper.lastname,
-        first_name: this.newHelper.firstname,
+        first_name: this.newHelper.firstname || '',
         email: this.newHelper.local.email
       };
       const newHelper = await this.$ogust.createContact(this.$_.pickBy(payload));
@@ -1085,7 +1085,7 @@ export default {
       this.newHelper.customers = [this.userProfile._id];
       this.newHelper.role = 'Aidants';
       this.newHelper.company = this.company.name;
-      const payload = this.$_.pickBy(this.newHelper)
+      const payload = this.$_.pickBy(this.newHelper);
       await this.$users.create(payload);
     },
     async sendWelcomingEmail () {
