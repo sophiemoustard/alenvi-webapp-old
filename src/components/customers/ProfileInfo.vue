@@ -160,7 +160,7 @@
     <div class="q-mb-lg">
       <p class="text-weight-bold">Justificatifs APA ou autres financements</p>
       <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement" @uploaded="documentUploaded" name="financialCertificates"
-        collapsibleLabel="Ajouter un justificatif" :userProfile="customerUploadData" :url="docsUploadUrl" @delete="deleteDocument($event)"
+        collapsibleLabel="Ajouter un justificatif" :userProfile="customer" :url="docsUploadUrl" @delete="deleteDocument($event)"
         additionalFieldsName="financialCertificate" />
     </div>
     <div class="q-mb-xl">
