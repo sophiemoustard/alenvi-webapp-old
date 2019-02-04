@@ -37,6 +37,8 @@
       </q-tr>
     </q-table>
     <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Ajouter une personne" @click="opened = true" />
+
+    <!-- User creation modal -->
     <q-modal v-model="opened" @hide="resetForm" content-classes="modal-container-sm">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
@@ -48,25 +50,22 @@
               <q-icon name="clear" size="1rem" @click.native="opened = false" /></span>
           </div>
         </div>
-        <ni-modal-select v-model="newUser.administrative.identity.title" :error="$v.newUser.administrative.identity.title.$error"
-          :options="civilityOptions" caption="Civilité" @blur="$v.newUser.administrative.identity.title.$touch"
-          errorLabel="Champ requis" requiredField />
-        <ni-modal-input v-model="newUser.lastname" :error="$v.newUser.lastname.$error" caption="Nom" @blur="$v.newUser.lastname.$touch"
-          errorLabel="Champ requis" requiredField />
-        <ni-modal-input v-model="newUser.firstname" :error="$v.newUser.firstname.$error" caption="Prénom" @blur="$v.newUser.firstname.$touch"
-          errorLabel="Champ requis" requiredField />
+        <ni-modal-select v-model="newUser.identity.title" :error="$v.newUser.identity.title.$error" :options="civilityOptions" caption="Civilité"
+          @blur="$v.newUser.identity.title.$touch" errorLabel="Champ requis" requiredField />
+        <ni-modal-input v-model="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error" caption="Nom"
+          @blur="$v.newUser.identity.lastname.$touch" errorLabel="Champ requis" requiredField />
+        <ni-modal-input v-model="newUser.identity.firstname" :error="$v.newUser.identity.firstname.$error" caption="Prénom"
+          @blur="$v.newUser.identity.firstname.$touch" errorLabel="Champ requis" requiredField />
         <ni-modal-input v-model="newUser.mobilePhone" :error="$v.newUser.mobilePhone.$error" caption="Numéro de téléphone"
           @blur="$v.newUser.mobilePhone.$touch" :errorLabel="mobilePhoneError" requiredField />
-        <ni-modal-input v-model="newUser.administrative.contact.address" :error="$v.newUser.administrative.contact.address.$error"
-          caption="Addresse" @blur="$v.newUser.administrative.contact.address.$touch" errorLabel="Champ requis"
-          requiredField />
-        <ni-modal-input v-model="newUser.administrative.contact.zipCode" :error="$v.newUser.administrative.contact.zipCode.$error"
-          caption="Code postal" @blur="$v.newUser.administrative.contact.zipCode.$touch" :errorLabel="zipCodeError"
-          requiredField />
-        <ni-modal-input v-model="newUser.administrative.contact.city" :error="$v.newUser.administrative.contact.city.$error"
-          caption="Ville" @blur="$v.newUser.administrative.contact.city.$touch" errorLabel="Champ requis" requiredField />
-        <ni-modal-input v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email" @blur="$v.newUser.local.email.$touch"
-          :errorLabel="emailError" requiredField />
+        <ni-modal-input v-model="newUser.contact.address" :error="$v.newUser.contact.address.$error" caption="Addresse"
+          @blur="$v.newUser.contact.address.$touch" errorLabel="Champ requis" requiredField />
+        <ni-modal-input v-model="newUser.contact.zipCode" :error="$v.newUser.contact.zipCode.$error" caption="Code postal"
+          @blur="$v.newUser.contact.zipCode.$touch" :errorLabel="zipCodeError" requiredField />
+        <ni-modal-input v-model="newUser.contact.city" :error="$v.newUser.contact.city.$error" caption="Ville"
+          @blur="$v.newUser.contact.city.$touch" errorLabel="Champ requis" requiredField />
+        <ni-modal-input v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email"
+          @blur="$v.newUser.local.email.$touch" :errorLabel="emailError" requiredField />
         <div class="row margin-input">
           <div class="col-12">
             <div class="row justify-between">
@@ -143,8 +142,17 @@ export default {
         }
       ],
       newUser: {
-        lastname: '',
-        firstname: '',
+        identity: {
+          lastname: '',
+          firstname: '',
+          title: '',
+        },
+        contact: {
+          addressId: '',
+          address: '',
+          city: '',
+          zipCode: ''
+        },
         employee_id: '',
         mobilePhone: '',
         local: {
@@ -154,15 +162,6 @@ export default {
         company: '',
         sector: '',
         administrative: {
-          contact: {
-            addressId: '',
-            address: '',
-            city: '',
-            zipCode: ''
-          },
-          identity: {
-            title: ''
-          },
           transportInvoice: {
             transportType: 'public'
           }
@@ -247,26 +246,24 @@ export default {
   },
   validations: {
     newUser: {
-      lastname: { required },
-      firstname: { required },
+      identity: {
+        lastname: { required },
+        firstname: { required },
+        title: { required },
+      },
       mobilePhone: {
         required,
         frPhoneNumber,
         maxLength: maxLength(10)
       },
-      administrative: {
-        contact: {
-          address: { required },
-          zipCode: {
-            required,
-            frZipCode,
-            maxLength: maxLength(5)
-          },
-          city: { required }
+      contact: {
+        address: { required },
+        zipCode: {
+          required,
+          frZipCode,
+          maxLength: maxLength(5)
         },
-        identity: {
-          title: { required }
-        }
+        city: { required }
       },
       local: {
         email: { required, email }
@@ -308,9 +305,9 @@ export default {
       }
     },
     zipCodeError () {
-      if (!this.$v.newUser.administrative.contact.zipCode.required) {
+      if (!this.$v.newUser.contact.zipCode.required) {
         return 'Champ requis';
-      } else if (!this.$v.newUser.administrative.contact.zipCode.frZipCode || !this.$v.newUser.administrative.contact.zipCode.maxLength) {
+      } else if (!this.$v.newUser.contact.zipCode.frZipCode || !this.$v.newUser.contact.zipCode.maxLength) {
         return 'Code postal non valide';
       }
     },
@@ -362,7 +359,7 @@ export default {
             return {
               auxiliary: {
                 _id: user._id,
-                name: `${user.firstname} ${user.lastname}`,
+                name: `${user.identity.firstname} ${user.identity.lastname}`,
                 picture: user.picture ? user.picture.link : null
               },
               profileErrors: checkProfileErrors.error,
@@ -376,7 +373,7 @@ export default {
           return {
             auxiliary: {
               _id: user._id,
-              name: `${user.firstname} ${user.lastname}`,
+              name: `${user.identity.firstname} ${user.identity.lastname}`,
               picture: user.picture ? user.picture.link : null
             },
             startDate: user.createdAt,
@@ -409,13 +406,13 @@ export default {
     },
     async createOgustUser () {
       const ogustPayload = {
-        title: this.newUser.administrative.identity.title,
-        last_name: this.newUser.lastname,
-        first_name: this.newUser.firstname,
+        title: this.newUser.identity.title,
+        last_name: this.newUser.identity.lastname,
+        first_name: this.newUser.identity.firstname,
         main_address: {
-          line: this.newUser.administrative.contact.address,
-          zip: this.newUser.administrative.contact.zipCode,
-          city: this.newUser.administrative.contact.city
+          line: this.newUser.contact.address,
+          zip: this.newUser.contact.zipCode,
+          city: this.newUser.contact.city
         },
         email: this.newUser.local.email,
         sector: this.newUser.sector,
@@ -437,17 +434,15 @@ export default {
       try {
         this.loading = true;
         this.$v.newUser.$touch();
-        if (this.$v.newUser.$error) {
-          throw new Error('Invalid fields');
-        }
+        if (this.$v.newUser.$error) throw new Error('Invalid fields');
+
         const existingEmployee = await this.$ogust.getEmployees({ email: this.newUser.local.email });
-        if (Object.keys(existingEmployee).length !== 0) {
-          throw new Error('Existing email');
-        }
+        if (Object.keys(existingEmployee).length !== 0) throw new Error('Existing email');
+
         const newEmployee = await this.createOgustUser();
         this.newUser.employee_id = newEmployee.data.data.employee.id_employee;
         const employee = await this.$ogust.getEmployeeById(this.newUser.employee_id);
-        this.newUser.administrative.contact.addressId = employee.main_address.id_address;
+        this.newUser.contact.addressId = employee.main_address.id_address;
         this.userCreated = await this.createAlenviUser();
         if (this.sendWelcomeMsg) {
           await this.sendSms(this.userCreated.data.data.user._id);
