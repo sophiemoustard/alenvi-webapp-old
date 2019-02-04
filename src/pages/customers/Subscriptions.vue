@@ -370,9 +370,9 @@ export default {
           const payload = {
             subscriptions,
             helper: {
-              firstname: this.helper.firstname || '',
-              lastname: this.helper.lastname || '',
-              title: this.helper.administrative && this.helper.administrative.identity ? this.helper.administrative.identity.title : ''
+              firstname: this.helper.identity.firstname || '',
+              lastname: this.helper.identity.lastname || '',
+              title: this.helper.identity ? this.helper.administrative.identity.title : ''
             }
           };
           await this.$customers.addSubscriptionHistory(this.customer._id, payload);

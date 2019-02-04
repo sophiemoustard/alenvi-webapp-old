@@ -217,8 +217,9 @@
             <span><q-icon name="clear" size="1rem" @click.native="addHelper = false" /></span>
           </div>
         </div>
-        <ni-modal-input v-model="newHelper.lastname" :error="$v.newHelper.lastname.$error" caption="Nom" @blur="$v.newHelper.lastname.$touch" />
-        <ni-modal-input v-model="newHelper.firstname" caption="Prénom" />
+        <ni-modal-input v-model="newHelper.identity.lastname" :error="$v.newHelper.identity.lastname.$error" caption="Nom"
+          @blur="$v.newHelper.identity.lastname.$touch" />
+        <ni-modal-input v-model="newHelper.identity.firstname" caption="Prénom" />
         <ni-modal-input v-model="newHelper.local.email" last :error="$v.newHelper.local.email.$error" caption="Email"
           @blur="$v.newHelper.local.email.$touch" :errorLabel="emailError" />
       </div>
@@ -484,13 +485,13 @@ export default {
           name: 'lastname',
           label: 'Nom',
           align: 'left',
-          field: 'lastname'
+          field: row => row.identity.lastname,
         },
         {
           name: 'firstname',
           label: 'Prénom',
           align: 'left',
-          field: 'firstname'
+          field: row => row.identity.firstname,
         },
         {
           name: 'email',
@@ -550,8 +551,10 @@ export default {
       ],
       userHelpers: [],
       newHelper: {
-        lastname: '',
-        firstname: '',
+        identity: {
+          lastname: '',
+          firstname: '',
+        },
         local: { email: '' }
       },
       newSubscription: {
@@ -770,7 +773,7 @@ export default {
       }
     },
     newHelper: {
-      lastname: { required },
+      identity: { lastname: { required } },
       local: {
         email: { required, email }
       }
@@ -1073,8 +1076,8 @@ export default {
     async createOgustHelper () {
       const payload = {
         id_customer: this.userProfile.customerId.toString(),
-        last_name: this.newHelper.lastname,
-        first_name: this.newHelper.firstname || '',
+        last_name: this.newHelper.identity.lastname,
+        first_name: this.newHelper.identity.firstname || '',
         email: this.newHelper.local.email
       };
       const newHelper = await this.$ogust.createContact(this.$_.pickBy(payload));
@@ -1085,6 +1088,7 @@ export default {
       this.newHelper.customers = [this.userProfile._id];
       this.newHelper.role = 'Aidants';
       this.newHelper.company = this.company.name;
+      this.newHelper.identity = this.$_.pickBy(this.newHelper.identity);
       const payload = this.$_.pickBy(this.newHelper);
       await this.$users.create(payload);
     },
