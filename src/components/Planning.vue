@@ -6,6 +6,9 @@
         <span>{{ timelineTitle() }}</span>
         <q-btn icon="chevron_right" flat round @click="goToNextWeek"></q-btn>
       </div>
+      <q-chips-input v-model="value" placeholder="Rechercher un(e) commununauté / auxiliaire">
+        <q-autocomplete @search="search" @selected="selected" />
+      </q-chips-input>
       <table style="width: 100%">
         <thead>
           <th></th>
@@ -68,6 +71,7 @@ export default {
   },
   data () {
     return {
+      value: [],
       loading: false,
       draggedObject: {},
       startOfWeek: '',
@@ -167,6 +171,34 @@ export default {
       } finally {
         this.draggedObject = {};
       }
+    },
+    async search (terms, done) {
+      try {
+        console.log('searched');
+        const res = [{
+          label: 'Commu 1',
+          value: '1a*'
+        }, {
+          label: 'Commu 2',
+          value: '1b*'
+        }, {
+          label: 'Commu 2',
+          value: '1c*'
+        }, {
+          label: 'Ghislaine Dubois',
+          value: '111111'
+        }, {
+          label: 'Irlène Guarrigues',
+          value: '222222'
+        }];
+        done(res);
+      } catch (e) {
+        console.error(e);
+        done([]);
+      }
+    },
+    selected () {
+      console.log('selected');
     }
   }
 }
