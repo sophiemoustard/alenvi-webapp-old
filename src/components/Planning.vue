@@ -212,6 +212,9 @@ export default {
 
   .person-name
     font-weight: 600
+    font-size: 14px
+    @media(max-width: 1024px)
+      font-size: 12px
 
   .event
     border-radius: 2px
