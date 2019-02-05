@@ -16,7 +16,7 @@
       <side-menu-auxiliary :ref="sidemenusRefs" v-if="user && user.role.name === 'Auxiliaire'" :user="user" />
       <side-menu-customer :ref="sidemenusRefs" v-if="user && user.role.name === 'Aidants'" :user="user" />
     </q-layout-drawer>
-    <q-layout-drawer v-else :width="0" side="left" class="hidden-menu"></q-layout-drawer>
+    <q-layout-drawer v-else :width="0" side="left"></q-layout-drawer>
 
     <q-page-container>
       <router-view :key="$route.fullPath"/>

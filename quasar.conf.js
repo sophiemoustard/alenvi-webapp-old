@@ -131,7 +131,8 @@ module.exports = function (ctx) {
         'QChipsInput',
         'QCollapsible',
         'QBtnToggle',
-        'QOptionGroup'
+        'QOptionGroup',
+        'QChip'
       ],
       directives: [
         'Ripple'
