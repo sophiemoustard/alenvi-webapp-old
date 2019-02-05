@@ -29,14 +29,16 @@
             <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
               class="event-cell" @click="$emit('createEvent', { dayIndex, person })" >
               <template v-for="(event, eventIndex) in getOneDayAuxiliaryEvents(person, days[dayIndex])">
-                <div :id="event._id" draggable @dragstart="drag(event._id)" class="row cursor-pointer col-12 event"
+                <div :id="event._id" draggable @dragstart="drag(event._id)" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`]"
                   :key="eventIndex" @click.stop="$emit('editEvent', event._id)">
-                  <p class="no-margin">{{ getEventHours(event) }}</p>
-                  <p v-if="event.type === INTERVENTION" class="no-margin">{{ event.customer.identity.title }} {{
-                    event.customer.identity.lastname }}</p>
-                  <p v-if="event.type === ABSENCE" class="no-margin">{{ displayAbsenceType(event.absence) }}</p>
-                  <p v-if="event.type === UNAVAILABILITY" class="no-margin">Indisponibilité</p>
-                  <p v-if="event.type === INTERNAL_HOUR" class="no-margin">{{ event.internalHour.name }}</p>
+                  <div class="col-12 event-title">
+                    <p v-if="event.type === INTERVENTION" class="no-margin">{{ event.customer.identity.title }} {{
+                      event.customer.identity.lastname }}</p>
+                    <p v-if="event.type === ABSENCE" class="no-margin">{{ displayAbsenceType(event.absence) }}</p>
+                    <p v-if="event.type === UNAVAILABILITY" class="no-margin">Indisponibilité</p>
+                    <p v-if="event.type === INTERNAL_HOUR" class="no-margin">{{ event.internalHour.name }}</p>
+                  </div>
+                  <p class="no-margin event-period">{{ getEventHours(event) }}</p>
                 </div>
               </template>
             </td>
@@ -204,16 +206,36 @@ export default {
   .planning-container
     background: white
 
-  .event
-    border: 1px solid black
-    padding: 2px
-    margin-bottom: 3px
-
   .person-row
     border-right: 1px solid $light-grey;
     height: 100px;
 
   .person-name
     font-weight: 600
+
+  .event
+    border-radius: 2px
+    padding: 8px 6px
+    margin-bottom: 3px
+    &-title
+      font-size: 0.875rem
+      font-weight: 600
+    &-period
+      font-size: 0.6875rem
+      color: $dark-grey
+    &-intervention
+      background: $light-pink
+    &-internalHour
+      background: rgba($primary-dark, 0.25)
+    &-absence
+      background: $grey-3
+    &-unavailability
+      background: repeating-linear-gradient(
+        45deg,
+        $grey-3,
+        $grey-3 3px,
+        $white 3px,
+        $white 7px
+      )
 
 </style>
