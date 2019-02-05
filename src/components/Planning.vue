@@ -9,11 +9,23 @@
       <table style="width: 100%">
         <thead>
           <th></th>
-          <th class="capitalize" v-for="(day, index) in daysHeader" :key="index">{{day}}</th>
+          <th class="capitalize" v-for="(day, index) in daysHeader" :key="index">
+            <div class="row justify-center items-baseline days-header">
+              <div class="days-name q-mr-md">{{ day.name }}</div>
+              <div :class="['days-number', { 'current-day': isCurrentDay(day.moment) }]">{{ day.number }}</div>
+            </div>
+          </th>
         </thead>
         <tbody>
           <tr class="person-row" v-for="(person, index) in persons" :key="index">
-            <td class="event-cell" valign="top">{{person.identity.firstname}} {{person.identity.lastname}}</td>
+            <td class="event-cell" valign="top">
+              <div class="q-pb-md q-mt-md">
+                <ni-chip :avatar="getAvatar(person.picture.link)"></ni-chip>
+              </div>
+              <div class="person-name">
+                {{ formatPersonName(person) }}
+              </div>
+            </td>
             <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
               class="event-cell" @click="$emit('createEvent', { dayIndex, person })" >
               <template v-for="(event, eventIndex) in getOneDayAuxiliaryEvents(person, days[dayIndex])">
@@ -38,9 +50,13 @@
 <script>
 import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, ABSENCE_TYPE } from '../data/constants';
 import { NotifyNegative } from './popup/notify';
+import NiChip from './Chip';
 
 export default {
   name: 'PlanningManager',
+  components: {
+    'ni-chip': NiChip
+  },
   props: {
     events: { type: Array, default: () => [] },
     customers: { type: Array, default: () => [] },
@@ -61,7 +77,13 @@ export default {
   },
   computed: {
     daysHeader () {
-      return this.days.map(day => this.$moment(day).format('dd DD'));
+      return this.days.map(day => {
+        return {
+          name: this.$moment(day).format('dd'),
+          number: this.$moment(day).format('DD'),
+          moment: day
+        }
+      });
     },
   },
   async mounted () {
@@ -90,6 +112,15 @@ export default {
     getTimelineDays () {
       const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
       this.days = Array.from(range.by('days'));
+    },
+    isCurrentDay (momentDay) {
+      return this.$moment(momentDay).isSame(new Date(), 'day');
+    },
+    getAvatar (link) {
+      return link || 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/images/users/default_avatar.png';
+    },
+    formatPersonName (person) {
+      return `${person.identity.firstname.slice(0, 1)}. ${person.identity.lastname}`.toUpperCase();
     },
     // Event display
     getOneDayAuxiliaryEvents (auxiliary, day) {
@@ -153,6 +184,23 @@ export default {
       width: 80%;
       border-bottom: 1px solid $light-grey;
 
+  th
+    & .days
+        &-header
+          padding: 8px 0px 16px 0px
+          width: 100%
+        &-name
+          font-size: 1.125rem
+          color: #777777
+        &-number
+          font-size: 1.5rem
+          font-weight: 600
+    & .current-day
+      border-radius: 4px
+      padding: 0px 5px
+      background: $primary
+      color: white
+
   .planning-container
     background: white
 
@@ -164,5 +212,8 @@ export default {
   .person-row
     border-right: 1px solid $light-grey;
     height: 100px;
+
+  .person-name
+    font-weight: 600
 
 </style>
