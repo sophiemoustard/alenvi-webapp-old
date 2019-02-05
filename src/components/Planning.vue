@@ -32,13 +32,13 @@
                 <div :id="event._id" draggable @dragstart="drag(event._id)" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`]"
                   :key="eventIndex" @click.stop="$emit('editEvent', event._id)">
                   <div class="col-12 event-title">
-                    <p v-if="event.type === INTERVENTION" class="no-margin">{{ event.customer.identity.title }} {{
+                    <p v-if="event.type === INTERVENTION" class="no-margin ellipsis">{{ event.customer.identity.title }} {{
                       event.customer.identity.lastname }}</p>
-                    <p v-if="event.type === ABSENCE" class="no-margin">{{ displayAbsenceType(event.absence) }}</p>
-                    <p v-if="event.type === UNAVAILABILITY" class="no-margin">Indisponibilité</p>
-                    <p v-if="event.type === INTERNAL_HOUR" class="no-margin">{{ event.internalHour.name }}</p>
+                    <p v-if="event.type === ABSENCE" class="no-margin ellipsis">{{ displayAbsenceType(event.absence) }}</p>
+                    <p v-if="event.type === UNAVAILABILITY" class="no-margin ellipsis">Indisponibilité</p>
+                    <p v-if="event.type === INTERNAL_HOUR" class="no-margin ellipsis">{{ event.internalHour.name }}</p>
                   </div>
-                  <p class="no-margin event-period">{{ getEventHours(event) }}</p>
+                  <p class="no-margin event-period ellipsis">{{ getEventHours(event) }}</p>
                 </div>
               </template>
             </td>
