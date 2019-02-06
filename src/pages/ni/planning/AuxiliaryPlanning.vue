@@ -47,6 +47,7 @@
         </template>
         <ni-search-address v-model="newEvent.location.fullAddress" @selected="selectedAddress" @blur="$v.newEvent.location.fullAddress.$touch"
           :error="$v.newEvent.location.fullAddress.$error" :error-label="addressError" inModal />
+        <ni-modal-input v-model="newEvent.misc" caption="Notes" />
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary" @click="createEvent"
         :disable="disableCreationButton" />
@@ -94,6 +95,7 @@
           </template>
           <ni-search-address v-model="editedEvent.location.fullAddress" @selected="selectedAddress" @blur="$v.editedEvent.location.fullAddress.$touch"
             :error="$v.editedEvent.location.fullAddress.$error" :error-label="addressError" inModal />
+          <ni-modal-input v-model="editedEvent.misc" caption="Notes" />
         </template>
         <template v-else-if="editionType === CANCELLATION">
         </template>
@@ -118,6 +120,7 @@ import SelectSector from '../../../components/form/SelectSector';
 import DatetimePicker from '../../../components/form/DatetimePicker.vue';
 import DatetimeRange from '../../../components/form/DatetimeRange.vue';
 import ModalSelect from '../../../components/form/ModalSelect';
+import ModalInput from '../../../components/form/ModalInput';
 import SearchAddress from '../../../components/form/SearchAddress';
 import FileUploader from '../../../components/form/FileUploader';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify.js';
@@ -131,6 +134,7 @@ export default {
     'ni-datetime-picker': DatetimePicker,
     'ni-search-address': SearchAddress,
     'ni-modal-select': ModalSelect,
+    'ni-modal-input': ModalInput,
     'ni-file-uploader': FileUploader,
     'ni-datetime-range': DatetimeRange,
   },
