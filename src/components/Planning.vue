@@ -13,7 +13,7 @@
         </thead>
         <tbody>
           <tr class="person-row" v-for="(person, index) in persons" :key="index">
-            <td class="event-cell" valign="top">{{person.firstname}} {{person.lastname}}</td>
+            <td class="event-cell" valign="top">{{person.identity.firstname}} {{person.identity.lastname}}</td>
             <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
               class="event-cell" @click="$emit('createEvent', { dayIndex, person })" >
               <template v-for="(event, eventIndex) in getOneDayAuxiliaryEvents(person, days[dayIndex])">

@@ -588,7 +588,7 @@ export default {
         const internHoursParams = {
           type: 'Heures internes',
           content: `${this.$moment(this.internHoursInfo.eventDate).format('dddd DD/MM')}.\n${this.internHoursInfo.reason}.\n${this.$moment(this.internHoursInfo.eventFrom).format('HH:mm')} - ${this.$moment(this.internHoursInfo.eventTo).format('HH:mm')}`,
-          involved: `${this.user.firstname} ${this.user.lastname}`,
+          involved: `${this.user.identity.firstname} ${this.user.identity.lastname}`,
         };
         await this.$planningUpdates.storePlanningupdates(this.user.employee_id, internHoursParams);
         NotifyPositive('Ta demande a bien été enregistrée');

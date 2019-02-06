@@ -20,10 +20,7 @@
         <q-btn-toggle no-wrap v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions" @input="resetCreationForm(true, newEvent.type)" />
         <ni-modal-select caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions" :error="$v.newEvent.auxiliary.$error" />
         <template v-if="newEvent.type !== ABSENCE">
-          <ni-datetime-picker caption="Date de debut" v-model="newEvent.startDate" type="datetime" :error="$v.newEvent.startDate.$error"
-            inModal />
-          <ni-datetime-picker caption="Date de fin" v-model="newEvent.endDate" type="datetime" :error="$v.newEvent.endDate.$error"
-            inModal :min="minEndDate" :max="maxEndDate" />
+          <ni-datetime-range caption="Dates et heures de l'intervention" v-model="newEvent.dates" @blur="$v.newEvent.dates.$touch" />
         </template>
         <template v-if="newEvent.type === INTERVENTION">
           <ni-modal-select caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions" :error="$v.newEvent.customer.$error" />
@@ -31,11 +28,11 @@
             :error="$v.newEvent.subscription.$error" />
         </template>
         <template v-if="newEvent.type === ABSENCE">
-          <ni-datetime-picker caption="Date de debut" v-model="newEvent.startDate" type="date" :error="$v.newEvent.startDate.$error"
+          <ni-datetime-picker caption="Date de debut" v-model="newEvent.dates.startDate" type="date" :error="$v.newEvent.dates.startDate.$error"
             inModal />
           <ni-modal-select caption="Durée" :error="$v.newEvent.startDuration.$error" :options="dateOptions" v-model="newEvent.startDuration"
             separator />
-          <ni-datetime-picker caption="Date de fin" v-model="newEvent.endDate" type="date" :error="$v.newEvent.endDate.$error"
+          <ni-datetime-picker caption="Date de fin" v-model="newEvent.dates.endDate" type="date" :error="$v.newEvent.dates.endDate.$error"
             inModal />
           <ni-modal-select caption="Durée" :error="$v.newEvent.endDuration.$error" :options="dateOptions" v-model="newEvent.endDuration"
             separator />
@@ -71,19 +68,18 @@
         <template v-if="editionType === EDITION">
           <ni-modal-select caption="Auxiliaire" v-model="editedEvent.auxiliary" :options="auxiliariesOptions" :error="$v.editedEvent.auxiliary.$error" />
           <template v-if="editedEvent.type !== ABSENCE">
-            <ni-datetime-picker caption="Date de début" v-model="editedEvent.startDate" type="datetime" inModal />
-            <ni-datetime-picker caption="Date de fin" v-model="editedEvent.endDate" type="datetime" inModal />
+            <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" @blur="$v.editedEvent.dates.$touch" />
           </template>
           <template v-if="editedEvent.type === INTERVENTION">
             <ni-modal-select caption="Service" v-model="editedEvent.subscription" :options="customerSubscriptionsOptions(editedEvent.customer._id)"
               :error="$v.editedEvent.subscription.$error" />
           </template>
           <template v-if="editedEvent.type === ABSENCE">
-            <ni-datetime-picker caption="Date de debut" v-model="editedEvent.startDate" type="date" :error="$v.editedEvent.startDate.$error"
+            <ni-datetime-picker caption="Date de debut" v-model="editedEvent.dates.startDate" type="date" :error="$v.editedEvent.dates.startDate.$error"
               inModal />
             <ni-modal-select caption="Durée" :error="$v.editedEvent.startDuration.$error" :options="dateOptions"
               v-model="editedEvent.startDuration" separator />
-            <ni-datetime-picker caption="Date de fin" v-model="editedEvent.endDate" type="date" :error="$v.editedEvent.endDate.$error"
+            <ni-datetime-picker caption="Date de fin" v-model="editedEvent.dates.endDate" type="date" :error="$v.editedEvent.dates.endDate.$error"
               inModal />
             <ni-modal-select caption="Durée" :error="$v.editedEvent.endDuration.$error" :options="dateOptions" v-model="editedEvent.endDuration"
               separator />
@@ -120,6 +116,7 @@ import { frAddress } from '../../../helpers/vuelidateCustomVal.js'
 import Planning from '../../../components/Planning.vue';
 import SelectSector from '../../../components/form/SelectSector';
 import DatetimePicker from '../../../components/form/DatetimePicker.vue';
+import DatetimeRange from '../../../components/form/DatetimeRange.vue';
 import ModalSelect from '../../../components/form/ModalSelect';
 import SearchAddress from '../../../components/form/SearchAddress';
 import FileUploader from '../../../components/form/FileUploader';
@@ -135,6 +132,7 @@ export default {
     'ni-search-address': SearchAddress,
     'ni-modal-select': ModalSelect,
     'ni-file-uploader': FileUploader,
+    'ni-datetime-range': DatetimeRange,
   },
   data () {
     return {
@@ -167,9 +165,13 @@ export default {
       creationModal: false,
       newEvent: {
         type: INTERVENTION,
-        startDate: '',
+        dates: {
+          startDate: '',
+          startHour: '',
+          endDate: '',
+          endHour: '',
+        },
         startDuration: '',
-        endDate: '',
         endDuration: '',
         auxiliary: '',
         customer: '',
@@ -187,6 +189,7 @@ export default {
         location: {},
         attachment: {},
         customer: '',
+        dates: {},
       },
       editionTypeOptions: [
         {label: 'Edition', value: EDITION},
@@ -198,9 +201,13 @@ export default {
   validations: {
     newEvent: {
       type: { required },
-      startDate: { required },
+      dates: {
+        startDate: { required },
+        stratHour: { required },
+        endDate: { required },
+        endHour: { required },
+      },
       startDuration: { required: requiredIf((item) => item.type === ABSENCE) },
-      endDate: { required },
       endDuration: { required: requiredIf((item) => item.type === ABSENCE) },
       auxiliary: { required },
       sector: { required },
@@ -211,9 +218,13 @@ export default {
       location: { fullAddress: { frAddress } },
     },
     editedEvent: {
-      startDate: { required },
+      dates: {
+        startDate: { required },
+        stratHour: { required: requiredIf((item) => item.type !== ABSENCE) },
+        endDate: { required },
+        endHour: { required: requiredIf((item) => item.type !== ABSENCE) },
+      },
       startDuration: { required: requiredIf((item) => item.type === ABSENCE) },
-      endDate: { required },
       endDuration: { required: requiredIf((item) => item.type === ABSENCE) },
       auxiliary: { required },
       sector: { required },
@@ -244,7 +255,7 @@ export default {
     },
     auxiliariesOptions () {
       return this.auxiliaries.length === 0 ? [] : this.auxiliaries.map(aux => ({
-        label: `${aux.firstname || ''} ${aux.lastname}`,
+        label: `${aux.identity.firstname || ''} ${aux.identity.lastname}`,
         value: aux._id,
       }));
     },
@@ -264,18 +275,22 @@ export default {
       if (!this.newEvent.type) return true;
       switch (this.newEvent.type) {
         case ABSENCE:
-          return !this.newEvent.auxiliary || !this.newEvent.absence || !this.newEvent.startDate || !this.newEvent.endDate;
+          return !this.newEvent.auxiliary || !this.newEvent.absence || !this.newEvent.dates.startDate ||
+            !this.newEvent.dates.endDate || !this.newEvent.startDuration;
         case INTERVENTION:
-          return !this.newEvent.auxiliary || !this.newEvent.customer || !this.newEvent.subscription || !this.newEvent.startDate || !this.newEvent.endDate;
+          return !this.newEvent.auxiliary || !this.newEvent.customer || !this.newEvent.subscription || !this.newEvent.dates.startDate ||
+            !this.newEvent.dates.endDate || !this.newEvent.dates.startHour || !this.newEvent.dates.endHour;
         case INTERNAL_HOUR:
-          return !this.newEvent.auxiliary || !this.newEvent.startDate || !this.newEvent.endDate || !this.newEvent.internalHour;
+          return !this.newEvent.auxiliary || !this.newEvent.dates.startDate || !this.newEvent.dates.endDate ||
+            !this.newEvent.internalHour || !this.newEvent.dates.startHour || !this.newEvent.dates.endHour;
         case UNAVAILABILITY:
         default:
-          return !this.newEvent.auxiliary || !this.newEvent.startDate || !this.newEvent.endDate;
+          return !this.newEvent.auxiliary || !this.newEvent.dates.startDate || !this.newEvent.dates.endDate ||
+            !this.newEvent.dates.startHour || !this.newEvent.dates.endHour;
       }
     },
     additionalValue () {
-      return !this.selectedAuxiliary._id ? '' : `justificatif_absence_${this.selectedAuxiliary.lastname}`;
+      return !this.selectedAuxiliary._id ? '' : `justificatif_absence_${this.selectedAuxiliary.identity.lastname}`;
     },
     docsUploadUrl () {
       return !this.selectedAuxiliary._id
@@ -365,8 +380,12 @@ export default {
       this.newEvent = {
         ...this.newEvent,
         auxiliary: person._id,
-        startDate: selectedDay.hours(8).toISOString(),
-        endDate: selectedDay.hours(20).toISOString(),
+        dates: {
+          startDate: selectedDay.toISOString(),
+          startHour: '08:00',
+          endDate: selectedDay.toISOString(),
+          endHour: '10:00',
+        },
       };
       this.creationModal = true;
     },
@@ -374,9 +393,13 @@ export default {
       this.$v.newEvent.$reset();
       this.newEvent = {
         type,
-        startDate: partialReset ? this.newEvent.startDate : '',
+        dates: {
+          startDate: partialReset ? this.newEvent.dates.startDate : '',
+          startHour: partialReset ? this.newEvent.dates.startHour : '',
+          endDate: partialReset ? this.newEvent.dates.endDate : '',
+          endHour: partialReset ? this.newEvent.dates.endHour : '',
+        },
         startDuration: '',
-        endDate: partialReset ? this.newEvent.endDate : '',
         endDuration: '',
         auxiliary: partialReset ? this.newEvent.auxiliary : '',
         customer: '',
@@ -389,7 +412,7 @@ export default {
       };
     },
     hasConflicts (scheduledEvent) {
-      const auxiliaryEvents = this.getAuxiliaryEventsBetweenDates(scheduledEvent.auxiliaryId, scheduledEvent.startDate, scheduledEvent.endDate);
+      const auxiliaryEvents = this.getAuxiliaryEventsBetweenDates(scheduledEvent.auxiliary, scheduledEvent.startDate, scheduledEvent.endDate);
       return auxiliaryEvents.some(ev => {
         if (scheduledEvent._id && scheduledEvent._id === ev._id) return false;
         return this.$moment(scheduledEvent.startDate).isBetween(ev.startDate, ev.endDate, 'minutes', '[]') ||
@@ -405,21 +428,26 @@ export default {
         });
     },
     getPayload (event) {
-      let payload = { ...event }
+      let payload = { ...this.$_.omit(event, 'dates') }
       if (event.type === INTERNAL_HOUR) {
         const internalHour = this.internalHours.find(hour => hour._id === event.internalHour);
         payload.internalHour = internalHour;
       }
       if (event.type === ABSENCE) {
-        payload.startDate = this.$moment(event.startDate).hours(event.startDuration[0].startHour).toISOString();
+        payload.startDate = this.$moment(event.dates.startDate).hours(event.startDuration[0].startHour).toISOString();
         if (event.endDuration !== '') {
-          payload.endDate = this.$moment(event.endDate).hours(event.endDuration[0].endHour).toISOString();
+          payload.endDate = this.$moment(event.dates.endDate).hours(event.endDuration[0].endHour).toISOString();
         } else {
-          payload.endDate = this.$moment(event.endDate).hours(event.startDuration[0].endHour).toISOString();
+          payload.endDate = this.$moment(event.dates.endDate).hours(event.startDuration[0].endHour).toISOString();
         }
 
         this.$_.unset(payload, 'startDuration');
         this.$_.unset(payload, 'endDuration');
+      } else {
+        payload.startDate = this.$moment(event.dates.startDate).hours(event.dates.startHour.split(':')[0])
+          .minutes(event.dates.startHour.split(':')[1]).toISOString();
+        payload.endDate = this.$moment(event.dates.endDate).hours(event.dates.endHour.split(':')[0])
+          .minutes(event.dates.endHour.split(':')[1]).toISOString();
       }
 
       if (event.location && event.location.fullAddress) delete payload.location.location;
@@ -476,23 +504,39 @@ export default {
     // Event edition
     openEditionModal (eventId) {
       const editedEvent = this.events.find(ev => ev._id === eventId);
-      const { createdAt, updatedAt, ...eventData } = editedEvent;
+      const { createdAt, updatedAt, startDate, endDate, ...eventData } = editedEvent;
       const auxiliary = editedEvent.auxiliary._id;
+      const dates = {
+        startDate,
+        endDate,
+        startHour: `${this.$moment(startDate).hours() < 10
+          ? `0${this.$moment(startDate).hours()}`
+          : this.$moment(startDate).hours()}:${this.$moment(startDate).minutes() || '00'}`,
+        endHour: `${this.$moment(endDate).hours()}:${this.$moment(endDate).minutes() || '00'}`,
+      };
       switch (editedEvent.type) {
         case INTERVENTION:
           const subscription = editedEvent.subscription._id;
-          this.editedEvent = { location: {}, ...eventData, auxiliary, subscription };
+          this.editedEvent = { location: {}, ...eventData, dates, auxiliary, subscription };
           break;
         case INTERNAL_HOUR:
           const internalHour = editedEvent.internalHour._id;
-          this.editedEvent = { location: {}, ...eventData, auxiliary, internalHour };
+          this.editedEvent = { location: {}, ...eventData, auxiliary, internalHour, dates };
           break;
         case ABSENCE:
           const { startDuration, endDuration } = this.getAbsenceDurations(editedEvent);
-          this.editedEvent = { location: {}, attachment: {}, ...eventData, auxiliary, startDuration, endDuration };
+          this.editedEvent = {
+            location: {},
+            attachment: {},
+            ...eventData,
+            auxiliary,
+            startDuration,
+            endDuration,
+            dates: { startDate, endDate },
+          };
           break;
         case UNAVAILABILITY:
-          this.editedEvent = { location: {}, ...eventData, auxiliary };
+          this.editedEvent = { location: {}, ...eventData, auxiliary, dates };
           break;
       }
 
@@ -504,6 +548,7 @@ export default {
       this.editedEvent = {
         subscription: {},
         location: {},
+        dates: {},
       };
     },
     async updateEvent () {

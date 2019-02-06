@@ -2,18 +2,6 @@ import { NotifyPositive, NotifyNegative } from '../components/popup/notify';
 import gdrive from '../api/GoogleDrive.js';
 
 export const financialCertificatesMixin = {
-  data () {
-    return {};
-  },
-  computed: {
-    customerUploadData () {
-      return {
-        firstname: this.customer.identity.firstname || '',
-        lastname: this.customer.identity.lastname || '',
-        financialCertificates: this.customer.financialCertificates,
-      }
-    },
-  },
   methods: {
     // Financial certificates
     async deleteDocument (driveId) {
