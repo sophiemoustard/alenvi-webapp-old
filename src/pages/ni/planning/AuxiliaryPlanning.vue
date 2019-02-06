@@ -659,3 +659,17 @@ export default {
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+  @import '~variables';
+
+  /deep/ .q-btn-group
+    border: none;
+    box-shadow: none;
+
+    & .q-btn-item
+      border-radius: 20px;
+      margin: 5px;
+      background-color: $light-grey;
+
+</style>
