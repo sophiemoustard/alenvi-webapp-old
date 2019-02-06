@@ -3,7 +3,7 @@
     <q-input color="white" inverted-light :value="value" @blur="blurHandler" align="center" @input="update"
       :after="[{ icon: 'access_time', handler () { toggleSelect(); } }]" />
     <q-select :options="options" v-model="value" @input="update" filter filter-placeholder=" "
-      color="white" inverted-light hide-underline align="center" class="datetime-item" :id="idKey" />
+      color="white" inverted-light hide-underline align="center" class="datetime-item" :ref="name" />
   </div>
 </template>
 
@@ -12,12 +12,12 @@ export default {
   name: 'NiSelectInput',
   props: {
     value: String,
-    idKey: String,
+    name: String,
     options: Array,
   },
   methods: {
     toggleSelect () {
-      document.getElementById(this.idKey).click();
+      this.$refs[this.name].show();
     },
     blurHandler (event) {
       this.$emit('blur');

@@ -6,13 +6,13 @@
     </div>
     <q-field :error="error" :error-label="errorLabel">
       <div class="datetime-container">
-        <ni-datetime-input :value="value.startDate" @input="update($event, 'startDate')" class="datetime-item" idKey="start-datetime" @blur="blurHandler" />
-        <ni-select-input :value="value.startHour" @input="update($event, 'startHour')" class="datetime-item" idKey="start-select" @blur="blurHandler"
+        <ni-datetime-input :value="value.startDate" @input="update($event, 'startDate')" class="datetime-item" name="start-datetime" @blur="blurHandler" />
+        <ni-select-input :value="value.startHour" @input="update($event, 'startHour')" class="datetime-item" name="start-select" @blur="blurHandler"
           :options="hoursOptions" />
         <p class="delimiter">-</p>
-        <ni-select-input :value="value.endHour" @input="update($event, 'endHour')" class="datetime-item" idKey="end-select" @blur="blurHandler"
+        <ni-select-input :value="value.endHour" @input="update($event, 'endHour')" class="datetime-item" name="end-select" @blur="blurHandler"
           :options="hoursOptions" />
-        <ni-datetime-input :value="value.endDate" @input="update($event, 'endDate')" :min="value.startDate" class="datetime-item" idKey="end-datetime"
+        <ni-datetime-input :value="value.endDate" @input="update($event, 'endDate')" :min="value.startDate" class="datetime-item" name="end-datetime"
           @blur="blurHandler"/>
       </div>
     </q-field>

@@ -2,7 +2,7 @@
   <div>
     <q-input color="white" inverted-light :value="formattedDate" @input="update($event, 'DD/MM/YYYY')" placeholder="jj/mm/yyyy"
       :after="[{ icon: 'calendar_today', handler () { toggleDatetime(); } }]" @blur="blurHandler" align="center" />
-    <q-datetime :id="idKey" :value="value" format="DD MMM YYYY" color="white" inverted-light @input="update" hide-underline />
+    <q-datetime :ref="name" :value="value" format="DD MMM YYYY" color="white" inverted-light @input="update" hide-underline />
   </div>
 </template>
 
@@ -11,7 +11,7 @@ export default {
   name: 'NiDatetimeInput',
   props: {
     value: String,
-    idKey: String,
+    name: String,
   },
   computed: {
     formattedDate () {
@@ -20,7 +20,7 @@ export default {
   },
   methods: {
     toggleDatetime () {
-      document.getElementById(this.idKey).click();
+      this.$refs[this.name].show();
     },
     blurHandler (event) {
       this.$emit('blur');
