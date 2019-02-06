@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="planning-container full-width q-pa-md">
+    <div :class="['planning-container', 'full-width', 'q-pa-md', { 'q-pl-xl': !toggleDrawer }]">
       <div class="row justify-between items-center q-mb-md">
         <q-btn icon="chevron_left" flat round @click="goToPreviousWeek"></q-btn>
         <span>{{ timelineTitle() }}</span>
@@ -78,6 +78,9 @@ export default {
     }
   },
   computed: {
+    toggleDrawer () {
+      return this.$store.getters['main/toggleDrawer'];
+    },
     daysHeader () {
       return this.days.map(day => {
         return {
@@ -92,6 +95,11 @@ export default {
     this.startOfWeek = this.$moment().startOf('week');
     this.getTimelineDays();
     this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
+  },
+  watch: {
+    toggleDrawer (val) {
+      console.log('toggle drawer', val);
+    }
   },
   methods: {
     // Table
