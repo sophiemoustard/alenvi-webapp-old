@@ -2,18 +2,19 @@
   <div class='col-12 margin-input'>
     <div v-if="caption" class="row justify-between">
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
-      <q-icon v-if="error" name="error_outline" color="secondary" />
+      <q-icon v-if="hasError" name="error_outline" color="secondary" />
     </div>
-    <q-field :error="error" :error-label="errorLabel">
+    <q-field :error="hasError" :error-label="errorMessage">
       <div class="datetime-container">
-        <ni-datetime-input :value="value.startDate" @input="update($event, 'startDate')" class="datetime-item" name="start-datetime" @blur="blurHandler" />
-        <ni-select-input :value="value.startHour" @input="update($event, 'startHour')" class="datetime-item" name="start-select" @blur="blurHandler"
-          :options="hoursOptions" />
+        <ni-datetime-input :value="value.startDate" @input="update($event, 'startDate')" class="datetime-item" name="start-datetime"
+          @blur="blurDateHandler" />
+        <ni-select-input :value="value.startHour" @input="update($event, 'startHour')" class="datetime-item" name="start-select"
+          @blur="blurHourHandler" :options="hoursOptions" />
         <p class="delimiter">-</p>
-        <ni-select-input :value="value.endHour" @input="update($event, 'endHour')" class="datetime-item" name="end-select" @blur="blurHandler"
-          :options="hoursOptions" />
-        <ni-datetime-input :value="value.endDate" @input="update($event, 'endDate')" :min="value.startDate" class="datetime-item" name="end-datetime"
-          @blur="blurHandler"/>
+        <ni-select-input :value="value.endHour" @input="update($event, 'endHour')" class="datetime-item" name="end-select"
+          @blur="blurHourHandler" :options="hoursOptions" />
+        <ni-datetime-input :value="value.endDate" @input="update($event, 'endDate')" :min="value.startDate" class="datetime-item"
+          name="end-datetime" @blur="blurDateHandler" />
       </div>
     </q-field>
   </div>
@@ -31,9 +32,14 @@ export default {
   props: {
     caption: { type: String, default: '' },
     error: Boolean,
-    errorLabel: { type: String, default: 'Champ requis' },
     value: Object,
     requiredField: { type: Boolean, default: false }
+  },
+  data () {
+    return {
+      errorMessage: 'Date(s) et heure(s) invalide(s)',
+      childError: false,
+    };
   },
   computed: {
     hoursOptions () {
@@ -46,19 +52,27 @@ export default {
       });
       return selectOptions;
     },
+    hasError () {
+      return this.error || this.childError;
+    },
   },
   methods: {
-    blurHandler (event) {
-      this.$emit('blur');
+    blurDateHandler (event) {
+      if (event && event.date === '') this.childError = true;
+      else if (event && event.date && !(this.$moment(event.date, 'DD/MM/YYYY', true).isValid())) this.childError = true;
+      else this.childError = false;
+    },
+    blurHourHandler (event) {
+      if (event && event.hour === '') this.childError = true;
+      else if (event && event.hour && !event.hour.match(/[0-2][0-9]:(00|30)/)) this.childError = true;
+      else this.childError = false;
     },
     focusHandler (event) {
       this.$emit('focus');
     },
     update (value, key) {
-      const date = {
-        ...this.value,
-        [key]: value,
-      }
+      const date = { ...this.value, [key]: value }
+      this.$emit('blur');
       this.$emit('input', date);
     },
   },
