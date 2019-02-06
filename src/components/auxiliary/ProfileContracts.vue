@@ -32,7 +32,7 @@
                   </div>
                   <div v-else class="row justify-center table-actions">
                     <q-btn flat round small color="primary">
-                      <a :href="props.row.link">
+                      <a :href="props.row.link" target="_blank">
                         <q-icon name="file download" />
                       </a>
                     </q-btn>
