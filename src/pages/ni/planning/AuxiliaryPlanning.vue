@@ -20,7 +20,7 @@
         <q-btn-toggle no-wrap v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions" @input="resetCreationForm(true, newEvent.type)" />
         <ni-modal-select caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions" :error="$v.newEvent.auxiliary.$error" />
         <template v-if="newEvent.type !== ABSENCE">
-          <ni-datetime-range caption="Dates et heures de l'intervention" v-model="newEvent.dates" @blur="$v.newEvent.dates.$touch" />
+          <ni-datetime-range caption="Dates et heures de l'intervention" v-model="newEvent.dates" />
         </template>
         <template v-if="newEvent.type === INTERVENTION">
           <ni-modal-select caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions" :error="$v.newEvent.customer.$error" />
@@ -68,7 +68,7 @@
         <template v-if="editionType === EDITION">
           <ni-modal-select caption="Auxiliaire" v-model="editedEvent.auxiliary" :options="auxiliariesOptions" :error="$v.editedEvent.auxiliary.$error" />
           <template v-if="editedEvent.type !== ABSENCE">
-            <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" @blur="$v.editedEvent.dates.$touch" />
+            <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" />
           </template>
           <template v-if="editedEvent.type === INTERVENTION">
             <ni-modal-select caption="Service" v-model="editedEvent.subscription" :options="customerSubscriptionsOptions(editedEvent.customer._id)"
@@ -203,9 +203,7 @@ export default {
       type: { required },
       dates: {
         startDate: { required },
-        stratHour: { required },
         endDate: { required },
-        endHour: { required },
       },
       startDuration: { required: requiredIf((item) => item.type === ABSENCE) },
       endDuration: { required: requiredIf((item) => item.type === ABSENCE) },
@@ -220,9 +218,7 @@ export default {
     editedEvent: {
       dates: {
         startDate: { required },
-        stratHour: { required: requiredIf((item) => item.type !== ABSENCE) },
         endDate: { required },
-        endHour: { required: requiredIf((item) => item.type !== ABSENCE) },
       },
       startDuration: { required: requiredIf((item) => item.type === ABSENCE) },
       endDuration: { required: requiredIf((item) => item.type === ABSENCE) },

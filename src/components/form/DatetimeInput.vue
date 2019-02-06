@@ -2,7 +2,8 @@
   <div>
     <q-input color="white" inverted-light :value="formattedDate" @input="update($event, 'DD/MM/YYYY')" placeholder="jj/mm/yyyy"
       :after="[{ icon: 'calendar_today', handler () { toggleDatetime(); } }]" @blur="blurHandler" align="center" />
-    <q-datetime :ref="name" :value="value" format="DD MMM YYYY" color="white" inverted-light @input="update" hide-underline />
+    <q-datetime :ref="name" :value="value" format="DD MMM YYYY" color="white" inverted-light @input="update"
+      hide-underline />
   </div>
 </template>
 
@@ -26,15 +27,19 @@ export default {
       this.$emit('blur');
     },
     update (value, format) {
-      let date;
+      // update from input component
       if (format) {
         if (this.$moment(value, 'DD/MM/YYYY', true).isValid()) {
-          date = this.$moment(value, format).toISOString();
+          const date = this.$moment(value, format).toISOString();
+          this.$emit('blur');
           this.$emit('input', date);
+        } else {
+          this.$emit('blur', { date: value });
         }
+      // update from datetime component
       } else {
-        date = value;
-        this.$emit('input', date);
+        this.$emit('blur');
+        this.$emit('input', value);
       }
     },
   },
