@@ -15,7 +15,7 @@
               ref="newEventAuxiliarySelect" :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
               :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`" />
           </div>
-          <div class="col-1 cursor-pointer close-button-modal" style="text-align: right">
+          <div class="col-1 cursor-pointer close-button-modal">
             <span>
               <q-icon name="clear" size="1.5rem" @click.native="creationModal = false" />
             </span>
@@ -74,7 +74,7 @@
               :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`"
               popupCover=false />
           </div>
-          <div class="col-1 cursor-pointer close-button-modal" style="text-align: right">
+          <div class="col-1 cursor-pointer close-button-modal">
             <span>
               <q-icon name="clear" size="1.5rem" @click.native="editionModal = false" />
             </span>
@@ -197,7 +197,7 @@ export default {
         {label: 'Intervention', value: INTERVENTION},
         {label: 'Interne', value: INTERNAL_HOUR},
         {label: 'Absence', value: ABSENCE},
-        {label: 'Indisp', value: UNAVAILABILITY}
+        {label: 'Indispo', value: UNAVAILABILITY}
       ],
       // Event Creation
       creationModal: false,
@@ -765,5 +765,6 @@ export default {
   .close-button-modal
     display: flex;
     align-items: center;
+    justify-content: flex-end;
 
 </style>
