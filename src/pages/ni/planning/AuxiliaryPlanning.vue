@@ -11,8 +11,8 @@
         <div class="row q-mb-lg">
           <div class="col-11 row modal-auxiliay-header">
             <img :src="getAvatar(selectedAuxiliary.picture.link)" class="avatar">
-            <q-select filter v-model="newEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions" ref="newEventAuxiliarySelect"
-              :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
+            <q-select filter v-model="newEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions"
+              ref="newEventAuxiliarySelect" :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
               :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`" />
           </div>
           <div class="col-1 cursor-pointer close-button-modal" style="text-align: right">
@@ -23,35 +23,40 @@
         </div>
         <q-btn-toggle no-wrap v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions" @input="resetCreationForm(true, newEvent.type)" />
         <template v-if="newEvent.type !== ABSENCE">
-          <ni-datetime-range caption="Dates et heures de l'intervention" v-model="newEvent.dates" />
+          <ni-datetime-range caption="Dates et heures de l'intervention" v-model="newEvent.dates" requiredField />
         </template>
         <template v-if="newEvent.type === INTERVENTION">
           <ni-modal-select caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions" :error="$v.newEvent.customer.$error"
-            icon="face" />
+            icon="face" requiredField />
           <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions(newEvent.customer)"
-            :error="$v.newEvent.subscription.$error" />
-          <ni-modal-select caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency" :options="repetitionOptions" />
+            :error="$v.newEvent.subscription.$error" requiredField />
+          <ni-modal-select caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency" :options="repetitionOptions"
+            requiredField />
         </template>
         <template v-if="newEvent.type === ABSENCE">
           <ni-datetime-picker caption="Date de debut" v-model="newEvent.dates.startDate" type="date" :error="$v.newEvent.dates.startDate.$error"
-            inModal />
+            inModal requiredField />
           <ni-modal-select caption="Durée" :error="$v.newEvent.startDuration.$error" :options="dateOptions" v-model="newEvent.startDuration"
-            separator />
+            separator requiredField />
           <ni-datetime-picker caption="Date de fin" v-model="newEvent.dates.endDate" type="date" :error="$v.newEvent.dates.endDate.$error"
-            inModal />
+            inModal :min="newEvent.dates.startDate" requiredField />
           <ni-modal-select caption="Durée" :error="$v.newEvent.endDuration.$error" :options="dateOptions" v-model="newEvent.endDuration"
-            separator />
-          <ni-modal-select caption="Type d'absence" v-model="newEvent.absence" :options="absenceOptions" :error="$v.newEvent.absence.$error" />
-          <ni-file-uploader caption="Justificatif d'absence" path="attachment" :entity="newEvent" alt="justificatif absence"
-            name="proofOfAbsence" :url="docsUploadUrl" @uploaded="documentUploaded" :additionalValue="additionalValue"
-            :disable="!selectedAuxiliary._id" @delete="deleteDocument(newEvent.attachment.driveId)" withBorders />
+            separator :requiredField="isEndDurationRequired" />
+          <ni-modal-select caption="Type d'absence" v-model="newEvent.absence" :options="absenceOptions" :error="$v.newEvent.absence.$error"
+            requiredField />
+          <ni-file-uploader v-if="newEvent.absence && newEvent.absence === ILLNESS" caption="Justificatif d'absence"
+            path="attachment" :entity="newEvent" alt="justificatif absence" name="proofOfAbsence" :url="docsUploadUrl"
+            @uploaded="documentUploaded" :additionalValue="additionalValue" requiredField :disable="!selectedAuxiliary._id"
+            @delete="deleteDocument(newEvent.attachment.driveId)" withBorders />
         </template>
         <template v-if="newEvent.type === INTERNAL_HOUR">
           <ni-modal-select caption="Type d'heure interne" v-model="newEvent.internalHour" :options="internalHourOptions"
-            :error="$v.newEvent.internalHour.$error" />
+            requiredField :error="$v.newEvent.internalHour.$error" />
+          <ni-modal-select caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency" :options="repetitionOptions"
+            requiredField />
+          <ni-search-address v-model="newEvent.location.fullAddress" @selected="selectedAddress" @blur="$v.newEvent.location.fullAddress.$touch"
+            :error="$v.newEvent.location.fullAddress.$error" :error-label="addressError" inModal />
         </template>
-        <ni-search-address v-model="newEvent.location.fullAddress" @selected="selectedAddress" @blur="$v.newEvent.location.fullAddress.$touch"
-          :error="$v.newEvent.location.fullAddress.$error" :error-label="addressError" inModal />
         <ni-modal-input v-model="newEvent.misc" caption="Notes" />
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary" @click="createEvent"
@@ -150,7 +155,8 @@ import {
   NEVER,
   EVERY_DAY,
   EVERY_WEEK_DAY,
-  EVERY_WEEK
+  EVERY_WEEK,
+  ILLNESS,
 } from '../../../data/constants';
 
 export default {
@@ -182,6 +188,7 @@ export default {
       DELETION,
       CANCELLATION,
       EDITION,
+      ILLNESS,
       editionType: EDITION,
       absenceOptions: ABSENCE_TYPE,
       dateOptions: DATE_OPTIONS,
@@ -247,6 +254,10 @@ export default {
       internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
       absence: { required: requiredIf((item) => item.type === ABSENCE) },
       location: { fullAddress: { frAddress } },
+      attachment: {
+        driveId: requiredIf((item) => item.type === ABSENCE && item.absence === ILLNESS),
+        link: requiredIf((item) => item.type === ABSENCE && item.absence === ILLNESS),
+      },
     },
     editedEvent: {
       dates: {
@@ -360,6 +371,11 @@ export default {
         { label: 'Tous les jours de la semaine (lundi au vendredi)', value: EVERY_WEEK_DAY },
         { label: oneDayRepetitionLabel, value: EVERY_WEEK },
       ];
+    },
+    isEndDurationRequired () {
+      if (this.newEvent.type !== ABSENCE) return false;
+
+      return this.$moment(this.newEvent.dates.endDate).isAfter(this.$moment(this.newEvent.dates.startDate));
     },
   },
   methods: {
