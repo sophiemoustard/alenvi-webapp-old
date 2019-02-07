@@ -6,15 +6,19 @@
     </div>
     <q-field :error="hasError" :error-label="errorMessage">
       <div class="datetime-container">
-        <ni-datetime-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" name="start-datetime"
-          @blur="blurDateHandler" />
-        <ni-select-input :value="value.startHour" @input="update($event, 'startHour')" class="time-item" align="center" autofocus-filter
-          @blur="blurHourHandler" :options="hoursOptions" filter :filter-placeholder="value.startHour" hide-underline name="start-hour" />
+        <div class="datetime-item">
+          <ni-datetime-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" name="start-datetime"
+            @blur="blurDateHandler" />
+          <ni-select-input :value="value.startHour" @input="update($event, 'startHour')" class="time-item" align="center" autofocus-filter
+            @blur="blurHourHandler" :options="hoursOptions" filter :filter-placeholder="value.startHour" hide-underline name="start-hour" />
+        </div>
         <p class="delimiter">-</p>
-        <ni-select-input :value="value.endHour" @input="update($event, 'endHour')" class="time-item" align="center" autofocus-filter
-          @blur="blurHourHandler" :options="endHourOptions" filter :filter-placeholder="value.endHour" hide-underline name="end-hour" />
-        <ni-datetime-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
-          name="end-datetime" @blur="blurDateHandler" />
+        <div class="datetime-item end">
+          <ni-select-input :value="value.endHour" @input="update($event, 'endHour')" class="time-item" align="center" autofocus-filter
+            @blur="blurHourHandler" :options="endHourOptions" filter :filter-placeholder="value.endHour" hide-underline name="end-hour" />
+          <ni-datetime-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
+            name="end-datetime" @blur="blurDateHandler" />
+        </div>
       </div>
     </q-field>
   </div>
@@ -93,15 +97,17 @@ export default {
     border: 1px solid $light-grey;
     border-radius: 3px;
     display: flex;
+    flex-direction: row;
     justify-content: center;
-    & .delimiter
-      padding: 10px 14px;
-      margin: 0;
-      width: 4%;
+    @media screen and (min-width: 678px)
+      & .delimiter
+        padding: 10px 14px;
+        margin: 0;
+        width: 4%;
     @media screen and (max-width: 677px)
-      flex-direction: column
-      .delimiter
-        display: none;
+      flex-direction: column;
+      & .delimiter
+        display: none
 
   /deep/ .q-select
     padding-top: 0px !important;
@@ -109,22 +115,24 @@ export default {
       padding: 10px;
 
   .time-item
-    /deep/ .q-field-content
-      padding-top: 0px;
-    @media screen and (min-width: 678px)
-      max-width: 120px;
-    @media screen and (max-width: 677px)
-      width: 100%
+    /deep/ .q-input.q-if-inverted
+      padding: 10px;
+      max-width: 120px
 
   .date-item
     /deep/ .q-input.q-if-inverted
       padding: 10px;
+      max-width: 120px
     /deep/ .q-field-content
       padding-top: 0px
-    @media screen and (min-width: 678px)
-      max-width: 120px;
-    @media screen and (max-width: 677px)
-      width: 100%
+
+  .datetime-item
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    &.end
+      @media screen and (max-width: 677px)
+        flex-direction: row-reverse;
 
   /deep/ .q-if-inverted.q-if-focused
     box-shadow: none;
