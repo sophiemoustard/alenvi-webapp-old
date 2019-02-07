@@ -133,7 +133,25 @@ import ModalInput from '../../../components/form/ModalInput';
 import SearchAddress from '../../../components/form/SearchAddress';
 import FileUploader from '../../../components/form/FileUploader';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify.js';
-import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, ABSENCE_TYPE, DATE_OPTIONS, EDITION, CANCELLATION, DELETION, MORNING, AFTERNOON, ALL_DAY, DEFAULT_AVATAR } from '../../../data/constants';
+import {
+  INTERVENTION,
+  ABSENCE,
+  UNAVAILABILITY,
+  INTERNAL_HOUR,
+  ABSENCE_TYPE,
+  DATE_OPTIONS,
+  EDITION,
+  CANCELLATION,
+  DELETION,
+  MORNING,
+  AFTERNOON,
+  ALL_DAY,
+  DEFAULT_AVATAR,
+  NEVER,
+  EVERY_DAY,
+  EVERY_WEEK_DAY,
+  EVERY_WEEK
+} from '../../../data/constants';
 
 export default {
   name: 'AuxiliaryPlanning',
@@ -184,7 +202,7 @@ export default {
           endDate: '',
           endHour: '',
         },
-        repetition: { frequency: 'never' },
+        repetition: { frequency: NEVER },
         startDuration: '',
         endDuration: '',
         auxiliary: '',
@@ -337,10 +355,10 @@ export default {
         : 'Tous les lundis';
 
       return [
-        { label: 'Jamais', value: 'never' },
-        { label: 'Tous les jours', value: 'every_day' },
-        { label: 'Tous les jours de la semaine (lundi au vendredi)', value: 'every_week_day' },
-        { label: oneDayRepetitionLabel, value: 'every_week' },
+        { label: 'Jamais', value: NEVER },
+        { label: 'Tous les jours', value: EVERY_DAY },
+        { label: 'Tous les jours de la semaine (lundi au vendredi)', value: EVERY_WEEK_DAY },
+        { label: oneDayRepetitionLabel, value: EVERY_WEEK },
       ];
     },
   },
@@ -434,7 +452,7 @@ export default {
           endDate: partialReset ? this.newEvent.dates.endDate : '',
           endHour: partialReset ? this.newEvent.dates.endHour : '',
         },
-        repetition: { frequency: 'never' },
+        repetition: { frequency: NEVER },
         startDuration: '',
         endDuration: '',
         auxiliary: partialReset ? this.newEvent.auxiliary : '',

@@ -49,3 +49,9 @@ export const FUNDING_NATURE_OPTIONS = [
 
 // AVATAR
 export const DEFAULT_AVATAR = 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/images/users/default_avatar.png';
+
+// REPETITION FREQUENCY
+export const NEVER = 'never';
+export const EVERY_DAY = 'every_day';
+export const EVERY_WEEK_DAY = 'every_week_day';
+export const EVERY_WEEK = 'every_week';
