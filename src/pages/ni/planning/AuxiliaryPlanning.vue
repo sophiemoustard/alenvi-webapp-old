@@ -767,4 +767,10 @@ export default {
     align-items: center;
     justify-content: flex-end;
 
+  /deep/ .q-btn-toggle
+    @media screen and (max-width: 677px)
+      display: inline-flex;
+      flex-wrap: wrap;
+      & .q-btn
+        width: 45%
 </style>
