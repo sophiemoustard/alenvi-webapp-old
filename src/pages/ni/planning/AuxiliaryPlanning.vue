@@ -26,6 +26,7 @@
           <ni-modal-select caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions" :error="$v.newEvent.customer.$error" />
           <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions(newEvent.customer)"
             :error="$v.newEvent.subscription.$error" />
+          <ni-modal-select caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency" :options="repetitionOptions" />
         </template>
         <template v-if="newEvent.type === ABSENCE">
           <ni-datetime-picker caption="Date de debut" v-model="newEvent.dates.startDate" type="date" :error="$v.newEvent.dates.startDate.$error"
@@ -175,6 +176,7 @@ export default {
           endDate: '',
           endHour: '',
         },
+        repetition: { frequency: 'never' },
         startDuration: '',
         endDuration: '',
         auxiliary: '',
@@ -194,6 +196,7 @@ export default {
         attachment: {},
         customer: '',
         dates: {},
+        repetition: {},
       },
       editionTypeOptions: [
         {label: 'Edition', value: EDITION},
@@ -239,9 +242,6 @@ export default {
     this.setInternalHours();
   },
   computed: {
-    endOfWeek () {
-      return this.$moment(this.startOfWeek).add(6, 'd');
-    },
     minEndDate () {
       return this.$moment(this.newEvent.startDate).toISOString()
     },
@@ -318,9 +318,29 @@ export default {
           return 'Edition de l\'indisponibilité';
       }
     },
+    oneDayRepetitionLabel () {
+      if (this.creationModal) return `Tous les ${this.$moment(this.newEvent.dates.startDate).day()}`;
+      if (this.editionModal) return `Tous les ${this.$moment(this.editedEvent.dates.startDate).day()}`;
+      return 'Tous les lundis';
+    },
+    repetitionOptions () {
+      const oneDayRepetitionLabel = this.creationModal
+        ? `Tous les ${this.$moment(this.newEvent.dates.startDate).format('dddd')}s`
+        : 'Tous les lundis';
+
+      return [
+        { label: 'Jamais', value: 'never' },
+        { label: 'Tous les jours', value: 'every_day' },
+        { label: 'Tous les jours de la semaine (lundi au vendredi)', value: 'every_week_day' },
+        { label: oneDayRepetitionLabel, value: 'every_week' },
+      ];
+    },
   },
   methods: {
     // Dates
+    endOfWeek () {
+      return this.$moment(this.startOfWeek).add(6, 'd');
+    },
     async updateStartOfWeek (vEvent) {
       const { startOfWeek } = vEvent;
       this.startOfWeek = startOfWeek;
@@ -334,7 +354,7 @@ export default {
       try {
         this.events = await this.$events.list({
           startDate: this.startOfWeek.format('YYYYMMDD'),
-          endStartDate: this.endOfWeek.format('YYYYMMDD'),
+          endStartDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
           sector: this.selectedSector,
         });
       } catch (e) {
@@ -399,6 +419,7 @@ export default {
           endDate: partialReset ? this.newEvent.dates.endDate : '',
           endHour: partialReset ? this.newEvent.dates.endHour : '',
         },
+        repetition: { frequency: 'never' },
         startDuration: '',
         endDuration: '',
         auxiliary: partialReset ? this.newEvent.auxiliary : '',
@@ -549,6 +570,7 @@ export default {
         subscription: {},
         location: {},
         dates: {},
+        repetition: {},
       };
     },
     async updateEvent () {
