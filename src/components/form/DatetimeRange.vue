@@ -13,7 +13,7 @@
         <p class="delimiter">-</p>
         <ni-select-input :value="value.endHour" @input="update($event, 'endHour')" class="datetime-item" name="end-select"
           @blur="blurHourHandler" :options="hoursOptions" />
-        <ni-datetime-input :value="value.endDate" @input="update($event, 'endDate')" :min="value.startDate" class="datetime-item"
+        <ni-datetime-input :value="value.endDate" @input="update($event, 'endDate')" class="datetime-item"
           name="end-datetime" @blur="blurDateHandler" />
       </div>
     </q-field>
@@ -33,7 +33,7 @@ export default {
     caption: { type: String, default: '' },
     error: Boolean,
     value: Object,
-    requiredField: { type: Boolean, default: false }
+    requiredField: { type: Boolean, default: false },
   },
   data () {
     return {
@@ -71,9 +71,10 @@ export default {
       this.$emit('focus');
     },
     update (value, key) {
-      const date = { ...this.value, [key]: value }
+      const dates = { ...this.value, [key]: value }
       this.$emit('blur');
-      this.$emit('input', date);
+      if (key === 'startDate') dates.endDate = value;
+      this.$emit('input', dates);
     },
   },
 }
