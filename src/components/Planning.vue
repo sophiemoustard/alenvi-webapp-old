@@ -6,7 +6,7 @@
         <span>{{ timelineTitle() }}</span>
         <q-btn icon="chevron_right" flat round @click="goToNextWeek"></q-btn>
       </div>
-      <q-chips-input v-model="value" placeholder="Rechercher un(e) commununauté / auxiliaire">
+      <q-chips-input v-model="terms" placeholder="Rechercher un(e) commununauté / auxiliaire">
         <q-autocomplete @search="search" @selected="selected" />
       </q-chips-input>
       <table style="width: 100%">
@@ -58,6 +58,7 @@
 import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, ABSENCE_TYPE } from '../data/constants';
 import { NotifyNegative } from './popup/notify';
 import NiChip from './Chip';
+import { filter } from 'quasar'
 
 export default {
   name: 'PlanningManager',
@@ -71,7 +72,8 @@ export default {
   },
   data () {
     return {
-      value: [],
+      terms: [],
+      toFilter: [],
       loading: false,
       draggedObject: {},
       startOfWeek: '',
@@ -101,6 +103,7 @@ export default {
     this.startOfWeek = this.$moment().startOf('week');
     this.getTimelineDays();
     this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
+    this.initFilter();
   },
   watch: {
     toggleDrawer (val) {
@@ -175,30 +178,43 @@ export default {
     async search (terms, done) {
       try {
         console.log('searched');
-        const res = [{
-          label: 'Commu 1',
-          value: '1a*'
-        }, {
-          label: 'Commu 2',
-          value: '1b*'
-        }, {
-          label: 'Commu 2',
-          value: '1c*'
-        }, {
-          label: 'Ghislaine Dubois',
-          value: '111111'
-        }, {
-          label: 'Irlène Guarrigues',
-          value: '222222'
-        }];
-        done(res);
+        done(filter(terms, {field: 'searchValue', list: this.toFilter}));
       } catch (e) {
         console.error(e);
         done([]);
       }
     },
-    selected () {
+    selected (selected) {
+      console.log(selected);
       console.log('selected');
+    },
+    async initFilter () {
+      try {
+        await this.addAuxiliariesToFilter();
+        await this.addSectorsToFilter();
+        console.log(this.toFilter);
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async addSectorsToFilter () {
+      const allSectorsRaw = await this.$ogust.getList('employee.sector');
+      for (const k in allSectorsRaw) {
+        if (k === '*') {
+          continue;
+        }
+        this.toFilter.push({
+          label: allSectorsRaw[k],
+          value: k
+        });
+      }
+    },
+    async addAuxiliariesToFilter () {
+      this.toFilter = await this.$users.showAll({ 'role': 'Auxiliaire' });
+      for (let i = 0, l = this.toFilter.length; i < l; i++) {
+        this.toFilter[i].searchValue = `${this.toFilter[i].identity.firstname} ${this.toFilter[i].identity.lastname}`;
+        this.toFilter[i].label = `${this.toFilter[i].identity.firstname} ${this.toFilter[i].identity.lastname}`;
+      }
     }
   }
 }
