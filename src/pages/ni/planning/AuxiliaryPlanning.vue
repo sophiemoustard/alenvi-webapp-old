@@ -195,9 +195,9 @@ export default {
       internalHours: [],
       eventTypeOptions: [
         {label: 'Intervention', value: INTERVENTION},
+        {label: 'Interne', value: INTERNAL_HOUR},
         {label: 'Absence', value: ABSENCE},
-        {label: 'Heure interne', value: INTERNAL_HOUR},
-        {label: 'Indisponibilité', value: UNAVAILABILITY}
+        {label: 'Indisp', value: UNAVAILABILITY}
       ],
       // Event Creation
       creationModal: false,

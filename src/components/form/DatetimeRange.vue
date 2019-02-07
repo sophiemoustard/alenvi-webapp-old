@@ -8,11 +8,11 @@
       <div class="datetime-container">
         <ni-datetime-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" name="start-datetime"
           @blur="blurDateHandler" />
-        <q-select :value="value.startHour" @input="update($event, 'startHour')" class="time-item" align="center" autofocus-filter
-          @blur="blurHourHandler" :options="hoursOptions" filter :filter-placeholder="value.startHour" hide-underline />
+        <ni-select-input :value="value.startHour" @input="update($event, 'startHour')" class="time-item" align="center" autofocus-filter
+          @blur="blurHourHandler" :options="hoursOptions" filter :filter-placeholder="value.startHour" hide-underline name="start-hour" />
         <p class="delimiter">-</p>
-        <q-select :value="value.endHour" @input="update($event, 'endHour')" class="time-item" align="center" autofocus-filter
-          @blur="blurHourHandler" :options="endHourOptions" filter :filter-placeholder="value.endHour" hide-underline />
+        <ni-select-input :value="value.endHour" @input="update($event, 'endHour')" class="time-item" align="center" autofocus-filter
+          @blur="blurHourHandler" :options="endHourOptions" filter :filter-placeholder="value.endHour" hide-underline name="end-hour" />
         <ni-datetime-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
           name="end-datetime" @blur="blurDateHandler" />
       </div>
@@ -22,10 +22,12 @@
 
 <script>
 import DatetimeInput from './DatetimeInput.vue';
+import SelectInput from './SelectInput.vue';
 
 export default {
   components: {
     'ni-datetime-input': DatetimeInput,
+    'ni-select-input': SelectInput,
   },
   props: {
     caption: { type: String, default: '' },
@@ -108,9 +110,9 @@ export default {
 
   .time-item
     /deep/ .q-field-content
-      padding-top: 0px
+      padding-top: 0px;
     @media screen and (min-width: 678px)
-      width: 19%
+      max-width: 120px;
     @media screen and (max-width: 677px)
       width: 100%
 
@@ -120,7 +122,7 @@ export default {
     /deep/ .q-field-content
       padding-top: 0px
     @media screen and (min-width: 678px)
-      width: 29%
+      max-width: 120px;
     @media screen and (max-width: 677px)
       width: 100%
 
