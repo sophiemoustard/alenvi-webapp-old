@@ -62,6 +62,7 @@ import randomize from 'randomatic';
 import ModalInput from './form/ModalInput.vue';
 import ModalSelect from './form/ModalSelect.vue';
 import { NotifyPositive, NotifyNegative } from './popup/notify';
+import { DEFAULT_AVATAR } from '../data/constants';
 
 export default {
   name: 'ProfileHeader',
@@ -146,7 +147,7 @@ export default {
       }
     },
     hasPicture () {
-      return !this.user.picture || (this.user.picture && !this.user.picture.link) ? 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/images/users/default_avatar.png' : this.user.picture.link;
+      return !this.user.picture || (this.user.picture && !this.user.picture.link) ? DEFAULT_AVATAR : this.user.picture.link;
     },
   },
   methods: {

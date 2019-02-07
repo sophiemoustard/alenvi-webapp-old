@@ -8,24 +8,29 @@
     <!-- Event creation modal -->
     <q-modal v-model="creationModal" content-classes="modal-container-md" @hide="resetCreationForm(false)">
       <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5>Création d'un <span class="text-weight-bold">évènement</span></h5>
+        <div class="row q-mb-lg">
+          <div class="col-11 row modal-auxiliay-header">
+            <img :src="getAvatar(selectedAuxiliary.picture.link)" class="avatar">
+            <q-select filter v-model="newEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions" ref="newEventAuxiliarySelect"
+              :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
+              :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`" />
           </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
+          <div class="col-1 cursor-pointer close-button-modal" style="text-align: right">
             <span>
-              <q-icon name="clear" size="1rem" @click.native="creationModal = false" /></span>
+              <q-icon name="clear" size="1.5rem" @click.native="creationModal = false" />
+            </span>
           </div>
         </div>
         <q-btn-toggle no-wrap v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions" @input="resetCreationForm(true, newEvent.type)" />
-        <ni-modal-select caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions" :error="$v.newEvent.auxiliary.$error" />
         <template v-if="newEvent.type !== ABSENCE">
           <ni-datetime-range caption="Dates et heures de l'intervention" v-model="newEvent.dates" />
         </template>
         <template v-if="newEvent.type === INTERVENTION">
-          <ni-modal-select caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions" :error="$v.newEvent.customer.$error" />
+          <ni-modal-select caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions" :error="$v.newEvent.customer.$error"
+            icon="face" />
           <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions(newEvent.customer)"
             :error="$v.newEvent.subscription.$error" />
+          <ni-modal-select caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency" :options="repetitionOptions" />
         </template>
         <template v-if="newEvent.type === ABSENCE">
           <ni-datetime-picker caption="Date de debut" v-model="newEvent.dates.startDate" type="date" :error="$v.newEvent.dates.startDate.$error"
@@ -47,6 +52,7 @@
         </template>
         <ni-search-address v-model="newEvent.location.fullAddress" @selected="selectedAddress" @blur="$v.newEvent.location.fullAddress.$touch"
           :error="$v.newEvent.location.fullAddress.$error" :error-label="addressError" inModal />
+        <ni-modal-input v-model="newEvent.misc" caption="Notes" />
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary" @click="createEvent"
         :disable="disableCreationButton" />
@@ -55,18 +61,22 @@
     <!-- Event edition modal -->
     <q-modal v-model="editionModal" content-classes="modal-container-md" @hide="resetEditionForm()">
       <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5>{{ editionModalTitle }}</h5>
+        <div class="row q-mb-lg">
+          <div class="col-11 row modal-auxiliay-header">
+            <img :src="getAvatar(selectedAuxiliary.picture.link)" class="avatar">
+            <q-select filter v-model="editedEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions"
+              ref="editedEventAuxiliarySelect" :after="[{ icon: 'face', class: 'select-icon', handler () { toggleAuxiliarySelect(); }, }]"
+              :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`"
+              popupCover=false />
           </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
+          <div class="col-1 cursor-pointer close-button-modal" style="text-align: right">
             <span>
-              <q-icon name="clear" size="1rem" @click.native="editionModal = false" /></span>
+              <q-icon name="clear" size="1.5rem" @click.native="editionModal = false" />
+            </span>
           </div>
         </div>
         <q-btn-toggle no-wrap v-model="editionType" toggle-color="primary" :options="editionTypeOptions" />
         <template v-if="editionType === EDITION">
-          <ni-modal-select caption="Auxiliaire" v-model="editedEvent.auxiliary" :options="auxiliariesOptions" :error="$v.editedEvent.auxiliary.$error" />
           <template v-if="editedEvent.type !== ABSENCE">
             <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" />
           </template>
@@ -94,6 +104,7 @@
           </template>
           <ni-search-address v-model="editedEvent.location.fullAddress" @selected="selectedAddress" @blur="$v.editedEvent.location.fullAddress.$touch"
             :error="$v.editedEvent.location.fullAddress.$error" :error-label="addressError" inModal />
+          <ni-modal-input v-model="editedEvent.misc" caption="Notes" />
         </template>
         <template v-else-if="editionType === CANCELLATION">
         </template>
@@ -118,10 +129,29 @@ import SelectSector from '../../../components/form/SelectSector';
 import DatetimePicker from '../../../components/form/DatetimePicker.vue';
 import DatetimeRange from '../../../components/form/DatetimeRange.vue';
 import ModalSelect from '../../../components/form/ModalSelect';
+import ModalInput from '../../../components/form/ModalInput';
 import SearchAddress from '../../../components/form/SearchAddress';
 import FileUploader from '../../../components/form/FileUploader';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify.js';
-import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, ABSENCE_TYPE, DATE_OPTIONS, EDITION, CANCELLATION, DELETION, MORNING, AFTERNOON, ALL_DAY } from '../../../data/constants';
+import {
+  INTERVENTION,
+  ABSENCE,
+  UNAVAILABILITY,
+  INTERNAL_HOUR,
+  ABSENCE_TYPE,
+  DATE_OPTIONS,
+  EDITION,
+  CANCELLATION,
+  DELETION,
+  MORNING,
+  AFTERNOON,
+  ALL_DAY,
+  DEFAULT_AVATAR,
+  NEVER,
+  EVERY_DAY,
+  EVERY_WEEK_DAY,
+  EVERY_WEEK
+} from '../../../data/constants';
 
 export default {
   name: 'AuxiliaryPlanning',
@@ -131,6 +161,7 @@ export default {
     'ni-datetime-picker': DatetimePicker,
     'ni-search-address': SearchAddress,
     'ni-modal-select': ModalSelect,
+    'ni-modal-input': ModalInput,
     'ni-file-uploader': FileUploader,
     'ni-datetime-range': DatetimeRange,
   },
@@ -171,6 +202,7 @@ export default {
           endDate: '',
           endHour: '',
         },
+        repetition: { frequency: NEVER },
         startDuration: '',
         endDuration: '',
         auxiliary: '',
@@ -190,6 +222,7 @@ export default {
         attachment: {},
         customer: '',
         dates: {},
+        repetition: {},
       },
       editionTypeOptions: [
         {label: 'Edition', value: EDITION},
@@ -235,9 +268,6 @@ export default {
     this.setInternalHours();
   },
   computed: {
-    endOfWeek () {
-      return this.$moment(this.startOfWeek).add(6, 'd');
-    },
     minEndDate () {
       return this.$moment(this.newEvent.startDate).toISOString()
     },
@@ -247,7 +277,7 @@ export default {
     selectedAuxiliary () {
       if (this.creationModal && this.newEvent.auxiliary !== '') return this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
       if (this.editionModal && this.editedEvent.auxiliary !== '') return this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
-      return {};
+      return { picture: {}, identity: {} };
     },
     auxiliariesOptions () {
       return this.auxiliaries.length === 0 ? [] : this.auxiliaries.map(aux => ({
@@ -314,9 +344,29 @@ export default {
           return 'Edition de l\'indisponibilité';
       }
     },
+    oneDayRepetitionLabel () {
+      if (this.creationModal) return `Tous les ${this.$moment(this.newEvent.dates.startDate).day()}`;
+      if (this.editionModal) return `Tous les ${this.$moment(this.editedEvent.dates.startDate).day()}`;
+      return 'Tous les lundis';
+    },
+    repetitionOptions () {
+      const oneDayRepetitionLabel = this.creationModal
+        ? `Tous les ${this.$moment(this.newEvent.dates.startDate).format('dddd')}s`
+        : 'Tous les lundis';
+
+      return [
+        { label: 'Jamais', value: NEVER },
+        { label: 'Tous les jours', value: EVERY_DAY },
+        { label: 'Tous les jours de la semaine (lundi au vendredi)', value: EVERY_WEEK_DAY },
+        { label: oneDayRepetitionLabel, value: EVERY_WEEK },
+      ];
+    },
   },
   methods: {
     // Dates
+    endOfWeek () {
+      return this.$moment(this.startOfWeek).add(6, 'd');
+    },
     async updateStartOfWeek (vEvent) {
       const { startOfWeek } = vEvent;
       this.startOfWeek = startOfWeek;
@@ -330,7 +380,7 @@ export default {
       try {
         this.events = await this.$events.list({
           startDate: this.startOfWeek.format('YYYYMMDD'),
-          endStartDate: this.endOfWeek.format('YYYYMMDD'),
+          endStartDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
           sector: this.selectedSector,
         });
       } catch (e) {
@@ -355,6 +405,13 @@ export default {
       }
     },
     // Event creation
+    getAvatar (link) {
+      return link || DEFAULT_AVATAR;
+    },
+    toggleAuxiliarySelect () {
+      if (this.creationModal) return this.$refs['newEventAuxiliarySelect'].show();
+      if (this.editionModal) return this.$refs['editedEventAuxiliarySelect'].show();
+    },
     customerSubscriptionsOptions (customerId) {
       if (!customerId) return [];
       const selectedCustomer = this.customers.find(customer => customer._id === customerId);
@@ -395,6 +452,7 @@ export default {
           endDate: partialReset ? this.newEvent.dates.endDate : '',
           endHour: partialReset ? this.newEvent.dates.endHour : '',
         },
+        repetition: { frequency: NEVER },
         startDuration: '',
         endDuration: '',
         auxiliary: partialReset ? this.newEvent.auxiliary : '',
@@ -545,6 +603,7 @@ export default {
         subscription: {},
         location: {},
         dates: {},
+        repetition: {},
       };
     },
     async updateEvent () {
@@ -655,3 +714,40 @@ export default {
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+  @import '~variables';
+
+  /deep/ .q-btn-group
+    border: none;
+    box-shadow: none;
+
+    & .q-btn-item
+      border-radius: 20px;
+      margin: 5px;
+      background-color: $light-grey;
+
+  /deep/ .modal-auxiliay-header
+    .q-if-inverted
+      border: none;
+      font-size: 24px;
+      &.q-if-focused
+        box-shadow: none;
+    .q-input-target
+      line-height: normal
+    .q-icon
+      display: none;
+
+  /deep/ .select-icon
+    display: flex !important;
+    margin: 0 0 0 10px;
+
+  /deep/ .pink-icon
+    color: $primary !important;
+    font-size: 22px;
+
+  .close-button-modal
+    display: flex;
+    align-items: center;
+
+</style>

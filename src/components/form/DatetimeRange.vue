@@ -6,14 +6,14 @@
     </div>
     <q-field :error="hasError" :error-label="errorMessage">
       <div class="datetime-container">
-        <ni-datetime-input :value="value.startDate" @input="update($event, 'startDate')" class="datetime-item" name="start-datetime"
+        <ni-datetime-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" name="start-datetime"
           @blur="blurDateHandler" />
-        <ni-select-input :value="value.startHour" @input="update($event, 'startHour')" class="datetime-item" name="start-select"
-          @blur="blurHourHandler" :options="hoursOptions" />
+        <q-select :value="value.startHour" @input="update($event, 'startHour')" class="time-item" align="center" autofocus-filter
+          @blur="blurHourHandler" :options="hoursOptions" filter :filter-placeholder="value.startHour" hide-underline />
         <p class="delimiter">-</p>
-        <ni-select-input :value="value.endHour" @input="update($event, 'endHour')" class="datetime-item" name="end-select"
-          @blur="blurHourHandler" :options="hoursOptions" />
-        <ni-datetime-input :value="value.endDate" @input="update($event, 'endDate')" :min="value.startDate" class="datetime-item"
+        <q-select :value="value.endHour" @input="update($event, 'endHour')" class="time-item" align="center" autofocus-filter
+          @blur="blurHourHandler" :options="endHourOptions" filter :filter-placeholder="value.endHour" hide-underline />
+        <ni-datetime-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
           name="end-datetime" @blur="blurDateHandler" />
       </div>
     </q-field>
@@ -22,18 +22,16 @@
 
 <script>
 import DatetimeInput from './DatetimeInput.vue';
-import SelectInput from './SelectInput.vue';
 
 export default {
   components: {
     'ni-datetime-input': DatetimeInput,
-    'ni-select-input': SelectInput,
   },
   props: {
     caption: { type: String, default: '' },
     error: Boolean,
     value: Object,
-    requiredField: { type: Boolean, default: false }
+    requiredField: { type: Boolean, default: false },
   },
   data () {
     return {
@@ -55,6 +53,9 @@ export default {
     hasError () {
       return this.error || this.childError;
     },
+    endHourOptions () {
+      return this.hoursOptions.map(option => ({ ...option, disable: this.$moment(option.value, 'HH:mm').isSameOrBefore(this.$moment(this.value.startHour, 'HH:mm')) }));
+    },
   },
   methods: {
     blurDateHandler (event) {
@@ -71,9 +72,13 @@ export default {
       this.$emit('focus');
     },
     update (value, key) {
-      const date = { ...this.value, [key]: value }
+      const dates = { ...this.value, [key]: value }
       this.$emit('blur');
-      this.$emit('input', date);
+      if (key === 'startDate') dates.endDate = value;
+      if (key === 'startHour' && this.$moment(value, 'HH:mm').isSameOrAfter(this.$moment(this.value.endHour, 'HH:mm'))) {
+        dates.endHour = this.$moment(value, 'HH:mm').add(2, 'H').format('HH:mm');
+      }
+      this.$emit('input', dates);
     },
   },
 }
@@ -96,11 +101,26 @@ export default {
       .delimiter
         display: none;
 
-  .datetime-item
+  /deep/ .q-select
+    padding-top: 0px !important;
+    .q-if-inner
+      padding: 10px;
+
+  .time-item
     /deep/ .q-field-content
       padding-top: 0px
     @media screen and (min-width: 678px)
-      width: 23%
+      width: 19%
+    @media screen and (max-width: 677px)
+      width: 100%
+
+  .date-item
+    /deep/ .q-input.q-if-inverted
+      padding: 10px;
+    /deep/ .q-field-content
+      padding-top: 0px
+    @media screen and (min-width: 678px)
+      width: 29%
     @media screen and (max-width: 677px)
       width: 100%
 

@@ -2,8 +2,7 @@
   <div>
     <q-input color="white" inverted-light :value="formattedDate" @input="update($event, 'DD/MM/YYYY')" placeholder="jj/mm/yyyy"
       :after="[{ icon: 'calendar_today', handler () { toggleDatetime(); } }]" @blur="blurHandler" align="center" />
-    <q-datetime :ref="name" :value="value" format="DD MMM YYYY" color="white" inverted-light @input="update"
-      hide-underline />
+    <q-datetime :ref="name" :value="value" format="DD MMM YYYY" color="white" inverted-light @input="update" hide-underline />
   </div>
 </template>
 
