@@ -38,11 +38,11 @@
           <ni-modal-select caption="Durée" :error="$v.newEvent.startDuration.$error" :options="dateOptions" v-model="newEvent.startDuration"
             separator />
           <ni-datetime-picker caption="Date de fin" v-model="newEvent.dates.endDate" type="date" :error="$v.newEvent.dates.endDate.$error"
-            inModal />
+            inModal :min="newEvent.dates.startDate" />
           <ni-modal-select caption="Durée" :error="$v.newEvent.endDuration.$error" :options="dateOptions" v-model="newEvent.endDuration"
             separator />
           <ni-modal-select caption="Type d'absence" v-model="newEvent.absence" :options="absenceOptions" :error="$v.newEvent.absence.$error" />
-          <ni-file-uploader caption="Justificatif d'absence" path="attachment" :entity="newEvent" alt="justificatif absence"
+          <ni-file-uploader v-if="newEvent.absence && newEvent.absence === ILLNESS" caption="Justificatif d'absence" path="attachment" :entity="newEvent" alt="justificatif absence"
             name="proofOfAbsence" :url="docsUploadUrl" @uploaded="documentUploaded" :additionalValue="additionalValue"
             :disable="!selectedAuxiliary._id" @delete="deleteDocument(newEvent.attachment.driveId)" withBorders />
         </template>
@@ -151,7 +151,8 @@ import {
   NEVER,
   EVERY_DAY,
   EVERY_WEEK_DAY,
-  EVERY_WEEK
+  EVERY_WEEK,
+  ILLNESS,
 } from '../../../data/constants';
 
 export default {
@@ -183,6 +184,7 @@ export default {
       DELETION,
       CANCELLATION,
       EDITION,
+      ILLNESS,
       editionType: EDITION,
       absenceOptions: ABSENCE_TYPE,
       dateOptions: DATE_OPTIONS,
