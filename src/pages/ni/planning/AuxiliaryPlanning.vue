@@ -8,17 +8,16 @@
     <!-- Event creation modal -->
     <q-modal v-model="creationModal" content-classes="modal-container-md" @hide="resetCreationForm(false)">
       <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5>Création d'un <span class="text-weight-bold">évènement</span></h5>
+        <div class="row q-mb-lg">
+          <div class="col-11 row modal-auxiliay-header">
+            <img :src="getAvatar(selectedAuxiliary.picture.link)" class="avatar">
+            <q-select filter v-model="newEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions" />
           </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
-            <span>
-              <q-icon name="clear" size="1rem" @click.native="creationModal = false" /></span>
+          <div class="col-1 cursor-pointer close-button-modal" style="text-align: right">
+            <span><q-icon name="clear" size="1.5rem" @click.native="creationModal = false" /></span>
           </div>
         </div>
         <q-btn-toggle no-wrap v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions" @input="resetCreationForm(true, newEvent.type)" />
-        <ni-modal-select caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions" :error="$v.newEvent.auxiliary.$error" />
         <template v-if="newEvent.type !== ABSENCE">
           <ni-datetime-range caption="Dates et heures de l'intervention" v-model="newEvent.dates" />
         </template>
@@ -57,13 +56,13 @@
     <!-- Event edition modal -->
     <q-modal v-model="editionModal" content-classes="modal-container-md" @hide="resetEditionForm()">
       <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5>{{ editionModalTitle }}</h5>
+        <div class="row q-mb-lg">
+          <div class="col-11 row modal-auxiliay-header">
+            <img :src="getAvatar(selectedAuxiliary.picture.link)" class="avatar">
+            <q-select filter v-model="editedEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions" />
           </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
-            <span>
-              <q-icon name="clear" size="1rem" @click.native="editionModal = false" /></span>
+          <div class="col-1 cursor-pointer close-button-modal" style="text-align: right">
+            <span><q-icon name="clear" size="1.5rem" @click.native="editionModal = false" /></span>
           </div>
         </div>
         <q-btn-toggle no-wrap v-model="editionType" toggle-color="primary" :options="editionTypeOptions" />
@@ -125,7 +124,7 @@ import ModalInput from '../../../components/form/ModalInput';
 import SearchAddress from '../../../components/form/SearchAddress';
 import FileUploader from '../../../components/form/FileUploader';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify.js';
-import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, ABSENCE_TYPE, DATE_OPTIONS, EDITION, CANCELLATION, DELETION, MORNING, AFTERNOON, ALL_DAY } from '../../../data/constants';
+import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, ABSENCE_TYPE, DATE_OPTIONS, EDITION, CANCELLATION, DELETION, MORNING, AFTERNOON, ALL_DAY, DEFAULT_AVATAR } from '../../../data/constants';
 
 export default {
   name: 'AuxiliaryPlanning',
@@ -251,7 +250,7 @@ export default {
     selectedAuxiliary () {
       if (this.creationModal && this.newEvent.auxiliary !== '') return this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
       if (this.editionModal && this.editedEvent.auxiliary !== '') return this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
-      return {};
+      return { picture: {} };
     },
     auxiliariesOptions () {
       return this.auxiliaries.length === 0 ? [] : this.auxiliaries.map(aux => ({
@@ -379,6 +378,9 @@ export default {
       }
     },
     // Event creation
+    getAvatar (link) {
+      return link || DEFAULT_AVATAR;
+    },
     customerSubscriptionsOptions (customerId) {
       if (!customerId) return [];
       const selectedCustomer = this.customers.find(customer => customer._id === customerId);
@@ -693,5 +695,18 @@ export default {
       border-radius: 20px;
       margin: 5px;
       background-color: $light-grey;
+
+  /deep/ .modal-auxiliay-header
+    .q-if-inverted
+      border: none;
+      font-size: 24px;
+      &.q-if-focused
+        box-shadow: none;
+    .q-input-target
+      line-height: normal
+
+  .close-button-modal
+    display: flex;
+    align-items: center;
 
 </style>

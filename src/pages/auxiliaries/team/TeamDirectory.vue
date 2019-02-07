@@ -29,6 +29,8 @@
 </template>
 
 <script>
+import { DEFAULT_AVATAR } from '../../../data/constants';
+
 export default {
   metaInfo: {
     title: 'Répertoire'
@@ -100,7 +102,7 @@ export default {
       }
     },
     getAvatar (link) {
-      return link || 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/images/users/default_avatar.png';
+      return link || DEFAULT_AVATAR;
     },
     formatPhone (phoneNumber) {
       if (phoneNumber) {

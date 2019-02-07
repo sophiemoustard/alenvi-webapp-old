@@ -46,3 +46,6 @@ export const FUNDING_NATURE_OPTIONS = [
   { label: 'Horaire', value: HOURLY },
   { label: 'Forfaitaire', value: 'fixed' }
 ];
+
+// AVATAR
+export const DEFAULT_AVATAR = 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/images/users/default_avatar.png';

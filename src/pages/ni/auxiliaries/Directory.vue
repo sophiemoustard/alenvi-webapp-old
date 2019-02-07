@@ -113,6 +113,7 @@ import SelectManager from '../../../components/form/SelectManager.vue';
 import NiModalInput from '../../../components/form/ModalInput';
 import NiModalSelect from '../../../components/form/ModalSelect';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../../components/popup/notify.js';
+import { DEFAULT_AVATAR } from '../../../data/constants';
 
 export default {
   metaInfo: {
@@ -319,7 +320,7 @@ export default {
       }
     },
     hasPicture () {
-      return !this.user.picture || (this.user.picture && !this.user.picture.link) ? 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/images/users/default_avatar.png' : this.user.picture.link;
+      return !this.user.picture || (this.user.picture && !this.user.picture.link) ? DEFAULT_AVATAR : this.user.picture.link;
     }
   },
   methods: {
@@ -473,7 +474,7 @@ export default {
       }
     },
     getAvatar (link) {
-      return link || 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/images/users/default_avatar.png';
+      return link || DEFAULT_AVATAR;
     }
   }
 }
