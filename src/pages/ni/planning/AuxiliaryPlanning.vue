@@ -11,10 +11,14 @@
         <div class="row q-mb-lg">
           <div class="col-11 row modal-auxiliay-header">
             <img :src="getAvatar(selectedAuxiliary.picture.link)" class="avatar">
-            <q-select filter v-model="newEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions" />
+            <q-select filter v-model="newEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions" ref="newEventAuxiliarySelect"
+              :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
+              :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`" />
           </div>
           <div class="col-1 cursor-pointer close-button-modal" style="text-align: right">
-            <span><q-icon name="clear" size="1.5rem" @click.native="creationModal = false" /></span>
+            <span>
+              <q-icon name="clear" size="1.5rem" @click.native="creationModal = false" />
+            </span>
           </div>
         </div>
         <q-btn-toggle no-wrap v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions" @input="resetCreationForm(true, newEvent.type)" />
@@ -22,7 +26,8 @@
           <ni-datetime-range caption="Dates et heures de l'intervention" v-model="newEvent.dates" />
         </template>
         <template v-if="newEvent.type === INTERVENTION">
-          <ni-modal-select caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions" :error="$v.newEvent.customer.$error" />
+          <ni-modal-select caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions" :error="$v.newEvent.customer.$error"
+            icon="face" />
           <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions(newEvent.customer)"
             :error="$v.newEvent.subscription.$error" />
           <ni-modal-select caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency" :options="repetitionOptions" />
@@ -59,15 +64,19 @@
         <div class="row q-mb-lg">
           <div class="col-11 row modal-auxiliay-header">
             <img :src="getAvatar(selectedAuxiliary.picture.link)" class="avatar">
-            <q-select filter v-model="editedEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions" />
+            <q-select filter v-model="editedEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions"
+              ref="editedEventAuxiliarySelect" :after="[{ icon: 'face', class: 'select-icon', handler () { toggleAuxiliarySelect(); }, }]"
+              :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`"
+              popupCover=false />
           </div>
           <div class="col-1 cursor-pointer close-button-modal" style="text-align: right">
-            <span><q-icon name="clear" size="1.5rem" @click.native="editionModal = false" /></span>
+            <span>
+              <q-icon name="clear" size="1.5rem" @click.native="editionModal = false" />
+            </span>
           </div>
         </div>
         <q-btn-toggle no-wrap v-model="editionType" toggle-color="primary" :options="editionTypeOptions" />
         <template v-if="editionType === EDITION">
-          <ni-modal-select caption="Auxiliaire" v-model="editedEvent.auxiliary" :options="auxiliariesOptions" :error="$v.editedEvent.auxiliary.$error" />
           <template v-if="editedEvent.type !== ABSENCE">
             <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" />
           </template>
@@ -250,7 +259,7 @@ export default {
     selectedAuxiliary () {
       if (this.creationModal && this.newEvent.auxiliary !== '') return this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
       if (this.editionModal && this.editedEvent.auxiliary !== '') return this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
-      return { picture: {} };
+      return { picture: {}, identity: {} };
     },
     auxiliariesOptions () {
       return this.auxiliaries.length === 0 ? [] : this.auxiliaries.map(aux => ({
@@ -380,6 +389,10 @@ export default {
     // Event creation
     getAvatar (link) {
       return link || DEFAULT_AVATAR;
+    },
+    toggleAuxiliarySelect () {
+      if (this.creationModal) return this.$refs['newEventAuxiliarySelect'].show();
+      if (this.editionModal) return this.$refs['editedEventAuxiliarySelect'].show();
     },
     customerSubscriptionsOptions (customerId) {
       if (!customerId) return [];
@@ -704,6 +717,16 @@ export default {
         box-shadow: none;
     .q-input-target
       line-height: normal
+    .q-icon
+      display: none;
+
+  /deep/ .select-icon
+    display: flex !important;
+    margin: 0 0 0 10px;
+
+  /deep/ .pink-icon
+    color: $primary !important;
+    font-size: 22px;
 
   .close-button-modal
     display: flex;

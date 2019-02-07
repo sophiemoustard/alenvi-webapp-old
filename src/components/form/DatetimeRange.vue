@@ -9,10 +9,10 @@
         <ni-datetime-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" name="start-datetime"
           @blur="blurDateHandler" />
         <q-select :value="value.startHour" @input="update($event, 'startHour')" class="time-item" align="center" autofocus-filter
-          @blur="blurHourHandler" :options="hoursOptions" filter filter-placeholder="08:00" hide-underline popup-cover />
+          @blur="blurHourHandler" :options="hoursOptions" filter :filter-placeholder="value.startHour" hide-underline />
         <p class="delimiter">-</p>
         <q-select :value="value.endHour" @input="update($event, 'endHour')" class="time-item" align="center" autofocus-filter
-          @blur="blurHourHandler" :options="endHourOptions" filter filter-placeholder="10:00" hide-underline popup-cover />
+          @blur="blurHourHandler" :options="endHourOptions" filter :filter-placeholder="value.endHour" hide-underline />
         <ni-datetime-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
           name="end-datetime" @blur="blurDateHandler" />
       </div>
