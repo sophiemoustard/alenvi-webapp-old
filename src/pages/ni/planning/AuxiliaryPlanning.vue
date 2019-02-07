@@ -15,7 +15,7 @@
               ref="newEventAuxiliarySelect" :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
               :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`" />
           </div>
-          <div class="col-1 cursor-pointer close-button-modal">
+          <div class="col-1 cursor-pointer modal-btn-close">
             <span>
               <q-icon name="clear" size="1.5rem" @click.native="creationModal = false" />
             </span>
@@ -60,7 +60,7 @@
         <ni-modal-input v-model="newEvent.misc" caption="Notes" />
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary" @click="createEvent"
-        :disable="disableCreationButton" />
+        :disable="disableCreationButton" icon-right="add" />
     </q-modal>
 
     <!-- Event edition modal -->
@@ -74,7 +74,7 @@
               :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`"
               popupCover=false />
           </div>
-          <div class="col-1 cursor-pointer close-button-modal">
+          <div class="col-1 cursor-pointer modal-btn-close">
             <span>
               <q-icon name="clear" size="1.5rem" @click.native="editionModal = false" />
             </span>
@@ -761,11 +761,6 @@ export default {
   /deep/ .pink-icon
     color: $primary !important;
     font-size: 22px;
-
-  .close-button-modal
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
 
   /deep/ .q-btn-toggle
     @media screen and (max-width: 677px)
