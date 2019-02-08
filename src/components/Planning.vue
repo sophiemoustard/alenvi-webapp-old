@@ -62,7 +62,7 @@ import ChipsAutocomplete from './ChipsAutocomplete';
 export default {
   name: 'PlanningManager',
   components: {
-    'ni-chip': NiChip
+    'ni-chip': NiChip,
     NiChipsAutocomplete: ChipsAutocomplete,
   },
   props: {
