@@ -1,6 +1,7 @@
 <template>
   <div>
     <div :class="['planning-container', 'full-width', 'q-pa-md', { 'q-pl-xl': !toggleDrawer }]">
+      <ni-chips-autocomplete v-model="terms" placeholder="Rechercher un(e) commununauté / auxiliaire" @selected="selectedElements"/>
       <div class="row justify-between items-center q-mb-md">
         <q-btn icon="chevron_left" flat round @click="goToPreviousWeek"></q-btn>
         <span>{{ timelineTitle() }}</span>
@@ -55,11 +56,13 @@
 import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, ABSENCE_TYPE } from '../data/constants';
 import { NotifyNegative } from './popup/notify';
 import NiChip from './Chip';
+import ChipsAutocomplete from './ChipsAutocomplete';
 
 export default {
   name: 'PlanningManager',
   components: {
-    'ni-chip': NiChip
+    'ni-chip': NiChip,
+    NiChipsAutocomplete: ChipsAutocomplete,
   },
   props: {
     events: { type: Array, default: () => [] },
@@ -68,6 +71,7 @@ export default {
   },
   data () {
     return {
+      terms: [],
       loading: false,
       draggedObject: {},
       startOfWeek: '',
@@ -167,6 +171,9 @@ export default {
       } finally {
         this.draggedObject = {};
       }
+    },
+    selectedElements (el) {
+      // Add elements filtered to planning renderer
     }
   }
 }
