@@ -44,8 +44,8 @@
           <div class="col-8">
             <h5>Envoyer un <span class="text-weight-bold">message</span></h5>
           </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
-            <span><q-icon name="clear" size="1rem" @click.native="opened = false" /></span>
+          <div class="col-1 cursor-pointer modal-btn-close">
+            <span><q-icon name="clear" @click.native="opened = false" /></span>
           </div>
         </div>
         <ni-modal-select caption="Modèle" :options="typeMessageOptions" v-model="typeMessage" />

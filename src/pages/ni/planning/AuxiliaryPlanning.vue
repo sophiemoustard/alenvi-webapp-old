@@ -16,8 +16,7 @@
               :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`" />
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
-            <span>
-              <q-icon name="clear" size="1.5rem" @click.native="creationModal = false" />
+            <span><q-icon name="clear" @click.native="creationModal = false" />
             </span>
           </div>
         </div>
@@ -75,8 +74,7 @@
               popupCover=false />
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
-            <span>
-              <q-icon name="clear" size="1.5rem" @click.native="editionModal = false" />
+            <span><q-icon name="clear" @click.native="editionModal = false" />
             </span>
           </div>
         </div>
@@ -117,7 +115,7 @@
         </template>
       </div>
       <q-btn v-if="editionType === EDITION" class="full-width modal-btn" no-caps color="primary" :loading="loading"
-        label="Editer l'évènement" @click="updateEvent" />
+        label="Editer l'évènement" @click="updateEvent" icon-right="check" />
       <q-btn v-if="editionType === CANCELLATION" class="full-width modal-btn" no-caps color="primary" :loading="loading"
         label="Annuler l'évènement" @click="cancelEvent" />
       <q-btn v-if="editionType === DELETION" class="full-width modal-btn" no-caps color="primary" :loading="loading"

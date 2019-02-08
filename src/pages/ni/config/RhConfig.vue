@@ -81,16 +81,15 @@
       </div>
     </div>
 
-     <!-- Service modal -->
+     <!-- Internal hour creation modal -->
     <q-modal v-model="newInternalHourModal" content-classes="modal-container-sm">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
             <h5>Créer une <span class="text-weight-bold">heure interne</span></h5>
           </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
-            <span>
-              <q-icon name="clear" size="1rem" @click.native="newInternalHourModal = false" /></span>
+          <div class="col-1 cursor-pointer modal-btn-close">
+            <span><q-icon name="clear" @click.native="newInternalHourModal = false" /></span>
           </div>
         </div>
         <ni-modal-input caption="Nom" v-model="newInternalHour.name" :error="$v.newInternalHour.name.$error" @blur="$v.newInternalHour.name.$touch" />

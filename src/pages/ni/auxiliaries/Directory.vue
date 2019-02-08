@@ -45,13 +45,13 @@
           <div class="col-8">
             <h5>Créer une nouvelle <span class="text-weight-bold">fiche auxiliaire</span></h5>
           </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
+          <div class="col-1 cursor-pointer modal-btn-close">
             <span>
-              <q-icon name="clear" size="1rem" @click.native="opened = false" /></span>
+              <q-icon name="clear" @click.native="opened = false" /></span>
           </div>
         </div>
-        <ni-modal-select v-model="newUser.identity.title" :error="$v.newUser.identity.title.$error" :options="civilityOptions" caption="Civilité"
-          @blur="$v.newUser.identity.title.$touch" errorLabel="Champ requis" requiredField />
+        <ni-modal-select v-model="newUser.identity.title" :error="$v.newUser.identity.title.$error" :options="civilityOptions"
+          caption="Civilité" @blur="$v.newUser.identity.title.$touch" errorLabel="Champ requis" requiredField />
         <ni-modal-input v-model="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error" caption="Nom"
           @blur="$v.newUser.identity.lastname.$touch" errorLabel="Champ requis" requiredField />
         <ni-modal-input v-model="newUser.identity.firstname" :error="$v.newUser.identity.firstname.$error" caption="Prénom"
@@ -62,10 +62,10 @@
           @blur="$v.newUser.contact.address.$touch" errorLabel="Champ requis" requiredField />
         <ni-modal-input v-model="newUser.contact.zipCode" :error="$v.newUser.contact.zipCode.$error" caption="Code postal"
           @blur="$v.newUser.contact.zipCode.$touch" :errorLabel="zipCodeError" requiredField />
-        <ni-modal-input v-model="newUser.contact.city" :error="$v.newUser.contact.city.$error" caption="Ville"
-          @blur="$v.newUser.contact.city.$touch" errorLabel="Champ requis" requiredField />
-        <ni-modal-input v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email"
-          @blur="$v.newUser.local.email.$touch" :errorLabel="emailError" requiredField />
+        <ni-modal-input v-model="newUser.contact.city" :error="$v.newUser.contact.city.$error" caption="Ville" @blur="$v.newUser.contact.city.$touch"
+          errorLabel="Champ requis" requiredField />
+        <ni-modal-input v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email" @blur="$v.newUser.local.email.$touch"
+          :errorLabel="emailError" requiredField />
         <div class="row margin-input">
           <div class="col-12">
             <div class="row justify-between">
