@@ -19,7 +19,7 @@
         <tbody>
           <tr class="person-row" v-for="(person, index) in persons" :key="index">
             <td valign="top">
-              <div class="q-my-md">
+              <div class="q-my-sm">
                 <div class="q-mb-md">
                   <ni-chip :data="person"></ni-chip>
                 </div>
@@ -31,7 +31,7 @@
             <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
               @click="$emit('createEvent', { dayIndex, person })" >
               <template v-for="(event, eventIndex) in getOneDayAuxiliaryEvents(person, days[dayIndex])">
-                <div :id="event._id" draggable @dragstart="drag(event._id)" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-md']"
+                <div :id="event._id" draggable @dragstart="drag(event._id)" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-sm']"
                   :key="eventIndex" @click.stop="$emit('editEvent', event._id)">
                   <div class="col-12 event-title">
                     <p v-if="event.type === INTERVENTION" class="no-margin ellipsis">{{ event.customer.identity.title }} {{
