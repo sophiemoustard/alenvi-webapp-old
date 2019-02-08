@@ -1,14 +1,12 @@
 <template>
   <div>
     <div class="planning-container full-width q-pa-md">
+      <ni-chips-autocomplete v-model="terms" placeholder="Rechercher un(e) commununauté / auxiliaire" @selected="selectedElements"/>
       <div class="row justify-between items-center q-mb-md">
         <q-btn icon="chevron_left" flat round @click="goToPreviousWeek"></q-btn>
         <span>{{ timelineTitle() }}</span>
         <q-btn icon="chevron_right" flat round @click="goToNextWeek"></q-btn>
       </div>
-      <q-chips-input v-model="terms" placeholder="Rechercher un(e) commununauté / auxiliaire">
-        <q-autocomplete @search="search" @selected="selected" />
-      </q-chips-input>
       <table style="width: 100%">
         <thead>
           <th></th>
@@ -41,10 +39,13 @@
 <script>
 import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, ABSENCE_TYPE } from '../data/constants';
 import { NotifyNegative } from './popup/notify';
-import { filter } from 'quasar'
+import ChipsAutocomplete from './ChipsAutocomplete';
 
 export default {
   name: 'PlanningManager',
+  components: {
+    NiChipsAutocomplete: ChipsAutocomplete,
+  },
   props: {
     events: { type: Array, default: () => [] },
     customers: { type: Array, default: () => [] },
@@ -53,7 +54,6 @@ export default {
   data () {
     return {
       terms: [],
-      toFilter: [],
       loading: false,
       draggedObject: {},
       startOfWeek: '',
@@ -74,7 +74,6 @@ export default {
     this.startOfWeek = this.$moment().startOf('week');
     this.getTimelineDays();
     this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
-    this.initFilter();
   },
   methods: {
     // Table
@@ -135,46 +134,8 @@ export default {
         this.draggedObject = {};
       }
     },
-    async search (terms, done) {
-      try {
-        console.log('searched');
-        done(filter(terms, {field: 'searchValue', list: this.toFilter}));
-      } catch (e) {
-        console.error(e);
-        done([]);
-      }
-    },
-    selected (selected) {
-      console.log(selected);
-      console.log('selected');
-    },
-    async initFilter () {
-      try {
-        await this.addAuxiliariesToFilter();
-        await this.addSectorsToFilter();
-        console.log(this.toFilter);
-      } catch (e) {
-        console.error(e);
-      }
-    },
-    async addSectorsToFilter () {
-      const allSectorsRaw = await this.$ogust.getList('employee.sector');
-      for (const k in allSectorsRaw) {
-        if (k === '*') {
-          continue;
-        }
-        this.toFilter.push({
-          label: allSectorsRaw[k],
-          value: k
-        });
-      }
-    },
-    async addAuxiliariesToFilter () {
-      this.toFilter = await this.$users.showAll({ 'role': 'Auxiliaire' });
-      for (let i = 0, l = this.toFilter.length; i < l; i++) {
-        this.toFilter[i].searchValue = `${this.toFilter[i].identity.firstname} ${this.toFilter[i].identity.lastname}`;
-        this.toFilter[i].label = `${this.toFilter[i].identity.firstname} ${this.toFilter[i].identity.lastname}`;
-      }
+    selectedElements (el) {
+      // Add elements filtered to planning renderer
     }
   }
 }
