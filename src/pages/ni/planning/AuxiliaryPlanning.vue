@@ -111,10 +111,15 @@
         <template v-if="editedEvent.type === INTERNAL_HOUR">
           <ni-modal-select caption="Type d'heure interne" v-model="editedEvent.internalHour" :options="internalHourOptions"
             :error="$v.editedEvent.internalHour.$error" />
+          <ni-search-address v-model="editedEvent.location.fullAddress" @selected="selectedAddress" @blur="$v.editedEvent.location.fullAddress.$touch"
+            :error="$v.editedEvent.location.fullAddress.$error" :error-label="addressError" inModal />
         </template>
-        <ni-search-address v-model="editedEvent.location.fullAddress" @selected="selectedAddress" @blur="$v.editedEvent.location.fullAddress.$touch"
-          :error="$v.editedEvent.location.fullAddress.$error" :error-label="addressError" inModal />
         <ni-modal-input v-model="editedEvent.misc" caption="Notes" />
+      </div>
+      <div v-if="editedEvent.type === INTERVENTION" class="cutomer-info">
+        <p class="input-caption">Infos bénéficiaire</p>
+        <div>{{ editedEvent.customer.contact.address.fullAddress }}</div>
+        <!-- <q-input v-model="" caption="Infos bénéficiaire" disable /> -->
       </div>
       <q-btn class="full-width modal-btn" no-caps color="primary" :loading="loading" label="Editer l'évènement" @click="updateEvent" icon-right="check" />
     </q-modal>
@@ -786,4 +791,10 @@ export default {
       flex-direction: row;
       align-items: center;
 
+  .cutomer-info
+    background: $light-grey
+    padding: 10px 25px 20px
+    /deep/ .q-if-inverted
+      background: $light-grey !important;
+      border: none
 </style>
