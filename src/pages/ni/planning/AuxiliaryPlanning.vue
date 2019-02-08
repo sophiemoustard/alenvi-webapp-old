@@ -74,7 +74,7 @@
           <div class="col-11 row modal-auxiliay-header">
             <img :src="getAvatar(selectedAuxiliary.picture.link)" class="avatar">
             <q-select filter v-model="editedEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions"
-              ref="editedEventAuxiliarySelect" :after="[{ icon: 'face', class: 'select-icon', handler () { toggleAuxiliarySelect(); }, }]"
+              ref="editedEventAuxiliarySelect" :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
               :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`"
               popupCover=false />
           </div>
@@ -83,48 +83,43 @@
             </span>
           </div>
         </div>
-        <q-btn-toggle no-wrap v-model="editionType" toggle-color="primary" :options="editionTypeOptions" />
-        <template v-if="editionType === EDITION">
-          <template v-if="editedEvent.type !== ABSENCE">
-            <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" />
-          </template>
-          <template v-if="editedEvent.type === INTERVENTION">
-            <ni-modal-select caption="Service" v-model="editedEvent.subscription" :options="customerSubscriptionsOptions(editedEvent.customer._id)"
-              :error="$v.editedEvent.subscription.$error" />
-          </template>
-          <template v-if="editedEvent.type === ABSENCE">
-            <ni-datetime-picker caption="Date de debut" v-model="editedEvent.dates.startDate" type="date" :error="$v.editedEvent.dates.startDate.$error"
-              inModal />
-            <ni-modal-select caption="Durée" :error="$v.editedEvent.startDuration.$error" :options="dateOptions"
-              v-model="editedEvent.startDuration" separator />
-            <ni-datetime-picker caption="Date de fin" v-model="editedEvent.dates.endDate" type="date" :error="$v.editedEvent.dates.endDate.$error"
-              inModal />
-            <ni-modal-select caption="Durée" :error="$v.editedEvent.endDuration.$error" :options="dateOptions" v-model="editedEvent.endDuration"
-              separator />
-            <ni-modal-select caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions" :error="$v.editedEvent.absence.$error" />
-            <ni-file-uploader caption="Justificatif d'absence" path="attachment" :entity="editedEvent" alt="justificatif absence"
-              name="proofOfAbsence" :url="docsUploadUrl" @uploaded="documentUploaded" :additionalValue="additionalValue"
-              :disable="!selectedAuxiliary._id" @delete="deleteDocument(editedEvent.attachment.driveId)" withBorders />
-          </template>
-          <template v-if="editedEvent.type === INTERNAL_HOUR">
-            <ni-modal-select caption="Type d'heure interne" v-model="editedEvent.internalHour" :options="internalHourOptions"
-              :error="$v.editedEvent.internalHour.$error" />
-          </template>
-          <ni-search-address v-model="editedEvent.location.fullAddress" @selected="selectedAddress" @blur="$v.editedEvent.location.fullAddress.$touch"
-            :error="$v.editedEvent.location.fullAddress.$error" :error-label="addressError" inModal />
-          <ni-modal-input v-model="editedEvent.misc" caption="Notes" />
+        <div class="modal-subtitle" style="display: flex">
+          <q-btn-toggle no-wrap v-model="editedEvent.type" toggle-color="primary" :options="[{ label: editedEvent.type, value: editedEvent.type }]" />
+          <div class="delete-action" style="display: flex" @click="deleteEvent">
+            <span>Supprimer l'évènement</span>
+            <q-btn flat round small color="grey" icon="delete"/>
+          </div>
+        </div>
+        <template v-if="editedEvent.type !== ABSENCE">
+          <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" />
         </template>
-        <template v-else-if="editionType === CANCELLATION">
+        <template v-if="editedEvent.type === INTERVENTION">
+          <ni-modal-select caption="Service" v-model="editedEvent.subscription" :options="customerSubscriptionsOptions(editedEvent.customer._id)"
+            :error="$v.editedEvent.subscription.$error" />
         </template>
-        <template v-else-if="editionType === DELETION">
+        <template v-if="editedEvent.type === ABSENCE">
+          <ni-datetime-picker caption="Date de debut" v-model="editedEvent.dates.startDate" type="date" :error="$v.editedEvent.dates.startDate.$error"
+            inModal />
+          <ni-modal-select caption="Durée" :error="$v.editedEvent.startDuration.$error" :options="dateOptions"
+            v-model="editedEvent.startDuration" separator />
+          <ni-datetime-picker caption="Date de fin" v-model="editedEvent.dates.endDate" type="date" :error="$v.editedEvent.dates.endDate.$error"
+            inModal />
+          <ni-modal-select caption="Durée" :error="$v.editedEvent.endDuration.$error" :options="dateOptions" v-model="editedEvent.endDuration"
+            separator />
+          <ni-modal-select caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions" :error="$v.editedEvent.absence.$error" />
+          <ni-file-uploader caption="Justificatif d'absence" path="attachment" :entity="editedEvent" alt="justificatif absence"
+            name="proofOfAbsence" :url="docsUploadUrl" @uploaded="documentUploaded" :additionalValue="additionalValue"
+            :disable="!selectedAuxiliary._id" @delete="deleteDocument(editedEvent.attachment.driveId)" withBorders />
         </template>
+        <template v-if="editedEvent.type === INTERNAL_HOUR">
+          <ni-modal-select caption="Type d'heure interne" v-model="editedEvent.internalHour" :options="internalHourOptions"
+            :error="$v.editedEvent.internalHour.$error" />
+        </template>
+        <ni-search-address v-model="editedEvent.location.fullAddress" @selected="selectedAddress" @blur="$v.editedEvent.location.fullAddress.$touch"
+          :error="$v.editedEvent.location.fullAddress.$error" :error-label="addressError" inModal />
+        <ni-modal-input v-model="editedEvent.misc" caption="Notes" />
       </div>
-      <q-btn v-if="editionType === EDITION" class="full-width modal-btn" no-caps color="primary" :loading="loading"
-        label="Editer l'évènement" @click="updateEvent" icon-right="check" />
-      <q-btn v-if="editionType === CANCELLATION" class="full-width modal-btn" no-caps color="primary" :loading="loading"
-        label="Annuler l'évènement" @click="cancelEvent" />
-      <q-btn v-if="editionType === DELETION" class="full-width modal-btn" no-caps color="primary" :loading="loading"
-        label="Supprimer l'évènement" @click="deleteEvent" />
+      <q-btn class="full-width modal-btn" no-caps color="primary" :loading="loading" label="Editer l'évènement" @click="updateEvent" icon-right="check" />
     </q-modal>
   </q-page>
 </template>
@@ -148,9 +143,6 @@ import {
   INTERNAL_HOUR,
   ABSENCE_TYPE,
   DATE_OPTIONS,
-  EDITION,
-  CANCELLATION,
-  DELETION,
   MORNING,
   AFTERNOON,
   ALL_DAY,
@@ -190,11 +182,7 @@ export default {
       UNAVAILABILITY,
       ABSENCE,
       INTERNAL_HOUR,
-      DELETION,
-      CANCELLATION,
-      EDITION,
       ILLNESS,
-      editionType: EDITION,
       absenceOptions: ABSENCE_TYPE,
       dateOptions: DATE_OPTIONS,
       internalHours: [],
@@ -236,12 +224,15 @@ export default {
         dates: {},
         repetition: {},
       },
+<<<<<<< HEAD
       editionTypeOptions: [
         {label: 'Edition', value: EDITION},
         {label: 'Annulation', value: CANCELLATION},
         {label: 'Suppression', value: DELETION},
       ],
       terms: []
+=======
+>>>>>>> [146] Remove edition options type
     };
   },
   validations: {
@@ -619,7 +610,6 @@ export default {
       this.editionModal = true
     },
     resetEditionForm () {
-      this.editionType = EDITION;
       this.$v.editedEvent.$reset();
       this.editedEvent = {
         subscription: {},
