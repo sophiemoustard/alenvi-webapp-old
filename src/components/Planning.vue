@@ -56,7 +56,6 @@
 import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, ABSENCE_TYPE } from '../data/constants';
 import { NotifyNegative } from './popup/notify';
 import NiChip from './Chip';
-import { filter } from 'quasar'
 import ChipsAutocomplete from './ChipsAutocomplete';
 
 export default {
