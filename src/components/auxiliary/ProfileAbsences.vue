@@ -28,15 +28,16 @@
     </q-card>
     <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="ion-document" label="Enregistrer une absence"
       @click="newAbsenceModal = true" />
+
+    <!-- Absence creation modal -->
     <q-modal v-model="newAbsenceModal" content-classes="modal-container-sm">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
             <h5>Créer une <span class="text-weight-bold">absence</span></h5>
           </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
-            <span>
-              <q-icon name="clear" size="1rem" @click.native="newAbsenceModal = false" /></span>
+          <div class="col-1 cursor-pointer modal-btn-close">
+            <span><q-icon name="clear" @click.native="newAbsenceModal = false" /></span>
           </div>
         </div>
         <ni-modal-select caption="Type d'absence" :error="$v.newAbsence.reason.$error" :options="reasonOptions" v-model="newAbsence.reason"

@@ -15,9 +15,8 @@
               ref="newEventAuxiliarySelect" :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
               :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`" />
           </div>
-          <div class="col-1 cursor-pointer close-button-modal" style="text-align: right">
-            <span>
-              <q-icon name="clear" size="1.5rem" @click.native="creationModal = false" />
+          <div class="col-1 cursor-pointer modal-btn-close">
+            <span><q-icon name="clear" @click.native="creationModal = false" />
             </span>
           </div>
         </div>
@@ -60,7 +59,7 @@
         <ni-modal-input v-model="newEvent.misc" caption="Notes" />
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary" @click="createEvent"
-        :disable="disableCreationButton" />
+        :disable="disableCreationButton" icon-right="add" />
     </q-modal>
 
     <!-- Event edition modal -->
@@ -74,9 +73,8 @@
               :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`"
               popupCover=false />
           </div>
-          <div class="col-1 cursor-pointer close-button-modal" style="text-align: right">
-            <span>
-              <q-icon name="clear" size="1.5rem" @click.native="editionModal = false" />
+          <div class="col-1 cursor-pointer modal-btn-close">
+            <span><q-icon name="clear" @click.native="editionModal = false" />
             </span>
           </div>
         </div>
@@ -117,7 +115,7 @@
         </template>
       </div>
       <q-btn v-if="editionType === EDITION" class="full-width modal-btn" no-caps color="primary" :loading="loading"
-        label="Editer l'évènement" @click="updateEvent" />
+        label="Editer l'évènement" @click="updateEvent" icon-right="check" />
       <q-btn v-if="editionType === CANCELLATION" class="full-width modal-btn" no-caps color="primary" :loading="loading"
         label="Annuler l'évènement" @click="cancelEvent" />
       <q-btn v-if="editionType === DELETION" class="full-width modal-btn" no-caps color="primary" :loading="loading"
@@ -195,9 +193,9 @@ export default {
       internalHours: [],
       eventTypeOptions: [
         {label: 'Intervention', value: INTERVENTION},
+        {label: 'Interne', value: INTERNAL_HOUR},
         {label: 'Absence', value: ABSENCE},
-        {label: 'Heure interne', value: INTERNAL_HOUR},
-        {label: 'Indisponibilité', value: UNAVAILABILITY}
+        {label: 'Indispo', value: UNAVAILABILITY}
       ],
       // Event Creation
       creationModal: false,
@@ -744,15 +742,24 @@ export default {
       background-color: $light-grey;
 
   /deep/ .modal-auxiliay-header
+    align-items: center
     .q-if-inverted
       border: none;
       font-size: 24px;
+      margin-left: 3px;
       &.q-if-focused
         box-shadow: none;
+      @media screen and (max-width: 677px)
+        font-size: 20px;
+        padding: 7px;
     .q-input-target
       line-height: normal
     .q-icon
       display: none;
+    .avatar
+      @media screen and (max-width: 677px)
+        height: 30px
+        width: 30px
 
   /deep/ .select-icon
     display: flex !important;
@@ -762,8 +769,10 @@ export default {
     color: $primary !important;
     font-size: 22px;
 
-  .close-button-modal
-    display: flex;
-    align-items: center;
-
+  /deep/ .q-btn-toggle
+    @media screen and (max-width: 677px)
+      display: inline-flex;
+      flex-wrap: wrap;
+      & .q-btn
+        width: 45%
 </style>

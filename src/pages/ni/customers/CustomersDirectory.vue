@@ -32,15 +32,16 @@
     </q-table>
     <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Ajouter un bénéficiaire"
       @click="opened = true" />
+
+    <!-- Customer creation modal -->
     <q-modal v-model="opened" @hide="resetForm" content-classes="modal-container-sm">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-8">
             <h5>Créer une nouvelle <span class="text-weight-bold">fiche bénéficiaire</span></h5>
           </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
-            <span>
-              <q-icon name="clear" size="1rem" @click.native="opened = false" /></span>
+          <div class="col-1 cursor-pointer modal-btn-close">
+            <span><q-icon name="clear" @click.native="opened = false" /></span>
           </div>
         </div>
         <ni-modal-select v-model="newCustomer.identity.title" :error="$v.newCustomer.identity.title.$error" :options="civilityOptions"

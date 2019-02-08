@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="displayCaption && displayUpload" class="row justify-between">
-      <p class="input-caption">{{ caption }}</p>
+      <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <div v-if="document && document.driveId" class="row justify-between" style="background: white">
@@ -47,6 +47,7 @@ export default {
     disable: { type: Boolean, default: false },
     withBorders: { type: Boolean, default: false },
     extensions: { type: String, default: '' },
+    requiredField: { type: Boolean, default: false },
   },
   methods: {
     deleteDocument () {

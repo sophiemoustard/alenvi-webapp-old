@@ -87,9 +87,8 @@
           <div class="col-11">
             <h5>Créer un <span class="text-weight-bold">service</span></h5>
           </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
-            <span>
-              <q-icon name="clear" size="1rem" @click.native="serviceCreationModal = false" /></span>
+          <div class="col-1 cursor-pointer modal-btn-close">
+            <span><q-icon name="clear" @click.native="serviceCreationModal = false" /></span>
           </div>
         </div>
         <ni-modal-input caption="Nom" v-model="newService.name" :error="$v.newService.name.$error" @blur="$v.newService.name.$touch" />
@@ -112,9 +111,8 @@
           <div class="col-11">
             <h5>Éditer le <span class="text-weight-bold">service</span></h5>
           </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
-            <span>
-              <q-icon name="clear" size="1rem" @click.native="serviceEditionModal = false" /></span>
+          <div class="col-1 cursor-pointer modal-btn-close">
+            <span><q-icon name="clear" @click.native="serviceEditionModal = false" /></span>
           </div>
         </div>
         <ni-datetime-picker caption="Date d'effet" v-model="editedService.startDate" :error="$v.editedService.startDate.$error"
@@ -126,7 +124,7 @@
         <ni-modal-input caption="Majoration dimanche/jours fériés" suffix="%" type="number" v-model="editedService.holidaySurcharge" />
         <ni-modal-input caption="Majoration soirée" suffix="%" type="number" v-model="editedService.eveningSurcharge" />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Editer le service" icon-right="add" color="primary" :loading="loading" @click="updateService"
+      <q-btn no-caps class="full-width modal-btn" label="Editer le service" icon-right="check" color="primary" :loading="loading" @click="updateService"
         :disable="disableEditionButton" />
     </q-modal>
 
@@ -137,9 +135,8 @@
           <div class="col-11">
             <h5>Historique du service <span class="text-weight-bold">{{selectedService.name}}</span></h5>
           </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
-            <span>
-              <q-icon name="clear" size="1rem" @click.native="serviceHistoryModal = false" /></span>
+          <div class="col-1 cursor-pointer modal-btn-close">
+            <span><q-icon name="clear" @click.native="serviceHistoryModal = false" /></span>
           </div>
         </div>
         <q-table class="q-mb-xl table-responsive" :data="selectedService.versions" :columns="serviceColumns" hide-bottom binary-state-sort :pagination.sync="paginationHistory"
@@ -158,9 +155,8 @@
           <div class="col-11">
             <h5>Ajouter un <span class="text-weight-bold">tiers payeur</span></h5>
           </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
-            <span>
-              <q-icon name="clear" size="1rem" @click.native="thirdPartyPayerCreationModal = false" /></span>
+          <div class="col-1 cursor-pointer modal-btn-close">
+            <span><q-icon name="clear" @click.native="thirdPartyPayerCreationModal = false" /></span>
           </div>
         </div>
         <ni-modal-input caption="Nom" v-model="newThirdPartyPayer.name" :error="$v.newThirdPartyPayer.name.$error" @blur="$v.newThirdPartyPayer.name.$touch"
@@ -184,9 +180,8 @@
           <div class="col-11">
             <h5>Editer le <span class="text-weight-bold">tiers payeur</span></h5>
           </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
-            <span>
-              <q-icon name="clear" size="1rem" @click.native="thirdPartyPayerEditionModal = false" /></span>
+          <div class="col-1 cursor-pointer modal-btn-close">
+            <span><q-icon name="clear" @click.native="thirdPartyPayerEditionModal = false" /></span>
           </div>
         </div>
         <ni-modal-input caption="Nom" v-model="editedThirdPartyPayer.name" :error="$v.editedThirdPartyPayer.name.$error"
@@ -199,7 +194,7 @@
           :error="$v.editedThirdPartyPayer.unitTTCRate.$error" error-label="Le prix unitaire doit être positif"/>
         <ni-modal-select v-model="editedThirdPartyPayer.billingMode" :options="billingModeOptions" caption="Facturation" :filter="false" />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Editer le tiers payeur" icon-right="add" color="primary" :loading="loading" @click="updateThirdPartyPayer" />
+      <q-btn no-caps class="full-width modal-btn" label="Editer le tiers payeur" icon-right="check" color="primary" :loading="loading" @click="updateThirdPartyPayer" />
     </q-modal>
   </q-page>
 </template>

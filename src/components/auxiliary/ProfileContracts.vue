@@ -83,9 +83,8 @@
           <div class="col-11">
             <h5>Créer un <span class="text-weight-bold">nouveau contrat</span></h5>
           </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
-            <span>
-              <q-icon name="clear" size="1rem" @click.native="newContractModal = false" /></span>
+          <div class="col-1 cursor-pointer modal-btn-close">
+            <span><q-icon name="clear" @click.native="newContractModal = false" /></span>
           </div>
         </div>
         <ni-modal-select caption="Statut" :error="$v.newContract.status.$error" :options="statusOptions" v-model="newContract.status"
@@ -108,9 +107,8 @@
           <div class="col-11">
             <h5>Créer une <span class="text-weight-bold">version</span></h5>
           </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
-            <span>
-              <q-icon name="clear" size="1rem" @click.native="newContractVersionModal = false" /></span>
+          <div class="col-1 cursor-pointer modal-btn-close">
+            <span><q-icon name="clear" @click.native="newContractVersionModal = false" /></span>
           </div>
         </div>
         <ni-modal-input caption="Volume horaire hebdomadaire" :error="$v.newContractVersion.weeklyHours.$error" v-model="newContractVersion.weeklyHours"
@@ -132,8 +130,7 @@
             <h5>Terminer un <span class="text-weight-bold">contrat</span></h5>
           </div>
           <div class="col-1 cursor-pointer" style="text-align: right">
-            <span>
-              <q-icon name="clear" size="1rem" @click.native="endContractModal = false" /></span>
+            <span><q-icon name="clear" @click.native="endContractModal = false" /></span>
           </div>
         </div>
         <ni-datetime-picker caption="Date de fin de contrat" v-model="endContractData.date" :min="minEndContractDate"

@@ -74,7 +74,7 @@
     <q-modal v-model="newESignModal" @hide="checkMandates" content-classes="e-sign-modal-container">
       <q-modal-layout>
         <q-toolbar class="no-shadow row justify-end toolbar-padding" color="black" inverted slot="header">
-          <q-icon class="cursor-pointer" name="clear" size="1rem" @click.native="newESignModal = false" />
+          <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="newESignModal = false" />
         </q-toolbar>
         <iframe :src="embeddedUrl" frameborder="0" class="iframe-normal"></iframe>
       </q-modal-layout>
@@ -85,7 +85,7 @@
       <q-modal-layout>
         <q-toolbar class="no-shadow row justify-between toolbar-padding" color="black" inverted slot="header">
           <h5 class="no-margin">Conditions Générales de Service Alenvi</h5>
-          <q-icon class="cursor-pointer" name="clear" size="1rem" @click.native="cgsModal = false" />
+          <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="cgsModal = false" />
         </q-toolbar>
         <div v-html="cgs" class="modal-padding"></div>
       </q-modal-layout>
@@ -99,9 +99,8 @@
             <h5>Historique de la souscription <span class="text-weight-bold">{{selectedSubscription.service &&
                 selectedSubscription.service.name}}</span></h5>
           </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
-            <span>
-              <q-icon name="clear" size="1rem" @click.native="subscriptionHistoryModal = false" /></span>
+          <div class="col-1 cursor-pointer modal-btn-close">
+            <span><q-icon name="clear" @click.native="subscriptionHistoryModal = false" /></span>
           </div>
         </div>
         <q-table class="q-mb-xl table-responsive" :data="selectedSubscription.versions" :columns="subscriptionHistoryColumns"
@@ -123,9 +122,8 @@
           <div class="col-11">
             <h5 class="text-weight-bold">Financement</h5>
           </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
-            <span>
-              <q-icon name="clear" size="1rem" @click.native="fundingModal = false" />
+          <div class="col-1 cursor-pointer modal-btn-close">
+            <span><q-icon name="clear" @click.native="fundingModal = false" />
             </span>
           </div>
         </div>

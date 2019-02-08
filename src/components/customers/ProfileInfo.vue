@@ -213,8 +213,8 @@
           <div class="col-8">
             <h5>Ajouter une <span class="text-weight-bold">personne</span></h5>
           </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
-            <span><q-icon name="clear" size="1rem" @click.native="addHelper = false" /></span>
+          <div class="col-1 cursor-pointer modal-btn-close">
+            <span><q-icon name="clear" @click.native="addHelper = false" /></span>
           </div>
         </div>
         <ni-modal-input v-model="newHelper.identity.lastname" :error="$v.newHelper.identity.lastname.$error" caption="Nom"
@@ -233,8 +233,8 @@
           <div class="col-8">
             <h5>Ajouter une <span class="text-weight-bold">souscription</span></h5>
           </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
-            <span><q-icon name="clear" size="1rem" @click.native="subscriptionCreationModal = false" /></span>
+          <div class="col-1 cursor-pointer modal-btn-close">
+            <span><q-icon name="clear" @click.native="subscriptionCreationModal = false" /></span>
           </div>
         </div>
         <ni-modal-select caption="Service" :options="serviceOptions" v-model="newSubscription.service" :error="$v.newSubscription.service.$error"
@@ -260,9 +260,8 @@
           <div class="col-11">
             <h5>Editer la <span class="text-weight-bold">souscription</span></h5>
           </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
-            <span>
-              <q-icon name="clear" size="1rem" @click.native="subscriptionEditionModal = false" /></span>
+          <div class="col-1 cursor-pointer modal-btn-close">
+            <span><q-icon name="clear" @click.native="subscriptionEditionModal = false" /></span>
           </div>
         </div>
         <ni-datetime-picker v-model="editedSubscription.startDate" :error="$v.editedSubscription.startDate.$error" caption="Dated'effet"
@@ -274,7 +273,7 @@
         <ni-modal-input v-if="editedSubscription.nature !== 'Forfaitaire'" v-model="editedSubscription.sundays" caption="Dont dimanche (h)" type="number" />
         <ni-modal-input v-if="editedSubscription.nature !== 'Forfaitaire'" v-model="editedSubscription.evenings" caption="Dont soirée (h)" last type="number" />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Editer la souscription" icon-right="add" color="primary" :loading="loading" @click="updateSubscription" />
+      <q-btn no-caps class="full-width modal-btn" label="Editer la souscription" icon-right="check" color="primary" :loading="loading" @click="updateSubscription" />
     </q-modal>
 
     <!-- Subscription history modal -->
@@ -284,9 +283,8 @@
           <div class="col-11">
             <h5>Historique de la souscription <span class="text-weight-bold">{{selectedSubscription.service && selectedSubscription.service.name}}</span></h5>
           </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
-            <span>
-              <q-icon name="clear" size="1rem" @click.native="subscriptionHistoryModal = false" /></span>
+          <div class="col-1 cursor-pointer modal-btn-close">
+            <span><q-icon name="clear" @click.native="subscriptionHistoryModal = false" /></span>
           </div>
         </div>
         <q-table class="q-mb-xl table-responsive" :data="selectedSubscription.versions" :columns="subscriptionHistoryColumns" hide-bottom binary-state-sort
@@ -308,9 +306,8 @@
           <div class="col-11">
             <h5>Détail du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span></h5>
           </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
-            <span>
-              <q-icon name="clear" size="1rem" @click.native="fundingDetailsModal = false" /></span>
+          <div class="col-1 cursor-pointer modal-btn-close">
+            <span><q-icon name="clear" @click.native="fundingDetailsModal = false" /></span>
           </div>
         </div>
         <q-table class="q-mb-xl table-grid" :data="fundingDetailsData" :columns="fundingColumns" hide-bottom binary-state-sort
@@ -331,9 +328,8 @@
           <div class="col-11">
             <h5>Historique du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span></h5>
           </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
-            <span>
-              <q-icon name="clear" size="1rem" @click.native="fundingHistoryModal = false" /></span>
+          <div class="col-1 cursor-pointer modal-btn-close">
+            <span><q-icon name="clear" @click.native="fundingHistoryModal = false" /></span>
           </div>
         </div>
         <q-table class="q-mb-xl table-grid" :data="selectedFunding.versions" :columns="fundingColumns" hide-bottom binary-state-sort
@@ -355,8 +351,8 @@
           <div class="col-8">
             <h5>Ajouter un <span class="text-weight-bold">financement</span></h5>
           </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
-            <span><q-icon name="clear" size="1rem" @click.native="fundingCreationModal = false" /></span>
+          <div class="col-1 cursor-pointer modal-btn-close">
+            <span><q-icon name="clear" @click.native="fundingCreationModal = false" /></span>
           </div>
         </div>
         <ni-modal-select caption="Tiers payeur" :options="fundingTppOptions" v-model="newFunding.thirdPartyPayer" :error="$v.newFunding.thirdPartyPayer.$error"
@@ -394,8 +390,8 @@
           <div class="col-8">
             <h5>Modifier le <span class="text-weight-bold">financement</span></h5>
           </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
-            <span><q-icon name="clear" size="1rem" @click.native="fundingEditionModal = false" /></span>
+          <div class="col-1 cursor-pointer modal-btn-close">
+            <span><q-icon name="clear" @click.native="fundingEditionModal = false" /></span>
           </div>
         </div>
         <ni-datetime-picker v-model="editedFunding.startDate" caption="Date de début de prise en charge" :max="editedFundingMaxStartDate" class="last"
@@ -416,7 +412,7 @@
         <ni-option-group v-model="editedFunding.careDays" :options="daysOptions" caption="Jours pris en charge" type="checkbox" inline
           @blur="$v.editedFunding.careDays.$touch" :error="$v.editedFunding.careDays.$error" requiredField />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Modifier le financement" icon-right="add" color="primary" :loading="loading"
+      <q-btn no-caps class="full-width modal-btn" label="Modifier le financement" icon-right="check" color="primary" :loading="loading"
         @click="editFunding" />
     </q-modal>
   </div>
