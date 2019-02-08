@@ -1,7 +1,7 @@
 <template>
   <div class="full-width row relative-position">
-    <img :src="avatar" class="avatar">
-    <q-chip class="absolute-center" small text-color="white">TEST</q-chip>
+    <img :src="getAvatar(data.picture.link)" class="avatar">
+    <q-chip :class="['absolute-center', { 'busy': isBusy }]" small text-color="white">{{ this.currentHours }}h / {{ weeklyHours }}</q-chip>
   </div>
 </template>
 
@@ -9,7 +9,41 @@
 export default {
   name: 'ni-chip',
   props: {
-    avatar: String
+    data: Object
+  },
+  data () {
+    return {
+      weeklyHours: 0,
+      currentHours: 22
+    }
+  },
+  computed: {
+    isBusy () {
+      if (this.weeklyHours === 0) return false;
+      return this.currentHours > this.weeklyHours;
+    }
+  },
+  mounted () {
+    this.getAuxiliaryWeeklyHours();
+  },
+  methods: {
+    getAvatar (link) {
+      return link || 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/images/users/default_avatar.png';
+    },
+    getCurrentContract (contracts) {
+      if (!contracts || contracts.length === 0) return 'N/A';
+      return contracts.find(contract => !contract.endDate);
+    },
+    getContractActiveVersion (contract) {
+      return contract.versions.find(version => version.isActive);
+    },
+    getAuxiliaryWeeklyHours () {
+      const currentContract = this.getCurrentContract(this.data.administrative.contracts);
+      if (!currentContract) return;
+      const activeVersion = this.getContractActiveVersion(currentContract);
+      if (!activeVersion) return;
+      this.weeklyHours = activeVersion.weeklyHours;
+    }
   }
 }
 </script>
@@ -30,14 +64,18 @@ export default {
         height: 1.5rem
 
   /deep/ .q-chip
-    background: $dark-grey
     width: 80%
+    background: $dark-grey
     @media(max-width: 1024px)
-      font-size: 10px
+      font-size: 8px
+    @media(max-width: 768px)
+      display: none
     &-main
-      text-align: center
+      text-align: end
     &-small
       @media(max-width: 1024px)
         min-height: 20px
+    &.busy
+      background: $secondary !important
 
 </style>

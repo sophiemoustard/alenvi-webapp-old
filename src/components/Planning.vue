@@ -18,18 +18,20 @@
         </thead>
         <tbody>
           <tr class="person-row" v-for="(person, index) in persons" :key="index">
-            <td class="event-cell" valign="top">
-              <div class="q-pb-md q-mt-md">
-                <ni-chip :avatar="getAvatar(person.picture.link)"></ni-chip>
-              </div>
-              <div class="person-name">
-                {{ formatPersonName(person) }}
+            <td valign="top">
+              <div class="q-my-md">
+                <div class="q-mb-md">
+                  <ni-chip :data="person"></ni-chip>
+                </div>
+                <div class="person-name">
+                  {{ formatPersonName(person) }}
+                </div>
               </div>
             </td>
             <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
-              class="event-cell" @click="$emit('createEvent', { dayIndex, person })" >
+              @click="$emit('createEvent', { dayIndex, person })" >
               <template v-for="(event, eventIndex) in getOneDayAuxiliaryEvents(person, days[dayIndex])">
-                <div :id="event._id" draggable @dragstart="drag(event._id)" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`]"
+                <div :id="event._id" draggable @dragstart="drag(event._id)" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-md']"
                   :key="eventIndex" @click.stop="$emit('editEvent', event._id)">
                   <div class="col-12 event-title">
                     <p v-if="event.type === INTERVENTION" class="no-margin ellipsis">{{ event.customer.identity.title }} {{
@@ -126,9 +128,6 @@ export default {
     isCurrentDay (momentDay) {
       return this.$moment(momentDay).isSame(new Date(), 'day');
     },
-    getAvatar (link) {
-      return link || 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/images/users/default_avatar.png';
-    },
     formatPersonName (person) {
       return `${person.identity.firstname.slice(0, 1)}. ${person.identity.lastname}`.toUpperCase();
     },
@@ -223,6 +222,8 @@ export default {
     font-size: 14px
     @media(max-width: 1024px)
       font-size: 12px
+    @media(max-width: 420px)
+      font-size: 8px
 
   .event
     border-radius: 2px
