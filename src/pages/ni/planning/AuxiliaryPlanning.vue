@@ -84,11 +84,8 @@
           </div>
         </div>
         <div class="modal-subtitle" style="display: flex">
-          <q-btn-toggle no-wrap v-model="editedEvent.type" toggle-color="primary" :options="[{ label: editedEvent.type, value: editedEvent.type }]" />
-          <div class="delete-action" style="display: flex" @click="deleteEvent">
-            <span>Supprimer l'évènement</span>
-            <q-btn flat round small color="grey" icon="delete"/>
-          </div>
+          <q-btn-toggle no-wrap v-model="editedEvent.type" toggle-color="primary" :options="eventTypeOptions.filter(option => option.value === editedEvent.type)" />
+          <q-btn label="Supprimer l'évènement" icon-right="delete" no-caps flat color="grey" @click="deleteEvent" />
         </div>
         <template v-if="editedEvent.type !== ABSENCE">
           <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" />
@@ -776,4 +773,17 @@ export default {
       flex-wrap: wrap;
       & .q-btn
         width: 45%
+
+  .modal-subtitle
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px
+    .q-btn-group
+      width: 30%
+      margin-bottom: 0
+    .delete-action
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
 </style>
