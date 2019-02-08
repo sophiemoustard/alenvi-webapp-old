@@ -132,6 +132,7 @@ export default {
     justify-content: space-around;
     &.end
       @media screen and (max-width: 677px)
+        border-top: 1px solid $light-grey
         flex-direction: row-reverse;
 
   /deep/ .q-if-inverted.q-if-focused

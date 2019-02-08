@@ -742,15 +742,24 @@ export default {
       background-color: $light-grey;
 
   /deep/ .modal-auxiliay-header
+    align-items: center
     .q-if-inverted
       border: none;
       font-size: 24px;
+      margin-left: 3px;
       &.q-if-focused
         box-shadow: none;
+      @media screen and (max-width: 677px)
+        font-size: 20px;
+        padding: 7px;
     .q-input-target
       line-height: normal
     .q-icon
       display: none;
+    .avatar
+      @media screen and (max-width: 677px)
+        height: 30px
+        width: 30px
 
   /deep/ .select-icon
     display: flex !important;
