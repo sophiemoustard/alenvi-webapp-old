@@ -4,6 +4,9 @@
       <p class="input-caption">Communauté</p>
       <ni-select-sector class="q-mb-md" @input="getEmployeesBySector" v-model="selectedSector" />
     </div>
+    <div style="margin: 2%; background-color: white">
+      <ni-chips-autocomplete-auxiliaries-sectors v-model="terms" placeholder="Rechercher un(e) commununauté / auxiliaire" @selected="selectedElements"/>
+    </div>
     <ni-planning-manager @refreshEvents="getEvents" :events="events" :customers="customers" :persons="auxiliaries"
       @updateStartOfWeek="updateStartOfWeek" @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop" />
 
@@ -158,6 +161,7 @@ import {
   EVERY_WEEK,
   ILLNESS,
 } from '../../../data/constants';
+import ChipsAutocompleteAuxiliariesSectors from '../../../components/ChipsAutocompleteAuxiliariesSectors';
 
 export default {
   name: 'AuxiliaryPlanning',
@@ -170,6 +174,7 @@ export default {
     'ni-modal-input': ModalInput,
     'ni-file-uploader': FileUploader,
     'ni-datetime-range': DatetimeRange,
+    'ni-chips-autocomplete-auxiliaries-sectors': ChipsAutocompleteAuxiliariesSectors
   },
   data () {
     return {
@@ -236,6 +241,7 @@ export default {
         {label: 'Annulation', value: CANCELLATION},
         {label: 'Suppression', value: DELETION},
       ],
+      terms: []
     };
   },
   validations: {
