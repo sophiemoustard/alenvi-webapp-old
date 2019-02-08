@@ -85,7 +85,7 @@
         </div>
         <div class="modal-subtitle" style="display: flex">
           <q-btn-toggle no-wrap v-model="editedEvent.type" toggle-color="primary" :options="eventTypeOptions.filter(option => option.value === editedEvent.type)" />
-          <q-btn label="Supprimer l'évènement" icon-right="delete" no-caps flat color="grey" @click="deleteEvent" />
+          <q-btn icon="delete" no-caps flat color="grey" @click="deleteEvent" />
         </div>
         <template v-if="editedEvent.type !== ABSENCE">
           <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" />
@@ -97,8 +97,8 @@
         <template v-if="editedEvent.type === ABSENCE">
           <ni-datetime-picker caption="Date de debut" v-model="editedEvent.dates.startDate" type="date" :error="$v.editedEvent.dates.startDate.$error"
             inModal />
-          <ni-modal-select caption="Durée" :error="$v.editedEvent.startDuration.$error" :options="dateOptions"
-            v-model="editedEvent.startDuration" separator />
+          <ni-modal-select caption="Durée" :error="$v.editedEvent.startDuration.$error" :options="dateOptions" v-model="editedEvent.startDuration"
+            separator />
           <ni-datetime-picker caption="Date de fin" v-model="editedEvent.dates.endDate" type="date" :error="$v.editedEvent.dates.endDate.$error"
             inModal />
           <ni-modal-select caption="Durée" :error="$v.editedEvent.endDuration.$error" :options="dateOptions" v-model="editedEvent.endDuration"
@@ -115,13 +115,21 @@
             :error="$v.editedEvent.location.fullAddress.$error" :error-label="addressError" inModal />
         </template>
         <ni-modal-input v-model="editedEvent.misc" caption="Notes" />
+        <template v-if="editedEvent.type === INTERVENTION">
+          <div class="row q-mb-lg light-checkbox">
+            <q-checkbox v-model="editedEvent.isCancelled" label="Annuler l'évènement" @input="toggleCancellationForm" />
+          </div>
+          <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.condition" caption="Conditions"
+            :options="cancellationConditions" />
+          <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.reason" caption="Motif" :options="cancellationReasons" />
+        </template>
       </div>
       <div v-if="editedEvent.type === INTERVENTION" class="cutomer-info">
         <p class="input-caption">Infos bénéficiaire</p>
         <div>{{ editedEvent.customer.contact.address.fullAddress }}</div>
-        <!-- <q-input v-model="" caption="Infos bénéficiaire" disable /> -->
       </div>
-      <q-btn class="full-width modal-btn" no-caps color="primary" :loading="loading" label="Editer l'évènement" @click="updateEvent" icon-right="check" />
+      <q-btn class="full-width modal-btn" no-caps color="primary" :loading="loading" label="Editer l'évènement" @click="updateEvent"
+        icon-right="check" />
     </q-modal>
   </q-page>
 </template>
@@ -154,6 +162,11 @@ import {
   EVERY_WEEK_DAY,
   EVERY_WEEK,
   ILLNESS,
+  INVOICED_AND_PAYED,
+  INVOICED_AND_NOT_PAYED,
+  NOT_INVOICED_AND_NOT_PAYED,
+  CUSTOMER_INITIATIVE,
+  AUXILIARY_INITIATIVE,
 } from '../../../data/constants';
 import ChipsAutocompleteAuxiliariesSectors from '../../../components/ChipsAutocompleteAuxiliariesSectors';
 
@@ -194,6 +207,15 @@ export default {
         {label: 'Absence', value: ABSENCE},
         {label: 'Indispo', value: UNAVAILABILITY}
       ],
+      cancellationConditions: [
+        { label: 'Facturée & payée', value: INVOICED_AND_PAYED },
+        { label: 'Facturée & non payée', value: INVOICED_AND_NOT_PAYED },
+        { label: 'Non facturée & non payée', value: NOT_INVOICED_AND_NOT_PAYED },
+      ],
+      cancellationReasons: [
+        { label: 'Initiative du client', value: CUSTOMER_INITIATIVE },
+        { label: 'Initiative du de l\'intervenant', value: AUXILIARY_INITIATIVE },
+      ],
       // Event Creation
       creationModal: false,
       newEvent: {
@@ -225,16 +247,9 @@ export default {
         customer: '',
         dates: {},
         repetition: {},
+        cancel: {},
       },
-<<<<<<< HEAD
-      editionTypeOptions: [
-        {label: 'Edition', value: EDITION},
-        {label: 'Annulation', value: CANCELLATION},
-        {label: 'Suppression', value: DELETION},
-      ],
       terms: []
-=======
->>>>>>> [146] Remove edition options type
     };
   },
   validations: {
@@ -520,6 +535,8 @@ export default {
       }
 
       if (event.location && event.location.fullAddress) delete payload.location.location;
+      if (event.location && Object.keys(event.location).length === 0) delete payload.location;
+      if (event.cancel && Object.keys(event.cancel).length === 0) delete payload.cancel;
 
       return this.$_.pickBy(payload)
     },
@@ -586,7 +603,7 @@ export default {
       switch (editedEvent.type) {
         case INTERVENTION:
           const subscription = editedEvent.subscription._id;
-          this.editedEvent = { location: {}, ...eventData, dates, auxiliary, subscription };
+          this.editedEvent = { cancel: {}, location: {}, ...eventData, dates, auxiliary, subscription };
           break;
         case INTERNAL_HOUR:
           const internalHour = editedEvent.internalHour._id;
@@ -611,6 +628,9 @@ export default {
 
       this.editionModal = true
     },
+    toggleCancellationForm (value) {
+      if (!value) this.editedEvent.cancel = {};
+    },
     resetEditionForm () {
       this.$v.editedEvent.$reset();
       this.editedEvent = {
@@ -618,6 +638,7 @@ export default {
         location: {},
         dates: {},
         repetition: {},
+        cancel: {},
       };
     },
     async updateEvent () {
@@ -782,19 +803,24 @@ export default {
   .modal-subtitle
     display: flex;
     justify-content: space-between;
-    margin-bottom: 20px
+    margin-bottom: 20px;
     .q-btn-group
-      width: 30%
-      margin-bottom: 0
+      width: 30%;
+      margin-bottom: 0;
+      cursor: default;
     .delete-action
       display: flex;
       flex-direction: row;
       align-items: center;
 
   .cutomer-info
-    background: $light-grey
-    padding: 10px 25px 20px
+    background: $light-grey;
+    padding: 10px 25px 20px;
     /deep/ .q-if-inverted
       background: $light-grey !important;
-      border: none
+      border: none;
+
+  .light-checkbox
+    color: $grey
+
 </style>

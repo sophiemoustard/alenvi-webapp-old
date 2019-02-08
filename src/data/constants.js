@@ -56,3 +56,12 @@ export const NEVER = 'never';
 export const EVERY_DAY = 'every_day';
 export const EVERY_WEEK_DAY = 'every_week_day';
 export const EVERY_WEEK = 'every_week';
+
+// CANCELLATION OPTIONS
+export const INVOICED_AND_PAYED = 'invoiced_and_payed';
+export const INVOICED_AND_NOT_PAYED = 'invoiced_and_not_payed';
+export const NOT_INVOICED_AND_NOT_PAYED = 'not_invoiced_and_not_payed';
+
+// CANCELLATION REASONS
+export const CUSTOMER_INITIATIVE = 'customer_initiative';
+export const AUXILIARY_INITIATIVE = 'auxiliary_initiative';
