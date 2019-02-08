@@ -1,10 +1,11 @@
 <template>
-  <q-page padding class="neutral-background">
-    <p class="input-caption">Communauté</p>
-    <ni-select-sector class="q-mb-md" @input="getEmployeesBySector" v-model="selectedSector" />
+  <q-page class="neutral-background">
+    <div class="layout-padding">
+      <p class="input-caption">Communauté</p>
+      <ni-select-sector class="q-mb-md" @input="getEmployeesBySector" v-model="selectedSector" />
+    </div>
     <ni-planning-manager @refreshEvents="getEvents" :events="events" :customers="customers" :persons="auxiliaries"
       @updateStartOfWeek="updateStartOfWeek" @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop" />
-
     <!-- Event creation modal -->
     <q-modal v-model="creationModal" content-classes="modal-container-md" @hide="resetCreationForm(false)">
       <div class="modal-padding">
