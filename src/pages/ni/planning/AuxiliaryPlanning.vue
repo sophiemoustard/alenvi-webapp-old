@@ -201,7 +201,8 @@ export default {
   data () {
     return {
       loading: false,
-      selectedSector: '',
+      selectedSectors: [],
+      selectedSector: '', // To remove after implementing working filter
       days: [],
       events: [],
       customers: [],
@@ -424,7 +425,7 @@ export default {
 
       const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
       this.days = Array.from(range.by('days'));
-      if (this.selectedSector !== '') await this.getEvents();
+      if (this.selectedSectors && this.selectedSectors.length) await this.getEvents();
     },
     // Refresh data
     async getEvents () {
@@ -432,7 +433,7 @@ export default {
         this.events = await this.$events.list({
           startDate: this.startOfWeek.format('YYYYMMDD'),
           endStartDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
-          sector: this.selectedSector,
+          sector: this.selectedSectors,
         });
       } catch (e) {
         this.events = [];
@@ -445,8 +446,8 @@ export default {
         this.customers = [];
       }
     },
-    async getEmployeesBySector () {
-      this.auxiliaries = await this.$users.showAllActive({ sector: this.selectedSector });
+    async getEmployeesBySector (sector) {
+      this.auxiliaries = await this.$users.showAllActive({ sector });
       this.getEvents({});
     },
     setInternalHours () {
@@ -494,6 +495,7 @@ export default {
         location: {},
         attachment: {},
         auxiliary: person._id,
+        sector: person.sector,
         dates: {
           startDate: selectedDay.toISOString(),
           startHour: '08:00',
@@ -577,7 +579,7 @@ export default {
     },
     async createEvent () {
       try {
-        this.newEvent.sector = this.selectedSector;
+        console.log(this.newEvent);
         this.$v.newEvent.$touch();
         if (this.$v.newEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
 
@@ -590,7 +592,7 @@ export default {
 
         await this.$events.create(payload);
 
-        this.getEvents(this.startDate, this.endDate, this.selectedSector);
+        this.getEvents(this.startDate, this.endDate, this.newEvent.sector);
         this.creationModal = false;
         this.loading = false;
         this.resetCreationForm(false);
@@ -688,7 +690,6 @@ export default {
     },
     async updateEvent () {
       try {
-        this.editedEvent.sector = this.selectedSector;
         this.$v.editedEvent.$touch();
         if (this.$v.editedEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
 
