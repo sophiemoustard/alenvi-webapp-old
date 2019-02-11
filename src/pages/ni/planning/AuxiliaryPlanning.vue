@@ -555,7 +555,6 @@ export default {
     },
     async createEvent () {
       try {
-        console.log(this.newEvent);
         this.$v.newEvent.$touch();
         if (this.$v.newEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
 
@@ -763,6 +762,7 @@ export default {
       }
     },
     selectedElements (el) {
+      console.log(el);
       // Add elements filtered to planning renderer
     }
   },
