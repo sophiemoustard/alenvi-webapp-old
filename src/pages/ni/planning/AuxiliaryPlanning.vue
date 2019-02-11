@@ -68,7 +68,7 @@
     </q-modal>
 
     <!-- Event edition modal -->
-    <q-modal v-model="editionModal" content-classes="modal-container-md" @hide="resetEditionForm()">
+    <q-modal v-if="Object.keys(editedEvent).length !== 0" v-model="editionModal" content-classes="modal-container-md" @hide="resetEditionForm()">
       <div class="modal-padding">
         <div class="row q-mb-lg">
           <div class="col-11 row modal-auxiliay-header">
@@ -249,14 +249,7 @@ export default {
       },
       // Event edition
       editionModal: false,
-      editedEvent: {
-        location: {},
-        attachment: {},
-        dates: {},
-        repetition: {},
-        cancel: {},
-        shouldUpdateRepetition: false,
-      },
+      editedEvent: {},
       terms: []
     };
   },
@@ -487,7 +480,7 @@ export default {
     },
     selectedAddress (item) {
       if (this.creationModal) this.newEvent.location = Object.assign({}, this.newEvent.location, item);
-      if (this.editionModal) this.editedEvent.location = Object.assign({}, this.newEvent.location, item);
+      if (this.editionModal) this.editedEvent.location = Object.assign({}, this.editedEvent.location, item);
     },
     openCreationModal (vEvent) {
       const { dayIndex, person } = vEvent;
@@ -642,16 +635,16 @@ export default {
       switch (editedEvent.type) {
         case INTERVENTION:
           const subscription = editedEvent.subscription._id;
-          this.editedEvent = { ...this.editedEvent, ...eventData, dates, auxiliary, subscription };
+          this.editedEvent = { isCancelled: false, cancel: {}, shouldUpdateRepetition: false, ...eventData, dates, auxiliary, subscription };
           break;
         case INTERNAL_HOUR:
           const internalHour = editedEvent.internalHour._id;
-          this.editedEvent = { ...this.editedEvent, ...eventData, auxiliary, internalHour, dates };
+          this.editedEvent = { location: {}, ...eventData, auxiliary, internalHour, dates };
           break;
         case ABSENCE:
           const { startDuration, endDuration } = this.getAbsenceDurations(editedEvent);
           this.editedEvent = {
-            ...this.editedEvent,
+            location: {},
             ...eventData,
             auxiliary,
             startDuration,
@@ -660,7 +653,7 @@ export default {
           };
           break;
         case UNAVAILABILITY:
-          this.editedEvent = { ...this.editedEvent, ...eventData, auxiliary, dates };
+          this.editedEvent = { ...eventData, auxiliary, dates };
           break;
       }
 
