@@ -299,6 +299,8 @@ export default {
     // Customer
     async updateOgustCustomer (paths) {
       let value = this.$_.get(this.customer, paths.alenvi);
+      if (paths.ogust.match(/iban_number/i)) value = value.split(' ').join('');
+
       const payload = this.$_.set({}, paths.ogust, value);
       if (paths.ogust.match(/((iban|bic)_number)|holder/i)) {
         if (this.customer.payment && this.customer.payment.bankAccountOwner && this.customer.payment.iban && this.customer.payment.bic) {
@@ -312,7 +314,9 @@ export default {
       }
     },
     async updateAlenviCustomer (path) {
-      const value = this.$_.get(this.customer, path);
+      let value = this.$_.get(this.customer, path);
+      if (path.match(/iban/i)) value = value.split(' ').join('');
+
       const payload = this.$_.set({}, path, value);
       payload._id = this.customer._id;
       await this.$customers.updateById(payload);
@@ -324,14 +328,9 @@ export default {
         if (this.$_.get(this.$v.customer, paths.alenvi).$error) {
           return NotifyWarning('Champ(s) invalide(s)');
         }
-        if (paths.alenvi && paths.ogust) {
-          await this.updateAlenviCustomer(paths.alenvi);
-          await this.updateOgustCustomer(paths);
-        } else if (paths.alenvi) {
-          await this.updateAlenviCustomer(paths.alenvi);
-        } else {
-          await this.updateOgustCustomer(paths);
-        }
+        if (paths.alenvi) await this.updateAlenviCustomer(paths.alenvi);
+        if (paths.ogust) await this.updateOgustCustomer(paths);
+
         await this.$store.dispatch('main/getUser', this.helper._id);
         await this.refreshCustomer();
         NotifyPositive('Modification enregistrée');
