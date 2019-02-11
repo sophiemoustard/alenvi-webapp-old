@@ -534,8 +534,8 @@ export default {
       return this.events
         .filter(event => event.auxiliary._id === auxiliaryId)
         .filter(event => {
-          return this.$moment(event.startDate).isBetween(startDate, endDate, 'minutes', '()') ||
-            this.$moment(startDate).isBetween(event.startDate, event.endDate, 'minutes', '()')
+          return this.$moment(event.startDate).isBetween(startDate, endDate, 'minutes', '[)') ||
+            this.$moment(startDate).isBetween(event.startDate, event.endDate, 'minutes', '[)')
         });
     },
     getPayload (event) {
