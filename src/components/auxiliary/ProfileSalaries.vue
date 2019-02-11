@@ -22,9 +22,7 @@ moment.updateLocale('fr', {
 });
 
 export default {
-  props: {
-    id: String
-  },
+  name: 'ProfileSalaries',
   data () {
     return {
       user: null,
@@ -37,83 +35,68 @@ export default {
     userProfile () {
       return this.$store.getters['rh/getUserProfile'];
     },
-    usePublicTransport () {
-      return this.user.administrative.transportInvoice.transportType;
-    },
-    hasPhoneInvoice () {
-      return this.user.administrative.phoneInvoice.driveId;
-    },
-    userLastContract () {
-      return this.contracts.find(contract => contract.isActive) || {};
-    },
     userCurrentMonthContracts () {
-      return this.contracts.filter(contract => this.$moment(contract.endDate).month() === this.$moment().month() ||
-      this.$moment(contract.startDate).month() === this.$moment().month());
+      return this.contracts.filter(contract => {
+        if (contract.endDate) {
+          return this.$moment(contract.endDate).isSameOrAfter(this.$moment().startOf('month')) &&
+            this.$moment(contract.startDate).isSameOrBefore(this.$moment().endOf('month'));
+        }
+        return this.$moment(contract.startDate).isSameOrBefore(this.$moment().endOf('month'));
+      });
     },
     currentMonth () {
       return this.$moment().format('MMMM YYYY');
     },
     salary () {
-      if (!this.userLastContract && this.userCurrentMonthContracts.length === 0) return 0;
+      if (this.userCurrentMonthContracts.length === 0) return '0.00';
       const workingDays = this.currentWorkingDays.length;
-      if (this.userCurrentMonthContracts.length > 1) {
-        let salary = 0;
-        for (let i = 0, l = this.userCurrentMonthContracts.length; i < l; i++) {
-          const effectiveWorkingDays = this.calculateEffectiveWorkingDays(this.userCurrentMonthContracts[i]);
-          const { grossHourlyRate, weeklyHours } = this.userCurrentMonthContracts[i];
-          salary += Number.parseFloat((effectiveWorkingDays / workingDays) * 4.33 * grossHourlyRate * weeklyHours);
-        }
-        return salary.toFixed(2);
-      } else {
-        const effectiveWorkingDays = this.calculateEffectiveWorkingDays(this.userLastContract);
-        const { grossHourlyRate, weeklyHours } = this.userLastContract;
-        if (!effectiveWorkingDays || !grossHourlyRate || !workingDays) return '0.00';
 
-        return Number.parseFloat((effectiveWorkingDays / workingDays) * 4.33 * grossHourlyRate * weeklyHours).toFixed(2);
+      let salary = 0;
+      for (let contract of this.userCurrentMonthContracts) {
+        const { grossHourlyRate, weeklyHours } = contract;
+        const effectiveWorkingDays = this.calculateEffectiveWorkingDays(contract);
+        if (!effectiveWorkingDays || !grossHourlyRate || !workingDays) salary += 0;
+        else salary += Number.parseFloat((effectiveWorkingDays / workingDays) * 4.33 * grossHourlyRate * weeklyHours);
       }
+
+      return salary.toFixed(2);
     }
   },
   async mounted () {
     this.user = await this.$users.getById(this.userProfile._id);
     this.currentWorkingDays = moment().monthBusinessDays();
     const rawContracts = this.user.administrative.contracts.filter(contract => contract.status === 'Prestataire');
-    for (let i = 0, l = rawContracts.length; i < l; i++) {
-      this.contracts.push(...rawContracts[i].versions);
+    for (let contract of rawContracts) {
+      this.contracts.push(...contract.versions);
     }
     this.company = this.user.company;
   },
   methods: {
-    isCurrentMonthContract (contract) {
-      return this.$moment(contract.endDate).month() === this.$moment().month() ||
-      this.$moment(contract.startDate).month() === this.$moment().month();
-    },
     calculateEffectiveWorkingDays (contract) {
-      const workingDays = this.currentWorkingDays.length;
-      let effectiveWorkingDays = 0;
+      if (!contract.endDate && !contract.isActive) return 0;
 
-      if (contract.endDate && this.isCurrentMonthContract(contract)) {
-        effectiveWorkingDays = moment(contract.startDate).businessDiff(moment(contract.endDate));
-      } else if (contract.startDate && contract.isActive && this.isCurrentMonthContract(contract)) {
-        effectiveWorkingDays = this.currentWorkingDays.filter(day => this.$moment(day).isSameOrAfter(contract.startDate, 'day')).length;
-      } else if (!contract.isActive) {
-        effectiveWorkingDays = 0;
-      } else {
-        effectiveWorkingDays = workingDays;
-      }
-      return effectiveWorkingDays;
+      const calculationStart = this.$moment.max([this.$moment().startOf('month'), this.$moment(contract.startDate)]);
+      const calculationEnd = contract.endDate
+        ? this.$moment.min([this.$moment().endOf('month'), this.$moment(contract.endDate)])
+        : this.$moment().endOf('month');
+
+      return calculationStart.businessDiff(moment(calculationEnd));
     },
     calculateRefunding (type) {
       if (!this.userLastContract && this.userCurrentMonthContracts.length === 0) return 0;
       if (!this.user.administrative[`${type}Invoice`]) return 0;
       if (!this.user.administrative[`${type}Invoice`].link) return 0;
+
       const workingDays = this.currentWorkingDays.length;
       let refundAmount = 0;
       let totalRefund = 0;
       switch (type) {
         case 'transport':
           if (this.user.administrative.transportInvoice.transportType !== 'public') return 'Non concerné(e)';
-          const currentSub = this.company.rhConfig.transportSubs.find(sub => sub.department === this.user.contact.zipCode.substring(0, 2));
-          refundAmount = currentSub.price;
+          if (this.user.contact && this.user.contact.zipCode) {
+            const currentSub = this.company.rhConfig.transportSubs.find(sub => sub.department === this.user.contact.zipCode.substring(0, 2));
+            refundAmount = currentSub.price;
+          }
           break;
         case 'phone':
           refundAmount = this.company.rhConfig.phoneSubRefunding;
@@ -121,16 +104,12 @@ export default {
         default:
           break;
       }
-      if (this.userCurrentMonthContracts.length > 1) {
-        for (let i = 0, l = this.userCurrentMonthContracts.length; i < l; i++) {
-          const effectiveWorkingDays = this.calculateEffectiveWorkingDays(this.userCurrentMonthContracts[i]);
-          totalRefund += Number.parseFloat((effectiveWorkingDays / workingDays) * refundAmount);
-        }
-        return totalRefund.toFixed(2);
-      } else {
-        const effectiveWorkingDays = this.calculateEffectiveWorkingDays(this.userLastContract);
-        return Number.parseFloat((effectiveWorkingDays / workingDays) * refundAmount).toFixed(2);
+
+      for (let i = 0, l = this.userCurrentMonthContracts.length; i < l; i++) {
+        const effectiveWorkingDays = this.calculateEffectiveWorkingDays(this.userCurrentMonthContracts[i]);
+        totalRefund += Number.parseFloat((effectiveWorkingDays / workingDays) * refundAmount);
       }
+      return totalRefund.toFixed(2);
     }
   }
 };
