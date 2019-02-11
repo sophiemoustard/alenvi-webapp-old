@@ -86,7 +86,7 @@
         </div>
         <div class="modal-subtitle" style="display: flex">
           <q-btn-toggle no-wrap v-model="editedEvent.type" toggle-color="primary" :options="eventTypeOptions.filter(option => option.value === editedEvent.type)" />
-          <q-btn icon="delete" no-caps flat color="grey" @click="deleteEvent" />
+          <q-btn icon="delete" no-caps flat color="grey" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" />
         </div>
         <template v-if="editedEvent.type !== ABSENCE">
           <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" />
@@ -103,7 +103,7 @@
           <ni-search-address v-model="editedEvent.location.fullAddress" @selected="selectedAddress" @blur="$v.editedEvent.location.fullAddress.$touch"
             :error="$v.editedEvent.location.fullAddress.$error" :error-label="addressError" inModal />
         </template>
-        <template v-if="[INTERNAL_HOUR, INTERVENTION].includes(editedEvent.type) && editedEvent.repetition && editedEvent.repetition.frequency !== NEVER">
+        <template v-if="isRepetition(editedEvent)">
           <div class="row q-mb-lg light-checkbox">
             <q-checkbox v-model="editedEvent.shouldUpdateRepetition" label="Appliquer à la répétition" @input="toggleRepetition" />
           </div>
@@ -252,7 +252,7 @@ export default {
       // Event edition
       editionModal: false,
       editedEvent: {},
-      terms: []
+      terms: [],
     };
   },
   validations: {
@@ -668,6 +668,9 @@ export default {
       this.editedEvent.cancel = {};
       this.editedEvent.isCancelled = false;
     },
+    isRepetition (event) {
+      return [INTERNAL_HOUR, INTERVENTION].includes(event.type) && event.repetition && event.repetition.frequency !== NEVER;
+    },
     resetEditionForm () {
       this.$v.editedEvent.$reset();
       this.editedEvent = {
@@ -735,11 +738,44 @@ export default {
           title: 'Confirmation',
           message: 'Etes-vous sûr de vouloir supprimer cet évènement ?',
           ok: 'OK',
-          cancel: 'Annuler'
+          cancel: 'Annuler',
         });
 
         this.loading = true
         await this.$events.deleteById(this.editedEvent._id);
+        this.getEvents();
+        this.editionModal = false;
+        this.resetEditionForm();
+        NotifyPositive('Service supprimé.');
+      } catch (e) {
+        if (e.message === '') return NotifyPositive('Suppression annulée');
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression du service.');
+      } finally {
+        this.loading = false
+      }
+    },
+    async deleteEventRepetition () {
+      try {
+        const shouldDeleteRepetition = await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Supprimer l\'événement périodique',
+          ok: 'OK',
+          cancel: 'Annuler',
+          options: {
+            type: 'radio',
+            model: false,
+            items: [
+              { label: 'Supprimer uniquement cet évenement', value: false },
+              { label: 'Supprimer cet évenement et tous les suivants', value: true },
+            ],
+          },
+        });
+
+        this.loading = true
+        if (shouldDeleteRepetition) await this.$events.deleteRepetition(this.editedEvent._id);
+        else await this.$events.deleteById(this.editedEvent._id);
+
         this.getEvents();
         this.editionModal = false;
         this.resetEditionForm();
