@@ -1,15 +1,17 @@
 <template>
   <div class="full-width row relative-position">
-    <img :src="getAvatar(data.picture.link)" class="avatar">
+    <img :src="getAvatar(data.picture)" class="avatar">
     <q-chip :class="['absolute-center', { 'busy': isBusy }]" small text-color="white">{{ this.currentHours }}h / {{ weeklyHours }}</q-chip>
   </div>
 </template>
 
 <script>
+import { DEFAULT_AVATAR } from '../data/constants.js';
+
 export default {
   name: 'ni-chip',
   props: {
-    data: Object
+    data: { type: Object, default: () => ({ picture: { link: '' }, administrative: {} }) },
   },
   data () {
     return {
@@ -27,8 +29,8 @@ export default {
     this.getAuxiliaryWeeklyHours();
   },
   methods: {
-    getAvatar (link) {
-      return link || 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/images/users/default_avatar.png';
+    getAvatar (picture) {
+      return (!picture || !picture.link) ? DEFAULT_AVATAR : picture.link;
     },
     getCurrentContract (contracts) {
       if (!contracts || contracts.length === 0) return 'N/A';
@@ -38,6 +40,7 @@ export default {
       return contract.versions.find(version => version.isActive);
     },
     getAuxiliaryWeeklyHours () {
+      if (!this.data.administrative) return;
       const currentContract = this.getCurrentContract(this.data.administrative.contracts);
       if (!currentContract) return;
       const activeVersion = this.getContractActiveVersion(currentContract);
