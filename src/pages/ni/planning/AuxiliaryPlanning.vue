@@ -5,7 +5,8 @@
       <ni-select-sector class="q-mb-md" @input="getEmployeesBySector" v-model="selectedSector" />
     </div>
     <div style="margin: 2%; background-color: white">
-      <ni-chips-autocomplete-auxiliaries-sectors v-model="terms" placeholder="Rechercher un(e) commununauté / auxiliaire" @selected="selectedElements"/>
+      <ni-chips-autocomplete-auxiliaries-sectors v-model="terms" placeholder="Rechercher un(e) commununauté / auxiliaire"
+        @selected="selectedElements" />
     </div>
     <ni-planning-manager @refreshEvents="getEvents" :events="events" :customers="customers" :persons="auxiliaries"
       @updateStartOfWeek="updateStartOfWeek" @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop" />
@@ -126,8 +127,9 @@
             <q-checkbox v-model="editedEvent.isCancelled" label="Annuler l'évènement" @input="toggleCancellationForm" />
           </div>
           <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.condition" caption="Conditions"
-            :options="cancellationConditions" />
-          <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.reason" caption="Motif" :options="cancellationReasons" />
+            :options="cancellationConditions" requiredField />
+          <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.reason" caption="Motif" :options="cancellationReasons"
+            requiredField />
         </template>
       </div>
       <div v-if="editedEvent.type === INTERVENTION" class="cutomer-info">
@@ -135,7 +137,7 @@
         <div>{{ editedEvent.customer.contact.address.fullAddress }}</div>
       </div>
       <q-btn class="full-width modal-btn" no-caps color="primary" :loading="loading" label="Editer l'évènement" @click="updateEvent"
-        icon-right="check" />
+        icon-right="check" :disable="disableEditionButton" />
     </q-modal>
   </q-page>
 </template>
@@ -248,10 +250,8 @@ export default {
       // Event edition
       editionModal: false,
       editedEvent: {
-        subscription: {},
         location: {},
         attachment: {},
-        customer: '',
         dates: {},
         repetition: {},
         cancel: {},
@@ -295,6 +295,10 @@ export default {
       internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
       absence: { required: requiredIf((item) => item.type === ABSENCE) },
       location: { fullAddress: { frAddress } },
+      cancel: {
+        condition: { required: requiredIf((item) => item.isCancelled) },
+        reason: { required: requiredIf((item) => item.isCancelled) },
+      },
     },
   },
   async mounted () {
@@ -347,6 +351,25 @@ export default {
         default:
           return !this.newEvent.auxiliary || !this.newEvent.dates.startDate || !this.newEvent.dates.endDate ||
             !this.newEvent.dates.startHour || !this.newEvent.dates.endHour;
+      }
+    },
+    disableEditionButton () {
+      switch (this.editedEvent.type) {
+        case ABSENCE:
+          return !this.editedEvent.auxiliary || !this.editedEvent.absence || !this.editedEvent.dates.startDate ||
+            !this.editedEvent.dates.endDate || !this.editedEvent.startDuration;
+        case INTERVENTION:
+          const shouldDisableButton = !this.editedEvent.auxiliary || !this.editedEvent.subscription || !this.editedEvent.dates.startDate ||
+            !this.editedEvent.dates.endDate || !this.editedEvent.dates.startHour || !this.editedEvent.dates.endHour;
+          if (this.editedEvent.isCancelled) return shouldDisableButton || !this.editedEvent.cancel.condition || !this.editedEvent.cancel.reason;
+          else return shouldDisableButton;
+        case INTERNAL_HOUR:
+          return !this.editedEvent.auxiliary || !this.editedEvent.dates.startDate || !this.editedEvent.dates.endDate ||
+            !this.editedEvent.internalHour || !this.editedEvent.dates.startHour || !this.editedEvent.dates.endHour;
+        case UNAVAILABILITY:
+        default:
+          return !this.editedEvent.auxiliary || !this.editedEvent.dates.startDate || !this.editedEvent.dates.endDate ||
+            !this.editedEvent.dates.startHour || !this.editedEvent.dates.endHour;
       }
     },
     additionalValue () {
@@ -522,6 +545,9 @@ export default {
     },
     getPayload (event) {
       let payload = { ...this.$_.omit(event, ['dates', '__v']) }
+      payload = this.$_.pickBy(payload);
+      if (event.misc) payload.misc = event.misc;
+
       if (event.type === INTERNAL_HOUR) {
         const internalHour = this.internalHours.find(hour => hour._id === event.internalHour);
         payload.internalHour = internalHour;
