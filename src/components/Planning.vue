@@ -167,9 +167,6 @@ export default {
       } finally {
         this.draggedObject = {};
       }
-    },
-    selectedElements (el) {
-      // Add elements filtered to planning renderer
     }
   }
 }

@@ -733,6 +733,9 @@ export default {
         NotifyNegative('Erreur lors de la suppression du document');
       }
     },
+    selectedElements (el) {
+      // Add elements filtered to planning renderer
+    }
   },
 }
 </script>
