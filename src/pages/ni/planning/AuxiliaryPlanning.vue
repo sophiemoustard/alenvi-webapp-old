@@ -539,7 +539,6 @@ export default {
     getPayload (event) {
       let payload = { ...this.$_.omit(event, ['dates', '__v']) }
       payload = this.$_.pickBy(payload);
-      if (event.misc) payload.misc = event.misc;
 
       if (event.type === INTERNAL_HOUR) {
         const internalHour = this.internalHours.find(hour => hour._id === event.internalHour);
