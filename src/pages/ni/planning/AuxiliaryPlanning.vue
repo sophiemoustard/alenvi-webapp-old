@@ -34,8 +34,6 @@
             icon="face" requiredField />
           <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions(newEvent.customer)"
             :error="$v.newEvent.subscription.$error" requiredField />
-          <ni-modal-select caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency" :options="repetitionOptions"
-            requiredField />
         </template>
         <template v-if="newEvent.type === ABSENCE">
           <ni-datetime-picker caption="Date de debut" v-model="newEvent.dates.startDate" type="date" :error="$v.newEvent.dates.startDate.$error"
@@ -56,8 +54,12 @@
         <template v-if="newEvent.type === INTERNAL_HOUR">
           <ni-modal-select caption="Type d'heure interne" v-model="newEvent.internalHour" :options="internalHourOptions"
             requiredField :error="$v.newEvent.internalHour.$error" />
+        </template>
+        <template v-if="newEvent.type !== ABSENCE">
           <ni-modal-select caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency" :options="repetitionOptions"
             requiredField />
+        </template>
+        <template v-if="newEvent.type === INTERNAL_HOUR">
           <ni-search-address v-model="newEvent.location.fullAddress" @selected="selectedAddress" @blur="$v.newEvent.location.fullAddress.$touch"
             :error="$v.newEvent.location.fullAddress.$error" :error-label="addressError" inModal />
         </template>
@@ -655,7 +657,7 @@ export default {
           };
           break;
         case UNAVAILABILITY:
-          this.editedEvent = { ...eventData, auxiliary, dates };
+          this.editedEvent = { shouldUpdateRepetition: false, ...eventData, auxiliary, dates };
           break;
       }
 
@@ -669,7 +671,7 @@ export default {
       this.editedEvent.isCancelled = false;
     },
     isRepetition (event) {
-      return [INTERNAL_HOUR, INTERVENTION].includes(event.type) && event.repetition && event.repetition.frequency !== NEVER;
+      return ABSENCE !== event.type && event.repetition && event.repetition.frequency !== NEVER;
     },
     resetEditionForm () {
       this.$v.editedEvent.$reset();
