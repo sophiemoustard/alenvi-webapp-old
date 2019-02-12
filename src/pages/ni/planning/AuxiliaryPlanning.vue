@@ -1,12 +1,9 @@
 <template>
   <q-page class="neutral-background">
     <div class="layout-padding">
-      <p class="input-caption">Communauté</p>
-      <ni-select-sector class="q-mb-md" @input="getEmployeesBySector" v-model="selectedSector" />
-    </div>
-    <div style="margin: 2%; background-color: white">
-      <ni-chips-autocomplete-auxiliaries-sectors v-model="terms" placeholder="Rechercher un(e) commununauté / auxiliaire"
-        @selected="selectedElements" />
+      <p class="input-caption">Filtre</p>
+      <ni-chips-autocomplete-auxiliaries-sectors class="q-mb-md filter-chips" @updateFilter="updatedFilter" v-model="terms" placeholder="Rechercher un(e) commununauté / auxiliaire"
+        @selected="selectedElement" @remove="removedElement" />
     </div>
     <ni-planning-manager @refreshEvents="getEvents" :events="events" :customers="customers" :persons="auxiliaries"
       @updateStartOfWeek="updateStartOfWeek" @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop" />
@@ -201,7 +198,8 @@ export default {
   data () {
     return {
       loading: false,
-      selectedSector: '',
+      selectedSectors: [],
+      toFilter: [],
       days: [],
       events: [],
       customers: [],
@@ -424,7 +422,7 @@ export default {
 
       const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
       this.days = Array.from(range.by('days'));
-      if (this.selectedSector !== '') await this.getEvents();
+      if (this.selectedSectors && this.selectedSectors.length) await this.getEvents();
     },
     // Refresh data
     async getEvents () {
@@ -432,7 +430,7 @@ export default {
         this.events = await this.$events.list({
           startDate: this.startOfWeek.format('YYYYMMDD'),
           endStartDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
-          sector: this.selectedSector,
+          sector: JSON.stringify(this.selectedSectors),
         });
       } catch (e) {
         this.events = [];
@@ -446,8 +444,8 @@ export default {
       }
     },
     async getEmployeesBySector () {
-      this.auxiliaries = await this.$users.showAllActive({ sector: this.selectedSector });
-      this.getEvents({});
+      this.auxiliaries = await this.$users.showAllActive({ sector: JSON.stringify(this.selectedSectors) });
+      this.getEvents();
     },
     setInternalHours () {
       const user = this.$store.getters['main/user'];
@@ -488,12 +486,12 @@ export default {
         endDuration: '',
         customer: '',
         subscription: '',
-        sector: '',
         internalHour: '',
         absence: person.sector,
         location: {},
         attachment: {},
         auxiliary: person._id,
+        sector: person.sector,
         dates: {
           startDate: selectedDay.toISOString(),
           startHour: '08:00',
@@ -577,7 +575,6 @@ export default {
     },
     async createEvent () {
       try {
-        this.newEvent.sector = this.selectedSector;
         this.$v.newEvent.$touch();
         if (this.$v.newEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
 
@@ -590,7 +587,7 @@ export default {
 
         await this.$events.create(payload);
 
-        this.getEvents(this.startDate, this.endDate, this.selectedSector);
+        this.getEvents();
         this.creationModal = false;
         this.loading = false;
         this.resetCreationForm(false);
@@ -688,7 +685,6 @@ export default {
     },
     async updateEvent () {
       try {
-        this.editedEvent.sector = this.selectedSector;
         this.$v.editedEvent.$touch();
         if (this.$v.editedEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
 
@@ -819,8 +815,20 @@ export default {
         NotifyNegative('Erreur lors de la suppression du document');
       }
     },
-    selectedElements (el) {
-      // Add elements filtered to planning renderer
+    selectedElement (el) {
+      if (el.ogustSector) {
+        this.selectedSectors.push(el.ogustSector);
+        this.getEmployeesBySector();
+      } else {
+        // Add auxiliary
+      }
+    },
+    removedElement (el) {
+      // this.auxiliaries.splice(this.auxiliaries.findIndex((elem) => { return el.value === elem.sector }), 1);
+      // Get element from name then remove element filtered from planning renderer
+    },
+    updatedFilter (filter) {
+      this.toFilter = filter;
     }
   },
 }
@@ -896,5 +904,9 @@ export default {
   .light-checkbox
     color: $grey
     font-size: 14px
+
+  .filter-chips
+    border: 1px solid $light-grey
+    background: white
 
 </style>

@@ -1,6 +1,6 @@
 <template>
-  <q-chips-input :value="terms" @input="inputEvent" :placeholder="placeholder">
-    <q-autocomplete @search="search" @selected="selected" />
+  <q-chips-input :value="terms" @input="inputEvent" :placeholder="placeholder" @remove="removed">
+    <q-autocomplete @search="search" @selected="selected"/>
   </q-chips-input>
 </template>
 
@@ -10,11 +10,12 @@ export default {
   name: 'ChipsAutocomplete',
   props: {
     terms: { type: Array, default: () => [] },
+    toFilter: { type: Array, default: () => [] },
     placeholder: String,
   },
   data () {
     return {
-      toFilter: [],
+      filter: [],
     }
   },
   mounted () {
@@ -24,24 +25,35 @@ export default {
     inputEvent (value) {
       this.$emit('input', value);
     },
+    selected (el) {
+      this.$emit('selected', el);
+    },
+    removed (el) {
+      this.$emit('remove', el);
+    },
     async search (terms, done) {
       try {
         const regex = new RegExp(terms, 'i');
-        done(this.toFilter.filter(el => el.value.match(regex)));
+        done(this.filter.filter(el => el.value.match(regex)));
       } catch (e) {
         console.error(e);
         done([]);
       }
     },
-    selected (selected) {
-      this.$emit('selected', selected);
-    },
     async initFilter () {
       try {
         await this.addAuxiliariesToFilter();
         await this.addSectorsToFilter();
+        this.$emit('updateFilter', this.filter);
       } catch (e) {
         console.error(e);
+      }
+    },
+    async addAuxiliariesToFilter () {
+      this.filter = await this.$users.showAll({ 'role': 'Auxiliaire' });
+      for (let i = 0, l = this.filter.length; i < l; i++) {
+        this.filter[i].value = `${this.filter[i].identity.firstname} ${this.filter[i].identity.lastname}`;
+        this.filter[i].label = `${this.filter[i].identity.firstname} ${this.filter[i].identity.lastname}`;
       }
     },
     async addSectorsToFilter () {
@@ -50,20 +62,13 @@ export default {
         if (k === '*') {
           continue;
         }
-        this.toFilter.push({
+        this.filter.push({
           label: allSectorsRaw[k],
           value: allSectorsRaw[k],
           ogustSector: k
         });
       }
     },
-    async addAuxiliariesToFilter () {
-      this.toFilter = await this.$users.showAll({ 'role': 'Auxiliaire' });
-      for (let i = 0, l = this.toFilter.length; i < l; i++) {
-        this.toFilter[i].value = `${this.toFilter[i].identity.firstname} ${this.toFilter[i].identity.lastname}`;
-        this.toFilter[i].label = `${this.toFilter[i].identity.firstname} ${this.toFilter[i].identity.lastname}`;
-      }
-    }
   }
 }
 </script>
