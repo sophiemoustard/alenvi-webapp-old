@@ -1,11 +1,12 @@
 <template>
   <q-page class="neutral-background">
-    <div class="layout-padding">
+    <!-- <div class="layout-padding">
       <p class="input-caption">Communauté</p>
       <ni-select-sector class="q-mb-md" @input="getEmployeesBySector" v-model="selectedSector" />
-    </div>
-    <div style="margin: 2%; background-color: white">
-      <ni-chips-autocomplete-auxiliaries-sectors @updateFilter="updatedFilter" stack-label="Filtre" v-model="terms" placeholder="Rechercher un(e) commununauté / auxiliaire"
+    </div> -->
+    <div class="layout-padding">
+      <p class="input-caption">Filtre</p>
+      <ni-chips-autocomplete-auxiliaries-sectors class="q-mb-md filter-chips" @updateFilter="updatedFilter" v-model="terms" placeholder="Rechercher un(e) commununauté / auxiliaire"
         @selected="selectedElement" @remove="removedElement" />
     </div>
     <ni-planning-manager @refreshEvents="getEvents" :events="events" :customers="customers" :persons="auxiliaries"
@@ -434,7 +435,7 @@ export default {
         this.events = await this.$events.list({
           startDate: this.startOfWeek.format('YYYYMMDD'),
           endStartDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
-          sector: this.selectedSectors,
+          sector: JSON.stringify(this.selectedSectors),
         });
       } catch (e) {
         this.events = [];
@@ -447,9 +448,9 @@ export default {
         this.customers = [];
       }
     },
-    async getEmployeesBySector (sector) {
-      this.auxiliaries = await this.$users.showAllActive({ sector });
-      this.getEvents({});
+    async getEmployeesBySector () {
+      this.auxiliaries = await this.$users.showAllActive({ sector: JSON.stringify(this.selectedSectors) });
+      this.getEvents();
     },
     setInternalHours () {
       const user = this.$store.getters['main/user'];
@@ -592,7 +593,7 @@ export default {
 
         await this.$events.create(payload);
 
-        this.getEvents(this.startDate, this.endDate, this.newEvent.sector);
+        this.getEvents();
         this.creationModal = false;
         this.loading = false;
         this.resetCreationForm(false);
@@ -821,9 +822,15 @@ export default {
       }
     },
     selectedElement (el) {
-      // Add element filtered to planning renderer
+      if (el.ogustSector) {
+        this.selectedSectors.push(el.ogustSector);
+        this.getEmployeesBySector();
+      } else {
+        // Add auxiliary
+      }
     },
     removedElement (el) {
+      // this.auxiliaries.splice(this.auxiliaries.findIndex((elem) => { return el.value === elem.sector }), 1);
       // Get element from name then remove element filtered from planning renderer
     },
     updatedFilter (filter) {
@@ -903,5 +910,9 @@ export default {
   .light-checkbox
     color: $grey
     font-size: 14px
+
+  .filter-chips
+    border: 1px solid $light-grey
+    background: white
 
 </style>
