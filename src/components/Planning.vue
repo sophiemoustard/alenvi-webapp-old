@@ -98,11 +98,6 @@ export default {
     this.getTimelineDays();
     this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
   },
-  watch: {
-    toggleDrawer (val) {
-      console.log('toggle drawer', val);
-    }
-  },
   methods: {
     // Table
     endOfWeek () {

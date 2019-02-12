@@ -291,8 +291,8 @@ export default {
       absence: { required: requiredIf((item) => item.type === ABSENCE) },
       location: { fullAddress: { frAddress } },
       cancel: {
-        condition: { required: requiredIf((item) => item.isCancelled) },
-        reason: { required: requiredIf((item) => item.isCancelled) },
+        condition: { required: requiredIf((item) => item && item.isCancelled) },
+        reason: { required: requiredIf((item) => item && item.isCancelled) },
       },
     },
   },
@@ -441,14 +441,14 @@ export default {
           sector: this.selectedSector,
         });
       } catch (e) {
-        console.error(e);
+        this.events = [];
       }
     },
     async getCustomers () {
       try {
         this.customers = await this.$customers.showAll();
       } catch (e) {
-        console.error(e);
+        this.customers = [];
       }
     },
     async getEmployeesBySector () {
@@ -692,6 +692,8 @@ export default {
         const payload = this.getPayload(this.editedEvent);
 
         if (this.hasConflicts(payload)) {
+          this.loading = false;
+          this.$v.editedEvent.$reset();
           return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
         }
 
@@ -749,7 +751,6 @@ export default {
         NotifyPositive('Service supprimé.');
       } catch (e) {
         if (e.message === '') return NotifyPositive('Suppression annulée');
-        console.error(e);
         NotifyNegative('Erreur lors de la suppression du service.');
       } finally {
         this.loading = false
@@ -781,7 +782,6 @@ export default {
         this.resetEditionForm();
         NotifyPositive('Service supprimé.');
       } catch (e) {
-        console.error(e);
         if (e.message === '') return NotifyPositive('Suppression annulée');
         NotifyNegative('Erreur lors de la suppression du service.');
       } finally {
@@ -811,10 +811,7 @@ export default {
         if (this.editionModal) this.editedEvent.attachment = {};
         NotifyPositive('Document supprimé');
       } catch (e) {
-        console.error(e);
-        if (e.message === '') {
-          return NotifyPositive('Suppression annulée');
-        }
+        if (e.message === '') return NotifyPositive('Suppression annulée');
         NotifyNegative('Erreur lors de la suppression du document');
       }
     },
