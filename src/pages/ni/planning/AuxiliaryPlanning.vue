@@ -1,9 +1,5 @@
 <template>
   <q-page class="neutral-background">
-    <!-- <div class="layout-padding">
-      <p class="input-caption">Communauté</p>
-      <ni-select-sector class="q-mb-md" @input="getEmployeesBySector" v-model="selectedSector" />
-    </div> -->
     <div class="layout-padding">
       <p class="input-caption">Filtre</p>
       <ni-chips-autocomplete-auxiliaries-sectors class="q-mb-md filter-chips" @updateFilter="updatedFilter" v-model="terms" placeholder="Rechercher un(e) commununauté / auxiliaire"
@@ -203,7 +199,6 @@ export default {
     return {
       loading: false,
       selectedSectors: [],
-      selectedSector: '', // To remove after implementing working filter
       toFilter: [],
       days: [],
       events: [],
@@ -491,7 +486,6 @@ export default {
         endDuration: '',
         customer: '',
         subscription: '',
-        sector: '',
         internalHour: '',
         absence: person.sector,
         location: {},
