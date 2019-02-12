@@ -68,7 +68,8 @@
     </q-modal>
 
     <!-- Event edition modal -->
-    <q-modal v-if="Object.keys(editedEvent).length !== 0" v-model="editionModal" content-classes="modal-container-md" @hide="resetEditionForm()">
+    <q-modal v-if="Object.keys(editedEvent).length !== 0" v-model="editionModal" content-classes="modal-container-md"
+      @hide="resetEditionForm()">
       <div class="modal-padding">
         <div class="row q-mb-lg">
           <div class="col-11 row modal-auxiliay-header">
@@ -76,7 +77,7 @@
             <q-select filter v-model="editedEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions"
               ref="editedEventAuxiliarySelect" :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
               :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`"
-              popupCover=false />
+              :disable="[UNAVAILABILITY, ABSENCE].includes(editedEvent.type)" />
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
             <span><q-icon name="clear" @click.native="editionModal = false" />
@@ -85,7 +86,7 @@
         </div>
         <div class="modal-subtitle" style="display: flex">
           <q-btn-toggle no-wrap v-model="editedEvent.type" toggle-color="primary" :options="eventTypeOptions.filter(option => option.value === editedEvent.type)" />
-          <q-btn icon="delete" no-caps flat color="grey" @click="deleteEvent" />
+          <q-btn icon="delete" no-caps flat color="grey" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" />
         </div>
         <template v-if="editedEvent.type !== ABSENCE">
           <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" />
@@ -95,11 +96,17 @@
             icon="face" requiredField disable />
           <ni-modal-select caption="Service" v-model="editedEvent.subscription" :options="customerSubscriptionsOptions(editedEvent.customer._id)"
             :error="$v.editedEvent.subscription.$error" />
-          <template v-if="editedEvent.repetition && editedEvent.repetition.frequency !== NEVER">
-            <div class="row q-mb-lg light-checkbox">
-              <q-checkbox v-model="editedEvent.shouldUpdateRepetition" label="Appliquer à la répétition" @input="toggleRepetition" />
-            </div>
-          </template>
+        </template>
+        <template v-if="editedEvent.type === INTERNAL_HOUR">
+          <ni-modal-select caption="Type d'heure interne" v-model="editedEvent.internalHour" :options="internalHourOptions"
+            :error="$v.editedEvent.internalHour.$error" />
+          <ni-search-address v-model="editedEvent.location.fullAddress" @selected="selectedAddress" @blur="$v.editedEvent.location.fullAddress.$touch"
+            :error="$v.editedEvent.location.fullAddress.$error" :error-label="addressError" inModal />
+        </template>
+        <template v-if="isRepetition(editedEvent)">
+          <div class="row q-mb-lg light-checkbox">
+            <q-checkbox v-model="editedEvent.shouldUpdateRepetition" label="Appliquer à la répétition" @input="toggleRepetition" />
+          </div>
         </template>
         <template v-if="editedEvent.type === ABSENCE">
           <ni-datetime-picker caption="Date de debut" v-model="editedEvent.dates.startDate" type="date" :error="$v.editedEvent.dates.startDate.$error"
@@ -111,15 +118,10 @@
           <ni-modal-select caption="Durée" :error="$v.editedEvent.endDuration.$error" :options="dateOptions" v-model="editedEvent.endDuration"
             separator />
           <ni-modal-select caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions" :error="$v.editedEvent.absence.$error" />
-          <ni-file-uploader caption="Justificatif d'absence" path="attachment" :entity="editedEvent" alt="justificatif absence"
-            name="proofOfAbsence" :url="docsUploadUrl" @uploaded="documentUploaded" :additionalValue="additionalValue"
-            :disable="!selectedAuxiliary._id" @delete="deleteDocument(editedEvent.attachment.driveId)" withBorders />
-        </template>
-        <template v-if="editedEvent.type === INTERNAL_HOUR">
-          <ni-modal-select caption="Type d'heure interne" v-model="editedEvent.internalHour" :options="internalHourOptions"
-            :error="$v.editedEvent.internalHour.$error" />
-          <ni-search-address v-model="editedEvent.location.fullAddress" @selected="selectedAddress" @blur="$v.editedEvent.location.fullAddress.$touch"
-            :error="$v.editedEvent.location.fullAddress.$error" :error-label="addressError" inModal />
+          <ni-file-uploader v-if="editedEvent.absence && editedEvent.absence === ILLNESS" caption="Justificatif d'absence"
+            path="attachment" :entity="editedEvent" alt="justificatif absence" name="proofOfAbsence" :url="docsUploadUrl"
+            @uploaded="documentUploaded" :additionalValue="additionalValue" :disable="!selectedAuxiliary._id" @delete="deleteDocument(editedEvent.attachment.driveId)"
+            withBorders requiredField />
         </template>
         <ni-modal-input v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes" />
         <template v-if="editedEvent.type === INTERVENTION && !editedEvent.shouldUpdateRepetition">
@@ -250,7 +252,7 @@ export default {
       // Event edition
       editionModal: false,
       editedEvent: {},
-      terms: []
+      terms: [],
     };
   },
   validations: {
@@ -532,8 +534,8 @@ export default {
       return this.events
         .filter(event => event.auxiliary._id === auxiliaryId)
         .filter(event => {
-          return this.$moment(event.startDate).isBetween(startDate, endDate, 'minutes', '()') ||
-            this.$moment(startDate).isBetween(event.startDate, event.endDate, 'minutes', '()')
+          return this.$moment(event.startDate).isBetween(startDate, endDate, 'minutes', '[)') ||
+            this.$moment(startDate).isBetween(event.startDate, event.endDate, 'minutes', '[)')
         });
     },
     getPayload (event) {
@@ -638,12 +640,13 @@ export default {
           break;
         case INTERNAL_HOUR:
           const internalHour = editedEvent.internalHour._id;
-          this.editedEvent = { location: {}, ...eventData, auxiliary, internalHour, dates };
+          this.editedEvent = { location: {}, shouldUpdateRepetition: false, ...eventData, auxiliary, internalHour, dates };
           break;
         case ABSENCE:
           const { startDuration, endDuration } = this.getAbsenceDurations(editedEvent);
           this.editedEvent = {
             location: {},
+            attachment: {},
             ...eventData,
             auxiliary,
             startDuration,
@@ -664,6 +667,9 @@ export default {
     toggleRepetition () {
       this.editedEvent.cancel = {};
       this.editedEvent.isCancelled = false;
+    },
+    isRepetition (event) {
+      return [INTERNAL_HOUR, INTERVENTION].includes(event.type) && event.repetition && event.repetition.frequency !== NEVER;
     },
     resetEditionForm () {
       this.$v.editedEvent.$reset();
@@ -732,11 +738,44 @@ export default {
           title: 'Confirmation',
           message: 'Etes-vous sûr de vouloir supprimer cet évènement ?',
           ok: 'OK',
-          cancel: 'Annuler'
+          cancel: 'Annuler',
         });
 
         this.loading = true
         await this.$events.deleteById(this.editedEvent._id);
+        this.getEvents();
+        this.editionModal = false;
+        this.resetEditionForm();
+        NotifyPositive('Service supprimé.');
+      } catch (e) {
+        if (e.message === '') return NotifyPositive('Suppression annulée');
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression du service.');
+      } finally {
+        this.loading = false
+      }
+    },
+    async deleteEventRepetition () {
+      try {
+        const shouldDeleteRepetition = await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Supprimer l\'événement périodique',
+          ok: 'OK',
+          cancel: 'Annuler',
+          options: {
+            type: 'radio',
+            model: false,
+            items: [
+              { label: 'Supprimer uniquement cet évenement', value: false },
+              { label: 'Supprimer cet évenement et tous les suivants', value: true },
+            ],
+          },
+        });
+
+        this.loading = true
+        if (shouldDeleteRepetition) await this.$events.deleteRepetition(this.editedEvent._id);
+        else await this.$events.deleteById(this.editedEvent._id);
+
         this.getEvents();
         this.editionModal = false;
         this.resetEditionForm();
