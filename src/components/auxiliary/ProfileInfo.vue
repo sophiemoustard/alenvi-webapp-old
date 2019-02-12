@@ -529,14 +529,8 @@ export default {
             },
             payment: {
               rib: {
-                iban: {
-                  required,
-                  iban
-                },
-                bic: {
-                  required,
-                  bic
-                }
+                iban: { required, iban },
+                bic: { required, bic }
               }
             },
             transportInvoice: {

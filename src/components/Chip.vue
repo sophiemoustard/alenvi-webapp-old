@@ -37,6 +37,7 @@ export default {
       return contracts.find(contract => !contract.endDate);
     },
     getContractActiveVersion (contract) {
+      if (!contract || !contract.versions) return null;
       return contract.versions.find(version => version.isActive);
     },
     getAuxiliaryWeeklyHours () {

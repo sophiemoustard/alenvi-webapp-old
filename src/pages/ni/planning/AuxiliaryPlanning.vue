@@ -12,7 +12,8 @@
       @updateStartOfWeek="updateStartOfWeek" @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop" />
 
     <!-- Event creation modal -->
-    <q-modal v-model="creationModal" content-classes="modal-container-md" @hide="resetCreationForm(false)">
+    <q-modal v-if="Object.keys(newEvent).length !== 0" v-model="creationModal" content-classes="modal-container-md"
+      @hide="resetCreationForm(false)">
       <div class="modal-padding">
         <div class="row q-mb-md">
           <div class="col-11 row modal-auxiliay-header">
@@ -31,21 +32,21 @@
         </template>
         <template v-if="newEvent.type === INTERVENTION">
           <ni-modal-select caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions" :error="$v.newEvent.customer.$error"
-            icon="face" requiredField />
+            icon="face" requiredField @blur="$v.newEvent.customer.$touch" />
           <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions(newEvent.customer)"
-            :error="$v.newEvent.subscription.$error" requiredField />
+            :error="$v.newEvent.subscription.$error" requiredField @blur="$v.newEvent.subscription.$touch" />
         </template>
         <template v-if="newEvent.type === ABSENCE">
           <ni-datetime-picker caption="Date de debut" v-model="newEvent.dates.startDate" type="date" :error="$v.newEvent.dates.startDate.$error"
-            inModal requiredField />
+            inModal requiredField @blur="$v.newEvent.dates.startDate.$touch" />
           <ni-modal-select caption="Durée" :error="$v.newEvent.startDuration.$error" :options="dateOptions" v-model="newEvent.startDuration"
-            separator requiredField />
+            separator requiredField @blur="$v.newEvent.startDuration.$touch" />
           <ni-datetime-picker caption="Date de fin" v-model="newEvent.dates.endDate" type="date" :error="$v.newEvent.dates.endDate.$error"
-            inModal :min="newEvent.dates.startDate" requiredField />
+            inModal :min="newEvent.dates.startDate" requiredField @blur="$v.newEvent.dates.endDate.$touch" />
           <ni-modal-select caption="Durée" :error="$v.newEvent.endDuration.$error" :options="dateOptions" v-model="newEvent.endDuration"
-            separator :requiredField="isEndDurationRequired" />
+            separator :requiredField="isEndDurationRequired" @blur="$v.newEvent.endDuration.$touch" />
           <ni-modal-select caption="Type d'absence" v-model="newEvent.absence" :options="absenceOptions" :error="$v.newEvent.absence.$error"
-            requiredField />
+            requiredField @blur="$v.newEvent.absence.$touch" />
           <ni-file-uploader v-if="newEvent.absence && newEvent.absence === ILLNESS" caption="Justificatif d'absence"
             path="attachment" :entity="newEvent" alt="justificatif absence" name="proofOfAbsence" :url="docsUploadUrl"
             @uploaded="documentUploaded" :additionalValue="additionalValue" requiredField :disable="!selectedAuxiliary._id"
@@ -53,11 +54,11 @@
         </template>
         <template v-if="newEvent.type === INTERNAL_HOUR">
           <ni-modal-select caption="Type d'heure interne" v-model="newEvent.internalHour" :options="internalHourOptions"
-            requiredField :error="$v.newEvent.internalHour.$error" />
+            requiredField :error="$v.newEvent.internalHour.$error" @blur="$v.newEvent.internalHour.$touch" />
         </template>
         <template v-if="newEvent.type !== ABSENCE">
           <ni-modal-select caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency" :options="repetitionOptions"
-            requiredField />
+            requiredField @blur="$v.newEvent.repetition.frequency.$touch" />
         </template>
         <template v-if="newEvent.type === INTERNAL_HOUR">
           <ni-search-address v-model="newEvent.location.fullAddress" @selected="selectedAddress" @blur="$v.newEvent.location.fullAddress.$touch"
@@ -82,7 +83,8 @@
               :disable="[UNAVAILABILITY, ABSENCE].includes(editedEvent.type)" />
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
-            <span><q-icon name="clear" @click.native="editionModal = false" />
+            <span>
+              <q-icon name="clear" @click.native="editionModal = false" />
             </span>
           </div>
         </div>
@@ -97,29 +99,30 @@
           <ni-modal-select caption="Bénéficiaire" v-model="editedEvent.customer._id" :options="customersOptions" :error="$v.editedEvent.customer.$error"
             icon="face" requiredField disable />
           <ni-modal-select caption="Service" v-model="editedEvent.subscription" :options="customerSubscriptionsOptions(editedEvent.customer._id)"
-            :error="$v.editedEvent.subscription.$error" />
+            :error="$v.editedEvent.subscription.$error" @blur="$v.editedEvent.subscription.$touch" />
         </template>
         <template v-if="editedEvent.type === INTERNAL_HOUR">
           <ni-modal-select caption="Type d'heure interne" v-model="editedEvent.internalHour" :options="internalHourOptions"
-            :error="$v.editedEvent.internalHour.$error" />
+            :error="$v.editedEvent.internalHour.$error" @blur="$v.editedEvent.internalHour.$touch" />
           <ni-search-address v-model="editedEvent.location.fullAddress" @selected="selectedAddress" @blur="$v.editedEvent.location.fullAddress.$touch"
             :error="$v.editedEvent.location.fullAddress.$error" :error-label="addressError" inModal />
         </template>
         <template v-if="isRepetition(editedEvent)">
           <div class="row q-mb-md light-checkbox">
-            <q-checkbox size="3em" v-model="editedEvent.shouldUpdateRepetition" label="Appliquer à la répétition" @input="toggleRepetition" />
+            <q-checkbox v-model="editedEvent.shouldUpdateRepetition" label="Appliquer à la répétition" @input="toggleRepetition" />
           </div>
         </template>
         <template v-if="editedEvent.type === ABSENCE">
           <ni-datetime-picker caption="Date de debut" v-model="editedEvent.dates.startDate" type="date" :error="$v.editedEvent.dates.startDate.$error"
-            inModal />
+            inModal @blur="$v.editedEvent.dates.startDate.$touch" />
           <ni-modal-select caption="Durée" :error="$v.editedEvent.startDuration.$error" :options="dateOptions" v-model="editedEvent.startDuration"
-            separator />
+            separator @blur="$v.editedEvent.startDuration.$touch" />
           <ni-datetime-picker caption="Date de fin" v-model="editedEvent.dates.endDate" type="date" :error="$v.editedEvent.dates.endDate.$error"
-            inModal />
+            inModal @blur="$v.editedEvent.dates.endDate.$touch" />
           <ni-modal-select caption="Durée" :error="$v.editedEvent.endDuration.$error" :options="dateOptions" v-model="editedEvent.endDuration"
-            separator />
-          <ni-modal-select caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions" :error="$v.editedEvent.absence.$error" />
+            separator @blur="$v.editedEvent.dates.endDuration.$touch"/>
+          <ni-modal-select caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions" :error="$v.editedEvent.absence.$error"
+            @blur="$v.editedEvent.absence.$touch" />
           <ni-file-uploader v-if="editedEvent.absence && editedEvent.absence === ILLNESS" caption="Justificatif d'absence"
             path="attachment" :entity="editedEvent" alt="justificatif absence" name="proofOfAbsence" :url="docsUploadUrl"
             @uploaded="documentUploaded" :additionalValue="additionalValue" :disable="!selectedAuxiliary._id" @delete="deleteDocument(editedEvent.attachment.driveId)"
@@ -131,9 +134,9 @@
             <q-checkbox v-model="editedEvent.isCancelled" label="Annuler l'évènement" @input="toggleCancellationForm" />
           </div>
           <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.condition" caption="Conditions"
-            :options="cancellationConditions" requiredField />
+            :options="cancellationConditions" requiredField @blur="$v.editedEvent.cancel.condition.$touch" />
           <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.reason" caption="Motif" :options="cancellationReasons"
-            requiredField />
+            requiredField @blur="$v.editedEvent.cancel.reason.$touch" />
         </template>
       </div>
       <div v-if="editedEvent.type === INTERVENTION" class="cutomer-info">
@@ -231,72 +234,61 @@ export default {
       NEVER,
       // Event Creation
       creationModal: false,
-      newEvent: {
-        type: INTERVENTION,
-        dates: {
-          startDate: '',
-          startHour: '',
-          endDate: '',
-          endHour: '',
-        },
-        repetition: { frequency: NEVER },
-        startDuration: '',
-        endDuration: '',
-        auxiliary: '',
-        customer: '',
-        subscription: '',
-        sector: '',
-        internalHour: '',
-        absence: '',
-        location: {},
-        attachment: {},
-      },
+      newEvent: {},
       // Event edition
       editionModal: false,
       editedEvent: {},
       terms: [],
     };
   },
-  validations: {
-    newEvent: {
-      type: { required },
-      dates: {
-        startDate: { required },
-        endDate: { required },
+  validations () {
+    return {
+      newEvent: {
+        type: { required },
+        dates: {
+          startDate: { required },
+          endDate: { required },
+        },
+        startDuration: { required: requiredIf((item) => item.type === ABSENCE) },
+        endDuration: { required: requiredIf((item) => item.type === ABSENCE) },
+        auxiliary: { required },
+        sector: { required },
+        customer: { required: requiredIf((item) => item.type === INTERVENTION) },
+        subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
+        internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
+        absence: { required: requiredIf((item) => item.type === ABSENCE) },
+        location: { fullAddress: { frAddress } },
+        repetition: {
+          frequency: { required: requiredIf((item) => item.type !== ABSENCE) }
+        },
+        attachment: {
+          driveId: requiredIf((item) => item.type === ABSENCE && item.absence === ILLNESS),
+          link: requiredIf((item) => item.type === ABSENCE && item.absence === ILLNESS),
+        },
       },
-      startDuration: { required: requiredIf((item) => item.type === ABSENCE) },
-      endDuration: { required: requiredIf((item) => item.type === ABSENCE) },
-      auxiliary: { required },
-      sector: { required },
-      customer: { required: requiredIf((item) => item.type === INTERVENTION) },
-      subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
-      internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
-      absence: { required: requiredIf((item) => item.type === ABSENCE) },
-      location: { fullAddress: { frAddress } },
-      attachment: {
-        driveId: requiredIf((item) => item.type === ABSENCE && item.absence === ILLNESS),
-        link: requiredIf((item) => item.type === ABSENCE && item.absence === ILLNESS),
+      editedEvent: {
+        dates: {
+          startDate: { required },
+          endDate: { required },
+        },
+        startDuration: { required: requiredIf((item) => item.type === ABSENCE) },
+        endDuration: { required: requiredIf((item) => item.type === ABSENCE) },
+        auxiliary: { required },
+        sector: { required },
+        customer: { required: requiredIf((item) => item.type === INTERVENTION) },
+        subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
+        internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
+        absence: { required: requiredIf((item) => item.type === ABSENCE) },
+        location: { fullAddress: { frAddress } },
+        repetition: {
+          frequency: { required: requiredIf((item) => item.type !== ABSENCE) },
+        },
+        cancel: {
+          condition: { required: requiredIf((item, parent) => parent.isCancelled) },
+          reason: { required: requiredIf((item, parent) => parent.isCancelled) },
+        },
       },
-    },
-    editedEvent: {
-      dates: {
-        startDate: { required },
-        endDate: { required },
-      },
-      startDuration: { required: requiredIf((item) => item.type === ABSENCE) },
-      endDuration: { required: requiredIf((item) => item.type === ABSENCE) },
-      auxiliary: { required },
-      sector: { required },
-      customer: { required: requiredIf((item) => item.type === INTERVENTION) },
-      subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
-      internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
-      absence: { required: requiredIf((item) => item.type === ABSENCE) },
-      location: { fullAddress: { frAddress } },
-      cancel: {
-        condition: { required: requiredIf((item) => item && item.isCancelled) },
-        reason: { required: requiredIf((item) => item && item.isCancelled) },
-      },
-    },
+    };
   },
   async mounted () {
     await this.getCustomers();
@@ -391,7 +383,7 @@ export default {
           const subscription = customer.subscriptions.find(sub => sub._id === this.editedEvent.subscription);
           return `Edition de l'intervention ${subscription.service.name} chez ${customer.identity.title} ${customer.identity.lastname}`;
         case ABSENCE:
-          return 'Edition de l\'abscence';
+          return 'Edition de l\'absence';
         case INTERNAL_HOUR:
           return 'Edition de l\'heure interne';
         case UNAVAILABILITY:
@@ -490,7 +482,17 @@ export default {
       const { dayIndex, person } = vEvent;
       const selectedDay = this.days[dayIndex];
       this.newEvent = {
-        ...this.newEvent,
+        type: INTERVENTION,
+        repetition: { frequency: NEVER },
+        startDuration: '',
+        endDuration: '',
+        customer: '',
+        subscription: '',
+        sector: '',
+        internalHour: '',
+        absence: person.sector,
+        location: {},
+        attachment: {},
         auxiliary: person._id,
         dates: {
           startDate: selectedDay.toISOString(),
