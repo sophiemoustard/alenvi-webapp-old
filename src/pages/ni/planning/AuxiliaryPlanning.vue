@@ -5,8 +5,8 @@
       <ni-select-sector class="q-mb-md" @input="getEmployeesBySector" v-model="selectedSector" />
     </div>
     <div style="margin: 2%; background-color: white">
-      <ni-chips-autocomplete-auxiliaries-sectors v-model="terms" placeholder="Rechercher un(e) commununauté / auxiliaire"
-        @selected="selectedElements" />
+      <ni-chips-autocomplete-auxiliaries-sectors @updateFilter="updatedFilter" stack-label="Filtre" v-model="terms" placeholder="Rechercher un(e) commununauté / auxiliaire"
+        @selected="selectedElement" @remove="removedElement" />
     </div>
     <ni-planning-manager @refreshEvents="getEvents" :events="events" :customers="customers" :persons="auxiliaries"
       @updateStartOfWeek="updateStartOfWeek" @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop" />
@@ -203,6 +203,7 @@ export default {
       loading: false,
       selectedSectors: [],
       selectedSector: '', // To remove after implementing working filter
+      toFilter: [],
       days: [],
       events: [],
       customers: [],
@@ -819,9 +820,14 @@ export default {
         NotifyNegative('Erreur lors de la suppression du document');
       }
     },
-    selectedElements (el) {
-      console.log(el);
-      // Add elements filtered to planning renderer
+    selectedElement (el) {
+      // Add element filtered to planning renderer
+    },
+    removedElement (el) {
+      // Get element from name then remove element filtered from planning renderer
+    },
+    updatedFilter (filter) {
+      this.toFilter = filter;
     }
   },
 }
