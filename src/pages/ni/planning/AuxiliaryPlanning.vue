@@ -14,7 +14,7 @@
     <!-- Event creation modal -->
     <q-modal v-model="creationModal" content-classes="modal-container-md" @hide="resetCreationForm(false)">
       <div class="modal-padding">
-        <div class="row q-mb-lg">
+        <div class="row q-mb-md">
           <div class="col-11 row modal-auxiliay-header">
             <img :src="getAvatar(selectedAuxiliary.picture.link)" class="avatar">
             <q-select filter v-model="newEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions"
@@ -73,7 +73,7 @@
     <q-modal v-if="Object.keys(editedEvent).length !== 0" v-model="editionModal" content-classes="modal-container-md"
       @hide="resetEditionForm()">
       <div class="modal-padding">
-        <div class="row q-mb-lg">
+        <div class="row q-mb-md">
           <div class="col-11 row modal-auxiliay-header">
             <img :src="getAvatar(selectedAuxiliary.picture.link)" class="avatar">
             <q-select filter v-model="editedEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions"
@@ -86,7 +86,7 @@
             </span>
           </div>
         </div>
-        <div class="modal-subtitle" style="display: flex">
+        <div class="modal-subtitle">
           <q-btn-toggle no-wrap v-model="editedEvent.type" toggle-color="primary" :options="eventTypeOptions.filter(option => option.value === editedEvent.type)" />
           <q-btn icon="delete" no-caps flat color="grey" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" />
         </div>
@@ -106,8 +106,8 @@
             :error="$v.editedEvent.location.fullAddress.$error" :error-label="addressError" inModal />
         </template>
         <template v-if="isRepetition(editedEvent)">
-          <div class="row q-mb-lg light-checkbox">
-            <q-checkbox v-model="editedEvent.shouldUpdateRepetition" label="Appliquer à la répétition" @input="toggleRepetition" />
+          <div class="row q-mb-md light-checkbox">
+            <q-checkbox size="3em" v-model="editedEvent.shouldUpdateRepetition" label="Appliquer à la répétition" @input="toggleRepetition" />
           </div>
         </template>
         <template v-if="editedEvent.type === ABSENCE">
@@ -127,7 +127,7 @@
         </template>
         <ni-modal-input v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes" />
         <template v-if="editedEvent.type === INTERVENTION && !editedEvent.shouldUpdateRepetition">
-          <div class="row q-mb-lg light-checkbox">
+          <div class="row q-mb-md light-checkbox">
             <q-checkbox v-model="editedEvent.isCancelled" label="Annuler l'évènement" @input="toggleCancellationForm" />
           </div>
           <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.condition" caption="Conditions"
@@ -827,15 +827,6 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables';
 
-  /deep/ .q-btn-group
-    border: none;
-    box-shadow: none;
-
-    & .q-btn-item
-      border-radius: 20px;
-      margin: 5px;
-      background-color: $light-grey;
-
   /deep/ .modal-auxiliay-header
     align-items: center
     .q-if-inverted
@@ -865,20 +856,29 @@ export default {
     font-size: 22px;
 
   /deep/ .q-btn-toggle
+    border: none;
+    box-shadow: none;
     @media screen and (max-width: 677px)
       display: inline-flex;
       flex-wrap: wrap;
-      & .q-btn
-        width: 45%
+    & .q-btn-item
+      width: 45%
+      border-radius: 20px;
+      margin: 5px;
+      background-color: $light-grey;
 
   .modal-subtitle
     display: flex;
     justify-content: space-between;
-    margin-bottom: 20px;
-    .q-btn-group
-      width: 30%;
+    margin-bottom: 16px;
+    .q-btn-toggle
       margin-bottom: 0;
       cursor: default;
+      width: 50%;
+      @media screen and (max-width: 677px)
+        width: 100%
+      & .q-btn-item
+          width: 100%
     .delete-action
       display: flex;
       flex-direction: row;
@@ -886,12 +886,13 @@ export default {
 
   .cutomer-info
     background: $light-grey;
-    padding: 10px 25px 20px;
+    padding: 10px 25px;
     /deep/ .q-if-inverted
       background: $light-grey !important;
       border: none;
 
   .light-checkbox
     color: $grey
+    font-size: 14px
 
 </style>
