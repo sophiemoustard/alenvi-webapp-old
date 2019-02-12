@@ -72,3 +72,12 @@ export default {
   }
 }
 </script>
+
+<style scoped lang="stylus">
+  .q-chips-input
+    background: white;
+    box-shadow: none;
+    padding: 9px 14px 11px 14px;
+    cursor: pointer;
+    border-radius: 3px;
+</style>

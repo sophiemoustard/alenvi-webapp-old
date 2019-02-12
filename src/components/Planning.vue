@@ -1,11 +1,18 @@
 <template>
-  <div>
-    <div :class="['planning-container', 'full-width', 'q-pa-md', { 'q-pl-xl': !toggleDrawer }]">
-      <div class="row justify-between items-center q-mb-md">
-        <q-btn icon="chevron_left" flat round @click="goToPreviousWeek"></q-btn>
-        <span>{{ timelineTitle() }}</span>
-        <q-btn icon="chevron_right" flat round @click="goToNextWeek"></q-btn>
+  <div :class="[{ 'planning': !toggleDrawer }]">
+    <div class="planning-header q-mb-md">
+      <ni-chips-autocomplete-auxiliaries-sectors @updateFilter="updatedFilter" v-model="terms" placeholder="Rechercher un(e) commununauté / auxiliaire"
+        @selected="selectedFilter" @remove="removedFilter" class="planning-search" />
+      <div class="row justify-center items-center planning-dates">
+        <div class="planning-month justify-center"><span class="capitalize">{{ timelineTitle() }}</span></div>
+        <div class="justify-around planning-actions">
+          <q-btn icon="chevron_left" flat round @click="goToPreviousWeek"></q-btn>
+          <q-btn icon="chevron_right" flat round @click="goToNextWeek"></q-btn>
+          <q-btn icon="today" flat round @click="goToToday"></q-btn>
+        </div>
       </div>
+    </div>
+    <div class="planning-container q-pa-md full-width">
       <table style="width: 100%">
         <thead>
           <th></th>
@@ -20,12 +27,8 @@
           <tr class="person-row" v-for="(person, index) in persons" :key="index">
             <td valign="top">
               <div class="q-my-sm">
-                <div class="q-mb-md">
-                  <ni-chip :data="person"></ni-chip>
-                </div>
-                <div class="person-name">
-                  {{ formatPersonName(person) }}
-                </div>
+                <div class="q-mb-md"><ni-chip :data="person"></ni-chip></div>
+                <div class="person-name">{{ formatPersonName(person) }}</div>
               </div>
             </td>
             <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
@@ -55,19 +58,25 @@
 import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, ABSENCE_TYPE } from '../data/constants';
 import { NotifyNegative } from './popup/notify';
 import NiChip from './Chip';
+import ChipsAutocompleteAuxiliariesSectors from './ChipsAutocompleteAuxiliariesSectors';
 
 export default {
   name: 'PlanningManager',
   components: {
-    'ni-chip': NiChip
+    'ni-chip': NiChip,
+    'ni-chips-autocomplete-auxiliaries-sectors': ChipsAutocompleteAuxiliariesSectors,
   },
   props: {
     events: { type: Array, default: () => [] },
     customers: { type: Array, default: () => [] },
     persons: { type: Array, default: () => [] },
+    selectedFilter: { type: Function, default: () => {} },
+    removedFilter: { type: Function, default: () => {} },
+    updatedFilter: { type: Function, default: () => {} },
   },
   data () {
     return {
+      terms: [],
       loading: false,
       draggedObject: {},
       startOfWeek: '',
@@ -104,7 +113,9 @@ export default {
       return this.$moment(this.startOfWeek).add(6, 'd');
     },
     timelineTitle () {
-      return `${this.$moment(this.startOfWeek).format('DD/MM')} - ${this.$moment(this.endOfWeek()).format('DD/MM')}`;
+      if (this.startOfWeek === '') return '';
+      if (this.$moment(this.startOfWeek).month() === this.$moment(this.endOfWeek()).month()) return this.$moment(this.startOfWeek).format('MMMM YYYY');
+      return `${this.$moment(this.startOfWeek).format('MMM')} - ${this.$moment(this.endOfWeek()).format('MMM YYYY')}`
     },
     goToPreviousWeek () {
       this.startOfWeek.subtract(7, 'd');
@@ -113,6 +124,11 @@ export default {
     },
     goToNextWeek () {
       this.startOfWeek.add(7, 'd');
+      this.getTimelineDays();
+      this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
+    },
+    goToToday () {
+      this.startOfWeek = this.$moment().startOf('week');
       this.getTimelineDays();
       this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
     },
@@ -162,7 +178,11 @@ export default {
       } finally {
         this.draggedObject = {};
       }
-    }
+    },
+    // Filters
+    selectedElements (el) {
+      // Add elements filtered to planning renderer
+    },
   }
 }
 </script>
@@ -245,4 +265,37 @@ export default {
         $white 7px
       )
 
+  .planning
+    padding-left: 30px;
+    @media screen and (max-width: 677px)
+      padding-left: 0px;
+    &-header
+      margin: 15px 0;
+      display: flex;
+      flex-direction: row;
+      @media screen and (max-width: 677px)
+        flex-direction: column;
+    &-search
+      @media screen and (min-width: 678px)
+        margin: 20px;
+        width: 40%;
+      @media screen and (max-width: 677px)
+        margin: 0 20px 10px;
+    &-month
+      display: flex;
+      font-size: 28px
+      @media screen and (min-width: 678px)
+        min-width: 200px
+      @media screen and (max-width: 677px)
+        width: 50%;
+    &-dates
+      margin: 0 20px
+      display: flex;
+      flex-direction: row;
+    &-actions
+      @media screen and (min-width: 678px)
+        min-width: 150px;
+      @media screen and (max-width: 677px)
+        width: 50%;
+      display: flex;
 </style>
