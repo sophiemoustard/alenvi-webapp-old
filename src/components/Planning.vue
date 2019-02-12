@@ -27,18 +27,19 @@
           <tr class="person-row" v-for="(person, index) in persons" :key="index">
             <td valign="top">
               <div class="q-my-sm">
-                <div class="q-mb-md"><ni-chip :data="person"></ni-chip></div>
+                <div v-if="personKey === 'auxiliary'" class="q-mb-md">
+                  <ni-chip :data="person" />
+                </div>
                 <div class="person-name">{{ formatPersonName(person) }}</div>
               </div>
             </td>
             <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
               @click="$emit('createEvent', { dayIndex, person })" >
-              <template v-for="(event, eventIndex) in getOneDayAuxiliaryEvents(person, days[dayIndex])">
+              <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
                 <div :id="event._id" draggable @dragstart="drag(event._id)" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-sm']"
                   :key="eventIndex" @click.stop="$emit('editEvent', event._id)">
                   <div class="col-12 event-title">
-                    <p v-if="event.type === INTERVENTION" class="no-margin ellipsis">{{ event.customer.identity.title }} {{
-                      event.customer.identity.lastname }}</p>
+                    <p v-if="event.type === INTERVENTION" class="no-margin ellipsis">{{ eventTitle(event) }}</p>
                     <p v-if="event.type === ABSENCE" class="no-margin ellipsis">{{ displayAbsenceType(event.absence) }}</p>
                     <p v-if="event.type === UNAVAILABILITY" class="no-margin ellipsis">Indisponibilité</p>
                     <p v-if="event.type === INTERNAL_HOUR" class="no-margin ellipsis">{{ event.internalHour.name }}</p>
@@ -68,11 +69,11 @@ export default {
   },
   props: {
     events: { type: Array, default: () => [] },
-    customers: { type: Array, default: () => [] },
     persons: { type: Array, default: () => [] },
     selectedFilter: { type: Function, default: () => {} },
     removedFilter: { type: Function, default: () => {} },
     updatedFilter: { type: Function, default: () => {} },
+    personKey: { type: String, default: 'auxiliary' }
   },
   data () {
     return {
@@ -140,12 +141,14 @@ export default {
       return this.$moment(momentDay).isSame(new Date(), 'day');
     },
     formatPersonName (person) {
-      return `${person.identity.firstname.slice(0, 1)}. ${person.identity.lastname}`.toUpperCase();
+      return this.personKey === 'auxiliary'
+        ? `${person.identity.firstname.slice(0, 1)}. ${person.identity.lastname}`.toUpperCase()
+        : `${person.identity.title} ${person.identity.lastname}`;
     },
     // Event display
-    getOneDayAuxiliaryEvents (auxiliary, day) {
+    getOneDayPersonEvents (person, day) {
       return this.events
-        .filter(event => event.auxiliary._id === auxiliary._id)
+        .filter(event => event[this.personKey] ? event[this.personKey]._id === person._id : false)
         .filter(event =>
           this.$moment(day).isSameOrAfter(event.startDate, 'day') && this.$moment(day).isSameOrBefore(event.endDate, 'day')
         )
@@ -164,6 +167,12 @@ export default {
     displayAbsenceType (value) {
       const absence = ABSENCE_TYPE.find(abs => abs.value === value);
       return !absence ? '' : absence.label;
+    },
+    eventTitle (event) {
+      if (this.personKey === 'customer') {
+        return `${event.auxiliary.identity.firstname.slice(0, 1)}. ${event.auxiliary.identity.lastname}`;
+      }
+      return `${event.customer.identity.title} ${event.customer.identity.lastname}`;
     },
     // Drag & drop
     drag (eventId) {

@@ -162,6 +162,15 @@ const routes = [
           parent: 'planning'
         },
       },
+      {
+        path: 'ni/planning/customers',
+        name: 'customers plannning',
+        component: () => import('pages/ni/planning/CustomerPlanning'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'planning'
+        },
+      },
       // Auxiliary view routes
       {
         path: 'auxiliaries/planning',
