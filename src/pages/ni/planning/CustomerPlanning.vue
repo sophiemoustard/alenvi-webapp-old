@@ -78,7 +78,7 @@ export default {
       }
     },
     async getCustomersBySector () {
-      this.customers = await this.$customers.showAll({ sectors: JSON.stringify(this.selectedSectors), isActive: true });
+      this.customers = await this.$customers.showAll({ sectors: JSON.stringify(this.selectedSectors), subscriptions: true });
       this.getEvents();
     },
     async getEmployeesBySector () {
