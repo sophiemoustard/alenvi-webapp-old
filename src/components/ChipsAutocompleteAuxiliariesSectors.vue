@@ -10,7 +10,6 @@ export default {
   name: 'ChipsAutocomplete',
   props: {
     terms: { type: Array, default: () => [] },
-    toFilter: { type: Array, default: () => [] },
     placeholder: String,
   },
   data () {

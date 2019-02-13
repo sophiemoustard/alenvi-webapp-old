@@ -1,13 +1,13 @@
 <template>
   <div :class="[{ 'planning': !toggleDrawer }]">
     <div class="planning-header q-mb-md">
-      <ni-chips-autocomplete-auxiliaries-sectors @updateFilter="updatedFilter" v-model="terms" placeholder="Rechercher un(e) commununauté / auxiliaire"
+      <ni-chips-autocomplete-auxiliaries-sectors v-model="terms" placeholder="Rechercher un(e) commununauté / auxiliaire"
         @selected="selectedFilter" @remove="removedFilter" class="planning-search" />
       <div class="row justify-center items-center planning-dates">
         <div class="planning-month justify-center" @click="datimeModal = !datimeModal">
           <span class="capitalize">{{ timelineTitle() }}</span>
           <q-icon name="arrow_drop_down" />
-          <q-popover v-model="datimeModal" >
+          <q-popover v-model="datimeModal">
             <q-datetime-picker minimal @input="goToWeek" :value="targetDate" />
           </q-popover>
         </div>
@@ -40,7 +40,7 @@
               </div>
             </td>
             <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
-              @click="$emit('createEvent', { dayIndex, person })" >
+              @click="$emit('createEvent', { dayIndex, person })">
               <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
                 <div :id="event._id" draggable @dragstart="drag(event._id)" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-sm']"
                   :key="eventIndex" @click.stop="$emit('editEvent', event._id)">
