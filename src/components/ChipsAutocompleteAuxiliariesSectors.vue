@@ -74,10 +74,14 @@ export default {
 </script>
 
 <style scoped lang="stylus">
+  @import '~variables';
   .q-chips-input
     background: white;
     box-shadow: none;
     padding: 9px 14px 11px 14px;
     cursor: pointer;
     border-radius: 3px;
+
+  .q-if:not(.q-if-disabled):not(.q-if-error):not(.q-if-warning):hover:before
+    color: $primary
 </style>

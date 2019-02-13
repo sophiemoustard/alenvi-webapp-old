@@ -311,7 +311,7 @@ export default {
       @media screen and (min-width: 678px)
         min-width: 200px
       @media screen and (max-width: 677px)
-        width: 50%;
+        width: 70%;
       .q-icon
         font-size: 0.8em;
         margin: 5px;
@@ -323,6 +323,6 @@ export default {
       @media screen and (min-width: 678px)
         min-width: 150px;
       @media screen and (max-width: 677px)
-        width: 50%;
+        width: 30%;
       display: flex;
 </style>

@@ -1,9 +1,13 @@
 <template>
-  <div>
-    <q-input color="white" inverted-light :value="value" @blur="blurHandler" align="center" @input="update" @focus="toggleSelect"
-      :class="[ isFocused ? 'underline' : '']" />
-    <q-select :options="options" :value="value" @input="update" color="white" inverted-light hide-underline align="center"
-      :ref="name" />
+  <div @click="selectPopover = !selectPopover">
+    <q-input color="white" inverted-light :value="value" @blur="blurHandler" align="center" @input="update" :class="[ selectPopover ? 'underline' : '']" />
+    <q-popover v-model="selectPopover">
+      <q-list>
+        <q-item link v-for="option in options" :key="option.value">
+          <div :class="[option.disable && 'disable']" @click="!option.disable && update(option.value)">{{ option. label }}</div>
+        </q-item>
+      </q-list>
+    </q-popover>
   </div>
 </template>
 
@@ -12,26 +16,21 @@ export default {
   name: 'NiSelectInput',
   props: {
     value: String,
-    name: String,
-    options: Array,
+    options: { type: Array, default: () => [] },
   },
   data () {
     return {
-      isFocused: false,
+      selectPopover: false,
     };
   },
   methods: {
-    toggleSelect () {
-      this.$refs[this.name].show();
-      this.isFocused = true;
-    },
     blurHandler (hour) {
       if (hour instanceof String) this.$emit('blur', { hour });
-      this.isFocused = false;
     },
     update (hour) {
       this.$emit('blur', { hour });
       if (hour.match(/[0-2][0-9]:(00|30)/)) this.$emit('input', hour);
+      this.selectPopover = false;
     },
   },
 }
@@ -45,16 +44,23 @@ export default {
     margin: 0;
     border-radius: 0;
 
-  /deep/ .q-select
-    &.q-if-inverted
-      padding: 0;
-      transform: translateY(2px);
-    .q-if-inner
-      display: none;
-    .q-icon
-      display: none;
+  /deep/.q-popover
+    transform: translateY(2px);
+    width: 120px;
+    /deep/.q-datetime-day-active
+      background-color: $primary !important;
 
   .underline
     border-bottom: 2px solid $primary;
+
+  .q-item
+    padding: 0;
+    div
+      width: 100%
+      padding: 8px 16px;
+
+  .disable
+    color: $light-grey;
+    cursor: default;
 
 </style>

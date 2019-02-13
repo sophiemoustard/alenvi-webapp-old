@@ -7,17 +7,15 @@
     <q-field :error="hasError" :error-label="errorMessage">
       <div class="datetime-container">
         <div class="datetime-item">
-          <ni-datetime-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" name="start-datetime"
-            @blur="blurDateHandler" />
-          <ni-select-input :value="value.startHour" @input="update($event, 'startHour')" class="time-item" align="center" autofocus-filter
+          <ni-datetime-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" @blur="blurDateHandler" />
+          <ni-select-input :value="value.startHour" @input="update($event, 'startHour')" class="time-item" align="center"
             @blur="blurHourHandler" :options="hoursOptions" filter :filter-placeholder="value.startHour" hide-underline name="start-hour" />
         </div>
         <p class="delimiter">-</p>
         <div class="datetime-item end">
-          <ni-select-input :value="value.endHour" @input="update($event, 'endHour')" class="time-item" align="center" autofocus-filter
-            @blur="blurHourHandler" :options="endHourOptions" filter :filter-placeholder="value.endHour" hide-underline name="end-hour" />
-          <ni-datetime-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
-            name="end-datetime" @blur="blurDateHandler" />
+          <ni-select-input :value="value.endHour" @input="update($event, 'endHour')" class="time-item" align="center"
+            @blur="blurHourHandler" :options="endHourOptions" />
+          <ni-datetime-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item" @blur="blurDateHandler" />
         </div>
       </div>
     </q-field>
@@ -60,7 +58,9 @@ export default {
       return this.error || this.childError;
     },
     endHourOptions () {
-      return this.hoursOptions.map(option => ({ ...option, disable: this.$moment(option.value, 'HH:mm').isSameOrBefore(this.$moment(this.value.startHour, 'HH:mm')) }));
+      return this.hoursOptions.map(option => {
+        return { ...option, disable: this.$moment(option.value, 'HH:mm').isSameOrBefore(this.$moment(this.value.startHour, 'HH:mm')) }
+      });
     },
   },
   methods: {
@@ -73,9 +73,6 @@ export default {
       if (event && event.hour === '') this.childError = true;
       else if (event && event.hour && !event.hour.match(/[0-2][0-9]:(00|30)/)) this.childError = true;
       else this.childError = false;
-    },
-    focusHandler (event) {
-      this.$emit('focus');
     },
     update (value, key) {
       const dates = { ...this.value, [key]: value }
@@ -107,12 +104,7 @@ export default {
     @media screen and (max-width: 677px)
       flex-direction: column;
       & .delimiter
-        display: none
-
-  /deep/ .q-select
-    padding-top: 0px !important;
-    .q-if-inner
-      padding: 10px;
+        display: none;
 
   .time-item
     /deep/ .q-input.q-if-inverted
@@ -122,9 +114,9 @@ export default {
   .date-item
     /deep/ .q-input.q-if-inverted
       padding: 10px;
-      max-width: 120px
+      max-width: 120px;
     /deep/ .q-field-content
-      padding-top: 0px
+      padding-top: 0px;
 
   .datetime-item
     display: flex;
@@ -132,12 +124,10 @@ export default {
     justify-content: space-around;
     &.end
       @media screen and (max-width: 677px)
-        border-top: 1px solid $light-grey
+        border-top: 1px solid $light-grey;
         flex-direction: row-reverse;
 
   /deep/ .q-if-inverted.q-if-focused
     box-shadow: none;
 
-  /deep/ .q-select .q-icon
-    display: none;
 </style>
