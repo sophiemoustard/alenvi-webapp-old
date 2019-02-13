@@ -1,12 +1,8 @@
 <template>
   <q-page class="neutral-background">
-    <div class="layout-padding">
-      <p class="input-caption">Filtre</p>
-      <ni-chips-autocomplete-auxiliaries-sectors class="q-mb-md filter-chips" @updateFilter="updatedFilter" v-model="terms" placeholder="Rechercher un(e) commununauté / auxiliaire"
-        @selected="selectedElement" @remove="removedElement" />
-    </div>
-    <ni-planning-manager @refreshEvents="getEvents" :events="events" :customers="customers" :persons="auxiliaries"
-      @updateStartOfWeek="updateStartOfWeek" @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop" />
+    <ni-planning-manager @refreshEvents="getEvents" :events="events" :customers="customers" :persons="auxiliaries" :updateFilter="updatedFilter"
+      @updateStartOfWeek="updateStartOfWeek" @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop"
+      :selectedFilter="selectedFilter" :removedFilter="removedFilter" />
 
     <!-- Event creation modal -->
     <q-modal v-if="Object.keys(newEvent).length !== 0" v-model="creationModal" content-classes="modal-container-md"
@@ -815,7 +811,7 @@ export default {
         NotifyNegative('Erreur lors de la suppression du document');
       }
     },
-    selectedElement (el) {
+    selectedFilter (el) {
       if (el.ogustSector) {
         this.selectedSectors.push(el.ogustSector);
         this.getEmployeesBySector();
@@ -823,7 +819,7 @@ export default {
         // Add auxiliary
       }
     },
-    removedElement (el) {
+    removedFilter (el) {
       // this.auxiliaries.splice(this.auxiliaries.findIndex((elem) => { return el.value === elem.sector }), 1);
       // Get element from name then remove element filtered from planning renderer
     },
@@ -836,6 +832,9 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables';
+
+  .q-layout-page
+    padding-top: 20px;
 
   /deep/ .modal-auxiliay-header
     align-items: center
@@ -904,9 +903,5 @@ export default {
   .light-checkbox
     color: $grey
     font-size: 14px
-
-  .filter-chips
-    border: 1px solid $light-grey
-    background: white
 
 </style>
