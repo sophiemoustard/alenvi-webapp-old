@@ -1,6 +1,6 @@
 <template>
   <q-page class="neutral-background">
-    <ni-planning-manager @refreshEvents="getEvents" :events="events" :customers="customers" :persons="auxiliaries" :updateFilter="updatedFilter"
+    <ni-planning-manager @refreshEvents="getEvents" :events="events" :persons="auxiliaries" :updateFilter="updatedFilter"
       @updateStartOfWeek="updateStartOfWeek" @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop"
       :selectedFilter="selectedFilter" :removedFilter="removedFilter" />
 
