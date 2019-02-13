@@ -4,10 +4,16 @@
       <ni-chips-autocomplete-auxiliaries-sectors @updateFilter="updatedFilter" v-model="terms" placeholder="Rechercher un(e) commununauté / auxiliaire"
         @selected="selectedFilter" @remove="removedFilter" class="planning-search" />
       <div class="row justify-center items-center planning-dates">
-        <div class="planning-month justify-center"><span class="capitalize">{{ timelineTitle() }}</span></div>
+        <div class="planning-month justify-center" @click="datimeModal = !datimeModal">
+          <span class="capitalize">{{ timelineTitle() }}</span>
+          <q-icon name="arrow_drop_down" />
+          <q-popover v-model="datimeModal" >
+            <q-datetime-picker minimal @input="goToWeek" :value="targetDate" />
+          </q-popover>
+        </div>
         <div class="justify-around planning-actions">
-          <q-btn icon="chevron_left" flat round @click="goToPreviousWeek"></q-btn>
-          <q-btn icon="chevron_right" flat round @click="goToNextWeek"></q-btn>
+          <q-btn icon="chevron_left" flat round @click="goToNextWeek(-7)"></q-btn>
+          <q-btn icon="chevron_right" flat round @click="goToNextWeek(7)"></q-btn>
           <q-btn icon="today" flat round @click="goToToday"></q-btn>
         </div>
       </div>
@@ -86,6 +92,8 @@ export default {
       UNAVAILABILITY,
       ABSENCE,
       INTERNAL_HOUR,
+      datimeModal: false,
+      targetDate: '',
     }
   },
   computed: {
@@ -107,6 +115,11 @@ export default {
     this.getTimelineDays();
     this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
   },
+  watch: {
+    startOfWeek: function () {
+      this.targetDate = this.startOfWeek.toISOString();
+    },
+  },
   methods: {
     // Table
     endOfWeek () {
@@ -117,18 +130,20 @@ export default {
       if (this.$moment(this.startOfWeek).month() === this.$moment(this.endOfWeek()).month()) return this.$moment(this.startOfWeek).format('MMMM YYYY');
       return `${this.$moment(this.startOfWeek).format('MMM')} - ${this.$moment(this.endOfWeek()).format('MMM YYYY')}`
     },
-    goToPreviousWeek () {
-      this.startOfWeek.subtract(7, 'd');
-      this.getTimelineDays();
-      this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
+    goToNextWeek (dayRange) {
+      this.startOfWeek.add(dayRange, 'd');
+      this.updateTimeline();
     },
-    goToNextWeek () {
-      this.startOfWeek.add(7, 'd');
-      this.getTimelineDays();
-      this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
-    },
-    goToToday () {
+    goToToday (value) {
       this.startOfWeek = this.$moment().startOf('week');
+      this.updateTimeline();
+    },
+    goToWeek (value) {
+      this.startOfWeek = this.$moment(value).startOf('week');
+      this.updateTimeline();
+      this.datimeModal = false;
+    },
+    updateTimeline () {
       this.getTimelineDays();
       this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
     },
@@ -288,6 +303,9 @@ export default {
         min-width: 200px
       @media screen and (max-width: 677px)
         width: 50%;
+      .q-icon
+        font-size: 0.8em;
+        margin: 5px;
     &-dates
       margin: 0 20px
       display: flex;
