@@ -7,6 +7,7 @@
 
 <script>
 import Planning from '../../../components/Planning.vue';
+import { INTERVENTION } from '../../../data/constants';
 
 export default {
   name: 'AuxiliaryPlanning',
@@ -63,7 +64,7 @@ export default {
 
       const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
       this.days = Array.from(range.by('days'));
-      this.getCustomersBySector();
+      if (Object.keys(this.selectedSectors).length !== 0) this.getCustomersBySector();
     },
     // Refresh data
     async getEvents () {
@@ -72,18 +73,26 @@ export default {
           startDate: this.startOfWeek.format('YYYYMMDD'),
           endStartDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
           sector: JSON.stringify(this.selectedSectors),
+          type: INTERVENTION,
         });
       } catch (e) {
+        this.events = [];
         console.error(e);
       }
     },
     async getCustomersBySector () {
-      this.customers = await this.$customers.showAll({ sectors: JSON.stringify(this.selectedSectors), subscriptions: true });
-      this.getEvents();
+      this.customers = [];
+      await this.getEvents();
+      const customers = [];
+      this.events.map(event => {
+        if (customers.filter(cust => cust._id === event.customer._id).length === 0) {
+          customers.push(event.customer);
+        }
+      });
+      this.customers = customers;
     },
     async getEmployeesBySector () {
       this.auxiliaries = await this.$users.showAllActive();
-      this.getEvents();
     },
     // Filtre
     selectedFilter (el) {
