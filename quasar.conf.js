@@ -107,6 +107,7 @@ module.exports = function (ctx) {
         'QSpinner',
         'QPopover',
         'QDatetime',
+        'QDatetimePicker',
         'QTable',
         'QSearch',
         'QTd',
