@@ -1,9 +1,10 @@
 <template>
-  <div>
+  <div @click="datetimePopover = !datetimePopover">
     <q-input color="white" inverted-light :value="formattedDate" @input="update($event, 'DD/MM/YYYY')" placeholder="jj/mm/yyyy"
-      @blur="blurHandler" align="center" @focus="toggleDatetime" :class="[ isFocused ? 'underline' : '']" />
-    <q-datetime :ref="name" :value="value" format="DD MMM YYYY" color="white" inverted-light @input="update"
-      minimal popover />
+      @blur="blurHandler" align="center" :class="[ datetimePopover ? 'underline' : '']" />
+    <q-popover v-model="datetimePopover">
+      <q-datetime-picker :value="value" format="DD MMM YYYY" color="white" inverted-light @input="update" minimal />
+    </q-popover>
   </div>
 </template>
 
@@ -12,11 +13,10 @@ export default {
   name: 'NiDatetimeInput',
   props: {
     value: String,
-    name: String,
   },
   data () {
     return {
-      isFocused: false,
+      datetimePopover: false,
     };
   },
   computed: {
@@ -25,13 +25,8 @@ export default {
     },
   },
   methods: {
-    toggleDatetime () {
-      this.$refs[this.name].show();
-      this.isFocused = true;
-    },
     blurHandler (event) {
       this.$emit('blur');
-      this.isFocused = false;
     },
     update (value, format) {
       // update from input component
@@ -45,6 +40,7 @@ export default {
         }
       // update from datetime component
       } else {
+        this.datetimePopover = false;
         this.$emit('blur');
         this.$emit('input', value);
       }
@@ -61,14 +57,10 @@ export default {
     margin: 0;
     border-radius: 0;
 
-  /deep/ .q-datetime-input
-    &.q-if-inverted
-      padding: 0;
-      transform: translateY(2px);
-    .q-if-inner
-      display: none;
-    .q-icon
-      display: none;
+  /deep/.q-popover
+    transform: translateY(2px);
+    /deep/.q-datetime-day-active
+      background-color: $primary !important;
 
   .underline
     border-bottom: 2px solid $primary;
