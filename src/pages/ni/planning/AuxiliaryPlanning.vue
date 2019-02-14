@@ -472,7 +472,7 @@ export default {
 
         this.loading = true
         await this.$events.deleteById(this.editedEvent._id);
-        this.getEvents();
+        this.events = this.events.filter(event => event._id !== this.editedEvent._id);
         this.editionModal = false;
         this.resetEditionForm();
         NotifyPositive('Évènement supprimé.');
@@ -501,8 +501,13 @@ export default {
         });
 
         this.loading = true
-        if (shouldDeleteRepetition) await this.$events.deleteRepetition(this.editedEvent._id);
-        else await this.$events.deleteById(this.editedEvent._id);
+        if (shouldDeleteRepetition) {
+          await this.$events.deleteRepetition(this.editedEvent._id);
+          this.getEvents();
+        } else {
+          await this.$events.deleteById(this.editedEvent._id);
+          this.events = this.events.filter(event => event._id !== this.editedEvent._id);
+        }
 
         this.getEvents();
         this.editionModal = false;

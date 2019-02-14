@@ -144,13 +144,13 @@ export default {
 
       const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
       this.days = Array.from(range.by('days'));
-      if (Object.keys(this.selectedSectors).length !== 0) this.refreshPlanning();
+      if (Object.keys(this.selectedSectors).length !== 0) {
+        this.customers = [];
+        this.refreshPlanning();
+      }
     },
     // Refresh data
     async refreshPlanning () {
-      this.events = [];
-      this.customers = [];
-
       try {
         const data = await this.$events.listByCustomerFromSectors({
           startDate: this.startOfWeek.format('YYYYMMDD'),
@@ -236,6 +236,7 @@ export default {
         this.refreshPlanning();
         this.editionModal = false;
         this.resetEditionForm();
+        NotifyPositive('Évènement modifié');
       } catch (e) {
         NotifyNegative('Erreur lors de l\'édition de l\'évènement');
       } finally {
@@ -254,7 +255,8 @@ export default {
 
         this.loading = true
         await this.$events.deleteById(this.editedEvent._id);
-        this.refreshPlanning();
+        this.events = this.events.filter(event => event._id !== this.editedEvent._id);
+
         this.editionModal = false;
         this.resetEditionForm();
         NotifyPositive('Évènement supprimé.');
@@ -283,10 +285,14 @@ export default {
         });
 
         this.loading = true
-        if (shouldDeleteRepetition) await this.$events.deleteRepetition(this.editedEvent._id);
-        else await this.$events.deleteById(this.editedEvent._id);
+        if (shouldDeleteRepetition) {
+          await this.$events.deleteRepetition(this.editedEvent._id);
+          this.refreshPlanning();
+        } else {
+          await this.$events.deleteById(this.editedEvent._id);
+          this.events = this.events.filter(event => event._id !== this.editedEvent._id);
+        }
 
-        this.refreshPlanning();
         this.editionModal = false;
         this.resetEditionForm();
         NotifyPositive('Évènement supprimé.');
