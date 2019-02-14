@@ -2,7 +2,7 @@
   <div :class="[{ 'planning': !toggleDrawer }]">
     <div class="planning-header q-mb-md">
       <ni-chips-autocomplete-auxiliaries-sectors v-model="terms" placeholder="Rechercher un(e) commununauté / auxiliaire"
-        @selected="selectedFilter" @remove="removedFilter" class="planning-search" />
+        @selected="selectedFilter" @remove="removedFilter" class="planning-search" @updatedFilter="updatedFilter" />
       <div class="row justify-center items-center planning-dates">
         <div class="planning-month justify-center" @click="datimeModal = !datimeModal">
           <span class="capitalize">{{ timelineTitle() }}</span>
@@ -200,10 +200,6 @@ export default {
       } finally {
         this.draggedObject = {};
       }
-    },
-    // Filters
-    selectedElements (el) {
-      // Add elements filtered to planning renderer
     },
   }
 }
