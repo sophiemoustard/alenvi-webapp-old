@@ -288,7 +288,6 @@ export default {
     @media screen and (max-width: 677px)
       padding-left: 0px;
     &-header
-      margin: 15px 0;
       display: flex;
       flex-direction: row;
       @media screen and (max-width: 677px)
