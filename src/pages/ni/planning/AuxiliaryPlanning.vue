@@ -1,7 +1,7 @@
 <template>
   <q-page class="neutral-background">
     <ni-planning-manager :events="events" :persons="auxiliaries" @updateStartOfWeek="updateStartOfWeek" @createEvent="openCreationModal"
-      @editEvent="openEditionModal" @onDrop="updateEventOnDrop" :selectedFilter="selectedFilter" :removedFilter="removedFilter" @updateFilter="updatedFilter"/>
+      @editEvent="openEditionModal" @onDrop="updateEventOnDrop" :selectedFilter="selectedFilter" :removedFilter="removedFilter" :updatedFilter="updatedFilter"/>
 
     <!-- Event creation modal -->
     <q-modal v-if="Object.keys(newEvent).length !== 0" v-model="creationModal" content-classes="modal-container-md"
@@ -170,6 +170,7 @@ export default {
     return {
       loading: false,
       selectedSectors: [],
+      toFilter: [],
       days: [],
       events: [],
       customers: [],
@@ -252,7 +253,7 @@ export default {
 
       const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
       this.days = Array.from(range.by('days'));
-      if (this.selectedSectors && this.selectedSectors.length) await this.getEvents();
+      if (this.auxiliaries && this.auxiliaries.length) await this.getEvents();
     },
     // Refresh data
     async getEvents () {
@@ -260,7 +261,6 @@ export default {
         this.events = await this.$events.list({
           startDate: this.startOfWeek.format('YYYYMMDD'),
           endStartDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
-          sector: JSON.stringify(this.selectedSectors),
           auxiliary: JSON.stringify(this.auxiliaries.map(aux => aux._id))
         });
       } catch (e) {
@@ -273,10 +273,6 @@ export default {
       } catch (e) {
         this.customers = [];
       }
-    },
-    async getEmployeesBySector () {
-      this.auxiliaries = await this.$users.showAllActive({ sector: JSON.stringify(this.selectedSectors) });
-      this.getEvents();
     },
     setInternalHours () {
       const user = this.$store.getters['main/user'];
@@ -522,12 +518,13 @@ export default {
       }
     },
     // Filters
+    updatedFilter (filter) {
+      console.log('filter', filter);
+      this.toFilter = filter;
+    },
     selectedFilter (el) {
       if (el.ogustSector) {
-        this.selectedSectors.push(el.ogustSector);
-        // Get all auxiliaries by sector entered
         const auxBySector = this.toFilter.filter(aux => aux.sector === el.ogustSector);
-        // For each auxiliary, check if she's not already in rendering array then push her
         for (let i = 0, l = auxBySector.length; i < l; i++) {
           if (!this.auxiliaries.some(aux => auxBySector[i]._id === aux._id)) {
             this.auxiliaries.push(auxBySector[i]);
@@ -542,7 +539,6 @@ export default {
     },
     removedFilter (el) {
       if (el.ogustSector) {
-        this.selectedSectors = this.selectedSectors.filter(sector => sector !== el.ogustSector);
         this.auxiliaries = this.auxiliaries.filter(auxiliary => auxiliary.sector !== el.ogustSector);
       } else {
         this.auxiliaries = this.auxiliaries.filter(auxiliary => auxiliary._id !== el._id);

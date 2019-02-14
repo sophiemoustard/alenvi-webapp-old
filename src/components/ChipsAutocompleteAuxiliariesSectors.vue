@@ -43,7 +43,7 @@ export default {
       try {
         await this.addAuxiliariesToFilter();
         await this.addSectorsToFilter();
-        this.$emit('updateFilter', this.filter);
+        this.$emit('updatedFilter', this.filter);
       } catch (e) {
         console.error(e);
       }
