@@ -1,8 +1,8 @@
 <template>
   <div :class="[{ 'planning': !toggleDrawer }]">
-    <div class="planning-header q-mb-md">
-      <ni-chips-autocomplete-auxiliaries-sectors v-model="terms" placeholder="Rechercher un(e) commununauté / auxiliaire"
-        @selected="selectedFilter" @remove="removedFilter" class="planning-search" @updatedFilter="updatedFilter" />
+    <div class="row justify-between planning-header q-mb-md">
+      <ni-chips-autocomplete-auxiliaries-sectors v-model="terms"
+        @selected="selectedFilter" @remove="removedFilter" class="planning-search" />
       <div class="row justify-center items-center planning-dates">
         <div class="planning-month justify-center" @click="datimeModal = !datimeModal">
           <span class="capitalize">{{ timelineTitle() }}</span>
@@ -11,14 +11,18 @@
             <q-datetime-picker minimal @input="goToWeek" :value="targetDate" />
           </q-popover>
         </div>
-        <div class="justify-around planning-actions">
+        <div class="row justify-around planning-actions">
           <q-btn icon="chevron_left" flat round @click="goToNextWeek(-7)"></q-btn>
           <q-btn icon="chevron_right" flat round @click="goToNextWeek(7)"></q-btn>
           <q-btn icon="today" flat round @click="goToToday"></q-btn>
+          <q-btn icon="playlist_play" round flat class="lt-sm" />
         </div>
       </div>
+      <div class="gt-xs">
+        <q-btn icon="playlist_play" round flat />
+      </div>
     </div>
-    <div class="planning-container q-pa-sm full-width">
+    <div class="planning-container full-width">
       <table style="width: 100%">
         <thead>
           <th></th>
@@ -42,12 +46,12 @@
             <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
               @click="$emit('createEvent', { dayIndex, person })">
               <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
-                <div :id="event._id" draggable @dragstart="drag(event._id)" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-sm']"
+                <div :id="event._id" draggable @dragstart="drag(event._id)" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`]"
                   :key="eventIndex" @click.stop="$emit('editEvent', event._id)">
                   <div class="col-12 event-title">
                     <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">{{ eventTitle(event) }}</p>
                     <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">{{ displayAbsenceType(event.absence) }}</p>
-                    <p v-if="event.type === UNAVAILABILITY" class="no-margin overflow-hidden-nowrap">Indisponibilité</p>
+                    <p v-if="event.type === UNAVAILABILITY" class="no-margin overflow-hidden-nowrap">Indispo.</p>
                     <p v-if="event.type === INTERNAL_HOUR" class="no-margin overflow-hidden-nowrap">{{ event.internalHour.name }}</p>
                   </div>
                   <p class="no-margin event-period overflow-hidden-nowrap">{{ getEventHours(event) }}</p>
@@ -219,7 +223,7 @@ export default {
     border-right: 1px solid $light-grey;
 
   td
-    padding: 5px 5px;
+    padding: 0px 6px 6px 6px;
 
     &:before
       content: "";
@@ -231,7 +235,7 @@ export default {
   th
     & .days
         &-header
-          padding: 8px 0px 16px 0px
+          padding: 8px 0px 8px 0px
           width: 100%
         &-name
           font-size: 1.125rem
@@ -257,13 +261,13 @@ export default {
       @media(max-width: 420px)
         font-size: 8px
     &-inner-cell
-      margin-bottom: 5px
-      margin-top: 5px
+      margin-top: 4px
 
   .event
     border-radius: 2px
-    padding: 8px 6px
-    margin-bottom: 3px
+    padding: 6px 4px
+    margin-bottom: 1px
+    margin-top: 6px
     &-title
       font-size: 0.875rem
       font-weight: 600
@@ -291,9 +295,17 @@ export default {
       padding-left: 0px;
     &-container
       background: white
+      padding: 5px 5px
+      @media(max-width: 767px)
+        padding: 2px
     &-header
-      display: flex;
-      flex-direction: row;
+      display: flex
+      flex-direction: row
+      margin-left: 38px
+      margin-right: 38px
+      @media(max-width: 767px)
+        margin-left: 19px
+        margin-right: 19px
       @media screen and (max-width: 677px)
         flex-direction: column;
     &-search
@@ -310,7 +322,7 @@ export default {
         font-size: 0.8em;
         margin: 5px;
     &-dates
-      margin: 0 20px
+      // margin: 0 20px
       display: flex;
       flex-direction: row;
     &-actions
