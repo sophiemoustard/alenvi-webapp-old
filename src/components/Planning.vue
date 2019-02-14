@@ -32,8 +32,10 @@
         <tbody>
           <tr class="person-row" v-for="(person, index) in persons" :key="index">
             <td valign="top">
-              <div class="q-my-sm">
-                <ni-chip :data="person" class="q-mb-md" />
+              <div class="person-inner-cell">
+                <div v-if="personKey === 'auxiliary'" class="q-mb-md">
+                  <ni-chip :data="person" />
+                </div>
                 <div class="person-name">{{ formatPersonName(person) }}</div>
               </div>
             </td>
@@ -217,7 +219,7 @@ export default {
     border-right: 1px solid $light-grey;
 
   td
-    padding: 5px 10px;
+    padding: 5px 5px;
 
     &:before
       content: "";
@@ -246,17 +248,20 @@ export default {
   .planning-container
     background: white
 
-  .person-row
-    border-right: 1px solid $light-grey;
-    height: 100px;
-
-  .person-name
-    font-weight: 600
-    font-size: 14px
-    @media(max-width: 1024px)
-      font-size: 12px
-    @media(max-width: 420px)
-      font-size: 8px
+  .person
+    &-row
+      border-right: 1px solid $light-grey;
+      height: 100px;
+    &-name
+      font-weight: 600
+      font-size: 14px
+      @media(max-width: 1024px)
+        font-size: 12px
+      @media(max-width: 420px)
+        font-size: 8px
+    &-inner-cell
+      margin-bottom: 5px
+      margin-top: 5px
 
   .event
     border-radius: 2px
