@@ -558,10 +558,6 @@ export default {
         height: 30px
         width: 30px
 
-  /deep/ .select-icon
-    display: flex !important;
-    margin: 0 0 0 10px;
-
   /deep/ .pink-icon
     color: $primary !important;
     font-size: 22px;

@@ -177,7 +177,6 @@ export const planningMixin = {
           value: sub._id,
         }));
     },
-    // Event creation
     selectedAddress (item) {
       if (this.creationModal) this.newEvent.location = Object.assign({}, this.newEvent.location, item);
       if (this.editionModal) this.editedEvent.location = Object.assign({}, this.editedEvent.location, item);

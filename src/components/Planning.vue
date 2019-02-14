@@ -33,9 +33,7 @@
           <tr class="person-row" v-for="(person, index) in persons" :key="index">
             <td valign="top">
               <div class="q-my-sm">
-                <div v-if="personKey === 'auxiliary'" class="q-mb-md">
-                  <ni-chip :data="person" />
-                </div>
+                <ni-chip :data="person" class="q-mb-md" />
                 <div class="person-name">{{ formatPersonName(person) }}</div>
               </div>
             </td>
@@ -158,7 +156,7 @@ export default {
     formatPersonName (person) {
       return this.personKey === 'auxiliary'
         ? `${person.identity.firstname.slice(0, 1)}. ${person.identity.lastname}`.toUpperCase()
-        : `${person.identity.title} ${person.identity.lastname}`;
+        : `${person.identity.title} ${person.identity.lastname}`.toUpperCase();
     },
     // Event display
     getOneDayPersonEvents (person, day) {
