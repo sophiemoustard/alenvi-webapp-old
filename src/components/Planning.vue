@@ -36,7 +36,7 @@
                 <div v-if="personKey === 'auxiliary'" class="q-mb-md">
                   <ni-chip :data="person" />
                 </div>
-                <div class="person-name">{{ formatPersonName(person) }}</div>
+                <div class="person-name overflow-hidden-nowrap">{{ formatPersonName(person) }}</div>
               </div>
             </td>
             <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
@@ -45,12 +45,12 @@
                 <div :id="event._id" draggable @dragstart="drag(event._id)" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-sm']"
                   :key="eventIndex" @click.stop="$emit('editEvent', event._id)">
                   <div class="col-12 event-title">
-                    <p v-if="event.type === INTERVENTION" class="no-margin ellipsis">{{ eventTitle(event) }}</p>
-                    <p v-if="event.type === ABSENCE" class="no-margin ellipsis">{{ displayAbsenceType(event.absence) }}</p>
-                    <p v-if="event.type === UNAVAILABILITY" class="no-margin ellipsis">Indisponibilité</p>
-                    <p v-if="event.type === INTERNAL_HOUR" class="no-margin ellipsis">{{ event.internalHour.name }}</p>
+                    <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">{{ eventTitle(event) }}</p>
+                    <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">{{ displayAbsenceType(event.absence) }}</p>
+                    <p v-if="event.type === UNAVAILABILITY" class="no-margin overflow-hidden-nowrap">Indisponibilité</p>
+                    <p v-if="event.type === INTERNAL_HOUR" class="no-margin overflow-hidden-nowrap">{{ event.internalHour.name }}</p>
                   </div>
-                  <p class="no-margin event-period ellipsis">{{ getEventHours(event) }}</p>
+                  <p class="no-margin event-period overflow-hidden-nowrap">{{ getEventHours(event) }}</p>
                 </div>
               </template>
             </td>
@@ -245,9 +245,6 @@ export default {
       background: $primary
       color: white
 
-  .planning-container
-    background: white
-
   .person
     &-row
       border-right: 1px solid $light-grey;
@@ -292,6 +289,8 @@ export default {
     padding-left: 30px;
     @media screen and (max-width: 677px)
       padding-left: 0px;
+    &-container
+      background: white
     &-header
       display: flex;
       flex-direction: row;
@@ -299,10 +298,7 @@ export default {
         flex-direction: column;
     &-search
       @media screen and (min-width: 678px)
-        margin: 20px;
         width: 40%;
-      @media screen and (max-width: 677px)
-        margin: 0 20px 10px;
     &-month
       display: flex;
       font-size: 28px
