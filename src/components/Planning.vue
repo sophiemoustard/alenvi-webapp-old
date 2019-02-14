@@ -76,7 +76,6 @@ export default {
     persons: { type: Array, default: () => [] },
     selectedFilter: { type: Function, default: () => {} },
     removedFilter: { type: Function, default: () => {} },
-    updatedFilter: { type: Function, default: () => {} },
     personKey: { type: String, default: 'auxiliary' }
   },
   data () {
@@ -201,6 +200,9 @@ export default {
         this.draggedObject = {};
       }
     },
+    updatedFilter (filter) {
+      this.$emit('updateFilter', filter);
+    }
   }
 }
 </script>

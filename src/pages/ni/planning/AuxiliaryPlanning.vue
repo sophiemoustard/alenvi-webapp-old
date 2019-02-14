@@ -1,7 +1,7 @@
 <template>
   <q-page class="neutral-background">
     <ni-planning-manager :events="events" :persons="auxiliaries" @updateStartOfWeek="updateStartOfWeek" @createEvent="openCreationModal"
-      @editEvent="openEditionModal" @onDrop="updateEventOnDrop" :selectedFilter="selectedFilter" :removedFilter="removedFilter" />
+      @editEvent="openEditionModal" @onDrop="updateEventOnDrop" :selectedFilter="selectedFilter" :removedFilter="removedFilter" @updateFilter="updatedFilter"/>
 
     <!-- Event creation modal -->
     <q-modal v-if="Object.keys(newEvent).length !== 0" v-model="creationModal" content-classes="modal-container-md"
@@ -261,6 +261,7 @@ export default {
           startDate: this.startOfWeek.format('YYYYMMDD'),
           endStartDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
           sector: JSON.stringify(this.selectedSectors),
+          auxiliary: JSON.stringify(this.auxiliaries.map(aux => aux._id))
         });
       } catch (e) {
         this.events = [];
@@ -524,14 +525,28 @@ export default {
     selectedFilter (el) {
       if (el.ogustSector) {
         this.selectedSectors.push(el.ogustSector);
-        this.getEmployeesBySector();
+        // Get all auxiliaries by sector entered
+        const auxBySector = this.toFilter.filter(aux => aux.sector === el.ogustSector);
+        // For each auxiliary, check if she's not already in rendering array then push her
+        for (let i = 0, l = auxBySector.length; i < l; i++) {
+          if (!this.auxiliaries.some(aux => auxBySector[i]._id === aux._id)) {
+            this.auxiliaries.push(auxBySector[i]);
+          }
+        }
       } else {
-        // Add auxiliary
+        if (!this.auxiliaries.some(aux => aux._id === el._id)) {
+          this.auxiliaries.push(el);
+        }
       }
+      this.getEvents();
     },
     removedFilter (el) {
-      // this.auxiliaries.splice(this.auxiliaries.findIndex((elem) => { return el.value === elem.sector }), 1);
-      // Get element from name then remove element filtered from planning renderer
+      if (el.ogustSector) {
+        this.selectedSectors = this.selectedSectors.filter(sector => sector !== el.ogustSector);
+        this.auxiliaries = this.auxiliaries.filter(auxiliary => auxiliary.sector !== el.ogustSector);
+      } else {
+        this.auxiliaries = this.auxiliaries.filter(auxiliary => auxiliary._id !== el._id);
+      }
     },
   },
 }

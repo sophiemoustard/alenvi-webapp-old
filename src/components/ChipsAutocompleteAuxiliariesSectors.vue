@@ -28,7 +28,7 @@ export default {
       this.$emit('selected', el);
     },
     removed (el) {
-      this.$emit('remove', el);
+      this.$emit('remove', this.filter.find(elem => elem.value === el.value[0]));
     },
     async search (terms, done) {
       try {
@@ -49,7 +49,7 @@ export default {
       }
     },
     async addAuxiliariesToFilter () {
-      this.filter = await this.$users.showAll({ 'role': 'Auxiliaire' });
+      this.filter = await this.$users.showAllActive({ 'role': 'Auxiliaire' });
       for (let i = 0, l = this.filter.length; i < l; i++) {
         this.filter[i].value = `${this.filter[i].identity.firstname} ${this.filter[i].identity.lastname}`;
         this.filter[i].label = `${this.filter[i].identity.firstname} ${this.filter[i].identity.lastname}`;
