@@ -18,7 +18,7 @@
         </div>
       </div>
     </div>
-    <div class="planning-container q-pa-md full-width">
+    <div class="planning-container q-pa-sm full-width">
       <table style="width: 100%">
         <thead>
           <th></th>
