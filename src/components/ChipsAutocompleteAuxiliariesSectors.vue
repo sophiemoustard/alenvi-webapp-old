@@ -81,7 +81,7 @@ export default {
   .q-chips-input
     background: white;
     box-shadow: none;
-    padding: 9px 14px 11px 14px;
+    padding: 6px 12px 6px 12px;
     cursor: pointer;
     border-radius: 3px;
 
