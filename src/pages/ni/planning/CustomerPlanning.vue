@@ -144,10 +144,13 @@ export default {
 
       const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
       this.days = Array.from(range.by('days'));
-      if (Object.keys(this.selectedSectors).length !== 0) this.getCustomersBySector();
+      if (Object.keys(this.selectedSectors).length !== 0) this.refreshPlanning();
     },
     // Refresh data
     async refreshPlanning () {
+      this.events = [];
+      this.customers = [];
+
       try {
         const data = await this.$events.listByCustomerFromSectors({
           startDate: this.startOfWeek.format('YYYYMMDD'),
