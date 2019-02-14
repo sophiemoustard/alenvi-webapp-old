@@ -15,7 +15,7 @@
         <div class="datetime-item end">
           <ni-select-input :value="value.endHour" @input="update($event, 'endHour')" class="time-item" align="center"
             @blur="blurHourHandler" :options="endHourOptions" />
-          <ni-datetime-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item" @blur="blurDateHandler" />
+          <ni-datetime-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item" @blur="blurDateHandler" :min="value.startDate" />
         </div>
       </div>
     </q-field>
@@ -67,6 +67,7 @@ export default {
     blurDateHandler (event) {
       if (event && event.date === '') this.childError = true;
       else if (event && event.date && !(this.$moment(event.date, 'DD/MM/YYYY', true).isValid())) this.childError = true;
+      else if (event && event.date && event.min && this.$moment(event.date).isBefore(this.$moment(event.min))) this.childError = true;
       else this.childError = false;
     },
     blurHourHandler (event) {

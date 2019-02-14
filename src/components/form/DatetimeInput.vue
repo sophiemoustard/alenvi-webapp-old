@@ -3,7 +3,7 @@
     <q-input color="white" inverted-light :value="formattedDate" @input="update($event, 'DD/MM/YYYY')" placeholder="jj/mm/yyyy"
       @blur="blurHandler" align="center" :class="[ datetimePopover ? 'underline' : '']" />
     <q-popover v-model="datetimePopover">
-      <q-datetime-picker :value="value" format="DD MMM YYYY" color="white" inverted-light @input="update" minimal />
+      <q-datetime-picker :value="value" format="DD MMM YYYY" color="white" inverted-light @input="update" minimal :min="min" />
     </q-popover>
   </div>
 </template>
@@ -13,6 +13,7 @@ export default {
   name: 'NiDatetimeInput',
   props: {
     value: String,
+    min: { type: String, default: '' },
   },
   data () {
     return {
@@ -33,8 +34,12 @@ export default {
       if (format) {
         if (this.$moment(value, 'DD/MM/YYYY', true).isValid()) {
           const date = this.$moment(value, format).toISOString();
-          this.$emit('blur');
-          this.$emit('input', date);
+          if (this.min && this.$moment(value, 'DD/MM/YYYY', true).isBefore(this.$moment(this.min))) {
+            this.$emit('blur', { date, min: this.min });
+          } else {
+            this.$emit('blur');
+            this.$emit('input', date);
+          }
         } else {
           this.$emit('blur', { date: value });
         }
