@@ -1,5 +1,6 @@
 <template>
-  <q-chips-input :value="terms" @input="inputEvent" :placeholder="placeholder" @remove="removed">
+  <q-chips-input class="input-search" :value="terms" @input="inputEvent" :placeholder="placeholder" @remove="removed"
+    :before="searchIcon" chips-bg-color="primary" inverted-light color="white">
     <q-autocomplete @search="search" @selected="selected"/>
   </q-chips-input>
 </template>
@@ -15,6 +16,9 @@ export default {
   data () {
     return {
       filter: [],
+      searchIcon: [{
+        icon: 'search'
+      }]
     }
   },
   mounted () {
