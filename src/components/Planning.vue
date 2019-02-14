@@ -183,9 +183,9 @@ export default {
     },
     eventTitle (event) {
       if (this.personKey === 'customer') {
-        return `${event.auxiliary.identity.firstname.slice(0, 1)}. ${event.auxiliary.identity.lastname}`;
+        return `${event.auxiliary.identity.firstname.slice(0, 1)}. ${event.auxiliary.identity.lastname}`.toUpperCase();
       }
-      return `${event.customer.identity.title} ${event.customer.identity.lastname}`;
+      return event.customer.identity.lastname.toUpperCase();
     },
     // Drag & drop
     drag (eventId) {
