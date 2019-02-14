@@ -519,7 +519,6 @@ export default {
     },
     // Filters
     updatedFilter (filter) {
-      console.log('filter', filter);
       this.toFilter = filter;
     },
     selectedFilter (el) {
