@@ -225,7 +225,7 @@ export default {
       content: "";
       display: block;
       margin: 0 auto 5px;
-      width: 80%;
+      width: 98%;
       border-bottom: 1px solid $light-grey;
 
   th
