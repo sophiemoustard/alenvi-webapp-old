@@ -4,16 +4,18 @@
       :selectedFilter="selectedFilter" @editEvent="openEditionModal" @createEvent="openCreationModal" />
 
     <!-- Event creation modal -->
-    <q-modal v-if="Object.keys(newEvent).length !== 0" v-model="creationModal" content-classes="modal-container-md"
-      @hide="resetCreationForm(false)">
+    <q-modal v-if="Object.keys(newEvent).length !== 0 && Object.keys(selectedCustomer.identity).length !== 0" v-model="creationModal"
+      content-classes="modal-container-md" @hide="resetCreationForm(false)">
       <div class="modal-padding">
         <div class="row q-mb-md">
           <div class="col-11 row modal-customer-header">
             <img :src="DEFAULT_AVATAR" class="avatar">
-            <div class="customer-name">{{ selectedCustomer.identity.title }} {{ selectedCustomer.identity.lastname }}</div>
+            <div class="customer-name">{{ selectedCustomer.identity.title }} {{
+              selectedCustomer.identity.lastname.toUpperCase() }}</div>
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
-            <span><q-icon name="clear" @click.native="creationModal = false" /></span>
+            <span>
+              <q-icon name="clear" @click.native="creationModal = false" /></span>
           </div>
         </div>
         <ni-datetime-range caption="Dates et heures de l'intervention" v-model="newEvent.dates" requiredField />
@@ -30,13 +32,14 @@
     </q-modal>
 
     <!-- Event edition modal -->
-    <q-modal v-if="Object.keys(editedEvent).length !== 0" v-model="editionModal" content-classes="modal-container-md"
-      @hide="resetEditionForm()">
+    <q-modal v-if="Object.keys(editedEvent).length !== 0 && Object.keys(selectedCustomer.identity).length !== 0" v-model="editionModal"
+      content-classes="modal-container-md" @hide="resetEditionForm()">
       <div class="modal-padding">
         <div class="row q-mb-md">
-          <div class="col-11 row modal-auxiliay-header">
+          <div class="col-11 row modal-customer-header">
             <img :src="DEFAULT_AVATAR" class="avatar">
-            <span>{{ editedEvent.customer.identity.firstname }}</span>
+            <div class="customer-name">{{ selectedCustomer.identity.title }} {{
+              selectedCustomer.identity.lastname.toUpperCase() }}</div>
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
             <span>
@@ -114,7 +117,7 @@ export default {
     },
     selectedCustomer () {
       if (this.creationModal && this.newEvent.customer !== '') return this.customers.find(cus => cus._id === this.newEvent.customer);
-      if (this.editionModal && this.editedEvent.auxiliary !== '') return this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
+      if (this.editionModal && this.editedEvent.auxiliary !== '') return this.customers.find(cus => cus._id === this.editedEvent.customer._id);
       return { picture: {}, identity: {} };
     },
     auxiliariesOptions () {
