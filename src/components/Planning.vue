@@ -26,9 +26,9 @@
       </div>
     </div>
     <div class="planning-container full-width">
-      <table style="width: 100%">
+      <table style="width: 100%" :class="[staffingView && 'staffing']">
         <thead>
-          <th></th>
+          <th><q-btn v-if="!isCustomerPlanning" flat round icon="remove_red_eye" @click="staffingView = !staffingView" /></th>
           <th class="capitalize" v-for="(day, index) in daysHeader" :key="index">
             <div class="row justify-center items-baseline days-header">
               <div class="days-name q-mr-md">{{ day.name }}</div>
@@ -46,22 +46,32 @@
                 <div class="person-name overflow-hidden-nowrap">{{ formatPersonName(person) }}</div>
               </div>
             </td>
-            <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
-              @click="$emit('createEvent', { dayIndex, person })">
-              <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
-                <div :id="event._id" draggable @dragstart="drag(event._id)" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`]"
-                  :key="eventIndex" @click.stop="$emit('editEvent', event._id)">
-                  <div class="col-12 event-title">
-                    <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">{{ eventTitle(event) }}</p>
-                    <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">{{ displayAbsenceType(event.absence) }}</p>
-                    <p v-if="event.type === UNAVAILABILITY" class="no-margin overflow-hidden-nowrap">Indispo.</p>
-                    <p v-if="event.type === INTERNAL_HOUR" class="no-margin overflow-hidden-nowrap">{{
-                      event.internalHour.name }}</p>
+            <template v-if="staffingView && !isCustomerPlanning">
+              <td v-for="(day, dayIndex) in days" :key="dayIndex" valign="top" @click="$emit('createEvent', { dayIndex, person })">
+                <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
+                  <div :id="event._id" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-sm']" :key="eventIndex"
+                    :style="{ left: `${4 * event.staffingLeft + 2}%`, width: `${4 * event.staffingWidth}%` }" @click.stop="$emit('editEvent', event._id)">
                   </div>
-                  <p class="no-margin event-period overflow-hidden-nowrap">{{ getEventHours(event) }}</p>
-                </div>
-              </template>
-            </td>
+                </template>
+              </td>
+            </template>
+            <template v-else>
+              <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
+                @click="$emit('createEvent', { dayIndex, person })">
+                <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
+                  <div :id="event._id" draggable @dragstart="drag(event._id)" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`]"
+                    :key="eventIndex" @click.stop="$emit('editEvent', event._id)">
+                    <div class="col-12 event-title">
+                      <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">{{ eventTitle(event) }}</p>
+                      <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">{{ displayAbsenceType(event.absence) }}</p>
+                      <p v-if="event.type === UNAVAILABILITY" class="no-margin overflow-hidden-nowrap">Indispo.</p>
+                      <p v-if="event.type === INTERNAL_HOUR" class="no-margin overflow-hidden-nowrap">{{ event.internalHour.name }}</p>
+                    </div>
+                    <p class="no-margin event-period overflow-hidden-nowrap">{{ getEventHours(event) }}</p>
+                  </div>
+                </template>
+              </td>
+            </template>
           </tr>
         </tbody>
       </table>
@@ -103,6 +113,7 @@ export default {
       INTERNAL_HOUR,
       datimeModal: false,
       targetDate: '',
+      staffingView: false,
     }
   },
   computed: {
@@ -118,6 +129,9 @@ export default {
         }
       });
     },
+    isCustomerPlanning () {
+      return this.personKey === 'customer';
+    }
   },
   async mounted () {
     this.startOfWeek = this.$moment().startOf('week');
@@ -164,9 +178,9 @@ export default {
       return this.$moment(momentDay).isSame(new Date(), 'day');
     },
     formatPersonName (person) {
-      return this.personKey === 'auxiliary'
-        ? `${person.identity.firstname.slice(0, 1)}. ${person.identity.lastname}`.toUpperCase()
-        : `${person.identity.title} ${person.identity.lastname}`.toUpperCase();
+      return this.isCustomerPlanning
+        ? `${person.identity.title} ${person.identity.lastname}`.toUpperCase()
+        : `${person.identity.firstname.slice(0, 1)}. ${person.identity.lastname}`.toUpperCase();
     },
     // Event display
     getOneDayPersonEvents (person, day) {
@@ -176,7 +190,15 @@ export default {
           this.$moment(day).isSameOrAfter(event.startDate, 'day') && this.$moment(day).isSameOrBefore(event.endDate, 'day')
         )
         .map((event) => {
-          let dayEvent = { ...event };
+          if (this.isCustomerPlanning) return event;
+
+          const staffingLeft = (this.$moment(event.startDate).hours() - 8) * 2 + (this.$moment(event.startDate).minutes() === 30 ? 1 : 0);
+          const staffingRight = (this.$moment(event.endDate).hours() - 8) * 2 + (this.$moment(event.endDate).minutes() === 30 ? 1 : 0);
+          let dayEvent = {
+            ...event,
+            staffingLeft,
+            staffingWidth: staffingRight - staffingLeft,
+          };
           if (!this.$moment(day).isSame(event.startDate, 'day')) dayEvent.startDate = this.$moment(day).hour(8).toISOString();
           if (!this.$moment(day).isSame(event.endDate, 'day')) dayEvent.endDate = this.$moment(day).hour(20).toISOString();
 
@@ -192,7 +214,7 @@ export default {
       return !absence ? '' : absence.label;
     },
     eventTitle (event) {
-      if (this.personKey === 'customer') {
+      if (this.isCustomerPlanning) {
         return `${event.auxiliary.identity.firstname.slice(0, 1)}. ${event.auxiliary.identity.lastname}`.toUpperCase();
       }
       return event.customer.identity.lastname.toUpperCase();
@@ -325,4 +347,13 @@ export default {
       @media screen and (max-width: 677px)
         width: 30%;
       display: flex;
+
+  .staffing
+    td
+      position: relative;
+    .event
+      position: absolute;
+      height: 90%;
+      padding: 0;
+      margin: 0;
 </style>
