@@ -196,6 +196,7 @@ export default {
       ],
       // Filters
       filters: [],
+      filteredSectors: [],
     };
   },
   async mounted () {
@@ -549,6 +550,7 @@ export default {
     },
     selectedFilter (el) {
       if (el.ogustSector) {
+        this.filteredSectors.push(el.ogustSector);
         const auxBySector = this.filters.filter(aux => aux.sector === el.ogustSector);
         for (let i = 0, l = auxBySector.length; i < l; i++) {
           if (!this.auxiliaries.some(aux => auxBySector[i]._id === aux._id)) {
@@ -565,8 +567,10 @@ export default {
     },
     removedFilter (el) {
       if (el.ogustSector) {
+        this.filteredSectors.filter(sec => sec !== el.ogustSector);
         this.auxiliaries = this.auxiliaries.filter(auxiliary => auxiliary.sector !== el.ogustSector);
       } else {
+        if (this.filteredSectors.includes(el.sector)) return;
         this.auxiliaries = this.auxiliaries.filter(auxiliary => auxiliary._id !== el._id);
       }
     },
