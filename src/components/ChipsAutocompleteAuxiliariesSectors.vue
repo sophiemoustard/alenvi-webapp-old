@@ -1,5 +1,5 @@
 <template>
-  <q-chips-input class="input-search" :value="terms" @input="inputEvent" :placeholder="counterSelectedEl === 0 ? placeholder : ''" @remove="removed"
+  <q-chips-input class="input-search" :value="terms" @input="inputEvent" @remove="removed"
     :before="searchIcon" chips-bg-color="primary" inverted-light color="white" add-icon="x" autofocus>
     <q-autocomplete @search="search" @selected="selected" :debounce='0'/>
   </q-chips-input>
@@ -11,7 +11,6 @@ export default {
   name: 'ChipsAutocomplete',
   props: {
     terms: { type: Array, default: () => [] },
-    placeholder: String,
     filters: { type: Array, default: () => [] },
   },
   data () {
