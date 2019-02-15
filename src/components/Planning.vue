@@ -191,16 +191,21 @@ export default {
         )
         .map((event) => {
           if (this.isCustomerPlanning) return event;
+          let dayEvent = { ...event };
 
-          const staffingLeft = (this.$moment(event.startDate).hours() - 8) * 2 + (this.$moment(event.startDate).minutes() === 30 ? 1 : 0);
-          const staffingRight = (this.$moment(event.endDate).hours() - 8) * 2 + (this.$moment(event.endDate).minutes() === 30 ? 1 : 0);
-          let dayEvent = {
-            ...event,
-            staffingLeft,
-            staffingWidth: staffingRight - staffingLeft,
-          };
-          if (!this.$moment(day).isSame(event.startDate, 'day')) dayEvent.startDate = this.$moment(day).hour(8).toISOString();
-          if (!this.$moment(day).isSame(event.endDate, 'day')) dayEvent.endDate = this.$moment(day).hour(20).toISOString();
+          let staffingLeft = (this.$moment(event.startDate).hours() - 8) * 2 + (this.$moment(event.startDate).minutes() === 30 ? 1 : 0);
+          let staffingRight = (this.$moment(event.endDate).hours() - 8) * 2 + (this.$moment(event.endDate).minutes() === 30 ? 1 : 0);
+          if (!this.$moment(day).isSame(event.startDate, 'day')) {
+            dayEvent.startDate = this.$moment(day).hour(8).toISOString();
+            staffingLeft = 0;
+          }
+          if (!this.$moment(day).isSame(event.endDate, 'day')) {
+            dayEvent.endDate = this.$moment(day).hour(20).toISOString();
+            staffingRight = 24;
+          }
+
+          dayEvent.staffingLeft = staffingLeft;
+          dayEvent.staffingWidth = staffingRight - staffingLeft;
 
           return dayEvent;
         })
