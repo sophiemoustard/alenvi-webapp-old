@@ -2,8 +2,8 @@
   <div :class="[{ 'planning': !toggleDrawer }]">
     <div class="row items-center planning-header q-mb-md">
       <div class="col-xs-12 col-md-5 planning-search">
-        <ni-chips-autocomplete-auxiliaries-sectors v-model="terms" @updatedFilter="updatedFilter"
-          @selected="selectedFilter" @remove="removedFilter" class="planning-search" :filters="filters" />
+        <ni-chips-autocomplete-auxiliaries-sectors v-model="terms" @selected="selectedFilter" @remove="removedFilter"
+          class="planning-search" :filters="filters" />
       </div>
       <div class="col-xs-10 col-md-6 row items-center justify-center">
         <div class="planning-month" @click="datimeModal = !datimeModal">
@@ -55,7 +55,8 @@
                     <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">{{ eventTitle(event) }}</p>
                     <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">{{ displayAbsenceType(event.absence) }}</p>
                     <p v-if="event.type === UNAVAILABILITY" class="no-margin overflow-hidden-nowrap">Indispo.</p>
-                    <p v-if="event.type === INTERNAL_HOUR" class="no-margin overflow-hidden-nowrap">{{ event.internalHour.name }}</p>
+                    <p v-if="event.type === INTERNAL_HOUR" class="no-margin overflow-hidden-nowrap">{{
+                      event.internalHour.name }}</p>
                   </div>
                   <p class="no-margin event-period overflow-hidden-nowrap">{{ getEventHours(event) }}</p>
                 </div>
