@@ -3,7 +3,7 @@
     <div class="row items-center planning-header q-mb-md">
       <div class="col-xs-12 col-md-5 planning-search">
         <ni-chips-autocomplete-auxiliaries-sectors v-model="terms" @updatedFilter="updatedFilter"
-          @selected="selectedFilter" @remove="removedFilter" class="planning-search" />
+          @selected="selectedFilter" @remove="removedFilter" class="planning-search" :filters="filters" />
       </div>
       <div class="col-xs-10 col-md-6 row items-center justify-center">
         <div class="planning-month" @click="datimeModal = !datimeModal">
@@ -86,7 +86,8 @@ export default {
     selectedFilter: { type: Function, default: () => {} },
     removedFilter: { type: Function, default: () => {} },
     updatedFilter: { type: Function, default: () => {} },
-    personKey: { type: String, default: 'auxiliary' }
+    personKey: { type: String, default: 'auxiliary' },
+    filters: { type: Array, default: () => [] },
   },
   data () {
     return {
