@@ -28,7 +28,9 @@
     <div class="planning-container full-width">
       <table style="width: 100%" :class="[staffingView && 'staffing']">
         <thead>
-          <th><q-btn v-if="!isCustomerPlanning" flat round icon="remove_red_eye" @click="staffingView = !staffingView" /></th>
+          <th>
+            <q-btn v-if="!isCustomerPlanning" flat round icon="view_week" :color="staffingView ? 'primary' : ''" @click="staffingView = !staffingView" />
+          </th>
           <th class="capitalize" v-for="(day, index) in daysHeader" :key="index">
             <div class="row justify-center items-baseline days-header">
               <div class="days-name q-mr-md">{{ day.name }}</div>
@@ -40,17 +42,19 @@
           <tr class="person-row" v-for="(person, index) in persons" :key="index">
             <td valign="top">
               <div class="person-inner-cell">
-                <div class="q-mb-md">
+                <div :class="[!staffingView && 'q-mb-md']">
                   <ni-chip :data="person" />
                 </div>
                 <div class="person-name overflow-hidden-nowrap">{{ formatPersonName(person) }}</div>
               </div>
             </td>
             <template v-if="staffingView && !isCustomerPlanning">
-              <td v-for="(day, dayIndex) in days" :key="dayIndex" valign="top" @click="$emit('createEvent', { dayIndex, person })">
+              <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
+                @click="$emit('createEvent', { dayIndex, person })">
                 <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
-                  <div :id="event._id" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-sm']" :key="eventIndex"
-                    :style="{ left: `${4 * event.staffingLeft + 2}%`, width: `${4 * event.staffingWidth}%` }" @click.stop="$emit('editEvent', event._id)">
+                  <div :id="event._id" draggable @dragstart="drag(event._id)" @click.stop="$emit('editEvent', event._id)"
+                    :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-sm']" :key="eventIndex"
+                    :style="{ left: `${4 * event.staffingLeft + 2}%`, width: `${4 * event.staffingWidth}%` }" >
                   </div>
                 </template>
               </td>
@@ -354,11 +358,19 @@ export default {
       display: flex;
 
   .staffing
+    .person
+      &-row
+        height: auto
+      &-name
+        margin: 2px 0 4px;
     td
       position: relative;
+      &:before
+        margin: 0 auto 2px;
     .event
       position: absolute;
-      height: 90%;
+      height: 95%;
       padding: 0;
       margin: 0;
+      border: 1px solid white;
 </style>
