@@ -115,7 +115,7 @@
           <ni-datetime-picker caption="Date de fin" v-model="editedEvent.dates.endDate" type="date" :error="$v.editedEvent.dates.endDate.$error"
             inModal @blur="$v.editedEvent.dates.endDate.$touch" />
           <ni-modal-select caption="Durée" :error="$v.editedEvent.endDuration.$error" :options="dateOptions" v-model="editedEvent.endDuration"
-            separator @blur="$v.editedEvent.dates.endDuration.$touch" />
+            separator @blur="$v.editedEvent.endDuration.$touch" />
           <ni-modal-select caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions" :error="$v.editedEvent.absence.$error"
             @blur="$v.editedEvent.absence.$touch" />
           <ni-file-uploader v-if="editedEvent.absence && editedEvent.absence === ILLNESS" caption="Justificatif d'absence"
