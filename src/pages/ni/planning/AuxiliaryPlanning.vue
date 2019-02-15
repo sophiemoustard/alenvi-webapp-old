@@ -545,7 +545,7 @@ export default {
         this.filters.push({
           label: allSectorsRaw[k],
           value: allSectorsRaw[k],
-          ogustSector: k
+          ogustSector: k,
         });
       }
     },
