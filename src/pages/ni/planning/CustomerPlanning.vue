@@ -366,7 +366,7 @@ export default {
     async addCustomersToFilter () {
       this.filters = await this.$customers.showAll({ subscriptions: true });
       for (let i = 0, l = this.filters.length; i < l; i++) {
-        this.filters[i].value = `${this.filters[i].identity.firstname} ${this.filters[i].identity.lastname}`;
+        this.filters[i].value = `${this.filters[i].identity.title} ${this.filters[i].identity.lastname}`;
         this.filters[i].label = `${this.filters[i].identity.title} ${this.filters[i].identity.lastname}`;
       }
     },
