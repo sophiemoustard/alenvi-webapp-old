@@ -375,12 +375,12 @@ export default {
 
         this.getEvents();
         this.creationModal = false;
-        this.loading = false;
         this.resetCreationForm(false);
         NotifyPositive('Évènement créé');
       } catch (e) {
         NotifyNegative('Erreur lors de la création de l\'évènement');
-        this.loading = false;
+      } finally {
+        this.loading = false
       }
     },
     // Event edition
@@ -393,7 +393,6 @@ export default {
         const payload = this.getPayload(this.editedEvent);
 
         if (this.hasConflicts(payload)) {
-          this.loading = false;
           this.$v.editedEvent.$reset();
           return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
         }

@@ -223,7 +223,6 @@ export default {
 
         const hasConflicts = await this.hasConflicts(payload);
         if (hasConflicts) {
-          this.loading = false;
           this.$v.editedEvent.$reset();
           return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
         }
@@ -232,12 +231,12 @@ export default {
 
         this.refreshPlanning();
         this.creationModal = false;
-        this.loading = false;
         this.resetCreationForm(false);
         NotifyPositive('Évènement créé');
       } catch (e) {
         NotifyNegative('Erreur lors de la création de l\'évènement');
-        this.loading = false;
+      } finally {
+        this.loading = false
       }
     },
     // Event edition
