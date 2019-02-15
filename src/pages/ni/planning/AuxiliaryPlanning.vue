@@ -509,7 +509,6 @@ export default {
           this.events = this.events.filter(event => event._id !== this.editedEvent._id);
         }
 
-        this.getEvents();
         this.editionModal = false;
         this.resetEditionForm();
         NotifyPositive('Évènement supprimé.');
@@ -556,12 +555,13 @@ export default {
             this.auxiliaries.push(auxBySector[i]);
           }
         }
+        this.getEvents();
       } else {
         if (!this.auxiliaries.some(aux => aux._id === el._id)) {
           this.auxiliaries.push(el);
+          this.getEvents();
         }
       }
-      this.getEvents();
     },
     removedFilter (el) {
       if (el.ogustSector) {
