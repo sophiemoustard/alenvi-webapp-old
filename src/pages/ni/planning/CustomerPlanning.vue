@@ -103,6 +103,7 @@ export default {
       auxiliaries: [],
       startDate: '',
       filteredSectors: [],
+      filteredCustomers: [],
       DEFAULT_AVATAR,
       filters: [],
     };
@@ -147,22 +148,41 @@ export default {
 
       const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
       this.days = Array.from(range.by('days'));
-      if (Object.keys(this.filteredSectors).length !== 0) {
-        this.customers = [];
-        this.refreshPlanning();
-      }
+      if (this.filteredSectors.length !== 0 || this.filteredCustomers.length !== 0) await this.refreshCustomers();
+      if (this.customers.length !== 0) await this.refreshPlanning();
     },
     // Refresh data
+    async refreshCustomers () {
+      this.customers = [];
+      let customersBySector = [];
+      try {
+        customersBySector = await this.getCustomersBySectors(this.filteredSectors);
+      } catch (e) {
+        customersBySector = []
+      }
+
+      for (let i = 0, l = customersBySector.length; i < l; i++) {
+        if (!this.customers.some(cus => customersBySector[i]._id === cus._id)) {
+          this.customers.push(customersBySector[i]);
+        }
+      }
+      if (this.filteredCustomers.length !== 0) {
+        for (let i = 0, l = this.filteredCustomers.length; i < l; i++) {
+          if (!this.customers.some(cus => this.filteredCustomers[i]._id === cus._id)) {
+            this.customers.push(this.filteredCustomers[i]);
+          }
+        }
+      }
+    },
     async refreshPlanning () {
       try {
         this.events = await this.$events.list({
           startDate: this.startOfWeek.format('YYYYMMDD'),
           endStartDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
-          customer: JSON.stringify(this.customers.map(cus => cus._id))
+          customer: JSON.stringify(this.customers.map(cus => cus._id)),
         });
       } catch (e) {
         this.events = [];
-        this.customers = [];
       }
     },
     async getEmployeesBySector () {
@@ -382,17 +402,26 @@ export default {
         });
       }
     },
+    async getCustomersBySectors (sectors) {
+      return sectors.length === 0 ? [] : this.$customers.showAllBySector({
+        startDate: this.startOfWeek.format('YYYYMMDD'),
+        endStartDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
+        sector: JSON.stringify(sectors),
+      });
+    },
     async selectedFilter (el) {
       if (el.ogustSector) {
-        const customersBySector = await this.$customers.showAllBySector({
-          startDate: this.startOfWeek.format('YYYYMMDD'),
-          endStartDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
-          sector: el.ogustSector,
-        });
-        this.customers.push(...customersBySector);
+        this.filteredSectors.push(el.ogustSector);
+        const customersBySector = await this.getCustomersBySectors(this.filteredSectors);
+        for (let i = 0, l = customersBySector.length; i < l; i++) {
+          if (!this.customers.some(cus => customersBySector[i]._id === cus._id)) {
+            this.customers.push(customersBySector[i]);
+          }
+        }
         this.refreshPlanning();
       } else {
         if (!this.customers.some(cust => cust._id === el._id)) {
+          this.filteredCustomers.push(el);
           this.customers.push(el);
           this.refreshPlanning();
         }
@@ -400,14 +429,11 @@ export default {
     },
     async removedFilter (el) {
       if (el.ogustSector) {
-        const customersBySector = await this.$customers.showAllBySector({
-          startDate: this.startOfWeek.format('YYYYMMDD'),
-          endStartDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
-          sector: el.ogustSector,
-        });
-        const customersIdsBySector = customersBySector.map(cus => cus._id);
-        this.customers = this.customers.filter(customer => !customersIdsBySector.includes(customer._id));
+        this.filteredSectors = this.filteredSectors.filter(sec => sec !== el.ogustSector);
+        await this.refreshCustomers();
+        await this.refreshPlanning();
       } else {
+        this.filteredCustomers = this.filteredCustomers.filter(cus => cus._id !== el._id);
         this.customers = this.customers.filter(customer => customer._id !== el._id);
       }
     },
