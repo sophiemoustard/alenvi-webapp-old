@@ -40,7 +40,7 @@
           <tr class="person-row" v-for="(person, index) in persons" :key="index">
             <td valign="top">
               <div class="person-inner-cell">
-                <div v-if="personKey === 'auxiliary'" class="q-mb-md">
+                <div class="q-mb-md">
                   <ni-chip :data="person" />
                 </div>
                 <div class="person-name overflow-hidden-nowrap">{{ formatPersonName(person) }}</div>
