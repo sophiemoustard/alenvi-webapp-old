@@ -1,6 +1,6 @@
 <template>
-  <q-chips-input class="input-search" :value="terms" @input="inputEvent" :placeholder="placeholder" @remove="removed"
-    :before="searchIcon" chips-bg-color="primary" inverted-light color="white" add-icon="x">
+  <q-chips-input class="input-search" :value="terms" @input="inputEvent" :placeholder="counterSelectedEl === 0 ? placeholder : ''" @remove="removed"
+    :before="searchIcon" chips-bg-color="primary" inverted-light color="white" add-icon="x" autofocus>
     <q-autocomplete @search="search" @selected="selected"/>
   </q-chips-input>
 </template>
@@ -18,7 +18,8 @@ export default {
     return {
       searchIcon: [{
         icon: 'search'
-      }]
+      }],
+      counterSelectedEl: 0
     }
   },
   methods: {
@@ -26,9 +27,11 @@ export default {
       this.$emit('input', value);
     },
     selected (el) {
+      ++this.counterSelectedEl;
       this.$emit('selected', el);
     },
     removed (el) {
+      --this.counterSelectedEl;
       this.$emit('remove', this.filters.find(elem => elem.value === el.value[0]));
     },
     async search (terms, done) {
