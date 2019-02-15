@@ -264,7 +264,6 @@ export default {
     &:before
       content: "";
       display: block;
-      margin: 0 auto 5px;
       width: 98%;
       border-bottom: 1px solid $light-grey;
 
@@ -302,7 +301,6 @@ export default {
   .event
     border-radius: 2px
     padding: 6px 4px
-    margin-bottom: 1px
     margin-top: 6px
     &-title
       font-size: 0.875rem
@@ -366,11 +364,10 @@ export default {
         margin: 2px 0 4px;
     td
       position: relative;
-      &:before
-        margin: 0 auto 2px;
     .event
       position: absolute;
-      height: 95%;
+      top: 2px;
+      bottom: 1px;
       padding: 0;
       margin: 0;
       border: 1px solid white;
