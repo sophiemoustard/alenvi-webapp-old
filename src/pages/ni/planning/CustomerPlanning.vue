@@ -1,7 +1,7 @@
 <template>
   <q-page class="neutral-background">
     <ni-planning-manager :events="events" :persons="customers" personKey="customer" @updateStartOfWeek="updateStartOfWeek"
-      :selectedFilter="selectedFilter" @editEvent="openEditionModal" @createEvent="openCreationModal" />
+      :selectedFilter="selectedFilter" @editEvent="openEditionModal" @createEvent="openCreationModal" @onDrop="updateEventOnDrop" />
 
     <!-- Event creation modal -->
     <q-modal v-if="Object.keys(newEvent).length !== 0 && Object.keys(selectedCustomer.identity).length !== 0" v-model="creationModal"
@@ -198,6 +198,20 @@ export default {
       };
       this.creationModal = true;
     },
+    async hasConflicts (scheduledEvent) {
+      let auxiliaryEvents = [];
+      try {
+        auxiliaryEvents = await this.$events.list({
+          auxiliary: JSON.stringify([scheduledEvent.auxiliary]),
+          startDate: scheduledEvent.startDate,
+          endStartDate: this.$moment(scheduledEvent.endDate).subtract(1, 'minutes').toISOString(),
+        });
+      } catch (e) {
+        if (e.status !== 404) return NotifyNegative('Une erreur s\'est produite');
+      }
+
+      return auxiliaryEvents.filter(event => event._id !== scheduledEvent._id).length !== 0;
+    },
     async createEvent () {
       try {
         this.$v.newEvent.$touch();
@@ -205,6 +219,13 @@ export default {
 
         this.loading = true;
         const payload = this.getPayload(this.newEvent);
+
+        const hasConflicts = await this.hasConflicts(payload);
+        if (hasConflicts) {
+          this.loading = false;
+          this.$v.editedEvent.$reset();
+          return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
+        }
 
         await this.$events.create(payload);
 
@@ -227,11 +248,17 @@ export default {
         this.loading = true;
         const payload = this.getPayload(this.editedEvent);
 
+        const hasConflicts = await this.hasConflicts(payload);
+        if (hasConflicts) {
+          this.loading = false;
+          this.$v.editedEvent.$reset();
+          return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
+        }
+
         delete payload.customer;
         delete payload.type;
         delete payload._id
         await this.$events.updateById(this.editedEvent._id, payload);
-        NotifyPositive('Évènement modifié');
 
         this.refreshPlanning();
         this.editionModal = false;
@@ -242,6 +269,30 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+    async updateEventOnDrop (vEvent) {
+      const { toDay, toPerson, draggedObject } = vEvent;
+
+      if (toPerson._id !== draggedObject.customer._id) return NotifyNegative('Impossible de modifier le bénéficiaire de l\'intervention');
+
+      const daysBetween = this.$moment(draggedObject.endDate).diff(this.$moment(draggedObject.startDate), 'days');
+      const payload = {
+        startDate: this.$moment(toDay).hours(this.$moment(draggedObject.startDate).hours())
+          .minutes(this.$moment(draggedObject.startDate).minutes()).toISOString(),
+        endDate: this.$moment(toDay).add(daysBetween, 'days').hours(this.$moment(draggedObject.endDate).hours())
+          .minutes(this.$moment(draggedObject.endDate).minutes()).toISOString(),
+        auxiliary: draggedObject.auxiliary._id,
+      };
+
+      const hasConflicts = await this.hasConflicts(payload);
+      if (hasConflicts) {
+        return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
+      }
+
+      const updatedEvent = await this.$events.updateById(draggedObject._id, payload);
+      this.events = this.events.map(event => (event._id === updatedEvent._id) ? updatedEvent : event);
+
+      NotifyPositive('Évènement modifié');
     },
     // Event deletion
     async deleteEvent () {
