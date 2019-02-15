@@ -1,24 +1,31 @@
 <template>
   <div :class="[{ 'planning': !toggleDrawer }]">
-    <div class="planning-header q-mb-md">
-      <ni-chips-autocomplete-auxiliaries-sectors v-model="terms" placeholder="Rechercher un(e) commununauté / auxiliaire"
-        @selected="selectedFilter" @remove="removedFilter" class="planning-search" @updatedFilter="updatedFilter" />
-      <div class="row justify-center items-center planning-dates">
-        <div class="planning-month justify-center" @click="datimeModal = !datimeModal">
+    <div class="row items-center planning-header q-mb-md">
+      <div class="col-xs-12 col-md-5 planning-search">
+        <ni-chips-autocomplete-auxiliaries-sectors v-model="terms" @updatedFilter="updatedFilter"
+          @selected="selectedFilter" @remove="removedFilter" class="planning-search" />
+      </div>
+      <div class="col-xs-10 col-md-6 row items-center justify-center">
+        <div class="planning-month" @click="datimeModal = !datimeModal">
           <span class="capitalize">{{ timelineTitle() }}</span>
           <q-icon name="arrow_drop_down" />
           <q-popover v-model="datimeModal">
             <q-datetime-picker minimal @input="goToWeek" :value="targetDate" />
           </q-popover>
         </div>
-        <div class="justify-around planning-actions">
+        <div class="row justify-around planning-actions">
           <q-btn icon="chevron_left" flat round @click="goToNextWeek(-7)"></q-btn>
           <q-btn icon="chevron_right" flat round @click="goToNextWeek(7)"></q-btn>
           <q-btn icon="today" flat round @click="goToToday"></q-btn>
         </div>
       </div>
+      <div class="col-xs-2 col-md-1">
+        <div class="row justify-end">
+          <q-btn icon="playlist_play" round flat />
+        </div>
+      </div>
     </div>
-    <div class="planning-container q-pa-md full-width">
+    <div class="planning-container full-width">
       <table style="width: 100%">
         <thead>
           <th></th>
@@ -32,23 +39,25 @@
         <tbody>
           <tr class="person-row" v-for="(person, index) in persons" :key="index">
             <td valign="top">
-              <div class="q-my-sm">
-                <ni-chip :data="person" class="q-mb-md" />
-                <div class="person-name">{{ formatPersonName(person) }}</div>
+              <div class="person-inner-cell">
+                <div class="q-mb-md">
+                  <ni-chip :data="person" />
+                </div>
+                <div class="person-name overflow-hidden-nowrap">{{ formatPersonName(person) }}</div>
               </div>
             </td>
             <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
               @click="$emit('createEvent', { dayIndex, person })">
               <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
-                <div :id="event._id" draggable @dragstart="drag(event._id)" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-sm']"
+                <div :id="event._id" draggable @dragstart="drag(event._id)" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`]"
                   :key="eventIndex" @click.stop="$emit('editEvent', event._id)">
                   <div class="col-12 event-title">
-                    <p v-if="event.type === INTERVENTION" class="no-margin ellipsis">{{ eventTitle(event) }}</p>
-                    <p v-if="event.type === ABSENCE" class="no-margin ellipsis">{{ displayAbsenceType(event.absence) }}</p>
-                    <p v-if="event.type === UNAVAILABILITY" class="no-margin ellipsis">Indisponibilité</p>
-                    <p v-if="event.type === INTERNAL_HOUR" class="no-margin ellipsis">{{ event.internalHour.name }}</p>
+                    <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">{{ eventTitle(event) }}</p>
+                    <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">{{ displayAbsenceType(event.absence) }}</p>
+                    <p v-if="event.type === UNAVAILABILITY" class="no-margin overflow-hidden-nowrap">Indispo.</p>
+                    <p v-if="event.type === INTERNAL_HOUR" class="no-margin overflow-hidden-nowrap">{{ event.internalHour.name }}</p>
                   </div>
-                  <p class="no-margin event-period ellipsis">{{ getEventHours(event) }}</p>
+                  <p class="no-margin event-period overflow-hidden-nowrap">{{ getEventHours(event) }}</p>
                 </div>
               </template>
             </td>
@@ -183,9 +192,9 @@ export default {
     },
     eventTitle (event) {
       if (this.personKey === 'customer') {
-        return `${event.auxiliary.identity.firstname.slice(0, 1)}. ${event.auxiliary.identity.lastname}`;
+        return `${event.auxiliary.identity.firstname.slice(0, 1)}. ${event.auxiliary.identity.lastname}`.toUpperCase();
       }
-      return `${event.customer.identity.title} ${event.customer.identity.lastname}`;
+      return event.customer.identity.lastname.toUpperCase();
     },
     // Drag & drop
     drag (eventId) {
@@ -217,19 +226,19 @@ export default {
     border-right: 1px solid $light-grey;
 
   td
-    padding: 5px 10px;
+    padding: 0px 6px 6px 6px;
 
     &:before
       content: "";
       display: block;
       margin: 0 auto 5px;
-      width: 80%;
+      width: 98%;
       border-bottom: 1px solid $light-grey;
 
   th
     & .days
         &-header
-          padding: 8px 0px 16px 0px
+          padding: 8px 0px 8px 0px
           width: 100%
         &-name
           font-size: 1.125rem
@@ -243,25 +252,25 @@ export default {
       background: $primary
       color: white
 
-  .planning-container
-    background: white
-
-  .person-row
-    border-right: 1px solid $light-grey;
-    height: 100px;
-
-  .person-name
-    font-weight: 600
-    font-size: 14px
-    @media(max-width: 1024px)
-      font-size: 12px
-    @media(max-width: 420px)
-      font-size: 8px
+  .person
+    &-row
+      border-right: 1px solid $light-grey;
+      height: 100px;
+    &-name
+      font-weight: 600
+      font-size: 14px
+      @media(max-width: 1024px)
+        font-size: 12px
+      @media(max-width: 420px)
+        font-size: 8px
+    &-inner-cell
+      margin-top: 4px
 
   .event
     border-radius: 2px
-    padding: 8px 6px
-    margin-bottom: 3px
+    padding: 6px 4px
+    margin-bottom: 1px
+    margin-top: 6px
     &-title
       font-size: 0.875rem
       font-weight: 600
@@ -287,32 +296,28 @@ export default {
     padding-left: 30px;
     @media screen and (max-width: 677px)
       padding-left: 0px;
+    &-container
+      background: white
+      padding: 5px 5px
+      @media(max-width: 767px)
+        padding: 2px
     &-header
-      margin: 15px 0;
-      display: flex;
-      flex-direction: row;
-      @media screen and (max-width: 677px)
-        flex-direction: column;
-    &-search
-      @media screen and (min-width: 678px)
-        margin: 20px;
-        width: 40%;
-      @media screen and (max-width: 677px)
-        margin: 0 20px 10px;
+      margin-left: 38px
+      margin-right: 38px
+      @media(max-width: 767px)
+        margin-left: 19px
+        margin-right: 19px
     &-month
-      display: flex;
       font-size: 28px
-      @media screen and (min-width: 678px)
-        min-width: 200px
       @media screen and (max-width: 677px)
-        width: 70%;
+        width: 60%;
+        font-size: 22px
       .q-icon
         font-size: 0.8em;
         margin: 5px;
-    &-dates
-      margin: 0 20px
-      display: flex;
-      flex-direction: row;
+    &-search
+      @media(max-width: 767px)
+        margin-bottom: 5px
     &-actions
       @media screen and (min-width: 678px)
         min-width: 150px;

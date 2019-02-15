@@ -1,5 +1,6 @@
 <template>
-  <q-chips-input :value="terms" @input="inputEvent" :placeholder="placeholder" @remove="removed">
+  <q-chips-input class="input-search" :value="terms" @input="inputEvent" :placeholder="placeholder" @remove="removed"
+    :before="searchIcon" chips-bg-color="primary" inverted-light color="white" add-icon="x">
     <q-autocomplete @search="search" @selected="selected"/>
   </q-chips-input>
 </template>
@@ -15,6 +16,9 @@ export default {
   data () {
     return {
       filter: [],
+      searchIcon: [{
+        icon: 'search'
+      }]
     }
   },
   mounted () {
@@ -72,14 +76,16 @@ export default {
 }
 </script>
 
-<style scoped lang="stylus">
+<style lang="stylus" scoped>
   @import '~variables';
   .q-chips-input
     background: white;
     box-shadow: none;
-    padding: 9px 14px 11px 14px;
-    cursor: pointer;
+    padding: 6px 12px 6px 12px;
+    cursor: default;
     border-radius: 3px;
+    & /deep/ .q-icon
+      cursor: default
 
   .q-if:not(.q-if-disabled):not(.q-if-error):not(.q-if-warning):hover:before
     color: $primary
