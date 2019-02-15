@@ -1,10 +1,12 @@
 <template>
   <div :class="[{ 'planning': !toggleDrawer }]">
-    <div class="row justify-between planning-header q-mb-md">
-      <ni-chips-autocomplete-auxiliaries-sectors v-model="terms"
-        @selected="selectedFilter" @remove="removedFilter" class="planning-search" />
-      <div class="row justify-center items-center planning-dates">
-        <div class="planning-month justify-center" @click="datimeModal = !datimeModal">
+    <div class="row items-center planning-header q-mb-md">
+      <div class="col-xs-12 col-md-5 planning-search">
+        <ni-chips-autocomplete-auxiliaries-sectors v-model="terms" @updatedFilter="updatedFilter"
+          @selected="selectedFilter" @remove="removedFilter" class="planning-search" />
+      </div>
+      <div class="col-xs-10 col-md-6 row items-center justify-center">
+        <div class="planning-month" @click="datimeModal = !datimeModal">
           <span class="capitalize">{{ timelineTitle() }}</span>
           <q-icon name="arrow_drop_down" />
           <q-popover v-model="datimeModal">
@@ -15,11 +17,12 @@
           <q-btn icon="chevron_left" flat round @click="goToNextWeek(-7)"></q-btn>
           <q-btn icon="chevron_right" flat round @click="goToNextWeek(7)"></q-btn>
           <q-btn icon="today" flat round @click="goToToday"></q-btn>
-          <q-btn icon="playlist_play" round flat class="lt-sm" />
         </div>
       </div>
-      <div class="gt-xs">
-        <q-btn icon="playlist_play" round flat />
+      <div class="col-xs-2 col-md-1">
+        <div class="row justify-end">
+          <q-btn icon="playlist_play" round flat />
+        </div>
       </div>
     </div>
     <div class="planning-container full-width">
@@ -299,32 +302,22 @@ export default {
       @media(max-width: 767px)
         padding: 2px
     &-header
-      display: flex
-      flex-direction: row
       margin-left: 38px
       margin-right: 38px
       @media(max-width: 767px)
         margin-left: 19px
         margin-right: 19px
-      @media screen and (max-width: 677px)
-        flex-direction: column;
-    &-search
-      @media screen and (min-width: 678px)
-        width: 40%;
     &-month
-      display: flex;
       font-size: 28px
-      @media screen and (min-width: 678px)
-        min-width: 200px
       @media screen and (max-width: 677px)
-        width: 70%;
+        width: 60%;
+        font-size: 22px
       .q-icon
         font-size: 0.8em;
         margin: 5px;
-    &-dates
-      // margin: 0 20px
-      display: flex;
-      flex-direction: row;
+    &-search
+      @media(max-width: 767px)
+        margin-bottom: 5px
     &-actions
       @media screen and (min-width: 678px)
         min-width: 150px;
