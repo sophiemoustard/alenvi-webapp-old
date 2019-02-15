@@ -1,7 +1,8 @@
 <template>
   <q-page class="neutral-background">
     <ni-planning-manager :events="events" :persons="auxiliaries" @updateStartOfWeek="updateStartOfWeek" @createEvent="openCreationModal"
-      @editEvent="openEditionModal" @onDrop="updateEventOnDrop" :selectedFilter="selectedFilter" :removedFilter="removedFilter" :updatedFilter="updatedFilter"/>
+      :filters="filters" @editEvent="openEditionModal" @onDrop="updateEventOnDrop" :selectedFilter="selectedFilter"
+      :removedFilter="removedFilter" />
 
     <!-- Event creation modal -->
     <q-modal v-if="Object.keys(newEvent).length !== 0" v-model="creationModal" content-classes="modal-container-md"
@@ -15,7 +16,9 @@
               :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`" />
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
-            <span><q-icon name="clear" @click.native="creationModal = false" /></span>
+            <span>
+              <q-icon name="clear" @click.native="creationModal = false" />
+            </span>
           </div>
         </div>
         <q-btn-toggle no-wrap v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions" @input="resetCreationForm(true, newEvent.type)" />
@@ -170,7 +173,6 @@ export default {
     return {
       loading: false,
       selectedSectors: [],
-      toFilter: [],
       days: [],
       events: [],
       customers: [],
@@ -192,11 +194,13 @@ export default {
         {label: 'Absence', value: ABSENCE},
         {label: 'Indispo', value: UNAVAILABILITY}
       ],
-      terms: [],
+      // Filters
+      filters: [],
     };
   },
   async mounted () {
     await this.getCustomers();
+    await this.initFilters();
     this.setInternalHours();
   },
   computed: {
@@ -371,12 +375,12 @@ export default {
 
         this.getEvents();
         this.creationModal = false;
-        this.loading = false;
         this.resetCreationForm(false);
         NotifyPositive('Évènement créé');
       } catch (e) {
         NotifyNegative('Erreur lors de la création de l\'évènement');
-        this.loading = false;
+      } finally {
+        this.loading = false
       }
     },
     // Event edition
@@ -389,7 +393,6 @@ export default {
         const payload = this.getPayload(this.editedEvent);
 
         if (this.hasConflicts(payload)) {
-          this.loading = false;
           this.$v.editedEvent.$reset();
           return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
         }
@@ -518,12 +521,36 @@ export default {
       }
     },
     // Filters
-    updatedFilter (filter) {
-      this.toFilter = filter;
+    async initFilters () {
+      try {
+        await this.addAuxiliariesToFilter();
+        await this.addSectorsToFilter();
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async addAuxiliariesToFilter () {
+      this.filters = await this.$users.showAllActive({ 'role': 'Auxiliaire' });
+      for (let i = 0, l = this.filters.length; i < l; i++) {
+        this.filters[i].value = `${this.filters[i].identity.firstname} ${this.filters[i].identity.lastname}`;
+        this.filters[i].label = `${this.filters[i].identity.firstname} ${this.filters[i].identity.lastname}`;
+      }
+    },
+    async addSectorsToFilter () {
+      const allSectorsRaw = await this.$ogust.getList('employee.sector');
+      for (const k in allSectorsRaw) {
+        if (k === '*') continue;
+
+        this.filters.push({
+          label: allSectorsRaw[k],
+          value: allSectorsRaw[k],
+          ogustSector: k,
+        });
+      }
     },
     selectedFilter (el) {
       if (el.ogustSector) {
-        const auxBySector = this.toFilter.filter(aux => aux.sector === el.ogustSector);
+        const auxBySector = this.filters.filter(aux => aux.sector === el.ogustSector);
         for (let i = 0, l = auxBySector.length; i < l; i++) {
           if (!this.auxiliaries.some(aux => auxBySector[i]._id === aux._id)) {
             this.auxiliaries.push(auxBySector[i]);

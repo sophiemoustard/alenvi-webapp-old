@@ -1,7 +1,8 @@
 <template>
   <q-page class="neutral-background">
-    <ni-planning-manager :events="events" :persons="customers" personKey="customer" @updateStartOfWeek="updateStartOfWeek"
-      :selectedFilter="selectedFilter" @editEvent="openEditionModal" @createEvent="openCreationModal" @onDrop="updateEventOnDrop" />
+    <ni-planning-manager :events="events" :persons="customers" personKey="customer" @updateStartOfWeek="updateStartOfWeek" :filters="filters"
+      :selectedFilter="selectedFilter" @editEvent="openEditionModal" @createEvent="openCreationModal" @onDrop="updateEventOnDrop"
+      :removedFilter="removedFilter" />
 
     <!-- Event creation modal -->
     <q-modal v-if="Object.keys(newEvent).length !== 0 && Object.keys(selectedCustomer.identity).length !== 0" v-model="creationModal"
@@ -101,12 +102,14 @@ export default {
       customers: [],
       auxiliaries: [],
       startDate: '',
-      selectedSectors: [],
+      filteredSectors: [],
       DEFAULT_AVATAR,
+      filters: [],
     };
   },
   async mounted () {
     await this.getEmployeesBySector();
+    await this.initFilters();
   },
   computed: {
     minEndDate () {
@@ -144,7 +147,7 @@ export default {
 
       const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
       this.days = Array.from(range.by('days'));
-      if (Object.keys(this.selectedSectors).length !== 0) {
+      if (Object.keys(this.filteredSectors).length !== 0) {
         this.customers = [];
         this.refreshPlanning();
       }
@@ -152,13 +155,11 @@ export default {
     // Refresh data
     async refreshPlanning () {
       try {
-        const data = await this.$events.listByCustomerFromSectors({
+        this.events = await this.$events.list({
           startDate: this.startOfWeek.format('YYYYMMDD'),
           endStartDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
-          sector: JSON.stringify(this.selectedSectors),
+          customer: JSON.stringify(this.customers.map(cus => cus._id))
         });
-        this.events = data.events;
-        this.customers = await this.$customers.showAll({ _id: JSON.stringify(data.customers) });
       } catch (e) {
         this.events = [];
         this.customers = [];
@@ -222,7 +223,6 @@ export default {
 
         const hasConflicts = await this.hasConflicts(payload);
         if (hasConflicts) {
-          this.loading = false;
           this.$v.editedEvent.$reset();
           return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
         }
@@ -231,12 +231,12 @@ export default {
 
         this.refreshPlanning();
         this.creationModal = false;
-        this.loading = false;
         this.resetCreationForm(false);
         NotifyPositive('Évènement créé');
       } catch (e) {
         NotifyNegative('Erreur lors de la création de l\'évènement');
-        this.loading = false;
+      } finally {
+        this.loading = false
       }
     },
     // Event edition
@@ -355,12 +355,60 @@ export default {
       }
     },
     // Filters
-    selectedFilter (el) {
+    async initFilters () {
+      try {
+        await this.addCustomersToFilter();
+        await this.addSectorsToFilter();
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async addCustomersToFilter () {
+      this.filters = await this.$customers.showAll({ subscriptions: true });
+      for (let i = 0, l = this.filters.length; i < l; i++) {
+        this.filters[i].value = `${this.filters[i].identity.title} ${this.filters[i].identity.lastname}`;
+        this.filters[i].label = `${this.filters[i].identity.title} ${this.filters[i].identity.lastname}`;
+      }
+    },
+    async addSectorsToFilter () {
+      const allSectorsRaw = await this.$ogust.getList('employee.sector');
+      for (const k in allSectorsRaw) {
+        if (k === '*') continue;
+
+        this.filters.push({
+          label: allSectorsRaw[k],
+          value: allSectorsRaw[k],
+          ogustSector: k
+        });
+      }
+    },
+    async selectedFilter (el) {
       if (el.ogustSector) {
-        this.selectedSectors.push(el.ogustSector);
+        const customersBySector = await this.$customers.showAllBySector({
+          startDate: this.startOfWeek.format('YYYYMMDD'),
+          endStartDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
+          sector: el.ogustSector,
+        });
+        this.customers.push(...customersBySector);
         this.refreshPlanning();
       } else {
-        // Add auxiliary
+        if (!this.customers.some(cust => cust._id === el._id)) {
+          this.customers.push(el);
+          this.refreshPlanning();
+        }
+      }
+    },
+    async removedFilter (el) {
+      if (el.ogustSector) {
+        const customersBySector = await this.$customers.showAllBySector({
+          startDate: this.startOfWeek.format('YYYYMMDD'),
+          endStartDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
+          sector: el.ogustSector,
+        });
+        const customersIdsBySector = customersBySector.map(cus => cus._id);
+        this.customers = this.customers.filter(customer => !customersIdsBySector.includes(customer._id));
+      } else {
+        this.customers = this.customers.filter(customer => customer._id !== el._id);
       }
     },
   },
