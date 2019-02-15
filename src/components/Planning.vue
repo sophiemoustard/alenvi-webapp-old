@@ -234,6 +234,7 @@ export default {
     },
     async drop (toDay, toPerson) {
       try {
+        if (this.draggedObject[this.personKey]._id === toPerson._id && toDay.isSame(this.draggedObject.startDate, 'd')) return;
         this.$emit('onDrop', { toDay, toPerson, draggedObject: this.draggedObject });
       } catch (e) {
         console.error(e);
