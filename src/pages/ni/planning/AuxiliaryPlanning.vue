@@ -197,6 +197,7 @@ export default {
       // Filters
       filters: [],
       filteredSectors: [],
+      filteredAuxiliaries: [],
     };
   },
   async mounted () {
@@ -559,6 +560,7 @@ export default {
         }
         this.getEvents();
       } else {
+        if (!this.filteredAuxiliaries.some(aux => aux._id === el._id)) this.filteredAuxiliaries.push(el);
         if (!this.auxiliaries.some(aux => aux._id === el._id)) {
           this.auxiliaries.push(el);
           this.getEvents();
@@ -568,8 +570,11 @@ export default {
     removedFilter (el) {
       if (el.ogustSector) {
         this.filteredSectors.filter(sec => sec !== el.ogustSector);
-        this.auxiliaries = this.auxiliaries.filter(auxiliary => auxiliary.sector !== el.ogustSector);
+        this.auxiliaries = this.auxiliaries.filter(auxiliary =>
+          auxiliary.sector !== el.ogustSector || this.filteredAuxiliaries.some(filteredAux => filteredAux._id === auxiliary._id)
+        );
       } else {
+        this.filteredAuxiliaries = this.filteredAuxiliaries.filter(auxiliary => auxiliary._id !== el._id);
         if (this.filteredSectors.includes(el.sector)) return;
         this.auxiliaries = this.auxiliaries.filter(auxiliary => auxiliary._id !== el._id);
       }
