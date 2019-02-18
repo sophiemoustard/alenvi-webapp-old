@@ -1,7 +1,7 @@
 <template>
-  <q-chips-input class="input-search" :value="terms" @input="inputEvent" :placeholder="placeholder" @remove="removed"
-    :before="searchIcon" chips-bg-color="primary" inverted-light color="white" add-icon="x">
-    <q-autocomplete @search="search" @selected="selected"/>
+  <q-chips-input class="input-search" :value="terms" @input="inputEvent" @remove="removed"
+    :before="searchIcon" chips-bg-color="primary" inverted-light color="white" add-icon="x" autofocus>
+    <q-autocomplete @search="search" @selected="selected" :debounce='0'/>
   </q-chips-input>
 </template>
 
@@ -11,14 +11,14 @@ export default {
   name: 'ChipsAutocomplete',
   props: {
     terms: { type: Array, default: () => [] },
-    placeholder: String,
     filters: { type: Array, default: () => [] },
   },
   data () {
     return {
       searchIcon: [{
         icon: 'search'
-      }]
+      }],
+      counterSelectedEl: 0
     }
   },
   methods: {
@@ -26,9 +26,11 @@ export default {
       this.$emit('input', value);
     },
     selected (el) {
+      ++this.counterSelectedEl;
       this.$emit('selected', el);
     },
     removed (el) {
+      --this.counterSelectedEl;
       this.$emit('remove', this.filters.find(elem => elem.value === el.value[0]));
     },
     async search (terms, done) {
