@@ -26,7 +26,7 @@
       </div>
     </div>
     <div class="planning-container full-width">
-      <table style="width: 100%" :class="[staffingView && 'staffing']">
+      <table style="width: 100%" :class="[staffingView && 'staffing', 'planning-table']">
         <thead>
           <th>
             <q-btn v-if="!isCustomerPlanning" flat round icon="view_week" :color="staffingView ? 'primary' : ''" @click="staffingView = !staffingView" />
@@ -84,13 +84,15 @@
 </template>
 
 <script>
-import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, ABSENCE_TYPE } from '../data/constants';
+import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR } from '../data/constants';
 import { NotifyNegative } from './popup/notify';
 import NiChip from './Chip';
 import ChipsAutocompleteAuxiliariesSectors from './ChipsAutocompleteAuxiliariesSectors';
+import { planningTimelineMixin } from '../mixins/planningTimelineMixin';
 
 export default {
   name: 'PlanningManager',
+  mixins: [planningTimelineMixin],
   components: {
     'ni-chip': NiChip,
     'ni-chips-autocomplete-auxiliaries-sectors': ChipsAutocompleteAuxiliariesSectors,
@@ -115,24 +117,10 @@ export default {
       UNAVAILABILITY,
       ABSENCE,
       INTERNAL_HOUR,
-      datimeModal: false,
-      targetDate: '',
       staffingView: false,
     }
   },
   computed: {
-    toggleDrawer () {
-      return this.$store.getters['main/toggleDrawer'];
-    },
-    daysHeader () {
-      return this.days.map(day => {
-        return {
-          name: this.$moment(day).format('dd'),
-          number: this.$moment(day).format('DD'),
-          moment: day
-        }
-      });
-    },
     isCustomerPlanning () {
       return this.personKey === 'customer';
     }
@@ -142,44 +130,11 @@ export default {
     this.getTimelineDays();
     this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
   },
-  watch: {
-    startOfWeek: function () {
-      this.targetDate = this.startOfWeek.toISOString();
-    },
-  },
   methods: {
     // Table
-    endOfWeek () {
-      return this.$moment(this.startOfWeek).add(6, 'd');
-    },
-    timelineTitle () {
-      if (this.startOfWeek === '') return '';
-      if (this.$moment(this.startOfWeek).month() === this.$moment(this.endOfWeek()).month()) return this.$moment(this.startOfWeek).format('MMMM YYYY');
-      return `${this.$moment(this.startOfWeek).format('MMM')} - ${this.$moment(this.endOfWeek()).format('MMM YYYY')}`
-    },
-    goToNextWeek (dayRange) {
-      this.startOfWeek.add(dayRange, 'd');
-      this.updateTimeline();
-    },
-    goToToday (value) {
-      this.startOfWeek = this.$moment().startOf('week');
-      this.updateTimeline();
-    },
-    goToWeek (value) {
-      this.startOfWeek = this.$moment(value).startOf('week');
-      this.updateTimeline();
-      this.datimeModal = false;
-    },
     updateTimeline () {
       this.getTimelineDays();
       this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
-    },
-    getTimelineDays () {
-      const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
-      this.days = Array.from(range.by('days'));
-    },
-    isCurrentDay (momentDay) {
-      return this.$moment(momentDay).isSame(new Date(), 'day');
     },
     formatPersonName (person) {
       return this.isCustomerPlanning
@@ -215,19 +170,6 @@ export default {
         })
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
     },
-    getEventHours (event) {
-      return `${this.$moment(event.startDate).format('HH:mm')} - ${this.$moment(event.endDate).format('HH:mm')}`
-    },
-    displayAbsenceType (value) {
-      const absence = ABSENCE_TYPE.find(abs => abs.value === value);
-      return !absence ? '' : absence.label;
-    },
-    eventTitle (event) {
-      if (this.isCustomerPlanning) {
-        return `${event.auxiliary.identity.firstname.slice(0, 1)}. ${event.auxiliary.identity.lastname}`.toUpperCase();
-      }
-      return event.customer.identity.lastname.toUpperCase();
-    },
     // Drag & drop
     drag (eventId) {
       this.draggedObject = this.events.find(ev => ev._id === eventId);
@@ -249,40 +191,6 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables';
-  table
-    border-collapse: collapse;
-    table-layout: fixed;
-    border-style: hidden;
-
-  td, th
-    border-left: 1px solid $light-grey;
-    border-right: 1px solid $light-grey;
-
-  td
-    padding: 0px 6px 6px 6px;
-
-    &:before
-      content: "";
-      display: block;
-      width: 98%;
-      border-bottom: 1px solid $light-grey;
-
-  th
-    & .days
-        &-header
-          padding: 8px 0px 8px 0px
-          width: 100%
-        &-name
-          font-size: 1.125rem
-          color: #777777
-        &-number
-          font-size: 1.5rem
-          font-weight: 600
-    & .current-day
-      border-radius: 4px
-      padding: 0px 5px
-      background: $primary
-      color: white
 
   .person
     &-row
@@ -297,64 +205,6 @@ export default {
         font-size: 8px
     &-inner-cell
       margin-top: 4px
-
-  .event
-    border-radius: 2px
-    padding: 6px 4px
-    margin-top: 6px
-    &-title
-      font-size: 0.875rem
-      font-weight: 600
-    &-period
-      font-size: 0.6875rem
-      color: $dark-grey
-    &-intervention
-      background: $light-pink
-    &-internalHour
-      background: rgba($primary-dark, 0.25)
-    &-absence
-      background: $grey-3
-    &-unavailability
-      background: repeating-linear-gradient(
-        45deg,
-        $grey-3,
-        $grey-3 3px,
-        $white 3px,
-        $white 7px
-      )
-
-  .planning
-    padding-left: 30px;
-    @media screen and (max-width: 677px)
-      padding-left: 0px;
-    &-container
-      background: white
-      padding: 5px 5px
-      @media(max-width: 767px)
-        padding: 2px
-    &-header
-      margin-left: 38px
-      margin-right: 38px
-      @media(max-width: 767px)
-        margin-left: 19px
-        margin-right: 19px
-    &-month
-      font-size: 28px
-      @media screen and (max-width: 677px)
-        width: 60%;
-        font-size: 22px
-      .q-icon
-        font-size: 0.8em;
-        margin: 5px;
-    &-search
-      @media(max-width: 767px)
-        margin-bottom: 5px
-    &-actions
-      @media screen and (min-width: 678px)
-        min-width: 150px;
-      @media screen and (max-width: 677px)
-        width: 30%;
-      display: flex;
 
   .staffing
     .person

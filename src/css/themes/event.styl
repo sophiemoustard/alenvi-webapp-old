@@ -1,0 +1,96 @@
+.event
+  border-radius: 2px
+  padding: 6px 4px
+  margin-top: 6px
+  &-title
+    font-size: 0.875rem
+    font-weight: 600
+  &-period
+    font-size: 0.6875rem
+    color: $dark-grey
+  &-intervention
+    background: $light-pink
+  &-internalHour
+    background: rgba($primary-dark, 0.25)
+  &-absence
+    background: $grey-3
+  &-unavailability
+    background: repeating-linear-gradient(
+      45deg,
+      $grey-3,
+      $grey-3 3px,
+      $white 3px,
+      $white 7px
+    )
+
+
+.planning-table
+.agenda-table
+  border-collapse: collapse;
+  table-layout: fixed;
+  border-style: hidden;
+
+  td, th
+    border-left: 1px solid $light-grey;
+    border-right: 1px solid $light-grey;
+
+  td
+    padding: 0px 6px 6px 6px;
+
+    &:before
+      content: "";
+      display: block;
+      width: 98%;
+      border-bottom: 1px solid $light-grey;
+
+  th
+    & .days
+        &-header
+          padding: 8px 0px 8px 0px
+          width: 100%
+        &-name
+          font-size: 1.125rem
+          color: #777777
+        &-number
+          font-size: 1.5rem
+          font-weight: 600
+    & .current-day
+      border-radius: 4px
+      padding: 0px 5px
+      background: $primary
+      color: white
+
+
+
+.planning
+  padding-left: 30px;
+  @media screen and (max-width: 677px)
+    padding-left: 0px;
+  &-container
+    background: white
+    padding: 5px 5px
+    @media(max-width: 767px)
+      padding: 2px
+  &-header
+    margin-left: 38px
+    margin-right: 38px
+    @media(max-width: 767px)
+      margin-left: 19px
+      margin-right: 19px
+  &-month
+    font-size: 28px
+    @media screen and (max-width: 677px)
+      width: 60%;
+      font-size: 22px
+    .q-icon
+      font-size: 0.8em;
+      margin: 5px;
+  &-search
+    @media(max-width: 767px)
+      margin-bottom: 5px
+  &-actions
+    @media screen and (min-width: 678px)
+      min-width: 150px;
+    @media screen and (max-width: 677px)
+      width: 30%;
+    display: flex;
