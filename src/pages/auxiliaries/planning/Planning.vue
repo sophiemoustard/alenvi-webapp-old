@@ -21,8 +21,9 @@
           <tbody>
             <tr>
               <td v-for="(day, dayIndex) in days" :key="dayIndex" valign="top">
+                <div class="background">
                   <template v-for="(event, eventId) in getOneDayEvents(days[dayIndex])">
-                    <div :key="eventId" :style="{ top: `${4 * event.staffingTop + 2}%`, height: `${4 * event.staffingHeight}%` }"
+                    <div :key="eventId" :style="{ top: `${4 * event.staffingTop}%`, height: `${4 * event.staffingHeight}%` }"
                       :class="['cursor-pointer', 'event', `event-${event.type}`]">
                       <div class="col-12 event-title">
                         <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">{{ eventTitle(event) }}</p>
@@ -33,7 +34,8 @@
                       <p class="no-margin event-period overflow-hidden-nowrap">{{ getEventHours(event) }}</p>
                     </div>
                   </template>
-                </td>
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -129,13 +131,25 @@ export default {
 
   .agenda-table
     td
-      position: relative
       height: 600px;
+
+      .background
+        background: repeating-linear-gradient(
+          180deg,
+          $white,
+          $white 15.8%,
+          $grey-3,
+          $grey-3 16%
+        )
+        height: 100%
+        position: relative;
+        margin-top: 2px
 
       .event
         position: absolute
         left: 5px
         right: 5px
+        margin: 0
 
   .auxiliary-agenda-title
     display: flex;
