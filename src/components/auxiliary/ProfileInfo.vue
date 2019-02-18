@@ -671,7 +671,6 @@ export default {
     async updateUser (paths) {
       try {
         if (this.tmpInput === this.$_.get(this.user.alenvi, paths.alenvi)) return;
-        console.log('DEH');
         if (this.$_.get(this.$v.user.alenvi, paths.alenvi)) {
           this.$_.get(this.$v.user.alenvi, paths.alenvi).$touch();
           if (this.$_.get(this.$v.user.alenvi, paths.alenvi).$error) {
