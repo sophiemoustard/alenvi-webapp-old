@@ -5,9 +5,9 @@ import redirect from '../router/redirect';
 const findPermission = (right, paramsId) => {
   return (permission) => {
     if (typeof permission === 'string') {
-      return permission === right.permission;
+      return permission === right.permission && right.hasAccess;
     } else if (paramsId && typeof permission.name === 'string' && typeof permission.when === 'function') {
-      return permission.name === right.permission && permission.when(paramsId, Cookies.get('user_id'));
+      return permission.name === right.permission && right.hasAccess && permission.when(paramsId, Cookies.get('user_id'));
     }
   }
 }
