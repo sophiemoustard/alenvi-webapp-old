@@ -46,7 +46,7 @@ export const planningTimelineMixin = {
       this.startOfWeek.add(dayRange, 'd');
       this.updateTimeline();
     },
-    goToToday (value) {
+    goToToday () {
       this.startOfWeek = this.$moment().startOf('week');
       this.updateTimeline();
     },

@@ -4,25 +4,7 @@
       <div class="row items-center planning-header q-mb-md">
         <div class="col-xs-12 col-md-5">
         </div>
-        <div class="col-xs-10 col-md-6 row items-center justify-center">
-          <div class="planning-month">
-            <span class="capitalize">{{ timelineTitle() }}</span>
-            <q-icon name="arrow_drop_down" />
-            <q-popover v-model="datimeModal">
-              <q-datetime-picker minimal @input="goToWeek" :value="targetDate" />
-            </q-popover>
-          </div>
-          <div class="row justify-around planning-actions">
-              <q-btn icon="chevron_left" flat round @click="goToNextWeek(-7)"></q-btn>
-              <q-btn icon="chevron_right" flat round @click="goToNextWeek(7)"></q-btn>
-              <q-btn icon="today" flat round @click="goToToday"></q-btn>
-          </div>
-        </div>
-        <div class="col-xs-2 col-md-1">
-          <div class="row justify-end">
-            <q-btn icon="playlist_play" round flat />
-          </div>
-        </div>
+        <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" />
       </div>
       <div class="planning-container full-width">
         <table style="width: 100%" class="agenda-table">
@@ -61,10 +43,14 @@
 <script>
 import { planningTimelineMixin } from '../../../mixins/planningTimelineMixin';
 import { ABSENCE, INTERVENTION, INTERNAL_HOUR, UNAVAILABILITY } from '../../../data/constants';
+import PlanningNavigation from '../../../components/PlanningNavigation';
 
 export default {
   mixins: [planningTimelineMixin],
   name: 'Planning',
+  components: {
+    'planning-navigation': PlanningNavigation,
+  },
   data () {
     return {
       ABSENCE,
