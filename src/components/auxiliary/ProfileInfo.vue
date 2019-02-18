@@ -1,14 +1,12 @@
 <template>
   <div v-if="isLoaded">
-    <div v-if="mainUser.role.name !== 'Auxiliaire'" class="row gutter-profile q-mb-xl">
+    <div v-if="!isAuxiliary" class="row gutter-profile q-mb-xl">
       <div class="col-xs-12 col-md-6">
         <p class="input-caption">Communauté</p>
         <ni-select-sector v-model="user.alenvi.sector" @myBlur="updateUser({ alenvi: 'sector', ogust: 'sector' })" />
       </div>
-      <div class="col-xs-12 col-md-6">
-        <p class="input-caption">Marraine/parrain</p>
-        <q-input v-model="user.alenvi.mentor" inverted-light color="white" @focus="saveTmp('mentor')" @blur="updateUser({ alenvi: 'mentor' })" />
-      </div>
+      <ni-input v-model="user.alenvi.mentor" caption="Marraine/parrain" @focus="saveTmp('mentor')" @blur="updateUser({ alenvi: 'mentor' })" />
+      <ni-select v-model="user.alenvi.role._id" caption="Rôle" :options="auxiliaryRolesOptions" @focus="saveTmp('role._id')" @blur="updateUser({ alenvi: 'role._id' })" />
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
@@ -306,6 +304,7 @@ import cloudinary from '../../api/Cloudinary.js';
 
 import nationalities from '../../data/nationalities.js';
 import countries from '../../data/countries.js';
+import { AUXILIARY, PLANNING_REFERENT } from '../../data/constants.js';
 
 import SelectSector from '../form/SelectSector';
 
@@ -408,6 +407,7 @@ export default {
             zipCode: '',
             city: ''
           },
+          role: { _id: '' },
           administrative: {
             emergencyContact: {
               name: '',
@@ -439,6 +439,7 @@ export default {
         }
       },
       extensions: 'image/jpg, image/jpeg, image/gif, image/png, application/pdf',
+      auxiliaryRolesOptions: []
     }
   },
   validations () {
@@ -640,10 +641,14 @@ export default {
         return 'BIC non valide';
       }
     },
+    isAuxiliary () {
+      return this.mainUser.role.name === AUXILIARY || this.mainUser.role.name === PLANNING_REFERENT;
+    }
   },
   async mounted () {
     const user = await this.$users.getById(this.currentUser._id);
     this.mergeUser(user);
+    await this.getAuxiliaryRoles();
     this.$v.user.alenvi.$touch();
     this.isLoaded = true;
   },
@@ -695,6 +700,8 @@ export default {
       }
       const payload = this.$_.set({}, path, value);
       payload._id = this.currentUser._id;
+
+      if (path === 'role._id') payload.role = value;
 
       if (path.match(/birthCountry/i) && value !== 'FR') {
         this.user.alenvi.identity.birthState = '99';
@@ -852,6 +859,14 @@ export default {
     },
     pictureDlLink (link) {
       return link ? link.replace(/(\/upload)/i, `$1/fl_attachment:photo_${this.currentUser.identity.firstname}_${this.currentUser.identity.lastname}`) : '';
+    },
+    async getAuxiliaryRoles () {
+      try {
+        const roles = await this.$roles.showAll({ name: JSON.stringify([AUXILIARY, PLANNING_REFERENT]) });
+        this.auxiliaryRolesOptions = roles.data.roles.map((role) => ({ label: role.name, value: role._id }));
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 }
