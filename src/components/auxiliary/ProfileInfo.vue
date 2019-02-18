@@ -304,6 +304,7 @@ import cloudinary from '../../api/Cloudinary.js';
 
 import nationalities from '../../data/nationalities.js';
 import countries from '../../data/countries.js';
+import { AUXILIARY, PLANNING_REFERENT } from '../../data/constants.js';
 
 import SelectSector from '../form/SelectSector';
 
@@ -406,9 +407,7 @@ export default {
             zipCode: '',
             city: ''
           },
-          role: {
-            _id: ''
-          },
+          role: { _id: '' },
           administrative: {
             emergencyContact: {
               name: '',
@@ -643,7 +642,7 @@ export default {
       }
     },
     isAuxiliary () {
-      return this.mainUser.role.name === 'Auxiliaire' || this.mainUser.role.name === 'Référent(e) planning';
+      return this.mainUser.role.name === AUXILIARY || this.mainUser.role.name === PLANNING_REFERENT;
     }
   },
   async mounted () {
@@ -863,7 +862,7 @@ export default {
     },
     async getAuxiliaryRoles () {
       try {
-        const roles = await this.$roles.showAll({ name: JSON.stringify(['Auxiliaire', 'Référent(e) planning']) });
+        const roles = await this.$roles.showAll({ name: JSON.stringify([AUXILIARY, PLANNING_REFERENT]) });
         this.auxiliaryRolesOptions = roles.data.roles.map((role) => ({ label: role.name, value: role._id }));
       } catch (e) {
         console.error(e);

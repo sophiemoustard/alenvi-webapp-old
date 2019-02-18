@@ -65,3 +65,8 @@ export const NOT_INVOICED_AND_NOT_PAYED = 'not_invoiced_and_not_payed';
 // CANCELLATION REASONS
 export const CUSTOMER_INITIATIVE = 'customer_initiative';
 export const AUXILIARY_INITIATIVE = 'auxiliary_initiative';
+
+// ROLES
+
+export const AUXILIARY = 'Auxiliaire';
+export const PLANNING_REFERENT = 'Référent(e) planning';
