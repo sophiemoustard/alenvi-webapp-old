@@ -9,7 +9,7 @@
 /* global scheduler */
 import 'dhtmlx-scheduler'
 
-import Scheduler from '../../components/scheduler/Scheduler'
+import Scheduler from '../../components/scheduler/OldScheduler'
 import { NotifyNegative } from '../../components/popup/notify';
 
 export default {

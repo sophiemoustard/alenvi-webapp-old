@@ -8,7 +8,7 @@
 <script>
 /* global oldscheduler */
 import { mapMutations, mapGetters } from 'vuex'
-import Scheduler from '../../../components/scheduler/Scheduler'
+import Scheduler from '../../../components/scheduler/OldScheduler'
 import 'dhtmlx-scheduler'
 import { NotifyWarning, NotifyNegative } from '../../../components/popup/notify';
 
