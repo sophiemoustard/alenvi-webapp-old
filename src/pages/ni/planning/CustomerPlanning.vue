@@ -11,8 +11,7 @@
         <div class="row q-mb-md">
           <div class="col-11 row modal-customer-header">
             <img :src="DEFAULT_AVATAR" class="avatar">
-            <div class="customer-name">{{ selectedCustomer.identity.title }} {{
-              selectedCustomer.identity.lastname.toUpperCase() }}</div>
+            <div class="customer-name">{{ selectedCustomer.identity.title }} {{ selectedCustomer.identity.lastname.toUpperCase() }}</div>
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
             <span>

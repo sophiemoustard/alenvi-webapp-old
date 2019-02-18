@@ -2,7 +2,9 @@
   <q-page class="neutral-background">
     <div :class="[{ 'planning': !toggleDrawer }]">
       <div class="row items-center planning-header q-mb-md">
-        <div class="col-xs-12 col-md-5">
+        <div class="col-xs-12 col-md-5 auxiliary-agenda-title">
+          <img :src="getAvatar(currentUser.picture.link)" class="avatar">
+          <div class="auxiliary-name">{{ currentUser.identity.firstname }} {{ currentUser.identity.lastname.toUpperCase() }}</div>
         </div>
         <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" />
       </div>
@@ -42,7 +44,7 @@
 
 <script>
 import { planningTimelineMixin } from '../../../mixins/planningTimelineMixin';
-import { ABSENCE, INTERVENTION, INTERNAL_HOUR, UNAVAILABILITY } from '../../../data/constants';
+import { ABSENCE, INTERVENTION, INTERNAL_HOUR, UNAVAILABILITY, DEFAULT_AVATAR } from '../../../data/constants';
 import PlanningNavigation from '../../../components/PlanningNavigation';
 
 export default {
@@ -73,6 +75,9 @@ export default {
     await this.getEvents();
   },
   methods: {
+    getAvatar (link) {
+      return link || DEFAULT_AVATAR;
+    },
     async updateTimeline () {
       this.getTimelineDays();
       await this.getEvents();
@@ -131,5 +136,22 @@ export default {
         position: absolute
         left: 5px
         right: 5px
+
+  .auxiliary-agenda-title
+    display: flex;
+    flex-direction: row;
+
+  .auxiliary-name
+    font-size: 24px;
+    margin-left: 3px;
+    padding: 9px 14px 11px;
+    @media screen and (max-width: 677px)
+      font-size: 20px;
+      padding: 7px;
+
+  .avatar
+    @media screen and (max-width: 677px)
+      height: 30px
+      width: 30px
 
 </style>
