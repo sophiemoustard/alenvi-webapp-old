@@ -175,7 +175,7 @@ const routes = [
       {
         path: 'auxiliaries/planning',
         name: 'profile planning',
-        component: () => import('pages/auxiliaries/planning/Planning'),
+        component: () => import('pages/auxiliaries/planning/OldPlanning'),
         props: (route) => ({ auxiliary: route.query.auxiliary || null, customer: route.query.customer || null }),
         beforeEnter: (to, from, next) => {
           if (!to.query.auxiliary && !to.query.customer) {
@@ -184,6 +184,16 @@ const routes = [
           }
           next();
         },
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['planning:read'],
+          parent: 'planning'
+        }
+      },
+      {
+        path: 'auxiliaries/agenda',
+        name: 'profile planning',
+        component: () => import('pages/auxiliaries/planning/Planning'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['planning:read'],
