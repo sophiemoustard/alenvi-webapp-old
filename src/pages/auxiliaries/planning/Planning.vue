@@ -132,6 +132,7 @@ export default {
   .agenda-table
     td
       height: 600px;
+      padding: 0px;
 
       .background
         background: repeating-linear-gradient(
