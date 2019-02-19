@@ -9,13 +9,15 @@
         <div class="datetime-item">
           <ni-datetime-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" @blur="blurDateHandler" />
           <ni-select-input :value="value.startHour" @input="update($event, 'startHour')" class="time-item" align="center"
-            @blur="blurHourHandler" :options="hoursOptions" filter :filter-placeholder="value.startHour" hide-underline name="start-hour" />
+            @blur="blurHourHandler" :options="hoursOptions" filter :filter-placeholder="value.startHour" hide-underline
+            name="start-hour" />
         </div>
         <p class="delimiter">-</p>
         <div class="datetime-item end">
           <ni-select-input :value="value.endHour" @input="update($event, 'endHour')" class="time-item" align="center"
             @blur="blurHourHandler" :options="endHourOptions" />
-          <ni-datetime-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item" @blur="blurDateHandler" :min="value.startDate" />
+          <ni-datetime-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item" @blur="blurDateHandler"
+            :min="value.startDate" />
         </div>
       </div>
     </q-field>
@@ -110,12 +112,12 @@ export default {
   .time-item
     /deep/ .q-input.q-if-inverted
       padding: 10px;
-      max-width: 120px
+      justify-content: center
 
   .date-item
     /deep/ .q-input.q-if-inverted
       padding: 10px;
-      max-width: 120px;
+      justify-content: center
     /deep/ .q-field-content
       padding-top: 0px;
 
