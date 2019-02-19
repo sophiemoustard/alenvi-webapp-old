@@ -20,14 +20,15 @@
           </thead>
           <tbody>
             <tr>
-              <td v-for="(day, dayIndex) in days" :key="dayIndex" valign="top">
+              <td v-for="(day, dayIndex) in days" :key="`day_${dayIndex}`" valign="top">
                 <div class="planning-background">
                   <template v-if="dayIndex === 0">
-                    <div class="planning-hour" v-for="(hour, hourIndex) in hours" :key="hourIndex" :style="{ top: `${(hourIndex * 16) - 1.5}%` }">{{ hour.format('HH:mm') }}</div>
+                    <div class="planning-hour" v-for="(hour, hourIndex) in hours" :key="`hour_${hourIndex}`"
+                      :style="{ top: `${(hourIndex * halfHourHeight * 4) - 1.5}%` }">{{ hour.format('HH:mm') }}</div>
                   </template>
                   <template v-for="(event, eventId) in getOneDayEvents(days[dayIndex])">
-                    <div :key="eventId" :style="{ top: `${4 * event.staffingTop}%`, height: `${4 * event.staffingHeight}%` }"
-                      :class="['cursor-pointer', 'event', `event-${event.type}`]">
+                    <div :style="{ top: `${halfHourHeight * event.staffingTop}%`, height: `${halfHourHeight * event.staffingHeight - 0.2}%` }"
+                      :key="eventId"  :class="['cursor-pointer', 'event', `event-${event.type}`]">
                       <div class="col-12 event-title">
                         <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">{{ eventTitle(event) }}</p>
                         <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">{{ displayAbsenceType(event.absence) }}</p>
@@ -68,6 +69,7 @@ export default {
       days: [],
       events: [],
       height: 0,
+      halfHourHeight: 4.1,
     };
   },
   computed: {
@@ -146,19 +148,20 @@ export default {
         background: repeating-linear-gradient(
           180deg,
           $white,
-          $white 15.8%,
+          $white 16.2%,
           $grey-3,
-          $grey-3 16%
+          $grey-3 16.4%
         )
         height: 100%
         position: relative;
         margin-top: 2px
 
       .event
-        position: absolute
-        left: 5px
-        right: 5px
-        margin: 0
+        position: absolute;
+        left: 3px;
+        right: 3px;
+        margin: 0;
+        border: 1px solid $white;
 
       .planning-hour
         position: absolute;
