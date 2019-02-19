@@ -208,6 +208,7 @@ import DatetimePicker from '../../../components/form/DatetimePicker.vue';
 import CustomImg from '../../../components/form/CustomImg.vue';
 import FileUploader from '../../../components/form/FileUploader.vue';
 import { configMixin } from '../../../mixins/configMixin';
+import { validationMixin } from '../../../mixins/validationMixin.js';
 import Input from '../../../components/form/Input.vue';
 import SearchAddress from '../../../components/form/SearchAddress.vue';
 import { frAddress, posDecimals } from '../../../helpers/vuelidateCustomVal';
@@ -224,7 +225,7 @@ export default {
     'ni-search-address': SearchAddress,
     'ni-datetime-picker': DatetimePicker,
   },
-  mixins: [configMixin],
+  mixins: [configMixin, validationMixin],
   data () {
     return {
       loading: false,
@@ -390,7 +391,10 @@ export default {
       name: { required },
       rcs: { required },
       address: {
-        fullAddress: { required, frAddress },
+        fullAddress: {
+          required,
+          frAddress
+        },
       },
     },
     newThirdPartyPayer: {
@@ -429,12 +433,10 @@ export default {
       return selectedService ? this.$moment(selectedService.startDate).add(1, 'd').toISOString() : '';
     },
   },
-  mounted () {
-    this.company = this.user.company;
-    this.documents = this.company.customersConfig.templates || {};
-    this.company.address = this.company.address || {};
-    this.refreshServices();
-    this.refreshThirdPartyPayers();
+  async mounted () {
+    await this.refreshCompany();
+    await this.refreshServices();
+    await this.refreshThirdPartyPayers();
   },
   methods: {
     getServiceLastVersion (service) {
@@ -477,10 +479,10 @@ export default {
       try {
         if (this.tmpInput === this.company[path]) return;
         if (this.$v.company[path]) {
-          const isValid = await this.waitForValidation(path);
+          this.$v.company[path].$touch();
+          const isValid = await this.waitForValidation(this.$v.company, path);
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
-
         const value = this.company[path];
         const payload = this.$_.set({}, path, value);
         payload._id = this.company._id;
@@ -492,23 +494,6 @@ export default {
       } finally {
         this.tmpInput = '';
       }
-    },
-    waitForValidation (path) {
-      return new Promise((resolve) => {
-        if (path === 'address') {
-          const unwatch = this.$watch(() => !this.$v.company.address.$pending, (notPending) => {
-            if (notPending) {
-              if (unwatch) {
-                unwatch();
-              }
-              resolve(!this.$v.company.address.fullAddress.$error);
-            }
-          }, { immediate: true });
-        } else {
-          this.$_.get(this.$v.company, path).$touch();
-          resolve(!this.$_.get(this.$v.company, path).$error);
-        }
-      })
     },
     // Services
     formatCreatedService () {

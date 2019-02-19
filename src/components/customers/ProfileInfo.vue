@@ -436,6 +436,7 @@ import DatetimePicker from '../form/DatetimePicker';
 import { downloadDocxFile } from '../../helpers/downloadFile';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
+import { validationMixin } from '../../mixins/validationMixin.js';
 import { days } from '../../data/days.js';
 import { FUNDING_FREQ_OPTIONS, FUNDING_NATURE_OPTIONS, FIXED, HOURLY } from '../../data/constants.js';
 import { financialCertificatesMixin } from '../../mixins/financialCertificatesMixin.js';
@@ -452,7 +453,7 @@ export default {
     NiOptionGroup,
     'ni-multiple-files-uploader': MultipleFilesUploader,
   },
-  mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin, fundingMixin],
+  mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin, fundingMixin, validationMixin],
   data () {
     return {
       days,
@@ -892,7 +893,8 @@ export default {
       try {
         if (this.tmpInput === this.$_.get(this.customer, paths.alenvi)) return;
         if (this.$_.get(this.$v.customer, paths.alenvi)) {
-          const isValid = await this.waitForValidation(paths.alenvi);
+          const isValid = await this.waitForValidation(this.$v.customer, paths.alenvi);
+          console.log('isValid', isValid);
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
         if (paths.alenvi) await this.updateAlenviCustomer(paths.alenvi);
@@ -944,23 +946,24 @@ export default {
         await this.$ogust.editOgustCustomer(this.userProfile.customerId, payload);
       }
     },
-    waitForValidation (path) {
-      return new Promise((resolve) => {
-        if (path === 'contact.address') {
-          const unwatch = this.$watch(() => !this.$v.customer.contact.address.$pending, (notPending) => {
-            if (notPending) {
-              if (unwatch) {
-                unwatch();
-              }
-              resolve(!this.$v.customer.contact.address.$error);
-            }
-          }, { immediate: true });
-        } else {
-          this.$_.get(this.$v.customer, path).$touch();
-          resolve(!this.$_.get(this.$v.customer, path).$error);
-        }
-      })
-    },
+    // waitForValidation (path) {
+    //   return new Promise((resolve) => {
+    //     if (path === 'contact.address') {
+    //       console.log('MEH');
+    //       const unwatch = this.$watch(() => !this.$v.customer.contact.address.$pending, (notPending) => {
+    //         if (notPending) {
+    //           if (unwatch) {
+    //             unwatch();
+    //           }
+    //           resolve(!this.$v.customer.contact.address.$error);
+    //         }
+    //       }, { immediate: true });
+    //     } else {
+    //       this.$_.get(this.$v.customer, path).$touch();
+    //       resolve(!this.$_.get(this.$v.customer, path).$error);
+    //     }
+    //   })
+    // },
     // Subscriptions
     formatCreatedSubscription () {
       const { service, unitTTCRate, estimatedWeeklyVolume, sundays, evenings } = this.newSubscription;
