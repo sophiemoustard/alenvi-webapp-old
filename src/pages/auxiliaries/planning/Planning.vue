@@ -1,6 +1,6 @@
 <template>
-  <q-page class="neutral-background">
-    <div :class="[{ 'planning': !toggleDrawer }]">
+  <q-page class="neutral-background" :style="{ height: height }">
+    <div :class="[{ 'planning': !toggleDrawer, 'full-height' : true }]" >
       <div class="row items-center planning-header q-mb-md">
         <div class="col-xs-12 col-md-5 auxiliary-agenda-title">
           <img :src="getAvatar(currentUser.picture.link)" class="avatar">
@@ -8,8 +8,8 @@
         </div>
         <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" />
       </div>
-      <div class="planning-container full-width">
-        <table style="width: 100%" class="agenda-table">
+      <div class="planning-container full-width full-height">
+        <table style="width: 100%" class="agenda-table full-height">
           <thead>
             <th class="capitalize" v-for="(day, index) in daysHeader" :key="index">
               <div class="row justify-center items-baseline days-header">
@@ -64,6 +64,7 @@ export default {
       startOfWeek: '',
       days: [],
       events: [],
+      height: 0,
     };
   },
   computed: {
@@ -72,6 +73,7 @@ export default {
     },
   },
   async mounted () {
+    this.height = window.innerHeight;
     this.startOfWeek = this.$moment().startOf('week');
     this.getTimelineDays();
     await this.getEvents();
@@ -131,7 +133,6 @@ export default {
 
   .agenda-table
     td
-      height: 600px;
       padding: 0px;
 
       .background
