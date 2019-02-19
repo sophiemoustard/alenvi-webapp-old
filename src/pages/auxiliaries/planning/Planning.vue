@@ -1,102 +1,190 @@
 <template>
-  <q-page>
-    <scheduler :title="true" :scroll="true" :showTabFilter="true" :events="events" @viewChanged="getEventsData"
-      @applyFilter="getEventsData"></scheduler>
+  <q-page class="neutral-background" :style="{ height: height }">
+    <div :class="[{ 'planning': !toggleDrawer, 'full-height' : true }]" >
+      <div class="row items-center planning-header q-mb-md">
+        <div class="col-xs-12 col-md-5 auxiliary-agenda-title">
+          <img :src="getAvatar(currentUser.picture.link)" class="avatar">
+          <div class="auxiliary-name">{{ currentUser.identity.firstname }} {{ currentUser.identity.lastname.toUpperCase() }}</div>
+        </div>
+        <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" />
+      </div>
+      <div class="planning-container full-width full-height">
+        <table style="width: 100%" class="agenda-table full-height">
+          <thead>
+            <th class="capitalize" v-for="(day, index) in daysHeader" :key="index">
+              <div class="row justify-center items-baseline days-header">
+                <div class="days-name q-mr-md">{{ day.name }}</div>
+                <div :class="['days-number', { 'current-day': isCurrentDay(day.moment) }]">{{ day.number }}</div>
+              </div>
+            </th>
+          </thead>
+          <tbody>
+            <tr>
+              <td v-for="(day, dayIndex) in days" :key="`day_${dayIndex}`" valign="top">
+                <div class="planning-background">
+                  <template v-if="dayIndex === 0">
+                    <div class="planning-hour" v-for="(hour, hourIndex) in hours" :key="`hour_${hourIndex}`"
+                      :style="{ top: `${(hourIndex * halfHourHeight * 4) - 1.5}%` }">{{ hour.format('HH:mm') }}</div>
+                  </template>
+                  <template v-for="(event, eventId) in getOneDayEvents(days[dayIndex])">
+                    <div :style="{ top: `${halfHourHeight * event.staffingTop}%`, height: `${halfHourHeight * event.staffingHeight - 0.2}%` }"
+                      :key="eventId"  :class="['cursor-pointer', 'event', `event-${event.type}`]">
+                      <div class="col-12 event-title">
+                        <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">{{ eventTitle(event) }}</p>
+                        <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">{{ displayAbsenceType(event.absence) }}</p>
+                        <p v-if="event.type === UNAVAILABILITY" class="no-margin overflow-hidden-nowrap">Indispo.</p>
+                        <p v-if="event.type === INTERNAL_HOUR" class="no-margin overflow-hidden-nowrap">{{ event.internalHour.name }}</p>
+                      </div>
+                      <p class="no-margin event-period overflow-hidden-nowrap">{{ getEventHours(event) }}</p>
+                    </div>
+                  </template>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </q-page>
 </template>
 
 <script>
-/* global scheduler */
-import { mapMutations, mapGetters } from 'vuex'
-import Scheduler from '../../../components/scheduler/Scheduler'
-import 'dhtmlx-scheduler'
-import { NotifyWarning, NotifyNegative } from '../../../components/popup/notify';
+import { planningTimelineMixin } from '../../../mixins/planningTimelineMixin';
+import { ABSENCE, INTERVENTION, INTERNAL_HOUR, UNAVAILABILITY, DEFAULT_AVATAR } from '../../../data/constants';
+import PlanningNavigation from '../../../components/PlanningNavigation';
 
 export default {
-  metaInfo () {
-    return {
-      title: this.title ? this.title : '-'
-    }
-  },
-  props: {
-    auxiliary: {
-      type: String,
-      default: null
-    },
-    customer: {
-      type: String,
-      default: null
-    }
-  },
+  mixins: [planningTimelineMixin],
+  name: 'Planning',
   components: {
-    Scheduler
+    'planning-navigation': PlanningNavigation,
   },
   data () {
     return {
-      events: null,
-      title: '',
-      token: '',
-      personId: '',
-      done: null
-    }
+      ABSENCE,
+      INTERVENTION,
+      INTERNAL_HOUR,
+      UNAVAILABILITY,
+      startOfWeek: '',
+      days: [],
+      events: [],
+      height: 0,
+      halfHourHeight: 4.1,
+    };
   },
   computed: {
-    ...mapGetters({
-      user: 'main/user',
-      personChosen: 'calendar/personChosen',
-      personType: 'calendar/personType'
-    }),
-    auxiliaryComp () {
-      return this.auxiliary;
+    currentUser () {
+      return this.$store.getters['main/user'];
     },
-    customerComp () {
-      return this.customer;
-    }
+    hours () {
+      const range = this.$moment.range(this.$moment().hours(8).minutes(0), this.$moment().hours(20).minutes(0));
+      return Array.from(range.by('hours', { step: 2 }));
+    },
+  },
+  async mounted () {
+    this.height = window.innerHeight;
+    this.startOfWeek = this.$moment().startOf('week');
+    this.getTimelineDays();
+    await this.getEvents();
   },
   methods: {
-    async getEventsData (event) {
-      try {
-        if (this.auxiliaryComp) {
-          this.setPersonType('employee');
-          this.personId = event && event.personChosen ? this.personChosen : this.user.employee_id;
-        } else if (this.customerComp) {
-          this.setPersonType('customer');
-          const customer = await this.getFirstCustomer();
-          this.personId = event && event.personChosen ? this.personChosen : customer.id_customer;
-        }
-        scheduler.clearAll();
-        const personData = await this.$ogust.getOgustPerson(this.personId, this.personType);
-        this.setOgustUser(personData);
-        this.title = personData.title;
-        this.events = await this.$ogust.getOgustEvents(this.personId, this.personType);
-        scheduler.parse(this.events, 'json');
-        this.toggleFilter(false);
-      } catch (e) {
-        console.error(e)
-        if (e.status === 404) {
-          this.events = [];
-          this.$store.commit('calendar/toggleFilter', false);
-          return NotifyWarning('Aucune intervention dans la période demandée');
-        }
-        NotifyNegative("Erreur de chargement des données :/ Si le problème persiste, contacte l'équipe technique :)");
+    getAvatar (link) {
+      return link || DEFAULT_AVATAR;
+    },
+    async updateTimeline () {
+      this.getTimelineDays();
+      await this.getEvents();
+    },
+    getOneDayEvents (day) {
+      return this.events
+        .filter(event =>
+          this.$moment(day).isSameOrAfter(event.startDate, 'day') && this.$moment(day).isSameOrBefore(event.endDate, 'day')
+        )
+        .map((event) => {
+          if (this.isCustomerPlanning) return event;
+          let dayEvent = { ...event };
+
+          let staffingTop = (this.$moment(event.startDate).hours() - 8) * 2 + (this.$moment(event.startDate).minutes() === 30 ? 1 : 0);
+          let staffingBottom = (this.$moment(event.endDate).hours() - 8) * 2 + (this.$moment(event.endDate).minutes() === 30 ? 1 : 0);
+          if (!this.$moment(day).isSame(event.startDate, 'day')) {
+            dayEvent.startDate = this.$moment(day).hour(8).toISOString();
+            staffingTop = 0;
+          }
+          if (!this.$moment(day).isSame(event.endDate, 'day')) {
+            dayEvent.endDate = this.$moment(day).hour(20).toISOString();
+            staffingBottom = 24;
+          }
+
+          dayEvent.staffingTop = staffingTop;
+          dayEvent.staffingHeight = staffingBottom - staffingTop;
+
+          return dayEvent;
+        })
+        .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+    },
+    async getEvents () {
+      const params = {
+        startDate: this.startOfWeek.format('YYYYMMDD'),
+        endStartDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
+        auxiliary: JSON.stringify([this.currentUser._id]),
       }
+      this.events = await this.$events.list(params);
     },
-    async getFirstCustomer () {
-      const customers = await this.$ogust.getCustomers({ sector: this.user.sector });
-      const filteredCustomers = this.$_.filter(customers, customer => !customer.last_name.match(/^ALENVI/i));
-      return filteredCustomers[0];
-    },
-    ...mapMutations({
-      setOgustUser: 'calendar/setOgustUser',
-      setPersonType: 'calendar/setPersonType',
-      setPersonChosen: 'calendar/setPersonChosen',
-      toggleFilter: 'calendar/toggleFilter'
-    })
   },
-  beforeRouteUpdate (to, from, next) {
-    this.setOgustUser(null);
-    this.setPersonChosen(null);
-    next();
-  }
 }
 </script>
+
+<style lang="stylus" scoped>
+  @import '~variables';
+
+  .q-layout-page
+    padding-top: 20px;
+
+  .agenda-table
+    td
+      padding: 0px;
+
+      .planning-background
+        background: repeating-linear-gradient(
+          180deg,
+          $white,
+          $white 16.2%,
+          $grey-3,
+          $grey-3 16.4%
+        )
+        height: 100%
+        position: relative;
+        margin-top: 2px
+
+      .event
+        position: absolute;
+        left: 3px;
+        right: 3px;
+        margin: 0;
+        border: 1px solid $white;
+
+      .planning-hour
+        position: absolute;
+        color: $light-grey;
+        background-color: $white;
+        font-size: 12px;
+        padding: 0 5px
+
+  .auxiliary-agenda-title
+    display: flex;
+    flex-direction: row;
+
+  .auxiliary-name
+    font-size: 24px;
+    margin-left: 3px;
+    padding: 9px 14px 11px;
+    @media screen and (max-width: 677px)
+      font-size: 20px;
+      padding: 7px;
+
+  .avatar
+    @media screen and (max-width: 677px)
+      height: 30px
+      width: 30px
+
+</style>

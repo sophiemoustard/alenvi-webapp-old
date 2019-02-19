@@ -17,7 +17,7 @@ import { mapMutations, mapGetters } from 'vuex'
 import 'dhtmlx-scheduler'
 
 import SelectSector from '../../../components/form/SelectSector'
-import Scheduler from '../../../components/scheduler/Scheduler'
+import Scheduler from '../../../components/scheduler/OldScheduler'
 import { NotifyNegative, NotifyWarning } from '../../../components/popup/notify';
 
 export default {
