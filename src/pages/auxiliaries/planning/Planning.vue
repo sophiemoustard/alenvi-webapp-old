@@ -21,7 +21,10 @@
           <tbody>
             <tr>
               <td v-for="(day, dayIndex) in days" :key="dayIndex" valign="top">
-                <div class="background">
+                <div class="planning-background">
+                  <template v-if="dayIndex === 0">
+                    <div class="planning-hour" v-for="(hour, hourIndex) in hours" :key="hourIndex" :style="{ top: `${(hourIndex * 16) - 1.5}%` }">{{ hour.format('HH:mm') }}</div>
+                  </template>
                   <template v-for="(event, eventId) in getOneDayEvents(days[dayIndex])">
                     <div :key="eventId" :style="{ top: `${4 * event.staffingTop}%`, height: `${4 * event.staffingHeight}%` }"
                       :class="['cursor-pointer', 'event', `event-${event.type}`]">
@@ -70,6 +73,10 @@ export default {
   computed: {
     currentUser () {
       return this.$store.getters['main/user'];
+    },
+    hours () {
+      const range = this.$moment.range(this.$moment().hours(8).minutes(0), this.$moment().hours(20).minutes(0));
+      return Array.from(range.by('hours', { step: 2 }));
     },
   },
   async mounted () {
@@ -135,7 +142,7 @@ export default {
     td
       padding: 0px;
 
-      .background
+      .planning-background
         background: repeating-linear-gradient(
           180deg,
           $white,
@@ -152,6 +159,13 @@ export default {
         left: 5px
         right: 5px
         margin: 0
+
+      .planning-hour
+        position: absolute;
+        color: $light-grey;
+        background-color: $white;
+        font-size: 12px;
+        padding: 0 5px
 
   .auxiliary-agenda-title
     display: flex;
