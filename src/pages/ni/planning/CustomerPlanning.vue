@@ -227,7 +227,7 @@ export default {
           endStartDate: this.$moment(scheduledEvent.endDate).subtract(1, 'minutes').toISOString(),
         });
       } catch (e) {
-        if (e.status !== 404) return NotifyNegative('Une erreur s\'est produite');
+        if (e.status.statusCode !== 404) return NotifyNegative('Une erreur s\'est produite');
       }
 
       return auxiliaryEvents.filter(event => event._id !== scheduledEvent._id).length !== 0;

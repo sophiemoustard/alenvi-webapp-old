@@ -1,24 +1,14 @@
-import { ABSENCE_TYPE } from '../data/constants';
-
 export const planningTimelineMixin = {
   data () {
     return {
       targetDate: '',
       datimeModal: false,
+      days: [],
     };
   },
   computed: {
     toggleDrawer () {
       return this.$store.getters['main/toggleDrawer'];
-    },
-    daysHeader () {
-      return this.days.map(day => {
-        return {
-          name: this.$moment(day).format('dd'),
-          number: this.$moment(day).format('DD'),
-          moment: day
-        }
-      });
     },
   },
   watch: {
@@ -30,9 +20,6 @@ export const planningTimelineMixin = {
     getTimelineDays () {
       const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
       this.days = Array.from(range.by('days'));
-    },
-    isCurrentDay (momentDay) {
-      return this.$moment(momentDay).isSame(new Date(), 'day');
     },
     endOfWeek () {
       return this.$moment(this.startOfWeek).add(6, 'd');
@@ -54,19 +41,6 @@ export const planningTimelineMixin = {
       this.startOfWeek = this.$moment(value).startOf('week');
       this.updateTimeline();
       this.datimeModal = false;
-    },
-    getEventHours (event) {
-      return `${this.$moment(event.startDate).format('HH:mm')} - ${this.$moment(event.endDate).format('HH:mm')}`
-    },
-    displayAbsenceType (value) {
-      const absence = ABSENCE_TYPE.find(abs => abs.value === value);
-      return !absence ? '' : absence.label;
-    },
-    eventTitle (event) {
-      if (this.isCustomerPlanning) {
-        return `${event.auxiliary.identity.firstname.slice(0, 1)}. ${event.auxiliary.identity.lastname}`.toUpperCase();
-      }
-      return event.customer.identity.lastname.toUpperCase();
     },
   },
 };

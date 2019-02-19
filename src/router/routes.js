@@ -192,8 +192,8 @@ const routes = [
       },
       {
         path: 'auxiliaries/agenda',
-        name: 'profile planning',
-        component: () => import('pages/auxiliaries/planning/Planning'),
+        name: 'auxiliary agenda',
+        component: () => import('pages/auxiliaries/planning/AuxiliaryAgenda'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['planning:read'],
@@ -259,6 +259,14 @@ const routes = [
         path: 'customers/planning',
         name: 'customer planning',
         component: () => import('pages/customers/Planning'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token']
+        }
+      },
+      {
+        path: 'customers/agenda',
+        name: 'customer agenda',
+        component: () => import('pages/customers/CustomerAgenda'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token']
         }
