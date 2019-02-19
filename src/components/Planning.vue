@@ -71,11 +71,12 @@ import { NotifyNegative } from './popup/notify';
 import NiChip from './Chip';
 import ChipsAutocompleteAuxiliariesSectors from './ChipsAutocompleteAuxiliariesSectors';
 import { planningTimelineMixin } from '../mixins/planningTimelineMixin';
+import { planningEventMixin } from '../mixins/planningEventMixin';
 import PlanningNavigation from './PlanningNavigation.vue';
 
 export default {
   name: 'PlanningManager',
-  mixins: [planningTimelineMixin],
+  mixins: [planningTimelineMixin, planningEventMixin],
   components: {
     'ni-chip': NiChip,
     'ni-chips-autocomplete-auxiliaries-sectors': ChipsAutocompleteAuxiliariesSectors,
@@ -102,11 +103,6 @@ export default {
       ABSENCE,
       INTERNAL_HOUR,
       staffingView: false,
-    }
-  },
-  computed: {
-    isCustomerPlanning () {
-      return this.personKey === 'customer';
     }
   },
   async mounted () {
