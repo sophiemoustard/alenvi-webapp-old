@@ -369,7 +369,7 @@ export default {
             helper: {
               firstname: this.helper.identity.firstname || '',
               lastname: this.helper.identity.lastname || '',
-              title: this.helper.identity ? this.helper.administrative.identity.title : ''
+              title: this.helper.identity ? this.helper.identity.title : ''
             }
           };
           await this.$customers.addSubscriptionHistory(this.customer._id, payload);
