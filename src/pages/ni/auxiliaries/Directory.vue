@@ -58,12 +58,8 @@
           @blur="$v.newUser.identity.firstname.$touch" errorLabel="Champ requis" requiredField />
         <ni-modal-input v-model="newUser.mobilePhone" :error="$v.newUser.mobilePhone.$error" caption="Numéro de téléphone"
           @blur="$v.newUser.mobilePhone.$touch" :errorLabel="mobilePhoneError" requiredField />
-        <ni-modal-input v-model="newUser.contact.address" :error="$v.newUser.contact.address.$error" caption="Addresse"
-          @blur="$v.newUser.contact.address.$touch" errorLabel="Champ requis" requiredField />
-        <ni-modal-input v-model="newUser.contact.zipCode" :error="$v.newUser.contact.zipCode.$error" caption="Code postal"
-          @blur="$v.newUser.contact.zipCode.$touch" :errorLabel="zipCodeError" requiredField />
-        <ni-modal-input v-model="newUser.contact.city" :error="$v.newUser.contact.city.$error" caption="Ville" @blur="$v.newUser.contact.city.$touch"
-          errorLabel="Champ requis" requiredField />
+        <ni-search-address v-model="newUser.contact.address.fullAddress" color="white" inverted-light @selected="selectedAddress" :errorLabel="addressError"
+          :error="$v.newUser.contact.address.fullAddress.$error" requiredField inModal />
         <ni-modal-input v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email" @blur="$v.newUser.local.email.$touch"
           :errorLabel="emailError" requiredField />
         <div class="row margin-input">
@@ -104,7 +100,7 @@
 import { required, email, maxLength } from 'vuelidate/lib/validators';
 import randomize from 'randomatic';
 
-import { frPhoneNumber, frZipCode } from '../../../helpers/vuelidateCustomVal';
+import { frPhoneNumber, frAddress } from '../../../helpers/vuelidateCustomVal';
 import { clear } from '../../../helpers/utils.js';
 import { userProfileValidation } from '../../../helpers/userProfileValidation';
 import { taskValidation } from '../../../helpers/taskValidation';
@@ -112,8 +108,10 @@ import SelectSector from '../../../components/form/SelectSector';
 import SelectManager from '../../../components/form/SelectManager.vue';
 import NiModalInput from '../../../components/form/ModalInput';
 import NiModalSelect from '../../../components/form/ModalSelect';
+import NiSearchAddress from '../../../components/form/SearchAddress';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../../components/popup/notify.js';
 import { DEFAULT_AVATAR } from '../../../data/constants';
+import { validationMixin } from '../../../mixins/validationMixin.js';
 
 export default {
   metaInfo: {
@@ -123,8 +121,10 @@ export default {
     NiSelectSector: SelectSector,
     NiSelectManager: SelectManager,
     NiModalInput,
-    NiModalSelect
+    NiModalSelect,
+    NiSearchAddress
   },
+  mixins: [validationMixin],
   data () {
     return {
       userCreated: null,
@@ -150,9 +150,7 @@ export default {
         },
         contact: {
           addressId: '',
-          address: '',
-          city: '',
-          zipCode: ''
+          address: { fullAddress: '' },
         },
         employee_id: '',
         mobilePhone: '',
@@ -258,13 +256,9 @@ export default {
         maxLength: maxLength(10)
       },
       contact: {
-        address: { required },
-        zipCode: {
-          required,
-          frZipCode,
-          maxLength: maxLength(5)
+        address: {
+          fullAddress: { required, frAddress }
         },
-        city: { required }
       },
       local: {
         email: { required, email }
@@ -319,11 +313,20 @@ export default {
         return 'Email non valide';
       }
     },
+    addressError () {
+      if (!this.$v.newUser.contact.address.fullAddress.required) {
+        return 'Champ requis';
+      }
+      return 'Adresse non valide';
+    },
     hasPicture () {
       return !this.user.picture || (this.user.picture && !this.user.picture.link) ? DEFAULT_AVATAR : this.user.picture.link;
     }
   },
   methods: {
+    selectedAddress (item) {
+      this.newUser.contact.address = Object.assign({}, this.newUser.contact.address, item);
+    },
     getHiringDate (user) {
       let hiringDate = null;
       if (user.administrative && user.administrative.contracts.length > 0) {
@@ -411,9 +414,9 @@ export default {
         last_name: this.newUser.identity.lastname,
         first_name: this.newUser.identity.firstname,
         main_address: {
-          line: this.newUser.contact.address,
-          zip: this.newUser.contact.zipCode,
-          city: this.newUser.contact.city
+          line: this.newUser.contact.address.street,
+          zip: this.newUser.contact.address.zipCode,
+          city: this.newUser.contact.address.city
         },
         email: this.newUser.local.email,
         sector: this.newUser.sector,
@@ -435,7 +438,8 @@ export default {
       try {
         this.loading = true;
         this.$v.newUser.$touch();
-        if (this.$v.newUser.$error) throw new Error('Invalid fields');
+        const isValid = await this.waitForFormValidation(this.$v.newUser);
+        if (!isValid) throw new Error('Invalid fields');
 
         const existingEmployee = await this.$ogust.getEmployees({ email: this.newUser.local.email });
         if (Object.keys(existingEmployee).length !== 0) throw new Error('Existing email');
