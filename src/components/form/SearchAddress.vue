@@ -4,7 +4,8 @@
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
     </div>
     <q-field :error="error" :error-label="errorLabel">
-      <q-search :value="value" inverted-light color="white" placeholder=" " no-icon @input="inputEvent" @blur="blurEvent" :class="{'borders': inModal}">
+      <q-search :value="value" inverted-light color="white" placeholder=" " no-icon @input="inputEvent"
+        @blur="blurEvent" @focus="focusEvent" :class="{'borders': inModal}">
         <q-autocomplete @search="searchAddress" @selected="selectedAddress" />
       </q-search>
     </q-field>
@@ -55,6 +56,9 @@ export default {
     },
     blurEvent () {
       this.$emit('blur');
+    },
+    focusEvent () {
+      this.$emit('focus');
     }
   }
 }
