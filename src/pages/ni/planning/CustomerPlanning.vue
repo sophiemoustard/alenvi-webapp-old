@@ -83,7 +83,7 @@
 
 <script>
 import Planning from '../../../components/planning/Planning.vue';
-import { planningActionMixin } from '../../../mixins/planningActionMixin';
+import { planningModalMixin } from '../../../mixins/planningModalMixin';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify.js';
 import { INTERVENTION, DEFAULT_AVATAR, NEVER, ABSENCE, INTERNAL_HOUR, ILLNESS, UNAVAILABILITY } from '../../../data/constants';
 import { required, requiredIf } from 'vuelidate/lib/validators';
@@ -91,7 +91,7 @@ import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
 
 export default {
   name: 'CustomerPlanning',
-  mixins: [planningActionMixin],
+  mixins: [planningModalMixin],
   components: {
     'ni-planning-manager': Planning,
   },
@@ -337,7 +337,7 @@ export default {
           endStartDate: this.$moment(scheduledEvent.endDate).subtract(1, 'minutes').toISOString(),
         });
       } catch (e) {
-        if (e.status.statusCode !== 404) return NotifyNegative('Une erreur s\'est produite');
+        if (e.data.statusCode !== 404) return NotifyNegative('Une erreur s\'est produite');
       }
 
       return auxiliaryEvents.filter(event => event._id !== scheduledEvent._id).length !== 0;

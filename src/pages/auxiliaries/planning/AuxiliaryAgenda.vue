@@ -11,24 +11,42 @@
         <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToToday="goToToday"
           @goToWeek="goToWeek" :targetDate="targetDate" />
       </div>
-      <agenda :events="events" :days="days" personKey="auxiliary" />
+      <agenda :events="events" :days="days" personKey="auxiliary" @createEvent="openCreationModal" @editEvent="openEditionModal" />
     </div>
+
+    <!-- Event creation modal -->
+    <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
+      :creationModal="creationModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary" :auxiliaries="auxiliaries"
+      :customers="customers" @resetForm="resetCreationForm" @deleteDocument="deleteDocument" @documentUploaded="documentUploaded"
+      @createEvent="createEvent" @close="closeCreationModal" @selectedAddress="selectedAddress" />
+
+    <!-- Event edition modal -->
+    <ni-auxiliary-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
+      :editionModal="editionModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary" :auxiliaries="auxiliaries"
+      :customers="customers" @resetForm="resetEditionForm" @deleteDocument="deleteDocument" @documentUploaded="documentUploaded"
+      @updateEvent="updateEvent" @close="closeEditionModal" @deleteEvent="deleteEvent" @deleteEventRepetition="deleteEventRepetition"
+      @selectedAddress="selectedAddress" />
   </q-page>
 </template>
 
 <script>
-import { DEFAULT_AVATAR } from '../../../data/constants';
-import { planningTimelineMixin } from '../../../mixins/planningTimelineMixin';
 import Agenda from '../../../components/Agenda';
 import PlanningNavigation from '../../../components/planning/PlanningNavigation';
+import AuxiliaryEventCreationModal from '../../../components/Planning/AuxiliaryEventCreationModal';
+import AuxiliaryEventEditionModal from '../../../components/Planning/AuxiliaryEventEditionModal';
+import { DEFAULT_AVATAR, INTERVENTION, NEVER } from '../../../data/constants';
+import { planningTimelineMixin } from '../../../mixins/planningTimelineMixin';
+import { planningActionMixin } from '../../../mixins/planningActionMixin';
 
 export default {
   name: 'AuxiliaryAgenda',
   components: {
     'agenda': Agenda,
     'planning-navigation': PlanningNavigation,
+    'ni-auxiliary-event-creation-modal': AuxiliaryEventCreationModal,
+    'ni-auxiliary-event-edition-modal': AuxiliaryEventEditionModal,
   },
-  mixins: [planningTimelineMixin],
+  mixins: [planningTimelineMixin, planningActionMixin],
   data () {
     return {
       startOfWeek: '',
@@ -36,6 +54,15 @@ export default {
       height: 0,
       selectedAuxiliary: {},
       auxiliaries: [],
+      customers: [],
+      internalHours: [],
+      loading: false,
+      // Event creation
+      newEvent: {},
+      creationModal: false,
+      // Event edition
+      editedEvent: {},
+      editionModal: false,
     };
   },
   computed: {
@@ -56,6 +83,8 @@ export default {
     this.getTimelineDays();
     await this.getAuxiliaries();
     await this.getEvents();
+    await this.getCustomers();
+    this.setInternalHours();
   },
   methods: {
     getAvatar (link) {
@@ -72,6 +101,7 @@ export default {
       this.getTimelineDays();
       await this.getEvents();
     },
+    // Refresh data
     async getEvents () {
       try {
         const params = {
@@ -86,13 +116,42 @@ export default {
     },
     async getAuxiliaries () {
       try {
-        const params = {
-          sector: this.currentUser.sector,
-        }
-        this.auxiliaries = await this.$users.showAll(params);
+        this.auxiliaries = await this.$users.showAll({ sector: this.currentUser.sector });
       } catch (e) {
         this.auxiliaries = [];
       }
+    },
+    async getCustomers () {
+      try {
+        this.customers = await this.$customers.showAll({ subscriptions: true });
+      } catch (e) {
+        this.customers = [];
+      }
+    },
+    // Event creation
+    openCreationModal (dayIndex) {
+      const selectedDay = this.days[dayIndex];
+      this.newEvent = {
+        type: INTERVENTION,
+        repetition: { frequency: NEVER },
+        startDuration: '',
+        endDuration: '',
+        customer: '',
+        subscription: '',
+        internalHour: '',
+        absence: '',
+        location: {},
+        attachment: {},
+        auxiliary: this.selectedAuxiliary._id,
+        sector: this.selectedAuxiliary.sector,
+        dates: {
+          startDate: selectedDay.toISOString(),
+          startHour: '08:00',
+          endDate: selectedDay.toISOString(),
+          endHour: '10:00',
+        },
+      };
+      this.creationModal = true;
     },
   },
 }

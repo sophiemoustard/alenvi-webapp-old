@@ -1,9 +1,9 @@
 <template>
-  <q-modal v-if="Object.keys(editedEvent).length !== 0" v-model="editionModal" content-classes="modal-container-md"
+  <q-modal v-if="Object.keys(editedEvent).length !== 0" :value="editionModal" content-classes="modal-container-md"
     @hide="resetForm()">
     <div class="modal-padding">
       <div class="row q-mb-md">
-        <div class="col-11 row auxiliary-name">
+        <div class="col-11 row auxiliary-name" v-if="selectedAuxiliary">
           <img :src="getAvatar(selectedAuxiliary)" class="avatar">
           <q-select filter v-model="editedEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions"
             ref="auxiliarySelect" :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
@@ -78,11 +78,11 @@
 
 <script>
 import { DEFAULT_AVATAR } from '../../data/constants';
-import { planningActionMixin } from '../../mixins/planningActionMixin';
+import { planningModalMixin } from '../../mixins/planningModalMixin';
 
 export default {
   name: 'AuxiliaryEventEditionModal',
-  mixins: [planningActionMixin],
+  mixins: [planningModalMixin],
   props: {
     editedEvent: { type: Object, default: () => ({}) },
     editionModal: { type: Boolean, default: false },

@@ -6,7 +6,7 @@
 </template>
 
 <script>
-/* global oldscheduler */
+/* global scheduler */
 import { mapMutations, mapGetters } from 'vuex'
 import Scheduler from '../../../components/scheduler/OldScheduler'
 import 'dhtmlx-scheduler'
@@ -64,12 +64,12 @@ export default {
           const customer = await this.getFirstCustomer();
           this.personId = event && event.personChosen ? this.personChosen : customer.id_customer;
         }
-        oldscheduler.clearAll();
+        scheduler.clearAll();
         const personData = await this.$ogust.getOgustPerson(this.personId, this.personType);
         this.setOgustUser(personData);
         this.title = personData.title;
         this.events = await this.$ogust.getOgustEvents(this.personId, this.personType);
-        oldscheduler.parse(this.events, 'json');
+        scheduler.parse(this.events, 'json');
         this.toggleFilter(false);
       } catch (e) {
         console.error(e)

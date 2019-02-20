@@ -1,5 +1,5 @@
 <template>
-  <q-modal v-if="Object.keys(newEvent).length !== 0" v-model="creationModal" content-classes="modal-container-md" @hide="resetForm(false)">
+  <q-modal v-if="Object.keys(newEvent).length !== 0" :value="creationModal" content-classes="modal-container-md" @hide="resetForm(false)">
     <div class="modal-padding">
       <div class="row q-mb-md">
         <div class="col-11 row auxiliary-name">
@@ -61,11 +61,11 @@
 
 <script>
 import { ABSENCE, DEFAULT_AVATAR } from '../../data/constants';
-import { planningActionMixin } from '../../mixins/planningActionMixin';
+import { planningModalMixin } from '../../mixins/planningModalMixin';
 
 export default {
   name: 'AuxiliaryEventCreationModal',
-  mixins: [planningActionMixin],
+  mixins: [planningModalMixin],
   props: {
     newEvent: { type: Object, default: () => ({}) },
     creationModal: { type: Boolean, default: false },
