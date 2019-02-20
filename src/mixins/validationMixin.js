@@ -15,6 +15,18 @@ export const validationMixin = {
           resolve(!this.$_.get(validationObj, path).$error);
         }
       });
+    },
+    waitForFormValidation (validationObj) {
+      return new Promise((resolve) => {
+        const unwatch = this.$watch(() => !validationObj.$pending, (notPending) => {
+          if (notPending) {
+            if (unwatch) {
+              unwatch();
+            }
+            resolve(!validationObj.$error);
+          }
+        }, { immediate: true });
+      })
     }
   }
 }
