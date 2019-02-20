@@ -1,6 +1,6 @@
 <template>
   <div :class="[{ 'planning': !toggleDrawer }]">
-    <div class="row items-center planning-header q-mb-md">
+    <div class="row items-center planning-header">
       <div class="col-xs-12 col-md-5 planning-search">
         <ni-chips-autocomplete-auxiliaries-sectors v-model="terms" @selected="selectedFilter" @remove="removedFilter"
           class="planning-search" :filters="filters" />
@@ -66,12 +66,12 @@
 </template>
 
 <script>
-import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR } from '../data/constants';
-import { NotifyNegative } from './popup/notify';
-import NiChip from './Chip';
-import ChipsAutocompleteAuxiliariesSectors from './ChipsAutocompleteAuxiliariesSectors';
-import { planningTimelineMixin } from '../mixins/planningTimelineMixin';
-import { planningEventMixin } from '../mixins/planningEventMixin';
+import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR } from '../../data/constants';
+import { NotifyNegative } from '../popup/notify';
+import NiChip from '../Chip';
+import ChipsAutocomplete from '../ChipsAutocomplete';
+import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
+import { planningEventMixin } from '../../mixins/planningEventMixin';
 import PlanningNavigation from './PlanningNavigation.vue';
 
 export default {
@@ -79,7 +79,7 @@ export default {
   mixins: [planningTimelineMixin, planningEventMixin],
   components: {
     'ni-chip': NiChip,
-    'ni-chips-autocomplete-auxiliaries-sectors': ChipsAutocompleteAuxiliariesSectors,
+    'ni-chips-autocomplete-auxiliaries-sectors': ChipsAutocomplete,
     'planning-navigation': PlanningNavigation,
   },
   props: {

@@ -9,9 +9,9 @@
       content-classes="modal-container-md" @hide="resetCreationForm(false)">
       <div class="modal-padding">
         <div class="row q-mb-md">
-          <div class="col-11 row modal-customer-header">
+          <div class="col-11 row customer-name">
             <img :src="DEFAULT_AVATAR" class="avatar">
-            <div class="customer-name">{{ selectedCustomer.identity.title }} {{ selectedCustomer.identity.lastname.toUpperCase() }}</div>
+            <div>{{ selectedCustomer.identity.title }} {{ selectedCustomer.identity.lastname.toUpperCase() }}</div>
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
             <span>
@@ -36,9 +36,9 @@
       content-classes="modal-container-md" @hide="resetEditionForm()">
       <div class="modal-padding">
         <div class="row q-mb-md">
-          <div class="col-11 row modal-customer-header">
+          <div class="col-11 row customer-name">
             <img :src="DEFAULT_AVATAR" class="avatar">
-            <div class="customer-name">{{ selectedCustomer.identity.title }} {{
+            <div>{{ selectedCustomer.identity.title }} {{
               selectedCustomer.identity.lastname.toUpperCase() }}</div>
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
@@ -82,14 +82,16 @@
 </template>
 
 <script>
-import Planning from '../../../components/Planning.vue';
-import { planningMixin } from '../../../mixins/planningMixin';
+import Planning from '../../../components/planning/Planning.vue';
+import { planningModalMixin } from '../../../mixins/planningModalMixin';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify.js';
-import { INTERVENTION, DEFAULT_AVATAR, NEVER } from '../../../data/constants';
+import { INTERVENTION, DEFAULT_AVATAR, NEVER, ABSENCE, INTERNAL_HOUR, ILLNESS, UNAVAILABILITY } from '../../../data/constants';
+import { required, requiredIf } from 'vuelidate/lib/validators';
+import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
 
 export default {
   name: 'CustomerPlanning',
-  mixins: [planningMixin],
+  mixins: [planningModalMixin],
   components: {
     'ni-planning-manager': Planning,
   },
@@ -105,19 +107,68 @@ export default {
       filteredCustomers: [],
       DEFAULT_AVATAR,
       filters: [],
+      // Event creation
+      newEvent: {},
+      creationModal: false,
+      // Event edition
+      editedEvent: {},
+      editionModal: false,
     };
   },
   async mounted () {
     await this.getEmployeesBySector();
     await this.initFilters();
   },
+  validations () {
+    return {
+      newEvent: {
+        type: { required },
+        dates: {
+          startDate: { required },
+          endDate: { required },
+        },
+        startDuration: { required: requiredIf((item) => item.type === ABSENCE) },
+        endDuration: { required: requiredIf((item) => item.type === ABSENCE) },
+        auxiliary: { required },
+        sector: { required },
+        customer: { required: requiredIf((item) => item.type === INTERVENTION) },
+        subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
+        internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
+        absence: { required: requiredIf((item) => item.type === ABSENCE) },
+        location: { fullAddress: { frAddress } },
+        repetition: {
+          frequency: { required: requiredIf((item) => item.type !== ABSENCE) }
+        },
+        attachment: {
+          driveId: requiredIf((item) => item.type === ABSENCE && item.absence === ILLNESS),
+          link: requiredIf((item) => item.type === ABSENCE && item.absence === ILLNESS),
+        },
+      },
+      editedEvent: {
+        dates: {
+          startDate: { required },
+          endDate: { required },
+        },
+        startDuration: { required: requiredIf((item) => item.type === ABSENCE) },
+        endDuration: { required: requiredIf((item) => item.type === ABSENCE) },
+        auxiliary: { required },
+        sector: { required },
+        customer: { required: requiredIf((item) => item.type === INTERVENTION) },
+        subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
+        internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
+        absence: { required: requiredIf((item) => item.type === ABSENCE) },
+        location: { fullAddress: { frAddress } },
+        repetition: {
+          frequency: { required: requiredIf((item) => item.type !== ABSENCE) },
+        },
+        cancel: {
+          condition: { required: requiredIf((item, parent) => parent.isCancelled) },
+          reason: { required: requiredIf((item, parent) => parent.isCancelled) },
+        },
+      },
+    };
+  },
   computed: {
-    minEndDate () {
-      return this.$moment(this.newEvent.startDate).toISOString()
-    },
-    maxEndDate () {
-      return this.$moment(this.newEvent.startDate).hours(23).minutes(59).toISOString();
-    },
     selectedCustomer () {
       if (this.creationModal && this.newEvent.customer !== '') return this.customers.find(cus => cus._id === this.newEvent.customer);
       if (this.editionModal && this.editedEvent.auxiliary !== '') return this.customers.find(cus => cus._id === this.editedEvent.customer._id);
@@ -218,6 +269,65 @@ export default {
       };
       this.creationModal = true;
     },
+    resetCreationForm (partialReset, type = INTERVENTION) {
+      this.$v.newEvent.$reset();
+      if (!partialReset) this.newEvent = {};
+      else {
+        this.newEvent = {
+          type,
+          dates: {
+            startDate: partialReset ? this.newEvent.dates.startDate : '',
+            startHour: partialReset ? this.newEvent.dates.startHour : '',
+            endDate: partialReset ? this.newEvent.dates.endDate : '',
+            endHour: partialReset ? this.newEvent.dates.endHour : '',
+          },
+          repetition: { frequency: NEVER },
+          startDuration: '',
+          endDuration: '',
+          auxiliary: partialReset ? this.newEvent.auxiliary : '',
+          customer: '',
+          subscription: '',
+          sector: partialReset ? this.newEvent.sector : '',
+          internalHour: '',
+          absence: '',
+          location: {},
+          attachment: {},
+        };
+      }
+    },
+    getPayload (event) {
+      let payload = { ...this.$_.omit(event, ['dates', '__v']) }
+      payload = this.$_.pickBy(payload);
+
+      if (event.type === INTERNAL_HOUR) {
+        const internalHour = this.internalHours.find(hour => hour._id === event.internalHour);
+        payload.internalHour = internalHour;
+      }
+      if (event.type === ABSENCE) {
+        payload.startDate = this.$moment(event.dates.startDate).hours(event.startDuration[0].startHour).toISOString();
+        if (event.endDuration !== '') {
+          payload.endDate = this.$moment(event.dates.endDate).hours(event.endDuration[0].endHour).toISOString();
+        } else {
+          payload.endDate = this.$moment(event.dates.endDate).hours(event.startDuration[0].endHour).toISOString();
+        }
+
+        this.$_.unset(payload, 'startDuration');
+        this.$_.unset(payload, 'endDuration');
+      } else {
+        payload.startDate = this.$moment(event.dates.startDate).hours(event.dates.startHour.split(':')[0])
+          .minutes(event.dates.startHour.split(':')[1]).toISOString();
+        payload.endDate = this.$moment(event.dates.endDate).hours(event.dates.endHour.split(':')[0])
+          .minutes(event.dates.endHour.split(':')[1]).toISOString();
+      }
+
+      if (event.location && event.location.fullAddress) delete payload.location.location;
+      if (event.location && Object.keys(event.location).length === 0) delete payload.location;
+      if (event.cancel && Object.keys(event.cancel).length === 0) delete payload.cancel;
+      if (event.cancel && Object.keys(event.cancel).length === 0) delete payload.attachment;
+      if (event.shouldUpdateRepetition) delete payload.misc;
+
+      return payload;
+    },
     async hasConflicts (scheduledEvent) {
       let auxiliaryEvents = [];
       try {
@@ -227,7 +337,7 @@ export default {
           endStartDate: this.$moment(scheduledEvent.endDate).subtract(1, 'minutes').toISOString(),
         });
       } catch (e) {
-        if (e.status.statusCode !== 404) return NotifyNegative('Une erreur s\'est produite');
+        if (e.data.statusCode !== 404) return NotifyNegative('Une erreur s\'est produite');
       }
 
       return auxiliaryEvents.filter(event => event._id !== scheduledEvent._id).length !== 0;
@@ -259,6 +369,52 @@ export default {
       }
     },
     // Event edition
+    openEditionModal (eventId) {
+      const editedEvent = this.events.find(ev => ev._id === eventId);
+      const { createdAt, updatedAt, startDate, endDate, ...eventData } = editedEvent;
+      const auxiliary = editedEvent.auxiliary._id;
+      const dates = {
+        startDate,
+        endDate,
+        startHour: `${this.$moment(startDate).hours() < 10
+          ? `0${this.$moment(startDate).hours()}`
+          : this.$moment(startDate).hours()}:${this.$moment(startDate).minutes() || '00'}`,
+        endHour: `${this.$moment(endDate).hours() < 10
+          ? `0${this.$moment(endDate).hours()}`
+          : this.$moment(endDate).hours()}:${this.$moment(endDate).minutes() || '00'}`,
+      };
+      switch (editedEvent.type) {
+        case INTERVENTION:
+          const subscription = editedEvent.subscription._id;
+          this.editedEvent = { isCancelled: false, cancel: {}, shouldUpdateRepetition: false, ...eventData, dates, auxiliary, subscription };
+          break;
+        case INTERNAL_HOUR:
+          const internalHour = editedEvent.internalHour._id;
+          this.editedEvent = { location: {}, shouldUpdateRepetition: false, ...eventData, auxiliary, internalHour, dates };
+          break;
+        case ABSENCE:
+          const { startDuration, endDuration } = this.getAbsenceDurations(editedEvent);
+          this.editedEvent = {
+            location: {},
+            attachment: {},
+            ...eventData,
+            auxiliary,
+            startDuration,
+            endDuration,
+            dates: { startDate, endDate },
+          };
+          break;
+        case UNAVAILABILITY:
+          this.editedEvent = { shouldUpdateRepetition: false, ...eventData, auxiliary, dates };
+          break;
+      }
+
+      this.editionModal = true
+    },
+    resetEditionForm () {
+      this.$v.editedEvent.$reset();
+      this.editedEvent = {};
+    },
     async updateEvent () {
       try {
         this.$v.editedEvent.$touch();
@@ -446,30 +602,9 @@ export default {
   .q-layout-page
     padding-top: 20px;
 
-  /deep/ .modal-customer-header
-    align-items: center
-    .customer-name
-      font-size: 24px;
-      margin-left: 3px;
-      padding: 9px 14px 11px;
-      @media screen and (max-width: 677px)
-        font-size: 20px;
-        padding: 7px;
-    .avatar
-      @media screen and (max-width: 677px)
-        height: 30px
-        width: 30px
-
   .modal-subtitle
     justify-content: flex-end;
     display: flex;
-
-  .cutomer-info
-    background: $light-grey;
-    padding: 10px 25px;
-    /deep/ .q-if-inverted
-      background: $light-grey !important;
-      border: none;
 
   .light-checkbox
     color: $grey

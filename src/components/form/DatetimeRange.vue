@@ -99,12 +99,12 @@ export default {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
-    @media screen and (min-width: 678px)
+    @media screen and (min-width: 768px)
       & .delimiter
         padding: 10px 14px;
         margin: 0;
         width: 4%;
-    @media screen and (max-width: 677px)
+    @media screen and (max-width: 767px)
       flex-direction: column;
       & .delimiter
         display: none;
@@ -130,8 +130,9 @@ export default {
   .datetime-item
     display: flex;
     flex-direction: row;
+    justify-content: center;
     &.end
-      @media screen and (max-width: 677px)
+      @media screen and (max-width: 767px)
         border-top: 1px solid $light-grey;
         flex-direction: row-reverse;
 

@@ -11,7 +11,7 @@
       </thead>
       <tbody>
         <tr>
-          <td v-for="(day, dayIndex) in days" :key="`day_${dayIndex}`" valign="top">
+          <td v-for="(day, dayIndex) in days" :key="`day_${dayIndex}`" valign="top" @click="createEvent(dayIndex)">
             <div class="planning-background">
               <template v-if="dayIndex === 0">
                 <div class="planning-hour" v-for="(hour, hourIndex) in hours" :key="`hour_${hourIndex}`"
@@ -19,7 +19,7 @@
               </template>
               <template v-for="(event, eventId) in getOneDayEvents(days[dayIndex])">
                 <div :style="{ top: `${halfHourHeight * event.staffingTop}%`, height: `${halfHourHeight * event.staffingHeight - 0.2}%` }"
-                  :key="eventId"  :class="['cursor-pointer', 'event', `event-${event.type}`]">
+                  :key="eventId"  :class="['cursor-pointer', 'event', `event-${event.type}`]" @click.stop="editEvent(event._id)">
                   <div class="col-12 event-title">
                     <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">{{ eventTitle(event) }}</p>
                     <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">{{ displayAbsenceType(event.absence) }}</p>
@@ -87,6 +87,12 @@ export default {
         })
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
     },
+    createEvent (value) {
+      this.$emit('createEvent', value);
+    },
+    editEvent (value) {
+      this.$emit('editEvent', value);
+    }
   },
 }
 </script>
