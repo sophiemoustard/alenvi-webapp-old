@@ -130,6 +130,7 @@ export default {
   .datetime-item
     display: flex;
     flex-direction: row;
+    justify-content: center;
     &.end
       @media screen and (max-width: 677px)
         border-top: 1px solid $light-grey;

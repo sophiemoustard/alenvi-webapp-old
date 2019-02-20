@@ -5,142 +5,16 @@
       :removedFilter="removedFilter" />
 
     <!-- Event creation modal -->
-    <q-modal v-if="Object.keys(newEvent).length !== 0" v-model="creationModal" content-classes="modal-container-md"
-      @hide="resetCreationForm(false)">
-      <div class="modal-padding">
-        <div class="row q-mb-md">
-          <div class="col-11 row auxiliary-name">
-            <img :src="getAvatar(selectedAuxiliary.picture.link)" class="avatar">
-            <q-select filter v-model="newEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions"
-              ref="newEventAuxiliarySelect" :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
-              :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`" />
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span>
-              <q-icon name="clear" @click.native="creationModal = false" />
-            </span>
-          </div>
-        </div>
-        <q-btn-toggle no-wrap v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions" @input="resetCreationForm(true, newEvent.type)" />
-        <template v-if="newEvent.type !== ABSENCE">
-          <ni-datetime-range caption="Dates et heures de l'intervention" v-model="newEvent.dates" requiredField />
-        </template>
-        <template v-if="newEvent.type === INTERVENTION">
-          <ni-modal-select caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions" :error="$v.newEvent.customer.$error"
-            icon="face" requiredField @blur="$v.newEvent.customer.$touch" />
-          <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions(newEvent.customer)"
-            :error="$v.newEvent.subscription.$error" requiredField @blur="$v.newEvent.subscription.$touch" />
-        </template>
-        <template v-if="newEvent.type === ABSENCE">
-          <ni-datetime-picker caption="Date de debut" v-model="newEvent.dates.startDate" type="date" :error="$v.newEvent.dates.startDate.$error"
-            inModal requiredField @blur="$v.newEvent.dates.startDate.$touch" />
-          <ni-modal-select caption="Durée" :error="$v.newEvent.startDuration.$error" :options="dateOptions" v-model="newEvent.startDuration"
-            separator requiredField @blur="$v.newEvent.startDuration.$touch" />
-          <ni-datetime-picker caption="Date de fin" v-model="newEvent.dates.endDate" type="date" :error="$v.newEvent.dates.endDate.$error"
-            inModal :min="newEvent.dates.startDate" requiredField @blur="$v.newEvent.dates.endDate.$touch" />
-          <ni-modal-select caption="Durée" :error="$v.newEvent.endDuration.$error" :options="dateOptions" v-model="newEvent.endDuration"
-            separator :requiredField="isEndDurationRequired" @blur="$v.newEvent.endDuration.$touch" />
-          <ni-modal-select caption="Type d'absence" v-model="newEvent.absence" :options="absenceOptions" :error="$v.newEvent.absence.$error"
-            requiredField @blur="$v.newEvent.absence.$touch" />
-          <ni-file-uploader v-if="newEvent.absence && newEvent.absence === ILLNESS" caption="Justificatif d'absence"
-            path="attachment" :entity="newEvent" alt="justificatif absence" name="proofOfAbsence" :url="docsUploadUrl"
-            @uploaded="documentUploaded" :additionalValue="additionalValue" requiredField :disable="!selectedAuxiliary._id"
-            @delete="deleteDocument(newEvent.attachment.driveId)" withBorders />
-        </template>
-        <template v-if="newEvent.type === INTERNAL_HOUR">
-          <ni-modal-select caption="Type d'heure interne" v-model="newEvent.internalHour" :options="internalHourOptions"
-            requiredField :error="$v.newEvent.internalHour.$error" @blur="$v.newEvent.internalHour.$touch" />
-        </template>
-        <template v-if="newEvent.type !== ABSENCE">
-          <ni-modal-select caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency" :options="repetitionOptions"
-            requiredField @blur="$v.newEvent.repetition.frequency.$touch" />
-        </template>
-        <template v-if="newEvent.type === INTERNAL_HOUR">
-          <ni-search-address v-model="newEvent.location.fullAddress" @selected="selectedAddress" @blur="$v.newEvent.location.fullAddress.$touch"
-            :error="$v.newEvent.location.fullAddress.$error" :error-label="addressError" inModal />
-        </template>
-        <ni-modal-input v-model="newEvent.misc" caption="Notes" />
-      </div>
-      <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary" @click="createEvent"
-        :disable="disableCreationButton" icon-right="add" />
-    </q-modal>
+    <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
+      :creationModal="creationModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary" :auxiliaries="auxiliaries"
+      :customers="customers" @resetForm="resetCreationForm" @deleteDocument="deleteDocument" @documentUploaded="documentUploaded"
+      @createEvent="createEvent" @close="closeCreationModal" @selectedAddress="selectedAddress" />
 
     <!-- Event edition modal -->
-    <q-modal v-if="Object.keys(editedEvent).length !== 0" v-model="editionModal" content-classes="modal-container-md"
-      @hide="resetEditionForm()">
-      <div class="modal-padding">
-        <div class="row q-mb-md">
-          <div class="col-11 row auxiliary-name">
-            <img :src="getAvatar(selectedAuxiliary.picture.link)" class="avatar">
-            <q-select filter v-model="editedEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions"
-              ref="editedEventAuxiliarySelect" :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
-              :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`"
-              :disable="[UNAVAILABILITY, ABSENCE].includes(editedEvent.type)" />
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span>
-              <q-icon name="clear" @click.native="editionModal = false" />
-            </span>
-          </div>
-        </div>
-        <div class="modal-subtitle">
-          <q-btn-toggle no-wrap v-model="editedEvent.type" toggle-color="primary" :options="eventTypeOptions.filter(option => option.value === editedEvent.type)" />
-          <q-btn icon="delete" no-caps flat color="grey" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" />
-        </div>
-        <template v-if="editedEvent.type !== ABSENCE">
-          <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" />
-        </template>
-        <template v-if="editedEvent.type === INTERVENTION">
-          <ni-modal-select caption="Bénéficiaire" v-model="editedEvent.customer._id" :options="customersOptions" :error="$v.editedEvent.customer.$error"
-            icon="face" requiredField disable />
-          <ni-modal-select caption="Service" v-model="editedEvent.subscription" :options="customerSubscriptionsOptions(editedEvent.customer._id)"
-            :error="$v.editedEvent.subscription.$error" @blur="$v.editedEvent.subscription.$touch" />
-        </template>
-        <template v-if="editedEvent.type === INTERNAL_HOUR">
-          <ni-modal-select caption="Type d'heure interne" v-model="editedEvent.internalHour" :options="internalHourOptions"
-            :error="$v.editedEvent.internalHour.$error" @blur="$v.editedEvent.internalHour.$touch" />
-          <ni-search-address v-model="editedEvent.location.fullAddress" @selected="selectedAddress" @blur="$v.editedEvent.location.fullAddress.$touch"
-            :error="$v.editedEvent.location.fullAddress.$error" :error-label="addressError" inModal />
-        </template>
-        <template v-if="isRepetition(editedEvent)">
-          <div class="row q-mb-md light-checkbox">
-            <q-checkbox v-model="editedEvent.shouldUpdateRepetition" label="Appliquer à la répétition" @input="toggleRepetition" />
-          </div>
-        </template>
-        <template v-if="editedEvent.type === ABSENCE">
-          <ni-datetime-picker caption="Date de debut" v-model="editedEvent.dates.startDate" type="date" :error="$v.editedEvent.dates.startDate.$error"
-            inModal @blur="$v.editedEvent.dates.startDate.$touch" />
-          <ni-modal-select caption="Durée" :error="$v.editedEvent.startDuration.$error" :options="dateOptions" v-model="editedEvent.startDuration"
-            separator @blur="$v.editedEvent.startDuration.$touch" />
-          <ni-datetime-picker caption="Date de fin" v-model="editedEvent.dates.endDate" type="date" :error="$v.editedEvent.dates.endDate.$error"
-            inModal @blur="$v.editedEvent.dates.endDate.$touch" />
-          <ni-modal-select caption="Durée" :error="$v.editedEvent.endDuration.$error" :options="dateOptions" v-model="editedEvent.endDuration"
-            separator @blur="$v.editedEvent.endDuration.$touch" />
-          <ni-modal-select caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions" :error="$v.editedEvent.absence.$error"
-            @blur="$v.editedEvent.absence.$touch" />
-          <ni-file-uploader v-if="editedEvent.absence && editedEvent.absence === ILLNESS" caption="Justificatif d'absence"
-            path="attachment" :entity="editedEvent" alt="justificatif absence" name="proofOfAbsence" :url="docsUploadUrl"
-            @uploaded="documentUploaded" :additionalValue="additionalValue" :disable="!selectedAuxiliary._id" @delete="deleteDocument(editedEvent.attachment.driveId)"
-            withBorders requiredField />
-        </template>
-        <ni-modal-input v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes" />
-        <template v-if="editedEvent.type === INTERVENTION && !editedEvent.shouldUpdateRepetition">
-          <div class="row q-mb-md light-checkbox">
-            <q-checkbox v-model="editedEvent.isCancelled" label="Annuler l'évènement" @input="toggleCancellationForm" />
-          </div>
-          <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.condition" caption="Conditions"
-            :options="cancellationConditions" requiredField @blur="$v.editedEvent.cancel.condition.$touch" />
-          <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.reason" caption="Motif" :options="cancellationReasons"
-            requiredField @blur="$v.editedEvent.cancel.reason.$touch" />
-        </template>
-      </div>
-      <div v-if="editedEvent.type === INTERVENTION" class="cutomer-info">
-        <p class="input-caption">Infos bénéficiaire</p>
-        <div>{{ editedEvent.customer.contact.address.fullAddress }}</div>
-      </div>
-      <q-btn class="full-width modal-btn" no-caps color="primary" :loading="loading" label="Editer l'évènement" @click="updateEvent"
-        icon-right="check" :disable="disableEditionButton" />
-    </q-modal>
+    <ni-auxiliary-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
+      :editionModal="editionModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary" :auxiliaries="auxiliaries"
+      :customers="customers" @resetForm="resetEditionForm" @deleteDocument="deleteDocument" @documentUploaded="documentUploaded"
+      @updateEvent="updateEvent" @close="closeEditionModal" @deleteEvent="deleteEvent" @deleteEventRepetition="deleteEventRepetition" @selectedAddress="selectedAddress" />
   </q-page>
 </template>
 
@@ -151,23 +25,26 @@ import {
   ABSENCE,
   UNAVAILABILITY,
   INTERNAL_HOUR,
-  ABSENCE_TYPE,
-  DATE_OPTIONS,
   MORNING,
   AFTERNOON,
   ALL_DAY,
-  DEFAULT_AVATAR,
   NEVER,
   ILLNESS,
 } from '../../../data/constants';
 import ChipsAutocompleteAuxiliariesSectors from '../../../components/ChipsAutocompleteAuxiliariesSectors';
-import { planningMixin } from '../../../mixins/planningMixin';
+import AuxiliaryEventCreationModal from '../../../components/Planning/AuxiliaryEventCreationModal';
+import AuxiliaryEventEditionModal from '../../../components/Planning/AuxiliaryEventEditionModal';
+import Planning from '../../../components/Planning.vue';
+import { required, requiredIf } from 'vuelidate/lib/validators';
+import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
 
 export default {
   name: 'AuxiliaryPlanning',
-  mixins: [planningMixin],
   components: {
-    'ni-chips-autocomplete-auxiliaries-sectors': ChipsAutocompleteAuxiliariesSectors
+    'ni-planning-manager': Planning,
+    'ni-chips-autocomplete-auxiliaries-sectors': ChipsAutocompleteAuxiliariesSectors,
+    'ni-auxiliary-event-creation-modal': AuxiliaryEventCreationModal,
+    'ni-auxiliary-event-edition-modal': AuxiliaryEventEditionModal,
   },
   data () {
     return {
@@ -178,26 +55,17 @@ export default {
       customers: [],
       auxiliaries: [],
       startDate: '',
-      // Event options
-      INTERVENTION,
-      UNAVAILABILITY,
-      ABSENCE,
-      INTERNAL_HOUR,
-      ILLNESS,
-      NEVER,
-      absenceOptions: ABSENCE_TYPE,
-      dateOptions: DATE_OPTIONS,
       internalHours: [],
-      eventTypeOptions: [
-        {label: 'Intervention', value: INTERVENTION},
-        {label: 'Interne', value: INTERNAL_HOUR},
-        {label: 'Absence', value: ABSENCE},
-        {label: 'Indispo', value: UNAVAILABILITY}
-      ],
       // Filters
       filters: [],
       filteredSectors: [],
       filteredAuxiliaries: [],
+      // Event creation
+      newEvent: {},
+      creationModal: false,
+      // Event edition
+      editedEvent: {},
+      editionModal: false,
     };
   },
   async mounted () {
@@ -205,47 +73,60 @@ export default {
     await this.initFilters();
     this.setInternalHours();
   },
+  validations () {
+    return {
+      newEvent: {
+        type: { required },
+        dates: {
+          startDate: { required },
+          endDate: { required },
+        },
+        startDuration: { required: requiredIf((item) => item.type === ABSENCE) },
+        endDuration: { required: requiredIf((item) => item.type === ABSENCE) },
+        auxiliary: { required },
+        sector: { required },
+        customer: { required: requiredIf((item) => item.type === INTERVENTION) },
+        subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
+        internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
+        absence: { required: requiredIf((item) => item.type === ABSENCE) },
+        location: { fullAddress: { frAddress } },
+        repetition: {
+          frequency: { required: requiredIf((item) => item.type !== ABSENCE) }
+        },
+        attachment: {
+          driveId: requiredIf((item) => item.type === ABSENCE && item.absence === ILLNESS),
+          link: requiredIf((item) => item.type === ABSENCE && item.absence === ILLNESS),
+        },
+      },
+      editedEvent: {
+        dates: {
+          startDate: { required },
+          endDate: { required },
+        },
+        startDuration: { required: requiredIf((item) => item.type === ABSENCE) },
+        endDuration: { required: requiredIf((item) => item.type === ABSENCE) },
+        auxiliary: { required },
+        sector: { required },
+        customer: { required: requiredIf((item) => item.type === INTERVENTION) },
+        subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
+        internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
+        absence: { required: requiredIf((item) => item.type === ABSENCE) },
+        location: { fullAddress: { frAddress } },
+        repetition: {
+          frequency: { required: requiredIf((item) => item.type !== ABSENCE) },
+        },
+        cancel: {
+          condition: { required: requiredIf((item, parent) => parent.isCancelled) },
+          reason: { required: requiredIf((item, parent) => parent.isCancelled) },
+        },
+      },
+    };
+  },
   computed: {
-    minEndDate () {
-      return this.$moment(this.newEvent.startDate).toISOString()
-    },
-    maxEndDate () {
-      return this.$moment(this.newEvent.startDate).hours(23).minutes(59).toISOString();
-    },
     selectedAuxiliary () {
       if (this.creationModal && this.newEvent.auxiliary !== '') return this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
       if (this.editionModal && this.editedEvent.auxiliary !== '') return this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
       return { picture: {}, identity: {} };
-    },
-    customersOptions () {
-      return this.customers.length === 0 ? [] : this.customers.map(customer => ({
-        label: `${customer.identity.firstname || ''} ${customer.identity.lastname}`,
-        value: customer._id,
-      }));
-    },
-    internalHourOptions () {
-      return this.internalHours.map(hour => ({
-        label: hour.name,
-        value: hour._id,
-      }));
-    },
-    additionalValue () {
-      return !this.selectedAuxiliary._id ? '' : `justificatif_absence_${this.selectedAuxiliary.identity.lastname}`;
-    },
-    docsUploadUrl () {
-      return !this.selectedAuxiliary._id
-        ? ''
-        : `${process.env.API_HOSTNAME}/events/${this.selectedAuxiliary._id}/gdrive/${this.selectedAuxiliary.administrative.driveFolder.id}/upload`;
-    },
-    addressError () {
-      if (!this.$v.newEvent.location.fullAddress.required) return 'Champ requis';
-
-      return 'Adresse non valide';
-    },
-    isEndDurationRequired () {
-      if (this.newEvent.type !== ABSENCE) return false;
-
-      return this.$moment(this.newEvent.dates.endDate).isAfter(this.$moment(this.newEvent.dates.startDate));
     },
   },
   methods: {
@@ -287,13 +168,6 @@ export default {
       }
     },
     // Event creation
-    getAvatar (link) {
-      return link || DEFAULT_AVATAR;
-    },
-    toggleAuxiliarySelect () {
-      if (this.creationModal) return this.$refs['newEventAuxiliarySelect'].show();
-      if (this.editionModal) return this.$refs['editedEventAuxiliarySelect'].show();
-    },
     selectedAddress (item) {
       if (this.creationModal) this.newEvent.location = Object.assign({}, this.newEvent.location, item);
       if (this.editionModal) this.editedEvent.location = Object.assign({}, this.editedEvent.location, item);
@@ -322,6 +196,68 @@ export default {
         },
       };
       this.creationModal = true;
+    },
+    resetCreationForm ({ partialReset, type = INTERVENTION }) {
+      this.$v.newEvent.$reset();
+      if (!partialReset) this.newEvent = {};
+      else {
+        this.newEvent = {
+          type,
+          dates: {
+            startDate: partialReset ? this.newEvent.dates.startDate : '',
+            startHour: partialReset ? this.newEvent.dates.startHour : '',
+            endDate: partialReset ? this.newEvent.dates.endDate : '',
+            endHour: partialReset ? this.newEvent.dates.endHour : '',
+          },
+          repetition: { frequency: NEVER },
+          startDuration: '',
+          endDuration: '',
+          auxiliary: partialReset ? this.newEvent.auxiliary : '',
+          customer: '',
+          subscription: '',
+          sector: partialReset ? this.newEvent.sector : '',
+          internalHour: '',
+          absence: '',
+          location: {},
+          attachment: {},
+        };
+      }
+    },
+    closeCreationModal () {
+      this.creationModal = false;
+    },
+    getPayload (event) {
+      let payload = { ...this.$_.omit(event, ['dates', '__v']) }
+      payload = this.$_.pickBy(payload);
+
+      if (event.type === INTERNAL_HOUR) {
+        const internalHour = this.internalHours.find(hour => hour._id === event.internalHour);
+        payload.internalHour = internalHour;
+      }
+      if (event.type === ABSENCE) {
+        payload.startDate = this.$moment(event.dates.startDate).hours(event.startDuration[0].startHour).toISOString();
+        if (event.endDuration !== '') {
+          payload.endDate = this.$moment(event.dates.endDate).hours(event.endDuration[0].endHour).toISOString();
+        } else {
+          payload.endDate = this.$moment(event.dates.endDate).hours(event.startDuration[0].endHour).toISOString();
+        }
+
+        this.$_.unset(payload, 'startDuration');
+        this.$_.unset(payload, 'endDuration');
+      } else {
+        payload.startDate = this.$moment(event.dates.startDate).hours(event.dates.startHour.split(':')[0])
+          .minutes(event.dates.startHour.split(':')[1]).toISOString();
+        payload.endDate = this.$moment(event.dates.endDate).hours(event.dates.endHour.split(':')[0])
+          .minutes(event.dates.endHour.split(':')[1]).toISOString();
+      }
+
+      if (event.location && event.location.fullAddress) delete payload.location.location;
+      if (event.location && Object.keys(event.location).length === 0) delete payload.location;
+      if (event.cancel && Object.keys(event.cancel).length === 0) delete payload.cancel;
+      if (event.cancel && Object.keys(event.cancel).length === 0) delete payload.attachment;
+      if (event.shouldUpdateRepetition) delete payload.misc;
+
+      return payload;
     },
     hasConflicts (scheduledEvent) {
       const auxiliaryEvents = this.getAuxiliaryEventsBetweenDates(scheduledEvent.auxiliary, scheduledEvent.startDate, scheduledEvent.endDate);
@@ -386,6 +322,55 @@ export default {
       }
     },
     // Event edition
+    openEditionModal (eventId) {
+      const editedEvent = this.events.find(ev => ev._id === eventId);
+      const { createdAt, updatedAt, startDate, endDate, ...eventData } = editedEvent;
+      const auxiliary = editedEvent.auxiliary._id;
+      const dates = {
+        startDate,
+        endDate,
+        startHour: `${this.$moment(startDate).hours() < 10
+          ? `0${this.$moment(startDate).hours()}`
+          : this.$moment(startDate).hours()}:${this.$moment(startDate).minutes() || '00'}`,
+        endHour: `${this.$moment(endDate).hours() < 10
+          ? `0${this.$moment(endDate).hours()}`
+          : this.$moment(endDate).hours()}:${this.$moment(endDate).minutes() || '00'}`,
+      };
+      switch (editedEvent.type) {
+        case INTERVENTION:
+          const subscription = editedEvent.subscription._id;
+          this.editedEvent = { isCancelled: false, cancel: {}, shouldUpdateRepetition: false, ...eventData, dates, auxiliary, subscription };
+          break;
+        case INTERNAL_HOUR:
+          const internalHour = editedEvent.internalHour._id;
+          this.editedEvent = { location: {}, shouldUpdateRepetition: false, ...eventData, auxiliary, internalHour, dates };
+          break;
+        case ABSENCE:
+          const { startDuration, endDuration } = this.getAbsenceDurations(editedEvent);
+          this.editedEvent = {
+            location: {},
+            attachment: {},
+            ...eventData,
+            auxiliary,
+            startDuration,
+            endDuration,
+            dates: { startDate, endDate },
+          };
+          break;
+        case UNAVAILABILITY:
+          this.editedEvent = { shouldUpdateRepetition: false, ...eventData, auxiliary, dates };
+          break;
+      }
+
+      this.editionModal = true
+    },
+    resetEditionForm () {
+      this.$v.editedEvent.$reset();
+      this.editedEvent = {};
+    },
+    closeEditionModal () {
+      this.editionModal = false;
+    },
     async updateEvent () {
       try {
         this.$v.editedEvent.$touch();
@@ -588,45 +573,5 @@ export default {
 
   .q-layout-page
     padding-top: 20px;
-
-  /deep/ .q-btn-toggle
-    border: none;
-    box-shadow: none;
-    @media screen and (max-width: 677px)
-      display: inline-flex;
-      flex-wrap: wrap;
-    & .q-btn-item
-      width: 45%
-      border-radius: 20px;
-      margin: 5px;
-      background-color: $light-grey;
-
-  .modal-subtitle
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 16px;
-    .q-btn-toggle
-      margin-bottom: 0;
-      cursor: default;
-      width: 50%;
-      @media screen and (max-width: 677px)
-        width: 100%
-      & .q-btn-item
-          width: 100%
-    .delete-action
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-
-  .cutomer-info
-    background: $light-grey;
-    padding: 10px 25px;
-    /deep/ .q-if-inverted
-      background: $light-grey !important;
-      border: none;
-
-  .light-checkbox
-    color: $grey
-    font-size: 14px
 
 </style>
