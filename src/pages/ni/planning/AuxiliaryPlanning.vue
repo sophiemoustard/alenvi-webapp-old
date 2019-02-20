@@ -9,7 +9,7 @@
       @hide="resetCreationForm(false)">
       <div class="modal-padding">
         <div class="row q-mb-md">
-          <div class="col-11 row modal-auxiliay-header">
+          <div class="col-11 row auxiliary-name">
             <img :src="getAvatar(selectedAuxiliary.picture.link)" class="avatar">
             <q-select filter v-model="newEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions"
               ref="newEventAuxiliarySelect" :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
@@ -70,7 +70,7 @@
       @hide="resetEditionForm()">
       <div class="modal-padding">
         <div class="row q-mb-md">
-          <div class="col-11 row modal-auxiliay-header">
+          <div class="col-11 row auxiliary-name">
             <img :src="getAvatar(selectedAuxiliary.picture.link)" class="avatar">
             <q-select filter v-model="editedEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions"
               ref="editedEventAuxiliarySelect" :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
@@ -588,30 +588,6 @@ export default {
 
   .q-layout-page
     padding-top: 20px;
-
-  /deep/ .modal-auxiliay-header
-    align-items: center
-    .q-if-inverted
-      border: none;
-      font-size: 24px;
-      margin-left: 3px;
-      &.q-if-focused
-        box-shadow: none;
-      @media screen and (max-width: 677px)
-        font-size: 20px;
-        padding: 7px;
-    .q-input-target
-      line-height: normal
-    .q-icon
-      display: none;
-    .avatar
-      @media screen and (max-width: 677px)
-        height: 30px
-        width: 30px
-
-  /deep/ .pink-icon
-    color: $primary !important;
-    font-size: 22px;
 
   /deep/ .q-btn-toggle
     border: none;

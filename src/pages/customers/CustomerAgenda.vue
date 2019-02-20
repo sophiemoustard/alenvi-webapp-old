@@ -2,9 +2,9 @@
   <q-page class="neutral-background" :style="{ height: height }">
     <div :class="[{ 'planning': !toggleDrawer, 'full-height' : true }]">
       <div class="row items-center planning-header q-mb-md">
-        <div class="col-xs-12 col-md-5 agenda-title" v-if="customer && customer.identity">
+        <div class="col-xs-12 col-md-5 customer-name" v-if="customer && customer.identity">
           <img :src="getAvatar()" class="avatar">
-          <div class="customer-name">
+          <div>
             {{ customer.identity.title }} {{ customer.identity.lastname.toUpperCase() }}
           </div>
         </div>
@@ -89,12 +89,16 @@ export default {
     padding-top: 20px;
 
   .customer-name
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     font-size: 24px;
-    margin-left: 3px;
     padding: 9px 14px 11px;
     @media screen and (max-width: 677px)
       font-size: 20px;
       padding: 7px;
+    div
+      margin-left: 3px;
 
   .avatar
     @media screen and (max-width: 677px)

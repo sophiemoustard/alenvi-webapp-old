@@ -2,11 +2,11 @@
   <q-page class="neutral-background" :style="{ height: height }">
     <div :class="[{ 'planning': !toggleDrawer, 'full-height' : true }]">
       <div class="row items-center planning-header q-mb-md">
-        <div class="col-xs-12 col-md-5 agenda-title">
-          <img :src="getAvatar(currentUser.picture.link)" class="avatar">
-          <div class="auxiliary-name">
-            {{ currentUser.identity.firstname }} {{ currentUser.identity.lastname.toUpperCase() }}
-          </div>
+        <div class="col-xs-12 col-md-5 auxiliary-name" v-if="Object.keys(selectedAuxiliary).length > 0">
+          <img :src="getAvatar(selectedAuxiliary.picture.link)" class="avatar">
+          <q-select filter v-model="selectedAuxiliary._id" color="white" inverted-light :options="auxiliariesOptions" @input="updateAuxiliary"
+            ref="auxiliarySelect" :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
+            :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`" />
         </div>
         <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToToday="goToToday"
           @goToWeek="goToWeek" :targetDate="targetDate" />
@@ -23,7 +23,7 @@ import Agenda from '../../../components/Agenda';
 import PlanningNavigation from '../../../components/PlanningNavigation';
 
 export default {
-  name: 'Planning',
+  name: 'AuxiliaryAgenda',
   components: {
     'agenda': Agenda,
     'planning-navigation': PlanningNavigation,
@@ -34,34 +34,65 @@ export default {
       startOfWeek: '',
       events: [],
       height: 0,
+      selectedAuxiliary: {},
+      auxiliaries: [],
     };
   },
   computed: {
     currentUser () {
       return this.$store.getters['main/user'];
     },
+    auxiliariesOptions () {
+      return this.auxiliaries.length === 0 ? [] : this.auxiliaries.map(aux => ({
+        label: `${aux.identity.firstname || ''} ${aux.identity.lastname}`,
+        value: aux._id,
+      }));
+    },
   },
   async mounted () {
     this.height = window.innerHeight;
     this.startOfWeek = this.$moment().startOf('week');
+    this.selectedAuxiliary = this.currentUser;
     this.getTimelineDays();
+    await this.getAuxiliaries();
     await this.getEvents();
   },
   methods: {
     getAvatar (link) {
       return link || DEFAULT_AVATAR;
     },
+    toggleAuxiliarySelect () {
+      return this.$refs['auxiliarySelect'].show();
+    },
+    async updateAuxiliary (auxiliaryId) {
+      this.selectedAuxiliary = this.auxiliaries.find(aux => aux._id === auxiliaryId);
+      await this.getEvents();
+    },
     async updateTimeline () {
       this.getTimelineDays();
       await this.getEvents();
     },
     async getEvents () {
-      const params = {
-        startDate: this.startOfWeek.format('YYYYMMDD'),
-        endStartDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
-        auxiliary: JSON.stringify([this.currentUser._id]),
+      try {
+        const params = {
+          startDate: this.startOfWeek.format('YYYYMMDD'),
+          endStartDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
+          auxiliary: JSON.stringify([this.selectedAuxiliary._id]),
+        }
+        this.events = await this.$events.list(params);
+      } catch (e) {
+        this.events = [];
       }
-      this.events = await this.$events.list(params);
+    },
+    async getAuxiliaries () {
+      try {
+        const params = {
+          sector: this.currentUser.sector,
+        }
+        this.auxiliaries = await this.$users.showAll(params);
+      } catch (e) {
+        this.auxiliaries = [];
+      }
     },
   },
 }
@@ -74,16 +105,7 @@ export default {
     padding-top: 20px;
 
   .auxiliary-name
-    font-size: 24px;
-    margin-left: 3px;
-    padding: 9px 14px 11px;
-    @media screen and (max-width: 677px)
-      font-size: 20px;
-      padding: 7px;
-
-  .avatar
-    @media screen and (max-width: 677px)
-      height: 30px
-      width: 30px
+    .q-if-inverted
+      background-color: $grey-3 !important;
 
 </style>

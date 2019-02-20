@@ -70,3 +70,4 @@ export const AUXILIARY_INITIATIVE = 'auxiliary_initiative';
 
 export const AUXILIARY = 'Auxiliaire';
 export const PLANNING_REFERENT = 'Référent(e) planning';
+export const AUXILIARY_ROLES = [AUXILIARY, PLANNING_REFERENT];

@@ -98,7 +98,7 @@ export default {
     border-radius: 3px;
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: space-evenly;
     @media screen and (min-width: 678px)
       & .delimiter
         padding: 10px 14px;
@@ -112,19 +112,24 @@ export default {
   .time-item
     /deep/ .q-input.q-if-inverted
       padding: 10px;
-      justify-content: center
+      max-width: 100px
+      /deep/ .q-if-inner
+        div
+          width: 100%
 
   .date-item
     /deep/ .q-input.q-if-inverted
       padding: 10px;
-      justify-content: center
+      max-width: 120px
+      /deep/ .q-if-inner
+        div
+          width: 100%
     /deep/ .q-field-content
       padding-top: 0px;
 
   .datetime-item
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
     &.end
       @media screen and (max-width: 677px)
         border-top: 1px solid $light-grey;
