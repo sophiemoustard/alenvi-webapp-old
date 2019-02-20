@@ -1,7 +1,7 @@
 <template>
   <q-page class="neutral-background" :style="{ height: height }">
     <div :class="[{ 'planning': !toggleDrawer, 'full-height' : true }]">
-      <div class="row items-center planning-header q-mb-md">
+      <div class="row items-center planning-header">
         <div class="col-xs-12 col-md-5 customer-name" v-if="customer && customer.identity">
           <img :src="getAvatar()" class="avatar">
           <div>
@@ -87,22 +87,5 @@ export default {
 
   .q-layout-page
     padding-top: 20px;
-
-  .customer-name
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    font-size: 24px;
-    padding: 9px 14px 11px;
-    @media screen and (max-width: 677px)
-      font-size: 20px;
-      padding: 7px;
-    div
-      margin-left: 3px;
-
-  .avatar
-    @media screen and (max-width: 677px)
-      height: 30px
-      width: 30px
 
 </style>

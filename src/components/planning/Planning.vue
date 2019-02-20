@@ -1,6 +1,6 @@
 <template>
   <div :class="[{ 'planning': !toggleDrawer }]">
-    <div class="row items-center planning-header q-mb-md">
+    <div class="row items-center planning-header">
       <div class="col-xs-12 col-md-5 planning-search">
         <ni-chips-autocomplete-auxiliaries-sectors v-model="terms" @selected="selectedFilter" @remove="removedFilter"
           class="planning-search" :filters="filters" />

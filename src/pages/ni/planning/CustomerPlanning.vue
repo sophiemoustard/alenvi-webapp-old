@@ -9,9 +9,9 @@
       content-classes="modal-container-md" @hide="resetCreationForm(false)">
       <div class="modal-padding">
         <div class="row q-mb-md">
-          <div class="col-11 row modal-customer-header">
+          <div class="col-11 row customer-name">
             <img :src="DEFAULT_AVATAR" class="avatar">
-            <div class="customer-name">{{ selectedCustomer.identity.title }} {{ selectedCustomer.identity.lastname.toUpperCase() }}</div>
+            <div>{{ selectedCustomer.identity.title }} {{ selectedCustomer.identity.lastname.toUpperCase() }}</div>
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
             <span>
@@ -36,9 +36,9 @@
       content-classes="modal-container-md" @hide="resetEditionForm()">
       <div class="modal-padding">
         <div class="row q-mb-md">
-          <div class="col-11 row modal-customer-header">
+          <div class="col-11 row customer-name">
             <img :src="DEFAULT_AVATAR" class="avatar">
-            <div class="customer-name">{{ selectedCustomer.identity.title }} {{
+            <div>{{ selectedCustomer.identity.title }} {{
               selectedCustomer.identity.lastname.toUpperCase() }}</div>
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
@@ -602,30 +602,9 @@ export default {
   .q-layout-page
     padding-top: 20px;
 
-  /deep/ .modal-customer-header
-    align-items: center
-    .customer-name
-      font-size: 24px;
-      margin-left: 3px;
-      padding: 9px 14px 11px;
-      @media screen and (max-width: 677px)
-        font-size: 20px;
-        padding: 7px;
-    .avatar
-      @media screen and (max-width: 677px)
-        height: 30px
-        width: 30px
-
   .modal-subtitle
     justify-content: flex-end;
     display: flex;
-
-  .cutomer-info
-    background: $light-grey;
-    padding: 10px 25px;
-    /deep/ .q-if-inverted
-      background: $light-grey !important;
-      border: none;
 
   .light-checkbox
     color: $grey

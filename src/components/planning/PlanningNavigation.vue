@@ -1,14 +1,14 @@
 <template>
-  <div class="col-xs-12 col-md-7 row">
+  <div class="col-xs-12 col-md-7 row planning-navigation">
     <div class="col-10 items-center row justify-center">
-      <div class="planning-month" @click="datimeModal = !datimeModal">
+      <div class="planning-month col-xs-8 col-md-7 justify-center" @click="datimeModal = !datimeModal">
         <span class="capitalize">{{ timelineTitle }}</span>
         <q-icon name="arrow_drop_down" />
         <q-popover v-model="datimeModal">
           <q-datetime-picker minimal @input="goToWeek" :value="targetDate" />
         </q-popover>
       </div>
-      <div class="row justify-around planning-actions">
+      <div class="row justify-between planning-actions col-xs-4 col-md-5">
         <q-btn icon="chevron_left" flat round @click="goToNextWeek(-7)"></q-btn>
         <q-btn icon="chevron_right" flat round @click="goToNextWeek(7)"></q-btn>
         <q-btn icon="today" flat round @click="goToToday"></q-btn>
@@ -50,4 +50,5 @@ export default {
 .planning-history-button
   display: flex;
   align-items: center;
+
 </style>

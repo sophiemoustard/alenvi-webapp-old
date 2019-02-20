@@ -35,82 +35,87 @@
 
   td
     padding: 0px 6px 6px 6px;
-
     &:before
       content: "";
       display: block;
       width: 98%;
       border-bottom: 1px solid $light-grey;
 
-  th
-    & .days
-        &-header
-          padding: 8px 0px 8px 0px
-          width: 100%
-        &-name
-          font-size: 1.125rem
-          color: #777777
-        &-number
-          font-size: 1.5rem
-          font-weight: 600
-    & .current-day
-      border-radius: 4px
-      padding: 0px 5px
-      background: $primary
-      color: white
+  .days
+    &-header
+      padding: 8px 0px 8px 0px
+      width: 100%
+    &-name
+      font-size: 1.125rem
+      color: #777777
+    &-number
+      font-size: 1.5rem
+      font-weight: 600
+  .current-day
+    border-radius: 4px
+    padding: 0px 5px
+    background: $primary
+    color: white
 
 .planning
   padding-left: 30px;
-  @media screen and (max-width: 677px)
-    padding-left: 0px;
+  @media screen and (max-width: 767px)
+      padding-left: 0px;
   &-container
-    background: white
-    padding: 5px 5px
-    @media(max-width: 767px)
-      padding: 2px
+    background: white;
+    padding: 5px;
+    @media screen and (max-width: 767px)
+      padding: 2px;
   &-header
-    margin-left: 38px
-    margin-right: 38px
-    @media(max-width: 767px)
-      margin-left: 19px
-      margin-right: 19px
+    margin: 0 38px 16px;
+    font-size: 1.3rem;
+    @media screen and (max-width: 767px)
+      margin: 0 19px 16px;
+  &-navigation
+    margin-top: 5px
   &-month
-    font-size: 28px
-    @media screen and (max-width: 677px)
+    display: flex;
+    font-size: 1.3rem
+    @media screen and (max-width: 767px)
       width: 60%;
-      font-size: 22px
     .q-icon
       font-size: 0.8em;
       margin: 5px;
   &-search
-    @media(max-width: 767px)
+    @media screen and (max-width: 767px)
       margin-bottom: 5px
   &-actions
-    @media screen and (min-width: 678px)
-      min-width: 150px;
-    @media screen and (max-width: 677px)
-      width: 30%;
     display: flex;
 
 .auxiliary-name
   display: flex;
   flex-direction: row;
-  align-items: center
   .q-if-inverted
     border: none;
-    font-size: 24px;
-    margin-left: 3px;
+    margin-left: 5px;
+    font-size: 1.3rem
     &.q-if-focused
       box-shadow: none;
-    @media screen and (max-width: 677px)
-      font-size: 20px;
-      padding: 7px;
   .q-input-target
     line-height: normal
   .q-icon
     display: none;
 
 .avatar
-  @media screen and (max-width: 677px)
+  @media screen and (max-width: 1024px)
     height: 30px;
     width: 30px;
+
+.cutomer-info
+  background: $light-grey;
+  padding: 10px 25px;
+  /deep/ .q-if-inverted
+    background: $light-grey !important;
+    border: none;
+
+.customer-name
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  div
+    margin-left: 5px;

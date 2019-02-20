@@ -1,7 +1,7 @@
 <template>
   <q-page class="neutral-background" :style="{ height: height }">
     <div :class="[{ 'planning': !toggleDrawer, 'full-height' : true }]">
-      <div class="row items-center planning-header q-mb-md">
+      <div class="row items-center planning-header">
         <div class="col-xs-12 col-md-5 auxiliary-name" v-if="Object.keys(selectedAuxiliary).length > 0">
           <img :src="getAvatar(selectedAuxiliary.picture.link)" class="avatar">
           <q-select filter v-model="selectedAuxiliary._id" color="white" inverted-light :options="auxiliariesOptions" @input="updateAuxiliary"

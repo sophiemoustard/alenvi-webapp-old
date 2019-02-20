@@ -126,7 +126,7 @@ export default {
   /deep/ .q-btn-toggle
     border: none;
     box-shadow: none;
-    @media screen and (max-width: 677px)
+    @media screen and (max-width: 767px)
       display: inline-flex;
       flex-wrap: wrap;
     & .q-btn-item
