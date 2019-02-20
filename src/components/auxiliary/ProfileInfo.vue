@@ -94,19 +94,10 @@
         <ni-input caption="Adresse email" :error="$v.user.alenvi.local.email.$error" :errorLabel="emailError" type="email" lowerCase disable
           v-model.trim="user.alenvi.local.email" @blur="updateUser({ alenvi: 'local.email', ogust: 'email' })" @focus="saveTmp('local.email')"
           :displayInput="mainUser.role.name !== 'Auxiliaire'" />
-        <ni-input caption="Adresse, numéro et rue" v-model="user.alenvi.contact.address"
-          @blur="updateUser({ alenvi: 'contact.address', ogust: 'line' })" @focus="saveTmp('contact.address')"
-          :error="$v.user.alenvi.contact.address.$error" />
-        <div class="col-xs-12 col-md-6">
-          <p class="input-caption">Complément d'adresse</p>
-          <q-input v-model="user.alenvi.contact.additionalAddress" @focus="saveTmp('contact.addionalAddress')"
-            @blur="updateUser({ alenvi: 'contact.additionalAddress', ogust: 'supplement' })" color="white" inverted-light />
-        </div>
-        <ni-input caption="Code postal" :error="$v.user.alenvi.contact.zipCode.$error" :errorLabel="zipCodeError"
-          v-model="user.alenvi.contact.zipCode" @focus="saveTmp('contact.zipCode')"
-          @blur="updateUser({ alenvi: 'contact.zipCode', ogust: 'zip' })" />
-        <ni-input caption="Ville" :error="$v.user.alenvi.contact.city.$error" v-model="user.alenvi.contact.city"
-          @blur="updateUser({ alenvi: 'contact.city', ogust: 'city' })" @focus="saveTmp('contact.city')" />
+        <ni-search-address v-model="user.alenvi.contact.address.fullAddress" color="white" inverted-light @focus="saveTmp('contact.address.fullAddress')"
+          @blur="updateUser({ alenvi: 'contact.address.fullAddress', ogust: 'address' })" @selected="selectedAddress" :error-label="addressError"
+          :error="$v.user.alenvi.contact.address.fullAddress.$error"
+        />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -296,7 +287,7 @@ import { Cookies } from 'quasar';
 import { required, email, numeric, minLength, maxLength, requiredIf } from 'vuelidate/lib/validators';
 import 'vue-croppa/dist/vue-croppa.css'
 
-import { frPhoneNumber, iban, frZipCode, bic } from '../../helpers/vuelidateCustomVal';
+import { frPhoneNumber, iban, frAddress, bic } from '../../helpers/vuelidateCustomVal';
 import { extend } from '../../helpers/utils.js';
 
 import gdrive from '../../api/GoogleDrive.js';
@@ -313,10 +304,13 @@ import Select from '../form/Select.vue';
 import FileUploader from '../form/FileUploader.vue';
 import MultipleFilesUploader from '../form/MultipleFilesUploader.vue';
 import DatetimePicker from '../form/DatetimePicker.vue';
+import SearchAddress from '../form/SearchAddress';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../popup/notify';
+import { validationMixin } from '../../mixins/validationMixin.js';
 
 export default {
   name: 'ProfileInfo',
+  mixins: [validationMixin],
   components: {
     'ni-select-sector': SelectSector,
     'ni-input': Input,
@@ -324,6 +318,7 @@ export default {
     'ni-file-uploader': FileUploader,
     'ni-multiple-files-uploader': MultipleFilesUploader,
     'ni-datetime-picker': DatetimePicker,
+    'ni-search-address': SearchAddress
   },
   data () {
     return {
@@ -402,10 +397,8 @@ export default {
             socialSecurityNumber: ''
           },
           contact: {
-            address: '',
-            additionalAddress: '',
-            zipCode: '',
-            city: ''
+            addressId: '',
+            address: { fullAddress: '' }
           },
           role: { _id: '' },
           administrative: {
@@ -483,13 +476,12 @@ export default {
             }
           },
           contact: {
-            address: { required },
-            zipCode: {
-              required,
-              frZipCode,
-              maxLength: maxLength(5)
-            },
-            city: { required }
+            address: {
+              fullAddress: {
+                required,
+                frAddress
+              }
+            }
           },
           administrative: {
             identityDocs: { required },
@@ -641,6 +633,12 @@ export default {
         return 'BIC non valide';
       }
     },
+    addressError () {
+      if (!this.$v.user.alenvi.contact.address.fullAddress.required) {
+        return 'Champ requis';
+      }
+      return 'Adresse non valide';
+    },
     isAuxiliary () {
       return this.mainUser.role.name === AUXILIARY || this.mainUser.role.name === PLANNING_REFERENT;
     }
@@ -665,16 +663,18 @@ export default {
       this.user.alenvi = Object.assign({}, extend(true, ...args));
     },
     saveTmp (path) {
-      this.tmpInput = this.$_.get(this.user.alenvi, path)
+      this.tmpInput = this.$_.get(this.user.alenvi, path);
+    },
+    selectedAddress (item) {
+      this.user.alenvi.contact.address = Object.assign({}, this.user.alenvi.contact.address, item);
     },
     async updateUser (paths) {
       try {
         if (this.tmpInput === this.$_.get(this.user.alenvi, paths.alenvi)) return;
         if (this.$_.get(this.$v.user.alenvi, paths.alenvi)) {
           this.$_.get(this.$v.user.alenvi, paths.alenvi).$touch();
-          if (this.$_.get(this.$v.user.alenvi, paths.alenvi).$error) {
-            return NotifyWarning('Champ(s) invalide(s)');
-          }
+          const isValid = await this.waitForValidation(this.$v.user.alenvi, paths.alenvi);
+          if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
         if (paths.alenvi && paths.ogust) {
           await this.updateAlenviUser(paths.alenvi);
@@ -694,6 +694,7 @@ export default {
       }
     },
     async updateAlenviUser (path) {
+      if (path.match(/fullAddress/)) path = 'contact.address';
       let value = this.$_.get(this.user.alenvi, path);
       if (path.match(/iban/i)) {
         value = value.split(' ').join('');
@@ -733,9 +734,17 @@ export default {
         }
         payload.id_tiers = this.currentUser.employee_id;
         await this.$ogust.setBankInfo(payload);
-      } else if (paths.ogust.match(/(city|line|supplement|zip)/i)) {
-        payload.id_address = this.currentUser.contact.addressId;
-        await this.$ogust.setAddress(payload);
+      } else if (paths.ogust === 'address') {
+        const { street, zipCode, city, additionalAddress } = this.user.alenvi.contact.address;
+        const addressPayload = {
+          id_address: this.currentUser.contact.addressId,
+          line: street,
+          supplement: additionalAddress,
+          zip: zipCode,
+          city
+        }
+        const cleanPayload = this.$_.pickBy(addressPayload);
+        await this.$ogust.setAddress(cleanPayload);
       } else {
         payload.id_employee = this.currentUser.employee_id
 
