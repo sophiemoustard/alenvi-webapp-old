@@ -894,7 +894,6 @@ export default {
         if (this.tmpInput === this.$_.get(this.customer, paths.alenvi)) return;
         if (this.$_.get(this.$v.customer, paths.alenvi)) {
           const isValid = await this.waitForValidation(this.$v.customer, paths.alenvi);
-          console.log('isValid', isValid);
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
         if (paths.alenvi) await this.updateAlenviCustomer(paths.alenvi);
