@@ -945,24 +945,6 @@ export default {
         await this.$ogust.editOgustCustomer(this.userProfile.customerId, payload);
       }
     },
-    // waitForValidation (path) {
-    //   return new Promise((resolve) => {
-    //     if (path === 'contact.address') {
-    //       console.log('MEH');
-    //       const unwatch = this.$watch(() => !this.$v.customer.contact.address.$pending, (notPending) => {
-    //         if (notPending) {
-    //           if (unwatch) {
-    //             unwatch();
-    //           }
-    //           resolve(!this.$v.customer.contact.address.$error);
-    //         }
-    //       }, { immediate: true });
-    //     } else {
-    //       this.$_.get(this.$v.customer, path).$touch();
-    //       resolve(!this.$_.get(this.$v.customer, path).$error);
-    //     }
-    //   })
-    // },
     // Subscriptions
     formatCreatedSubscription () {
       const { service, unitTTCRate, estimatedWeeklyVolume, sundays, evenings } = this.newSubscription;
