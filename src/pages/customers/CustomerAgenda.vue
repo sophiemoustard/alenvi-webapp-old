@@ -8,8 +8,8 @@
             {{ customer.identity.title }} {{ customer.identity.lastname.toUpperCase() }}
           </div>
         </div>
-        <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToToday="goToToday"
-          @goToWeek="goToWeek" :targetDate="targetDate" />
+        <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
+          @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :viewMode="viewMode" @updateViewMode="updateViewMode" />
       </div>
       <agenda :events="events" :days="days" personKey="customer" />
     </div>
@@ -35,6 +35,7 @@ export default {
       startOfWeek: '',
       events: [],
       height: 0,
+      viewMode: 'week',
     };
   },
   computed: {
@@ -62,6 +63,7 @@ export default {
     getAvatar () {
       return DEFAULT_AVATAR;
     },
+    // Refresh data
     async updateTimeline () {
       this.getTimelineDays();
       await this.getEvents();

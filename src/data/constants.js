@@ -31,7 +31,6 @@ export const BILLING_INDIRECT = 'indirect';
 export const BILLING_DIRECT = 'direct';
 
 // CUSTOMER FUNDING
-
 export const MONTHLY = 'monthly';
 export const WEEKLY = 'weekly';
 export const ONCE = 'once';
@@ -67,7 +66,14 @@ export const CUSTOMER_INITIATIVE = 'customer_initiative';
 export const AUXILIARY_INITIATIVE = 'auxiliary_initiative';
 
 // ROLES
-
 export const AUXILIARY = 'Auxiliaire';
 export const PLANNING_REFERENT = 'Référent(e) planning';
 export const AUXILIARY_ROLES = [AUXILIARY, PLANNING_REFERENT];
+
+// PLANNING
+export const THREE_DAYS_VIEW = '3days';
+export const WEEK_VIEW = 'week';
+export const VIEW_OPTIONS = [
+  { label: '3 jrs ', value: THREE_DAYS_VIEW },
+  { label: 'Sem', value: WEEK_VIEW },
+]

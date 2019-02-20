@@ -67,15 +67,16 @@
     @media screen and (max-width: 767px)
       padding: 2px;
   &-header
-    margin: 0 38px 16px;
-    font-size: 1.3rem;
+    margin: 0 30px 16px;
+    font-size: 1.2em;
     @media screen and (max-width: 767px)
-      margin: 0 19px 16px;
+      margin: 0 16px 16px;
   &-navigation
-    margin-top: 5px
+    margin-top: 10px
   &-month
     display: flex;
-    font-size: 1.3rem
+    @media screen and (min-width: 768px)
+      justify-content: center;
     @media screen and (max-width: 767px)
       width: 60%;
     .q-icon
@@ -83,9 +84,12 @@
       margin: 5px;
   &-search
     @media screen and (max-width: 767px)
-      margin-bottom: 5px
+      margin-bottom: 5px;
   &-actions
     display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    justify-content: space-evenly;
 
 .auxiliary-name
   display: flex;
@@ -101,10 +105,11 @@
   .q-icon
     display: none;
 
+
 .avatar
   @media screen and (max-width: 1024px)
-    height: 30px;
-    width: 30px;
+    height: 30px !important;
+    width: 30px !important;
 
 .cutomer-info
   background: $light-grey;
