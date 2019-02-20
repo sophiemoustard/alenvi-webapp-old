@@ -30,7 +30,7 @@
         <div class="row gutter-profile">
           <ni-input caption="Nom" v-model="company.name" @focus="saveTmp('name')" @blur="updateCompany('name')" />
           <ni-search-address v-model="company.address.fullAddress" color="white" inverted-light @selected="selectedAddress" :errorLabel="addressError"
-            @focus="saveTmp('address.fullAddress')" @blur="updateCompany('address')" :error="$v.company.address.fullAddress.$error"
+            @focus="saveTmp('address.fullAddress')" @blur="updateCompany('address.fullAddress')" :error="$v.company.address.fullAddress.$error"
           />
           <ni-input caption="Numéro ICS" v-model="company.ics" @focus="saveTmp('ics')" @blur="updateCompany('ics')" />
           <ni-input caption="Numéro RCS" v-model="company.rcs" @focus="saveTmp('rcs')" @blur="updateCompany('rcs')" />
@@ -454,7 +454,7 @@ export default {
       this.newThirdPartyPayer.address = Object.assign({}, this.newThirdPartyPayer.address, this.$_.omit(item, ['location']));
     },
     saveTmp (path) {
-      this.tmpInput = this.company[path];
+      this.tmpInput = this.$_.get(this.company, path)
     },
     // Refresh data
     async refreshServices () {
@@ -477,13 +477,14 @@ export default {
     // Company
     async updateCompany (path) {
       try {
-        if (this.tmpInput === this.company[path]) return;
-        if (this.$v.company[path]) {
-          this.$v.company[path].$touch();
+        if (this.tmpInput === this.$_.get(this.company, path)) return;
+        if (this.$_.get(this.$v.company, path)) {
+          this.$_.get(this.$v.company, path).$touch();
           const isValid = await this.waitForValidation(this.$v.company, path);
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
-        const value = this.company[path];
+        if (path.match(/fullAddress/)) path = 'address';
+        const value = this.$_.get(this.company, path);
         const payload = this.$_.set({}, path, value);
         payload._id = this.company._id;
         await this.$companies.updateById(payload);
