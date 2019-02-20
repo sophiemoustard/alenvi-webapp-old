@@ -22,7 +22,7 @@
         <ni-input caption="Téléphone" type="tel" :error="$v.customer.contact.phone.$error" errorLabel="Numéro de téléphone non valide"
           v-model.trim="customer.contact.phone" @focus="saveTmp('contact.phone')" @blur="updateUser({ alenvi: 'contact.phone', ogust: 'mobile_phone' })" />
         <ni-search-address v-model="customer.contact.address.fullAddress" color="white" inverted-light @focus="saveTmp('contact.address.fullAddress')"
-          @blur="updateUser({ alenvi: 'contact.address', ogust: 'address' })" @selected="selectedAddress" :error-label="addressError"
+          @blur="updateUser({ alenvi: 'contact.address.fullAddress', ogust: 'address' })" @selected="selectedAddress" :error-label="addressError"
           :error="$v.customer.contact.address.fullAddress.$error"
         />
         <ni-input caption="Code porte" v-model="customer.contact.doorCode" @focus="saveTmp('contact.doorCode')" @blur="updateUser({ alenvi: 'contact.doorCode', ogust: 'door_code' })" />
@@ -912,6 +912,7 @@ export default {
       }
     },
     async updateAlenviCustomer (path) {
+      if (path.match(/fullAddress/)) path = 'contact.address';
       let value = this.$_.get(this.customer, path);
       if (path.match(/iban/i)) value = value.split(' ').join('');
 
