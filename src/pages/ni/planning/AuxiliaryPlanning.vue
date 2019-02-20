@@ -31,10 +31,10 @@ import {
   NEVER,
   ILLNESS,
 } from '../../../data/constants';
-import ChipsAutocompleteAuxiliariesSectors from '../../../components/ChipsAutocompleteAuxiliariesSectors';
+import ChipsAutocomplete from '../../../components/ChipsAutocomplete';
 import AuxiliaryEventCreationModal from '../../../components/Planning/AuxiliaryEventCreationModal';
 import AuxiliaryEventEditionModal from '../../../components/Planning/AuxiliaryEventEditionModal';
-import Planning from '../../../components/Planning.vue';
+import Planning from '../../../components/planning/Planning.vue';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
 
@@ -42,7 +42,7 @@ export default {
   name: 'AuxiliaryPlanning',
   components: {
     'ni-planning-manager': Planning,
-    'ni-chips-autocomplete-auxiliaries-sectors': ChipsAutocompleteAuxiliariesSectors,
+    'ni-chips-autocomplete-auxiliaries-sectors': ChipsAutocomplete,
     'ni-auxiliary-event-creation-modal': AuxiliaryEventCreationModal,
     'ni-auxiliary-event-edition-modal': AuxiliaryEventEditionModal,
   },

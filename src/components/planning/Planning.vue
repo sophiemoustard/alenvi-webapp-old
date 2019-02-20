@@ -66,12 +66,12 @@
 </template>
 
 <script>
-import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR } from '../data/constants';
-import { NotifyNegative } from './popup/notify';
-import NiChip from './Chip';
-import ChipsAutocompleteAuxiliariesSectors from './ChipsAutocompleteAuxiliariesSectors';
-import { planningTimelineMixin } from '../mixins/planningTimelineMixin';
-import { planningEventMixin } from '../mixins/planningEventMixin';
+import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR } from '../../data/constants';
+import { NotifyNegative } from '../popup/notify';
+import NiChip from '../Chip';
+import ChipsAutocomplete from '../ChipsAutocomplete';
+import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
+import { planningEventMixin } from '../../mixins/planningEventMixin';
 import PlanningNavigation from './PlanningNavigation.vue';
 
 export default {
@@ -79,7 +79,7 @@ export default {
   mixins: [planningTimelineMixin, planningEventMixin],
   components: {
     'ni-chip': NiChip,
-    'ni-chips-autocomplete-auxiliaries-sectors': ChipsAutocompleteAuxiliariesSectors,
+    'ni-chips-autocomplete-auxiliaries-sectors': ChipsAutocomplete,
     'planning-navigation': PlanningNavigation,
   },
   props: {

@@ -20,7 +20,7 @@
 import { DEFAULT_AVATAR } from '../../data/constants';
 import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import Agenda from '../../components/Agenda';
-import PlanningNavigation from '../../components/PlanningNavigation';
+import PlanningNavigation from '../../components/planning/PlanningNavigation';
 
 export default {
   name: 'CustomerAgenda',
