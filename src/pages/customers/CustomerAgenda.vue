@@ -74,7 +74,7 @@ export default {
       try {
         const params = {
           startDate: this.startOfWeek.format('YYYYMMDD'),
-          endStartDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
+          endDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
           customer: JSON.stringify([this.customer._id]),
         }
         this.events = await this.$events.list(params);
