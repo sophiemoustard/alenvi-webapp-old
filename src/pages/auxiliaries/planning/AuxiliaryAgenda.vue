@@ -4,7 +4,7 @@
       <div class="row items-center planning-header">
         <div class="col-xs-12 col-md-5 auxiliary-name" v-if="Object.keys(selectedAuxiliary).length > 0">
           <img :src="getAvatar(selectedAuxiliary.picture.link)" class="avatar">
-          <q-select filter v-model="selectedAuxiliary._id" color="white" inverted-light :options="auxiliariesOptions"
+          <q-select filter :value="selectedAuxiliary._id" color="white" inverted-light :options="auxiliariesOptions"
             @input="updateAuxiliary" ref="auxiliarySelect" :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
             :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`" />
         </div>
