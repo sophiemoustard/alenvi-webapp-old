@@ -24,7 +24,7 @@ export default {
         if (!auxiliaries.includes(event.auxiliary._id)) auxiliaries.push(event.auxiliary._id);
         weeklyHours += this.$moment(event.endDate).diff(event.startDate, 'h', true);
       });
-      return { auxiliariesNumber: auxiliaries.length, weeklyHours: Math.ceil(weeklyHours) };
+      return { auxiliariesNumber: auxiliaries.length, weeklyHours: Math.round(weeklyHours) };
     },
   },
   methods: {
