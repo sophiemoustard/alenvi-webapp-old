@@ -75,8 +75,7 @@ export default {
       try {
         this.tableLoading = true;
         const customers = await this.$customers.showAll();
-        const filteredCustomers = this.$_.filter(customers, customer => !customer.identity.lastname.match(/^ALENVI/i));
-        this.customersList = filteredCustomers.map(customer => ({ name: `${customer.identity.title} ${customer.identity.lastname}`, customerId: customer._id }));
+        this.customersList = customers.map(customer => ({ name: `${customer.identity.title} ${customer.identity.lastname}`, customerId: customer._id }));
         this.tableLoading = false;
       } catch (e) {
         this.tableLoading = false;
