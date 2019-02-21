@@ -4,12 +4,12 @@
       <div class="row items-center planning-header">
         <div class="col-xs-12 col-md-5 auxiliary-name" v-if="Object.keys(selectedAuxiliary).length > 0">
           <img :src="getAvatar(selectedAuxiliary.picture.link)" class="avatar">
-          <q-select filter v-model="selectedAuxiliary._id" color="white" inverted-light :options="auxiliariesOptions" @input="updateAuxiliary"
-            ref="auxiliarySelect" :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
+          <q-select filter v-model="selectedAuxiliary._id" color="white" inverted-light :options="auxiliariesOptions"
+            @input="updateAuxiliary" ref="auxiliarySelect" :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
             :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`" />
         </div>
-        <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToToday="goToToday"
-          @goToWeek="goToWeek" :targetDate="targetDate" />
+        <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
+          @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :viewMode="viewMode" />
       </div>
       <agenda :events="events" :days="days" personKey="auxiliary" @createEvent="openCreationModal" @editEvent="openEditionModal" />
     </div>
@@ -32,8 +32,8 @@
 <script>
 import Agenda from '../../../components/Agenda';
 import PlanningNavigation from '../../../components/planning/PlanningNavigation';
-import AuxiliaryEventCreationModal from '../../../components/Planning/AuxiliaryEventCreationModal';
-import AuxiliaryEventEditionModal from '../../../components/Planning/AuxiliaryEventEditionModal';
+import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryEventCreationModal';
+import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
 import { DEFAULT_AVATAR, INTERVENTION, NEVER } from '../../../data/constants';
 import { planningTimelineMixin } from '../../../mixins/planningTimelineMixin';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
@@ -57,6 +57,7 @@ export default {
       customers: [],
       internalHours: [],
       loading: false,
+      viewMode: 'week',
       // Event creation
       newEvent: {},
       creationModal: false,

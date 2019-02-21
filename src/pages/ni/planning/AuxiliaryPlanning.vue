@@ -21,8 +21,8 @@
 
 <script>
 import ChipsAutocomplete from '../../../components/ChipsAutocomplete';
-import AuxiliaryEventCreationModal from '../../../components/Planning/AuxiliaryEventCreationModal';
-import AuxiliaryEventEditionModal from '../../../components/Planning/AuxiliaryEventEditionModal';
+import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryEventCreationModal';
+import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
 import Planning from '../../../components/planning/Planning.vue';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { INTERVENTION, NEVER } from '../../../data/constants';

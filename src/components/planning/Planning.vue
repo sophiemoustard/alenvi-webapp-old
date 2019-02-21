@@ -5,7 +5,8 @@
         <ni-chips-autocomplete-auxiliaries-sectors v-model="terms" @selected="selectedFilter" @remove="removedFilter"
           class="planning-search" :filters="filters" />
       </div>
-      <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" />
+      <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
+        @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" />
     </div>
     <div class="planning-container full-width">
       <table style="width: 100%" :class="[staffingView && 'staffing', 'planning-table']">
@@ -36,7 +37,7 @@
                 <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
                   <div :id="event._id" draggable @dragstart="drag(event._id)" @click.stop="$emit('editEvent', event._id)"
                     :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-sm']" :key="eventIndex"
-                    :style="{ left: `${4 * event.staffingLeft + 2}%`, width: `${4 * event.staffingWidth}%` }" >
+                    :style="{ left: `${4 * event.staffingLeft + 2}%`, width: `${4 * event.staffingWidth}%` }">
                   </div>
                 </template>
               </td>
@@ -48,10 +49,13 @@
                   <div :id="event._id" draggable @dragstart="drag(event._id)" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`]"
                     :key="eventIndex" @click.stop="$emit('editEvent', event._id)">
                     <div class="col-12 event-title">
-                      <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">{{ eventTitle(event) }}</p>
-                      <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">{{ displayAbsenceType(event.absence) }}</p>
+                      <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">{{
+                        eventTitle(event) }}</p>
+                      <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">{{
+                        displayAbsenceType(event.absence) }}</p>
                       <p v-if="event.type === UNAVAILABILITY" class="no-margin overflow-hidden-nowrap">Indispo.</p>
-                      <p v-if="event.type === INTERNAL_HOUR" class="no-margin overflow-hidden-nowrap">{{ event.internalHour.name }}</p>
+                      <p v-if="event.type === INTERNAL_HOUR" class="no-margin overflow-hidden-nowrap">{{
+                        event.internalHour.name }}</p>
                     </div>
                     <p class="no-margin event-period overflow-hidden-nowrap">{{ getEventHours(event) }}</p>
                   </div>
