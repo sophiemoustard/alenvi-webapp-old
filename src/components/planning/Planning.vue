@@ -38,7 +38,7 @@
                 <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
                   <div :id="event._id" draggable @dragstart="drag(event._id)" @click.stop="$emit('editEvent', event._id)"
                     :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-sm']" :key="eventIndex"
-                    :style="{ left: `${4 * event.staffingLeft + 2}%`, width: `${4 * event.staffingWidth}%` }">
+                    :style="{ left: `${PERCENTAGE_BY_MINUTES * event.staffingLeft + 2}%`, width: `${PERCENTAGE_BY_MINUTES * event.staffingWidth}%` }">
                   </div>
                 </template>
               </td>
@@ -50,10 +50,12 @@
                   <div :id="event._id" draggable @dragstart="drag(event._id)" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`]"
                     :key="eventIndex" @click.stop="$emit('editEvent', event._id)">
                     <div class="col-12 event-title">
-                      <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">{{
-                        eventTitle(event) }}</p>
-                      <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">{{
-                        displayAbsenceType(event.absence) }}</p>
+                      <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">
+                        {{eventTitle(event) }}
+                      </p>
+                      <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">
+                        {{ displayAbsenceType(event.absence) }}
+                      </p>
                       <p v-if="event.type === UNAVAILABILITY" class="no-margin overflow-hidden-nowrap">Indispo.</p>
                       <p v-if="event.type === INTERNAL_HOUR" class="no-margin overflow-hidden-nowrap">{{
                         event.internalHour.name }}</p>
@@ -71,7 +73,7 @@
 </template>
 
 <script>
-import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, PLANNING } from '../../data/constants';
+import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, PLANNING, PERCENTAGE_BY_MINUTES } from '../../data/constants';
 import { NotifyNegative } from '../popup/notify';
 import NiChipAuxiliaryIndicator from '../planning/ChipAuxiliaryIndicator';
 import NiChipCustomerIndicator from '../planning/ChipCustomerIndicator';
@@ -111,6 +113,7 @@ export default {
       INTERNAL_HOUR,
       staffingView: false,
       PLANNING,
+      PERCENTAGE_BY_MINUTES,
     }
   },
   async mounted () {
@@ -140,15 +143,15 @@ export default {
           if (this.isCustomerPlanning) return event;
           let dayEvent = { ...event };
 
-          let staffingLeft = (this.$moment(event.startDate).hours() - 8) * 2 + (this.$moment(event.startDate).minutes() === 30 ? 1 : 0);
-          let staffingRight = (this.$moment(event.endDate).hours() - 8) * 2 + (this.$moment(event.endDate).minutes() === 30 ? 1 : 0);
+          let staffingLeft = (this.$moment(event.startDate).hours() - 8) * 60 + this.$moment(event.startDate).minutes();
+          let staffingRight = (this.$moment(event.endDate).hours() - 8) * 60 + this.$moment(event.endDate).minutes();
           if (!this.$moment(day).isSame(event.startDate, 'day')) {
             dayEvent.startDate = this.$moment(day).hour(8).toISOString();
             staffingLeft = 0;
           }
           if (!this.$moment(day).isSame(event.endDate, 'day')) {
             dayEvent.endDate = this.$moment(day).hour(20).toISOString();
-            staffingRight = 24;
+            staffingRight = 720;
           }
 
           dayEvent.staffingLeft = staffingLeft;
