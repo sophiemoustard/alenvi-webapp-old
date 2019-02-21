@@ -10,7 +10,7 @@
     </div>
     <q-table :data="filteredUsers" :columns="columns" row-key="name" :rows-per-page-options="[]" :pagination.sync="pagination" :loading="tableLoading"
       class="people-list">
-      <q-tr slot="body" slot-scope="props" :props="props" class="datatable-row" @click.native="goToCustomerProfile(props.row.customerId)">
+      <q-tr slot="body" slot-scope="props" :props="props" class="datatable-row" @click.native="goToCustomerProfile(props.row.ogustId)">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
           <template>{{ col.value }}</template>
         </q-td>
@@ -75,7 +75,7 @@ export default {
       try {
         this.tableLoading = true;
         const customers = await this.$customers.showAll();
-        this.customersList = customers.map(customer => ({ name: `${customer.identity.title} ${customer.identity.lastname}`, customerId: customer._id }));
+        this.customersList = customers.map(customer => ({ name: `${customer.identity.title} ${customer.identity.lastname}`, customerId: customer._id, ogustId: customer.customerId }));
         this.tableLoading = false;
       } catch (e) {
         this.tableLoading = false;
