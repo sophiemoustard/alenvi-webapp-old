@@ -35,6 +35,9 @@
 
   td
     padding: 0px 6px 6px 6px;
+  td:first-child
+    padding: 0px 4px 4px 4px;
+  td
     &:before
       content: "";
       display: block;
@@ -89,7 +92,9 @@
     display: flex;
     align-items: center;
     flex-wrap: nowrap;
-    justify-content: space-between;
+    justify-content: space-around;
+    @media screen and (max-width: 767px)
+      justify-content: space-between;
 
 .auxiliary-name
   display: flex;
