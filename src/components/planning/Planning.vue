@@ -2,7 +2,7 @@
   <div :class="[{ 'planning': !toggleDrawer }]">
     <div class="row items-center planning-header">
       <div class="col-xs-12 col-md-5 planning-search">
-        <ni-chips-autocomplete-auxiliaries-sectors v-model="terms" @selected="selectedFilter" @remove="removedFilter"
+        <ni-chips-autocomplete v-model="terms" @selected="selectedFilter" @remove="removedFilter"
           class="planning-search" :filters="filters" />
       </div>
       <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
@@ -26,7 +26,8 @@
             <td valign="top">
               <div class="person-inner-cell">
                 <div :class="[!staffingView && 'q-mb-md']">
-                  <ni-chip :data="person" />
+                  <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person" :events="getPersonEvents(person)" />
+                  <ni-chip-auxiliary-indicator v-else :data="person" />
                 </div>
                 <div class="person-name overflow-hidden-nowrap">{{ formatPersonName(person) }}</div>
               </div>
@@ -72,7 +73,8 @@
 <script>
 import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, PLANNING } from '../../data/constants';
 import { NotifyNegative } from '../popup/notify';
-import NiChip from '../Chip';
+import NiChipAuxiliaryIndicator from '../planning/ChipAuxiliaryIndicator';
+import NiChipCustomerIndicator from '../planning/ChipCustomerIndicator';
 import ChipsAutocomplete from '../ChipsAutocomplete';
 import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import { planningEventMixin } from '../../mixins/planningEventMixin';
@@ -82,8 +84,9 @@ export default {
   name: 'PlanningManager',
   mixins: [planningTimelineMixin, planningEventMixin],
   components: {
-    'ni-chip': NiChip,
-    'ni-chips-autocomplete-auxiliaries-sectors': ChipsAutocomplete,
+    'ni-chip-customer-indicator': NiChipCustomerIndicator,
+    'ni-chip-auxiliary-indicator': NiChipAuxiliaryIndicator,
+    'ni-chips-autocomplete': ChipsAutocomplete,
     'planning-navigation': PlanningNavigation,
   },
   props: {
@@ -154,6 +157,9 @@ export default {
           return dayEvent;
         })
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+    },
+    getPersonEvents (person) {
+      return this.events.filter(event => event[this.personKey] ? event[this.personKey]._id === person._id : false);
     },
     // Drag & drop
     drag (eventId) {

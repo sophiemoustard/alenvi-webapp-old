@@ -6,10 +6,10 @@
 </template>
 
 <script>
-import { DEFAULT_AVATAR } from '../data/constants.js';
+import { DEFAULT_AVATAR } from '../../data/constants.js';
 
 export default {
-  name: 'ni-chip',
+  name: 'ChipAuxiliaryIndicator',
   props: {
     data: { type: Object, default: () => ({ picture: { link: '' }, administrative: {} }) },
   },
@@ -68,14 +68,17 @@ export default {
         height: 1.5rem
 
   /deep/ .q-chip
-    width: 80%
+    width: 100%
     background: $dark-grey
     @media(max-width: 1024px)
       font-size: 8px
     @media(max-width: 768px)
       display: none
     &-main
-      text-align: end
+      text-align: end;
+      padding-left: 1.8rem;
+      overflow: visible;
+
     &-small
       @media(max-width: 1024px)
         min-height: 20px
