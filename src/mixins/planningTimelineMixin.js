@@ -59,7 +59,7 @@ export const planningTimelineMixin = {
     updateViewMode (viewMode) {
       this.viewMode = viewMode;
       if (!this.isThreeDaysView) this.startOfWeek = this.startOfWeek.startOf('week');
-      this.getTimelineDays();
+      this.updateTimeline();
     },
   },
 };

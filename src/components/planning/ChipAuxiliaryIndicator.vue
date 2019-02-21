@@ -1,52 +1,89 @@
 <template>
   <div class="full-width row relative-position">
-    <img :src="getAvatar(data.picture)" class="avatar">
-    <q-chip :class="['absolute-center', { 'busy': isBusy }]" small text-color="white">{{ this.currentHours }}h / {{ weeklyHours }}</q-chip>
+    <img :src="getAvatar(person.picture)" class="avatar">
+    <q-chip :class="['absolute-center', { 'busy': isBusy }]" small text-color="white">
+      {{ indicators.weeklyHours }}h / {{ indicators.contractHours }}
+    </q-chip>
   </div>
 </template>
 
 <script>
-import { DEFAULT_AVATAR } from '../../data/constants.js';
+import { DEFAULT_AVATAR, ABSENCE, INTERVENTION } from '../../data/constants.js';
 
 export default {
   name: 'ChipAuxiliaryIndicator',
   props: {
-    data: { type: Object, default: () => ({ picture: { link: '' }, administrative: {} }) },
-  },
-  data () {
-    return {
-      weeklyHours: 0,
-      currentHours: 22
-    }
+    person: { type: Object, default: () => ({ picture: { link: '' }, administrative: {} }) },
+    events: { type: Array, default: () => [] },
+    startOfWeek: { type: Object, default: () => ({}) },
+    endOfWorkingWeek: { type: Object, default: () => ({}) },
   },
   computed: {
     isBusy () {
-      if (this.weeklyHours === 0) return false;
-      return this.currentHours > this.weeklyHours;
+      if (this.contractHours === 0) return false;
+      return this.weeklyHours > this.contractHours;
+    },
+    indicators () {
+      let weeklyHours = 0;
+      this.events.forEach((event) => {
+        if (event.type === INTERVENTION) weeklyHours += this.$moment(event.endDate).diff(event.startDate, 'm', true) / 60;
+      });
+
+      return { weeklyHours: Math.round(weeklyHours), contractHours: this.getAuxiliaryContractHours() };
+    },
+    days () {
+      const range = this.$moment.range(this.startOfWeek, this.endOfWorkingWeek);
+      return Array.from(range.by('days'));
     }
-  },
-  mounted () {
-    this.getAuxiliaryWeeklyHours();
   },
   methods: {
     getAvatar (picture) {
       return (!picture || !picture.link) ? DEFAULT_AVATAR : picture.link;
     },
-    getCurrentContract (contracts) {
-      if (!contracts || contracts.length === 0) return 'N/A';
-      return contracts.find(contract => !contract.endDate);
+    getAbsencesOnDay (day) {
+      const absences = this.events.filter(event =>
+        event.type === ABSENCE && day.isSameOrAfter(event.startDate, 'd') && day.isSameOrBefore(event.endDate, 'd')
+      );
+
+      let morning = false;
+      let afternoon = false;
+      if (!absences || absences.length === 0) return { morning, afternoon };
+
+      absences.forEach(abs => {
+        if (day.hours(8).isSameOrAfter(abs.startDate)) morning = true;
+        if (day.hours(20).isSameOrBefore(abs.endDate)) afternoon = true;
+      });
+
+      return { morning, afternoon };
     },
-    getContractActiveVersion (contract) {
-      if (!contract || !contract.versions) return null;
-      return contract.versions.find(version => version.isActive);
+    getCurrentContract (contracts, day) {
+      if (!contracts || contracts.length === 0) return [];
+      return contracts.find(contract =>
+        this.$moment(contract.startDate).isSameOrBefore(this.day) &&
+        (!contract.endDate || this.$moment(contract.endDate).isAfter(this.endOfWorkingWeek))
+      );
     },
-    getAuxiliaryWeeklyHours () {
-      if (!this.data.administrative) return;
-      const currentContract = this.getCurrentContract(this.data.administrative.contracts);
-      if (!currentContract) return;
-      const activeVersion = this.getContractActiveVersion(currentContract);
-      if (!activeVersion) return;
-      this.weeklyHours = activeVersion.weeklyHours;
+    getContractVersionOnDay (day) {
+      if (!this.person || !this.person.administrative || !this.person.administrative.contracts) return null;
+
+      const currentContract = this.getCurrentContract(this.person.administrative.contracts, day);
+      if (!currentContract) return null;
+
+      return this.getCurrentContract(currentContract.versions, day);
+    },
+    getAuxiliaryContractHours () {
+      let contractHours = 0;
+      this.days.forEach(day => {
+        const absences = this.getAbsencesOnDay(day);
+        if (absences.morning && absences.afternoon) return;
+
+        const version = this.getContractVersionOnDay(day);
+        if (!version) return;
+
+        if (!absences.morning) contractHours += version.weeklyHours / 10 || 0;
+        if (!absences.afternoon) contractHours += version.weeklyHours / 10 || 0;
+      });
+      return Math.round(contractHours);
     }
   }
 }
@@ -55,17 +92,16 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables';
 
-  img
+  .avatar
     z-index: 10
-    &.avatar
-      box-shadow: none
-      border: 1px solid #979797
-      @media(min-width: 1025px)
-        width: 2.5rem
-        height: 2.5rem
-      @media(max-width: 1024px)
-        width: 1.5rem
-        height: 1.5rem
+    box-shadow: none
+    border: 1px solid #979797
+    @media(min-width: 1025px)
+      width: 2.5rem
+      height: 2.5rem
+    @media(max-width: 1024px)
+      width: 1.5rem
+      height: 1.5rem
 
   /deep/ .q-chip
     width: 100%

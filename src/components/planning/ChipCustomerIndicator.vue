@@ -1,8 +1,9 @@
 <template>
   <div class="full-width row relative-position">
-    <img :src="getAvatar(person.picture)" class="avatar chip-img">
+    <img :src="getAvatar(person.picture)" class="avatar">
     <q-chip class="absolute-center" small text-color="white">
-      <span class="chip-indicator">{{ indicators.weeklyHours }}h - {{ indicators.auxiliariesNumber }}</span><q-icon size="14px" name="mdi-human-male" />
+      <span class="chip-indicator">{{ indicators.weeklyHours }}h - {{ indicators.auxiliariesNumber }}</span>
+      <q-icon size="14px" name="mdi-human-male" />
     </q-chip>
   </div>
 </template>
@@ -38,17 +39,16 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables';
 
-  .chip-img
+  .avatar
     z-index: 10
-    &.avatar
-      box-shadow: none
-      border: 1px solid #979797
-      @media(min-width: 1025px)
-        width: 2.5rem
-        height: 2.5rem
-      @media(max-width: 1024px)
-        width: 1.5rem
-        height: 1.5rem
+    box-shadow: none
+    border: 1px solid #979797
+    @media(min-width: 1025px)
+      width: 2.5rem
+      height: 2.5rem
+    @media(max-width: 1024px)
+      width: 1.5rem
+      height: 1.5rem
 
   /deep/ .q-chip
     width: 100%
