@@ -12,7 +12,10 @@
         <q-btn icon="chevron_left" flat round @click="goToPreviousWeek()"></q-btn>
         <q-btn icon="chevron_right" flat round @click="goToNextWeek()"></q-btn>
         <q-btn icon="today" flat round @click="goToToday"></q-btn>
-        <q-select v-if="$q.platform.is.mobile" class="col-xs-4 col-md-3" :value="viewMode" :options="viewOptions" @input="updateViewMode" hide-underline />
+        <template v-if="$q.platform.is.mobile">
+          <q-btn class="col-2 planning-view" sizs="sm" flat v-if="!isThreeDaysView" label="3J" @click="updateViewMode(THREE_DAYS_VIEW)" />
+          <q-btn class="col-2 planning-view" sizs="sm" flat v-else label="Sem" @click="updateViewMode(WEEK_VIEW)" />
+        </template>
       </div>
     </div>
   </div>
@@ -20,7 +23,7 @@
 
 <script>
 import Select from '../form/Select';
-import { VIEW_OPTIONS } from '../../data/constants';
+import { AGENDA, PLANNING, THREE_DAYS_VIEW, WEEK_VIEW } from '../../data/constants';
 
 export default {
   name: 'PlanningNavigation',
@@ -31,12 +34,22 @@ export default {
     timelineTitle: { type: String, default: '' },
     targetDate: { type: String },
     viewMode: { type: String, default: 'week' },
+    type: { type: String, default: PLANNING },
   },
   data () {
     return {
       datimeModal: false,
-      viewOptions: VIEW_OPTIONS,
+      THREE_DAYS_VIEW,
+      WEEK_VIEW,
     };
+  },
+  computed: {
+    isAgenda () {
+      return this.type === AGENDA;
+    },
+    isThreeDaysView () {
+      return this.viewMode === THREE_DAYS_VIEW;
+    }
   },
   methods: {
     goToNextWeek (value) {
@@ -64,6 +77,10 @@ export default {
   .planning-history-button
     display: flex;
     align-items: center;
+
+  .planning-view
+    padding: 4px;
+    color: $primary;
 
   .q-select
     margin-left: 1px

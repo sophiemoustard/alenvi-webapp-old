@@ -228,7 +228,7 @@ export default {
       try {
         this.events = await this.$events.list({
           startDate: this.startOfWeek.format('YYYYMMDD'),
-          endStartDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
+          endDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
           customer: JSON.stringify(this.customers.map(cus => cus._id)),
         });
       } catch (e) {
@@ -334,7 +334,7 @@ export default {
         auxiliaryEvents = await this.$events.list({
           auxiliary: JSON.stringify([scheduledEvent.auxiliary]),
           startDate: scheduledEvent.startDate,
-          endStartDate: this.$moment(scheduledEvent.endDate).subtract(1, 'minutes').toISOString(),
+          endDate: this.$moment(scheduledEvent.endDate).subtract(1, 'minutes').toISOString(),
         });
       } catch (e) {
         if (e.data.statusCode !== 404) return NotifyNegative('Une erreur s\'est produite');
@@ -560,7 +560,7 @@ export default {
     async getCustomersBySectors (sectors) {
       return sectors.length === 0 ? [] : this.$customers.showAllBySector({
         startDate: this.startOfWeek.format('YYYYMMDD'),
-        endStartDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
+        endDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
         sector: JSON.stringify(sectors),
       });
     },

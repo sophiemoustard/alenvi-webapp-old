@@ -6,7 +6,7 @@
           class="planning-search" :filters="filters" />
       </div>
       <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
-        @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" />
+        @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :type="PLANNING" />
     </div>
     <div class="planning-container full-width">
       <table style="width: 100%" :class="[staffingView && 'staffing', 'planning-table']">
@@ -70,7 +70,7 @@
 </template>
 
 <script>
-import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR } from '../../data/constants';
+import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, PLANNING } from '../../data/constants';
 import { NotifyNegative } from '../popup/notify';
 import NiChip from '../Chip';
 import ChipsAutocomplete from '../ChipsAutocomplete';
@@ -107,6 +107,7 @@ export default {
       ABSENCE,
       INTERNAL_HOUR,
       staffingView: false,
+      PLANNING,
     }
   },
   async mounted () {

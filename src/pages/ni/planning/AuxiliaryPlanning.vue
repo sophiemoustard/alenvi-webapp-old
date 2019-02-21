@@ -88,7 +88,7 @@ export default {
       try {
         this.events = await this.$events.list({
           startDate: this.startOfWeek.format('YYYYMMDD'),
-          endStartDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
+          endDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
           auxiliary: JSON.stringify(this.auxiliaries.map(aux => aux._id))
         });
       } catch (e) {

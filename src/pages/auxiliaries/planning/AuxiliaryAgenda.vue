@@ -4,12 +4,13 @@
       <div class="row items-center planning-header">
         <div class="col-xs-12 col-md-5 auxiliary-name" v-if="Object.keys(selectedAuxiliary).length > 0">
           <img :src="getAvatar(selectedAuxiliary.picture.link)" class="avatar">
-          <q-select filter v-model="selectedAuxiliary._id" color="white" inverted-light :options="auxiliariesOptions"
+          <q-select filter :value="selectedAuxiliary._id" color="white" inverted-light :options="auxiliariesOptions"
             @input="updateAuxiliary" ref="auxiliarySelect" :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
             :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`" />
         </div>
         <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
-          @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :viewMode="viewMode" />
+          @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :viewMode="viewMode" @updateViewMode="updateViewMode"
+          :type="AGENDA" />
       </div>
       <agenda :events="events" :days="days" personKey="auxiliary" @createEvent="openCreationModal" @editEvent="openEditionModal" />
     </div>
@@ -34,7 +35,7 @@ import Agenda from '../../../components/Agenda';
 import PlanningNavigation from '../../../components/planning/PlanningNavigation';
 import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryEventCreationModal';
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
-import { DEFAULT_AVATAR, INTERVENTION, NEVER } from '../../../data/constants';
+import { DEFAULT_AVATAR, INTERVENTION, NEVER, AGENDA, WEEK_VIEW } from '../../../data/constants';
 import { planningTimelineMixin } from '../../../mixins/planningTimelineMixin';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
 
@@ -57,7 +58,8 @@ export default {
       customers: [],
       internalHours: [],
       loading: false,
-      viewMode: 'week',
+      viewMode: WEEK_VIEW,
+      AGENDA,
       // Event creation
       newEvent: {},
       creationModal: false,
@@ -107,7 +109,7 @@ export default {
       try {
         const params = {
           startDate: this.startOfWeek.format('YYYYMMDD'),
-          endStartDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
+          endDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
           auxiliary: JSON.stringify([this.selectedAuxiliary._id]),
         }
         this.events = await this.$events.list(params);
