@@ -9,7 +9,8 @@
           </div>
         </div>
         <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
-          @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :viewMode="viewMode" @updateViewMode="updateViewMode" />
+          @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :viewMode="viewMode" @updateViewMode="updateViewMode"
+          :type="AGENDA" />
       </div>
       <agenda :events="events" :days="days" personKey="customer" />
     </div>
@@ -17,7 +18,7 @@
 </template>
 
 <script>
-import { DEFAULT_AVATAR } from '../../data/constants';
+import { DEFAULT_AVATAR, WEEK_VIEW, AGENDA } from '../../data/constants';
 import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import Agenda from '../../components/Agenda';
 import PlanningNavigation from '../../components/planning/PlanningNavigation';
@@ -35,7 +36,8 @@ export default {
       startOfWeek: '',
       events: [],
       height: 0,
-      viewMode: 'week',
+      viewMode: WEEK_VIEW,
+      AGENDA,
     };
   },
   computed: {

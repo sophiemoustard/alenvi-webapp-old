@@ -76,4 +76,6 @@ export const WEEK_VIEW = 'week';
 export const VIEW_OPTIONS = [
   { label: '3 jrs ', value: THREE_DAYS_VIEW },
   { label: 'Sem', value: WEEK_VIEW },
-]
+];
+export const PLANNING = 'planning';
+export const AGENDA = 'agenda';

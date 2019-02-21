@@ -9,7 +9,8 @@
             :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`" />
         </div>
         <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
-          @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :viewMode="viewMode" />
+          @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :viewMode="viewMode" @updateViewMode="updateViewMode"
+          :type="AGENDA" />
       </div>
       <agenda :events="events" :days="days" personKey="auxiliary" @createEvent="openCreationModal" @editEvent="openEditionModal" />
     </div>
@@ -34,7 +35,7 @@ import Agenda from '../../../components/Agenda';
 import PlanningNavigation from '../../../components/planning/PlanningNavigation';
 import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryEventCreationModal';
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
-import { DEFAULT_AVATAR, INTERVENTION, NEVER } from '../../../data/constants';
+import { DEFAULT_AVATAR, INTERVENTION, NEVER, AGENDA, WEEK_VIEW } from '../../../data/constants';
 import { planningTimelineMixin } from '../../../mixins/planningTimelineMixin';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
 
@@ -57,7 +58,8 @@ export default {
       customers: [],
       internalHours: [],
       loading: false,
-      viewMode: 'week',
+      viewMode: WEEK_VIEW,
+      AGENDA,
       // Event creation
       newEvent: {},
       creationModal: false,
