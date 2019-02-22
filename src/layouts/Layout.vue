@@ -1,13 +1,8 @@
 <template>
-  <q-layout view="hHh Lpr lff">
-    <q-layout-header>
-      <q-toolbar class="row justify-between lt-md" color="white">
-        <q-btn color="primary" flat round dense big @click="toggleLeft">
-          <q-icon name="menu" style="width: 24px; height: 24px" />
-        </q-btn>
-        <img style="height: 20px" src="https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_texte_rose_1000.png" alt="">
-      </q-toolbar>
-    </q-layout-header>
+  <q-layout view="hhh Lpr lff">
+    <q-page-sticky v-if="$q.platform.is.mobile" position="bottom-left" :offset="[18, 18]">
+      <q-btn class="menu-icon" color="primary" round dense big @click="toggleLeft" icon="menu" size="lg" />
+    </q-page-sticky>
 
     <q-btn v-if="toggleDrawer" flat round icon="chevron_left" @click="toggleLeft" class="chevron chevron-left" />
     <q-btn v-else flat round icon="view_headline" @click="toggleLeft" class="chevron chevron-right" />
@@ -75,6 +70,9 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables'
+
+  .q-page-sticky
+    z-index: 10
 
   .chevron
     background-color: white

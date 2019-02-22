@@ -133,7 +133,8 @@ module.exports = function (ctx) {
         'QCollapsible',
         'QBtnToggle',
         'QOptionGroup',
-        'QChip'
+        'QChip',
+        'QPageSticky',
       ],
       directives: [
         'Ripple'
