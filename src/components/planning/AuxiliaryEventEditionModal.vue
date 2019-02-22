@@ -17,17 +17,18 @@
         </div>
       </div>
       <div class="modal-subtitle">
-        <q-btn-toggle no-wrap v-model="editedEvent.type" toggle-color="primary" :options="eventTypeOptions.filter(option => option.value === editedEvent.type)" />
+        <q-btn-toggle no-wrap v-model="editedEvent.type" :options="eventTypeOptions.filter(option => option.value === editedEvent.type)"
+          toggle-color="primary" />
         <q-btn icon="delete" no-caps flat color="grey" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" />
       </div>
       <template v-if="editedEvent.type !== ABSENCE">
-        <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" />
+        <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" requiredField />
       </template>
       <template v-if="editedEvent.type === INTERVENTION">
         <ni-modal-select caption="Bénéficiaire" v-model="editedEvent.customer._id" :options="customersOptions" :error="validations.customer.$error"
           icon="face" requiredField disable />
         <ni-modal-select caption="Service" v-model="editedEvent.subscription" :options="customerSubscriptionsOptions(editedEvent.customer._id)"
-          :error="validations.subscription.$error" @blur="validations.subscription.$touch" />
+          :error="validations.subscription.$error" @blur="validations.subscription.$touch" requiredField />
       </template>
       <template v-if="editedEvent.type === INTERNAL_HOUR">
         <ni-modal-select caption="Type d'heure interne" v-model="editedEvent.internalHour" :options="internalHourOptions"
@@ -53,18 +54,21 @@
           @blur="validations.absence.$touch" />
         <ni-file-uploader v-if="editedEvent.absence && editedEvent.absence === ILLNESS" caption="Justificatif d'absence"
           path="attachment" :entity="editedEvent" alt="justificatif absence" name="proofOfAbsence" :url="docsUploadUrl"
-          @uploaded="documentUploaded" :additionalValue="additionalValue" :disable="!selectedAuxiliary._id" @delete="deleteDocument(editedEvent.attachment.driveId)"
-          withBorders requiredField />
+          @uploaded="documentUploaded" :additionalValue="additionalValue" :disable="!selectedAuxiliary._id" withBorders
+          requiredField @delete="deleteDocument(editedEvent.attachment.driveId)" />
       </template>
       <ni-modal-input v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes" />
       <template v-if="editedEvent.type === INTERVENTION && !editedEvent.shouldUpdateRepetition">
         <div class="row q-mb-md light-checkbox">
           <q-checkbox v-model="editedEvent.isCancelled" label="Annuler l'évènement" @input="toggleCancellationForm" />
         </div>
-        <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.condition" caption="Conditions"
-          :options="cancellationConditions" requiredField @blur="validations.cancel.condition.$touch" />
-        <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.reason" caption="Motif" :options="cancellationReasons"
-          requiredField @blur="validations.cancel.reason.$touch" />
+        <div class="row justify-between">
+          <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.condition" caption="Conditions"
+            :options="cancellationConditions" requiredField @blur="validations.cancel.condition.$touch" class="col-6"
+            style="padding-right: 3px" />
+          <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.reason" caption="Motif" :options="cancellationReasons"
+            requiredField @blur="validations.cancel.reason.$touch" class="col-6" style="padding-left: 3px" />
+        </div>
       </template>
     </div>
     <div v-if="editedEvent.type === INTERVENTION" class="cutomer-info">

@@ -126,9 +126,6 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables'
 
-  .input-caption
-    margin-bottom: 4px
-
   .datatable-team-row
     background: $white
     &:hover

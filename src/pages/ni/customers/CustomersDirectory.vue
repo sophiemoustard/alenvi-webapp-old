@@ -301,9 +301,6 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables'
 
-  .input-caption
-    margin-bottom: 4px
-
   /deep/ .q-option .q-option-label
     font-size: 14px
 

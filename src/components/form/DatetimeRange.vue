@@ -93,6 +93,9 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables'
 
+  /deep/ .q-field-content
+    padding: 0;
+
   /deep/ .datetime-container
     border: 1px solid $light-grey;
     border-radius: 3px;
