@@ -78,7 +78,7 @@ export default {
           }
           if (!this.$moment(day).isSame(event.endDate, 'day')) {
             dayEvent.endDate = this.$moment(day).hour(20).toISOString();
-            staffingBottom = 24;
+            staffingBottom = 720;
           }
 
           dayEvent.staffingTop = staffingTop;
