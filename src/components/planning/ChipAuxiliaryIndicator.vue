@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { DEFAULT_AVATAR, ABSENCE, INTERVENTION } from '../../data/constants.js';
+import { DEFAULT_AVATAR, ABSENCE, INTERVENTION, INTERNAL_HOUR } from '../../data/constants.js';
 
 export default {
   name: 'ChipAuxiliaryIndicator',
@@ -26,7 +26,9 @@ export default {
     indicators () {
       let weeklyHours = 0;
       this.events.forEach((event) => {
-        if (event.type === INTERVENTION) weeklyHours += this.$moment(event.endDate).diff(event.startDate, 'm', true) / 60;
+        if (event.type === INTERVENTION || event.type === INTERNAL_HOUR) {
+          weeklyHours += this.$moment(event.endDate).diff(event.startDate, 'm', true) / 60;
+        }
       });
 
       return { weeklyHours: Math.round(weeklyHours), contractHours: this.getAuxiliaryContractHours() };
