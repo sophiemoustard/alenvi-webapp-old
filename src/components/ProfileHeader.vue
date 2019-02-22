@@ -229,9 +229,6 @@ export default {
     border-radius: 50%
     background: white
 
-  .input-caption
-    margin-bottom: 4px
-
   .custom-justify
     &-end
       justify-content: flex-end

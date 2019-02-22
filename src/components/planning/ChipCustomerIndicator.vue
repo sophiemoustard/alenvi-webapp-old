@@ -71,5 +71,6 @@ export default {
 
   .chip-indicator
     white-space: nowrap;
+    padding-left: 1px;
 
 </style>
