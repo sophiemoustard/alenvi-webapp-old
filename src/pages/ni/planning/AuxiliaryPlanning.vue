@@ -2,7 +2,7 @@
   <q-page class="neutral-background">
     <ni-planning-manager :events="events" :persons="auxiliaries" @updateStartOfWeek="updateStartOfWeek" @createEvent="openCreationModal"
       :filters="filters" @editEvent="openEditionModal" @onDrop="updateEventOnDrop" :selectedFilter="selectedFilter"
-      :removedFilter="removedFilter" />
+      :removedFilter="removedFilter" :mySector="userSector()" />
 
     <!-- Event creation modal -->
     <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
@@ -62,8 +62,12 @@ export default {
     await this.getCustomers();
     await this.initFilters();
     this.setInternalHours();
+    this.selectedFilter({ ogustSector: this.getUser.sector });
   },
   computed: {
+    getUser () {
+      return this.$store.getters['main/user'];
+    },
     selectedAuxiliary () {
       if (this.creationModal && this.newEvent.auxiliary !== '') return this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
       if (this.editionModal && this.editedEvent.auxiliary !== '') return this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
@@ -185,6 +189,9 @@ export default {
         if (this.filteredSectors.includes(el.sector)) return;
         this.auxiliaries = this.auxiliaries.filter(auxiliary => auxiliary._id !== el._id);
       }
+    },
+    userSector () {
+      return this.filters.find(filter => filter.ogustSector === this.getUser.sector);
     },
   },
 }
