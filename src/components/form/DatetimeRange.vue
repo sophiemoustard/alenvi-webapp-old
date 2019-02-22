@@ -74,7 +74,7 @@ export default {
     },
     blurHourHandler (event) {
       if (event && event.hour === '') this.childError = true;
-      else if (event && event.hour && !event.hour.match(/[0-2][0-9]:(00|30)/)) this.childError = true;
+      else if (event && event.hour && !event.hour.match(/[0-2][0-9]:([0-5]|[0-9])/)) this.childError = true;
       else this.childError = false;
     },
     update (value, key) {

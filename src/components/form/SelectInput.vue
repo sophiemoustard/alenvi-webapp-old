@@ -29,7 +29,7 @@ export default {
     },
     update (hour) {
       this.$emit('blur', { hour });
-      if (hour.match(/[0-2][0-9]:(00|30)/)) this.$emit('input', hour);
+      if (hour.match(/[0-2][0-9]:([0-5]|[0-9])/)) this.$emit('input', hour);
       this.selectPopover = false;
     },
   },

@@ -18,7 +18,7 @@
                   :style="{ top: `${(hourIndex * halfHourHeight * 4) - 1.5}%` }">{{ hour.format('HH:mm') }}</div>
               </template>
               <template v-for="(event, eventId) in getOneDayEvents(days[dayIndex])">
-                <div :style="{ top: `${halfHourHeight * event.staffingTop}%`, height: `${halfHourHeight * event.staffingHeight - 0.2}%` }"
+                <div :style="{ top: `${PERCENTAGE_BY_MINUTES * event.staffingTop}%`, height: `${PERCENTAGE_BY_MINUTES * event.staffingHeight - 0.2}%` }"
                   :key="eventId"  :class="[!isCustomerPlanning && 'cursor-pointer', 'event', `event-${event.type}`]" @click.stop="editEvent(event._id)">
                   <div class="col-12 event-title">
                     <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">{{ eventTitle(event) }}</p>
@@ -39,7 +39,7 @@
 
 <script>
 import { planningEventMixin } from '../mixins/planningEventMixin';
-import { ABSENCE, INTERVENTION, INTERNAL_HOUR, UNAVAILABILITY } from '../data/constants';
+import { ABSENCE, INTERVENTION, INTERNAL_HOUR, UNAVAILABILITY, PERCENTAGE_BY_MINUTES } from '../data/constants';
 
 export default {
   name: 'Agenda',
@@ -55,6 +55,7 @@ export default {
       INTERVENTION,
       INTERNAL_HOUR,
       UNAVAILABILITY,
+      PERCENTAGE_BY_MINUTES,
     };
   },
   mounted () {
@@ -69,8 +70,8 @@ export default {
         .map((event) => {
           let dayEvent = { ...event };
 
-          let staffingTop = (this.$moment(event.startDate).hours() - 8) * 2 + (this.$moment(event.startDate).minutes() === 30 ? 1 : 0);
-          let staffingBottom = (this.$moment(event.endDate).hours() - 8) * 2 + (this.$moment(event.endDate).minutes() === 30 ? 1 : 0);
+          let staffingTop = (this.$moment(event.startDate).hours() - 8) * 60 + this.$moment(event.startDate).minutes();
+          let staffingBottom = (this.$moment(event.endDate).hours() - 8) * 60 + this.$moment(event.endDate).minutes();
           if (!this.$moment(day).isSame(event.startDate, 'day')) {
             dayEvent.startDate = this.$moment(day).hour(8).toISOString();
             staffingTop = 0;
