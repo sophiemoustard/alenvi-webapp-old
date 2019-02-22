@@ -73,6 +73,8 @@ export default {
 
   .q-page-sticky
     z-index: 10
+    @media (min-width: 768px)
+      display: none;
 
   .chevron
     background-color: white
