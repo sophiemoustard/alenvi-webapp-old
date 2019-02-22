@@ -377,7 +377,7 @@ export default {
       const containerWidth = container.style.width;
       const containerHeight = container.style.height;
       const html = `<div class="dhx_event_move" style="width: ${containerWidth}"></div>
-                    <div class="custom_event" style="height: ${containerHeight.replace(/\D+/g, '') - 10}px">
+                    <div class="custom_event" style="height: ${Math.round(containerHeight.replace(/px/g, '') - 10)}px">
                       <span class="event_date">
                         ${scheduler.templates.event_header(ev.start_date, ev.end_date, ev)}
                       </span><br/>
