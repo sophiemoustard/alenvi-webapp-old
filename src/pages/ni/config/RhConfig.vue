@@ -271,6 +271,7 @@ export default {
         if (this.$v.newInternalHour.$error) return;
 
         this.loading = true;
+        if (!this.internalHours || this.internalHours.length === 0) this.newInternalHour.default = true;
         const payload = this.$_.pickBy(this.newInternalHour);
         await this.$companies.createInternalHour(this.company._id, payload);
         NotifyPositive('Heure interne créée');
@@ -310,8 +311,11 @@ export default {
     },
     async updateDefaultInternalHour (internalHourId) {
       const defaultInternalHour = this.internalHours.find(internalHour => internalHour.default);
-      const params = { id: this.company._id, internalHourId: defaultInternalHour._id };
-      await this.$companies.updateInternalHour(params, { default: false });
+      const params = { id: this.company._id };
+      if (defaultInternalHour) {
+        params.internalHourId = defaultInternalHour._id;
+        await this.$companies.updateInternalHour(params, { default: false });
+      }
 
       params.internalHourId = internalHourId;
       await this.$companies.updateInternalHour(params, { default: true });
