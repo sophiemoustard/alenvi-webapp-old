@@ -1,8 +1,8 @@
 <template>
-  <div class="full-width row relative-position">
+  <div class="full-width row relative-position chip-container">
     <img :src="getAvatar(person.picture)" class="avatar">
     <q-chip :class="['absolute-center', { 'busy': isBusy }]" small text-color="white">
-      {{ indicators.weeklyHours }}h / {{ indicators.contractHours }}
+      <span class="chip-indicator">{{ indicators.weeklyHours }}h / {{ indicators.contractHours }}</span>
     </q-chip>
   </div>
 </template>
@@ -20,8 +20,8 @@ export default {
   },
   computed: {
     isBusy () {
-      if (this.contractHours === 0) return false;
-      return this.weeklyHours > this.contractHours;
+      if (this.indicators.contractHours === 0) return false;
+      return this.indicators.weeklyHours > this.indicators.contractHours;
     },
     indicators () {
       let weeklyHours = 0;
@@ -90,37 +90,3 @@ export default {
   }
 }
 </script>
-
-<style lang="stylus" scoped>
-  @import '~variables';
-
-  .avatar
-    z-index: 10
-    box-shadow: none
-    border: 1px solid #979797
-    @media(min-width: 1025px)
-      width: 2.5rem
-      height: 2.5rem
-    @media(max-width: 1024px)
-      width: 1.5rem
-      height: 1.5rem
-
-  /deep/ .q-chip
-    width: 100%
-    background: $dark-grey
-    @media(max-width: 1024px)
-      font-size: 8px
-    @media(max-width: 768px)
-      display: none
-    &-main
-      text-align: end;
-      padding-left: 1.8rem;
-      overflow: visible;
-
-    &-small
-      @media(max-width: 1024px)
-        min-height: 20px
-    &.busy
-      background: $secondary !important
-
-</style>

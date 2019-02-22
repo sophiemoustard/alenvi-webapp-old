@@ -1,5 +1,5 @@
 <template>
-  <div class="full-width row relative-position">
+  <div class="full-width row relative-position chip-container">
     <img :src="getAvatar(person.picture)" class="avatar">
     <q-chip class="absolute-center" small text-color="white">
       <span class="chip-indicator">{{ indicators.weeklyHours }}h - {{ indicators.auxiliariesNumber }}</span>
@@ -39,38 +39,8 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables';
 
-  .avatar
-    z-index: 10
-    box-shadow: none
-    border: 1px solid #979797
-    @media(min-width: 1025px)
-      width: 2.5rem
-      height: 2.5rem
-    @media(max-width: 1024px)
-      width: 1.5rem
-      height: 1.5rem
-
   /deep/ .q-chip
-    width: 100%
-    background: $dark-grey
-    @media(max-width: 1024px)
-      font-size: 8px
-    @media(max-width: 768px)
-      display: none
-    &-main
-      justify-content: flex-end;
-      padding-left: 1.8rem;
-      overflow: visible;
-      display: flex;
-      align-items: center;
       .q-icon
         width: 8px;
-    &-small
-      @media(max-width: 1024px)
-        min-height: 20px
-
-  .chip-indicator
-    white-space: nowrap;
-    padding-left: 1px;
 
 </style>
