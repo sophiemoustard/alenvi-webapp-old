@@ -45,5 +45,21 @@ export default {
   async updateThirdPartyPayer (params, payload) {
     const thirdPartyPayer = await alenviAxios.put(`${process.env.API_HOSTNAME}/companies/${params.id}/thirdpartypayers/${params.thirdPartyPayerId}`, payload);
     return thirdPartyPayer.data.data.thirdPartyPayers;
+  },
+  async createSector (id, payload) {
+    const sectors = await alenviAxios.post(`${process.env.API_HOSTNAME}/companies/${id}/sectors`, payload);
+    return sectors.data.data.sectors;
+  },
+  async getSectors (id) {
+    const sectors = await alenviAxios.get(`${process.env.API_HOSTNAME}/companies/${id}/sectors`);
+    return sectors.data.data.sectors;
+  },
+  async updateSector (params, payload) {
+    const sector = await alenviAxios.put(`${process.env.API_HOSTNAME}/companies/${params.id}/sectors/${params.sectorId}`, payload);
+    return sector.data.data.sector;
+  },
+  async deleteSector (queries) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/companies/${queries.id}/sectors/${queries.sectorId}`);
   }
+
 }
