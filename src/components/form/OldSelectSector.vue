@@ -1,6 +1,6 @@
 <template>
   <q-select :value="value" color="white" :error="myError" inverted-light :stack-label="stackLabel" ref="selectSector" @change="updateSector"
-    :options="orderedSectors" @blur="blurHandler" filter filter-placeholder="Rechercher" separator :class="{border: inModal}" :company-id="companyId" />
+    :options="orderedSectors" @blur="blurHandler" filter filter-placeholder="Rechercher" separator :class="{border: inModal}" />
 </template>
 
 <script>
@@ -13,7 +13,6 @@ export default {
     stackLabel: String,
     myError: { type: String, default: null },
     inModal: { type: Boolean, default: false },
-    companyId: String
   },
   data () {
     return {
@@ -25,14 +24,22 @@ export default {
   },
   computed: {
     orderedSectors () {
-      return _.sortBy(this.sectors, ['label']);
+      return _.sortBy(this.sectors, ['value']);
     },
   },
   methods: {
     async getSectors () {
       try {
-        const sectors = await this.$companies.getSectors(this.companyId);
-        this.sectors = sectors.map(sector => ({ label: sector.name, value: sector._id }));
+        const allSectorsRaw = await this.$ogust.getList('employee.sector');
+        for (const k in allSectorsRaw) {
+          if (k === '*') {
+            continue;
+          }
+          this.sectors.push({
+            label: allSectorsRaw[k],
+            value: k
+          });
+        }
       } catch (e) {
         console.error(e);
       }
