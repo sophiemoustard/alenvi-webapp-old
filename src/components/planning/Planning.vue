@@ -120,11 +120,22 @@ export default {
       distanceMatrix: [],
     }
   },
+  beforeDestroy () {
+    this.$q.localStorage.set('lastSearch', JSON.stringify(this.terms));
+    console.log('beforeDestroy', this.terms);
+  },
   async mounted () {
     this.startOfWeek = this.$moment().startOf('week');
     this.getTimelineDays();
-    this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
+    this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek })
     if (!this.isCustomerPlanning) await this.getDistanceMatrix();
+    // this.$q.localStorage.clear();
+    if (this.$q.localStorage.has('lastSearch')) {
+      const lastSearch = JSON.parse(this.$q.localStorage.get.item('lastSearch'));
+      for (let i = 0, l = lastSearch.length; i < l; i++) {
+        this.terms.push(lastSearch[i]);
+      }
+    }
   },
   methods: {
     async getDistanceMatrix () {
@@ -193,6 +204,10 @@ export default {
   watch: {
     mySector (val) {
       if (val) {
+        if (this.$q.localStorage.has('lastSearch')) {
+          console.log('not pushing mySector props init');
+          return;
+        }
         this.terms.push(this.mySector.label);
       }
     }

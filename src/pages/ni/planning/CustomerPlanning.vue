@@ -118,6 +118,7 @@ export default {
   async mounted () {
     await this.getEmployeesBySector();
     await this.initFilters();
+    this.selectedFilter({ ogustSector: this.getUser.sector });
   },
   validations () {
     return {
