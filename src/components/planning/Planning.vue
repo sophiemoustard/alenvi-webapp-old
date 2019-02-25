@@ -98,6 +98,7 @@ export default {
     removedFilter: { type: Function, default: () => {} },
     personKey: { type: String, default: 'auxiliary' },
     filters: { type: Array, default: () => [] },
+    mySector: Object
   },
   data () {
     return {
@@ -179,6 +180,13 @@ export default {
         this.draggedObject = {};
       }
     },
+  },
+  watch: {
+    mySector (val) {
+      if (val) {
+        this.terms.push(this.mySector.label);
+      }
+    }
   }
 }
 </script>

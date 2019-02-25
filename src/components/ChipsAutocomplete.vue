@@ -18,7 +18,6 @@ export default {
       searchIcon: [{
         icon: 'search'
       }],
-      counterSelectedEl: 0
     }
   },
   methods: {
@@ -26,11 +25,9 @@ export default {
       this.$emit('input', value);
     },
     selected (el) {
-      ++this.counterSelectedEl;
       this.$emit('selected', el);
     },
     removed (el) {
-      --this.counterSelectedEl;
       this.$emit('remove', this.filters.find(elem => elem.value === el.value[0]));
     },
     async search (terms, done) {
@@ -41,7 +38,7 @@ export default {
         done([]);
       }
     },
-  }
+  },
 }
 </script>
 
