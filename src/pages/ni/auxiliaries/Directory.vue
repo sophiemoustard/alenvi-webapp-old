@@ -62,25 +62,14 @@
           :error="$v.newUser.contact.address.fullAddress.$error" requiredField inModal />
         <ni-modal-input v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email" @blur="$v.newUser.local.email.$touch"
           :errorLabel="emailError" requiredField />
-        <div class="row margin-input">
+        <div class="row margin-input last">
           <div class="col-12">
             <div class="row justify-between">
               <p class="input-caption required">Communauté</p>
               <q-icon v-if="$v.newUser.sector.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newUser.sector.$error" error-label="Champ requis">
-              <ni-select-sector v-model="newUser.sector" @myBlur="$v.newUser.sector.$touch" inModal />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input last">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption required">Géré par</p>
-              <q-icon v-if="$v.newUser.ogustManagerId.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newUser.ogustManagerId.$error" error-label="Champ requis">
-              <ni-select-manager v-model="newUser.ogustManagerId" @myBlur="$v.newUser.ogustManagerId.$touch" inModal />
+              <ni-select-sector v-model="newUser.sector" @myBlur="$v.newUser.sector.$touch" inModal :company-id="company._id" />
             </q-field>
           </div>
         </div>
@@ -149,10 +138,8 @@ export default {
           title: '',
         },
         contact: {
-          addressId: '',
           address: { fullAddress: '' },
         },
-        employee_id: '',
         mobilePhone: '',
         local: {
           email: '',
@@ -165,7 +152,6 @@ export default {
             transportType: 'public'
           }
         },
-        ogustManagerId: ''
       },
       userList: [],
       searchStr: '',
@@ -264,11 +250,10 @@ export default {
         email: { required, email }
       },
       sector: { required },
-      ogustManagerId: { required }
     }
   },
-  mounted () {
-    this.getUserList();
+  async mounted () {
+    await this.getUserList();
   },
   computed: {
     currentUser () {
@@ -406,24 +391,6 @@ export default {
       await this.$users.createDriveFolder({ _id: newUser.data.data.user._id });
       return newUser;
     },
-    async createOgustUser () {
-      const ogustPayload = {
-        title: this.newUser.identity.title,
-        last_name: this.newUser.identity.lastname,
-        first_name: this.newUser.identity.firstname,
-        main_address: {
-          line: this.newUser.contact.address.street,
-          zip: this.newUser.contact.address.zipCode,
-          city: this.newUser.contact.address.city
-        },
-        email: this.newUser.local.email,
-        sector: this.newUser.sector,
-        mobile_phone: this.newUser.mobilePhone,
-        manager: this.newUser.ogustManagerId
-      };
-      const newEmployee = await this.$ogust.createEmployee(ogustPayload);
-      return newEmployee;
-    },
     async sendSms (newUserId) {
       const activationDataRaw = await this.$activationCode.create({ newUserId, userEmail: this.newUser.local.email });
       const code = activationDataRaw.activationData.code;
@@ -439,13 +406,6 @@ export default {
         const isValid = await this.waitForFormValidation(this.$v.newUser);
         if (!isValid) throw new Error('Invalid fields');
 
-        const existingEmployee = await this.$ogust.getEmployees({ email: this.newUser.local.email });
-        if (Object.keys(existingEmployee).length !== 0) throw new Error('Existing email');
-
-        const newEmployee = await this.createOgustUser();
-        this.newUser.employee_id = newEmployee.data.data.employee.id_employee;
-        const employee = await this.$ogust.getEmployeeById(this.newUser.employee_id);
-        this.newUser.contact.addressId = employee.main_address.id_address;
         this.userCreated = await this.createAlenviUser();
         if (this.sendWelcomeMsg) {
           await this.sendSms(this.userCreated.data.data.user._id);
