@@ -27,7 +27,8 @@
               <div class="person-inner-cell">
                 <div :class="[!staffingView && 'q-mb-md']">
                   <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person" :events="getPersonEvents(person)" />
-                  <ni-chip-auxiliary-indicator v-else :data="person" />
+                  <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)" :startOfWeek="startOfWeek"
+                    :endOfWorkingWeek="endOfWeek().subtract(2, 'd')" />
                 </div>
                 <div class="person-name overflow-hidden-nowrap">{{ formatPersonName(person) }}</div>
               </div>
@@ -163,7 +164,9 @@ export default {
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
     },
     getPersonEvents (person) {
-      return this.events.filter(event => event[this.personKey] ? event[this.personKey]._id === person._id : false);
+      return this.events.filter(event =>
+        (event[this.personKey] ? event[this.personKey]._id === person._id : false)
+      );
     },
     // Drag & drop
     drag (eventId) {
