@@ -2,7 +2,7 @@
   <q-page class="neutral-background">
     <ni-planning-manager :events="events" :persons="customers" personKey="customer" @updateStartOfWeek="updateStartOfWeek" :filters="filters"
       :selectedFilter="selectedFilter" @editEvent="openEditionModal" @createEvent="openCreationModal" @onDrop="updateEventOnDrop"
-      :removedFilter="removedFilter" />
+      :removedFilter="removedFilter" :mySector="userSector()"/>
 
     <!-- Event creation modal -->
     <q-modal v-if="Object.keys(newEvent).length !== 0 && Object.keys(selectedCustomer.identity).length !== 0" v-model="creationModal"
@@ -169,6 +169,9 @@ export default {
     };
   },
   computed: {
+    getUser () {
+      return this.$store.getters['main/user'];
+    },
     selectedCustomer () {
       if (this.creationModal && this.newEvent.customer !== '') return this.customers.find(cus => cus._id === this.newEvent.customer);
       if (this.editionModal && this.editedEvent.auxiliary !== '') return this.customers.find(cus => cus._id === this.editedEvent.customer._id);
@@ -592,6 +595,9 @@ export default {
         this.customers = this.customers.filter(customer => customer._id !== el._id);
       }
     },
+    userSector () {
+      return this.filters.find(filter => filter.ogustSector === this.getUser.sector);
+    }
   },
 }
 </script>
