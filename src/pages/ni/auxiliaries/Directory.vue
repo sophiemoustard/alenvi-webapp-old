@@ -343,10 +343,8 @@ export default {
     async getUserList () {
       try {
         const users = await this.$users.showAll({ role: [AUXILIARY, PLANNING_REFERENT] });
-        const sectors = await this.$ogust.getList('employee.sector');
         this.userList = users.map((user) => {
           const hiringDate = this.getHiringDate(user);
-
           if (user.isActive) {
             const checkProfileErrors = userProfileValidation(user);
             this.$store.commit('rh/saveNotification', {
@@ -369,7 +367,7 @@ export default {
               profileErrors: checkProfileErrors.error,
               tasksErrors: checkTasks,
               startDate: user.createdAt,
-              sector: sectors[user.sector],
+              sector: user.sector ? user.sector.name : 'N/A',
               isActive: user.isActive,
               hiringDate,
             }
@@ -381,7 +379,7 @@ export default {
               picture: user.picture ? user.picture.link : null
             },
             startDate: user.createdAt,
-            sector: sectors[user.sector],
+            sector: user.sector ? user.sector.name : 'N/A',
             isActive: user.isActive,
             hiringDate,
           }
