@@ -195,6 +195,15 @@ export const planningActionMixin = {
       const editedEvent = this.events.find(ev => ev._id === eventId);
       const { createdAt, updatedAt, startDate, endDate, ...eventData } = editedEvent;
       const auxiliary = editedEvent.auxiliary._id;
+      const can = this.$can({
+        user: this.$store.getters['main/user'],
+        auxiliaryIdEvent: auxiliary,
+        permissions: [
+          'planning:edit:user',
+          { name: 'planning:edit', rule: 'isOwner' }
+        ],
+      });
+      if (!can) return;
       const dates = {
         startDate,
         endDate,
