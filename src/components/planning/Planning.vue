@@ -2,7 +2,7 @@
   <div :class="[{ 'planning': !toggleDrawer }]">
     <div class="row items-center planning-header">
       <div class="col-xs-12 col-md-5 planning-search">
-        <ni-chips-autocomplete v-model="terms" @selected="selectedFilter" @remove="removedFilter"
+        <ni-chips-autocomplete ref="chipsAutocomplete" v-model="terms" @selected="selectedFilter" @remove="removedFilter"
           class="planning-search" />
       </div>
       <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
@@ -120,7 +120,6 @@ export default {
   },
   beforeDestroy () {
     this.$q.localStorage.set('lastSearch', JSON.stringify(this.terms));
-    console.log('beforeDestroy', this.terms);
   },
   async mounted () {
     this.startOfWeek = this.$moment().startOf('week');
@@ -138,11 +137,11 @@ export default {
   watch: {
     getFilter (val) {
       if (val.length > 0) {
-        this.$q.localStorage.clear();
+        // this.$q.localStorage.clear();
         if (this.$q.localStorage.has('lastSearch')) {
           const lastSearch = JSON.parse(this.$q.localStorage.get.item('lastSearch'));
           for (let i = 0, l = lastSearch.length; i < l; i++) {
-            this.terms.push(lastSearch[i]);
+            this.$refs.chipsAutocomplete.add(lastSearch[i]);
           }
         } else {
           const userSector = this.getFilter.find(filter => filter.ogustSector === this.getUser.sector);

@@ -1,5 +1,5 @@
 <template>
-  <q-chips-input class="input-search" :value="value" @input="inputEvent" @remove="removed"
+  <q-chips-input ref="chipsInput" class="input-search" :value="value" @input="inputEvent" @remove="removed"
     :before="searchIcon" chips-bg-color="primary" inverted-light color="white" add-icon="x" autofocus>
     <q-autocomplete @search="search" @selected="selected" :debounce='0'/>
   </q-chips-input>
@@ -10,6 +10,7 @@
 export default {
   name: 'ChipsAutocomplete',
   props: {
+    myRef: String,
     value: { type: Array, default: () => [] },
   },
   data () {
@@ -26,9 +27,11 @@ export default {
   },
   methods: {
     inputEvent (value) {
+      console.log('test');
       this.$emit('input', value);
     },
     selected (el) {
+      console.log('test2');
       this.$emit('selected', el);
     },
     removed (el) {
@@ -42,6 +45,9 @@ export default {
         done([]);
       }
     },
+    add (value) {
+      return this.$refs.chipsInput.add(value);
+    }
   },
 }
 </script>
