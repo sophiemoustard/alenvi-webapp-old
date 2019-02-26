@@ -1,3 +1,3 @@
-export function getFilters (state) {
-  return state.filters;
+export function getFilter (state) {
+  return state.filter;
 }

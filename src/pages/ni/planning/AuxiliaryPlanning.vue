@@ -1,8 +1,8 @@
 <template>
   <q-page class="neutral-background">
     <ni-planning-manager :events="events" :persons="auxiliaries" @updateStartOfWeek="updateStartOfWeek" @createEvent="openCreationModal"
-      :filters="filters" @editEvent="openEditionModal" @onDrop="updateEventOnDrop" :selectedFilter="selectedFilter"
-      :removedFilter="removedFilter" :mySector="userSector()" />
+      @editEvent="openEditionModal" @onDrop="updateEventOnDrop" :selectedFilter="selectedFilter"
+      :removedFilter="removedFilter" />
 
     <!-- Event creation modal -->
     <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
@@ -25,7 +25,8 @@ import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryE
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
 import Planning from '../../../components/planning/Planning.vue';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
-import { INTERVENTION, NEVER, AUXILIARY, PLANNING_REFERENT } from '../../../data/constants';
+import { INTERVENTION, NEVER } from '../../../data/constants';
+import { mapActions } from 'vuex';
 
 export default {
   name: 'AuxiliaryPlanning',
@@ -47,7 +48,6 @@ export default {
       startDate: '',
       internalHours: [],
       // Filters
-      filters: [],
       filteredSectors: [],
       filteredAuxiliaries: [],
       // Event creation
@@ -65,6 +65,9 @@ export default {
     this.selectedFilter({ ogustSector: this.getUser.sector });
   },
   computed: {
+    getFilter () {
+      return this.$store.getters['planning/getFilter'];
+    },
     getUser () {
       return this.$store.getters['main/user'];
     },
@@ -75,6 +78,10 @@ export default {
     },
   },
   methods: {
+    ...mapActions({
+      addAuxiliariesToFilter: 'planning/addAuxiliariesToFilter',
+      addSectorsToFilter: 'planning/addSectorsToFilter'
+    }),
     // Dates
     endOfWeek () {
       return this.$moment(this.startOfWeek).add(6, 'd');
@@ -141,29 +148,10 @@ export default {
         console.error(e);
       }
     },
-    async addAuxiliariesToFilter () {
-      this.filters = await this.$users.showAllActive({ role: [AUXILIARY, PLANNING_REFERENT] });
-      for (let i = 0, l = this.filters.length; i < l; i++) {
-        this.filters[i].value = `${this.filters[i].identity.firstname} ${this.filters[i].identity.lastname}`;
-        this.filters[i].label = `${this.filters[i].identity.firstname} ${this.filters[i].identity.lastname}`;
-      }
-    },
-    async addSectorsToFilter () {
-      const allSectorsRaw = await this.$ogust.getList('employee.sector');
-      for (const k in allSectorsRaw) {
-        if (k === '*') continue;
-
-        this.filters.push({
-          label: allSectorsRaw[k],
-          value: allSectorsRaw[k],
-          ogustSector: k,
-        });
-      }
-    },
     selectedFilter (el) {
       if (el.ogustSector) {
         this.filteredSectors.push(el.ogustSector);
-        const auxBySector = this.filters.filter(aux => aux.sector === el.ogustSector);
+        const auxBySector = this.getFilter.filter(aux => aux.sector === el.ogustSector);
         for (let i = 0, l = auxBySector.length; i < l; i++) {
           if (!this.auxiliaries.some(aux => auxBySector[i]._id === aux._id)) {
             this.auxiliaries.push(auxBySector[i]);
@@ -189,9 +177,6 @@ export default {
         if (this.filteredSectors.includes(el.sector)) return;
         this.auxiliaries = this.auxiliaries.filter(auxiliary => auxiliary._id !== el._id);
       }
-    },
-    userSector () {
-      return this.filters.find(filter => filter.ogustSector === this.getUser.sector);
     },
   },
 }

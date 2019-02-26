@@ -11,7 +11,6 @@ export default {
   name: 'ChipsAutocomplete',
   props: {
     value: { type: Array, default: () => [] },
-    filters: { type: Array, default: () => [] },
   },
   data () {
     return {
@@ -19,6 +18,11 @@ export default {
         icon: 'search'
       }],
     }
+  },
+  computed: {
+    getFilter () {
+      return this.$store.getters['planning/getFilter'];
+    },
   },
   methods: {
     inputEvent (value) {
@@ -28,12 +32,12 @@ export default {
       this.$emit('selected', el);
     },
     removed (el) {
-      this.$emit('remove', this.filters.find(elem => elem.value === el.value[0]));
+      this.$emit('remove', this.getFilter.find(elem => elem.value === el.value[0]));
     },
     async search (terms, done) {
       try {
         const regex = new RegExp(terms, 'i');
-        done(this.filters.filter(el => el.value.match(regex)));
+        done(this.getFilter.filter(el => el.value.match(regex)));
       } catch (e) {
         done([]);
       }

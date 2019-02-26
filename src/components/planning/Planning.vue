@@ -3,7 +3,7 @@
     <div class="row items-center planning-header">
       <div class="col-xs-12 col-md-5 planning-search">
         <ni-chips-autocomplete v-model="terms" @selected="selectedFilter" @remove="removedFilter"
-          class="planning-search" :filters="filters" />
+          class="planning-search" />
       </div>
       <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
         @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :type="PLANNING" />
@@ -99,8 +99,6 @@ export default {
     selectedFilter: { type: Function, default: () => {} },
     removedFilter: { type: Function, default: () => {} },
     personKey: { type: String, default: 'auxiliary' },
-    filters: { type: Array, default: () => [] },
-    mySector: Object
   },
   data () {
     return {
@@ -136,6 +134,32 @@ export default {
         this.terms.push(lastSearch[i]);
       }
     }
+  },
+  watch: {
+    getFilter (val) {
+      if (val.length > 0) {
+        this.$q.localStorage.clear();
+        if (this.$q.localStorage.has('lastSearch')) {
+          const lastSearch = JSON.parse(this.$q.localStorage.get.item('lastSearch'));
+          for (let i = 0, l = lastSearch.length; i < l; i++) {
+            this.terms.push(lastSearch[i]);
+          }
+        } else {
+          const userSector = this.getFilter.find(filter => filter.ogustSector === this.getUser.sector);
+          if (userSector) {
+            this.terms.push(userSector.label);
+          }
+        }
+      }
+    }
+  },
+  computed: {
+    getFilter () {
+      return this.$store.getters['planning/getFilter'];
+    },
+    getUser () {
+      return this.$store.getters['main/user'];
+    },
   },
   methods: {
     async getDistanceMatrix () {
@@ -201,17 +225,6 @@ export default {
       }
     },
   },
-  watch: {
-    mySector (val) {
-      if (val) {
-        if (this.$q.localStorage.has('lastSearch')) {
-          console.log('not pushing mySector props init');
-          return;
-        }
-        this.terms.push(this.mySector.label);
-      }
-    }
-  }
 }
 </script>
 
