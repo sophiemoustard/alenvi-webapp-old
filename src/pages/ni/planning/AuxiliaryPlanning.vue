@@ -172,7 +172,7 @@ export default {
       if (el.ogustSector) {
         this.filteredSectors.filter(sec => sec !== el.ogustSector);
         this.auxiliaries = this.auxiliaries.filter(auxiliary =>
-          auxiliary.sector !== el.ogustSector || this.filteredAuxiliaries.some(filteredAux => filteredAux._id === auxiliary._id)
+          auxiliary.sector.name !== el.sector || this.filteredAuxiliaries.some(filteredAux => filteredAux._id === auxiliary._id)
         );
       } else {
         this.filteredAuxiliaries = this.filteredAuxiliaries.filter(auxiliary => auxiliary._id !== el._id);
