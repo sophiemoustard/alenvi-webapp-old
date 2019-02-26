@@ -1,8 +1,8 @@
 <template>
   <q-page class="neutral-background">
-    <ni-planning-manager :events="events" :persons="customers" personKey="customer" @updateStartOfWeek="updateStartOfWeek" :filters="filters"
+    <ni-planning-manager :events="events" :persons="customers" personKey="customer" @updateStartOfWeek="updateStartOfWeek"
       :selectedFilter="selectedFilter" @editEvent="openEditionModal" @createEvent="openCreationModal" @onDrop="updateEventOnDrop"
-      :removedFilter="removedFilter" :mySector="userSector()"/>
+      :removedFilter="removedFilter" />
 
     <!-- Event creation modal -->
     <q-modal v-if="Object.keys(newEvent).length !== 0 && Object.keys(selectedCustomer.identity).length !== 0" v-model="creationModal"
@@ -88,6 +88,7 @@ import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../componen
 import { INTERVENTION, DEFAULT_AVATAR, NEVER, ABSENCE, INTERNAL_HOUR, ILLNESS, UNAVAILABILITY } from '../../../data/constants';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
+import { mapActions } from 'vuex';
 
 export default {
   name: 'CustomerPlanning',
@@ -106,7 +107,6 @@ export default {
       filteredSectors: [],
       filteredCustomers: [],
       DEFAULT_AVATAR,
-      filters: [],
       // Event creation
       newEvent: {},
       creationModal: false,
@@ -170,6 +170,9 @@ export default {
     };
   },
   computed: {
+    getFilter () {
+      return this.$store.getters['planning/getFilter'];
+    },
     getUser () {
       return this.$store.getters['main/user'];
     },
@@ -192,6 +195,10 @@ export default {
     },
   },
   methods: {
+    ...mapActions({
+      addCustomersToFilter: 'planning/addCustomersToFilter',
+      addSectorsToFilter: 'planning/addSectorsToFilter'
+    }),
     // Dates
     endOfWeek () {
       return this.$moment(this.startOfWeek).add(6, 'd');
@@ -542,25 +549,6 @@ export default {
         console.error(e);
       }
     },
-    async addCustomersToFilter () {
-      this.filters = await this.$customers.showAll({ subscriptions: true });
-      for (let i = 0, l = this.filters.length; i < l; i++) {
-        this.filters[i].value = `${this.filters[i].identity.title} ${this.filters[i].identity.lastname}`;
-        this.filters[i].label = `${this.filters[i].identity.title} ${this.filters[i].identity.lastname}`;
-      }
-    },
-    async addSectorsToFilter () {
-      const allSectorsRaw = await this.$ogust.getList('employee.sector');
-      for (const k in allSectorsRaw) {
-        if (k === '*') continue;
-
-        this.filters.push({
-          label: allSectorsRaw[k],
-          value: allSectorsRaw[k],
-          ogustSector: k
-        });
-      }
-    },
     async getCustomersBySectors (sectors) {
       return sectors.length === 0 ? [] : this.$customers.showAllBySector({
         startDate: this.startOfWeek.format('YYYYMMDD'),
@@ -596,9 +584,6 @@ export default {
         this.customers = this.customers.filter(customer => customer._id !== el._id);
       }
     },
-    userSector () {
-      return this.filters.find(filter => filter.ogustSector === this.getUser.sector);
-    }
   },
 }
 </script>
