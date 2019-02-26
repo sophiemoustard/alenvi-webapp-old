@@ -89,7 +89,7 @@ export default {
 
         if (this.getUser.role.name === 'Aidants') {
           this.$router.replace({ name: 'customer planning' });
-        } else if (this.getUser.role.name === 'Auxiliaire') {
+        } else if (this.getUser.role.name === 'Auxiliaire' || this.getUser.role.name === 'Référent(e) planning') {
           this.$router.replace({ name: 'profile planning', params: { id: this.$q.cookies.get('user_id') }, query: { auxiliary: 'true', self: 'true' } });
         } else {
           this.$router.replace({ name: 'administrative directory' });
