@@ -62,12 +62,10 @@ export default {
     await this.getCustomers();
     await this.fillFilter();
     this.setInternalHours();
-    // this.selectedFilter({ ogustSector: this.getUser.sector });
   },
   watch: {
     getElemAdded (val) {
       console.log('WATCH GET ELEM ADDED', val);
-      // console.log(this.getFilter.find(elem => elem.value === val));
       this.selectedFilter(this.getFilter.find(elem => elem.value === val));
     }
   },

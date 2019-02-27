@@ -1,7 +1,7 @@
 <template>
-  <q-chips-input ref="refFilter" class="input-search" :value="value" @input="inputEvent" @add="addEvent" @remove="removed"
+  <q-chips-input ref="refFilter" class="input-search" :value="value" @input="input" @add="addEvent" @remove="removed"
     :before="searchIcon" chips-bg-color="primary" inverted-light color="white" add-icon="x" autofocus>
-    <q-autocomplete ref="refAutocomplete" @search="search" @selected="selected" :debounce='0'/>
+    <q-autocomplete ref="refAutocomplete" @search="search" :debounce='0'/>
   </q-chips-input>
 </template>
 
@@ -31,13 +31,9 @@ export default {
     addEvent (value) {
       console.log('@add', value);
       this.$store.commit('planning/setElemAdded', value.val);
-      // this.$emit('selected', this.getFilter.find(elem => elem.value === value.val));
     },
-    inputEvent (value) {
-      this.$emit('input', value);
-    },
-    selected (el) {
-      this.$emit('selected', el);
+    input (el) {
+      this.$emit('input', el);
     },
     removed (el) {
       this.$emit('remove', this.getFilter.find(elem => elem.value === el.value[0]));

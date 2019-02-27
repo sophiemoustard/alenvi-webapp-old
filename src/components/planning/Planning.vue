@@ -145,7 +145,7 @@ export default {
           console.log(this.$q.localStorage.get.item('lastSearch'));
           const lastSearch = JSON.parse(this.$q.localStorage.get.item('lastSearch'));
           for (let i = 0, l = lastSearch.length; i < l; i++) {
-            this.$refs.refFilter.add(lastSearch[i]);
+            setTimeout(() => this.$refs.refFilter.add(lastSearch[i]), 1);
           }
         } else {
           const userSector = this.getFilter.find(filter => filter.ogustSector === this.getUser.sector);
