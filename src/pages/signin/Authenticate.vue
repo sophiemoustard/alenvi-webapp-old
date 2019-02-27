@@ -78,7 +78,7 @@ export default {
         this.$q.cookies.set('alenvi_token', user.data.data.token, { path: '/', expires: parseInt(user.data.data.expiresIn / 3600 / 24, 10), secure: process.env.NODE_ENV !== 'development' });
         this.$q.cookies.set('alenvi_token_expires_in', user.data.data.expiresIn, { path: '/', expires: parseInt(user.data.data.expiresIn / 3600 / 24, 10), secure: process.env.NODE_ENV !== 'development' });
         this.$q.cookies.set('refresh_token', user.data.data.refreshToken, { path: '/', expires: 365, secure: process.env.NODE_ENV !== 'development' });
-        this.$q.cookies.set('user_id', user.data.data.user._id, { path: '/', expires: parseInt(user.data.data.expiresIn / 3600 / 24), secure: process.env.NODE_ENV !== 'development' });
+        this.$q.cookies.set('user_id', user.data.data.user._id, { path: '/', expires: parseInt(user.data.data.expiresIn / 3600 / 24, 10), secure: process.env.NODE_ENV !== 'development' });
         await this.$store.dispatch('main/getUser', this.$q.cookies.get('user_id'));
         if (this.$q.platform.is.desktop) {
           this.$store.commit('main/setToggleDrawer', true);
