@@ -385,7 +385,6 @@ export default {
     async createAlenviUser () {
       this.newUser.local.password = randomize('*', 10);
       this.newUser.role = AUXILIARY;
-      this.newUser.ogustManagerId = this.currentUser._id;
       this.newUser.company = this.company.name;
       const newUser = await this.$users.create(this.newUser);
       await this.$users.createDriveFolder({ _id: newUser.data.data.user._id });
