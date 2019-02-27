@@ -1229,11 +1229,7 @@ export default {
     },
     // Fundings
     fundingServicesOptions () {
-      let fundingServices = this.fundings.map(funding => ({ ...funding, services: funding.services.map(service => service._id) }));
-
-      return this.subscriptions
-        .filter(sub => !fundingServices.some(funding => funding.services.includes(sub.service._id) && !funding.endDate))
-        .map(sub => ({ label: sub.service.name, value: sub.service._id }));
+      return this.subscriptions.map(sub => ({ label: sub.service.name, value: sub.service._id }));
     },
     showFundingHistory (id) {
       this.selectedFunding = this.fundings.find(sub => sub._id === id);
@@ -1334,14 +1330,16 @@ export default {
         this.$v.editedFunding.$touch();
         if (this.$v.editedFunding.$error) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
-        const { folderNumber, endDate, frequency, amountTTC, unitTTCRate, careHours, careDays, customerParticipationRate, startDate } = this.editedFunding;
+        const { folderNumber, endDate, frequency, amountTTC, unitTTCRate, careHours, careDays, customerParticipationRate, startDate, services, _id } = this.editedFunding;
         const payload = {
+          fundingId: _id,
           folderNumber,
           frequency,
           careDays,
           customerParticipationRate,
           startDate,
-          endDate
+          endDate,
+          services,
         };
         if (this.editedFunding.nature === FIXED) payload.amountTTC = amountTTC;
         if (this.editedFunding.nature === HOURLY) {
