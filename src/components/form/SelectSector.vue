@@ -1,6 +1,6 @@
 <template>
   <q-select :value="value" color="white" :error="myError" inverted-light :stack-label="stackLabel" ref="selectSector" @change="updateSector"
-    :options="orderedSectors" @blur="blurHandler" filter filter-placeholder="Rechercher" separator :class="{border: inModal}" :company-id="companyId" />
+    :options="orderedSectors" @blur="blurHandler" @focus="focusHandler" filter filter-placeholder="Rechercher" separator :class="{border: inModal}" :company-id="companyId" />
 </template>
 
 <script>
@@ -41,7 +41,10 @@ export default {
       this.$emit('input', value);
     },
     blurHandler () {
-      this.$emit('myBlur');
+      this.$emit('blur');
+    },
+    focusHandler () {
+      this.$emit('focus');
     }
   }
 };

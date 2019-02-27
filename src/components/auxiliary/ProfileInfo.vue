@@ -3,7 +3,7 @@
     <div v-if="!isAuxiliary" class="row gutter-profile q-mb-xl">
       <div class="col-xs-12 col-md-6">
         <p class="input-caption">Communauté</p>
-        <ni-select-sector v-model="user.alenvi.sector" :company-id="company._id" @myBlur="updateUser('sector')" />
+        <ni-select-sector v-model="user.alenvi.sector" :company-id="company._id" @focus="saveTmp('sector')" @blur="updateUser('sector')" />
       </div>
       <ni-input v-model="user.alenvi.mentor" caption="Marraine/parrain" @focus="saveTmp('mentor')" @blur="updateUser('mentor')" />
       <ni-select v-model="user.alenvi.role._id" caption="Rôle" :options="auxiliaryRolesOptions" @focus="saveTmp('role._id')" @blur="updateUser('role._id')" />
@@ -667,6 +667,8 @@ export default {
     },
     async updateUser (path) {
       try {
+        console.log('tmp', this.tmpInput);
+        console.log('user', this.$_.get(this.user.alenvi, path));
         if (this.tmpInput === this.$_.get(this.user.alenvi, path)) return;
         if (this.$_.get(this.$v.user.alenvi, path)) {
           this.$_.get(this.$v.user.alenvi, path).$touch();
