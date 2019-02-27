@@ -98,6 +98,9 @@ export default {
       const duration = distanceMatrix && distanceMatrix.duration ? Math.round(distanceMatrix.duration / 60) : 0;
       const timeBetweenEvents = this.$moment(eventDestination.startDate).diff(this.$moment(eventOrigin.endDate), 'minutes');
 
+      /** If there is less than 15 min free between two events (without transport), the remaining time is paid as
+       * the auxiliary has not enough time to be free
+       */
       return (duration + 15 > timeBetweenEvents) ? timeBetweenEvents / 60 : duration / 60;
     },
     // Compute contract hours
