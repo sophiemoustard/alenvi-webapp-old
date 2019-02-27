@@ -28,7 +28,7 @@
                 <div :class="[!staffingView && 'q-mb-md']">
                   <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person" :events="getPersonEvents(person)" />
                   <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)" :startOfWeek="startOfWeek"
-                    :endOfWorkingWeek="endOfWeek().subtract(2, 'd')" :distanceMatrix="distanceMatrix" />
+                    :endOfWorkingWeek="endOfWeek().subtract(1, 'd')" :distanceMatrix="distanceMatrix" />
                 </div>
                 <div class="person-name overflow-hidden-nowrap">{{ formatPersonName(person) }}</div>
               </div>

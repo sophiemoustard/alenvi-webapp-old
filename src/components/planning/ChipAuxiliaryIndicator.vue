@@ -17,7 +17,7 @@ export default {
     person: { type: Object, default: () => ({ picture: { link: '' }, administrative: {} }) },
     events: { type: Array, default: () => [] },
     startOfWeek: { type: Object, default: () => ({}) },
-    endOfWorkingWeek: { type: Object, default: () => ({}) },
+    endOfWorkingWeek: { type: Object, default: () => ({}) }, // Saturday
     distanceMatrix: { type: Array, default: () => [] },
   },
   data () {
@@ -141,8 +141,9 @@ export default {
         const version = this.getContractVersionOnDay(day);
         if (!version) return;
 
-        if (!absences.morning) contractHours += version.weeklyHours / 10 || 0;
-        if (!absences.afternoon) contractHours += version.weeklyHours / 10 || 0;
+        /* 12 : from Monday to Saturday, there are 12 half days */
+        if (!absences.morning) contractHours += version.weeklyHours / 12 || 0;
+        if (!absences.afternoon) contractHours += version.weeklyHours / 12 || 0;
       });
       return Math.round(contractHours);
     }
