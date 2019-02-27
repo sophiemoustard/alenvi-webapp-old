@@ -110,7 +110,7 @@ import NiModalInput from '../../../components/form/ModalInput';
 import NiModalSelect from '../../../components/form/ModalSelect';
 import NiSearchAddress from '../../../components/form/SearchAddress';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../../components/popup/notify.js';
-import { DEFAULT_AVATAR } from '../../../data/constants';
+import { DEFAULT_AVATAR, AUXILIARY, PLANNING_REFERENT } from '../../../data/constants';
 import { validationMixin } from '../../../mixins/validationMixin.js';
 
 export default {
@@ -342,7 +342,7 @@ export default {
     },
     async getUserList () {
       try {
-        const users = await this.$users.showAll({ role: 'Auxiliaire' });
+        const users = await this.$users.showAll({ role: [AUXILIARY, PLANNING_REFERENT] });
         const sectors = await this.$ogust.getList('employee.sector');
         this.userList = users.map((user) => {
           const hiringDate = this.getHiringDate(user);
@@ -401,7 +401,7 @@ export default {
     },
     async createAlenviUser () {
       this.newUser.local.password = randomize('*', 10);
-      this.newUser.role = 'Auxiliaire';
+      this.newUser.role = AUXILIARY;
       this.newUser.ogustManagerId = this.currentUser._id;
       this.newUser.company = this.company.name;
       const newUser = await this.$users.create(this.newUser);

@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { DEFAULT_AVATAR } from '../../../data/constants';
+import { DEFAULT_AVATAR, AUXILIARY, PLANNING_REFERENT } from '../../../data/constants';
 
 export default {
   metaInfo: {
@@ -87,7 +87,7 @@ export default {
   methods: {
     async getUserList () {
       try {
-        const users = await this.$users.showAllActive({ role: 'Auxiliaire' });
+        const users = await this.$users.showAllActive({ role: [AUXILIARY, PLANNING_REFERENT] });
         this.userList = users.map(user => ({
           auxiliary: {
             name: `${user.identity.firstname} ${user.identity.lastname}`,
