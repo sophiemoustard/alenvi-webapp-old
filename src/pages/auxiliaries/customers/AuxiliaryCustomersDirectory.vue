@@ -20,12 +20,13 @@
 </template>
 
 <script>
+import { AUXILIARY } from '../../../data/constants.js'
 
 export default {
   props: {
     role: {
       type: String,
-      default: 'Auxiliaire'
+      default: AUXILIARY
     }
   },
   metaInfo: {

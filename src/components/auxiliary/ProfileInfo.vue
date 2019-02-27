@@ -93,7 +93,7 @@
           v-model.trim="user.alenvi.mobilePhone" @blur="updateUser({ alenvi: 'mobilePhone', ogust: 'mobile_phone' })" @focus="saveTmp('mobilePhone')" />
         <ni-input caption="Adresse email" :error="$v.user.alenvi.local.email.$error" :errorLabel="emailError" type="email" lowerCase disable
           v-model.trim="user.alenvi.local.email" @blur="updateUser({ alenvi: 'local.email', ogust: 'email' })" @focus="saveTmp('local.email')"
-          :displayInput="mainUser.role.name !== 'Auxiliaire'" />
+          :displayInput="!isAuxiliary" />
         <ni-search-address v-model="user.alenvi.contact.address.fullAddress" color="white" inverted-light @focus="saveTmp('contact.address.fullAddress')"
           @blur="updateUser({ alenvi: 'contact.address.fullAddress', ogust: 'address' })" @selected="selectedAddress" :error-label="addressError"
           :error="$v.user.alenvi.contact.address.fullAddress.$error"
@@ -140,7 +140,7 @@
       <div class="row gutter-profile items-stretch">
         <div class="col-xs-12">
           <div class="row justify-between">
-            <p v-if="mainUser.role.name === 'Auxiliaire'" class="input-caption">Merci de nous indiquer le type de document d'identité que tu possèdes.</p>
+            <p v-if="isAuxiliary" class="input-caption">Merci de nous indiquer le type de document d'identité que tu possèdes.</p>
           </div>
           <q-field :error="$v.user.alenvi.administrative.identityDocs.$error" :error-label="requiredField">
             <q-option-group color="primary" v-model="user.alenvi.administrative.identityDocs" @input="updateUser({ alenvi: 'administrative.identityDocs' })"
@@ -216,7 +216,7 @@
       </div>
       <div class="row gutter-profile-x">
         <div class="col-xs-12">
-          <div v-if="mainUser.role.name === 'Auxiliaire'" class="row justify-between">
+          <div v-if="isAuxiliary" class="row justify-between">
             <p class="input-caption">Veux-tu adhérer à la mutuelle d'entreprise ?</p>
             <q-icon v-if="$v.user.alenvi.administrative.mutualFund.has.$error" name="error_outline" color="secondary" />
           </div>
@@ -233,7 +233,7 @@
             path="administrative.mutualFund" alt="justif mutuelle" :entity="currentUser"
             @delete="deleteDocument(user.alenvi.administrative.mutualFund.driveId, 'administrative.mutualFund')" name="mutualFund" @uploaded="refreshUser"
             :displayUpload="user.alenvi.administrative.mutualFund.has && !user.alenvi.administrative.mutualFund.driveId" entityUrl="users"
-            :error="$v.user.alenvi.administrative.mutualFund.driveId.$error" :displayCaption="mainUser.role.name === 'Auxiliaire'"
+            :error="$v.user.alenvi.administrative.mutualFund.driveId.$error" :displayCaption="isAuxiliary"
             :url="docsUploadUrl" :additionalValue="`mutuelle_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" :extensions="extensions"
           />
       </div>
@@ -246,7 +246,7 @@
       </div>
       <div class="row gutter-profile-x">
         <div class="col-xs-12">
-          <div v-if="mainUser.role.name === 'Auxiliaire'" class="row justify-between">
+          <div v-if="isAuxiliary" class="row justify-between">
             <p class="input-caption">Par quel moyen comptes-tu te rendre au travail ?</p>
             <q-icon v-if="$v.user.alenvi.administrative.transportInvoice.transportType.$error" name="error_outline"
               color="secondary" />
@@ -259,7 +259,7 @@
         <div v-if="user.alenvi.administrative.transportInvoice.transportType === 'public'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Merci de nous transmettre ton justificatif d'abonnement" path="administrative.transportInvoice"
             alt="justif transport" :entity="currentUser" name="transportInvoice" @uploaded="refreshUser"
-            :error="$v.user.alenvi.administrative.transportInvoice.driveId.$error" :displayCaption="mainUser.role.name === 'Auxiliaire'"
+            :error="$v.user.alenvi.administrative.transportInvoice.driveId.$error" :displayCaption="isAuxiliary"
             @delete="deleteDocument(user.alenvi.administrative.transportInvoice.driveId, 'administrative.transportInvoice')"
             :url="docsUploadUrl" :additionalValue="`justif_transport_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
             :extensions="extensions" />

@@ -134,6 +134,15 @@ export default {
     },
     // Event creation
     openCreationModal (dayIndex) {
+      const can = this.$can({
+        user: this.currentUser,
+        auxiliaryIdEvent: this.selectedAuxiliary._id,
+        permissions: [
+          'planning:create:user',
+          { name: 'planning:edit', rule: 'isOwner' }
+        ]
+      });
+      if (!can) return;
       const selectedDay = this.days[dayIndex];
       this.newEvent = {
         type: INTERVENTION,

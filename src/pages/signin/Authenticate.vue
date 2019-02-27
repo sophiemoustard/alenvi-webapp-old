@@ -42,6 +42,7 @@ import { date } from 'quasar'
 
 import CompaniHeader from '../../components/CompaniHeader';
 import { NotifyNegative } from '../../components/popup/notify';
+import { AUXILIARY, PLANNING_REFERENT } from '../../data/constants.js';
 
 export default {
   metaInfo: {
@@ -65,6 +66,9 @@ export default {
   computed: {
     getUser () {
       return this.$store.getters['main/user'];
+    },
+    isAuxiliary () {
+      return this.user.role.name === AUXILIARY || this.user.role.name === PLANNING_REFERENT;
     }
   },
   methods: {
@@ -89,7 +93,7 @@ export default {
 
         if (this.getUser.role.name === 'Aidants') {
           this.$router.replace({ name: 'customer planning' });
-        } else if (this.getUser.role.name === 'Auxiliaire') {
+        } else if (this.isAuxiliary) {
           this.$router.replace({ name: 'profile planning', params: { id: this.$q.cookies.get('user_id') }, query: { auxiliary: 'true', self: 'true' } });
         } else {
           this.$router.replace({ name: 'administrative directory' });

@@ -25,7 +25,7 @@ import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryE
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
 import Planning from '../../../components/planning/Planning.vue';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
-import { INTERVENTION, NEVER } from '../../../data/constants';
+import { INTERVENTION, NEVER, AUXILIARY, PLANNING_REFERENT } from '../../../data/constants';
 
 export default {
   name: 'AuxiliaryPlanning',
@@ -142,7 +142,7 @@ export default {
       }
     },
     async addAuxiliariesToFilter () {
-      this.filters = await this.$users.showAllActive({ 'role': 'Auxiliaire' });
+      this.filters = await this.$users.showAllActive({ role: [AUXILIARY, PLANNING_REFERENT] });
       for (let i = 0, l = this.filters.length; i < l; i++) {
         this.filters[i].value = `${this.filters[i].identity.firstname} ${this.filters[i].identity.lastname}`;
         this.filters[i].label = `${this.filters[i].identity.firstname} ${this.filters[i].identity.lastname}`;

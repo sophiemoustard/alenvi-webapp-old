@@ -1,10 +1,10 @@
 <template>
   <q-page padding class="neutral-background">
     <div v-if="userProfile">
-      <profile-header v-if="currentUser.role.name !== 'Auxiliaire'" :profileId="id" class="header" />
-      <profile-tabs v-if="currentUser.role.name !== 'Auxiliaire'" :profileId="id" :tabsContent="tabsContent" />
-      <h4 v-if="currentUser.role.name === 'Auxiliaire'">Informations personnelles</h4>
-      <profile-info v-if="currentUser.role.name === 'Auxiliaire'" />
+      <profile-header v-if="!isAuxiliary" :profileId="id" class="header" />
+      <profile-tabs v-if="!isAuxiliary" :profileId="id" :tabsContent="tabsContent" />
+      <h4 v-if="isAuxiliary">Informations personnelles</h4>
+      <profile-info v-if="isAuxiliary" />
     </div>
   </q-page>
 </template>
@@ -18,6 +18,7 @@ import ProfileTasks from '../../../components/auxiliary/ProfileTasks';
 import ProfileContracts from '../../../components/auxiliary/ProfileContracts';
 import ProfileSalaries from '../../../components/auxiliary/ProfileSalaries';
 // import ProfileAbsences from '../../../components/auxiliary/ProfileAbsences';
+import { AUXILIARY, PLANNING_REFERENT } from '../../../data/constants.js';
 
 export default {
   props: ['id'],
@@ -35,6 +36,9 @@ export default {
     },
     currentUser () {
       return this.$store.getters['main/user'];
+    },
+    isAuxiliary () {
+      return this.currentUser.role.name === AUXILIARY || this.currentUser.role.name === PLANNING_REFERENT;
     }
   },
   data () {

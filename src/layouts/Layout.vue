@@ -7,8 +7,8 @@
     <q-btn v-if="toggleDrawer" flat round icon="chevron_left" @click="toggleLeft" class="chevron chevron-left" />
     <q-btn v-else flat round icon="view_headline" @click="toggleLeft" class="chevron chevron-right" />
     <q-layout-drawer v-if="toggleDrawer" :width="250" side="left" v-model="toggleDrawer">
-      <side-menu-coach :ref="sidemenusRefs" v-if="user && user.role.name !== 'Auxiliaire' && user.role.name !== 'Aidants'" :user="user" />
-      <side-menu-auxiliary :ref="sidemenusRefs" v-if="user && user.role.name === 'Auxiliaire'" :user="user" />
+      <side-menu-coach :ref="sidemenusRefs" v-if="user && !isAuxiliary && user.role.name !== 'Aidants'" :user="user" />
+      <side-menu-auxiliary :ref="sidemenusRefs" v-if="user && isAuxiliary" :user="user" />
       <side-menu-customer :ref="sidemenusRefs" v-if="user && user.role.name === 'Aidants'" :user="user" />
     </q-layout-drawer>
     <q-layout-drawer v-else :width="0" side="left" class="hidden-menu"></q-layout-drawer>
@@ -26,6 +26,7 @@ import { mapGetters } from 'vuex'
 import SideMenuCoach from '../components/menu/SideMenuCoach'
 import SideMenuAuxiliary from '../components/menu/SideMenuAuxiliary'
 import SideMenuCustomer from '../components/menu/SideMenuCustomer'
+import { AUXILIARY, PLANNING_REFERENT } from '../data/constants.js';
 
 export default {
   components: {
@@ -37,6 +38,9 @@ export default {
     ...mapGetters({
       user: 'main/user'
     }),
+    isAuxiliary () {
+      return this.user.role.name === AUXILIARY || this.user.role.name === PLANNING_REFERENT;
+    },
     toggleDrawer: {
       get () {
         return this.$store.state.main.toggleDrawer;
@@ -46,7 +50,7 @@ export default {
       }
     },
     sidemenusRefs () {
-      if (this.user && this.user.role.name !== 'Auxiliaire') {
+      if (this.user && !this.isAuxiliary) {
         return 'defaultMenu';
       }
       return 'auxiliaryMenu';
