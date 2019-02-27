@@ -1,11 +1,12 @@
 <template>
-  <q-chips-input ref="refFilter" class="input-search" :value="value" @input="inputEvent" @remove="removed"
+  <q-chips-input ref="refFilter" class="input-search" :value="value" @input="inputEvent" @add="addEvent" @remove="removed"
     :before="searchIcon" chips-bg-color="primary" inverted-light color="white" add-icon="x" autofocus>
-    <q-autocomplete @search="search" @selected="selected" :debounce='0'/>
+    <q-autocomplete ref="refAutocomplete" @search="search" @selected="selected" :debounce='0'/>
   </q-chips-input>
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'ChipsAutocomplete',
@@ -21,17 +22,21 @@ export default {
     }
   },
   computed: {
-    getFilter () {
-      return this.$store.getters['planning/getFilter'];
-    },
+    ...mapGetters({
+      getFilter: 'planning/getFilter',
+      getElemAdded: 'planning/getElemAdded'
+    }),
   },
   methods: {
+    addEvent (value) {
+      console.log('@add', value);
+      this.$store.commit('planning/setElemAdded', value.val);
+      // this.$emit('selected', this.getFilter.find(elem => elem.value === value.val));
+    },
     inputEvent (value) {
-      console.log('test');
       this.$emit('input', value);
     },
     selected (el) {
-      console.log('test2');
       this.$emit('selected', el);
     },
     removed (el) {
@@ -45,9 +50,10 @@ export default {
         done([]);
       }
     },
+    // q-chips-input method trigger
     add (value) {
       return this.$refs.refFilter.add(value);
-    }
+    },
   },
 }
 </script>

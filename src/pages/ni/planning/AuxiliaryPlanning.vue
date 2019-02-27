@@ -26,7 +26,7 @@ import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEv
 import Planning from '../../../components/planning/Planning.vue';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { INTERVENTION, NEVER } from '../../../data/constants';
-import { mapActions } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
   name: 'AuxiliaryPlanning',
@@ -60,14 +60,23 @@ export default {
   },
   async mounted () {
     await this.getCustomers();
-    await this.initFilters();
+    await this.fillFilter();
     this.setInternalHours();
-    this.selectedFilter({ ogustSector: this.getUser.sector });
+    // this.selectedFilter({ ogustSector: this.getUser.sector });
+  },
+  watch: {
+    getElemAdded (val) {
+      console.log('WATCH GET ELEM ADDED', val);
+      // console.log(this.getFilter.find(elem => elem.value === val));
+      this.selectedFilter(this.getFilter.find(elem => elem.value === val));
+    }
   },
   computed: {
-    getFilter () {
-      return this.$store.getters['planning/getFilter'];
-    },
+    ...mapGetters({
+      getUser: 'main/user',
+      getFilter: 'planning/getFilter',
+      getElemAdded: 'planning/getElemAdded'
+    }),
     getUser () {
       return this.$store.getters['main/user'];
     },
@@ -79,8 +88,7 @@ export default {
   },
   methods: {
     ...mapActions({
-      addAuxiliariesToFilter: 'planning/addAuxiliariesToFilter',
-      addSectorsToFilter: 'planning/addSectorsToFilter'
+      fillFilter: 'planning/fillFilter',
     }),
     // Dates
     endOfWeek () {
@@ -140,14 +148,6 @@ export default {
       this.creationModal = true;
     },
     // Filters
-    async initFilters () {
-      try {
-        await this.addAuxiliariesToFilter();
-        await this.addSectorsToFilter();
-      } catch (e) {
-        console.error(e);
-      }
-    },
     selectedFilter (el) {
       if (el.ogustSector) {
         this.filteredSectors.push(el.ogustSector);

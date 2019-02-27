@@ -5,3 +5,7 @@ export const setFilter = (state, filterData) => {
 export const addToFilter = (state, filterData) => {
   state.filter.push(filterData);
 }
+
+export const setElemAdded = (state, elem) => {
+  state.elemAdded = elem;
+}

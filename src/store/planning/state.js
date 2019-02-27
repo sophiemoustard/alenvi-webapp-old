@@ -1,3 +1,4 @@
 export default {
-  filter: []
+  filter: [],
+  elemAdded: ''
 }

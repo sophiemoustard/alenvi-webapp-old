@@ -2,7 +2,7 @@
   <div :class="[{ 'planning': !toggleDrawer }]">
     <div class="row items-center planning-header">
       <div class="col-xs-12 col-md-5 planning-search">
-        <ni-chips-autocomplete ref="refFilter" v-model="terms" @selected="selectedFilter" @remove="removedFilter"
+        <ni-chips-autocomplete ref="refFilter" v-model="terms" @remove="removedFilter"
           class="planning-search" />
       </div>
       <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
@@ -96,7 +96,6 @@ export default {
   props: {
     events: { type: Array, default: () => [] },
     persons: { type: Array, default: () => [] },
-    selectedFilter: { type: Function, default: () => {} },
     removedFilter: { type: Function, default: () => {} },
     personKey: { type: String, default: 'auxiliary' },
   },
@@ -120,6 +119,8 @@ export default {
   },
   beforeDestroy () {
     this.$q.localStorage.set('lastSearch', JSON.stringify(this.terms));
+    console.log('BEFORE DESTROY');
+    console.log(this.$q.localStorage.get.item('lastSearch'));
   },
   async mounted () {
     this.startOfWeek = this.$moment().startOf('week');
@@ -135,10 +136,13 @@ export default {
     }
   },
   watch: {
+    // Initial filter getter
     getFilter (val) {
       if (val.length > 0) {
         // this.$q.localStorage.clear();
-        if (this.$q.localStorage.has('lastSearch')) {
+        if (this.$q.localStorage.has('lastSearch') && this.$q.localStorage.get.item('lastSearch').length > 0) {
+          console.log('IN LASTSEARCH');
+          console.log(this.$q.localStorage.get.item('lastSearch'));
           const lastSearch = JSON.parse(this.$q.localStorage.get.item('lastSearch'));
           for (let i = 0, l = lastSearch.length; i < l; i++) {
             this.$refs.refFilter.add(lastSearch[i]);
@@ -146,7 +150,7 @@ export default {
         } else {
           const userSector = this.getFilter.find(filter => filter.ogustSector === this.getUser.sector);
           if (userSector) {
-            this.terms.push(userSector.label);
+            this.$refs.refFilter.add(userSector.label);
           }
         }
       }
