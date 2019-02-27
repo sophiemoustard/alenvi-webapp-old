@@ -65,7 +65,7 @@ export default {
       return this.$store.getters['main/user'];
     },
     isAuxiliary () {
-      return this.user ? this.user.role.name === AUXILIARY || this.user.role.name === PLANNING_REFERENT : false;
+      return this.getUser ? this.getUser.role.name === AUXILIARY || this.getUser.role.name === PLANNING_REFERENT : false;
     }
   },
   methods: {
