@@ -21,6 +21,7 @@ module.exports = function (ctx) {
       'planningUpdates',
       'resize',
       'roles',
+      'sectors',
       'twilio',
       'vue-croppa',
       'vMask',

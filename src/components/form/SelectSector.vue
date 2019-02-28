@@ -31,7 +31,8 @@ export default {
   methods: {
     async getSectors () {
       try {
-        const sectors = await this.$companies.getSectors(this.companyId);
+        const sectors = await this.$sectors.showAll();
+        console.log('sectors', sectors);
         this.sectors = sectors.map(sector => ({ label: sector.name, value: sector._id }));
       } catch (e) {
         console.error(e);
