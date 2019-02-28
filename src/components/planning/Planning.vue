@@ -117,7 +117,7 @@ export default {
     }
   },
   beforeDestroy () {
-    if (this.getUser.role.name !== 'Auxiliaire') {
+    if (this.getUser.role.name !== AUXILIARY && this.getUser.role.name !== PLANNING_REFERENT) {
       this.$q.localStorage.set('lastSearch', JSON.stringify(this.terms));
     }
   },
