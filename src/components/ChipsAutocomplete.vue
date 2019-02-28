@@ -1,6 +1,6 @@
 <template>
   <q-chips-input ref="refFilter" class="input-search" :value="value" @input="input" @add="addEvent" @remove="removeEvent"
-    :before="searchIcon" chips-bg-color="primary" inverted-light color="white" add-icon="x" autofocus>
+    :before="searchIcon" chips-bg-color="primary" inverted-light color="white" add-icon="x">
     <q-autocomplete ref="refAutocomplete" @search="search" :debounce='0'/>
   </q-chips-input>
 </template>
