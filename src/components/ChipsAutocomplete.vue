@@ -11,7 +11,6 @@ import { mapGetters } from 'vuex';
 export default {
   name: 'ChipsAutocomplete',
   props: {
-    myRef: String,
     value: { type: Array, default: () => [] },
   },
   data () {
