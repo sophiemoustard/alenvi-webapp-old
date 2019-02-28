@@ -44,7 +44,7 @@ export default {
         done([]);
       }
     },
-    // q-chips-input method trigger called from Planning.vue, only once (first time planning start)
+    // q-chips-input 'add' method called from Planning.vue only when planning starts for the first time
     add (el) {
       this.$store.commit('planning/setElemAdded', this.getFilter.find(elem => elem.value === el));
       return this.$refs.refFilter.add(el);
