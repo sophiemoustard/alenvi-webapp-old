@@ -143,7 +143,8 @@ module.exports = function (ctx) {
         'Notify',
         'Cookies',
         'Loading',
-        'Dialog'
+        'Dialog',
+        'LocalStorage'
       ]
     },
     animations: [

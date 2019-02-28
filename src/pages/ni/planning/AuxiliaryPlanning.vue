@@ -1,8 +1,7 @@
 <template>
   <q-page class="neutral-background">
     <ni-planning-manager :events="events" :persons="auxiliaries" @updateStartOfWeek="updateStartOfWeek" @createEvent="openCreationModal"
-      :filters="filters" @editEvent="openEditionModal" @onDrop="updateEventOnDrop" :selectedFilter="selectedFilter"
-      :removedFilter="removedFilter" :mySector="userSector()" />
+      @editEvent="openEditionModal" @onDrop="updateEventOnDrop" />
 
     <!-- Event creation modal -->
     <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
@@ -25,7 +24,9 @@ import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryE
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
 import Planning from '../../../components/planning/Planning.vue';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
-import { INTERVENTION, NEVER, AUXILIARY, PLANNING_REFERENT } from '../../../data/constants';
+import { INTERVENTION, NEVER } from '../../../data/constants';
+import { mapGetters, mapActions } from 'vuex';
+import { NotifyNegative } from '../../../components/popup/notify';
 
 export default {
   name: 'AuxiliaryPlanning',
@@ -39,7 +40,6 @@ export default {
   data () {
     return {
       loading: false,
-      selectedSectors: [],
       days: [],
       events: [],
       customers: [],
@@ -47,7 +47,6 @@ export default {
       startDate: '',
       internalHours: [],
       // Filters
-      filters: [],
       filteredSectors: [],
       filteredAuxiliaries: [],
       // Event creation
@@ -59,15 +58,30 @@ export default {
     };
   },
   async mounted () {
-    await this.getCustomers();
-    await this.initFilters();
-    this.setInternalHours();
-    this.selectedFilter({ ogustSector: this.getUser.sector });
+    try {
+      await this.getCustomers();
+      await this.fillFilter('auxiliaries');
+      this.setInternalHours();
+    } catch (e) {
+      console.error(e);
+      NotifyNegative('Erreur lors de la récupération des personnes');
+    }
+  },
+  watch: {
+    getElemAdded (val) {
+      this.handleElemAddedToFilter(val);
+    },
+    getElemRemoved (val) {
+      this.handleElemRemovedFromFilter(val);
+    }
   },
   computed: {
-    getUser () {
-      return this.$store.getters['main/user'];
-    },
+    ...mapGetters({
+      getUser: 'main/user',
+      getFilter: 'planning/getFilter',
+      getElemAdded: 'planning/getElemAdded',
+      getElemRemoved: 'planning/getElemRemoved'
+    }),
     selectedAuxiliary () {
       if (this.creationModal && this.newEvent.auxiliary !== '') return this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
       if (this.editionModal && this.editedEvent.auxiliary !== '') return this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
@@ -75,6 +89,9 @@ export default {
     },
   },
   methods: {
+    ...mapActions({
+      fillFilter: 'planning/fillFilter',
+    }),
     // Dates
     endOfWeek () {
       return this.$moment(this.startOfWeek).add(6, 'd');
@@ -85,10 +102,10 @@ export default {
 
       const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
       this.days = Array.from(range.by('days'));
-      if (this.auxiliaries && this.auxiliaries.length) await this.getEvents();
+      if (this.auxiliaries && this.auxiliaries.length) await this.refreshPlanning();
     },
     // Refresh data
-    async getEvents () {
+    async refreshPlanning () {
       try {
         this.events = await this.$events.list({
           startDate: this.startOfWeek.format('YYYYMMDD'),
@@ -132,53 +149,26 @@ export default {
       };
       this.creationModal = true;
     },
-    // Filters
-    async initFilters () {
-      try {
-        await this.addAuxiliariesToFilter();
-        await this.addSectorsToFilter();
-      } catch (e) {
-        console.error(e);
-      }
-    },
-    async addAuxiliariesToFilter () {
-      this.filters = await this.$users.showAllActive({ role: [AUXILIARY, PLANNING_REFERENT] });
-      for (let i = 0, l = this.filters.length; i < l; i++) {
-        this.filters[i].value = `${this.filters[i].identity.firstname} ${this.filters[i].identity.lastname}`;
-        this.filters[i].label = `${this.filters[i].identity.firstname} ${this.filters[i].identity.lastname}`;
-      }
-    },
-    async addSectorsToFilter () {
-      const allSectorsRaw = await this.$ogust.getList('employee.sector');
-      for (const k in allSectorsRaw) {
-        if (k === '*') continue;
-
-        this.filters.push({
-          label: allSectorsRaw[k],
-          value: allSectorsRaw[k],
-          ogustSector: k,
-        });
-      }
-    },
-    selectedFilter (el) {
+    // Filter
+    handleElemAddedToFilter (el) {
       if (el.ogustSector) {
         this.filteredSectors.push(el.ogustSector);
-        const auxBySector = this.filters.filter(aux => aux.sector === el.ogustSector);
+        const auxBySector = this.getFilter.filter(aux => aux.sector === el.ogustSector);
         for (let i = 0, l = auxBySector.length; i < l; i++) {
           if (!this.auxiliaries.some(aux => auxBySector[i]._id === aux._id)) {
             this.auxiliaries.push(auxBySector[i]);
           }
         }
-        this.getEvents();
+        this.refreshPlanning();
       } else {
         if (!this.filteredAuxiliaries.some(aux => aux._id === el._id)) this.filteredAuxiliaries.push(el);
         if (!this.auxiliaries.some(aux => aux._id === el._id)) {
           this.auxiliaries.push(el);
-          this.getEvents();
+          this.refreshPlanning();
         }
       }
     },
-    removedFilter (el) {
+    handleElemRemovedFromFilter (el) {
       if (el.ogustSector) {
         this.filteredSectors.filter(sec => sec !== el.ogustSector);
         this.auxiliaries = this.auxiliaries.filter(auxiliary =>
@@ -189,9 +179,6 @@ export default {
         if (this.filteredSectors.includes(el.sector)) return;
         this.auxiliaries = this.auxiliaries.filter(auxiliary => auxiliary._id !== el._id);
       }
-    },
-    userSector () {
-      return this.filters.find(filter => filter.ogustSector === this.getUser.sector);
     },
   },
 }

@@ -2,8 +2,7 @@
   <div :class="[{ 'planning': !toggleDrawer }]">
     <div class="row items-center planning-header">
       <div class="col-xs-12 col-md-5 planning-search">
-        <ni-chips-autocomplete v-model="terms" @selected="selectedFilter" @remove="removedFilter"
-          class="planning-search" :filters="filters" />
+        <ni-chips-autocomplete ref="refFilter" v-model="terms" class="planning-search" />
       </div>
       <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
         @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :type="PLANNING" />
@@ -74,7 +73,7 @@
 </template>
 
 <script>
-import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, PLANNING, PERCENTAGE_BY_MINUTES } from '../../data/constants';
+import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, PLANNING, PERCENTAGE_BY_MINUTES, AUXILIARY_ROLES } from '../../data/constants';
 import { NotifyNegative } from '../popup/notify';
 import NiChipAuxiliaryIndicator from '../planning/ChipAuxiliaryIndicator';
 import NiChipCustomerIndicator from '../planning/ChipCustomerIndicator';
@@ -96,11 +95,7 @@ export default {
   props: {
     events: { type: Array, default: () => [] },
     persons: { type: Array, default: () => [] },
-    selectedFilter: { type: Function, default: () => {} },
-    removedFilter: { type: Function, default: () => {} },
     personKey: { type: String, default: 'auxiliary' },
-    filters: { type: Array, default: () => [] },
-    mySector: Object
   },
   data () {
     return {
@@ -120,11 +115,44 @@ export default {
       distanceMatrix: [],
     }
   },
+  beforeDestroy () {
+    if (!AUXILIARY_ROLES.includes(this.getUser.role.name)) {
+      this.$q.localStorage.set('lastSearch', JSON.stringify(this.terms));
+    }
+  },
   async mounted () {
     this.startOfWeek = this.$moment().startOf('week');
     this.getTimelineDays();
     this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
     if (!this.isCustomerPlanning) await this.getDistanceMatrix();
+  },
+  watch: {
+    // Initial filter getter
+    getFilter (val) {
+      if (val.length > 0) {
+        if (!AUXILIARY_ROLES.includes(this.getUser.role.name)) {
+          if (this.$q.localStorage.has('lastSearch') && this.$q.localStorage.get.item('lastSearch').length > 0) {
+            const lastSearch = JSON.parse(this.$q.localStorage.get.item('lastSearch'));
+            for (let i = 0, l = lastSearch.length; i < l; i++) {
+              setTimeout(() => this.$refs.refFilter.add(lastSearch[i]), 1);
+            }
+          }
+        } else {
+          const userSector = this.getFilter.find(filter => filter.ogustSector === this.getUser.sector);
+          if (userSector) {
+            this.$refs.refFilter.add(userSector.label);
+          }
+        }
+      }
+    }
+  },
+  computed: {
+    getFilter () {
+      return this.$store.getters['planning/getFilter'];
+    },
+    getUser () {
+      return this.$store.getters['main/user'];
+    },
   },
   methods: {
     async getDistanceMatrix () {
@@ -208,13 +236,6 @@ export default {
       this.$emit('editEvent', event);
     }
   },
-  watch: {
-    mySector (val) {
-      if (val) {
-        this.terms.push(this.mySector.label);
-      }
-    }
-  }
 }
 </script>
 

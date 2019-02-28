@@ -1,17 +1,17 @@
 <template>
-  <q-chips-input class="input-search" :value="value" @input="inputEvent" @remove="removed"
-    :before="searchIcon" chips-bg-color="primary" inverted-light color="white" add-icon="x" autofocus>
-    <q-autocomplete @search="search" @selected="selected" :debounce='0'/>
+  <q-chips-input ref="refFilter" class="input-search" :value="value" @input="input" @add="addEvent" @remove="removeEvent"
+    :before="searchIcon" chips-bg-color="primary" inverted-light color="white" add-icon="x">
+    <q-autocomplete ref="refAutocomplete" @search="search" :debounce='0'/>
   </q-chips-input>
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'ChipsAutocomplete',
   props: {
     value: { type: Array, default: () => [] },
-    filters: { type: Array, default: () => [] },
   },
   data () {
     return {
@@ -20,23 +20,34 @@ export default {
       }],
     }
   },
+  computed: {
+    ...mapGetters({
+      getFilter: 'planning/getFilter',
+      getElemAdded: 'planning/getElemAdded'
+    }),
+  },
   methods: {
-    inputEvent (value) {
-      this.$emit('input', value);
+    addEvent (el) {
+      this.$store.commit('planning/setElemAdded', this.getFilter.find(elem => elem.value === el.val));
     },
-    selected (el) {
-      this.$emit('selected', el);
+    input (el) {
+      this.$emit('input', el);
     },
-    removed (el) {
-      this.$emit('remove', this.filters.find(elem => elem.value === el.value[0]));
+    removeEvent (el) {
+      this.$store.commit('planning/setElemRemoved', this.getFilter.find(elem => elem.value === el.value[0]));
     },
     async search (terms, done) {
       try {
         const regex = new RegExp(terms, 'i');
-        done(this.filters.filter(el => el.value.match(regex)));
+        done(this.getFilter.filter(el => el.value.match(regex)));
       } catch (e) {
         done([]);
       }
+    },
+    // q-chips-input 'add' method called from Planning.vue only when planning starts for the first time
+    add (el) {
+      this.$store.commit('planning/setElemAdded', this.getFilter.find(elem => elem.value === el));
+      return this.$refs.refFilter.add(el);
     },
   },
 }
