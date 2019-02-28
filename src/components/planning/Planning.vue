@@ -190,15 +190,18 @@ export default {
       }
     },
     createEvent (eventInfo) {
-      const can = this.$can({
-        user: this.$store.getters['main/user'],
-        auxiliaryIdEvent: eventInfo.person.id,
-        permissions: [
-          'planning:edit:user',
-          { name: 'planning:edit', rule: 'isOwner' }
-        ],
-      });
-      if (!can) return;
+      if (this.personkey === 'auxiliary') {
+        const can = this.$can({
+          user: this.$store.getters['main/user'],
+          auxiliaryIdEvent: eventInfo.person.id,
+          auxiliarySectorEvent: eventInfo.person.sector,
+          permissions: [
+            { name: 'planning:edit:user', rule: 'isInSameSector' },
+            { name: 'planning:edit', rule: 'isOwner' }
+          ],
+        });
+        if (!can) return;
+      }
       this.$emit('createEvent', eventInfo);
     },
     editEvent (event) {

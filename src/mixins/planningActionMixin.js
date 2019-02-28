@@ -196,8 +196,9 @@ export const planningActionMixin = {
       const can = this.$can({
         user: this.$store.getters['main/user'],
         auxiliaryIdEvent: auxiliary,
+        auxiliarySectorEvent: event.sector,
         permissions: [
-          'planning:edit:user',
+          { name: 'planning:edit:user', rule: 'isInSameSector' },
           { name: 'planning:edit', rule: 'isOwner' }
         ],
       });
