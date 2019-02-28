@@ -135,6 +135,7 @@ module.exports = function (ctx) {
         'QOptionGroup',
         'QChip',
         'QPageSticky',
+        'QProgress',
       ],
       directives: [
         'Ripple'
