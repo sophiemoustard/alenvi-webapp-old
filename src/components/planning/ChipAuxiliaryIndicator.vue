@@ -5,6 +5,7 @@
       <span class="chip-indicator">{{ indicators.weeklyHours }}h / {{ indicators.contractHours }}</span>
     </q-chip>
 
+    <!-- Indicators modal -->
     <q-modal v-model="indicatorsModal" content-classes="modal-container-md">
       <div class="row q-mb-md modal-padding">
         <div class="col-11 row customer-name">
@@ -19,8 +20,8 @@
       <q-tabs align="justify" color="transparent" text-color="primary">
         <q-tab class="col-6" v-for="(tab, index) in tabsContent" :key="index" slot="title" :label="tab.label" :default="tab.default"
           :name="tab.name" :disable="tab.disable" />
-        <q-tab-pane class="no-border" key="week_stats" name="week_stats">
-          <p style="font-weight:bold">Heures travailées</p>
+        <q-tab-pane class="no-border economic-indicators" key="week_stats" name="week_stats">
+          <p style="font-weight:bold">Heures travaillées</p>
           <div class="progress-indicator">
             <q-progress :percentage="Math.round(weeklyInterventionsPercentage)" class="intervention" />
             <div class="progress-caption">
@@ -38,14 +39,23 @@
             </div>
           </div>
           <div class="progress-indicator">
-            <q-progress :percentage="Math.round(weeklyTravelPercentage)" class="transports" />
+            <q-progress :percentage="Math.round(weeklyPaidTransportsPercentage)" class="transports" />
             <div class="progress-caption">
               <div>Transports</div>
-              <div>{{ `${Math.round(this.weeklyTransports)}h` }} - {{`${Math.round(weeklyTravelPercentage)}%`}}</div>
+              <div>{{ `${Math.round(this.weeklyPaidTransports)}h` }} -
+                {{`${Math.round(weeklyPaidTransportsPercentage)}%`}}</div>
             </div>
           </div>
         </q-tab-pane>
       </q-tabs>
+      <div class="quality-indicators">
+        <div class="quality-indicators-item"><span class="highlight">{{ `${Math.round(weeklyTotalTransports)}h` }}</span>
+          de transports dont <span class="highlight">{{ `${Math.round(weeklyPaidTransports)}h` }}</span> remunérées</div>
+        <div class="quality-indicators-item"><span class="highlight">{{ customersCount }}</span> bénéficiaires
+          accompagnés, <span class="highlight">{{ `${averageTimeByCustomer}h` }}</span> en moyenne</div>
+        <div class="quality-indicators-item"><span class="highlight">{{ `${Math.round(weeklyBreak)}h` }}</span> de
+          coupure, incluant transport</div>
+      </div>
     </q-modal>
   </div>
 </template>
@@ -71,45 +81,44 @@ export default {
         { label: 'Stats de la semaine', default: true, name: 'week_stats', disable: false },
         { label: 'Stats du mois', default: false, name: 'month_stat', disable: true },
       ],
-      weeklyTransports: 0,
+      breakInfo: [],
+      weeklyInternalHours: 0,
+      weeklyInterventions: 0,
+      weeklyPaidTransports: 0,
+      weeklyTotalTransports: 0,
+      weeklyBreak: 0,
+      customersCount: 0,
+      averageTimeByCustomer: 0,
     };
   },
   computed: {
     isBusy () {
-      if (this.indicators.contractHours === 0) return false;
-      return this.indicators.weeklyHours > this.indicators.contractHours;
+      return this.indicators.contractHours !== 0 && this.indicators.weeklyHours > this.indicators.contractHours;
     },
     days () {
       const range = this.$moment.range(this.startOfWeek, this.endOfWorkingWeek);
       return Array.from(range.by('days'));
     },
-    weeklyInternalHours () {
-      let weeklyHours = 0;
-      this.events.forEach((event) => {
-        if (event.type === INTERNAL_HOUR) weeklyHours += this.$moment(event.endDate).diff(event.startDate, 'm', true) / 60;
-      });
-
-      return weeklyHours;
+    weeklyHours () {
+      return Math.round(this.weeklyInternalHours + this.weeklyInterventions + this.weeklyPaidTransports);
+    },
+    totalWorkingHours () {
+      return this.weeklyInternalHours + this.weeklyInterventions + this.weeklyPaidTransports;
     },
     weeklyInternalHoursPercentage () {
-      return this.weeklyInternalHours / this.workinHoursTotal * 100;
-    },
-    weeklyInterventions () {
-      let weeklyHours = 0;
-      this.events.forEach((event) => {
-        if (event.type === INTERVENTION) weeklyHours += this.$moment(event.endDate).diff(event.startDate, 'm', true) / 60;
-      });
-
-      return weeklyHours;
+      if (this.totalWorkingHours === 0) return 0;
+      return this.weeklyInternalHours / this.totalWorkingHours * 100;
     },
     weeklyInterventionsPercentage () {
-      return this.weeklyInterventions / this.workinHoursTotal * 100;
+      if (this.totalWorkingHours === 0) return 0;
+      return this.weeklyInterventions / this.totalWorkingHours * 100;
     },
-    weeklyTravelPercentage () {
-      return this.weeklyTransports / this.workinHoursTotal * 100;
+    weeklyPaidTransportsPercentage () {
+      if (this.totalWorkingHours === 0) return 0;
+      return this.weeklyPaidTransports / this.totalWorkingHours * 100;
     },
-    workinHoursTotal () {
-      return this.weeklyInternalHours + this.weeklyInterventions + this.weeklyTransports;
+    transportMode () {
+      return this.person.administrative.transportInvoice.transportType === PUBLIC_TRANSPORT ? TRANSIT : DRIVING;
     },
   },
   async mounted () {
@@ -118,68 +127,128 @@ export default {
   watch: {
     async events () {
       await this.getIndicators();
-    }
+    },
+    breakInfo () {
+      this.computeIndicatorsFromBreakInfo();
+    },
   },
   methods: {
     getAvatar (picture) {
       return (!picture || !picture.link) ? DEFAULT_AVATAR : picture.link;
     },
     async getIndicators () {
-      await this.getTravelHours();
-      this.indicators = { weeklyHours: await this.getWeeklyHours(), contractHours: this.getContractHours() };
+      await this.getBreakInfo();
+      this.computeIndicatorsFromEvents();
+      this.indicators = { weeklyHours: this.weeklyHours, contractHours: this.getContractHours() };
     },
-    // Compute weekly hours
-    getWeeklyHours () {
-      let weeklyHours = 0;
-      this.events.forEach((event) => {
-        if (event.type === INTERVENTION || event.type === INTERNAL_HOUR) {
-          weeklyHours += this.$moment(event.endDate).diff(event.startDate, 'm', true) / 60;
+    // Compute indicators
+    computeIndicatorsFromBreakInfo () {
+      let weeklyPaidTransports = 0;
+      let weeklyTotalTransports = 0;
+      let weeklyBreak = 0;
+      for (const info of this.breakInfo) {
+        if (info.timeBetween) weeklyBreak += info.timeBetween;
+        if (!info.isFirstOrLast) weeklyPaidTransports += info.transportDuration;
+        weeklyTotalTransports += info.transportDuration;
+      };
+
+      this.weeklyBreak = weeklyBreak / 60;
+      this.weeklyPaidTransports = weeklyPaidTransports / 60;
+      this.weeklyTotalTransports = weeklyTotalTransports / 60;
+    },
+    computeIndicatorsFromEvents () {
+      let weeklyInternalHours = 0;
+      let weeklyInterventions = 0;
+      let hoursByCustomer = {}
+      for (const event of this.events) {
+        if (event.type === INTERNAL_HOUR) weeklyInternalHours += this.$moment(event.endDate).diff(event.startDate, 'm', true);
+        if (event.type === INTERVENTION) {
+          weeklyInterventions += this.$moment(event.endDate).diff(event.startDate, 'm', true);
+          if (!Object.keys(hoursByCustomer).includes(event.customer._id)) hoursByCustomer[event.customer._id] = 0;
+          const interventionTime = this.$moment(event.endDate).diff(event.startDate, 'm', true);
+          hoursByCustomer[event.customer._id] += interventionTime;
         }
-      });
+      };
 
-      weeklyHours += this.weeklyTransports;
-
-      return Math.round(weeklyHours);
+      this.weeklyInternalHours = weeklyInternalHours / 60;
+      this.weeklyInterventions = weeklyInterventions / 60;
+      this.customersCount = Object.keys(hoursByCustomer).length;
+      this.averageTimeByCustomer = this.customersCount === 0 ? 0
+        : Object.values(hoursByCustomer).reduce((acc, hours) => acc + hours, 0) / 60 / this.customersCount;
     },
-    async getTravelHours () {
-      let weeklyTransports = 0;
+    async getBreakInfo () {
+      const breakInfo = [];
       for (const day of this.days) {
         const eventsOnDay = this.getEventsOnDay(day);
         if (eventsOnDay.length <= 1) continue;
 
+        const firstTransportInfo = await this.getFirstTransportInfo(eventsOnDay[0]);
+        if (firstTransportInfo) breakInfo.push(firstTransportInfo);
+        const lastTransportInfo = await this.getLastTransportInfo(eventsOnDay[eventsOnDay.length - 1]);
+        if (lastTransportInfo) breakInfo.push(lastTransportInfo);
+
         for (let i = 0; i < eventsOnDay.length - 1; i++) {
-          weeklyTransports += await this.getTravelTimeBetweenTwoEvents(eventsOnDay[i], eventsOnDay[i + 1]);
+          const transportInfo = await this.getBreakInfoBetweenTwoEvents(eventsOnDay[i], eventsOnDay[i + 1]);
+          if (transportInfo) breakInfo.push(transportInfo);
         }
       }
 
-      this.weeklyTransports = weeklyTransports;
+      this.breakInfo = breakInfo;
     },
-    getEventsOnDay (day) {
-      return this.events.filter(event => day.isSameOrAfter(event.startDate, 'd') && day.isSameOrBefore(event.endDate, 'd'));
+    async getFirstTransportInfo (event) {
+      if (!this.person.contact || !this.person.contact.address || !this.person.contact.address.fullAddress) return null;
+      const destinations = this.getEventAddress(event);
+      if (!destinations) return null;
+      const transportDuration = await this.getTransportDuration(this.person.contact.address.fullAddress, destinations);
+
+      return { destination: event._id, transportDuration, isFirstOrLast: true };
     },
-    async getTravelTimeBetweenTwoEvents (eventOrigin, eventDestination) {
-      let origins;
-      let destinations;
-      if (eventOrigin.type === INTERVENTION) origins = eventOrigin.customer.contact.address.fullAddress;
-      else if (eventOrigin.type === INTERNAL_HOUR) origins = eventOrigin.location.fullAddress;
+    async getLastTransportInfo (event) {
+      if (!this.person.contact || !this.person.contact.address || !this.person.contact.address.fullAddress) return null;
+      const origins = this.getEventAddress(event);
+      if (!origins) return null;
+      const transportDuration = await this.getTransportDuration(origins, this.person.contact.address.fullAddress);
 
-      if (eventDestination.type === INTERVENTION) destinations = eventDestination.customer.contact.address.fullAddress;
-      else if (eventDestination.type === INTERNAL_HOUR) destinations = eventDestination.location.fullAddress;
+      return { origin: event._id, transportDuration, isFirstOrLast: true };
+    },
+    getEventAddress (event) {
+      let address;
+      if (event.type === INTERVENTION && event.customer && event.customer.contact && event.customer.contact.address) {
+        address = event.customer.contact.address.fullAddress;
+      } else if (event.type === INTERNAL_HOUR && event.location) address = event.location.fullAddress;
 
-      if (!origins || !destinations) return 0;
-      const mode = this.person.administrative.transportInvoice.transportType === PUBLIC_TRANSPORT ? TRANSIT : DRIVING;
-      let distanceMatrix = this.distanceMatrix.find(dm => dm.origin === origins && dm.destination === destinations && dm.mode === mode);
+      return !address ? null : address;
+    },
+    async getTransportDuration (origins, destinations) {
+      let distanceMatrix = this.distanceMatrix
+        .find(dm => dm.origin === origins && dm.destination === destinations && dm.mode === this.transportMode);
       if (!distanceMatrix) {
-        distanceMatrix = await googleMaps.getDistanceMatrix({ origins, destinations, mode });
+        distanceMatrix = await googleMaps.getDistanceMatrix({ origins, destinations, mode: this.transportMode });
       }
 
-      const duration = distanceMatrix && distanceMatrix.duration ? Math.round(distanceMatrix.duration / 60) : 0;
-      const timeBetweenEvents = this.$moment(eventDestination.startDate).diff(this.$moment(eventOrigin.endDate), 'minutes');
+      return distanceMatrix && distanceMatrix.duration ? Math.round(distanceMatrix.duration / 60) : 0;
+    },
+    getEventsOnDay (day) {
+      return this.events
+        .filter(event => day.isSameOrAfter(event.startDate, 'd') && day.isSameOrBefore(event.endDate, 'd') &&
+          [INTERVENTION, INTERNAL_HOUR].includes(event.type))
+        .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+    },
+    async getBreakInfoBetweenTwoEvents (eventOrigin, eventDestination) {
+      const origins = this.getEventAddress(eventOrigin);
+      const destinations = this.getEventAddress(eventDestination);
+      if (!origins || !destinations) return {};
 
-      /** If there is less than 15 min free between two events (without transport), the remaining time is paid as
-       * the auxiliary has not enough time to be free
-       */
-      return (duration + 15 > timeBetweenEvents) ? timeBetweenEvents / 60 : duration / 60;
+      const transportDuration = await this.getTransportDuration(origins, destinations);
+      const timeBetween = this.$moment(eventDestination.startDate).diff(this.$moment(eventOrigin.endDate), 'minutes');
+
+      return {
+        origin: eventOrigin._id,
+        destination: eventDestination._id,
+        transportDuration,
+        timeBetween,
+        isFirstOrLast: false,
+      };
     },
     // Compute contract hours
     getAbsencesOnDay (day) {
@@ -191,10 +260,10 @@ export default {
       let afternoon = false;
       if (!absences || absences.length === 0) return { morning, afternoon };
 
-      absences.forEach(abs => {
+      for (const abs of absences) {
         if (day.hours(8).isSameOrAfter(abs.startDate)) morning = true;
         if (day.hours(20).isSameOrBefore(abs.endDate)) afternoon = true;
-      });
+      };
 
       return { morning, afternoon };
     },
@@ -215,17 +284,17 @@ export default {
     },
     getContractHours () {
       let contractHours = 0;
-      this.days.forEach(day => {
+      for (const day of this.days) {
         const absences = this.getAbsencesOnDay(day);
-        if (absences.morning && absences.afternoon) return;
+        if (absences.morning && absences.afternoon) continue;
 
         const version = this.getContractVersionOnDay(day);
-        if (!version) return;
+        if (!version) continue;
 
         /* 12 : from Monday to Saturday, there are 12 half days */
         if (!absences.morning) contractHours += version.weeklyHours / 12 || 0;
         if (!absences.afternoon) contractHours += version.weeklyHours / 12 || 0;
-      });
+      };
       return Math.round(contractHours);
     },
   }
@@ -246,6 +315,24 @@ export default {
   .progress-caption
     display: flex;
     justify-content: space-between;
+
+  .highlight
+    color: $primary
+    font-weight: bold
+
+  .economic-indicators
+    padding: 0 24px;
+    margin: 24px 0;
+    border-left: 5px solid $primary-dark !important;
+
+  .quality-indicators
+    padding: 0 24px;
+    margin-bottom: 24px;
+    border-left: 5px solid $primary !important;
+
+  .quality-indicators-item
+    border-top: 1px solid $light-grey;
+    padding: 10px 0;
 
   /deep/.q-progress
     height: 10px !important;
@@ -274,11 +361,6 @@ export default {
 
   /deep/ .q-tabs-head
     margin: 0px 24px;
-
-  .q-tab-pane
-    padding: 0 24px;
-    margin: 24px 0;
-    border-left: 5px solid $primary-dark !important;
 
   .q-tab
     text-transform: none;
