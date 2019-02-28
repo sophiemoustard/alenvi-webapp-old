@@ -2,8 +2,7 @@
   <div :class="[{ 'planning': !toggleDrawer }]">
     <div class="row items-center planning-header">
       <div class="col-xs-12 col-md-5 planning-search">
-        <ni-chips-autocomplete ref="refFilter" v-model="terms"
-          class="planning-search" />
+        <ni-chips-autocomplete ref="refFilter" v-model="terms" class="planning-search" />
       </div>
       <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
         @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :type="PLANNING" />
@@ -124,14 +123,8 @@ export default {
   async mounted () {
     this.startOfWeek = this.$moment().startOf('week');
     this.getTimelineDays();
-    this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek })
+    this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
     if (!this.isCustomerPlanning) await this.getDistanceMatrix();
-    if (this.$q.localStorage.has('lastSearch')) {
-      const lastSearch = JSON.parse(this.$q.localStorage.get.item('lastSearch'));
-      for (let i = 0, l = lastSearch.length; i < l; i++) {
-        this.terms.push(lastSearch[i]);
-      }
-    }
   },
   watch: {
     // Initial filter getter

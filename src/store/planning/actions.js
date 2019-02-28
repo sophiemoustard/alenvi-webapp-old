@@ -6,7 +6,7 @@ import { AUXILIARY, PLANNING_REFERENT } from '../../data/constants';
 
 export const fillFilter = async ({ commit }, role) => {
   let elems = [];
-  if (role === 'auxiliaries') {
+  if (role === AUXILIARY) {
     elems = await Users.showAllActive({ role: [AUXILIARY, PLANNING_REFERENT] });
     for (let i = 0, l = elems.length; i < l; i++) {
       elems[i].value = `${elems[i].identity.firstname} ${elems[i].identity.lastname}`;
