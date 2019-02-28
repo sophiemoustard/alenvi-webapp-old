@@ -124,7 +124,7 @@ export default {
     this.startOfWeek = this.$moment().startOf('week');
     this.getTimelineDays();
     this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
-    await this.getDistanceMatrix();
+    if (!this.isCustomerPlanning) await this.getDistanceMatrix();
   },
   methods: {
     async getDistanceMatrix () {
