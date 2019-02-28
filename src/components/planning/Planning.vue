@@ -196,8 +196,8 @@ export default {
           auxiliaryIdEvent: eventInfo.person.id,
           auxiliarySectorEvent: eventInfo.person.sector,
           permissions: [
-            { name: 'planning:edit:user', rule: 'isInSameSector' },
-            { name: 'planning:edit', rule: 'isOwner' }
+            { name: 'planning:create:user', rule: 'isInSameSector' },
+            { name: 'planning:create', rule: 'isOwner' }
           ],
         });
         if (!can) return;

@@ -139,7 +139,7 @@ export default {
         auxiliaryIdEvent: this.selectedAuxiliary._id,
         permissions: [
           'planning:create:user',
-          { name: 'planning:edit', rule: 'isOwner' }
+          { name: 'planning:create', rule: 'isOwner' }
         ]
       });
       if (!can) return;
