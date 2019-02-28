@@ -46,8 +46,9 @@ export default {
       }
     },
     // q-chips-input method trigger called from Planning.vue
-    add (value) {
-      return this.$refs.refFilter.add(value);
+    add (el) {
+      this.$store.commit('planning/setElemAdded', this.getFilter.find(elem => elem.value === el));
+      return this.$refs.refFilter.add(el);
     },
   },
 }

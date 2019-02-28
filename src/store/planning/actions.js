@@ -2,10 +2,12 @@ import Ogust from '../../api/Ogust'
 import Users from '../../api/Users'
 import Customers from '../../api/Customers'
 
+import { AUXILIARY, PLANNING_REFERENT } from '../../data/constants';
+
 export const fillFilter = async ({ commit }, role) => {
   let elems = [];
   if (role === 'auxiliaries') {
-    elems = await Users.showAllActive({ 'role': 'Auxiliaire' });
+    elems = await Users.showAllActive({ role: [AUXILIARY, PLANNING_REFERENT] });
     for (let i = 0, l = elems.length; i < l; i++) {
       elems[i].value = `${elems[i].identity.firstname} ${elems[i].identity.lastname}`;
       elems[i].label = `${elems[i].identity.firstname} ${elems[i].identity.lastname}`;
