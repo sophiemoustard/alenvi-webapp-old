@@ -19,7 +19,7 @@
               </template>
               <template v-for="(event, eventId) in getOneDayEvents(days[dayIndex])">
                 <div :style="{ top: `${PERCENTAGE_BY_MINUTES * event.staffingTop}%`, height: `${PERCENTAGE_BY_MINUTES * event.staffingHeight - 0.2}%` }"
-                  :key="eventId"  :class="[!isCustomerPlanning && 'cursor-pointer', 'event', `event-${event.type}`]" @click.stop="editEvent(event._id)">
+                  :key="eventId"  :class="[!isCustomerPlanning && 'cursor-pointer', 'event', `event-${event.type}`]" @click.stop="editEvent(event)">
                   <div class="col-12 event-title">
                     <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">{{ eventTitle(event) }}</p>
                     <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">{{ displayAbsenceType(event.absence) }}</p>

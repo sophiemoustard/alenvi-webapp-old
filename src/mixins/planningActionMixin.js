@@ -191,10 +191,8 @@ export const planningActionMixin = {
       }
     },
     // Event edition
-    openEditionModal (eventId) {
-      const editedEvent = this.events.find(ev => ev._id === eventId);
-      const { createdAt, updatedAt, startDate, endDate, ...eventData } = editedEvent;
-      const auxiliary = editedEvent.auxiliary._id;
+    openEditionModal (event) {
+      const auxiliary = event.auxiliary._id;
       const can = this.$can({
         user: this.$store.getters['main/user'],
         auxiliaryIdEvent: auxiliary,
@@ -204,6 +202,7 @@ export const planningActionMixin = {
         ],
       });
       if (!can) return;
+      const { createdAt, updatedAt, startDate, endDate, ...eventData } = event;
       const dates = {
         startDate,
         endDate,
@@ -214,17 +213,17 @@ export const planningActionMixin = {
           ? `0${this.$moment(endDate).hours()}`
           : this.$moment(endDate).hours()}:${this.$moment(endDate).minutes() || '00'}`,
       };
-      switch (editedEvent.type) {
+      switch (event.type) {
         case INTERVENTION:
-          const subscription = editedEvent.subscription._id;
+          const subscription = event.subscription._id;
           this.editedEvent = { isCancelled: false, cancel: {}, shouldUpdateRepetition: false, ...eventData, dates, auxiliary, subscription };
           break;
         case INTERNAL_HOUR:
-          const internalHour = editedEvent.internalHour._id;
+          const internalHour = event.internalHour._id;
           this.editedEvent = { location: {}, shouldUpdateRepetition: false, ...eventData, auxiliary, internalHour, dates };
           break;
         case ABSENCE:
-          const { startDuration, endDuration } = this.getAbsenceDurations(editedEvent);
+          const { startDuration, endDuration } = this.getAbsenceDurations(event);
           this.editedEvent = {
             location: {},
             attachment: {},
