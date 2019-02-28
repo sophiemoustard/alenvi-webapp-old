@@ -74,7 +74,7 @@
 </template>
 
 <script>
-import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, PLANNING, PERCENTAGE_BY_MINUTES } from '../../data/constants';
+import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, PLANNING, PERCENTAGE_BY_MINUTES, AUXILIARY, PLANNING_REFERENT } from '../../data/constants';
 import { NotifyNegative } from '../popup/notify';
 import NiChipAuxiliaryIndicator from '../planning/ChipAuxiliaryIndicator';
 import NiChipCustomerIndicator from '../planning/ChipCustomerIndicator';
@@ -138,7 +138,7 @@ export default {
     // Initial filter getter
     getFilter (val) {
       if (val.length > 0) {
-        if (this.getUser.role.name !== 'Auxiliaire') {
+        if (this.getUser.role.name !== AUXILIARY && this.getUser.role.name !== PLANNING_REFERENT) {
           if (this.$q.localStorage.has('lastSearch') && this.$q.localStorage.get.item('lastSearch').length > 0) {
             const lastSearch = JSON.parse(this.$q.localStorage.get.item('lastSearch'));
             for (let i = 0, l = lastSearch.length; i < l; i++) {
