@@ -35,9 +35,9 @@
             </td>
             <template v-if="staffingView && !isCustomerPlanning">
               <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
-                @click="$emit('createEvent', { dayIndex, person })">
+                @click="createEvent({ dayIndex, person })">
                 <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
-                  <div :id="event._id" draggable @dragstart="drag(event._id)" @click.stop="$emit('editEvent', event._id)"
+                  <div :id="event._id" draggable @dragstart="drag(event._id)" @click.stop="editEvent(event)"
                     :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-sm']" :key="eventIndex"
                     :style="{ left: `${PERCENTAGE_BY_MINUTES * event.staffingLeft + 2}%`, width: `${PERCENTAGE_BY_MINUTES * event.staffingWidth}%` }">
                   </div>
@@ -46,10 +46,10 @@
             </template>
             <template v-else>
               <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
-                @click="$emit('createEvent', { dayIndex, person })">
+                @click="createEvent({ dayIndex, person })">
                 <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
                   <div :id="event._id" draggable @dragstart="drag(event._id)" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`]"
-                    :key="eventIndex" @click.stop="$emit('editEvent', event._id)">
+                    :key="eventIndex" @click.stop="editEvent(event)">
                     <div class="col-12 event-title">
                       <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">
                         {{eventTitle(event) }}
@@ -189,6 +189,24 @@ export default {
         this.draggedObject = {};
       }
     },
+    createEvent (eventInfo) {
+      if (this.personKey === 'auxiliary') {
+        const can = this.$can({
+          user: this.$store.getters['main/user'],
+          auxiliaryIdEvent: eventInfo.person.id,
+          auxiliarySectorEvent: eventInfo.person.sector,
+          permissions: [
+            { name: 'planning:create:user', rule: 'isInSameSector' },
+            { name: 'planning:create', rule: 'isOwner' }
+          ],
+        });
+        if (!can) return;
+      }
+      this.$emit('createEvent', eventInfo);
+    },
+    editEvent (event) {
+      this.$emit('editEvent', event);
+    }
   },
   watch: {
     mySector (val) {
