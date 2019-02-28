@@ -126,7 +126,6 @@ export default {
     this.getTimelineDays();
     this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek })
     if (!this.isCustomerPlanning) await this.getDistanceMatrix();
-    // this.$q.localStorage.clear();
     if (this.$q.localStorage.has('lastSearch')) {
       const lastSearch = JSON.parse(this.$q.localStorage.get.item('lastSearch'));
       for (let i = 0, l = lastSearch.length; i < l; i++) {
