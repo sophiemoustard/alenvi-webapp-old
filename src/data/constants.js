@@ -87,3 +87,19 @@ export const TRANSPORT_OPTIONS = [
 ];
 export const TRANSIT = 'transit';
 export const DRIVING = 'driving';
+
+// CONTRACTS
+export const OTHER = 'other';
+export const END_CONTRACT_REASONS = [
+  { label: 'Rupture période d’essai employeur', value: 'employer_trial_period_termination' },
+  { label: 'Rupture période d’essai salarié', value: 'employee_trial_period_termination' },
+  { label: 'Démission', value: 'resignation' },
+  { label: 'Licenciement faute grave', value: 'serious_misconduct_layoff' },
+  { label: 'Licenciement faute lourde', value: 'gross_fault_layoff' },
+  { label: 'Licenciement autre motif', value: 'other_reason_layoff' },
+  { label: 'Mutation', value: 'mutation' },
+  { label: 'Rupture conventionnelle', value: 'contractual_termination' },
+  { label: 'Fin de stage', value: 'internship_end' },
+  { label: 'Fin de contrat CDD', value: 'cdd_end' },
+  { label: 'Autres', value: OTHER },
+];
