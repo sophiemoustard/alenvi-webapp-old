@@ -28,7 +28,7 @@
                 <div :class="[!staffingView && 'q-mb-md']">
                   <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person" :events="getPersonEvents(person)" />
                   <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)" :startOfWeek="startOfWeek"
-                    :endOfWorkingWeek="endOfWeek().subtract(2, 'd')" />
+                    :endOfWorkingWeek="endOfWeek().subtract(1, 'd')" :distanceMatrix="distanceMatrix" />
                 </div>
                 <div class="person-name overflow-hidden-nowrap">{{ formatPersonName(person) }}</div>
               </div>
@@ -82,6 +82,7 @@ import ChipsAutocomplete from '../ChipsAutocomplete';
 import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import { planningEventMixin } from '../../mixins/planningEventMixin';
 import PlanningNavigation from './PlanningNavigation.vue';
+import distanceMatrix from '../../api/DistanceMatrix';
 
 export default {
   name: 'PlanningManager',
@@ -106,7 +107,7 @@ export default {
       terms: [],
       loading: false,
       draggedObject: {},
-      startOfWeek: '',
+      startOfWeek: {},
       days: [],
       maxDays: 7,
       INTERVENTION,
@@ -116,14 +117,19 @@ export default {
       staffingView: false,
       PLANNING,
       PERCENTAGE_BY_MINUTES,
+      distanceMatrix: [],
     }
   },
   async mounted () {
     this.startOfWeek = this.$moment().startOf('week');
     this.getTimelineDays();
     this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
+    await this.getDistanceMatrix();
   },
   methods: {
+    async getDistanceMatrix () {
+      this.distanceMatrix = await distanceMatrix.list();
+    },
     // Table
     updateTimeline () {
       this.getTimelineDays();
@@ -164,9 +170,9 @@ export default {
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
     },
     getPersonEvents (person) {
-      return this.events.filter(event =>
-        (event[this.personKey] ? event[this.personKey]._id === person._id : false)
-      );
+      return this.events
+        .filter(event => (event[this.personKey] ? event[this.personKey]._id === person._id : false))
+        .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
     },
     // Drag & drop
     drag (eventId) {

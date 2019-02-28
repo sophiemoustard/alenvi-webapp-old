@@ -295,7 +295,7 @@ import cloudinary from '../../api/Cloudinary.js';
 
 import nationalities from '../../data/nationalities.js';
 import countries from '../../data/countries.js';
-import { AUXILIARY, PLANNING_REFERENT } from '../../data/constants.js';
+import { AUXILIARY, PLANNING_REFERENT, TRANSPORT_OPTIONS } from '../../data/constants.js';
 
 import SelectSector from '../form/SelectSector';
 
@@ -322,11 +322,7 @@ export default {
   },
   data () {
     return {
-      transportOptions: [
-        { label: 'Abonnement transports en commun', value: 'public', ogustValue: 'C' },
-        { label: 'Voiture personnelle', value: 'private', ogustValue: 'V' },
-        { label: 'Aucun', value: 'none', ogustValue: 'P' }
-      ],
+      transportOptions: TRANSPORT_OPTIONS,
       requiredField: 'Champ requis',
       requiredDoc: 'Document requis',
       disablePictureEdition: true,

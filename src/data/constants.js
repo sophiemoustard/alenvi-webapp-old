@@ -76,3 +76,14 @@ export const WEEK_VIEW = 'week';
 export const PLANNING = 'planning';
 export const AGENDA = 'agenda';
 export const PERCENTAGE_BY_MINUTES = 0.136; // ( = 100 / (12 * 60))
+
+// TRANSORT
+export const PUBLIC_TRANSPORT = 'public';
+export const PRIVATE_TRANSPORT = 'private';
+export const TRANSPORT_OPTIONS = [
+  { label: 'Abonnement transports en commun', value: PUBLIC_TRANSPORT, ogustValue: 'C' },
+  { label: 'Voiture personnelle', value: PRIVATE_TRANSPORT, ogustValue: 'V' },
+  { label: 'Aucun', value: 'none', ogustValue: 'P' }
+];
+export const TRANSIT = 'transit';
+export const DRIVING = 'driving';
