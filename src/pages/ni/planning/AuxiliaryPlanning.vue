@@ -26,6 +26,7 @@ import Planning from '../../../components/planning/Planning.vue';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { INTERVENTION, NEVER } from '../../../data/constants';
 import { mapGetters, mapActions } from 'vuex';
+import { NotifyNegative } from '../../../components/popup/notify';
 
 export default {
   name: 'AuxiliaryPlanning',
@@ -57,9 +58,14 @@ export default {
     };
   },
   async mounted () {
-    await this.getCustomers();
-    await this.fillFilter('auxiliaries');
-    this.setInternalHours();
+    try {
+      await this.getCustomers();
+      await this.fillFilter('auxiliaries');
+      this.setInternalHours();
+    } catch (e) {
+      console.error(e);
+      NotifyNegative('Erreur lors de la récupération des personnes');
+    }
   },
   watch: {
     getElemAdded (val) {
