@@ -190,7 +190,7 @@ export default {
       }
     },
     createEvent (eventInfo) {
-      if (this.personkey === 'auxiliary') {
+      if (this.personKey === 'auxiliary') {
         const can = this.$can({
           user: this.$store.getters['main/user'],
           auxiliaryIdEvent: eventInfo.person.id,
