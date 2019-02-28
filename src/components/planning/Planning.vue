@@ -2,7 +2,7 @@
   <div :class="[{ 'planning': !toggleDrawer }]">
     <div class="row items-center planning-header">
       <div class="col-xs-12 col-md-5 planning-search">
-        <ni-chips-autocomplete ref="refFilter" v-model="terms" @remove="removedFilter"
+        <ni-chips-autocomplete ref="refFilter" v-model="terms"
           class="planning-search" />
       </div>
       <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
@@ -96,7 +96,6 @@ export default {
   props: {
     events: { type: Array, default: () => [] },
     persons: { type: Array, default: () => [] },
-    removedFilter: { type: Function, default: () => {} },
     personKey: { type: String, default: 'auxiliary' },
   },
   data () {
@@ -118,9 +117,9 @@ export default {
     }
   },
   beforeDestroy () {
-    this.$q.localStorage.set('lastSearch', JSON.stringify(this.terms));
-    console.log('BEFORE DESTROY');
-    console.log(this.$q.localStorage.get.item('lastSearch'));
+    if (this.getUser.role.name !== 'Auxiliaire') {
+      this.$q.localStorage.set('lastSearch', JSON.stringify(this.terms));
+    }
   },
   async mounted () {
     this.startOfWeek = this.$moment().startOf('week');
@@ -139,13 +138,12 @@ export default {
     // Initial filter getter
     getFilter (val) {
       if (val.length > 0) {
-        // this.$q.localStorage.clear();
-        if (this.$q.localStorage.has('lastSearch') && this.$q.localStorage.get.item('lastSearch').length > 0) {
-          console.log('IN LASTSEARCH');
-          console.log(this.$q.localStorage.get.item('lastSearch'));
-          const lastSearch = JSON.parse(this.$q.localStorage.get.item('lastSearch'));
-          for (let i = 0, l = lastSearch.length; i < l; i++) {
-            setTimeout(() => this.$refs.refFilter.add(lastSearch[i]), 1);
+        if (this.getUser.role.name !== 'Auxiliaire') {
+          if (this.$q.localStorage.has('lastSearch') && this.$q.localStorage.get.item('lastSearch').length > 0) {
+            const lastSearch = JSON.parse(this.$q.localStorage.get.item('lastSearch'));
+            for (let i = 0, l = lastSearch.length; i < l; i++) {
+              setTimeout(() => this.$refs.refFilter.add(lastSearch[i]), 1);
+            }
           }
         } else {
           const userSector = this.getFilter.find(filter => filter.ogustSector === this.getUser.sector);

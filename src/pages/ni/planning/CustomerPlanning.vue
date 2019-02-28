@@ -1,8 +1,7 @@
 <template>
   <q-page class="neutral-background">
     <ni-planning-manager :events="events" :persons="customers" personKey="customer" @updateStartOfWeek="updateStartOfWeek"
-      :selectedFilter="selectedFilter" @editEvent="openEditionModal" @createEvent="openCreationModal" @onDrop="updateEventOnDrop"
-      :removedFilter="removedFilter" />
+      @editEvent="openEditionModal" @createEvent="openCreationModal" @onDrop="updateEventOnDrop" />
 
     <!-- Event creation modal -->
     <q-modal v-if="Object.keys(newEvent).length !== 0 && Object.keys(selectedCustomer.identity).length !== 0" v-model="creationModal"
@@ -88,7 +87,7 @@ import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../componen
 import { INTERVENTION, DEFAULT_AVATAR, NEVER, ABSENCE, INTERNAL_HOUR, ILLNESS, UNAVAILABILITY } from '../../../data/constants';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
-import { mapActions } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
   name: 'CustomerPlanning',
@@ -117,8 +116,15 @@ export default {
   },
   async mounted () {
     await this.getEmployeesBySector();
-    await this.initFilters();
-    this.selectedFilter({ ogustSector: this.getUser.sector });
+    await this.fillFilter('customers');
+  },
+  watch: {
+    getElemAdded (val) {
+      this.handleElemAddedToFilter(val);
+    },
+    getElemRemoved (val) {
+      this.handleElemRemovedFromFilter(val);
+    }
   },
   validations () {
     return {
@@ -170,12 +176,12 @@ export default {
     };
   },
   computed: {
-    getFilter () {
-      return this.$store.getters['planning/getFilter'];
-    },
-    getUser () {
-      return this.$store.getters['main/user'];
-    },
+    ...mapGetters({
+      getUser: 'main/user',
+      getFilter: 'planning/getFilter',
+      getElemAdded: 'planning/getElemAdded',
+      getElemRemoved: 'planning/getElemRemoved'
+    }),
     selectedCustomer () {
       if (this.creationModal && this.newEvent.customer !== '') return this.customers.find(cus => cus._id === this.newEvent.customer);
       if (this.editionModal && this.editedEvent.auxiliary !== '') return this.customers.find(cus => cus._id === this.editedEvent.customer._id);
@@ -196,8 +202,7 @@ export default {
   },
   methods: {
     ...mapActions({
-      addCustomersToFilter: 'planning/addCustomersToFilter',
-      addSectorsToFilter: 'planning/addSectorsToFilter'
+      fillFilter: 'planning/fillFilter',
     }),
     // Dates
     endOfWeek () {
@@ -540,15 +545,6 @@ export default {
         this.loading = false
       }
     },
-    // Filters
-    async initFilters () {
-      try {
-        await this.addCustomersToFilter();
-        await this.addSectorsToFilter();
-      } catch (e) {
-        console.error(e);
-      }
-    },
     async getCustomersBySectors (sectors) {
       return sectors.length === 0 ? [] : this.$customers.showAllBySector({
         startDate: this.startOfWeek.format('YYYYMMDD'),
@@ -556,7 +552,8 @@ export default {
         sector: JSON.stringify(sectors),
       });
     },
-    async selectedFilter (el) {
+    // Filter
+    async handleElemAddedToFilter (el) {
       if (el.ogustSector) {
         this.filteredSectors.push(el.ogustSector);
         const customersBySector = await this.getCustomersBySectors(this.filteredSectors);
@@ -574,7 +571,7 @@ export default {
         }
       }
     },
-    async removedFilter (el) {
+    async handleElemRemovedFromFilter (el) {
       if (el.ogustSector) {
         this.filteredSectors = this.filteredSectors.filter(sec => sec !== el.ogustSector);
         await this.refreshCustomers();

@@ -1,8 +1,7 @@
 <template>
   <q-page class="neutral-background">
     <ni-planning-manager :events="events" :persons="auxiliaries" @updateStartOfWeek="updateStartOfWeek" @createEvent="openCreationModal"
-      @editEvent="openEditionModal" @onDrop="updateEventOnDrop" :selectedFilter="selectedFilter"
-      :removedFilter="removedFilter" />
+      @editEvent="openEditionModal" @onDrop="updateEventOnDrop" />
 
     <!-- Event creation modal -->
     <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
@@ -40,7 +39,6 @@ export default {
   data () {
     return {
       loading: false,
-      selectedSectors: [],
       days: [],
       events: [],
       customers: [],
@@ -60,24 +58,24 @@ export default {
   },
   async mounted () {
     await this.getCustomers();
-    await this.fillFilter();
+    await this.fillFilter('auxiliaries');
     this.setInternalHours();
   },
   watch: {
     getElemAdded (val) {
-      console.log('WATCH GET ELEM ADDED', val);
-      this.selectedFilter(this.getFilter.find(elem => elem.value === val));
+      this.handleElemAddedToFilter(val);
+    },
+    getElemRemoved (val) {
+      this.handleElemRemovedFromFilter(val);
     }
   },
   computed: {
     ...mapGetters({
       getUser: 'main/user',
       getFilter: 'planning/getFilter',
-      getElemAdded: 'planning/getElemAdded'
+      getElemAdded: 'planning/getElemAdded',
+      getElemRemoved: 'planning/getElemRemoved'
     }),
-    getUser () {
-      return this.$store.getters['main/user'];
-    },
     selectedAuxiliary () {
       if (this.creationModal && this.newEvent.auxiliary !== '') return this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
       if (this.editionModal && this.editedEvent.auxiliary !== '') return this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
@@ -98,10 +96,10 @@ export default {
 
       const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
       this.days = Array.from(range.by('days'));
-      if (this.auxiliaries && this.auxiliaries.length) await this.getEvents();
+      if (this.auxiliaries && this.auxiliaries.length) await this.refreshPlanning();
     },
     // Refresh data
-    async getEvents () {
+    async refreshPlanning () {
       try {
         this.events = await this.$events.list({
           startDate: this.startOfWeek.format('YYYYMMDD'),
@@ -145,8 +143,8 @@ export default {
       };
       this.creationModal = true;
     },
-    // Filters
-    selectedFilter (el) {
+    // Filter
+    handleElemAddedToFilter (el) {
       if (el.ogustSector) {
         this.filteredSectors.push(el.ogustSector);
         const auxBySector = this.getFilter.filter(aux => aux.sector === el.ogustSector);
@@ -155,16 +153,16 @@ export default {
             this.auxiliaries.push(auxBySector[i]);
           }
         }
-        this.getEvents();
+        this.refreshPlanning();
       } else {
         if (!this.filteredAuxiliaries.some(aux => aux._id === el._id)) this.filteredAuxiliaries.push(el);
         if (!this.auxiliaries.some(aux => aux._id === el._id)) {
           this.auxiliaries.push(el);
-          this.getEvents();
+          this.refreshPlanning();
         }
       }
     },
-    removedFilter (el) {
+    handleElemRemovedFromFilter (el) {
       if (el.ogustSector) {
         this.filteredSectors.filter(sec => sec !== el.ogustSector);
         this.auxiliaries = this.auxiliaries.filter(auxiliary =>

@@ -5,3 +5,7 @@ export const getFilter = (state) => {
 export const getElemAdded = (state) => {
   return state.elemAdded;
 }
+
+export const getElemRemoved = (state) => {
+  return state.elemRemoved;
+}

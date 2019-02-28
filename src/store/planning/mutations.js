@@ -9,3 +9,7 @@ export const addToFilter = (state, filterData) => {
 export const setElemAdded = (state, elem) => {
   state.elemAdded = elem;
 }
+
+export const setElemRemoved = (state, elem) => {
+  state.elemRemoved = elem;
+}

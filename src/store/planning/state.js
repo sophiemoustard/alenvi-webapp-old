@@ -1,4 +1,5 @@
 export default {
   filter: [],
-  elemAdded: ''
+  elemAdded: '',
+  elemRemoved: ''
 }

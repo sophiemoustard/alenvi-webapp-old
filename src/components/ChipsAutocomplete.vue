@@ -1,5 +1,5 @@
 <template>
-  <q-chips-input ref="refFilter" class="input-search" :value="value" @input="input" @add="addEvent" @remove="removed"
+  <q-chips-input ref="refFilter" class="input-search" :value="value" @input="input" @add="addEvent" @remove="removeEvent"
     :before="searchIcon" chips-bg-color="primary" inverted-light color="white" add-icon="x" autofocus>
     <q-autocomplete ref="refAutocomplete" @search="search" :debounce='0'/>
   </q-chips-input>
@@ -28,15 +28,14 @@ export default {
     }),
   },
   methods: {
-    addEvent (value) {
-      console.log('@add', value);
-      this.$store.commit('planning/setElemAdded', value.val);
+    addEvent (el) {
+      this.$store.commit('planning/setElemAdded', this.getFilter.find(elem => elem.value === el.val));
     },
     input (el) {
       this.$emit('input', el);
     },
-    removed (el) {
-      this.$emit('remove', this.getFilter.find(elem => elem.value === el.value[0]));
+    removeEvent (el) {
+      this.$store.commit('planning/setElemRemoved', this.getFilter.find(elem => elem.value === el.value[0]));
     },
     async search (terms, done) {
       try {
@@ -46,7 +45,7 @@ export default {
         done([]);
       }
     },
-    // q-chips-input method trigger
+    // q-chips-input method trigger called from Planning.vue
     add (value) {
       return this.$refs.refFilter.add(value);
     },
