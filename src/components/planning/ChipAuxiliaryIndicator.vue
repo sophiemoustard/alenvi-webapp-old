@@ -8,7 +8,7 @@
     <!-- Indicators modal -->
     <q-modal v-model="indicatorsModal" content-classes="modal-container-md">
       <div class="row q-mb-md modal-padding">
-        <div class="col-11 row customer-name">
+        <div class="col-11 row person-name">
           <img :src="getAvatar(person.picture)" class="avatar">
           <div>{{ person.identity.firstname }} {{ person.identity.lastname.toUpperCase() }}</div>
         </div>
@@ -52,7 +52,7 @@
         <div class="quality-indicators-item"><span class="highlight">{{ `${Math.round(weeklyTotalTransports)}h` }}</span>
           de transports dont <span class="highlight">{{ `${Math.round(weeklyPaidTransports)}h` }}</span> remunérées</div>
         <div class="quality-indicators-item"><span class="highlight">{{ customersCount }}</span> bénéficiaires
-          accompagnés, <span class="highlight">{{ `${averageTimeByCustomer}h` }}</span> en moyenne</div>
+          accompagnés, <span class="highlight">{{ `${Math.round(averageTimeByCustomer)}h` }}</span> en moyenne</div>
         <div class="quality-indicators-item"><span class="highlight">{{ `${Math.round(weeklyBreak)}h` }}</span> de
           coupure, incluant transport</div>
       </div>
