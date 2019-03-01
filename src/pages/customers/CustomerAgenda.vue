@@ -2,7 +2,7 @@
   <q-page class="neutral-background" :style="{ height: height }">
     <div :class="[{ 'planning': !toggleDrawer, 'full-height' : true }]">
       <div class="row items-center planning-header">
-        <div class="col-xs-12 col-md-5 customer-name" v-if="customer && customer.identity">
+        <div class="col-xs-12 col-md-5 person-name" v-if="customer && customer.identity">
           <img :src="getAvatar()" class="avatar">
           <div>
             {{ customer.identity.title }} {{ customer.identity.lastname.toUpperCase() }}

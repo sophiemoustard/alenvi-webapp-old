@@ -8,7 +8,7 @@
       content-classes="modal-container-md" @hide="resetCreationForm(false)">
       <div class="modal-padding">
         <div class="row q-mb-md">
-          <div class="col-11 row customer-name">
+          <div class="col-11 row person-name">
             <img :src="DEFAULT_AVATAR" class="avatar">
             <div>{{ selectedCustomer.identity.title }} {{ selectedCustomer.identity.lastname.toUpperCase() }}</div>
           </div>
@@ -35,7 +35,7 @@
       content-classes="modal-container-md" @hide="resetEditionForm()">
       <div class="modal-padding">
         <div class="row q-mb-md">
-          <div class="col-11 row customer-name">
+          <div class="col-11 row person-name">
             <img :src="DEFAULT_AVATAR" class="avatar">
             <div>{{ selectedCustomer.identity.title }} {{
               selectedCustomer.identity.lastname.toUpperCase() }}</div>

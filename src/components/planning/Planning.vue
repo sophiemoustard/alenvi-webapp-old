@@ -198,9 +198,7 @@ export default {
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
     },
     getPersonEvents (person) {
-      return this.events
-        .filter(event => (event[this.personKey] ? event[this.personKey]._id === person._id : false))
-        .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+      return this.events.filter(event => (event[this.personKey] ? event[this.personKey]._id === person._id : false));
     },
     // Drag & drop
     drag (eventId) {

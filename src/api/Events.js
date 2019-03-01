@@ -1,12 +1,19 @@
+import qs from 'qs';
 import { alenviAxios } from './ressources/alenviAxios';
 
 export default {
   async list (params = null) {
-    const events = await alenviAxios.get(`${process.env.API_HOSTNAME}/events`, { params });
+    const events = await alenviAxios.get(
+      `${process.env.API_HOSTNAME}/events`,
+      { params, paramsSerializer: params => qs.stringify(params, { indices: false }) }
+    );
     return events.data.data.events;
   },
   async listByCustomerFromSectors (params = null) {
-    const events = await alenviAxios.get(`${process.env.API_HOSTNAME}/events/customers`, { params });
+    const events = await alenviAxios.get(
+      `${process.env.API_HOSTNAME}/events/customers`,
+      { params, paramsSerializer: params => qs.stringify(params, { indices: false }) }
+    );
     return events.data.data;
   },
   async create (data) {
