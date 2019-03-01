@@ -12,7 +12,7 @@
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions table-actions-margin">
                     <q-btn flat round small color="grey" icon="edit" @click.native="startSectorEdition(col.value)" />
-                    <ni-async-disable-btn disable flat round small color="grey" icon="delete" :sector="col.value" @click="deleteSector(col.value, props.row.__index)" />
+                    <ni-async-disable-btn flat round small color="grey" icon="delete" :sector="col.value" @click="deleteSector(col.value, props.row.__index)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
