@@ -141,7 +141,6 @@ export default {
   methods: {
     saveTmp (event) {
       this.tmpInput = event
-      console.log(event);
     },
     async getSectors () {
       try {
