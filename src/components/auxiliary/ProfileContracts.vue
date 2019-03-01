@@ -13,7 +13,7 @@
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
                 <template v-if="col.name === 'contractEmpty'">
                   <div class="row justify-center table-actions">
-                    <q-btn flat round small color="primary" @click="dlTemplate(props.row, props.row.__index, contract.startDate)">
+                    <q-btn flat round small color="primary" @click="dlTemplate(props.row, contract.startDate)">
                       <q-icon name="file download" />
                     </q-btn>
                   </div>
@@ -133,24 +133,31 @@
             <span><q-icon name="clear" @click.native="endContractModal = false" /></span>
           </div>
         </div>
-        <ni-datetime-picker caption="Date de fin de contrat" v-model="endContractData.date" :min="minEndContractDate"
-          inModal requiredField />
+        <ni-datetime-picker caption="Date de notification" v-model="endContract.endNotificationDate" inModal requiredField
+          @blur="$v.endContract.endNotificationDate.$touch" :error="$v.endContract.endNotificationDate.$error" />
+        <ni-datetime-picker caption="Date de fin de contrat" v-model="endContract.endDate" :min="minEndContractDate"
+          inModal requiredField @blur="$v.endContract.endDate.$touch" :error="$v.endContract.endDate.$error" />
+        <ni-modal-select caption="Motif" :options="endContractReasons" v-model="endContract.endReason" requiredField
+          @blur="$v.endContract.endReason.$touch" :error="$v.endContract.endReason.$error" @input="resetOtherMisc" />
+        <ni-modal-input caption="Autres" v-if="endContract.endReason === OTHER" v-model="endContract.otherMisc"
+          requiredField @blur="$v.endContract.otherMisc.$touch" :error="$v.endContract.otherMisc.$error" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Mettre fin au contrat" icon-right="clear" color="primary"
-        :loading="loading" @click="endContract" />
+        :loading="loading" @click="endExistingContract" />
     </q-modal>
   </div>
 </template>
 
 <script>
 import { Cookies } from 'quasar';
-import { required } from 'vuelidate/lib/validators';
+import { required, requiredIf } from 'vuelidate/lib/validators';
 import ModalSelect from '../form/ModalSelect.vue';
 import ModalInput from '../form/ModalInput.vue';
 import DatetimePicker from '../form/DatetimePicker.vue';
-import { NotifyPositive, NotifyNegative } from '../popup/notify';
+import { NotifyPositive, NotifyNegative, NotifyWarning } from '../popup/notify';
 import { downloadDocxFile } from '../../helpers/downloadFile';
 import nationalities from '../../data/nationalities.js';
+import { END_CONTRACT_REASONS, OTHER } from '../../data/constants';
 
 export default {
   name: 'ProfileContracts',
@@ -166,10 +173,14 @@ export default {
       newContractModal: false,
       newContractVersionModal: false,
       endContractModal: false,
-      endContractData: {
-        date: '',
+      endContract: {
+        endDate: '',
+        endNotificationDate: '',
+        endReason: '',
         contract: {},
       },
+      OTHER,
+      endContractReasons: END_CONTRACT_REASONS,
       contracts: [],
       contractSelected: {},
       newContract: {
@@ -251,13 +262,21 @@ export default {
       status: { required },
       weeklyHours: { required },
       startDate: { required },
-      grossHourlyRate: { required }
+      grossHourlyRate: { required },
     },
     newContractVersion: {
       weeklyHours: { required },
       startDate: { required },
-      grossHourlyRate: { required }
-    }
+      grossHourlyRate: { required },
+    },
+    endContract: {
+      endNotificationDate: { required },
+      endDate: { required },
+      endReason: { required },
+      otherMisc: { required: requiredIf((item) => {
+        return item.endReason === OTHER;
+      }) },
+    },
   },
   computed: {
     getUser () {
@@ -293,7 +312,7 @@ export default {
     },
     minEndContractDate () {
       if (this.endContractModal) {
-        const activeVersion = this.getActiveVersion(this.endContractData.contract);
+        const activeVersion = this.getActiveVersion(this.endContract.contract);
         return this.$moment(activeVersion.startDate).add(1, 'day').toISOString();
       }
       return '';
@@ -344,7 +363,7 @@ export default {
         console.error(e);
       }
     },
-    async dlTemplate (contract, index, contractStartDate) {
+    async dlTemplate (contract, contractStartDate) {
       try {
         const monthlyHours = Number.parseFloat(contract.weeklyHours * 4.33).toFixed(1);
         const { identity, contact } = this.getUser
@@ -366,7 +385,7 @@ export default {
           'initialContractStartDate': this.$moment(contractStartDate).format('DD/MM/YYYY'),
         };
         const params = {
-          driveId: index === 0 ? this.getUser.company.rhConfig.templates.contract.driveId : this.getUser.company.rhConfig.templates.amendment.driveId,
+          driveId: contract.__index === 0 ? this.getUser.company.rhConfig.templates.contract.driveId : this.getUser.company.rhConfig.templates.amendment.driveId,
         };
 
         await downloadDocxFile(params, data, 'contrat.docx');
@@ -514,32 +533,40 @@ export default {
       }
     },
     async fillEndContract (contract) {
-      this.endContractData.contract = contract;
+      this.endContract.contract = contract;
       this.endContractModal = true
     },
-    async endContract () {
+    resetOtherMisc () {
+      if (this.endContract.endReason !== OTHER && this.endContract.otherMisc) {
+        delete this.endContract.otherMisc;
+        this.$v.endContract.otherMisc.$reset();
+      }
+    },
+    async endExistingContract () {
       try {
+        this.$v.endContract.$touch();
+        if (this.$v.endContract.$error) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
-        const ogustVersionId = this.endContractData.contract.versions.find(version => version.isActive).ogustContractId;
+        const ogustVersionId = this.endContract.contract.versions.find(version => version.isActive).ogustContractId;
         const payload = {
           status: 'T',
-          end_date: this.$moment(this.endContractData.date).format('YYYYMMDD')
+          end_date: this.$moment(this.endContract.endDate).format('YYYYMMDD')
         };
         await this.$ogust.endContract(ogustVersionId, payload);
         const queries = {
           userId: this.getUser._id,
-          contractId: this.endContractData.contract._id,
+          contractId: this.endContract.contract._id,
         };
-        await this.$users.endContract(queries, { endDate: this.endContractData.date });
+        await this.$users.endContract(queries, this.$_.omit(this.endContract, ['contract']));
         await this.refreshContracts();
+        this.endContractModal = false;
+        this.endContract = {};
         NotifyPositive('Contrat terminé');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la mise à jour du contrat');
       } finally {
         this.loading = false;
-        this.endContractModal = false;
-        this.endContractData = {};
       }
     }
   }
