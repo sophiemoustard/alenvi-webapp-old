@@ -312,7 +312,7 @@ export default {
   /deep/ .q-tab:hover:before
     background: none;
 
-  /deep/ .q-ripple-containter
+  /deep/ .q-ripple-container
     display: none;
 
 </style>
