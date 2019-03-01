@@ -139,7 +139,7 @@ export default {
         location: {},
         attachment: {},
         auxiliary: person._id,
-        sector: person.sector,
+        sector: person.sector._id,
         dates: {
           startDate: selectedDay.toISOString(),
           startHour: '08:00',
@@ -151,9 +151,9 @@ export default {
     },
     // Filter
     handleElemAddedToFilter (el) {
-      if (el.ogustSector) {
-        this.filteredSectors.push(el.ogustSector);
-        const auxBySector = this.getFilter.filter(aux => aux.sector === el.ogustSector);
+      if (el.sector) {
+        this.filteredSectors.push(el.sector);
+        const auxBySector = this.getFilter.filter(aux => aux.sector._id === el.sector);
         for (let i = 0, l = auxBySector.length; i < l; i++) {
           if (!this.auxiliaries.some(aux => auxBySector[i]._id === aux._id)) {
             this.auxiliaries.push(auxBySector[i]);
@@ -169,10 +169,10 @@ export default {
       }
     },
     handleElemRemovedFromFilter (el) {
-      if (el.ogustSector) {
-        this.filteredSectors.filter(sec => sec !== el.ogustSector);
+      if (el.sector) {
+        this.filteredSectors.filter(sec => sec !== el.sector);
         this.auxiliaries = this.auxiliaries.filter(auxiliary =>
-          auxiliary.sector.name !== el.sector || this.filteredAuxiliaries.some(filteredAux => filteredAux._id === auxiliary._id)
+          auxiliary.sector._id !== el.sector || this.filteredAuxiliaries.some(filteredAux => filteredAux._id === auxiliary._id)
         );
       } else {
         this.filteredAuxiliaries = this.filteredAuxiliaries.filter(auxiliary => auxiliary._id !== el._id);

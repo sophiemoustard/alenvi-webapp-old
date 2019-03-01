@@ -84,7 +84,7 @@
 import Planning from '../../../components/planning/Planning.vue';
 import { planningModalMixin } from '../../../mixins/planningModalMixin';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify.js';
-import { INTERVENTION, DEFAULT_AVATAR, NEVER, ABSENCE, INTERNAL_HOUR, ILLNESS, UNAVAILABILITY } from '../../../data/constants';
+import { INTERVENTION, DEFAULT_AVATAR, NEVER, ABSENCE, INTERNAL_HOUR, ILLNESS, UNAVAILABILITY, AUXILIARY, PLANNING_REFERENT } from '../../../data/constants';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
 import { mapGetters, mapActions } from 'vuex';
@@ -257,13 +257,13 @@ export default {
       }
     },
     async getEmployeesBySector () {
-      this.auxiliaries = await this.$users.showAllActive({ role: 'Auxiliaire' });
+      this.auxiliaries = await this.$users.showAllActive({ role: [AUXILIARY, PLANNING_REFERENT] });
     },
     // Event creation
     setSector (auxiliaryId) {
       const auxiliary = this.auxiliaries.find(aux => aux._id === auxiliaryId);
-      if (this.creationModal) this.newEvent.sector = auxiliary.sector;
-      if (this.editionModal) this.editedEvent.sector = auxiliary.sector;
+      if (this.creationModal) this.newEvent.sector = auxiliary.sector._id;
+      if (this.editionModal) this.editedEvent.sector = auxiliary.sector._id;
     },
     openCreationModal (vEvent) {
       const { dayIndex, person } = vEvent;
@@ -558,8 +558,8 @@ export default {
     },
     // Filter
     async handleElemAddedToFilter (el) {
-      if (el.ogustSector) {
-        this.filteredSectors.push(el.ogustSector);
+      if (el.sector) {
+        this.filteredSectors.push(el.sector);
         const customersBySector = await this.getCustomersBySectors(this.filteredSectors);
         for (let i = 0, l = customersBySector.length; i < l; i++) {
           if (!this.customers.some(cus => customersBySector[i]._id === cus._id)) {
@@ -576,8 +576,8 @@ export default {
       }
     },
     async handleElemRemovedFromFilter (el) {
-      if (el.ogustSector) {
-        this.filteredSectors = this.filteredSectors.filter(sec => sec !== el.ogustSector);
+      if (el.sector) {
+        this.filteredSectors = this.filteredSectors.filter(sec => sec !== el.sector);
         await this.refreshCustomers();
         await this.refreshPlanning();
       } else {

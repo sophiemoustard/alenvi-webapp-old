@@ -123,6 +123,7 @@ export default {
   async mounted () {
     this.startOfWeek = this.$moment().startOf('week');
     this.getTimelineDays();
+    console.log('getUser', this.getUser);
     this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
     if (!this.isCustomerPlanning) await this.getDistanceMatrix();
   },
@@ -138,7 +139,8 @@ export default {
             }
           }
         } else {
-          const userSector = this.getFilter.find(filter => filter.ogustSector === this.getUser.sector);
+          console.log('MEH');
+          const userSector = this.getFilter.find(filter => filter.sector === this.getUser.sector);
           if (userSector) {
             this.$refs.refFilter.add(userSector.label);
           }
@@ -222,7 +224,7 @@ export default {
         const can = this.$can({
           user: this.$store.getters['main/user'],
           auxiliaryIdEvent: eventInfo.person.id,
-          auxiliarySectorEvent: eventInfo.person.sector,
+          auxiliarySectorEvent: eventInfo.person.sector._id,
           permissions: [
             { name: 'planning:create:user', rule: 'isInSameSector' },
             { name: 'planning:create', rule: 'isOwner' }
