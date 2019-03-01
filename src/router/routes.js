@@ -146,7 +146,7 @@ const routes = [
       },
       {
         path: 'ni/planning/auxiliaries',
-        name: 'auxiliaries plannning',
+        name: 'auxiliaries planning',
         component: () => import('pages/ni/planning/AuxiliaryPlanning'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],

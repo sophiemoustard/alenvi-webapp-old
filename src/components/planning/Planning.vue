@@ -117,7 +117,11 @@ export default {
   },
   beforeDestroy () {
     if (!AUXILIARY_ROLES.includes(this.getUser.role.name)) {
-      this.$q.localStorage.set('lastSearch', JSON.stringify(this.terms));
+      if (!this.isCustomerPlanning) {
+        this.$q.localStorage.set('lastSearchAuxiliaries', JSON.stringify(this.terms));
+      } else {
+        this.$q.localStorage.set('lastSearchCustomers', JSON.stringify(this.terms));
+      }
     }
   },
   async mounted () {
@@ -131,11 +135,11 @@ export default {
     getFilter (val) {
       if (val.length > 0) {
         if (!AUXILIARY_ROLES.includes(this.getUser.role.name)) {
-          if (this.$q.localStorage.has('lastSearch') && this.$q.localStorage.get.item('lastSearch').length > 0) {
-            const lastSearch = JSON.parse(this.$q.localStorage.get.item('lastSearch'));
-            for (let i = 0, l = lastSearch.length; i < l; i++) {
-              setTimeout(() => this.$refs.refFilter.add(lastSearch[i]), 1);
-            }
+          if (!this.isCustomerPlanning) {
+            console.log('auxiliaries');
+            this.addSavedTerms('Auxiliaries');
+          } else {
+            this.addSavedTerms('Customers');
           }
         } else {
           const userSector = this.getFilter.find(filter => filter.ogustSector === this.getUser.sector);
@@ -234,7 +238,15 @@ export default {
     },
     editEvent (event) {
       this.$emit('editEvent', event);
-    }
+    },
+    addSavedTerms (endPath) {
+      if (this.$q.localStorage.has(`lastSearch${endPath}`) && this.$q.localStorage.get.item(`lastSearch${endPath}`).length > 0) {
+        const lastSearch = JSON.parse(this.$q.localStorage.get.item(`lastSearch${endPath}`));
+        for (let i = 0, l = lastSearch.length; i < l; i++) {
+          setTimeout(() => this.$refs.refFilter.add(lastSearch[i]), 1);
+        }
+      }
+    },
   },
 }
 </script>
