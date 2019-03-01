@@ -42,14 +42,14 @@
 export default {
   name: 'AuxiliaryIndicators',
   props: {
-    totalWorkingHours: { type: Number, defult: 0 },
-    weeklyInterventions: { type: Number, defult: 0 },
-    weeklyInternalHours: { type: Number, defult: 0 },
-    weeklyPaidTransports: { type: Number, defult: 0 },
-    weeklyTotalTransports: { type: Number, defult: 0 },
-    customersCount: { type: Number, defult: 0 },
-    averageTimeByCustomer: { type: Number, defult: 0 },
-    weeklyBreak: { type: Number, defult: 0 },
+    totalWorkingHours: { type: Number, default: 0 },
+    weeklyInterventions: { type: Number, default: 0 },
+    weeklyInternalHours: { type: Number, default: 0 },
+    weeklyPaidTransports: { type: Number, default: 0 },
+    weeklyTotalTransports: { type: Number, default: 0 },
+    customersCount: { type: Number, default: 0 },
+    averageTimeByCustomer: { type: Number, default: 0 },
+    weeklyBreak: { type: Number, default: 0 },
   },
   computed: {
     weeklyInternalHoursPercentage () {

@@ -169,14 +169,15 @@ export default {
       const breakInfo = [];
       for (const day of this.days) {
         const eventsOnDay = this.getEventsOnDay(day);
-        if (eventsOnDay.length < 1) continue;
+        const eventsOnDayCount = eventsOnDay.length;
+        if (eventsOnDayCount < 1) continue;
 
         const firstTransportInfo = await this.getFirstTransportInfo(eventsOnDay[0]);
         if (firstTransportInfo) breakInfo.push(firstTransportInfo);
-        const lastTransportInfo = await this.getLastTransportInfo(eventsOnDay[eventsOnDay.length - 1]);
+        const lastTransportInfo = await this.getLastTransportInfo(eventsOnDay[eventsOnDayCount - 1]);
         if (lastTransportInfo) breakInfo.push(lastTransportInfo);
 
-        for (let i = 0; i < eventsOnDay.length - 1; i++) {
+        for (let i = 0; i < eventsOnDayCount - 1; i++) {
           const transportInfo = await this.getBreakInfoBetweenTwoEvents(eventsOnDay[i], eventsOnDay[i + 1]);
           if (transportInfo) breakInfo.push(transportInfo);
         }
