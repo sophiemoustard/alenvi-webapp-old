@@ -136,7 +136,6 @@ export default {
       if (val.length > 0) {
         if (!AUXILIARY_ROLES.includes(this.getUser.role.name)) {
           if (!this.isCustomerPlanning) {
-            console.log('auxiliaries');
             this.addSavedTerms('Auxiliaries');
           } else {
             this.addSavedTerms('Customers');
