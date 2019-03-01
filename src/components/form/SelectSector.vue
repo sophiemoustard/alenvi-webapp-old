@@ -1,10 +1,9 @@
 <template>
   <q-select :value="value" color="white" :error="myError" inverted-light :stack-label="stackLabel" ref="selectSector" @change="updateSector"
-    :options="orderedSectors" @blur="blurHandler" @focus="focusHandler" filter filter-placeholder="Rechercher" separator :class="{border: inModal}" :company-id="companyId" />
+    :options="sectors" @blur="blurHandler" @focus="focusHandler" filter filter-placeholder="Rechercher" separator :class="{border: inModal}" :company-id="companyId" />
 </template>
 
 <script>
-import _ from 'lodash';
 
 export default {
   name: 'SelectSector',
@@ -24,9 +23,6 @@ export default {
     await this.getSectors();
   },
   computed: {
-    orderedSectors () {
-      return _.sortBy(this.sectors, ['label']);
-    },
     currentUser () {
       return this.$store.getters['main/user'];
     }
@@ -35,7 +31,7 @@ export default {
     async getSectors () {
       try {
         const sectors = await this.$sectors.showAll({ company: this.currentUser.company._id });
-        this.sectors = sectors.map(sector => ({ label: sector.name, value: sector._id }));
+        this.sectors = this.$_.sortBy(sectors.map(sector => ({ label: sector.name, value: sector._id })), ['label']);
       } catch (e) {
         console.error(e);
       }

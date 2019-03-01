@@ -69,7 +69,7 @@
               <q-icon v-if="$v.newUser.sector.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newUser.sector.$error" error-label="Champ requis">
-              <ni-select-sector v-model="newUser.sector" @blur="$v.newUser.sector.$touch" inModal :company-id="company._id" />
+              <ni-select-sector v-model="newUser.sector" @blur="$v.newUser.sector.$touch" in-modal :company-id="company._id" />
             </q-field>
           </div>
         </div>

@@ -52,9 +52,9 @@
             <span><q-icon name="clear" @click.native="sectorEditionModal = false" /></span>
           </div>
         </div>
-        <ni-modal-input caption="Nom" v-model="editedSector.name" :error="$v.editedSector.name.$error" :errorLabel="nameError($v.editedSector)" @focus="saveTmp(editedSector.name)" @blur="$v.editedSector.name.$touch" />
+        <ni-modal-input ref="modalInput" caption="Nom" v-model="editedSector.name" :error="$v.editedSector.name.$error" :errorLabel="nameError($v.editedSector)" />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Editer l'équipe" icon-right="add" color="primary" :loading="loading" @click="updateSector" />
+      <q-btn no-caps class="full-width modal-btn" label="Editer l'équipe" icon-right="add" color="primary" :disable="isSameThanEditedSector" :loading="loading" @click="updateSector" />
     </q-modal>
   </q-page>
 </template>
@@ -104,24 +104,12 @@ export default {
       editedSector: { name: '' }
     };
   },
-  validations () {
-    if (this.isSameThanEditedSector) {
-      return {
-        newSector: {
-          name: { required, sector }
-        },
-        editedSector: {
-          name: { required }
-        }
-      }
-    }
-    return {
-      newSector: {
-        name: { required, sector }
-      },
-      editedSector: {
-        name: { required, sector }
-      }
+  validations: {
+    newSector: {
+      name: { required, sector }
+    },
+    editedSector: {
+      name: { required, sector }
     }
   },
   computed: {
@@ -152,7 +140,8 @@ export default {
     },
     async createNewSector () {
       try {
-        if (this.$v.newSector.$error) return NotifyWarning('Champ(s) invalide(s)');
+        const isValid = await this.waitForSectorValidation(this.$v.newSector);
+        if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
         this.newSector.company = this.company._id;
         await this.$sectors.create(this.newSector);
@@ -174,11 +163,13 @@ export default {
     startSectorEdition (id) {
       const selectedSector = this.sectors.find(sector => sector._id === id);
       this.editedSector = { _id: selectedSector._id, name: selectedSector.name };
+      this.tmpInput = this.editedSector.name;
       this.sectorEditionModal = true;
     },
     async updateSector () {
       try {
-        if (this.$v.editedSector.$error) return NotifyWarning('Champ(s) invalide(s)');
+        const isValid = await this.waitForSectorValidation(this.$v.editedSector);
+        if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
         await this.$sectors.updateById(this.editedSector._id, { name: this.editedSector.name });
         NotifyPositive('Equipe modifiée.');
@@ -195,6 +186,19 @@ export default {
       this.sectorEditionModal = false;
       this.editedSector = { name: '' };
       this.$v.editedSector.$reset();
+    },
+    async waitForSectorValidation (validationObj) {
+      return new Promise((resolve) => {
+        const unwatch = this.$watch(() => !validationObj.$pending, (notPending) => {
+          if (notPending) {
+            if (unwatch) {
+              unwatch();
+            }
+            validationObj.$touch();
+            resolve(!validationObj.$error);
+          }
+        }, { immediate: true });
+      })
     },
     async deleteSector (sectorId, cell) {
       try {

@@ -123,7 +123,6 @@ export default {
   async mounted () {
     this.startOfWeek = this.$moment().startOf('week');
     this.getTimelineDays();
-    console.log('getUser', this.getUser);
     this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
     if (!this.isCustomerPlanning) await this.getDistanceMatrix();
   },
@@ -139,7 +138,6 @@ export default {
             }
           }
         } else {
-          console.log('MEH');
           const userSector = this.getFilter.find(filter => filter.sector === this.getUser.sector);
           if (userSector) {
             this.$refs.refFilter.add(userSector.label);
