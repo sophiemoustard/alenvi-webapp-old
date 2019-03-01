@@ -93,31 +93,28 @@ export default {
     },
   },
   async mounted () {
-    await this.getBreakInfo();
-    this.computeIndicatorsFromEvents();
     await this.getRatio();
-    await this.getMonthEvents();
   },
   watch: {
     async selectedEvents () {
-      await this.getBreakInfo();
-      this.computeIndicatorsFromEvents();
+      await this.computeIndicators();
     },
     async events () {
       this.selectedTab = WEEK_STATS;
-      await this.getBreakInfo();
-      this.computeIndicatorsFromEvents();
       await this.getRatio();
-    },
-    breakInfo () {
-      this.computeIndicatorsFromBreakInfo();
     },
   },
   methods: {
     getAvatar (picture) {
       return (!picture || !picture.link) ? DEFAULT_AVATAR : picture.link;
     },
+    async computeIndicators () {
+      await this.computeBreakInfo();
+      this.computeIndicatorsFromBreakInfo();
+      this.computeIndicatorsFromEvents();
+    },
     async getRatio () {
+      await this.computeIndicators();
       this.ratio = { weeklyHours: Math.round(this.totalWorkingHours), contractHours: this.getContractHours() };
     },
     async openIndicatorsModal () {
@@ -168,7 +165,7 @@ export default {
       this.averageTimeByCustomer = this.customersCount === 0 ? 0
         : Object.values(hoursByCustomer).reduce((acc, hours) => acc + hours, 0) / 60 / this.customersCount;
     },
-    async getBreakInfo () {
+    async computeBreakInfo () {
       const breakInfo = [];
       for (const day of this.days) {
         const eventsOnDay = this.getEventsOnDay(day);
