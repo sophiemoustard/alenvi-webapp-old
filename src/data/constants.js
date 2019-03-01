@@ -77,6 +77,9 @@ export const PLANNING = 'planning';
 export const AGENDA = 'agenda';
 export const PERCENTAGE_BY_MINUTES = 0.136; // ( = 100 / (12 * 60))
 
+// INDICATORS
+export const WEEK_STATS = 'week_stats';
+
 // TRANSORT
 export const PUBLIC_TRANSPORT = 'public';
 export const PRIVATE_TRANSPORT = 'private';

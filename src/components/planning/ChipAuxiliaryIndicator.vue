@@ -1,8 +1,8 @@
 <template>
-  <div class="full-width row relative-position chip-container" @click="indicatorsModal = true">
+  <div class="full-width row relative-position chip-container" @click="openIndicatorsModal">
     <img :src="getAvatar(person.picture)" class="avatar">
     <q-chip :class="['absolute-center', { 'busy': isBusy }]" small text-color="white">
-      <span class="chip-indicator">{{ indicators.weeklyHours }}h / {{ indicators.contractHours }}</span>
+      <span class="chip-indicator">{{ ratio.weeklyHours }}h / {{ ratio.contractHours }}</span>
     </q-chip>
 
     <!-- Indicators modal -->
@@ -17,55 +17,30 @@
             <q-icon name="clear" @click.native="indicatorsModal = false" /></span>
         </div>
       </div>
-      <q-tabs align="justify" color="transparent" text-color="primary">
+      <q-tabs align="justify" color="transparent" text-color="primary" v-model="selectedTab">
         <q-tab class="col-6" v-for="(tab, index) in tabsContent" :key="index" slot="title" :label="tab.label" :default="tab.default"
-          :name="tab.name" :disable="tab.disable" />
-        <q-tab-pane class="no-border economic-indicators" key="week_stats" name="week_stats">
-          <p style="font-weight:bold">Heures travaillées</p>
-          <div class="progress-indicator">
-            <q-progress :percentage="Math.round(weeklyInterventionsPercentage)" class="intervention" />
-            <div class="progress-caption">
-              <div>Interventions</div>
-              <div> {{ `${Math.round(this.weeklyInterventions)}h` }} -
-                {{`${Math.round(weeklyInterventionsPercentage)}%`}}</div>
-            </div>
-          </div>
-          <div class="progress-indicator">
-            <q-progress :percentage="Math.round(weeklyInternalHoursPercentage)" class="internal-hours" />
-            <div class="progress-caption">
-              <div>Interne</div>
-              <div>{{ `${Math.round(this.weeklyInternalHours)}h` }} -
-                {{`${Math.round(weeklyInternalHoursPercentage)}%`}} </div>
-            </div>
-          </div>
-          <div class="progress-indicator">
-            <q-progress :percentage="Math.round(weeklyPaidTransportsPercentage)" class="transports" />
-            <div class="progress-caption">
-              <div>Transports</div>
-              <div>{{ `${Math.round(this.weeklyPaidTransports)}h` }} -
-                {{`${Math.round(weeklyPaidTransportsPercentage)}%`}}</div>
-            </div>
-          </div>
+          :name="tab.name" />
+        <q-tab-pane class="no-border" v-for="(tab, index) in tabsContent" :key="index" :name="tab.name">
+          <ni-auxiliary-indicators :totalWorkingHours="totalWorkingHours" :weeklyInterventions="weeklyInterventions"
+            :weeklyInternalHours="weeklyInternalHours" :weeklyPaidTransports="weeklyPaidTransports"
+            :weeklyTotalTransports="weeklyTotalTransports" :customersCount="customersCount" :averageTimeByCustomer="averageTimeByCustomer"
+            :weeklyBreak="weeklyBreak" />
         </q-tab-pane>
       </q-tabs>
-      <div class="quality-indicators">
-        <div class="quality-indicators-item"><span class="highlight">{{ `${Math.round(weeklyTotalTransports)}h` }}</span>
-          de transports dont <span class="highlight">{{ `${Math.round(weeklyPaidTransports)}h` }}</span> remunérées</div>
-        <div class="quality-indicators-item"><span class="highlight">{{ customersCount }}</span> bénéficiaires
-          accompagnés, <span class="highlight">{{ `${Math.round(averageTimeByCustomer)}h` }}</span> en moyenne</div>
-        <div class="quality-indicators-item"><span class="highlight">{{ `${Math.round(weeklyBreak)}h` }}</span> de
-          coupure, incluant transport</div>
-      </div>
     </q-modal>
   </div>
 </template>
 
 <script>
-import { DEFAULT_AVATAR, ABSENCE, INTERVENTION, INTERNAL_HOUR, TRANSIT, DRIVING, PUBLIC_TRANSPORT } from '../../data/constants.js';
+import AuxiliaryIndicators from '../AuxiliaryIndicators';
+import { DEFAULT_AVATAR, ABSENCE, INTERVENTION, INTERNAL_HOUR, TRANSIT, DRIVING, PUBLIC_TRANSPORT, WEEK_STATS } from '../../data/constants.js';
 import googleMaps from '../../api/GoogleMaps';
 
 export default {
   name: 'ChipAuxiliaryIndicator',
+  components: {
+    'ni-auxiliary-indicators': AuxiliaryIndicators,
+  },
   props: {
     person: { type: Object, default: () => ({ picture: { link: '' }, administrative: {} }) },
     events: { type: Array, default: () => [] },
@@ -75,10 +50,10 @@ export default {
   },
   data () {
     return {
-      indicators: { weeklyHours: 0, contractHours: 0 },
+      ratio: { weeklyHours: 0, contractHours: 0 },
       indicatorsModal: false,
       tabsContent: [
-        { label: 'Stats de la semaine', default: true, name: 'week_stats', disable: false },
+        { label: 'Stats de la semaine', default: true, name: WEEK_STATS, disable: false },
         { label: 'Stats du mois', default: false, name: 'month_stat', disable: true },
       ],
       breakInfo: [],
@@ -89,44 +64,50 @@ export default {
       weeklyBreak: 0,
       customersCount: 0,
       averageTimeByCustomer: 0,
+      selectedTab: WEEK_STATS,
+      monthEvents: [],
     };
   },
   computed: {
     isBusy () {
-      return this.indicators.contractHours !== 0 && this.indicators.weeklyHours > this.indicators.contractHours;
+      return this.ratio.contractHours !== 0 && this.ratio.weeklyHours > this.ratio.contractHours;
     },
     days () {
-      const range = this.$moment.range(this.startOfWeek, this.endOfWorkingWeek);
+      let range;
+      if (this.selectedTab === WEEK_STATS) range = this.$moment.range(this.startOfWeek, this.endOfWorkingWeek);
+      else {
+        const start = this.$moment(this.startOfWeek).startOf('month');
+        const end = this.$moment(this.startOfWeek).endOf('month');
+        range = this.$moment.range(start, end);
+      }
       return Array.from(range.by('days'));
-    },
-    weeklyHours () {
-      return Math.round(this.weeklyInternalHours + this.weeklyInterventions + this.weeklyPaidTransports);
     },
     totalWorkingHours () {
       return this.weeklyInternalHours + this.weeklyInterventions + this.weeklyPaidTransports;
     },
-    weeklyInternalHoursPercentage () {
-      if (this.totalWorkingHours === 0) return 0;
-      return this.weeklyInternalHours / this.totalWorkingHours * 100;
-    },
-    weeklyInterventionsPercentage () {
-      if (this.totalWorkingHours === 0) return 0;
-      return this.weeklyInterventions / this.totalWorkingHours * 100;
-    },
-    weeklyPaidTransportsPercentage () {
-      if (this.totalWorkingHours === 0) return 0;
-      return this.weeklyPaidTransports / this.totalWorkingHours * 100;
-    },
     transportMode () {
       return this.person.administrative.transportInvoice.transportType === PUBLIC_TRANSPORT ? TRANSIT : DRIVING;
     },
+    selectedEvents () {
+      return this.selectedTab === WEEK_STATS ? this.events : this.monthEvents;
+    },
   },
   async mounted () {
-    await this.getIndicators();
+    await this.getBreakInfo();
+    this.computeIndicatorsFromEvents();
+    await this.getRatio();
+    await this.getMonthEvents();
   },
   watch: {
+    async selectedEvents () {
+      await this.getBreakInfo();
+      this.computeIndicatorsFromEvents();
+    },
     async events () {
-      await this.getIndicators();
+      this.selectedTab = WEEK_STATS;
+      await this.getBreakInfo();
+      this.computeIndicatorsFromEvents();
+      await this.getRatio();
     },
     breakInfo () {
       this.computeIndicatorsFromBreakInfo();
@@ -136,10 +117,21 @@ export default {
     getAvatar (picture) {
       return (!picture || !picture.link) ? DEFAULT_AVATAR : picture.link;
     },
-    async getIndicators () {
-      await this.getBreakInfo();
-      this.computeIndicatorsFromEvents();
-      this.indicators = { weeklyHours: this.weeklyHours, contractHours: this.getContractHours() };
+    async getRatio () {
+      this.ratio = { weeklyHours: Math.round(this.totalWorkingHours), contractHours: this.getContractHours() };
+    },
+    async openIndicatorsModal () {
+      try {
+        this.monthEvents = await this.$events.list({
+          startDate: this.$moment(this.startOfWeek).startOf('month').format('YYYYMMDD'),
+          endDate: this.$moment(this.startOfWeek).endOf('month').add(1, 'd').format('YYYYMMDD'),
+          auxiliary: this.person._id,
+        });
+      } catch (e) {
+        this.monthEvents = [];
+      } finally {
+        this.indicatorsModal = true;
+      }
     },
     // Compute indicators
     computeIndicatorsFromBreakInfo () {
@@ -160,7 +152,7 @@ export default {
       let weeklyInternalHours = 0;
       let weeklyInterventions = 0;
       let hoursByCustomer = {}
-      for (const event of this.events) {
+      for (const event of this.selectedEvents) {
         if (event.type === INTERNAL_HOUR) weeklyInternalHours += this.$moment(event.endDate).diff(event.startDate, 'm', true);
         if (event.type === INTERVENTION) {
           weeklyInterventions += this.$moment(event.endDate).diff(event.startDate, 'm', true);
@@ -180,7 +172,7 @@ export default {
       const breakInfo = [];
       for (const day of this.days) {
         const eventsOnDay = this.getEventsOnDay(day);
-        if (eventsOnDay.length <= 1) continue;
+        if (eventsOnDay.length < 1) continue;
 
         const firstTransportInfo = await this.getFirstTransportInfo(eventsOnDay[0]);
         if (firstTransportInfo) breakInfo.push(firstTransportInfo);
@@ -229,7 +221,7 @@ export default {
       return distanceMatrix && distanceMatrix.duration ? Math.round(distanceMatrix.duration / 60) : 0;
     },
     getEventsOnDay (day) {
-      return this.events
+      return this.selectedEvents
         .filter(event => day.isSameOrAfter(event.startDate, 'd') && day.isSameOrBefore(event.endDate, 'd') &&
           [INTERVENTION, INTERNAL_HOUR].includes(event.type))
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
@@ -304,60 +296,8 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables'
 
-  .progress-indicator
-    padding: 3px
-    border-top: 1px solid $light-grey;
-    border-left: 1px solid $light-grey;
-    border-right: 1px solid $light-grey;
-    &:last-child
-      border-bottom: 1px solid $light-grey;
-
-  .progress-caption
-    display: flex;
-    justify-content: space-between;
-
-  .highlight
-    color: $primary
-    font-weight: bold
-
-  .economic-indicators
-    padding: 0 24px;
-    margin: 24px 0;
-    border-left: 5px solid $primary-dark !important;
-
-  .quality-indicators
-    padding: 0 24px;
-    margin-bottom: 24px;
-    border-left: 5px solid $primary !important;
-
-  .quality-indicators-item
-    border-top: 1px solid $light-grey;
-    padding: 10px 0;
-
-  /deep/.q-progress
-    height: 10px !important;
-
-    /deep/ .q-progress-track
-      background: repeating-linear-gradient(
-        45deg,
-        $grey-3,
-        $grey-3 1px,
-        $white 1px,
-        $white 3px
-      )
-      opacity: 0.8;
-
-    &.intervention
-      /deep/ .q-progress-model
-        color: $light-pink;
-
-    &.internal-hours
-      /deep/ .q-progress-model
-        color: $light-purple;
-
-    &.transports
-      /deep/ .q-progress-model
-        color: $primary-dark;
+  .q-tab-pane
+    padding: 0;
 
   /deep/ .q-tabs-head
     margin: 0px 24px;
@@ -370,5 +310,11 @@ export default {
 
   /deep/ .q-tabs-position-top > .q-tabs-head .q-tabs-bar
     width: 90%;
+
+  /deep/ .q-tab:hover:before
+    background: none;
+
+  /deep/ .q-ripple-containter
+    display: none;
 
 </style>
