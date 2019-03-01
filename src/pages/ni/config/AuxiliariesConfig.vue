@@ -140,7 +140,7 @@ export default {
     },
     async createNewSector () {
       try {
-        const isValid = await this.waitForSectorValidation(this.$v.newSector);
+        const isValid = await this.waitForSectorValidation(this.$v.newSector.name);
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
         this.newSector.company = this.company._id;
@@ -168,7 +168,7 @@ export default {
     },
     async updateSector () {
       try {
-        const isValid = await this.waitForSectorValidation(this.$v.editedSector);
+        const isValid = await this.waitForSectorValidation(this.$v.editedSector.name);
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
         await this.$sectors.updateById(this.editedSector._id, { name: this.editedSector.name });
