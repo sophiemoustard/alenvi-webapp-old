@@ -36,7 +36,7 @@
             <span><q-icon name="clear" @click.native="sectorCreationModal = false" /></span>
           </div>
         </div>
-        <ni-modal-input caption="Nom" v-model="newSector.name" :error="$v.newSector.name.$error" @blur="$v.newSector.name.$touch" />
+        <ni-modal-input caption="Nom" v-model="newSector.name" :error="$v.newSector.name.$error" :errorLabel="nameError($v.newSector)" @blur="$v.newSector.name.$touch" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter une équipe" icon-right="add" color="primary" :loading="loading" @click="createNewSector" />
     </q-modal>
@@ -52,7 +52,7 @@
             <span><q-icon name="clear" @click.native="sectorEditionModal = false" /></span>
           </div>
         </div>
-        <ni-modal-input caption="Nom" v-model="editedSector.name" :error="$v.editedSector.name.$error" @blur="$v.editedSector.name.$touch" />
+        <ni-modal-input caption="Nom" v-model="editedSector.name" :error="$v.editedSector.name.$error" :errorLabel="nameError($v.editedSector)" @focus="saveTmp(editedSector.name)" @blur="$v.editedSector.name.$touch" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Editer l'équipe" icon-right="add" color="primary" :loading="loading" @click="updateSector" />
     </q-modal>
@@ -61,6 +61,7 @@
 
 <script>
 import { required } from 'vuelidate/lib/validators';
+import { sector } from '../../../helpers/vuelidateCustomVal.js';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '../../../components/popup/notify';
 import ModalInput from '../../../components/form/ModalInput.vue';
 import ModalSelect from '../../../components/form/ModalSelect.vue';
@@ -75,6 +76,7 @@ export default {
   },
   data () {
     return {
+      tmpInput: '',
       loading: false,
       sectors: [],
       sectorsColumns: [
@@ -102,12 +104,24 @@ export default {
       editedSector: { name: '' }
     };
   },
-  validations: {
-    newSector: {
-      name: { required }
-    },
-    editedSector: {
-      name: { required }
+  validations () {
+    if (this.isSameThanEditedSector) {
+      return {
+        newSector: {
+          name: { required, sector }
+        },
+        editedSector: {
+          name: { required }
+        }
+      }
+    }
+    return {
+      newSector: {
+        name: { required, sector }
+      },
+      editedSector: {
+        name: { required, sector }
+      }
     }
   },
   computed: {
@@ -116,12 +130,19 @@ export default {
     },
     company () {
       return this.user.company;
+    },
+    isSameThanEditedSector () {
+      return this.tmpInput === this.editedSector.name;
     }
   },
   async mounted () {
     await this.getSectors();
   },
   methods: {
+    saveTmp (event) {
+      this.tmpInput = event
+      console.log(event);
+    },
     async getSectors () {
       try {
         this.sectors = await this.$sectors.showAll({ company: this.company._id });
@@ -174,6 +195,7 @@ export default {
     resetEditionSectorData () {
       this.sectorEditionModal = false;
       this.editedSector = { name: '' };
+      this.$v.editedSector.$reset();
     },
     async deleteSector (sectorId, cell) {
       try {
@@ -193,6 +215,13 @@ export default {
         NotifyNegative("Erreur lors de la suppression de l'équipe.");
       }
     },
+    nameError (obj) {
+      if (!obj.name.required) {
+        return 'Champ requis';
+      } else if (!obj.name.sector) {
+        return 'Nom déjà existant';
+      }
+    }
   }
 }
 </script>

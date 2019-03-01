@@ -6,7 +6,7 @@
         <q-icon v-if="error" name="error_outline" color="secondary" />
       </div>
       <q-field :error="error" :error-label="errorLabel">
-        <q-input :value="value" color="white" inverted-light @input="inputHandler" @blur="blurHandler" :suffix="suffix" :type="type" :rows="rows" :readonly="readOnly" />
+        <q-input :value="value" color="white" inverted-light @input="inputHandler" @blur="blurHandler" @focus="focusHandler" :suffix="suffix" :type="type" :rows="rows" :readonly="readOnly" />
       </q-field>
     </div>
   </div>
@@ -33,6 +33,9 @@ export default {
     },
     blurHandler () {
       this.$emit('blur');
+    },
+    focusHandler () {
+      this.$emit('focus');
     }
   }
 }
