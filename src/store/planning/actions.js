@@ -1,6 +1,7 @@
 import Sectors from '../../api/Sectors'
 import Users from '../../api/Users'
 import Customers from '../../api/Customers'
+import store from '../../store/index'
 
 import { AUXILIARY, PLANNING_REFERENT } from '../../data/constants';
 
@@ -19,7 +20,7 @@ export const fillFilter = async ({ commit }, role) => {
       elems[i].label = `${elems[i].identity.title} ${elems[i].identity.lastname}`;
     }
   }
-  const sectors = await Sectors.showAll();
+  const sectors = await Sectors.showAll({ company: store.getters['main/user'].company._id });
   sectors.forEach(sector => {
     elems.push({
       label: sector.name,

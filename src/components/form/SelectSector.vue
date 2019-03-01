@@ -27,11 +27,14 @@ export default {
     orderedSectors () {
       return _.sortBy(this.sectors, ['label']);
     },
+    currentUser () {
+      return this.$store.getters['main/user'];
+    }
   },
   methods: {
     async getSectors () {
       try {
-        const sectors = await this.$sectors.showAll();
+        const sectors = await this.$sectors.showAll({ company: this.currentUser.company._id });
         this.sectors = sectors.map(sector => ({ label: sector.name, value: sector._id }));
       } catch (e) {
         console.error(e);
