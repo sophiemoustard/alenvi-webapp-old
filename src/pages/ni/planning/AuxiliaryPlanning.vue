@@ -151,7 +151,7 @@ export default {
     },
     // Filter
     handleElemAddedToFilter (el) {
-      if (el.sectorId) {
+      if (el.sectorId) { // el = sector
         this.filteredSectors.push(el.sector);
         const auxBySector = this.getFilter.filter(aux => aux.sector && aux.sector._id === el.sectorId);
         for (let i = 0, l = auxBySector.length; i < l; i++) {
@@ -160,7 +160,7 @@ export default {
           }
         }
         this.refreshPlanning();
-      } else {
+      } else { // el = auxiliary
         if (!this.filteredAuxiliaries.some(aux => aux._id === el._id)) this.filteredAuxiliaries.push(el);
         if (!this.auxiliaries.some(aux => aux._id === el._id)) {
           this.auxiliaries.push(el);

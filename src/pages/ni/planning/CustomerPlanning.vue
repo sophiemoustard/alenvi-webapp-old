@@ -558,7 +558,7 @@ export default {
     },
     // Filter
     async handleElemAddedToFilter (el) {
-      if (el.sectorId) {
+      if (el.sectorId) { // el = sector
         this.filteredSectors.push(el.sectorId);
         const customersBySector = await this.getCustomersBySectors(this.filteredSectors);
         for (let i = 0, l = customersBySector.length; i < l; i++) {
@@ -567,7 +567,7 @@ export default {
           }
         }
         this.refreshPlanning();
-      } else {
+      } else { // el = auxiliary
         if (!this.customers.some(cust => cust._id === el._id)) {
           this.filteredCustomers.push(el);
           this.customers.push(el);
