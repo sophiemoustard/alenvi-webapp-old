@@ -38,14 +38,9 @@ import CustomImg from './CustomImg';
 import { NotifyNegative } from '../popup/notify';
 
 export default {
+  name: 'MultipleFilesUploader',
   components: {
     'ni-custom-img': CustomImg,
-  },
-  data () {
-    return {
-      extensions: 'image/jpg, image/jpeg, image/gif, image/png, application/pdf',
-      collapsibleOpened: false,
-    };
   },
   props: {
     caption: String,
@@ -57,6 +52,26 @@ export default {
     additionalFieldsName: String,
     userProfile: Object,
     collapsibleLabel: String,
+  },
+  data () {
+    return {
+      extensions: 'image/jpg, image/jpeg, image/gif, image/png, application/pdf',
+      collapsibleOpened: false,
+    };
+  },
+  computed: {
+    headers () {
+      return { 'x-access-token': Cookies.get('alenvi_token') || '' };
+    },
+    collapsibleIcon () {
+      return !this.collapsibleOpened ? 'add' : 'mdi-close';
+    },
+    additionalFields () {
+      return [{ name: 'fileName', value: `${this.additionalFieldsName}_${this.userProfile.identity.firstname}_${this.userProfile.identity.lastname}` }];
+    },
+    documents () {
+      return this.$_.get(this.userProfile, this.path) || [];
+    },
   },
   methods: {
     deleteDocument (documentId) {
@@ -81,20 +96,6 @@ export default {
       } else {
         this.$refs[this.name].upload();
       }
-    },
-  },
-  computed: {
-    headers () {
-      return { 'x-access-token': Cookies.get('alenvi_token') || '' };
-    },
-    collapsibleIcon () {
-      return !this.collapsibleOpened ? 'add' : 'mdi-close';
-    },
-    additionalFields () {
-      return [{ name: 'fileName', value: `${this.additionalFieldsName}_${this.userProfile.identity.firstname}_${this.userProfile.identity.lastname}` }];
-    },
-    documents () {
-      return this.$_.get(this.userProfile, this.path);
     },
   },
 };
