@@ -151,9 +151,9 @@ export default {
     },
     // Filter
     handleElemAddedToFilter (el) {
-      if (el.sector) {
+      if (el.sectorId) {
         this.filteredSectors.push(el.sector);
-        const auxBySector = this.getFilter.filter(aux => aux.sector._id === el.sector);
+        const auxBySector = this.getFilter.filter(aux => aux.sector && aux.sector._id === el.sectorId);
         for (let i = 0, l = auxBySector.length; i < l; i++) {
           if (!this.auxiliaries.some(aux => auxBySector[i]._id === aux._id)) {
             this.auxiliaries.push(auxBySector[i]);
@@ -169,10 +169,10 @@ export default {
       }
     },
     handleElemRemovedFromFilter (el) {
-      if (el.sector) {
-        this.filteredSectors.filter(sec => sec !== el.sector);
+      if (el.sectorId) {
+        this.filteredSectors.filter(sec => sec !== el.sectorId);
         this.auxiliaries = this.auxiliaries.filter(auxiliary =>
-          auxiliary.sector._id !== el.sector || this.filteredAuxiliaries.some(filteredAux => filteredAux._id === auxiliary._id)
+          auxiliary.sector._id !== el.sectorId || this.filteredAuxiliaries.some(filteredAux => filteredAux._id === auxiliary._id)
         );
       } else {
         this.filteredAuxiliaries = this.filteredAuxiliaries.filter(auxiliary => auxiliary._id !== el._id);
