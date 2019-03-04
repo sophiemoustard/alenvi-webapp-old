@@ -51,17 +51,17 @@
           </div>
         </div>
         <ni-modal-select v-model="newUser.identity.title" :error="$v.newUser.identity.title.$error" :options="civilityOptions"
-          caption="Civilité" @blur="$v.newUser.identity.title.$touch" requiredField />
+          caption="Civilité" @blur="$v.newUser.identity.title.$touch" required-field />
         <ni-modal-input v-model="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error" caption="Nom"
-          @blur="$v.newUser.identity.lastname.$touch" requiredField />
+          @blur="$v.newUser.identity.lastname.$touch" required-field />
         <ni-modal-input v-model="newUser.identity.firstname" :error="$v.newUser.identity.firstname.$error" caption="Prénom"
-          @blur="$v.newUser.identity.firstname.$touch" requiredField />
+          @blur="$v.newUser.identity.firstname.$touch" required-field />
         <ni-modal-input v-model="newUser.mobilePhone" :error="$v.newUser.mobilePhone.$error" caption="Numéro de téléphone"
-          @blur="$v.newUser.mobilePhone.$touch" :errorLabel="mobilePhoneError" requiredField />
+          @blur="$v.newUser.mobilePhone.$touch" :error-label="mobilePhoneError" required-field />
         <ni-search-address v-model="newUser.contact.address.fullAddress" color="white" inverted-light @selected="selectedAddress"
-          :errorLabel="addressError" :error="$v.newUser.contact.address.fullAddress.$error" requiredField inModal />
+          :error-label="addressError" :error="$v.newUser.contact.address.fullAddress.$error" required-field in-modal />
         <ni-modal-input v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email" @blur="$v.newUser.local.email.$touch"
-          :errorLabel="emailError" requiredField />
+          :error-label="emailError" required-field />
         <div class="row margin-input">
           <div class="col-12">
             <div class="row justify-between">
@@ -80,9 +80,9 @@
               <q-icon v-if="$v.newUser.ogustManagerId.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newUser.ogustManagerId.$error" :error-label="REQUIRED_LABEL">
-              <ni-select-manager v-model="newUser.ogustManagerId" @myBlur="$v.newUser.ogustManagerId.$touch" inModal />
+              <ni-select-manager v-model="newUser.ogustManagerId" @blur="$v.newUser.ogustManagerId.$touch" in-modal />
             </q-field>
-          </div>
+        </div>
         </div>
         <div class="row margin-input last">
           <div class="col-12">

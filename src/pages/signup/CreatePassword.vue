@@ -5,10 +5,12 @@
       <div class="signup-body-padding">
         <div class="row items-center">
           <div class="col-2" style="text-align: left">
-            <span><q-icon name="thumb up" size="2rem" /></span>
+            <span>
+              <q-icon name="thumb up" size="2rem" /></span>
           </div>
           <div class="col-10 signup-bloctext-padding">
-            <p class="no-margin" style="font-size: 0.8rem;">Afin de confirmer la création de votre compte, merci de <span class="text-weight-bold">choisir un mot de passe</span></p>
+            <p class="no-margin" style="font-size: 0.8rem;">Afin de confirmer la création de votre compte, merci de
+              <span class="text-weight-bold">choisir un mot de passe</span></p>
           </div>
         </div>
         <div class="row margin-input">
@@ -17,7 +19,7 @@
               <p class="input-caption">Email</p>
               <q-icon v-if="$v.user.alenvi.local.email.$error" name="error_outline" color="secondary" />
             </div>
-            <q-input v-model.trim="user.alenvi.local.email" color="white" inverted-light lower-case @blur="$v.user.alenvi.local.email.$touch()"/>
+            <q-input v-model.trim="user.alenvi.local.email" color="white" inverted-light lower-case @blur="$v.user.alenvi.local.email.$touch()" />
           </div>
         </div>
         <div class="row margin-input">
@@ -27,7 +29,7 @@
               <q-icon v-if="$v.user.alenvi.local.password.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.user.alenvi.local.password.$error" :error-label="passwordError">
-              <q-input v-model="user.alenvi.local.password" type="password" color="white" inverted-light @blur="$v.user.alenvi.local.password.$touch()"/>
+              <q-input v-model="user.alenvi.local.password" type="password" color="white" inverted-light @blur="$v.user.alenvi.local.password.$touch()" />
             </q-field>
           </div>
         </div>
@@ -38,12 +40,13 @@
               <q-icon v-if="$v.passwordConfirm.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.passwordConfirm.$error" :error-label="passwordConfirmError">
-              <q-input v-model="passwordConfirm" type="password" color="white" inverted-light lower-case @blur="$v.passwordConfirm.$touch()"/>
+              <q-input v-model="passwordConfirm" type="password" color="white" inverted-light lower-case @blur="$v.passwordConfirm.$touch()" />
             </q-field>
           </div>
         </div>
         <div class="row justify-center">
-          <q-btn no-caps class="signup-btn" label="Créer mon compte" icon-right="arrow_forward" color="primary" :loading="loading" @click="submit" />
+          <q-btn no-caps class="signup-btn" label="Créer mon compte" icon-right="arrow_forward" color="primary"
+            :loading="loading" @click="submit" />
         </div>
       </div>
     </div>

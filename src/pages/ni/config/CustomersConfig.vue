@@ -5,7 +5,7 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Services</p>
         <q-card style="background: white">
-          <q-table :data="services" :columns="serviceColumns" hide-bottom binary-state-sort :pagination.sync="pagination" :visibleColumns="visibleColumns"
+          <q-table :data="services" :columns="serviceColumns" hide-bottom binary-state-sort :pagination.sync="pagination" :visible-columns="visibleColumns"
             class="table-responsive">
             <q-tr slot="body" slot-scope="props" :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
@@ -29,7 +29,7 @@
         <p class="text-weight-bold">Informations de l'organisation</p>
         <div class="row gutter-profile">
           <ni-input caption="Nom" v-model="company.name" @focus="saveTmp('name')" @blur="updateCompany('name')" />
-          <ni-search-address v-model="company.address.fullAddress" color="white" inverted-light @selected="selectedAddress" :errorLabel="addressError"
+          <ni-search-address v-model="company.address.fullAddress" color="white" inverted-light @selected="selectedAddress" :error-label="addressError"
             @focus="saveTmp('address.fullAddress')" @blur="updateCompany('address.fullAddress')" :error="$v.company.address.fullAddress.$error"
           />
           <ni-input caption="Numéro ICS" v-model="company.ics" @focus="saveTmp('ics')" @blur="updateCompany('ics')" />
@@ -42,13 +42,13 @@
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Mandat de prélèvement" path="customersConfig.templates.debitMandate" :entity="company" alt="template mandat prelevement"
               name="debitMandate" @delete="deleteDocument(documents.debitMandate.driveId, 'debitMandate', 'customersConfig')"
-              @uploaded="documentUploaded" :additionalValue="`modele_mandat_prelevement_${company.name}`" :url="docsUploadUrl"
+              @uploaded="documentUploaded" :additional-value="`modele_mandat_prelevement_${company.name}`" :url="docsUploadUrl"
             />
           </div>
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Devis" path="customersConfig.templates.quote" :entity="company" alt="template devis"
               name="quote" @delete="deleteDocument(documents.quote.driveId, 'quote', 'customersConfig')"
-              @uploaded="documentUploaded" :additionalValue="`modele_devis_${company.name}`" :url="docsUploadUrl"
+              @uploaded="documentUploaded" :additional-value="`modele_devis_${company.name}`" :url="docsUploadUrl"
             />
           </div>
         </div>
@@ -116,7 +116,7 @@
           </div>
         </div>
         <ni-datetime-picker caption="Date d'effet" v-model="editedService.startDate" :error="$v.editedService.startDate.$error"
-          @blur="$v.editedService.startDate.$touch" :min="minStartDate" inModal />
+          @blur="$v.editedService.startDate.$touch" :min="minStartDate" in-modal />
         <ni-modal-input caption="Nom" v-model="editedService.name" :error="$v.editedService.name.$error" @blur="$v.editedService.name.$touch" />
         <ni-modal-input caption="Prix unitaire par défaut TTC" suffix="€" type="number" v-model="editedService.defaultUnitAmount"
           :error="$v.editedService.defaultUnitAmount.$error" @blur="$v.editedService.defaultUnitAmount.$touch"/>
@@ -140,7 +140,7 @@
           </div>
         </div>
         <q-table class="q-mb-xl table-responsive" :data="selectedService.versions" :columns="serviceColumns" hide-bottom binary-state-sort :pagination.sync="paginationHistory"
-          :visibleColumns="visibleHistoryColumns">
+          :visible-columns="visibleHistoryColumns">
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">{{ col.value }}</q-td>
           </q-tr>
@@ -160,10 +160,9 @@
           </div>
         </div>
         <ni-modal-input caption="Nom" v-model="newThirdPartyPayer.name" :error="$v.newThirdPartyPayer.name.$error" @blur="$v.newThirdPartyPayer.name.$touch"
-          requiredField />
-        <ni-search-address v-model="newThirdPartyPayer.address.fullAddress" @selected="selectedThirdPartyPayerCreationAddress" error-label="Adresse invalide" inModal
-          @blur="$v.newThirdPartyPayer.address.fullAddress.$touch" :error="$v.newThirdPartyPayer.address.fullAddress.$error"
-          />
+          required-field />
+        <ni-search-address v-model="newThirdPartyPayer.address.fullAddress" @selected="selectedThirdPartyPayerCreationAddress" error-label="Adresse invalide" in-modal
+          @blur="$v.newThirdPartyPayer.address.fullAddress.$touch" :error="$v.newThirdPartyPayer.address.fullAddress.$error" />
         <ni-modal-input caption="Email" v-model.trim="newThirdPartyPayer.email" />
         <ni-modal-input caption="Prix unitaire TTC par défaut" suffix="€" type="number" v-model="newThirdPartyPayer.unitTTCRate"
           :error="$v.newThirdPartyPayer.unitTTCRate.$error" error-label="Le prix unitaire doit être positif"/>
@@ -185,9 +184,9 @@
           </div>
         </div>
         <ni-modal-input caption="Nom" v-model="editedThirdPartyPayer.name" :error="$v.editedThirdPartyPayer.name.$error"
-          @blur="$v.editedThirdPartyPayer.name.$touch" requiredField />
+          @blur="$v.editedThirdPartyPayer.name.$touch" required-field />
         <ni-search-address v-model="editedThirdPartyPayer.address.fullAddress" @selected="selectedThirdPartyPayerEditionAddress" error-label="Adresse invalide"
-          @blur="$v.editedThirdPartyPayer.address.fullAddress.$touch" :error="$v.editedThirdPartyPayer.address.fullAddress.$error" inModal
+          @blur="$v.editedThirdPartyPayer.address.fullAddress.$touch" :error="$v.editedThirdPartyPayer.address.fullAddress.$error" in-modal
           />
         <ni-modal-input caption="Email" v-model.trim="editedThirdPartyPayer.email" />
         <ni-modal-input caption="Prix unitaire TTC par défaut" suffix="€" type="number" v-model="editedThirdPartyPayer.unitTTCRate"

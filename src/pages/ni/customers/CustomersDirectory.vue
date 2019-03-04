@@ -41,18 +41,18 @@
             <h5>Créer une nouvelle <span class="text-weight-bold">fiche bénéficiaire</span></h5>
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
-            <span><q-icon name="clear" @click.native="opened = false" /></span>
+            <span>
+              <q-icon name="clear" @click.native="opened = false" /></span>
           </div>
         </div>
         <ni-modal-select v-model="newCustomer.identity.title" :error="$v.newCustomer.identity.title.$error" :options="civilityOptions"
-          caption="Civilité" @blur="$v.newCustomer.identity.title.$touch" :error-label="REQUIRED_LABEL" requiredField />
+          caption="Civilité" @blur="$v.newCustomer.identity.title.$touch" required-field />
         <ni-modal-input v-model="newCustomer.identity.lastname" :error="$v.newCustomer.identity.lastname.$error"
-          caption="Nom" @blur="$v.newCustomer.identity.lastname.$touch" :error-label="REQUIRED_LABEL" requiredField />
+          caption="Nom" @blur="$v.newCustomer.identity.lastname.$touch" required-field />
         <ni-modal-input v-model="newCustomer.identity.firstname" caption="Prénom" />
         <div class="row margin-input last">
           <ni-search-address v-model="newCustomer.contact.address.fullAddress" @selected="selectedAddress" @blur="$v.newCustomer.contact.address.fullAddress.$touch"
-            :error="$v.newCustomer.contact.address.fullAddress.$error" :error-label="addressError" inModal
-            requiredField />
+            :error="$v.newCustomer.contact.address.fullAddress.$error" :error-label="addressError" in-modal required-field />
         </div>
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary" :loading="loading"

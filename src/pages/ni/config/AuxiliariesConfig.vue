@@ -73,6 +73,7 @@ import ModalInput from '../../../components/form/ModalInput.vue';
 import ModalSelect from '../../../components/form/ModalSelect.vue';
 import DeleteSectorBtn from '../../../components/button/DeleteSectorBtn';
 import { validationMixin } from '../../../mixins/validationMixin.js';
+import { REQUIRED_LABEL } from '../../../data/constants.js';
 
 export default {
   name: 'AuxiliariesConfig',
@@ -212,7 +213,7 @@ export default {
     },
     nameError (obj) {
       if (!obj.name.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!obj.name.sector) {
         return 'Nom déjà existant';
       }

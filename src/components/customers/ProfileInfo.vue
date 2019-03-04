@@ -20,7 +20,7 @@
         <p class="text-weight-bold">Contact</p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="Téléphone" type="tel" :error="$v.customer.contact.phone.$error" errorLabel="Numéro de téléphone non valide"
+        <ni-input caption="Téléphone" type="tel" :error="$v.customer.contact.phone.$error" error-label="Numéro de téléphone non valide"
           v-model.trim="customer.contact.phone" @focus="saveTmp('contact.phone')" @blur="updateUser({ alenvi: 'contact.phone', ogust: 'mobile_phone' })" />
         <ni-search-address v-model="customer.contact.address.fullAddress" color="white" inverted-light @focus="saveTmp('contact.address.fullAddress')"
           @blur="updateUser({ alenvi: 'contact.address.fullAddress', ogust: 'address' })" @selected="selectedAddress"
@@ -88,9 +88,9 @@
       <div class="row gutter-profile q-mb-lg">
         <ni-input caption="Nom associé au compte bancaire" :error="$v.customer.payment.bankAccountOwner.$error" v-model="customer.payment.bankAccountOwner"
           @focus="saveTmp('payment.bankAccountOwner')" @blur="updateUser({ alenvi: 'payment.bankAccountOwner', ogust: 'holder' })" />
-        <ni-input caption="IBAN" :error="$v.customer.payment.iban.$error" errorLabel="IBAN non valide" v-model="customer.payment.iban"
+        <ni-input caption="IBAN" :error="$v.customer.payment.iban.$error" error-label="IBAN non valide" v-model="customer.payment.iban"
           @focus="saveTmp('payment.iban')" @blur="updateUser({ alenvi: 'payment.iban', ogust: 'iban_number' })" />
-        <ni-input caption="BIC" :error="$v.customer.payment.bic.$error" errorLabel="BIC non valide" v-model="customer.payment.bic"
+        <ni-input caption="BIC" :error="$v.customer.payment.bic.$error" error-label="BIC non valide" v-model="customer.payment.bic"
           @focus="saveTmp('payment.bic')" @blur="updateUser({ alenvi: 'payment.bic', ogust: 'bic_number' })" />
       </div>
     </div>
@@ -130,7 +130,7 @@
               </template>
               <template v-else-if="col.name === 'signedAt'">
                 <ni-datetime-picker v-model="customer.payment.mandates[props.row.__index].signedAt" withBorders @blur="updateSignedAt(props.row)"
-                  @focus="saveTmpSignedAt(props.row.__index)" inModal class="datetime" />
+                  @focus="saveTmpSignedAt(props.row.__index)" in-modal class="datetime" />
               </template>
               <template v-else>{{ col.value}}</template>
             </q-td>
@@ -168,8 +168,8 @@
     <div class="q-mb-lg">
       <p class="text-weight-bold">Justificatifs APA ou autres financements</p>
       <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement" @uploaded="documentUploaded"
-        name="financialCertificates" collapsibleLabel="Ajouter un justificatif" :userProfile="customer" :url="docsUploadUrl"
-        @delete="deleteDocument($event)" additionalFieldsName="financialCertificate" />
+        name="financialCertificates" collapsibleLabel="Ajouter un justificatif" :user-profile="customer" :url="docsUploadUrl"
+        @delete="deleteDocument($event)" additional-fields-name="financialCertificate" />
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
@@ -231,7 +231,7 @@
           @blur="$v.newHelper.identity.lastname.$touch" />
         <ni-modal-input v-model="newHelper.identity.firstname" caption="Prénom" />
         <ni-modal-input v-model="newHelper.local.email" last :error="$v.newHelper.local.email.$error" caption="Email"
-          @blur="$v.newHelper.local.email.$touch" :errorLabel="emailError" />
+          @blur="$v.newHelper.local.email.$touch" :error-label="emailError" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter un aidant" icon-right="add" color="primary" :loading="loading"
         @click="submitHelper" />
@@ -250,12 +250,12 @@
           </div>
         </div>
         <ni-modal-select caption="Service" :options="serviceOptions" v-model="newSubscription.service" :error="$v.newSubscription.service.$error"
-          @blur="$v.newSubscription.service.$touch" @input="updateNewSubscription" requiredField />
+          @blur="$v.newSubscription.service.$touch" @input="updateNewSubscription" required-field />
         <ni-modal-input v-model="newSubscription.unitTTCRate" :error="$v.newSubscription.unitTTCRate.$error" caption="Prix unitaire TTC"
-          @blur="$v.newSubscription.unitTTCRate.$touch" type="number" requiredField />
+          @blur="$v.newSubscription.unitTTCRate.$touch" type="number" required-field />
         <ni-modal-input v-model="newSubscription.estimatedWeeklyVolume" :error="$v.newSubscription.estimatedWeeklyVolume.$error"
           caption="Volume hebdomadaire estimatif" @blur="$v.newSubscription.estimatedWeeklyVolume.$touch" type="number"
-          requiredField />
+          required-field />
         <ni-modal-input v-if="newSubscription.nature !== 'Forfaitaire'" v-model="newSubscription.sundays" caption="Dont dimanche (h)"
           type="number" />
         <ni-modal-input v-if="newSubscription.nature !== 'Forfaitaire'" v-model="newSubscription.evenings" caption="Dont soirée (h)"
@@ -278,13 +278,13 @@
           </div>
         </div>
         <ni-datetime-picker v-model="editedSubscription.startDate" :error="$v.editedSubscription.startDate.$error"
-          caption="Dated'effet" @blur="$v.editedSubscription.startDate.$touch" :min="minStartDate" requiredField
-          inModal />
+          caption="Dated'effet" @blur="$v.editedSubscription.startDate.$touch" :min="minStartDate" required-field
+          in-modal />
         <ni-modal-input v-model="editedSubscription.unitTTCRate" :error="$v.editedSubscription.unitTTCRate.$error"
-          caption="Prix unitaire TTC" @blur="$v.editedSubscription.unitTTCRate.$touch" type="number" requiredField />
+          caption="Prix unitaire TTC" @blur="$v.editedSubscription.unitTTCRate.$touch" type="number" required-field />
         <ni-modal-input v-model="editedSubscription.estimatedWeeklyVolume" :error="$v.editedSubscription.estimatedWeeklyVolume.$error"
           caption="Volume hebdomadaire estimatif" @blur="$v.editedSubscription.estimatedWeeklyVolume.$touch" type="number"
-          requiredField />
+          required-field />
         <ni-modal-input v-if="editedSubscription.nature !== 'Forfaitaire'" v-model="editedSubscription.sundays" caption="Dont dimanche (h)"
           type="number" />
         <ni-modal-input v-if="editedSubscription.nature !== 'Forfaitaire'" v-model="editedSubscription.evenings"
@@ -381,31 +381,31 @@
           </div>
         </div>
         <ni-modal-select caption="Tiers payeur" :options="fundingTppOptions" v-model="newFunding.thirdPartyPayer"
-          :error="$v.newFunding.thirdPartyPayer.$error" @blur="$v.newFunding.thirdPartyPayer.$touch" requiredField />
+          :error="$v.newFunding.thirdPartyPayer.$error" @blur="$v.newFunding.thirdPartyPayer.$touch" required-field />
         <ni-option-group v-model="newFunding.services" :options="fundingServicesOptions()" caption="Souscriptions" type="checkbox"
-          @blur="$v.newFunding.services.$touch" :error="$v.newFunding.services.$error" requiredField />
+          @blur="$v.newFunding.services.$touch" :error="$v.newFunding.services.$error" required-field />
         <ni-datetime-picker v-model="newFunding.startDate" caption="Date de début de prise en charge" :min="newFundingMinStartDate"
-          inModal @blur="$v.newFunding.startDate.$touch" :error="$v.newFunding.startDate.$error" requiredField />
+          in-modal @blur="$v.newFunding.startDate.$touch" :error="$v.newFunding.startDate.$error" required-field />
         <ni-datetime-picker v-model="newFunding.endDate" :min="$moment(newFunding.startDate).add(1, 'day').toISOString()"
-          inModal caption="Date de fin de prise en charge" />
+          in-modal caption="Date de fin de prise en charge" />
         <ni-modal-input v-model="newFunding.folderNumber" caption="Numéro de dossier" />
         <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="newFunding.frequency" @blur="$v.newFunding.frequency.$touch"
-          :error="$v.newFunding.frequency.$error" requiredField />
-        <ni-modal-select caption="Nature" :options="fundingNatureOptions" v-model="newFunding.nature" inModal :error="$v.newFunding.nature.$error"
-          @blur="$v.newFunding.nature.$touch" requiredField />
+          :error="$v.newFunding.frequency.$error" required-field />
+        <ni-modal-select caption="Nature" :options="fundingNatureOptions" v-model="newFunding.nature" in-modal :error="$v.newFunding.nature.$error"
+          @blur="$v.newFunding.nature.$touch" required-field />
         <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.unitTTCRate" caption="Prix unitaire TTC"
           type="number" @blur="$v.newFunding.unitTTCRate.$touch" :error="$v.newFunding.unitTTCRate.$error"
-          requiredField />
+          required-field />
         <ni-modal-input v-if="isOneTimeFundingNature" v-model="newFunding.amountTTC" caption="Montant forfaitaire TTC"
-          type="number" @blur="$v.newFunding.amountTTC.$touch" :error="$v.newFunding.amountTTC.$error" requiredField />
+          type="number" @blur="$v.newFunding.amountTTC.$touch" :error="$v.newFunding.amountTTC.$error" required-field />
         <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.careHours" caption="Nb. heures prises en charge"
           type="number" suffix="h" @blur="$v.newFunding.careHours.$touch" :error="$v.newFunding.careHours.$error"
-          requiredField />
+          required-field />
         <ni-modal-input v-model="newFunding.customerParticipationRate" caption="Taux de participation du bénéficiaire"
           type="number" suffix="%" @blur="$v.newFunding.customerParticipationRate.$touch" :error="$v.newFunding.customerParticipationRate.$error"
-          requiredField />
+          required-field />
         <ni-option-group v-model="newFunding.careDays" :options="daysOptions" caption="Jours pris en charge" type="checkbox"
-          inline @blur="$v.newFunding.careDays.$touch" :error="$v.newFunding.careDays.$error" requiredField />
+          inline @blur="$v.newFunding.careDays.$touch" :error="$v.newFunding.careDays.$error" required-field />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter un financement" icon-right="add" color="primary"
         :loading="loading" @click="submitFunding" />
@@ -425,27 +425,27 @@
           </div>
         </div>
         <ni-datetime-picker v-model="editedFunding.startDate" caption="Date de début de prise en charge" :max="editedFundingMaxStartDate"
-          class="last" :min="editedFundingMinStartDate" inModal @blur="$v.editedFunding.startDate.$touch" :error="$v.editedFunding.startDate.$error"
-          requiredField />
-        <ni-datetime-picker v-model="editedFunding.endDate" caption="Date de fin de prise en charge" inModal
+          class="last" :min="editedFundingMinStartDate" in-modal @blur="$v.editedFunding.startDate.$touch" :error="$v.editedFunding.startDate.$error"
+          required-field />
+        <ni-datetime-picker v-model="editedFunding.endDate" caption="Date de fin de prise en charge" in-modal
           :min="$moment(editedFunding.startDate).add(1, 'day').toISOString()" />
         <ni-modal-input v-model="editedFunding.folderNumber" caption="Numéro de dossier" />
         <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="editedFunding.frequency" @blur="$v.editedFunding.frequency.$touch"
-          :error="$v.editedFunding.frequency.$error" requiredField />
+          :error="$v.editedFunding.frequency.$error" required-field />
         <ni-modal-input v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.unitTTCRate" caption="Prix unitaire TTC"
           type="number" @blur="$v.editedFunding.unitTTCRate.$touch" :error="$v.editedFunding.unitTTCRate.$error"
-          requiredField />
+          required-field />
         <ni-modal-input v-if="isOneTimeEditedFundingNature" v-model="editedFunding.amountTTC" caption="Montant forfaitaire TTC"
           type="number" @blur="$v.editedFunding.amountTTC.$touch" :error="$v.editedFunding.amountTTC.$error"
-          requiredField />
+          required-field />
         <ni-modal-input v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.careHours" caption="Nb. heures prises en charge"
           type="number" @blur="$v.editedFunding.careHours.$touch" :error="$v.editedFunding.careHours.$error"
-          requiredField suffix="h" />
+          required-field suffix="h" />
         <ni-modal-input v-model="editedFunding.customerParticipationRate" caption="Taux de participation du bénéficiaire"
           type="number" suffix="%" @blur="$v.editedFunding.customerParticipationRate.$touch" :error="$v.editedFunding.customerParticipationRate.$error"
-          requiredField />
+          required-field />
         <ni-option-group v-model="editedFunding.careDays" :options="daysOptions" caption="Jours pris en charge" type="checkbox"
-          inline @blur="$v.editedFunding.careDays.$touch" :error="$v.editedFunding.careDays.$error" requiredField />
+          inline @blur="$v.editedFunding.careDays.$touch" :error="$v.editedFunding.careDays.$error" required-field />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Modifier le financement" icon-right="check" color="primary"
         :loading="loading" @click="editFunding" />
