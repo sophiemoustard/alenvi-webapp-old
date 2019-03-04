@@ -36,7 +36,7 @@
               <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
                 @click="createEvent({ dayIndex, person })">
                 <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
-                  <div :id="event._id" draggable @dragstart="drag(event._id)" @click.stop="editEvent(event)"
+                  <div :id="event._id" draggable @dragstart="drag(event)" @click.stop="editEvent(event)"
                     :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-sm']" :key="eventIndex"
                     :style="{ left: `${PERCENTAGE_BY_MINUTES * event.staffingLeft + 2}%`, width: `${PERCENTAGE_BY_MINUTES * event.staffingWidth}%` }">
                   </div>
@@ -47,7 +47,7 @@
               <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
                 @click="createEvent({ dayIndex, person })">
                 <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
-                  <div :id="event._id" draggable @dragstart="drag(event._id)" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`]"
+                  <div :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event)" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`]"
                     :key="eventIndex" @click.stop="editEvent(event)">
                     <div class="col-12 event-title">
                       <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">
@@ -204,8 +204,8 @@ export default {
       return this.events.filter(event => (event[this.personKey] ? event[this.personKey]._id === person._id : false));
     },
     // Drag & drop
-    drag (eventId) {
-      this.draggedObject = this.events.find(ev => ev._id === eventId);
+    drag (event) {
+      this.draggedObject = event;
     },
     async drop (toDay, toPerson) {
       try {
@@ -217,6 +217,17 @@ export default {
       } finally {
         this.draggedObject = {};
       }
+    },
+    canDrag (event) {
+      return this.$can({
+        user: this.$store.getters['main/user'],
+        auxiliaryIdEvent: event.auxiliary._id,
+        auxiliarySectorEvent: event.sector,
+        permissions: [
+          { name: 'planning:edit:user', rule: 'isInSameSector' },
+          { name: 'planning:edit', rule: 'isOwner' }
+        ],
+      });
     },
     createEvent (eventInfo) {
       if (this.personKey === 'auxiliary') {
