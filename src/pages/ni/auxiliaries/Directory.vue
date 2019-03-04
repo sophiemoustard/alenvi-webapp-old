@@ -51,15 +51,15 @@
           </div>
         </div>
         <ni-modal-select v-model="newUser.identity.title" :error="$v.newUser.identity.title.$error" :options="civilityOptions"
-          caption="Civilité" @blur="$v.newUser.identity.title.$touch" errorLabel="Champ requis" requiredField />
+          caption="Civilité" @blur="$v.newUser.identity.title.$touch" requiredField />
         <ni-modal-input v-model="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error" caption="Nom"
-          @blur="$v.newUser.identity.lastname.$touch" errorLabel="Champ requis" requiredField />
+          @blur="$v.newUser.identity.lastname.$touch" requiredField />
         <ni-modal-input v-model="newUser.identity.firstname" :error="$v.newUser.identity.firstname.$error" caption="Prénom"
-          @blur="$v.newUser.identity.firstname.$touch" errorLabel="Champ requis" requiredField />
+          @blur="$v.newUser.identity.firstname.$touch" requiredField />
         <ni-modal-input v-model="newUser.mobilePhone" :error="$v.newUser.mobilePhone.$error" caption="Numéro de téléphone"
           @blur="$v.newUser.mobilePhone.$touch" :errorLabel="mobilePhoneError" requiredField />
-        <ni-search-address v-model="newUser.contact.address.fullAddress" color="white" inverted-light @selected="selectedAddress" :errorLabel="addressError"
-          :error="$v.newUser.contact.address.fullAddress.$error" requiredField inModal />
+        <ni-search-address v-model="newUser.contact.address.fullAddress" color="white" inverted-light @selected="selectedAddress"
+          :errorLabel="addressError" :error="$v.newUser.contact.address.fullAddress.$error" requiredField inModal />
         <ni-modal-input v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email" @blur="$v.newUser.local.email.$touch"
           :errorLabel="emailError" requiredField />
         <div class="row margin-input">
@@ -68,7 +68,7 @@
               <p class="input-caption required">Communauté</p>
               <q-icon v-if="$v.newUser.sector.$error" name="error_outline" color="secondary" />
             </div>
-            <q-field :error="$v.newUser.sector.$error" error-label="Champ requis">
+            <q-field :error="$v.newUser.sector.$error" :error-label="REQUIRED_LABEL">
               <ni-select-sector v-model="newUser.sector" @blur="$v.newUser.sector.$touch" in-modal :company-id="company._id" />
             </q-field>
           </div>
@@ -79,7 +79,7 @@
               <p class="input-caption required">Géré par</p>
               <q-icon v-if="$v.newUser.ogustManagerId.$error" name="error_outline" color="secondary" />
             </div>
-            <q-field :error="$v.newUser.ogustManagerId.$error" error-label="Champ requis">
+            <q-field :error="$v.newUser.ogustManagerId.$error" :error-label="REQUIRED_LABEL">
               <ni-select-manager v-model="newUser.ogustManagerId" @myBlur="$v.newUser.ogustManagerId.$touch" inModal />
             </q-field>
           </div>
@@ -109,7 +109,7 @@ import NiModalInput from '../../../components/form/ModalInput';
 import NiModalSelect from '../../../components/form/ModalSelect';
 import NiSearchAddress from '../../../components/form/SearchAddress';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../../components/popup/notify.js';
-import { DEFAULT_AVATAR, AUXILIARY, PLANNING_REFERENT } from '../../../data/constants';
+import { DEFAULT_AVATAR, AUXILIARY, PLANNING_REFERENT, REQUIRED_LABEL } from '../../../data/constants';
 import { validationMixin } from '../../../mixins/validationMixin.js';
 export default {
   metaInfo: {
@@ -238,7 +238,8 @@ export default {
           sortable: false,
           style: 'width: 30px'
         }
-      ]
+      ],
+      REQUIRED_LABEL,
     }
   },
   validations: {
@@ -292,28 +293,28 @@ export default {
     },
     mobilePhoneError () {
       if (!this.$v.newUser.mobilePhone.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.newUser.mobilePhone.frPhoneNumber || !this.$v.newUser.mobilePhone.maxLength) {
         return 'Numéro de téléphone non valide';
       }
     },
     zipCodeError () {
       if (!this.$v.newUser.contact.zipCode.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.newUser.contact.zipCode.frZipCode || !this.$v.newUser.contact.zipCode.maxLength) {
         return 'Code postal non valide';
       }
     },
     emailError () {
       if (!this.$v.newUser.local.email.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.newUser.local.email.email) {
         return 'Email non valide';
       }
     },
     addressError () {
       if (!this.$v.newUser.contact.address.fullAddress.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       }
       return 'Adresse non valide';
     },

@@ -292,7 +292,8 @@ import gdrive from '../../api/GoogleDrive.js';
 import cloudinary from '../../api/Cloudinary.js';
 import nationalities from '../../data/nationalities.js';
 import countries from '../../data/countries.js';
-import { AUXILIARY, PLANNING_REFERENT, TRANSPORT_OPTIONS } from '../../data/constants.js';
+import { AUXILIARY, PLANNING_REFERENT, TRANSPORT_OPTIONS, REQUIRED_LABEL } from '../../data/constants.js';
+
 import SelectSector from '../form/SelectSector';
 import Input from '../form/Input.vue';
 import Select from '../form/Select.vue';
@@ -317,7 +318,7 @@ export default {
   data () {
     return {
       transportOptions: TRANSPORT_OPTIONS,
-      requiredField: 'Champ requis',
+      requiredField: REQUIRED_LABEL,
       requiredDoc: 'Document requis',
       disablePictureEdition: true,
       docsThmbnails: {},
@@ -565,7 +566,7 @@ export default {
     },
     birthStateError () {
       if (!this.$v.user.alenvi.identity.birthState.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.user.alenvi.identity.birthState.minLength ||
       !this.$v.user.alenvi.identity.birthState.maxLength ||
       !this.$v.user.alenvi.identity.birthState.numeric) {
@@ -574,7 +575,7 @@ export default {
     },
     ssnError () {
       if (!this.$v.user.alenvi.identity.socialSecurityNumber.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.user.alenvi.identity.socialSecurityNumber.minLength ||
       !this.$v.user.alenvi.identity.socialSecurityNumber.maxLength ||
       !this.$v.user.alenvi.identity.socialSecurityNumber.numeric) {
@@ -583,49 +584,49 @@ export default {
     },
     phoneNbrError () {
       if (!this.$v.user.alenvi.mobilePhone.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.user.alenvi.mobilePhone.frPhoneNumber || !this.$v.user.alenvi.mobilePhone.maxLength) {
         return 'Numéro de téléphone non valide';
       }
     },
     emailError () {
       if (!this.$v.user.alenvi.local.email.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.user.alenvi.local.email.email) {
         return 'Email non valide';
       }
     },
     zipCodeError () {
       if (!this.$v.user.alenvi.contact.zipCode.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.user.alenvi.contact.zipCode.frZipCode || !this.$v.user.alenvi.contact.zipCode.maxLength) {
         return 'Code postal non valide';
       }
     },
     emergencyPhoneNbrError () {
       if (!this.$v.user.alenvi.administrative.emergencyContact.phoneNumber.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.user.alenvi.administrative.emergencyContact.phoneNumber.frPhoneNumber || !this.$v.user.alenvi.administrative.emergencyContact.phoneNumber.maxLength) {
         return 'Numéro de téléphone non valide';
       }
     },
     ibanError () {
       if (!this.$v.user.alenvi.administrative.payment.rib.iban.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.user.alenvi.administrative.payment.rib.iban.iban) {
         return 'IBAN non valide';
       }
     },
     bicError () {
       if (!this.$v.user.alenvi.administrative.payment.rib.bic.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.user.alenvi.administrative.payment.rib.bic.bic) {
         return 'BIC non valide';
       }
     },
     addressError () {
       if (!this.$v.user.alenvi.contact.address.fullAddress.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       }
       return 'Adresse non valide';
     },

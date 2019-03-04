@@ -56,6 +56,7 @@ import { required, email, sameAs, minLength } from 'vuelidate/lib/validators';
 
 import CompaniHeader from '../../components/CompaniHeader';
 import { NotifyNegative } from '../../components/popup/notify';
+import { REQUIRED_LABEL } from '../../data/constants';
 
 export default {
   name: 'CreatePassword',
@@ -100,14 +101,14 @@ export default {
   computed: {
     passwordError () {
       if (!this.$v.user.alenvi.local.password.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.user.alenvi.local.password.minLength) {
         return 'Mot de passe trop court';
       }
     },
     passwordConfirmError () {
       if (!this.$v.passwordConfirm.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.passwordConfirm.sameAs) {
         return 'Le mot de passe doit être identique';
       }

@@ -106,3 +106,5 @@ export const END_CONTRACT_REASONS = [
   { label: 'Fin de contrat CDD', value: 'cdd_end' },
   { label: 'Autres', value: OTHER },
 ];
+
+export const REQUIRED_LABEL = 'Champ requis';

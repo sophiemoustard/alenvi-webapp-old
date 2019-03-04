@@ -141,6 +141,7 @@ import { required } from 'vuelidate/lib/validators';
 
 import SectorFilter from '../../components/form/SectorFilter'
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../popup/notify.js';
+import { REQUIRED_LABEL } from '../../data/constants.js';
 
 const configDhtmlxScheduler = (vm) => {
   // config line mark of current time
@@ -221,7 +222,7 @@ export default {
   },
   data () {
     return {
-      requiredField: 'Champ requis',
+      requiredField: REQUIRED_LABEL,
       openInternHoursModal: false,
       internHoursModalBtnLoading: false,
       internHoursDefault: Date.now(),

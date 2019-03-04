@@ -212,7 +212,7 @@ import { validationMixin } from '../../../mixins/validationMixin.js';
 import Input from '../../../components/form/Input.vue';
 import SearchAddress from '../../../components/form/SearchAddress.vue';
 import { frAddress, posDecimals } from '../../../helpers/vuelidateCustomVal';
-import { BILLING_DIRECT, BILLING_INDIRECT } from '../../../data/constants.js';
+import { BILLING_DIRECT, BILLING_INDIRECT, REQUIRED_LABEL } from '../../../data/constants.js';
 
 export default {
   name: 'CustomersConfig',
@@ -420,7 +420,7 @@ export default {
       return `${process.env.API_HOSTNAME}/companies/${this.company._id}/gdrive/${this.company.folderId}/upload`;
     },
     addressError () {
-      return !this.$v.company.address.fullAddress.required ? 'Champ requis' : 'Adresse non valide';
+      return !this.$v.company.address.fullAddress.required ? REQUIRED_LABEL : 'Adresse non valide';
     },
     disableEditionButton () {
       return !this.editedService.name || !this.editedService.startDate || !this.editedService.defaultUnitAmount || !this.editedService.vat;

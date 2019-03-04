@@ -154,7 +154,7 @@ import { financialCertificatesMixin } from '../../mixins/financialCertificatesMi
 import { fundingMixin } from '../../mixins/fundingMixin.js';
 import esign from '../../api/Esign.js';
 import cgs from '../../statics/CGS.html';
-import { FIXED } from '../../data/constants';
+import { FIXED, REQUIRED_LABEL } from '../../data/constants';
 
 export default {
   name: 'Subscriptions',
@@ -230,14 +230,14 @@ export default {
     },
     ibanError () {
       if (!this.$v.customer.payment.iban.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.customer.payment.iban.iban) {
         return 'IBAN non valide';
       }
     },
     bicError () {
       if (!this.$v.customer.payment.bic.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.customer.payment.bic.bic) {
         return 'BIC non valide';
       }

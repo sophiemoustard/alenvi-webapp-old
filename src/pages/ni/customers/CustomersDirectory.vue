@@ -45,9 +45,9 @@
           </div>
         </div>
         <ni-modal-select v-model="newCustomer.identity.title" :error="$v.newCustomer.identity.title.$error" :options="civilityOptions"
-          caption="Civilité" @blur="$v.newCustomer.identity.title.$touch" errorLabel="Champ requis" requiredField />
+          caption="Civilité" @blur="$v.newCustomer.identity.title.$touch" :error-label="REQUIRED_LABEL" requiredField />
         <ni-modal-input v-model="newCustomer.identity.lastname" :error="$v.newCustomer.identity.lastname.$error"
-          caption="Nom" @blur="$v.newCustomer.identity.lastname.$touch" errorLabel="Champ requis" requiredField />
+          caption="Nom" @blur="$v.newCustomer.identity.lastname.$touch" :error-label="REQUIRED_LABEL" requiredField />
         <ni-modal-input v-model="newCustomer.identity.firstname" caption="Prénom" />
         <div class="row margin-input last">
           <ni-search-address v-model="newCustomer.contact.address.fullAddress" @selected="selectedAddress" @blur="$v.newCustomer.contact.address.fullAddress.$touch"
@@ -71,6 +71,7 @@ import NiModalInput from '../../../components/form/ModalInput';
 import NiModalSelect from '../../../components/form/ModalSelect';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../../components/popup/notify.js';
 import { customerProfileValidation } from '../../../helpers/customerProfileValidation.js';
+import { REQUIRED_LABEL } from '../../../data/constants';
 
 export default {
   metaInfo: {
@@ -193,21 +194,21 @@ export default {
     },
     zipCodeError () {
       if (!this.$v.newCustomer.contact.address.zipCode.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.newCustomer.contact.address.zipCode.frZipCode || !this.$v.newCustomer.contact.address.zipCode.maxLength) {
         return 'Code postal non valide';
       }
     },
     emailError () {
       if (!this.$v.newCustomer.email.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.newCustomer.email.email) {
         return 'Email non valide';
       }
     },
     addressError () {
       if (!this.$v.newCustomer.contact.address.fullAddress.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       }
       return 'Adresse non valide';
     }

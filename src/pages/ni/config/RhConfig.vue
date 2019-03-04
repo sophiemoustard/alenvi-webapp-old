@@ -110,6 +110,7 @@ import Input from '../../../components/form/Input.vue';
 import ModalInput from '../../../components/form/ModalInput.vue';
 import FileUploader from '../../../components/form/FileUploader.vue';
 import { configMixin } from '../../../mixins/configMixin';
+import { REQUIRED_LABEL } from '../../../data/constants';
 
 export default {
   name: 'RhConfig',
@@ -253,7 +254,7 @@ export default {
     },
     nbrError (path) {
       if (!this.$_.get(this.$v.company.rhConfig, path).required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$_.get(this.$v.company.rhConfig, path).numeric) {
         return 'Nombre non valide';
       }
