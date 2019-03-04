@@ -83,8 +83,8 @@ export default {
       getElemRemoved: 'planning/getElemRemoved'
     }),
     selectedAuxiliary () {
-      if (this.creationModal && this.newEvent.auxiliary !== '') return this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
-      if (this.editionModal && this.editedEvent.auxiliary !== '') return this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
+      if (this.creationModal && this.newEvent.auxiliary) return this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
+      if (this.editionModal && this.editedEvent.auxiliary) return this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
       return { picture: {}, identity: {} };
     },
   },
