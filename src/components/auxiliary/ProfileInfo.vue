@@ -3,10 +3,10 @@
     <div v-if="!isAuxiliary" class="row gutter-profile q-mb-xl">
       <div class="col-xs-12 col-md-6">
         <p class="input-caption">Communauté</p>
-        <ni-select-sector v-model="user.alenvi.sector" :company-id="company._id" @focus="saveTmp('sector')" @blur="updateUser('sector')" />
+        <ni-select-sector v-model="user.alenvi.sector" @blur="updateUser({ alenvi: 'sector' })" @focus="saveTmp('sector')" :company-id="mainUser.company._id" />
       </div>
-      <ni-input v-model="user.alenvi.mentor" caption="Marraine/parrain" @focus="saveTmp('mentor')" @blur="updateUser('mentor')" />
-      <ni-select v-model="user.alenvi.role._id" caption="Rôle" :options="auxiliaryRolesOptions" @focus="saveTmp('role._id')" @blur="updateUser('role._id')" />
+      <ni-input v-model="user.alenvi.mentor" caption="Marraine/parrain" @focus="saveTmp('mentor')" @blur="updateUser({ alenvi: 'mentor' })" />
+      <ni-select v-model="user.alenvi.role._id" caption="Rôle" :options="auxiliaryRolesOptions" @focus="saveTmp('role._id')" @blur="updateUser({ alenvi: 'role._id' })" />
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
@@ -52,34 +52,34 @@
       </div>
       <div class="row gutter-profile">
         <ni-input caption="Prénom" :error="$v.user.alenvi.identity.firstname.$error" v-model="user.alenvi.identity.firstname"
-          @blur="updateUser('identity.firstname')" @focus="saveTmp('identity.firstname')"
+          @blur="updateUser({ alenvi: 'identity.firstname', ogust: 'first_name' })" @focus="saveTmp('identity.firstname')"
         />
         <ni-input caption="Nom" :error="$v.user.alenvi.identity.lastname.$error" v-model="user.alenvi.identity.lastname"
-          @blur="updateUser('identity.lastname')" @focus="saveTmp('identity.lastname')"
+          @blur="updateUser({ alenvi: 'identity.lastname', ogust: 'last_name' })" @focus="saveTmp('identity.lastname')"
         />
         <ni-select caption="Nationalité" :error="$v.user.alenvi.identity.nationality.$error" :options="nationalitiesOptions"
           v-model="user.alenvi.identity.nationality" @focus="saveTmp('identity.nationality')"
-          @blur="updateUser('identity.nationality')"
+          @blur="updateUser({ alenvi: 'identity.nationality', ogust: 'nationality' })"
         />
         <ni-datetime-picker caption="Date de naissance" :error="$v.user.alenvi.identity.birthDate.$error"
           v-model="user.alenvi.identity.birthDate" @focus="saveTmp('identity.birthDate')"
-          @blur="updateUser('identity.birthDate')"
+          @blur="updateUser({ alenvi: 'identity.birthDate', ogust: 'date_of_birth' })"
         />
         <ni-select caption="Pays de naissance" :error="$v.user.alenvi.identity.birthCountry.$error" :options="nationalitiesOptions"
           v-model="user.alenvi.identity.birthCountry" @focus="saveTmp('identity.birthCountry')"
-          @blur="updateUser('identity.birthCountry')"
+          @blur="updateUser({ alenvi: 'identity.birthCountry', ogust: 'country_of_birth' })"
         />
         <ni-input caption="Département de naissance" :error="$v.user.alenvi.identity.birthState.$error" :errorLabel="birthStateError"
-          v-model="user.alenvi.identity.birthState" @blur="updateUser('identity.birthState')"
+          v-model="user.alenvi.identity.birthState" @blur="updateUser({ alenvi: 'identity.birthState', ogust: 'state_of_birth' })"
           @focus="saveTmp('identity.birthState')" :displayInput="this.user.alenvi.identity.birthCountry === 'FR'"
         />
         <ni-input caption="Ville de naissance" :error="$v.user.alenvi.identity.birthCity.$error"
           v-model="user.alenvi.identity.birthCity" @focus="saveTmp('identity.birthCity')"
-          @blur="updateUser('identity.birthCity')"
+          @blur="updateUser({ alenvi: 'identity.birthCity', ogust: 'place_of_birth' })"
         />
         <ni-input caption="Numéro de sécurité sociale" :error="$v.user.alenvi.identity.socialSecurityNumber.$error"
           v-model="user.alenvi.identity.socialSecurityNumber" @focus="saveTmp('identity.socialSecurityNumber')"
-          @blur="updateUser('identity.socialSecurityNumber')" :errorLabel="ssnError"
+          @blur="updateUser({ alenvi: 'identity.socialSecurityNumber', ogust: 'social_insurance_number' })" :errorLabel="ssnError"
         />
       </div>
     </div>
@@ -90,12 +90,12 @@
       </div>
       <div class="row gutter-profile">
         <ni-input caption="Numéro de téléphone" :error="$v.user.alenvi.mobilePhone.$error" :errorLabel="phoneNbrError" type="tel"
-          v-model.trim="user.alenvi.mobilePhone" @blur="updateUser('mobilePhone')" @focus="saveTmp('mobilePhone')" />
+          v-model.trim="user.alenvi.mobilePhone" @blur="updateUser({ alenvi: 'mobilePhone', ogust: 'mobile_phone' })" @focus="saveTmp('mobilePhone')" />
         <ni-input caption="Adresse email" :error="$v.user.alenvi.local.email.$error" :errorLabel="emailError" type="email" lowerCase disable
           v-model.trim="user.alenvi.local.email" @blur="updateUser({ alenvi: 'local.email', ogust: 'email' })" @focus="saveTmp('local.email')"
           :displayInput="!isAuxiliary" />
         <ni-search-address v-model="user.alenvi.contact.address.fullAddress" color="white" inverted-light @focus="saveTmp('contact.address.fullAddress')"
-          @blur="updateUser('contact.address.fullAddress')" @selected="selectedAddress" :error-label="addressError"
+          @blur="updateUser({ alenvi: 'contact.address.fullAddress', ogust: 'address' })" @selected="selectedAddress" :error-label="addressError"
           :error="$v.user.alenvi.contact.address.fullAddress.$error"
         />
       </div>
@@ -108,11 +108,11 @@
       <div class="row gutter-profile">
         <ni-input caption="Prénom et nom" :error="$v.user.alenvi.administrative.emergencyContact.name.$error"
           v-model="user.alenvi.administrative.emergencyContact.name" @focus="saveTmp('administrative.emergencyContact.name')"
-          @blur="updateUser('administrative.emergencyContact.name')"
+          @blur="updateUser({ alenvi: 'administrative.emergencyContact.name' })"
         />
         <ni-input caption="Numéro de téléphone" :error="$v.user.alenvi.administrative.emergencyContact.phoneNumber.$error"
           v-model.trim="user.alenvi.administrative.emergencyContact.phoneNumber" @focus="saveTmp('administrative.emergencyContact.phoneNumber')"
-          @blur="updateUser('administrative.emergencyContact.phoneNumber')" :errorLabel="emergencyPhoneNbrError"
+          @blur="updateUser({ alenvi: 'administrative.emergencyContact.phoneNumber' })" :errorLabel="emergencyPhoneNbrError"
         />
       </div>
     </div>
@@ -124,11 +124,11 @@
       <div class="row gutter-profile">
         <ni-input caption="IBAN" :error="$v.user.alenvi.administrative.payment.rib.iban.$error" :errorLabel="ibanError"
         v-model="user.alenvi.administrative.payment.rib.iban" @focus="saveTmp('administrative.payment.rib.iban')" upperCase
-          @blur="updateUser('administrative.payment.rib.iban')"
+          @blur="updateUser({ alenvi: 'administrative.payment.rib.iban', ogust: 'iban_number' })"
         />
         <ni-input caption="BIC" :error="$v.user.alenvi.administrative.payment.rib.bic.$error" :errorLabel="bicError" upperCase
           v-model.trim="user.alenvi.administrative.payment.rib.bic" @focus="saveTmp('administrative.payment.rib.bic')"
-          @blur="updateUser('administrative.payment.rib.bic')"
+          @blur="updateUser({ alenvi: 'administrative.payment.rib.bic', ogust: 'bic_number' })"
         />
       </div>
     </div>
@@ -143,7 +143,7 @@
             <p v-if="isAuxiliary" class="input-caption">Merci de nous indiquer le type de document d'identité que tu possèdes.</p>
           </div>
           <q-field :error="$v.user.alenvi.administrative.identityDocs.$error" :error-label="requiredField">
-            <q-option-group color="primary" v-model="user.alenvi.administrative.identityDocs" @input="updateUser('administrative.identityDocs')"
+            <q-option-group color="primary" v-model="user.alenvi.administrative.identityDocs" @input="updateUser({ alenvi: 'administrative.identityDocs' })"
               :options="[
              { label: 'Carte Nationale d\'Identité', value: 'cni' },
              { label: 'Passeport', value: 'pp' },
@@ -222,7 +222,7 @@
           </div>
           <q-field :error="$v.user.alenvi.administrative.mutualFund.has.$error" :error-label="requiredField">
             <q-btn-toggle class="full-width" color="white" text-color="black" toggle-color="primary" v-model="user.alenvi.administrative.mutualFund.has"
-              @input="updateUser('administrative.mutualFund.has')" :options="[
+              @input="updateUser({ alenvi: 'administrative.mutualFund.has' })" :options="[
                   { label: 'Oui', value: false },
                   { label: 'Non', value: true }
                 ]" />
@@ -252,7 +252,7 @@
               color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.administrative.transportInvoice.transportType.$error" :error-label="requiredField">
-            <q-option-group color="primary" v-model="user.alenvi.administrative.transportInvoice.transportType" @input="updateUser('administrative.transportInvoice.transportType')"
+            <q-option-group color="primary" v-model="user.alenvi.administrative.transportInvoice.transportType" @input="updateUser({ alenvi: 'administrative.transportInvoice.transportType', ogust: 'default_means_of_transport' })"
               :options="transportOptions" />
           </q-field>
         </div>
@@ -286,19 +286,14 @@ import { mapGetters } from 'vuex';
 import { Cookies } from 'quasar';
 import { required, email, numeric, minLength, maxLength, requiredIf } from 'vuelidate/lib/validators';
 import 'vue-croppa/dist/vue-croppa.css'
-
 import { frPhoneNumber, iban, frAddress, bic } from '../../helpers/vuelidateCustomVal';
 import { extend } from '../../helpers/utils.js';
-
 import gdrive from '../../api/GoogleDrive.js';
 import cloudinary from '../../api/Cloudinary.js';
-
 import nationalities from '../../data/nationalities.js';
 import countries from '../../data/countries.js';
 import { AUXILIARY, PLANNING_REFERENT, TRANSPORT_OPTIONS } from '../../data/constants.js';
-
 import SelectSector from '../form/SelectSector';
-
 import Input from '../form/Input.vue';
 import Select from '../form/Select.vue';
 import FileUploader from '../form/FileUploader.vue';
@@ -307,7 +302,6 @@ import DatetimePicker from '../form/DatetimePicker.vue';
 import SearchAddress from '../form/SearchAddress';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../popup/notify';
 import { validationMixin } from '../../mixins/validationMixin.js';
-
 export default {
   name: 'ProfileInfo',
   mixins: [validationMixin],
@@ -377,6 +371,7 @@ export default {
       ],
       user: {
         alenvi: {
+          mentorId: '',
           local: {
             email: ''
           },
@@ -447,6 +442,7 @@ export default {
             maxLength: maxLength(10)
           },
           sector: { required },
+          mentorId: { required },
           identity: {
             firstname: { required },
             lastname: { required },
@@ -551,9 +547,6 @@ export default {
         return this.userProfile;
       }
       return this.mainUser;
-    },
-    company () {
-      return this.currentUser.company;
     },
     nationalitiesOptions () {
       return ['FR', ...Object.keys(nationalities).filter(nationality => nationality !== 'FR')].map(nationality => ({ value: nationality, label: nationalities[nationality] }));
@@ -665,15 +658,22 @@ export default {
     selectedAddress (item) {
       this.user.alenvi.contact.address = Object.assign({}, this.user.alenvi.contact.address, item);
     },
-    async updateUser (path) {
+    async updateUser (paths) {
       try {
-        if (this.tmpInput === this.$_.get(this.user.alenvi, path)) return;
-        if (this.$_.get(this.$v.user.alenvi, path)) {
-          this.$_.get(this.$v.user.alenvi, path).$touch();
-          const isValid = await this.waitForValidation(this.$v.user.alenvi, path);
+        if (this.tmpInput === this.$_.get(this.user.alenvi, paths.alenvi)) return;
+        if (this.$_.get(this.$v.user.alenvi, paths.alenvi)) {
+          this.$_.get(this.$v.user.alenvi, paths.alenvi).$touch();
+          const isValid = await this.waitForValidation(this.$v.user.alenvi, paths.alenvi);
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
-        await this.updateAlenviUser(path);
+        if (paths.alenvi && paths.ogust) {
+          await this.updateAlenviUser(paths.alenvi);
+          await this.updateOgustUser(paths);
+        } else if (paths.alenvi) {
+          await this.updateAlenviUser(paths.alenvi);
+        } else {
+          await this.updateOgustUser(paths);
+        }
         NotifyPositive('Modification enregistrée');
       } catch (e) {
         console.error(e);
@@ -691,15 +691,54 @@ export default {
       }
       const payload = this.$_.set({}, path, value);
       payload._id = this.currentUser._id;
-
       if (path === 'role._id') payload.role = value;
-
       if (path.match(/birthCountry/i) && value !== 'FR') {
         this.user.alenvi.identity.birthState = '99';
         payload.identity.birthState = '99';
       }
-
       await this.$users.updateById(payload);
+    },
+    async updateOgustUser (paths) {
+      let value = this.$_.get(this.user.alenvi, paths.alenvi);
+      if (paths.ogust.match(/date_of_birth/i)) {
+        value = this.$moment(value).format('YYYYMMDD');
+      }
+      if (paths.ogust.match(/iban_number/i)) {
+        value = value.split(' ').join('');
+      }
+      if (paths.ogust === 'default_means_of_transport') {
+        const correspondingOption = this.transportOptions.find(option => option.value === value);
+        value = correspondingOption.ogustValue;
+      }
+      const payload = this.$_.set({}, paths.ogust, value);
+      if (paths.ogust.match(/(iban|bic)_number/i)) {
+        if (paths.ogust === 'iban_number' && this.user.alenvi.administrative.payment.rib.bic) {
+          payload.bic_number = this.user.alenvi.administrative.payment.rib.bic;
+        } else if (paths.ogust === 'bic_number' && this.user.alenvi.administrative.payment.rib.iban) {
+          payload.iban_number = this.user.alenvi.administrative.payment.rib.iban.split(' ').join('');
+        } else {
+          return;
+        }
+        payload.id_tiers = this.currentUser.employee_id;
+        await this.$ogust.setBankInfo(payload);
+      } else if (paths.ogust === 'address') {
+        const { street, zipCode, city, additionalAddress } = this.user.alenvi.contact.address;
+        const addressPayload = {
+          id_address: this.currentUser.contact.addressId,
+          line: street,
+          supplement: additionalAddress,
+          zip: zipCode,
+          city
+        }
+        const cleanPayload = this.$_.pickBy(addressPayload);
+        await this.$ogust.setAddress(cleanPayload);
+      } else {
+        payload.id_employee = this.currentUser.employee_id
+        if (paths.ogust.match(/country_of_birth/i) && value !== 'FR') {
+          payload.state_of_birth = '99';
+        }
+        await this.$ogust.setEmployee(payload);
+      }
     },
     async uploadImage () {
       try {
@@ -830,22 +869,18 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables'
-
   .q-btn-group
     box-shadow: none
     & /deep/ button
       flex: 1
-
   .group-error
     font-size: 12px
     color: $secondary
     &-ok
       font-size: 12px
       color: $tertiary
-
   .croppa-container
     background-color: white
-
   .picture-container
      width: 200px
      height: 200px
