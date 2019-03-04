@@ -25,7 +25,7 @@ export const fillFilter = async ({ commit }, role) => {
     elems.push({
       label: sector.name,
       value: sector.name,
-      sector: sector._id
+      sectorId: sector._id
     })
   });
   commit('setFilter', elems);

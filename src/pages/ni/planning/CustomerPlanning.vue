@@ -558,8 +558,8 @@ export default {
     },
     // Filter
     async handleElemAddedToFilter (el) {
-      if (el.sector) {
-        this.filteredSectors.push(el.sector);
+      if (el.sectorId) { // el = sector
+        this.filteredSectors.push(el.sectorId);
         const customersBySector = await this.getCustomersBySectors(this.filteredSectors);
         for (let i = 0, l = customersBySector.length; i < l; i++) {
           if (!this.customers.some(cus => customersBySector[i]._id === cus._id)) {
@@ -567,7 +567,7 @@ export default {
           }
         }
         this.refreshPlanning();
-      } else {
+      } else { // el = auxiliary
         if (!this.customers.some(cust => cust._id === el._id)) {
           this.filteredCustomers.push(el);
           this.customers.push(el);
@@ -576,8 +576,8 @@ export default {
       }
     },
     async handleElemRemovedFromFilter (el) {
-      if (el.sector) {
-        this.filteredSectors = this.filteredSectors.filter(sec => sec !== el.sector);
+      if (el.sectorId) {
+        this.filteredSectors = this.filteredSectors.filter(sec => sec !== el.sectorId);
         await this.refreshCustomers();
         await this.refreshPlanning();
       } else {
