@@ -49,6 +49,16 @@ const routes = [
         },
       },
       {
+        path: 'ni/config/auxiliaries',
+        name: 'auxiliaries config',
+        component: () => import('pages/ni/config/auxiliariesConfig'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['rhconfig:edit'],
+          parent: 'configuration',
+        },
+      },
+      {
         path: 'ni/config/tags',
         name: 'tags config',
         component: () => import('pages/ni/config/TagConfig'),

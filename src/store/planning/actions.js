@@ -1,6 +1,7 @@
-import Ogust from '../../api/Ogust'
+import Sectors from '../../api/Sectors'
 import Users from '../../api/Users'
 import Customers from '../../api/Customers'
+import store from '../../store/index'
 
 import { AUXILIARY, PLANNING_REFERENT } from '../../data/constants';
 
@@ -19,14 +20,13 @@ export const fillFilter = async ({ commit }, role) => {
       elems[i].label = `${elems[i].identity.title} ${elems[i].identity.lastname}`;
     }
   }
-  const allSectorsRaw = await Ogust.getList('employee.sector');
-  for (const k in allSectorsRaw) {
-    if (k === '*') continue;
+  const sectors = await Sectors.showAll({ company: store.getters['main/user'].company._id });
+  sectors.forEach(sector => {
     elems.push({
-      label: allSectorsRaw[k],
-      value: allSectorsRaw[k],
-      ogustSector: k
-    });
-  }
+      label: sector.name,
+      value: sector.name,
+      sector: sector._id
+    })
+  });
   commit('setFilter', elems);
 }

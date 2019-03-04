@@ -141,7 +141,7 @@ export default {
             this.addSavedTerms('Customers');
           }
         } else {
-          const userSector = this.getFilter.find(filter => filter.ogustSector === this.getUser.sector);
+          const userSector = this.getFilter.find(filter => filter.sector === this.getUser.sector);
           if (userSector) {
             this.$refs.refFilter.add(userSector.label);
           }
@@ -223,7 +223,7 @@ export default {
         const can = this.$can({
           user: this.$store.getters['main/user'],
           auxiliaryIdEvent: eventInfo.person.id,
-          auxiliarySectorEvent: eventInfo.person.sector,
+          auxiliarySectorEvent: eventInfo.person.sector._id,
           permissions: [
             { name: 'planning:create:user', rule: 'isInSameSector' },
             { name: 'planning:create', rule: 'isOwner' }

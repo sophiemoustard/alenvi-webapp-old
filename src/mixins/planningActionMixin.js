@@ -180,11 +180,12 @@ export const planningActionMixin = {
 
         await this.$events.create(payload);
 
-        this.getEvents();
+        this.refreshPlanning();
         this.creationModal = false;
         this.resetCreationForm(false);
         NotifyPositive('Évènement créé');
       } catch (e) {
+        console.error(e);
         NotifyNegative('Erreur lors de la création de l\'évènement');
       } finally {
         this.loading = false
@@ -268,7 +269,7 @@ export const planningActionMixin = {
         await this.$events.updateById(this.editedEvent._id, payload);
         NotifyPositive('Évènement modifié');
 
-        this.getEvents();
+        this.refreshPlanning();
         this.editionModal = false;
         this.resetEditionForm();
       } catch (e) {
@@ -368,7 +369,7 @@ export const planningActionMixin = {
         this.loading = true
         if (shouldDeleteRepetition) {
           await this.$events.deleteRepetition(this.editedEvent._id);
-          this.getEvents();
+          this.refreshPlanning();
         } else {
           await this.$events.deleteById(this.editedEvent._id);
           this.events = this.events.filter(event => event._id !== this.editedEvent._id);

@@ -3,7 +3,7 @@
     <div v-if="!isAuxiliary" class="row gutter-profile q-mb-xl">
       <div class="col-xs-12 col-md-6">
         <p class="input-caption">Communauté</p>
-        <ni-select-sector v-model="user.alenvi.sector" @myBlur="updateUser({ alenvi: 'sector', ogust: 'sector' })" />
+        <ni-select-sector v-model="user.alenvi.sector" @blur="updateUser({ alenvi: 'sector' })" @focus="saveTmp('sector')" :company-id="mainUser.company._id" />
       </div>
       <ni-input v-model="user.alenvi.mentor" caption="Marraine/parrain" @focus="saveTmp('mentor')" @blur="updateUser({ alenvi: 'mentor' })" />
       <ni-select v-model="user.alenvi.role._id" caption="Rôle" :options="auxiliaryRolesOptions" @focus="saveTmp('role._id')" @blur="updateUser({ alenvi: 'role._id' })" />
@@ -286,19 +286,14 @@ import { mapGetters } from 'vuex';
 import { Cookies } from 'quasar';
 import { required, email, numeric, minLength, maxLength, requiredIf } from 'vuelidate/lib/validators';
 import 'vue-croppa/dist/vue-croppa.css'
-
 import { frPhoneNumber, iban, frAddress, bic } from '../../helpers/vuelidateCustomVal';
 import { extend } from '../../helpers/utils.js';
-
 import gdrive from '../../api/GoogleDrive.js';
 import cloudinary from '../../api/Cloudinary.js';
-
 import nationalities from '../../data/nationalities.js';
 import countries from '../../data/countries.js';
 import { AUXILIARY, PLANNING_REFERENT, TRANSPORT_OPTIONS } from '../../data/constants.js';
-
 import SelectSector from '../form/SelectSector';
-
 import Input from '../form/Input.vue';
 import Select from '../form/Select.vue';
 import FileUploader from '../form/FileUploader.vue';
@@ -307,7 +302,6 @@ import DatetimePicker from '../form/DatetimePicker.vue';
 import SearchAddress from '../form/SearchAddress';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../popup/notify';
 import { validationMixin } from '../../mixins/validationMixin.js';
-
 export default {
   name: 'ProfileInfo',
   mixins: [validationMixin],
@@ -697,14 +691,11 @@ export default {
       }
       const payload = this.$_.set({}, path, value);
       payload._id = this.currentUser._id;
-
       if (path === 'role._id') payload.role = value;
-
       if (path.match(/birthCountry/i) && value !== 'FR') {
         this.user.alenvi.identity.birthState = '99';
         payload.identity.birthState = '99';
       }
-
       await this.$users.updateById(payload);
     },
     async updateOgustUser (paths) {
@@ -743,7 +734,6 @@ export default {
         await this.$ogust.setAddress(cleanPayload);
       } else {
         payload.id_employee = this.currentUser.employee_id
-
         if (paths.ogust.match(/country_of_birth/i) && value !== 'FR') {
           payload.state_of_birth = '99';
         }
@@ -879,22 +869,18 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables'
-
   .q-btn-group
     box-shadow: none
     & /deep/ button
       flex: 1
-
   .group-error
     font-size: 12px
     color: $secondary
     &-ok
       font-size: 12px
       color: $tertiary
-
   .croppa-container
     background-color: white
-
   .picture-container
      width: 200px
      height: 200px

@@ -69,7 +69,7 @@
               <q-icon v-if="$v.newUser.sector.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newUser.sector.$error" error-label="Champ requis">
-              <ni-select-sector v-model="newUser.sector" @myBlur="$v.newUser.sector.$touch" inModal />
+              <ni-select-sector v-model="newUser.sector" @blur="$v.newUser.sector.$touch" in-modal :company-id="company._id" />
             </q-field>
           </div>
         </div>
@@ -99,7 +99,6 @@
 <script>
 import { required, email, maxLength } from 'vuelidate/lib/validators';
 import randomize from 'randomatic';
-
 import { frPhoneNumber, frAddress } from '../../../helpers/vuelidateCustomVal';
 import { clear } from '../../../helpers/utils.js';
 import { userProfileValidation } from '../../../helpers/userProfileValidation';
@@ -112,7 +111,6 @@ import NiSearchAddress from '../../../components/form/SearchAddress';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../../components/popup/notify.js';
 import { DEFAULT_AVATAR, AUXILIARY, PLANNING_REFERENT } from '../../../data/constants';
 import { validationMixin } from '../../../mixins/validationMixin.js';
-
 export default {
   metaInfo: {
     title: 'Répertoire'
@@ -337,16 +335,13 @@ export default {
           hiringDate = this.$_.orderBy(contracts, ['startDate'], ['asc'])[0].startDate;
         }
       }
-
       return hiringDate;
     },
     async getUserList () {
       try {
         const users = await this.$users.showAll({ role: [AUXILIARY, PLANNING_REFERENT] });
-        const sectors = await this.$ogust.getList('employee.sector');
         this.userList = users.map((user) => {
           const hiringDate = this.getHiringDate(user);
-
           if (user.isActive) {
             const checkProfileErrors = userProfileValidation(user);
             this.$store.commit('rh/saveNotification', {
@@ -369,7 +364,7 @@ export default {
               profileErrors: checkProfileErrors.error,
               tasksErrors: checkTasks,
               startDate: user.createdAt,
-              sector: sectors[user.sector],
+              sector: user.sector ? user.sector.name : 'N/A',
               isActive: user.isActive,
               hiringDate,
             }
@@ -381,7 +376,7 @@ export default {
               picture: user.picture ? user.picture.link : null
             },
             startDate: user.createdAt,
-            sector: sectors[user.sector],
+            sector: user.sector ? user.sector.name : 'N/A',
             isActive: user.isActive,
             hiringDate,
           }
@@ -419,7 +414,6 @@ export default {
           city: this.newUser.contact.address.city
         },
         email: this.newUser.local.email,
-        sector: this.newUser.sector,
         mobile_phone: this.newUser.mobilePhone,
         manager: this.newUser.ogustManagerId
       };
@@ -440,10 +434,8 @@ export default {
         this.$v.newUser.$touch();
         const isValid = await this.waitForFormValidation(this.$v.newUser);
         if (!isValid) throw new Error('Invalid fields');
-
         const existingEmployee = await this.$ogust.getEmployees({ email: this.newUser.local.email });
         if (Object.keys(existingEmployee).length !== 0) throw new Error('Existing email');
-
         const newEmployee = await this.createOgustUser();
         this.newUser.employee_id = newEmployee.data.data.employee.id_employee;
         const employee = await this.$ogust.getEmployeeById(this.newUser.employee_id);
@@ -486,7 +478,6 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables'
-
   /deep/ .q-option .q-option-label
     font-size: 14px
 </style>

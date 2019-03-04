@@ -86,7 +86,7 @@ export default {
     this.selectedAuxiliary = this.currentUser;
     this.getTimelineDays();
     await this.getAuxiliaries();
-    await this.getEvents();
+    await this.refreshPlanning();
     await this.getCustomers();
     this.setInternalHours();
   },
@@ -99,14 +99,14 @@ export default {
     },
     async updateAuxiliary (auxiliaryId) {
       this.selectedAuxiliary = this.auxiliaries.find(aux => aux._id === auxiliaryId);
-      await this.getEvents();
+      await this.refreshPlanning();
     },
     async updateTimeline () {
       this.getTimelineDays();
-      await this.getEvents();
+      await this.refreshPlanning();
     },
     // Refresh data
-    async getEvents () {
+    async refreshPlanning () {
       try {
         const params = {
           startDate: this.startOfWeek.format('YYYYMMDD'),
