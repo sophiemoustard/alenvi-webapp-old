@@ -11,8 +11,8 @@
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions table-actions-margin">
-                    <q-btn flat round small color="grey" icon="edit" @click.native="startSectorEdition(col.value)" />
-                    <ni-async-disable-btn flat round small color="grey" icon="delete" :sector="col.value" @click="deleteSector(col.value, props.row.__index)" />
+                    <q-btn flat round small color="grey" icon="edit" @click.native="openEditionModal(col.value)" />
+                    <ni-delete-sector-btn flat round small color="grey" icon="delete" :sector="col.value" @click="deleteSector(col.value, props.row.__index)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -36,9 +36,9 @@
             <span><q-icon name="clear" @click.native="sectorCreationModal = false" /></span>
           </div>
         </div>
-        <ni-modal-input caption="Nom" v-model="newSector.name" :error="$v.newSector.name.$error" :errorLabel="nameError($v.newSector)" @blur="$v.newSector.name.$touch" />
+        <ni-modal-input caption="Nom" v-model="newSector.name" :error="$v.newSector.name.$error" :error-label="nameError($v.newSector)" @blur="$v.newSector.name.$touch" required-field />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Ajouter une équipe" icon-right="add" color="primary" :loading="loading" @click="createNewSector" />
+      <q-btn no-caps class="full-width modal-btn" label="Ajouter une équipe" icon-right="add" color="primary" :disable="newSector.name === ''" :loading="loading" @click="createNewSector" />
     </q-modal>
 
     <!-- Sector edition modal -->
@@ -52,7 +52,7 @@
             <span><q-icon name="clear" @click.native="sectorEditionModal = false" /></span>
           </div>
         </div>
-        <ni-modal-input ref="modalInput" caption="Nom" v-model="editedSector.name" :error="$v.editedSector.name.$error" :errorLabel="nameError($v.editedSector)" />
+        <ni-modal-input caption="Nom" v-model="editedSector.name" :error="$v.editedSector.name.$error" :error-label="nameError($v.editedSector)" required-field />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Editer l'équipe" icon-right="add" color="primary" :disable="isSameThanEditedSector" :loading="loading" @click="updateSector" />
     </q-modal>
@@ -65,14 +65,16 @@ import { sector } from '../../../helpers/vuelidateCustomVal.js';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '../../../components/popup/notify';
 import ModalInput from '../../../components/form/ModalInput.vue';
 import ModalSelect from '../../../components/form/ModalSelect.vue';
-import AsyncDisableBtn from '../../../components/button/AsyncDisableBtn';
+import DeleteSectorBtn from '../../../components/button/DeleteSectorBtn';
+import { validationMixin } from '../../../mixins/validationMixin.js';
 
 export default {
   name: 'AuxiliariesConfig',
+  mixins: [validationMixin],
   components: {
     'ni-modal-input': ModalInput,
     'ni-modal-select': ModalSelect,
-    'ni-async-disable-btn': AsyncDisableBtn
+    'ni-delete-sector-btn': DeleteSectorBtn
   },
   data () {
     return {
@@ -127,9 +129,6 @@ export default {
     await this.getSectors();
   },
   methods: {
-    saveTmp (event) {
-      this.tmpInput = event
-    },
     async getSectors () {
       try {
         this.sectors = await this.$sectors.showAll({ company: this.company._id });
@@ -140,7 +139,7 @@ export default {
     },
     async createNewSector () {
       try {
-        const isValid = await this.waitForSectorValidation(this.$v.newSector.name);
+        const isValid = await this.waitForFormValidation(this.$v.newSector.name);
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
         this.newSector.company = this.company._id;
@@ -160,7 +159,7 @@ export default {
       this.newSector = { name: '' };
       this.$v.newSector.$reset();
     },
-    startSectorEdition (id) {
+    openEditionModal (id) {
       const selectedSector = this.sectors.find(sector => sector._id === id);
       this.editedSector = { _id: selectedSector._id, name: selectedSector.name };
       this.tmpInput = this.editedSector.name;
@@ -168,7 +167,7 @@ export default {
     },
     async updateSector () {
       try {
-        const isValid = await this.waitForSectorValidation(this.$v.editedSector.name);
+        const isValid = await this.waitForFormValidation(this.$v.editedSector.name);
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
         await this.$sectors.updateById(this.editedSector._id, { name: this.editedSector.name });
@@ -186,19 +185,6 @@ export default {
       this.sectorEditionModal = false;
       this.editedSector = { name: '' };
       this.$v.editedSector.$reset();
-    },
-    async waitForSectorValidation (validationObj) {
-      return new Promise((resolve) => {
-        const unwatch = this.$watch(() => !validationObj.$pending, (notPending) => {
-          if (notPending) {
-            if (unwatch) {
-              unwatch();
-            }
-            validationObj.$touch();
-            resolve(!validationObj.$error);
-          }
-        }, { immediate: true });
-      })
     },
     async deleteSector (sectorId, cell) {
       try {

@@ -23,6 +23,7 @@ export const validationMixin = {
             if (unwatch) {
               unwatch();
             }
+            validationObj.$touch();
             resolve(!validationObj.$error);
           }
         }, { immediate: true });
