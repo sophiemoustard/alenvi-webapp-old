@@ -51,7 +51,7 @@ const routes = [
       {
         path: 'ni/config/auxiliaries',
         name: 'auxiliaries config',
-        component: () => import('pages/ni/config/auxiliariesConfig'),
+        component: () => import('pages/ni/config/AuxiliariesConfig'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['rhconfig:edit'],
