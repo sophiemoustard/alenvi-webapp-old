@@ -33,12 +33,15 @@
             <h5>Ajouter une <span class="text-weight-bold">équipe</span></h5>
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
-            <span><q-icon name="clear" @click.native="sectorCreationModal = false" /></span>
+            <span>
+              <q-icon name="clear" @click.native="sectorCreationModal = false" /></span>
           </div>
         </div>
-        <ni-modal-input caption="Nom" v-model="newSector.name" :error="$v.newSector.name.$error" :error-label="nameError($v.newSector)" @blur="$v.newSector.name.$touch" required-field />
+        <ni-modal-input caption="Nom" v-model="newSector.name" :error="$v.newSector.name.$error" :error-label="nameError($v.newSector)"
+          @blur="$v.newSector.name.$touch" required-field />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Ajouter une équipe" icon-right="add" color="primary" :disable="newSector.name === ''" :loading="loading" @click="createNewSector" />
+      <q-btn no-caps class="full-width modal-btn" label="Ajouter une équipe" icon-right="add" color="primary" :disable="newSector.name === ''"
+        :loading="loading" @click="createNewSector" />
     </q-modal>
 
     <!-- Sector edition modal -->
@@ -49,12 +52,15 @@
             <h5>Editer l'<span class="text-weight-bold">équipe</span></h5>
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
-            <span><q-icon name="clear" @click.native="sectorEditionModal = false" /></span>
+            <span>
+              <q-icon name="clear" @click.native="sectorEditionModal = false" /></span>
           </div>
         </div>
-        <ni-modal-input caption="Nom" v-model="editedSector.name" :error="$v.editedSector.name.$error" :error-label="nameError($v.editedSector)" required-field />
+        <ni-modal-input caption="Nom" v-model="editedSector.name" :error="$v.editedSector.name.$error" :error-label="nameError($v.editedSector)"
+          required-field />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Editer l'équipe" icon-right="add" color="primary" :disable="isSameThanEditedSector" :loading="loading" @click="updateSector" />
+      <q-btn no-caps class="full-width modal-btn" label="Editer l'équipe" icon-right="add" color="primary" :disable="isSameThanEditedSector"
+        :loading="loading" @click="updateSector" />
     </q-modal>
   </q-page>
 </template>
