@@ -294,6 +294,11 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables'
 
+  .chip-container:hover
+    .avatar
+    .q-chip
+      box-shadow: 0 0 1px 1px $primary-dark;
+
   .q-tab-pane
     padding: 0;
 
