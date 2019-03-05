@@ -59,8 +59,8 @@ export default {
   },
   async mounted () {
     try {
-      await this.getCustomers();
       await this.fillFilter('auxiliaries');
+      await this.getCustomers();
       this.setInternalHours();
     } catch (e) {
       console.error(e);

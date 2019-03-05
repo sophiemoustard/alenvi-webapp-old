@@ -116,8 +116,8 @@ export default {
   },
   async mounted () {
     try {
-      await this.getEmployeesBySector();
       await this.fillFilter('customers');
+      await this.getEmployeesBySector();
     } catch (e) {
       console.error(e);
       NotifyNegative('Erreur lors de la récupération des personnes');

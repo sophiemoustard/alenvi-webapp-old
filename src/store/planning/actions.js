@@ -5,28 +5,40 @@ import store from '../../store/index'
 
 import { AUXILIARY, PLANNING_REFERENT } from '../../data/constants';
 
-export const fillFilter = async ({ commit }, role) => {
+export const fillFilter = async ({ commit }, roleToSearch) => {
+  const rawPromises = [];
   let elems = [];
-  if (role === 'auxiliaries') {
-    elems = await Users.showAllActive({ role: [AUXILIARY, PLANNING_REFERENT] });
-    for (let i = 0, l = elems.length; i < l; i++) {
-      elems[i].value = `${elems[i].identity.firstname} ${elems[i].identity.lastname}`;
-      elems[i].label = `${elems[i].identity.firstname} ${elems[i].identity.lastname}`;
-    }
+  rawPromises.push(Sectors.showAll({ company: store.getters['main/user'].company._id }));
+  if (roleToSearch === 'auxiliaries') {
+    rawPromises.push(Users.showAllActive({ role: [AUXILIARY, PLANNING_REFERENT] }));
   } else {
-    elems = await Customers.showAll({ subscriptions: true });
-    for (let i = 0, l = elems.length; i < l; i++) {
-      elems[i].value = `${elems[i].identity.title} ${elems[i].identity.lastname}`;
-      elems[i].label = `${elems[i].identity.title} ${elems[i].identity.lastname}`;
+    rawPromises.push(Customers.showAll({ subscriptions: true }));
+  }
+  const filterPromises = await Promise.all(rawPromises);
+  for (let i = 0, l = filterPromises[0].length; i < l; i++) {
+    elems.push({
+      label: filterPromises[0][i].name,
+      value: filterPromises[0][i].name,
+      sectorId: filterPromises[0][i]._id,
+      ...filterPromises[0][i]
+    });
+  }
+  if (roleToSearch === 'auxiliaries') {
+    for (let i = 0, l = filterPromises[1].length; i < l; i++) {
+      elems.push({
+        label: `${filterPromises[1][i].identity.firstname} ${filterPromises[1][i].identity.lastname}`,
+        value: `${filterPromises[1][i].identity.firstname} ${filterPromises[1][i].identity.lastname}`,
+        ...filterPromises[1][i]
+      })
+    }
+  } else { // customers
+    for (let i = 0, l = filterPromises[1].length; i < l; i++) {
+      elems.push({
+        label: `${filterPromises[1][i].identity.title} ${filterPromises[1][i].identity.lastname}`,
+        value: `${filterPromises[1][i].identity.title} ${filterPromises[1][i].identity.lastname}`,
+        ...filterPromises[1][i]
+      })
     }
   }
-  const sectors = await Sectors.showAll({ company: store.getters['main/user'].company._id });
-  sectors.forEach(sector => {
-    elems.push({
-      label: sector.name,
-      value: sector.name,
-      sectorId: sector._id
-    })
-  });
   commit('setFilter', elems);
 }
