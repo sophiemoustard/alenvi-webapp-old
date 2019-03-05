@@ -16,7 +16,6 @@ export default {
   data () {
     return {
       disable: false,
-      test: []
     }
   },
   async created () {
