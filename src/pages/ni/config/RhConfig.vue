@@ -479,7 +479,6 @@ export default {
     },
     async deleteSector (sectorId, cell) {
       try {
-        console.log('secotrID', sectorId);
         await this.$q.dialog({
           title: 'Confirmation',
           message: 'Etes-vous sûr de vouloir supprimer cette équipe ?',
