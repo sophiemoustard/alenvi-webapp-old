@@ -4,7 +4,7 @@
 
 <script>
 export default {
-  name: 'AsyncDisableBtn',
+  name: 'DeleteSectorBtn',
   props: {
     flat: Boolean,
     round: Boolean,
@@ -15,11 +15,17 @@ export default {
   },
   data () {
     return {
-      disable: false
+      disable: false,
+      test: []
     }
   },
-  async mounted () {
+  async created () {
     await this.hasAuxiliaries();
+  },
+  watch: {
+    async sector (val) {
+      await this.hasAuxiliaries();
+    }
   },
   methods: {
     clickHandler () {
