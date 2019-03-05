@@ -6,6 +6,6 @@ export default {
   isInSameSector (params) {
     if (!params.auxiliarySectorEvent) throw new Error('[can] wrong rule parameters');
     if (!params.user.sector) return true;
-    return params.user.sector._id === params.auxiliarySectorEvent;
+    return params.user.sector === params.auxiliarySectorEvent;
   }
 }

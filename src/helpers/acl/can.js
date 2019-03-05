@@ -13,7 +13,7 @@ const findPermission = (right, params) => {
 
 export const can = (params) => {
   if (params.user && params.user.role && params.user.role.rights) {
-    return params.user.role.rights.some(right => right ? params.permissions.some(findPermission(right, params)) : false);
+    return params.user.role.rights.filter(right => right ? params.permissions.some(findPermission(right, params)) : false).length > 0;
   }
   return false;
 };
