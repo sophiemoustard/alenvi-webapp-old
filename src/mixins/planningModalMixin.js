@@ -22,6 +22,7 @@ import {
   DATE_OPTIONS,
   ABSENCE_TYPE,
   ILLNESS,
+  REQUIRED_LABEL,
 } from '../data/constants';
 
 export const planningModalMixin = {
@@ -135,7 +136,7 @@ export const planningModalMixin = {
       ];
     },
     addressError () {
-      if (!this.validations.location.fullAddress.required) return 'Champ requis';
+      if (!this.validations.location.fullAddress.required) return REQUIRED_LABEL;
 
       return 'Adresse non valide';
     },

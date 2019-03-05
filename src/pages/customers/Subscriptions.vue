@@ -34,17 +34,17 @@
       <div class="q-mb-lg">
         <p class="title">Justificatifs APA ou autres financements</p>
         <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement" @uploaded="documentUploaded"
-          name="financialCertificates" collapsibleLabel="Ajouter un justificatif" :userProfile="customer"
-          :url="docsUploadUrl" @delete="deleteDocument($event)" additionalFieldsName="financialCertificate" />
+          name="financialCertificates" collapsible-label="Ajouter un justificatif" :user-profile="customer"
+          :url="docsUploadUrl" @delete="deleteDocument($event)" additional-fields-name="financialCertificate" />
       </div>
       <div class="q-mb-lg">
         <p class="title">Paiement</p>
         <div class="row gutter-profile">
           <ni-input caption="Nom associé au compte bancaire" v-model="customer.payment.bankAccountOwner" :error="$v.customer.payment.bankAccountOwner.$error"
             @focus="saveTmp('payment.bankAccountOwner')" @blur="updateCustomer({ alenvi: 'payment.bankAccountOwner', ogust: 'holder' })" />
-          <ni-input caption="IBAN" v-model="customer.payment.iban" :error="$v.customer.payment.iban.$error" :errorLabel="ibanError"
+          <ni-input caption="IBAN" v-model="customer.payment.iban" :error="$v.customer.payment.iban.$error" :error-label="ibanError"
             @focus="saveTmp('payment.iban')" @blur="updateCustomer({ alenvi: 'payment.iban', ogust: 'iban_number' })" />
-          <ni-input caption="BIC" v-model="customer.payment.bic" :error="$v.customer.payment.bic.$error" :errorLabel="bicError"
+          <ni-input caption="BIC" v-model="customer.payment.bic" :error="$v.customer.payment.bic.$error" :error-label="bicError"
             @focus="saveTmp('payment.bic')" @blur="updateCustomer({ alenvi: 'payment.bic', ogust: 'bic_number' })" />
         </div>
       </div>
@@ -154,7 +154,7 @@ import { financialCertificatesMixin } from '../../mixins/financialCertificatesMi
 import { fundingMixin } from '../../mixins/fundingMixin.js';
 import esign from '../../api/Esign.js';
 import cgs from '../../statics/CGS.html';
-import { FIXED } from '../../data/constants';
+import { FIXED, REQUIRED_LABEL } from '../../data/constants';
 
 export default {
   name: 'Subscriptions',
@@ -230,14 +230,14 @@ export default {
     },
     ibanError () {
       if (!this.$v.customer.payment.iban.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.customer.payment.iban.iban) {
         return 'IBAN non valide';
       }
     },
     bicError () {
       if (!this.$v.customer.payment.bic.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.customer.payment.bic.bic) {
         return 'BIC non valide';
       }

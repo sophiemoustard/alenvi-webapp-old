@@ -2,6 +2,7 @@
   <div :class="{ 'col-12 col-md-6': !inModal, 'col-12': inModal }">
     <div class="row justify-between">
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
+      <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <q-field :error="error" :error-label="errorLabel">
       <q-search :value="value" inverted-light color="white" placeholder=" " no-icon @input="inputEvent"
@@ -13,12 +14,14 @@
 </template>
 
 <script>
+import { REQUIRED_LABEL } from '../../data/constants';
+
 export default {
   name: 'SearchAddress',
   props: {
     value: String,
     caption: { type: String, default: 'Adresse' },
-    errorLabel: { type: String, default: 'Champ requis' },
+    errorLabel: { type: String, default: REQUIRED_LABEL },
     error: { type: Boolean, default: false },
     inModal: { type: Boolean, default: false },
     requiredField: { type: Boolean, default: false }

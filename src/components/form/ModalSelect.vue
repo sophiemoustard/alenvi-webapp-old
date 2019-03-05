@@ -15,12 +15,14 @@
 </template>
 
 <script>
+import { REQUIRED_LABEL } from '../../data/constants';
+
 export default {
   name: 'NiModalSelect',
   props: {
     caption: String,
     error: Boolean,
-    errorLabel: { type: String, default: 'Champ requis' },
+    errorLabel: { type: String, default: REQUIRED_LABEL },
     value: [String, Array],
     last: Boolean,
     options: Array,

@@ -44,7 +44,7 @@ export default {
       this.$emit('input', value);
     },
     blurHandler () {
-      this.$emit('myBlur');
+      this.$emit('blur');
     }
   }
 };

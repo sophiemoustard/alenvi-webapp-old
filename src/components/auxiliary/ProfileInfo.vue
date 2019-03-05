@@ -69,7 +69,7 @@
           v-model="user.alenvi.identity.birthCountry" @focus="saveTmp('identity.birthCountry')"
           @blur="updateUser({ alenvi: 'identity.birthCountry', ogust: 'country_of_birth' })"
         />
-        <ni-input caption="Département de naissance" :error="$v.user.alenvi.identity.birthState.$error" :errorLabel="birthStateError"
+        <ni-input caption="Département de naissance" :error="$v.user.alenvi.identity.birthState.$error" :error-label="birthStateError"
           v-model="user.alenvi.identity.birthState" @blur="updateUser({ alenvi: 'identity.birthState', ogust: 'state_of_birth' })"
           @focus="saveTmp('identity.birthState')" :displayInput="this.user.alenvi.identity.birthCountry === 'FR'"
         />
@@ -79,7 +79,7 @@
         />
         <ni-input caption="Numéro de sécurité sociale" :error="$v.user.alenvi.identity.socialSecurityNumber.$error"
           v-model="user.alenvi.identity.socialSecurityNumber" @focus="saveTmp('identity.socialSecurityNumber')"
-          @blur="updateUser({ alenvi: 'identity.socialSecurityNumber', ogust: 'social_insurance_number' })" :errorLabel="ssnError"
+          @blur="updateUser({ alenvi: 'identity.socialSecurityNumber', ogust: 'social_insurance_number' })" :error-label="ssnError"
         />
       </div>
     </div>
@@ -89,11 +89,11 @@
         <p :class="[groupErrors('contact').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('contact').msg }}</p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="Numéro de téléphone" :error="$v.user.alenvi.mobilePhone.$error" :errorLabel="phoneNbrError" type="tel"
+        <ni-input caption="Numéro de téléphone" :error="$v.user.alenvi.mobilePhone.$error" :error-label="phoneNbrError" type="tel"
           v-model.trim="user.alenvi.mobilePhone" @blur="updateUser({ alenvi: 'mobilePhone', ogust: 'mobile_phone' })" @focus="saveTmp('mobilePhone')" />
-        <ni-input caption="Adresse email" :error="$v.user.alenvi.local.email.$error" :errorLabel="emailError" type="email" lowerCase disable
+        <ni-input caption="Adresse email" :error="$v.user.alenvi.local.email.$error" :error-label="emailError" type="email" lower-case disable
           v-model.trim="user.alenvi.local.email" @blur="updateUser({ alenvi: 'local.email', ogust: 'email' })" @focus="saveTmp('local.email')"
-          :displayInput="!isAuxiliary" />
+          :display-input="!isAuxiliary" />
         <ni-search-address v-model="user.alenvi.contact.address.fullAddress" color="white" inverted-light @focus="saveTmp('contact.address.fullAddress')"
           @blur="updateUser({ alenvi: 'contact.address.fullAddress', ogust: 'address' })" @selected="selectedAddress" :error-label="addressError"
           :error="$v.user.alenvi.contact.address.fullAddress.$error"
@@ -112,7 +112,7 @@
         />
         <ni-input caption="Numéro de téléphone" :error="$v.user.alenvi.administrative.emergencyContact.phoneNumber.$error"
           v-model.trim="user.alenvi.administrative.emergencyContact.phoneNumber" @focus="saveTmp('administrative.emergencyContact.phoneNumber')"
-          @blur="updateUser({ alenvi: 'administrative.emergencyContact.phoneNumber' })" :errorLabel="emergencyPhoneNbrError"
+          @blur="updateUser({ alenvi: 'administrative.emergencyContact.phoneNumber' })" :error-label="emergencyPhoneNbrError"
         />
       </div>
     </div>
@@ -122,11 +122,11 @@
         <p :class="[groupErrors('iban').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('iban').msg }}</p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="IBAN" :error="$v.user.alenvi.administrative.payment.rib.iban.$error" :errorLabel="ibanError"
-        v-model="user.alenvi.administrative.payment.rib.iban" @focus="saveTmp('administrative.payment.rib.iban')" upperCase
+        <ni-input caption="IBAN" :error="$v.user.alenvi.administrative.payment.rib.iban.$error" :error-label="ibanError"
+          v-model="user.alenvi.administrative.payment.rib.iban" @focus="saveTmp('administrative.payment.rib.iban')" upper-case
           @blur="updateUser({ alenvi: 'administrative.payment.rib.iban', ogust: 'iban_number' })"
         />
-        <ni-input caption="BIC" :error="$v.user.alenvi.administrative.payment.rib.bic.$error" :errorLabel="bicError" upperCase
+        <ni-input caption="BIC" :error="$v.user.alenvi.administrative.payment.rib.bic.$error" :error-label="bicError" upper-case
           v-model.trim="user.alenvi.administrative.payment.rib.bic" @focus="saveTmp('administrative.payment.rib.bic')"
           @blur="updateUser({ alenvi: 'administrative.payment.rib.bic', ogust: 'bic_number' })"
         />
@@ -144,24 +144,20 @@
           </div>
           <q-field :error="$v.user.alenvi.administrative.identityDocs.$error" :error-label="requiredField">
             <q-option-group color="primary" v-model="user.alenvi.administrative.identityDocs" @input="updateUser({ alenvi: 'administrative.identityDocs' })"
-              :options="[
-             { label: 'Carte Nationale d\'Identité', value: 'cni' },
-             { label: 'Passeport', value: 'pp' },
-             { label: 'Titre de séjour', value: 'ts' }
-           ]" />
+              :options="identityDocsOptions" />
           </q-field>
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Carte d'identité (recto)" path="administrative.idCardRecto" alt="cni recto" :entity="currentUser"
             @delete="deleteDocument(user.alenvi.administrative.idCardRecto.driveId, 'administrative.idCardRecto')" name="idCardRecto"
             @uploaded="refreshUser" :url="docsUploadUrl" :error="$v.user.alenvi.administrative.idCardRecto.driveId.$error"
-            :additionalValue="`cni_recto_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" :extensions="extensions"
+            :additional-value="`cni_recto_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" :extensions="extensions"
           />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Carte d'identité (verso)" path="administrative.idCardVerso" alt="cni verso" :entity="currentUser" :url="docsUploadUrl"
             @delete="deleteDocument(user.alenvi.administrative.idCardVerso.driveId, 'administrative.idCardVerso')" name="idCardVerso"
-            @uploaded="refreshUser" :additionalValue="`cni_verso_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
+            @uploaded="refreshUser" :additional-value="`cni_verso_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
             :extensions="extensions"
           />
         </div>
@@ -169,14 +165,14 @@
           <ni-file-uploader caption="Passeport" path="administrative.passport" alt="passeport" :entity="currentUser"
             @delete="deleteDocument(user.alenvi.administrative.passport.driveId, 'administrative.passport')" name="passport" :url="docsUploadUrl"
             @uploaded="refreshUser" :error="$v.user.alenvi.administrative.passport.driveId.$error" :extensions="extensions"
-            :additionalValue="`passport_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
+            :additional-value="`passport_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
           />
         </div>
         <div v-if="user.alenvi.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Titre de séjour (recto)" path="administrative.residencePermitRecto" alt="titre de séjour (recto)" :entity="currentUser"
             @delete="deleteDocument(user.alenvi.administrative.residencePermitRecto.driveId, 'administrative.residencePermitRecto')"
             @uploaded="refreshUser" :url="docsUploadUrl" :error="$v.user.alenvi.administrative.residencePermitRecto.driveId.$error"
-            name="residencePermitRecto" :additionalValue="`titre_de_séjour_recto_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
+            name="residencePermitRecto" :additional-value="`titre_de_séjour_recto_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
             :extensions="extensions"
           />
         </div>
@@ -184,28 +180,28 @@
           <ni-file-uploader caption="Titre de séjour (verso)" path="administrative.residencePermitVerso" alt="titre de séjour (verso)" name="residencePermitVerso"
             @delete="deleteDocument(user.alenvi.administrative.residencePermitVerso.driveId, 'administrative.residencePermitVerso')" :entity="currentUser"
             @uploaded="refreshUser" :url="docsUploadUrl" :extensions="extensions"
-            :additionalValue="`titre_de_séjour_verso_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
+            :additional-value="`titre_de_séjour_verso_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
           />
         </div>
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Attestation de sécurité sociale" path="administrative.healthAttest" alt="attestation secu" :entity="currentUser"
             @delete="deleteDocument(user.alenvi.administrative.healthAttest.driveId, 'administrative.healthAttest')" name="healthAttest"
             @uploaded="refreshUser" :error="$v.user.alenvi.administrative.healthAttest.driveId.$error"
-            :additionalValue="`attestation_secu_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" :url="docsUploadUrl" :extensions="extensions"
+            :additional-value="`attestation_secu_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" :url="docsUploadUrl" :extensions="extensions"
           />
         </div>
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Facture téléphonique" path="administrative.phoneInvoice" alt="facture téléphone" :entity="currentUser"
             @delete="deleteDocument(user.alenvi.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')" name="phoneInvoice"
             @uploaded="refreshUser" :error="$v.user.alenvi.administrative.phoneInvoice.driveId.$error"
-            :additionalValue="`facture_telephone_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" :url="docsUploadUrl" :extensions="extensions"
+            :additional-value="`facture_telephone_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" :url="docsUploadUrl" :extensions="extensions"
           />
         </div>
       </div>
       <div class="q-mt-lg">
         <ni-multiple-files-uploader caption="Diplome(s) ou certificat(s)" path="administrative.certificates" alt="facture téléphone"
-          @delete="deleteDocument($event, 'certificates')" name="certificates" collapsibleLabel="Ajouter un diplôme" :userProfile="currentUser"
-          :url="docsUploadUrl" additionalFieldsName="diplomes" @uploaded="refreshUser"
+          @delete="deleteDocument($event, 'certificates')" name="certificates" collapsible-label="Ajouter un diplôme" :user-profile="currentUser"
+          :url="docsUploadUrl" additional-fields-name="diplomes" @uploaded="refreshUser"
         />
       </div>
     </div>
@@ -232,9 +228,9 @@
           <ni-file-uploader caption="Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle"
             path="administrative.mutualFund" alt="justif mutuelle" :entity="currentUser"
             @delete="deleteDocument(user.alenvi.administrative.mutualFund.driveId, 'administrative.mutualFund')" name="mutualFund" @uploaded="refreshUser"
-            :displayUpload="user.alenvi.administrative.mutualFund.has && !user.alenvi.administrative.mutualFund.driveId" entityUrl="users"
-            :error="$v.user.alenvi.administrative.mutualFund.driveId.$error" :displayCaption="isAuxiliary"
-            :url="docsUploadUrl" :additionalValue="`mutuelle_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" :extensions="extensions"
+            :display-upload="user.alenvi.administrative.mutualFund.has && !user.alenvi.administrative.mutualFund.driveId" entity-url="users"
+            :error="$v.user.alenvi.administrative.mutualFund.driveId.$error" :display-caption="isAuxiliary"
+            :url="docsUploadUrl" :additional-value="`mutuelle_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" :extensions="extensions"
           />
       </div>
         </div>
@@ -252,16 +248,16 @@
               color="secondary" />
           </div>
           <q-field :error="$v.user.alenvi.administrative.transportInvoice.transportType.$error" :error-label="requiredField">
-            <q-option-group color="primary" v-model="user.alenvi.administrative.transportInvoice.transportType" @input="updateUser({ alenvi: 'administrative.transportInvoice.transportType', ogust: 'default_means_of_transport' })"
-              :options="transportOptions" />
+            <q-option-group color="primary" v-model="user.alenvi.administrative.transportInvoice.transportType" :options="transportOptions"
+              @input="updateUser({ alenvi: 'administrative.transportInvoice.transportType', ogust: 'default_means_of_transport' })" />
           </q-field>
         </div>
         <div v-if="user.alenvi.administrative.transportInvoice.transportType === 'public'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Merci de nous transmettre ton justificatif d'abonnement" path="administrative.transportInvoice"
             alt="justif transport" :entity="currentUser" name="transportInvoice" @uploaded="refreshUser"
-            :error="$v.user.alenvi.administrative.transportInvoice.driveId.$error" :displayCaption="isAuxiliary"
+            :error="$v.user.alenvi.administrative.transportInvoice.driveId.$error" :display-caption="isAuxiliary"
             @delete="deleteDocument(user.alenvi.administrative.transportInvoice.driveId, 'administrative.transportInvoice')"
-            :url="docsUploadUrl" :additionalValue="`justif_transport_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
+            :url="docsUploadUrl" :additional-value="`justif_transport_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
             :extensions="extensions" />
         </div>
       </div>
@@ -272,7 +268,7 @@
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Certificat d'aptitude" path="administrative.medicalCertificate" alt="certificat médical" :entity="user.alenvi"
             @delete="deleteDocument(user.alenvi.administrative.medicalCertificate.driveId, 'administrative.medicalCertificate')" name="medicalCertificate"
-            @uploaded="refreshUser" :additionalValue="`certificat_medical_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
+            @uploaded="refreshUser" :additional-value="`certificat_medical_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
             :url="docsUploadUrl" :extensions="extensions"
           />
         </div>
@@ -292,7 +288,8 @@ import gdrive from '../../api/GoogleDrive.js';
 import cloudinary from '../../api/Cloudinary.js';
 import nationalities from '../../data/nationalities.js';
 import countries from '../../data/countries.js';
-import { AUXILIARY, PLANNING_REFERENT, TRANSPORT_OPTIONS } from '../../data/constants.js';
+import { AUXILIARY, PLANNING_REFERENT, TRANSPORT_OPTIONS, REQUIRED_LABEL } from '../../data/constants.js';
+
 import SelectSector from '../form/SelectSector';
 import Input from '../form/Input.vue';
 import Select from '../form/Select.vue';
@@ -317,7 +314,7 @@ export default {
   data () {
     return {
       transportOptions: TRANSPORT_OPTIONS,
-      requiredField: 'Champ requis',
+      requiredField: REQUIRED_LABEL,
       requiredDoc: 'Document requis',
       disablePictureEdition: true,
       docsThmbnails: {},
@@ -422,7 +419,12 @@ export default {
         }
       },
       extensions: 'image/jpg, image/jpeg, image/gif, image/png, application/pdf',
-      auxiliaryRolesOptions: []
+      auxiliaryRolesOptions: [],
+      identityDocsOptions: [
+        { label: 'Carte Nationale d\'Identité', value: 'cni' },
+        { label: 'Passeport', value: 'pp' },
+        { label: 'Titre de séjour', value: 'ts' }
+      ],
     }
   },
   validations () {
@@ -565,7 +567,7 @@ export default {
     },
     birthStateError () {
       if (!this.$v.user.alenvi.identity.birthState.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.user.alenvi.identity.birthState.minLength ||
       !this.$v.user.alenvi.identity.birthState.maxLength ||
       !this.$v.user.alenvi.identity.birthState.numeric) {
@@ -574,7 +576,7 @@ export default {
     },
     ssnError () {
       if (!this.$v.user.alenvi.identity.socialSecurityNumber.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.user.alenvi.identity.socialSecurityNumber.minLength ||
       !this.$v.user.alenvi.identity.socialSecurityNumber.maxLength ||
       !this.$v.user.alenvi.identity.socialSecurityNumber.numeric) {
@@ -583,49 +585,49 @@ export default {
     },
     phoneNbrError () {
       if (!this.$v.user.alenvi.mobilePhone.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.user.alenvi.mobilePhone.frPhoneNumber || !this.$v.user.alenvi.mobilePhone.maxLength) {
         return 'Numéro de téléphone non valide';
       }
     },
     emailError () {
       if (!this.$v.user.alenvi.local.email.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.user.alenvi.local.email.email) {
         return 'Email non valide';
       }
     },
     zipCodeError () {
       if (!this.$v.user.alenvi.contact.zipCode.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.user.alenvi.contact.zipCode.frZipCode || !this.$v.user.alenvi.contact.zipCode.maxLength) {
         return 'Code postal non valide';
       }
     },
     emergencyPhoneNbrError () {
       if (!this.$v.user.alenvi.administrative.emergencyContact.phoneNumber.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.user.alenvi.administrative.emergencyContact.phoneNumber.frPhoneNumber || !this.$v.user.alenvi.administrative.emergencyContact.phoneNumber.maxLength) {
         return 'Numéro de téléphone non valide';
       }
     },
     ibanError () {
       if (!this.$v.user.alenvi.administrative.payment.rib.iban.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.user.alenvi.administrative.payment.rib.iban.iban) {
         return 'IBAN non valide';
       }
     },
     bicError () {
       if (!this.$v.user.alenvi.administrative.payment.rib.bic.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.user.alenvi.administrative.payment.rib.bic.bic) {
         return 'BIC non valide';
       }
     },
     addressError () {
       if (!this.$v.user.alenvi.contact.address.fullAddress.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       }
       return 'Adresse non valide';
     },

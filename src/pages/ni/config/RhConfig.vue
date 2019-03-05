@@ -68,13 +68,13 @@
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Modèle de contrat" path="rhConfig.templates.contract" :entity="company" alt="template contrat"
               name="contract" @delete="deleteDocument(company.rhConfig.templates.contract.driveId, 'contract', 'rhConfig')"
-              @uploaded="documentUploaded" :additionalValue="`modele_contrat_${company.name}`" :url="docsUploadUrl"
+              @uploaded="documentUploaded" :additional-value="`modele_contrat_${company.name}`" :url="docsUploadUrl"
             />
           </div>
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Modèle d'avenant au contrat" path="rhConfig.templates.amendment" :entity="company" alt="template avenant"
               name="amendment" @delete="deleteDocument(company.rhConfig.templates.amendment.driveId, 'amendment', 'rhConfig')"
-              @uploaded="documentUploaded" :additionalValue="`modele_avenant_${company.name}`" :url="docsUploadUrl"
+              @uploaded="documentUploaded" :additional-value="`modele_avenant_${company.name}`" :url="docsUploadUrl"
             />
           </div>
         </div>
@@ -110,6 +110,7 @@ import Input from '../../../components/form/Input.vue';
 import ModalInput from '../../../components/form/ModalInput.vue';
 import FileUploader from '../../../components/form/FileUploader.vue';
 import { configMixin } from '../../../mixins/configMixin';
+import { REQUIRED_LABEL } from '../../../data/constants';
 
 export default {
   name: 'RhConfig',
@@ -253,7 +254,7 @@ export default {
     },
     nbrError (path) {
       if (!this.$_.get(this.$v.company.rhConfig, path).required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$_.get(this.$v.company.rhConfig, path).numeric) {
         return 'Nombre non valide';
       }

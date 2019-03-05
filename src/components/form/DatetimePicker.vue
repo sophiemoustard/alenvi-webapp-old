@@ -13,11 +13,13 @@
 </template>
 
 <script>
+import { REQUIRED_LABEL } from '../../data/constants';
+
 export default {
   props: {
     caption: { type: String, default: '' },
     error: Boolean,
-    errorLabel: { type: String, default: 'Champ requis' },
+    errorLabel: { type: String, default: REQUIRED_LABEL },
     value: [String, Date],
     type: { type: String, default: 'date' },
     min: { type: String, default: null },
