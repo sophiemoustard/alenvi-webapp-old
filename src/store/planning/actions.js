@@ -15,28 +15,29 @@ export const fillFilter = async ({ commit }, roleToSearch) => {
     rawPromises.push(Customers.showAll({ subscriptions: true }));
   }
   const filterPromises = await Promise.all(rawPromises);
-  for (let i = 0, l = filterPromises[0].length; i < l; i++) {
+  const sectors = filterPromises[0];
+  const persons = filterPromises[1];
+  for (let i = 0, l = sectors.length; i < l; i++) {
     elems.push({
-      label: filterPromises[0][i].name,
-      value: filterPromises[0][i].name,
-      sectorId: filterPromises[0][i]._id,
-      ...filterPromises[0][i]
+      label: sectors[i].name,
+      value: sectors[i].name,
+      sectorId: sectors[i]._id,
     });
   }
   if (roleToSearch === 'auxiliaries') {
-    for (let i = 0, l = filterPromises[1].length; i < l; i++) {
+    for (let i = 0, l = persons.length; i < l; i++) {
       elems.push({
-        label: `${filterPromises[1][i].identity.firstname} ${filterPromises[1][i].identity.lastname}`,
-        value: `${filterPromises[1][i].identity.firstname} ${filterPromises[1][i].identity.lastname}`,
-        ...filterPromises[1][i]
+        label: `${persons[i].identity.firstname} ${persons[i].identity.lastname}`,
+        value: `${persons[i].identity.firstname} ${persons[i].identity.lastname}`,
+        ...persons[i]
       })
     }
   } else { // customers
-    for (let i = 0, l = filterPromises[1].length; i < l; i++) {
+    for (let i = 0, l = persons.length; i < l; i++) {
       elems.push({
-        label: `${filterPromises[1][i].identity.title} ${filterPromises[1][i].identity.lastname}`,
-        value: `${filterPromises[1][i].identity.title} ${filterPromises[1][i].identity.lastname}`,
-        ...filterPromises[1][i]
+        label: `${persons[i].identity.title} ${persons[i].identity.lastname}`,
+        value: `${persons[i].identity.title} ${persons[i].identity.lastname}`,
+        ...persons[i]
       })
     }
   }
