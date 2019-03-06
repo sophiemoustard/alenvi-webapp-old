@@ -43,7 +43,6 @@
                     <q-checkbox :disable="col.value || (props.row && 'endDate' in props.row)" :value="col.value" @input="updateContractActivity({
                         contractId: contract._id,
                         versionId: props.row._id,
-                        ogustContractId: contract.ogustContractId,
                         versionStartDate: props.row.startDate,
                         isActive: !col.value,
                         cell: props.row.__index,
