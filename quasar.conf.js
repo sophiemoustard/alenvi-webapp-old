@@ -22,6 +22,7 @@ module.exports = function (ctx) {
       'resize',
       'roles',
       'sectors',
+      'services',
       'twilio',
       'vue-croppa',
       'vMask',
