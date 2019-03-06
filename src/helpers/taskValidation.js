@@ -13,7 +13,7 @@ export const taskValidation = (user = null) => {
   for (let i = 0, l = tasks.length; i < l; i++) {
     if (!tasks[i].check.isDone && displayTask(tasks[i], user)) {
       if (tasks[i].task.name.match(/inscription (mutuelle|médecine)/i)) {
-        const contract = user.administrative.contracts.find(contract => contract.status === 'Prestataire' && !contract.endDate);
+        const contract = user.contracts.find(contract => contract.status === 'Prestataire' && !contract.endDate);
         if (contract) {
           const contractPlusSixWeeks = moment(contract.startDate).add(6, 'w');
           return moment().isAfter(moment(contractPlusSixWeeks));

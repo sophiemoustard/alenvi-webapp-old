@@ -328,8 +328,8 @@ export default {
     },
     getHiringDate (user) {
       let hiringDate = null;
-      if (user.administrative && user.administrative.contracts.length > 0) {
-        const contracts = user.administrative.contracts;
+      if (user.contracts && user.contracts.length > 0) {
+        const contracts = user.contracts;
         if (contracts.length === 1) {
           hiringDate = contracts[0].startDate;
         } else {

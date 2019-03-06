@@ -65,8 +65,7 @@ export default {
   async mounted () {
     this.user = await this.$users.getById(this.userProfile._id);
     this.currentWorkingDays = moment().monthBusinessDays();
-    const rawContracts = await this.$contracts.list({ user: this.userProfile._id, status: 'Prestataire' });
-    for (let contract of rawContracts) {
+    for (let contract of this.user.contracts) {
       this.contracts.push(...contract.versions);
     }
     this.company = this.user.company;
