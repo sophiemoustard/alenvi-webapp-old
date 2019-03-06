@@ -457,8 +457,8 @@ export default {
     },
     // Refresh data
     async refreshServices () {
-      await this.$store.dispatch('main/getUser', this.user._id);
-      this.services = this.user.company.customersConfig.services.map(service => ({
+      const services = await this.$services.showAll({ company: this.user.company._id });
+      this.services = services.map(service => ({
         ...this.getServiceLastVersion(service),
         ...service,
       }));
@@ -523,7 +523,8 @@ export default {
 
         this.loading = true;
         const payload = this.formatCreatedService();
-        await this.$companies.createService(this.company._id, payload);
+        payload.company = this.user.company._id;
+        await this.$services.create(payload);
         NotifyPositive('Service créé.');
         this.resetCreationServiceData();
         await this.refreshServices();
@@ -569,7 +570,7 @@ export default {
         const serviceId = this.editedService._id;
         const payload = this.$_.pickBy(this.editedService);
         delete payload._id;
-        await this.$companies.updateService({ id: this.company._id, serviceId }, payload);
+        await this.$services.updateById(serviceId, payload);
         NotifyPositive('Service modifié');
         this.resetEditionServiceData();
         await this.refreshServices();
@@ -589,8 +590,7 @@ export default {
           cancel: 'Annuler'
         });
 
-        const queries = { id: this.company._id, serviceId };
-        await this.$companies.deleteService(queries);
+        await this.$services.remove(serviceId);
         this.services.splice(cell, 1);
         NotifyPositive('Service supprimé.');
       } catch (e) {
