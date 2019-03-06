@@ -37,7 +37,6 @@
       </template>
       <ni-menu-item name="rh config" :params="{ id: user._id }" icon="settings" label="Configuration RH" />
       <ni-menu-item name="customers config" :params="{ id: user._id }" icon="settings" label="Configuration bénéficiaires" />
-      <ni-menu-item name="auxiliaries config" :params="{ id: user._id }" icon="settings" label="Configuration auxiliaires" />
       <ni-menu-item name="tags config" :params="{ id: user._id }" icon="list_alt" label="Tags" />
     </q-collapsible>
     <q-item-separator />
