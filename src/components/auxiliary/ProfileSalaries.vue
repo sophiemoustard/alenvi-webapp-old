@@ -65,7 +65,7 @@ export default {
   async mounted () {
     this.user = await this.$users.getById(this.userProfile._id);
     this.currentWorkingDays = moment().monthBusinessDays();
-    const rawContracts = this.user.administrative.contracts.filter(contract => contract.status === 'Prestataire');
+    const rawContracts = await this.$contracts.list({ user: this.userProfile._id, status: 'Prestataire' });
     for (let contract of rawContracts) {
       this.contracts.push(...contract.versions);
     }
