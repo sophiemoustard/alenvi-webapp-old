@@ -20,7 +20,7 @@
                 </template>
                 <template v-else-if="col.name === 'contractSigned'">
                   <div v-if="!props.row.link" class="row justify-center table-actions">
-                    <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :url="docsUploadUrl"
+                    <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :url="docsUploadUrl(contract._id)"
                       :headers="headers" :additional-fields="[
                         { name: 'fileName', value: `contrat_signe_${getUser.identity.firstname}_${getUser.identity.lastname}` },
                         { name: 'contractId', value: contract._id },
@@ -282,9 +282,6 @@ export default {
     getUser () {
       return this.$store.getters['rh/getUserProfile'];
     },
-    docsUploadUrl () {
-      return `${process.env.API_HOSTNAME}/users/${this.getUser._id}/gdrive/${this.getUser.administrative.driveFolder.id}/upload`;
-    },
     headers () {
       return {
         'x-access-token': Cookies.get('alenvi_token') || ''
@@ -510,6 +507,9 @@ export default {
       }
     },
     // Documents
+    docsUploadUrl (contractId) {
+      return `${process.env.API_HOSTNAME}/contracts/${contractId}/gdrive/${this.getUser.administrative.driveFolder.id}/upload`;
+    },
     async dlTemplate (contract, contractStartDate) {
       try {
         const monthlyHours = Number.parseFloat(contract.weeklyHours * 4.33).toFixed(1);
