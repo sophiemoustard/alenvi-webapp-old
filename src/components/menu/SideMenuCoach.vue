@@ -17,8 +17,8 @@
       <template slot="header">
         <q-item-main :class="{'text-weight-bold': activeRoutes.planning.highlight }" label="Planning" />
       </template>
-      <ni-menu-item name="view planning" icon="date range" label="Vue planning" />
-      <ni-menu-item name="modification planning" icon="update" label="Modifications planning" />
+      <ni-menu-item name="auxiliaries planning" icon="date range" label="Auxiliaires" />
+      <ni-menu-item name="customers planning" icon="date range" label="Bénéficiaires" />
       <ni-menu-item name="constrained coaches" icon="perm contact calendar" label="Coach(s) de permanence" />
     </q-collapsible>
     <q-item-separator />

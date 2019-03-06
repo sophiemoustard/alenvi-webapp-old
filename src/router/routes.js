@@ -104,45 +104,13 @@ const routes = [
         }
       },
       {
-        path: 'ni/planning',
-        name: 'planning',
-        component: () => import('pages/ni/planning/Planning'),
-        redirect: {
-          name: 'view planning'
+        path: 'permanences',
+        name: 'constrained coaches',
+        component: () => import('pages/ni/planning/ConstrainedCoaches'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['duty:read'],
         },
-        // Children so collapsible in side menu highlights good selection
-        children: [
-          {
-            path: 'view',
-            name: 'view planning',
-            component: () => import('pages/ni/planning/PlanningView'),
-            meta: {
-              cookies: ['alenvi_token', 'refresh_token'],
-              permissions: ['planning:read'],
-              parent: 'planning'
-            },
-          },
-          {
-            path: 'modification',
-            name: 'modification planning',
-            component: () => import('pages/ni/planning/PlanningModification'),
-            meta: {
-              cookies: ['alenvi_token', 'refresh_token'],
-              permissions: ['planning:history'],
-              parent: 'planning'
-            },
-          },
-          {
-            path: 'permanences',
-            name: 'constrained coaches',
-            component: () => import('pages/ni/planning/ConstrainedCoaches'),
-            meta: {
-              cookies: ['alenvi_token', 'refresh_token'],
-              permissions: ['duty:read'],
-              parent: 'planning'
-            },
-          },
-        ]
       },
       {
         path: 'ni/planning/auxiliaries',
@@ -150,37 +118,17 @@ const routes = [
         component: () => import('pages/ni/planning/AuxiliaryPlanning'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'planning'
         },
       },
       {
         path: 'ni/planning/customers',
-        name: 'customers plannning',
+        name: 'customers planning',
         component: () => import('pages/ni/planning/CustomerPlanning'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'planning'
         },
       },
       // Auxiliary view routes
-      {
-        path: 'auxiliaries/planning',
-        name: 'profile planning',
-        component: () => import('pages/auxiliaries/planning/OldPlanning'),
-        props: (route) => ({ auxiliary: route.query.auxiliary || null, customer: route.query.customer || null }),
-        beforeEnter: (to, from, next) => {
-          if (!to.query.auxiliary && !to.query.customer) {
-            to.query.auxiliary = 'true';
-            return next();
-          }
-          next();
-        },
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['planning:read'],
-          parent: 'planning'
-        }
-      },
       {
         path: 'auxiliaries/agenda',
         name: 'auxiliary agenda',
@@ -188,7 +136,6 @@ const routes = [
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['planning:read'],
-          parent: 'planning'
         }
       },
       {
@@ -256,14 +203,6 @@ const routes = [
         },
       },
       // Customers view routes
-      {
-        path: 'customers/planning',
-        name: 'customer planning',
-        component: () => import('pages/customers/Planning'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token']
-        }
-      },
       {
         path: 'customers/agenda',
         name: 'customer agenda',

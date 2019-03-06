@@ -6,7 +6,7 @@
       </q-item>
     </q-list-header>
     <q-item-separator />
-    <ni-menu-item class="customer-menu-size" name="customer planning" icon="date range" label="Planning" />
+    <ni-menu-item class="customer-menu-size" name="customer agenda" icon="date range" label="Planning" />
     <q-item-separator />
     <ni-menu-item class="customer-menu-size" name="customer documents" icon="euro_symbol" label="Facturation" />
     <q-item-separator />
