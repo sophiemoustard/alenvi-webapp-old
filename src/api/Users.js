@@ -73,27 +73,6 @@ export default {
     const tasks = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/${userId}/tasks`);
     return tasks.data.data.tasks;
   },
-  // Contracts
-  async createContract (queries, data) {
-    const contractCreated = await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${queries.userId}/contracts`, data);
-    return contractCreated;
-  },
-  async endContract (queries, payload) {
-    await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${queries.userId}/contracts/${queries.contractId}`, payload);
-  },
-  async getContracts (userId) {
-    const contracts = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/${userId}/contracts`);
-    return contracts.data.data.contracts;
-  },
-  // Contracts version
-  async updateContractVersion (queries, data) {
-    const versionUpdated = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${queries.userId}/contracts/${queries.contractId}/versions/${queries.versionId}`, data);
-    return versionUpdated;
-  },
-  async createContractVersion (queries, data) {
-    const versionCreated = await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${queries.userId}/contracts/${queries.mainContractId}/versions`, data);
-    return versionCreated;
-  },
   // Absences
   async createAbsence (userId, payload) {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${userId}/absences`, payload);

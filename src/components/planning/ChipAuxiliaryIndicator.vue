@@ -265,9 +265,9 @@ export default {
       );
     },
     getContractVersionOnDay (day) {
-      if (!this.person || !this.person.administrative || !this.person.administrative.contracts) return null;
+      if (!this.person || !this.person.contracts) return null;
 
-      const currentContract = this.getCurrentContract(this.person.administrative.contracts, day);
+      const currentContract = this.getCurrentContract(this.person.contracts, day);
       if (!currentContract) return null;
 
       return this.getCurrentContract(currentContract.versions, day);

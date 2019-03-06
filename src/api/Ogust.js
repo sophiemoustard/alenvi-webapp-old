@@ -249,17 +249,6 @@ export default {
     const employeeDeleted = await alenviAxios.delete(`${process.env.API_HOSTNAME}/ogust/employees/${id}`);
     return employeeDeleted;
   },
-  async newContract (data) {
-    const contractCreated = await alenviAxios.post(`${process.env.API_HOSTNAME}/ogust/contracts`, data);
-    return contractCreated.data.data.employment;
-  },
-  async updateContract (ogustContractId, payload) {
-    const contract = await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/contracts/${ogustContractId}`, payload);
-    return contract;
-  },
-  async endContract (ogustVersionId, payload) {
-    await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/contracts/${ogustVersionId}`, payload);
-  },
   async createSepaInfo (payload) {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/ogust/sepaInfo`, payload);
   },

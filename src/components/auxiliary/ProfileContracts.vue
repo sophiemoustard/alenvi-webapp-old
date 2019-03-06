@@ -20,7 +20,7 @@
                 </template>
                 <template v-else-if="col.name === 'contractSigned'">
                   <div v-if="!props.row.link" class="row justify-center table-actions">
-                    <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :url="docsUploadUrl"
+                    <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :url="docsUploadUrl(contract._id)"
                       :headers="headers" :additional-fields="[
                         { name: 'fileName', value: `contrat_signe_${getUser.identity.firstname}_${getUser.identity.lastname}` },
                         { name: 'contractId', value: contract._id },
@@ -43,7 +43,6 @@
                     <q-checkbox :disable="col.value || (props.row && 'endDate' in props.row)" :value="col.value" @input="updateContractActivity({
                         contractId: contract._id,
                         versionId: props.row._id,
-                        ogustContractId: props.row.ogustContractId,
                         versionStartDate: props.row.startDate,
                         isActive: !col.value,
                         cell: props.row.__index,
@@ -57,14 +56,14 @@
           </q-table>
           <q-card-actions align="end">
             <q-btn v-if="getActiveVersion(contract)" flat no-caps color="primary" icon="add" label="Ajouter un avenant"
-              @click="fillVersion(contract)" />
+              @click="openVersionCreationModal(contract)" />
             <q-btn v-if="getActiveVersion(contract)" flat no-caps color="grey-6" icon="clear" label="Mettre fin au contrat"
-              @click="fillEndContract(contract)" />
+              @click="openEndContractModal(contract)" />
           </q-card-actions>
         </q-card>
       </template>
       <q-btn :disable="!hasBasicInfo || hasActiveContract" class="fixed fab-add-person" no-caps rounded color="primary"
-        icon="add" label="Créer un nouveau contrat" @click="newContractModal = true" />
+        icon="add" label="Créer un nouveau contrat" @click="openCreationModal" />
       <div v-if="!hasBasicInfo" class="missingBasicInfo">
         <p>/!\ Il manque une ou des information(s) importante(s) pour pouvoir créer un nouveau contrat parmi:</p>
         <ul>
@@ -97,7 +96,7 @@
           inModal requiredField />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer le contrat" icon-right="add" color="primary" :loading="loading"
-        @click="createNewContract" />
+        @click="createContract" />
     </q-modal>
 
     <!-- New version modal -->
@@ -119,7 +118,7 @@
           :min="getMinimalStartDate(contractSelected)" inModal requiredField />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer l'avenant" icon-right="add" color="primary" :loading="loading"
-        @click="createNewContractVersion" />
+        @click="createVersion" />
     </q-modal>
 
     <!-- End contract modal -->
@@ -282,9 +281,6 @@ export default {
     getUser () {
       return this.$store.getters['rh/getUserProfile'];
     },
-    docsUploadUrl () {
-      return `${process.env.API_HOSTNAME}/users/${this.getUser._id}/gdrive/${this.getUser.administrative.driveFolder.id}/upload`;
-    },
     headers () {
       return {
         'x-access-token': Cookies.get('alenvi_token') || ''
@@ -319,8 +315,7 @@ export default {
     }
   },
   async mounted () {
-    const contracts = await this.$users.getContracts(this.getUser._id);
-    this.contracts = contracts;
+    await this.refreshContracts();
     this.newContract.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
   },
   methods: {
@@ -357,11 +352,162 @@ export default {
     },
     async refreshContracts () {
       try {
-        const contracts = await this.$users.getContracts(this.getUser._id);
+        const contracts = await this.$contracts.list({ user: this.getUser._id });
         this.contracts = contracts;
       } catch (e) {
+        this.contracts = [];
         console.error(e);
       }
+    },
+    // Contract creation
+    openCreationModal () {
+      this.newContract.user = this.getUser._id;
+      this.newContractModal = true;
+    },
+    closeCreationModal () {
+      this.newContractModal = false;
+      this.newContract = {};
+      this.newContract.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
+      this.$v.newContract.$reset();
+    },
+    async createContract () {
+      try {
+        this.loading = true;
+        const payload = {
+          startDate: this.newContract.startDate,
+          status: this.newContract.status,
+          user: this.newContract.user,
+          versions: [{
+            weeklyHours: this.newContract.weeklyHours,
+            grossHourlyRate: this.newContract.grossHourlyRate,
+            startDate: this.newContract.startDate,
+          }],
+        }
+        await this.$contracts.create(payload);
+        await this.refreshContracts();
+        this.closeCreationModal();
+        NotifyPositive('Contrat créé');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création du contrat');
+      } finally {
+        this.loading = false;
+      }
+    },
+    // Contract edition
+    async updateEndDateOfPreviousVersion (data) {
+      const lastActiveVersion = this.getActiveVersion(this.contracts[data.contractIndex]);
+      const lastVersion = this.getLastVersion(this.contracts[data.contractIndex]);
+
+      if (lastActiveVersion) {
+        const queries = {
+          contractId: data.contractId,
+          versionId: lastActiveVersion._id
+        };
+        const payload = { endDate: this.$moment(lastVersion.startDate).toDate() };
+        await this.$contracts.updateVersion(queries, payload);
+      }
+    },
+    async updatePreviousVersions (data) {
+      for (let i = 0, l = this.contracts[data.contractIndex].versions.length; i < l; i++) {
+        const contract = this.contracts[data.contractIndex];
+        const currentVersion = contract.versions[i];
+        if (currentVersion.isActive && currentVersion._id !== data.versionId) {
+          const queries = {
+            contractId: contract._id,
+            versionId: currentVersion._id,
+          };
+          await this.$contracts.updateVersion(queries, { 'isActive': false });
+          currentVersion.isActive = false;
+        }
+      }
+    },
+    async updateContractActivity (data) {
+      try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Es-tu sûr(e) de vouloir activer ce contrat ?',
+          ok: true,
+          cancel: 'Annuler'
+        });
+        await this.updateEndDateOfPreviousVersion(data);
+        const queries = {
+          contractId: data.contractId,
+          versionId: data.versionId,
+        };
+        await this.$contracts.updateVersion(queries, { 'isActive': data.isActive });
+        // Update manually checkbox because it's not dynamic
+        this.sortedContracts[data.contractIndex].versions[data.cell].isActive = data.isActive;
+        await this.updatePreviousVersions(data);
+        await this.refreshContracts();
+        NotifyPositive('Activité du contrat changée');
+      } catch (e) {
+        console.error(e);
+        if (e.message !== '') {
+          NotifyNegative('Erreur lors du changement de l\'activité du contrat');
+        }
+      }
+    },
+    // Version creation
+    openVersionCreationModal (contract) {
+      this.newContractVersion.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
+      this.newContractVersion.contractId = contract._id;
+      this.contractSelected = contract;
+      this.newContractVersionModal = true;
+    },
+    closeVersionCreationModal () {
+      this.newContractVersionModal = false;
+      this.newContractVersion = {};
+      this.newContractVersion.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
+      this.$v.newContractVersion.$reset();
+    },
+    async createVersion () {
+      try {
+        this.loading = true;
+        const contractId = this.newContractVersion.contractId;
+        delete this.newContractVersion.contractId;
+        await this.$contracts.createVersion(contractId, this.newContractVersion);
+        await this.refreshContracts();
+        this.closeVersionCreationModal();
+        NotifyPositive('Version créée');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création de la version du contrat');
+      } finally {
+        this.loading = false;
+      }
+    },
+    // End contract
+    async openEndContractModal (contract) {
+      this.endContract.contract = contract;
+      this.endContractModal = true
+    },
+    resetOtherMisc () {
+      if (this.endContract.endReason !== OTHER && this.endContract.otherMisc) {
+        delete this.endContract.otherMisc;
+        this.$v.endContract.otherMisc.$reset();
+      }
+    },
+    async endExistingContract () {
+      try {
+        this.$v.endContract.$touch();
+        if (this.$v.endContract.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.loading = true;
+        await this.$contracts.update(this.endContract.contract._id, this.$_.omit(this.endContract, ['contract']));
+        await this.refreshContracts();
+        this.endContractModal = false;
+        this.endContract = {};
+        NotifyPositive('Contrat terminé');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la mise à jour du contrat');
+      } finally {
+        this.loading = false;
+      }
+    },
+    // Documents
+    docsUploadUrl (contractId) {
+      return `${process.env.API_HOSTNAME}/contracts/${contractId}/gdrive/${this.getUser.administrative.driveFolder.id}/upload`;
     },
     async dlTemplate (contract, contractStartDate) {
       try {
@@ -402,173 +548,6 @@ export default {
         this.$refs[refName][0].upload();
       }
     },
-    fillVersion (contract) {
-      this.newContractVersion.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
-      this.newContractVersion.mainContractId = contract._id;
-      this.newContractVersion.versions = contract.versions;
-      this.contractSelected = contract;
-      this.newContractVersionModal = true;
-    },
-    async updateEndDateOfPreviousVersion (data) {
-      const lastActiveVersion = this.getActiveVersion(this.contracts[data.contractIndex]);
-      const lastVersion = this.getLastVersion(this.contracts[data.contractIndex]);
-
-      if (lastActiveVersion) {
-        const queries = {
-          userId: this.getUser._id,
-          contractId: data.contractId,
-          versionId: lastActiveVersion._id
-        };
-        const payload = {
-          endDate: this.$moment(lastVersion.startDate).toDate()
-        };
-        await this.$users.updateContractVersion(queries, payload);
-      }
-    },
-    async updatePreviousVersions (data) {
-      for (let i = 0, l = this.contracts[data.contractIndex].versions.length; i < l; i++) {
-        const contract = this.contracts[data.contractIndex];
-        const currentVersion = contract.versions[i];
-        if (currentVersion.isActive && currentVersion._id !== data.versionId) {
-          let payload = { status: 'T', end_date: this.$moment(data.versionStartDate).subtract(1, 'day').format('YYYYMMDD') };
-          await this.$ogust.updateContract(currentVersion.ogustContractId, payload);
-          const queries = {
-            userId: this.getUser._id,
-            contractId: contract._id,
-            versionId: currentVersion._id,
-          };
-          await this.$users.updateContractVersion(queries, { 'isActive': false });
-          currentVersion.isActive = false;
-        }
-      }
-    },
-    async updateContractActivity (data) {
-      try {
-        await this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Es-tu sûr(e) de vouloir activer ce contrat ?',
-          ok: true,
-          cancel: 'Annuler'
-        });
-        await this.updateEndDateOfPreviousVersion(data);
-        await this.$ogust.updateContract(data.ogustContractId, { status: 'V' });
-        const queries = {
-          userId: this.getUser._id,
-          contractId: data.contractId,
-          versionId: data.versionId,
-        };
-        await this.$users.updateContractVersion(queries, { 'isActive': data.isActive });
-        // Update manually checkbox because it's not dynamic
-        this.sortedContracts[data.contractIndex].versions[data.cell].isActive = data.isActive;
-        await this.updatePreviousVersions(data);
-        await this.refreshContracts();
-        NotifyPositive('Activité du contrat changée');
-      } catch (e) {
-        console.error(e);
-        if (e.message !== '') {
-          NotifyNegative('Erreur lors du changement de l\'activité du contrat');
-        }
-      }
-    },
-    async createNewContract () {
-      try {
-        this.loading = true;
-        const payload = {
-          id_employee: this.getUser.employee_id.toString(),
-          start_date: this.$moment(this.newContract.startDate).format('YYYYMMDD'),
-          creation_date: this.$moment().format('YYYYMMDD'),
-          contractual_salary: Number.parseFloat(this.newContract.grossHourlyRate * this.newContract.weeklyHours * 4.33).toFixed(2),
-          contract_hours: Number.parseFloat(this.newContract.weeklyHours * 4.33).toFixed(1),
-          type_employer: 'S'
-        };
-        const newOgustContract = await this.$ogust.newContract(payload);
-        this.newContract.ogustContractId = newOgustContract.id_contract;
-        await this.$users.createContract({ userId: this.getUser._id }, this.newContract);
-        await this.refreshContracts();
-        NotifyPositive('Contrat créé');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la création du contrat');
-      } finally {
-        this.loading = false;
-        this.newContractModal = false;
-        this.newContract = {};
-        this.newContract.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
-        this.$v.newContract.$reset();
-      }
-    },
-    async createNewContractVersion () {
-      try {
-        this.loading = true;
-        const mainContractId = this.newContractVersion.mainContractId;
-        const lastActiveVersion = this.getActiveVersion(this.newContractVersion);
-        delete this.newContractVersion.mainContractId;
-        delete this.newContractVersion.versions;
-        let payload = {
-          id_employee: this.getUser.employee_id.toString(),
-          start_date: this.$moment(this.newContractVersion.startDate).format('YYYYMMDD'),
-          creation_date: this.$moment().format('YYYYMMDD'),
-          contractual_salary: Number.parseFloat(this.newContractVersion.grossHourlyRate * this.newContractVersion.weeklyHours * 4.33).toFixed(2),
-          contract_hours: Number.parseFloat(this.newContractVersion.weeklyHours * 4.33).toFixed(1),
-          source_contract: lastActiveVersion.ogustContractId
-        };
-        const newOgustContract = await this.$ogust.newContract(payload);
-        this.newContractVersion.ogustContractId = newOgustContract.id_contract;
-        const queries = {
-          userId: this.getUser._id,
-          mainContractId
-        };
-        await this.$users.createContractVersion(queries, this.newContractVersion);
-        await this.refreshContracts();
-        NotifyPositive('Version créée');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la création de la version du contrat');
-      } finally {
-        this.loading = false;
-        this.newContractVersionModal = false;
-        this.newContractVersion = {};
-        this.newContractVersion.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
-        this.$v.newContractVersion.$reset();
-      }
-    },
-    async fillEndContract (contract) {
-      this.endContract.contract = contract;
-      this.endContractModal = true
-    },
-    resetOtherMisc () {
-      if (this.endContract.endReason !== OTHER && this.endContract.otherMisc) {
-        delete this.endContract.otherMisc;
-        this.$v.endContract.otherMisc.$reset();
-      }
-    },
-    async endExistingContract () {
-      try {
-        this.$v.endContract.$touch();
-        if (this.$v.endContract.$error) return NotifyWarning('Champ(s) invalide(s)');
-        this.loading = true;
-        const ogustVersionId = this.endContract.contract.versions.find(version => version.isActive).ogustContractId;
-        const payload = {
-          status: 'T',
-          end_date: this.$moment(this.endContract.endDate).format('YYYYMMDD')
-        };
-        await this.$ogust.endContract(ogustVersionId, payload);
-        const queries = {
-          userId: this.getUser._id,
-          contractId: this.endContract.contract._id,
-        };
-        await this.$users.endContract(queries, this.$_.omit(this.endContract, ['contract']));
-        await this.refreshContracts();
-        this.endContractModal = false;
-        this.endContract = {};
-        NotifyPositive('Contrat terminé');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la mise à jour du contrat');
-      } finally {
-        this.loading = false;
-      }
-    }
   }
 };
 </script>
