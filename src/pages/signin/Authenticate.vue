@@ -90,9 +90,9 @@ export default {
         }
 
         if (this.getUser.role.name === 'Aidants') {
-          this.$router.replace({ name: 'customer planning' });
+          this.$router.replace({ name: 'customer agenda' });
         } else if (this.isAuxiliary) {
-          this.$router.replace({ name: 'profile planning', params: { id: this.$q.cookies.get('user_id') }, query: { auxiliary: 'true', self: 'true' } });
+          this.$router.replace({ name: 'auxiliary agenda' });
         } else {
           this.$router.replace({ name: 'administrative directory' });
         }
