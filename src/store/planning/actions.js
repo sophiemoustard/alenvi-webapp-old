@@ -5,28 +5,41 @@ import store from '../../store/index'
 
 import { AUXILIARY, PLANNING_REFERENT } from '../../data/constants';
 
-export const fillFilter = async ({ commit }, role) => {
+export const fillFilter = async ({ commit }, roleToSearch) => {
+  const rawPromises = [];
   let elems = [];
-  if (role === 'auxiliaries') {
-    elems = await Users.showAllActive({ role: [AUXILIARY, PLANNING_REFERENT] });
-    for (let i = 0, l = elems.length; i < l; i++) {
-      elems[i].value = `${elems[i].identity.firstname} ${elems[i].identity.lastname}`;
-      elems[i].label = `${elems[i].identity.firstname} ${elems[i].identity.lastname}`;
-    }
+  rawPromises.push(Sectors.showAll({ company: store.getters['main/user'].company._id }));
+  if (roleToSearch === 'auxiliaries') {
+    rawPromises.push(Users.showAllActive({ role: [AUXILIARY, PLANNING_REFERENT] }));
   } else {
-    elems = await Customers.showAll({ subscriptions: true });
-    for (let i = 0, l = elems.length; i < l; i++) {
-      elems[i].value = `${elems[i].identity.title} ${elems[i].identity.lastname}`;
-      elems[i].label = `${elems[i].identity.title} ${elems[i].identity.lastname}`;
+    rawPromises.push(Customers.showAll({ subscriptions: true }));
+  }
+  const filterPromises = await Promise.all(rawPromises);
+  const sectors = filterPromises[0];
+  const persons = filterPromises[1];
+  for (let i = 0, l = sectors.length; i < l; i++) {
+    elems.push({
+      label: sectors[i].name,
+      value: sectors[i].name,
+      sectorId: sectors[i]._id,
+    });
+  }
+  if (roleToSearch === 'auxiliaries') {
+    for (let i = 0, l = persons.length; i < l; i++) {
+      elems.push({
+        label: `${persons[i].identity.firstname} ${persons[i].identity.lastname}`,
+        value: `${persons[i].identity.firstname} ${persons[i].identity.lastname}`,
+        ...persons[i]
+      })
+    }
+  } else { // customers
+    for (let i = 0, l = persons.length; i < l; i++) {
+      elems.push({
+        label: `${persons[i].identity.title} ${persons[i].identity.lastname}`,
+        value: `${persons[i].identity.title} ${persons[i].identity.lastname}`,
+        ...persons[i]
+      })
     }
   }
-  const sectors = await Sectors.showAll({ company: store.getters['main/user'].company._id });
-  sectors.forEach(sector => {
-    elems.push({
-      label: sector.name,
-      value: sector.name,
-      sectorId: sector._id
-    })
-  });
   commit('setFilter', elems);
 }

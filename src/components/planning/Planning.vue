@@ -141,7 +141,7 @@ export default {
             this.addSavedTerms('Customers');
           }
         } else {
-          const userSector = this.getFilter.find(filter => filter.sector === this.getUser.sector);
+          const userSector = this.getFilter.find(filter => filter.sectorId === this.getUser.sector);
           if (userSector) {
             this.$refs.refFilter.add(userSector.label);
           }
