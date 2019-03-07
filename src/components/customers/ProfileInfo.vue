@@ -512,6 +512,7 @@ export default {
       },
       subscriptions: [],
       selectedSubscription: [],
+      services: [],
       helpersColumns: [
         {
           name: 'lastname',
@@ -685,10 +686,10 @@ export default {
       return this.$store.getters['main/company'];
     },
     serviceOptions () {
-      if (!this.company.customersConfig || !this.company.customersConfig.services) return [];
+      if (!this.services) return [];
 
       const subscribedServices = this.subscriptions.map(subscription => subscription.service._id);
-      const availableServices = this.company.customersConfig.services.filter(service => !subscribedServices.includes(service._id));
+      const availableServices = this.services.filter(service => !subscribedServices.includes(service._id));
 
       return availableServices.map(service => ({
         label: this.getServiceLastVersion(service).name,
@@ -864,6 +865,7 @@ export default {
   async mounted () {
     await this.getUserHelpers();
     await this.refreshCustomer();
+    await this.getServices();
     this.isLoaded = true;
   },
   methods: {
@@ -889,6 +891,13 @@ export default {
     async getUserHelpers () {
       try {
         this.userHelpers = await this.$users.showAll({ customers: this.userProfile._id });
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async getServices () {
+      try {
+        this.services = await this.$services.showAll({ company: this.company._id });
       } catch (e) {
         console.error(e);
       }
