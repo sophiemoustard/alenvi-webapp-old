@@ -89,7 +89,7 @@
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions table-actions-margin">
                     <q-btn flat round small color="grey" icon="edit" @click.native="openEditionModal(col.value._id)" />
-                    <q-btn flat round small color="grey" icon="delete" :disable="col.value.numAuxiliary > 0" @click="deleteSector(col.value._id, props.row.__index)" />
+                    <q-btn flat round small color="grey" icon="delete" :disable="col.value.auxiliaryCount > 0" @click="deleteSector(col.value._id, props.row.__index)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -225,7 +225,7 @@ export default {
           name: 'actions',
           label: '',
           align: 'center',
-          field: row => ({ _id: row._id, numAuxiliary: row.numAuxiliary })
+          field: row => ({ _id: row._id, auxiliaryCount: row.auxiliaryCount })
         }
       ],
       sectorPagination: {
