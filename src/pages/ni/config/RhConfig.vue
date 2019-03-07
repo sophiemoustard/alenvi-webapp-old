@@ -88,8 +88,8 @@
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions table-actions-margin">
-                    <q-btn flat round small color="grey" icon="edit" @click.native="openEditionModal(col.value)" />
-                    <ni-delete-sector-btn flat round small color="grey" icon="delete" :sector="col.value" @click="deleteSector(col.value, props.row.__index)" />
+                    <q-btn flat round small color="grey" icon="edit" @click.native="openEditionModal(col.value._id)" />
+                    <q-btn flat round small color="grey" icon="delete" :disable="col.value.auxiliaryCount > 0" @click="deleteSector(col.value._id, props.row.__index)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -171,7 +171,6 @@ import ModalInput from '../../../components/form/ModalInput.vue';
 import FileUploader from '../../../components/form/FileUploader.vue';
 import { configMixin } from '../../../mixins/configMixin';
 import { REQUIRED_LABEL } from '../../../data/constants';
-import DeleteSectorBtn from '../../../components/button/DeleteSectorBtn';
 import { validationMixin } from '../../../mixins/validationMixin.js';
 
 export default {
@@ -181,7 +180,6 @@ export default {
     'ni-input': Input,
     'ni-modal-input': ModalInput,
     'ni-file-uploader': FileUploader,
-    'ni-delete-sector-btn': DeleteSectorBtn
   },
   mixins: [configMixin, validationMixin],
   data () {
@@ -227,7 +225,7 @@ export default {
           name: 'actions',
           label: '',
           align: 'center',
-          field: '_id'
+          field: row => ({ _id: row._id, auxiliaryCount: row.auxiliaryCount })
         }
       ],
       sectorPagination: {
