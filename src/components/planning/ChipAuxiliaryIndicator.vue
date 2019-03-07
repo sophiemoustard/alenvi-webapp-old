@@ -1,7 +1,8 @@
 <template>
-  <div class="full-width row relative-position chip-container" @click="openIndicatorsModal">
+  <div :class="[{ 'highlight': !this.isOnlyUnderCustomerContract },  'full-width', 'row', 'relative-position', 'chip-container']"
+    @click="!this.isOnlyUnderCustomerContract && openIndicatorsModal">
     <img :src="getAvatar(person.picture)" class="avatar">
-    <q-chip :class="['absolute-center', { 'busy': isBusy }]" small text-color="white">
+    <q-chip v-if="!this.isOnlyUnderCustomerContract" :class="['absolute-center', { 'busy': isBusy }]" small text-color="white">
       <span class="chip-indicator">{{ ratio.weeklyHours }}h / {{ ratio.contractHours }}</span>
     </q-chip>
 
@@ -21,10 +22,10 @@
         <q-tab class="col-6" v-for="(tab, index) in tabsContent" :key="index" slot="title" :label="tab.label" :default="tab.default"
           :name="tab.name" />
         <q-tab-pane class="no-border" v-for="(tab, index) in tabsContent" :key="index" :name="tab.name">
-          <ni-auxiliary-indicators :totalWorkingHours="totalWorkingHours" :weeklyInterventions="weeklyInterventions"
-            :weeklyInternalHours="weeklyInternalHours" :weeklyPaidTransports="weeklyPaidTransports"
-            :weeklyTotalTransports="weeklyTotalTransports" :customersCount="customersCount" :averageTimeByCustomer="averageTimeByCustomer"
-            :weeklyBreak="weeklyBreak" />
+          <ni-auxiliary-indicators :total-working-hours="totalWorkingHours" :weekly-interventions="weeklyInterventions"
+            :weekly-internal-hours="weeklyInternalHours" :weekly-paid-transports="weeklyPaidTransports"
+            :weekly-total-transports="weeklyTotalTransports" :customers-count="customersCount" :average-time-by-customer="averageTimeByCustomer"
+            :weekly-break="weeklyBreak" />
         </q-tab-pane>
       </q-tabs>
     </q-modal>
@@ -33,7 +34,7 @@
 
 <script>
 import AuxiliaryIndicators from '../AuxiliaryIndicators';
-import { DEFAULT_AVATAR, ABSENCE, INTERVENTION, INTERNAL_HOUR, TRANSIT, DRIVING, PUBLIC_TRANSPORT, WEEK_STATS } from '../../data/constants.js';
+import { DEFAULT_AVATAR, ABSENCE, INTERVENTION, INTERNAL_HOUR, TRANSIT, DRIVING, PUBLIC_TRANSPORT, WEEK_STATS, CUSTOMER_CONTRACT } from '../../data/constants.js';
 import googleMaps from '../../api/GoogleMaps';
 
 export default {
@@ -91,8 +92,12 @@ export default {
     selectedEvents () {
       return this.selectedTab === WEEK_STATS ? this.events : this.monthEvents;
     },
+    isOnlyUnderCustomerContract () {
+      return this.person.contracts && this.person.contracts.every(contract => contract.status === CUSTOMER_CONTRACT);
+    }
   },
   async mounted () {
+    if (this.isOnlyUnderCustomerContract) return;
     await this.getRatio();
   },
   watch: {
@@ -294,7 +299,9 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables'
 
-  .chip-container:hover
+  .highlight
+    cursor: pointer;
+  .highlight:hover
     .avatar
     .q-chip
       box-shadow: 0 0 1px 1px $primary-dark;
