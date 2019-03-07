@@ -88,6 +88,8 @@
         </div>
         <ni-modal-select caption="Statut" :error="$v.newContract.status.$error" :options="statusOptions" v-model="newContract.status"
           @blur="$v.newContract.status.$touch" separator requiredField />
+        <ni-modal-select v-if="newContract.status === CUSTOMER_CONTRACT" caption="Bénéficiaire" :error="$v.newContract.customer.$error"
+          :options="customerOptions" v-model="newContract.customer" @blur="$v.newContract.customer.$touch" separator requiredField />
         <ni-modal-input caption="Volume horaire hebdomadaire" :error="$v.newContract.weeklyHours.$error" type="number"
           v-model="newContract.weeklyHours" @blur="$v.newContract.weeklyHours.$touch" suffix="hr" requiredField />
         <ni-modal-input caption="Taux horaire" :error="$v.newContract.grossHourlyRate.$error" type="number" v-model="newContract.grossHourlyRate"
@@ -156,7 +158,7 @@ import DatetimePicker from '../form/DatetimePicker.vue';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../popup/notify';
 import { downloadDocxFile } from '../../helpers/downloadFile';
 import nationalities from '../../data/nationalities.js';
-import { END_CONTRACT_REASONS, OTHER } from '../../data/constants';
+import { END_CONTRACT_REASONS, OTHER, CONTRACT_STATUS_OPTIONS, CUSTOMER_CONTRACT } from '../../data/constants';
 
 export default {
   name: 'ProfileContracts',
@@ -184,6 +186,7 @@ export default {
       contractSelected: {},
       newContract: {
         status: '',
+        customer: '',
         weeklyHours: '',
         startDate: '',
         grossHourlyRate: ''
@@ -193,12 +196,9 @@ export default {
         startDate: '',
         grossHourlyRate: ''
       },
-      statusOptions: [
-        {
-          label: 'Prestataire',
-          value: 'Prestataire'
-        },
-      ],
+      statusOptions: CONTRACT_STATUS_OPTIONS,
+      CUSTOMER_CONTRACT,
+      customerOptions: [],
       visibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractEmpty', 'contractSigned', 'isActive'],
       columns: [
         {
@@ -259,6 +259,9 @@ export default {
   validations: {
     newContract: {
       status: { required },
+      customer: { required: requiredIf((item) => {
+        return item.status === CUSTOMER_CONTRACT;
+      }) },
       weeklyHours: { required },
       startDate: { required },
       grossHourlyRate: { required },
@@ -316,6 +319,7 @@ export default {
   },
   async mounted () {
     await this.refreshContracts();
+    await this.getCustomersWithCustomerContractSubscriptions();
     this.newContract.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
   },
   methods: {
@@ -359,6 +363,18 @@ export default {
         console.error(e);
       }
     },
+    async getCustomersWithCustomerContractSubscriptions () {
+      try {
+        const customers = await this.$customers.showAllWithCustomerContractSubscriptions();
+        this.customerOptions = customers.map(cus => ({
+          label: `${cus.identity.title} ${cus.identity.lastname}`,
+          value: cus._id
+        }));
+      } catch (e) {
+        this.customerOptions = [];
+        console.error(e);
+      }
+    },
     // Contract creation
     openCreationModal () {
       this.newContract.user = this.getUser._id;
@@ -372,6 +388,9 @@ export default {
     },
     async createContract () {
       try {
+        this.$v.newContract.$touch();
+        if (this.$v.newContract.$error) return NotifyWarning('Champ(s) invalide(s)');
+
         this.loading = true;
         const payload = {
           startDate: this.newContract.startDate,
@@ -382,7 +401,9 @@ export default {
             grossHourlyRate: this.newContract.grossHourlyRate,
             startDate: this.newContract.startDate,
           }],
-        }
+        };
+        if (payload.status === CUSTOMER_CONTRACT) payload.customer = this.newContract.customer;
+
         await this.$contracts.create(payload);
         await this.refreshContracts();
         this.closeCreationModal();
@@ -463,6 +484,9 @@ export default {
     },
     async createVersion () {
       try {
+        this.$v.newContractVersion.$touch();
+        if (this.$v.newContractVersion.$error) return NotifyWarning('Champ(s) invalide(s)');
+
         this.loading = true;
         const contractId = this.newContractVersion.contractId;
         delete this.newContractVersion.contractId;
@@ -492,6 +516,7 @@ export default {
       try {
         this.$v.endContract.$touch();
         if (this.$v.endContract.$error) return NotifyWarning('Champ(s) invalide(s)');
+
         this.loading = true;
         await this.$contracts.update(this.endContract.contract._id, this.$_.omit(this.endContract, ['contract']));
         await this.refreshContracts();

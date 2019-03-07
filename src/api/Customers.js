@@ -9,6 +9,10 @@ export default {
     const customersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/customers/sectors`, { params });
     return customersRaw.data.data.customers;
   },
+  async showAllWithCustomerContractSubscriptions () {
+    const customersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/customers/customer-contract-subscriptions`);
+    return customersRaw.data.data.customers;
+  },
   async getById (id) {
     return alenviAxios.get(`${process.env.API_HOSTNAME}/customers/${id}`);
   },

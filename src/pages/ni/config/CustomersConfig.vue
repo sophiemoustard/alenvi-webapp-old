@@ -213,7 +213,7 @@ import { validationMixin } from '../../../mixins/validationMixin.js';
 import Input from '../../../components/form/Input.vue';
 import SearchAddress from '../../../components/form/SearchAddress.vue';
 import { frAddress, posDecimals } from '../../../helpers/vuelidateCustomVal';
-import { BILLING_DIRECT, BILLING_INDIRECT, REQUIRED_LABEL, CONTRACT_TYPE_OPTIONS } from '../../../data/constants.js';
+import { BILLING_DIRECT, BILLING_INDIRECT, REQUIRED_LABEL, CONTRACT_STATUS_OPTIONS } from '../../../data/constants.js';
 
 export default {
   name: 'CustomersConfig',
@@ -258,7 +258,7 @@ export default {
         { label: 'Horaire', value: 'Horaire' },
         { label: 'Forfaitaire', value: 'Forfaitaire' },
       ],
-      serviceTypeOptions: CONTRACT_TYPE_OPTIONS,
+      serviceTypeOptions: CONTRACT_STATUS_OPTIONS,
       visibleColumns: ['name', 'nature', 'defaultUnitAmount', 'vat', 'holidaySurcharge', 'eveningSurcharge', 'actions'],
       visibleHistoryColumns: ['startDate', 'name', 'defaultUnitAmount', 'vat', 'holidaySurcharge', 'eveningSurcharge'],
       serviceColumns: [
