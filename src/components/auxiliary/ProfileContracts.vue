@@ -6,29 +6,24 @@
           <q-card-title :style="{ color: cardTitle(contract.endDate).color }">
             {{ cardTitle(contract.endDate).msg }}
           </q-card-title>
-          <p class="card-sub-title">Statut: {{ contract.status }}</p>
+          <p v-if="contract.status === CUSTOMER_CONTRACT" class="card-sub-title">
+            Statut : {{ getContractStatus(contract) }} - Bénéficiaire : {{ contract.customer.identity.title }} {{ contract.customer.identity.lastname }}
+          </p>
+          <p v-else class="card-sub-title">Statut : {{ getContractStatus(contract) }}</p>
           <q-table :data="contract.versions" :columns="columns" row-key="name" :pagination.sync="pagination"
             hide-bottom :visible-columns="visibleColumns" binary-state-sort class="table-responsive">
             <q-tr slot="body" slot-scope="props" :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
                 <template v-if="col.name === 'contractEmpty'">
                   <div class="row justify-center table-actions">
-                    <q-btn flat round small color="primary" @click="dlTemplate(props.row, contract.startDate)">
-                      <q-icon name="file download" />
-                    </q-btn>
+                    <q-btn flat round small color="primary" @click="dlTemplate(props.row, contract.startDate)" icon="file download" />
                   </div>
                 </template>
                 <template v-else-if="col.name === 'contractSigned'">
                   <div v-if="!props.row.link" class="row justify-center table-actions">
-                    <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :url="docsUploadUrl(contract._id)"
-                      :headers="headers" :additional-fields="[
-                        { name: 'fileName', value: `contrat_signe_${getUser.identity.firstname}_${getUser.identity.lastname}` },
-                        { name: 'contractId', value: contract._id },
-                        { name: 'versionId', value: props.row._id }
-                      ]"
-                      hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
-                      hide-upload-button @add="uploadDocument($event, `signedContract_${props.row._id}`)" @uploaded="refreshContracts"
-                      @fail="failMsg" />
+                    <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :headers="headers" :url="docsUploadUrl(contract._id)"
+                      @fail="failMsg" :additional-fields="getAdditionalFields(contract, props.row)" hide-underline @uploaded="refreshContracts"
+                      :extensions="extensions" hide-upload-button @add="uploadDocument($event, `signedContract_${props.row._id}`)" />
                   </div>
                   <div v-else class="row justify-center table-actions">
                     <q-btn flat round small color="primary">
@@ -40,14 +35,8 @@
                 </template>
                 <template v-else-if="col.name === 'isActive'">
                   <div class="row justify-center table-actions">
-                    <q-checkbox :disable="col.value || (props.row && 'endDate' in props.row)" :value="col.value" @input="updateContractActivity({
-                        contractId: contract._id,
-                        versionId: props.row._id,
-                        versionStartDate: props.row.startDate,
-                        isActive: !col.value,
-                        cell: props.row.__index,
-                        contractIndex: index })">
-                    </q-checkbox>
+                    <q-checkbox :disable="col.value || (props.row && 'endDate' in props.row)" :value="col.value"
+                      @input="updateContractActivity($event, contract, props.row, index)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -62,8 +51,8 @@
           </q-card-actions>
         </q-card>
       </template>
-      <q-btn :disable="!hasBasicInfo || hasActiveContract" class="fixed fab-add-person" no-caps rounded color="primary"
-        icon="add" label="Créer un nouveau contrat" @click="openCreationModal" />
+      <q-btn :disable="!hasBasicInfo" class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat"
+        @click="openCreationModal" />
       <div v-if="!hasBasicInfo" class="missingBasicInfo">
         <p>/!\ Il manque une ou des information(s) importante(s) pour pouvoir créer un nouveau contrat parmi:</p>
         <ul>
@@ -76,7 +65,7 @@
     </div>
 
     <!-- New contract modal -->
-    <q-modal v-model="newContractModal" content-classes="modal-container-sm">
+    <q-modal v-model="newContractModal" content-classes="modal-container-sm" @hide="resetContractCreationModal">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -87,20 +76,23 @@
           </div>
         </div>
         <ni-modal-select caption="Statut" :error="$v.newContract.status.$error" :options="statusOptions" v-model="newContract.status"
-          @blur="$v.newContract.status.$touch" separator requiredField />
+          @blur="$v.newContract.status.$touch" separator required-field @input="resetContractCustomer" />
+        <ni-modal-select v-if="newContract.status === CUSTOMER_CONTRACT" caption="Bénéficiaire" :error="$v.newContract.customer.$error"
+          :options="customerOptions" v-model="newContract.customer" @blur="$v.newContract.customer.$touch" separator
+          required-field />
         <ni-modal-input caption="Volume horaire hebdomadaire" :error="$v.newContract.weeklyHours.$error" type="number"
-          v-model="newContract.weeklyHours" @blur="$v.newContract.weeklyHours.$touch" suffix="hr" requiredField />
-        <ni-modal-input caption="Taux horaire" :error="$v.newContract.grossHourlyRate.$error" type="number" v-model="newContract.grossHourlyRate"
-          @blur="$v.newContract.grossHourlyRate.$touch" suffix="€" requiredField />
+          v-model="newContract.weeklyHours" @blur="$v.newContract.weeklyHours.$touch" suffix="hr" required-field />
+        <ni-modal-input v-if="newContract.status === COMPANY_CONTRACT" caption="Taux horaire" :error="$v.newContract.grossHourlyRate.$error"
+          type="number" v-model="newContract.grossHourlyRate" @blur="$v.newContract.grossHourlyRate.$touch" suffix="€" required-field />
         <ni-datetime-picker caption="Date d'effet" :error="$v.newContract.startDate.$error" v-model="newContract.startDate"
-          inModal requiredField />
+          in-modal required-field />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer le contrat" icon-right="add" color="primary" :loading="loading"
         @click="createContract" />
     </q-modal>
 
     <!-- New version modal -->
-    <q-modal v-model="newContractVersionModal" content-classes="modal-container-sm">
+    <q-modal v-model="newContractVersionModal" content-classes="modal-container-sm" @hide="resetVersionCreationModal">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -111,35 +103,35 @@
           </div>
         </div>
         <ni-modal-input caption="Volume horaire hebdomadaire" :error="$v.newContractVersion.weeklyHours.$error" v-model="newContractVersion.weeklyHours"
-          type="number" @blur="$v.newContractVersion.weeklyHours.$touch" suffix="hr" requiredField />
-        <ni-modal-input caption="Taux horaire" :error="$v.newContractVersion.grossHourlyRate.$error" v-model="newContractVersion.grossHourlyRate"
-          type="number" @blur="$v.newContractVersion.grossHourlyRate.$touch" suffix="€" requiredField />
+          type="number" @blur="$v.newContractVersion.weeklyHours.$touch" suffix="hr" required-field />
+        <ni-modal-input v-if="contractSelected.status === COMPANY_CONTRACT" caption="Taux horaire" :error="$v.newContractVersion.grossHourlyRate.$error"
+          v-model="newContractVersion.grossHourlyRate" type="number" @blur="$v.newContractVersion.grossHourlyRate.$touch" suffix="€" required-field />
         <ni-datetime-picker caption="Date d'effet" :error="$v.newContractVersion.startDate.$error" v-model="newContractVersion.startDate"
-          :min="getMinimalStartDate(contractSelected)" inModal requiredField />
+          :min="getMinimalStartDate(contractSelected)" in-modal required-field />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer l'avenant" icon-right="add" color="primary" :loading="loading"
         @click="createVersion" />
     </q-modal>
 
     <!-- End contract modal -->
-    <q-modal v-model="endContractModal" content-classes="modal-container-sm">
+    <q-modal v-model="endContractModal" content-classes="modal-container-sm" @hide="resetEndContractModal">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
             <h5>Terminer un <span class="text-weight-bold">contrat</span></h5>
           </div>
-          <div class="col-1 cursor-pointer" style="text-align: right">
+          <div class="col-1 cursor-pointer modal-btn-close" style="text-align: right">
             <span><q-icon name="clear" @click.native="endContractModal = false" /></span>
           </div>
         </div>
-        <ni-datetime-picker caption="Date de notification" v-model="endContract.endNotificationDate" inModal requiredField
-          @blur="$v.endContract.endNotificationDate.$touch" :error="$v.endContract.endNotificationDate.$error" />
+        <ni-datetime-picker caption="Date de notification" v-model="endContract.endNotificationDate" in-modal
+          required-field @blur="$v.endContract.endNotificationDate.$touch" :error="$v.endContract.endNotificationDate.$error" />
         <ni-datetime-picker caption="Date de fin de contrat" v-model="endContract.endDate" :min="minEndContractDate"
-          inModal requiredField @blur="$v.endContract.endDate.$touch" :error="$v.endContract.endDate.$error" />
-        <ni-modal-select caption="Motif" :options="endContractReasons" v-model="endContract.endReason" requiredField
+          in-modal required-field @blur="$v.endContract.endDate.$touch" :error="$v.endContract.endDate.$error" />
+        <ni-modal-select caption="Motif" :options="endContractReasons" v-model="endContract.endReason" required-field
           @blur="$v.endContract.endReason.$touch" :error="$v.endContract.endReason.$error" @input="resetOtherMisc" />
         <ni-modal-input caption="Autres" v-if="endContract.endReason === OTHER" v-model="endContract.otherMisc"
-          requiredField @blur="$v.endContract.otherMisc.$touch" :error="$v.endContract.otherMisc.$error" />
+          required-field @blur="$v.endContract.otherMisc.$touch" :error="$v.endContract.otherMisc.$error" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Mettre fin au contrat" icon-right="clear" color="primary"
         :loading="loading" @click="endExistingContract" />
@@ -156,7 +148,7 @@ import DatetimePicker from '../form/DatetimePicker.vue';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../popup/notify';
 import { downloadDocxFile } from '../../helpers/downloadFile';
 import nationalities from '../../data/nationalities.js';
-import { END_CONTRACT_REASONS, OTHER } from '../../data/constants';
+import { END_CONTRACT_REASONS, OTHER, CONTRACT_STATUS_OPTIONS, CUSTOMER_CONTRACT, COMPANY_CONTRACT } from '../../data/constants';
 
 export default {
   name: 'ProfileContracts',
@@ -184,6 +176,7 @@ export default {
       contractSelected: {},
       newContract: {
         status: '',
+        customer: '',
         weeklyHours: '',
         startDate: '',
         grossHourlyRate: ''
@@ -193,12 +186,9 @@ export default {
         startDate: '',
         grossHourlyRate: ''
       },
-      statusOptions: [
-        {
-          label: 'Prestataire',
-          value: 'Prestataire'
-        },
-      ],
+      CUSTOMER_CONTRACT,
+      COMPANY_CONTRACT,
+      customerOptions: [],
       visibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractEmpty', 'contractSigned', 'isActive'],
       columns: [
         {
@@ -254,11 +244,15 @@ export default {
           required: false
         }
       ],
+      extensions: 'image/jpg, image/jpeg, image/gif, image/png, application/pdf',
     }
   },
   validations: {
     newContract: {
       status: { required },
+      customer: { required: requiredIf((item) => {
+        return item.status === CUSTOMER_CONTRACT;
+      }) },
       weeklyHours: { required },
       startDate: { required },
       grossHourlyRate: { required },
@@ -301,10 +295,15 @@ export default {
       if (this.contracts.length === 0) return false;
       for (let i = 0; i < this.contracts.length; i++) {
         const activeVersion = this.contracts[i].versions.find(version => version.isActive);
-        if (activeVersion) return true;
+        if (this.contracts[i].status === COMPANY_CONTRACT && activeVersion) return true;
       }
 
       return false;
+    },
+    statusOptions () {
+      if (!this.hasActiveContract) return CONTRACT_STATUS_OPTIONS;
+
+      return CONTRACT_STATUS_OPTIONS.filter(option => option.value === CUSTOMER_CONTRACT);
     },
     minEndContractDate () {
       if (this.endContractModal) {
@@ -316,6 +315,7 @@ export default {
   },
   async mounted () {
     await this.refreshContracts();
+    await this.getCustomersWithCustomerContractSubscriptions();
     this.newContract.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
   },
   methods: {
@@ -347,6 +347,9 @@ export default {
         }
       }
     },
+    getContractStatus (contract) {
+      return CONTRACT_STATUS_OPTIONS.find(status => status.value === contract.status).label;
+    },
     failMsg () {
       NotifyNegative('Echec de l\'envoi du document');
     },
@@ -359,12 +362,28 @@ export default {
         console.error(e);
       }
     },
+    async getCustomersWithCustomerContractSubscriptions () {
+      try {
+        const customers = await this.$customers.showAllWithCustomerContractSubscriptions();
+        this.customerOptions = customers.map(cus => ({
+          label: `${cus.identity.title} ${cus.identity.lastname}`,
+          value: cus._id
+        }));
+      } catch (e) {
+        this.customerOptions = [];
+        console.error(e);
+      }
+    },
     // Contract creation
+    resetContractCustomer () {
+      this.newContract.customer = '';
+      this.$v.newContract.customer.$reset();
+    },
     openCreationModal () {
       this.newContract.user = this.getUser._id;
       this.newContractModal = true;
     },
-    closeCreationModal () {
+    resetContractCreationModal () {
       this.newContractModal = false;
       this.newContract = {};
       this.newContract.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
@@ -372,6 +391,9 @@ export default {
     },
     async createContract () {
       try {
+        this.$v.newContract.$touch();
+        if (this.$v.newContract.$error) return NotifyWarning('Champ(s) invalide(s)');
+
         this.loading = true;
         const payload = {
           startDate: this.newContract.startDate,
@@ -379,13 +401,15 @@ export default {
           user: this.newContract.user,
           versions: [{
             weeklyHours: this.newContract.weeklyHours,
-            grossHourlyRate: this.newContract.grossHourlyRate,
             startDate: this.newContract.startDate,
           }],
-        }
-        await this.$contracts.create(payload);
+        };
+        if (payload.status === CUSTOMER_CONTRACT) payload.customer = this.newContract.customer;
+        else payload.versions[0].grossHourlyRate = this.newContract.grossHourlyRate;
+
+        await this.$contracts.create(this.$_.pickBy(payload));
         await this.refreshContracts();
-        this.closeCreationModal();
+        this.resetContractCreationModal();
         NotifyPositive('Contrat créé');
       } catch (e) {
         console.error(e);
@@ -395,24 +419,24 @@ export default {
       }
     },
     // Contract edition
-    async updateEndDateOfPreviousVersion (data) {
-      const lastActiveVersion = this.getActiveVersion(this.contracts[data.contractIndex]);
-      const lastVersion = this.getLastVersion(this.contracts[data.contractIndex]);
+    async updateEndDateOfPreviousVersion (contractId, contractIndex) {
+      const lastActiveVersion = this.getActiveVersion(this.contracts[contractIndex]);
+      const lastVersion = this.getLastVersion(this.contracts[contractIndex]);
 
       if (lastActiveVersion) {
         const queries = {
-          contractId: data.contractId,
+          contractId: contractId,
           versionId: lastActiveVersion._id
         };
         const payload = { endDate: this.$moment(lastVersion.startDate).toDate() };
         await this.$contracts.updateVersion(queries, payload);
       }
     },
-    async updatePreviousVersions (data) {
-      for (let i = 0, l = this.contracts[data.contractIndex].versions.length; i < l; i++) {
-        const contract = this.contracts[data.contractIndex];
+    async updatePreviousVersions (contractIndex, versionId) {
+      for (let i = 0, l = this.contracts[contractIndex].versions.length; i < l; i++) {
+        const contract = this.contracts[contractIndex];
         const currentVersion = contract.versions[i];
-        if (currentVersion.isActive && currentVersion._id !== data.versionId) {
+        if (currentVersion.isActive && currentVersion._id !== versionId) {
           const queries = {
             contractId: contract._id,
             versionId: currentVersion._id,
@@ -422,7 +446,7 @@ export default {
         }
       }
     },
-    async updateContractActivity (data) {
+    async updateContractActivity (isActive, contract, version, contractIndex) {
       try {
         await this.$q.dialog({
           title: 'Confirmation',
@@ -430,15 +454,15 @@ export default {
           ok: true,
           cancel: 'Annuler'
         });
-        await this.updateEndDateOfPreviousVersion(data);
+        await this.updateEndDateOfPreviousVersion(contract._id, contractIndex);
         const queries = {
-          contractId: data.contractId,
-          versionId: data.versionId,
+          contractId: contract._id,
+          versionId: version._id,
         };
-        await this.$contracts.updateVersion(queries, { 'isActive': data.isActive });
+        await this.$contracts.updateVersion(queries, { 'isActive': isActive });
         // Update manually checkbox because it's not dynamic
-        this.sortedContracts[data.contractIndex].versions[data.cell].isActive = data.isActive;
-        await this.updatePreviousVersions(data);
+        this.sortedContracts[contractIndex].versions[version.__index].isActive = isActive;
+        await this.updatePreviousVersions(contractIndex, version._id);
         await this.refreshContracts();
         NotifyPositive('Activité du contrat changée');
       } catch (e) {
@@ -455,7 +479,7 @@ export default {
       this.contractSelected = contract;
       this.newContractVersionModal = true;
     },
-    closeVersionCreationModal () {
+    resetVersionCreationModal () {
       this.newContractVersionModal = false;
       this.newContractVersion = {};
       this.newContractVersion.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
@@ -463,12 +487,15 @@ export default {
     },
     async createVersion () {
       try {
+        this.$v.newContractVersion.$touch();
+        if (this.$v.newContractVersion.$error) return NotifyWarning('Champ(s) invalide(s)');
+
         this.loading = true;
         const contractId = this.newContractVersion.contractId;
         delete this.newContractVersion.contractId;
         await this.$contracts.createVersion(contractId, this.newContractVersion);
         await this.refreshContracts();
-        this.closeVersionCreationModal();
+        this.resetVersionCreationModal();
         NotifyPositive('Version créée');
       } catch (e) {
         console.error(e);
@@ -482,6 +509,11 @@ export default {
       this.endContract.contract = contract;
       this.endContractModal = true
     },
+    resetEndContractModal () {
+      this.endContractModal = false;
+      this.endContract = {};
+      this.$v.endContract.$reset();
+    },
     resetOtherMisc () {
       if (this.endContract.endReason !== OTHER && this.endContract.otherMisc) {
         delete this.endContract.otherMisc;
@@ -492,11 +524,11 @@ export default {
       try {
         this.$v.endContract.$touch();
         if (this.$v.endContract.$error) return NotifyWarning('Champ(s) invalide(s)');
+
         this.loading = true;
         await this.$contracts.update(this.endContract.contract._id, this.$_.omit(this.endContract, ['contract']));
         await this.refreshContracts();
-        this.endContractModal = false;
-        this.endContract = {};
+        this.resetEndContractModal();
         NotifyPositive('Contrat terminé');
       } catch (e) {
         console.error(e);
@@ -506,6 +538,13 @@ export default {
       }
     },
     // Documents
+    getAdditionalFields (contract, version) {
+      return [
+        { name: 'fileName', value: `contrat_signe_${this.getUser.identity.firstname}_${this.getUser.identity.lastname}` },
+        { name: 'contractId', value: contract._id },
+        { name: 'versionId', value: version._id }
+      ]
+    },
     docsUploadUrl (contractId) {
       return `${process.env.API_HOSTNAME}/contracts/${contractId}/gdrive/${this.getUser.administrative.driveFolder.id}/upload`;
     },

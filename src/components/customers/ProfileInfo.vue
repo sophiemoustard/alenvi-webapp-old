@@ -219,7 +219,7 @@
     <q-modal v-model="addHelper" @hide="resetHelperForm" content-classes="modal-container-sm">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
-          <div class="col-8">
+          <div class="col-11">
             <h5>Ajouter une <span class="text-weight-bold">personne</span></h5>
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
@@ -241,7 +241,7 @@
     <q-modal v-model="subscriptionCreationModal" @hide="resetCreationSubscriptionData" content-classes="modal-container-sm">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
-          <div class="col-8">
+          <div class="col-11">
             <h5>Ajouter une <span class="text-weight-bold">souscription</span></h5>
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
@@ -372,7 +372,7 @@
     <q-modal v-model="fundingCreationModal" @hide="resetCreationFundingData" @show="checkAll" content-classes="modal-container-sm">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
-          <div class="col-8">
+          <div class="col-11">
             <h5>Ajouter un <span class="text-weight-bold">financement</span></h5>
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
@@ -416,7 +416,7 @@
       content-classes="modal-container-sm">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
-          <div class="col-8">
+          <div class="col-11">
             <h5>Modifier le <span class="text-weight-bold">financement</span></h5>
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
