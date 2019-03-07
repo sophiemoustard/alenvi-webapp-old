@@ -6,7 +6,7 @@
           <q-card-title :style="{ color: cardTitle(contract.endDate).color }">
             {{ cardTitle(contract.endDate).msg }}
           </q-card-title>
-          <p class="card-sub-title">Statut: {{ contract.status }}</p>
+          <p class="card-sub-title">Statut: {{ getContractStatus(contract) }}</p>
           <q-table :data="contract.versions" :columns="columns" row-key="name" :pagination.sync="pagination"
             hide-bottom :visible-columns="visibleColumns" binary-state-sort class="table-responsive">
             <q-tr slot="body" slot-scope="props" :props="props">
@@ -354,6 +354,9 @@ export default {
           color: 'red'
         }
       }
+    },
+    getContractStatus (contract) {
+      return CONTRACT_STATUS_OPTIONS.find(status => status.value === contract.status).label;
     },
     failMsg () {
       NotifyNegative('Echec de l\'envoi du document');
