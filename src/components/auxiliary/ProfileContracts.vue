@@ -286,7 +286,7 @@ export default {
     },
     hasBasicInfo () {
       if (this.getUser.identity && this.getUser.identity.lastname && this.getUser.identity.birthDate && this.getUser.identity.nationality &&
-        this.getUser.contact && this.getUser.contact.address && this.getUser.contact.zipCode && this.getUser.contact.city) {
+        this.getUser.contact && this.getUser.contact.address && this.getUser.contact.address.street && this.getUser.contact.address.city) {
         return true;
       }
       return false;
@@ -316,7 +316,8 @@ export default {
   async mounted () {
     await this.refreshContracts();
     await this.getCustomersWithCustomerContractSubscriptions();
-    this.newContract.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
+    this.newContract.grossHourlyRate = this.getUser.company.rhConfig.contractWithCompany.grossHourlyRate;
+    console.log('new', this.newContract);
   },
   methods: {
     getFullNationality (nationality) {
@@ -386,7 +387,7 @@ export default {
     resetContractCreationModal () {
       this.newContractModal = false;
       this.newContract = {};
-      this.newContract.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
+      this.newContract.grossHourlyRate = this.getUser.company.rhConfig.contractWithCompany.grossHourlyRate;
       this.$v.newContract.$reset();
     },
     async createContract () {
@@ -474,7 +475,7 @@ export default {
     },
     // Version creation
     openVersionCreationModal (contract) {
-      this.newContractVersion.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
+      this.newContractVersion.grossHourlyRate = this.getUser.company.rhConfig.contractWithCompany.grossHourlyRate;
       this.newContractVersion.contractId = contract._id;
       this.contractSelected = contract;
       this.newContractVersionModal = true;
@@ -482,7 +483,7 @@ export default {
     resetVersionCreationModal () {
       this.newContractVersionModal = false;
       this.newContractVersion = {};
-      this.newContractVersion.grossHourlyRate = this.getUser.company.rhConfig.providerContracts.grossHourlyRate;
+      this.newContractVersion.grossHourlyRate = this.getUser.company.rhConfig.contractWithCompany.grossHourlyRate;
       this.$v.newContractVersion.$reset();
     },
     async createVersion () {
@@ -570,7 +571,7 @@ export default {
           'initialContractStartDate': this.$moment(contractStartDate).format('DD/MM/YYYY'),
         };
         const params = {
-          driveId: contract.__index === 0 ? this.getUser.company.rhConfig.templates.contract.driveId : this.getUser.company.rhConfig.templates.amendment.driveId,
+          driveId: contract.__index === 0 ? this.getUser.company.rhConfig.templates.contractWithCompany.driveId : this.getUser.company.rhConfig.templates.contractWithCompanyVersion.driveId,
         };
 
         await downloadDocxFile(params, data, 'contrat.docx');
