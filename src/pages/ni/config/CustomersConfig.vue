@@ -3,16 +3,38 @@
     <div v-if="company">
       <h4>Configuration Bénéficiaires</h4>
       <div class="q-mb-xl">
+        <p class="text-weight-bold">Plans de majoration</p>
+        <q-card style="background: white">
+          <q-table :data="surcharges" :columns="surchargeColumns" hide-bottom binary-state-sort :pagination.sync="pagination" :visible-columns="visibleColumnsSurcharges"
+            class="table-responsive">
+            <q-tr slot="body" slot-scope="props" :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+                <template v-if="col.name === 'actions'">
+                  <div class="row no-wrap table-actions table-actions-margin">
+                    <q-btn flat round small color="grey" icon="edit" @click.native="initSurchargeEdition(col.value)" />
+                    <q-btn disable flat round small color="grey" icon="delete" @click="deleteSurcharge(col.value, props.row.__index)" />
+                  </div>
+                </template>
+                <template v-else>{{ col.value }}</template>
+              </q-td>
+            </q-tr>
+          </q-table>
+          <q-card-actions align="end">
+            <q-btn no-caps flat color="primary" icon="add" label="Ajouter un service" @click="surchargeCreationModal = true" />
+          </q-card-actions>
+        </q-card>
+      </div>
+      <div class="q-mb-xl">
         <p class="text-weight-bold">Services</p>
         <q-card style="background: white">
-          <q-table :data="services" :columns="serviceColumns" hide-bottom binary-state-sort :pagination.sync="pagination" :visible-columns="visibleColumns"
+          <q-table :data="services" :columns="serviceColumns" hide-bottom binary-state-sort :pagination.sync="pagination" :visible-columns="visibleColumnsServices"
             class="table-responsive">
             <q-tr slot="body" slot-scope="props" :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions table-actions-margin">
                     <q-btn flat round small color="grey" icon="history" @click.native="showHistory(col.value)" />
-                    <q-btn flat round small color="grey" icon="edit" @click.native="startEdition(col.value)" />
+                    <q-btn flat round small color="grey" icon="edit" @click.native="initServiceEdition(col.value)" />
                     <q-btn disable flat round small color="grey" icon="delete" @click="deleteService(col.value, props.row.__index)" />
                   </div>
                 </template>
@@ -79,6 +101,29 @@
         </q-card>
       </div>
     </div>
+
+    <!-- Surcharge creation modal -->
+    <q-modal v-model="surchargeCreationModal" content-classes="modal-container-sm" @hide="resetCreationSurchargeData">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-11">
+            <h5>Créer un <span class="text-weight-bold">plan de majoration</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer modal-btn-close">
+            <span><q-icon name="clear" @click.native="surchargeCreationModal = false" /></span>
+          </div>
+        </div>
+        <ni-modal-input caption="Nom" v-model="newSurcharge.name" :error="$v.newSurcharge.name.$error" @blur="$v.newSurcharge.name.$touch" />
+        <ni-modal-input caption="Majoration samedis" suffix="%" type="number" v-model="newSurcharge.saturdays"
+          :error="$v.newSurcharge.saturdays.$error" @blur="$v.newSurcharge.saturdays.$touch" />
+        <ni-modal-input caption="Majoration dimanches" suffix="%" type="number" v-model="newSurcharge.sundays"
+          :error="$v.newSurcharge.sundays.$error" @blur="$v.newSurcharge.sundays.$touch" />
+        <ni-modal-input caption="Majoration dimanches" suffix="%" type="number" v-model="newSurcharge.sundays"
+          :error="$v.newSurcharge.sundays.$error" @blur="$v.newSurcharge.sundays.$touch" />
+      </div>
+      <q-btn no-caps class="full-width modal-btn" label="Créer le plan de majoration" icon-right="add" color="primary" :loading="loading" @click="createNewService"
+        :disable="disableCreationButton" />
+    </q-modal>
 
     <!-- Service creation modal -->
     <q-modal v-model="serviceCreationModal" content-classes="modal-container-sm" @hide="resetCreationServiceData">
@@ -235,6 +280,128 @@ export default {
       loading: false,
       company: null,
       documents: null,
+      // Surcharges
+      surcharges: [],
+      surchargeCreationModal: false,
+      seurchargeEditionModal: false,
+      surchargeHistoryModal: false,
+      selectedSurcharge: {},
+      newSurcharge: {
+        name: '',
+        saturdays: '',
+        sundays: '',
+        publicHolidays: '',
+        christmas: '',
+        laborDay: '',
+        evenings: '',
+        eveningsStartTime: '',
+        eveningsEndTime: '',
+        customs: '',
+        customsStartTime: '',
+        customsEndTime: '',
+        service: '',
+        company: ''
+      },
+      editedSurcharge: {
+        name: '',
+        saturdays: '',
+        sundays: '',
+        publicHolidays: '',
+        christmas: '',
+        laborDay: '',
+        evenings: '',
+        eveningsStartTime: '',
+        eveningsEndTime: '',
+        customs: '',
+        customsStartTime: '',
+        customsEndTime: '',
+        service: '',
+        company: ''
+      },
+      visibleColumnsSurcharges: ['name', 'saturdays', 'sundays', 'publicHolidays', 'christmas', 'laborDay',
+        'evenings', 'eveningsStartTime', 'eveningsEndTime', 'customs', 'customsStartTime', 'customsEndTime', 'actions'],
+      surchargeColumns: [
+        {
+          name: 'name',
+          label: 'Nom',
+          align: 'left',
+          field: 'name',
+        },
+        {
+          name: 'saturdays',
+          label: 'Majoration samedis',
+          align: 'center',
+          field: row => row.saturdays && `${row.saturdays}%`,
+        },
+        {
+          name: 'sundays',
+          label: 'Majoration dimanches',
+          align: 'center',
+          field: row => row.sundays && `${row.sundays}%`,
+        },
+        {
+          name: 'publicHolidays',
+          label: 'Majoration jours fériés',
+          align: 'center',
+          field: row => row.publicHolidays && `${row.publicHolidays}%`,
+        },
+        {
+          name: 'christmas',
+          label: 'Majoration noëls',
+          align: 'center',
+          field: row => row.christmas && `${row.christmas}%`,
+        },
+        {
+          name: 'laborDay',
+          label: 'Majoration fête du travail',
+          align: 'center',
+          field: row => row.laborDay && `${row.laborDay}%`,
+        },
+        {
+          name: 'evenings',
+          label: 'Majoration soirées',
+          align: 'center',
+          field: row => row.evenings && `${row.evenings}%`,
+        },
+        {
+          name: 'eveningsStartTime',
+          label: 'Date d\'effet',
+          align: 'left',
+          field: row => row.eveningsStartTime ? this.$moment(row.eveningsStartTime).format('DD/MM/YYYY') : '',
+        },
+        {
+          name: 'eveningsEndTime',
+          label: 'Date de fin',
+          align: 'left',
+          field: row => row.eveningsEndTime ? this.$moment(row.eveningsEndTime).format('DD/MM/YYYY') : '',
+        },
+        {
+          name: 'customs',
+          label: 'Majoration personnalisées',
+          align: 'center',
+          field: row => row.customs && `${row.customs}%`,
+        },
+        {
+          name: 'customsStartTime',
+          label: 'Date d\'effet',
+          align: 'left',
+          field: row => row.customsStartTime ? this.$moment(row.customsStartTime).format('DD/MM/YYYY') : '',
+        },
+        {
+          name: 'customsEndTime',
+          label: 'Date de fin',
+          align: 'left',
+          field: row => row.customsEndTime ? this.$moment(row.customsEndTime).format('DD/MM/YYYY') : '',
+        },
+        {
+          name: 'actions',
+          label: '',
+          align: 'center',
+          field: '_id',
+        },
+      ],
+
+      // Services
       services: [],
       serviceCreationModal: false,
       serviceEditionModal: false,
@@ -246,23 +413,19 @@ export default {
         nature: '',
         defaultUnitAmount: '',
         vat: '',
-        holidaySurcharge: '',
-        eveningSurcharge: '',
       },
       editedService: {
         name: '',
         startDate: '',
         defaultUnitAmount: '',
         vat: '',
-        holidaySurcharge: '',
-        eveningSurcharge: '',
       },
       natureOptions: [
         { label: 'Horaire', value: 'Horaire' },
         { label: 'Forfaitaire', value: 'Forfaitaire' },
       ],
       serviceTypeOptions: CONTRACT_STATUS_OPTIONS,
-      visibleColumns: ['name', 'nature', 'defaultUnitAmount', 'vat', 'holidaySurcharge', 'eveningSurcharge', 'actions'],
+      visibleColumnsServices: ['name', 'nature', 'defaultUnitAmount', 'vat', 'actions'],
       visibleHistoryColumns: ['startDate', 'name', 'defaultUnitAmount', 'vat', 'holidaySurcharge', 'eveningSurcharge'],
       serviceColumns: [
         {
@@ -548,7 +711,7 @@ export default {
         this.loading = false;
       }
     },
-    startEdition (id) {
+    initServiceEdition (id) {
       const selectedService = this.services.find(service => service._id === id);
       const { name, defaultUnitAmount, vat, holidaySurcharge, eveningSurcharge } = selectedService;
       this.editedService = {
