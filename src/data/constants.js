@@ -108,3 +108,9 @@ export const END_CONTRACT_REASONS = [
 ];
 
 export const REQUIRED_LABEL = 'Champ requis';
+export const CUSTOMER_CONTRACT = 'contract_with_customer';
+export const COMPANY_CONTRACT = 'contract_with_company';
+export const CONTRACT_TYPE_OPTIONS = [
+  { label: 'Prestataire', value: COMPANY_CONTRACT },
+  { label: 'Mandataire', value: CUSTOMER_CONTRACT },
+];
