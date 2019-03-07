@@ -104,7 +104,7 @@ const routes = [
         }
       },
       {
-        path: 'permanences',
+        path: 'ni/planning/permanences',
         name: 'constrained coaches',
         component: () => import('pages/ni/planning/ConstrainedCoaches'),
         meta: {
