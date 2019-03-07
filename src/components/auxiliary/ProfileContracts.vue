@@ -62,7 +62,7 @@
           </q-card-actions>
         </q-card>
       </template>
-      <q-btn :disable="!hasBasicInfo || hasActiveContract" class="fixed fab-add-person" no-caps rounded color="primary"
+      <q-btn :disable="!hasBasicInfo" class="fixed fab-add-person" no-caps rounded color="primary"
         icon="add" label="Créer un nouveau contrat" @click="openCreationModal" />
       <div v-if="!hasBasicInfo" class="missingBasicInfo">
         <p>/!\ Il manque une ou des information(s) importante(s) pour pouvoir créer un nouveau contrat parmi:</p>
@@ -158,7 +158,7 @@ import DatetimePicker from '../form/DatetimePicker.vue';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../popup/notify';
 import { downloadDocxFile } from '../../helpers/downloadFile';
 import nationalities from '../../data/nationalities.js';
-import { END_CONTRACT_REASONS, OTHER, CONTRACT_STATUS_OPTIONS, CUSTOMER_CONTRACT } from '../../data/constants';
+import { END_CONTRACT_REASONS, OTHER, CONTRACT_STATUS_OPTIONS, CUSTOMER_CONTRACT, COMPANY_CONTRACT } from '../../data/constants';
 
 export default {
   name: 'ProfileContracts',
@@ -196,7 +196,6 @@ export default {
         startDate: '',
         grossHourlyRate: ''
       },
-      statusOptions: CONTRACT_STATUS_OPTIONS,
       CUSTOMER_CONTRACT,
       customerOptions: [],
       visibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractEmpty', 'contractSigned', 'isActive'],
@@ -304,10 +303,15 @@ export default {
       if (this.contracts.length === 0) return false;
       for (let i = 0; i < this.contracts.length; i++) {
         const activeVersion = this.contracts[i].versions.find(version => version.isActive);
-        if (activeVersion) return true;
+        if (this.contracts[i].status === COMPANY_CONTRACT && activeVersion) return true;
       }
 
       return false;
+    },
+    statusOptions () {
+      if (!this.hasActiveContract) return CONTRACT_STATUS_OPTIONS;
+
+      return CONTRACT_STATUS_OPTIONS.filter(option => option.value === CUSTOMER_CONTRACT);
     },
     minEndContractDate () {
       if (this.endContractModal) {
@@ -378,6 +382,7 @@ export default {
     // Contract creation
     resetContractCustomer () {
       this.newContract.customer = '';
+      this.$v.newContract.customer.$reset();
     },
     openCreationModal () {
       this.newContract.user = this.getUser._id;
