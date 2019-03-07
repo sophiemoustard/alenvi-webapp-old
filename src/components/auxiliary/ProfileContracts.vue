@@ -87,7 +87,7 @@
           </div>
         </div>
         <ni-modal-select caption="Statut" :error="$v.newContract.status.$error" :options="statusOptions" v-model="newContract.status"
-          @blur="$v.newContract.status.$touch" separator requiredField />
+          @blur="$v.newContract.status.$touch" separator requiredField @input="resetContractCustomer" />
         <ni-modal-select v-if="newContract.status === CUSTOMER_CONTRACT" caption="Bénéficiaire" :error="$v.newContract.customer.$error"
           :options="customerOptions" v-model="newContract.customer" @blur="$v.newContract.customer.$touch" separator requiredField />
         <ni-modal-input caption="Volume horaire hebdomadaire" :error="$v.newContract.weeklyHours.$error" type="number"
@@ -376,6 +376,9 @@ export default {
       }
     },
     // Contract creation
+    resetContractCustomer () {
+      this.newContract.customer = '';
+    },
     openCreationModal () {
       this.newContract.user = this.getUser._id;
       this.newContractModal = true;
@@ -404,7 +407,7 @@ export default {
         };
         if (payload.status === CUSTOMER_CONTRACT) payload.customer = this.newContract.customer;
 
-        await this.$contracts.create(payload);
+        await this.$contracts.create(this.$_.pickBy(payload));
         await this.refreshContracts();
         this.closeCreationModal();
         NotifyPositive('Contrat créé');
