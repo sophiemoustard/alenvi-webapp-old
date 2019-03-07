@@ -91,6 +91,8 @@
             <span><q-icon name="clear" @click.native="serviceCreationModal = false" /></span>
           </div>
         </div>
+        <ni-modal-select caption="Type" v-model="newService.type" :error="$v.newService.type.$error" @blur="$v.newService.type.$touch"
+          :options="serviceTypeOptions" />
         <ni-modal-input caption="Nom" v-model="newService.name" :error="$v.newService.name.$error" @blur="$v.newService.name.$touch" />
         <ni-modal-select caption="Nature" v-model="newService.nature" :error="$v.newService.nature.$error" @blur="$v.newService.nature.$touch"
           :options="natureOptions" />
@@ -211,7 +213,7 @@ import { validationMixin } from '../../../mixins/validationMixin.js';
 import Input from '../../../components/form/Input.vue';
 import SearchAddress from '../../../components/form/SearchAddress.vue';
 import { frAddress, posDecimals } from '../../../helpers/vuelidateCustomVal';
-import { BILLING_DIRECT, BILLING_INDIRECT, REQUIRED_LABEL } from '../../../data/constants.js';
+import { BILLING_DIRECT, BILLING_INDIRECT, REQUIRED_LABEL, CONTRACT_TYPE_OPTIONS } from '../../../data/constants.js';
 
 export default {
   name: 'CustomersConfig',
@@ -237,6 +239,7 @@ export default {
       selectedService: {},
       newService: {
         name: '',
+        type: '',
         nature: '',
         defaultUnitAmount: '',
         vat: '',
@@ -255,6 +258,7 @@ export default {
         { label: 'Horaire', value: 'Horaire' },
         { label: 'Forfaitaire', value: 'Forfaitaire' },
       ],
+      serviceTypeOptions: CONTRACT_TYPE_OPTIONS,
       visibleColumns: ['name', 'nature', 'defaultUnitAmount', 'vat', 'holidaySurcharge', 'eveningSurcharge', 'actions'],
       visibleHistoryColumns: ['startDate', 'name', 'defaultUnitAmount', 'vat', 'holidaySurcharge', 'eveningSurcharge'],
       serviceColumns: [
@@ -375,6 +379,7 @@ export default {
   validations: {
     newService: {
       name: { required },
+      type: { required },
       nature: { required },
       defaultUnitAmount: { required },
       vat: { required },
@@ -497,8 +502,13 @@ export default {
     },
     // Services
     formatCreatedService () {
-      const { nature, name, defaultUnitAmount, vat, eveningSurcharge, holidaySurcharge } = this.newService;
-      const formattedService = { nature, versions: [{ name, defaultUnitAmount, vat }] }
+      const { nature, name, defaultUnitAmount, vat, eveningSurcharge, holidaySurcharge, type } = this.newService;
+      const formattedService = {
+        nature,
+        versions: [{ name, defaultUnitAmount, vat }],
+        type,
+        company: this.user.company._id
+      };
 
       if (eveningSurcharge) formattedService.versions[0].eveningSurcharge = eveningSurcharge;
       if (holidaySurcharge) formattedService.versions[0].holidaySurcharge = holidaySurcharge;
@@ -523,7 +533,6 @@ export default {
 
         this.loading = true;
         const payload = this.formatCreatedService();
-        payload.company = this.user.company._id;
         await this.$services.create(payload);
         NotifyPositive('Service créé.');
         this.resetCreationServiceData();
