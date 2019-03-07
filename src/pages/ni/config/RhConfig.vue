@@ -27,18 +27,18 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Contrats prestataires</p>
         <div class="row gutter-profile">
-          <ni-input caption="Taux horaire brut par défaut" :error="$v.company.rhConfig.providerContracts.grossHourlyRate.$error"
-            :error-label="nbrError('providerContracts.grossHourlyRate')" type="number" v-model="company.rhConfig.providerContracts.grossHourlyRate"
-            @focus="saveTmp('rhConfig.providerContracts.grossHourlyRate')" suffix="€" @blur="updateCompany('rhConfig.providerContracts.grossHourlyRate')"
+          <ni-input caption="Taux horaire brut par défaut" :error="$v.company.rhConfig.contractWithCompany.grossHourlyRate.$error"
+            :error-label="nbrError('contractWithCompany.grossHourlyRate')" type="number" v-model="company.rhConfig.contractWithCompany.grossHourlyRate"
+            @focus="saveTmp('rhConfig.contractWithCompany.grossHourlyRate')" suffix="€" @blur="updateCompany('rhConfig.contractWithCompany.grossHourlyRate')"
           />
         </div>
       </div>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Contrats mandataires</p>
         <div class="row gutter-profile">
-          <ni-input caption="Taux horaire brut par défaut" :error="$v.company.rhConfig.agentContracts.grossHourlyRate.$error"
-            :error-label="nbrError('agentContracts.grossHourlyRate')" type="number" v-model="company.rhConfig.agentContracts.grossHourlyRate"
-            @focus="saveTmp('rhConfig.agentContracts.grossHourlyRate')" suffix="€" @blur="updateCompany('rhConfig.agentContracts.grossHourlyRate')"
+          <ni-input caption="Taux horaire brut par défaut" :error="$v.company.rhConfig.contractWithCustomer.grossHourlyRate.$error"
+            :error-label="nbrError('contractWithCustomer.grossHourlyRate')" type="number" v-model="company.rhConfig.contractWithCustomer.grossHourlyRate"
+            @focus="saveTmp('rhConfig.contractWithCustomer.grossHourlyRate')" suffix="€" @blur="updateCompany('rhConfig.contractWithCustomer.grossHourlyRate')"
           />
         </div>
       </div>
@@ -66,15 +66,27 @@
         <p class="text-weight-bold">Documents</p>
         <div class="row gutter-profile">
           <div class="col-xs-12 col-md-6">
-            <ni-file-uploader caption="Modèle de contrat" path="rhConfig.templates.contract" :entity="company" alt="template contrat"
-              name="contract" @delete="deleteDocument(company.rhConfig.templates.contract.driveId, 'contract', 'rhConfig')"
-              @uploaded="documentUploaded" :additional-value="`modele_contrat_${company.name}`" :url="docsUploadUrl"
+            <ni-file-uploader caption="Modèle de contrat prestataire" path="rhConfig.templates.contractWithCompany" :entity="company" alt="template contrat prestataire"
+              name="contractWithCompany" @delete="deleteDocument(company.rhConfig.templates.contractWithCompany.driveId, 'contractWithCompany', 'rhConfig')"
+              @uploaded="documentUploaded" :additional-value="`modele_contrat_prestataire_${company.name}`" :url="docsUploadUrl"
             />
           </div>
           <div class="col-xs-12 col-md-6">
-            <ni-file-uploader caption="Modèle d'avenant au contrat" path="rhConfig.templates.amendment" :entity="company" alt="template avenant"
-              name="amendment" @delete="deleteDocument(company.rhConfig.templates.amendment.driveId, 'amendment', 'rhConfig')"
-              @uploaded="documentUploaded" :additional-value="`modele_avenant_${company.name}`" :url="docsUploadUrl"
+            <ni-file-uploader caption="Modèle d'avenant au contrat prestataire" path="rhConfig.templates.contractWithCompanyVersion" :entity="company" alt="template avenant prestataire"
+              name="contractWithCompanyVersion" @delete="deleteDocument(company.rhConfig.templates.contractWithCompanyVersion.driveId, 'contractWithCompanyVersion', 'rhConfig')"
+              @uploaded="documentUploaded" :additional-value="`modele_avenant_prestataire_${company.name}`" :url="docsUploadUrl"
+            />
+          </div>
+          <div class="col-xs-12 col-md-6">
+            <ni-file-uploader caption="Modèle de contrat mandataire" path="rhConfig.templates.contractWithCustomer" :entity="company" alt="template contrat mandataire"
+              name="contractWithCustomer" @delete="deleteDocument(company.rhConfig.templates.contractWithCustomer.driveId, 'contractWithCustomer', 'rhConfig')"
+              @uploaded="documentUploaded" :additional-value="`modele_contrat_mandataire_${company.name}`" :url="docsUploadUrl"
+            />
+          </div>
+          <div class="col-xs-12 col-md-6">
+            <ni-file-uploader caption="Modèle d'avenant au contrat mandataire" path="rhConfig.templates.contractWithCustomerVersion" :entity="company" alt="template avenant mandataire"
+              name="contractWithCustomerVersion" @delete="deleteDocument(company.rhConfig.templates.contractWithCustomerVersion.driveId, 'contractWithCustomerVersion', 'rhConfig')"
+              @uploaded="documentUploaded" :additional-value="`modele_avenant_mandataire_${company.name}`" :url="docsUploadUrl"
             />
           </div>
         </div>
@@ -250,12 +262,6 @@ export default {
         'x-access-token': Cookies.get('alenvi_token') || ''
       }
     },
-    hasContractTemplate () {
-      return this.company.rhConfig.templates && this.company.rhConfig.templates.contract && this.company.rhConfig.templates.contract.driveId;
-    },
-    hasAmendmentTemplate () {
-      return this.company.rhConfig.templates && this.company.rhConfig.templates.amendment && this.company.rhConfig.templates.amendment.driveId;
-    },
     isSameThanEditedSector () {
       return this.tmpInput === this.editedSector.name;
     }
@@ -263,10 +269,10 @@ export default {
   validations: {
     company: {
       rhConfig: {
-        providerContracts: {
+        contractWithCompany: {
           grossHourlyRate: { required, posDecimals, maxValue: maxValue(999) }
         },
-        agentContracts: {
+        contractWithCustomer: {
           grossHourlyRate: { required, posDecimals, maxValue: maxValue(999) }
         },
         phoneSubRefunding: { required, posDecimals, maxValue: maxValue(999) },
