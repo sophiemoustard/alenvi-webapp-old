@@ -528,6 +528,7 @@ export default {
         this.loading = true;
         await this.$contracts.update(this.endContract.contract._id, this.$_.omit(this.endContract, ['contract']));
         await this.refreshContracts();
+        this.resetEndContractModal();
         NotifyPositive('Contrat terminé');
       } catch (e) {
         console.error(e);
