@@ -82,8 +82,8 @@
           required-field />
         <ni-modal-input caption="Volume horaire hebdomadaire" :error="$v.newContract.weeklyHours.$error" type="number"
           v-model="newContract.weeklyHours" @blur="$v.newContract.weeklyHours.$touch" suffix="hr" required-field />
-        <ni-modal-input caption="Taux horaire" :error="$v.newContract.grossHourlyRate.$error" type="number" v-model="newContract.grossHourlyRate"
-          @blur="$v.newContract.grossHourlyRate.$touch" suffix="€" required-field />
+        <ni-modal-input v-if="newContract.status === COMPANY_CONTRACT" caption="Taux horaire" :error="$v.newContract.grossHourlyRate.$error"
+          type="number" v-model="newContract.grossHourlyRate" @blur="$v.newContract.grossHourlyRate.$touch" suffix="€" required-field />
         <ni-datetime-picker caption="Date d'effet" :error="$v.newContract.startDate.$error" v-model="newContract.startDate"
           in-modal required-field />
       </div>
@@ -104,8 +104,8 @@
         </div>
         <ni-modal-input caption="Volume horaire hebdomadaire" :error="$v.newContractVersion.weeklyHours.$error" v-model="newContractVersion.weeklyHours"
           type="number" @blur="$v.newContractVersion.weeklyHours.$touch" suffix="hr" required-field />
-        <ni-modal-input caption="Taux horaire" :error="$v.newContractVersion.grossHourlyRate.$error" v-model="newContractVersion.grossHourlyRate"
-          type="number" @blur="$v.newContractVersion.grossHourlyRate.$touch" suffix="€" required-field />
+        <ni-modal-input v-if="contractSelected.status === COMPANY_CONTRACT" caption="Taux horaire" :error="$v.newContractVersion.grossHourlyRate.$error"
+          v-model="newContractVersion.grossHourlyRate" type="number" @blur="$v.newContractVersion.grossHourlyRate.$touch" suffix="€" required-field />
         <ni-datetime-picker caption="Date d'effet" :error="$v.newContractVersion.startDate.$error" v-model="newContractVersion.startDate"
           :min="getMinimalStartDate(contractSelected)" in-modal required-field />
       </div>
@@ -187,6 +187,7 @@ export default {
         grossHourlyRate: ''
       },
       CUSTOMER_CONTRACT,
+      COMPANY_CONTRACT,
       customerOptions: [],
       visibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractEmpty', 'contractSigned', 'isActive'],
       columns: [
@@ -400,11 +401,11 @@ export default {
           user: this.newContract.user,
           versions: [{
             weeklyHours: this.newContract.weeklyHours,
-            grossHourlyRate: this.newContract.grossHourlyRate,
             startDate: this.newContract.startDate,
           }],
         };
         if (payload.status === CUSTOMER_CONTRACT) payload.customer = this.newContract.customer;
+        else payload.versions[0].grossHourlyRate = this.newContract.grossHourlyRate;
 
         await this.$contracts.create(this.$_.pickBy(payload));
         await this.refreshContracts();
