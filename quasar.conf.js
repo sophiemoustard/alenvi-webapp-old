@@ -23,6 +23,7 @@ module.exports = function (ctx) {
       'roles',
       'sectors',
       'services',
+      'surcharges',
       'twilio',
       'vue-croppa',
       'vMask',

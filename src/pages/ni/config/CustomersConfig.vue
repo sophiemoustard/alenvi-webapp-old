@@ -126,19 +126,58 @@
           :error="$v.newSurcharge.laborDay.$error" @blur="$v.newSurcharge.laborDay.$touch" />
         <ni-modal-input caption="Majoration soirs" suffix="%" type="number" v-model="newSurcharge.evenings"
           :error="$v.newSurcharge.evenings.$error" @blur="$v.newSurcharge.evenings.$touch" />
-        <ni-datetime-picker caption="Date d'effet" v-model="newSurcharge.eveningsStartTime" :error="$v.newSurcharge.eveningsStartTime.$error"
-          @blur="$v.newSurcharge.eveningsStartTime.$touch" :min="minStartDate" in-modal />
-        <ni-datetime-picker caption="Date de fin" v-model="newSurcharge.eveningsStartTime" :error="$v.newSurcharge.eveningsStartTime.$error"
-          @blur="$v.newSurcharge.eveningsStartTime.$touch" :min="minStartDate" in-modal />
+        <ni-datetime-picker caption="Heure d'effet" v-model="newSurcharge.eveningsStartTime" :error="$v.newSurcharge.eveningsStartTime.$error"
+          @blur="$v.newSurcharge.eveningsStartTime.$touch" in-modal type="time"/>
+        <ni-datetime-picker caption="Heure de fin" v-model="newSurcharge.eveningsEndTime" :error="$v.newSurcharge.eveningsEndTime.$error"
+          @blur="$v.newSurcharge.eveningsEndTime.$touch" in-modal type="time"/>
         <ni-modal-input caption="Majoration personnalisée" suffix="%" type="number" v-model="newSurcharge.customs"
           :error="$v.newSurcharge.customs.$error" @blur="$v.newSurcharge.customs.$touch" />
-        <ni-datetime-picker caption="Date d'effet" v-model="newSurcharge.customsStartTime" :error="$v.newSurcharge.customsStartTime.$error"
-          @blur="$v.newSurcharge.customsStartTime.$touch" :min="minStartDate" in-modal />
-        <ni-datetime-picker caption="Date de fin" v-model="newSurcharge.customsEndTime" :error="$v.newSurcharge.customsEndTime.$error"
-          @blur="$v.newSurcharge.customsEndTime.$touch" :min="minStartDate" in-modal />
+        <ni-datetime-picker caption="Heure d'effet" v-model="newSurcharge.customsStartTime" :error="$v.newSurcharge.customsStartTime.$error"
+          @blur="$v.newSurcharge.customsStartTime.$touch" in-modal type="time"/>
+        <ni-datetime-picker caption="Heure de fin" v-model="newSurcharge.customsEndTime" :error="$v.newSurcharge.customsEndTime.$error"
+          @blur="$v.newSurcharge.customsEndTime.$touch" in-modal type="time"/>
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Créer le plan de majoration" icon-right="add" color="primary" :loading="loading" @click="createNewService"
-        :disable="disableCreationButton" />
+      <q-btn no-caps class="full-width modal-btn" label="Créer le plan de majoration" icon-right="add" color="primary" :loading="loading" @click="createNewSurcharge"
+        :disable="$v.newSurcharge.$error" />
+    </q-modal>
+
+    <!-- Surcharge edition modal -->
+    <q-modal v-model="surchargeEditionModal" content-classes="modal-container-sm" @hide="resetEditionSurchargeData">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-11">
+            <h5>Éditer le <span class="text-weight-bold">plan de majoration</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer modal-btn-close">
+            <span><q-icon name="clear" @click.native="surchargeEditionModal = false" /></span>
+          </div>
+        </div>
+        <ni-modal-input caption="Nom" v-model="editedSurcharge.name" :error="$v.editedSurcharge.name.$error" @blur="$v.editedSurcharge.name.$touch" />
+        <ni-modal-input caption="Majoration samedis" suffix="%" type="number" v-model="editedSurcharge.saturdays"
+          :error="$v.editedSurcharge.saturdays.$error" @blur="$v.editedSurcharge.saturdays.$touch" />
+        <ni-modal-input caption="Majoration dimanches" suffix="%" type="number" v-model="editedSurcharge.sundays"
+          :error="$v.editedSurcharge.sundays.$error" @blur="$v.editedSurcharge.sundays.$touch" />
+        <ni-modal-input caption="Majoration jours fériés" suffix="%" type="number" v-model="editedSurcharge.publicHolidays"
+          :error="$v.editedSurcharge.publicHolidays.$error" @blur="$v.editedSurcharge.publicHolidays.$touch" />
+        <ni-modal-input caption="Majoration noëls" suffix="%" type="number" v-model="editedSurcharge.christmas"
+          :error="$v.editedSurcharge.christmas.$error" @blur="$v.editedSurcharge.christmas.$touch" />
+        <ni-modal-input caption="Majoration fête du travail" suffix="%" type="number" v-model="editedSurcharge.laborDay"
+          :error="$v.editedSurcharge.laborDay.$error" @blur="$v.editedSurcharge.laborDay.$touch" />
+        <ni-modal-input caption="Majoration soirs" suffix="%" type="number" v-model="editedSurcharge.evenings"
+          :error="$v.editedSurcharge.evenings.$error" @blur="$v.editedSurcharge.evenings.$touch" />
+        <ni-datetime-picker caption="Heure d'effet" v-model="editedSurcharge.eveningsStartTime" :error="$v.editedSurcharge.eveningsStartTime.$error"
+          @blur="$v.editedSurcharge.eveningsStartTime.$touch" in-modal type="time"/>
+        <ni-datetime-picker caption="Heure de fin" v-model="editedSurcharge.eveningsEndTime" :error="$v.editedSurcharge.eveningsEndTime.$error"
+          @blur="$v.editedSurcharge.eveningsEndTime.$touch" in-modal type="time"/>
+        <ni-modal-input caption="Majoration personnalisée" suffix="%" type="number" v-model="editedSurcharge.customs"
+          :error="$v.editedSurcharge.customs.$error" @blur="$v.editedSurcharge.customs.$touch" />
+        <ni-datetime-picker caption="Heure d'effet" v-model="editedSurcharge.customsStartTime" :error="$v.editedSurcharge.customsStartTime.$error"
+          @blur="$v.editedSurcharge.customsStartTime.$touch" in-modal type="time"/>
+        <ni-datetime-picker caption="Heure de fin" v-model="editedSurcharge.customsEndTime" :error="$v.editedSurcharge.customsEndTime.$error"
+          @blur="$v.editedSurcharge.customsEndTime.$touch" in-modal type="time"/>
+      </div>
+      <q-btn no-caps class="full-width modal-btn" label="Editer le service" icon-right="check" color="primary" :loading="loading" @click="updateSurcharge"
+        :disable="$v.editedSurcharge.$error" />
     </q-modal>
 
     <!-- Service creation modal -->
@@ -161,11 +200,9 @@
           :error="$v.newService.defaultUnitAmount.$error" @blur="$v.newService.defaultUnitAmount.$touch" required-field />
         <ni-modal-input caption="TVA" suffix="%" v-model="newService.vat" type="number" :error="$v.newService.vat.$error" @blur="$v.newService.vat.$touch"
           error-label="La TVA doit être positive ou nulle" />
-        <ni-modal-input caption="Majoration dimanche/jours fériés" suffix="%" type="number" v-model="newService.holidaySurcharge" />
-        <ni-modal-input caption="Majoration soirée" suffix="%" type="number" v-model="newService.eveningSurcharge" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer le service" icon-right="add" color="primary" :loading="loading" @click="createNewService"
-        :disable="disableCreationButton" />
+        :disable="disableServiceCreationButton" />
     </q-modal>
 
     <!-- Service edition modal -->
@@ -187,11 +224,9 @@
           :error="$v.editedService.defaultUnitAmount.$error" @blur="$v.editedService.defaultUnitAmount.$touch" required-field />
         <ni-modal-input caption="TVA" suffix="%" v-model="editedService.vat" type="number" :error="$v.editedService.vat.$error" @blur="$v.editedService.vat.$touch"
           error-label="La TVA doit être positive ou nulle" />
-        <ni-modal-input caption="Majoration dimanche/jours fériés" suffix="%" type="number" v-model="editedService.holidaySurcharge" />
-        <ni-modal-input caption="Majoration soirée" suffix="%" type="number" v-model="editedService.eveningSurcharge" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Editer le service" icon-right="check" color="primary" :loading="loading" @click="updateService"
-        :disable="disableEditionButton" />
+        :disable="disableServiceEditionButton" />
     </q-modal>
 
     <!-- Service history modal -->
@@ -299,8 +334,7 @@ export default {
       // Surcharges
       surcharges: [],
       surchargeCreationModal: false,
-      seurchargeEditionModal: false,
-      surchargeHistoryModal: false,
+      surchargeEditionModal: false,
       selectedSurcharge: {},
       newSurcharge: {
         name: '',
@@ -343,67 +377,67 @@ export default {
         },
         {
           name: 'saturdays',
-          label: 'Majoration samedis',
+          label: 'Samedis',
           align: 'center',
           field: row => row.saturdays && `${row.saturdays}%`,
         },
         {
           name: 'sundays',
-          label: 'Majoration dimanches',
+          label: 'Dimanches',
           align: 'center',
           field: row => row.sundays && `${row.sundays}%`,
         },
         {
           name: 'publicHolidays',
-          label: 'Majoration jours fériés',
+          label: 'Jours fériés',
           align: 'center',
           field: row => row.publicHolidays && `${row.publicHolidays}%`,
         },
         {
           name: 'christmas',
-          label: 'Majoration noëls',
+          label: 'Noëls',
           align: 'center',
           field: row => row.christmas && `${row.christmas}%`,
         },
         {
           name: 'laborDay',
-          label: 'Majoration fête du travail',
+          label: 'Fête du travail',
           align: 'center',
           field: row => row.laborDay && `${row.laborDay}%`,
         },
         {
           name: 'evenings',
-          label: 'Majoration soirées',
+          label: 'Soirées',
           align: 'center',
           field: row => row.evenings && `${row.evenings}%`,
         },
         {
           name: 'eveningsStartTime',
-          label: 'Date d\'effet',
+          label: 'Heure de début (soirées)',
           align: 'left',
           field: row => row.eveningsStartTime ? this.$moment(row.eveningsStartTime).format('DD/MM/YYYY') : '',
         },
         {
           name: 'eveningsEndTime',
-          label: 'Date de fin',
+          label: 'Heure de fin (soirées)',
           align: 'left',
           field: row => row.eveningsEndTime ? this.$moment(row.eveningsEndTime).format('DD/MM/YYYY') : '',
         },
         {
           name: 'customs',
-          label: 'Majoration personnalisées',
+          label: 'Majoration perso.',
           align: 'center',
           field: row => row.customs && `${row.customs}%`,
         },
         {
           name: 'customsStartTime',
-          label: 'Date d\'effet',
+          label: 'Heure de début perso.',
           align: 'left',
           field: row => row.customsStartTime ? this.$moment(row.customsStartTime).format('DD/MM/YYYY') : '',
         },
         {
           name: 'customsEndTime',
-          label: 'Date de fin',
+          label: 'Heure de fin perso.',
           align: 'left',
           field: row => row.customsEndTime ? this.$moment(row.customsEndTime).format('DD/MM/YYYY') : '',
         },
@@ -440,7 +474,7 @@ export default {
       ],
       serviceTypeOptions: CONTRACT_STATUS_OPTIONS,
       visibleColumnsServices: ['name', 'nature', 'defaultUnitAmount', 'vat', 'actions'],
-      visibleHistoryColumns: ['startDate', 'name', 'defaultUnitAmount', 'vat', 'holidaySurcharge', 'eveningSurcharge'],
+      visibleHistoryColumns: ['startDate', 'name', 'defaultUnitAmount', 'vat'],
       serviceColumns: [
         {
           name: 'startDate',
@@ -471,18 +505,6 @@ export default {
           label: 'TVA',
           align: 'center',
           field: row => row.vat && `${row.vat}%`,
-        },
-        {
-          name: 'holidaySurcharge',
-          label: 'Majoration dimanche / jours fériés',
-          align: 'center',
-          field: row => row.holidaySurcharge && `${row.holidaySurcharge}%`,
-        },
-        {
-          name: 'eveningSurcharge',
-          label: 'Majoration soirée',
-          align: 'center',
-          field: row => row.eveningSurcharge && `${row.eveningSurcharge}%`,
         },
         {
           name: 'actions',
@@ -566,24 +588,54 @@ export default {
       laborDay: { numeric },
       evenings: { numeric },
       eveningsStartTime: {
-        required: requiredIf(() => {
-          return this.newSurcharge.evenings;
+        required: requiredIf((item) => {
+          return item.evenings;
         })
       },
       eveningsEndTime: {
-        required: requiredIf(() => {
-          return this.newSurcharge.evenings;
+        required: requiredIf((item) => {
+          return item.evenings;
         })
       },
       customs: { numeric },
       customsStartTime: {
-        required: requiredIf(() => {
-          return this.newSurcharge.customs;
+        required: requiredIf((item) => {
+          return item.customs;
         })
       },
       customsEndTime: {
-        required: requiredIf(() => {
-          return this.newSurcharge.customs;
+        required: requiredIf((item) => {
+          return item.customs;
+        })
+      },
+    },
+    editedSurcharge: {
+      name: { required },
+      saturdays: { numeric },
+      sundays: { numeric },
+      publicHolidays: { numeric },
+      christmas: { numeric },
+      laborDay: { numeric },
+      evenings: { numeric },
+      eveningsStartTime: {
+        required: requiredIf((item) => {
+          return item.evenings;
+        })
+      },
+      eveningsEndTime: {
+        required: requiredIf((item) => {
+          return item.evenings;
+        })
+      },
+      customs: { numeric },
+      customsStartTime: {
+        required: requiredIf((item) => {
+          return item.customs;
+        })
+      },
+      customsEndTime: {
+        required: requiredIf((item) => {
+          return item.customs;
         })
       },
     },
@@ -636,11 +688,11 @@ export default {
     addressError () {
       return !this.$v.company.address.fullAddress.required ? REQUIRED_LABEL : 'Adresse non valide';
     },
-    disableEditionButton () {
-      return !this.editedService.name || !this.editedService.startDate || !this.editedService.defaultUnitAmount || this.editedService.vat < 0;
+    disableServiceEditionButton () {
+      return !this.editedService.name || !this.editedService.startDate || !this.editedService.defaultUnitAmount || !this.editedService.vat < 0;
     },
-    disableCreationButton () {
-      return !this.newService.name || !this.newService.nature || !this.newService.defaultUnitAmount || this.newService.vat < 0;
+    disableServiceCreationButton () {
+      return !this.newService.name || !this.newService.nature || !this.newService.defaultUnitAmount || !this.newService.vat < 0;
     },
     minStartDate () {
       const selectedService = this.services.find(ser => ser._id === this.editedService._id);
@@ -649,6 +701,7 @@ export default {
   },
   async mounted () {
     await this.refreshCompany();
+    await this.refreshSurcharges();
     await this.refreshServices();
     await this.refreshThirdPartyPayers();
   },
@@ -671,6 +724,10 @@ export default {
       this.tmpInput = this.$_.get(this.company, path)
     },
     // Refresh data
+    async refreshSurcharges () {
+      const surcharges = await this.$surcharges.showAll({ company: this.user.company._id });
+      this.surcharges = surcharges;
+    },
     async refreshServices () {
       const services = await this.$services.showAll({ company: this.user.company._id });
       this.services = services.map(service => ({
@@ -729,20 +786,93 @@ export default {
       };
       this.$v.newService.$reset();
     },
+    async createNewSurcharge () {
+      try {
+        if (this.$v.newSurcharge.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        this.loading = true;
+        this.newSurcharge.company = this.user.company._id;
+        await this.$surcharges.create(this.newSurcharge);
+        NotifyPositive('Majoration créée.');
+        this.resetCreationSurchargeData();
+        await this.refreshSurcharges();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création du service.');
+      } finally {
+        this.loading = false;
+      }
+    },
+    initSurchargeEdition (id) {
+      this.editedSurcharge = this.surcharges.find(surcharge => surcharge._id === id);
+      delete this.editedSurcharge.createdAt;
+      delete this.editedSurcharge.updatedAt;
+      delete this.editedSurcharge.__index;
+      this.surchargeEditionModal = true;
+    },
+    resetEditionSurchargeData () {
+      this.surchargeEditionModal = false;
+      this.editedSurcharge = {
+        name: '',
+        saturdays: '',
+        sundays: '',
+        publicHolidays: '',
+        christmas: '',
+        laborDay: '',
+        evenings: '',
+        eveningsStartTime: '',
+        eveningsEndTime: '',
+        customs: '',
+        customsStartTime: '',
+        customsEndTime: '',
+      };
+      this.$v.editedSurcharge.$reset();
+    },
+    async updateSurcharge () {
+      try {
+        if (this.$v.editedSurcharge.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.loading = true;
+        const surchargeId = this.editedSurcharge._id;
+        const payload = this.$_.pickBy(this.editedSurcharge);
+        delete payload._id;
+        await this.$surcharges.updateById(surchargeId, payload);
+        NotifyPositive('Majoration modifiée.');
+        this.resetEditionSurchargeData();
+        await this.refreshSurcharges();
+      } catch (e) {
+        console.error(e)
+        NotifyNegative('Erreur lors de la modification de la majoration');
+      } finally {
+        this.loading = false;
+      }
+    },
+    async deleteSurcharge (surchargeId, cell) {
+      try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Etes-vous sûr de vouloir supprimer cette majoration ?',
+          ok: 'OK',
+          cancel: 'Annuler'
+        });
+        await this.$surcharges.remove(surchargeId);
+        this.surcharges.splice(cell, 1);
+        NotifyPositive('Majoration supprimée.');
+      } catch (e) {
+        console.error(e);
+        if (e.message === '') return NotifyPositive('Suppression annulée');
+        NotifyNegative('Erreur lors de la suppression de la majoration.');
+      }
+    },
     // Services
     formatCreatedService () {
-      const { nature, name, defaultUnitAmount, eveningSurcharge, holidaySurcharge, type } = this.newService;
+      const { nature, name, defaultUnitAmount, type } = this.newService;
       const formattedService = {
         nature,
         versions: [{ name, defaultUnitAmount }],
         type,
         company: this.user.company._id
       };
-      if (this.newService.vat && this.newService.vat) formattedService.versions[0].vat = this.newService.vat;
-
-      if (eveningSurcharge) formattedService.versions[0].eveningSurcharge = eveningSurcharge;
-      if (holidaySurcharge) formattedService.versions[0].holidaySurcharge = holidaySurcharge;
-
+      if (this.newService.vat && this.newService.vat !== '') formattedService.versions[0].vat = this.newService.vat;
       return formattedService;
     },
     resetCreationServiceData () {
@@ -752,8 +882,6 @@ export default {
         nature: '',
         defaultUnitAmount: '',
         vat: '',
-        holidaySurcharge: '',
-        eveningSurcharge: '',
       };
       this.$v.newService.$reset();
     },
@@ -776,15 +904,13 @@ export default {
     },
     initServiceEdition (id) {
       const selectedService = this.services.find(service => service._id === id);
-      const { name, defaultUnitAmount, vat, holidaySurcharge, eveningSurcharge } = selectedService;
+      const { name, defaultUnitAmount, vat } = selectedService;
       this.editedService = {
         _id: selectedService._id,
         name: name || '',
         startDate: '',
         defaultUnitAmount: defaultUnitAmount || '',
         vat: vat || '',
-        holidaySurcharge: holidaySurcharge || '',
-        eveningSurcharge: eveningSurcharge || '',
       };
 
       this.serviceEditionModal = true;
@@ -796,8 +922,6 @@ export default {
         startDate: '',
         defaultUnitAmount: '',
         vat: '',
-        holidaySurcharge: '',
-        eveningSurcharge: '',
       };
       this.$v.editedService.$reset();
     },
