@@ -20,7 +20,7 @@
             </q-tr>
           </q-table>
           <q-card-actions align="end">
-            <q-btn no-caps flat color="primary" icon="add" label="Ajouter un service" @click="surchargeCreationModal = true" />
+            <q-btn no-caps flat color="primary" icon="add" label="Ajouter un plan de majoration" @click="surchargeCreationModal = true" />
           </q-card-actions>
         </q-card>
       </div>
@@ -265,7 +265,7 @@
 </template>
 
 <script>
-import { required } from 'vuelidate/lib/validators';
+import { required, numeric, requiredIf } from 'vuelidate/lib/validators';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
 import ModalInput from '../../../components/form/ModalInput.vue';
 import ModalSelect from '../../../components/form/ModalSelect.vue';
@@ -315,8 +315,6 @@ export default {
         customs: '',
         customsStartTime: '',
         customsEndTime: '',
-        service: '',
-        company: ''
       },
       editedSurcharge: {
         name: '',
@@ -559,6 +557,36 @@ export default {
     };
   },
   validations: {
+    newSurcharge: {
+      name: { required },
+      saturdays: { numeric },
+      sundays: { numeric },
+      publicHolidays: { numeric },
+      christmas: { numeric },
+      laborDay: { numeric },
+      evenings: { numeric },
+      eveningsStartTime: {
+        required: requiredIf(() => {
+          return this.newSurcharge.evenings;
+        })
+      },
+      eveningsEndTime: {
+        required: requiredIf(() => {
+          return this.newSurcharge.evenings;
+        })
+      },
+      customs: { numeric },
+      customsStartTime: {
+        required: requiredIf(() => {
+          return this.newSurcharge.customs;
+        })
+      },
+      customsEndTime: {
+        required: requiredIf(() => {
+          return this.newSurcharge.customs;
+        })
+      },
+    },
     newService: {
       name: { required },
       type: { required },
@@ -681,6 +709,25 @@ export default {
       } finally {
         this.tmpInput = '';
       }
+    },
+    // Surcharges
+    resetCreationSurchargeData () {
+      this.surchargeCreationModal = false;
+      this.newSurcharge = {
+        name: '',
+        saturdays: '',
+        sundays: '',
+        publicHolidays: '',
+        christmas: '',
+        laborDay: '',
+        evenings: '',
+        eveningsStartTime: '',
+        eveningsEndTime: '',
+        customs: '',
+        customsStartTime: '',
+        customsEndTime: '',
+      };
+      this.$v.newService.$reset();
     },
     // Services
     formatCreatedService () {
