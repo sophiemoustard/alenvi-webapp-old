@@ -29,7 +29,7 @@ export const fillFilter = async ({ commit }, roleToSearch) => {
       elems.push({
         label: `${persons[i].identity.firstname} ${persons[i].identity.lastname}`,
         value: `${persons[i].identity.firstname} ${persons[i].identity.lastname}`,
-        ...persons[i]
+        ...persons[i],
       })
     }
   } else { // customers

@@ -84,6 +84,7 @@ export default {
       if (key === 'startHour' && this.$moment(value, 'HH:mm').isSameOrAfter(this.$moment(this.value.endHour, 'HH:mm'))) {
         dates.endHour = this.$moment(value, 'HH:mm').add(2, 'H').format('HH:mm');
       }
+
       this.$emit('input', dates);
     },
   },
