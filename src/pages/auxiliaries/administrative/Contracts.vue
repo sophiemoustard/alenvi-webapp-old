@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="neutral-background">
     <h4>Contrats</h4>
-    <ni-contracts v-if="contracts" :contracts="contracts" :user="getUser" :visible-columns="contractVisibleColumns" />
+    <ni-contracts v-if="contracts" :contracts="contracts" :user="getUser" :columns="contractVisibleColumns" />
   </q-page>
 </template>
 

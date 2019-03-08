@@ -9,8 +9,8 @@
         contract.customer.identity.lastname }}
       </p>
       <p v-else class="card-sub-title">Statut : {{ getContractStatus(contract) }}</p>
-      <q-table :data="contract.versions" :columns="columns" row-key="name" :pagination.sync="pagination" hide-bottom
-        :visible-columns="visibleColumns" binary-state-sort class="table-responsive">
+      <q-table :data="contract.versions" :columns="contractColumns" row-key="name" :pagination.sync="pagination" hide-bottom
+        :visible-columns="visibleColumns(contract)" binary-state-sort class="table-responsive">
         <q-tr slot="body" slot-scope="props" :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
             <template v-if="col.name === 'contractEmpty'">
@@ -67,7 +67,7 @@ export default {
   props: {
     user: { type: Object, default: () => null },
     contracts: { type: Array, default: () => [] },
-    visibleColumns: { type: Array, default: () => [] },
+    columns: { type: Array, default: () => [] },
     displayActions: { type: Boolean, default: () => false },
     displayUploader: { type: Boolean, default: () => false }
   },
@@ -75,7 +75,7 @@ export default {
     return {
       CUSTOMER_CONTRACT,
       pagination: { rowsPerPage: 0 },
-      columns: [
+      contractColumns: [
         {
           name: 'weeklyHours',
           label: 'Volume horaire hebdomadaire',
@@ -122,6 +122,7 @@ export default {
         },
       ],
       extensions: 'image/jpg, image/jpeg, image/gif, image/png, application/pdf',
+
     }
   },
   computed: {
@@ -166,6 +167,10 @@ export default {
     },
     getLastVersion (contract) {
       return this.$_.orderBy(contract.versions, ['startDate'], ['desc'])[0];
+    },
+    visibleColumns (contract) {
+      if (contract.status === CUSTOMER_CONTRACT) return this.columns.filter(col => col !== 'weeklyHours');
+      return this.columns;
     },
     getContractStatus (contract) {
       return CONTRACT_STATUS_OPTIONS.find(status => status.value === contract.status).label;

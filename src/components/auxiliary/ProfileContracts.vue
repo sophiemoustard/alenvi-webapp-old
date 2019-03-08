@@ -2,7 +2,7 @@
   <div>
     <div class="row">
       <ni-contracts v-if="contracts" :contracts="contracts" :user="getUser" @openVersionCreation="openVersionCreationModal"
-        @openEndContract="openEndContractModal" @refresh="refreshContracts" :visible-columns="contractVisibleColumns" display-actions display-uploader />
+        @openEndContract="openEndContractModal" @refresh="refreshContracts" :columns="contractVisibleColumns" display-actions display-uploader />
       <q-btn :disable="!hasBasicInfo" class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat"
         @click="openCreationModal" />
       <div v-if="!hasBasicInfo" class="missingBasicInfo">
