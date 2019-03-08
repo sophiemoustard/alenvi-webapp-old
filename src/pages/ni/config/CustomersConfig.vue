@@ -118,8 +118,24 @@
           :error="$v.newSurcharge.saturdays.$error" @blur="$v.newSurcharge.saturdays.$touch" />
         <ni-modal-input caption="Majoration dimanches" suffix="%" type="number" v-model="newSurcharge.sundays"
           :error="$v.newSurcharge.sundays.$error" @blur="$v.newSurcharge.sundays.$touch" />
-        <ni-modal-input caption="Majoration dimanches" suffix="%" type="number" v-model="newSurcharge.sundays"
-          :error="$v.newSurcharge.sundays.$error" @blur="$v.newSurcharge.sundays.$touch" />
+        <ni-modal-input caption="Majoration jours fériés" suffix="%" type="number" v-model="newSurcharge.publicHolidays"
+          :error="$v.newSurcharge.publicHolidays.$error" @blur="$v.newSurcharge.publicHolidays.$touch" />
+        <ni-modal-input caption="Majoration noëls" suffix="%" type="number" v-model="newSurcharge.christmas"
+          :error="$v.newSurcharge.christmas.$error" @blur="$v.newSurcharge.christmas.$touch" />
+        <ni-modal-input caption="Majoration fête du travail" suffix="%" type="number" v-model="newSurcharge.laborDay"
+          :error="$v.newSurcharge.laborDay.$error" @blur="$v.newSurcharge.laborDay.$touch" />
+        <ni-modal-input caption="Majoration soirs" suffix="%" type="number" v-model="newSurcharge.evenings"
+          :error="$v.newSurcharge.evenings.$error" @blur="$v.newSurcharge.evenings.$touch" />
+        <ni-datetime-picker caption="Date d'effet" v-model="newSurcharge.eveningsStartTime" :error="$v.newSurcharge.eveningsStartTime.$error"
+          @blur="$v.newSurcharge.eveningsStartTime.$touch" :min="minStartDate" in-modal />
+        <ni-datetime-picker caption="Date de fin" v-model="newSurcharge.eveningsStartTime" :error="$v.newSurcharge.eveningsStartTime.$error"
+          @blur="$v.newSurcharge.eveningsStartTime.$touch" :min="minStartDate" in-modal />
+        <ni-modal-input caption="Majoration personnalisée" suffix="%" type="number" v-model="newSurcharge.customs"
+          :error="$v.newSurcharge.customs.$error" @blur="$v.newSurcharge.customs.$touch" />
+        <ni-datetime-picker caption="Date d'effet" v-model="newSurcharge.customsStartTime" :error="$v.newSurcharge.customsStartTime.$error"
+          @blur="$v.newSurcharge.customsStartTime.$touch" :min="minStartDate" in-modal />
+        <ni-datetime-picker caption="Date de fin" v-model="newSurcharge.customsEndTime" :error="$v.newSurcharge.customsEndTime.$error"
+          @blur="$v.newSurcharge.customsEndTime.$touch" :min="minStartDate" in-modal />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer le plan de majoration" icon-right="add" color="primary" :loading="loading" @click="createNewService"
         :disable="disableCreationButton" />
