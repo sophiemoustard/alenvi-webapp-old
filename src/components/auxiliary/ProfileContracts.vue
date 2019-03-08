@@ -2,7 +2,7 @@
   <div>
     <div class="row">
       <ni-contracts v-if="contracts" :contracts="contracts" :user="getUser" @openVersionCreation="openVersionCreationModal"
-        @openEndContract="openEndContractModal" :visible-columns="contractVisibleColumns" display-actions display-uploader />
+        @openEndContract="openEndContractModal" @refresh="refreshContracts" :visible-columns="contractVisibleColumns" display-actions display-uploader />
       <q-btn :disable="!hasBasicInfo" class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat"
         @click="openCreationModal" />
       <div v-if="!hasBasicInfo" class="missingBasicInfo">
@@ -149,29 +149,33 @@ export default {
       contractVisibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractEmpty', 'contractSigned', 'isActive'],
     }
   },
-  validations: {
-    newContract: {
-      status: { required },
-      customer: { required: requiredIf((item) => {
-        return item.status === CUSTOMER_CONTRACT;
-      }) },
-      weeklyHours: { required },
-      startDate: { required },
-      grossHourlyRate: { required },
-    },
-    newContractVersion: {
-      weeklyHours: { required },
-      startDate: { required },
-      grossHourlyRate: { required },
-    },
-    endContract: {
-      endNotificationDate: { required },
-      endDate: { required },
-      endReason: { required },
-      otherMisc: { required: requiredIf((item) => {
-        return item.endReason === OTHER;
-      }) },
-    },
+  validations () {
+    return {
+      newContract: {
+        status: { required },
+        customer: { required: requiredIf((item) => {
+          return item.status === CUSTOMER_CONTRACT;
+        }) },
+        weeklyHours: { required: requiredIf((item) => {
+          return item.status === COMPANY_CONTRACT;
+        }) },
+        startDate: { required },
+        grossHourlyRate: { required },
+      },
+      newContractVersion: {
+        weeklyHours: this.contractSelected.status === CUSTOMER_CONTRACT ? {} : { required },
+        startDate: { required },
+        grossHourlyRate: { required },
+      },
+      endContract: {
+        endNotificationDate: { required },
+        endDate: { required },
+        endReason: { required },
+        otherMisc: { required: requiredIf((item) => {
+          return item.endReason === OTHER;
+        }) },
+      },
+    }
   },
   computed: {
     getUser () {
@@ -211,9 +215,6 @@ export default {
     await this.getCustomersWithCustomerContractSubscriptions();
   },
   methods: {
-    getLastVersion (contract) {
-      return this.$_.orderBy(contract.versions, ['startDate'], ['desc'])[0];
-    },
     getMinimalStartDate (contract) {
       const activeVersion = this.getActiveVersion(contract);
       return activeVersion ? this.$moment(activeVersion.startDate).toISOString() : '';
@@ -257,13 +258,14 @@ export default {
           status: this.newContract.status,
           user: this.newContract.user,
           versions: [{
-            weeklyHours: this.newContract.weeklyHours,
+            ...(this.newContract.weeklyHours !== '' && { weeklyHours: this.newContract.weeklyHours }),
             startDate: this.newContract.startDate,
           }],
         };
         if (payload.status === CUSTOMER_CONTRACT) payload.customer = this.newContract.customer;
         else payload.versions[0].grossHourlyRate = this.newContract.grossHourlyRate;
 
+        console.log('payload', this.$_.pickBy(payload));
         await this.$contracts.create(this.$_.pickBy(payload));
         await this.refreshContracts();
         this.resetContractCreationModal();
@@ -273,34 +275,6 @@ export default {
         NotifyNegative('Erreur lors de la création du contrat');
       } finally {
         this.loading = false;
-      }
-    },
-    // Contract edition
-    async updateEndDateOfPreviousVersion (contractId, contractIndex) {
-      const lastActiveVersion = this.getActiveVersion(this.contracts[contractIndex]);
-      const lastVersion = this.getLastVersion(this.contracts[contractIndex]);
-
-      if (lastActiveVersion) {
-        const queries = {
-          contractId: contractId,
-          versionId: lastActiveVersion._id
-        };
-        const payload = { endDate: this.$moment(lastVersion.startDate).toDate() };
-        await this.$contracts.updateVersion(queries, payload);
-      }
-    },
-    async updatePreviousVersions (contractIndex, versionId) {
-      for (let i = 0, l = this.contracts[contractIndex].versions.length; i < l; i++) {
-        const contract = this.contracts[contractIndex];
-        const currentVersion = contract.versions[i];
-        if (currentVersion.isActive && currentVersion._id !== versionId) {
-          const queries = {
-            contractId: contract._id,
-            versionId: currentVersion._id,
-          };
-          await this.$contracts.updateVersion(queries, { 'isActive': false });
-          currentVersion.isActive = false;
-        }
       }
     },
     // Version creation

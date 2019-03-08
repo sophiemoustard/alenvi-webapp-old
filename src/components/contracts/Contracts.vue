@@ -22,7 +22,7 @@
               <div v-if="!props.row.link && displayUploader" class="row justify-center table-actions">
                 <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :headers="headers" :url="docsUploadUrl(contract._id)"
                   @fail="failMsg" :additional-fields="getAdditionalFields(contract, props.row)" hide-underline
-                  @uploaded="refreshContracts" :extensions="extensions" hide-upload-button @add="uploadDocument($event, `signedContract_${props.row._id}`)" />
+                  @uploaded="refresh" :extensions="extensions" hide-upload-button @add="uploadDocument($event, `signedContract_${props.row._id}`)" />
               </div>
               <div v-else-if="props.row.link" class="row justify-center table-actions">
                 <q-btn flat round small color="primary">
@@ -164,6 +164,9 @@ export default {
         { name: 'versionId', value: version._id }
       ]
     },
+    getLastVersion (contract) {
+      return this.$_.orderBy(contract.versions, ['startDate'], ['desc'])[0];
+    },
     getContractStatus (contract) {
       return CONTRACT_STATUS_OPTIONS.find(status => status.value === contract.status).label;
     },
@@ -172,6 +175,9 @@ export default {
     },
     openEndContract (contract) {
       this.$emit('openEndContract', contract);
+    },
+    refresh () {
+      this.$emit('refresh');
     },
     async updateContractActivity (isActive, contract, version, contractIndex) {
       try {
@@ -190,13 +196,41 @@ export default {
         // Update manually checkbox because it's not dynamic
         this.sortedContracts[contractIndex].versions[version.__index].isActive = isActive;
         await this.updatePreviousVersions(contractIndex, version._id);
-        await this.refreshContracts();
+        this.refresh();
         NotifyPositive('Activité du contrat changée');
       } catch (e) {
         console.error(e);
         if (e.message !== '') {
           NotifyNegative('Erreur lors du changement de l\'activité du contrat');
         }
+      }
+    },
+    // Contract edition
+    async updatePreviousVersions (contractIndex, versionId) {
+      for (let i = 0, l = this.contracts[contractIndex].versions.length; i < l; i++) {
+        const contract = this.contracts[contractIndex];
+        const currentVersion = contract.versions[i];
+        if (currentVersion.isActive && currentVersion._id !== versionId) {
+          const queries = {
+            contractId: contract._id,
+            versionId: currentVersion._id,
+          };
+          await this.$contracts.updateVersion(queries, { 'isActive': false });
+          currentVersion.isActive = false;
+        }
+      }
+    },
+    async updateEndDateOfPreviousVersion (contractId, contractIndex) {
+      const lastActiveVersion = this.getActiveVersion(this.contracts[contractIndex]);
+      const lastVersion = this.getLastVersion(this.contracts[contractIndex]);
+
+      if (lastActiveVersion) {
+        const queries = {
+          contractId: contractId,
+          versionId: lastActiveVersion._id
+        };
+        const payload = { endDate: this.$moment(lastVersion.startDate).toDate() };
+        await this.$contracts.updateVersion(queries, payload);
       }
     },
     // Documents
