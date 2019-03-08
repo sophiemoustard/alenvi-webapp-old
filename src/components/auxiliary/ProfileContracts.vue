@@ -1,7 +1,8 @@
 <template>
   <div>
     <div class="row">
-      <ni-contracts v-if="contracts" :contracts="contracts" @openVersionCreation="openVersionCreationModal" @openEndContract="openEndContractModal" :visible-columns="contractVisibleColumns" />
+      <ni-contracts v-if="contracts" :contracts="contracts" :user="getUser" @openVersionCreation="openVersionCreationModal"
+        @openEndContract="openEndContractModal" :visible-columns="contractVisibleColumns" display-actions display-uploader />
       <q-btn :disable="!hasBasicInfo" class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat"
         @click="openCreationModal" />
       <div v-if="!hasBasicInfo" class="missingBasicInfo">
@@ -23,7 +24,8 @@
             <h5>Créer un <span class="text-weight-bold">nouveau contrat</span></h5>
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
-            <span><q-icon name="clear" @click.native="newContractModal = false" /></span>
+            <span>
+              <q-icon name="clear" @click.native="newContractModal = false" /></span>
           </div>
         </div>
         <ni-modal-select caption="Statut" :error="$v.newContract.status.$error" :options="statusOptions" v-model="newContract.status"
@@ -31,10 +33,11 @@
         <ni-modal-select v-if="newContract.status === CUSTOMER_CONTRACT" caption="Bénéficiaire" :error="$v.newContract.customer.$error"
           :options="customerOptions" v-model="newContract.customer" @blur="$v.newContract.customer.$touch" separator
           required-field />
-        <ni-modal-input v-if="newContract.status === COMPANY_CONTRACT" caption="Volume horaire hebdomadaire" :error="$v.newContract.weeklyHours.$error" type="number"
-          v-model="newContract.weeklyHours" @blur="$v.newContract.weeklyHours.$touch" suffix="hr" required-field />
-        <ni-modal-input caption="Taux horaire" :error="$v.newContract.grossHourlyRate.$error"
-          type="number" v-model="newContract.grossHourlyRate" @blur="$v.newContract.grossHourlyRate.$touch" suffix="€" required-field />
+        <ni-modal-input v-if="newContract.status === COMPANY_CONTRACT" caption="Volume horaire hebdomadaire" :error="$v.newContract.weeklyHours.$error"
+          type="number" v-model="newContract.weeklyHours" @blur="$v.newContract.weeklyHours.$touch" suffix="hr"
+          required-field />
+        <ni-modal-input caption="Taux horaire" :error="$v.newContract.grossHourlyRate.$error" type="number" v-model="newContract.grossHourlyRate"
+          @blur="$v.newContract.grossHourlyRate.$touch" suffix="€" required-field />
         <ni-datetime-picker caption="Date d'effet" :error="$v.newContract.startDate.$error" v-model="newContract.startDate"
           in-modal required-field />
       </div>
@@ -50,13 +53,15 @@
             <h5>Créer une <span class="text-weight-bold">version</span></h5>
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
-            <span><q-icon name="clear" @click.native="newContractVersionModal = false" /></span>
+            <span>
+              <q-icon name="clear" @click.native="newContractVersionModal = false" /></span>
           </div>
         </div>
-        <ni-modal-input v-if="contractSelected.status === COMPANY_CONTRACT" caption="Volume horaire hebdomadaire" :error="$v.newContractVersion.weeklyHours.$error" v-model="newContractVersion.weeklyHours"
-          type="number" @blur="$v.newContractVersion.weeklyHours.$touch" suffix="hr" required-field />
-        <ni-modal-input caption="Taux horaire" :error="$v.newContractVersion.grossHourlyRate.$error"
-          v-model="newContractVersion.grossHourlyRate" type="number" @blur="$v.newContractVersion.grossHourlyRate.$touch" suffix="€" required-field />
+        <ni-modal-input v-if="contractSelected.status === COMPANY_CONTRACT" caption="Volume horaire hebdomadaire"
+          :error="$v.newContractVersion.weeklyHours.$error" v-model="newContractVersion.weeklyHours" type="number"
+          @blur="$v.newContractVersion.weeklyHours.$touch" suffix="hr" required-field />
+        <ni-modal-input caption="Taux horaire" :error="$v.newContractVersion.grossHourlyRate.$error" v-model="newContractVersion.grossHourlyRate"
+          type="number" @blur="$v.newContractVersion.grossHourlyRate.$touch" suffix="€" required-field />
         <ni-datetime-picker caption="Date d'effet" :error="$v.newContractVersion.startDate.$error" v-model="newContractVersion.startDate"
           :min="getMinimalStartDate(contractSelected)" in-modal required-field />
       </div>
@@ -72,7 +77,8 @@
             <h5>Terminer un <span class="text-weight-bold">contrat</span></h5>
           </div>
           <div class="col-1 cursor-pointer modal-btn-close" style="text-align: right">
-            <span><q-icon name="clear" @click.native="endContractModal = false" /></span>
+            <span>
+              <q-icon name="clear" @click.native="endContractModal = false" /></span>
           </div>
         </div>
         <ni-datetime-picker caption="Date de notification" v-model="endContract.endNotificationDate" in-modal
@@ -318,7 +324,7 @@ export default {
         this.loading = true;
         const contractId = this.newContractVersion.contractId;
         delete this.newContractVersion.contractId;
-        await this.$contracts.createVersion(contractId, this.newContractVersion);
+        await this.$contracts.createVersion(contractId, this.$_.pickBy(this.newContractVersion));
         await this.refreshContracts();
         this.resetVersionCreationModal();
         NotifyPositive('Version créée');

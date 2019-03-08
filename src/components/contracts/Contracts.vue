@@ -19,12 +19,12 @@
               </div>
             </template>
             <template v-else-if="col.name === 'contractSigned'">
-              <div v-if="!props.row.link" class="row justify-center table-actions">
+              <div v-if="!props.row.link && displayUploader" class="row justify-center table-actions">
                 <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :headers="headers" :url="docsUploadUrl(contract._id)"
                   @fail="failMsg" :additional-fields="getAdditionalFields(contract, props.row)" hide-underline
                   @uploaded="refreshContracts" :extensions="extensions" hide-upload-button @add="uploadDocument($event, `signedContract_${props.row._id}`)" />
               </div>
-              <div v-else class="row justify-center table-actions">
+              <div v-else-if="props.row.link" class="row justify-center table-actions">
                 <q-btn flat round small color="primary">
                   <a :href="props.row.link" target="_blank">
                     <q-icon name="file download" />
@@ -42,10 +42,12 @@
         </q-tr>
       </q-table>
       <q-card-actions align="end">
-        <q-btn v-if="getActiveVersion(contract)" flat no-caps color="primary" icon="add" label="Ajouter un avenant"
-          @click="openVersionCreation(contract)" />
-        <q-btn v-if="getActiveVersion(contract)" flat no-caps color="grey-6" icon="clear" label="Mettre fin au contrat"
-          @click="openEndContract(contract)" />
+        <template v-if="displayActions">
+          <q-btn v-if="getActiveVersion(contract)" flat no-caps color="primary" icon="add" label="Ajouter un avenant"
+            @click="openVersionCreation(contract)" />
+          <q-btn v-if="getActiveVersion(contract)" flat no-caps color="grey-6" icon="clear" label="Mettre fin au contrat"
+            @click="openEndContract(contract)" />
+        </template>
       </q-card-actions>
     </q-card>
   </div>
@@ -63,8 +65,11 @@ export default {
   name: 'Contracts',
   mixins: [contractMixin],
   props: {
+    user: { type: Object, default: () => null },
     contracts: { type: Array, default: () => [] },
-    visibleColumns: { type: Array, default: () => [] }
+    visibleColumns: { type: Array, default: () => [] },
+    displayActions: { type: Boolean, default: () => false },
+    displayUploader: { type: Boolean, default: () => false }
   },
   data () {
     return {
@@ -120,9 +125,6 @@ export default {
     }
   },
   computed: {
-    getUser () {
-      return this.$store.getters['rh/getUserProfile'];
-    },
     sortedContracts () {
       const contracts = this.contracts;
       return contracts.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
@@ -157,7 +159,7 @@ export default {
     },
     getAdditionalFields (contract, version) {
       return [
-        { name: 'fileName', value: `contrat_signe_${this.getUser.identity.firstname}_${this.getUser.identity.lastname}` },
+        { name: 'fileName', value: `contrat_signe_${this.user.identity.firstname}_${this.user.identity.lastname}` },
         { name: 'contractId', value: contract._id },
         { name: 'versionId', value: version._id }
       ]
@@ -199,7 +201,7 @@ export default {
     },
     // Documents
     docsUploadUrl (contractId) {
-      return `${process.env.API_HOSTNAME}/contracts/${contractId}/gdrive/${this.getUser.administrative.driveFolder.id}/upload`;
+      return `${process.env.API_HOSTNAME}/contracts/${contractId}/gdrive/${this.user.administrative.driveFolder.id}/upload`;
     },
     uploadDocument (files, refName) {
       if (files[0].size > 5000000) {
@@ -213,7 +215,7 @@ export default {
     async dlTemplate (contract, contractStartDate) {
       try {
         const monthlyHours = Number.parseFloat(contract.weeklyHours * 4.33).toFixed(1);
-        const { identity, contact } = this.getUser
+        const { identity, contact } = this.user
         const data = {
           'auxiliaryTitle': identity.title,
           'auxiliaryFirstname': identity.firstname,
@@ -232,7 +234,7 @@ export default {
           'initialContractStartDate': this.$moment(contractStartDate).format('DD/MM/YYYY'),
         };
         const params = {
-          driveId: contract.__index === 0 ? this.getUser.company.rhConfig.templates.contractWithCompany.driveId : this.getUser.company.rhConfig.templates.contractWithCompanyVersion.driveId,
+          driveId: contract.__index === 0 ? this.user.company.rhConfig.templates.contractWithCompany.driveId : this.user.company.rhConfig.templates.contractWithCompanyVersion.driveId,
         };
 
         await downloadDocxFile(params, data, 'contrat.docx');

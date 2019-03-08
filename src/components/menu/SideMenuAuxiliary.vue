@@ -30,6 +30,7 @@
       <ni-menu-item name="auxiliary personal info" :params="{ id: user._id }" icon="person" label="Infos personnelles" />
       <ni-menu-item name="profile salaries" :params="{ id: user._id }" icon="layers" label="Paye" />
       <ni-menu-item name="profile docs" :params="{ id: user._id }" icon="insert_drive_file" label="Documents" />
+      <ni-menu-item name="profile contracts" icon="description" label="Contrats" />
     </q-collapsible>
     <q-item-separator />
     <q-collapsible ref="team" v-model="activeRoutes.team.open" collapseIcon="expand_more">

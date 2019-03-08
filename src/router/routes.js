@@ -189,6 +189,16 @@ const routes = [
         }
       },
       {
+        path: 'auxiliaries/contracts',
+        name: 'profile contracts',
+        component: () => import('pages/auxiliaries/administrative/Contracts'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['profiles:read'],
+          parent: 'administrative'
+        }
+      },
+      {
         path: 'auxiliaries/:id',
         name: 'auxiliary personal info',
         component: () => import('pages/auxiliaries/administrative/Info'),
