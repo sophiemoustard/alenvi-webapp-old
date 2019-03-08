@@ -1,8 +1,8 @@
 <template>
-  <div :class="[{ 'highlight': !this.isOnlyUnderCustomerContract },  'full-width', 'row', 'relative-position', 'chip-container']"
-    @click="!this.isOnlyUnderCustomerContract && openIndicatorsModal">
+  <div :class="[{ 'highlight': !isOnlyUnderCustomerContract },  'full-width', 'row', 'relative-position', 'chip-container']"
+    @click="openIndicatorsModal">
     <img :src="getAvatar(person.picture)" class="avatar">
-    <q-chip v-if="!this.isOnlyUnderCustomerContract" :class="['absolute-center', { 'busy': isBusy }]" small text-color="white">
+    <q-chip v-if="!isOnlyUnderCustomerContract" :class="['absolute-center', { 'busy': isBusy }]" small text-color="white">
       <span class="chip-indicator">{{ ratio.weeklyHours }}h / {{ ratio.contractHours }}</span>
     </q-chip>
 
@@ -123,6 +123,7 @@ export default {
       this.ratio = { weeklyHours: Math.round(this.totalWorkingHours), contractHours: this.getContractHours() };
     },
     async openIndicatorsModal () {
+      if (this.isOnlyUnderCustomerContract) return;
       try {
         this.monthEvents = await this.$events.list({
           startDate: this.$moment(this.startOfWeek).startOf('month').format('YYYYMMDD'),
