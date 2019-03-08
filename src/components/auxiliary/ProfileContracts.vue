@@ -317,7 +317,6 @@ export default {
     await this.refreshContracts();
     await this.getCustomersWithCustomerContractSubscriptions();
     this.newContract.grossHourlyRate = this.getUser.company.rhConfig.contractWithCompany.grossHourlyRate;
-    console.log('new', this.newContract);
   },
   methods: {
     getFullNationality (nationality) {
