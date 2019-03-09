@@ -30,7 +30,12 @@ export default {
   },
   computed: {
     format () {
-      return this.type === 'datetime' ? 'DD/MM/YYYY HH:mm' : 'DD/MM/YYYY';
+      if (this.type === 'datetime') {
+        return 'DD/MM/YYYY HH:mm';
+      } else if (this.type === 'time') {
+        return 'HH:mm';
+      }
+      return 'DD/MM/YYYY';
     },
   },
   methods: {

@@ -166,7 +166,7 @@
         <ni-modal-input caption="Majoration soirs" suffix="%" type="number" v-model="editedSurcharge.evenings"
           :error="$v.editedSurcharge.evenings.$error" @blur="$v.editedSurcharge.evenings.$touch" />
         <ni-datetime-picker caption="Heure d'effet" v-model="editedSurcharge.eveningsStartTime" :error="$v.editedSurcharge.eveningsStartTime.$error"
-          @blur="$v.editedSurcharge.eveningsStartTime.$touch" in-modal type="time"/>
+          @blur="$v.editedSurcharge.eveningsStartTime.$touch" in-modal type="time" />
         <ni-datetime-picker caption="Heure de fin" v-model="editedSurcharge.eveningsEndTime" :error="$v.editedSurcharge.eveningsEndTime.$error"
           @blur="$v.editedSurcharge.eveningsEndTime.$touch" in-modal type="time"/>
         <ni-modal-input caption="Majoration personnalisée" suffix="%" type="number" v-model="editedSurcharge.customs"
@@ -415,13 +415,13 @@ export default {
           name: 'eveningsStartTime',
           label: 'Heure de début (soirées)',
           align: 'left',
-          field: row => row.eveningsStartTime ? this.$moment(row.eveningsStartTime).format('DD/MM/YYYY') : '',
+          field: row => row.eveningsStartTime ? this.$moment(row.eveningsStartTime).format('HH:mm') : '',
         },
         {
           name: 'eveningsEndTime',
           label: 'Heure de fin (soirées)',
           align: 'left',
-          field: row => row.eveningsEndTime ? this.$moment(row.eveningsEndTime).format('DD/MM/YYYY') : '',
+          field: row => row.eveningsEndTime ? this.$moment(row.eveningsEndTime).format('HH:mm') : '',
         },
         {
           name: 'customs',
@@ -433,13 +433,13 @@ export default {
           name: 'customsStartTime',
           label: 'Heure de début perso.',
           align: 'left',
-          field: row => row.customsStartTime ? this.$moment(row.customsStartTime).format('DD/MM/YYYY') : '',
+          field: row => row.customsStartTime ? this.$moment(row.customsStartTime).format('HH:mm') : '',
         },
         {
           name: 'customsEndTime',
           label: 'Heure de fin perso.',
           align: 'left',
-          field: row => row.customsEndTime ? this.$moment(row.customsEndTime).format('DD/MM/YYYY') : '',
+          field: row => row.customsEndTime ? this.$moment(row.customsEndTime).format('HH:mm') : '',
         },
         {
           name: 'actions',
