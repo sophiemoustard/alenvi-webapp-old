@@ -92,13 +92,14 @@
           </div>
         </div>
         <ni-modal-select caption="Type" v-model="newService.type" :error="$v.newService.type.$error" @blur="$v.newService.type.$touch"
-          :options="serviceTypeOptions" />
-        <ni-modal-input caption="Nom" v-model="newService.name" :error="$v.newService.name.$error" @blur="$v.newService.name.$touch" />
+          :options="serviceTypeOptions" required-field />
+        <ni-modal-input caption="Nom" v-model="newService.name" :error="$v.newService.name.$error" @blur="$v.newService.name.$touch" required-field />
         <ni-modal-select caption="Nature" v-model="newService.nature" :error="$v.newService.nature.$error" @blur="$v.newService.nature.$touch"
-          :options="natureOptions" />
+          :options="natureOptions" required-field />
         <ni-modal-input caption="Prix unitaire par défaut TTC" suffix="€" type="number" v-model="newService.defaultUnitAmount"
-          :error="$v.newService.defaultUnitAmount.$error" @blur="$v.newService.defaultUnitAmount.$touch"/>
-        <ni-modal-input caption="TVA" suffix="%" v-model="newService.vat" type="number" :error="$v.newService.vat.$error" @blur="$v.newService.vat.$touch" />
+          :error="$v.newService.defaultUnitAmount.$error" @blur="$v.newService.defaultUnitAmount.$touch" required-field />
+        <ni-modal-input caption="TVA" suffix="%" v-model="newService.vat" type="number" :error="$v.newService.vat.$error" @blur="$v.newService.vat.$touch"
+          required-field />
         <ni-modal-input caption="Majoration dimanche/jours fériés" suffix="%" type="number" v-model="newService.holidaySurcharge" />
         <ni-modal-input caption="Majoration soirée" suffix="%" type="number" v-model="newService.eveningSurcharge" />
       </div>
@@ -118,11 +119,13 @@
           </div>
         </div>
         <ni-datetime-picker caption="Date d'effet" v-model="editedService.startDate" :error="$v.editedService.startDate.$error"
-          @blur="$v.editedService.startDate.$touch" :min="minStartDate" in-modal />
-        <ni-modal-input caption="Nom" v-model="editedService.name" :error="$v.editedService.name.$error" @blur="$v.editedService.name.$touch" />
+          @blur="$v.editedService.startDate.$touch" :min="minStartDate" in-modal required-field />
+        <ni-modal-input caption="Nom" v-model="editedService.name" :error="$v.editedService.name.$error" @blur="$v.editedService.name.$touch"
+          required-field />
         <ni-modal-input caption="Prix unitaire par défaut TTC" suffix="€" type="number" v-model="editedService.defaultUnitAmount"
-          :error="$v.editedService.defaultUnitAmount.$error" @blur="$v.editedService.defaultUnitAmount.$touch"/>
-        <ni-modal-input caption="TVA" suffix="%" v-model="editedService.vat" type="number" :error="$v.editedService.vat.$error" @blur="$v.editedService.vat.$touch" />
+          :error="$v.editedService.defaultUnitAmount.$error" @blur="$v.editedService.defaultUnitAmount.$touch" required-field />
+        <ni-modal-input caption="TVA" suffix="%" v-model="editedService.vat" type="number" :error="$v.editedService.vat.$error" @blur="$v.editedService.vat.$touch"
+          required-field />
         <ni-modal-input caption="Majoration dimanche/jours fériés" suffix="%" type="number" v-model="editedService.holidaySurcharge" />
         <ni-modal-input caption="Majoration soirée" suffix="%" type="number" v-model="editedService.eveningSurcharge" />
       </div>
@@ -430,7 +433,7 @@ export default {
       return !this.editedService.name || !this.editedService.startDate || !this.editedService.defaultUnitAmount || !this.editedService.vat;
     },
     disableCreationButton () {
-      return !this.newService.name || !this.newService.nature || !this.newService.defaultUnitAmount || !this.newService.vat;
+      return !this.newService.name || !this.newService.nature || !this.newService.defaultUnitAmount || (this.newService.vat === '' || this.newService.vat < 0);
     },
     minStartDate () {
       const selectedService = this.services.find(ser => ser._id === this.editedService._id);
