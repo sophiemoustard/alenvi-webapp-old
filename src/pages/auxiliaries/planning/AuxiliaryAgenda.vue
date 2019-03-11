@@ -35,9 +35,10 @@ import Agenda from '../../../components/Agenda';
 import PlanningNavigation from '../../../components/planning/PlanningNavigation';
 import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryEventCreationModal';
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
-import { DEFAULT_AVATAR, INTERVENTION, NEVER, AGENDA, WEEK_VIEW, THREE_DAYS_VIEW } from '../../../data/constants';
+import { DEFAULT_AVATAR, INTERVENTION, NEVER, AGENDA, WEEK_VIEW, THREE_DAYS_VIEW, ABSENCE } from '../../../data/constants';
 import { planningTimelineMixin } from '../../../mixins/planningTimelineMixin';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
+import { NotifyWarning } from '../../../components/popup/notify';
 
 export default {
   name: 'AuxiliaryAgenda',
@@ -143,7 +144,10 @@ export default {
         ]
       });
       if (!can) return;
+
       const selectedDay = this.days[dayIndex];
+      if (!this.canCreateEvent(this.selectedAuxiliary, selectedDay)) return NotifyWarning('Impossible de créer un évènement à cette date à cette auxiliaire.');
+
       this.newEvent = {
         type: INTERVENTION,
         repetition: { frequency: NEVER },
@@ -164,7 +168,24 @@ export default {
           endHour: '10:00',
         },
       };
+
+      this.selectedAuxiliary.hasActiveCustomerContract = this.hasActiveCustomerContract(this.selectedAuxiliary, selectedDay);
+      this.selectedAuxiliary.hasActiveCompanyContract = this.hasActiveCompanyContract(this.selectedAuxiliary, selectedDay);
+
       this.creationModal = true;
+    },
+    // Event edition
+    openEditionModal (event) {
+      const auxiliary = event.auxiliary._id;
+      const can = this.canEditEvent(event, auxiliary);
+      if (!can) return;
+      this.formatEditedEvent(event, auxiliary);
+      if (event.type !== ABSENCE) {
+        this.selectedAuxiliary.hasActiveCustomerContract = this.hasActiveCustomerContract(this.selectedAuxiliary, event.startDate);
+        this.selectedAuxiliary.hasActiveCompanyContract = this.hasActiveCompanyContract(this.selectedAuxiliary, event.startDate);
+      }
+
+      this.editionModal = true
     },
   },
 }

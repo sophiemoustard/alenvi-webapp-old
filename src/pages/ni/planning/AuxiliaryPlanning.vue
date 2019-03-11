@@ -24,7 +24,7 @@ import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryE
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
 import Planning from '../../../components/planning/Planning.vue';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
-import { INTERVENTION, NEVER, COMPANY_CONTRACT, CUSTOMER_CONTRACT } from '../../../data/constants';
+import { INTERVENTION, NEVER } from '../../../data/constants';
 import { mapGetters, mapActions } from 'vuex';
 import { NotifyNegative, NotifyWarning } from '../../../components/popup/notify';
 
@@ -135,34 +135,12 @@ export default {
         this.customers = [];
       }
     },
-    hasActiveCustomerContract (auxiliary, selectedDay) {
-      if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
-      if (!auxiliary.contracts.some(contract => contract.status === CUSTOMER_CONTRACT)) return false;
-      const customerContracts = auxiliary.contracts.filter(contract => contract.status === CUSTOMER_CONTRACT);
-
-      return customerContracts.some(contract => {
-        return this.$moment(contract.startDate).isSameOrBefore(selectedDay) &&
-          ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(selectedDay));
-      });
-    },
-    hasActiveCompanyContract (auxiliary, selectedDay) {
-      if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
-      if (!auxiliary.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
-      const companyContracts = auxiliary.contracts.filter(contract => contract.status === COMPANY_CONTRACT);
-
-      return companyContracts.some(contract => {
-        return this.$moment(contract.startDate).isSameOrBefore(selectedDay) &&
-          ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(selectedDay));
-      });
-    },
     // Event creation
     openCreationModal (vEvent) {
       const { dayIndex, person } = vEvent;
       const selectedDay = this.days[dayIndex];
 
-      const hasActiveCustomerContract = this.hasActiveCustomerContract(person, selectedDay);
-      const hasActiveCompanyContract = this.hasActiveCompanyContract(person, selectedDay);
-      if (!hasActiveCustomerContract && !hasActiveCompanyContract) return NotifyWarning('Impossible de créer un évènement à cette date à cette auxiliaire.');
+      if (!this.canCreateEvent(person, selectedDay)) return NotifyWarning('Impossible de créer un évènement à cette date à cette auxiliaire.');
 
       this.newEvent = {
         type: INTERVENTION,
@@ -185,6 +163,15 @@ export default {
         },
       };
       this.creationModal = true;
+    },
+    // Event edition
+    openEditionModal (event) {
+      const auxiliary = event.auxiliary._id;
+      const can = this.canEditEvent(event, auxiliary);
+      if (!can) return;
+      this.formatEditedEvent(event, auxiliary);
+
+      this.editionModal = true
     },
     // Filter
     handleElemAddedToFilter (el) {
