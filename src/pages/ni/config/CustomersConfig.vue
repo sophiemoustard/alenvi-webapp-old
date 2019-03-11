@@ -843,6 +843,7 @@ export default {
         const surchargeId = this.editedSurcharge._id;
         const payload = this.$_.pickBy(this.editedSurcharge);
         delete payload._id;
+        delete payload.company;
         await this.$surcharges.updateById(surchargeId, payload);
         NotifyPositive('Plan de majoration modifié.');
         this.resetEditionSurchargeData();
