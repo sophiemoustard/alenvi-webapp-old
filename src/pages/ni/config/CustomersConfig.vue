@@ -5,8 +5,7 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Plans de majoration</p>
         <q-card style="background: white">
-          <q-table :data="surcharges" :columns="surchargeColumns" hide-bottom binary-state-sort :pagination.sync="pagination" :visible-columns="visibleColumnsSurcharges"
-            class="table-responsive">
+          <q-table :data="surcharges" :columns="surchargeColumns" hide-bottom binary-state-sort :pagination.sync="pagination" class="table-responsive">
             <q-tr slot="body" slot-scope="props" :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
                 <template v-if="col.name === 'actions'">
@@ -124,7 +123,7 @@
           :error="$v.newSurcharge.twentyFifthOfDecember.$error" @blur="$v.newSurcharge.twentyFifthOfDecember.$touch" />
         <ni-modal-input caption="Majoration 1er mai" suffix="%" type="number" v-model="newSurcharge.firstOfMay"
           :error="$v.newSurcharge.firstOfMay.$error" @blur="$v.newSurcharge.firstOfMay.$touch" />
-        <ni-modal-input caption="Majoration soir" suffix="%" type="number" v-model="newSurcharge.evening"
+        <ni-modal-input caption="Majoration soirée" suffix="%" type="number" v-model="newSurcharge.evening"
           :error="$v.newSurcharge.evening.$error" @blur="$v.newSurcharge.evening.$touch" />
         <ni-datetime-picker caption="Heure d'effet" v-model="newSurcharge.eveningStartTime" :error="$v.newSurcharge.eveningStartTime.$error"
           @blur="$v.newSurcharge.eveningStartTime.$touch" in-modal type="time"/>
@@ -138,7 +137,7 @@
           @blur="$v.newSurcharge.customEndTime.$touch" in-modal type="time"/>
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer le plan de majoration" icon-right="add" color="primary" :loading="loading" @click="createNewSurcharge"
-        :disable="$v.newSurcharge.$error" />
+        :disable="$v.newSurcharge.$error || !newSurcharge.name" />
     </q-modal>
 
     <!-- Surcharge edition modal -->
@@ -165,15 +164,15 @@
           :error="$v.editedSurcharge.firstOfMay.$error" @blur="$v.editedSurcharge.firstOfMay.$touch" />
         <ni-modal-input caption="Majoration soir" suffix="%" type="number" v-model="editedSurcharge.evening"
           :error="$v.editedSurcharge.evening.$error" @blur="$v.editedSurcharge.evening.$touch" />
-        <ni-datetime-picker caption="Heure d'effet" v-model="editedSurcharge.eveningStartTime" :error="$v.editedSurcharge.eveningStartTime.$error"
+        <ni-datetime-picker caption="Début soirée" v-model="editedSurcharge.eveningStartTime" :error="$v.editedSurcharge.eveningStartTime.$error"
           @blur="$v.editedSurcharge.eveningStartTime.$touch" in-modal type="time" />
-        <ni-datetime-picker caption="Heure de fin" v-model="editedSurcharge.eveningEndTime" :error="$v.editedSurcharge.eveningEndTime.$error"
+        <ni-datetime-picker caption="Fin soirée" v-model="editedSurcharge.eveningEndTime" :error="$v.editedSurcharge.eveningEndTime.$error"
           @blur="$v.editedSurcharge.eveningEndTime.$touch" in-modal type="time"/>
         <ni-modal-input caption="Majoration personnalisée" suffix="%" type="number" v-model="editedSurcharge.custom"
           :error="$v.editedSurcharge.custom.$error" @blur="$v.editedSurcharge.custom.$touch" />
-        <ni-datetime-picker caption="Heure d'effet" v-model="editedSurcharge.customStartTime" :error="$v.editedSurcharge.customStartTime.$error"
+        <ni-datetime-picker caption="Début personnalisé" v-model="editedSurcharge.customStartTime" :error="$v.editedSurcharge.customStartTime.$error"
           @blur="$v.editedSurcharge.customStartTime.$touch" in-modal type="time"/>
-        <ni-datetime-picker caption="Heure de fin" v-model="editedSurcharge.customEndTime" :error="$v.editedSurcharge.customEndTime.$error"
+        <ni-datetime-picker caption="Fin personnalisée" v-model="editedSurcharge.customEndTime" :error="$v.editedSurcharge.customEndTime.$error"
           @blur="$v.editedSurcharge.customEndTime.$touch" in-modal type="time"/>
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Editer le service" icon-right="check" color="primary" :loading="loading" @click="updateSurcharge"
@@ -365,8 +364,6 @@ export default {
         customEndTime: '',
         service: '',
       },
-      visibleColumnsSurcharges: ['name', 'saturday', 'sunday', 'publicHoliday', 'twentyFifthOfDecember', 'firstOfMay',
-        'evening', 'eveningStartTime', 'eveningEndTime', 'custom', 'customStartTime', 'customEndTime', 'actions'],
       surchargeColumns: [
         {
           name: 'name',
@@ -412,31 +409,31 @@ export default {
         },
         {
           name: 'eveningStartTime',
-          label: 'Heure de début (soirée)',
+          label: 'Début soirée',
           align: 'left',
           field: row => row.eveningStartTime ? this.$moment(row.eveningStartTime).format('HH:mm') : '',
         },
         {
           name: 'eveningEndTime',
-          label: 'Heure de fin (soirée)',
+          label: 'Fin soirée',
           align: 'left',
           field: row => row.eveningEndTime ? this.$moment(row.eveningEndTime).format('HH:mm') : '',
         },
         {
           name: 'custom',
-          label: 'Majoration perso.',
+          label: 'Majoration personnalisée',
           align: 'center',
           field: row => row.custom && `${row.custom}%`,
         },
         {
           name: 'customStartTime',
-          label: 'Heure de début perso.',
+          label: 'Début personnalisé',
           align: 'left',
           field: row => row.customStartTime ? this.$moment(row.customStartTime).format('HH:mm') : '',
         },
         {
           name: 'customEndTime',
-          label: 'Heure de fin perso.',
+          label: 'Fin personnalisée',
           align: 'left',
           field: row => row.customEndTime ? this.$moment(row.customEndTime).format('HH:mm') : '',
         },
@@ -724,15 +721,26 @@ export default {
     },
     // Refresh data
     async refreshSurcharges () {
-      const surcharges = await this.$surcharges.showAll({ company: this.user.company._id });
-      this.surcharges = surcharges;
+      try {
+        this.surcharges = await this.$surcharges.showAll({ company: this.user.company._id });
+      } catch (e) {
+        NotifyNegative('Erreur lors du rafraîchissement des plans de majoration.');
+        console.error(e);
+        this.surcharges = [];
+      }
     },
     async refreshServices () {
-      const services = await this.$services.showAll({ company: this.user.company._id });
-      this.services = services.map(service => ({
-        ...this.getServiceLastVersion(service),
-        ...service,
-      }));
+      try {
+        const services = await this.$services.showAll({ company: this.user.company._id });
+        this.services = services.map(service => ({
+          ...this.getServiceLastVersion(service),
+          ...service,
+        }));
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors du rafraîchissement des services.');
+        this.services = [];
+      }
     },
     async refreshCompany () {
       await this.$store.dispatch('main/getUser', this.user._id);
@@ -787,16 +795,17 @@ export default {
     },
     async createNewSurcharge () {
       try {
+        this.$v.newSurcharge.$touch();
         if (this.$v.newSurcharge.$error) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
         this.newSurcharge.company = this.user.company._id;
         await this.$surcharges.create(this.newSurcharge);
-        NotifyPositive('Majoration créée.');
+        NotifyPositive('Plan de majoration créé.');
         this.resetCreationSurchargeData();
         await this.refreshSurcharges();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création du service.');
+        NotifyNegative('Erreur lors de la création du plan de majoration.');
       } finally {
         this.loading = false;
       }
@@ -828,18 +837,19 @@ export default {
     },
     async updateSurcharge () {
       try {
+        this.$v.editedSurcharge.$touch();
         if (this.$v.editedSurcharge.$error) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
         const surchargeId = this.editedSurcharge._id;
         const payload = this.$_.pickBy(this.editedSurcharge);
         delete payload._id;
         await this.$surcharges.updateById(surchargeId, payload);
-        NotifyPositive('Majoration modifiée.');
+        NotifyPositive('Plan de majoration modifié.');
         this.resetEditionSurchargeData();
         await this.refreshSurcharges();
       } catch (e) {
         console.error(e)
-        NotifyNegative('Erreur lors de la modification du plan de majoration');
+        NotifyNegative('Erreur lors de la modification du plan de majoration.');
       } finally {
         this.loading = false;
       }
@@ -854,7 +864,7 @@ export default {
         });
         await this.$surcharges.remove(surchargeId);
         this.surcharges.splice(cell, 1);
-        NotifyPositive('Majoration supprimée.');
+        NotifyPositive('Plan de majoration supprimé.');
       } catch (e) {
         console.error(e);
         if (e.message === '') return NotifyPositive('Suppression annulée');
