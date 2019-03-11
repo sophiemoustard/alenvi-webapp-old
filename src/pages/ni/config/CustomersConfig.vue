@@ -723,6 +723,12 @@ export default {
     async refreshSurcharges () {
       try {
         this.surcharges = await this.$surcharges.showAll({ company: this.user.company._id });
+        for (let l = this.surcharges.length, i = l; i > l; i--) {
+          if (this.surcharges[i].eveningStartTime) this.surcharges[i].eveningStartTime = this.$moment(this.surcharges[i].eveningStartTime, 'HH:mm');
+          if (this.surcharges[i].eveningEndTime) this.surcharges[i].eveningEndTime = this.$moment(this.surcharges[i].eveningEndTime, 'HH:mm');
+          if (this.surcharges[i].customStartTime) this.surcharges[i].customStartTime = this.$moment(this.surcharges[i].customStartTime, 'HH:mm');
+          if (this.surcharges[i].customEndTime) this.surcharges[i].customEndTime = this.$moment(this.surcharges[i].customEndTime, 'HH:mm');
+        }
       } catch (e) {
         NotifyNegative('Erreur lors du rafraîchissement des plans de majoration.');
         console.error(e);
@@ -844,6 +850,10 @@ export default {
         const payload = this.$_.pickBy(this.editedSurcharge);
         delete payload._id;
         delete payload.company;
+        if (this.editedSurcharge.eveningStartTime) this.editedSurcharge.eveningStartTime = this.$moment(this.editedSurcharge.eveningStartTime).format('HH:mm');
+        if (this.editedSurcharge.eveningEndTime) this.editedSurcharge.eveningEndTime = this.$moment(this.editedSurcharge.eveningEndTime).format('HH:mm');
+        if (this.editedSurcharge.customStartTime) this.editedSurcharge.customStartTime = this.$moment(this.editedSurcharge.customStartTime).format('HH:mm');
+        if (this.editedSurcharge.customEndTime) this.editedSurcharge.customEndTime = this.$moment(this.editedSurcharge.customEndTime).format('HH:mm');
         await this.$surcharges.updateById(surchargeId, payload);
         NotifyPositive('Plan de majoration modifié.');
         this.resetEditionSurchargeData();
