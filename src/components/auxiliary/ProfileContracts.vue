@@ -145,7 +145,7 @@ export default {
       },
       CUSTOMER_CONTRACT,
       COMPANY_CONTRACT,
-      customerOptions: [],
+      customers: [],
       contractVisibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractEmpty', 'contractSigned', 'isActive'],
     }
   },
@@ -208,7 +208,13 @@ export default {
         return this.$moment(activeVersion.startDate).add(1, 'day').toISOString();
       }
       return '';
-    }
+    },
+    customerOptions () {
+      return this.customers.map(cus => ({
+        label: `${cus.identity.title} ${cus.identity.lastname}`,
+        value: cus._id
+      }));
+    },
   },
   async mounted () {
     await this.refreshContracts();
@@ -221,11 +227,7 @@ export default {
     },
     async getCustomersWithCustomerContractSubscriptions () {
       try {
-        const customers = await this.$customers.showAllWithCustomerContractSubscriptions();
-        this.customerOptions = customers.map(cus => ({
-          label: `${cus.identity.title} ${cus.identity.lastname}`,
-          value: cus._id
-        }));
+        this.customers = await this.$customers.showAllWithCustomerContractSubscriptions();
       } catch (e) {
         this.customerOptions = [];
         console.error(e);
@@ -258,14 +260,13 @@ export default {
           status: this.newContract.status,
           user: this.newContract.user,
           versions: [{
-            ...(this.newContract.weeklyHours !== '' && { weeklyHours: this.newContract.weeklyHours }),
             startDate: this.newContract.startDate,
+            grossHourlyRate: this.newContract.grossHourlyRate,
           }],
         };
         if (payload.status === CUSTOMER_CONTRACT) payload.customer = this.newContract.customer;
-        else payload.versions[0].grossHourlyRate = this.newContract.grossHourlyRate;
+        else payload.versions[0].weeklyHours = this.newContract.weeklyHours;
 
-        console.log('payload', this.$_.pickBy(payload));
         await this.$contracts.create(this.$_.pickBy(payload));
         await this.refreshContracts();
         this.resetContractCreationModal();
