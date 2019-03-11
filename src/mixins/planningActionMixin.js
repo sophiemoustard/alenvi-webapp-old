@@ -47,8 +47,8 @@ export const planningActionMixin = {
           frequency: { required: requiredIf((item) => item.type !== ABSENCE) },
         },
         cancel: {
-          condition: { required: requiredIf((item, parent) => parent.isCancelled) },
-          reason: { required: requiredIf((item, parent) => parent.isCancelled) },
+          condition: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
+          reason: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
         },
       },
     };
@@ -265,8 +265,10 @@ export const planningActionMixin = {
         }
 
         delete payload.customer;
+        delete payload.staffingLeft;
+        delete payload.staffingWidth;
         delete payload.type;
-        delete payload._id
+        delete payload._id;
         await this.$events.updateById(this.editedEvent._id, payload);
         NotifyPositive('Évènement modifié');
 
@@ -274,6 +276,10 @@ export const planningActionMixin = {
         this.editionModal = false;
         this.resetEditionForm();
       } catch (e) {
+        if (e.data && e.data.statusCode === 422) {
+          this.$v.editedEvent.$reset();
+          return NotifyNegative('Cette modification n\'est pas autorisée');
+        }
         NotifyNegative('Erreur lors de l\'édition de l\'évènement');
       } finally {
         this.loading = false;

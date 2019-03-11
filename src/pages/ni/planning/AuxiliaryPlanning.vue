@@ -91,7 +91,11 @@ export default {
         return { ...aux, hasActiveCustomerContract, hasActiveCompanyContract };
       }
       if (this.editionModal && this.editedEvent.auxiliary) {
-        return this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
+        const aux = this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
+        const hasActiveCustomerContract = this.hasActiveCustomerContract(aux, this.editedEvent.dates.startDate);
+        const hasActiveCompanyContract = this.hasActiveCompanyContract(aux, this.editedEvent.dates.endDate);
+
+        return { ...aux, hasActiveCustomerContract, hasActiveCompanyContract };
       }
       return { picture: {}, identity: {} };
     },
