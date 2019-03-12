@@ -43,7 +43,7 @@ export default {
     'ni-auxiliary-indicators': AuxiliaryIndicators,
   },
   props: {
-    person: { type: Object, default: () => ({ picture: { link: '' }, administrative: {} }) },
+    person: { type: Object, default: () => ({ picture: { link: '' }, administrative: {}, contracts: [] }) },
     events: { type: Array, default: () => [] },
     startOfWeek: { type: Object, default: () => ({}) },
     endOfWorkingWeek: { type: Object, default: () => ({}) }, // Saturday
@@ -98,9 +98,14 @@ export default {
       const companyContracts = this.person.contracts.filter(contract => contract.status === COMPANY_CONTRACT);
 
       return companyContracts.some(contract => {
-        return this.$moment(contract.startDate).isSameOrBefore(this.startOfWeek) &&
-          ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(this.endOfWorkingWeek));
+        return (this.$moment(contract.startDate).isSameOrBefore(this.endOfWorkingWeek) &&
+          ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(this.endOfWorkingWeek))) ||
+          (this.$moment(contract.startDate).isSameOrBefore(this.startOfWeek) &&
+          ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(this.startOfWeek)));
       });
+    },
+    companyContracts () {
+      return this.person.contracts ? this.person.contracts.filter(contract => contract.status === COMPANY_CONTRACT) : [];
     }
   },
   async mounted () {
@@ -242,7 +247,7 @@ export default {
     async getBreakInfoBetweenTwoEvents (eventOrigin, eventDestination) {
       const origins = this.getEventAddress(eventOrigin);
       const destinations = this.getEventAddress(eventDestination);
-      if (!origins || !destinations) return {};
+      if (!origins || !destinations) return null;
 
       const transportDuration = await this.getTransportDuration(origins, destinations);
       const timeBetween = this.$moment(eventDestination.startDate).diff(this.$moment(eventOrigin.endDate), 'minutes');
@@ -275,14 +280,14 @@ export default {
     getCurrentContract (contracts, day) {
       if (!contracts || contracts.length === 0) return [];
       return contracts.find(contract =>
-        this.$moment(contract.startDate).isSameOrBefore(this.day) &&
-        (!contract.endDate || this.$moment(contract.endDate).isAfter(this.endOfWorkingWeek))
+        this.$moment(contract.startDate).isSameOrBefore(day) &&
+        (!contract.endDate || this.$moment(contract.endDate).isAfter(day))
       );
     },
     getContractVersionOnDay (day) {
-      if (!this.person || !this.person.contracts) return null;
+      if (!this.companyContracts || this.companyContracts.length === 0) return null;
 
-      const currentContract = this.getCurrentContract(this.person.contracts, day);
+      const currentContract = this.getCurrentContract(this.companyContracts, day);
       if (!currentContract) return null;
 
       return this.getCurrentContract(currentContract.versions, day);
