@@ -1,7 +1,7 @@
 <template>
   <div class="planning-container full-width full-height">
     <table style="width: 100%" class="agenda-table full-height">
-      <thead>
+      <thead style="height: 5%">
         <th class="capitalize" v-for="(day, index) in daysHeader" :key="index">
           <div class="row justify-center items-baseline days-header">
             <div class="days-name q-mr-md">{{ day.name }}</div>
@@ -104,6 +104,7 @@ export default {
   .agenda-table
     td
       padding: 0px;
+      height: 100%;
 
       .planning-background
         background: repeating-linear-gradient(
@@ -113,9 +114,11 @@ export default {
           $grey-3,
           $grey-3 16.4%
         )
-        height: 100%
+        height: 100%;
         position: relative;
-        margin-top: 2px
+        margin-top: 2px;
+        display: list-item;
+        list-style: none;
 
       .event
         position: absolute;
