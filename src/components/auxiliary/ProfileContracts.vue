@@ -2,7 +2,8 @@
   <div>
     <div class="row">
       <ni-contracts v-if="contracts" :contracts="contracts" :user="getUser" @openVersionCreation="openVersionCreationModal"
-        @openEndContract="openEndContractModal" @refresh="refreshContracts" :columns="contractVisibleColumns" display-actions display-uploader />
+        @openEndContract="openEndContractModal" @refresh="refreshContracts" :columns="contractVisibleColumns" display-actions display-uploader
+        :personKey="COACH" />
       <q-btn :disable="!hasBasicInfo" class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat"
         @click="openCreationModal" />
       <div v-if="!hasBasicInfo" class="missingBasicInfo">
@@ -103,7 +104,7 @@ import NiModalInput from '../form/ModalInput';
 import NiDatetimePicker from '../form/DatetimePicker';
 import NiContracts from '../contracts/Contracts';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../popup/notify';
-import { END_CONTRACT_REASONS, OTHER, CONTRACT_STATUS_OPTIONS, CUSTOMER_CONTRACT, COMPANY_CONTRACT } from '../../data/constants';
+import { END_CONTRACT_REASONS, OTHER, CONTRACT_STATUS_OPTIONS, CUSTOMER_CONTRACT, COMPANY_CONTRACT, COACH } from '../../data/constants';
 import { contractMixin } from '../../mixins/contractMixin.js';
 
 export default {
@@ -128,6 +129,7 @@ export default {
         contract: {},
       },
       OTHER,
+      COACH,
       endContractReasons: END_CONTRACT_REASONS,
       contracts: [],
       contractSelected: {},
@@ -230,6 +232,15 @@ export default {
         this.customers = await this.$customers.showAllWithCustomerContractSubscriptions();
       } catch (e) {
         this.customerOptions = [];
+        console.error(e);
+      }
+    },
+    async refreshContracts () {
+      try {
+        const contracts = await this.$contracts.list({ user: this.getUser._id });
+        this.contracts = contracts;
+      } catch (e) {
+        this.contracts = [];
         console.error(e);
       }
     },

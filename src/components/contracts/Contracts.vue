@@ -4,13 +4,17 @@
       <q-card-title :style="{ color: cardTitle(contract.endDate).color }">
         {{ cardTitle(contract.endDate).msg }}
       </q-card-title>
-      <p v-if="contract.status === CUSTOMER_CONTRACT" class="card-sub-title">
+      <p v-if="contract.status === CUSTOMER_CONTRACT && personKey !== CUSTOMER" class="card-sub-title">
         Statut : {{ getContractStatus(contract) }} - Bénéficiaire : {{ contract.customer.identity.title }} {{
         contract.customer.identity.lastname }}
       </p>
-      <p v-else class="card-sub-title">Statut : {{ getContractStatus(contract) }}</p>
-      <q-table :data="contract.versions" :columns="contractColumns" row-key="name" :pagination.sync="pagination" hide-bottom
-        :visible-columns="visibleColumns(contract)" binary-state-sort class="table-responsive">
+      <p v-if="contract.status === CUSTOMER_CONTRACT && personKey === CUSTOMER" class="card-sub-title">
+        Statut : {{ getContractStatus(contract) }} - Auxiliaire : {{ contract.user.identity.firstname }} {{
+        contract.user.identity.lastname }}
+      </p>
+      <p v-if="contract.status === COMPANY_CONTRACT" class="card-sub-title">Statut : {{ getContractStatus(contract) }}</p>
+      <q-table :data="contract.versions" :columns="contractColumns" row-key="name" :pagination.sync="pagination"
+        hide-bottom :visible-columns="visibleColumns(contract)" binary-state-sort class="table-responsive">
         <q-tr slot="body" slot-scope="props" :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
             <template v-if="col.name === 'contractEmpty'">
@@ -34,7 +38,8 @@
             </template>
             <template v-else-if="col.name === 'isActive'">
               <div class="row justify-center table-actions">
-                <q-checkbox :disable="col.value || (props.row && 'endDate' in props.row)" :value="col.value" @input="updateContractActivity($event, contract, props.row, index)" />
+                <q-checkbox :disable="col.value || (props.row && 'endDate' in props.row)" :value="col.value"
+                  @input="updateContractActivity($event, contract, props.row, index)" />
               </div>
             </template>
             <template v-else>{{ col.value }}</template>
@@ -56,7 +61,7 @@
 <script>
 import { Cookies } from 'quasar';
 import { contractMixin } from '../../mixins/contractMixin.js';
-import { CONTRACT_STATUS_OPTIONS, CUSTOMER_CONTRACT } from '../../data/constants.js';
+import { CONTRACT_STATUS_OPTIONS, CUSTOMER_CONTRACT, COACH, CUSTOMER, COMPANY_CONTRACT } from '../../data/constants.js';
 import { NotifyPositive, NotifyNegative } from '../../components/popup/notify.js';
 import { downloadDocxFile } from '../../helpers/downloadFile';
 import nationalities from '../../data/nationalities.js';
@@ -69,11 +74,14 @@ export default {
     contracts: { type: Array, default: () => [] },
     columns: { type: Array, default: () => [] },
     displayActions: { type: Boolean, default: () => false },
-    displayUploader: { type: Boolean, default: () => false }
+    displayUploader: { type: Boolean, default: () => false },
+    personKey: { type: String, default: () => COACH },
   },
   data () {
     return {
       CUSTOMER_CONTRACT,
+      COMPANY_CONTRACT,
+      CUSTOMER,
       pagination: { rowsPerPage: 0 },
       contractColumns: [
         {
@@ -122,7 +130,6 @@ export default {
         },
       ],
       extensions: 'image/jpg, image/jpeg, image/gif, image/png, application/pdf',
-
     }
   },
   computed: {
@@ -131,9 +138,7 @@ export default {
       return contracts.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
     },
     headers () {
-      return {
-        'x-access-token': Cookies.get('alenvi_token') || ''
-      }
+      return { 'x-access-token': Cookies.get('alenvi_token') || '' };
     },
   },
   methods: {
