@@ -99,7 +99,7 @@
         <ni-modal-input caption="Prix unitaire par défaut TTC" suffix="€" type="number" v-model="newService.defaultUnitAmount"
           :error="$v.newService.defaultUnitAmount.$error" @blur="$v.newService.defaultUnitAmount.$touch" required-field />
         <ni-modal-input caption="TVA" suffix="%" v-model="newService.vat" type="number" :error="$v.newService.vat.$error" @blur="$v.newService.vat.$touch"
-          required-field />
+          error-label="La TVA doit être positive ou nulle" />
         <ni-modal-input caption="Majoration dimanche/jours fériés" suffix="%" type="number" v-model="newService.holidaySurcharge" />
         <ni-modal-input caption="Majoration soirée" suffix="%" type="number" v-model="newService.eveningSurcharge" />
       </div>
@@ -125,7 +125,7 @@
         <ni-modal-input caption="Prix unitaire par défaut TTC" suffix="€" type="number" v-model="editedService.defaultUnitAmount"
           :error="$v.editedService.defaultUnitAmount.$error" @blur="$v.editedService.defaultUnitAmount.$touch" required-field />
         <ni-modal-input caption="TVA" suffix="%" v-model="editedService.vat" type="number" :error="$v.editedService.vat.$error" @blur="$v.editedService.vat.$touch"
-          required-field />
+          error-label="La TVA doit être positive ou nulle" />
         <ni-modal-input caption="Majoration dimanche/jours fériés" suffix="%" type="number" v-model="editedService.holidaySurcharge" />
         <ni-modal-input caption="Majoration soirée" suffix="%" type="number" v-model="editedService.eveningSurcharge" />
       </div>
@@ -215,7 +215,7 @@ import { configMixin } from '../../../mixins/configMixin';
 import { validationMixin } from '../../../mixins/validationMixin.js';
 import Input from '../../../components/form/Input.vue';
 import SearchAddress from '../../../components/form/SearchAddress.vue';
-import { frAddress, posDecimals } from '../../../helpers/vuelidateCustomVal';
+import { frAddress, posDecimals, positiveNumber } from '../../../helpers/vuelidateCustomVal';
 import { BILLING_DIRECT, BILLING_INDIRECT, REQUIRED_LABEL, CONTRACT_STATUS_OPTIONS } from '../../../data/constants.js';
 
 export default {
@@ -385,13 +385,13 @@ export default {
       type: { required },
       nature: { required },
       defaultUnitAmount: { required },
-      vat: { required },
+      vat: { positiveNumber },
     },
     editedService: {
       name: { required },
       startDate: { required },
       defaultUnitAmount: { required },
-      vat: { required },
+      vat: { positiveNumber },
     },
     company: {
       ics: { required },
@@ -430,10 +430,10 @@ export default {
       return !this.$v.company.address.fullAddress.required ? REQUIRED_LABEL : 'Adresse non valide';
     },
     disableEditionButton () {
-      return !this.editedService.name || !this.editedService.startDate || !this.editedService.defaultUnitAmount || (this.editedService.vat === '' || this.editedService.vat < 0);
+      return !this.editedService.name || !this.editedService.startDate || !this.editedService.defaultUnitAmount || this.editedService.vat < 0;
     },
     disableCreationButton () {
-      return !this.newService.name || !this.newService.nature || !this.newService.defaultUnitAmount || (this.newService.vat === '' || this.newService.vat < 0);
+      return !this.newService.name || !this.newService.nature || !this.newService.defaultUnitAmount || this.newService.vat < 0;
     },
     minStartDate () {
       const selectedService = this.services.find(ser => ser._id === this.editedService._id);
@@ -505,13 +505,14 @@ export default {
     },
     // Services
     formatCreatedService () {
-      const { nature, name, defaultUnitAmount, vat, eveningSurcharge, holidaySurcharge, type } = this.newService;
+      const { nature, name, defaultUnitAmount, eveningSurcharge, holidaySurcharge, type } = this.newService;
       const formattedService = {
         nature,
-        versions: [{ name, defaultUnitAmount, vat }],
+        versions: [{ name, defaultUnitAmount }],
         type,
         company: this.user.company._id
       };
+      if (this.newService.vat && this.newService.vat) formattedService.versions[0].vat = this.newService.vat;
 
       if (eveningSurcharge) formattedService.versions[0].eveningSurcharge = eveningSurcharge;
       if (holidaySurcharge) formattedService.versions[0].holidaySurcharge = holidaySurcharge;
