@@ -293,7 +293,7 @@ export default {
           name: 'vat',
           label: 'TVA',
           align: 'center',
-          field: row => `${row.vat}%`,
+          field: row => row.vat && `${row.vat}%`,
         },
         {
           name: 'holidaySurcharge',
@@ -430,7 +430,7 @@ export default {
       return !this.$v.company.address.fullAddress.required ? REQUIRED_LABEL : 'Adresse non valide';
     },
     disableEditionButton () {
-      return !this.editedService.name || !this.editedService.startDate || !this.editedService.defaultUnitAmount || !this.editedService.vat;
+      return !this.editedService.name || !this.editedService.startDate || !this.editedService.defaultUnitAmount || (this.editedService.vat === '' || this.editedService.vat < 0);
     },
     disableCreationButton () {
       return !this.newService.name || !this.newService.nature || !this.newService.defaultUnitAmount || (this.newService.vat === '' || this.newService.vat < 0);
