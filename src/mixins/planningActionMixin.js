@@ -312,25 +312,29 @@ export const planningActionMixin = {
       }
     },
     async updateEventOnDrop (vEvent) {
-      const { toDay, toPerson, draggedObject } = vEvent;
-      const daysBetween = this.$moment(draggedObject.endDate).diff(this.$moment(draggedObject.startDate), 'days');
+      try {
+        const { toDay, toPerson, draggedObject } = vEvent;
+        const daysBetween = this.$moment(draggedObject.endDate).diff(this.$moment(draggedObject.startDate), 'days');
 
-      const payload = {
-        startDate: this.$moment(toDay).hours(this.$moment(draggedObject.startDate).hours())
-          .minutes(this.$moment(draggedObject.startDate).minutes()).toISOString(),
-        endDate: this.$moment(toDay).add(daysBetween, 'days').hours(this.$moment(draggedObject.endDate).hours())
-          .minutes(this.$moment(draggedObject.endDate).minutes()).toISOString(),
-        auxiliary: toPerson._id
-      };
+        const payload = {
+          startDate: this.$moment(toDay).hours(this.$moment(draggedObject.startDate).hours())
+            .minutes(this.$moment(draggedObject.startDate).minutes()).toISOString(),
+          endDate: this.$moment(toDay).add(daysBetween, 'days').hours(this.$moment(draggedObject.endDate).hours())
+            .minutes(this.$moment(draggedObject.endDate).minutes()).toISOString(),
+          auxiliary: toPerson._id
+        };
 
-      if (this.hasConflicts(payload)) {
-        return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
+        if (this.hasConflicts(payload)) {
+          return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
+        }
+
+        const updatedEvent = await this.$events.updateById(draggedObject._id, payload);
+        this.events = this.events.map(event => (event._id === updatedEvent._id) ? updatedEvent : event);
+
+        NotifyPositive('Évènement modifié');
+      } catch (e) {
+        if (e.data.statusCode === 422) return NotifyNegative('Cette modification n\'est pas autorisée');
       }
-
-      const updatedEvent = await this.$events.updateById(draggedObject._id, payload);
-      this.events = this.events.map(event => (event._id === updatedEvent._id) ? updatedEvent : event);
-
-      NotifyPositive('Évènement modifié');
     },
     // Event files
     documentUploaded (uploadedInfo) {
