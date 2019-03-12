@@ -1,8 +1,8 @@
 <template>
-  <div :class="[{ 'highlight': !this.isOnlyUnderCustomerContract },  'full-width', 'row', 'relative-position', 'chip-container']"
-    @click="!this.isOnlyUnderCustomerContract && openIndicatorsModal">
+  <div :class="[{ 'highlight': hasActiveCompanyContract },  'full-width', 'row', 'relative-position', 'chip-container']"
+    @click="openIndicatorsModal">
     <img :src="getAvatar(person.picture)" class="avatar">
-    <q-chip v-if="!this.isOnlyUnderCustomerContract" :class="['absolute-center', { 'busy': isBusy }]" small text-color="white">
+    <q-chip v-if="hasActiveCompanyContract" :class="['absolute-center', { 'busy': isBusy }]" small text-color="white">
       <span class="chip-indicator">{{ ratio.weeklyHours }}h / {{ ratio.contractHours }}</span>
     </q-chip>
 
@@ -34,7 +34,7 @@
 
 <script>
 import AuxiliaryIndicators from '../AuxiliaryIndicators';
-import { DEFAULT_AVATAR, ABSENCE, INTERVENTION, INTERNAL_HOUR, TRANSIT, DRIVING, PUBLIC_TRANSPORT, WEEK_STATS, CUSTOMER_CONTRACT } from '../../data/constants.js';
+import { DEFAULT_AVATAR, ABSENCE, INTERVENTION, INTERNAL_HOUR, TRANSIT, DRIVING, PUBLIC_TRANSPORT, WEEK_STATS, COMPANY_CONTRACT } from '../../data/constants.js';
 import googleMaps from '../../api/GoogleMaps';
 
 export default {
@@ -92,19 +92,28 @@ export default {
     selectedEvents () {
       return this.selectedTab === WEEK_STATS ? this.events : this.monthEvents;
     },
-    isOnlyUnderCustomerContract () {
-      return this.person.contracts && this.person.contracts.every(contract => contract.status === CUSTOMER_CONTRACT);
+    hasActiveCompanyContract () {
+      if (!this.person.contracts || this.person.contracts.length === 0) return false;
+      if (!this.person.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
+      const companyContracts = this.person.contracts.filter(contract => contract.status === COMPANY_CONTRACT);
+
+      return companyContracts.some(contract => {
+        return this.$moment(contract.startDate).isSameOrBefore(this.startOfWeek) &&
+          ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(this.endOfWorkingWeek));
+      });
     }
   },
   async mounted () {
-    if (this.isOnlyUnderCustomerContract) return;
+    if (!this.hasActiveCompanyContract) return;
     await this.getRatio();
   },
   watch: {
     async selectedEvents () {
+      if (!this.hasActiveCompanyContract) return;
       await this.computeIndicators();
     },
     async events () {
+      if (!this.hasActiveCompanyContract) return;
       this.selectedTab = WEEK_STATS;
       await this.getRatio();
     },
@@ -123,6 +132,7 @@ export default {
       this.ratio = { weeklyHours: Math.round(this.totalWorkingHours), contractHours: this.getContractHours() };
     },
     async openIndicatorsModal () {
+      if (!this.hasActiveCompanyContract) return;
       try {
         this.monthEvents = await this.$events.list({
           startDate: this.$moment(this.startOfWeek).startOf('month').format('YYYYMMDD'),

@@ -1,7 +1,7 @@
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { frAddress } from '../helpers/vuelidateCustomVal.js';
 import { NotifyWarning, NotifyNegative, NotifyPositive } from '../components/popup/notify';
-import { INTERNAL_HOUR, ABSENCE, INTERVENTION, MORNING, AFTERNOON, ALL_DAY, NEVER, UNAVAILABILITY, ILLNESS } from '../data/constants';
+import { INTERNAL_HOUR, ABSENCE, INTERVENTION, MORNING, AFTERNOON, ALL_DAY, NEVER, UNAVAILABILITY, ILLNESS, CUSTOMER_CONTRACT, COMPANY_CONTRACT } from '../data/constants';
 
 export const planningActionMixin = {
   validations () {
@@ -47,8 +47,8 @@ export const planningActionMixin = {
           frequency: { required: requiredIf((item) => item.type !== ABSENCE) },
         },
         cancel: {
-          condition: { required: requiredIf((item, parent) => parent.isCancelled) },
-          reason: { required: requiredIf((item, parent) => parent.isCancelled) },
+          condition: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
+          reason: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
         },
       },
     };
@@ -60,7 +60,33 @@ export const planningActionMixin = {
         this.internalHours = user.company.rhConfig.internalHours;
       }
     },
+    hasActiveCustomerContract (auxiliary, selectedDay) {
+      if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
+      if (!auxiliary.contracts.some(contract => contract.status === CUSTOMER_CONTRACT)) return false;
+      const customerContracts = auxiliary.contracts.filter(contract => contract.status === CUSTOMER_CONTRACT);
+
+      return customerContracts.some(contract => {
+        return this.$moment(contract.startDate).isSameOrBefore(selectedDay) &&
+          ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(selectedDay));
+      });
+    },
+    hasActiveCompanyContract (auxiliary, selectedDay) {
+      if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
+      if (!auxiliary.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
+      const companyContracts = auxiliary.contracts.filter(contract => contract.status === COMPANY_CONTRACT);
+
+      return companyContracts.some(contract => {
+        return this.$moment(contract.startDate).isSameOrBefore(selectedDay) &&
+          ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(selectedDay));
+      });
+    },
     // Event creation
+    canCreateEvent (person, selectedDay) {
+      const hasActiveCustomerContract = this.hasActiveCustomerContract(person, selectedDay);
+      const hasActiveCompanyContract = this.hasActiveCompanyContract(person, selectedDay);
+
+      return hasActiveCustomerContract || hasActiveCompanyContract;
+    },
     selectedAddress (item) {
       if (this.creationModal) this.newEvent.location = Object.assign({}, this.newEvent.location, item);
       if (this.editionModal) this.editedEvent.location = Object.assign({}, this.editedEvent.location, item);
@@ -186,24 +212,14 @@ export const planningActionMixin = {
         NotifyPositive('Évènement créé');
       } catch (e) {
         console.error(e);
+        if (e.data.statusCode === 422) return NotifyNegative('La creation de cet evenement n\'est pas autorisée');
         NotifyNegative('Erreur lors de la création de l\'évènement');
       } finally {
         this.loading = false
       }
     },
     // Event edition
-    openEditionModal (event) {
-      const auxiliary = event.auxiliary._id;
-      const can = this.$can({
-        user: this.$store.getters['main/user'],
-        auxiliaryIdEvent: auxiliary,
-        auxiliarySectorEvent: event.sector,
-        permissions: [
-          { name: 'planning:edit:user', rule: 'isInSameSector' },
-          { name: 'planning:edit', rule: 'isOwner' }
-        ],
-      });
-      if (!can) return;
+    formatEditedEvent (event, auxiliary) {
       const { createdAt, updatedAt, startDate, endDate, ...eventData } = event;
       const dates = {
         startDate,
@@ -240,8 +256,17 @@ export const planningActionMixin = {
           this.editedEvent = { shouldUpdateRepetition: false, ...eventData, auxiliary, dates };
           break;
       }
-
-      this.editionModal = true
+    },
+    canEditEvent (event, auxiliary) {
+      return this.$can({
+        user: this.$store.getters['main/user'],
+        auxiliaryIdEvent: auxiliary,
+        auxiliarySectorEvent: event.sector,
+        permissions: [
+          { name: 'planning:edit:user', rule: 'isInSameSector' },
+          { name: 'planning:edit', rule: 'isOwner' }
+        ],
+      });
     },
     resetEditionForm () {
       this.$v.editedEvent.$reset();
@@ -264,8 +289,12 @@ export const planningActionMixin = {
         }
 
         delete payload.customer;
+        delete payload.staffingLeft;
+        delete payload.staffingWidth;
+        delete payload.staffingTop;
+        delete payload.staffingHeight;
         delete payload.type;
-        delete payload._id
+        delete payload._id;
         await this.$events.updateById(this.editedEvent._id, payload);
         NotifyPositive('Évènement modifié');
 
@@ -273,6 +302,10 @@ export const planningActionMixin = {
         this.editionModal = false;
         this.resetEditionForm();
       } catch (e) {
+        if (e.data && e.data.statusCode === 422) {
+          this.$v.editedEvent.$reset();
+          return NotifyNegative('Cette modification n\'est pas autorisée');
+        }
         NotifyNegative('Erreur lors de l\'édition de l\'évènement');
       } finally {
         this.loading = false;

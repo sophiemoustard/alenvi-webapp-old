@@ -26,7 +26,7 @@ import Planning from '../../../components/planning/Planning.vue';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { INTERVENTION, NEVER } from '../../../data/constants';
 import { mapGetters, mapActions } from 'vuex';
-import { NotifyNegative } from '../../../components/popup/notify';
+import { NotifyNegative, NotifyWarning } from '../../../components/popup/notify';
 
 export default {
   name: 'AuxiliaryPlanning',
@@ -73,7 +73,7 @@ export default {
     },
     getElemRemoved (val) {
       this.handleElemRemovedFromFilter(val);
-    }
+    },
   },
   computed: {
     ...mapGetters({
@@ -83,8 +83,20 @@ export default {
       getElemRemoved: 'planning/getElemRemoved'
     }),
     selectedAuxiliary () {
-      if (this.creationModal && this.newEvent.auxiliary) return this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
-      if (this.editionModal && this.editedEvent.auxiliary) return this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
+      if (this.creationModal && this.newEvent.auxiliary) {
+        const aux = this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
+        const hasActiveCustomerContract = this.hasActiveCustomerContract(aux, this.newEvent.dates.startDate);
+        const hasActiveCompanyContract = this.hasActiveCompanyContract(aux, this.newEvent.dates.endDate);
+
+        return { ...aux, hasActiveCustomerContract, hasActiveCompanyContract };
+      }
+      if (this.editionModal && this.editedEvent.auxiliary) {
+        const aux = this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
+        const hasActiveCustomerContract = this.hasActiveCustomerContract(aux, this.editedEvent.dates.startDate);
+        const hasActiveCompanyContract = this.hasActiveCompanyContract(aux, this.editedEvent.dates.endDate);
+
+        return { ...aux, hasActiveCustomerContract, hasActiveCompanyContract };
+      }
       return { picture: {}, identity: {} };
     },
   },
@@ -127,6 +139,9 @@ export default {
     openCreationModal (vEvent) {
       const { dayIndex, person } = vEvent;
       const selectedDay = this.days[dayIndex];
+
+      if (!this.canCreateEvent(person, selectedDay)) return NotifyWarning('Impossible de créer un évènement à cette date à cette auxiliaire.');
+
       this.newEvent = {
         type: INTERVENTION,
         repetition: { frequency: NEVER },
@@ -148,6 +163,15 @@ export default {
         },
       };
       this.creationModal = true;
+    },
+    // Event edition
+    openEditionModal (event) {
+      const auxiliary = event.auxiliary._id;
+      const can = this.canEditEvent(event, auxiliary);
+      if (!can) return;
+      this.formatEditedEvent(event, auxiliary);
+
+      this.editionModal = true
     },
     // Filter
     handleElemAddedToFilter (el) {

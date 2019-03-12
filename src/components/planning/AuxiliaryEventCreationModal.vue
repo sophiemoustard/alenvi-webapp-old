@@ -60,7 +60,7 @@
 </template>
 
 <script>
-import { ABSENCE, DEFAULT_AVATAR } from '../../data/constants';
+import { ABSENCE, DEFAULT_AVATAR, INTERNAL_HOUR, INTERVENTION } from '../../data/constants';
 import { planningModalMixin } from '../../mixins/planningModalMixin';
 
 export default {
@@ -90,6 +90,11 @@ export default {
         ? ''
         : `${process.env.API_HOSTNAME}/events/${this.selectedAuxiliary._id}/gdrive/${this.selectedAuxiliary.administrative.driveFolder.id}/upload`;
     },
+  },
+  watch: {
+    selectedAuxiliary (value) {
+      if (!this.selectedAuxiliary.hasActiveCompanyContract && this.newEvent.type === INTERNAL_HOUR) this.newEvent.type = INTERVENTION;
+    }
   },
   methods: {
     getAvatar (user) {

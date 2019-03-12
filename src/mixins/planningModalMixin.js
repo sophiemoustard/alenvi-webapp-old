@@ -23,6 +23,8 @@ import {
   ABSENCE_TYPE,
   ILLNESS,
   REQUIRED_LABEL,
+  CUSTOMER_CONTRACT,
+  COMPANY_CONTRACT,
 } from '../data/constants';
 
 export const planningModalMixin = {
@@ -53,12 +55,6 @@ export const planningModalMixin = {
       cancellationReasons: [
         { label: 'Initiative du client', value: CUSTOMER_INITIATIVE },
         { label: 'Initiative du de l\'intervenant', value: AUXILIARY_INITIATIVE },
-      ],
-      eventTypeOptions: [
-        {label: 'Intervention', value: INTERVENTION},
-        {label: 'Interne', value: INTERNAL_HOUR},
-        {label: 'Absence', value: ABSENCE},
-        {label: 'Indispo', value: UNAVAILABILITY}
       ],
     };
   },
@@ -100,6 +96,21 @@ export const planningModalMixin = {
             !this.editedEvent.dates.startHour || !this.editedEvent.dates.endHour;
       }
     },
+    eventTypeOptions () {
+      if (this.selectedAuxiliary && !this.selectedAuxiliary.hasActiveCompanyContract) {
+        return [
+          {label: 'Intervention', value: INTERVENTION},
+          {label: 'Absence', value: ABSENCE},
+          {label: 'Indispo', value: UNAVAILABILITY}
+        ]
+      }
+      return [
+        {label: 'Intervention', value: INTERVENTION},
+        {label: 'Interne', value: INTERNAL_HOUR},
+        {label: 'Absence', value: ABSENCE},
+        {label: 'Indispo', value: UNAVAILABILITY}
+      ]
+    },
     auxiliariesOptions () {
       return this.auxiliaries.length === 0 ? [] : this.auxiliaries.map(aux => ({
         label: `${aux.identity.firstname || ''} ${aux.identity.lastname}`,
@@ -107,7 +118,19 @@ export const planningModalMixin = {
       }));
     },
     customersOptions () {
-      return this.customers.length === 0 ? [] : this.customers.map(customer => ({
+      if (this.customers.length === 0 || !this.selectedAuxiliary || !this.selectedAuxiliary.contracts) return [];
+
+      let customers = this.customers;
+      if (this.selectedAuxiliary && !this.selectedAuxiliary.hasActiveCompanyContract) {
+        const auxiliaryCustomers = [];
+        for (const contract of this.selectedAuxiliary.contracts) {
+          if (contract.customer && !auxiliaryCustomers.includes(contract.customer)) auxiliaryCustomers.push(contract.customer);
+        }
+
+        customers = this.customers.filter(cus => auxiliaryCustomers.includes(cus._id));
+      }
+
+      return customers.map(customer => ({
         label: `${customer.identity.firstname || ''} ${customer.identity.lastname}`,
         value: customer._id,
       }));
@@ -136,9 +159,7 @@ export const planningModalMixin = {
       ];
     },
     addressError () {
-      if (!this.validations.location.fullAddress.required) return REQUIRED_LABEL;
-
-      return 'Adresse non valide';
+      return !this.validations.location.fullAddress.required ? REQUIRED_LABEL : 'Adresse non valide';
     },
   },
   methods: {
@@ -146,13 +167,16 @@ export const planningModalMixin = {
     customerSubscriptionsOptions (customerId) {
       if (!customerId) return [];
       const selectedCustomer = this.customers.find(customer => customer._id === customerId);
+      if (!selectedCustomer || !selectedCustomer.subscriptions || selectedCustomer.subscriptions.length === 0) return [];
 
-      return !selectedCustomer || !selectedCustomer.subscriptions || selectedCustomer.subscriptions.length === 0
-        ? []
-        : selectedCustomer.subscriptions.map(sub => ({
-          label: sub.service.name,
-          value: sub._id,
-        }));
+      let subscriptions = selectedCustomer.subscriptions;
+      if (!this.selectedAuxiliary.hasActiveCustomerContract) subscriptions = subscriptions.filter(sub => sub.service.type !== CUSTOMER_CONTRACT)
+      if (!this.selectedAuxiliary.hasActiveCompanyContract) subscriptions = subscriptions.filter(sub => sub.service.type !== COMPANY_CONTRACT)
+
+      return subscriptions.map(sub => ({
+        label: sub.service.name,
+        value: sub._id,
+      }));
     },
     // Event edition
     toggleCancellationForm (value) {
