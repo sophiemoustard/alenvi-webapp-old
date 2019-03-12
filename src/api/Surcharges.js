@@ -11,7 +11,7 @@ export default {
   },
   async updateById (id, payload) {
     const surcharges = await alenviAxios.put(`${process.env.API_HOSTNAME}/surcharges/${id}`, payload);
-    return surcharges.data.data.surcharges;
+    return surcharges.data.data.surcharge;
   },
   async remove (id) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/surcharges/${id}`);

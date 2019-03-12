@@ -11,7 +11,7 @@ export default {
   },
   async updateById (id, payload) {
     const services = await alenviAxios.put(`${process.env.API_HOSTNAME}/services/${id}`, payload);
-    return services.data.data.services;
+    return services.data.data.service;
   },
   async remove (id) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/services/${id}`);
