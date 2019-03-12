@@ -64,7 +64,6 @@ import { contractMixin } from '../../mixins/contractMixin.js';
 import { CONTRACT_STATUS_OPTIONS, CUSTOMER_CONTRACT, COACH, CUSTOMER, COMPANY_CONTRACT } from '../../data/constants.js';
 import { NotifyPositive, NotifyNegative } from '../../components/popup/notify.js';
 import { downloadDocxFile } from '../../helpers/downloadFile';
-import nationalities from '../../data/nationalities.js';
 
 export default {
   name: 'Contracts',
@@ -142,9 +141,6 @@ export default {
     },
   },
   methods: {
-    getFullNationality (nationality) {
-      return nationalities[nationality];
-    },
     cardTitle (contractEndDate) {
       if (!contractEndDate) return { msg: 'Contrat en cours', color: 'green' };
 
