@@ -19,7 +19,7 @@
           <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
             <template v-if="col.name === 'contractEmpty'">
               <div class="row justify-center table-actions">
-                <q-btn flat round small color="primary" @click="dlTemplate(props.row, contract.startDate)" icon="file download" />
+                <q-btn flat round small color="primary" @click="dlTemplate(props.row, contract)" icon="file download" />
               </div>
             </template>
             <template v-else-if="col.name === 'contractSigned'">
@@ -64,6 +64,7 @@ import { contractMixin } from '../../mixins/contractMixin.js';
 import { CONTRACT_STATUS_OPTIONS, CUSTOMER_CONTRACT, COACH, CUSTOMER, COMPANY_CONTRACT } from '../../data/constants.js';
 import { NotifyPositive, NotifyNegative } from '../../components/popup/notify.js';
 import { downloadDocxFile } from '../../helpers/downloadFile';
+import { generateContractFields } from '../../helpers/generateContractFields';
 
 export default {
   name: 'Contracts',
@@ -252,27 +253,9 @@ export default {
         this.$refs[refName][0].upload();
       }
     },
-    async dlTemplate (contract, contractStartDate) {
+    async dlTemplate (contract, parentContract) {
       try {
-        const monthlyHours = Number.parseFloat(contract.weeklyHours * 4.33).toFixed(1);
-        const { identity, contact } = this.user
-        const data = {
-          'auxiliaryTitle': identity.title,
-          'auxiliaryFirstname': identity.firstname,
-          'auxiliaryLastname': identity.lastname,
-          'auxiliaryAddress': contact.address.fullAddress,
-          'auxiliaryBirthDate': this.$moment(identity.birthDate).format('DD/MM/YYYY'),
-          'auxiliaryNationality': this.getFullNationality(identity.nationality),
-          'auxiliarySSN': identity.socialSecurityNumber,
-          'grossHourlyRate': contract.grossHourlyRate,
-          'monthlyHours': monthlyHours,
-          'salary': monthlyHours * contract.grossHourlyRate,
-          'startDate': this.$moment(contract.startDate).format('DD/MM/YYYY'),
-          'weeklyHours': contract.weeklyHours,
-          'yearlyHours': contract.weeklyHours * 52,
-          'uploadDate': this.$moment(Date.now()).format('DD/MM/YYYY'),
-          'initialContractStartDate': this.$moment(contractStartDate).format('DD/MM/YYYY'),
-        };
+        const data = generateContractFields(parentContract.status, { user: this.user, contract, initialContractStartDate: parentContract.startDate });
         const params = {
           driveId: contract.__index === 0 ? this.user.company.rhConfig.templates.contractWithCompany.driveId : this.user.company.rhConfig.templates.contractWithCompanyVersion.driveId,
         };
