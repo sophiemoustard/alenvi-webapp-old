@@ -199,6 +199,7 @@
           :error="$v.newService.defaultUnitAmount.$error" @blur="$v.newService.defaultUnitAmount.$touch" required-field />
         <ni-modal-input caption="TVA" suffix="%" v-model="newService.vat" type="number" :error="$v.newService.vat.$error" @blur="$v.newService.vat.$touch"
           error-label="La TVA doit être positive ou nulle" />
+        <ni-modal-select caption="Plan de majoration" v-model="newService.surcharge" :options="surchargesOptions" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer le service" icon-right="add" color="primary" :loading="loading" @click="createNewService"
         :disable="disableServiceCreationButton" />
@@ -215,14 +216,15 @@
             <span><q-icon name="clear" @click.native="serviceEditionModal = false" /></span>
           </div>
         </div>
-        <ni-datetime-picker caption="Date d'effet" v-model="editedService.startDate" :error="$v.editedService.startDate.$error"
-          @blur="$v.editedService.startDate.$touch" :min="minStartDate" in-modal required-field />
         <ni-modal-input caption="Nom" v-model="editedService.name" :error="$v.editedService.name.$error" @blur="$v.editedService.name.$touch"
           required-field />
+        <ni-datetime-picker caption="Date d'effet" v-model="editedService.startDate" :error="$v.editedService.startDate.$error"
+          @blur="$v.editedService.startDate.$touch" :min="minStartDate" in-modal required-field />
         <ni-modal-input caption="Prix unitaire par défaut TTC" suffix="€" type="number" v-model="editedService.defaultUnitAmount"
           :error="$v.editedService.defaultUnitAmount.$error" @blur="$v.editedService.defaultUnitAmount.$touch" required-field />
         <ni-modal-input caption="TVA" suffix="%" v-model="editedService.vat" type="number" :error="$v.editedService.vat.$error" @blur="$v.editedService.vat.$touch"
           error-label="La TVA doit être positive ou nulle" />
+        <ni-modal-select caption="Plan de majoration" v-model="editedService.surcharge" :options="surchargesOptions" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Editer le service" icon-right="check" color="primary" :loading="loading" @click="updateService"
         :disable="disableServiceEditionButton" />
@@ -334,6 +336,7 @@ export default {
       surcharges: [],
       surchargeCreationModal: false,
       surchargeEditionModal: false,
+      surchargesOptions: [],
       selectedSurcharge: {},
       newSurcharge: {
         name: '',
@@ -456,20 +459,22 @@ export default {
         nature: '',
         defaultUnitAmount: '',
         vat: '',
+        surcharge: ''
       },
       editedService: {
         name: '',
         startDate: '',
         defaultUnitAmount: '',
         vat: '',
+        surcharge: ''
       },
       natureOptions: [
         { label: 'Horaire', value: 'Horaire' },
         { label: 'Forfaitaire', value: 'Forfaitaire' },
       ],
       serviceTypeOptions: CONTRACT_STATUS_OPTIONS,
-      visibleColumnsServices: ['name', 'nature', 'defaultUnitAmount', 'vat', 'actions'],
-      visibleHistoryColumns: ['startDate', 'name', 'defaultUnitAmount', 'vat'],
+      visibleColumnsServices: ['name', 'nature', 'defaultUnitAmount', 'vat', 'surcharge', 'actions'],
+      visibleHistoryColumns: ['startDate', 'name', 'defaultUnitAmount', 'vat', 'surcharge'],
       serviceColumns: [
         {
           name: 'startDate',
@@ -500,6 +505,12 @@ export default {
           label: 'TVA',
           align: 'center',
           field: row => row.vat && `${row.vat}%`,
+        },
+        {
+          name: 'surcharge',
+          label: 'Plan de majoration',
+          align: 'left',
+          field: row => row.surcharge ? row.surcharge.name : '/',
         },
         {
           name: 'actions',
@@ -684,10 +695,12 @@ export default {
       return !this.$v.company.address.fullAddress.required ? REQUIRED_LABEL : 'Adresse non valide';
     },
     disableServiceEditionButton () {
-      return !this.editedService.name || !this.editedService.startDate || !this.editedService.defaultUnitAmount || !this.editedService.vat < 0;
+      return !this.editedService.name || !this.editedService.startDate || !this.editedService.defaultUnitAmount ||
+        !this.editedService.vat < 0;
     },
     disableServiceCreationButton () {
-      return !this.newService.name || !this.newService.nature || !this.newService.defaultUnitAmount || !this.newService.vat < 0;
+      return !this.newService.name || !this.newService.nature || !this.newService.defaultUnitAmount ||
+        !this.newService.vat < 0;
     },
     minStartDate () {
       const selectedService = this.services.find(ser => ser._id === this.editedService._id);
@@ -722,11 +735,14 @@ export default {
     async refreshSurcharges () {
       try {
         this.surcharges = await this.$surcharges.showAll({ company: this.user.company._id });
-        for (let l = this.surcharges.length, i = l; i > l; i--) {
+        for (let l = this.surcharges.length, i = 0; i < l; i++) {
           if (this.surcharges[i].eveningStartTime) this.surcharges[i].eveningStartTime = this.$moment(this.surcharges[i].eveningStartTime, 'HH:mm');
           if (this.surcharges[i].eveningEndTime) this.surcharges[i].eveningEndTime = this.$moment(this.surcharges[i].eveningEndTime, 'HH:mm');
           if (this.surcharges[i].customStartTime) this.surcharges[i].customStartTime = this.$moment(this.surcharges[i].customStartTime, 'HH:mm');
           if (this.surcharges[i].customEndTime) this.surcharges[i].customEndTime = this.$moment(this.surcharges[i].customEndTime, 'HH:mm');
+          this.surchargesOptions.push({
+            label: this.surcharges[i].name, value: this.surcharges[i]._id
+          });
         }
       } catch (e) {
         NotifyNegative('Erreur lors du rafraîchissement des plans de majoration.');
@@ -898,12 +914,13 @@ export default {
     },
     // Services
     formatCreatedService () {
-      const { nature, name, defaultUnitAmount, type } = this.newService;
+      const { nature, name, defaultUnitAmount, type, surcharge } = this.newService;
       const formattedService = {
         nature,
         versions: [{ name, defaultUnitAmount }],
         type,
-        company: this.user.company._id
+        company: this.user.company._id,
+        surcharge
       };
       if (this.newService.vat && this.newService.vat !== '') formattedService.versions[0].vat = this.newService.vat;
       return formattedService;
@@ -937,13 +954,14 @@ export default {
     },
     openServiceEditionModal (id) {
       const selectedService = this.services.find(service => service._id === id);
-      const { name, defaultUnitAmount, vat } = selectedService;
+      const { name, defaultUnitAmount, vat, surcharge } = selectedService;
       this.editedService = {
         _id: selectedService._id,
         name: name || '',
         startDate: '',
         defaultUnitAmount: defaultUnitAmount || '',
         vat: vat || '',
+        surcharge: surcharge ? surcharge._id : ''
       };
 
       this.serviceEditionModal = true;
