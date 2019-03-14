@@ -17,7 +17,7 @@ const routes = [
         if (store.getters['main/user'] && store.getters['main/user'].role.name === 'Aidants') {
           return next({ name: 'customer planning' });
         } else if (store.getters['main/user'] && (store.getters['main/user'].role.name === AUXILIARY || store.getters['main/user'].role.name === PLANNING_REFERENT)) {
-          return next({ name: 'profile planning', params: { id: store.getters['main/user']._id }, query: { auxiliary: 'true', self: 'true' } });
+          return next({ name: 'auxiliary agenda' });
         } else if (store.getters['main/user'] && store.getters['main/user'].role.name !== AUXILIARY && store.getters['main/user'].role.name !== 'Aidants') {
           return next({ name: 'administrative directory' });
         } else {

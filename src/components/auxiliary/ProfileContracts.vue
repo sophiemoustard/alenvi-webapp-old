@@ -41,6 +41,11 @@
           @blur="$v.newContract.grossHourlyRate.$touch" suffix="€" required-field />
         <ni-datetime-picker caption="Date d'effet" :error="$v.newContract.startDate.$error" v-model="newContract.startDate"
           in-modal required-field />
+        <div class="row margin-input last">
+          <div class="col-12">
+            <q-checkbox v-model="shouldBeSigned" label="Signature en ligne" />
+          </div>
+        </div>
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer le contrat" icon-right="add" color="primary" :loading="loading"
         @click="createContract" />
@@ -58,13 +63,18 @@
               <q-icon name="clear" @click.native="newContractVersionModal = false" /></span>
           </div>
         </div>
-        <ni-modal-input v-if="contractSelected.status === COMPANY_CONTRACT" caption="Volume horaire hebdomadaire"
+        <ni-modal-input v-if="selectedContract.status === COMPANY_CONTRACT" caption="Volume horaire hebdomadaire"
           :error="$v.newContractVersion.weeklyHours.$error" v-model="newContractVersion.weeklyHours" type="number"
           @blur="$v.newContractVersion.weeklyHours.$touch" suffix="hr" required-field />
         <ni-modal-input caption="Taux horaire" :error="$v.newContractVersion.grossHourlyRate.$error" v-model="newContractVersion.grossHourlyRate"
           type="number" @blur="$v.newContractVersion.grossHourlyRate.$touch" suffix="€" required-field />
         <ni-datetime-picker caption="Date d'effet" :error="$v.newContractVersion.startDate.$error" v-model="newContractVersion.startDate"
-          :min="getMinimalStartDate(contractSelected)" in-modal required-field />
+          :min="getMinimalStartDate(selectedContract)" in-modal required-field />
+        <div class="row margin-input last">
+          <div class="col-12">
+            <q-checkbox v-model="shouldBeSigned" label="Signature en ligne" />
+          </div>
+        </div>
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer l'avenant" icon-right="add" color="primary" :loading="loading"
         @click="createVersion" />
@@ -105,7 +115,9 @@ import NiDatetimePicker from '../form/DatetimePicker';
 import NiContracts from '../contracts/Contracts';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../popup/notify';
 import { END_CONTRACT_REASONS, OTHER, CONTRACT_STATUS_OPTIONS, CUSTOMER_CONTRACT, COMPANY_CONTRACT, COACH } from '../../data/constants';
+import { translate } from '../../data/translate';
 import { contractMixin } from '../../mixins/contractMixin.js';
+import { generateContractFields } from '../../helpers/generateContractFields.js';
 
 export default {
   name: 'ProfileContracts',
@@ -119,6 +131,7 @@ export default {
   data () {
     return {
       loading: false,
+      shouldBeSigned: true,
       newContractModal: false,
       newContractVersionModal: false,
       endContractModal: false,
@@ -132,7 +145,7 @@ export default {
       COACH,
       endContractReasons: END_CONTRACT_REASONS,
       contracts: [],
-      contractSelected: {},
+      selectedContract: {},
       newContract: {
         status: '',
         customer: '',
@@ -165,7 +178,7 @@ export default {
         grossHourlyRate: { required },
       },
       newContractVersion: {
-        weeklyHours: this.contractSelected.status === CUSTOMER_CONTRACT ? {} : { required },
+        weeklyHours: this.selectedContract.status === CUSTOMER_CONTRACT ? {} : { required },
         startDate: { required },
         grossHourlyRate: { required },
       },
@@ -180,8 +193,14 @@ export default {
     }
   },
   computed: {
+    mainUser () {
+      return this.$store.getters['main/user'];
+    },
     getUser () {
       return this.$store.getters['rh/getUserProfile'];
+    },
+    userCompany () {
+      return this.getUser.company;
     },
     hasBasicInfo () {
       if (this.getUser.identity && this.getUser.identity.lastname && this.getUser.identity.birthDate && this.getUser.identity.nationality &&
@@ -217,6 +236,9 @@ export default {
         value: cus._id
       }));
     },
+    userFullName () {
+      return `${this.getUser.identity.firstname} ${this.getUser.identity.lastname}`;
+    }
   },
   async mounted () {
     await this.refreshContracts();
@@ -244,6 +266,15 @@ export default {
         console.error(e);
       }
     },
+    generateContractSigners (signer) {
+      const signers = [{
+        id: '1',
+        name: this.userFullName,
+        email: this.getUser.local.email
+      }];
+      signers.push({ id: `${signers.length + 1}`, name: signer.name, email: signer.email });
+      return signers;
+    },
     // Contract creation
     resetContract (val) {
       this.newContract.customer = '';
@@ -266,18 +297,30 @@ export default {
         if (this.$v.newContract.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        const payload = {
+        let payload = {
           startDate: this.newContract.startDate,
           status: this.newContract.status,
           user: this.newContract.user,
+          ...(this.newContract.status === CUSTOMER_CONTRACT && { customer: this.newContract.customer }),
           versions: [{
             startDate: this.newContract.startDate,
             grossHourlyRate: this.newContract.grossHourlyRate,
+            ...(this.newContract.status === COMPANY_CONTRACT && { weeklyHours: this.newContract.weeklyHours })
           }],
         };
-        if (payload.status === CUSTOMER_CONTRACT) payload.customer = this.newContract.customer;
-        else payload.versions[0].weeklyHours = this.newContract.weeklyHours;
-
+        if (this.shouldBeSigned) {
+          payload.signature = { templateId: this.userCompany.rhConfig.templates[this.$_.camelCase(this.newContract.status)].driveId };
+          payload.signature.fields = generateContractFields(this.newContract.status, { user: this.getUser, contract: this.newContract, initialContractStartDate: this.newContract.startDate });
+          if (this.newContract.status === CUSTOMER_CONTRACT) {
+            const helpers = await this.$users.showAll({ customers: this.newContract.customer });
+            const currentCustomer = helpers[0].customers.find(cus => cus._id === this.newContract.customer);
+            payload.signature.signers = this.generateContractSigners({ name: helpers[0].identity.lastname, email: helpers[0].local.email });
+            payload.signature.title = `${translate[this.newContract.status]} - ${currentCustomer.identity.lastname}`;
+          } else {
+            payload.signature.signers = this.generateContractSigners({ name: `${this.mainUser.identity.firstname} ${this.mainUser.identity.lastname}`, email: this.mainUser.local.email });
+            payload.signature.title = `${translate[this.newContract.status]} - ${this.userFullName}`;
+          }
+        }
         await this.$contracts.create(this.$_.pickBy(payload));
         await this.refreshContracts();
         this.resetContractCreationModal();
@@ -293,7 +336,8 @@ export default {
     openVersionCreationModal (contract) {
       this.newContractVersion.grossHourlyRate = this.getUser.company.rhConfig[this.$_.camelCase(contract.status)].grossHourlyRate;
       this.newContractVersion.contractId = contract._id;
-      this.contractSelected = contract;
+      this.selectedContract = contract;
+      this.shouldBeSigned = this.selectedContract.status === CUSTOMER_CONTRACT;
       this.newContractVersionModal = true;
     },
     resetVersionCreationModal () {
@@ -301,6 +345,7 @@ export default {
       this.newContractVersion = {};
       this.newContractVersion.grossHourlyRate = '';
       this.$v.newContractVersion.$reset();
+      this.shouldBeSigned = true;
     },
     async createVersion () {
       try {
@@ -310,7 +355,21 @@ export default {
         this.loading = true;
         const contractId = this.newContractVersion.contractId;
         delete this.newContractVersion.contractId;
-        await this.$contracts.createVersion(contractId, this.$_.pickBy(this.newContractVersion));
+        const payload = this.newContractVersion;
+        if (this.shouldBeSigned) {
+          const contractVersionMix = { ...this.selectedContract, ...this.newContractVersion };
+          payload.signature = { templateId: this.userCompany.rhConfig.templates[`${this.$_.camelCase(contractVersionMix.status)}Version`].driveId };
+          payload.signature.fields = generateContractFields(contractVersionMix.status, { user: this.getUser, contract: contractVersionMix, initialContractStartDate: this.selectedContract.startDate });
+          if (this.newContract.status === CUSTOMER_CONTRACT) {
+            const helpers = await this.$users.showAll({ customers: contractVersionMix.customer._id });
+            payload.signature.signers = this.generateContractSigners({ name: helpers[0].identity.lastname, email: helpers[0].local.email });
+            payload.signature.title = `Avenant au ${translate[contractVersionMix.status]} - ${contractVersionMix.customer.identity.lastname}`;
+          } else {
+            payload.signature.signers = this.generateContractSigners({ name: `${this.mainUser.identity.firstname} ${this.mainUser.identity.lastname}`, email: this.mainUser.local.email });
+            payload.signature.title = `Avenant au ${translate[contractVersionMix.status]} - ${contractVersionMix.customer.identity.lastname}`;
+          }
+        }
+        await this.$contracts.createVersion(contractId, this.$_.pickBy(payload));
         await this.refreshContracts();
         this.resetVersionCreationModal();
         NotifyPositive('Version créée');
