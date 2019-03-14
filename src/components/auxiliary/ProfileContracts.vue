@@ -358,7 +358,6 @@ export default {
         const payload = this.newContractVersion;
         if (this.shouldBeSigned) {
           const contractVersionMix = { ...this.selectedContract, ...this.newContractVersion };
-          payload.signature = {};
           payload.signature = { templateId: this.userCompany.rhConfig.templates[`${this.$_.camelCase(contractVersionMix.status)}Version`].driveId };
           payload.signature.fields = generateContractFields(contractVersionMix.status, { user: this.getUser, contract: contractVersionMix, initialContractStartDate: this.selectedContract.startDate });
           if (this.newContract.status === CUSTOMER_CONTRACT) {
