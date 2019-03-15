@@ -256,6 +256,10 @@
         <ni-modal-input v-model="newSubscription.estimatedWeeklyVolume" :error="$v.newSubscription.estimatedWeeklyVolume.$error"
           caption="Volume hebdomadaire estimatif" @blur="$v.newSubscription.estimatedWeeklyVolume.$touch" type="number"
           required-field />
+        <ni-modal-input v-if="newSubscription.nature !== 'Forfaitaire'" v-model="newSubscription.sundays" caption="Dont dimanche (h)"
+          type="number" />
+        <ni-modal-input v-if="newSubscription.nature !== 'Forfaitaire'" v-model="newSubscription.evenings" caption="Dont soirée (h)"
+          last type="number" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter une souscription" icon-right="add" color="primary"
         :loading="loading" @click="submitSubscription" />
@@ -281,7 +285,11 @@
         <ni-modal-input v-model="editedSubscription.estimatedWeeklyVolume" :error="$v.editedSubscription.estimatedWeeklyVolume.$error"
           caption="Volume hebdomadaire estimatif" @blur="$v.editedSubscription.estimatedWeeklyVolume.$touch" type="number"
           required-field />
-      </div>
+        <ni-modal-input v-if="editedSubscription.nature !== 'Forfaitaire'" v-model="editedSubscription.sundays" caption="Dont dimanche (h)"
+          type="number" />
+        <ni-modal-input v-if="editedSubscription.nature !== 'Forfaitaire'" v-model="editedSubscription.evenings"
+          caption="Dont soirée (h)" last type="number" />
+        </div>
       <q-btn no-caps class="full-width modal-btn" label="Editer la souscription" icon-right="check" color="primary"
         :loading="loading" @click="updateSubscription" />
     </q-modal>
@@ -984,8 +992,11 @@ export default {
     },
     // Subscriptions
     formatCreatedSubscription () {
-      const { service, unitTTCRate, estimatedWeeklyVolume } = this.newSubscription;
+      const { service, unitTTCRate, estimatedWeeklyVolume, sundays, evenings } = this.newSubscription;
       const formattedService = { service, versions: [{ unitTTCRate, estimatedWeeklyVolume }] }
+
+      if (sundays) formattedService.versions[0].sundays = sundays;
+      if (evenings) formattedService.versions[0].evenings = evenings;
 
       return formattedService;
     },
@@ -1026,13 +1037,15 @@ export default {
     },
     startEdition (id) {
       const selectedSubscription = this.subscriptions.find(sub => sub._id === id);
-      const { _id, service, unitTTCRate, estimatedWeeklyVolume } = selectedSubscription;
+      const { _id, service, unitTTCRate, estimatedWeeklyVolume, evenings, sundays } = selectedSubscription;
       this.editedSubscription = {
         _id,
         nature: service.nature,
         unitTTCRate,
         estimatedWeeklyVolume,
         startDate: '',
+        evenings,
+        sundays
       };
 
       this.subscriptionEditionModal = true;
@@ -1216,6 +1229,8 @@ export default {
             unitTTCRate: subscription.unitTTCRate ? `${this.formatNumber(subscription.unitTTCRate)}€` : '',
             weeklyVolume: subscription.estimatedWeeklyVolume,
             weeklyRate: estimatedWeeklyRate ? `${this.formatNumber(estimatedWeeklyRate)}€` : '',
+            sundays: subscription.sundays || '',
+            evenings: subscription.evenings || '',
           }
         });
 
@@ -1244,6 +1259,8 @@ export default {
           serviceName: subscription.service.name,
           unitTTCRate: subscription.unitTTCRate,
           estimatedWeeklyVolume: subscription.estimatedWeeklyVolume,
+          sundays: subscription.sundays,
+          evenings: subscription.evenings,
         }));
         const payload = { subscriptions };
         await this.$customers.addQuote(this.customer._id, payload);

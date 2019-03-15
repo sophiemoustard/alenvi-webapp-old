@@ -91,13 +91,14 @@ export const subscriptionMixin = {
     },
     computeWeeklyRate (subscription, funding) {
       let weeklyRate = subscription.unitTTCRate * subscription.estimatedWeeklyVolume;
-      if (subscription.sundays && subscription.service.holidaySurcharge) {
-        weeklyRate += subscription.sundays * subscription.unitTTCRate * subscription.service.holidaySurcharge / 100;
+      if (subscription.service.surcharge) {
+        if (subscription.sundays && subscription.service.surcharge.sunday) {
+          weeklyRate += subscription.sundays * subscription.unitTTCRate * subscription.service.surcharge.sunday / 100;
+        }
+        if (subscription.evenings && subscription.service.surcharge.evenings) {
+          weeklyRate += subscription.evenings * subscription.unitTTCRate * subscription.service.surcharge.evenings / 100;
+        }
       }
-      if (subscription.evenings && subscription.service.eveningSurcharge) {
-        weeklyRate += subscription.evenings * subscription.unitTTCRate * subscription.service.eveningSurcharge / 100;
-      }
-
       let fundingReduction = 0;
       if (this.isCompleteFunding(funding)) {
         if (funding.frequency !== ONCE) {
