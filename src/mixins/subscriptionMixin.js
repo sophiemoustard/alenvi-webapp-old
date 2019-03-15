@@ -95,8 +95,8 @@ export const subscriptionMixin = {
         if (subscription.sundays && subscription.service.surcharge.sunday) {
           weeklyRate += subscription.sundays * subscription.unitTTCRate * subscription.service.surcharge.sunday / 100;
         }
-        if (subscription.evenings && subscription.service.surcharge.evenings) {
-          weeklyRate += subscription.evenings * subscription.unitTTCRate * subscription.service.surcharge.evenings / 100;
+        if (subscription.evenings && subscription.service.surcharge.evening) {
+          weeklyRate += subscription.evenings * subscription.unitTTCRate * subscription.service.surcharge.evening / 100;
         }
       }
       let fundingReduction = 0;
