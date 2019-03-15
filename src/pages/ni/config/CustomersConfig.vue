@@ -845,11 +845,11 @@ export default {
         twentyFifthOfDecember,
         firstOfMay,
         evening,
-        eveningStartTime,
-        eveningEndTime,
+        eveningStartTime: eveningStartTime ? eveningStartTime.toISOString() : '',
+        eveningEndTime: eveningEndTime ? eveningEndTime.toISOString() : '',
         custom,
-        customStartTime,
-        customEndTime
+        customStartTime: customStartTime ? customStartTime.toISOString() : '',
+        customEndTime: customEndTime ? customEndTime.toISOString() : ''
       };
       this.surchargeEditionModal = true;
     },
@@ -880,10 +880,10 @@ export default {
         const payload = this.$_.pickBy(this.editedSurcharge);
         delete payload._id;
         delete payload.company;
-        if (this.editedSurcharge.eveningStartTime) this.editedSurcharge.eveningStartTime = this.$moment(this.editedSurcharge.eveningStartTime).format('HH:mm');
-        if (this.editedSurcharge.eveningEndTime) this.editedSurcharge.eveningEndTime = this.$moment(this.editedSurcharge.eveningEndTime).format('HH:mm');
-        if (this.editedSurcharge.customStartTime) this.editedSurcharge.customStartTime = this.$moment(this.editedSurcharge.customStartTime).format('HH:mm');
-        if (this.editedSurcharge.customEndTime) this.editedSurcharge.customEndTime = this.$moment(this.editedSurcharge.customEndTime).format('HH:mm');
+        if (this.editedSurcharge.eveningStartTime) payload.eveningStartTime = this.$moment(this.editedSurcharge.eveningStartTime).format('HH:mm');
+        if (this.editedSurcharge.eveningEndTime) payload.eveningEndTime = this.$moment(this.editedSurcharge.eveningEndTime).format('HH:mm');
+        if (this.editedSurcharge.customStartTime) payload.customStartTime = this.$moment(this.editedSurcharge.customStartTime).format('HH:mm');
+        if (this.editedSurcharge.customEndTime) payload.customEndTime = this.$moment(this.editedSurcharge.customEndTime).format('HH:mm');
         await this.$surcharges.updateById(surchargeId, payload);
         NotifyPositive('Plan de majoration modifié.');
         this.resetEditionSurchargeData();
