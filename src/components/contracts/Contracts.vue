@@ -19,14 +19,15 @@
           <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
             <template v-if="col.name === 'contractEmpty'">
               <div class="row justify-center table-actions">
-                <q-btn flat round small color="primary" @click="dlTemplate(props.row, contract)" icon="file download" />
+                <q-btn flat round small color="primary" @click="dlTemplate(props.row, contract)" icon="file download"
+                  :disable="!canDownload(props.row, contract.status)" />
               </div>
             </template>
             <template v-else-if="col.name === 'contractSigned'">
               <div v-if="!props.row.link && displayUploader" class="row justify-center table-actions">
                 <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :headers="headers" :url="docsUploadUrl(contract._id)"
                   @fail="failMsg" :additional-fields="getAdditionalFields(contract, props.row)" hide-underline
-                  @uploaded="refresh" :extensions="extensions" hide-upload-button @add="uploadDocument($event, `signedContract_${props.row._id}`)" />
+                  @uploaded="refresh" :extensions="extensions" hide-upload-button @add="uploadDocument($event, `signedContract_${props.row._id}`)"/>
               </div>
               <div v-else-if="props.row.link" class="row justify-center table-actions">
                 <q-btn flat round small color="primary">
@@ -195,11 +196,10 @@ export default {
           cancel: 'Annuler'
         });
         await this.updateEndDateOfPreviousVersion(contract._id, contractIndex);
-        const queries = {
-          contractId: contract._id,
-          versionId: version._id,
-        };
+
+        const queries = { contractId: contract._id, versionId: version._id, };
         await this.$contracts.updateVersion(queries, { 'isActive': isActive });
+
         // Update manually checkbox because it's not dynamic
         this.sortedContracts[contractIndex].versions[version.__index].isActive = isActive;
         await this.updatePreviousVersions(contractIndex, version._id);
@@ -241,6 +241,18 @@ export default {
       }
     },
     // Documents
+    canDownload (contract, status) {
+      if (!this.user.company || !this.user.company.rhConfig || !this.user.company.rhConfig.templates) return false;
+
+      const templates = this.user.company.rhConfig.templates;
+      if (status === COMPANY_CONTRACT) {
+        if (contract.__index === 0) return !!templates.contractWithCompany && !!templates.contractWithCompany.driveId;
+        return !!templates.contractWithCompanyVersion && !!templates.contractWithCompanyVersion.driveId;
+      }
+
+      if (contract.__index === 0) return !!templates.contractWithCustomer && !!templates.contractWithCustomer.driveId;
+      return !!templates.contractWithCustomerVersion && !!templates.contractWithCustomerVersion.driveId;
+    },
     docsUploadUrl (contractId) {
       return `${process.env.API_HOSTNAME}/contracts/${contractId}/gdrive/${this.user.administrative.driveFolder.id}/upload`;
     },
@@ -253,11 +265,13 @@ export default {
         this.$refs[refName][0].upload();
       }
     },
-    async dlTemplate (contract, parentContract) {
+    async dlTemplate (contractVersion, parentContract) {
       try {
-        const data = generateContractFields(parentContract.status, { user: this.user, contract, initialContractStartDate: parentContract.startDate });
+        const data = generateContractFields(parentContract.status, { user: this.user, contract: contractVersion, initialContractStartDate: parentContract.startDate });
+        if (!this.canDownload(contractVersion, parentContract.status)) return NotifyNegative('Impossible de télécharger le contrat.');
+
         const params = {
-          driveId: contract.__index === 0 ? this.user.company.rhConfig.templates.contractWithCompany.driveId : this.user.company.rhConfig.templates.contractWithCompanyVersion.driveId,
+          driveId: contractVersion.__index === 0 ? this.user.company.rhConfig.templates.contractWithCompany.driveId : this.user.company.rhConfig.templates.contractWithCompanyVersion.driveId,
         };
 
         await downloadDocxFile(params, data, 'contrat.docx');
