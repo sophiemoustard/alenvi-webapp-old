@@ -293,6 +293,7 @@ export default {
     },
     async createContract () {
       try {
+        if (!this.userCompany.rhConfig.templates[this.$_.camelCase(this.newContract.status)].driveId) return NotifyNegative('Template manquant');
         this.$v.newContract.$touch();
         if (this.$v.newContract.$error) return NotifyWarning('Champ(s) invalide(s)');
 
@@ -309,7 +310,10 @@ export default {
           }],
         };
         if (this.shouldBeSigned) {
-          payload.signature = { templateId: this.userCompany.rhConfig.templates[this.$_.camelCase(this.newContract.status)].driveId };
+          payload.signature = {
+            templateId: this.userCompany.rhConfig.templates[this.$_.camelCase(this.newContract.status)].driveId,
+            meta: { type: this.newContract.status }
+          };
           payload.signature.fields = generateContractFields(this.newContract.status, { user: this.getUser, contract: this.newContract, initialContractStartDate: this.newContract.startDate });
           if (this.newContract.status === CUSTOMER_CONTRACT) {
             const helpers = await this.$users.showAll({ customers: this.newContract.customer });
@@ -349,6 +353,7 @@ export default {
     },
     async createVersion () {
       try {
+        if (!this.userCompany.rhConfig.templates[`${this.$_.camelCase(this.selectedContract.status)}Version`].driveId) return NotifyNegative('Template manquant');
         this.$v.newContractVersion.$touch();
         if (this.$v.newContractVersion.$error) return NotifyWarning('Champ(s) invalide(s)');
 
@@ -358,7 +363,10 @@ export default {
         const payload = this.newContractVersion;
         if (this.shouldBeSigned) {
           const contractVersionMix = { ...this.selectedContract, ...this.newContractVersion };
-          payload.signature = { templateId: this.userCompany.rhConfig.templates[`${this.$_.camelCase(contractVersionMix.status)}Version`].driveId };
+          payload.signature = {
+            templateId: this.userCompany.rhConfig.templates[`${this.$_.camelCase(contractVersionMix.status)}Version`].driveId,
+            meta: { type: contractVersionMix.status }
+          };
           payload.signature.fields = generateContractFields(contractVersionMix.status, { user: this.getUser, contract: contractVersionMix, initialContractStartDate: this.selectedContract.startDate });
           if (this.newContract.status === CUSTOMER_CONTRACT) {
             const helpers = await this.$users.showAll({ customers: contractVersionMix.customer._id });
@@ -366,7 +374,7 @@ export default {
             payload.signature.title = `Avenant au ${translate[contractVersionMix.status]} - ${contractVersionMix.customer.identity.lastname}`;
           } else {
             payload.signature.signers = this.generateContractSigners({ name: `${this.mainUser.identity.firstname} ${this.mainUser.identity.lastname}`, email: this.mainUser.local.email });
-            payload.signature.title = `Avenant au ${translate[contractVersionMix.status]} - ${contractVersionMix.customer.identity.lastname}`;
+            payload.signature.title = `Avenant au ${translate[contractVersionMix.status]} - ${this.userFullName}`;
           }
         }
         await this.$contracts.createVersion(contractId, this.$_.pickBy(payload));
