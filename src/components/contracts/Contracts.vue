@@ -24,7 +24,11 @@
               </div>
             </template>
             <template v-else-if="col.name === 'contractSigned'">
-              <div v-if="!props.row.link && displayUploader" class="row justify-center table-actions">
+              <div v-if="hasToBeSignedOnline(props.row)">
+                <q-btn v-if="hasSignedDocument(props.row.signature)" :disable="!props.row.isActive" no-caps small color="primary"
+                  label="Signer" :loading="loading" @click="openSignatureModal(props.row.signature.eversignId)" />
+              </div>
+              <div v-if="!props.row.link && displayUploader && !hasToBeSignedOnline(props.row)" class="row justify-center table-actions">
                 <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :headers="headers" :url="docsUploadUrl(contract._id)"
                   @fail="failMsg" :additional-fields="getAdditionalFields(contract, props.row)" hide-underline
                   @uploaded="refresh" :extensions="extensions" hide-upload-button @add="uploadDocument($event, `signedContract_${props.row._id}`)"/>
@@ -39,8 +43,7 @@
             </template>
             <template v-else-if="col.name === 'isActive'">
               <div class="row justify-center table-actions">
-                <q-checkbox :disable="col.value || (props.row && 'endDate' in props.row)" :value="col.value"
-                  @input="updateContractActivity($event, contract, props.row, index)" />
+                <q-checkbox :disable="col.value || (props.row && 'endDate' in props.row)" :value="col.value" @input="updateContractActivity($event, contract, props.row, index)" />
               </div>
             </template>
             <template v-else>{{ col.value }}</template>
@@ -56,16 +59,26 @@
         </template>
       </q-card-actions>
     </q-card>
+
+    <q-modal v-model="esignModal" @hide="refresh" content-classes="e-sign-modal-container">
+      <q-modal-layout>
+        <q-toolbar class="no-shadow row justify-end toolbar-padding" color="black" inverted slot="header">
+          <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="esignModal = false" />
+        </q-toolbar>
+        <iframe :src="embeddedUrl" frameborder="0" class="iframe-normal"></iframe>
+      </q-modal-layout>
+    </q-modal>
   </div>
 </template>
 
 <script>
 import { Cookies } from 'quasar';
 import { contractMixin } from '../../mixins/contractMixin.js';
-import { CONTRACT_STATUS_OPTIONS, CUSTOMER_CONTRACT, COACH, CUSTOMER, COMPANY_CONTRACT } from '../../data/constants.js';
+import { CONTRACT_STATUS_OPTIONS, CUSTOMER_CONTRACT, COACH, CUSTOMER, AUXILIARY, COMPANY_CONTRACT } from '../../data/constants.js';
 import { NotifyPositive, NotifyNegative } from '../../components/popup/notify.js';
 import { downloadDocxFile } from '../../helpers/downloadFile';
 import { generateContractFields } from '../../helpers/generateContractFields';
+import esign from '../../api/Esign.js';
 
 export default {
   name: 'Contracts',
@@ -83,6 +96,9 @@ export default {
       CUSTOMER_CONTRACT,
       COMPANY_CONTRACT,
       CUSTOMER,
+      esignModal: false,
+      embeddedUrl: '',
+      loading: false,
       pagination: { rowsPerPage: 0 },
       contractColumns: [
         {
@@ -113,15 +129,15 @@ export default {
         },
         {
           name: 'contractEmpty',
-          label: 'Contrat',
+          label: 'Word',
           align: 'center',
           field: 'contractEmpty',
         },
         {
           name: 'contractSigned',
-          label: 'Contrat signé',
+          label: 'Contrat / Avenant',
           align: 'center',
-          field: 'contractSigned',
+          field: (val) => val.signature ? val.signature.eversignId : '',
         },
         {
           name: 'isActive',
@@ -278,6 +294,29 @@ export default {
       } catch (e) {
         console.error(e);
       }
+    },
+    async openSignatureModal (eversignId) {
+      try {
+        this.loading = true;
+        const docRaw = await esign.getDocument(eversignId);
+        const id = this.personKey === AUXILIARY ? 1 : 2;
+        this.embeddedUrl = docRaw.data.data.document.signers.find(signer => signer.id === id).embedded_signing_url;
+        this.esignModal = true;
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la requête de signature en ligne du contrat');
+      } finally {
+        this.loading = false;
+      }
+    },
+    hasToBeSignedOnline (contract) {
+      return contract.signature && contract.signature.eversignId;
+    },
+    hasSignedDocument (contractSignature) {
+      if (this.personKey === COACH || this.personKey === CUSTOMER) {
+        return !contractSignature.signedBy.other;
+      }
+      return !contractSignature.signedBy.auxiliary;
     }
   }
 }
@@ -293,4 +332,19 @@ export default {
   .card-sub-title
     margin:  0 10px 10px
     font-size: 14px
+
+  /deep/ .e-sign-modal-container
+    min-width: 80vw
+    min-height: 90vh
+
+  .toolbar-padding
+    padding: 20px 58px
+
+  /deep/ .q-layout-header
+    box-shadow: none
+
+  .iframe-normal
+    position: absolute
+    width: 100%
+    height:100%
 </style>
