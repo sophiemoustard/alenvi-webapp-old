@@ -126,15 +126,15 @@
         <ni-modal-input caption="Majoration soirée" suffix="%" type="number" v-model="newSurcharge.evening"
           :error="$v.newSurcharge.evening.$error" @blur="$v.newSurcharge.evening.$touch" />
         <ni-datetime-picker caption="Début soirée" v-model="newSurcharge.eveningStartTime" :error="$v.newSurcharge.eveningStartTime.$error"
-          @blur="$v.newSurcharge.eveningStartTime.$touch" in-modal type="time" clearable/>
+          @blur="$v.newSurcharge.eveningStartTime.$touch" in-modal type="time" :disable="!newSurcharge.evening" clearable />
         <ni-datetime-picker caption="Fin soirée" v-model="newSurcharge.eveningEndTime" :error="$v.newSurcharge.eveningEndTime.$error"
-          @blur="$v.newSurcharge.eveningEndTime.$touch" in-modal type="time" clearable/>
+          @blur="$v.newSurcharge.eveningEndTime.$touch" in-modal type="time" :disable="!newSurcharge.evening" clearable />
         <ni-modal-input caption="Majoration personnalisée" suffix="%" type="number" v-model="newSurcharge.custom"
           :error="$v.newSurcharge.custom.$error" @blur="$v.newSurcharge.custom.$touch" />
         <ni-datetime-picker caption="Début personnalisé" v-model="newSurcharge.customStartTime" :error="$v.newSurcharge.customStartTime.$error"
-          @blur="$v.newSurcharge.customStartTime.$touch" in-modal type="time" clearable/>
+          @blur="$v.newSurcharge.customStartTime.$touch" in-modal type="time" :disable="!newSurcharge.custom" clearable />
         <ni-datetime-picker caption="Fin personnalisée" v-model="newSurcharge.customEndTime" :error="$v.newSurcharge.customEndTime.$error"
-          @blur="$v.newSurcharge.customEndTime.$touch" in-modal type="time" clearable/>
+          @blur="$v.newSurcharge.customEndTime.$touch" in-modal type="time" :disable="!newSurcharge.custom" clearable />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer le plan de majoration" icon-right="add" color="primary" :loading="loading" @click="createNewSurcharge"
         :disable="$v.newSurcharge.$error || !newSurcharge.name" />
@@ -219,7 +219,7 @@
         <ni-modal-input caption="Nom" v-model="editedService.name" :error="$v.editedService.name.$error" @blur="$v.editedService.name.$touch"
           required-field />
         <ni-datetime-picker caption="Date d'effet" v-model="editedService.startDate" :error="$v.editedService.startDate.$error"
-          @blur="$v.editedService.startDate.$touch" :min="minStartDate" in-modal required-field clearable />
+          @blur="$v.editedService.startDate.$touch" :min="minStartDate" in-modal required-field />
         <ni-modal-input caption="Prix unitaire par défaut TTC" suffix="€" type="number" v-model="editedService.defaultUnitAmount"
           :error="$v.editedService.defaultUnitAmount.$error" @blur="$v.editedService.defaultUnitAmount.$touch" required-field />
         <ni-modal-input caption="TVA" suffix="%" v-model="editedService.vat" type="number" :error="$v.editedService.vat.$error" @blur="$v.editedService.vat.$touch"
@@ -372,11 +372,11 @@ export default {
         twentyFifthOfDecember: '',
         firstOfMay: '',
         evening: '',
-        eveningStartTime: '',
-        eveningEndTime: '',
+        eveningStartTime: null,
+        eveningEndTime: null,
         custom: '',
-        customStartTime: '',
-        customEndTime: '',
+        customStartTime: null,
+        customEndTime: null,
       },
       editedSurcharge: {
         name: '',
@@ -386,11 +386,11 @@ export default {
         twentyFifthOfDecember: '',
         firstOfMay: '',
         evening: '',
-        eveningStartTime: '',
-        eveningEndTime: '',
+        eveningStartTime: null,
+        eveningEndTime: null,
         custom: '',
-        customStartTime: '',
-        customEndTime: '',
+        customStartTime: null,
+        customEndTime: null,
       },
       surchargeColumns: [
         {
@@ -485,14 +485,14 @@ export default {
         nature: '',
         defaultUnitAmount: '',
         vat: '',
-        surcharge: ''
+        surcharge: null
       },
       editedService: {
         name: '',
         startDate: '',
         defaultUnitAmount: '',
         vat: '',
-        surcharge: ''
+        surcharge: null
       },
       natureOptions: [
         { label: 'Horaire', value: 'Horaire' },
@@ -833,11 +833,11 @@ export default {
         twentyFifthOfDecember: '',
         firstOfMay: '',
         evening: '',
-        eveningStartTime: '',
-        eveningEndTime: '',
+        eveningStartTime: null,
+        eveningEndTime: null,
         custom: '',
-        customStartTime: '',
-        customEndTime: '',
+        customStartTime: null,
+        customEndTime: null,
       };
       this.$v.newSurcharge.$reset();
     },
@@ -899,11 +899,11 @@ export default {
         twentyFifthOfDecember: '',
         firstOfMay: '',
         evening: '',
-        eveningStartTime: '',
-        eveningEndTime: '',
+        eveningStartTime: null,
+        eveningEndTime: null,
         custom: '',
-        customStartTime: '',
-        customEndTime: '',
+        customStartTime: null,
+        customEndTime: null,
       };
       this.$v.editedSurcharge.$reset();
     },
@@ -963,6 +963,7 @@ export default {
         nature: '',
         defaultUnitAmount: '',
         vat: '',
+        surcharge: null
       };
       this.$v.newService.$reset();
     },
@@ -992,7 +993,7 @@ export default {
         startDate: '',
         defaultUnitAmount: defaultUnitAmount || '',
         vat: vat || '',
-        surcharge: surcharge ? surcharge._id : ''
+        surcharge: surcharge ? surcharge._id : null
       };
 
       this.serviceEditionModal = true;
@@ -1004,6 +1005,7 @@ export default {
         startDate: '',
         defaultUnitAmount: '',
         vat: '',
+        surcharge: null
       };
       this.$v.editedService.$reset();
     },

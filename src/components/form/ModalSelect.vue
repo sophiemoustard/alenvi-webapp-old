@@ -29,7 +29,7 @@ export default {
     filterPlaceholder: { type: String, default: 'Rechercher' },
     disable: { type: Boolean, default: false },
     requiredField: { type: Boolean, default: false },
-    clearable: { type: Boolean, default: false }
+    clearable: { type: Boolean, default: false },
   },
   methods: {
     inputHandler (value) {
