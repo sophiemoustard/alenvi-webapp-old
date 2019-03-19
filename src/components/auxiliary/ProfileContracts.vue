@@ -312,7 +312,7 @@ export default {
         if (this.shouldBeSigned) {
           payload.signature = {
             templateId: this.userCompany.rhConfig.templates[this.$_.camelCase(this.newContract.status)].driveId,
-            meta: { type: this.newContract.status }
+            meta: { type: this.newContract.status, auxiliaryDriveId: this.getUser.administrative.driveFolder.id }
           };
           payload.signature.fields = generateContractFields(this.newContract.status, { user: this.getUser, contract: this.newContract, initialContractStartDate: this.newContract.startDate });
           if (this.newContract.status === CUSTOMER_CONTRACT) {
@@ -320,6 +320,7 @@ export default {
             const currentCustomer = helpers[0].customers.find(cus => cus._id === this.newContract.customer);
             payload.signature.signers = this.generateContractSigners({ name: helpers[0].identity.lastname, email: helpers[0].local.email });
             payload.signature.title = `${translate[this.newContract.status]} - ${currentCustomer.identity.lastname}`;
+            payload.signature.meta.customerDriveId = currentCustomer.driveFolder.id
           } else {
             payload.signature.signers = this.generateContractSigners({ name: `${this.mainUser.identity.firstname} ${this.mainUser.identity.lastname}`, email: this.mainUser.local.email });
             payload.signature.title = `${translate[this.newContract.status]} - ${this.userFullName}`;
@@ -365,13 +366,14 @@ export default {
           const contractVersionMix = { ...this.selectedContract, ...this.newContractVersion };
           payload.signature = {
             templateId: this.userCompany.rhConfig.templates[`${this.$_.camelCase(contractVersionMix.status)}Version`].driveId,
-            meta: { type: contractVersionMix.status }
+            meta: { type: contractVersionMix.status, auxiliaryDriveId: this.getUser.administrative.driveFolder.id }
           };
           payload.signature.fields = generateContractFields(contractVersionMix.status, { user: this.getUser, contract: contractVersionMix, initialContractStartDate: this.selectedContract.startDate });
           if (this.newContract.status === CUSTOMER_CONTRACT) {
             const helpers = await this.$users.showAll({ customers: contractVersionMix.customer._id });
             payload.signature.signers = this.generateContractSigners({ name: helpers[0].identity.lastname, email: helpers[0].local.email });
             payload.signature.title = `Avenant au ${translate[contractVersionMix.status]} - ${contractVersionMix.customer.identity.lastname}`;
+            payload.signature.meta.customerDriveId = contractVersionMix.customer.driveFolder.id
           } else {
             payload.signature.signers = this.generateContractSigners({ name: `${this.mainUser.identity.firstname} ${this.mainUser.identity.lastname}`, email: this.mainUser.local.email });
             payload.signature.title = `Avenant au ${translate[contractVersionMix.status]} - ${this.userFullName}`;
