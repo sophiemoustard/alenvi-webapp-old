@@ -27,7 +27,7 @@ export default {
     disable: { type: Boolean, default: false },
     inModal: { type: Boolean, default: false },
     requiredField: { type: Boolean, default: false },
-    clearable: { type: Boolean, default: false }
+    clearable: { type: Boolean, default: false },
   },
   computed: {
     format () {
