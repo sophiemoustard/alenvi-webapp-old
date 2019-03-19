@@ -1043,9 +1043,9 @@ export default {
         nature: service.nature,
         unitTTCRate,
         estimatedWeeklyVolume,
-        evenings,
-        sundays,
         startDate: '',
+        evenings,
+        sundays
       };
 
       this.subscriptionEditionModal = true;
@@ -1228,9 +1228,9 @@ export default {
             serviceNature: subscription.service.nature,
             unitTTCRate: subscription.unitTTCRate ? `${this.formatNumber(subscription.unitTTCRate)}€` : '',
             weeklyVolume: subscription.estimatedWeeklyVolume,
+            weeklyRate: estimatedWeeklyRate ? `${this.formatNumber(estimatedWeeklyRate)}€` : '',
             sundays: subscription.sundays || '',
             evenings: subscription.evenings || '',
-            weeklyRate: estimatedWeeklyRate ? `${this.formatNumber(estimatedWeeklyRate)}€` : '',
           }
         });
 

@@ -7,8 +7,7 @@
       </div>
       <q-field :error="error" :error-label="errorLabel">
         <q-select :filter="filter" :filter-placeholder="filterPlaceholder" :value="value" color="white" inverted-light :options="options"
-          @input="inputHandler" @blur="blurHandler" :disable="disable" class="custom-icon" ref="select"
-          :after="[{ icon, class: 'select-icon', handler () { toggleSelect(); } }]" />
+          @input="inputHandler" @blur="blurHandler" :disable="disable" :clearable="clearable" />
       </q-field>
     </div>
   </div>
@@ -30,7 +29,7 @@ export default {
     filterPlaceholder: { type: String, default: 'Rechercher' },
     disable: { type: Boolean, default: false },
     requiredField: { type: Boolean, default: false },
-    icon: { type: String, default: 'arrow_drop_down' }
+    clearable: { type: Boolean, default: false }
   },
   methods: {
     inputHandler (value) {
@@ -38,9 +37,6 @@ export default {
     },
     blurHandler () {
       this.$emit('blur');
-    },
-    toggleSelect () {
-      this.$refs.select.show();
     },
   }
 }
@@ -50,7 +46,4 @@ export default {
   @import '~variables'
   .q-if-inverted
     border: 1px solid $light-grey
-  /deep/ .custom-icon
-    .q-icon
-      display: none;
 </style>

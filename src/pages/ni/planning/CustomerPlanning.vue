@@ -19,7 +19,7 @@
         </div>
         <ni-datetime-range caption="Dates et heures de l'intervention" v-model="newEvent.dates" requiredField />
         <ni-modal-select caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions" :error="$v.newEvent.auxiliary.$error"
-          icon="face" requiredField @blur="$v.newEvent.auxiliary.$touch" @input="setSector" />
+          requiredField @blur="$v.newEvent.auxiliary.$touch" @input="setSector" />
         <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions(newEvent.customer)"
           :error="$v.newEvent.subscription.$error" requiredField @blur="$v.newEvent.subscription.$touch" />
         <ni-modal-select caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency" :options="repetitionOptions"
@@ -51,7 +51,7 @@
         </div>
         <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" />
         <ni-modal-select caption="Auxiliaire" v-model="editedEvent.auxiliary" :options="auxiliariesOptions" :error="$v.editedEvent.auxiliary.$error"
-          icon="face" requiredField @input="setSector" />
+          requiredField @input="setSector" />
         <ni-modal-select caption="Service" v-model="editedEvent.subscription" :options="customerSubscriptionsOptions(editedEvent.customer._id)"
           :error="$v.editedEvent.subscription.$error" @blur="$v.editedEvent.subscription.$touch" />
         <template v-if="isRepetition(editedEvent)">

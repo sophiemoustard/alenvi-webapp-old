@@ -6,7 +6,7 @@
     </div>
     <q-field :error="error" :error-label="errorLabel">
       <q-datetime :value="value" :type="type" :format="format" color="white" ok-label="OK" cancel-label="Fermer" :class="{border: inModal}"
-        inverted-light popover @focus="focusHandler" @blur="blurHandler" @input="update" :min="min" :max="max" :disable="disable"
+        inverted-light popover @focus="focusHandler" @blur="blurHandler" @input="update" :min="min" :max="max" :disable="disable" :clearable="clearable"
       />
     </q-field>
   </div>
@@ -26,7 +26,8 @@ export default {
     max: { type: String, default: null },
     disable: { type: Boolean, default: false },
     inModal: { type: Boolean, default: false },
-    requiredField: { type: Boolean, default: false }
+    requiredField: { type: Boolean, default: false },
+    clearable: { type: Boolean, default: false }
   },
   computed: {
     format () {
