@@ -25,7 +25,7 @@
             </template>
             <template v-else-if="col.name === 'contractSigned'">
               <div v-if="hasToBeSignedOnline(props.row) && !hasSignedDocument(props.row.signature) && shouldSignDocument(contract)">
-                <q-btn no-caps small color="primary" label="Signer" :loading="loading" @click="openSignatureModal(props.row.signature.eversignId)" />
+                <q-btn no-caps small color="primary" label="Signer" @click="openSignatureModal(props.row.signature.eversignId)" />
               </div>
               <div v-else-if="!getContractLink(props.row) && displayUploader && !hasToBeSignedOnline(props.row)" class="row justify-center table-actions">
                 <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :headers="headers" :url="docsUploadUrl(contract._id)"
@@ -299,16 +299,15 @@ export default {
     },
     async openSignatureModal (eversignId) {
       try {
-        this.loading = true;
+        this.$q.loading.show();
         const docRaw = await esign.getDocument(eversignId);
         const id = this.personKey === AUXILIARY ? 1 : 2;
         this.embeddedUrl = docRaw.data.data.document.signers.find(signer => signer.id === id).embedded_signing_url;
+        this.$q.loading.hide();
         this.esignModal = true;
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la requête de signature en ligne du contrat');
-      } finally {
-        this.loading = false;
       }
     },
     hasToBeSignedOnline (contract) {
