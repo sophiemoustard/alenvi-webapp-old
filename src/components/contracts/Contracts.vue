@@ -24,21 +24,23 @@
               </div>
             </template>
             <template v-else-if="col.name === 'contractSigned'">
-              <div v-if="hasToBeSignedOnline(props.row)">
-                <q-btn v-if="hasSignedDocument(props.row.signature)" :disable="!props.row.isActive" no-caps small color="primary"
-                  label="Signer" :loading="loading" @click="openSignatureModal(props.row.signature.eversignId)" />
+              <div v-if="hasToBeSignedOnline(props.row) && !hasSignedDocument(props.row.signature) && shouldSignDocument(contract)">
+                <q-btn no-caps small color="primary" label="Signer" :loading="loading" @click="openSignatureModal(props.row.signature.eversignId)" />
               </div>
-              <div v-if="!props.row.link && displayUploader && !hasToBeSignedOnline(props.row)" class="row justify-center table-actions">
+              <div v-else-if="!getContractLink(props.row) && displayUploader && !hasToBeSignedOnline(props.row)" class="row justify-center table-actions">
                 <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :headers="headers" :url="docsUploadUrl(contract._id)"
                   @fail="failMsg" :additional-fields="getAdditionalFields(contract, props.row)" hide-underline
                   @uploaded="refresh" :extensions="extensions" hide-upload-button @add="uploadDocument($event, `signedContract_${props.row._id}`)"/>
               </div>
-              <div v-else-if="props.row.link" class="row justify-center table-actions">
+              <div v-else-if="getContractLink(props.row)" class="row justify-center table-actions">
                 <q-btn flat round small color="primary">
-                  <a :href="props.row.link" target="_blank">
+                  <a :href="getContractLink(props.row)" target="_blank">
                     <q-icon name="file download" />
                   </a>
                 </q-btn>
+              </div>
+              <div v-else class="row justify-center table-actions">
+                <p class="no-margin">En attente de signature.</p>
               </div>
             </template>
             <template v-else-if="col.name === 'isActive'">
@@ -313,10 +315,22 @@ export default {
       return contract.signature && contract.signature.eversignId;
     },
     hasSignedDocument (contractSignature) {
-      if (this.personKey === COACH || this.personKey === CUSTOMER) {
-        return !contractSignature.signedBy.other;
+      if (this.personKey === AUXILIARY) {
+        return contractSignature.signedBy.auxiliary;
       }
-      return !contractSignature.signedBy.auxiliary;
+      return contractSignature.signedBy.other;
+    },
+    shouldSignDocument (contract) {
+      return !(this.personKey === COACH && contract.status === CUSTOMER_CONTRACT);
+    },
+    getContractLink (contract) {
+      if (this.personKey === CUSTOMER) {
+        return contract.customerDoc ? contract.customerDoc.link : false;
+      }
+      return contract.auxiliaryDoc ? contract.auxiliaryDoc.link : false;
+    },
+    isCustomerContract (contract) {
+      return (this.personKey === COACH && contract.status === COMPANY_CONTRACT)
     }
   }
 }
