@@ -327,6 +327,32 @@ export default {
     'ni-datetime-picker': DatetimePicker,
   },
   mixins: [configMixin, validationMixin],
+  watch: {
+    'editedSurcharge.evening' (value) {
+      if (!value) {
+        this.editedSurcharge.eveningStartTime = null;
+        this.editedSurcharge.eveningEndTime = null;
+      }
+    },
+    'editedSurcharge.custom' (value) {
+      if (!value) {
+        this.editedSurcharge.customStartTime = null;
+        this.editedSurcharge.eveningEndTime = null;
+      }
+    },
+    'newSurcharge.evening' (value) {
+      if (!value) {
+        this.newSurcharge.eveningStartTime = null;
+        this.newSurcharge.eveningEndTime = null;
+      }
+    },
+    'newSurcharge.custom' (value) {
+      if (!value) {
+        this.newSurcharge.customStartTime = null;
+        this.newSurcharge.customEndTime = null;
+      }
+    }
+  },
   data () {
     return {
       loading: false,
@@ -815,13 +841,22 @@ export default {
       };
       this.$v.newSurcharge.$reset();
     },
+    getSurchargePayload (surchargeType) {
+      const payload = surchargeType;
+      if (surchargeType.eveningStartTime) payload.eveningStartTime = this.$moment(surchargeType.eveningStartTime).format('HH:mm');
+      if (surchargeType.eveningEndTime) payload.eveningEndTime = this.$moment(surchargeType.eveningEndTime).format('HH:mm');
+      if (surchargeType.customStartTime) payload.customStartTime = this.$moment(surchargeType.customStartTime).format('HH:mm');
+      if (surchargeType.customEndTime) payload.customEndTime = this.$moment(surchargeType.customEndTime).format('HH:mm');
+      return payload;
+    },
     async createNewSurcharge () {
       try {
         this.$v.newSurcharge.$touch();
         if (this.$v.newSurcharge.$error) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
-        this.newSurcharge.company = this.user.company._id;
-        await this.$surcharges.create(this.newSurcharge);
+        const payload = this.getSurchargePayload(this.newSurcharge);
+        payload.company = this.user.company._id;
+        await this.$surcharges.create(payload);
         NotifyPositive('Plan de majoration créé.');
         this.resetCreationSurchargeData();
         await this.refreshSurcharges();
@@ -878,13 +913,9 @@ export default {
         if (this.$v.editedSurcharge.$error) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
         const surchargeId = this.editedSurcharge._id;
-        const payload = this.$_.pickBy(this.editedSurcharge);
+        const payload = this.getSurchargePayload(this.editedSurcharge);
         delete payload._id;
         delete payload.company;
-        if (this.editedSurcharge.eveningStartTime) payload.eveningStartTime = this.$moment(this.editedSurcharge.eveningStartTime).format('HH:mm');
-        if (this.editedSurcharge.eveningEndTime) payload.eveningEndTime = this.$moment(this.editedSurcharge.eveningEndTime).format('HH:mm');
-        if (this.editedSurcharge.customStartTime) payload.customStartTime = this.$moment(this.editedSurcharge.customStartTime).format('HH:mm');
-        if (this.editedSurcharge.customEndTime) payload.customEndTime = this.$moment(this.editedSurcharge.customEndTime).format('HH:mm');
         await this.$surcharges.updateById(surchargeId, payload);
         NotifyPositive('Plan de majoration modifié.');
         this.resetEditionSurchargeData();

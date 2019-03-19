@@ -289,7 +289,7 @@
           type="number" />
         <ni-modal-input v-if="editedSubscription.nature !== 'Forfaitaire'" v-model="editedSubscription.evenings"
           caption="Dont soirée (h)" last type="number" />
-        </div>
+      </div>
       <q-btn no-caps class="full-width modal-btn" label="Editer la souscription" icon-right="check" color="primary"
         :loading="loading" @click="updateSubscription" />
     </q-modal>

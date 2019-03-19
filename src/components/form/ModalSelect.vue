@@ -7,8 +7,7 @@
       </div>
       <q-field :error="error" :error-label="errorLabel">
         <q-select :filter="filter" :filter-placeholder="filterPlaceholder" :value="value" color="white" inverted-light :options="options"
-          @input="inputHandler" @blur="blurHandler" :disable="disable" :clearable="clearable"
-        />
+          @input="inputHandler" @blur="blurHandler" :disable="disable" :clearable="clearable" />
       </q-field>
     </div>
   </div>
