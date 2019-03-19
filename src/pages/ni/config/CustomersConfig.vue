@@ -337,7 +337,7 @@ export default {
     'editedSurcharge.custom' (value) {
       if (!value) {
         this.editedSurcharge.customStartTime = null;
-        this.editedSurcharge.eveningEndTime = null;
+        this.editedSurcharge.customEndTime = null;
       }
     },
     'newSurcharge.evening' (value) {
