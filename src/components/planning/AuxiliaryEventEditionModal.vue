@@ -26,7 +26,7 @@
       </template>
       <template v-if="editedEvent.type === INTERVENTION">
         <ni-modal-select caption="Bénéficiaire" v-model="editedEvent.customer._id" :options="customersOptions" :error="validations.customer.$error"
-          icon="face" requiredField disable />
+          requiredField disable />
         <ni-modal-select caption="Service" v-model="editedEvent.subscription" :options="customerSubscriptionsOptions(editedEvent.customer._id)"
           :error="validations.subscription.$error" @blur="validations.subscription.$touch" requiredField />
       </template>

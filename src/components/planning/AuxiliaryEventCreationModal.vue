@@ -20,7 +20,7 @@
       </template>
       <template v-if="newEvent.type === INTERVENTION">
         <ni-modal-select caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions" :error="validations.customer.$error"
-          icon="face" requiredField @blur="validations.customer.$touch" />
+          requiredField @blur="validations.customer.$touch" />
         <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions(newEvent.customer)"
           :error="validations.subscription.$error" requiredField @blur="validations.subscription.$touch" />
       </template>
