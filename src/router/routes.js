@@ -282,7 +282,7 @@ const routes = [
   { path: '/resetPassword/:token', component: () => import('pages/signin/ResetPwd') },
   { path: '/error403Pwd', component: () => import('pages/signin/403') },
   { path: '/401', component: () => import('pages/401') },
-  { path: '/docsigned', component: () => import('pages/DocumentSigned'), props: true },
+  { path: '/docsigned', component: () => import('pages/DocumentSigned'), props: (route) => ({ signed: route.query.signed }) },
   { // Always leave this as last one
     path: '*',
     component: () => import('pages/404')
