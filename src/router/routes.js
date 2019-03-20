@@ -15,7 +15,7 @@ const routes = [
           await store.dispatch('main/getUser', Cookies.get('user_id'));
         }
         if (store.getters['main/user'] && store.getters['main/user'].role.name === 'Aidants') {
-          return next({ name: 'customer planning' });
+          return next({ name: 'customer agenda' });
         } else if (store.getters['main/user'] && (store.getters['main/user'].role.name === AUXILIARY || store.getters['main/user'].role.name === PLANNING_REFERENT)) {
           return next({ name: 'auxiliary agenda' });
         } else if (store.getters['main/user'] && store.getters['main/user'].role.name !== AUXILIARY && store.getters['main/user'].role.name !== 'Aidants') {

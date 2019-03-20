@@ -242,7 +242,7 @@ export default {
     esignRedirection () {
       return {
         redirect: `${process.env.COMPANI_HOSTNAME}/docsigned?signed=true`,
-        redirectDecline: `${process.env.COMPANI_HOSTNAME}/docsigned?signed=false`
+        redirectDecline: `${process.env.COMPANI_HOSTNAME}/docsigned?signed=false`,
       }
     },
   },
@@ -385,7 +385,7 @@ export default {
             meta: { type: contractVersionMix.status, auxiliaryDriveId: this.getUser.administrative.driveFolder.id },
             fields: generateContractFields(contractVersionMix.status, { user: this.getUser, contract: contractVersionMix, initialContractStartDate: this.selectedContract.startDate })
           };
-          if (this.newContract.status === CUSTOMER_CONTRACT) {
+          if (contractVersionMix.status === CUSTOMER_CONTRACT) {
             const helpers = await this.$users.showAll({ customers: contractVersionMix.customer._id });
             payload.signature.signers = this.generateContractSigners({ name: helpers[0].identity.lastname, email: helpers[0].local.email });
             payload.signature.title = `Avenant au ${translate[contractVersionMix.status]} - ${contractVersionMix.customer.identity.lastname}`;

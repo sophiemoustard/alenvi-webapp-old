@@ -307,7 +307,11 @@ export default {
         const document = await esign.getDocument(eversignId);
         const id = this.personKey === AUXILIARY ? 1 : 2;
         this.embeddedUrl = document.signers.find(signer => signer.id === id).embedded_signing_url;
-        this.esignModal = true;
+        if (this.$q.platform.is.mobile) {
+          window.location.href = this.embeddedUrl;
+        } else {
+          this.esignModal = true;
+        }
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la requête de signature en ligne du contrat');
