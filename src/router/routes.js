@@ -15,7 +15,7 @@ const routes = [
           await store.dispatch('main/getUser', Cookies.get('user_id'));
         }
         if (store.getters['main/user'] && store.getters['main/user'].role.name === 'Aidants') {
-          return next({ name: 'customer planning' });
+          return next({ name: 'customer agenda' });
         } else if (store.getters['main/user'] && (store.getters['main/user'].role.name === AUXILIARY || store.getters['main/user'].role.name === PLANNING_REFERENT)) {
           return next({ name: 'auxiliary agenda' });
         } else if (store.getters['main/user'] && store.getters['main/user'].role.name !== AUXILIARY && store.getters['main/user'].role.name !== 'Aidants') {
@@ -282,7 +282,7 @@ const routes = [
   { path: '/resetPassword/:token', component: () => import('pages/signin/ResetPwd') },
   { path: '/error403Pwd', component: () => import('pages/signin/403') },
   { path: '/401', component: () => import('pages/401') },
-  { path: '/docsigned', component: () => import('pages/DocumentSigned'), props: true },
+  { path: '/docsigned', component: () => import('pages/DocumentSigned'), props: (route) => ({ signed: route.query.signed }) },
   { // Always leave this as last one
     path: '*',
     component: () => import('pages/404')
