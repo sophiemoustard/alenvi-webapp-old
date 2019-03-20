@@ -24,7 +24,7 @@
               </div>
             </template>
             <template v-else-if="col.name === 'contractSigned'">
-              <div v-if="hasToBeSignedOnline(props.row) && !hasSignedDocument(props.row.signature) && shouldSignDocument(contract)">
+              <div v-if="hasToBeSignedOnline(props.row) && shouldSignDocument(contract.status, props.row.signature)">
                 <q-btn no-caps small color="primary" label="Signer" @click="openSignatureModal(props.row.signature.eversignId)" />
               </div>
               <div v-else-if="!getContractLink(props.row) && displayUploader && !hasToBeSignedOnline(props.row)" class="row justify-center table-actions">
@@ -40,7 +40,7 @@
                 </q-btn>
               </div>
               <div v-else class="row justify-center table-actions">
-                <p class="no-margin">En attente de signature.</p>
+                <p class="no-margin">En attente de signature</p>
               </div>
             </template>
             <template v-else-if="col.name === 'isActive'">
@@ -62,7 +62,7 @@
       </q-card-actions>
     </q-card>
 
-    <q-modal v-model="esignModal" @hide="refresh" content-classes="e-sign-modal-container">
+    <q-modal v-model="esignModal" @hide="refreshWithTimeout" content-classes="e-sign-modal-container">
       <q-modal-layout>
         <q-toolbar class="no-shadow row justify-end toolbar-padding" color="black" inverted slot="header">
           <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="esignModal = false" />
@@ -205,6 +205,9 @@ export default {
     refresh () {
       this.$emit('refresh');
     },
+    refreshWithTimeout () {
+      this.$emit('refreshWithTimeout');
+    },
     async updateContractActivity (isActive, contract, version, contractIndex) {
       try {
         await this.$q.dialog({
@@ -300,27 +303,29 @@ export default {
     async openSignatureModal (eversignId) {
       try {
         this.$q.loading.show();
-        const docRaw = await esign.getDocument(eversignId);
+        const document = await esign.getDocument(eversignId);
         const id = this.personKey === AUXILIARY ? 1 : 2;
-        this.embeddedUrl = docRaw.data.data.document.signers.find(signer => signer.id === id).embedded_signing_url;
-        this.$q.loading.hide();
+        this.embeddedUrl = document.signers.find(signer => signer.id === id).embedded_signing_url;
         this.esignModal = true;
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la requête de signature en ligne du contrat');
+      } finally {
+        this.$q.loading.hide();
       }
     },
     hasToBeSignedOnline (contract) {
-      return contract.signature && contract.signature.eversignId;
+      return !!(contract.signature && contract.signature.eversignId);
     },
-    hasSignedDocument (contractSignature) {
-      if (this.personKey === AUXILIARY) {
-        return contractSignature.signedBy.auxiliary;
+    shouldSignDocument (contractStatus, contractSignature) {
+      switch (this.personKey) {
+        case COACH:
+          return contractStatus === COMPANY_CONTRACT && !contractSignature.signedBy.other;
+        case AUXILIARY:
+          return !contractSignature.signedBy.auxiliary;
+        case CUSTOMER:
+          return contractStatus === CUSTOMER_CONTRACT && !contractSignature.signedBy.other;
       }
-      return contractSignature.signedBy.other;
-    },
-    shouldSignDocument (contract) {
-      return !(this.personKey === COACH && contract.status === CUSTOMER_CONTRACT);
     },
     getContractLink (contract) {
       if (this.personKey === CUSTOMER) {
@@ -328,9 +333,6 @@ export default {
       }
       return contract.auxiliaryDoc ? contract.auxiliaryDoc.link : false;
     },
-    isCustomerContract (contract) {
-      return (this.personKey === COACH && contract.status === COMPANY_CONTRACT)
-    }
   }
 }
 </script>
