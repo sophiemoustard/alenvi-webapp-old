@@ -39,7 +39,7 @@
                   </a>
                 </q-btn>
               </div>
-              <div v-else class="row justify-center table-actions">
+              <div v-else-if="hasToBeSignedOnline(props.row)" class="row justify-center table-actions">
                 <p class="no-margin">En attente de signature</p>
               </div>
             </template>
