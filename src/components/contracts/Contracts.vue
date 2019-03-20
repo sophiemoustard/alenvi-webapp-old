@@ -183,7 +183,8 @@ export default {
       return [
         { name: 'fileName', value: `contrat_signe_${this.user.identity.firstname}_${this.user.identity.lastname}` },
         { name: 'contractId', value: contract._id },
-        { name: 'versionId', value: version._id }
+        { name: 'versionId', value: version._id },
+        { name: 'type', value: contract.status }
       ]
     },
     getLastVersion (contract) {
