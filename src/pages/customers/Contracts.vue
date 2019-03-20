@@ -1,7 +1,8 @@
 <template>
   <q-page padding class="neutral-background">
     <h4>Contrats</h4>
-    <ni-contracts v-if="contracts" :contracts="contracts" :user="getUser" :columns="contractVisibleColumns" :person-key="CUSTOMER" />
+    <ni-contracts v-if="contracts" :contracts="contracts" :user="getUser" :columns="contractVisibleColumns"
+      @refresh="refreshContracts" :person-key="CUSTOMER" @refreshWithTimeout="refreshContractsWithTimeout" />
   </q-page>
 </template>
 
@@ -40,7 +41,10 @@ export default {
         this.contracts = [];
         console.error(e);
       }
-    }
+    },
+  },
+  beforeDestroy () {
+    clearTimeout(this.timeout);
   },
 }
 </script>

@@ -386,7 +386,7 @@ export default {
     async preOpenESignModal (data) {
       try {
         this.$q.loading.show({ message: 'Contact du support de signature en ligne...' });
-        const sign = await this.$customers.generateMandateSignatureRequest({ mandateId: data._id, _id: this.customer._id }, {
+        const signatureRequest = await this.$customers.generateMandateSignatureRequest({ mandateId: data._id, _id: this.customer._id }, {
           customer: {
             name: this.customer.identity.lastname,
             email: this.helper.local.email
@@ -406,8 +406,7 @@ export default {
           ...this.esignRedirection
         });
         await this.refreshCustomer();
-        this.$q.loading.hide();
-        this.embeddedUrl = sign.data.data.signatureRequest.embeddedUrl;
+        this.embeddedUrl = signatureRequest.embeddedUrl;
         if (this.$q.platform.is.mobile) {
           window.location.href = this.embeddedUrl;
         } else {
@@ -418,6 +417,8 @@ export default {
         this.$q.loading.hide();
         this.newESignModal = false;
         NotifyNegative('Erreur lors de la requête de signature en ligne du mandat');
+      } finally {
+        this.$q.loading.hide();
       }
     },
     async checkMandates () {
@@ -441,8 +442,8 @@ export default {
     },
     async hasSignedDoc (docId) {
       try {
-        const docRaw = await esign.getDocument(docId);
-        return docRaw.data.data.document.log.some(el => el.event === 'document_signed');
+        const document = await esign.getDocument(docId);
+        return document.log.some(el => el.event === 'document_signed');
       } catch (e) {
         console.error(e);
       }

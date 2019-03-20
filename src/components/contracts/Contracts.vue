@@ -24,23 +24,28 @@
               </div>
             </template>
             <template v-else-if="col.name === 'contractSigned'">
-              <div v-if="!props.row.link && displayUploader" class="row justify-center table-actions">
+              <div v-if="hasToBeSignedOnline(props.row) && shouldSignDocument(contract.status, props.row.signature)">
+                <q-btn no-caps small color="primary" label="Signer" @click="openSignatureModal(props.row.signature.eversignId)" />
+              </div>
+              <div v-else-if="!getContractLink(props.row) && displayUploader && !hasToBeSignedOnline(props.row)" class="row justify-center table-actions">
                 <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :headers="headers" :url="docsUploadUrl(contract._id)"
                   @fail="failMsg" :additional-fields="getAdditionalFields(contract, props.row)" hide-underline
                   @uploaded="refresh" :extensions="extensions" hide-upload-button @add="uploadDocument($event, `signedContract_${props.row._id}`)"/>
               </div>
-              <div v-else-if="props.row.link" class="row justify-center table-actions">
+              <div v-else-if="getContractLink(props.row)" class="row justify-center table-actions">
                 <q-btn flat round small color="primary">
-                  <a :href="props.row.link" target="_blank">
+                  <a :href="getContractLink(props.row)" target="_blank">
                     <q-icon name="file download" />
                   </a>
                 </q-btn>
               </div>
+              <div v-else class="row justify-center table-actions">
+                <p class="no-margin">En attente de signature</p>
+              </div>
             </template>
             <template v-else-if="col.name === 'isActive'">
               <div class="row justify-center table-actions">
-                <q-checkbox :disable="col.value || (props.row && 'endDate' in props.row)" :value="col.value"
-                  @input="updateContractActivity($event, contract, props.row, index)" />
+                <q-checkbox :disable="col.value || (props.row && 'endDate' in props.row)" :value="col.value" @input="updateContractActivity($event, contract, props.row, index)" />
               </div>
             </template>
             <template v-else>{{ col.value }}</template>
@@ -56,16 +61,26 @@
         </template>
       </q-card-actions>
     </q-card>
+
+    <q-modal v-model="esignModal" @hide="refreshWithTimeout" content-classes="e-sign-modal-container">
+      <q-modal-layout>
+        <q-toolbar class="no-shadow row justify-end toolbar-padding" color="black" inverted slot="header">
+          <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="esignModal = false" />
+        </q-toolbar>
+        <iframe :src="embeddedUrl" frameborder="0" class="iframe-normal"></iframe>
+      </q-modal-layout>
+    </q-modal>
   </div>
 </template>
 
 <script>
 import { Cookies } from 'quasar';
 import { contractMixin } from '../../mixins/contractMixin.js';
-import { CONTRACT_STATUS_OPTIONS, CUSTOMER_CONTRACT, COACH, CUSTOMER, COMPANY_CONTRACT } from '../../data/constants.js';
+import { CONTRACT_STATUS_OPTIONS, CUSTOMER_CONTRACT, COACH, CUSTOMER, AUXILIARY, COMPANY_CONTRACT } from '../../data/constants.js';
 import { NotifyPositive, NotifyNegative } from '../../components/popup/notify.js';
 import { downloadDocxFile } from '../../helpers/downloadFile';
 import { generateContractFields } from '../../helpers/generateContractFields';
+import esign from '../../api/Esign.js';
 
 export default {
   name: 'Contracts',
@@ -83,6 +98,9 @@ export default {
       CUSTOMER_CONTRACT,
       COMPANY_CONTRACT,
       CUSTOMER,
+      esignModal: false,
+      embeddedUrl: '',
+      loading: false,
       pagination: { rowsPerPage: 0 },
       contractColumns: [
         {
@@ -113,15 +131,15 @@ export default {
         },
         {
           name: 'contractEmpty',
-          label: 'Contrat',
+          label: 'Word',
           align: 'center',
           field: 'contractEmpty',
         },
         {
           name: 'contractSigned',
-          label: 'Contrat signé',
+          label: 'Contrat / Avenant',
           align: 'center',
-          field: 'contractSigned',
+          field: (val) => val.signature ? val.signature.eversignId : '',
         },
         {
           name: 'isActive',
@@ -165,7 +183,8 @@ export default {
       return [
         { name: 'fileName', value: `contrat_signe_${this.user.identity.firstname}_${this.user.identity.lastname}` },
         { name: 'contractId', value: contract._id },
-        { name: 'versionId', value: version._id }
+        { name: 'versionId', value: version._id },
+        { name: 'type', value: contract.status }
       ]
     },
     getLastVersion (contract) {
@@ -186,6 +205,9 @@ export default {
     },
     refresh () {
       this.$emit('refresh');
+    },
+    refreshWithTimeout () {
+      this.$emit('refreshWithTimeout');
     },
     async updateContractActivity (isActive, contract, version, contractIndex) {
       try {
@@ -278,7 +300,40 @@ export default {
       } catch (e) {
         console.error(e);
       }
-    }
+    },
+    async openSignatureModal (eversignId) {
+      try {
+        this.$q.loading.show();
+        const document = await esign.getDocument(eversignId);
+        const id = this.personKey === AUXILIARY ? 1 : 2;
+        this.embeddedUrl = document.signers.find(signer => signer.id === id).embedded_signing_url;
+        this.esignModal = true;
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la requête de signature en ligne du contrat');
+      } finally {
+        this.$q.loading.hide();
+      }
+    },
+    hasToBeSignedOnline (contract) {
+      return !!(contract.signature && contract.signature.eversignId);
+    },
+    shouldSignDocument (contractStatus, contractSignature) {
+      switch (this.personKey) {
+        case COACH:
+          return contractStatus === COMPANY_CONTRACT && !contractSignature.signedBy.other;
+        case AUXILIARY:
+          return !contractSignature.signedBy.auxiliary;
+        case CUSTOMER:
+          return contractStatus === CUSTOMER_CONTRACT && !contractSignature.signedBy.other;
+      }
+    },
+    getContractLink (contract) {
+      if (this.personKey === CUSTOMER) {
+        return contract.customerDoc ? contract.customerDoc.link : false;
+      }
+      return contract.auxiliaryDoc ? contract.auxiliaryDoc.link : false;
+    },
   }
 }
 </script>
@@ -293,4 +348,19 @@ export default {
   .card-sub-title
     margin:  0 10px 10px
     font-size: 14px
+
+  /deep/ .e-sign-modal-container
+    min-width: 80vw
+    min-height: 90vh
+
+  .toolbar-padding
+    padding: 20px 58px
+
+  /deep/ .q-layout-header
+    box-shadow: none
+
+  .iframe-normal
+    position: absolute
+    width: 100%
+    height:100%
 </style>

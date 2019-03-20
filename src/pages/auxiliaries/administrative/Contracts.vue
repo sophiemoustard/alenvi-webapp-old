@@ -1,7 +1,8 @@
 <template>
   <q-page padding class="neutral-background">
     <h4>Contrats</h4>
-    <ni-contracts v-if="contracts" :contracts="contracts" :user="getUser" :columns="contractVisibleColumns" :person-key="AUXILIARY" />
+    <ni-contracts v-if="contracts" :contracts="contracts" :user="getUser" :columns="contractVisibleColumns"
+      @refresh="refreshContracts" :person-key="AUXILIARY" @refreshWithTimeout="refreshContractsWithTimeout" />
   </q-page>
 </template>
 
@@ -43,6 +44,9 @@ export default {
         console.error(e);
       }
     },
+  },
+  beforeDestroy () {
+    clearTimeout(this.timeout);
   },
 }
 </script>
