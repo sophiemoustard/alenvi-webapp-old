@@ -161,7 +161,7 @@
         </q-table>
         <q-card-actions align="end">
           <q-btn :disable="fundingServicesOptions().length === 0" flat no-caps color="primary" icon="add" label="Ajouter un financement"
-            @click="fundingCreationModal = true" />
+            @click="openfundingCreationModal" />
         </q-card-actions>
       </q-card>
     </div>
@@ -646,6 +646,7 @@ export default {
         sortBy: 'startDate',
         descending: true,
       },
+      fundingTppOptions: [],
       newFunding: {
         thirdPartyPayer: '',
         folderNumber: '',
@@ -746,14 +747,6 @@ export default {
         return ['frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'services'];
       }
       return ['frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays', 'services'];
-    },
-    fundingTppOptions () {
-      if (!this.company.customersConfig || !this.company.customersConfig.thirdPartyPayers) return [];
-
-      return this.company.customersConfig.thirdPartyPayers.map(tpp => ({
-        label: tpp.name,
-        value: tpp._id,
-      }));
     },
     isOneTimeFundingNature () {
       return this.newFunding.nature === FIXED;
@@ -1272,6 +1265,18 @@ export default {
       }
     },
     // Fundings
+    async getThirdPartyPayersOptions () {
+      try {
+        const thirdPartyPayers = await this.$thirdPartyPayers.showAll({ company: this.company._id });
+        this.fundingTppOptions = thirdPartyPayers.map(tpp => ({ label: tpp.name, value: tpp._id }));
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async openfundingCreationModal () {
+      await this.getThirdPartyPayersOptions();
+      this.fundingCreationModal = true;
+    },
     fundingServicesOptions () {
       return this.subscriptions.map(sub => ({ label: sub.service.name, value: sub.service._id }));
     },
