@@ -30,14 +30,24 @@
     </q-collapsible>
     <q-item-separator />
     <q-collapsible v-if="user.role.name === 'Admin'" ref="configuration" v-model="activeRoutes.configuration.open"
-      collapseIcon="expand_more"
-    >
+      collapseIcon="expand_more">
       <template slot="header">
         <q-item-main :class="{'text-weight-bold': activeRoutes.configuration.highlight }" label="Configuration" />
       </template>
       <ni-menu-item name="rh config" :params="{ id: user._id }" icon="settings" label="Configuration RH" />
       <ni-menu-item name="customers config" :params="{ id: user._id }" icon="settings" label="Configuration bénéficiaires" />
       <ni-menu-item name="tags config" :params="{ id: user._id }" icon="list_alt" label="Tags" />
+    </q-collapsible>
+    <q-item-separator />
+    <q-collapsible v-if="user.role.name === 'Admin'" ref="billing" v-model="activeRoutes.billing.open"
+      collapseIcon="expand_more">
+      <template slot="header">
+        <q-item-main :class="{'text-weight-bold': activeRoutes.billing.highlight }" label="Facturation" />
+      </template>
+      <ni-menu-item name="to bill" :params="{ id: user._id }" icon="credit_card" label="A facturer" />
+      <ni-menu-item name="credit note" :params="{ id: user._id }" icon="mdi-credit-card-refund" label="Avoirs" />
+      <ni-menu-item name="clients balances" :params="{ id: user._id }" icon="mdi-scale-balance" label="Balances clients" />
+      <ni-menu-item name="debits archive" :params="{ id: user._id }" icon="mdi-archive" label="Archive prélèvements" />
     </q-collapsible>
     <q-item-separator />
     <ni-side-menu-footer :label="userFirstnameUpper" :userId="user._id" />
@@ -74,6 +84,10 @@ export default {
           highlight: false
         },
         configuration: {
+          open: false,
+          highlight: false
+        },
+        billing: {
           open: false,
           highlight: false
         },
