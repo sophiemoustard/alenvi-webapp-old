@@ -116,3 +116,8 @@ export const CONTRACT_STATUS_OPTIONS = [
   { label: 'Prestataire', value: COMPANY_CONTRACT },
   { label: 'Mandataire', value: CUSTOMER_CONTRACT },
 ];
+
+// Billing
+
+export const TWO_WEEKS = 'two_weeks';
+export const MONTH = 'month';
