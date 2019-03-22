@@ -24,6 +24,7 @@ module.exports = function (ctx) {
       'sectors',
       'services',
       'surcharges',
+      'thirdPartyPayers',
       'twilio',
       'vue-croppa',
       'vMask',

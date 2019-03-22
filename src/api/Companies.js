@@ -20,15 +20,4 @@ export default {
   async deleteInternalHour (queries) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/companies/${queries.id}/internalHours/${queries.internalHourId}`);
   },
-  async createThirdPartyPayer (id, data) {
-    const newThirdPartyPayer = await alenviAxios.post(`${process.env.API_HOSTNAME}/companies/${id}/thirdpartypayers`, data);
-    return newThirdPartyPayer.data.data.thirdPartyPayers;
-  },
-  async deleteThirdPartyPayer (queries) {
-    await alenviAxios.delete(`${process.env.API_HOSTNAME}/companies/${queries.id}/thirdpartypayers/${queries.thirdPartyPayerId}`);
-  },
-  async updateThirdPartyPayer (params, payload) {
-    const thirdPartyPayer = await alenviAxios.put(`${process.env.API_HOSTNAME}/companies/${params.id}/thirdpartypayers/${params.thirdPartyPayerId}`, payload);
-    return thirdPartyPayer.data.data.thirdPartyPayers;
-  }
 }
