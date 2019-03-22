@@ -59,6 +59,46 @@ const routes = [
         },
       },
       {
+        path: 'ni/billing/to-bill',
+        name: 'to bill',
+        component: () => import('pages/ni/billing/ToBill'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['billing:edit'],
+          parent: 'billing',
+        },
+      },
+      {
+        path: 'ni/billing/credit-notes',
+        name: 'credit note',
+        component: () => import('pages/ni/billing/CreditNotes'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['billing:edit'],
+          parent: 'billing',
+        },
+      },
+      {
+        path: 'ni/billing/clients-balances',
+        name: 'clients balances',
+        component: () => import('pages/ni/billing/ClientsBalances'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['billing:edit'],
+          parent: 'billing',
+        },
+      },
+      {
+        path: 'ni/billing/debits-archive',
+        name: 'debits archive',
+        component: () => import('pages/ni/billing/DebitsArchive'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['billing:edit'],
+          parent: 'billing',
+        },
+      },
+      {
         path: 'ni/auxiliaries',
         name: 'administrative directory',
         component: () => import('pages/ni/auxiliaries/Directory'),
