@@ -99,6 +99,14 @@
           </q-card-actions>
         </q-card>
       </div>
+      <div class="q-mb-xl">
+        <p class="text-weight-bold">Facturation</p>
+        <div class="row gutter-profile">
+          <ni-select caption="Période de facturation par défaut" v-model="company.customersConfig.billingPeriod"
+            @focus="saveTmp('customersConfig.billingPeriod')" @blur="updateCompany('customersConfig.billingPeriod')"
+            :options="billingPeriodOptions" />
+        </div>
+      </div>
     </div>
 
     <!-- Surcharge creation modal -->
@@ -311,9 +319,10 @@ import FileUploader from '../../../components/form/FileUploader.vue';
 import { configMixin } from '../../../mixins/configMixin';
 import { validationMixin } from '../../../mixins/validationMixin.js';
 import Input from '../../../components/form/Input.vue';
+import Select from '../../../components/form/Select.vue';
 import SearchAddress from '../../../components/form/SearchAddress.vue';
 import { frAddress, posDecimals, positiveNumber } from '../../../helpers/vuelidateCustomVal';
-import { BILLING_DIRECT, BILLING_INDIRECT, REQUIRED_LABEL, CONTRACT_STATUS_OPTIONS } from '../../../data/constants.js';
+import { BILLING_DIRECT, BILLING_INDIRECT, REQUIRED_LABEL, CONTRACT_STATUS_OPTIONS, TWO_WEEKS, MONTH } from '../../../data/constants.js';
 
 export default {
   name: 'CustomersConfig',
@@ -323,6 +332,7 @@ export default {
     'ni-file-uploader': FileUploader,
     'ni-modal-select': ModalSelect,
     'ni-input': Input,
+    'ni-select': Select,
     'ni-search-address': SearchAddress,
     'ni-datetime-picker': DatetimePicker,
   },
@@ -358,6 +368,10 @@ export default {
       loading: false,
       company: null,
       documents: null,
+      billingPeriodOptions: [
+        { value: TWO_WEEKS, label: 'Quinzaine' },
+        { value: MONTH, label: 'Mois' },
+      ],
       // Surcharges
       surcharges: [],
       surchargeCreationModal: false,
@@ -694,6 +708,9 @@ export default {
           frAddress
         },
       },
+      customersConfig: {
+        bllingPeriod: { required },
+      }
     },
     newThirdPartyPayer: {
       name: { required },
@@ -810,6 +827,7 @@ export default {
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
         if (path.match(/fullAddress/)) path = 'address';
+
         const value = this.$_.get(this.company, path);
         const payload = this.$_.set({}, path, value);
         payload._id = this.company._id;
