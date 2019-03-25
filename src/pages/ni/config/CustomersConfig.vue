@@ -800,6 +800,7 @@ export default {
       try {
         this.thirdPartyPayers = await this.$thirdPartyPayers.showAll({ company: this.company._id });
       } catch (e) {
+        this.thirdPartyPayers = [];
         console.error(e);
       }
     },

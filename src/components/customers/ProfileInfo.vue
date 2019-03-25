@@ -1267,9 +1267,10 @@ export default {
     // Fundings
     async getThirdPartyPayersOptions () {
       try {
-        const thirdPartyPayers = await this.$thirdPartyPayers.showAll({ company: this.company._id });
+        const thirdPartyPayers = await this.$hirdPartyPayers.showAll({ company: this.company._id });
         this.fundingTppOptions = thirdPartyPayers.map(tpp => ({ label: tpp.name, value: tpp._id }));
       } catch (e) {
+        this.fundingTppOptions = [];
         console.error(e);
       }
     },
