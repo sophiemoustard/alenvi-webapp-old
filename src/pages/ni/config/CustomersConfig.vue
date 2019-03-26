@@ -814,8 +814,12 @@ export default {
       this.company.address = this.company.address || {};
     },
     async refreshThirdPartyPayers () {
-      await this.$store.dispatch('main/getUser', this.user._id);
-      this.thirdPartyPayers = this.user.company.customersConfig.thirdPartyPayers;
+      try {
+        this.thirdPartyPayers = await this.$thirdPartyPayers.showAll({ company: this.company._id });
+      } catch (e) {
+        this.thirdPartyPayers = [];
+        console.error(e);
+      }
     },
     // Company
     async updateCompany (path) {
@@ -1092,7 +1096,7 @@ export default {
         email: '',
         address: {},
         unitTTCRate: '',
-        billingMode: ''
+        billingMode: '',
       }
     },
     async createNewThirdPartyPayer () {
@@ -1100,8 +1104,9 @@ export default {
         if (this.$v.newThirdPartyPayer.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
+        this.newThirdPartyPayer.company = this.company._id;
         const payload = this.$_.pickBy(this.newThirdPartyPayer);
-        await this.$companies.createThirdPartyPayer(this.company._id, payload);
+        await this.$thirdPartyPayers.create(payload);
         await this.refreshThirdPartyPayers();
         NotifyPositive('Tiers payeur créé.');
       } catch (e) {
@@ -1129,7 +1134,7 @@ export default {
         if (payload.address && !payload.address.fullAddress) {
           payload.address = {};
         }
-        await this.$companies.updateThirdPartyPayer({ id: this.company._id, thirdPartyPayerId }, payload);
+        await this.$thirdPartyPayers.updateById(thirdPartyPayerId, payload);
         await this.refreshThirdPartyPayers();
         NotifyPositive('Tiers payeur modifié.');
       } catch (e) {
@@ -1149,8 +1154,7 @@ export default {
           cancel: 'Annuler'
         });
 
-        const queries = { id: this.company._id, thirdPartyPayerId };
-        await this.$companies.deleteThirdPartyPayer(queries);
+        await this.$thirdPartyPayers.removeById(thirdPartyPayerId);
         this.thirdPartyPayers.splice(cell, 1);
         NotifyPositive('Tiers payeur supprimé.');
       } catch (e) {
