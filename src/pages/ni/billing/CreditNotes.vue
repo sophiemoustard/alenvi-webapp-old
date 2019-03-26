@@ -18,18 +18,80 @@
         </q-table>
       </q-card>
       <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="mdi-credit-card-refund" label="Créer un avoir"
-        @click="newCreditNoteModal = true" />
+        @click="creditNoteCreationModal = true" />
     </div>
+
+    <!-- Credit note creation modal -->
+    <q-modal v-model="creditNoteCreationModal" content-classes="modal-container-sm" @hide="resetCreationCreditNoteData">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-11">
+            <h5>Créer un <span class="text-weight-bold">avoir</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer modal-btn-close">
+            <span><q-icon name="clear" @click.native="creditNoteCreationModal = false" /></span>
+          </div>
+        </div>
+        <q-search caption="Bénéficiaire" v-model="terms" placeholder="Rechercher..." inverted-light color="white" required-field>
+          <q-autocomplete @search="search" @selected="selected" :debounce='0'/>
+        </q-search>
+        [Tiers payeurs à venir]
+        <!-- <ni-modal-select caption="Tiers payeur" :options="fundingTppOptions" v-model="newFunding.thirdPartyPayer"
+          :error="$v.newFunding.thirdPartyPayer.$error" @blur="$v.newFunding.thirdPartyPayer.$touch" required-field /> -->
+        <ni-datetime-picker caption="Date de l'avoir" v-model="newCreditNote.date" :error="$v.newCreditNote.date.$error"
+          @blur="$v.newCreditNote.date.$touch" in-modal type="date" clearable required-field />
+        <q-toggle v-model="hasEvents" label="Lié à des intervention ?" />
+        <ni-datetime-picker v-if="hasEvents" caption="Début période concernée" v-model="newCreditNote.startDate" :error="$v.newCreditNote.startDate.$error"
+          @blur="$v.newCreditNote.startDate.$touch" in-modal type="date" :disable="!hasEvents" clearable />
+        <ni-datetime-picker v-if="hasEvents" caption="Fin période concernée" v-model="newCreditNote.endDate" :error="$v.newCreditNote.endDate.$error"
+          @blur="$v.newCreditNote.endDate.$touch" in-modal type="date" :disable="!hasEvents" clearable />
+        <!-- Add events management here -->
+        <ni-modal-input v-if="hasEvents" caption="Montant HT" suffix="€" type="number" v-model="newCreditNote.exclTaxes" disable />
+        <ni-modal-input v-if="!hasEvents" caption="Montant TTC" suffix="€" type="number" v-model="newCreditNote.inclTaxes" disable />
+        <ni-modal-select v-if="!hasEvents" caption="Souscription concernée" v-model="newCreditNote.subscription"
+          :options="subscriptionsOptions" :disable="hasEvents" required-field />
+      </div>
+      <q-btn no-caps class="full-width modal-btn" label="Créer l'avoir" icon-right="add" color="primary" :loading="loading" @click="createNewCreditNote"
+        :disable="disableCreditNoteCreationButton" />
+    </q-modal>
+
   </q-page>
 </template>
 
 <script>
+import DatetimePicker from '../../../components/form/DatetimePicker.vue';
+import ModalInput from '../../../components/form/ModalInput.vue';
+import ModalSelect from '../../../components/form/ModalSelect.vue';
+import { required, requiredIf } from 'vuelidate/lib/validators';
+
 export default {
   name: 'CreditNotes',
+  components: {
+    'ni-datetime-picker': DatetimePicker,
+    'ni-modal-input': ModalInput,
+    'ni-modal-select': ModalSelect,
+  },
   data () {
     return {
+      loading: false,
       company: null,
-      newCreditNoteModal: false,
+      creditNoteCreationModal: false,
+      customers: [],
+      terms: '',
+      hasEvents: false,
+      subscriptionsOptions: [],
+      thirdPartyPayersOptions: [],
+      newCreditNote: {
+        customer: null,
+        thirdPartyPayer: null,
+        date: null,
+        events: [],
+        startDate: null,
+        endDate: null,
+        exclTaxes: '',
+        inclTaxes: '',
+        subscription: null
+      },
       creditNotes: [],
       creditNotesColumns: [
         {
@@ -81,9 +143,59 @@ export default {
           field: '_id',
         },
       ],
-      loading: false,
       pagination: { rowsPerPage: 0 },
     }
   },
+  async mounted () {
+    this.customers = await this.$customers.showAll();
+    for (let i = 0, l = this.customers.length; i < l; i++) {
+      this.customers[i].label = this.customers[i].identity.lastname;
+      this.customers[i].value = this.customers[i].identity.lastname;
+    }
+  },
+  validations: {
+    newCreditNote: {
+      date: { required },
+      startDate: {
+        required: requiredIf((item) => {
+          return this.hasEvents;
+        })
+      },
+      endDate: {
+        required: requiredIf((item) => {
+          return this.hasEvents;
+        })
+      },
+      subscription: {
+        required: requiredIf((item) => {
+          return !this.hasEvents;
+        })
+      },
+    }
+  },
+  computed: {
+    disableCreditNoteCreationButton () {
+      return '';
+    }
+  },
+  methods: {
+    async search (terms, done) {
+      try {
+        const regex = new RegExp(terms, 'i');
+        done(this.customers.filter(el => el.value.match(regex)));
+      } catch (e) {
+        done([]);
+      }
+    },
+    selected (value) {
+      console.log(value);
+    },
+    createNewCreditNote () {
+      console.log('test');
+    },
+    resetCreationCreditNoteData () {
+      console.log('test2');
+    }
+  }
 }
 </script>
