@@ -88,11 +88,11 @@ export const fundingMixin = {
           field: 'careDays',
         },
         {
-          name: 'services',
+          name: 'subscriptions',
           label: 'Souscriptions',
           align: 'left',
-          format: (value) => value && value.length > 0 ? value.map(sub => sub.name).join(', ') : '',
-          field: 'services',
+          format: (value) => value && value.length > 0 ? value.map(sub => sub.service.name).join(', ') : '',
+          field: 'subscriptions',
         },
         {
           name: 'actions',

@@ -448,15 +448,8 @@ export default {
         console.error(e);
       }
     },
-    getSubscriptionServiceId (subscriptionId) {
-      const subscription = this.subscriptions.find(sub => sub._id === subscriptionId);
-      if (!subscription) return undefined;
-      return subscription.service._id;
-    },
     hasFunding (subscriptionId) {
-      const serviceId = this.getSubscriptionServiceId(subscriptionId);
-      if (!serviceId) return;
-      return this.fundings.find(fund => fund.services.some(service => service._id === serviceId));
+      return this.fundings.find(fund => fund.subscriptions.some(sub => sub._id === subscriptionId));
     },
     showFunding (subscriptionId) {
       this.selectedFunding = this.hasFunding(subscriptionId);
