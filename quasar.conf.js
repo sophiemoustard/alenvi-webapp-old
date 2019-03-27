@@ -9,6 +9,7 @@ module.exports = function (ctx) {
       'alenviAxios',
       'bot',
       'can',
+      'creditNotes',
       'companies',
       'customers',
       'googleDrive',
