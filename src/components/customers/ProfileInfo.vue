@@ -161,7 +161,7 @@
         </q-table>
         <q-card-actions align="end">
           <q-btn :disable="fundingServicesOptions().length === 0" flat no-caps color="primary" icon="add" label="Ajouter un financement"
-            @click="openfundingCreationModal" />
+            @click="openFundingCreationModal" />
         </q-card-actions>
       </q-card>
     </div>
@@ -382,8 +382,8 @@
         </div>
         <ni-modal-select caption="Tiers payeur" :options="fundingTppOptions" v-model="newFunding.thirdPartyPayer"
           :error="$v.newFunding.thirdPartyPayer.$error" @blur="$v.newFunding.thirdPartyPayer.$touch" required-field />
-        <ni-option-group v-model="newFunding.services" :options="fundingServicesOptions()" caption="Souscriptions" type="checkbox"
-          @blur="$v.newFunding.services.$touch" :error="$v.newFunding.services.$error" required-field />
+        <ni-option-group v-model="newFunding.subscriptions" :options="fundingServicesOptions()" caption="Souscriptions" type="checkbox"
+          @blur="$v.newFunding.subscriptions.$touch" :error="$v.newFunding.subscriptions.$error" required-field />
         <ni-datetime-picker v-model="newFunding.startDate" caption="Date de début de prise en charge" :min="newFundingMinStartDate"
           in-modal @blur="$v.newFunding.startDate.$touch" :error="$v.newFunding.startDate.$error" required-field />
         <ni-datetime-picker v-model="newFunding.endDate" :min="$moment(newFunding.startDate).add(1, 'day').toISOString()"
@@ -658,7 +658,7 @@ export default {
         unitTTCRate: '',
         customerParticipationRate: 0,
         careDays: [0, 1, 2, 3, 4, 5, 6, 7],
-        services: []
+        subscriptions: []
       },
       fundingFreqOptions: FUNDING_FREQ_OPTIONS,
       fundingNatureOptions: FUNDING_NATURE_OPTIONS,
@@ -744,9 +744,9 @@ export default {
     },
     fundingDetailsVisibleColumns () {
       if (this.selectedFunding.nature === 'fixed') {
-        return ['frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'services'];
+        return ['frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'subscriptions'];
       }
-      return ['frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays', 'services'];
+      return ['frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays', 'subscriptions'];
     },
     isOneTimeFundingNature () {
       return this.newFunding.nature === FIXED;
@@ -761,16 +761,16 @@ export default {
       }));
     },
     newFundingMinStartDate () {
-      if (this.newFunding.services.length > 0) {
+      if (this.newFunding.subscriptions.length > 0) {
         const latestFunding = this.fundings
-          .filter(funding => funding.services.some(sub => this.newFunding.services.includes(sub._id)))
+          .filter(funding => funding.subscriptions.some(sub => this.newFunding.subscriptions.includes(sub._id)))
           .sort((a, b) => new Date(b.endDate) - new Date(a.endDate))[0];
         return latestFunding && latestFunding.endDate ? this.$moment(latestFunding.endDate).add(1, 'day').toISOString() : '';
       }
     },
     editedFundingMinStartDate () {
       const latestFunding = this.fundings
-        .filter(funding => funding._id !== this.editedFunding._id && funding.services.some(sub => this.editedFunding.services.includes(sub._id)))
+        .filter(funding => funding._id !== this.editedFunding._id && funding.subscriptions.some(sub => this.editedFunding.subscriptions.includes(sub._id)))
         .sort((a, b) => new Date(b.endDate) - new Date(a.endDate))[0];
       return latestFunding && latestFunding.endDate ? this.$moment(latestFunding.endDate).add(1, 'day').toISOString() : '';
     },
@@ -816,7 +816,7 @@ export default {
     },
     newFunding: {
       thirdPartyPayer: { required },
-      services: { required },
+      subscriptions: { required },
       nature: { required },
       frequency: { required },
       amountTTC: { required: requiredIf((item) => {
@@ -1267,19 +1267,19 @@ export default {
     // Fundings
     async getThirdPartyPayersOptions () {
       try {
-        const thirdPartyPayers = await this.$hirdPartyPayers.showAll({ company: this.company._id });
+        const thirdPartyPayers = await this.$thirdPartyPayers.showAll({ company: this.company._id });
         this.fundingTppOptions = thirdPartyPayers.map(tpp => ({ label: tpp.name, value: tpp._id }));
       } catch (e) {
         this.fundingTppOptions = [];
         console.error(e);
       }
     },
-    async openfundingCreationModal () {
+    async openFundingCreationModal () {
       await this.getThirdPartyPayersOptions();
       this.fundingCreationModal = true;
     },
     fundingServicesOptions () {
-      return this.subscriptions.map(sub => ({ label: sub.service.name, value: sub.service._id }));
+      return this.subscriptions.map(sub => ({ label: sub.service.name, value: sub._id }));
     },
     showFundingHistory (id) {
       this.selectedFunding = this.fundings.find(sub => sub._id === id);
@@ -1303,16 +1303,16 @@ export default {
         unitTTCRate: '',
         customerParticipationRate: 0,
         careDays: [0, 1, 2, 3, 4, 5, 6, 7],
-        services: []
+        subscriptions: []
       };
     },
     formatCreatedFunding () {
       const cleanPayload = this.$_.pickBy(this.newFunding);
-      const { nature, thirdPartyPayer, services, ...version } = cleanPayload;
+      const { nature, thirdPartyPayer, subscriptions, ...version } = cleanPayload;
       return {
         nature,
         thirdPartyPayer,
-        services,
+        subscriptions,
         versions: [{...version}]
       };
     },
@@ -1336,7 +1336,7 @@ export default {
       }
     },
     checkAll () {
-      this.newFunding.services.push(...this.fundingServicesOptions().map(sub => sub.value));
+      this.newFunding.subscriptions.push(...this.fundingServicesOptions().map(sub => sub.value));
     },
     async removeFunding (fundingId) {
       try {
@@ -1367,7 +1367,7 @@ export default {
     },
     startFundingEdition (id) {
       this.editedFunding = Object.assign({}, this.fundings.find(fund => fund._id === id));
-      this.editedFunding.services = this.editedFunding.services.map(service => service._id);
+      this.editedFunding.subscriptions = this.editedFunding.subscriptions.map(service => service._id);
       this.fundingEditionModal = true;
     },
     resetEditionFundingData () {
@@ -1380,7 +1380,7 @@ export default {
         this.$v.editedFunding.$touch();
         if (this.$v.editedFunding.$error) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
-        const { folderNumber, endDate, frequency, amountTTC, unitTTCRate, careHours, careDays, customerParticipationRate, startDate, services, _id } = this.editedFunding;
+        const { folderNumber, endDate, frequency, amountTTC, unitTTCRate, careHours, careDays, customerParticipationRate, startDate, subscriptions, _id } = this.editedFunding;
         const payload = {
           fundingId: _id,
           folderNumber,
@@ -1389,7 +1389,7 @@ export default {
           customerParticipationRate,
           startDate,
           endDate,
-          services,
+          subscriptions,
         };
         if (this.editedFunding.nature === FIXED) payload.amountTTC = amountTTC;
         if (this.editedFunding.nature === HOURLY) {
