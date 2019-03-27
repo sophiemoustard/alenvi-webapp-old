@@ -152,25 +152,28 @@ export default {
       this.customers[i].label = this.customers[i].identity.lastname;
       this.customers[i].value = this.customers[i].identity.lastname;
     }
+    console.log(this.customers);
   },
-  validations: {
-    newCreditNote: {
-      date: { required },
-      startDate: {
-        required: requiredIf((item) => {
-          return this.hasEvents;
-        })
-      },
-      endDate: {
-        required: requiredIf((item) => {
-          return this.hasEvents;
-        })
-      },
-      subscription: {
-        required: requiredIf((item) => {
-          return !this.hasEvents;
-        })
-      },
+  validations () {
+    return {
+      newCreditNote: {
+        date: { required },
+        startDate: {
+          required: requiredIf(() => {
+            return this.hasEvents;
+          })
+        },
+        endDate: {
+          required: requiredIf(() => {
+            return this.hasEvents;
+          })
+        },
+        subscription: {
+          required: requiredIf(() => {
+            return !this.hasEvents;
+          })
+        },
+      }
     }
   },
   computed: {
