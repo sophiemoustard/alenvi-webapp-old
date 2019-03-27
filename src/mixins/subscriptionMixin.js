@@ -126,8 +126,7 @@ export const subscriptionMixin = {
       return true;
     },
     getMatchingFunding (subscription) {
-      return this.fundings.find(fd =>
-        fd.subscriptions.some(sub => sub._id === subscription._id) &&
+      return this.fundings.find(fd => fd.subscription === subscription._id &&
         (fd.endDate ? this.$moment().isBetween(fd.startDate, fd.endDate) : this.$moment().isSameOrAfter(fd.startDate))
       );
     },
