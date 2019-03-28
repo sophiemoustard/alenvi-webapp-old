@@ -32,14 +32,12 @@ export const BILLING_DIRECT = 'direct';
 
 // CUSTOMER FUNDING
 export const MONTHLY = 'monthly';
-export const WEEKLY = 'weekly';
 export const ONCE = 'once';
 export const FIXED = 'fixed';
 export const HOURLY = 'hourly';
 
 export const FUNDING_FREQ_OPTIONS = [
   { label: 'Mensuelle', value: MONTHLY },
-  { label: 'Hebdomadaire', value: WEEKLY },
   { label: 'Une seule fois', value: ONCE }
 ];
 export const FUNDING_NATURE_OPTIONS = [

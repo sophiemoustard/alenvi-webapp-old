@@ -160,7 +160,7 @@
           </q-tr>
         </q-table>
         <q-card-actions align="end">
-          <q-btn :disable="fundingServicesOptions().length === 0" flat no-caps color="primary" icon="add" label="Ajouter un financement"
+          <q-btn :disable="fundingSubscriptionsOptions().length === 0" flat no-caps color="primary" icon="add" label="Ajouter un financement"
             @click="openFundingCreationModal" />
         </q-card-actions>
       </q-card>
@@ -369,7 +369,7 @@
     </q-modal>
 
     <!-- Funding creation modal -->
-    <q-modal v-model="fundingCreationModal" @hide="resetCreationFundingData" @show="checkAll" content-classes="modal-container-sm">
+    <q-modal v-model="fundingCreationModal" @hide="resetCreationFundingData" content-classes="modal-container-sm">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -382,8 +382,8 @@
         </div>
         <ni-modal-select caption="Tiers payeur" :options="fundingTppOptions" v-model="newFunding.thirdPartyPayer"
           :error="$v.newFunding.thirdPartyPayer.$error" @blur="$v.newFunding.thirdPartyPayer.$touch" required-field />
-        <ni-option-group v-model="newFunding.subscriptions" :options="fundingServicesOptions()" caption="Souscriptions" type="checkbox"
-          @blur="$v.newFunding.subscriptions.$touch" :error="$v.newFunding.subscriptions.$error" required-field />
+        <ni-modal-select v-model="newFunding.subscription" :options="fundingSubscriptionsOptions()" caption="Souscription"
+          @blur="$v.newFunding.subscription.$touch" :error="$v.newFunding.subscription.$error" required-field />
         <ni-datetime-picker v-model="newFunding.startDate" caption="Date de début de prise en charge" :min="newFundingMinStartDate"
           in-modal @blur="$v.newFunding.startDate.$touch" :error="$v.newFunding.startDate.$error" required-field />
         <ni-datetime-picker v-model="newFunding.endDate" :min="$moment(newFunding.startDate).add(1, 'day').toISOString()"
@@ -392,7 +392,7 @@
         <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="newFunding.frequency" @blur="$v.newFunding.frequency.$touch"
           :error="$v.newFunding.frequency.$error" required-field />
         <ni-modal-select caption="Nature" :options="fundingNatureOptions" v-model="newFunding.nature" in-modal :error="$v.newFunding.nature.$error"
-          @blur="$v.newFunding.nature.$touch" required-field />
+          @blur="$v.newFunding.nature.$touch" required-field @input="resetFundingFrequency" />
         <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.unitTTCRate" caption="Prix unitaire TTC"
           type="number" @blur="$v.newFunding.unitTTCRate.$touch" :error="$v.newFunding.unitTTCRate.$error"
           required-field />
@@ -401,7 +401,7 @@
         <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.careHours" caption="Nb. heures prises en charge"
           type="number" suffix="h" @blur="$v.newFunding.careHours.$touch" :error="$v.newFunding.careHours.$error"
           required-field />
-        <ni-modal-input v-model="newFunding.customerParticipationRate" caption="Taux de participation du bénéficiaire"
+        <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.customerParticipationRate" caption="Taux de participation du bénéficiaire"
           type="number" suffix="%" @blur="$v.newFunding.customerParticipationRate.$touch" :error="$v.newFunding.customerParticipationRate.$error"
           required-field />
         <ni-option-group v-model="newFunding.careDays" :options="daysOptions" caption="Jours pris en charge" type="checkbox"
@@ -441,7 +441,7 @@
         <ni-modal-input v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.careHours" caption="Nb. heures prises en charge"
           type="number" @blur="$v.editedFunding.careHours.$touch" :error="$v.editedFunding.careHours.$error"
           required-field suffix="h" />
-        <ni-modal-input v-model="editedFunding.customerParticipationRate" caption="Taux de participation du bénéficiaire"
+        <ni-modal-input v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.customerParticipationRate" caption="Taux de participation du bénéficiaire"
           type="number" suffix="%" @blur="$v.editedFunding.customerParticipationRate.$touch" :error="$v.editedFunding.customerParticipationRate.$error"
           required-field />
         <ni-option-group v-model="editedFunding.careDays" :options="daysOptions" caption="Jours pris en charge" type="checkbox"
@@ -473,7 +473,7 @@ import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
 import { validationMixin } from '../../mixins/validationMixin.js';
 import { days } from '../../data/days.js';
-import { FUNDING_FREQ_OPTIONS, FUNDING_NATURE_OPTIONS, FIXED, HOURLY, REQUIRED_LABEL } from '../../data/constants.js';
+import { FUNDING_FREQ_OPTIONS, FUNDING_NATURE_OPTIONS, FIXED, HOURLY, REQUIRED_LABEL, ONCE } from '../../data/constants.js';
 import { financialCertificatesMixin } from '../../mixins/financialCertificatesMixin.js';
 import { fundingMixin } from '../../mixins/fundingMixin.js';
 
@@ -658,9 +658,8 @@ export default {
         unitTTCRate: '',
         customerParticipationRate: 0,
         careDays: [0, 1, 2, 3, 4, 5, 6, 7],
-        subscriptions: []
+        subscription: '',
       },
-      fundingFreqOptions: FUNDING_FREQ_OPTIONS,
       fundingNatureOptions: FUNDING_NATURE_OPTIONS,
       fundingCreationModal: false,
       fundingEditionModal: false,
@@ -737,22 +736,30 @@ export default {
       return selectedSubscription ? this.$moment(selectedSubscription.startDate).add(1, 'd').toISOString() : '';
     },
     fundingHistoryVisibleColumns () {
-      if (this.selectedFunding.nature === 'fixed') {
+      if (this.selectedFunding.nature === FIXED) {
         return ['startDate', 'endDate', 'frequency', 'amountTTC', 'customerParticipationRate', 'careDays'];
       }
       return ['startDate', 'endDate', 'frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays'];
     },
     fundingDetailsVisibleColumns () {
-      if (this.selectedFunding.nature === 'fixed') {
-        return ['frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'subscriptions'];
+      if (this.selectedFunding.nature === FIXED) {
+        return ['frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'subscription'];
       }
-      return ['frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays', 'subscriptions'];
+      return ['frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays', 'subscription'];
     },
     isOneTimeFundingNature () {
       return this.newFunding.nature === FIXED;
     },
     isOneTimeEditedFundingNature () {
       return this.editedFunding.nature === FIXED;
+    },
+    fundingFreqOptions () {
+      if ((this.fundingCreationModal && this.newFunding.nature === FIXED) ||
+        (this.fundingEditionModal && this.editedFunding.nature === FIXED)) {
+        return FUNDING_FREQ_OPTIONS.filter(option => option.value === ONCE);
+      }
+
+      return FUNDING_FREQ_OPTIONS;
     },
     daysOptions () {
       return days.map((day, i) => ({
@@ -761,16 +768,16 @@ export default {
       }));
     },
     newFundingMinStartDate () {
-      if (this.newFunding.subscriptions.length > 0) {
+      if (this.newFunding.subscription.length > 0) {
         const latestFunding = this.fundings
-          .filter(funding => funding.subscriptions.some(sub => this.newFunding.subscriptions.includes(sub._id)))
+          .filter(funding => funding.subscription === this.newFunding.subscription)
           .sort((a, b) => new Date(b.endDate) - new Date(a.endDate))[0];
         return latestFunding && latestFunding.endDate ? this.$moment(latestFunding.endDate).add(1, 'day').toISOString() : '';
       }
     },
     editedFundingMinStartDate () {
       const latestFunding = this.fundings
-        .filter(funding => funding._id !== this.editedFunding._id && funding.subscriptions.some(sub => this.editedFunding.subscriptions.includes(sub._id)))
+        .filter(funding => funding._id !== this.editedFunding._id && funding.subscription === this.editedFunding.subscription)
         .sort((a, b) => new Date(b.endDate) - new Date(a.endDate))[0];
       return latestFunding && latestFunding.endDate ? this.$moment(latestFunding.endDate).add(1, 'day').toISOString() : '';
     },
@@ -816,7 +823,7 @@ export default {
     },
     newFunding: {
       thirdPartyPayer: { required },
-      subscriptions: { required },
+      subscription: { required },
       nature: { required },
       frequency: { required },
       amountTTC: { required: requiredIf((item) => {
@@ -830,7 +837,9 @@ export default {
       }) },
       careDays: { required },
       startDate: { required },
-      customerParticipationRate: { required },
+      customerParticipationRate: { required: requiredIf((item) => {
+        return item.nature === HOURLY;
+      }) },
     },
     editedFunding: {
       frequency: { required },
@@ -845,7 +854,9 @@ export default {
       }) },
       careDays: { required },
       startDate: { required },
-      customerParticipationRate: { required },
+      customerParticipationRate: { required: requiredIf((item) => {
+        return item.nature === HOURLY;
+      }) },
     }
   },
   watch: {
@@ -1278,7 +1289,12 @@ export default {
       await this.getThirdPartyPayersOptions();
       this.fundingCreationModal = true;
     },
-    fundingServicesOptions () {
+    resetFundingFrequency () {
+      if (this.newFunding.nature === FIXED && this.newFunding.frequency !== ONCE) {
+        this.newFunding.frequency = '';
+      }
+    },
+    fundingSubscriptionsOptions () {
       return this.subscriptions.map(sub => ({ label: sub.service.name, value: sub._id }));
     },
     showFundingHistory (id) {
@@ -1303,16 +1319,16 @@ export default {
         unitTTCRate: '',
         customerParticipationRate: 0,
         careDays: [0, 1, 2, 3, 4, 5, 6, 7],
-        subscriptions: []
+        subscription: '',
       };
     },
     formatCreatedFunding () {
       const cleanPayload = this.$_.pickBy(this.newFunding);
-      const { nature, thirdPartyPayer, subscriptions, ...version } = cleanPayload;
+      const { nature, thirdPartyPayer, subscription, ...version } = cleanPayload;
       return {
         nature,
         thirdPartyPayer,
-        subscriptions,
+        subscription,
         versions: [{...version}]
       };
     },
@@ -1334,9 +1350,6 @@ export default {
       } finally {
         this.loading = false;
       }
-    },
-    checkAll () {
-      this.newFunding.subscriptions.push(...this.fundingServicesOptions().map(sub => sub.value));
     },
     async removeFunding (fundingId) {
       try {
@@ -1367,7 +1380,6 @@ export default {
     },
     startFundingEdition (id) {
       this.editedFunding = Object.assign({}, this.fundings.find(fund => fund._id === id));
-      this.editedFunding.subscriptions = this.editedFunding.subscriptions.map(service => service._id);
       this.fundingEditionModal = true;
     },
     resetEditionFundingData () {
@@ -1380,7 +1392,7 @@ export default {
         this.$v.editedFunding.$touch();
         if (this.$v.editedFunding.$error) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
-        const { folderNumber, endDate, frequency, amountTTC, unitTTCRate, careHours, careDays, customerParticipationRate, startDate, subscriptions, _id } = this.editedFunding;
+        const { folderNumber, endDate, frequency, amountTTC, unitTTCRate, careHours, careDays, customerParticipationRate, startDate, subscription, _id } = this.editedFunding;
         const payload = {
           fundingId: _id,
           folderNumber,
@@ -1389,7 +1401,7 @@ export default {
           customerParticipationRate,
           startDate,
           endDate,
-          subscriptions,
+          subscription,
         };
         if (this.editedFunding.nature === FIXED) payload.amountTTC = amountTTC;
         if (this.editedFunding.nature === HOURLY) {
