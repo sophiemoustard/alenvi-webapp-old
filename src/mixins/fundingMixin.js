@@ -1,5 +1,5 @@
 import { days } from '../data/days';
-import { FUNDING_FREQ_OPTIONS, FUNDING_NATURE_OPTIONS } from '../data/constants.js';
+import { FUNDING_FREQ_OPTIONS, NATURE_OPTIONS } from '../data/constants.js';
 import { getLastVersion } from '../helpers/utils';
 
 export const fundingMixin = {
@@ -27,7 +27,7 @@ export const fundingMixin = {
           label: 'Nature',
           align: 'left',
           format: (value) => {
-            const nature = FUNDING_NATURE_OPTIONS.find(option => option.value === value);
+            const nature = NATURE_OPTIONS.find(option => option.value === value);
             return nature ? this.$_.capitalize(nature.label) : ''
           },
           field: 'nature',

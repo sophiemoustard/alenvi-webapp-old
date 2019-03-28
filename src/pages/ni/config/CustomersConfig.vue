@@ -322,7 +322,7 @@ import Input from '../../../components/form/Input.vue';
 import Select from '../../../components/form/Select.vue';
 import SearchAddress from '../../../components/form/SearchAddress.vue';
 import { frAddress, posDecimals, positiveNumber } from '../../../helpers/vuelidateCustomVal';
-import { BILLING_DIRECT, BILLING_INDIRECT, REQUIRED_LABEL, CONTRACT_STATUS_OPTIONS, TWO_WEEKS, MONTH } from '../../../data/constants.js';
+import { BILLING_DIRECT, BILLING_INDIRECT, REQUIRED_LABEL, CONTRACT_STATUS_OPTIONS, TWO_WEEKS, MONTH, NATURE_OPTIONS } from '../../../data/constants.js';
 
 export default {
   name: 'CustomersConfig',
@@ -486,7 +486,6 @@ export default {
           field: '_id',
         },
       ],
-
       // Services
       services: [],
       serviceCreationModal: false,
@@ -508,10 +507,7 @@ export default {
         vat: '',
         surcharge: null
       },
-      natureOptions: [
-        { label: 'Horaire', value: 'Horaire' },
-        { label: 'Forfaitaire', value: 'Forfaitaire' },
-      ],
+      natureOptions: NATURE_OPTIONS,
       serviceTypeOptions: CONTRACT_STATUS_OPTIONS,
       visibleColumnsServices: ['name', 'nature', 'defaultUnitAmount', 'vat', 'surcharge', 'actions'],
       visibleHistoryColumns: ['startDate', 'name', 'defaultUnitAmount', 'vat', 'surcharge'],
@@ -532,7 +528,11 @@ export default {
           name: 'nature',
           label: 'Nature',
           align: 'left',
-          field: 'nature'
+          format: (value) => {
+            const nature = NATURE_OPTIONS.find(option => option.value === value);
+            return nature ? this.$_.capitalize(nature.label) : '';
+          },
+          field: 'nature',
         },
         {
           name: 'defaultUnitAmount',
@@ -968,13 +968,14 @@ export default {
     },
     // Services
     formatCreatedService () {
-      const { nature, name, defaultUnitAmount, type, surcharge } = this.newService;
+      const { nature, name, defaultUnitAmount, type } = this.newService;
       const formattedService = {
         nature,
-        versions: [{ name, defaultUnitAmount, surcharge }],
+        versions: [{ name, defaultUnitAmount }],
         type,
         company: this.user.company._id,
       };
+      if (this.newService.surcharge && this.newService.surcharge !== '') formattedService.versions[0].surcharge = this.newService.surcharge;
       if (this.newService.vat && this.newService.vat !== '') formattedService.versions[0].vat = this.newService.vat;
       return formattedService;
     },

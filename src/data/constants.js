@@ -40,9 +40,9 @@ export const FUNDING_FREQ_OPTIONS = [
   { label: 'Mensuelle', value: MONTHLY },
   { label: 'Une seule fois', value: ONCE }
 ];
-export const FUNDING_NATURE_OPTIONS = [
+export const NATURE_OPTIONS = [
   { label: 'Horaire', value: HOURLY },
-  { label: 'Forfaitaire', value: 'fixed' }
+  { label: 'Forfaitaire', value: FIXED },
 ];
 
 // AVATAR
