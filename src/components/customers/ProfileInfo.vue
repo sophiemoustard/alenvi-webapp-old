@@ -1259,13 +1259,17 @@ export default {
     },
     async generateQuote () {
       try {
-        const subscriptions = this.subscriptions.map(subscription => ({
-          serviceName: subscription.service.name,
-          unitTTCRate: subscription.unitTTCRate,
-          estimatedWeeklyVolume: subscription.estimatedWeeklyVolume,
-          sundays: subscription.sundays,
-          evenings: subscription.evenings,
-        }));
+        const subscriptions = this.subscriptions.map(subscription => {
+          const sub = {
+            serviceName: subscription.service.name,
+            unitTTCRate: subscription.unitTTCRate,
+            estimatedWeeklyVolume: subscription.estimatedWeeklyVolume,
+          }
+          if (subscription.sundays) sub.sundays = subscription.sundays;
+          if (subscription.evenings) sub.evenings = subscription.evenings;
+
+          return sub;
+        });
         const payload = { subscriptions };
         await this.$customers.addQuote(this.customer._id, payload);
         await this.refreshQuotes();
