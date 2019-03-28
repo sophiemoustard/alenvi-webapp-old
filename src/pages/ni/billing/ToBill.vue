@@ -3,7 +3,31 @@
     <h4>À facturer</h4>
     <div class="q-mb-xl">
       <q-card style="background: white">
-        <q-table :data="draftBills" :columns="columns" row-key="name" hide-bottom binary-state-sort :pagination.sync="pagination" />
+        <q-table :data="draftBills" :columns="columns" row-key="name" hide-bottom binary-state-sort :pagination.sync="pagination">
+          <template slot="body" slot-scope="props">
+            <q-tr :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :props="props">
+                <template>{{ col.value }}</template>
+              </q-td>
+            </q-tr>
+            <q-tr v-for="(bill, index) in props.row.bills.slice(1)" :key="index" :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+                <template v-if="col.name === 'service'">{{ bill.subscription.service.versions[bill.subscription.service.versions.length - 1].name }}</template>
+                <template v-if="col.name === 'hours'">{{ formatHours(bill.hours) }}</template>
+                <template v-if="col.name === 'unitPreTaxPrice'">{{ formatPrice(bill.unitPreTaxPrice) }}</template>
+                <template v-if="col.name === 'discount'">{{ bill.discount }}</template>
+                <template v-if="col.name === 'preTaxPrice'">{{ formatPrice(bill.preTaxPrice) }}</template>
+                <template v-if="col.name === 'withTaxPrice'">{{ formatPrice(bill.withTaxPrice) }}</template>
+              </q-td>
+            </q-tr>
+            <q-tr v-if="props.row.bills.length > 1" :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+                <template v-if="col.name === 'preTaxPrice'">Total :</template>
+                <template v-if="col.name === 'withTaxPrice'">{{ formatPrice(props.row.total) }}</template>
+              </q-td>
+            </q-tr>
+          </template>
+        </q-table>
       </q-card>
     </div>
   </q-page>
@@ -21,7 +45,7 @@ export default {
       draftBills: [],
       columns: [
         {
-          name: 'toBill',
+          name: 'status',
           label: 'Status',
           align: 'left',
           field: '_id',
@@ -30,65 +54,65 @@ export default {
           name: 'customer',
           label: 'Bénéficiaire',
           align: 'left',
-          field: row => `${row.identity.lastname}`,
+          field: row => `${row.customer.identity.lastname}`,
         },
         {
           name: 'client',
           label: 'Client',
           align: 'left',
-          field: row => `${row.identity.lastname}`,
+          field: row => `${row.customer.identity.lastname}`,
         },
         {
           name: 'startDate',
           label: 'Début F.',
           align: 'left',
-          field: row => row.startDate ? this.$moment(row.startDate).format('DD/MM/YYYY') : '',
+          field: row => row.bills[0].startDate ? this.$moment(row.startDate).format('DD/MM/YYYY') : '',
         },
         {
           name: 'endDate',
           label: 'Fin F.',
           align: 'left',
-          field: row => row.endDate ? this.$moment(row.endDate).format('DD/MM/YYYY') : '',
+          field: row => row.bills[0].endDate ? this.$moment(row.endDate).format('DD/MM/YYYY') : '',
         },
         {
           name: 'service',
           label: 'Service',
           align: 'left',
-          field: row => row.subscription.service.versions[row.subscription.service.versions.length - 1].name,
+          field: row => row.bills[0].subscription.service.versions[row.bills[0].subscription.service.versions.length - 1].name,
         },
         {
           name: 'hours',
           label: 'Décompte',
           align: 'center',
-          field: 'hours',
-          format: value => value ? `${value}h` : '',
+          field: row => row.bills[0].hours,
+          format: value => this.formatHours(value),
         },
         {
           name: 'unitPreTaxPrice',
           label: 'PU HT',
           align: 'center',
-          field: 'unitPreTaxPrice',
-          format: value => value ? `${parseFloat(value).toFixed(2)}€` : '',
+          field: row => row.bills[0].unitPreTaxPrice,
+          format: value => this.formatPrice(value),
         },
         {
           name: 'discount',
           label: 'Remise',
           align: 'center',
-          field: 'discount',
+          field: row => row.bills[0].discount,
         },
         {
           name: 'preTaxPrice',
           label: 'HT',
           align: 'center',
-          field: 'preTaxPrice',
-          format: value => value ? `${parseFloat(value).toFixed(2)}€` : '',
+          field: row => row.bills[0].preTaxPrice,
+          format: value => this.formatPrice(value),
         },
         {
           name: 'withTaxPrice',
           label: 'TTC',
           align: 'center',
-          field: 'withTaxPrice',
-          format: value => value ? `${parseFloat(value).toFixed(2)}€` : '',
+          field: row => row.bills[0].withTaxPrice,
+          format: value => this.formatPrice(value),
         },
       ],
     }
@@ -125,7 +149,14 @@ export default {
       console.error(e);
     }
   },
-  methods: {},
+  methods: {
+    formatPrice (value) {
+      return value ? `${parseFloat(value).toFixed(2)}€` : '';
+    },
+    formatHours (value) {
+      return value ? `${parseFloat(value).toFixed(2)}h` : '';
+    },
+  },
 }
 </script>
 

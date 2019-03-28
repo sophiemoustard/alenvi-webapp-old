@@ -1014,7 +1014,7 @@ export default {
     },
     updateNewSubscription () {
       if (this.newSubscription.service !== '') {
-        const selectedService = this.company.customersConfig.services.find(service => service._id === this.newSubscription.service);
+        const selectedService = this.services.find(service => service._id === this.newSubscription.service);
         this.newSubscription.unitTTCRate = selectedService.defaultUnitAmount;
         this.newSubscription.nature = selectedService.nature;
       }
