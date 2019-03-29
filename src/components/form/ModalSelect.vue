@@ -22,7 +22,7 @@ export default {
     caption: String,
     error: Boolean,
     errorLabel: { type: String, default: REQUIRED_LABEL },
-    value: [String, Array],
+    value: [String, Array, Object],
     last: Boolean,
     options: Array,
     filter: { type: Boolean, default: true },
