@@ -1,5 +1,5 @@
 import { getLastVersion } from '../helpers/utils';
-import { MONTHLY, FIXED, ONCE, HOURLY } from '../data/constants';
+import { MONTHLY, FIXED, ONCE, HOURLY, NATURE_OPTIONS } from '../data/constants';
 
 export const subscriptionMixin = {
   data () {
@@ -18,6 +18,10 @@ export const subscriptionMixin = {
           name: 'nature',
           label: 'Nature',
           align: 'left',
+          format: (value) => {
+            const nature = NATURE_OPTIONS.find(option => option.value === value);
+            return nature ? this.$_.capitalize(nature.label) : '';
+          },
           field: row => row.service.nature,
         },
         {
@@ -30,7 +34,7 @@ export const subscriptionMixin = {
           name: 'estimatedWeeklyVolume',
           label: 'Volume hebdomadaire estimatif',
           align: 'center',
-          field: row => row.service.nature === 'Horaire' ? `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume,
+          field: row => row.service.nature === HOURLY ? `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume,
         },
         {
           name: 'weeklyRate',
@@ -62,7 +66,7 @@ export const subscriptionMixin = {
           name: 'estimatedWeeklyVolume',
           label: 'Volume hebdomadaire estimatif',
           align: 'center',
-          field: row => this.selectedSubscription.service && this.selectedSubscription.service.nature === 'Horaire'
+          field: row => this.selectedSubscription.service && this.selectedSubscription.service.nature === HOURLY
             ? `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume,
         },
         {

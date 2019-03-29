@@ -473,7 +473,7 @@ import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
 import { validationMixin } from '../../mixins/validationMixin.js';
 import { days } from '../../data/days.js';
-import { FUNDING_FREQ_OPTIONS, FUNDING_NATURE_OPTIONS, FIXED, HOURLY, REQUIRED_LABEL, ONCE } from '../../data/constants.js';
+import { FUNDING_FREQ_OPTIONS, NATURE_OPTIONS, FIXED, HOURLY, REQUIRED_LABEL, ONCE } from '../../data/constants.js';
 import { financialCertificatesMixin } from '../../mixins/financialCertificatesMixin.js';
 import { fundingMixin } from '../../mixins/fundingMixin.js';
 
@@ -660,7 +660,7 @@ export default {
         careDays: [0, 1, 2, 3, 4, 5, 6, 7],
         subscription: '',
       },
-      fundingNatureOptions: FUNDING_NATURE_OPTIONS,
+      fundingNatureOptions: NATURE_OPTIONS,
       fundingCreationModal: false,
       fundingEditionModal: false,
       fundingDetailsModal: false,
@@ -1014,7 +1014,7 @@ export default {
     },
     updateNewSubscription () {
       if (this.newSubscription.service !== '') {
-        const selectedService = this.company.customersConfig.services.find(service => service._id === this.newSubscription.service);
+        const selectedService = this.services.find(service => service._id === this.newSubscription.service);
         this.newSubscription.unitTTCRate = selectedService.defaultUnitAmount;
         this.newSubscription.nature = selectedService.nature;
       }
