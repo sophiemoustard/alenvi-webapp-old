@@ -54,13 +54,15 @@ export default {
           name: 'customer',
           label: 'Bénéficiaire',
           align: 'left',
-          field: row => `${row.customer.identity.lastname}`,
+          field: row => row.customer.identity.lastname,
         },
         {
           name: 'client',
           label: 'Client',
           align: 'left',
-          field: row => `${row.customer.identity.lastname}`,
+          field: row => row.bills && row.bills[0] && row.bills[0].thirdPartyPayer
+            ? row.bills[0].thirdPartyPayer.name
+            : row.customer.identity.lastname,
         },
         {
           name: 'startDate',
@@ -143,6 +145,7 @@ export default {
       this.draftBills = await this.$bills.getDraftBills({
         endDate: this.billingPeriod.endDate.toDate(),
         startDate: this.billingPeriod.startDate.toDate(),
+        billingPeriod: this.user.company.customersConfig.billingPeriod,
       });
     } catch (e) {
       this.draftBills = [];
