@@ -66,7 +66,6 @@ import ModalInput from '../../../components/form/ModalInput';
 import ModalSelect from '../../../components/form/ModalSelect';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
-import { getLastVersion } from '../../../helpers/utils';
 
 export default {
   name: 'CreditNotes',
@@ -204,25 +203,12 @@ export default {
     },
     subscriptionsOptions () {
       if (this.newCreditNote.customer) {
-        console.log('new cus', this.newCreditNote.customer);
         const selectedCustomer = this.getCustomerById(this.newCreditNote.customer);
         if (!selectedCustomer) return [];
-        return selectedCustomer.subscriptions.map(sub => ({ label: sub.service.name, value: sub._id }));
+        return selectedCustomer.subscriptions.map(sub => ({ label: sub.service.name, value: { service: sub.service.name, vat: sub.service.vat } }));
       }
       return [];
     },
-    customerLastSubscription () {
-      if (this.selectedCustomer) {
-        const selectedSubscription = this.selectedCustomer.subscriptions.find(sub => sub._id === this.newCreditNote.subscription);
-        if (!selectedSubscription) return;
-        const currentSubscriptionVersion = getLastVersion(selectedSubscription.versions, 'startDate');
-        return {
-          ...selectedSubscription,
-          version: currentSubscriptionVersion
-        };
-      }
-      return null;
-    }
   },
   methods: {
     async refreshCustomersOptions () {
@@ -250,16 +236,15 @@ export default {
       try {
         this.$v.newCreditNote.$touch();
         if (this.$v.newCreditNote.$error) return NotifyWarning('Champ(s) invalide(s)');
-        if (!this.hasLinkedEvents && this.customerLastSubscription) {
-          const vat = this.customerLastSubscription.service.vat;
-          const subscriptionInclTaxesPrice = this.customerLastSubscription.version.unitTTCprice;
-          this.newCreditNote.exclTaxes = Number.parseFloat((subscriptionInclTaxesPrice * (1 - vat)).toFixed(2));
+        if (!this.hasLinkedEvents) {
+          const vat = this.newCreditNote.subscription.vat;
+          this.newCreditNote.exclTaxes = Number.parseFloat((this.newCreditNote.inclTaxes / (1 + (vat / 100))).toFixed(2));
         }
         this.loading = true;
-        await this.$creditNotes.create(this.newCreditNote);
+        await this.$creditNotes.create(this.$_.pickBy(this.newCreditNote));
         NotifyPositive('Avoir créé');
-        this.resetCreationCreditNoteData();
         await this.refreshCreditNotes();
+        this.creditNoteCreationModal = false;
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création de l\'avoir');
