@@ -84,7 +84,7 @@
 import Planning from '../../../components/planning/Planning.vue';
 import { planningModalMixin } from '../../../mixins/planningModalMixin';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify.js';
-import { INTERVENTION, DEFAULT_AVATAR, NEVER, ABSENCE, INTERNAL_HOUR, ILLNESS, UNAVAILABILITY, AUXILIARY, PLANNING_REFERENT } from '../../../data/constants';
+import { INTERVENTION, DEFAULT_AVATAR, NEVER, ABSENCE, INTERNAL_HOUR, ILLNESS, UNAVAILABILITY, AUXILIARY, PLANNING_REFERENT, CUSTOMER_CONTRACT, COMPANY_CONTRACT } from '../../../data/constants';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
 import { mapGetters, mapActions } from 'vuex';
@@ -204,6 +204,23 @@ export default {
         value: customer._id,
       }));
     },
+    selectedAuxiliary () {
+      if (this.creationModal && this.newEvent.auxiliary) {
+        const aux = this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
+        const hasActiveCustomerContract = this.hasActiveCustomerContract(aux, this.newEvent.dates.startDate);
+        const hasActiveCompanyContract = this.hasActiveCompanyContract(aux, this.newEvent.dates.endDate);
+
+        return { ...aux, hasActiveCustomerContract, hasActiveCompanyContract };
+      }
+      if (this.editionModal && this.editedEvent.auxiliary) {
+        const aux = this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
+        const hasActiveCustomerContract = this.hasActiveCustomerContract(aux, this.editedEvent.dates.startDate);
+        const hasActiveCompanyContract = this.hasActiveCompanyContract(aux, this.editedEvent.dates.endDate);
+
+        return { ...aux, hasActiveCustomerContract, hasActiveCompanyContract };
+      }
+      return { picture: {}, identity: {} };
+    },
   },
   methods: {
     ...mapActions({
@@ -221,6 +238,26 @@ export default {
       this.days = Array.from(range.by('days'));
       if (this.filteredSectors.length !== 0 || this.filteredCustomers.length !== 0) await this.refreshCustomers();
       if (this.customers.length !== 0) await this.refreshPlanning();
+    },
+    hasActiveCustomerContract (auxiliary, selectedDay) {
+      if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
+      if (!auxiliary.contracts.some(contract => contract.status === CUSTOMER_CONTRACT)) return false;
+      const customerContracts = auxiliary.contracts.filter(contract => contract.status === CUSTOMER_CONTRACT);
+
+      return customerContracts.some(contract => {
+        return this.$moment(contract.startDate).isSameOrBefore(selectedDay) &&
+          ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(selectedDay));
+      });
+    },
+    hasActiveCompanyContract (auxiliary, selectedDay) {
+      if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
+      if (!auxiliary.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
+      const companyContracts = auxiliary.contracts.filter(contract => contract.status === COMPANY_CONTRACT);
+
+      return companyContracts.some(contract => {
+        return this.$moment(contract.startDate).isSameOrBefore(selectedDay) &&
+          ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(selectedDay));
+      });
     },
     // Refresh data
     async refreshCustomers () {
