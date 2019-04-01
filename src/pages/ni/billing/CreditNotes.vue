@@ -41,10 +41,12 @@
         <q-toggle v-model="hasLinkedEvents" label="Lié à des intervention ?" />
         <!-- Has linked events -->
         <ni-datetime-picker v-if="hasLinkedEvents" caption="Début période concernée" v-model="newCreditNote.startDate" :error="$v.newCreditNote.startDate.$error"
-          @blur="$v.newCreditNote.startDate.$touch" in-modal type="date" :disable="!hasLinkedEvents" clearable />
+          @blur="$v.newCreditNote.startDate.$touch" in-modal type="date" :disable="!hasLinkedEvents" clearable @input="getEvents" />
         <ni-datetime-picker v-if="hasLinkedEvents" caption="Fin période concernée" v-model="newCreditNote.endDate" :error="$v.newCreditNote.endDate.$error"
-          @blur="$v.newCreditNote.endDate.$touch" in-modal type="date" :disable="!hasLinkedEvents" clearable />
-        <ni-modal-select caption="Evènements" v-model="newCreditNote.events" v-if="hasLinkedEvents" :options="eventsOptions" @input="setCreditNoteTaxes"></ni-modal-select>
+          @blur="$v.newCreditNote.endDate.$touch" in-modal type="date" :disable="!hasLinkedEvents" clearable @input="getEvents" />
+        <template v-if="newCreditNote.events.length > 0">
+          <q-checkbox v-for="(event, index) in newCreditNote.events" :key="index"></q-checkbox>
+        </template>
         <ni-modal-input v-if="hasLinkedEvents" caption="Montant HT" suffix="€" type="number" v-model="newCreditNote.exclTaxes" disable />
         <ni-modal-input v-if="hasLinkedEvents" caption="Montant TTC" suffix="€" type="number" v-model="newCreditNote.inclTaxes" disable />
         <!-- Hasn't linked event -->
@@ -282,6 +284,12 @@ export default {
         if (!selectedCustomer) return;
         this.selectedCustomer = selectedCustomer;
         return selectedCustomer;
+      }
+    },
+    getEvents () {
+      if (this.newCreditNote.startDate && this.newCreditNote.endDate) {
+        console.log('test');
+        this.newCreditNote.events = [];
       }
     }
   }
