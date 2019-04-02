@@ -44,8 +44,10 @@
           @blur="$v.newCreditNote.startDate.$touch" in-modal type="date" :disable="!hasLinkedEvents" clearable @input="getEvents" />
         <ni-datetime-picker v-if="hasLinkedEvents" caption="Fin période concernée" v-model="newCreditNote.endDate" :error="$v.newCreditNote.endDate.$error"
           @blur="$v.newCreditNote.endDate.$touch" in-modal type="date" :disable="!hasLinkedEvents" clearable @input="getEvents" />
-        <template v-if="newCreditNote.events.length > 0">
-          <q-checkbox v-for="(event, index) in newCreditNote.events" :key="index"></q-checkbox>
+        <template v-if="events.length > 0">
+          <q-checkbox v-model="newCreditNote.events" color="primary" v-for="(event, index) in events" :key="index" :val="event"
+            :label="`${$moment(event.startDate).format('DD/MM/YYYY HH:mm')} - ${$moment(event.endDate).format('HH:mm')}`">
+          </q-checkbox>
         </template>
         <ni-modal-input v-if="hasLinkedEvents" caption="Montant HT" suffix="€" type="number" v-model="newCreditNote.exclTaxes" disable />
         <ni-modal-input v-if="hasLinkedEvents" caption="Montant TTC" suffix="€" type="number" v-model="newCreditNote.inclTaxes" disable />
@@ -86,6 +88,7 @@ export default {
       customersOptions: [],
       thirdPartyPayersOptions: [],
       eventsOptions: [],
+      events: [],
       selectedCustomer: null,
       creditNotesDates: {
         startDate: null,
@@ -98,8 +101,8 @@ export default {
         events: [],
         startDate: null,
         endDate: null,
-        exclTaxes: '',
-        inclTaxes: '',
+        exclTaxes: 0,
+        inclTaxes: 0,
         subscription: null
       },
       creditNotes: [],
@@ -114,25 +117,25 @@ export default {
           name: 'startDate',
           label: 'Début',
           align: 'left',
-          field: 'startDate',
+          field: row => row.startDate ? this.$moment(row.startDate).format('DD/MM/YYYY') : '',
         },
         {
           name: 'endDate',
           label: 'Fin',
           align: 'left',
-          field: 'endDate',
+          field: row => row.endDate ? this.$moment(row.endDate).format('DD/MM/YYYY') : '',
         },
         {
           name: 'customer',
           label: 'Bénéficiaire',
           align: 'left',
-          field: 'customer',
+          field: row => `${row.customer.identity.lastname}`,
         },
         {
           name: 'thirdPartyPayer',
           label: 'Client',
           align: 'left',
-          field: 'thirdPartyPayer',
+          field: row => `${row.thirdPartyPayer.name}`,
         },
         {
           name: 'exclTaxes',
@@ -156,6 +159,16 @@ export default {
       pagination: { rowsPerPage: 0 },
     }
   },
+  watch: {
+    'newCreditNote.events': function (value) {
+      this.newCreditNote.exclTaxes = 0;
+      this.newCreditNote.inclTaxes = 0;
+      for (let i = 0, l = this.newCreditNote.events.length; i < l; i++) {
+        this.newCreditNote.exclTaxes += this.newCreditNote.events[i].exclTaxes;
+        this.newCreditNote.inclTaxes += this.newCreditNote.events[i].inclTaxes;
+      }
+    }
+  },
   async mounted () {
     if (this.mainUser.company.customersConfig.billingPeriod === 'two_weeks') {
       if (this.$moment().date() > 16) {
@@ -169,9 +182,7 @@ export default {
       this.creditNotesDates.startDate = this.$moment().startOf('month').toISOString();
       this.creditNotesDates.endDate = this.$moment().endOf('month').toISOString();
     }
-    await this.refreshCustomersOptions();
-    await this.getThirdPartyPayersOptions();
-    await this.refreshCreditNotes();
+    await Promise.all([this.refreshCreditNotes(), this.refreshCustomersOptions(), this.getThirdPartyPayersOptions()]);
   },
   validations () {
     return {
@@ -220,7 +231,6 @@ export default {
           this.customersOptions[i].label = this.customersOptions[i].identity.lastname;
           this.customersOptions[i].value = this.customersOptions[i]._id;
         }
-        console.log(this.customersOptions);
       } catch (e) {
         console.error(e);
         NotifyNegative('Impossible de récupérer les bénéficiaires');
@@ -242,6 +252,7 @@ export default {
           const vat = this.newCreditNote.subscription.vat;
           this.newCreditNote.exclTaxes = Number.parseFloat((this.newCreditNote.inclTaxes / (1 + (vat / 100))).toFixed(2));
         }
+        this.newCreditNote.events = this.newCreditNote.events.map(event => event._id);
         this.loading = true;
         await this.$creditNotes.create(this.$_.pickBy(this.newCreditNote));
         NotifyPositive('Avoir créé');
@@ -262,8 +273,8 @@ export default {
         events: [],
         startDate: null,
         endDate: null,
-        exclTaxes: '',
-        inclTaxes: '',
+        exclTaxes: 0,
+        inclTaxes: 0,
         subscription: null
       };
       this.selectedCustomer = null;
@@ -286,10 +297,19 @@ export default {
         return selectedCustomer;
       }
     },
-    getEvents () {
-      if (this.newCreditNote.startDate && this.newCreditNote.endDate) {
-        console.log('test');
-        this.newCreditNote.events = [];
+    async getEvents () {
+      try {
+        if (this.newCreditNote.startDate && this.newCreditNote.endDate) {
+          this.events = await this.$events.list({
+            startDate: this.newCreditNote.startDate,
+            endDate: this.newCreditNote.endDate,
+            customer: this.newCreditNote.customer,
+            isBilled: true
+          });
+        }
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Impossible de récupérer les évènements de ce bénéficiaire');
       }
     }
   }
