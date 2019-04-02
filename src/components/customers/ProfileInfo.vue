@@ -6,12 +6,12 @@
       </div>
       <div class="row gutter-profile">
         <ni-input caption="Prénom" v-model="customer.identity.firstname" @focus="saveTmp('identity.firstname')"
-          @blur="updateUser({ alenvi: 'identity.firstname', ogust: 'first_name' })" />
+          @blur="updateUser('identity.firstname')" />
         <ni-input caption="Nom" :error="$v.customer.identity.lastname.$error" v-model="customer.identity.lastname"
-          @focus="saveTmp('identity.lastname')" @blur="updateUser({ alenvi: 'identity.lastname', ogust: 'last_name' })" />
+          @focus="saveTmp('identity.lastname')" @blur="updateUser('identity.lastname')" />
         <div class="col-xs-12 col-md-6">
           <ni-datetime-picker v-model="customer.identity.birthDate" @focus="saveTmp('identity.birthDate')" caption="Date de naissance"
-            @blur="updateUser({ alenvi: 'identity.birthDate', ogust: 'date_of_birth' })" />
+            @blur="updateUser('identity.birthDate')" />
         </div>
       </div>
     </div>
@@ -21,12 +21,12 @@
       </div>
       <div class="row gutter-profile">
         <ni-input caption="Téléphone" type="tel" :error="$v.customer.contact.phone.$error" error-label="Numéro de téléphone non valide"
-          v-model.trim="customer.contact.phone" @focus="saveTmp('contact.phone')" @blur="updateUser({ alenvi: 'contact.phone', ogust: 'mobile_phone' })" />
+          v-model.trim="customer.contact.phone" @focus="saveTmp('contact.phone')" @blur="updateUser('contact.phone')" />
         <ni-search-address v-model="customer.contact.address.fullAddress" color="white" inverted-light @focus="saveTmp('contact.address.fullAddress')"
-          @blur="updateUser({ alenvi: 'contact.address.fullAddress', ogust: 'address' })" @selected="selectedAddress"
+          @blur="updateUser('contact.address.fullAddress')" @selected="selectedAddress"
           :error-label="addressError" :error="$v.customer.contact.address.fullAddress.$error" />
         <ni-input caption="Code porte" v-model="customer.contact.doorCode" @focus="saveTmp('contact.doorCode')"
-          @blur="updateUser({ alenvi: 'contact.doorCode', ogust: 'door_code' })" />
+          @blur="updateUser('contact.doorCode')" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -87,11 +87,11 @@
       </div>
       <div class="row gutter-profile q-mb-lg">
         <ni-input caption="Nom associé au compte bancaire" :error="$v.customer.payment.bankAccountOwner.$error" v-model="customer.payment.bankAccountOwner"
-          @focus="saveTmp('payment.bankAccountOwner')" @blur="updateUser({ alenvi: 'payment.bankAccountOwner', ogust: 'holder' })" />
+          @focus="saveTmp('payment.bankAccountOwner')" @blur="updateUser('payment.bankAccountOwner')" />
         <ni-input caption="IBAN" :error="$v.customer.payment.iban.$error" error-label="IBAN non valide" v-model="customer.payment.iban"
-          @focus="saveTmp('payment.iban')" @blur="updateUser({ alenvi: 'payment.iban', ogust: 'iban_number' })" />
+          @focus="saveTmp('payment.iban')" @blur="updateUser('payment.iban')" />
         <ni-input caption="BIC" :error="$v.customer.payment.bic.$error" error-label="BIC non valide" v-model="customer.payment.bic"
-          @focus="saveTmp('payment.bic')" @blur="updateUser({ alenvi: 'payment.bic', ogust: 'bic_number' })" />
+          @focus="saveTmp('payment.bic')" @blur="updateUser('payment.bic')" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -937,18 +937,17 @@ export default {
       this.$v.customer.$touch();
     },
     // Customer
-    async updateUser (paths) {
+    async updateUser (path) {
       try {
-        if (this.tmpInput === this.$_.get(this.customer, paths.alenvi)) return;
-        if (this.$_.get(this.$v.customer, paths.alenvi)) {
-          const isValid = await this.waitForValidation(this.$v.customer, paths.alenvi);
+        if (this.tmpInput === this.$_.get(this.customer, path)) return;
+        if (this.$_.get(this.$v.customer, path)) {
+          const isValid = await this.waitForValidation(this.$v.customer, path);
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
-        if (paths.alenvi) await this.updateAlenviCustomer(paths.alenvi);
-        if (paths.ogust) await this.updateOgustCustomer(paths);
+        await this.updateAlenviCustomer(path);
 
         NotifyPositive('Modification enregistrée');
-        if (paths.alenvi.match(/iban/i)) this.refreshCustomer();
+        if (path.match(/iban/i)) this.refreshCustomer();
 
         this.$store.commit('rh/saveUserProfile', this.customer);
       } catch (e) {
@@ -967,32 +966,6 @@ export default {
       const payload = this.$_.set({}, path, value);
       payload._id = this.userProfile._id;
       await this.$customers.updateById(payload);
-    },
-    async updateOgustCustomer (paths) {
-      let value = this.$_.get(this.customer, paths.alenvi);
-      if (paths.ogust.match(/date_of_birth/i)) value = this.$moment(value).format('YYYYMMDD');
-      if (paths.ogust.match(/iban_number/i)) value = value.split(' ').join('');
-
-      const payload = this.$_.set({}, paths.ogust, value);
-      if (paths.ogust.match(/((iban|bic)_number)|holder/i)) {
-        if (this.customer.payment && this.customer.payment.bankAccountOwner && this.customer.payment.iban && this.customer.payment.bic) {
-          payload.bic_number = this.customer.payment.bic;
-          payload.iban_number = this.customer.payment.iban;
-          payload.id_tiers = this.userProfile.customerId;
-          await this.$ogust.setBankInfo(payload);
-        }
-      } else if (paths.ogust === 'address') {
-        const { street, zipCode, city } = payload.address;
-        const addressPayload = {
-          line: street,
-          zip: zipCode,
-          city,
-          id_address: this.userProfile.contact.ogustAddressId
-        }
-        await this.$ogust.setAddress(addressPayload);
-      } else {
-        await this.$ogust.editOgustCustomer(this.userProfile.customerId, payload);
-      }
     },
     // Subscriptions
     formatCreatedSubscription () {
@@ -1102,16 +1075,6 @@ export default {
       this.$v.newHelper.$reset();
       this.newHelper = Object.assign({}, clear(this.newHelper));
     },
-    async createOgustHelper () {
-      const payload = {
-        id_customer: this.userProfile.customerId.toString(),
-        last_name: this.newHelper.identity.lastname,
-        first_name: this.newHelper.identity.firstname || '',
-        email: this.newHelper.local.email
-      };
-      const newHelper = await this.$ogust.createContact(this.$_.pickBy(payload));
-      return newHelper;
-    },
     async createAlenviHelper () {
       this.newHelper.local.password = randomize('0', 6);
       this.newHelper.customers = [this.userProfile._id];
@@ -1134,10 +1097,8 @@ export default {
       try {
         this.loading = true;
         this.$v.newHelper.$touch();
-        if (this.$v.newHelper.$error) throw new Error('Invalid fields');
+        if (this.$v.newHelper.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        const newHelper = await this.createOgustHelper();
-        this.newHelper.ogustInterlocId = newHelper.data.data.contact.id_interloc;
         await this.createAlenviHelper();
         NotifyPositive('Aidant créé');
         await this.sendWelcomingEmail();
@@ -1161,9 +1122,6 @@ export default {
           ok: true,
           cancel: 'Annuler'
         });
-        const helper = this.userHelpers.find(helper => helper._id === helperId);
-        const { ogustInterlocId } = helper;
-        await this.$ogust.deleteContact(ogustInterlocId);
         await this.$users.deleteById(helperId);
         NotifyPositive('Aidant supprimé');
         await this.getUserHelpers();
