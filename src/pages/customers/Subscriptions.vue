@@ -12,7 +12,8 @@
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions table-actions-margin">
                     <q-btn flat round small color="grey" icon="history" @click="showHistory(col.value)" />
-                    <q-btn :disable="!hasFunding(col.value)" flat round small color="grey" icon="mdi-calculator" @click="showFunding(col.value)" />
+                    <q-btn :disable="!getFunding(col.value)" flat round small color="grey" icon="mdi-calculator"
+                      @click="showFunding(col.value)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -41,11 +42,11 @@
         <p class="title">Paiement</p>
         <div class="row gutter-profile">
           <ni-input caption="Nom associé au compte bancaire" v-model="customer.payment.bankAccountOwner" :error="$v.customer.payment.bankAccountOwner.$error"
-            @focus="saveTmp('payment.bankAccountOwner')" @blur="updateCustomer({ alenvi: 'payment.bankAccountOwner', ogust: 'holder' })" />
+            @focus="saveTmp('payment.bankAccountOwner')" @blur="updateCustomer('payment.bankAccountOwner')" />
           <ni-input caption="IBAN" v-model="customer.payment.iban" :error="$v.customer.payment.iban.$error" :error-label="ibanError"
-            @focus="saveTmp('payment.iban')" @blur="updateCustomer({ alenvi: 'payment.iban', ogust: 'iban_number' })" />
+            @focus="saveTmp('payment.iban')" @blur="updateCustomer('payment.iban')" />
           <ni-input caption="BIC" v-model="customer.payment.bic" :error="$v.customer.payment.bic.$error" :error-label="bicError"
-            @focus="saveTmp('payment.bic')" @blur="updateCustomer({ alenvi: 'payment.bic', ogust: 'bic_number' })" />
+            @focus="saveTmp('payment.bic')" @blur="updateCustomer('payment.bic')" />
         </div>
       </div>
       <div class="q-mb-lg">
@@ -142,26 +143,25 @@
 
 <script>
 import { required } from 'vuelidate/lib/validators';
+
+import esign from '../../api/Esign.js';
 import Input from '../../components/form/Input.vue';
-import NiModalInput from '../../components/form/ModalInput';
 import MultipleFilesUploader from '../../components/form/MultipleFilesUploader.vue';
+import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify';
+import { FIXED, REQUIRED_LABEL } from '../../data/constants';
 import { bic, iban } from '../../helpers/vuelidateCustomVal';
 import { getLastVersion } from '../../helpers/utils';
-import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
 import { financialCertificatesMixin } from '../../mixins/financialCertificatesMixin.js';
 import { fundingMixin } from '../../mixins/fundingMixin.js';
-import esign from '../../api/Esign.js';
 import cgs from '../../statics/CGS.html';
-import { FIXED, REQUIRED_LABEL } from '../../data/constants';
 
 export default {
   name: 'Subscriptions',
   components: {
     'ni-input': Input,
     'ni-multiple-files-uploader': MultipleFilesUploader,
-    NiModalInput
   },
   mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin, fundingMixin],
   data () {
@@ -295,22 +295,6 @@ export default {
       this.tmpInput = this.$_.get(this.customer, path);
     },
     // Customer
-    async updateOgustCustomer (paths) {
-      let value = this.$_.get(this.customer, paths.alenvi);
-      if (paths.ogust.match(/iban_number/i)) value = value.split(' ').join('');
-
-      const payload = this.$_.set({}, paths.ogust, value);
-      if (paths.ogust.match(/((iban|bic)_number)|holder/i)) {
-        if (this.customer.payment && this.customer.payment.bankAccountOwner && this.customer.payment.iban && this.customer.payment.bic) {
-          payload.bic_number = this.customer.payment.bic;
-          payload.iban_number = this.customer.payment.iban;
-          payload.id_tiers = this.customer.customerId;
-          await this.$ogust.setBankInfo(payload);
-        }
-      } else {
-        await this.$ogust.editOgustCustomer(this.userProfile.customerId, payload);
-      }
-    },
     async updateAlenviCustomer (path) {
       let value = this.$_.get(this.customer, path);
       if (path.match(/iban/i)) value = value.split(' ').join('');
@@ -319,30 +303,23 @@ export default {
       payload._id = this.customer._id;
       await this.$customers.updateById(payload);
     },
-    async updateCustomer (paths) {
+    async updateCustomer (path) {
       try {
-        if (this.tmpInput === this.$_.get(this.customer, paths.alenvi)) return;
-        this.$_.get(this.$v.customer, paths.alenvi).$touch();
-        if (this.$_.get(this.$v.customer, paths.alenvi).$error) {
-          return NotifyWarning('Champ(s) invalide(s)');
-        }
-        if (paths.alenvi) await this.updateAlenviCustomer(paths.alenvi);
-        if (paths.ogust) await this.updateOgustCustomer(paths);
+        if (this.tmpInput === this.$_.get(this.customer, path)) return;
+        this.$_.get(this.$v.customer, path).$touch();
+        if (this.$_.get(this.$v.customer, path).$error) return NotifyWarning('Champ(s) invalide(s)');
 
+        await this.updateAlenviCustomer(path);
         await this.$store.dispatch('main/getUser', this.helper._id);
         await this.refreshCustomer();
         NotifyPositive('Modification enregistrée');
-        if (paths.alenvi === 'payment.iban') {
+        if (path === 'payment.iban') {
           this.$v.customer.payment.bic.$touch();
-          if (!this.$v.customer.payment.bic.required) {
-            return NotifyWarning('Merci de renseigner votre BIC');
-          }
+          if (!this.$v.customer.payment.bic.required) return NotifyWarning('Merci de renseigner votre BIC');
         }
       } catch (e) {
         console.error(e);
-        if (e.message === 'Champ(s) invalide(s)') {
-          return NotifyWarning(e.message)
-        }
+        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message)
         NotifyNegative('Erreur lors de la modification');
       } finally {
         this.tmpInput = '';
@@ -426,15 +403,12 @@ export default {
         if (this.customer.payment.mandates.length === 0) return;
         const mandates = this.customer.payment.mandates.filter(mandate => !mandate.drive && mandate.everSignId);
         if (mandates.length === 0) return;
-        const hasSignedPromises = [];
         for (const mandate of mandates) {
           const hasSigned = await this.hasSignedDoc(mandate.everSignId);
           if (hasSigned) {
-            hasSignedPromises.push(this.$customers.saveSignedDoc({ _id: this.customer._id, mandateId: mandate._id }),
-              this.$ogust.createSepaInfo({ id_tiers: this.customer.customerId, rum: mandate.rum, signature_date: this.$moment().format('YYYYMMDD') }));
+            this.$customers.saveSignedDoc({ _id: this.customer._id, mandateId: mandate._id });
           }
         }
-        await Promise.all(hasSignedPromises);
         await this.refreshCustomer();
       } catch (e) {
         console.error(e);
@@ -448,11 +422,11 @@ export default {
         console.error(e);
       }
     },
-    hasFunding (subscriptionId) {
-      return this.fundings.find(fund => fund.subscriptions.some(sub => sub._id === subscriptionId));
+    getFunding (subscriptionId) {
+      return this.fundings.find(fund => fund.subscription._id === subscriptionId);
     },
     showFunding (subscriptionId) {
-      this.selectedFunding = this.hasFunding(subscriptionId);
+      this.selectedFunding = this.getFunding(subscriptionId);
       this.fundingData.push(this.selectedFunding);
       this.fundingModal = true;
     },
