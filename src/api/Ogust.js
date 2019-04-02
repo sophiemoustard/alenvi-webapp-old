@@ -1,5 +1,4 @@
 import axios from 'axios'
-// For webapp requests
 import { alenviAxios } from './ressources/alenviAxios'
 
 export default {
@@ -73,31 +72,9 @@ export default {
     }
     return newEmployee;
   },
-  async updateServiceById (serviceId, data, ogustToken = null) {
-    let serviceUpdated;
-    if (ogustToken === null) {
-      serviceUpdated = await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/services/${serviceId}`, data);
-    } else {
-      serviceUpdated = await axios.put(`${process.env.API_HOSTNAME}/ogust/services/${serviceId}`, data, { headers: { 'x-ogust-token': ogustToken } });
-    }
-    return serviceUpdated;
-  },
   async getEmployeeSalaries (employeeId) {
     const salaries = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/employees/${employeeId}/salaries`);
     return salaries.data.data.salaries.array_salary.result;
-  },
-  async getEmployeeCustomers (employeeId) {
-    const customers = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/employees/${employeeId}/customers`);
-    return customers.data.data.customers;
-  },
-  async setEmployee (data, ogustToken = null) {
-    let employeeUpdated = {};
-    if (ogustToken === null) {
-      employeeUpdated = await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/employees/${data.id_employee}`, data);
-    } else {
-      employeeUpdated = await axios.put(`${process.env.API_HOSTNAME}/ogust/employees/${data.id_employee}`, data, { headers: { 'x-ogust-token': ogustToken } });
-    }
-    return employeeUpdated;
   },
   async getCustomers (params, ogustToken = null) {
     let customersRaw = {};
@@ -120,49 +97,4 @@ export default {
     const customerFiscalAttestsRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/customers/${id}/fiscalAttests`, { params });
     return customerFiscalAttestsRaw.data.data.info.array_fiscalattest.result;
   },
-  async getCustomerContacts (id, params) {
-    const customerContactsRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/customers/${id}/contacts`, { params });
-    return customerContactsRaw.data.data.contacts.array_contact.result;
-  },
-  async getContacts (params) {
-    const contactsRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/contacts`, { params });
-    return contactsRaw.data.data.contacts.array_contact.result;
-  },
-  async setContact (data) {
-    const contactUpdated = await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/contacts/${data.id_interloc}`, data);
-    return contactUpdated;
-  },
-  async createContact (data) {
-    const contactCreated = await alenviAxios.post(`${process.env.API_HOSTNAME}/ogust/contacts`, data);
-    return contactCreated;
-  },
-  async deleteContact (id) {
-    await alenviAxios.delete(`${process.env.API_HOSTNAME}/ogust/contacts/${id}`);
-  },
-  async setBankInfo (data, ogustToken = null) {
-    let employeeBankInfoRaw;
-    if (ogustToken === null) {
-      employeeBankInfoRaw = await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/bankInfo`, data);
-    } else {
-      employeeBankInfoRaw = await axios.put(`${process.env.API_HOSTNAME}/ogust/bankInfo`, data, { headers: { 'x-ogust-token': ogustToken } });
-    }
-    return employeeBankInfoRaw.data.data.updatedBankInfo;
-  },
-  async setAddress (data) {
-    const addressUpdated = await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/address/${data.id_address}`, data);
-    return addressUpdated;
-  },
-  async deleteEmployee (id) {
-    const employeeDeleted = await alenviAxios.delete(`${process.env.API_HOSTNAME}/ogust/employees/${id}`);
-    return employeeDeleted;
-  },
-  async createSepaInfo (payload) {
-    await alenviAxios.post(`${process.env.API_HOSTNAME}/ogust/sepaInfo`, payload);
-  },
-  async getSepaInfo (payload) {
-    await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/sepaInfo`, payload);
-  },
-  async getSepaInfoById (id, payload) {
-    await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/sepaInfo/id`, payload);
-  }
 }
