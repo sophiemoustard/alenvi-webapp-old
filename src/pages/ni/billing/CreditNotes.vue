@@ -34,8 +34,6 @@
           </div>
         </div>
         <ni-modal-select caption="Bénéficiaire" v-model="newCreditNote.customer" :options="customersOptions" required-field></ni-modal-select>
-        <ni-modal-select caption="Tiers payeur" :options="thirdPartyPayersOptions" v-model="newCreditNote.thirdPartyPayer"
-          :error="$v.newCreditNote.thirdPartyPayer.$error" @blur="$v.newCreditNote.thirdPartyPayer.$touch" required-field />
         <ni-datetime-picker caption="Date de l'avoir" v-model="newCreditNote.date" :error="$v.newCreditNote.date.$error"
           @blur="$v.newCreditNote.date.$touch" in-modal type="date" clearable required-field />
         <q-toggle v-model="hasLinkedEvents" label="Lié à des intervention ?" />
@@ -86,7 +84,6 @@ export default {
       terms: '',
       hasLinkedEvents: false,
       customersOptions: [],
-      thirdPartyPayersOptions: [],
       eventsOptions: [],
       events: [],
       selectedCustomer: null,
@@ -96,7 +93,6 @@ export default {
       },
       newCreditNote: {
         customer: null,
-        thirdPartyPayer: null,
         date: null,
         events: [],
         startDate: null,
@@ -130,12 +126,6 @@ export default {
           label: 'Bénéficiaire',
           align: 'left',
           field: row => `${row.customer.identity.lastname}`,
-        },
-        {
-          name: 'thirdPartyPayer',
-          label: 'Client',
-          align: 'left',
-          field: row => `${row.thirdPartyPayer.name}`,
         },
         {
           name: 'exclTaxes',
@@ -182,7 +172,7 @@ export default {
       this.creditNotesDates.startDate = this.$moment().startOf('month').toISOString();
       this.creditNotesDates.endDate = this.$moment().endOf('month').toISOString();
     }
-    await Promise.all([this.refreshCreditNotes(), this.refreshCustomersOptions(), this.getThirdPartyPayersOptions()]);
+    await Promise.all([this.refreshCreditNotes(), this.refreshCustomersOptions()]);
   },
   validations () {
     return {
@@ -203,7 +193,6 @@ export default {
             return !this.hasLinkedEvents;
           })
         },
-        thirdPartyPayer: { required }
       }
     }
   },
@@ -268,7 +257,6 @@ export default {
     resetCreationCreditNoteData () {
       this.newCreditNote = {
         customer: null,
-        thirdPartyPayer: null,
         date: null,
         events: [],
         startDate: null,
@@ -279,15 +267,6 @@ export default {
       };
       this.selectedCustomer = null;
       this.$v.newCreditNote.$reset();
-    },
-    async getThirdPartyPayersOptions () {
-      try {
-        const thirdPartyPayers = await this.$thirdPartyPayers.showAll({ company: this.company._id });
-        this.thirdPartyPayersOptions = thirdPartyPayers.map(tpp => ({ label: tpp.name, value: tpp._id }));
-      } catch (e) {
-        this.thirdPartyPayersOptions = [];
-        console.error(e);
-      }
     },
     getCustomerById (customerId) {
       if (this.customersOptions.length > 0) {
