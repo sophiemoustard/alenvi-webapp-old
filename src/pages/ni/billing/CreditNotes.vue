@@ -43,9 +43,7 @@
         <ni-datetime-picker v-if="hasLinkedEvents" caption="Fin période concernée" v-model="newCreditNote.endDate" :error="$v.newCreditNote.endDate.$error"
           @blur="$v.newCreditNote.endDate.$touch" in-modal type="date" :disable="!hasLinkedEvents" clearable @input="getEvents" />
         <template v-if="events.length > 0">
-          <q-checkbox v-model="newCreditNote.events" color="primary" v-for="(event, index) in events" :key="index" :val="event"
-            :label="`${$moment(event.startDate).format('DD/MM/YYYY HH:mm')} - ${$moment(event.endDate).format('HH:mm')}`">
-          </q-checkbox>
+          <q-option-group color="primary" type="checkbox" v-model="newCreditNote.events" :options="getEventsOptions" />
         </template>
         <ni-modal-input v-if="hasLinkedEvents" caption="Montant HT" suffix="€" type="number" v-model="newCreditNote.exclTaxes" disable />
         <ni-modal-input v-if="hasLinkedEvents" caption="Montant TTC" suffix="€" type="number" v-model="newCreditNote.inclTaxes" disable />
@@ -150,6 +148,15 @@ export default {
     }
   },
   watch: {
+    hasLinkedEvents: function () {
+      this.events = [];
+      this.newCreditNote.events = [];
+      this.newCreditNote.subscription = null;
+      this.newCreditNote.startDate = null;
+      this.newCreditNote.endDate = null;
+      this.newCreditNote.exclTaxes = 0;
+      this.newCreditNote.inclTaxes = 0;
+    },
     'newCreditNote.events': function (value) {
       this.newCreditNote.exclTaxes = 0;
       this.newCreditNote.inclTaxes = 0;
@@ -211,6 +218,11 @@ export default {
       }
       return [];
     },
+    getEventsOptions () {
+      return this.events.map(event => ({
+        label: `${this.$moment(event.startDate).format('DD/MM/YYYY HH:mm')} - ${this.$moment(event.endDate).format('HH:mm')}`, value: event
+      }))
+    }
   },
   methods: {
     async refreshCustomersOptions () {
