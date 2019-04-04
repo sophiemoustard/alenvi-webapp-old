@@ -43,11 +43,15 @@
         <ni-datetime-picker v-if="hasLinkedEvents" caption="Fin période concernée" v-model="newCreditNote.endDate" :error="$v.newCreditNote.endDate.$error"
           @blur="$v.newCreditNote.endDate.$touch" in-modal type="date" :disable="!hasLinkedEvents" clearable @input="getEvents" />
         <template v-if="events.length > 0">
+          <p>Évènements</p>
           <q-option-group color="primary" type="checkbox" v-model="newCreditNote.events" :options="getEventsOptions" />
         </template>
-        <ni-modal-input v-if="hasLinkedEvents" caption="Montant HT" suffix="€" type="number" v-model="newCreditNote.exclTaxes" disable />
-        <ni-modal-input v-if="hasLinkedEvents" caption="Montant TTC" suffix="€" type="number" v-model="newCreditNote.inclTaxes" disable />
         <!-- Hasn't linked event -->
+        <br>
+        <div class="row justify-between items-baseline">
+          <div class="col-6"><p>Montant HT: {{ newCreditNote.exclTaxes }}</p></div>
+          <div class="col-6"><p>Montant TTC: {{ newCreditNote.inclTaxes }}</p></div>
+        </div>
         <ni-modal-select v-if="!hasLinkedEvents" caption="Souscription concernée" v-model="newCreditNote.subscription"
           :options="subscriptionsOptions" :disable="!hasLinkedEvents && !newCreditNote.customer" required-field />
         <ni-modal-input v-if="!hasLinkedEvents" caption="Montant TTC" suffix="€" type="number" v-model="newCreditNote.inclTaxes" :disable="!newCreditNote.subscription" />
@@ -95,8 +99,10 @@ export default {
         events: [],
         startDate: null,
         endDate: null,
-        exclTaxes: 0,
-        inclTaxes: 0,
+        bills: {
+          exclTaxesCustomer: 0,
+          inclTaxesCustomer: 0
+        },
         subscription: null
       },
       creditNotes: [],
@@ -154,15 +160,32 @@ export default {
       this.newCreditNote.subscription = null;
       this.newCreditNote.startDate = null;
       this.newCreditNote.endDate = null;
+      this.newCreditNote.bills = {
+        exclTaxesCustomer: 0,
+        inclTaxesCustomer: 0
+      };
       this.newCreditNote.exclTaxes = 0;
       this.newCreditNote.inclTaxes = 0;
     },
     'newCreditNote.events': function (value) {
-      this.newCreditNote.exclTaxes = 0;
-      this.newCreditNote.inclTaxes = 0;
+      this.newCreditNote.bills = {
+        exclTaxesCustomer: 0,
+        inclTaxesCustomer: 0
+      };
       for (let i = 0, l = this.newCreditNote.events.length; i < l; i++) {
-        this.newCreditNote.exclTaxes += this.newCreditNote.events[i].exclTaxes;
-        this.newCreditNote.inclTaxes += this.newCreditNote.events[i].inclTaxes;
+        this.newCreditNote.bills.exclTaxesCustomer += this.newCreditNote.events[i].bills.exclTaxesCustomer;
+        this.newCreditNote.bills.inclTaxesCustomer += this.newCreditNote.events[i].bills.inclTaxesCustomer;
+      }
+    },
+    'newCreditNote.startDate': function (value) {
+      console.log('value', value);
+      if (value === null) {
+        this.events = [];
+      }
+    },
+    'newCreditNote.endDate': function (value) {
+      if (value === null) {
+        this.events = [];
       }
     }
   },
