@@ -1,11 +1,10 @@
 <template>
-  <div :class="['row', { 'margin-input': marginInput }, { last: last }]">
+  <div :class="['row', 'margin-input', { last: last }]">
     <div class="col-12">
       <div v-if="!!caption" class="row justify-between">
-        <p :class="[{ 'input-caption': inputCaption }, { required: requiredField }]">{{ caption }}</p>
+        <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
         <q-icon v-if="error" name="error_outline" color="secondary" />
       </div>
-      <q-input v-if="noQField" ref="originInput" :value="value" color="white" inverted-light @input="inputHandler" @blur="blurHandler" @focus="focusHandler" :suffix="suffix" :type="type" :rows="rows" :readonly="readOnly" :no-parent-field="noQField" />
       <q-field v-else :error="error" :error-label="errorLabel">
         <q-input ref="originInput" :value="value" color="white" inverted-light @input="inputHandler" @blur="blurHandler" @focus="focusHandler" :suffix="suffix" :type="type" :rows="rows" :readonly="readOnly" />
       </q-field>
@@ -29,8 +28,6 @@ export default {
     rows: { type: Number, default: 1 },
     readOnly: { type: Boolean, default: false },
     requiredField: { type: Boolean, default: false },
-    marginInput: { type: Boolean, default: true },
-    noQField: { type: Boolean, default: false },
   },
   methods: {
     inputHandler (value) {
