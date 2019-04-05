@@ -6,12 +6,10 @@
         <q-checkbox v-model="bill.externalBilling" />
       </template>
       <template v-if="index === 0 && col.name === 'client'">
-        {{ getClientName({ customer: props.row.customer, bill }) }}
+        {{ getClientName(props.row.customer, bill) }}
       </template>
-      <template
-        v-else-if="index === 0 && (col.name === 'startDate' || col.name === 'endDate')">{{ formatDate(bill[col.name]) }}</template>
-      <template
-        v-else-if="col.name === 'service'">{{ bill.subscription.service.versions[bill.subscription.service.versions.length - 1].name }}</template>
+      <template v-else-if="index === 0 && (col.name === 'startDate' || col.name === 'endDate')">{{ formatDate(bill[col.name]) }}</template>
+      <template v-else-if="col.name === 'service'">{{ bill.subscription.service.versions[bill.subscription.service.versions.length - 1].name }}</template>
       <template v-else-if="col.name === 'hours'">{{ formatHours(bill.hours) }}</template>
       <template v-else-if="col.name === 'unitExclTaxes'">{{ formatPrice(bill.unitExclTaxes) }}</template>
       <template v-else-if="col.name === 'discount'">
@@ -48,11 +46,8 @@ export default {
     formatDate (value) {
       return value ? `${this.$moment(value).format('DD/MM/YY')}` : '';
     },
-    getClientName ({ customer, bill }) {
-      if (bill.thirdPartyPayer) {
-        return bill.thirdPartyPayer.name;
-      }
-      return customer.identity.lastname;
+    getClientName (customer, bill) {
+      return bill.thirdPartyPayer ? bill.thirdPartyPayer.name : customer.identity.lastname;
     },
     getExclTaxesDiscount (bill) {
       return bill.discount / 1 + (bill.vat);
