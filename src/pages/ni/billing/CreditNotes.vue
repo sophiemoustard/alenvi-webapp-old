@@ -9,7 +9,7 @@
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
               <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions table-actions-margin">
-                  <q-btn flat round small color="grey" icon="edit" @click.native="openCreditNoteEditionModal(col.value)" />
+                  <q-btn flat round small color="grey" icon="edit" @click.native="openCreditNoteEditionModal(props.row)" />
                   <q-btn flat round small color="grey" icon="delete" @click="deleteCreditNote(col.value, props.row.__index)" />
                 </div>
               </template>
@@ -47,12 +47,12 @@
           <p>Évènements</p>
           <q-option-group color="primary" type="checkbox" v-model="newCreditNote.events" :options="getEventsOptions" />
         </template>
-        <!-- Hasn't linked event -->
         <br>
         <div v-if="hasLinkedEvents" class="row justify-between items-baseline">
           <div class="col-6"><p>Montant HT: {{ newCreditNote.exclTaxesCustomer }}</p></div>
           <div class="col-6"><p>Montant TTC: {{ newCreditNote.inclTaxesCustomer }}</p></div>
         </div>
+        <!-- Hasn't linked event -->
         <ni-modal-select v-if="!hasLinkedEvents" caption="Souscription concernée" v-model="newCreditNote.subscription"
           :options="subscriptionsOptions" :disable="!hasLinkedEvents && !newCreditNote.customer" required-field />
         <ni-modal-input v-if="!hasLinkedEvents" caption="Montant TTC" suffix="€" type="number" v-model="newCreditNote.inclTaxesCustomer" :disable="!newCreditNote.subscription" />
@@ -62,7 +62,7 @@
     </q-modal>
 
     <!-- Credit note edition modal -->
-    <!-- <q-modal v-model="creditNoteEditionModal" content-classes="modal-container-sm" @hide="resetEditionCreditNoteData">
+    <q-modal v-model="creditNoteEditionModal" content-classes="modal-container-sm" @hide="resetEditionCreditNoteData">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -73,31 +73,30 @@
           </div>
         </div>
         <ni-modal-select caption="Bénéficiaire" v-model="editCreditNote.customer" :options="customersOptions" required-field></ni-modal-select>
-        <ni-datetime-picker caption="Date de l'avoir" v-model="newCreditNote.date" :error="$v.newCreditNote.date.$error"
-          @blur="$v.newCreditNote.date.$touch" in-modal type="date" clearable required-field />
-        <br> -->
+        <ni-datetime-picker caption="Date de l'avoir" v-model="editCreditNote.date" in-modal type="date" clearable required-field />
+        <br>
         <!-- Has linked events -->
-        <!-- <ni-datetime-picker v-if="hasLinkedEvents" caption="Début période concernée" v-model="newCreditNote.startDate" :error="$v.newCreditNote.startDate.$error"
-          @blur="$v.newCreditNote.startDate.$touch" in-modal type="date" :disable="!hasLinkedEvents" clearable @input="getEvents" />
-        <ni-datetime-picker v-if="hasLinkedEvents" caption="Fin période concernée" v-model="newCreditNote.endDate" :error="$v.newCreditNote.endDate.$error"
-          @blur="$v.newCreditNote.endDate.$touch" in-modal type="date" :disable="!hasLinkedEvents" clearable @input="getEvents" />
+        <ni-datetime-picker v-if="editCreditNote.events.length > 0" caption="Début période concernée" v-model="editCreditNote.startDate"
+          in-modal type="date" :disable="!editCreditNote.events" clearable @input="getEvents" />
+        <ni-datetime-picker v-if="editCreditNote.events.length > 0" caption="Fin période concernée" v-model="editCreditNote.endDate"
+          in-modal type="date" :disable="!editCreditNote.events" clearable @input="getEvents" />
         <template v-if="events.length > 0">
           <p>Évènements</p>
-          <q-option-group color="primary" type="checkbox" v-model="newCreditNote.events" :options="getEventsOptions" />
-        </template> -->
+          <q-option-group color="primary" type="checkbox" v-model="editCreditNote.events" :options="getEventsOptions" />
+        </template>
         <!-- Hasn't linked event -->
-        <!-- <br>
-        <div v-if="hasLinkedEvents" class="row justify-between items-baseline">
-          <div class="col-6"><p>Montant HT: {{ newCreditNote.exclTaxesCustomer }}</p></div>
-          <div class="col-6"><p>Montant TTC: {{ newCreditNote.inclTaxesCustomer }}</p></div>
+        <br>
+        <div v-if="editCreditNote.events.length > 0" class="row justify-between items-baseline">
+          <div class="col-6"><p>Montant HT: {{ editCreditNote.exclTaxesCustomer }}</p></div>
+          <div class="col-6"><p>Montant TTC: {{ editCreditNote.inclTaxesCustomer }}</p></div>
         </div>
-        <ni-modal-select v-if="!hasLinkedEvents" caption="Souscription concernée" v-model="newCreditNote.subscription"
-          :options="subscriptionsOptions" :disable="!hasLinkedEvents && !newCreditNote.customer" required-field />
-        <ni-modal-input v-if="!hasLinkedEvents" caption="Montant TTC" suffix="€" type="number" v-model="newCreditNote.inclTaxesCustomer" :disable="!newCreditNote.subscription" />
+        <ni-modal-select v-if="!editCreditNote.events.length > 0" caption="Souscription concernée" v-model="editCreditNote.subscription"
+          :options="subscriptionsOptions" :disable="!hasLinkedEvents && !editCreditNote.customer" required-field />
+        <ni-modal-input v-if="!editCreditNote.events.length > 0" caption="Montant TTC" suffix="€" type="number" v-model="editCreditNote.inclTaxesCustomer" :disable="!editCreditNote.subscription" />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Créer l'avoir" icon-right="add" color="primary" :loading="loading" @click="createNewCreditNote"
-        :disable="$v.newCreditNote.$error" />
-    </q-modal> -->
+      <q-btn no-caps class="full-width modal-btn" label="Editer l'avoir" icon-right="add" color="primary" :loading="loading" @click="updateCreditNote"
+        :disable="$v.editCreditNote.$error" />
+    </q-modal>
 
   </q-page>
 </template>
@@ -122,6 +121,7 @@ export default {
     return {
       loading: false,
       creditNoteCreationModal: false,
+      creditNoteEditionModal: false,
       terms: '',
       hasLinkedEvents: false,
       customersOptions: [],
@@ -133,6 +133,16 @@ export default {
         endDate: null,
       },
       newCreditNote: {
+        customer: null,
+        date: null,
+        events: [],
+        startDate: null,
+        endDate: null,
+        exclTaxesCustomer: 0,
+        inclTaxesCustomer: 0,
+        subscription: null
+      },
+      editCreditNote: {
         customer: null,
         date: null,
         events: [],
@@ -254,7 +264,25 @@ export default {
             return !this.hasLinkedEvents;
           })
         },
-      }
+      },
+      editCreditNote: {
+        date: { required },
+        startDate: {
+          required: requiredIf(() => {
+            return this.editCreditNote.events.length > 0;
+          })
+        },
+        endDate: {
+          required: requiredIf(() => {
+            return this.editCreditNote.events.length > 0;
+          })
+        },
+        subscription: {
+          required: requiredIf(() => {
+            return !this.editCreditNote.events.length > 0;
+          })
+        },
+      },
     }
   },
   computed: {
@@ -307,6 +335,9 @@ export default {
           const vat = this.newCreditNote.subscription.vat;
           this.newCreditNote.exclTaxesCustomer = Number.parseFloat((this.newCreditNote.inclTaxesCustomer / (1 + (vat / 100))).toFixed(2));
         }
+        for (const event of this.newCreditNote.events) {
+          this.$events.updateById(event._id, { isBilled: false });
+        }
         this.newCreditNote.events = this.newCreditNote.events.map(event => event._id);
         this.loading = true;
         await this.$creditNotes.create(this.$_.pickBy(this.newCreditNote));
@@ -356,7 +387,48 @@ export default {
         console.error(e);
         NotifyNegative('Impossible de récupérer les évènements de ce bénéficiaire');
       }
-    }
+    },
+    openCreditNoteEditionModal (creditNote) {
+      this.editCreditNote = creditNote;
+      this.creditNoteEditionModal = true
+    },
+    resetEditionCreditNoteData () {
+      this.editCreditNote = {
+        customer: null,
+        date: null,
+        events: [],
+        startDate: null,
+        endDate: null,
+        exclTaxesCustomer: 0,
+        inclTaxesCustomer: 0,
+        subscription: null
+      };
+      this.selectedCustomer = null;
+    },
+    async updateCreditNote () {
+      try {
+        this.$v.editCreditNote.$touch();
+        if (this.$v.editCreditNote.$error) return NotifyWarning('Champ(s) invalide(s)');
+        if (!this.editCreditNote.events.length > 0) {
+          const vat = this.editCreditNote.subscription.vat;
+          this.editCreditNote.exclTaxesCustomer = Number.parseFloat((this.editCreditNote.inclTaxesCustomer / (1 + (vat / 100))).toFixed(2));
+        }
+        for (const event of this.editCreditNote.events) {
+          this.$events.updateById(event._id, { isBilled: false });
+        }
+        this.newCreditNote.events = this.newCreditNote.events.map(event => event._id);
+        this.loading = true;
+        await this.$creditNotes.create(this.$_.pickBy(this.newCreditNote));
+        NotifyPositive('Avoir créé');
+        await this.refreshCreditNotes();
+        this.creditNoteCreationModal = false;
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création de l\'avoir');
+      } finally {
+        this.loading = false;
+      }
+    },
   }
 }
 </script>
