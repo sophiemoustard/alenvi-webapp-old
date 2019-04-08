@@ -416,15 +416,15 @@ export default {
         for (const event of this.editCreditNote.events) {
           this.$events.updateById(event._id, { isBilled: false });
         }
-        this.newCreditNote.events = this.newCreditNote.events.map(event => event._id);
+        this.editCreditNote.events = this.editCreditNote.events.map(event => event._id);
         this.loading = true;
-        await this.$creditNotes.create(this.$_.pickBy(this.newCreditNote));
-        NotifyPositive('Avoir créé');
+        await this.$creditNotes.updateById(this.editCreditNote._id, this.$_.pickBy(this.editCreditNote));
+        NotifyPositive('Avoir édité');
         await this.refreshCreditNotes();
-        this.creditNoteCreationModal = false;
+        this.creditNoteEditionModal = false;
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création de l\'avoir');
+        NotifyNegative('Erreur lors de l\'éditionde l\'avoir');
       } finally {
         this.loading = false;
       }
