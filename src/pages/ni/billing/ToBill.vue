@@ -1,10 +1,10 @@
 <template>
   <q-page class="neutral-background">
     <h4 class="layout-padding">À facturer</h4>
-    <div class="q-mb-xl q-pa-sm">
+    <div class="'q-mb-xl q-pa-sm">
       <q-card class="neutral-background" flat>
-        <q-table :data="draftBills" :columns="columns" row-key="customerId" binary-state-sort :pagination.sync="pagination" separator="none"
-          selection="multiple" :selected.sync="selected">
+        <q-table :data="draftBills" :columns="columns" row-key="customerId" binary-state-sort
+          :pagination.sync="pagination" separator="none" selection="multiple" :selected.sync="selected" :loading="tableLoading">
 
           <q-tr slot="header" slot-scope="props">
             <q-th v-for="col in props.cols" :key="col.name" :props="props">
@@ -16,8 +16,8 @@
           </q-tr>
 
           <template slot="body" slot-scope="props">
-            <ni-to-bill-row  v-for="(bill, index) in props.row.customerBills.bills" :key="bill._id" :props="props" :index="index" :bill.sync="bill" display-checkbox
-              @click="discountEdit($event, bill)" />
+            <ni-to-bill-row v-for="(bill, index) in props.row.customerBills.bills" :key="bill._id" :props="props"
+              :index="index" :bill.sync="bill" display-checkbox @click="discountEdit($event, bill)" />
 
             <q-tr v-if="props.row.customerBills.bills.length > 1" :props="props">
               <q-td colspan="10">
@@ -29,7 +29,8 @@
             </q-tr>
 
             <template v-if="props.row.thirdPartyPayerBills">
-              <ni-to-bill-row  v-for="bill in props.row.thirdPartyPayerBills.bills" :key="bill._id" :props="props" :bill="bill" @click="discountEdit($event, bill)"/>
+              <ni-to-bill-row v-for="bill in props.row.thirdPartyPayerBills.bills" :key="bill._id" :props="props"
+                :bill="bill" @click="discountEdit($event, bill)" display-checkbox />
             </template>
           </template>
 
@@ -42,8 +43,10 @@
             <div class="row items-center">
               <div class="on-left">{{ paginationLabel }}</div>
               <div>
-                <q-btn icon="chevron_left" class="no-shadow" :disable="props.isFirstPage" @click="props.prevPage" size="md" dense />
-                <q-btn icon="chevron_right" class="no-shadow" :disable="props.isLastPage" @click="props.nextPage" size="md" dense />
+                <q-btn icon="chevron_left" class="no-shadow" :disable="props.isFirstPage" @click="props.prevPage"
+                  size="md" dense />
+                <q-btn icon="chevron_right" class="no-shadow" :disable="props.isLastPage" @click="props.nextPage"
+                  size="md" dense />
               </div>
             </div>
           </div>
@@ -66,6 +69,7 @@ export default {
   },
   data () {
     return {
+      tableLoading: false,
       editDiscount: false,
       pagination: { rowsPerPage: 0 },
       rowsPerPageOptions: [
@@ -179,6 +183,7 @@ export default {
   },
   async mounted () {
     try {
+      this.tableLoading = true;
       this.draftBills = await this.$bills.getDraftBills({
         endDate: this.billingPeriod.endDate.toDate(),
         startDate: this.billingPeriod.startDate.toDate(),
@@ -197,6 +202,8 @@ export default {
     } catch (e) {
       this.draftBills = [];
       console.error(e);
+    } finally {
+      this.tableLoading = false;
     }
   },
   methods: {
@@ -227,8 +234,11 @@ export default {
     cursor: pointer
 
   /deep/ .q-table
+    border-collapse: separate
     & tbody tr.selected
       background: $white
+    &-bottom > .q-icon
+      display: none
 
   /deep/ .datatable-inner-input
     width: auto

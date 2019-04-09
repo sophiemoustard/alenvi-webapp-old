@@ -1,6 +1,6 @@
 <template>
   <q-tr :props="props"
-    :class="{'datatable-row-border-top': index === 0 && !bill.thirdPartyPayer }">
+    :class="{'datatable-row-border-top': index === 0 }">
     <q-td v-for="col in props.cols" :key="col.name" :props="props">
       <template v-if="col.name === 'externalBilling' && bill.thirdPartyPayer">
         <q-checkbox v-model="bill.externalBilling" />
