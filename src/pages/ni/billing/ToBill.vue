@@ -1,32 +1,52 @@
 <template>
-  <q-page class="neutral-background" padding>
-    <h4>À facturer</h4>
-    <div class="q-mb-xl">
-      <q-card style="background: white">
-        <q-table :data="draftBills" :columns="columns" row-key="name" hide-bottom binary-state-sort :pagination.sync="pagination">
+  <q-page class="neutral-background">
+    <h4 class="layout-padding">À facturer</h4>
+    <div class="q-mb-xl q-pa-sm">
+      <q-card class="neutral-background" flat>
+        <q-table :data="draftBills" :columns="columns" row-key="customerId" binary-state-sort :pagination.sync="pagination" separator="none"
+          selection="multiple" :selected.sync="selected">
+
+          <q-tr slot="header" slot-scope="props">
+            <q-th v-for="col in props.cols" :key="col.name" :props="props">
+              {{ col.label }}
+            </q-th>
+            <q-th auto-width>
+              <q-checkbox v-model="props.selected" indeterminate-value="some" />
+            </q-th>
+          </q-tr>
+
           <template slot="body" slot-scope="props">
-            <q-tr :props="props">
-              <q-td v-for="col in props.cols" :key="col.name" :props="props">
-                <template>{{ col.value }}</template>
+            <ni-to-bill-row  v-for="(bill, index) in props.row.customerBills.bills" :key="bill._id" :props="props" :index="index" :bill.sync="bill" display-checkbox
+              @click="discountEdit($event, bill)" />
+
+            <q-tr v-if="props.row.customerBills.bills.length > 1" :props="props">
+              <q-td colspan="10">
+                <div class="text-right">Total :</div>
+              </q-td>
+              <q-td colspan="2">
+                {{ formatPrice(props.row.customerBills.total) }}
               </q-td>
             </q-tr>
-            <q-tr v-for="(bill, index) in props.row.bills.slice(1)" :key="index" :props="props">
-              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-                <template v-if="col.name === 'service'">{{ bill.subscription.service.versions[bill.subscription.service.versions.length - 1].name }}</template>
-                <template v-if="col.name === 'hours'">{{ formatHours(bill.hours) }}</template>
-                <template v-if="col.name === 'unitPreTaxPrice'">{{ formatPrice(bill.unitPreTaxPrice) }}</template>
-                <template v-if="col.name === 'discount'">{{ bill.discount }}</template>
-                <template v-if="col.name === 'preTaxPrice'">{{ formatPrice(bill.preTaxPrice) }}</template>
-                <template v-if="col.name === 'withTaxPrice'">{{ formatPrice(bill.withTaxPrice) }}</template>
-              </q-td>
-            </q-tr>
-            <q-tr v-if="props.row.bills.length > 1" :props="props">
-              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-                <template v-if="col.name === 'preTaxPrice'">Total :</template>
-                <template v-if="col.name === 'withTaxPrice'">{{ formatPrice(props.row.total) }}</template>
-              </q-td>
-            </q-tr>
+
+            <template v-if="props.row.thirdPartyPayerBills">
+              <ni-to-bill-row  v-for="bill in props.row.thirdPartyPayerBills.bills" :key="bill._id" :props="props" :bill="bill" @click="discountEdit($event, bill)"/>
+            </template>
           </template>
+
+          <div slot="bottom" slot-scope="props" class="row justify-between full-width">
+            <div class="row items-center">
+              <q-btn-toggle class="on-left no-shadow" v-model="pagination.rowsPerPage" :options="rowsPerPageOptions"
+                toggle-text-color="primary" toggle-color="white" no-caps dense size="md" />
+              <div>Eléments par page</div>
+            </div>
+            <div class="row items-center">
+              <div class="on-left">{{ paginationLabel }}</div>
+              <div>
+                <q-btn icon="chevron_left" class="no-shadow" :disable="props.isFirstPage" @click="props.prevPage" size="md" dense />
+                <q-btn icon="chevron_right" class="no-shadow" :disable="props.isLastPage" @click="props.nextPage" size="md" dense />
+              </div>
+            </div>
+          </div>
         </q-table>
       </q-card>
     </div>
@@ -35,20 +55,32 @@
 
 <script>
 import { MONTH } from '../../../data/constants';
+import ModalInput from '../../../components/form/ModalInput';
+import ToBillRow from '../../../components/table/ToBillRow';
 
 export default {
   name: 'ToBill',
-  components: {},
+  components: {
+    'ni-modal-input': ModalInput,
+    'ni-to-bill-row': ToBillRow
+  },
   data () {
     return {
+      editDiscount: false,
       pagination: { rowsPerPage: 0 },
+      rowsPerPageOptions: [
+        { label: '25', value: 25 },
+        { label: '50', value: 50 },
+        { label: '100', value: 100 },
+        { label: 'Tous', value: 0 },
+      ],
       draftBills: [],
+      selected: [],
       columns: [
         {
-          name: 'status',
-          label: 'Status',
+          name: 'externalBilling',
+          label: 'Factu. externe',
           align: 'left',
-          field: '_id',
         },
         {
           name: 'customer',
@@ -60,61 +92,46 @@ export default {
           name: 'client',
           label: 'Client',
           align: 'left',
-          field: row => row.bills && row.bills[0] && row.bills[0].thirdPartyPayer
-            ? row.bills[0].thirdPartyPayer.name
-            : row.customer.identity.lastname,
         },
         {
           name: 'startDate',
           label: 'Début F.',
           align: 'left',
-          field: row => row.bills[0].startDate ? this.$moment(row.startDate).format('DD/MM/YYYY') : '',
         },
         {
           name: 'endDate',
           label: 'Fin F.',
           align: 'left',
-          field: row => row.bills[0].endDate ? this.$moment(row.endDate).format('DD/MM/YYYY') : '',
         },
         {
           name: 'service',
           label: 'Service',
           align: 'left',
-          field: row => row.bills[0].subscription.service.versions[row.bills[0].subscription.service.versions.length - 1].name,
         },
         {
           name: 'hours',
           label: 'Décompte',
           align: 'center',
-          field: row => row.bills[0].hours,
-          format: value => this.formatHours(value),
         },
         {
-          name: 'unitPreTaxPrice',
+          name: 'unitExclTaxes',
           label: 'PU HT',
           align: 'center',
-          field: row => row.bills[0].unitPreTaxPrice,
-          format: value => this.formatPrice(value),
         },
         {
           name: 'discount',
           label: 'Remise',
           align: 'center',
-          field: row => row.bills[0].discount,
         },
         {
-          name: 'preTaxPrice',
+          name: 'exclTaxes',
           label: 'HT',
           align: 'center',
-          field: row => row.bills[0].preTaxPrice,
-          format: value => this.formatPrice(value),
         },
         {
-          name: 'withTaxPrice',
+          name: 'inclTaxes',
           label: 'TTC',
           align: 'center',
-          field: row => row.bills[0].withTaxPrice,
-          format: value => this.formatPrice(value),
         },
       ],
     }
@@ -139,6 +156,26 @@ export default {
           : this.$moment().date(16).hour(0).minute(0),
       }
     },
+    firstRowIndex () {
+      const { page, rowsPerPage } = this.pagination;
+      return (page - 1) * rowsPerPage;
+    },
+    lastRowIndex () {
+      const { page, rowsPerPage } = this.pagination;
+      return page * rowsPerPage;
+    },
+    computedRowNumber () {
+      if (this.pagination.rowsPerPage) {
+        return this.draftBills.slice(this.firstRowIndex, this.lastRowIndex).length + this.firstRowIndex;
+      }
+      return this.draftBills.length;
+    },
+    paginationLabel () {
+      const { rowsPerPage } = this.pagination;
+      return rowsPerPage
+        ? `${this.firstRowIndex + 1}-${Math.min(this.lastRowIndex, this.computedRowNumber)} de ${this.draftBills.length}`
+        : `1-${this.draftBills.length} de ${this.draftBills.length}`;
+    },
   },
   async mounted () {
     try {
@@ -146,6 +183,16 @@ export default {
         endDate: this.billingPeriod.endDate.toDate(),
         startDate: this.billingPeriod.startDate.toDate(),
         billingPeriod: this.user.company.customersConfig.billingPeriod,
+      });
+      this.draftBills = this.draftBills.map((draft) => {
+        return {
+          ...draft,
+          customerBills: { total: draft.customerBills.total, bills: this.addEditDiscountToBills(draft.customerBills.bills) },
+          ...(!!draft.thirdPartyPayerBills && {
+            thirdPartyPayerBills:
+            { total: draft.thirdPartyPayerBills.total, bills: this.addEditDiscountToBills(draft.thirdPartyPayerBills.bills) }
+          }),
+        }
       });
     } catch (e) {
       this.draftBills = [];
@@ -156,16 +203,50 @@ export default {
     formatPrice (value) {
       return value ? `${parseFloat(value).toFixed(2)}€` : '';
     },
-    formatHours (value) {
-      return value ? `${parseFloat(value).toFixed(2)}h` : '';
+    discountEdit (event, bill) {
+      bill.editDiscount = true;
+      this.$nextTick(() => {
+        event[0].focus();
+      });
+    },
+    addEditDiscountToBills (bills) {
+      return bills.map(bill => ({ ...bill, editDiscount: false }));
     },
   },
 }
 </script>
 
 <style lang="stylus" scoped>
+  @import '~variables'
 
   .layout-padding
     padding: 2rem 3rem;
+
+  .editable
+    color: $primary
+    cursor: pointer
+
+  /deep/ .q-table
+    & tbody tr.selected
+      background: $white
+
+  /deep/ .datatable-inner-input
+    width: auto
+    min-width: 60px
+
+  /deep/ .q-btn-group
+    & button .q-btn-inner
+      font-size: 12px
+    & > .q-btn-item:first-child
+      border: 1px solid rgba(0,0,0,0.12)
+    & > .q-btn-item:not(:last-child)
+      border-top: 1px solid rgba(0,0,0,0.12)
+      border-right: 1px solid rgba(0,0,0,0.12)
+      border-bottom: 1px solid rgba(0,0,0,0.12)
+    & > .q-btn-item:last-child
+      border-top: 1px solid rgba(0,0,0,0.12)
+      border-right: 1px solid rgba(0,0,0,0.12)
+      border-bottom: 1px solid rgba(0,0,0,0.12)
+      font-weight: bold
 
 </style>

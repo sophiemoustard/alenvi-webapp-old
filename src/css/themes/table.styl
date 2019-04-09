@@ -181,20 +181,32 @@
       & .q-table-nodata > i
         display: none
 
-.datatable-row
-  cursor: pointer
-  background: $white
-  &:hover
-    background: $white !important
-    box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.2)
-    & td
-      border-top: 1px solid $light-grey
-      border-bottom: 1px solid $light-grey
-      &:first-child
-        border-left: 1px solid $light-grey
-      &:last-child
-        border-right: 1px solid $light-grey
-  &-inactive
-    background: rgba(255, 255, 255, 0.5)
+.datatable
+  &-row
+    cursor: pointer
+    background: $white
     &:hover
+      background: $white !important
+      box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.2)
+      & td
+        border-top: 1px solid $light-grey
+        border-bottom: 1px solid $light-grey
+        &:first-child
+          border-left: 1px solid $light-grey
+        &:last-child
+          border-right: 1px solid $light-grey
+    &-inactive
       background: rgba(255, 255, 255, 0.5)
+      &:hover
+        background: rgba(255, 255, 255, 0.5)
+    &-border-top td
+      border-width: 1px 0 0 0
+    &-no-border td
+      border-width: 0 !important
+  &-inner-input.q-input.q-if-inverted
+    padding: 3px 5px
+    border: 1px solid $light-grey
+    & .q-input-target
+      font-size: 13px
+    & span.q-if-addon
+      font-size: 13px
