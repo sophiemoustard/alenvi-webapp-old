@@ -430,11 +430,16 @@ export default {
           this.editCreditNote.exclTaxesCustomer = Number.parseFloat((this.editCreditNote.inclTaxesCustomer / (1 + (vat / 100))).toFixed(2));
         }
         for (const event of this.editCreditNote.events) {
-          this.$events.updateById(event._id, { isBilled: false });
+          await this.$events.updateById(event._id, { isBilled: false });
         }
         this.editCreditNote.events = this.editCreditNote.events.map(event => event._id);
         this.loading = true;
-        await this.$creditNotes.updateById(this.editCreditNote._id, this.$_.pickBy(this.editCreditNote));
+        delete this.editCreditNote.updatedAt;
+        delete this.editCreditNote.createdAt;
+        delete this.editCreditNote.number;
+        const id = this.editCreditNote._id;
+        delete this.editCreditNote._id;
+        await this.$creditNotes.updateById(id, this.$_.pickBy(this.editCreditNote));
         NotifyPositive('Avoir édité');
         await this.refreshCreditNotes();
         this.creditNoteEditionModal = false;
