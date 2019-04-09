@@ -389,7 +389,8 @@ export default {
       }
     },
     openCreditNoteEditionModal (creditNote) {
-      this.editCreditNote = creditNote;
+      this.editCreditNote = { ...creditNote }; // spread to not update by reference
+      this.editCreditNote.customer = creditNote.customer._id;
       this.creditNoteEditionModal = true
     },
     resetEditionCreditNoteData () {
@@ -424,7 +425,7 @@ export default {
         this.creditNoteEditionModal = false;
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de l\'éditionde l\'avoir');
+        NotifyNegative('Erreur lors de l\'édition de l\'avoir');
       } finally {
         this.loading = false;
       }
