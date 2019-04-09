@@ -383,14 +383,29 @@ export default {
             isBilled: true
           });
         }
+        if (this.editCreditNote.startDate && this.editCreditNote.endDate) {
+          this.events = await this.$events.list({
+            startDate: this.editCreditNote.startDate,
+            endDate: this.editCreditNote.endDate,
+            customer: this.editCreditNote.customer,
+            isBilled: true
+          });
+        }
       } catch (e) {
         console.error(e);
-        NotifyNegative('Impossible de récupérer les évènements de ce bénéficiaire');
+        NotifyNegative('Impossible de récupérer les évènements facturés de ce bénéficiaire');
       }
     },
-    openCreditNoteEditionModal (creditNote) {
+    async openCreditNoteEditionModal (creditNote) {
       this.editCreditNote = { ...creditNote }; // spread to not update by reference
       this.editCreditNote.customer = creditNote.customer._id;
+      await this.getEvents();
+      for (let i = 0, l = this.editCreditNote.events.length; i < l; i++) {
+        if (!this.events.some(event => this.editCreditNote.events[i]._id === event._id)) {
+          this.events.push(this.editCreditNote.events[i]);
+        }
+      }
+      console.log(this.editCreditNote);
       this.creditNoteEditionModal = true
     },
     resetEditionCreditNoteData () {
