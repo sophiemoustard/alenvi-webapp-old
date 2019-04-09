@@ -4,14 +4,13 @@
       <q-btn class="menu-icon" color="primary" round dense big @click="toggleLeft" icon="menu" size="lg" />
     </q-page-sticky>
 
-    <q-btn v-if="toggleDrawer" flat round icon="chevron_left" @click="toggleLeft" class="chevron chevron-left" />
-    <q-btn v-else flat round icon="view_headline" @click="toggleLeft" class="chevron chevron-right" />
-    <q-layout-drawer v-if="toggleDrawer" :width="250" side="left" v-model="toggleDrawer">
-      <side-menu-coach :ref="sidemenusRefs" v-if="user && !isAuxiliary && user.role.name !== 'Aidants'" :user="user" />
-      <side-menu-auxiliary :ref="sidemenusRefs" v-if="user && isAuxiliary" :user="user" />
-      <side-menu-customer :ref="sidemenusRefs" v-if="user && user.role.name === 'Aidants'" :user="user" />
+    <q-btn v-if="!enableMini" flat round icon="chevron_left" @click="enableMini = !enableMini" class="chevron chevron-left" />
+    <q-btn v-else flat round icon="view_headline" @click="enableMini = !enableMini" class="chevron chevron-right" />
+    <q-layout-drawer :mini="enableMini" :mini-width="30" :width="250" side="left" v-model="toggleDrawer">
+      <side-menu-coach :ref="sidemenusRefs" v-if="user && !isAuxiliary && user.role.name !== 'Aidants' && !enableMini" :user="user" />
+      <side-menu-auxiliary :ref="sidemenusRefs" v-if="user && isAuxiliary && !enableMini" :user="user" />
+      <side-menu-customer :ref="sidemenusRefs" v-if="user && user.role.name === 'Aidants' && !enableMini" :user="user" />
     </q-layout-drawer>
-    <q-layout-drawer v-else :width="0" side="left" class="hidden-menu"></q-layout-drawer>
 
     <q-page-container>
       <router-view :key="$route.fullPath"/>
@@ -33,6 +32,11 @@ export default {
     SideMenuCoach,
     SideMenuAuxiliary,
     SideMenuCustomer
+  },
+  data () {
+    return {
+      enableMini: false,
+    }
   },
   computed: {
     ...mapGetters({
@@ -59,7 +63,7 @@ export default {
   methods: {
     toggleLeft () {
       this.$store.commit('main/setToggleDrawer', !this.toggleDrawer);
-    }
+    },
   },
   beforeRouteUpdate (to, from, next) {
     if (this.toggleDrawer) {
@@ -102,12 +106,4 @@ export default {
     color: $dark-grey
     &:hover
       color: $primary
-
-  .hidden-menu
-    @media (max-width: 767px)
-      display: none
-
-  @media (max-width: 991px) and (min-width: 768px)
-    /deep/ .layout-padding
-      padding-left: 3em !important;
   </style>
