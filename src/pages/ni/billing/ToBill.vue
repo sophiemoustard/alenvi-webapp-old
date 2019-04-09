@@ -17,7 +17,7 @@
 
           <template slot="body" slot-scope="props">
             <ni-to-bill-row v-for="(bill, index) in props.row.customerBills.bills" :key="bill._id" :props="props"
-              :index="index" :bill.sync="bill" display-checkbox @click="discountEdit($event, bill)" />
+              :index="index" :bill.sync="bill" display-checkbox @discount:click="discountEdit($event, bill)" @datetime:hide="refreshBill(props.row, bill)" />
 
             <q-tr v-if="props.row.customerBills.bills.length > 1" :props="props">
               <q-td colspan="10">
@@ -30,7 +30,7 @@
 
             <template v-if="props.row.thirdPartyPayerBills">
               <ni-to-bill-row v-for="bill in props.row.thirdPartyPayerBills.bills" :key="bill._id" :props="props"
-                :bill="bill" @click="discountEdit($event, bill)" display-checkbox />
+                :bill="bill" @discount:click="discountEdit($event, bill)" display-checkbox @datetime:hide="refreshBill(props.row, bill, true)" />
             </template>
           </template>
 
@@ -193,7 +193,11 @@ export default {
     },
   },
   async mounted () {
-    await this.getDraftBills();
+    await this.getDraftBills({
+      endDate: this.billingPeriod.endDate.toDate(),
+      startDate: this.billingPeriod.startDate.toDate(),
+      billingPeriod: this.user.company.customersConfig.billingPeriod,
+    });
   },
   methods: {
     formatPrice (value) {
@@ -208,14 +212,10 @@ export default {
     addEditDiscountToBills (bills) {
       return bills.map(bill => ({ ...bill, editDiscount: false }));
     },
-    async getDraftBills () {
+    async getDraftBills (params) {
       try {
         this.tableLoading = true;
-        this.draftBills = await this.$bills.getDraftBills({
-          endDate: this.billingPeriod.endDate.toDate(),
-          startDate: this.billingPeriod.startDate.toDate(),
-          billingPeriod: this.user.company.customersConfig.billingPeriod,
-        });
+        this.draftBills = await this.$bills.getDraftBills(params);
         this.draftBills = this.draftBills.map((draft) => {
           return {
             ...draft,
@@ -237,6 +237,28 @@ export default {
       try {
         if (!this.hasSelectedRows) return;
         await this.$bills.create({ bills: this.selected });
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async refreshBill (row, bill, isTpp = false) {
+      try {
+        const { customer, __index } = row;
+        const { startDate, endDate } = bill;
+        if (isTpp) {
+          row.customerBills.startDate = startDate;
+          row.customerBills.endDate = endDate;
+        } else if (!isTpp && row.thirdPartyPayerBills) {
+          row.thirdPartyPayerBills.startDate = startDate;
+          row.thirdPartyPayerBills.endDate = endDate;
+        }
+        const draftBills = await this.$bills.getDraftBills({
+          startDate,
+          endDate,
+          billingPeriod: this.user.company.customersConfig.billingPeriod,
+          customer: customer._id
+        });
+        this.draftBills.splice(__index, 1, ...draftBills);
       } catch (e) {
         console.error(e);
       }
