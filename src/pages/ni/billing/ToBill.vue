@@ -53,6 +53,7 @@
         </q-table>
       </q-card>
     </div>
+    <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done" :label="totalToBillLabel" @click="opened = true" />
   </q-page>
 </template>
 
@@ -180,31 +181,19 @@ export default {
         ? `${this.firstRowIndex + 1}-${Math.min(this.lastRowIndex, this.computedRowNumber)} de ${this.draftBills.length}`
         : `1-${this.draftBills.length} de ${this.draftBills.length}`;
     },
+    hasSelectedRows () {
+      return this.selected.length > 0;
+    },
+    totalToBillLabel () {
+      if (this.hasSelectedRows) {
+        const total = this.selected.reduce((prev, next) => prev + next.customerBills.total + (next.thirdPartyPayerBills ? next.thirdPartyPayerBills.total : 0), 0);
+        return `Facturer ${total.toFixed(2)} €`;
+      }
+      return 'Facturer';
+    },
   },
   async mounted () {
-    try {
-      this.tableLoading = true;
-      this.draftBills = await this.$bills.getDraftBills({
-        endDate: this.billingPeriod.endDate.toDate(),
-        startDate: this.billingPeriod.startDate.toDate(),
-        billingPeriod: this.user.company.customersConfig.billingPeriod,
-      });
-      this.draftBills = this.draftBills.map((draft) => {
-        return {
-          ...draft,
-          customerBills: { total: draft.customerBills.total, bills: this.addEditDiscountToBills(draft.customerBills.bills) },
-          ...(!!draft.thirdPartyPayerBills && {
-            thirdPartyPayerBills:
-            { total: draft.thirdPartyPayerBills.total, bills: this.addEditDiscountToBills(draft.thirdPartyPayerBills.bills) }
-          }),
-        }
-      });
-    } catch (e) {
-      this.draftBills = [];
-      console.error(e);
-    } finally {
-      this.tableLoading = false;
-    }
+    await this.getDraftBills();
   },
   methods: {
     formatPrice (value) {
@@ -218,6 +207,39 @@ export default {
     },
     addEditDiscountToBills (bills) {
       return bills.map(bill => ({ ...bill, editDiscount: false }));
+    },
+    async getDraftBills () {
+      try {
+        this.tableLoading = true;
+        this.draftBills = await this.$bills.getDraftBills({
+          endDate: this.billingPeriod.endDate.toDate(),
+          startDate: this.billingPeriod.startDate.toDate(),
+          billingPeriod: this.user.company.customersConfig.billingPeriod,
+        });
+        this.draftBills = this.draftBills.map((draft) => {
+          return {
+            ...draft,
+            customerBills: { total: draft.customerBills.total, bills: this.addEditDiscountToBills(draft.customerBills.bills) },
+            ...(!!draft.thirdPartyPayerBills && {
+              thirdPartyPayerBills:
+            { total: draft.thirdPartyPayerBills.total, bills: this.addEditDiscountToBills(draft.thirdPartyPayerBills.bills) }
+            }),
+          }
+        });
+      } catch (e) {
+        this.draftBills = [];
+        console.error(e);
+      } finally {
+        this.tableLoading = false;
+      }
+    },
+    async createBills () {
+      try {
+        if (!this.hasSelectedRows) return;
+        await this.$bills.create({ bills: this.selected });
+      } catch (e) {
+        console.error(e);
+      }
     },
   },
 }
