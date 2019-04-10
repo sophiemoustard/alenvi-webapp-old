@@ -35,7 +35,7 @@
             <span><q-icon name="clear" @click.native="creditNoteCreationModal = false" /></span>
           </div>
         </div>
-        <ni-modal-select caption="Bénéficiaire" v-model="newCreditNote.customer" :options="customersOptions" required-field />
+        <ni-modal-select caption="Bénéficiaire" v-model="newCreditNote.customer" :options="customersOptions" required-field @input="getEvents" />
         <ni-datetime-picker caption="Date de l'avoir" v-model="newCreditNote.date" :error="$v.newCreditNote.date.$error"
           @blur="$v.newCreditNote.date.$touch" in-modal type="date" clearable required-field />
         <div class="row q-mb-md light">
@@ -46,9 +46,9 @@
           @blur="$v.newCreditNote.startDate.$touch" in-modal type="date" :disable="!hasLinkedEvents" clearable @input="getEvents" />
         <ni-datetime-picker v-if="hasLinkedEvents" caption="Fin période concernée" v-model="newCreditNote.endDate" :error="$v.newCreditNote.endDate.$error"
           @blur="$v.newCreditNote.endDate.$touch" in-modal type="date" :disable="!hasLinkedEvents" clearable @input="getEvents" />
-        <template v-if="events.length > 0">
-          <ni-option-group v-model="newCreditNote.events" :options="getEventsOptions" caption="Évènements" type="checkbox"
-            required-field />
+        <template v-if="hasLinkedEvents && events.length > 0">
+          <ni-option-group v-model="newCreditNote.events" :options="eventsOptions" caption="Évènements" type="checkbox"
+            required-field inline />
         </template>
         <div v-if="hasLinkedEvents" class="row justify-between items-baseline">
           <div class="col-6 light"><p>Montant HT : {{ newCreditNote.exclTaxesCustomer }}</p></div>
@@ -64,7 +64,7 @@
     </q-modal>
 
     <!-- Credit note edition modal -->
-    <q-modal v-model="creditNoteEditionModal" content-classes="modal-container-md" @hide="resetEditionCreditNoteData">
+    <q-modal v-model="creditNoteEditionModal" content-classes="modal-container-sm" @hide="resetEditionCreditNoteData">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -74,7 +74,7 @@
             <span><q-icon name="clear" @click.native="creditNoteEditionModal = false" /></span>
           </div>
         </div>
-        <ni-modal-select caption="Bénéficiaire" v-model="editCreditNote.customer" :options="customersOptions" required-field></ni-modal-select>
+        <ni-modal-select caption="Bénéficiaire" v-model="editCreditNote.customer" :options="customersOptions" required-field @input="getEvents" />
         <ni-datetime-picker caption="Date de l'avoir" v-model="editCreditNote.date" in-modal type="date" clearable required-field />
         <!-- Has linked events -->
         <ni-datetime-picker v-if="editCreditNote.events.length > 0" caption="Début période concernée" v-model="editCreditNote.startDate"
@@ -82,7 +82,7 @@
         <ni-datetime-picker v-if="editCreditNote.events.length > 0" caption="Fin période concernée" v-model="editCreditNote.endDate"
           in-modal type="date" :disable="!editCreditNote.events" clearable @input="getEvents" />
         <template v-if="events.length > 0">
-          <ni-option-group v-model="editCreditNote.events" :options="getEventsOptions" caption="Évènements" type="checkbox"
+          <ni-option-group v-model="editCreditNote.events" :options="eventsOptions" caption="Évènements" type="checkbox"
             required-field />
         </template>
         <!-- Hasn't linked event -->
@@ -97,7 +97,6 @@
       <q-btn no-caps class="full-width modal-btn" label="Editer l'avoir" icon-right="add" color="primary" :loading="loading" @click="updateCreditNote"
         :disable="$v.editCreditNote.$error" />
     </q-modal>
-
   </q-page>
 </template>
 
@@ -125,12 +124,9 @@ export default {
       loading: false,
       creditNoteCreationModal: false,
       creditNoteEditionModal: false,
-      terms: '',
       hasLinkedEvents: false,
       customersOptions: [],
-      eventsOptions: [],
       events: [],
-      selectedCustomer: null,
       creditNotesDates: {
         startDate: null,
         endDate: null,
@@ -204,7 +200,7 @@ export default {
     }
   },
   watch: {
-    hasLinkedEvents: function () {
+    hasLinkedEvents () {
       this.events = [];
       this.newCreditNote.events = [];
       this.newCreditNote.subscription = null;
@@ -212,8 +208,10 @@ export default {
       this.newCreditNote.endDate = null;
       this.newCreditNote.exclTaxesCustomer = 0;
       this.newCreditNote.inclTaxesCustomer = 0;
+      this.$v.newCreditNote.startDate.$reset();
+      this.$v.newCreditNote.endDate.$reset();
     },
-    'newCreditNote.events': function (value) {
+    'newCreditNote.events' (value) {
       if (value[0] && typeof value[0] === 'string') return '';
       this.newCreditNote.exclTaxesCustomer = 0;
       this.newCreditNote.inclTaxesCustomer = 0;
@@ -222,12 +220,12 @@ export default {
         this.newCreditNote.inclTaxesCustomer += this.newCreditNote.events[i].bills.inclTaxesCustomer;
       }
     },
-    'newCreditNote.startDate': function (value) {
+    'newCreditNote.startDate' (value) {
       if (value === null) {
         this.events = [];
       }
     },
-    'newCreditNote.endDate': function (value) {
+    'newCreditNote.endDate' (value) {
       if (value === null) {
         this.events = [];
       }
@@ -258,32 +256,22 @@ export default {
           })
         },
         endDate: {
-          required: requiredIf(() => {
-            return this.hasLinkedEvents;
-          })
+          required: requiredIf(() => this.hasLinkedEvents)
         },
         subscription: {
-          required: requiredIf(() => {
-            return !this.hasLinkedEvents;
-          })
+          required: requiredIf(() => !this.hasLinkedEvents)
         },
       },
       editCreditNote: {
         date: { required },
         startDate: {
-          required: requiredIf(() => {
-            return this.editCreditNote.events.length > 0;
-          })
+          required: requiredIf(() => this.editCreditNote.events.length > 0)
         },
         endDate: {
-          required: requiredIf(() => {
-            return this.editCreditNote.events.length > 0;
-          })
+          required: requiredIf(() => this.editCreditNote.events.length > 0)
         },
         subscription: {
-          required: requiredIf(() => {
-            return !this.editCreditNote.events.length > 0;
-          })
+          required: requiredIf(() => !this.editCreditNote.events.length > 0)
         },
       },
     }
@@ -292,24 +280,23 @@ export default {
     mainUser () {
       return this.$store.getters['main/user'];
     },
-    company () {
-      return this.mainUser.company;
-    },
     subscriptionsOptions () {
       if (this.newCreditNote.customer) {
-        const selectedCustomer = this.getCustomerById(this.newCreditNote.customer);
+        const selectedCustomer = this.customersOptions.find(customer => customer._id === this.newCreditNote.customer);
         if (!selectedCustomer) return [];
         return selectedCustomer.subscriptions.map(sub => ({ label: sub.service.name, value: { service: sub.service.name, vat: sub.service.vat } }));
       }
       return [];
     },
-    getEventsOptions () {
+    eventsOptions () {
       return this.events.map(event => ({
-        label: `${this.$moment(event.startDate).format('DD/MM/YYYY HH:mm')} - ${this.$moment(event.endDate).format('HH:mm')}`, value: event
+        label: `${this.$moment(event.startDate).format('DD/MM/YYYY HH:mm')} - ${this.$moment(event.endDate).format('HH:mm')}`,
+        value: event,
       }))
     }
   },
   methods: {
+    // Refresh data
     async refreshCustomersOptions () {
       try {
         this.customersOptions = await this.$customers.showAll({ isActive: true, subscriptions: true });
@@ -330,30 +317,30 @@ export default {
         NotifyNegative('Impossible de récupérer les avoirs');
       }
     },
-    async createNewCreditNote () {
+    async getEvents () {
       try {
-        this.$v.newCreditNote.$touch();
-        if (this.$v.newCreditNote.$error) return NotifyWarning('Champ(s) invalide(s)');
-        if (!this.hasLinkedEvents) {
-          const vat = this.newCreditNote.subscription.vat;
-          this.newCreditNote.exclTaxesCustomer = Number.parseFloat((this.newCreditNote.inclTaxesCustomer / (1 + (vat / 100))).toFixed(2));
+        if (this.hasLinkedEvents && this.newCreditNote.customer && this.newCreditNote.startDate && this.newCreditNote.endDate) {
+          this.events = await this.$events.list({
+            startDate: this.newCreditNote.startDate,
+            endDate: this.newCreditNote.endDate,
+            customer: this.newCreditNote.customer,
+            isBilled: true
+          });
+        } else if (this.editCreditNote.customer && this.editCreditNote.startDate && this.editCreditNote.endDate) {
+          this.events = await this.$events.list({
+            startDate: this.editCreditNote.startDate,
+            endDate: this.editCreditNote.endDate,
+            customer: this.editCreditNote.customer,
+            isBilled: true
+          });
         }
-        for (const event of this.newCreditNote.events) {
-          this.$events.updateById(event._id, { isBilled: false });
-        }
-        this.newCreditNote.events = this.newCreditNote.events.map(event => event._id);
-        this.loading = true;
-        await this.$creditNotes.create(this.$_.pickBy(this.newCreditNote));
-        NotifyPositive('Avoir créé');
-        await this.refreshCreditNotes();
-        this.creditNoteCreationModal = false;
       } catch (e) {
+        this.events = [];
         console.error(e);
-        NotifyNegative('Erreur lors de la création de l\'avoir');
-      } finally {
-        this.loading = false;
+        NotifyNegative('Impossible de récupérer les évènements facturés de ce bénéficiaire');
       }
     },
+    // Creation
     resetCreationCreditNoteData () {
       this.newCreditNote = {
         customer: null,
@@ -365,40 +352,35 @@ export default {
         inclTaxesCustomer: 0,
         subscription: null
       };
-      this.selectedCustomer = null;
+      this.events = [];
+      this.hasLinkedEvents = false;
       this.$v.newCreditNote.$reset();
     },
-    getCustomerById (customerId) {
-      if (this.customersOptions.length > 0) {
-        const selectedCustomer = this.customersOptions.find(customer => customer._id === customerId);
-        if (!selectedCustomer) return;
-        this.selectedCustomer = selectedCustomer;
-        return selectedCustomer;
-      }
-    },
-    async getEvents () {
+    async createNewCreditNote () {
       try {
-        if (this.newCreditNote.startDate && this.newCreditNote.endDate) {
-          this.events = await this.$events.list({
-            startDate: this.newCreditNote.startDate,
-            endDate: this.newCreditNote.endDate,
-            customer: this.newCreditNote.customer,
-            isBilled: true
-          });
+        this.$v.newCreditNote.$touch();
+        if (this.$v.newCreditNote.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        if (!this.hasLinkedEvents) {
+          const vat = this.newCreditNote.subscription.vat;
+          this.newCreditNote.exclTaxesCustomer = Number.parseFloat((this.newCreditNote.inclTaxesCustomer / (1 + (vat / 100))).toFixed(2));
         }
-        if (this.editCreditNote.startDate && this.editCreditNote.endDate) {
-          this.events = await this.$events.list({
-            startDate: this.editCreditNote.startDate,
-            endDate: this.editCreditNote.endDate,
-            customer: this.editCreditNote.customer,
-            isBilled: true
-          });
-        }
+
+        this.newCreditNote.events = this.newCreditNote.events.map(event => event._id);
+        this.loading = true;
+        await this.$creditNotes.create(this.$_.pickBy(this.newCreditNote));
+
+        NotifyPositive('Avoir créé');
+        await this.refreshCreditNotes();
+        this.creditNoteCreationModal = false;
       } catch (e) {
         console.error(e);
-        NotifyNegative('Impossible de récupérer les évènements facturés de ce bénéficiaire');
+        NotifyNegative('Erreur lors de la création de l\'avoir');
+      } finally {
+        this.loading = false;
       }
     },
+    // Edition
     async openCreditNoteEditionModal (creditNote) {
       this.editCreditNote = { ...creditNote }; // spread to not update by reference
       this.editCreditNote.customer = creditNote.customer._id;
@@ -408,7 +390,6 @@ export default {
           this.events.push(this.editCreditNote.events[i]);
         }
       }
-      console.log(this.editCreditNote);
       this.creditNoteEditionModal = true
     },
     resetEditionCreditNoteData () {
@@ -422,7 +403,6 @@ export default {
         inclTaxesCustomer: 0,
         subscription: null
       };
-      this.selectedCustomer = null;
     },
     async updateCreditNote () {
       try {
@@ -466,6 +446,9 @@ export default {
     justify-content: space-between;
 
   .light
-    font-size: 14px
+    font-size: 14px;
+
+  /deep/ .modal-container-md
+    width: 45vw;
 
 </style>
