@@ -16,7 +16,7 @@
 import { REQUIRED_LABEL } from '../../data/constants';
 
 export default {
-  name: 'NiModalInput',
+  name: 'NiOptionGroup',
   props: {
     caption: String,
     error: Boolean,

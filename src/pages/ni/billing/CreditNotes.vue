@@ -20,12 +20,12 @@
           </q-tr>
         </q-table>
       </q-card>
-      <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="mdi-credit-card-refund" label="Créer un avoir"
+      <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un avoir"
         @click="creditNoteCreationModal = true" />
     </div>
 
     <!-- Credit note creation modal -->
-    <q-modal v-model="creditNoteCreationModal" content-classes="modal-container-sm" @hide="resetCreationCreditNoteData">
+    <q-modal v-model="creditNoteCreationModal" content-classes="modal-container-md" @hide="resetCreationCreditNoteData">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -35,36 +35,36 @@
             <span><q-icon name="clear" @click.native="creditNoteCreationModal = false" /></span>
           </div>
         </div>
-        <ni-modal-select caption="Bénéficiaire" v-model="newCreditNote.customer" :options="customersOptions" required-field></ni-modal-select>
+        <ni-modal-select caption="Bénéficiaire" v-model="newCreditNote.customer" :options="customersOptions" required-field />
         <ni-datetime-picker caption="Date de l'avoir" v-model="newCreditNote.date" :error="$v.newCreditNote.date.$error"
           @blur="$v.newCreditNote.date.$touch" in-modal type="date" clearable required-field />
-        <q-toggle v-model="hasLinkedEvents" label="Lié à des intervention ?" />
-        <br>
+        <div class="row q-mb-md light">
+          <q-toggle v-model="hasLinkedEvents" label="Lié à des interventions ?" />
+        </div>
         <!-- Has linked events -->
         <ni-datetime-picker v-if="hasLinkedEvents" caption="Début période concernée" v-model="newCreditNote.startDate" :error="$v.newCreditNote.startDate.$error"
           @blur="$v.newCreditNote.startDate.$touch" in-modal type="date" :disable="!hasLinkedEvents" clearable @input="getEvents" />
         <ni-datetime-picker v-if="hasLinkedEvents" caption="Fin période concernée" v-model="newCreditNote.endDate" :error="$v.newCreditNote.endDate.$error"
           @blur="$v.newCreditNote.endDate.$touch" in-modal type="date" :disable="!hasLinkedEvents" clearable @input="getEvents" />
         <template v-if="events.length > 0">
-          <p>Évènements</p>
-          <q-option-group color="primary" type="checkbox" v-model="newCreditNote.events" :options="getEventsOptions" />
+          <ni-option-group v-model="newCreditNote.events" :options="getEventsOptions" caption="Évènements" type="checkbox"
+            required-field />
         </template>
-        <br>
         <div v-if="hasLinkedEvents" class="row justify-between items-baseline">
-          <div class="col-6"><p>Montant HT: {{ newCreditNote.exclTaxesCustomer }}</p></div>
-          <div class="col-6"><p>Montant TTC: {{ newCreditNote.inclTaxesCustomer }}</p></div>
+          <div class="col-6 light"><p>Montant HT : {{ newCreditNote.exclTaxesCustomer }}</p></div>
+          <div class="col-6 light"><p>Montant TTC : {{ newCreditNote.inclTaxesCustomer }}</p></div>
         </div>
         <!-- Hasn't linked event -->
         <ni-modal-select v-if="!hasLinkedEvents" caption="Souscription concernée" v-model="newCreditNote.subscription"
           :options="subscriptionsOptions" :disable="!hasLinkedEvents && !newCreditNote.customer" required-field />
-        <ni-modal-input v-if="!hasLinkedEvents" caption="Montant TTC" suffix="€" type="number" v-model="newCreditNote.inclTaxesCustomer" :disable="!newCreditNote.subscription" />
+        <ni-modal-input v-if="!hasLinkedEvents" caption="Montant TTC" suffix="€" type="number" v-model="newCreditNote.inclTaxesCustomer" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer l'avoir" icon-right="add" color="primary" :loading="loading" @click="createNewCreditNote"
         :disable="$v.newCreditNote.$error" />
     </q-modal>
 
     <!-- Credit note edition modal -->
-    <q-modal v-model="creditNoteEditionModal" content-classes="modal-container-sm" @hide="resetEditionCreditNoteData">
+    <q-modal v-model="creditNoteEditionModal" content-classes="modal-container-md" @hide="resetEditionCreditNoteData">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -76,21 +76,19 @@
         </div>
         <ni-modal-select caption="Bénéficiaire" v-model="editCreditNote.customer" :options="customersOptions" required-field></ni-modal-select>
         <ni-datetime-picker caption="Date de l'avoir" v-model="editCreditNote.date" in-modal type="date" clearable required-field />
-        <br>
         <!-- Has linked events -->
         <ni-datetime-picker v-if="editCreditNote.events.length > 0" caption="Début période concernée" v-model="editCreditNote.startDate"
           in-modal type="date" :disable="!editCreditNote.events" clearable @input="getEvents" />
         <ni-datetime-picker v-if="editCreditNote.events.length > 0" caption="Fin période concernée" v-model="editCreditNote.endDate"
           in-modal type="date" :disable="!editCreditNote.events" clearable @input="getEvents" />
         <template v-if="events.length > 0">
-          <p>Évènements</p>
-          <q-option-group color="primary" type="checkbox" v-model="editCreditNote.events" :options="getEventsOptions" />
+          <ni-option-group v-model="editCreditNote.events" :options="getEventsOptions" caption="Évènements" type="checkbox"
+            required-field />
         </template>
         <!-- Hasn't linked event -->
-        <br>
         <div v-if="editCreditNote.events.length > 0" class="row justify-between items-baseline">
-          <div class="col-6"><p>Montant HT: {{ editCreditNote.exclTaxesCustomer }}</p></div>
-          <div class="col-6"><p>Montant TTC: {{ editCreditNote.inclTaxesCustomer }}</p></div>
+          <div class="col-6 light"><p>Montant HT : {{ editCreditNote.exclTaxesCustomer }}</p></div>
+          <div class="col-6 light"><p>Montant TTC : {{ editCreditNote.inclTaxesCustomer }}</p></div>
         </div>
         <ni-modal-select v-if="!editCreditNote.events.length > 0" caption="Souscription concernée" v-model="editCreditNote.subscription"
           :options="subscriptionsOptions" :disable="!hasLinkedEvents && !editCreditNote.customer" required-field />
@@ -108,6 +106,7 @@ import DatetimePicker from '../../../components/form/DatetimePicker';
 import DatetimeRange from '../../../components/form/DatetimeRange';
 import ModalInput from '../../../components/form/ModalInput';
 import ModalSelect from '../../../components/form/ModalSelect';
+import OptionGroup from '../../../components/form/OptionGroup';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
 import { TWO_WEEKS } from '../../../data/constants';
@@ -118,7 +117,8 @@ export default {
     'ni-datetime-picker': DatetimePicker,
     'ni-modal-input': ModalInput,
     'ni-modal-select': ModalSelect,
-    'ni-datetime-range': DatetimeRange
+    'ni-datetime-range': DatetimeRange,
+    'ni-option-group': OptionGroup,
   },
   data () {
     return {
@@ -458,10 +458,14 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+@import '~variables';
 
   .title
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+
+  .light
+    font-size: 14px
 
 </style>
