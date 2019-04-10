@@ -5,7 +5,7 @@
         <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
         <q-icon v-if="error" name="error_outline" color="secondary" />
       </div>
-      <q-field v-else :error="error" :error-label="errorLabel">
+      <q-field :error="error" :error-label="errorLabel">
         <q-input ref="originInput" :value="value" color="white" inverted-light @input="inputHandler" @blur="blurHandler" @focus="focusHandler" :suffix="suffix" :type="type" :rows="rows" :readonly="readOnly" />
       </q-field>
     </div>
