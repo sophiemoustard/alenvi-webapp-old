@@ -8,13 +8,16 @@
       <template v-if="index === 0 && col.name === 'client'">
         {{ getClientName(props.row.customer, bill) }}
       </template>
-      <template v-else-if="index === 0 && (col.name === 'startDate' || col.name === 'endDate')">
+      <template v-else-if="index === 0 && col.name === 'startDate'">
         <div class="cursor-pointer text-primary">
-          {{ formatDate(bill[col.name]) }}
-          <q-popover @hide="$emit('datetime:hide')">
-            <q-datetime-picker v-model="bill[col.name]" minimal />
+          {{ formatDate(bill.startDate) }}
+          <q-popover>
+            <q-datetime-picker v-model="bill.startDate" :max="bill.endDate" minimal @input="$emit('datetime:input')" />
           </q-popover>
         </div>
+      </template>
+      <template v-else-if="col.name === 'endDate'">
+        {{ formatDate(bill.endDate) }}
       </template>
       <template v-else-if="col.name === 'service'">{{ bill.subscription.service.versions[bill.subscription.service.versions.length - 1].name }}</template>
       <template v-else-if="col.name === 'hours'">{{ formatHours(bill.hours) }}</template>

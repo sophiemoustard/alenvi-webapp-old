@@ -17,7 +17,7 @@
 
           <template slot="body" slot-scope="props">
             <ni-to-bill-row v-for="(bill, index) in props.row.customerBills.bills" :key="bill._id" :props="props"
-              :index="index" :bill.sync="bill" display-checkbox @discount:click="discountEdit($event, bill)" @datetime:hide="refreshBill(props.row, bill)" />
+              :index="index" :bill.sync="bill" display-checkbox @discount:click="discountEdit($event, bill)" @datetime:input="refreshBill(props.row, bill)" />
 
             <q-tr v-if="props.row.customerBills.bills.length > 1" :props="props">
               <q-td colspan="10">
@@ -30,7 +30,7 @@
 
             <template v-if="props.row.thirdPartyPayerBills">
               <ni-to-bill-row v-for="bill in props.row.thirdPartyPayerBills.bills" :key="bill._id" :props="props"
-                :bill="bill" @discount:click="discountEdit($event, bill)" display-checkbox @datetime:hide="refreshBill(props.row, bill, true)" />
+                :bill="bill" @discount:click="discountEdit($event, bill)" display-checkbox @datetime:input="refreshBill(props.row, bill)" />
             </template>
           </template>
 
@@ -53,7 +53,7 @@
         </q-table>
       </q-card>
     </div>
-    <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done" :label="totalToBillLabel" @click="opened = true" />
+    <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done" :label="totalToBillLabel" @click="createBills" />
   </q-page>
 </template>
 
@@ -61,6 +61,7 @@
 import { MONTH } from '../../../data/constants';
 import ModalInput from '../../../components/form/ModalInput';
 import ToBillRow from '../../../components/table/ToBillRow';
+import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
 
 export default {
   name: 'ToBill',
@@ -193,11 +194,7 @@ export default {
     },
   },
   async mounted () {
-    await this.getDraftBills({
-      endDate: this.billingPeriod.endDate.toDate(),
-      startDate: this.billingPeriod.startDate.toDate(),
-      billingPeriod: this.user.company.customersConfig.billingPeriod,
-    });
+    await this.getDraftBills();
   },
   methods: {
     formatPrice (value) {
@@ -214,6 +211,13 @@ export default {
     },
     async getDraftBills (params) {
       try {
+        if (!params) {
+          params = {
+            endDate: this.billingPeriod.endDate.toDate(),
+            startDate: this.billingPeriod.startDate.toDate(),
+            billingPeriod: this.user.company.customersConfig.billingPeriod,
+          }
+        }
         this.tableLoading = true;
         this.draftBills = await this.$bills.getDraftBills(params);
         this.draftBills = this.draftBills.map((draft) => {
@@ -229,6 +233,7 @@ export default {
       } catch (e) {
         this.draftBills = [];
         console.error(e);
+        NotifyNegative('Erreur lors du chargement des données à facturer');
       } finally {
         this.tableLoading = false;
       }
@@ -237,21 +242,17 @@ export default {
       try {
         if (!this.hasSelectedRows) return;
         await this.$bills.create({ bills: this.selected });
+        NotifyPositive('Clients facturés');
+        await this.getDraftBills();
       } catch (e) {
         console.error(e);
+        NotifyNegative('Erreur lors de la facturation des clients');
       }
     },
-    async refreshBill (row, bill, isTpp = false) {
+    async refreshBill (row, bill) {
       try {
         const { customer, __index } = row;
         const { startDate, endDate } = bill;
-        if (isTpp) {
-          row.customerBills.startDate = startDate;
-          row.customerBills.endDate = endDate;
-        } else if (!isTpp && row.thirdPartyPayerBills) {
-          row.thirdPartyPayerBills.startDate = startDate;
-          row.thirdPartyPayerBills.endDate = endDate;
-        }
         const draftBills = await this.$bills.getDraftBills({
           startDate,
           endDate,
@@ -259,8 +260,10 @@ export default {
           customer: customer._id
         });
         this.draftBills.splice(__index, 1, ...draftBills);
+        NotifyPositive('Date de début de facturation modifiée');
       } catch (e) {
         console.error(e);
+        NotifyNegative('Erreur lors de la modification de la date de début de facturation');
       }
     },
   },
