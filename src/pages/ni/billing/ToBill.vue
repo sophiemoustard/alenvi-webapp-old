@@ -1,7 +1,7 @@
 <template>
   <q-page class="neutral-background">
     <h4 class="layout-padding">À facturer</h4>
-    <div class="'q-mb-xl q-pa-sm">
+    <div class="q-mb-xl q-pa-sm">
       <q-card class="neutral-background" flat>
         <q-table :data="draftBills" :columns="columns" row-key="customerId" binary-state-sort
           :pagination.sync="pagination" separator="none" selection="multiple" :selected.sync="selected" :loading="tableLoading">
