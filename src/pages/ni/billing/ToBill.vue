@@ -222,7 +222,6 @@ export default {
         }
         this.tableLoading = true;
         this.draftBills = await this.$bills.getDraftBills(params);
-        console.log(this.draftBills);
         this.draftBills = this.draftBills.map((draft) => {
           return {
             ...draft,

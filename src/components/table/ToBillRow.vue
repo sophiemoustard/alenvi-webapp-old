@@ -57,7 +57,7 @@ export default {
       return value ? `${this.$moment(value).format('DD/MM/YY')}` : '';
     },
     getClientName (customer, bill) {
-      return bill.thirdPartyPayer ? `${bill.thirdPartyPayer.name.length > 34 ? bill.thirdPartyPayer.name.substring(0, 35) : bill.thirdPartyPayer.name}...` : customer.identity.lastname;
+      return bill.thirdPartyPayer ? `${bill.thirdPartyPayer.name.length > 35 ? `${bill.thirdPartyPayer.name.substring(0, 35)}...` : bill.thirdPartyPayer.name}` : customer.identity.lastname;
     },
     getExclTaxesDiscount (bill) {
       return bill.discount / 1 + (bill.vat);
