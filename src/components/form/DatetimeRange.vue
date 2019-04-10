@@ -8,13 +8,13 @@
       <div class="datetime-container">
         <div class="datetime-item">
           <ni-datetime-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" @blur="blurDateHandler" />
-          <ni-select-input :value="value.startHour" @input="update($event, 'startHour')" class="time-item" align="center"
+          <ni-select-input v-if="!disableHours" :value="value.startHour" @input="update($event, 'startHour')" class="time-item" align="center"
             @blur="blurHourHandler" :options="hoursOptions" filter :filter-placeholder="value.startHour" hide-underline
             name="start-hour" />
         </div>
         <p class="delimiter">-</p>
         <div class="datetime-item end">
-          <ni-select-input :value="value.endHour" @input="update($event, 'endHour')" class="time-item" align="center"
+          <ni-select-input v-if="!disableHours" :value="value.endHour" @input="update($event, 'endHour')" class="time-item" align="center"
             @blur="blurHourHandler" :options="endHourOptions" />
           <ni-datetime-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item" @blur="blurDateHandler"
             :min="value.startDate" />
@@ -38,6 +38,7 @@ export default {
     error: Boolean,
     value: Object,
     requiredField: { type: Boolean, default: false },
+    disableHours: { type: Boolean, default: false }
   },
   data () {
     return {
@@ -103,6 +104,7 @@ export default {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
+    background-color: $white;
     @media screen and (min-width: 768px)
       & .delimiter
         padding: 10px 14px;

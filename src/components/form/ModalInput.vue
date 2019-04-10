@@ -27,6 +27,7 @@ export default {
     type: { type: String, default: 'text' },
     rows: { type: Number, default: 1 },
     readOnly: { type: Boolean, default: false },
+    disable: { type: Boolean, default: false },
     requiredField: { type: Boolean, default: false },
   },
   methods: {
