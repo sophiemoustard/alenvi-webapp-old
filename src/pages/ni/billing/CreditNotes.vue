@@ -492,6 +492,24 @@ export default {
         this.loading = false;
       }
     },
+    // Deletion
+    async deleteCreditNote (id, cell) {
+      try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Etes-vous sûr de vouloir supprimer cet avoirs ?',
+          ok: 'OK',
+          cancel: 'Annuler'
+        });
+        await this.$creditNotes.remove(id);
+        this.creditNotes.splice(cell, 1);
+        NotifyPositive('Avoir supprimé');
+      } catch (e) {
+        console.error(e);
+        if (e.message === '') return NotifyPositive('Suppression annulée');
+        NotifyNegative('Erreur lors de la suppression de l\'avoir');
+      }
+    }
   }
 }
 </script>
