@@ -36,7 +36,7 @@
         </q-td>
       </q-tr>
     </q-table>
-    <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Ajouter une personne" @click="opened = true" />
+    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une personne" @click="opened = true" />
 
     <!-- User creation modal -->
     <q-modal v-model="opened" @hide="resetForm" content-classes="modal-container-sm">

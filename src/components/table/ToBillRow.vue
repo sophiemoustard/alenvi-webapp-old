@@ -1,6 +1,6 @@
 <template>
   <q-tr :props="props"
-    :class="{'datatable-row-border-top': index === 0 && !bill.thirdPartyPayer }">
+    :class="{'datatable-row-border-top': index === 0 }">
     <q-td v-for="col in props.cols" :key="col.name" :props="props">
       <template v-if="col.name === 'externalBilling' && bill.thirdPartyPayer">
         <q-checkbox v-model="bill.externalBilling" />
@@ -8,12 +8,22 @@
       <template v-if="index === 0 && col.name === 'client'">
         {{ getClientName(props.row.customer, bill) }}
       </template>
-      <template v-else-if="index === 0 && (col.name === 'startDate' || col.name === 'endDate')">{{ formatDate(bill[col.name]) }}</template>
+      <template v-else-if="index === 0 && col.name === 'startDate'">
+        <div class="cursor-pointer text-primary">
+          {{ formatDate(bill.startDate) }}
+          <q-popover>
+            <q-datetime-picker v-model="bill.startDate" :max="bill.endDate" minimal @input="$emit('datetime:input')" />
+          </q-popover>
+        </div>
+      </template>
+      <template v-else-if="col.name === 'endDate'">
+        {{ formatDate(bill.endDate) }}
+      </template>
       <template v-else-if="col.name === 'service'">{{ bill.subscription.service.versions[bill.subscription.service.versions.length - 1].name }}</template>
       <template v-else-if="col.name === 'hours'">{{ formatHours(bill.hours) }}</template>
       <template v-else-if="col.name === 'unitExclTaxes'">{{ formatPrice(bill.unitExclTaxes) }}</template>
       <template v-else-if="col.name === 'discount'">
-        <div class="cursor-pointer text-primary" @click="$emit('click', $refs[bill._id])" v-show="!bill.editDiscount">{{ `${bill.discount}€` }}</div>
+        <div class="cursor-pointer text-primary" @click="$emit('discount:click', $refs[bill._id])" v-show="!bill.editDiscount">{{ `${bill.discount}€` }}</div>
         <q-input :ref="bill._id" v-show="bill.editDiscount" class="datatable-inner-input" :value="bill.discount" @input="setDiscount($event, bill)" suffix="€" inverted-light color="white"
           no-parent-field type="number" @blur="disableDiscountEditing(bill)" @keyup.enter="disableDiscountEditing(bill)" @keyup.esc="disableDiscountEditing(bill)" />
       </template>
@@ -47,7 +57,7 @@ export default {
       return value ? `${this.$moment(value).format('DD/MM/YY')}` : '';
     },
     getClientName (customer, bill) {
-      return bill.thirdPartyPayer ? bill.thirdPartyPayer.name : customer.identity.lastname;
+      return bill.thirdPartyPayer ? `${bill.thirdPartyPayer.name.length > 35 ? `${bill.thirdPartyPayer.name.substring(0, 35)}...` : bill.thirdPartyPayer.name}` : customer.identity.lastname;
     },
     getExclTaxesDiscount (bill) {
       return bill.discount / 1 + (bill.vat);

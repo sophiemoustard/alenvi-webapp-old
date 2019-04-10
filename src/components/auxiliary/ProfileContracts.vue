@@ -4,7 +4,7 @@
       <ni-contracts v-if="contracts" :contracts="contracts" :user="getUser" @openVersionCreation="openVersionCreationModal"
         @openEndContract="openEndContractModal" @refresh="refreshContracts" :columns="contractVisibleColumns" display-actions display-uploader
         :personKey="COACH" @refreshWithTimeout="refreshContractsWithTimeout" />
-      <q-btn :disable="!hasBasicInfo" class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat"
+      <q-btn :disable="!hasBasicInfo" class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat"
         @click="openCreationModal" />
       <div v-if="!hasBasicInfo" class="missingBasicInfo">
         <p>/!\ Il manque une ou des information(s) importante(s) pour pouvoir créer un nouveau contrat parmi:</p>

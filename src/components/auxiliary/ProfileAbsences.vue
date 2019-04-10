@@ -26,7 +26,7 @@
         </q-table>
       </q-card-main>
     </q-card>
-    <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="ion-document" label="Enregistrer une absence"
+    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="ion-document" label="Enregistrer une absence"
       @click="newAbsenceModal = true" />
 
     <!-- Absence creation modal -->
