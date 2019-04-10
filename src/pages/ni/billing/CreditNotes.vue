@@ -237,13 +237,14 @@ export default {
       this.$v.newCreditNote.endDate.$reset();
     },
     'newCreditNote.events' (value) {
-      if (value[0] && typeof value[0] === 'string') return '';
-      this.newCreditNote.exclTaxesCustomer = 0;
-      this.newCreditNote.inclTaxesCustomer = 0;
-      for (let i = 0, l = this.newCreditNote.events.length; i < l; i++) {
-        this.newCreditNote.exclTaxesCustomer += this.newCreditNote.events[i].bills.exclTaxesCustomer;
-        this.newCreditNote.inclTaxesCustomer += this.newCreditNote.events[i].bills.inclTaxesCustomer;
-      }
+      const prices = this.computePrices(this.newCreditNote.events);
+      this.newCreditNote.exclTaxesCustomer = prices.exclTaxesCustomer;
+      this.newCreditNote.inclTaxesCustomer = prices.inclTaxesCustomer;
+    },
+    'editedCreditNote.events' (value) {
+      const prices = this.computePrices(this.editedCreditNote.events);
+      this.editedCreditNote.exclTaxesCustomer = prices.exclTaxesCustomer;
+      this.editedCreditNote.inclTaxesCustomer = prices.inclTaxesCustomer;
     },
     'newCreditNote.startDate' (value) {
       if (value === null) {
@@ -290,13 +291,13 @@ export default {
       editedCreditNote: {
         date: { required },
         startDate: {
-          required: requiredIf(() => this.editedCreditNote.events.length > 0)
+          required: requiredIf(() => this.hasLinkedEvents)
         },
         endDate: {
-          required: requiredIf(() => this.editedCreditNote.events.length > 0)
+          required: requiredIf(() => this.hasLinkedEvents)
         },
         subscription: {
-          required: requiredIf(() => !this.editedCreditNote.events.length > 0)
+          required: requiredIf(() => !this.hasLinkedEvents)
         },
       },
     }
@@ -319,7 +320,7 @@ export default {
     eventsOptions () {
       return this.events.map(event => ({
         label: `${this.$moment(event.startDate).format('DD/MM/YYYY HH:mm')} - ${this.$moment(event.endDate).format('HH:mm')}`,
-        value: event,
+        value: event._id,
       }))
     }
   },
@@ -380,6 +381,17 @@ export default {
         NotifyNegative('Impossible de récupérer les évènements facturés de ce bénéficiaire');
       }
     },
+    // Compute
+    computePrices (events) {
+      let exclTaxesCustomer = 0, inclTaxesCustomer = 0;
+      const creditNoteEvents = this.events.filter(ev => events.includes(ev._id));
+      for (let i = 0, l = creditNoteEvents.length; i < l; i++) {
+        exclTaxesCustomer += creditNoteEvents[i].bills.exclTaxesCustomer;
+        inclTaxesCustomer += creditNoteEvents[i].bills.inclTaxesCustomer;
+      }
+
+      return { exclTaxesCustomer, inclTaxesCustomer };
+    },
     // Creation
     resetCreationCreditNoteData () {
       this.newCreditNote = {
@@ -396,19 +408,30 @@ export default {
       this.hasLinkedEvents = false;
       this.$v.newCreditNote.$reset();
     },
+    formatPayload (creditNote) {
+      const { date, inclTaxesCustomer, customer } = creditNote;
+      const payload = { date, inclTaxesCustomer, customer };
+
+      if (!this.hasLinkedEvents) {
+        const vat = creditNote.subscription.vat;
+        payload.exclTaxesCustomer = Number.parseFloat((creditNote.inclTaxesCustomer / (1 + (vat / 100))).toFixed(2));
+        payload.subscription = creditNote.subscription
+      } else {
+        payload.startDate = creditNote.startDate;
+        payload.endDate = creditNote.endDate;
+        payload.events = creditNote.events;
+        payload.exclTaxesCustomer = creditNote.exclTaxesCustomer;
+      }
+
+      return payload;
+    },
     async createNewCreditNote () {
       try {
         this.$v.newCreditNote.$touch();
         if (this.$v.newCreditNote.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        if (!this.hasLinkedEvents) {
-          const vat = this.newCreditNote.subscription.vat;
-          this.newCreditNote.exclTaxesCustomer = Number.parseFloat((this.newCreditNote.inclTaxesCustomer / (1 + (vat / 100))).toFixed(2));
-        }
-
-        this.newCreditNote.events = this.newCreditNote.events.map(event => event._id);
         this.loading = true;
-        await this.$creditNotes.create(this.$_.pickBy(this.newCreditNote));
+        await this.$creditNotes.create(this.formatPayload(this.newCreditNote));
 
         NotifyPositive('Avoir créé');
         await this.refreshCreditNotes();
@@ -424,15 +447,19 @@ export default {
     async openCreditNoteEditionModal (creditNote) {
       this.editedCreditNote = { ...creditNote }; // spread to not update by reference
       this.editedCreditNote.customer = creditNote.customer._id;
-      this.hasLinkedEvents = this.editedCreditNote.events && this.editedCreditNote.events.length > 0;
+
+      this.hasLinkedEvents = creditNote.events && creditNote.events.length > 0;
       if (this.hasLinkedEvents) {
         await this.getEvents();
-        for (let i = 0, l = this.editedCreditNote.events.length; i < l; i++) {
-          if (!this.events.some(event => this.editedCreditNote.events[i]._id === event._id)) {
-            this.events.push(this.editedCreditNote.events[i]);
+        for (let i = 0, l = creditNote.events.length; i < l; i++) {
+          if (!this.events.some(event => creditNote.events[i]._id === event._id)) {
+            this.events.push(creditNote.events[i]);
           }
         }
       }
+
+      this.editedCreditNote.events = creditNote.events.map(ev => ev._id);
+
       this.creditNoteEditionModal = true
     },
     resetEditionCreditNoteData () {
@@ -451,21 +478,10 @@ export default {
       try {
         this.$v.editedCreditNote.$touch();
         if (this.$v.editedCreditNote.$error) return NotifyWarning('Champ(s) invalide(s)');
-        if (!this.editedCreditNote.events.length > 0) {
-          const vat = this.editedCreditNote.subscription.vat;
-          this.editedCreditNote.exclTaxesCustomer = Number.parseFloat((this.editedCreditNote.inclTaxesCustomer / (1 + (vat / 100))).toFixed(2));
-        }
-        for (const event of this.editedCreditNote.events) {
-          await this.$events.updateById(event._id, { isBilled: false });
-        }
-        this.editedCreditNote.events = this.editedCreditNote.events.map(event => event._id);
+
         this.loading = true;
-        delete this.editedCreditNote.updatedAt;
-        delete this.editedCreditNote.createdAt;
-        delete this.editedCreditNote.number;
-        const id = this.editedCreditNote._id;
-        delete this.editedCreditNote._id;
-        await this.$creditNotes.updateById(id, this.$_.pickBy(this.editedCreditNote));
+        await this.$creditNotes.updateById(this.editedCreditNote._id, this.formatPayload(this.editedCreditNote));
+
         NotifyPositive('Avoir édité');
         await this.refreshCreditNotes();
         this.creditNoteEditionModal = false;
