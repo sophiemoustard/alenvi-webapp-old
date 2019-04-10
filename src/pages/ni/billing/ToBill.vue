@@ -244,6 +244,7 @@ export default {
         await this.$bills.create({ bills: this.selected });
         NotifyPositive('Clients facturés');
         await this.getDraftBills();
+        this.selected = [];
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la facturation des clients');
