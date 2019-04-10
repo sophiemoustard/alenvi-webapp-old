@@ -243,7 +243,8 @@ export default {
     async createBills () {
       try {
         if (!this.hasSelectedRows) return;
-        await this.$bills.create({ bills: this.selected });
+        const bills = this.selected.map(row => this.$_.omit(row, ['__index']));
+        await this.$bills.create({ bills });
         NotifyPositive('Clients facturés');
         await this.getDraftBills();
         this.selected = [];
