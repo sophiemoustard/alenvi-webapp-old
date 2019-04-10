@@ -1,7 +1,9 @@
 <template>
   <q-page class="neutral-background" padding>
-    <h4>Avoirs</h4>
-    <ni-datetime-range v-model="creditNotesDates" disable-hours></ni-datetime-range>
+    <div class="title">
+      <h4>Avoirs</h4>
+      <ni-datetime-range v-model="creditNotesDates" disable-hours></ni-datetime-range>
+    </div>
     <div class="q-mb-xl">
       <q-card style="background: white">
         <q-table :data="creditNotes" :columns="creditNotesColumns" binary-state-sort :pagination.sync="pagination" class="table-responsive">
@@ -454,3 +456,12 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus" scoped>
+
+  .title
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+</style>

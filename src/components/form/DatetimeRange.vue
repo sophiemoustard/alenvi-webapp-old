@@ -104,6 +104,7 @@ export default {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
+    background-color: $white;
     @media screen and (min-width: 768px)
       & .delimiter
         padding: 10px 14px;
