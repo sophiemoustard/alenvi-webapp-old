@@ -108,6 +108,7 @@ import ModalInput from '../../../components/form/ModalInput';
 import ModalSelect from '../../../components/form/ModalSelect';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
+import { TWO_WEEKS } from '../../../data/constants';
 
 export default {
   name: 'CreditNotes',
@@ -231,7 +232,7 @@ export default {
     }
   },
   async mounted () {
-    if (this.mainUser.company.customersConfig.billingPeriod === 'two_weeks') {
+    if (this.mainUser.company.customersConfig.billingPeriod === TWO_WEEKS) {
       if (this.$moment().date() > 16) {
         this.creditNotesDates.startDate = this.$moment().set('date', 16).toISOString();
         this.creditNotesDates.endDate = this.$moment().endOf('month').toISOString()
