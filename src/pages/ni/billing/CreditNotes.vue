@@ -51,8 +51,8 @@
             required-field inline />
         </template>
         <div v-if="hasLinkedEvents" class="row justify-between items-baseline">
-          <div class="col-6 light"><p>Montant HT : {{ newCreditNote.exclTaxesCustomer }}</p></div>
-          <div class="col-6 light"><p>Montant TTC : {{ newCreditNote.inclTaxesCustomer }}</p></div>
+          <div class="col-6 light"><p>Montant HT : {{ formatPrice(newCreditNote.exclTaxesCustomer) }}</p></div>
+          <div class="col-6 light"><p>Montant TTC : {{ formatPrice(newCreditNote.inclTaxesCustomer) }}</p></div>
         </div>
         <!-- Hasn't linked event -->
         <ni-modal-select v-if="!hasLinkedEvents" caption="Souscription concernée" v-model="newCreditNote.subscription"
@@ -87,8 +87,8 @@
         </template>
         <!-- Hasn't linked event -->
         <div v-if="editCreditNote.events.length > 0" class="row justify-between items-baseline">
-          <div class="col-6 light"><p>Montant HT : {{ editCreditNote.exclTaxesCustomer }}</p></div>
-          <div class="col-6 light"><p>Montant TTC : {{ editCreditNote.inclTaxesCustomer }}</p></div>
+          <div class="col-6 light"><p>Montant HT : {{ formatPrice(editCreditNote.exclTaxesCustomer) }}</p></div>
+          <div class="col-6 light"><p>Montant TTC : {{ formatPrice(editCreditNote.inclTaxesCustomer) }}</p></div>
         </div>
         <ni-modal-select v-if="!editCreditNote.events.length > 0" caption="Souscription concernée" v-model="editCreditNote.subscription"
           :options="subscriptionsOptions" :disable="!hasLinkedEvents && !editCreditNote.customer" required-field />
@@ -182,12 +182,14 @@ export default {
           label: 'HT',
           align: 'left',
           field: 'exclTaxesCustomer',
+          format: value => this.formatPrice(value),
         },
         {
           name: 'inclTaxes',
           label: 'TTC',
           align: 'left',
           field: 'inclTaxesCustomer',
+          format: value => this.formatPrice(value),
         },
         {
           name: 'actions',
@@ -296,23 +298,34 @@ export default {
     }
   },
   methods: {
+    formatPrice (value) {
+      return value ? `${parseFloat(value).toFixed(2)}€` : '0€';
+    },
     // Refresh data
     async refreshCustomersOptions () {
       try {
-        this.customersOptions = await this.$customers.showAll({ isActive: true, subscriptions: true });
-        for (let i = 0, l = this.customersOptions.length; i < l; i++) {
-          this.customersOptions[i].label = this.customersOptions[i].identity.lastname;
-          this.customersOptions[i].value = this.customersOptions[i]._id;
+        this.customersOptions = [];
+        const customers = await this.$customers.showAll({ isActive: true, subscriptions: true });
+        for (let i = 0, l = customers.length; i < l; i++) {
+          this.customersOptions.push({
+            label: customers[i].identity.lastname,
+            value: customers[i]._id
+          });
         }
       } catch (e) {
+        this.customersOptions = [];
         console.error(e);
         NotifyNegative('Impossible de récupérer les bénéficiaires');
       }
     },
     async refreshCreditNotes () {
       try {
-        this.creditNotes = await this.$creditNotes.showAll({ startDate: this.creditNotesDates.startDate, endDate: this.creditNotesDates.endDate });
+        this.creditNotes = await this.$creditNotes.showAll({
+          startDate: this.creditNotesDates.startDate,
+          endDate: this.creditNotesDates.endDate
+        });
       } catch (e) {
+        this.creditNotes = [];
         console.error(e);
         NotifyNegative('Impossible de récupérer les avoirs');
       }
