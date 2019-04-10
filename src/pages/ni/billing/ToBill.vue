@@ -29,8 +29,10 @@
             </q-tr>
 
             <template v-if="props.row.thirdPartyPayerBills">
-              <ni-to-bill-row v-for="bill in props.row.thirdPartyPayerBills.bills" :key="bill._id" :props="props"
-                :bill="bill" @discount:click="discountEdit($event, bill)" display-checkbox @datetime:input="refreshBill(props.row, bill)" />
+              <template v-for="tpp in props.row.thirdPartyPayerBills">
+                <ni-to-bill-row v-for="bill in tpp.bills" :key="bill._id" :props="props"
+                  :bill="bill" @discount:click="discountEdit($event, bill)" display-checkbox @datetime:input="refreshBill(props.row, bill)" />
+              </template>
             </template>
           </template>
 
@@ -220,13 +222,13 @@ export default {
         }
         this.tableLoading = true;
         this.draftBills = await this.$bills.getDraftBills(params);
+        console.log(this.draftBills);
         this.draftBills = this.draftBills.map((draft) => {
           return {
             ...draft,
             customerBills: { total: draft.customerBills.total, bills: this.addEditDiscountToBills(draft.customerBills.bills) },
             ...(!!draft.thirdPartyPayerBills && {
-              thirdPartyPayerBills:
-            { total: draft.thirdPartyPayerBills.total, bills: this.addEditDiscountToBills(draft.thirdPartyPayerBills.bills) }
+              thirdPartyPayerBills: draft.thirdPartyPayerBills.map(tpp => ({ total: tpp.total, bills: this.addEditDiscountToBills(tpp.bills) }))
             }),
           }
         });
