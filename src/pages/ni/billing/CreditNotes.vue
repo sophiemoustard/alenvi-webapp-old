@@ -55,6 +55,9 @@
             <ni-option-group v-model="newCreditNote.events" :options="eventsOptions" caption="Évènements"
               type="checkbox" required-field inline />
           </template>
+          <div v-if="newCreditNote.customer && newCreditNote.startDate && newCreditNote.endDate && events.length === 0" class="light warning">
+            <p>{{ eventsNotFoundMessage }}</p>
+          </div>
           <div class="row justify-between items-baseline">
             <div class="col-6 light">
               <p>Montant HT : {{ formatPrice(newCreditNote.exclTaxesCustomer) }}</p>
@@ -101,6 +104,10 @@
             <ni-option-group v-model="editedCreditNote.events" :options="eventsOptions" caption="Évènements"
               type="checkbox" required-field />
           </template>
+          <div v-if="editedCreditNote.customer && editedCreditNote.startDate && editedCreditNote.endDate && events.length === 0"
+            class="light warning">
+            <p>{{ eventsNotFoundMessage }}</p>
+          </div>
           <div class="row justify-between items-baseline">
             <div class="col-6 light">
               <p>Montant HT : {{ formatPrice(editedCreditNote.exclTaxesCustomer) }}</p>
@@ -145,6 +152,7 @@ export default {
   },
   data () {
     return {
+      eventsNotFoundMessage: "Il n'y a aucune intervention facturée pour le bénéficiaire aux dates données",
       loading: false,
       creditNoteCreationModal: false,
       creditNoteEditionModal: false,
@@ -427,11 +435,11 @@ export default {
       } else {
         payload.startDate = creditNote.startDate;
         payload.endDate = creditNote.endDate;
-        payload.events = creditNote.events;
+        payload.events = creditNote.events.length > 0 ? creditNote.events : null;
         payload.exclTaxesCustomer = creditNote.exclTaxesCustomer;
       }
 
-      return payload;
+      return this.$_.pickBy(payload);
     },
     async createNewCreditNote () {
       try {
@@ -533,6 +541,9 @@ export default {
 
   .light
     font-size: 14px;
+
+  .warning
+    color: $red;
 
   /deep/ .modal-container-md
     width: 45vw;
