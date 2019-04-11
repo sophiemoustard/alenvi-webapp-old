@@ -2,7 +2,7 @@
   <q-page class="neutral-background">
     <div class="title layout-padding">
       <h4>Avoirs</h4>
-      <ni-date-range v-model="creditNotesDates" />
+      <ni-date-range v-model="creditNotesDates" @input="refreshCreditNotes" />
     </div>
     <div class="q-mb-xl q-pa-sm">
       <q-card class="neutral-background" flat>
