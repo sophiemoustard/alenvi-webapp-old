@@ -21,7 +21,7 @@
           </q-tr>
         </q-table>
       </q-card>
-      <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Créer un avoir"
+      <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer un avoir"
         @click="creditNoteCreationModal = true" />
     </div>
 
