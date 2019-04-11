@@ -1,11 +1,11 @@
 <template>
-  <q-page class="neutral-background" padding>
-    <div class="title">
+  <q-page class="neutral-background">
+    <div class="title layout-padding">
       <h4>Avoirs</h4>
       <ni-datetime-range v-model="creditNotesDates" disable-hours></ni-datetime-range>
     </div>
-    <div class="q-mb-xl">
-      <q-card style="background: white">
+    <div class="q-mb-xl q-pa-sm">
+      <q-card class="neutral-background" flat>
         <q-table :data="creditNotes" :columns="creditNotesColumns" binary-state-sort :pagination.sync="pagination"
           class="table-responsive">
           <q-tr slot="body" slot-scope="props" :props="props">
@@ -527,5 +527,10 @@ export default {
 
   /deep/ .modal-container-md
     width: 45vw;
+
+  /deep/ .q-table-bottom
+    border-top: none;
+  /deep/ .q-table-middle
+    margin-bottom: 0;
 
 </style>
