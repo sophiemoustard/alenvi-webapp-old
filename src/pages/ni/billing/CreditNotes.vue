@@ -2,7 +2,6 @@
   <q-page class="neutral-background">
     <div class="title layout-padding">
       <h4>Avoirs</h4>
-      <ni-date-range v-model="creditNotesDates" @input="refreshCreditNotes" />
     </div>
     <div class="q-pa-sm">
       <q-card class="q-mb-xl neutral-background" flat>
@@ -148,7 +147,7 @@ import OptionGroup from '../../../components/form/OptionGroup';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { strictPositiveNumber } from '../../../helpers/vuelidateCustomVal.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
-import { TWO_WEEKS, REQUIRED_LABEL } from '../../../data/constants';
+import { REQUIRED_LABEL } from '../../../data/constants';
 
 export default {
   name: 'CreditNotes',
@@ -168,10 +167,6 @@ export default {
       hasLinkedEvents: false,
       customersOptions: [],
       events: [],
-      creditNotesDates: {
-        startDate: null,
-        endDate: null,
-      },
       newCreditNote: {
         customer: null,
         date: null,
@@ -199,6 +194,12 @@ export default {
           label: '#',
           align: 'left',
           field: 'number',
+        },
+        {
+          name: 'date',
+          label: 'Date de l\'avoir',
+          align: 'left',
+          field: row => row.date ? this.$moment(row.date).format('DD/MM/YYYY') : '',
         },
         {
           name: 'startDate',
@@ -239,7 +240,11 @@ export default {
           field: '_id',
         },
       ],
-      pagination: { rowsPerPage: 0 },
+      pagination: {
+        rowsPerPage: 0,
+        sortBy: 'date',
+        descending: true,
+      },
     }
   },
   watch: {
@@ -278,18 +283,6 @@ export default {
     }
   },
   async mounted () {
-    if (this.mainUser.company.customersConfig.billingPeriod === TWO_WEEKS) {
-      if (this.$moment().date() > 16) {
-        this.creditNotesDates.startDate = this.$moment().set('date', 16).toISOString();
-        this.creditNotesDates.endDate = this.$moment().endOf('month').toISOString()
-      } else {
-        this.creditNotesDates.startDate = this.$moment().startOf('month').toISOString()
-        this.creditNotesDates.endDate = this.$moment().set('date', 15).toISOString();
-      }
-    } else {
-      this.creditNotesDates.startDate = this.$moment().startOf('month').toISOString();
-      this.creditNotesDates.endDate = this.$moment().endOf('month').toISOString();
-    }
     await Promise.all([this.refreshCreditNotes(), this.refreshCustomersOptions()]);
   },
   validations () {
@@ -396,10 +389,7 @@ export default {
     },
     async refreshCreditNotes () {
       try {
-        this.creditNotes = await this.$creditNotes.showAll({
-          startDate: this.creditNotesDates.startDate,
-          endDate: this.creditNotesDates.endDate
-        });
+        this.creditNotes = await this.$creditNotes.showAll();
       } catch (e) {
         this.creditNotes = [];
         console.error(e);
