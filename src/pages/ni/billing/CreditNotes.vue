@@ -463,11 +463,11 @@ export default {
       const payload = { date, inclTaxesCustomer, customer };
 
       if (!this.hasLinkedEvents) {
-        const vat = creditNote.subscription.vat;
-        payload.exclTaxesCustomer = Number.parseFloat((creditNote.inclTaxesCustomer / (1 + (vat / 100))).toFixed(2));
         const selectedCustomer = this.customersOptions.find(cus => cus.value === customer);
         const subscription = selectedCustomer.subscriptions.find(sub => sub._id === creditNote.subscription);
-        payload.subscription = { _id: subscription._id, service: subscription.service.name, vat: subscription.service.versions[0].vat };
+        const vat = subscription.service.vat;
+        payload.exclTaxesCustomer = Number.parseFloat((creditNote.inclTaxesCustomer / (1 + (vat / 100))).toFixed(2));
+        payload.subscription = { _id: subscription._id, service: subscription.service.name, vat };
       } else {
         payload.startDate = creditNote.startDate;
         payload.endDate = creditNote.endDate;
