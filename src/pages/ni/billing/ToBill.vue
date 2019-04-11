@@ -17,7 +17,7 @@
 
           <template slot="body" slot-scope="props">
             <ni-to-bill-row v-for="(bill, index) in props.row.customerBills.bills" :key="bill._id" :props="props"
-              :index="index" :bill.sync="bill" display-checkbox @discount:click="discountEdit($event, bill)" @datetime:input="refreshBill(props.row, bill)" />
+              :index="index" :bill.sync="bill" display-checkbox @discount:click="discountEdit($event, bill)" @datetime:input="refreshBill(props.row, bill)" @discount:input="computeTotalAmount(props.row.customerBills)" />
 
             <q-tr v-if="props.row.customerBills.bills.length > 1" :props="props">
               <q-td colspan="10">
@@ -31,7 +31,7 @@
             <template v-if="props.row.thirdPartyPayerBills">
               <template v-for="tpp in props.row.thirdPartyPayerBills">
                 <ni-to-bill-row v-for="bill in tpp.bills" :key="bill._id" :props="props"
-                  :bill="bill" @discount:click="discountEdit($event, bill)" display-checkbox @datetime:input="refreshBill(props.row, bill)" />
+                  :bill="bill" @discount:click="discountEdit($event, bill)" display-checkbox @datetime:input="refreshBill(props.row, bill)" @discount:input="computeTotalAmount(tpp)"/>
               </template>
             </template>
           </template>
@@ -201,6 +201,11 @@ export default {
   methods: {
     formatPrice (value) {
       return value ? `${parseFloat(value).toFixed(2)}€` : '';
+    },
+    computeTotalAmount (data) {
+      const total = data.bills.reduce((prev, next) => prev + (next.inclTaxes - next.discount), 0);
+      data.total = total;
+      return total;
     },
     discountEdit (event, bill) {
       bill.editDiscount = true;

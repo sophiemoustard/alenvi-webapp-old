@@ -27,8 +27,8 @@
         <q-input :ref="bill._id" v-show="bill.editDiscount" class="datatable-inner-input" :value="bill.discount" @input="setDiscount($event, bill)" suffix="€" inverted-light color="white"
           no-parent-field type="number" @blur="disableDiscountEditing(bill)" @keyup.enter="disableDiscountEditing(bill)" @keyup.esc="disableDiscountEditing(bill)" />
       </template>
-      <template v-else-if="col.name === 'exclTaxes'">{{ formatPrice(bill.exclTaxes - getExclTaxesDiscount(bill)) }}</template>
-      <template v-else-if="col.name === 'inclTaxes'">{{ formatPrice(bill.inclTaxes - bill.discount) }}</template>
+      <template v-else-if="col.name === 'exclTaxes'">{{ formatPrice(getNetExclTaxes(bill)) }}</template>
+      <template v-else-if="col.name === 'inclTaxes'">{{ formatPrice(getNetInclTaxes(bill)) }}</template>
       <template v-else-if="index === 0">{{ col.value }}</template>
     </q-td>
     <q-td auto-width>
@@ -60,10 +60,17 @@ export default {
       return bill.thirdPartyPayer ? `${bill.thirdPartyPayer.name.length > 35 ? `${bill.thirdPartyPayer.name.substring(0, 35)}...` : bill.thirdPartyPayer.name}` : customer.identity.lastname;
     },
     getExclTaxesDiscount (bill) {
-      return bill.discount / 1 + (bill.vat);
+      return bill.discount / (1 + bill.vat);
+    },
+    getNetExclTaxes (bill) {
+      return bill.exclTaxes - this.getExclTaxesDiscount(bill);
+    },
+    getNetInclTaxes (bill) {
+      return bill.inclTaxes - bill.discount;
     },
     setDiscount (event, bill) {
       bill.discount = !event || isNaN(event) ? 0 : event;
+      this.$emit('discount:input');
     },
     disableDiscountEditing (bill) {
       bill.editDiscount = false;
