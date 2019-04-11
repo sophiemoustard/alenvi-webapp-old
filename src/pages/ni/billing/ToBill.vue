@@ -1,41 +1,37 @@
 <template>
   <q-page class="neutral-background">
-    <h4 class="layout-padding">À facturer</h4>
-    <div class="q-mb-xl q-pa-sm">
-      <q-card class="neutral-background" flat>
-        <q-table :data="draftBills" :columns="columns" row-key="customerId" binary-state-sort
-          :pagination.sync="pagination" separator="none" selection="multiple" :selected.sync="selected" :loading="tableLoading">
-
+    <div class="title layout-padding">
+      <h4>À facturer</h4>
+      <ni-date-range v-model="billingDates" @input="getDraftBills" />
+    </div>
+    <div class="q-pa-sm">
+      <q-card class="q-mb-xl neutral-background" flat>
+        <q-table :data="draftBills" :columns="columns" row-key="customerId" binary-state-sort :loading="tableLoading"
+          :pagination.sync="pagination" separator="none" selection="multiple" :selected.sync="selected">
           <q-tr slot="header" slot-scope="props">
-            <q-th v-for="col in props.cols" :key="col.name" :props="props">
-              {{ col.label }}
-            </q-th>
+            <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
             <q-th auto-width>
               <q-checkbox v-model="props.selected" indeterminate-value="some" />
             </q-th>
           </q-tr>
-
           <template slot="body" slot-scope="props">
             <ni-to-bill-row v-for="(bill, index) in props.row.customerBills.bills" :key="bill._id" :props="props"
-              :index="index" :bill.sync="bill" display-checkbox @discount:click="discountEdit($event, bill)" @datetime:input="refreshBill(props.row, bill)" @discount:input="computeTotalAmount(props.row.customerBills)" />
-
+              @discount:click="discountEdit($event, bill)" @datetime:input="refreshBill(props.row, bill)"
+              @discount:input="computeTotalAmount(props.row.customerBills)" :index="index" :bill.sync="bill"
+              display-checkbox />
             <q-tr v-if="props.row.customerBills.bills.length > 1" :props="props">
-              <q-td colspan="10">
-                <div class="text-right">Total :</div>
-              </q-td>
-              <q-td colspan="2">
-                {{ formatPrice(props.row.customerBills.total) }}
-              </q-td>
+              <q-td colspan="10"><div class="text-right">Total :</div></q-td>
+              <q-td colspan="1" align="center">{{ formatPrice(props.row.customerBills.total) }}</q-td>
+              <q-td colspan="1" />
             </q-tr>
-
             <template v-if="props.row.thirdPartyPayerBills">
               <template v-for="tpp in props.row.thirdPartyPayerBills">
-                <ni-to-bill-row v-for="bill in tpp.bills" :key="bill._id" :props="props"
-                  :bill="bill" @discount:click="discountEdit($event, bill)" display-checkbox @datetime:input="refreshBill(props.row, bill)" @discount:input="computeTotalAmount(tpp)"/>
+                <ni-to-bill-row v-for="bill in tpp.bills" :key="bill._id" :props="props" :bill="bill" display-checkbox
+                  @discount:click="discountEdit($event, bill)" @datetime:input="refreshBill(props.row, bill)"
+                  @discount:input="computeTotalAmount(tpp)" />
               </template>
             </template>
           </template>
-
           <div slot="bottom" slot-scope="props" class="row justify-between full-width">
             <div class="row items-center">
               <q-btn-toggle class="on-left no-shadow" v-model="pagination.rowsPerPage" :options="rowsPerPageOptions"
@@ -55,13 +51,15 @@
         </q-table>
       </q-card>
     </div>
-    <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done" :label="totalToBillLabel" @click="createBills" />
+    <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
+      :label="totalToBillLabel" @click="createBills" />
   </q-page>
 </template>
 
 <script>
 import { MONTH } from '../../../data/constants';
 import ModalInput from '../../../components/form/ModalInput';
+import DateRange from '../../../components/form/DateRange';
 import ToBillRow from '../../../components/table/ToBillRow';
 import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
 
@@ -69,7 +67,8 @@ export default {
   name: 'ToBill',
   components: {
     'ni-modal-input': ModalInput,
-    'ni-to-bill-row': ToBillRow
+    'ni-to-bill-row': ToBillRow,
+    'ni-date-range': DateRange,
   },
   data () {
     return {
@@ -82,6 +81,10 @@ export default {
         { label: '300', value: 300 },
         { label: 'Tous', value: 0 },
       ],
+      billingDates: {
+        startDate: null,
+        endDate: null,
+      },
       draftBills: [],
       selected: [],
       columns: [
@@ -148,22 +151,6 @@ export default {
     user () {
       return this.$store.getters['main/user'];
     },
-    billingPeriod () {
-      const billingPeriod = this.user.company.customersConfig.billingPeriod;
-      if (billingPeriod === MONTH) {
-        return {
-          endDate: this.$moment().subtract(1, 'M').endOf('month'),
-          startDate: this.$moment().subtract(1, 'M').startOf('month'),
-        };
-      }
-
-      return {
-        endDate: this.$moment().date() > 15 ? this.$moment().date(15).hour(23).minute(59)
-          : this.$moment().endOf('month').hour(23).minute(59),
-        startDate: this.$moment().date() > 15 ? this.$moment().date(1).hour(0).minute(0)
-          : this.$moment().date(16).hour(0).minute(0),
-      }
-    },
     firstRowIndex () {
       const { page, rowsPerPage } = this.pagination;
       return (page - 1) * rowsPerPage;
@@ -196,9 +183,26 @@ export default {
     },
   },
   async mounted () {
+    this.setBillingDates();
     await this.getDraftBills();
   },
   methods: {
+    setBillingDates () {
+      const billingPeriod = this.user.company.customersConfig.billingPeriod;
+      if (billingPeriod === MONTH) {
+        this.billingDates = {
+          endDate: this.$moment().subtract(1, 'M').endOf('month').toISOString(),
+          startDate: this.$moment().subtract(1, 'M').startOf('month').toISOString(),
+        };
+      } else {
+        this.billingDates = {
+          endDate: this.$moment().date() > 15 ? this.$moment().date(15).hour(23).minute(59).toISOString()
+            : this.$moment().endOf('month').hour(23).minute(59).toISOString(),
+          startDate: this.$moment().date() > 15 ? this.$moment().date(1).hour(0).minute(0).toISOString()
+            : this.$moment().date(16).hour(0).minute(0).toISOString(),
+        }
+      }
+    },
     formatPrice (value) {
       return value ? `${parseFloat(value).toFixed(2)}€` : '';
     },
@@ -220,11 +224,15 @@ export default {
       try {
         if (!params) {
           params = {
-            endDate: this.billingPeriod.endDate.toDate(),
-            startDate: this.billingPeriod.startDate.toDate(),
+            endDate: this.billingDates.endDate,
+            startDate: this.billingDates.startDate,
             billingPeriod: this.user.company.customersConfig.billingPeriod,
           }
         }
+        if (!params.startDate) params.startDate = this.billingDates.startDate;
+        if (!params.endDate) params.endDate = this.billingDates.endDate;
+        if (!params.billingPeriod) params.billingPeriod = this.user.company.customersConfig.billingPeriod;
+
         this.tableLoading = true;
         this.draftBills = await this.$bills.getDraftBills(params);
         this.draftBills = this.draftBills.map((draft) => {
@@ -281,8 +289,10 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables'
 
-  .layout-padding
-    padding: 2rem 3rem;
+  .title
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 
   .editable
     color: $primary

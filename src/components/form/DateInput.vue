@@ -10,7 +10,7 @@
 
 <script>
 export default {
-  name: 'NiDatetimeInput',
+  name: 'NiDateInput',
   props: {
     value: String,
     min: { type: String, default: '' },
@@ -69,5 +69,8 @@ export default {
 
   .underline
     border-bottom: 2px solid $primary;
+
+  /deep/ .q-datetime-days div.q-datetime-day-active > span
+    color: $black !important;
 
 </style>

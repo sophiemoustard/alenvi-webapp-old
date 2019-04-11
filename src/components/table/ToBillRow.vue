@@ -1,6 +1,5 @@
 <template>
-  <q-tr :props="props"
-    :class="{'datatable-row-border-top': index === 0 }">
+  <q-tr :props="props" :class="{'datatable-row-border-top': index === 0 }">
     <q-td v-for="col in props.cols" :key="col.name" :props="props">
       <template v-if="col.name === 'externalBilling' && bill.thirdPartyPayer">
         <q-checkbox v-model="bill.externalBilling" />
@@ -16,16 +15,21 @@
           </q-popover>
         </div>
       </template>
-      <template v-else-if="col.name === 'endDate'">
-        {{ formatDate(bill.endDate) }}
+      <template v-else-if="col.name === 'endDate'">{{ formatDate(bill.endDate) }}</template>
+      <template v-else-if="col.name === 'service'">
+        {{ bill.subscription.service.versions[bill.subscription.service.versions.length - 1].name }}
       </template>
-      <template v-else-if="col.name === 'service'">{{ bill.subscription.service.versions[bill.subscription.service.versions.length - 1].name }}</template>
       <template v-else-if="col.name === 'hours'">{{ formatHours(bill.hours) }}</template>
       <template v-else-if="col.name === 'unitExclTaxes'">{{ formatPrice(bill.unitExclTaxes) }}</template>
       <template v-else-if="col.name === 'discount'">
-        <div class="cursor-pointer text-primary" @click="$emit('discount:click', $refs[bill._id])" v-show="!bill.editDiscount">{{ `${bill.discount}€` }}</div>
-        <q-input :ref="bill._id" v-show="bill.editDiscount" class="datatable-inner-input" :value="bill.discount" @input="setDiscount($event, bill)" suffix="€" inverted-light color="white"
-          no-parent-field type="number" @blur="disableDiscountEditing(bill)" @keyup.enter="disableDiscountEditing(bill)" @keyup.esc="disableDiscountEditing(bill)" />
+        <div class="cursor-pointer text-primary" @click="$emit('discount:click', $refs[bill._id])"
+          v-show="!bill.editDiscount">
+          {{ `${bill.discount}€` }}
+        </div>
+        <q-input :ref="bill._id" v-show="bill.editDiscount" class="datatable-inner-input" :value="bill.discount"
+          @input="setDiscount($event, bill)" suffix="€" inverted-light color="white" no-parent-field type="number"
+          @blur="disableDiscountEditing(bill)" @keyup.enter="disableDiscountEditing(bill)"
+          @keyup.esc="disableDiscountEditing(bill)" />
       </template>
       <template v-else-if="col.name === 'exclTaxes'">{{ formatPrice(getNetExclTaxes(bill)) }}</template>
       <template v-else-if="col.name === 'inclTaxes'">{{ formatPrice(getNetInclTaxes(bill)) }}</template>
