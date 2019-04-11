@@ -7,7 +7,7 @@
     <q-field :error="hasError" :error-label="errorMessage">
       <div class="datetime-container">
         <div class="datetime-item">
-          <ni-datetime-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" @blur="blurDateHandler" />
+          <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" @blur="blurDateHandler" />
           <ni-select-input v-if="!disableHours" :value="value.startHour" @input="update($event, 'startHour')" class="time-item" align="center"
             @blur="blurHourHandler" :options="hoursOptions" filter :filter-placeholder="value.startHour" hide-underline
             name="start-hour" />
@@ -16,7 +16,7 @@
         <div class="datetime-item end">
           <ni-select-input v-if="!disableHours" :value="value.endHour" @input="update($event, 'endHour')" class="time-item" align="center"
             @blur="blurHourHandler" :options="endHourOptions" />
-          <ni-datetime-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item" @blur="blurDateHandler"
+          <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item" @blur="blurDateHandler"
             :min="value.startDate" />
         </div>
       </div>
@@ -25,12 +25,12 @@
 </template>
 
 <script>
-import DatetimeInput from './DatetimeInput.vue';
+import DateInput from './DateInput.vue';
 import SelectInput from './SelectInput.vue';
 
 export default {
   components: {
-    'ni-datetime-input': DatetimeInput,
+    'ni-date-input': DateInput,
     'ni-select-input': SelectInput,
   },
   props: {

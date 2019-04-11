@@ -2,7 +2,7 @@
   <q-page class="neutral-background">
     <div class="title layout-padding">
       <h4>Avoirs</h4>
-      <ni-datetime-range v-model="creditNotesDates" disable-hours></ni-datetime-range>
+      <ni-date-range v-model="creditNotesDates" />
     </div>
     <div class="q-mb-xl q-pa-sm">
       <q-card class="neutral-background" flat>
@@ -125,7 +125,7 @@
 
 <script>
 import DatetimePicker from '../../../components/form/DatetimePicker';
-import DatetimeRange from '../../../components/form/DatetimeRange';
+import DateRange from '../../../components/form/DateRange';
 import ModalInput from '../../../components/form/ModalInput';
 import ModalSelect from '../../../components/form/ModalSelect';
 import OptionGroup from '../../../components/form/OptionGroup';
@@ -139,7 +139,7 @@ export default {
     'ni-datetime-picker': DatetimePicker,
     'ni-modal-input': ModalInput,
     'ni-modal-select': ModalSelect,
-    'ni-datetime-range': DatetimeRange,
+    'ni-date-range': DateRange,
     'ni-option-group': OptionGroup,
   },
   data () {
