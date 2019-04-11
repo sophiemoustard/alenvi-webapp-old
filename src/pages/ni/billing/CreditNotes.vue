@@ -4,8 +4,8 @@
       <h4>Avoirs</h4>
       <ni-date-range v-model="creditNotesDates" @input="refreshCreditNotes" />
     </div>
-    <div class="q-mb-xl q-pa-sm">
-      <q-card class="neutral-background" flat>
+    <div class="q-pa-sm">
+      <q-card class="q-mb-xl neutral-background" flat>
         <q-table :data="creditNotes" :columns="creditNotesColumns" binary-state-sort :pagination.sync="pagination"
           class="table-responsive">
           <q-tr slot="body" slot-scope="props" :props="props">
