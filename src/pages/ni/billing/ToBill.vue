@@ -21,7 +21,8 @@
               display-checkbox />
             <q-tr v-if="props.row.customerBills.bills.length > 1" :props="props">
               <q-td colspan="10"><div class="text-right">Total :</div></q-td>
-              <q-td colspan="2">{{ formatPrice(props.row.customerBills.total) }}</q-td>
+              <q-td colspan="1" align="center">{{ formatPrice(props.row.customerBills.total) }}</q-td>
+              <q-td colspan="1" />
             </q-tr>
             <template v-if="props.row.thirdPartyPayerBills">
               <template v-for="tpp in props.row.thirdPartyPayerBills">
