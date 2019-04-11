@@ -57,3 +57,10 @@ export const positiveNumber = (value) => {
 
   return value >= 0;
 }
+
+export const strictPositiveNumber = (value) => {
+  if (!value && value !== 0) return true;
+  if (isNaN(parseFloat(value)) || !isFinite(value)) return false;
+
+  return value > 0;
+}
