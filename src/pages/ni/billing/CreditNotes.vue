@@ -380,7 +380,7 @@ export default {
     async refreshCustomersOptions () {
       try {
         this.customersOptions = [];
-        const customers = await this.$customers.showAll({ isActive: true, subscriptions: true });
+        const customers = await this.$customers.showAllWithBilledEvents();
         for (let i = 0, l = customers.length; i < l; i++) {
           this.customersOptions.push({
             subscriptions: customers[i].subscriptions,
