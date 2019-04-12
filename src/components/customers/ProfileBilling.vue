@@ -50,6 +50,8 @@ export default {
   },
   methods: {
     async refresh () {
+      this.customerBillingDocuments = [];
+      this.tppBillingDocuments = [];
       await Promise.all([this.getBills(), this.getCreditNotes()]);
     },
     async getBills () {
@@ -65,7 +67,6 @@ export default {
           else if (bill.client._id && !this.tppBillingDocuments[bill.client.name]) this.tppBillingDocuments[bill.client.name] = [bill]
           else this.tppBillingDocuments[bill.client.name].push(bill);
         }
-        console.log(this.tppBillingDocuments)
       } catch (e) {
         console.error(e)
       }

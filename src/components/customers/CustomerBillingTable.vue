@@ -55,6 +55,7 @@ export default {
           label: 'Montant TTC',
           align: 'center',
           field: row => row.type === BILL ? row.netInclTaxes : row.inclTaxesCustomer,
+          format: value => this.formatPrice(value),
         },
       ],
     }
