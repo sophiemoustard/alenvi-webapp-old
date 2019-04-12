@@ -1,6 +1,11 @@
 <template>
   <q-card v-if="Object.keys(documents).length > 0" class="q-mb-lg neutral-background" flat>
-    <q-table :data="documents" :columns="columns" binary-state-sort :pagination.sync="pagination">
+    <q-table :data="documents" :columns="columns" binary-state-sort>
+      <q-tr slot="top-row" slot-scope="props">
+        <q-td>{{ formatDate(billingDates.startDate) }}</q-td>
+        <q-td>Début de période</q-td>
+        <q-td />
+      </q-tr>
       <q-tr slot="body" slot-scope="props" :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
           <template v-if="col.name === 'document'">
@@ -9,6 +14,11 @@
           </template>
           <template v-else>{{ col.value }}</template>
         </q-td>
+      </q-tr>
+      <q-tr slot="bottom-row" slot-scope="props">
+        <q-td>{{ formatDate(billingDates.endDate) }}</q-td>
+        <q-td>Fin de période</q-td>
+        <q-td />
       </q-tr>
     </q-table>
   </q-card>
@@ -21,6 +31,7 @@ export default {
   name: 'CustomerBillingTable',
   props: {
     documents: { type: Array, default: () => [] },
+    billingDates: { type: Object, default: () => ({}) },
   },
   data () {
     return {
@@ -46,12 +57,15 @@ export default {
           field: row => row.type === BILL ? row.netInclTaxes : row.inclTaxesCustomer,
         },
       ],
-      pagination: {
-        rowsPerPage: 0,
-        sortBy: 'date',
-        ascending: true,
-      },
     }
   },
+  methods: {
+    formatPrice (value) {
+      return value ? `${parseFloat(value).toFixed(2)}€` : '';
+    },
+    formatDate (value) {
+      return value ? `${this.$moment(value).format('DD/MM/YY')}` : '';
+    },
+  }
 }
 </script>
