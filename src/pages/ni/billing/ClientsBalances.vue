@@ -123,9 +123,6 @@ export default {
     isNegative (val) {
       return val[0] === '-';
     },
-    canWithDraw (row) {
-      return !row.thirdPartyPayer && row.customer.payment && row.customer.payment.iban;
-    },
     async getBalances () {
       try {
         this.tableLoading = true;
