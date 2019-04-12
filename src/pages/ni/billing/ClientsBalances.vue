@@ -3,7 +3,7 @@
     <h4>Balances Clients</h4>
     <div>
       <q-card class="q-mb-xl neutral-background" flat>
-        <q-table :data="balances" :columns="columns" row-key="tableId" binary-state-sort :loading="tableLoading"
+        <q-table :data="balances" :columns="columns" row-key="rowId" binary-state-sort :loading="tableLoading"
           :pagination.sync="pagination" selection="multiple" :selected.sync="selected">
           <q-tr slot="header" slot-scope="props">
             <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
@@ -30,7 +30,7 @@
                   </div>
                   <div v-else-if="isNegative(col.value)" class="row no-wrap items-center">
                     <q-icon name="mdi-minus-circle-outline" color="secondary" class="balance-icon" />
-                    <div>{{ col.value.slice(1) }}</div>
+                    <div>{{ col.value.substring(1) }}</div>
                   </div>
                   <div v-else>{{ col.value }}</div>
                 </template>
@@ -127,6 +127,7 @@ export default {
       try {
         this.tableLoading = true;
         this.balances = await this.$balances.showAll();
+        this.balances = this.balances.map(balance => ({ ...balance, rowId: this.$_.uniqueId() }))
       } catch (e) {
         console.error(e);
       } finally {
