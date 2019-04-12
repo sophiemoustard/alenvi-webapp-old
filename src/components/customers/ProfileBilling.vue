@@ -1,64 +1,31 @@
 <template>
-  <div class="q-pa-sm">
-    <q-card v-if="Object.keys(billingDocuments).length > 0" class="q-mb-xl neutral-background" flat>
-      <q-table :data="billingDocuments" :columns="columns" binary-state-sort :pagination.sync="pagination">
-        <q-tr slot="body" slot-scope="props" :props="props">
-          <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-            <template v-if="col.name === 'document'">
-              <div v-if="props.row.type === BILL">Facture {{ props.row.billNumber }}</div>
-              <div v-if="props.row.type === CREDIT_NOTE">Avoir {{ props.row.number }}</div>
-            </template>
-            <template v-if="col.name === 'actions'">
-              <div class="row no-wrap table-actions table-actions-margin">
-              </div>
-            </template>
-            <template v-else>{{ col.value }}</template>
-          </q-td>
-        </q-tr>
-      </q-table>
-    </q-card>
+  <div>
+    <div class="q-pa-sm">
+      <p class="text-weight-bold">{{ this.userProfile.identity.title }} {{ this.userProfile.identity.lastname }}</p>
+      <ni-customer-billing-table :documents="customerBillingDocuments" />
+    </div>
+    <template v-for="(tpp, index) in Object.keys(tppBillingDocuments)">
+      <div class="q-pa-sm" :key="index">
+        <p class="text-weight-bold">{{ tpp }}</p>
+        <ni-customer-billing-table :documents="tppBillingDocuments[tpp]" />
+      </div>
+    </template>
   </div>
 </template>
 
 <script>
 import { CREDIT_NOTE, BILL } from '../../data/constants';
+import CustomerBillingTable from '../../components/customers/CustomerBillingTable';
+
 export default {
   name: 'ProfileBilling',
+  components: {
+    'ni-customer-billing-table': CustomerBillingTable,
+  },
   data () {
     return {
-      CREDIT_NOTE,
-      BILL,
-      billingDocuments: [],
-      columns: [
-        {
-          name: 'date',
-          label: 'Date',
-          align: 'left',
-          field: 'date',
-          format: value => value ? this.$moment(value).format('DD/MM/YYYY') : '',
-        },
-        {
-          name: 'document',
-          label: 'Évènemnts',
-          align: 'left',
-        },
-        {
-          name: 'inclTaxes',
-          label: 'Montant TTC',
-          align: 'center',
-          field: row => row.type === BILL ? row.netInclTaxes : row.inclTaxesCustomer,
-        },
-        {
-          name: 'actions',
-          label: '',
-          align: 'left',
-        },
-      ],
-      pagination: {
-        rowsPerPage: 0,
-        sortBy: 'date',
-        ascending: true,
-      },
+      customerBillingDocuments: [],
+      tppBillingDocuments: {},
     }
   },
   computed: {
@@ -73,7 +40,13 @@ export default {
     async getBills () {
       try {
         const bills = await this.$bills.showAll({ customer: this.userProfile._id });
-        this.billingDocuments.push(...bills.map(bill => ({ ...bill, type: BILL })));
+        for (const bill of bills) {
+          bill.type = BILL;
+          if (!bill.client) this.customerBillingDocuments.push(bill);
+          else if (bill.client._id && !this.tppBillingDocuments[bill.client.name]) this.tppBillingDocuments[bill.client.name] = [bill]
+          else this.tppBillingDocuments[bill.client.name].push(bill);
+        }
+        console.log(this.tppBillingDocuments)
       } catch (e) {
         console.error(e)
       }
@@ -81,7 +54,7 @@ export default {
     async getCreditNotes () {
       try {
         const creditNotes = await this.$creditNotes.showAll({ customer: this.userProfile._id });
-        this.billingDocuments.push(...creditNotes.map(cn => ({ ...cn, type: CREDIT_NOTE })));
+        this.customerBillingDocuments.push(...creditNotes.map(cn => ({ ...cn, type: CREDIT_NOTE })));
       } catch (e) {
         console.error(e)
       }
@@ -91,5 +64,8 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+@import '~variables';
 
+  .text-weight-bold
+    color: $primary
 </style>
