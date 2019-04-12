@@ -5,8 +5,7 @@
     </div>
     <div class="q-pa-sm">
       <q-card class="q-mb-xl neutral-background" flat>
-        <q-table :data="creditNotes" :columns="creditNotesColumns" binary-state-sort :pagination.sync="pagination"
-          class="table-responsive">
+        <q-table :data="creditNotes" :columns="creditNotesColumns" binary-state-sort :pagination.sync="pagination">
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
               <template v-if="col.name === 'actions'">
@@ -573,10 +572,5 @@ export default {
 
   /deep/ .modal-container-md
     width: 45vw;
-
-  /deep/ .q-table-bottom
-    border-top: none;
-  /deep/ .q-table-middle
-    margin-bottom: 0;
 
 </style>
