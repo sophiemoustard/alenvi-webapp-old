@@ -1,10 +1,11 @@
 <template>
-  <q-card v-if="Object.keys(documents).length > 0" class="q-mb-lg neutral-background" flat>
-    <q-table :data="documents" :columns="columns" binary-state-sort>
+  <q-card v-if="Object.keys(documents).length > 0" class="q-mb-xl neutral-background" flat>
+    <q-table :data="documents" :columns="columns" binary-state-sort hide-bottom>
       <q-tr slot="top-row" slot-scope="props">
-        <q-td>{{ formatDate(billingDates.startDate) }}</q-td>
-        <q-td>Début de période</q-td>
+        <q-td class="bold">{{ formatDate(billingDates.startDate) }}</q-td>
+        <q-td class="bold">Début de période</q-td>
         <q-td />
+        <td class="bold" align="center">{{ formatPrice(startBalance) }}</td>
       </q-tr>
       <q-tr slot="body" slot-scope="props" :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
@@ -16,9 +17,10 @@
         </q-td>
       </q-tr>
       <q-tr slot="bottom-row" slot-scope="props">
-        <q-td>{{ formatDate(billingDates.endDate) }}</q-td>
-        <q-td>Fin de période</q-td>
+        <q-td class="bold">{{ formatDate(billingDates.endDate) }}</q-td>
+        <q-td class="bold">Fin de période</q-td>
         <q-td />
+        <td class="bold" align="center">{{ formatPrice(periodBalance) }}</td>
       </q-tr>
     </q-table>
   </q-card>
@@ -26,6 +28,7 @@
 
 <script>
 import { CREDIT_NOTE, BILL } from '../../data/constants';
+import { getLastVersion } from '../../helpers/utils.js';
 
 export default {
   name: 'CustomerBillingTable',
@@ -47,7 +50,7 @@ export default {
         },
         {
           name: 'document',
-          label: 'Évènements',
+          label: '',
           align: 'left',
         },
         {
@@ -57,12 +60,33 @@ export default {
           field: row => row.type === BILL ? row.netInclTaxes : row.inclTaxesCustomer,
           format: value => this.formatPrice(value),
         },
+        {
+          name: 'balance',
+          label: 'Solde',
+          align: 'center',
+          field: 'balance',
+          format: value => this.formatPrice(value),
+        },
       ],
+    }
+  },
+  computed: {
+    periodBalance () {
+      return getLastVersion(this.documents, 'date').balance;
+    },
+    startBalance () {
+      if (this.documents.length === 0) return 0;
+      switch (this.documents[0].type) {
+        case BILL:
+          return this.documents[0].balance + this.documents[0].netInclTaxes;
+        case CREDIT_NOTE:
+          return this.documents[0].balance - this.documents[0].inclTaxesCustomer;
+      }
     }
   },
   methods: {
     formatPrice (value) {
-      return value ? `${parseFloat(value).toFixed(2)}€` : '';
+      return value || value === 0 ? `${parseFloat(value).toFixed(2)}€` : '';
     },
     formatDate (value) {
       return value ? `${this.$moment(value).format('DD/MM/YY')}` : '';
@@ -70,3 +94,9 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus" scoped>
+
+  .bold
+    font-weight bold;
+</style>

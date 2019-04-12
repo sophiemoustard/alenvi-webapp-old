@@ -31,7 +31,8 @@ export default {
     return {
       customerBillingDocuments: [],
       tppBillingDocuments: {},
-      billingDates: {}
+      billingDates: {},
+      balances: [],
     }
   },
   computed: {
@@ -49,12 +50,45 @@ export default {
   methods: {
     setBillingDates () {
       this.billingDates.endDate = this.$moment().toISOString();
-      this.billingDates.startDate = this.$moment().subtract(6, 'M').toISOString();
+      this.billingDates.startDate = this.$moment().subtract(6, 'M').hour(0).minute(0).toISOString();
     },
     async refresh () {
       this.customerBillingDocuments = [];
-      this.tppBillingDocuments = [];
+      this.tppBillingDocuments = {};
+      await this.getCustomerBalance();
       await Promise.all([this.getBills(), this.getCreditNotes()]);
+      const customerStartBalance = this.balances.length === 0 ? 0 : this.balances.find(bal => bal.customer._id === this.customer._id).balance;
+      this.computeIntermediateBalances(this.customerBillingDocuments, customerStartBalance)
+      for (const tpp of Object.keys(this.tppBillingDocuments)) {
+        const tppStartBalance = this.balances.length === 0 ? 0 : this.balances.find(bal => bal.thirdPartyPayer && bal.thirdPartyPayer._id === tpp).balance;
+        this.computeIntermediateBalances(this.tppBillingDocuments[tpp], tppStartBalance)
+      }
+    },
+    computeIntermediateBalances (docs, startBalance) {
+      docs.sort((a, b) => new Date(a.date) - new Date(b.date));
+      for (let i = 0, l = docs.length; i < l; i++) {
+        if (i === 0) docs[i].balance = startBalance + this.getInclTaxes(docs[i]);
+        else docs[i].balance = docs[i - 1].balance + this.getInclTaxes(docs[i]);
+      }
+    },
+    getInclTaxes (doc) {
+      switch (doc.type) {
+        case BILL:
+          return -doc.netInclTaxes;
+        case CREDIT_NOTE:
+          return doc.inclTaxesCustomer;
+      }
+    },
+    async getCustomerBalance () {
+      try {
+        this.balances = await this.$balances.showAll({
+          customer: this.customer._id,
+          date: this.billingDates.startDate,
+        });
+      } catch (e) {
+        this.balances = [];
+        console.error(e);
+      }
     },
     async getBills () {
       try {
