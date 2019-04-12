@@ -4,8 +4,15 @@
       <template v-if="col.name === 'externalBilling' && bill.thirdPartyPayer">
         <q-checkbox v-model="bill.externalBilling" />
       </template>
-      <template v-if="index === 0 && col.name === 'client'">
-        {{ getClientName(props.row.customer, bill) }}
+      <template v-if="index === 0 && col.name === 'customer'">
+        <span class="uppercase text-weight-bold">
+          {{ col.value }}
+        </span>
+      </template>
+      <template v-else-if="index === 0 && col.name === 'client'">
+        <span class="uppercase text-weight-bold">
+          {{ getClientName(props.row.customer, bill) }}
+        </span>
       </template>
       <template v-else-if="index === 0 && col.name === 'startDate'">
         <div class="cursor-pointer text-primary">
