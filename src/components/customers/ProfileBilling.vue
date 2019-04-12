@@ -20,11 +20,9 @@
 import { CREDIT_NOTE, BILL } from '../../data/constants';
 import CustomerBillingTable from '../../components/customers/CustomerBillingTable';
 import DateRange from '../../components/form/DateRange';
-import { billingMixin } from '../../mixins/billingMixin.js';
 
 export default {
   name: 'ProfileBilling',
-  mixins: [billingMixin],
   components: {
     'ni-customer-billing-table': CustomerBillingTable,
     'ni-date-range': DateRange,
@@ -49,6 +47,10 @@ export default {
     await this.refresh();
   },
   methods: {
+    setBillingDates () {
+      this.billingDates.endDate = this.$moment().toISOString();
+      this.billingDates.startDate = this.$moment().subtract(6, 'M').toISOString();
+    },
     async refresh () {
       this.customerBillingDocuments = [];
       this.tppBillingDocuments = [];
