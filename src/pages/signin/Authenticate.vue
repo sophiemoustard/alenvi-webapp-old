@@ -90,6 +90,8 @@ export default {
         }
 
         if (this.getUser.role.name === 'Aidants') {
+          const customer = await this.$customers.getById(this.getUser.customers[0]._id);
+          this.$store.commit('rh/saveUserProfile', customer);
           this.$router.replace({ name: 'customer agenda' });
         } else if (this.isAuxiliary) {
           this.$router.replace({ name: 'auxiliary agenda' });

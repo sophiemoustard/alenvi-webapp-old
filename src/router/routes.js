@@ -264,7 +264,7 @@ const routes = [
       {
         path: 'customers/documents',
         name: 'customer documents',
-        component: () => import('pages/customers/Documents'),
+        component: () => import('pages/customers/Billing'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token']
         }
