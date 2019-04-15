@@ -16,7 +16,10 @@ import ProfileInfo from '../../../components/customers/ProfileInfo';
 import ProfileBilling from '../../../components/customers/ProfileBilling';
 
 export default {
-  props: ['id'],
+  props: {
+    id: { type: String },
+    defaultTab: { type: String, default: () => 'followUp' },
+  },
   components: {
     ProfileHeader,
     ProfileTabs
@@ -38,20 +41,20 @@ export default {
         {
           label: 'Accompagnement',
           name: 'followUp',
-          default: true,
+          default: this.defaultTab === 'followUp',
           component: ProfileFollowUp,
         },
         {
           label: 'Infos',
           name: 'info',
-          default: false,
+          default: this.defaultTab === 'info',
           component: ProfileInfo,
           notification: 'profiles',
         },
         {
           label: 'Facturation',
           name: 'billing',
-          default: false,
+          default: this.defaultTab === 'billing',
           component: ProfileBilling,
         },
       ]
