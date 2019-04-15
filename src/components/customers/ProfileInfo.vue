@@ -927,8 +927,7 @@ export default {
       }
     },
     async refreshCustomer () {
-      const customerRaw = await this.$customers.getById(this.userProfile._id);
-      const customer = customerRaw.data.data.customer;
+      const customer = await this.$customers.getById(this.userProfile._id);
       this.mergeUser(customer);
       await this.refreshSubscriptions();
       await this.refreshFundings();

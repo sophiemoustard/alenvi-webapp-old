@@ -279,8 +279,7 @@ export default {
   methods: {
     async refreshCustomer () {
       try {
-        const customerRaw = await this.$customers.getById(this.helper.customers[0]._id);
-        this.customer = customerRaw.data.data.customer;
+        this.customer = await this.$customers.getById(this.helper.customers[0]._id);
         this.refreshSubscriptions();
         this.refreshFundings();
 

@@ -4,44 +4,38 @@
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Informations</p>
       </div>
-      <div class="row gutter-profile">
+      <div class="row gutter-profile q-mb-lg">
         <ni-select caption="Pathologie" v-model="customer.followUp.pathology" :options="selectOptions"
-          @blur="updateUser({ alenvi: 'followUp.pathology', ogust: 'pathology' })" @focus="saveTmp('followUp.pathology')"
-        />
+          @blur="updateCustomer('followUp.pathology')" @focus="saveTmp('followUp.pathology')" />
       </div>
       <div class="row gutter-profile">
         <ni-input  caption="Commentaires" v-model="customer.followUp.comments" :rows="6" type="textarea"
-          @blur="updateUser({ alenvi: 'followUp.comments', ogust: 'comments' })" @focus="saveTmp('followUp.comments')"
-        />
+          @blur="updateCustomer('followUp.comments')" @focus="saveTmp('followUp.comments')" />
         <ni-input  caption="Détails intervention" v-model="customer.followUp.details" :rows="6" type="textarea"
-          @blur="updateUser({ alenvi: 'followUp.details', ogust: 'interventionDetails' })" @focus="saveTmp('followUp.details')"
-        />
+          @blur="updateCustomer('followUp.details')" @focus="saveTmp('followUp.details')" />
         <ni-input  caption="Autres" v-model="customer.followUp.misc" :rows="6" type="textarea"
-          @blur="updateUser({ alenvi: 'followUp.misc', ogust: 'misc' })" @focus="saveTmp('followUp.misc')"
-        />
+          @blur="updateCustomer('followUp.misc')" @focus="saveTmp('followUp.misc')" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { extend } from '../../helpers/utils.js';
 import Input from '../form/Input.vue';
 import Select from '../form/Select.vue';
-import { NotifyPositive, NotifyNegative } from '../../components/popup/notify.js';
 import pathologies from '../../data/pathologies';
+import { followUpMixin } from '../../mixins/followUpMixin.js';
 
 export default {
   components: {
     'ni-input': Input,
     'ni-select': Select,
   },
+  mixins: [followUpMixin],
   data () {
     return {
       isLoaded: false,
-      customer: {
-        followUp: {},
-      },
+      customer: { followUp: {} },
       tmpInput: '',
       selectOptions: pathologies,
     };
@@ -52,55 +46,7 @@ export default {
     },
   },
   async mounted () {
-    const customerRaw = await this.$customers.getById(this.userProfile._id);
-    const customer = customerRaw.data.data.customer;
-    this.mergeUser(customer);
-    this.isLoaded = true;
-  },
-  methods: {
-    mergeUser (value = null) {
-      const args = [this.customer, value];
-      this.customer = Object.assign({}, extend(true, ...args));
-    },
-    saveTmp (path) {
-      this.tmpInput = this.$_.get(this.customer, path);
-    },
-    async updateUser (paths) {
-      try {
-        if (this.tmpInput === this.$_.get(this.customer, paths.alenvi)) return;
-        if (paths.alenvi && paths.ogust) {
-          await this.updateAlenviCustomer(paths.alenvi);
-          await this.updateOgustCustomer(paths);
-        } else if (paths.alenvi) {
-          await this.updateAlenviCustomer(paths.alenvi);
-        } else {
-          await this.updateOgustCustomer(paths)
-        }
-        NotifyPositive('Modification enregistrée');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de l\'édition de la fiche bénéficiaire')
-      }
-    },
-    async updateAlenviCustomer (path) {
-      let value = this.$_.get(this.customer, path);
-      const payload = this.$_.set({}, path, value);
-      payload._id = this.userProfile._id;
-      await this.$customers.updateById(payload);
-    },
-    async updateOgustCustomer (paths) {
-      let data = { arrayValues: {} };
-      const infoTitles = {
-        pathology: 'NIVEAU',
-        comments: 'COMMNIV',
-        details: 'DETAILEVE',
-        misc: 'AUTRESCOMM',
-      };
-      for (const k in infoTitles) {
-        data.arrayValues[infoTitles[k]] = this.customer.followUp[k]
-      }
-      await this.$ogust.editOgustCustomerDetails(this.userProfile.customerId, data);
-    },
+    await this.getCustomer(this.userProfile._id);
   },
 }
 </script>
