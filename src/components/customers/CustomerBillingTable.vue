@@ -87,7 +87,6 @@ export default {
   },
   methods: {
     formatPrice (value) {
-      console.log('value', [...this.documents][0], {...this.documents[0]}.netInclTaxes, {...this.documents[0]}.balance, value)
       return value || value === 0 ? `${parseFloat(value).toFixed(2)}€` : '';
     },
     formatDate (value) {

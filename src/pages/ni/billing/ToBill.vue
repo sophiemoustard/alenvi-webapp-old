@@ -138,7 +138,15 @@ export default {
     },
     totalToBillLabel () {
       if (this.hasSelectedRows) {
-        const total = this.selected.reduce((prev, next) => prev + next.customerBills.total + (next.thirdPartyPayerBills ? next.thirdPartyPayerBills.total : 0), 0);
+        let total = 0;
+        for (const row of this.selected) {
+          if (row.customerBills) total += row.customerBills.total;
+          if (row.thirdPartyPayerBills) {
+            for (const bill of row.thirdPartyPayerBills) {
+              total += bill.total;
+            }
+          }
+        }
         return `Facturer ${total.toFixed(2)} €`;
       }
       return 'Facturer';
