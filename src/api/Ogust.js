@@ -89,12 +89,4 @@ export default {
     const customerRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/customers/${id}`);
     return customerRaw.data.data.user.customer;
   },
-  async getCustomerInvoices (id, params) {
-    const customerInvoicesRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/customers/${id}/invoices`, { params });
-    return customerInvoicesRaw.data.data.invoices.array_invoice.result;
-  },
-  async getCustomerFiscalAttests (id, params) {
-    const customerFiscalAttestsRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/customers/${id}/fiscalAttests`, { params });
-    return customerFiscalAttestsRaw.data.data.info.array_fiscalattest.result;
-  },
 }
