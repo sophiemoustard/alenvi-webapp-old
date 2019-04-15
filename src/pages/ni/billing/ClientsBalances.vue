@@ -61,7 +61,6 @@ export default {
       tableLoading: false,
       selected: [],
       balances: [],
-      pagination: { rowsPerPage: 0 },
       columns: [
         {
           name: 'client',
@@ -110,6 +109,11 @@ export default {
           field: row => row.customer._id,
         },
       ],
+      pagination: {
+        sortBy: 'customer',
+        ascending: true,
+        rowsPerPage: 0,
+      },
     }
   },
   computed: {
