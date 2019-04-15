@@ -19,7 +19,7 @@
                 </template>
                 <template v-else-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions table-actions-margin">
-                    <q-btn flat round small color="grey" icon="remove_red_eye" />
+                    <q-btn flat round small color="grey" icon="remove_red_eye" @click="goToCustomerBillingPage(col.value)" />
                     <q-btn flat round small color="grey" icon="add" />
                   </div>
                 </template>
@@ -61,7 +61,6 @@ export default {
       tableLoading: false,
       selected: [],
       balances: [],
-      pagination: { rowsPerPage: 0 },
       columns: [
         {
           name: 'client',
@@ -107,8 +106,14 @@ export default {
           name: 'actions',
           label: '',
           align: 'left',
+          field: row => row.customer._id,
         },
       ],
+      pagination: {
+        sortBy: 'customer',
+        ascending: true,
+        rowsPerPage: 0,
+      },
     }
   },
   computed: {
@@ -122,6 +127,9 @@ export default {
     },
     isNegative (val) {
       return val[0] === '-';
+    },
+    goToCustomerBillingPage (customerId) {
+      this.$router.replace({ name: 'customers profile', params: { id: customerId, defaultTab: 'billing' } });
     },
     async getBalances () {
       try {

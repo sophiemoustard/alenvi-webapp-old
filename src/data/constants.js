@@ -119,3 +119,5 @@ export const CONTRACT_STATUS_OPTIONS = [
 
 export const TWO_WEEKS = 'two_weeks';
 export const MONTH = 'month';
+export const BILL = 'bill';
+export const CREDIT_NOTE = 'creditNote';

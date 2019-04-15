@@ -42,15 +42,16 @@
 </template>
 
 <script>
-import { MONTH } from '../../../data/constants';
 import ModalInput from '../../../components/form/ModalInput';
 import DateRange from '../../../components/form/DateRange';
 import ToBillRow from '../../../components/table/ToBillRow';
 import BillingPagination from '../../../components/table/BillingPagination';
 import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
+import { billingMixin } from '../../../mixins/billingMixin.js';
 
 export default {
   name: 'ToBill',
+  mixins: [billingMixin],
   components: {
     'ni-modal-input': ModalInput,
     'ni-to-bill-row': ToBillRow,
@@ -137,7 +138,15 @@ export default {
     },
     totalToBillLabel () {
       if (this.hasSelectedRows) {
-        const total = this.selected.reduce((prev, next) => prev + next.customerBills.total + (next.thirdPartyPayerBills ? next.thirdPartyPayerBills.total : 0), 0);
+        let total = 0;
+        for (const row of this.selected) {
+          if (row.customerBills) total += row.customerBills.total;
+          if (row.thirdPartyPayerBills) {
+            for (const bill of row.thirdPartyPayerBills) {
+              total += bill.total;
+            }
+          }
+        }
         return `Facturer ${total.toFixed(2)} €`;
       }
       return 'Facturer';
@@ -148,22 +157,6 @@ export default {
     await this.getDraftBills();
   },
   methods: {
-    setBillingDates () {
-      const billingPeriod = this.user.company.customersConfig.billingPeriod;
-      if (billingPeriod === MONTH) {
-        this.billingDates = {
-          endDate: this.$moment().subtract(1, 'M').endOf('month').toISOString(),
-          startDate: this.$moment().subtract(1, 'M').startOf('month').toISOString(),
-        };
-      } else {
-        this.billingDates = {
-          endDate: this.$moment().date() > 15 ? this.$moment().date(15).hour(23).minute(59).toISOString()
-            : this.$moment().endOf('month').hour(23).minute(59).toISOString(),
-          startDate: this.$moment().date() > 15 ? this.$moment().date(1).hour(0).minute(0).toISOString()
-            : this.$moment().date(16).hour(0).minute(0).toISOString(),
-        }
-      }
-    },
     formatPrice (value) {
       return value ? `${parseFloat(value).toFixed(2)}€` : '';
     },
