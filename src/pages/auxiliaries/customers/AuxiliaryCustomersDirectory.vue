@@ -10,7 +10,7 @@
     </div>
     <q-table :data="filteredUsers" :columns="columns" row-key="name" :rows-per-page-options="[]" :pagination.sync="pagination" :loading="tableLoading"
       class="people-list">
-      <q-tr slot="body" slot-scope="props" :props="props" class="datatable-row" @click.native="goToCustomerProfile(props.row.ogustId)">
+      <q-tr slot="body" slot-scope="props" :props="props" class="datatable-row" @click.native="goToCustomerProfile(props.row.customerId)">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
           <template>{{ col.value }}</template>
         </q-td>

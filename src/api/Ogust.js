@@ -7,18 +7,6 @@ export default {
     const ogustToken = res.data.data.token;
     return ogustToken;
   },
-  async getOgustCustomerDetails (customerId, ogustToken = null) {
-    let customerDetails = {};
-    if (ogustToken == null) {
-      customerDetails = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/customers/${customerId}/moreInfo`);
-    } else {
-      customerDetails = await axios.get(`${process.env.API_HOSTNAME}/ogust/customers/${customerId}/moreInfo`, { headers: { 'x-ogust-token': ogustToken } });
-    }
-    return customerDetails;
-  },
-  async editOgustCustomerDetails (customerId, data, ogustToken = null) {
-    ogustToken ? await axios.put(`${process.env.API_HOSTNAME}/ogust/customers/${customerId}/moreInfo`, data, { headers: { 'x-ogust-token': ogustToken } }) : await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/customers/${customerId}/moreInfo`, data);
-  },
   async editOgustCustomer (customerId, data, ogustToken = null) {
     if (ogustToken === null) {
       await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/customers/${customerId}`, data);
@@ -88,13 +76,5 @@ export default {
   async getCustomerById (id) {
     const customerRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/customers/${id}`);
     return customerRaw.data.data.user.customer;
-  },
-  async getCustomerInvoices (id, params) {
-    const customerInvoicesRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/customers/${id}/invoices`, { params });
-    return customerInvoicesRaw.data.data.invoices.array_invoice.result;
-  },
-  async getCustomerFiscalAttests (id, params) {
-    const customerFiscalAttestsRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/customers/${id}/fiscalAttests`, { params });
-    return customerFiscalAttestsRaw.data.data.info.array_fiscalattest.result;
   },
 }

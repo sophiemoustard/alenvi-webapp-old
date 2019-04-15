@@ -18,7 +18,8 @@ export default {
     return customersRaw.data.data.customers;
   },
   async getById (id) {
-    return alenviAxios.get(`${process.env.API_HOSTNAME}/customers/${id}`);
+    const customerRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/customers/${id}`);
+    return customerRaw.data.data.customer;
   },
   async create (data) {
     return alenviAxios.post(`${process.env.API_HOSTNAME}/customers`, data);
