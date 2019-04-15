@@ -13,6 +13,17 @@
             <div v-if="props.row.type === BILL">Facture {{ props.row.billNumber }}</div>
             <div v-if="props.row.type === CREDIT_NOTE">Avoir {{ props.row.number }}</div>
           </template>
+          <template v-else-if="col.name === 'balance'">
+            <div v-if="!isNegative(col.value)" class="row no-wrap items-center justify-center">
+              <q-icon name="mdi-plus-circle-outline" color="grey" class="balance-icon" />
+              <div>{{ col.value }}</div>
+            </div>
+            <div v-else-if="isNegative(col.value)" class="row no-wrap items-center justify-center">
+              <q-icon name="mdi-minus-circle-outline" color="secondary" class="balance-icon" />
+              <div>{{ col.value.substring(1) }}</div>
+            </div>
+            <div v-else>{{ col.value }}</div>
+          </template>
           <template v-else>{{ col.value }}</template>
         </q-td>
       </q-tr>
@@ -91,6 +102,9 @@ export default {
     },
     formatDate (value) {
       return value ? `${this.$moment(value).format('DD/MM/YY')}` : '';
+    },
+    isNegative (val) {
+      return val[0] === '-';
     },
   }
 }
