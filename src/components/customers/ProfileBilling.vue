@@ -5,12 +5,12 @@
         <p class="text-weight-bold">{{ this.customer.identity.title }} {{ this.customer.identity.lastname }}</p>
         <ni-date-range v-model="billingDates" @input="refresh" />
       </div>
-      <ni-customer-billing-table :documents="customerBillingDocuments" :billingDates="billingDates" />
+      <ni-customer-billing-table v-if="!loading" :documents="customerBillingDocuments" :billingDates="billingDates" />
     </div>
     <template v-for="(tpp, index) in Object.keys(tppBillingDocuments)">
       <div class="q-pa-sm" :key="index">
         <p class="text-weight-bold">{{ tpp }}</p>
-        <ni-customer-billing-table :documents="tppBillingDocuments[tpp]" :billingDates="billingDates" />
+        <ni-customer-billing-table v-if="!loading" :documents="tppBillingDocuments[tpp]" :billingDates="billingDates" />
       </div>
     </template>
   </div>
@@ -29,6 +29,7 @@ export default {
   },
   data () {
     return {
+      loading: true,
       customerBillingDocuments: [],
       tppBillingDocuments: {},
       billingDates: {},
@@ -53,6 +54,7 @@ export default {
       this.billingDates.startDate = this.$moment().subtract(6, 'M').hour(0).minute(0).toISOString();
     },
     async refresh () {
+      this.loading = true;
       this.customerBillingDocuments = [];
       this.tppBillingDocuments = {};
       await this.getCustomerBalance();
@@ -63,6 +65,7 @@ export default {
         const tppStartBalance = this.balances.length === 0 ? 0 : this.balances.find(bal => bal.thirdPartyPayer && bal.thirdPartyPayer._id === tpp).balance;
         this.computeIntermediateBalances(this.tppBillingDocuments[tpp], tppStartBalance)
       }
+      this.loading = false;
     },
     computeIntermediateBalances (docs, startBalance) {
       docs.sort((a, b) => new Date(a.date) - new Date(b.date));

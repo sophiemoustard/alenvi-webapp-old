@@ -72,6 +72,7 @@ export default {
   },
   computed: {
     periodBalance () {
+      if (!this.documents || this.documents.length === 0) return 0;
       return getLastVersion(this.documents, 'date').balance;
     },
     startBalance () {
@@ -82,10 +83,11 @@ export default {
         case CREDIT_NOTE:
           return this.documents[0].balance - this.documents[0].inclTaxesCustomer;
       }
-    }
+    },
   },
   methods: {
     formatPrice (value) {
+      console.log('value', [...this.documents][0], {...this.documents[0]}.netInclTaxes, {...this.documents[0]}.balance, value)
       return value || value === 0 ? `${parseFloat(value).toFixed(2)}€` : '';
     },
     formatDate (value) {
