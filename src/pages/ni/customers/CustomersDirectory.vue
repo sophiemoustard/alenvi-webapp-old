@@ -100,12 +100,8 @@ export default {
           firstname: ''
         },
         email: '',
-        customerId: '',
         contact: {
-          ogustAddressId: '',
-          address: {
-            fullAddress: '',
-          }
+          address: { fullAddress: '' }
         },
         isActive: true
       },
@@ -244,49 +240,21 @@ export default {
       this.$v.newCustomer.$reset();
       this.newCustomer = Object.assign({}, clear(this.newCustomer));
     },
-    async createAlenviCustomer () {
-      const payload = this.$_.pickBy(this.newCustomer);
-      const newCustomer = await this.$customers.create(payload);
-      await this.$customers.createDriveFolder(newCustomer.data.data.customer._id);
-      return newCustomer;
-    },
-    async createOgustCustomer () {
-      const ogustPayload = {
-        title: this.newCustomer.identity.title,
-        last_name: this.newCustomer.identity.lastname,
-        first_name: this.newCustomer.identity.firstname,
-        email: this.newCustomer.email,
-        main_address: {
-          line: this.newCustomer.contact.address.street,
-          zip: this.newCustomer.contact.address.zipCode,
-          city: this.newCustomer.contact.address.city
-        },
-      };
-      const cleanPayload = this.$_.pickBy(ogustPayload);
-      const newCustomer = await this.$ogust.createCustomer(cleanPayload);
-      return newCustomer;
-    },
     async submit () {
       try {
         this.loading = true;
         this.$v.newCustomer.$touch();
-        if (this.$v.newCustomer.$error) {
-          throw new Error('Invalid fields');
-        }
-        const newCustomer = await this.createOgustCustomer();
-        this.newCustomer.customerId = newCustomer.data.data.customer.id_customer;
-        const customer = await this.$ogust.getCustomerById(this.newCustomer.customerId);
-        this.newCustomer.contact.ogustAddressId = customer.main_address.id_address;
-        this.customerCreated = await this.createAlenviCustomer();
+        if (this.$v.newCustomer.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        const payload = this.$_.pickBy(this.newCustomer);
+        const newCustomer = await this.$customers.create(payload);
+        await this.$customers.createDriveFolder(newCustomer.data.data.customer._id);
         await this.getCustomersList();
-        NotifyPositive('Fiche bénéficiaire créée')
+        NotifyPositive('Fiche bénéficiaire créée');
         this.opened = false;
       } catch (e) {
         console.error(e);
-        if (e && e.message === 'Invalid fields') {
-          NotifyWarning('Champ(s) invalide(s)');
-          return;
-        }
+        if (e && e.message === 'Invalid fields') return NotifyWarning('Champ(s) invalide(s)');
         NotifyNegative('Erreur lors de la création de la fiche bénéficiaire');
       } finally {
         this.loading = false;

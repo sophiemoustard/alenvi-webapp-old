@@ -7,15 +7,6 @@ export default {
     const ogustToken = res.data.data.token;
     return ogustToken;
   },
-  async createCustomer (data, ogustToken = null) {
-    let newCustomer;
-    if (ogustToken === null) {
-      newCustomer = await alenviAxios.post(`${process.env.API_HOSTNAME}/ogust/customers`, data);
-    } else {
-      newCustomer = await axios.post(`${process.env.API_HOSTNAME}/ogust/customers`, data, { headers: { 'x-ogust-token': ogustToken } });
-    }
-    return newCustomer;
-  },
   async getList (key, ogustToken = null) {
     let ogustListRaw = {};
     if (ogustToken == null) {
