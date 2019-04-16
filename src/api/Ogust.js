@@ -7,22 +7,6 @@ export default {
     const ogustToken = res.data.data.token;
     return ogustToken;
   },
-  async editOgustCustomer (customerId, data, ogustToken = null) {
-    if (ogustToken === null) {
-      await alenviAxios.put(`${process.env.API_HOSTNAME}/ogust/customers/${customerId}`, data);
-    } else {
-      await axios.put(`${process.env.API_HOSTNAME}/ogust/customers/${customerId}`, data, { headers: { 'x-ogust-token': ogustToken } });
-    }
-  },
-  async createCustomer (data, ogustToken = null) {
-    let newCustomer;
-    if (ogustToken === null) {
-      newCustomer = await alenviAxios.post(`${process.env.API_HOSTNAME}/ogust/customers`, data);
-    } else {
-      newCustomer = await axios.post(`${process.env.API_HOSTNAME}/ogust/customers`, data, { headers: { 'x-ogust-token': ogustToken } });
-    }
-    return newCustomer;
-  },
   async getList (key, ogustToken = null) {
     let ogustListRaw = {};
     if (ogustToken == null) {
@@ -63,18 +47,5 @@ export default {
   async getEmployeeSalaries (employeeId) {
     const salaries = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/employees/${employeeId}/salaries`);
     return salaries.data.data.salaries.array_salary.result;
-  },
-  async getCustomers (params, ogustToken = null) {
-    let customersRaw = {};
-    if (ogustToken === null) {
-      customersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/customers`, { params });
-    } else {
-      customersRaw = await axios.get(`${process.env.API_HOSTNAME}/ogust/customers`, { params, headers: { 'x-ogust-token': ogustToken } });
-    }
-    return customersRaw.data.data.customers.array_customer.result;
-  },
-  async getCustomerById (id) {
-    const customerRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/customers/${id}`);
-    return customerRaw.data.data.user.customer;
   },
 }
