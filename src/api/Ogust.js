@@ -48,8 +48,4 @@ export default {
     const salaries = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/employees/${employeeId}/salaries`);
     return salaries.data.data.salaries.array_salary.result;
   },
-  async getCustomerById (id) {
-    const customerRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/ogust/customers/${id}`);
-    return customerRaw.data.data.user.customer;
-  },
 }
