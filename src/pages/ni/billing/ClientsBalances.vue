@@ -24,15 +24,7 @@
                   </div>
                 </template>
                 <template v-else-if="col.name === 'balance'">
-                  <div v-if="isPositive(col.value)" class="row no-wrap items-center">
-                    <q-icon name="mdi-plus-circle-outline" color="grey" class="balance-icon" />
-                    <div>{{ col.value }}</div>
-                  </div>
-                  <div v-else-if="isNegative(col.value)" class="row no-wrap items-center">
-                    <q-icon name="mdi-minus-circle-outline" color="secondary" class="balance-icon" />
-                    <div>{{ col.value.substring(1) }}</div>
-                  </div>
-                  <div v-else>{{ col.value }}</div>
+                  <ni-prefixed-cell-content :cell-value="col.value" />
                 </template>
                 <template v-else>{{ col.value }}</template>
               </q-td>
@@ -80,7 +72,7 @@ import BillingPagination from '../../../components/table/BillingPagination';
 import ModalSelect from '../../../components/form/ModalSelect';
 import ModalInput from '../../../components/form/ModalInput';
 import DatetimePicker from '../../../components/form/DatetimePicker';
-// import { NotifyNegative } from '../../../components/popup/notify';
+import PrefixedCellContent from '../../../components/table/PrefixedCellContent';
 import { REQUIRED_LABEL, PAYMENT, PAYMENT_OPTIONS, PAYMENT_NATURE_OPTIONS } from '../../../data/constants';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
 
@@ -91,6 +83,7 @@ export default {
     'ni-modal-select': ModalSelect,
     'ni-modal-input': ModalInput,
     'ni-datetime-picker': DatetimePicker,
+    'ni-prefixed-cell-content': PrefixedCellContent,
   },
   data () {
     return {
@@ -131,7 +124,6 @@ export default {
           label: 'Solde',
           align: 'left',
           field: row => row.balance,
-          format: val => this.formatPrices(val),
         },
         {
           name: 'toPay',
@@ -239,6 +231,7 @@ export default {
     },
     async createPayment () {
       try {
+        this.creationLoading = true;
         this.$v.newPayment.$touch();
         if (this.$v.newPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
         if (this.newPayment.customer === this.newPayment.client) delete this.newPayment.client;
@@ -249,6 +242,8 @@ export default {
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création du règlement');
+      } finally {
+        this.creationLoading = false;
       }
     }
   }
@@ -263,9 +258,6 @@ export default {
       background: $white
     &-bottom > .q-icon
       display: none
-
-  .balance-icon
-    margin-right: 4px
 
   .modal-subtitle
     display: flex;
