@@ -179,11 +179,11 @@ export default {
         if (!params) {
           params = {
             endDate: this.billingDates.endDate,
-            startDate: this.billingDates.startDate,
+            billingStartDate: this.billingDates.startDate,
             billingPeriod: this.user.company.customersConfig.billingPeriod,
           }
         }
-        if (!params.startDate) params.startDate = this.billingDates.startDate;
+        if (!params.billingStartDate) params.billingStartDate = this.billingDates.startDate;
         if (!params.endDate) params.endDate = this.billingDates.endDate;
         if (!params.billingPeriod) params.billingPeriod = this.user.company.customersConfig.billingPeriod;
 
@@ -224,6 +224,7 @@ export default {
         const { customer, __index } = row;
         const { startDate, endDate } = bill;
         const draftBills = await this.$bills.getDraftBills({
+          billingStartDate: startDate,
           startDate,
           endDate,
           billingPeriod: this.user.company.customersConfig.billingPeriod,
