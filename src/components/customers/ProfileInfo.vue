@@ -359,7 +359,7 @@
           @blur="$v.newFunding.thirdPartyPayer.$touch" requiredField />
         <ni-option-group v-model="newFunding.services" :options="fundingServicesOptions()" caption="Souscriptions" type="checkbox"
           @blur="$v.newFunding.services.$touch" :error="$v.newFunding.services.$error" requiredField />
-        <ni-datetime-picker v-model="newFunding.startDate" caption="Date de début de prise en charge" :min="newFundingMinStartDate" inModal
+        <ni-datetime-picker v-model="newFunding.startDate" caption="Date de début de prise en charge" inModal
           @blur="$v.newFunding.startDate.$touch" :error="$v.newFunding.startDate.$error" requiredField />
         <ni-datetime-picker v-model="newFunding.endDate" :min="$moment(newFunding.startDate).add(1, 'day').toISOString()" inModal
           caption="Date de fin de prise en charge" />
@@ -395,7 +395,7 @@
           </div>
         </div>
         <ni-datetime-picker v-model="editedFunding.startDate" caption="Date de début de prise en charge" :max="editedFundingMaxStartDate" class="last"
-          :min="editedFundingMinStartDate" inModal @blur="$v.editedFunding.startDate.$touch" :error="$v.editedFunding.startDate.$error" requiredField />
+          inModal @blur="$v.editedFunding.startDate.$touch" :error="$v.editedFunding.startDate.$error" requiredField />
         <ni-datetime-picker v-model="editedFunding.endDate" caption="Date de fin de prise en charge" inModal
           :min="$moment(editedFunding.startDate).add(1, 'day').toISOString()" />
         <ni-modal-input v-model="editedFunding.folderNumber" caption="Numéro de dossier" />
@@ -729,20 +729,6 @@ export default {
         label: day !== 'Jours fériés' ? day.slice(0, 2) : day,
         value: i
       }));
-    },
-    newFundingMinStartDate () {
-      if (this.newFunding.services.length > 0) {
-        const latestFunding = this.fundings
-          .filter(funding => funding.services.some(sub => this.newFunding.services.includes(sub._id)))
-          .sort((a, b) => new Date(b.endDate) - new Date(a.endDate))[0];
-        return latestFunding && latestFunding.endDate ? this.$moment(latestFunding.endDate).add(1, 'day').toISOString() : '';
-      }
-    },
-    editedFundingMinStartDate () {
-      const latestFunding = this.fundings
-        .filter(funding => funding._id !== this.editedFunding._id && funding.services.some(sub => this.editedFunding.services.includes(sub._id)))
-        .sort((a, b) => new Date(b.endDate) - new Date(a.endDate))[0];
-      return latestFunding && latestFunding.endDate ? this.$moment(latestFunding.endDate).add(1, 'day').toISOString() : '';
     },
     editedFundingMaxStartDate () {
       if (this.editedFunding && this.editedFunding.endDate) {
