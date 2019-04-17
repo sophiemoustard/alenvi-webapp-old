@@ -189,12 +189,6 @@ export default {
     formatPrices (val) {
       return val ? `${val.toFixed(2)} €` : '0 €';
     },
-    isNegative (val) {
-      return Number.parseFloat(val.substring(0, val.length - 2)) < 0;
-    },
-    isPositive (val) {
-      return Number.parseFloat(val.substring(0, val.length - 2)) > 0;
-    },
     goToCustomerBillingPage (customerId) {
       this.$router.replace({ name: 'customers profile', params: { id: customerId, defaultTab: 'billing' } });
     },
