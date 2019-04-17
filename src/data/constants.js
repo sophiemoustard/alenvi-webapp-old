@@ -121,3 +121,18 @@ export const TWO_WEEKS = 'two_weeks';
 export const MONTH = 'month';
 export const BILL = 'bill';
 export const CREDIT_NOTE = 'creditNote';
+
+// Payments
+
+export const PAYMENT_OPTIONS = [
+  { label: 'Prélèvement', value: 'withdrawal' },
+  { label: 'Virement', value: 'bank_transfer' },
+  { label: 'Chèque', value: 'check' },
+  { label: 'CESU', value: 'cesu' },
+];
+export const REFUND = 'refund';
+export const PAYMENT = 'payment';
+export const PAYMENT_NATURE_OPTIONS = [
+  { label: 'Règlement', value: PAYMENT },
+  { label: 'Remboursement', value: REFUND },
+]
