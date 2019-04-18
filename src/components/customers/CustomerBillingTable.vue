@@ -93,6 +93,12 @@ export default {
           return this.documents[0].balance + this.documents[0].netInclTaxes;
         case CREDIT_NOTE:
           return this.documents[0].balance - this.documents[0].inclTaxesCustomer;
+        case BANK_TRANSFER:
+        case WITHDRAWAL:
+        case CHECK:
+        case CESU:
+          if (this.documents[0].nature === REFUND) return this.documents[0].balance + this.documents[0].netInclTaxes;
+          return this.documents[0].balance - this.documents[0].netInclTaxes;
       }
     },
   },
@@ -128,4 +134,7 @@ export default {
 
   .bold
     font-weight bold;
+
+  .q-table tbody tr:hover
+    background: none;
 </style>
