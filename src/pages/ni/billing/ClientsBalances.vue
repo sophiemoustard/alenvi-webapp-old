@@ -141,19 +141,54 @@ export default {
         this.tableLoading = false;
       }
     },
-    async createPayment () {
+    openPaymentCreationModal (row) {
+      this.selectedCustomer = row.customer.identity.lastname;
+      this.selectedClient = row._id.tpp ? row.thirdPartyPayer.name : row.customer.identity.lastname;
+      this.newPayment.customer = row._id.customer;
+      this.newPayment.client = row._id.tpp ? row._id.tpp : row._id.customer;
+      this.paymentCreationModal = true;
+    },
+    resetPaymentCreationModal () {
+      this.selectedCustomer = '';
+      this.selectedClient = '';
+      this.newPayment = {
+        nature: this.PAYMENT,
+        customer: null,
+        client: null,
+        netInclTaxes: 0,
+        type: '',
+        date: '',
+      };
+      this.$v.newPayment.$reset();
+    },
+    async createPayments () {
       try {
-        this.creationLoading = true;
-        this.$v.newPayment.$touch();
-        if (this.$v.newPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
-        if (this.newPayment.customer === this.newPayment.client) delete this.newPayment.client;
-        await this.$payments.create(this.newPayment);
-        NotifyPositive('Règlement créé');
+        let payload = null;
+        if (this.selected.length > 0 && this.selectedCustomer === '') {
+          payload = this.selected.map((row) => {
+            return {
+              nature: this.PAYMENT,
+              customer: row._id.customer,
+              ...(row._id.tpp && { client: row._id.tpp }),
+              netInclTaxes: row.toPay,
+              type: this.PAYMENT_OPTIONS[0].value,
+              date: this.$moment().toDate(),
+            }
+          });
+        } else {
+          this.creationLoading = true;
+          this.$v.newPayment.$touch();
+          if (this.$v.newPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
+          if (this.newPayment.customer === this.newPayment.client) delete this.newPayment.client;
+          payload = this.newPayment;
+        }
+        await this.$payments.create(payload);
+        NotifyPositive('Règlement(s) créé(s)');
         await this.getBalances();
         this.paymentCreationModal = false;
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création du règlement');
+        NotifyNegative('Erreur lors de la création du(des) règlement(s)');
       } finally {
         this.creationLoading = false;
       }
