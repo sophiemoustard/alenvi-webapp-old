@@ -237,7 +237,7 @@ export default {
         NotifyNegative('Erreur lors de la modification de la date de début de facturation');
       }
     },
-  },
+  }
 }
 </script>
 
