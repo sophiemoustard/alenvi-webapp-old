@@ -1,32 +1,50 @@
 <template>
   <div>
-    <div class="q-pa-sm">
+    <div class="q-pa-sm q-mb-lg">
       <div class="title">
         <p class="text-weight-bold">{{ this.customer.identity.title }} {{ this.customer.identity.lastname }}</p>
         <ni-date-range v-model="billingDates" @input="refresh" />
       </div>
       <ni-customer-billing-table v-if="!loading" :documents="customerBillingDocuments" :billingDates="billingDates" />
+      <div align="right">
+        <q-btn class="add-payment" label="Ajouter un réglement" @click="openPaymentCreationModal(customer)"
+          no-caps flat color="white" icon="add" />
+      </div>
     </div>
     <template v-for="(tpp, index) in Object.keys(tppBillingDocuments)">
-      <div class="q-pa-sm" :key="index">
+      <div class="q-pa-sm q-mb-lg" :key="index">
         <p class="text-weight-bold">{{ tpp }}</p>
         <ni-customer-billing-table v-if="!loading" :documents="tppBillingDocuments[tpp]" :billingDates="billingDates" />
+        <div align="right">
+          <q-btn class="add-payment" label="Ajouter un réglement" no-caps flat color="white" icon="add"
+            @click="openPaymentCreationModal(customer, tppBillingDocuments[tpp][0].client)"/>
+        </div>
       </div>
     </template>
+
+    <!-- Payment creation modal -->
+    <ni-payment-creation-modal :newPayment="newPayment" :validations="$v.newPayment" :selectedClient="selectedClient"
+      @createPayment="createPayment" :creationModal="paymentCreationModal" :selectedCustomer="selectedCustomer"
+      :loading="creationLoading" @resetForm="resetPaymentCreationModal"  />
   </div>
 </template>
 
 <script>
 import { CREDIT_NOTE, BILL, WITHDRAWAL, BANK_TRANSFER, CHECK, CESU, REFUND } from '../../data/constants';
 import CustomerBillingTable from '../../components/customers/CustomerBillingTable';
+import PaymentCreationModal from '../../components/customers/PaymentCreationModal';
 import DateRange from '../../components/form/DateRange';
+import { paymentMixin } from '../../mixins/paymentMixin.js';
+import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../components/popup/notify';
 
 export default {
   name: 'ProfileBilling',
   components: {
     'ni-customer-billing-table': CustomerBillingTable,
     'ni-date-range': DateRange,
+    'ni-payment-creation-modal': PaymentCreationModal,
   },
+  mixins: [paymentMixin],
   data () {
     return {
       loading: true,
@@ -84,8 +102,8 @@ export default {
         case WITHDRAWAL:
         case CHECK:
         case CESU:
-          if (doc.nature === REFUND) return doc.netInclTaxes;
-          return -doc.netInclTaxes;
+          if (doc.nature === REFUND) return -doc.netInclTaxes;
+          return doc.netInclTaxes;
       }
     },
     async getCustomerBalance () {
@@ -144,12 +162,32 @@ export default {
         console.error(e)
       }
     },
+    async createPayment () {
+      try {
+        this.creationLoading = true;
+        this.$v.newPayment.$touch();
+        if (this.$v.newPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
+        if (this.newPayment.customer === this.newPayment.client) delete this.newPayment.client;
+        await this.$payments.create(this.newPayment);
+        NotifyPositive('Règlement créé');
+        await this.refresh();
+        this.paymentCreationModal = false;
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création du règlement');
+      } finally {
+        this.creationLoading = false;
+      }
+    },
   },
 }
 </script>
 
 <style lang="stylus" scoped>
 @import '~variables';
+
+  .add-payment
+    background-color: $primary;
 
   .text-weight-bold
     color: $primary

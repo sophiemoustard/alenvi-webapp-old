@@ -1,5 +1,5 @@
 <template>
-  <q-card v-if="Object.keys(documents).length > 0" class="q-mb-xl neutral-background" flat>
+  <q-card v-if="Object.keys(documents).length > 0" class="q-mb-lg neutral-background" flat>
     <q-table :data="documents" :columns="columns" binary-state-sort hide-bottom>
       <q-tr slot="top-row" slot-scope="props">
         <q-td class="bold">{{ formatDate(billingDates.startDate) }}</q-td>
@@ -116,8 +116,8 @@ export default {
         case WITHDRAWAL:
         case CHECK:
         case CESU:
-          if (doc.nature === REFUND) return doc.netInclTaxes;
-          return -doc.netInclTaxes;
+          if (doc.nature === REFUND) return -doc.netInclTaxes;
+          return doc.netInclTaxes;
       }
     },
   }

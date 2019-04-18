@@ -20,7 +20,7 @@
                 <template v-else-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions table-actions-margin">
                     <q-btn flat round small color="grey" icon="remove_red_eye" @click="goToCustomerBillingPage(col.value)" />
-                    <q-btn flat round small color="grey" icon="add" @click="openPaymentCreationModal(props.row)" />
+                    <q-btn flat round small color="grey" icon="add" @click="openPaymentCreationModal(props.row.customer, props.row.thirdPartyPayer)" />
                   </div>
                 </template>
                 <template v-else-if="col.name === 'balance'">
@@ -46,11 +46,10 @@
 </template>
 
 <script>
-import { required } from 'vuelidate/lib/validators';
 import BillingPagination from '../../../components/table/BillingPagination';
 import PrefixedCellContent from '../../../components/table/PrefixedCellContent';
 import PaymentCreationModal from '../../../components/customers/PaymentCreationModal';
-import { PAYMENT } from '../../../data/constants';
+import { paymentMixin } from '../../../mixins/paymentMixin.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
 
 export default {
@@ -60,9 +59,9 @@ export default {
     'ni-prefixed-cell-content': PrefixedCellContent,
     'ni-payment-creation-modal': PaymentCreationModal,
   },
+  mixins: [paymentMixin],
   data () {
     return {
-      creationLoading: false,
       tableLoading: false,
       selected: [],
       balances: [],
@@ -118,24 +117,6 @@ export default {
         ascending: true,
         rowsPerPage: 0,
       },
-      paymentCreationModal: false,
-      selectedCustomer: '',
-      selectedClient: '',
-      newPayment: {
-        nature: PAYMENT,
-        customer: null,
-        client: null,
-        netInclTaxes: 0,
-        type: '',
-        date: '',
-      }
-    }
-  },
-  validations: {
-    newPayment: {
-      netInclTaxes: { required },
-      type: { required },
-      date: { required },
     }
   },
   async mounted () {
@@ -159,27 +140,6 @@ export default {
       } finally {
         this.tableLoading = false;
       }
-    },
-    openPaymentCreationModal (row) {
-      this.selectedCustomer = row.customer.identity.lastname;
-      this.selectedClient = row._id.tpp ? row.thirdPartyPayer.name : row.customer.identity.lastname;
-      this.newPayment.customer = row._id.customer;
-      this.newPayment.nature = PAYMENT;
-      this.newPayment.client = row._id.tpp ? row._id.tpp : row._id.customer;
-      this.paymentCreationModal = true;
-    },
-    resetPaymentCreationModal () {
-      this.paymentCreationModal = false;
-      this.selectedCustomer = '';
-      this.selectedClient = '';
-      this.newPayment = {
-        nature: PAYMENT,
-        customer: null,
-        client: null,
-        netInclTaxes: 0,
-        type: '',
-        date: '',
-      };
     },
     async createPayment () {
       try {
