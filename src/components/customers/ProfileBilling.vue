@@ -6,7 +6,7 @@
         <ni-date-range v-model="billingDates" @input="refresh" />
       </div>
       <ni-customer-billing-table v-if="!loading" :documents="customerBillingDocuments" :billingDates="billingDates" />
-      <div align="right">
+      <div v-if="user.role.name === ADMIN || user.role.name === COACH" align="right">
         <q-btn class="add-payment" label="Ajouter un réglement" @click="openPaymentCreationModal(customer)"
           no-caps flat color="white" icon="add" />
       </div>
@@ -15,7 +15,7 @@
       <div class="q-pa-sm q-mb-lg" :key="index">
         <p class="text-weight-bold">{{ tpp }}</p>
         <ni-customer-billing-table v-if="!loading" :documents="tppBillingDocuments[tpp]" :billingDates="billingDates" />
-        <div align="right">
+        <div v-if="user.role.name === ADMIN || user.role.name === COACH" align="right">
           <q-btn class="add-payment" label="Ajouter un réglement" no-caps flat color="white" icon="add"
             @click="openPaymentCreationModal(customer, tppBillingDocuments[tpp][0].client)"/>
         </div>
@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import { CREDIT_NOTE, BILL, WITHDRAWAL, BANK_TRANSFER, CHECK, CESU, REFUND } from '../../data/constants';
+import { CREDIT_NOTE, BILL, WITHDRAWAL, BANK_TRANSFER, CHECK, CESU, REFUND, ADMIN, COACH } from '../../data/constants';
 import CustomerBillingTable from '../../components/customers/CustomerBillingTable';
 import PaymentCreationModal from '../../components/customers/PaymentCreationModal';
 import DateRange from '../../components/form/DateRange';
@@ -52,6 +52,8 @@ export default {
       tppBillingDocuments: {},
       billingDates: {},
       balances: [],
+      COACH,
+      ADMIN,
     }
   },
   computed: {

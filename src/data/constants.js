@@ -65,6 +65,7 @@ export const AUXILIARY_INITIATIVE = 'auxiliary_initiative';
 
 // ROLES
 export const COACH = 'Coach';
+export const ADMIN = 'Admin';
 export const CUSTOMER = 'Customer';
 export const AUXILIARY = 'Auxiliaire';
 export const PLANNING_REFERENT = 'Référent(e) planning';
