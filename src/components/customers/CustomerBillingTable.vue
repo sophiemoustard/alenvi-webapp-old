@@ -6,6 +6,7 @@
         <q-td class="bold">Début de période</q-td>
         <q-td />
         <td class="bold" align="center">{{ formatPrice(startBalance) }}</td>
+        <q-td />
       </q-tr>
       <q-tr slot="body" slot-scope="props" :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
@@ -25,6 +26,10 @@
             </div>
             <div v-else>{{ col.value }}</div>
           </template>
+          <template v-else-if="col.name === 'actions'">
+            <q-btn v-if="displayActions && paymentTypes.includes(props.row.type)" flat small color="grey" icon="edit"
+              @click="openEditionModal(props.row)" />
+          </template>
           <template v-else>{{ col.value }}</template>
         </q-td>
       </q-tr>
@@ -33,19 +38,21 @@
         <q-td class="bold">Fin de période</q-td>
         <q-td />
         <td class="bold" align="center">{{ formatPrice(periodBalance) }}</td>
+        <q-td />
       </q-tr>
     </q-table>
   </q-card>
 </template>
 
 <script>
-import { CREDIT_NOTE, BILL, BANK_TRANSFER, WITHDRAWAL, CHECK, CESU, REFUND } from '../../data/constants';
+import { CREDIT_NOTE, BILL, BANK_TRANSFER, WITHDRAWAL, CHECK, CESU, REFUND, PAYMENT_OPTIONS } from '../../data/constants';
 
 export default {
   name: 'CustomerBillingTable',
   props: {
     documents: { type: Array, default: () => [] },
     billingDates: { type: Object, default: () => ({}) },
+    displayActions: { type: Boolean, default: false },
   },
   data () {
     return {
@@ -78,7 +85,13 @@ export default {
           field: 'balance',
           format: value => this.formatPrice(value),
         },
+        {
+          name: 'actions',
+          label: '',
+          align: 'center',
+        },
       ],
+      paymentTypes: PAYMENT_OPTIONS.map(op => op.value),
     }
   },
   computed: {
@@ -126,6 +139,9 @@ export default {
           return doc.netInclTaxes;
       }
     },
+    openEditionModal (payment) {
+      this.$emit('openEditionModal', payment);
+    }
   }
 }
 </script>
@@ -137,4 +153,7 @@ export default {
 
   .q-table tbody tr:hover
     background: none;
+
+  .q-btn
+    height: 100%
 </style>
