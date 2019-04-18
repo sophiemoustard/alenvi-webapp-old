@@ -1,17 +1,19 @@
 <template>
-  <q-card v-if="Object.keys(documents).length > 0" class="q-mb-xl neutral-background" flat>
+  <q-card v-if="Object.keys(documents).length > 0" class="q-mb-lg neutral-background" flat>
     <q-table :data="documents" :columns="columns" binary-state-sort hide-bottom>
       <q-tr slot="top-row" slot-scope="props">
         <q-td class="bold">{{ formatDate(billingDates.startDate) }}</q-td>
         <q-td class="bold">Début de période</q-td>
         <q-td />
         <td class="bold" align="center">{{ formatPrice(startBalance) }}</td>
+        <q-td />
       </q-tr>
       <q-tr slot="body" slot-scope="props" :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
           <template v-if="col.name === 'document'">
             <div v-if="props.row.type === BILL">Facture {{ props.row.billNumber }}</div>
-            <div v-if="props.row.type === CREDIT_NOTE">Avoir {{ props.row.number }}</div>
+            <div v-else-if="props.row.type === CREDIT_NOTE">Avoir {{ props.row.number }}</div>
+            <div v-else>Paiement {{ props.row.number }}</div>
           </template>
           <template v-else-if="col.name === 'balance'">
             <div v-if="!isNegative(col.value)" class="row no-wrap items-center justify-center">
@@ -24,6 +26,10 @@
             </div>
             <div v-else>{{ col.value }}</div>
           </template>
+          <template v-else-if="col.name === 'actions'">
+            <q-btn v-if="displayActions && paymentTypes.includes(props.row.type)" flat small color="grey" icon="edit"
+              @click="openEditionModal(props.row)" />
+          </template>
           <template v-else>{{ col.value }}</template>
         </q-td>
       </q-tr>
@@ -32,20 +38,21 @@
         <q-td class="bold">Fin de période</q-td>
         <q-td />
         <td class="bold" align="center">{{ formatPrice(periodBalance) }}</td>
+        <q-td />
       </q-tr>
     </q-table>
   </q-card>
 </template>
 
 <script>
-import { CREDIT_NOTE, BILL } from '../../data/constants';
-import { getLastVersion } from '../../helpers/utils.js';
+import { CREDIT_NOTE, BILL, BANK_TRANSFER, WITHDRAWAL, CHECK, CESU, REFUND, PAYMENT_OPTIONS } from '../../data/constants';
 
 export default {
   name: 'CustomerBillingTable',
   props: {
     documents: { type: Array, default: () => [] },
     billingDates: { type: Object, default: () => ({}) },
+    displayActions: { type: Boolean, default: false },
   },
   data () {
     return {
@@ -68,7 +75,7 @@ export default {
           name: 'inclTaxes',
           label: 'Montant TTC',
           align: 'center',
-          field: row => row.type === BILL ? row.netInclTaxes : row.inclTaxesCustomer,
+          field: row => this.getInclTaxes(row),
           format: value => this.formatPrice(value),
         },
         {
@@ -78,13 +85,19 @@ export default {
           field: 'balance',
           format: value => this.formatPrice(value),
         },
+        {
+          name: 'actions',
+          label: '',
+          align: 'center',
+        },
       ],
+      paymentTypes: PAYMENT_OPTIONS.map(op => op.value),
     }
   },
   computed: {
     periodBalance () {
       if (!this.documents || this.documents.length === 0) return 0;
-      return getLastVersion(this.documents, 'date').balance;
+      return this.documents[this.documents.length - 1].balance;
     },
     startBalance () {
       if (this.documents.length === 0) return 0;
@@ -93,6 +106,12 @@ export default {
           return this.documents[0].balance + this.documents[0].netInclTaxes;
         case CREDIT_NOTE:
           return this.documents[0].balance - this.documents[0].inclTaxesCustomer;
+        case BANK_TRANSFER:
+        case WITHDRAWAL:
+        case CHECK:
+        case CESU:
+          if (this.documents[0].nature === REFUND) return this.documents[0].balance + this.documents[0].netInclTaxes;
+          return this.documents[0].balance - this.documents[0].netInclTaxes;
       }
     },
   },
@@ -106,6 +125,23 @@ export default {
     isNegative (val) {
       return val[0] === '-';
     },
+    getInclTaxes (doc) {
+      switch (doc.type) {
+        case BILL:
+          return -doc.netInclTaxes;
+        case CREDIT_NOTE:
+          return doc.inclTaxesCustomer;
+        case BANK_TRANSFER:
+        case WITHDRAWAL:
+        case CHECK:
+        case CESU:
+          if (doc.nature === REFUND) return -doc.netInclTaxes;
+          return doc.netInclTaxes;
+      }
+    },
+    openEditionModal (payment) {
+      this.$emit('openEditionModal', payment);
+    }
   }
 }
 </script>
@@ -114,4 +150,10 @@ export default {
 
   .bold
     font-weight bold;
+
+  .q-table tbody tr:hover
+    background: none;
+
+  .q-btn
+    height: 100%
 </style>

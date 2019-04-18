@@ -9,4 +9,8 @@ export default {
     const payment = await alenviAxios.post(`${process.env.API_HOSTNAME}/payments`, data);
     return payment.data.data.payment;
   },
+  async update (id, data) {
+    const payment = await alenviAxios.put(`${process.env.API_HOSTNAME}/payments/${id}`, data);
+    return payment.data.data.payment;
+  },
 }
