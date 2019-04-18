@@ -15,5 +15,11 @@ export default {
   },
   async remove (id) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/creditNotes/${id}`);
-  }
+  },
+  async getPDF (id) {
+    return alenviAxios.get(
+      `${process.env.API_HOSTNAME}/creditNotes/${id}/pdfs`,
+      { responseType: 'arraybuffer', headers: { 'Accept': 'application/pdf' } }
+    );
+  },
 }

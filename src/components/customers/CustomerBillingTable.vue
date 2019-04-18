@@ -11,8 +11,12 @@
       <q-tr slot="body" slot-scope="props" :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
           <template v-if="col.name === 'document'">
-            <div v-if="props.row.type === BILL">Facture {{ props.row.billNumber }}</div>
-            <div v-else-if="props.row.type === CREDIT_NOTE">Avoir {{ props.row.number }}</div>
+            <div :class="{'download': props.row.billNumber}" v-if="props.row.type === BILL" @click="downloadBillPdf(props.row._id)">
+              Facture {{ props.row.billNumber || 'tiers' }}
+            </div>
+            <div class="download" v-else-if="props.row.type === CREDIT_NOTE" @click="downloadCreditNotePdf(props.row._id)">
+              Avoir {{ props.row.number }}
+            </div>
             <div v-else>Paiement {{ props.row.number }}</div>
           </template>
           <template v-else-if="col.name === 'balance'">
@@ -46,6 +50,8 @@
 
 <script>
 import { CREDIT_NOTE, BILL, BANK_TRANSFER, WITHDRAWAL, CHECK, CESU, REFUND, PAYMENT_OPTIONS } from '../../data/constants';
+import { NotifyNegative, NotifyPositive } from '../popup/notify.js';
+import { downloadPdf } from '../../helpers/downloadFile.js';
 
 export default {
   name: 'CustomerBillingTable',
@@ -141,12 +147,33 @@ export default {
     },
     openEditionModal (payment) {
       this.$emit('openEditionModal', payment);
-    }
+    },
+    async downloadBillPdf (billId) {
+      try {
+        const pdf = await this.$bills.getPDF(billId);
+        await downloadPdf(pdf, 'your-file-name.pdf');
+        NotifyPositive('Facture téléchargée');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Impossible de télécharger la facture');
+      }
+    },
+    async downloadCreditNotePdf (creditNoteId) {
+      try {
+        const pdf = await this.$creditNotes.getPDF(creditNoteId);
+        await downloadPdf(pdf, 'your-file-name.pdf');
+        NotifyPositive('Facture téléchargée');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Impossible de télécharger la facture');
+      }
+    },
   }
 }
 </script>
 
 <style lang="stylus" scoped>
+@import '~variables'
 
   .bold
     font-weight bold;
@@ -155,5 +182,11 @@ export default {
     background: none;
 
   .q-btn
-    height: 100%
+    height: 100%;
+
+  .download
+    cursor: pointer;
+    color: $primary;
+    text-decoration underline;
+
 </style>

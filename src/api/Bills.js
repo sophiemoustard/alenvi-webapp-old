@@ -12,10 +12,10 @@ export default {
     const bills = await alenviAxios.get(`${process.env.API_HOSTNAME}/bills`, { params });
     return bills.data.data.bills;
   },
-  async getPDF () {
-    return alenviAxios.get(`${process.env.API_HOSTNAME}/bills/pdfs`, {
-      responseType: 'arraybuffer',
-      headers: { 'Accept': 'application/pdf' }
-    });
+  async getPDF (id) {
+    return alenviAxios.get(
+      `${process.env.API_HOSTNAME}/bills/${id}/pdfs`,
+      { responseType: 'arraybuffer', headers: { 'Accept': 'application/pdf' } }
+    );
   },
 }

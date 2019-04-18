@@ -1,6 +1,5 @@
 <template>
   <q-page class="neutral-background">
-    <button @click="savePDF">Save as PDF</button>
     <div class="title layout-padding">
       <h4>À facturer</h4>
       <ni-date-range v-model="billingDates" @input="getDraftBills" />
@@ -237,14 +236,6 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la modification de la date de début de facturation');
       }
-    },
-    async savePDF () {
-      const pdf = await this.$bills.getPDF();
-      const blob = new Blob([pdf.data], { type: 'application/pdf' })
-      const link = document.createElement('a');
-      link.href = window.URL.createObjectURL(blob);
-      link.download = `your-file-name.pdf`;
-      link.click();
     },
   }
 }
