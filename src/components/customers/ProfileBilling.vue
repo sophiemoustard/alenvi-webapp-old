@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import { CREDIT_NOTE, BILL } from '../../data/constants';
+import { CREDIT_NOTE, BILL, WITHDRAWAL, BANK_TRANSFER, CHECK, CESU, REFUND } from '../../data/constants';
 import CustomerBillingTable from '../../components/customers/CustomerBillingTable';
 import DateRange from '../../components/form/DateRange';
 
@@ -58,7 +58,7 @@ export default {
       this.customerBillingDocuments = [];
       this.tppBillingDocuments = {};
       await this.getCustomerBalance();
-      await Promise.all([this.getBills(), this.getCreditNotes()]);
+      await Promise.all([this.getBills(), this.getCreditNotes(), this.getPayments()]);
       const customerStartBalance = this.balances.length === 0 ? 0 : this.balances.find(bal => bal.customer._id === this.customer._id).balance;
       this.computeIntermediateBalances(this.customerBillingDocuments, customerStartBalance)
       for (const tpp of Object.keys(this.tppBillingDocuments)) {
@@ -80,6 +80,12 @@ export default {
           return -doc.netInclTaxes;
         case CREDIT_NOTE:
           return doc.inclTaxesCustomer;
+        case BANK_TRANSFER:
+        case WITHDRAWAL:
+        case CHECK:
+        case CESU:
+          if (doc.nature === REFUND) return doc.netInclTaxes;
+          return -doc.netInclTaxes;
       }
     },
     async getCustomerBalance () {
@@ -118,6 +124,22 @@ export default {
           endDate: this.billingDates.endDate,
         });
         this.customerBillingDocuments.push(...creditNotes.map(cn => ({ ...cn, type: CREDIT_NOTE })));
+      } catch (e) {
+        console.error(e)
+      }
+    },
+    async getPayments () {
+      try {
+        const payments = await this.$payments.list({
+          customer: this.customer._id,
+          startDate: this.billingDates.startDate,
+          endDate: this.billingDates.endDate,
+        });
+        for (const payment of payments) {
+          if (!payment.client) this.customerBillingDocuments.push(payment);
+          else if (payment.client._id && !this.tppBillingDocuments[payment.client.name]) this.tppBillingDocuments[payment.client.name] = [payment]
+          else this.tppBillingDocuments[payment.client.name].push(payment);
+        }
       } catch (e) {
         console.error(e)
       }

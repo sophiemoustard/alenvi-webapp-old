@@ -11,7 +11,8 @@
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
           <template v-if="col.name === 'document'">
             <div v-if="props.row.type === BILL">Facture {{ props.row.billNumber }}</div>
-            <div v-if="props.row.type === CREDIT_NOTE">Avoir {{ props.row.number }}</div>
+            <div v-else-if="props.row.type === CREDIT_NOTE">Avoir {{ props.row.number }}</div>
+            <div v-else>Paiement {{ props.row.number }}</div>
           </template>
           <template v-else-if="col.name === 'balance'">
             <div v-if="!isNegative(col.value)" class="row no-wrap items-center justify-center">
@@ -38,8 +39,7 @@
 </template>
 
 <script>
-import { CREDIT_NOTE, BILL } from '../../data/constants';
-import { getLastVersion } from '../../helpers/utils.js';
+import { CREDIT_NOTE, BILL, BANK_TRANSFER, WITHDRAWAL, CHECK, CESU, REFUND } from '../../data/constants';
 
 export default {
   name: 'CustomerBillingTable',
@@ -68,7 +68,7 @@ export default {
           name: 'inclTaxes',
           label: 'Montant TTC',
           align: 'center',
-          field: row => row.type === BILL ? row.netInclTaxes : row.inclTaxesCustomer,
+          field: row => this.getInclTaxes(row),
           format: value => this.formatPrice(value),
         },
         {
@@ -84,7 +84,7 @@ export default {
   computed: {
     periodBalance () {
       if (!this.documents || this.documents.length === 0) return 0;
-      return getLastVersion(this.documents, 'date').balance;
+      return this.documents[this.documents.length - 1].balance;
     },
     startBalance () {
       if (this.documents.length === 0) return 0;
@@ -105,6 +105,20 @@ export default {
     },
     isNegative (val) {
       return val[0] === '-';
+    },
+    getInclTaxes (doc) {
+      switch (doc.type) {
+        case BILL:
+          return -doc.netInclTaxes;
+        case CREDIT_NOTE:
+          return doc.inclTaxesCustomer;
+        case BANK_TRANSFER:
+        case WITHDRAWAL:
+        case CHECK:
+        case CESU:
+          if (doc.nature === REFUND) return doc.netInclTaxes;
+          return -doc.netInclTaxes;
+      }
     },
   }
 }

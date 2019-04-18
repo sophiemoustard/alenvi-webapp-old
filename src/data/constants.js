@@ -123,12 +123,15 @@ export const BILL = 'bill';
 export const CREDIT_NOTE = 'creditNote';
 
 // Payments
-
+export const WITHDRAWAL = 'withdrawal';
+export const BANK_TRANSFER = 'bank_transfer';
+export const CHECK = 'check';
+export const CESU = 'cesu';
 export const PAYMENT_OPTIONS = [
-  { label: 'Prélèvement', value: 'withdrawal' },
-  { label: 'Virement', value: 'bank_transfer' },
-  { label: 'Chèque', value: 'check' },
-  { label: 'CESU', value: 'cesu' },
+  { label: 'Prélèvement', value: WITHDRAWAL },
+  { label: 'Virement', value: BANK_TRANSFER },
+  { label: 'Chèque', value: CHECK },
+  { label: 'CESU', value: CESU },
 ];
 export const REFUND = 'refund';
 export const PAYMENT = 'payment';
