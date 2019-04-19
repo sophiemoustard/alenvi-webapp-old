@@ -90,7 +90,8 @@
     </q-modal>
 
     <!-- Credit note edition modal -->
-    <q-modal v-model="creditNoteEditionModal" content-classes="modal-container-sm" @hide="resetEditionCreditNoteData">
+    <q-modal v-if="Object.keys(editedCreditNote).length > 0" v-model="creditNoteEditionModal"
+      content-classes="modal-container-md" @hide="resetEditionCreditNoteData">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -100,9 +101,9 @@
             <span><q-icon name="clear" @click.native="creditNoteEditionModal = false" /></span>
           </div>
         </div>
-        <ni-modal-select caption="Bénéficiaire" v-model="editedCreditNote.customer" :options="customersOptions"
-          required-field @input="getEvents" :error="$v.editedCreditNote.customer.$error"
-          @blur="$v.editedCreditNote.customer.$touch" />
+        <ni-modal-input caption="Bénéficiaire" v-model="editedCreditNote.customer.identity.lastname" required-field disable />
+        <ni-modal-input v-if="editedCreditNote.thirdPartyPayer" caption="Tiers payeur"
+          v-model="editedCreditNote.thirdPartyPayer.name" required-field disable />
         <ni-datetime-picker caption="Date de l'avoir" v-model="editedCreditNote.date" in-modal type="date"
           required-field :error="$v.editedCreditNote.date.$error" @blur="$v.editedCreditNote.date.$touch" />
         <!-- Has linked events -->
@@ -123,10 +124,12 @@
           </div>
           <div class="row justify-between items-baseline">
             <div class="col-6 light">
-              <p>Montant HT : {{ formatPrice(editedCreditNote.exclTaxesCustomer) }}</p>
+              <p v-if="this.editedCreditNote.exclTaxesCustomer">Montant HT bénéficiaire : {{ formatPrice(editedCreditNote.exclTaxesCustomer) }}</p>
+              <p v-if="this.editedCreditNote.exclTaxesTpp">Montant HT tiers-payeur : {{ formatPrice(editedCreditNote.exclTaxesTpp) }}</p>
             </div>
             <div class="col-6 light">
-              <p>Montant TTC : {{ formatPrice(editedCreditNote.inclTaxesCustomer) }}</p>
+              <p v-if="this.editedCreditNote.inclTaxesCustomer">Montant TTC bénéficiaire : {{ formatPrice(editedCreditNote.inclTaxesCustomer) }}</p>
+              <p v-if="this.editedCreditNote.inclTaxesTpp">Montant TTC tiers-payeur : {{ formatPrice(editedCreditNote.inclTaxesTpp) }}</p>
             </div>
           </div>
         </template>
@@ -135,9 +138,12 @@
           <ni-modal-select caption="Souscription concernée" v-model="editedCreditNote.subscription"
             :options="subscriptionsOptions" :disable="!hasLinkedEvents && !editedCreditNote.customer" required-field
             :error="$v.editedCreditNote.subscription.$error" @blur="$v.editedCreditNote.subscription.$touch" />
-          <ni-modal-input caption="Montant TTC" suffix="€" type="number" v-model="editedCreditNote.inclTaxesCustomer"
-            required-field :error="$v.editedCreditNote.inclTaxesCustomer.$error"
-            @blur="$v.editedCreditNote.inclTaxesCustomer.$touch" :error-label="inclTaxesError" />
+          <ni-modal-input v-if="!editedCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€" type="number"
+            v-model="editedCreditNote.inclTaxesCustomer" :error="$v.editedCreditNote.inclTaxesCustomer.$error"
+            @blur="$v.editedCreditNote.inclTaxesCustomer.$touch" :error-label="inclTaxesError" required-field />
+          <ni-modal-input v-if="editedCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€"
+            v-model="editedCreditNote.inclTaxesTpp" required-field :error="$v.editedCreditNote.inclTaxesTpp.$error"
+            @blur="$v.editedCreditNote.inclTaxesTpp.$touch" :error-label="inclTaxesError" type="number" />
         </template>
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Editer l'avoir" icon-right="add" color="primary"
@@ -185,16 +191,7 @@ export default {
         inclTaxesCustomer: 0,
         subscription: null
       },
-      editedCreditNote: {
-        customer: null,
-        date: null,
-        events: [],
-        startDate: null,
-        endDate: null,
-        exclTaxesCustomer: 0,
-        inclTaxesCustomer: 0,
-        subscription: null
-      },
+      editedCreditNote: {},
       creditNotes: [],
       creditNotesColumns: [
         {
@@ -324,15 +321,7 @@ export default {
           positiveNumber,
           required: requiredIf(() => !this.thirdPartyPayer),
         },
-        exclTaxesCustomer: {
-          positiveNumber,
-          required: requiredIf(() => !this.thirdPartyPayer),
-        },
         inclTaxesTpp: {
-          positiveNumber,
-          required: requiredIf(() => this.thirdPartyPayer),
-        },
-        exclTaxesTpp: {
           positiveNumber,
           required: requiredIf(() => this.thirdPartyPayer),
         },
@@ -350,8 +339,12 @@ export default {
           required: requiredIf(() => !this.hasLinkedEvents)
         },
         inclTaxesCustomer: {
-          required: requiredIf(() => !this.hasLinkedEvents),
+          required: requiredIf(() => !this.thirdPartyPayer),
           positiveNumber,
+        },
+        inclTaxesTpp: {
+          positiveNumber,
+          required: requiredIf(() => this.thirdPartyPayer),
         },
       },
     }
@@ -361,11 +354,14 @@ export default {
       return this.$store.getters['main/user'];
     },
     subscriptionsOptions () {
-      let customer;
-      if (this.newCreditNote.customer) customer = this.newCreditNote.customer;
-      if (this.editedCreditNote.customer) customer = this.editedCreditNote.customer;
+      let selectedCustomer;
+      if (this.newCreditNote.customer) {
+        selectedCustomer = this.customersOptions.find(cus => cus.value === this.newCreditNote.customer);
+      }
+      if (this.editedCreditNote.customer) {
+        selectedCustomer = this.editedCreditNote.customer;
+      }
 
-      const selectedCustomer = this.customersOptions.find(cus => cus.value === customer);
       if (!selectedCustomer) return [];
       return selectedCustomer.subscriptions.map(sub => ({
         label: sub.service.name,
@@ -379,9 +375,9 @@ export default {
       }))
     },
     thirdPartyPayerOptions () {
-      if (!this.newCreditNote.customer) return [];
-
-      const customer = this.newCreditNote.customer;
+      let customer;
+      if (this.creditNoteCreationModal) customer = this.newCreditNote.customer;
+      if (this.creditNoteEditionModal) customer = this.editedCreditNote.customer;
       const selectedCustomer = this.customersOptions.find(cus => cus.value === customer);
       if (!selectedCustomer) return [];
 
@@ -393,12 +389,14 @@ export default {
     disableCreationButton () {
       return !(this.newCreditNote.customer && this.newCreditNote.date &&
       ((this.newCreditNote.events && this.newCreditNote.events.length > 0) ||
-      (this.newCreditNote.subscription && ((this.newCreditNote.thirdPartyPayer && this.newCreditNote.inclTaxesTpp) || this.newCreditNote.inclTaxesCustomer))));
+      (this.newCreditNote.subscription &&
+        ((this.newCreditNote.thirdPartyPayer && this.newCreditNote.inclTaxesTpp) || this.newCreditNote.inclTaxesCustomer))));
     },
     disableEditionButton () {
       return !(this.editedCreditNote.customer && this.editedCreditNote.date &&
       ((this.editedCreditNote.events && this.editedCreditNote.events.length > 0) ||
-      (this.editedCreditNote.subscription && this.editedCreditNote.inclTaxesCustomer)));
+      (this.editedCreditNote.subscription &&
+        ((this.editedCreditNote.thirdPartyPayer && this.editedCreditNote.inclTaxesTpp) || this.editedCreditNote.inclTaxesCustomer))));
     },
     inclTaxesError () {
       return 'Montant TTC non valide';
@@ -447,13 +445,18 @@ export default {
           };
           if (this.newCreditNote.thirdPartyPayer) query.thirdPartyPayer = this.newCreditNote.thirdPartyPayer;
           this.events = await this.$events.listForCreditNotes(query);
-        } else if (this.editedCreditNote.customer && this.editedCreditNote.startDate && this.editedCreditNote.endDate) {
+        } else if (this.hasLinkedEvents && this.editedCreditNote.customer && this.editedCreditNote.startDate && this.editedCreditNote.endDate) {
           const query = {
             startDate: this.editedCreditNote.startDate,
             endDate: this.editedCreditNote.endDate,
-            customer: this.editedCreditNote.customer,
+            customer: this.editedCreditNote.customer._id,
             isBilled: true
           };
+          if (this.editedCreditNote.thirdPartyPayer) query.thirdPartyPayer = this.editedCreditNote.thirdPartyPayer._id;
+          else if (this.editedCreditNote.linkedCreditNote) {
+            const creditNote = this.creditNotes.find(cd => cd._id === this.editedCreditNote.linkedCreditNote);
+            query.thirdPartyPayer = creditNote.thirdPartyPayer._id;
+          }
           this.events = await this.$events.listForCreditNotes(query);
         }
       } catch (e) {
@@ -501,9 +504,10 @@ export default {
     formatPayload (creditNote) {
       const { date, customer } = creditNote;
       const payload = { date, customer };
+      console.log(customer)
 
       if (!this.hasLinkedEvents) {
-        const selectedCustomer = this.customersOptions.find(cus => cus.value === customer);
+        const selectedCustomer = customer._id ? customer : this.customersOptions.find(cus => cus.value === customer) || customer;
         const subscription = selectedCustomer.subscriptions.find(sub => sub._id === creditNote.subscription);
         const vat = subscription.service.vat;
         if (creditNote.inclTaxesCustomer) {
@@ -520,6 +524,7 @@ export default {
         payload.endDate = creditNote.endDate;
         payload.events = creditNote.events.length > 0 ? creditNote.events : null;
         payload.exclTaxesCustomer = creditNote.exclTaxesCustomer;
+        payload.inclTaxesCustomer = creditNote.inclTaxesCustomer;
         payload.exclTaxesTpp = creditNote.exclTaxesTpp;
         payload.inclTaxesTpp = creditNote.inclTaxesTpp;
         payload.thirdPartyPayer = creditNote.thirdPartyPayer;
@@ -547,8 +552,9 @@ export default {
     },
     // Edition
     async openCreditNoteEditionModal (creditNote) {
-      this.editedCreditNote = { ...creditNote }; // spread to not update by reference
-      this.editedCreditNote.customer = creditNote.customer._id;
+      this.editedCreditNote = { inclTaxesCustomer: 0, inclTaxesTpp: 0, ...creditNote };
+      this.editedCreditNote.customer = creditNote.customer;
+      if (creditNote.thirdPartyPayer) this.editedCreditNote.thirdPartyPayer = creditNote.thirdPartyPayer;
 
       this.hasLinkedEvents = creditNote.events && creditNote.events.length > 0;
       if (this.hasLinkedEvents) {
@@ -566,16 +572,11 @@ export default {
       this.creditNoteEditionModal = true
     },
     resetEditionCreditNoteData () {
-      this.editedCreditNote = {
-        customer: null,
-        date: null,
-        events: [],
-        startDate: null,
-        endDate: null,
-        exclTaxesCustomer: 0,
-        inclTaxesCustomer: 0,
-        subscription: null
-      };
+      this.creditNoteEditionModal = false;
+      this.editedCreditNote = {};
+      this.events = [];
+      this.hasLinkedEvents = false;
+      this.$v.editedCreditNote.$reset();
     },
     async updateCreditNote () {
       try {
@@ -583,7 +584,9 @@ export default {
         if (this.$v.editedCreditNote.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        await this.$creditNotes.updateById(this.editedCreditNote._id, this.formatPayload(this.editedCreditNote));
+        const payload = { ...this.formatPayload(this.editedCreditNote), customer: this.editedCreditNote.customer_id };
+        if (this.editedCreditNote.thirdPartyPayer) payload.thirdPartyPayer = this.editedCreditNote.thirdPartyPayer._id;
+        await this.$creditNotes.updateById(this.editedCreditNote._id, payload);
 
         NotifyPositive('Avoir édité');
         await this.refreshCreditNotes();
