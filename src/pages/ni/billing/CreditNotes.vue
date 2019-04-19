@@ -63,12 +63,12 @@
           </div>
           <div class="row justify-between items-baseline">
             <div class="col-6 light">
-              <p v-if="this.newCreditNote.exclTaxesCustomer">Montant HT bénéficiaire : {{ formatPrice(newCreditNote.exclTaxesCustomer) }}</p>
-              <p v-if="this.newCreditNote.exclTaxesTpp">Montant HT tiers-payeur : {{ formatPrice(newCreditNote.exclTaxesTpp) }}</p>
+              <p v-if="newCreditNote.exclTaxesCustomer">Montant HT bénéficiaire : {{ formatPrice(newCreditNote.exclTaxesCustomer) }}</p>
+              <p v-if="newCreditNote.exclTaxesTpp">Montant HT tiers-payeur : {{ formatPrice(newCreditNote.exclTaxesTpp) }}</p>
             </div>
             <div class="col-6 light">
-              <p v-if="this.newCreditNote.inclTaxesCustomer">Montant TTC bénéficiaire : {{ formatPrice(newCreditNote.inclTaxesCustomer) }}</p>
-              <p v-if="this.newCreditNote.inclTaxesTpp">Montant TTC tiers-payeur : {{ formatPrice(newCreditNote.inclTaxesTpp) }}</p>
+              <p v-if="newCreditNote.inclTaxesCustomer">Montant TTC bénéficiaire : {{ formatPrice(newCreditNote.inclTaxesCustomer) }}</p>
+              <p v-if="newCreditNote.inclTaxesTpp">Montant TTC tiers-payeur : {{ formatPrice(newCreditNote.inclTaxesTpp) }}</p>
             </div>
           </div>
         </template>
@@ -124,12 +124,12 @@
           </div>
           <div class="row justify-between items-baseline">
             <div class="col-6 light">
-              <p v-if="this.editedCreditNote.exclTaxesCustomer">Montant HT bénéficiaire : {{ formatPrice(editedCreditNote.exclTaxesCustomer) }}</p>
-              <p v-if="this.editedCreditNote.exclTaxesTpp">Montant HT tiers-payeur : {{ formatPrice(editedCreditNote.exclTaxesTpp) }}</p>
+              <p v-if="editedCreditNote.exclTaxesCustomer">Montant HT bénéficiaire : {{ formatPrice(editedCreditNote.exclTaxesCustomer) }}</p>
+              <p v-if="editedCreditNote.exclTaxesTpp">Montant HT tiers-payeur : {{ formatPrice(editedCreditNote.exclTaxesTpp) }}</p>
             </div>
             <div class="col-6 light">
-              <p v-if="this.editedCreditNote.inclTaxesCustomer">Montant TTC bénéficiaire : {{ formatPrice(editedCreditNote.inclTaxesCustomer) }}</p>
-              <p v-if="this.editedCreditNote.inclTaxesTpp">Montant TTC tiers-payeur : {{ formatPrice(editedCreditNote.inclTaxesTpp) }}</p>
+              <p v-if="editedCreditNote.inclTaxesCustomer">Montant TTC bénéficiaire : {{ formatPrice(editedCreditNote.inclTaxesCustomer) }}</p>
+              <p v-if="editedCreditNote.inclTaxesTpp">Montant TTC tiers-payeur : {{ formatPrice(editedCreditNote.inclTaxesTpp) }}</p>
             </div>
           </div>
         </template>
