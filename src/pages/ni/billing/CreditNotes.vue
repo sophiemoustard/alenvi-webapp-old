@@ -600,9 +600,10 @@ export default {
     // Deletion
     async deleteCreditNote (id, cell) {
       try {
+        const deletedCreditNote = this.creditNotes.find(cd => cd._id === id);
         await this.$q.dialog({
           title: 'Confirmation',
-          message: 'Etes-vous sûr de vouloir supprimer cet avoirs ?',
+          message: `Etes-vous sûr de vouloir supprimer cet avoir ${deletedCreditNote.linkedCreditNote ? 'et l\'avoir relié aux mêmes évènements' : ''} ?`,
           ok: 'OK',
           cancel: 'Annuler'
         });
@@ -610,8 +611,8 @@ export default {
         await this.refreshCreditNotes();
         NotifyPositive('Avoir supprimé');
       } catch (e) {
-        console.error(e);
         if (e.message === '') return NotifyPositive('Suppression annulée');
+        console.error(e);
         NotifyNegative('Erreur lors de la suppression de l\'avoir');
       }
     }
