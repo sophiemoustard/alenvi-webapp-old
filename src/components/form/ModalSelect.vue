@@ -46,5 +46,7 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables'
   .q-if-inverted
-    border: 1px solid $light-grey
+    border: 1px solid $light-grey;
+  /deep/ .q-if .q-if-inner
+      overflow: hidden;
 </style>
