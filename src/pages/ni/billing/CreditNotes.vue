@@ -504,7 +504,6 @@ export default {
     formatPayload (creditNote) {
       const { date, customer } = creditNote;
       const payload = { date, customer };
-      console.log(customer)
 
       if (!this.hasLinkedEvents) {
         const selectedCustomer = customer._id ? customer : this.customersOptions.find(cus => cus.value === customer) || customer;
@@ -608,7 +607,7 @@ export default {
           cancel: 'Annuler'
         });
         await this.$creditNotes.remove(id);
-        this.creditNotes.splice(cell, 1);
+        await this.refreshCreditNotes();
         NotifyPositive('Avoir supprimé');
       } catch (e) {
         console.error(e);
