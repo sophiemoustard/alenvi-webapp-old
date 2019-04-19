@@ -228,17 +228,23 @@ export default {
           field: row => `${row.customer.identity.lastname}`,
         },
         {
+          name: 'thirdPartyPayer',
+          label: 'Tiers payeur',
+          align: 'left',
+          field: row => row.thirdPartyPayer ? `${row.thirdPartyPayer.name}` : '',
+        },
+        {
           name: 'exclTaxes',
           label: 'HT',
           align: 'left',
-          field: 'exclTaxesCustomer',
+          field: row => row.thirdPartyPayer ? row.exclTaxesTpp : row.exclTaxesCustomer,
           format: value => this.formatPrice(value),
         },
         {
           name: 'inclTaxes',
           label: 'TTC',
           align: 'left',
-          field: 'inclTaxesCustomer',
+          field: row => row.thirdPartyPayer ? row.inclTaxesTpp : row.inclTaxesCustomer,
           format: value => this.formatPrice(value),
         },
         {
@@ -506,6 +512,7 @@ export default {
         } else {
           payload.inclTaxesTpp = creditNote.inclTaxesTpp;
           payload.exclTaxesTpp = Number.parseFloat((creditNote.inclTaxesTpp / (1 + (vat / 100))).toFixed(2));
+          payload.thirdPartyPayer = creditNote.thirdPartyPayer;
         }
         payload.subscription = { _id: subscription._id, service: subscription.service.name, vat };
       } else {
