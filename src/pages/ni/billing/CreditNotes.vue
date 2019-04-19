@@ -11,7 +11,8 @@
               <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions table-actions-margin">
                   <q-btn flat round small color="grey" icon="edit" @click.native="openCreditNoteEditionModal(props.row)" />
-                  <q-btn flat round small color="grey" icon="delete" @click="deleteCreditNote(col.value, props.row.__index)" />
+                  <q-btn flat round small color="grey" icon="delete"
+                    @click="deleteCreditNote(col.value, props.row.__index)" />
                 </div>
               </template>
               <template v-else>{{ col.value }}</template>
@@ -37,6 +38,8 @@
         <ni-modal-select caption="Bénéficiaire" v-model="newCreditNote.customer" :options="customersOptions"
           required-field @input="getEvents" @blur="$v.newCreditNote.customer.$touch"
           :error="$v.newCreditNote.customer.$error" />
+        <ni-modal-select caption="Tiers payeur" v-model="newCreditNote.thirdPartyPayer" :options="thirdPartyPayerOptions"
+          required-field @input="getEvents" :disable="thirdPartyPayerOptions.length === 0" clearable />
         <ni-datetime-picker caption="Date de l'avoir" v-model="newCreditNote.date" :error="$v.newCreditNote.date.$error"
           @blur="$v.newCreditNote.date.$touch" in-modal type="date" required-field />
         <div class="row q-mb-md light">
@@ -54,15 +57,18 @@
             <ni-option-group v-model="newCreditNote.events" :options="eventsOptions" caption="Évènements"
               type="checkbox" required-field inline />
           </template>
-          <div v-if="newCreditNote.customer && newCreditNote.startDate && newCreditNote.endDate && events.length === 0" class="light warning">
+          <div v-if="newCreditNote.customer && newCreditNote.startDate && newCreditNote.endDate && events.length === 0"
+            class="light warning">
             <p>{{ eventsNotFoundMessage }}</p>
           </div>
           <div class="row justify-between items-baseline">
             <div class="col-6 light">
-              <p>Montant HT : {{ formatPrice(newCreditNote.exclTaxesCustomer) }}</p>
+              <p v-if="this.newCreditNote.exclTaxesCustomer">Montant HT bénéficiaire : {{ formatPrice(newCreditNote.exclTaxesCustomer) }}</p>
+              <p v-if="this.newCreditNote.exclTaxesTpp">Montant HT tiers-payeur : {{ formatPrice(newCreditNote.exclTaxesTpp) }}</p>
             </div>
             <div class="col-6 light">
-              <p>Montant TTC : {{ formatPrice(newCreditNote.inclTaxesCustomer) }}</p>
+              <p v-if="this.newCreditNote.inclTaxesCustomer">Montant TTC bénéficiaire : {{ formatPrice(newCreditNote.inclTaxesCustomer) }}</p>
+              <p v-if="this.newCreditNote.inclTaxesTpp">Montant TTC tiers-payeur : {{ formatPrice(newCreditNote.inclTaxesTpp) }}</p>
             </div>
           </div>
         </template>
@@ -144,7 +150,7 @@ import ModalInput from '../../../components/form/ModalInput';
 import ModalSelect from '../../../components/form/ModalSelect';
 import OptionGroup from '../../../components/form/OptionGroup';
 import { required, requiredIf } from 'vuelidate/lib/validators';
-import { strictPositiveNumber } from '../../../helpers/vuelidateCustomVal.js';
+import { positiveNumber } from '../../../helpers/vuelidateCustomVal.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
 import { REQUIRED_LABEL } from '../../../data/constants';
 
@@ -168,6 +174,7 @@ export default {
       events: [],
       newCreditNote: {
         customer: null,
+        thirdPartyPayer: null,
         date: null,
         events: [],
         startDate: null,
@@ -258,16 +265,23 @@ export default {
       this.$v.newCreditNote.startDate.$reset();
       this.$v.newCreditNote.endDate.$reset();
     },
+    'newCreditNote.customer' (value) {
+      this.newCreditNote.thirdPartyPayer = null;
+    },
     'newCreditNote.events' (value) {
       const prices = this.computePrices(this.newCreditNote.events);
       this.newCreditNote.exclTaxesCustomer = prices.exclTaxesCustomer;
       this.newCreditNote.inclTaxesCustomer = prices.inclTaxesCustomer;
+      this.newCreditNote.exclTaxesTpp = prices.exclTaxesTpp;
+      this.newCreditNote.inclTaxesTpp = prices.inclTaxesTpp;
     },
     'editedCreditNote.events' (value) {
       if (this.hasLinkedEvents) {
         const prices = this.computePrices(this.editedCreditNote.events);
         this.editedCreditNote.exclTaxesCustomer = prices.exclTaxesCustomer;
         this.editedCreditNote.inclTaxesCustomer = prices.inclTaxesCustomer;
+        this.editedCreditNote.exclTaxesTpp = prices.exclTaxesTpp;
+        this.editedCreditNote.inclTaxesTpp = prices.inclTaxesTpp;
       }
     },
     'newCreditNote.startDate' (value) {
@@ -298,10 +312,10 @@ export default {
         subscription: {
           required: requiredIf(() => !this.hasLinkedEvents)
         },
-        inclTaxesCustomer: {
-          required: requiredIf(() => !this.hasLinkedEvents),
-          strictPositiveNumber,
-        },
+        inclTaxesCustomer: { positiveNumber },
+        exclTaxesCustomer: { positiveNumber },
+        inclTaxesTpp: { positiveNumber },
+        exclTaxesTpp: { positiveNumber },
       },
       editedCreditNote: {
         date: { required },
@@ -317,7 +331,7 @@ export default {
         },
         inclTaxesCustomer: {
           required: requiredIf(() => !this.hasLinkedEvents),
-          strictPositiveNumber,
+          positiveNumber,
         },
       },
     }
@@ -343,6 +357,18 @@ export default {
         label: `${this.$moment(event.startDate).format('DD/MM/YYYY HH:mm')} - ${this.$moment(event.endDate).format('HH:mm')}`,
         value: event._id,
       }))
+    },
+    thirdPartyPayerOptions () {
+      if (!this.newCreditNote.customer) return [];
+
+      const customer = this.newCreditNote.customer;
+      const selectedCustomer = this.customersOptions.find(cus => cus.value === customer);
+      if (!selectedCustomer) return [];
+
+      return selectedCustomer.thirdPartyPayers.map(tpp => ({
+        label: tpp.name,
+        value: tpp._id,
+      }));
     },
     disableCreationButton () {
       return !(this.newCreditNote.customer && this.newCreditNote.date &&
@@ -376,6 +402,7 @@ export default {
         for (let i = 0, l = customers.length; i < l; i++) {
           this.customersOptions.push({
             subscriptions: customers[i].subscriptions,
+            thirdPartyPayers: customers[i].thirdPartyPayers,
             label: customers[i].identity.lastname,
             value: customers[i]._id
           });
@@ -398,19 +425,22 @@ export default {
     async getEvents () {
       try {
         if (this.hasLinkedEvents && this.newCreditNote.customer && this.newCreditNote.startDate && this.newCreditNote.endDate) {
-          this.events = await this.$events.list({
+          const query = {
             startDate: this.newCreditNote.startDate,
             endDate: this.newCreditNote.endDate,
             customer: this.newCreditNote.customer,
             isBilled: true
-          });
+          };
+          if (this.newCreditNote.thirdPartyPayer) query.thirdPartyPayer = this.newCreditNote.thirdPartyPayer;
+          this.events = await this.$events.listForCreditNotes(query);
         } else if (this.editedCreditNote.customer && this.editedCreditNote.startDate && this.editedCreditNote.endDate) {
-          this.events = await this.$events.list({
+          const query = {
             startDate: this.editedCreditNote.startDate,
             endDate: this.editedCreditNote.endDate,
             customer: this.editedCreditNote.customer,
             isBilled: true
-          });
+          };
+          this.events = await this.$events.listForCreditNotes(query);
         }
       } catch (e) {
         this.events = [];
@@ -421,15 +451,22 @@ export default {
     // Compute
     computePrices (events) {
       let exclTaxesCustomer = 0, inclTaxesCustomer = 0;
+      let exclTaxesTpp = 0, inclTaxesTpp = 0;
       if (this.events) {
         const creditNoteEvents = this.events.filter(ev => events.includes(ev._id));
         for (let i = 0, l = creditNoteEvents.length; i < l; i++) {
-          exclTaxesCustomer += creditNoteEvents[i].bills.exclTaxesCustomer;
-          inclTaxesCustomer += creditNoteEvents[i].bills.inclTaxesCustomer;
+          if (creditNoteEvents[i].bills.exclTaxesCustomer) {
+            exclTaxesCustomer += creditNoteEvents[i].bills.exclTaxesCustomer;
+            inclTaxesCustomer += creditNoteEvents[i].bills.inclTaxesCustomer;
+          }
+          if (creditNoteEvents[i].bills.exclTaxesTpp) {
+            exclTaxesTpp += creditNoteEvents[i].bills.exclTaxesTpp;
+            inclTaxesTpp += creditNoteEvents[i].bills.inclTaxesTpp;
+          }
         }
       }
 
-      return { exclTaxesCustomer, inclTaxesCustomer };
+      return { exclTaxesCustomer, inclTaxesCustomer, exclTaxesTpp, inclTaxesTpp };
     },
     // Creation
     resetCreationCreditNoteData () {
@@ -462,6 +499,9 @@ export default {
         payload.endDate = creditNote.endDate;
         payload.events = creditNote.events.length > 0 ? creditNote.events : null;
         payload.exclTaxesCustomer = creditNote.exclTaxesCustomer;
+        payload.exclTaxesTpp = creditNote.exclTaxesTpp;
+        payload.inclTaxesTpp = creditNote.inclTaxesTpp;
+        payload.thirdPartyPayer = creditNote.thirdPartyPayer;
       }
 
       return this.$_.pickBy(payload);
