@@ -77,9 +77,12 @@
           <ni-modal-select v-if="!hasLinkedEvents" caption="Souscription concernée" :options="subscriptionsOptions"
             v-model="newCreditNote.subscription" :disable="!hasLinkedEvents && !newCreditNote.customer" required-field
             :error="$v.newCreditNote.subscription.$error" @blur="$v.newCreditNote.subscription.$touch" />
-          <ni-modal-input v-if="!hasLinkedEvents" caption="Montant TTC" suffix="€" type="number"
+          <ni-modal-input v-if="!hasLinkedEvents && !newCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€" type="number"
             v-model="newCreditNote.inclTaxesCustomer" required-field :error="$v.newCreditNote.inclTaxesCustomer.$error"
-            @blur="$v.newCreditNote.inclTaxesCustomer.$touch" :error-label="inclTaxesCustomerError" />
+            @blur="$v.newCreditNote.inclTaxesCustomer.$touch" :error-label="inclTaxesError" />
+          <ni-modal-input v-if="!hasLinkedEvents && newCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€" type="number"
+            v-model="newCreditNote.inclTaxesTpp" required-field :error="$v.newCreditNote.inclTaxesTpp.$error"
+            @blur="$v.newCreditNote.inclTaxesTpp.$touch" :error-label="inclTaxesError" />
         </template>
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer l'avoir" icon-right="add" color="primary"
@@ -134,7 +137,7 @@
             :error="$v.editedCreditNote.subscription.$error" @blur="$v.editedCreditNote.subscription.$touch" />
           <ni-modal-input caption="Montant TTC" suffix="€" type="number" v-model="editedCreditNote.inclTaxesCustomer"
             required-field :error="$v.editedCreditNote.inclTaxesCustomer.$error"
-            @blur="$v.editedCreditNote.inclTaxesCustomer.$touch" :error-label="inclTaxesCustomerError" />
+            @blur="$v.editedCreditNote.inclTaxesCustomer.$touch" :error-label="inclTaxesError" />
         </template>
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Editer l'avoir" icon-right="add" color="primary"
@@ -152,7 +155,6 @@ import OptionGroup from '../../../components/form/OptionGroup';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { positiveNumber } from '../../../helpers/vuelidateCustomVal.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
-import { REQUIRED_LABEL } from '../../../data/constants';
 
 export default {
   name: 'CreditNotes',
@@ -312,10 +314,22 @@ export default {
         subscription: {
           required: requiredIf(() => !this.hasLinkedEvents)
         },
-        inclTaxesCustomer: { positiveNumber },
-        exclTaxesCustomer: { positiveNumber },
-        inclTaxesTpp: { positiveNumber },
-        exclTaxesTpp: { positiveNumber },
+        inclTaxesCustomer: {
+          positiveNumber,
+          required: requiredIf(() => !this.thirdPartyPayer),
+        },
+        exclTaxesCustomer: {
+          positiveNumber,
+          required: requiredIf(() => !this.thirdPartyPayer),
+        },
+        inclTaxesTpp: {
+          positiveNumber,
+          required: requiredIf(() => this.thirdPartyPayer),
+        },
+        exclTaxesTpp: {
+          positiveNumber,
+          required: requiredIf(() => this.thirdPartyPayer),
+        },
       },
       editedCreditNote: {
         date: { required },
@@ -373,20 +387,14 @@ export default {
     disableCreationButton () {
       return !(this.newCreditNote.customer && this.newCreditNote.date &&
       ((this.newCreditNote.events && this.newCreditNote.events.length > 0) ||
-      (this.newCreditNote.subscription && this.newCreditNote.inclTaxesCustomer)));
+      (this.newCreditNote.subscription && ((this.newCreditNote.thirdPartyPayer && this.newCreditNote.inclTaxesTpp) || this.newCreditNote.inclTaxesCustomer))));
     },
     disableEditionButton () {
       return !(this.editedCreditNote.customer && this.editedCreditNote.date &&
       ((this.editedCreditNote.events && this.editedCreditNote.events.length > 0) ||
       (this.editedCreditNote.subscription && this.editedCreditNote.inclTaxesCustomer)));
     },
-    inclTaxesCustomerError () {
-      if (!this.$v.newCreditNote.inclTaxesCustomer.required) {
-        return REQUIRED_LABEL;
-      }
-      if (!this.$v.editedCreditNote.inclTaxesCustomer.required) {
-        return REQUIRED_LABEL;
-      }
+    inclTaxesError () {
       return 'Montant TTC non valide';
     },
   },
@@ -485,14 +493,20 @@ export default {
       this.$v.newCreditNote.$reset();
     },
     formatPayload (creditNote) {
-      const { date, inclTaxesCustomer, customer } = creditNote;
-      const payload = { date, inclTaxesCustomer, customer };
+      const { date, customer } = creditNote;
+      const payload = { date, customer };
 
       if (!this.hasLinkedEvents) {
         const selectedCustomer = this.customersOptions.find(cus => cus.value === customer);
         const subscription = selectedCustomer.subscriptions.find(sub => sub._id === creditNote.subscription);
         const vat = subscription.service.vat;
-        payload.exclTaxesCustomer = Number.parseFloat((creditNote.inclTaxesCustomer / (1 + (vat / 100))).toFixed(2));
+        if (creditNote.inclTaxesCustomer) {
+          payload.inclTaxesCustomer = creditNote.inclTaxesCustomer;
+          payload.exclTaxesCustomer = Number.parseFloat((creditNote.inclTaxesCustomer / (1 + (vat / 100))).toFixed(2));
+        } else {
+          payload.inclTaxesTpp = creditNote.inclTaxesTpp;
+          payload.exclTaxesTpp = Number.parseFloat((creditNote.inclTaxesTpp / (1 + (vat / 100))).toFixed(2));
+        }
         payload.subscription = { _id: subscription._id, service: subscription.service.name, vat };
       } else {
         payload.startDate = creditNote.startDate;
