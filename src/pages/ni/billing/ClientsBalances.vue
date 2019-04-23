@@ -165,11 +165,17 @@ export default {
       try {
         let payload = null;
         if (this.selected.length > 0 && this.selectedCustomer === '') {
+          await this.$q.dialog({
+            title: 'Confirmation',
+            message: 'Cette opération est définitive. Confirmez-vous ?',
+            ok: 'Oui',
+            cancel: 'Non'
+          });
           payload = this.selected.map((row) => {
             return {
               nature: this.PAYMENT,
               customer: row._id.customer,
-              ...(row._id.tpp && { client: row._id.tpp }),
+              customerInfo: row.customer,
               netInclTaxes: row.toPay,
               type: this.PAYMENT_OPTIONS[0].value,
               date: this.$moment().toDate(),
@@ -188,8 +194,10 @@ export default {
         this.paymentCreationModal = false;
       } catch (e) {
         console.error(e);
+        if (e.message === '') return;
         NotifyNegative('Erreur lors de la création du(des) règlement(s)');
       } finally {
+        this.selected = [];
         this.creationLoading = false;
       }
     }
