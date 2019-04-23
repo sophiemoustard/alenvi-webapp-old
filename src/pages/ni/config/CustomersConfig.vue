@@ -55,6 +55,10 @@
           />
           <ni-input caption="Numéro ICS" v-model="company.ics" @focus="saveTmp('ics')" @blur="updateCompany('ics')" />
           <ni-input caption="Numéro RCS" v-model="company.rcs" @focus="saveTmp('rcs')" @blur="updateCompany('rcs')" />
+          <ni-input caption="IBAN" :error="$v.company.iban.$error" :error-label="ibanError"
+            v-model.trim="company.iban" @focus="saveTmp('administrative.payment.rib.iban')" upper-case @blur="updateCompany('iban')" />
+          <ni-input caption="BIC" :error="$v.company.bic.$error" :error-label="bicError" upper-case
+            v-model.trim="company.bic" @focus="saveTmp('bic')" @blur="updateCompany('bic')" />
         </div>
       </div>
       <div class="q-mb-xl">
@@ -321,7 +325,7 @@ import { validationMixin } from '../../../mixins/validationMixin.js';
 import Input from '../../../components/form/Input.vue';
 import Select from '../../../components/form/Select.vue';
 import SearchAddress from '../../../components/form/SearchAddress.vue';
-import { frAddress, posDecimals, positiveNumber } from '../../../helpers/vuelidateCustomVal';
+import { frAddress, posDecimals, positiveNumber, iban, bic } from '../../../helpers/vuelidateCustomVal';
 import { BILLING_DIRECT, BILLING_INDIRECT, REQUIRED_LABEL, CONTRACT_STATUS_OPTIONS, TWO_WEEKS, MONTH, NATURE_OPTIONS } from '../../../data/constants.js';
 
 export default {
@@ -702,6 +706,8 @@ export default {
       ics: { required },
       name: { required },
       rcs: { required },
+      iban: { required, iban },
+      bic: { required, bic },
       address: {
         fullAddress: {
           required,
@@ -748,6 +754,20 @@ export default {
     minStartDate () {
       const selectedService = this.services.find(ser => ser._id === this.editedService._id);
       return selectedService ? this.$moment(selectedService.startDate).add(1, 'd').toISOString() : '';
+    },
+    ibanError () {
+      if (!this.$v.company.iban.required) {
+        return REQUIRED_LABEL;
+      } else if (!this.$v.company.iban.iban) {
+        return 'IBAN non valide';
+      }
+    },
+    bicError () {
+      if (!this.$v.company.bic.required) {
+        return REQUIRED_LABEL;
+      } else if (!this.$v.company.bic.bic) {
+        return 'BIC non valide';
+      }
     },
   },
   async mounted () {
