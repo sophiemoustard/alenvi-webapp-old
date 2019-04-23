@@ -70,7 +70,6 @@ export const CUSTOMER = 'Customer';
 export const AUXILIARY = 'Auxiliaire';
 export const PLANNING_REFERENT = 'Référent(e) planning';
 export const AUXILIARY_ROLES = [AUXILIARY, PLANNING_REFERENT];
-export const THIRD_PARTY_PAYER = 'ThirdPartyPayer';
 
 // PLANNING
 export const THREE_DAYS_VIEW = '3days';
@@ -140,4 +139,7 @@ export const PAYMENT = 'payment';
 export const PAYMENT_NATURE_OPTIONS = [
   { label: 'Règlement', value: PAYMENT },
   { label: 'Remboursement', value: REFUND },
-]
+];
+
+// FUNDINGS
+export const THIRD_PARTY_PAYER = 'ThirdPartyPayer';
