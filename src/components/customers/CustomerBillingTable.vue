@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { CREDIT_NOTE, BILL, BANK_TRANSFER, WITHDRAWAL, CHECK, CESU, REFUND, PAYMENT_OPTIONS } from '../../data/constants';
+import { CREDIT_NOTE, BILL, BANK_TRANSFER, WITHDRAWAL, CHECK, CESU, REFUND, PAYMENT_OPTIONS, CUSTOMER } from '../../data/constants';
 import { NotifyNegative, NotifyPositive } from '../popup/notify.js';
 import { downloadPdf } from '../../helpers/downloadFile.js';
 
@@ -59,6 +59,7 @@ export default {
     documents: { type: Array, default: () => [] },
     billingDates: { type: Object, default: () => ({}) },
     displayActions: { type: Boolean, default: false },
+    type: { type: String, default: CUSTOMER },
   },
   data () {
     return {
@@ -111,7 +112,9 @@ export default {
         case BILL:
           return this.documents[0].balance + this.documents[0].netInclTaxes;
         case CREDIT_NOTE:
-          return this.documents[0].balance - this.documents[0].inclTaxesCustomer;
+          console.log(this.documents[0])
+          console.log((this.type === CUSTOMER));
+          return this.documents[0].balance - (this.type === CUSTOMER ? this.documents[0].inclTaxesCustomer : this.documents[0].inclTaxesTpp);
         case BANK_TRANSFER:
         case WITHDRAWAL:
         case CHECK:
@@ -136,7 +139,7 @@ export default {
         case BILL:
           return -doc.netInclTaxes;
         case CREDIT_NOTE:
-          return doc.inclTaxesCustomer;
+          return this.type === CUSTOMER ? doc.inclTaxesCustomer : doc.inclTaxesTpp;
         case BANK_TRANSFER:
         case WITHDRAWAL:
         case CHECK:
