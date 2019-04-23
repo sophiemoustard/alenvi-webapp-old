@@ -139,4 +139,7 @@ export const PAYMENT = 'payment';
 export const PAYMENT_NATURE_OPTIONS = [
   { label: 'Règlement', value: PAYMENT },
   { label: 'Remboursement', value: REFUND },
-]
+];
+
+// FUNDINGS
+export const THIRD_PARTY_PAYER = 'ThirdPartyPayer';

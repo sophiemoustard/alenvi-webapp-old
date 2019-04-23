@@ -6,7 +6,8 @@
         <ni-date-range v-model="billingDates" @input="refresh" />
       </div>
       <ni-customer-billing-table v-if="!loading" :documents="customerBillingDocuments" :billingDates="billingDates"
-        :displayActions="user.role.name === ADMIN || user.role.name === COACH" @openEditionModal="openEditionModal" />
+        :displayActions="user.role.name === ADMIN || user.role.name === COACH" @openEditionModal="openEditionModal"
+        :type="CUSTOMER" />
       <div v-if="user.role.name === ADMIN || user.role.name === COACH" align="right">
         <q-btn class="add-payment" label="Ajouter un réglement" @click="openPaymentCreationModal(customer)"
           no-caps flat color="white" icon="add" />
@@ -16,7 +17,8 @@
       <div class="q-pa-sm q-mb-lg" :key="index">
         <p class="text-weight-bold">{{ tpp }}</p>
         <ni-customer-billing-table v-if="!loading" :documents="tppBillingDocuments[tpp]" :billingDates="billingDates"
-          :displayActions="user.role.name === ADMIN || user.role.name === COACH" @openEditionModal="openEditionModal" />
+          :displayActions="user.role.name === ADMIN || user.role.name === COACH" @openEditionModal="openEditionModal"
+          :type="THIRD_PARTY_PAYER" />
         <div v-if="user.role.name === ADMIN || user.role.name === COACH" align="right">
           <q-btn class="add-payment" label="Ajouter un réglement" no-caps flat color="white" icon="add"
             @click="openPaymentCreationModal(customer, tppBillingDocuments[tpp][0].client)"/>
@@ -38,7 +40,7 @@
 
 <script>
 import { required } from 'vuelidate/lib/validators';
-import { CREDIT_NOTE, BILL, WITHDRAWAL, BANK_TRANSFER, CHECK, CESU, REFUND, ADMIN, COACH } from '../../data/constants';
+import { CREDIT_NOTE, BILL, WITHDRAWAL, BANK_TRANSFER, CHECK, CESU, REFUND, ADMIN, COACH, CUSTOMER, THIRD_PARTY_PAYER } from '../../data/constants';
 import CustomerBillingTable from '../../components/customers/CustomerBillingTable';
 import PaymentCreationModal from '../../components/customers/PaymentCreationModal';
 import PaymentEditionModal from '../../components/customers/PaymentEditionModal';
@@ -65,6 +67,8 @@ export default {
       balances: [],
       COACH,
       ADMIN,
+      CUSTOMER,
+      THIRD_PARTY_PAYER,
       editedPayment: {},
     }
   },
@@ -104,26 +108,26 @@ export default {
       await this.getCustomerBalance();
       await Promise.all([this.getBills(), this.getCreditNotes(), this.getPayments()]);
       const customerStartBalance = this.balances.length === 0 ? 0 : this.balances.find(bal => bal.customer._id === this.customer._id).balance;
-      this.computeIntermediateBalances(this.customerBillingDocuments, customerStartBalance)
+      this.computeIntermediateBalances(this.customerBillingDocuments, customerStartBalance, CUSTOMER)
       for (const tpp of Object.keys(this.tppBillingDocuments)) {
         const tppStartBalance = this.balances.length === 0 ? 0 : this.balances.find(bal => bal.thirdPartyPayer && bal.thirdPartyPayer._id === tpp).balance;
-        this.computeIntermediateBalances(this.tppBillingDocuments[tpp], tppStartBalance)
+        this.computeIntermediateBalances(this.tppBillingDocuments[tpp], tppStartBalance, THIRD_PARTY_PAYER)
       }
       this.loading = false;
     },
-    computeIntermediateBalances (docs, startBalance) {
+    computeIntermediateBalances (docs, startBalance, type) {
       docs.sort((a, b) => new Date(a.date) - new Date(b.date));
       for (let i = 0, l = docs.length; i < l; i++) {
-        if (i === 0) docs[i].balance = startBalance + this.getInclTaxes(docs[i]);
-        else docs[i].balance = docs[i - 1].balance + this.getInclTaxes(docs[i]);
+        if (i === 0) docs[i].balance = startBalance + this.getInclTaxes(docs[i], type);
+        else docs[i].balance = docs[i - 1].balance + this.getInclTaxes(docs[i], type);
       }
     },
-    getInclTaxes (doc) {
+    getInclTaxes (doc, type) {
       switch (doc.type) {
         case BILL:
           return -doc.netInclTaxes;
         case CREDIT_NOTE:
-          return doc.inclTaxesCustomer;
+          return type === CUSTOMER ? doc.inclTaxesCustomer : doc.inclTaxesTpp;
         case BANK_TRANSFER:
         case WITHDRAWAL:
         case CHECK:
@@ -167,7 +171,13 @@ export default {
           startDate: this.billingDates.startDate,
           endDate: this.billingDates.endDate,
         });
-        this.customerBillingDocuments.push(...creditNotes.map(cn => ({ ...cn, type: CREDIT_NOTE })));
+        for (const cd of creditNotes) {
+          cd.type = CREDIT_NOTE;
+          if (cd.inclTaxesTpp && !this.tppBillingDocuments[cd.thirdPartyPayer.name]) this.tppBillingDocuments[cd.thirdPartyPayer.name] = [cd]
+          else if (cd.inclTaxesTpp && this.tppBillingDocuments[cd.thirdPartyPayer.name]) this.tppBillingDocuments[cd.thirdPartyPayer.name].push(cd);
+
+          if (cd.inclTaxesCustomer) this.customerBillingDocuments.push(cd);
+        }
       } catch (e) {
         console.error(e)
       }
