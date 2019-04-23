@@ -112,8 +112,6 @@ export default {
         case BILL:
           return this.documents[0].balance + this.documents[0].netInclTaxes;
         case CREDIT_NOTE:
-          console.log(this.documents[0])
-          console.log((this.type === CUSTOMER));
           return this.documents[0].balance - (this.type === CUSTOMER ? this.documents[0].inclTaxesCustomer : this.documents[0].inclTaxesTpp);
         case BANK_TRANSFER:
         case WITHDRAWAL:
