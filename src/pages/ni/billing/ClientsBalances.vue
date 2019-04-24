@@ -40,8 +40,10 @@
 
     <!-- Payment creation modal -->
     <ni-payment-creation-modal :newPayment="newPayment" :validations="$v.newPayment" :selectedClient="selectedClient"
-      @createPayment="createPayment" :creationModal="paymentCreationModal" :selectedCustomer="selectedCustomer"
+      @createPayment="createPayments" :creationModal="paymentCreationModal" :selectedCustomer="selectedCustomer"
       :loading="creationLoading" @resetForm="resetPaymentCreationModal"  />
+
+    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer les prélèvements" :disable="selected.length === 0" @click="createPayments" />
   </q-page>
 </template>
 
@@ -140,26 +142,6 @@ export default {
       } finally {
         this.tableLoading = false;
       }
-    },
-    openPaymentCreationModal (row) {
-      this.selectedCustomer = row.customer.identity.lastname;
-      this.selectedClient = row._id.tpp ? row.thirdPartyPayer.name : row.customer.identity.lastname;
-      this.newPayment.customer = row._id.customer;
-      this.newPayment.client = row._id.tpp ? row._id.tpp : row._id.customer;
-      this.paymentCreationModal = true;
-    },
-    resetPaymentCreationModal () {
-      this.selectedCustomer = '';
-      this.selectedClient = '';
-      this.newPayment = {
-        nature: this.PAYMENT,
-        customer: null,
-        client: null,
-        netInclTaxes: 0,
-        type: '',
-        date: '',
-      };
-      this.$v.newPayment.$reset();
     },
     async createPayments () {
       try {
