@@ -254,6 +254,7 @@ export default {
     cursor: pointer
 
   /deep/ .q-table
+    table-layout: fixed;
     border-collapse: separate
     & tbody tr.selected
       background: $white
