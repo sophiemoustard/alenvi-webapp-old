@@ -9,11 +9,9 @@ export const fillFilter = async ({ commit }, roleToSearch) => {
   const rawPromises = [];
   let elems = [];
   rawPromises.push(Sectors.showAll({ company: store.getters['main/user'].company._id }));
-  if (roleToSearch === 'auxiliaries') {
-    rawPromises.push(Users.showAllActive({ role: [AUXILIARY, PLANNING_REFERENT] }));
-  } else {
-    rawPromises.push(Customers.showAll({ subscriptions: true }));
-  }
+  if (roleToSearch === AUXILIARY) rawPromises.push(Users.showAll({ role: [AUXILIARY, PLANNING_REFERENT] }));
+  else rawPromises.push(Customers.showAll({ subscriptions: true }));
+
   const filterPromises = await Promise.all(rawPromises);
   const sectors = filterPromises[0];
   const persons = filterPromises[1];
@@ -24,7 +22,8 @@ export const fillFilter = async ({ commit }, roleToSearch) => {
       sectorId: sectors[i]._id,
     });
   }
-  if (roleToSearch === 'auxiliaries') {
+
+  if (roleToSearch === AUXILIARY) {
     for (let i = 0, l = persons.length; i < l; i++) {
       elems.push({
         label: `${persons[i].identity.firstname} ${persons[i].identity.lastname}`,

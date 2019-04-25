@@ -84,7 +84,7 @@
 import Planning from '../../../components/planning/Planning.vue';
 import { planningModalMixin } from '../../../mixins/planningModalMixin';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify.js';
-import { INTERVENTION, DEFAULT_AVATAR, NEVER, ABSENCE, INTERNAL_HOUR, ILLNESS, UNAVAILABILITY, AUXILIARY, PLANNING_REFERENT, CUSTOMER_CONTRACT, COMPANY_CONTRACT } from '../../../data/constants';
+import { INTERVENTION, DEFAULT_AVATAR, NEVER, ABSENCE, INTERNAL_HOUR, ILLNESS, UNAVAILABILITY, AUXILIARY, PLANNING_REFERENT, CUSTOMER_CONTRACT, COMPANY_CONTRACT, CUSTOMER } from '../../../data/constants';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
 import { mapGetters, mapActions } from 'vuex';
@@ -116,7 +116,7 @@ export default {
   },
   async mounted () {
     try {
-      await this.fillFilter('customers');
+      await this.fillFilter(CUSTOMER);
       await this.getEmployeesBySector();
     } catch (e) {
       console.error(e);

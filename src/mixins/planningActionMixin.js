@@ -44,7 +44,7 @@ export const planningActionMixin = {
         absence: { required: requiredIf((item) => item.type === ABSENCE) },
         location: { fullAddress: { frAddress } },
         repetition: {
-          frequency: { required: requiredIf((item) => item.type !== ABSENCE) },
+          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
         },
         cancel: {
           condition: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
@@ -60,24 +60,27 @@ export const planningActionMixin = {
         this.internalHours = user.company.rhConfig.internalHours;
       }
     },
-    hasActiveCustomerContract (auxiliary, selectedDay) {
+    hasActiveCustomerContract (auxiliary, startDate, endDate = startDate) {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
       if (!auxiliary.contracts.some(contract => contract.status === CUSTOMER_CONTRACT)) return false;
       const customerContracts = auxiliary.contracts.filter(contract => contract.status === CUSTOMER_CONTRACT);
+      console.log(auxiliary.contracts[0])
+      console.log(auxiliary.contracts[0].startDate, endDate)
+      console.log(((!auxiliary.contracts[0].endDate && auxiliary.contracts[0].versions.some(version => version.isActive)) || this.$moment(auxiliary.contracts[0].endDate).isSameOrAfter(startDate)))
 
       return customerContracts.some(contract => {
-        return this.$moment(contract.startDate).isSameOrBefore(selectedDay) &&
-          ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(selectedDay));
+        return this.$moment(contract.startDate).isSameOrBefore(endDate) &&
+          ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isSameOrAfter(startDate));
       });
     },
-    hasActiveCompanyContract (auxiliary, selectedDay) {
+    hasActiveCompanyContract (auxiliary, startDate, endDate) {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
       if (!auxiliary.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
       const companyContracts = auxiliary.contracts.filter(contract => contract.status === COMPANY_CONTRACT);
 
       return companyContracts.some(contract => {
-        return this.$moment(contract.startDate).isSameOrBefore(selectedDay) &&
-          ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(selectedDay));
+        return this.$moment(contract.startDate).isSameOrBefore(endDate) &&
+          ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(startDate));
       });
     },
     // Event creation

@@ -1,6 +1,6 @@
 <template>
   <q-page class="neutral-background">
-    <ni-planning-manager :events="events" :persons="auxiliaries" @updateStartOfWeek="updateStartOfWeek" @createEvent="openCreationModal"
+    <ni-planning-manager :events="events" :persons="getActiveAuxiliaries()" @updateStartOfWeek="updateStartOfWeek" @createEvent="openCreationModal"
       @editEvent="openEditionModal" @onDrop="updateEventOnDrop" />
 
     <!-- Event creation modal -->
@@ -24,7 +24,7 @@ import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryE
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
 import Planning from '../../../components/planning/Planning.vue';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
-import { INTERVENTION, NEVER } from '../../../data/constants';
+import { INTERVENTION, NEVER, AUXILIARY } from '../../../data/constants';
 import { mapGetters, mapActions } from 'vuex';
 import { NotifyNegative, NotifyWarning } from '../../../components/popup/notify';
 
@@ -59,7 +59,7 @@ export default {
   },
   async mounted () {
     try {
-      await this.fillFilter('auxiliaries');
+      await this.fillFilter(AUXILIARY);
       await this.getCustomers();
       this.setInternalHours();
     } catch (e) {
@@ -134,6 +134,10 @@ export default {
       } catch (e) {
         this.customers = [];
       }
+    },
+    getActiveAuxiliaries () {
+      return this.auxiliaries.filter(aux => this.hasActiveCustomerContract(aux, this.startOfWeek, this.endOfWeek()) ||
+        this.hasActiveCompanyContract(aux, this.startOfWeek, this.endOfWeek()));
     },
     // Event creation
     openCreationModal (vEvent) {
