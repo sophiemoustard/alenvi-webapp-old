@@ -1,5 +1,5 @@
 import { required } from 'vuelidate/lib/validators';
-import { PAYMENT } from '../data/constants';
+import { PAYMENT, PAYMENT_OPTIONS } from '../data/constants';
 
 export const paymentMixin = {
   data () {
@@ -8,6 +8,8 @@ export const paymentMixin = {
       paymentCreationModal: false,
       selectedCustomer: '',
       selectedClient: '',
+      PAYMENT,
+      PAYMENT_OPTIONS,
       newPayment: {
         nature: PAYMENT,
         customer: null,
