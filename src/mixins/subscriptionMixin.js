@@ -28,13 +28,13 @@ export const subscriptionMixin = {
           name: 'unitTTCRate',
           label: 'Prix unitaire TTC',
           align: 'center',
-          field: row => `${this.formatNumber(row.unitTTCRate)}€`,
+          field: row => row.unitTTCRate && `${this.formatNumber(row.unitTTCRate)}€`,
         },
         {
           name: 'estimatedWeeklyVolume',
           label: 'Volume hebdomadaire estimatif',
           align: 'center',
-          field: row => row.service.nature === HOURLY ? `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume,
+          field: row => row.service.nature === HOURLY ? row.estimatedWeeklyVolume && `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume,
         },
         {
           name: 'weeklyRate',
