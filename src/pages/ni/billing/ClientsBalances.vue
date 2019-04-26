@@ -179,7 +179,7 @@ export default {
             date: this.$moment().toDate(),
           }
         });
-        await this.$payments.createBatch(payload);
+        await this.$payments.createList(payload);
         NotifyPositive('Règlement(s) créé(s)');
         await this.getBalances();
       } catch (e) {

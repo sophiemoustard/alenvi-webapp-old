@@ -56,7 +56,7 @@
           <ni-input caption="Numéro ICS" v-model="company.ics" @focus="saveTmp('ics')" @blur="updateCompany('ics')" />
           <ni-input caption="Numéro RCS" v-model="company.rcs" @focus="saveTmp('rcs')" @blur="updateCompany('rcs')" />
           <ni-input caption="IBAN" :error="$v.company.iban.$error" :error-label="ibanError"
-            v-model.trim="company.iban" @focus="saveTmp('administrative.payment.rib.iban')" upper-case @blur="updateCompany('iban')" />
+            v-model.trim="company.iban" @focus="saveTmp('iban')" upper-case @blur="updateCompany('iban')" />
           <ni-input caption="BIC" :error="$v.company.bic.$error" :error-label="bicError" upper-case
             v-model.trim="company.bic" @focus="saveTmp('bic')" @blur="updateCompany('bic')" />
         </div>
