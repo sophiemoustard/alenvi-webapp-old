@@ -8,17 +8,17 @@ export default {
     return payments.data.data.payments;
   },
   async create (data) {
-    if (Array.isArray(data)) {
-      const file = await alenviAxios({
-        url: `${process.env.API_HOSTNAME}/payments`,
-        method: 'POST',
-        responseType: 'blob',
-        data,
-      });
-      return downloadFile(file, `prélèvements_${moment().format('YYYYMMDD_HHmm')}.xml`);
-    }
     const payment = await alenviAxios.post(`${process.env.API_HOSTNAME}/payments`, data);
     return payment.data.data.payment;
+  },
+  async createBatch (data) {
+    const file = await alenviAxios({
+      url: `${process.env.API_HOSTNAME}/payments/batch`,
+      method: 'POST',
+      responseType: 'blob',
+      data,
+    });
+    return downloadFile(file, `prélèvements_${moment().format('YYYYMMDD_HHmm')}.xml`);
   },
   async update (id, data) {
     const payment = await alenviAxios.put(`${process.env.API_HOSTNAME}/payments/${id}`, data);

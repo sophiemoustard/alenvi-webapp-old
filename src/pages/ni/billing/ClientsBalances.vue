@@ -40,7 +40,7 @@
 
     <!-- Payment creation modal -->
     <ni-payment-creation-modal :newPayment="newPayment" :validations="$v.newPayment" :selectedClient="selectedClient"
-      @createPayment="createPayments" :creationModal="paymentCreationModal" :selectedCustomer="selectedCustomer"
+      @createPayment="createPayment" :creationModal="paymentCreationModal" :selectedCustomer="selectedCustomer"
       :loading="creationLoading" @resetForm="resetPaymentCreationModal"  />
 
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer les prélèvements" :disable="selected.length === 0" @click="createPayments" />
@@ -143,37 +143,45 @@ export default {
         this.tableLoading = false;
       }
     },
-    async createPayments () {
+    async createPayment () {
       try {
-        let payload = null;
-        if (this.selected.length > 0 && this.selectedCustomer === '') {
-          await this.$q.dialog({
-            title: 'Confirmation',
-            message: 'Cette opération est définitive. Confirmez-vous ?',
-            ok: 'Oui',
-            cancel: 'Non'
-          });
-          payload = this.selected.map((row) => {
-            return {
-              nature: this.PAYMENT,
-              customer: row._id.customer,
-              customerInfo: row.customer,
-              netInclTaxes: row.toPay,
-              type: this.PAYMENT_OPTIONS[0].value,
-              date: this.$moment().toDate(),
-            }
-          });
-        } else {
-          this.creationLoading = true;
-          this.$v.newPayment.$touch();
-          if (this.$v.newPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
-          if (this.newPayment.customer === this.newPayment.client) delete this.newPayment.client;
-          payload = this.newPayment;
-        }
+        this.creationLoading = true;
+        this.$v.newPayment.$touch();
+        if (this.$v.newPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
+        if (this.newPayment.customer === this.newPayment.client) delete this.newPayment.client;
+        const payload = this.newPayment;
         await this.$payments.create(payload);
-        NotifyPositive('Règlement(s) créé(s)');
+        NotifyPositive('Règlement créé');
         await this.getBalances();
         this.paymentCreationModal = false;
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création du règlement');
+      } finally {
+        this.creationLoading = false;
+      }
+    },
+    async createPayments () {
+      try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Cette opération est définitive. Confirmez-vous ?',
+          ok: 'Oui',
+          cancel: 'Non'
+        });
+        const payload = this.selected.map((row) => {
+          return {
+            nature: this.PAYMENT,
+            customer: row._id.customer,
+            customerInfo: row.customer,
+            netInclTaxes: row.toPay,
+            type: this.PAYMENT_OPTIONS[0].value,
+            date: this.$moment().toDate(),
+          }
+        });
+        await this.$payments.createBatch(payload);
+        NotifyPositive('Règlement(s) créé(s)');
+        await this.getBalances();
       } catch (e) {
         console.error(e);
         if (e.message === '') return;
