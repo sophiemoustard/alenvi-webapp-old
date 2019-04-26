@@ -13,7 +13,7 @@ export default {
   },
   async createList (data) {
     const file = await alenviAxios({
-      url: `${process.env.API_HOSTNAME}/payments/batch`,
+      url: `${process.env.API_HOSTNAME}/payments/createlist`,
       method: 'POST',
       responseType: 'blob',
       data,
