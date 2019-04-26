@@ -64,9 +64,6 @@ export const planningActionMixin = {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
       if (!auxiliary.contracts.some(contract => contract.status === CUSTOMER_CONTRACT)) return false;
       const customerContracts = auxiliary.contracts.filter(contract => contract.status === CUSTOMER_CONTRACT);
-      console.log(auxiliary.contracts[0])
-      console.log(auxiliary.contracts[0].startDate, endDate)
-      console.log(((!auxiliary.contracts[0].endDate && auxiliary.contracts[0].versions.some(version => version.isActive)) || this.$moment(auxiliary.contracts[0].endDate).isSameOrAfter(startDate)))
 
       return customerContracts.some(contract => {
         return this.$moment(contract.startDate).isSameOrBefore(endDate) &&
