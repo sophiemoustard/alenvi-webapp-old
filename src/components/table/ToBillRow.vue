@@ -1,6 +1,6 @@
 <template>
   <q-tr :props="props" :class="{'datatable-row-border-top': index === 0 }">
-    <q-td v-for="col in props.cols" :key="col.name" :props="props">
+    <q-td v-for="col in props.cols" :key="col.name" :props="props" style="width: 200px">
       <template v-if="col.name === 'externalBilling' && bill.thirdPartyPayer">
         <q-checkbox v-model="bill.externalBilling" />
       </template>
@@ -42,7 +42,7 @@
       <template v-else-if="col.name === 'inclTaxes'">{{ formatPrice(getNetInclTaxes(bill)) }}</template>
       <template v-else-if="index === 0">{{ col.value }}</template>
     </q-td>
-    <q-td auto-width>
+    <q-td auto-width style="width: 50px">
       <q-checkbox v-if="index === 0 && displayCheckbox" v-model="props.selected" />
     </q-td>
   </q-tr>
@@ -89,3 +89,9 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus" scoped>
+
+  /deep/ .datatable-inner-input
+    min-width: 50px
+</style>

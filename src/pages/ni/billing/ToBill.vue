@@ -188,8 +188,8 @@ export default {
         if (!params.billingPeriod) params.billingPeriod = this.user.company.customersConfig.billingPeriod;
 
         this.tableLoading = true;
-        this.draftBills = await this.$bills.getDraftBills(params);
-        this.draftBills = this.draftBills.map((draft) => {
+        const draftBills = await this.$bills.getDraftBills(params);
+        this.draftBills = draftBills.map((draft) => {
           return {
             ...draft,
             customerBills: { total: draft.customerBills.total, bills: this.addEditDiscountToBills(draft.customerBills.bills) },
@@ -254,15 +254,9 @@ export default {
     cursor: pointer
 
   /deep/ .q-table
-    table-layout: fixed;
     border-collapse: separate
     & tbody tr.selected
       background: $white
     &-bottom > .q-icon
       display: none
-
-  /deep/ .datatable-inner-input
-    width: auto
-    min-width: 60px
-
 </style>
