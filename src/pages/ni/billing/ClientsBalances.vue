@@ -80,7 +80,7 @@ export default {
           name: 'customer',
           label: 'Bénéficiaire',
           align: 'left',
-          field: row => row.customer.identity.lastname,
+          field: row => this.getCustomerName(row.customer),
         },
         {
           name: 'billed',
@@ -126,6 +126,9 @@ export default {
     await this.getBalances();
   },
   methods: {
+    getCustomerName (customer) {
+      return `${customer.identity.firstname ? `${customer.identity.firstname.charAt(0, 1)}. ` : ''}${customer.identity.lastname}`;
+    },
     formatPrices (val) {
       return val ? `${val.toFixed(2)} €` : '0 €';
     },

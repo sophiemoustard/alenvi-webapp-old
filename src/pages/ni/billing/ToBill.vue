@@ -79,7 +79,6 @@ export default {
           name: 'customer',
           label: 'Bénéficiaire',
           align: 'left',
-          field: row => row.customer.identity.lastname,
         },
         {
           name: 'client',

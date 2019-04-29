@@ -222,7 +222,7 @@ export default {
           name: 'customer',
           label: 'Bénéficiaire',
           align: 'left',
-          field: row => `${row.customer.identity.lastname}`,
+          field: row => this.getCustomerName(row.customer),
         },
         {
           name: 'thirdPartyPayer',
@@ -403,6 +403,9 @@ export default {
     },
   },
   methods: {
+    getCustomerName (customer) {
+      return `${customer.identity.firstname ? `${customer.identity.firstname.charAt(0, 1)}. ` : ''}${customer.identity.lastname}`;
+    },
     formatPrice (value) {
       return value ? `${parseFloat(value).toFixed(2)}€` : '0€';
     },
