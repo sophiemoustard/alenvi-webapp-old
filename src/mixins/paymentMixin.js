@@ -48,6 +48,7 @@ export const paymentMixin = {
         type: '',
         date: '',
       };
+      this.$v.newPayment.$reset();
     },
   },
 };

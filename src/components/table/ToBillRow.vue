@@ -6,7 +6,7 @@
       </template>
       <template v-if="index === 0 && col.name === 'customer'">
         <span class="uppercase text-weight-bold">
-          {{ col.value }}
+          {{ getCustomerName(props.row.customer) }}
         </span>
       </template>
       <template v-else-if="index === 0 && col.name === 'client'">
@@ -49,6 +49,8 @@
 </template>
 
 <script>
+import { formatPrice } from '../../helpers/utils.js';
+
 export default {
   name: 'ToBillRow',
   props: {
@@ -59,7 +61,7 @@ export default {
   },
   methods: {
     formatPrice (value) {
-      return value ? `${parseFloat(value).toFixed(2)}€` : '';
+      return formatPrice(value)
     },
     formatHours (value) {
       return value ? `${parseFloat(value).toFixed(2)}h` : '';
@@ -69,6 +71,9 @@ export default {
     },
     getClientName (customer, bill) {
       return bill.thirdPartyPayer ? `${bill.thirdPartyPayer.name.length > 35 ? `${bill.thirdPartyPayer.name.substring(0, 35)}...` : bill.thirdPartyPayer.name}` : customer.identity.lastname;
+    },
+    getCustomerName (customer) {
+      return `${customer.identity.firstname ? `${customer.identity.firstname.charAt(0, 1)}. ` : ''}${customer.identity.lastname}`;
     },
     getExclTaxesDiscount (bill) {
       return bill.discount / (1 + bill.vat);

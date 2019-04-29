@@ -3,7 +3,7 @@
     <div class="modal-padding">
       <div class="row justify-between items-baseline">
         <div class="col-11">
-          <h5>Ajouter un <span class="text-weight-bold">{{ editionModalNature }}</span></h5>
+          <h5>Editer le <span class="text-weight-bold">{{ editionModalNature }}</span></h5>
         </div>
         <div class="col-1 cursor-pointer modal-btn-close">
           <span><q-icon name="clear" @click.native="resetForm" /></span>

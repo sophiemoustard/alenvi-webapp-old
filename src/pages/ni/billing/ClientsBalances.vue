@@ -4,11 +4,11 @@
     <div>
       <q-card class="q-mb-xl neutral-background" flat>
         <q-table :data="balances" :columns="columns" row-key="rowId" binary-state-sort :loading="tableLoading"
-          :pagination.sync="pagination" selection="multiple" :selected.sync="selected">
+          :pagination.sync="pagination" selection="multiple" :selected.sync="selected" >
           <q-tr slot="header" slot-scope="props">
             <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
             <q-th auto-width>
-              <q-checkbox v-model="props.selected" indeterminate-value="some" />
+              <q-checkbox @input="selectRows(props.selected)" v-model="props.selected" indeterminate-value="some" />
             </q-th>
           </q-tr>
           <template slot="body" slot-scope="props">
@@ -28,9 +28,10 @@
                 </template>
                 <template v-else>{{ col.value }}</template>
               </q-td>
-              <q-td auto-width>
+              <q-td v-if="props.row.toPay > 0" auto-width>
                 <q-checkbox v-model="props.selected" />
               </q-td>
+              <q-td v-else />
             </q-tr>
           </template>
           <ni-billing-pagination slot="bottom" slot-scope="props" :props="props" :pagination.sync="pagination" :data="balances" />
@@ -53,6 +54,7 @@ import PrefixedCellContent from '../../../components/table/PrefixedCellContent';
 import PaymentCreationModal from '../../../components/customers/PaymentCreationModal';
 import { paymentMixin } from '../../../mixins/paymentMixin.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
+import { formatPrice } from '../../../helpers/utils.js';
 
 export default {
   name: 'ClientsBalances',
@@ -79,21 +81,21 @@ export default {
           name: 'customer',
           label: 'Bénéficiaire',
           align: 'left',
-          field: row => row.customer.identity.lastname,
+          field: row => this.getCustomerName(row.customer),
         },
         {
           name: 'billed',
           label: 'Facturé TTC',
           align: 'left',
           field: row => row.billed,
-          format: val => this.formatPrices(val),
+          format: val => formatPrice(val),
         },
         {
           name: 'paid',
           label: 'Payé TTC',
           align: 'left',
           field: row => row.paid,
-          format: val => this.formatPrices(val),
+          format: val => formatPrice(val),
         },
         {
           name: 'balance',
@@ -105,7 +107,7 @@ export default {
           name: 'toPay',
           label: 'A Prélever',
           align: 'left',
-          field: row => this.formatPrices(row.toPay),
+          field: row => formatPrice(row.toPay),
         },
         {
           name: 'actions',
@@ -125,12 +127,17 @@ export default {
     await this.getBalances();
   },
   methods: {
-    formatPrices (val) {
-      return val ? `${val.toFixed(2)} €` : '0 €';
+    getCustomerName (customer) {
+      return `${customer.identity.firstname ? `${customer.identity.firstname.charAt(0, 1)}. ` : ''}${customer.identity.lastname}`;
     },
     goToCustomerBillingPage (customerId) {
       this.$router.replace({ name: 'customers profile', params: { id: customerId, defaultTab: 'billing' } });
     },
+    selectRows (oldValue) {
+      if (oldValue) this.selected = [];
+      else this.selected = this.balances.filter(bl => bl.toPay > 0);
+    },
+    // Refresh
     async getBalances () {
       try {
         this.tableLoading = true;

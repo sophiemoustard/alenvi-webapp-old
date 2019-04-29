@@ -1,5 +1,5 @@
 <template>
-  <q-card v-if="Object.keys(documents).length > 0" class="q-mb-lg neutral-background" flat>
+  <q-card class="q-mb-lg neutral-background" flat>
     <q-table :data="documents" :columns="columns" binary-state-sort hide-bottom>
       <q-tr slot="top-row" slot-scope="props">
         <q-td class="bold">{{ formatDate(billingDates.startDate) }}</q-td>
@@ -8,7 +8,7 @@
         <td class="bold" align="center">{{ formatPrice(startBalance) }}</td>
         <q-td />
       </q-tr>
-      <q-tr slot="body" slot-scope="props" :props="props">
+      <q-tr v-if="Object.keys(documents).length > 0" slot="body" slot-scope="props" :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
           <template v-if="col.name === 'document'">
             <div :class="{'download': props.row.billNumber}" v-if="props.row.type === BILL" @click="downloadBillPdf(props.row._id)">
@@ -17,7 +17,7 @@
             <div class="download" v-else-if="props.row.type === CREDIT_NOTE" @click="downloadCreditNotePdf(props.row._id)">
               Avoir {{ props.row.number }}
             </div>
-            <div v-else>Paiement {{ props.row.number }}</div>
+            <div v-else>{{ getPaymentTitle(props.row) }}</div>
           </template>
           <template v-else-if="col.name === 'balance'">
             <div v-if="!isNegative(col.value)" class="row no-wrap items-center justify-center">
@@ -41,7 +41,7 @@
         <q-td class="bold">{{ formatDate(billingDates.endDate) }}</q-td>
         <q-td class="bold">Fin de période</q-td>
         <q-td />
-        <td class="bold" align="center">{{ formatPrice(periodBalance) }}</td>
+        <td class="bold" align="center">{{ formatPrice(endBalance) }}</td>
         <q-td />
       </q-tr>
     </q-table>
@@ -49,9 +49,10 @@
 </template>
 
 <script>
-import { CREDIT_NOTE, BILL, BANK_TRANSFER, WITHDRAWAL, CHECK, CESU, REFUND, PAYMENT_OPTIONS, CUSTOMER } from '../../data/constants';
+import { CREDIT_NOTE, BILL, BANK_TRANSFER, WITHDRAWAL, CHECK, CESU, REFUND, PAYMENT_OPTIONS, CUSTOMER, PAYMENT } from '../../data/constants';
 import { NotifyNegative, NotifyPositive } from '../popup/notify.js';
 import { downloadPdf } from '../../helpers/downloadFile.js';
+import { formatPrice } from '../../helpers/utils';
 
 export default {
   name: 'CustomerBillingTable',
@@ -60,6 +61,8 @@ export default {
     billingDates: { type: Object, default: () => ({}) },
     displayActions: { type: Boolean, default: false },
     type: { type: String, default: CUSTOMER },
+    startBalance: { type: Number, default: 0 },
+    endBalance: { type: Number, default: 0 },
   },
   data () {
     return {
@@ -83,14 +86,14 @@ export default {
           label: 'Montant TTC',
           align: 'center',
           field: row => this.getInclTaxes(row),
-          format: value => this.formatPrice(value),
+          format: value => formatPrice(value),
         },
         {
           name: 'balance',
           label: 'Solde',
           align: 'center',
           field: 'balance',
-          format: value => this.formatPrice(value),
+          format: value => formatPrice(value),
         },
         {
           name: 'actions',
@@ -101,30 +104,9 @@ export default {
       paymentTypes: PAYMENT_OPTIONS.map(op => op.value),
     }
   },
-  computed: {
-    periodBalance () {
-      if (!this.documents || this.documents.length === 0) return 0;
-      return this.documents[this.documents.length - 1].balance;
-    },
-    startBalance () {
-      if (this.documents.length === 0) return 0;
-      switch (this.documents[0].type) {
-        case BILL:
-          return this.documents[0].balance + this.documents[0].netInclTaxes;
-        case CREDIT_NOTE:
-          return this.documents[0].balance - (this.type === CUSTOMER ? this.documents[0].inclTaxesCustomer : this.documents[0].inclTaxesTpp);
-        case BANK_TRANSFER:
-        case WITHDRAWAL:
-        case CHECK:
-        case CESU:
-          if (this.documents[0].nature === REFUND) return this.documents[0].balance + this.documents[0].netInclTaxes;
-          return this.documents[0].balance - this.documents[0].netInclTaxes;
-      }
-    },
-  },
   methods: {
-    formatPrice (value) {
-      return value || value === 0 ? `${parseFloat(value).toFixed(2)}€` : '';
+    getPaymentTitle (payment) {
+      return payment.nature === PAYMENT ? `Paiement ${payment.number}` : `Remboursement ${payment.number}`;
     },
     formatDate (value) {
       return value ? `${this.$moment(value).format('DD/MM/YY')}` : '';
