@@ -160,6 +160,7 @@ import ModalSelect from '../../../components/form/ModalSelect';
 import OptionGroup from '../../../components/form/OptionGroup';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { positiveNumber } from '../../../helpers/vuelidateCustomVal.js';
+import { formatPrice } from '../../../helpers/utils.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
 
 export default {
@@ -235,14 +236,14 @@ export default {
           label: 'HT',
           align: 'left',
           field: row => row.thirdPartyPayer ? row.exclTaxesTpp : row.exclTaxesCustomer,
-          format: value => this.formatPrice(value),
+          format: value => formatPrice(value),
         },
         {
           name: 'inclTaxes',
           label: 'TTC',
           align: 'left',
           field: row => row.thirdPartyPayer ? row.inclTaxesTpp : row.inclTaxesCustomer,
-          format: value => this.formatPrice(value),
+          format: value => formatPrice(value),
         },
         {
           name: 'actions',
@@ -407,7 +408,7 @@ export default {
       return `${customer.identity.firstname ? `${customer.identity.firstname.charAt(0, 1)}. ` : ''}${customer.identity.lastname}`;
     },
     formatPrice (value) {
-      return value ? `${parseFloat(value).toFixed(2)}€` : '0€';
+      return formatPrice(value);
     },
     // Refresh data
     async refreshCustomersOptions () {

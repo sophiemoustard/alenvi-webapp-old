@@ -52,6 +52,7 @@
 import { CREDIT_NOTE, BILL, BANK_TRANSFER, WITHDRAWAL, CHECK, CESU, REFUND, PAYMENT_OPTIONS, CUSTOMER, PAYMENT } from '../../data/constants';
 import { NotifyNegative, NotifyPositive } from '../popup/notify.js';
 import { downloadPdf } from '../../helpers/downloadFile.js';
+import { formatPrice } from '../../helpers/utils';
 
 export default {
   name: 'CustomerBillingTable',
@@ -85,14 +86,14 @@ export default {
           label: 'Montant TTC',
           align: 'center',
           field: row => this.getInclTaxes(row),
-          format: value => this.formatPrice(value),
+          format: value => formatPrice(value),
         },
         {
           name: 'balance',
           label: 'Solde',
           align: 'center',
           field: 'balance',
-          format: value => this.formatPrice(value),
+          format: value => formatPrice(value),
         },
         {
           name: 'actions',
@@ -106,9 +107,6 @@ export default {
   methods: {
     getPaymentTitle (payment) {
       return payment.nature === PAYMENT ? `Paiement ${payment.number}` : `Remboursement ${payment.number}`;
-    },
-    formatPrice (value) {
-      return value || value === 0 ? `${parseFloat(value).toFixed(2)}€` : '';
     },
     formatDate (value) {
       return value ? `${this.$moment(value).format('DD/MM/YY')}` : '';

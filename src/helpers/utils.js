@@ -52,3 +52,9 @@ export const getLastVersion = (versions, dateKey) => {
 
   return [...versions].sort((a, b) => new Date(b[dateKey]) - new Date(a[dateKey]))[0];
 };
+
+export const roundFrenchNumber = number => number.toLocaleString('fr-FR');
+
+export const formatPrice = (val) => {
+  return val ? `${roundFrenchNumber(parseFloat(val.toFixed(2)))}€` : '0€';
+};

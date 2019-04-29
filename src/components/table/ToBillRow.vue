@@ -49,6 +49,8 @@
 </template>
 
 <script>
+import { formatPrice } from '../../helpers/utils.js';
+
 export default {
   name: 'ToBillRow',
   props: {
@@ -59,7 +61,7 @@ export default {
   },
   methods: {
     formatPrice (value) {
-      return value ? `${parseFloat(value).toFixed(2)}€` : '';
+      return formatPrice(value)
     },
     formatHours (value) {
       return value ? `${parseFloat(value).toFixed(2)}h` : '';

@@ -54,6 +54,7 @@ import PrefixedCellContent from '../../../components/table/PrefixedCellContent';
 import PaymentCreationModal from '../../../components/customers/PaymentCreationModal';
 import { paymentMixin } from '../../../mixins/paymentMixin.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
+import { formatPrice } from '../../../helpers/utils.js';
 
 export default {
   name: 'ClientsBalances',
@@ -87,14 +88,14 @@ export default {
           label: 'Facturé TTC',
           align: 'left',
           field: row => row.billed,
-          format: val => this.formatPrices(val),
+          format: val => formatPrice(val),
         },
         {
           name: 'paid',
           label: 'Payé TTC',
           align: 'left',
           field: row => row.paid,
-          format: val => this.formatPrices(val),
+          format: val => formatPrice(val),
         },
         {
           name: 'balance',
@@ -106,7 +107,7 @@ export default {
           name: 'toPay',
           label: 'A Prélever',
           align: 'left',
-          field: row => this.formatPrices(row.toPay),
+          field: row => formatPrice(row.toPay),
         },
         {
           name: 'actions',
@@ -128,9 +129,6 @@ export default {
   methods: {
     getCustomerName (customer) {
       return `${customer.identity.firstname ? `${customer.identity.firstname.charAt(0, 1)}. ` : ''}${customer.identity.lastname}`;
-    },
-    formatPrices (val) {
-      return val ? `${val.toFixed(2)} €` : '0 €';
     },
     goToCustomerBillingPage (customerId) {
       this.$router.replace({ name: 'customers profile', params: { id: customerId, defaultTab: 'billing' } });

@@ -48,6 +48,7 @@ import ToBillRow from '../../../components/table/ToBillRow';
 import BillingPagination from '../../../components/table/BillingPagination';
 import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
 import { billingMixin } from '../../../mixins/billingMixin.js';
+import { formatPrice } from '../../../helpers/utils';
 
 export default {
   name: 'ToBill',
@@ -146,7 +147,7 @@ export default {
             }
           }
         }
-        return `Facturer ${total.toFixed(2)} €`;
+        return `Facturer ${total.toFixed(2).toLocaleString('fr-FR')} €`;
       }
       return 'Facturer';
     },
@@ -157,7 +158,7 @@ export default {
   },
   methods: {
     formatPrice (value) {
-      return value ? `${parseFloat(value).toFixed(2)}€` : '';
+      return formatPrice(value);
     },
     computeTotalAmount (data) {
       const total = data.bills.reduce((prev, next) => prev + (next.inclTaxes - next.discount), 0);

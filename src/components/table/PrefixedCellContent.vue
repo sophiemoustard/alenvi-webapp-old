@@ -2,11 +2,13 @@
   <div class="row no-wrap items-center">
     <q-icon v-if="cellValue > 0" name="mdi-plus-circle-outline" color="grey" class="balance-icon" />
     <q-icon v-if="cellValue < 0" name="mdi-minus-circle-outline" color="secondary" class="balance-icon" />
-    <div>{{ content }} €</div>
+    <div>{{ content }}</div>
   </div>
 </template>
 
 <script>
+import { formatPrice } from '../../helpers/utils.js';
+
 export default {
   name: 'PrefixedCellContent',
   props: {
@@ -14,7 +16,7 @@ export default {
   },
   computed: {
     content () {
-      return Math.abs(this.cellValue);
+      return formatPrice(Math.abs(this.cellValue));
     }
   }
 }
