@@ -149,7 +149,7 @@ export default {
         absence: { required: requiredIf((item) => item.type === ABSENCE) },
         location: { fullAddress: { frAddress } },
         repetition: {
-          frequency: { required: requiredIf((item) => item.type !== ABSENCE) }
+          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) }
         },
         attachment: {
           driveId: requiredIf((item) => item.type === ABSENCE && item.absence === ILLNESS),
@@ -171,11 +171,11 @@ export default {
         absence: { required: requiredIf((item) => item.type === ABSENCE) },
         location: { fullAddress: { frAddress } },
         repetition: {
-          frequency: { required: requiredIf((item) => item.type !== ABSENCE) },
+          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
         },
         cancel: {
-          condition: { required: requiredIf((item, parent) => parent.isCancelled) },
-          reason: { required: requiredIf((item, parent) => parent.isCancelled) },
+          condition: { required: requiredIf((item, parent) => parent && parent.isCancelled) },
+          reason: { required: requiredIf((item, parent) => parent && parent.isCancelled) },
         },
       },
     };

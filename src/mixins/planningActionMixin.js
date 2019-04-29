@@ -22,7 +22,7 @@ export const planningActionMixin = {
         absence: { required: requiredIf((item) => item.type === ABSENCE) },
         location: { fullAddress: { frAddress } },
         repetition: {
-          frequency: { required: requiredIf((item) => item && item.type !== ABSENCE) }
+          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) }
         },
         attachment: {
           driveId: requiredIf((item) => item.type === ABSENCE && item.absence === ILLNESS),
