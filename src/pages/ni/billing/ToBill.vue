@@ -112,7 +112,7 @@ export default {
         },
         {
           name: 'discount',
-          label: 'Remise',
+          label: 'Remise TTC',
           align: 'center',
         },
         {
