@@ -4,11 +4,11 @@
     <div>
       <q-card class="q-mb-xl neutral-background" flat>
         <q-table :data="balances" :columns="columns" row-key="rowId" binary-state-sort :loading="tableLoading"
-          :pagination.sync="pagination" selection="multiple" :selected.sync="selected">
+          :pagination.sync="pagination" selection="multiple" :selected.sync="selected" >
           <q-tr slot="header" slot-scope="props">
             <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
             <q-th auto-width>
-              <q-checkbox v-model="props.selected" indeterminate-value="some" />
+              <q-checkbox @input="selectRows(props.selected)" v-model="props.selected" indeterminate-value="some" />
             </q-th>
           </q-tr>
           <template slot="body" slot-scope="props">
@@ -28,9 +28,10 @@
                 </template>
                 <template v-else>{{ col.value }}</template>
               </q-td>
-              <q-td auto-width>
+              <q-td v-if="props.row.toPay > 0" auto-width>
                 <q-checkbox v-model="props.selected" />
               </q-td>
+              <q-td v-else />
             </q-tr>
           </template>
           <ni-billing-pagination slot="bottom" slot-scope="props" :props="props" :pagination.sync="pagination" :data="balances" />
@@ -131,6 +132,11 @@ export default {
     goToCustomerBillingPage (customerId) {
       this.$router.replace({ name: 'customers profile', params: { id: customerId, defaultTab: 'billing' } });
     },
+    selectRows (oldValue) {
+      if (oldValue) this.selected = [];
+      else this.selected = this.balances.filter(bl => bl.toPay > 0);
+    },
+    // Refresh
     async getBalances () {
       try {
         this.tableLoading = true;
