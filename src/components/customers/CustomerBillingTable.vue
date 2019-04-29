@@ -17,7 +17,7 @@
             <div class="download" v-else-if="props.row.type === CREDIT_NOTE" @click="downloadCreditNotePdf(props.row._id)">
               Avoir {{ props.row.number }}
             </div>
-            <div v-else>Paiement {{ props.row.number }}</div>
+            <div v-else>{{ getPaymentTitle(props.row) }}</div>
           </template>
           <template v-else-if="col.name === 'balance'">
             <div v-if="!isNegative(col.value)" class="row no-wrap items-center justify-center">
@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { CREDIT_NOTE, BILL, BANK_TRANSFER, WITHDRAWAL, CHECK, CESU, REFUND, PAYMENT_OPTIONS, CUSTOMER } from '../../data/constants';
+import { CREDIT_NOTE, BILL, BANK_TRANSFER, WITHDRAWAL, CHECK, CESU, REFUND, PAYMENT_OPTIONS, CUSTOMER, PAYMENT } from '../../data/constants';
 import { NotifyNegative, NotifyPositive } from '../popup/notify.js';
 import { downloadPdf } from '../../helpers/downloadFile.js';
 
@@ -123,6 +123,9 @@ export default {
     },
   },
   methods: {
+    getPaymentTitle (payment) {
+      return payment.nature === PAYMENT ? `Paiement ${payment.number}` : `Remboursement ${payment.number}`;
+    },
     formatPrice (value) {
       return value || value === 0 ? `${parseFloat(value).toFixed(2)}€` : '';
     },
