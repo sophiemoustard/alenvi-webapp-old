@@ -7,7 +7,7 @@
       </div>
       <ni-customer-billing-table v-if="!loading" :documents="customerBillingDocuments" :billingDates="billingDates"
         :displayActions="user.role.name === ADMIN || user.role.name === COACH" @openEditionModal="openEditionModal"
-        :type="CUSTOMER" />
+        :type="CUSTOMER" :startBalance="getStartBalance()" :endBalance="getEndBalance(customerBillingDocuments)" />
       <div v-if="user.role.name === ADMIN || user.role.name === COACH" align="right">
         <q-btn class="add-payment" label="Ajouter un réglement" @click="openPaymentCreationModal(customer)"
           no-caps flat color="white" icon="add" />
@@ -18,7 +18,8 @@
         <p class="text-weight-bold">{{ tpp }}</p>
         <ni-customer-billing-table v-if="!loading" :documents="tppBillingDocuments[tpp]" :billingDates="billingDates"
           :displayActions="user.role.name === ADMIN || user.role.name === COACH" @openEditionModal="openEditionModal"
-          :type="THIRD_PARTY_PAYER" />
+          :type="THIRD_PARTY_PAYER" :startBalance="getStartBalance(tpp)"
+          :endBalance="getEndBalance(tppBillingDocuments[tpp], tpp)" />
         <div v-if="user.role.name === ADMIN || user.role.name === COACH" align="right">
           <q-btn class="add-payment" label="Ajouter un réglement" no-caps flat color="white" icon="add"
             @click="openPaymentCreationModal(customer, tppBillingDocuments[tpp][0].client)"/>
@@ -97,23 +98,32 @@ export default {
     }
   },
   methods: {
+    // Billing dates
     setBillingDates () {
       this.billingDates.endDate = this.$moment().toISOString();
       this.billingDates.startDate = this.$moment().subtract(6, 'M').hour(0).minute(0).toISOString();
     },
-    async refresh () {
-      this.loading = true;
-      this.customerBillingDocuments = [];
-      this.tppBillingDocuments = {};
-      await this.getCustomerBalance();
-      await Promise.all([this.getBills(), this.getCreditNotes(), this.getPayments()]);
-      const customerStartBalance = this.balances.length === 0 ? 0 : this.balances.find(bal => bal.customer._id === this.customer._id).balance;
+    // Compute balances
+    getEndBalance (documents, tpp) {
+      if (!documents || documents.length === 0) return this.getStartBalance(tpp);
+      return documents[documents.length - 1].balance;
+    },
+    getStartBalance (tpp = null) {
+      const balance = !tpp
+        ? this.balances.find(bal => bal.customer._id === this.customer._id && !bal.thirdPartyPayer)
+        : this.balances.find(bal => bal.thirdPartyPayer && bal.thirdPartyPayer.name === tpp);
+
+      return balance ? balance.balance : 0;
+    },
+    computeCustomerBalance () {
+      const customerStartBalance = this.getStartBalance();
       this.computeIntermediateBalances(this.customerBillingDocuments, customerStartBalance, CUSTOMER)
+    },
+    computeTppBalances () {
       for (const tpp of Object.keys(this.tppBillingDocuments)) {
-        const tppStartBalance = this.balances.length === 0 ? 0 : this.balances.find(bal => bal.thirdPartyPayer && bal.thirdPartyPayer._id === tpp).balance;
+        const tppStartBalance = this.getStartBalance(tpp)
         this.computeIntermediateBalances(this.tppBillingDocuments[tpp], tppStartBalance, THIRD_PARTY_PAYER)
       }
-      this.loading = false;
     },
     computeIntermediateBalances (docs, startBalance, type) {
       docs.sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -135,6 +145,17 @@ export default {
           if (doc.nature === REFUND) return -doc.netInclTaxes;
           return doc.netInclTaxes;
       }
+    },
+    // Refresh data
+    async refresh () {
+      this.loading = true;
+      this.customerBillingDocuments = [];
+      this.tppBillingDocuments = {};
+      await this.getCustomerBalance();
+      await Promise.all([this.getBills(), this.getCreditNotes(), this.getPayments()]);
+      this.computeCustomerBalance();
+      this.computeTppBalances();
+      this.loading = false;
     },
     async getCustomerBalance () {
       try {
@@ -198,6 +219,7 @@ export default {
         console.error(e)
       }
     },
+    // Payments
     async createPayment () {
       try {
         this.loading = true;

@@ -1,5 +1,5 @@
 <template>
-  <q-card v-if="Object.keys(documents).length > 0" class="q-mb-lg neutral-background" flat>
+  <q-card class="q-mb-lg neutral-background" flat>
     <q-table :data="documents" :columns="columns" binary-state-sort hide-bottom>
       <q-tr slot="top-row" slot-scope="props">
         <q-td class="bold">{{ formatDate(billingDates.startDate) }}</q-td>
@@ -8,7 +8,7 @@
         <td class="bold" align="center">{{ formatPrice(startBalance) }}</td>
         <q-td />
       </q-tr>
-      <q-tr slot="body" slot-scope="props" :props="props">
+      <q-tr v-if="Object.keys(documents).length > 0" slot="body" slot-scope="props" :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
           <template v-if="col.name === 'document'">
             <div :class="{'download': props.row.billNumber}" v-if="props.row.type === BILL" @click="downloadBillPdf(props.row._id)">
@@ -41,7 +41,7 @@
         <q-td class="bold">{{ formatDate(billingDates.endDate) }}</q-td>
         <q-td class="bold">Fin de période</q-td>
         <q-td />
-        <td class="bold" align="center">{{ formatPrice(periodBalance) }}</td>
+        <td class="bold" align="center">{{ formatPrice(endBalance) }}</td>
         <q-td />
       </q-tr>
     </q-table>
@@ -60,6 +60,8 @@ export default {
     billingDates: { type: Object, default: () => ({}) },
     displayActions: { type: Boolean, default: false },
     type: { type: String, default: CUSTOMER },
+    startBalance: { type: Number, default: 0 },
+    endBalance: { type: Number, default: 0 },
   },
   data () {
     return {
@@ -100,27 +102,6 @@ export default {
       ],
       paymentTypes: PAYMENT_OPTIONS.map(op => op.value),
     }
-  },
-  computed: {
-    periodBalance () {
-      if (!this.documents || this.documents.length === 0) return 0;
-      return this.documents[this.documents.length - 1].balance;
-    },
-    startBalance () {
-      if (this.documents.length === 0) return 0;
-      switch (this.documents[0].type) {
-        case BILL:
-          return this.documents[0].balance + this.documents[0].netInclTaxes;
-        case CREDIT_NOTE:
-          return this.documents[0].balance - (this.type === CUSTOMER ? this.documents[0].inclTaxesCustomer : this.documents[0].inclTaxesTpp);
-        case BANK_TRANSFER:
-        case WITHDRAWAL:
-        case CHECK:
-        case CESU:
-          if (this.documents[0].nature === REFUND) return this.documents[0].balance + this.documents[0].netInclTaxes;
-          return this.documents[0].balance - this.documents[0].netInclTaxes;
-      }
-    },
   },
   methods: {
     getPaymentTitle (payment) {
