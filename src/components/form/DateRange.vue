@@ -21,17 +21,15 @@
 
 <script>
 import DateInput from './DateInput.vue';
-import SelectInput from './SelectInput.vue';
 
 export default {
   components: {
     'ni-date-input': DateInput,
-    'ni-select-input': SelectInput,
   },
   props: {
     caption: { type: String, default: '' },
     error: Boolean,
-    value: Object,
+    value: { type: Object, default: () => ({ startDate: this.$moment().toISOString(), endDate: this.$moment().toISOString() }) },
     requiredField: { type: Boolean, default: false },
   },
   data () {

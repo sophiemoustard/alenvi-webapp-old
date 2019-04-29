@@ -63,7 +63,7 @@ export default {
       paymentEditionModal: false,
       customerBillingDocuments: [],
       tppBillingDocuments: {},
-      billingDates: {},
+      billingDates: { startDate: this.$moment().toISOString(), endDate: this.$moment().toISOString() },
       balances: [],
       COACH,
       ADMIN,
