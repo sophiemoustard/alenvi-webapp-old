@@ -52,7 +52,7 @@ export default {
       ],
       pagination: {
         rowsPerPage: 0,
-        sortBy: 'creationTime',
+        sortBy: 'createdTime',
         descending: true,
       }
     }

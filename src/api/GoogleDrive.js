@@ -7,7 +7,6 @@ export default {
   },
   async getList (params) {
     const list = await alenviAxios.get(`${process.env.API_HOSTNAME}/gdrive/list`, { params });
-    console.log('list', list);
     return list.data.data.files;
   },
   async removeFileById (params) {
