@@ -116,7 +116,7 @@
             :error="$v.editedCreditNote.endDate.$error" @blur="$v.editedCreditNote.endDate.$touch" />
           <template v-if="events.length > 0">
             <ni-option-group v-model="editedCreditNote.events" :options="eventsOptions" caption="Évènements"
-              type="checkbox" required-field />
+              type="checkbox" required-field inline />
           </template>
           <div v-if="editedCreditNote.customer && editedCreditNote.startDate && editedCreditNote.endDate && events.length === 0"
             class="light warning">
