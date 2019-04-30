@@ -111,6 +111,9 @@ export default {
     formatDate (value) {
       return value ? `${this.$moment(value).format('DD/MM/YY')}` : '';
     },
+    formatPrice (value) {
+      return formatPrice(value);
+    },
     isNegative (val) {
       return val[0] === '-';
     },
