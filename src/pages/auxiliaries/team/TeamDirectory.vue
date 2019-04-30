@@ -32,9 +32,7 @@
 import { DEFAULT_AVATAR, AUXILIARY, PLANNING_REFERENT } from '../../../data/constants';
 
 export default {
-  metaInfo: {
-    title: 'Répertoire'
-  },
+  metaInfo: { title: 'Répertoire équipe' },
   data () {
     return {
       tableLoading: true,

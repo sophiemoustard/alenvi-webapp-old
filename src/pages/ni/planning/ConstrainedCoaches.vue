@@ -19,6 +19,8 @@
 import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
 
 export default {
+  name: 'ConstrainedCoaches',
+  metaInfo: { title: 'Permanences' },
   data () {
     return {
       checked: null,

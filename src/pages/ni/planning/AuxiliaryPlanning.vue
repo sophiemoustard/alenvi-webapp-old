@@ -31,6 +31,7 @@ import { NotifyNegative, NotifyWarning } from '../../../components/popup/notify'
 export default {
   name: 'AuxiliaryPlanning',
   mixins: [planningActionMixin],
+  metaInfo: { title: 'Plannnig auxiliaires' },
   components: {
     'ni-planning-manager': Planning,
     'ni-chips-autocomplete-auxiliaries-sectors': ChipsAutocomplete,

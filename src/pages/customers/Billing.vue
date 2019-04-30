@@ -9,6 +9,7 @@ import ProfileBilling from '../../components/customers/ProfileBilling.vue';
 
 export default {
   name: 'Billing',
+  metaInfo: { title: 'Facturation' },
   components: {
     'ni-profile-billing': ProfileBilling,
   },

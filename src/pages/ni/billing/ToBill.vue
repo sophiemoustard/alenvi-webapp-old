@@ -52,6 +52,9 @@ import { formatPrice } from '../../../helpers/utils';
 
 export default {
   name: 'ToBill',
+  metaInfo: {
+    title: 'A facturer',
+  },
   mixins: [billingMixin],
   components: {
     'ni-modal-input': ModalInput,

@@ -42,6 +42,7 @@ import { NotifyWarning } from '../../../components/popup/notify';
 
 export default {
   name: 'AuxiliaryAgenda',
+  metaInfo: { title: 'Agenda' },
   components: {
     'agenda': Agenda,
     'planning-navigation': PlanningNavigation,

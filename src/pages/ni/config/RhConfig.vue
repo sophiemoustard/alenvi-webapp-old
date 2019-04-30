@@ -187,6 +187,7 @@ import { validationMixin } from '../../../mixins/validationMixin.js';
 
 export default {
   name: 'RhConfig',
+  metaInfo: { title: 'Configuration rh' },
   components: {
     'ni-custom-img': CustomImg,
     'ni-input': Input,

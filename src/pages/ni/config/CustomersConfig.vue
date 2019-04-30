@@ -330,6 +330,7 @@ import { BILLING_DIRECT, BILLING_INDIRECT, REQUIRED_LABEL, CONTRACT_STATUS_OPTIO
 
 export default {
   name: 'CustomersConfig',
+  metaInfo: { title: 'Configuration bénéficiaire' },
   components: {
     'ni-modal-input': ModalInput,
     'ni-custom-img': CustomImg,
