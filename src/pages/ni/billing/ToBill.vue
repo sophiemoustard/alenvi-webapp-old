@@ -147,7 +147,7 @@ export default {
             }
           }
         }
-        return `Facturer ${total.toFixed(2).toLocaleString('fr-FR')} €`;
+        return `Facturer ${formatPrice(total)}`;
       }
       return 'Facturer';
     },
