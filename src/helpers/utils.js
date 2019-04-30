@@ -53,8 +53,8 @@ export const getLastVersion = (versions, dateKey) => {
   return [...versions].sort((a, b) => new Date(b[dateKey]) - new Date(a[dateKey]))[0];
 };
 
-export const roundFrenchNumber = number => number.toLocaleString('fr-FR');
+export const roundFrenchNumber = number => number.toLocaleString('fr-FR', { minimumFractionDigits: 2, style: 'currency', currency: 'EUR', currencyDisplay: 'symbol' });
 
 export const formatPrice = (val) => {
-  return val ? `${roundFrenchNumber(parseFloat(val.toFixed(2)))}€` : '0€';
+  return val ? roundFrenchNumber(val) : roundFrenchNumber(0);
 };
