@@ -155,11 +155,13 @@ export default {
         this.creationLoading = true;
         this.$v.newPayment.$touch();
         if (this.$v.newPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
-        if (this.newPayment.customer === this.newPayment.client) delete this.newPayment.client;
-        const payload = this.newPayment;
-        if (this.newPayment.type === this.WITHDRAWAL) {
-          payload.rum = getLastVersion(this.selectedClient.payment.mandates, 'createdAt').rum;
+        if (this.newPayment.customer === this.newPayment.client) {
+          delete this.newPayment.client
+          if (this.newPayment.type === this.WITHDRAWAL) {
+            this.newPayment.rum = getLastVersion(this.selectedCustomer.payment.mandates, 'createdAt').rum;
+          }
         }
+        const payload = this.newPayment;
         await this.$payments.create(payload);
         NotifyPositive('Règlement créé');
         await this.getBalances();

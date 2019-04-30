@@ -12,9 +12,8 @@
       <div class="modal-subtitle">
         <q-btn-toggle no-wrap v-model="newPayment.nature" :options="paymentNatureOptions" toggle-color="primary" />
       </div>
-      <ni-modal-input caption="Bénéficiaire" v-model="selectedCustomer" required-field read-only />
-      <ni-modal-input v-if="selectedClient.name" caption="Client" v-model="selectedClient.name" required-field read-only />
-      <ni-modal-input v-else-if="selectedClient.identity" caption="Client" v-model="selectedClient.identity.lastname" required-field read-only />
+      <ni-modal-input caption="Bénéficiaire" v-model="selectedCustomer.identity.lastname" required-field read-only />
+      <ni-modal-input caption="Client" v-model="selectedClient" required-field read-only />
       <ni-modal-input :caption="`Montant du ${creationModalNature}`" suffix="€" type="number"
         v-model="newPayment.netInclTaxes" required-field :error="validations.netInclTaxes.$error"
         @blur="validations.netInclTaxes.$touch" :error-label="netInclTaxesError" />
@@ -46,8 +45,8 @@ export default {
     creationModal: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
     validations: { type: Object, default: () => ({}) },
-    selectedCustomer: { type: String, default: '' },
-    selectedClient: { type: Object, default: () => ({}) },
+    selectedCustomer: { type: Object, default: () => ({}) },
+    selectedClient: { type: String, default: '' },
   },
   data () {
     return {
