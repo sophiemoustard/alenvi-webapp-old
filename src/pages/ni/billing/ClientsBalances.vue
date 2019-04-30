@@ -40,7 +40,7 @@
     </div>
 
     <!-- Payment creation modal -->
-    <ni-payment-creation-modal :newPayment="newPayment" :validations="$v.newPayment" :selectedClient="selectedClient"
+    <ni-payment-creation-modal :newPayment="newPayment" :validations="$v.newPayment" :selectedClientName="selectedClientName"
       @createPayment="createPayment" :creationModal="paymentCreationModal" :selectedCustomer="selectedCustomer"
       :loading="creationLoading" @resetForm="resetPaymentCreationModal"  />
 
