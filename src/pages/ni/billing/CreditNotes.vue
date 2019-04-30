@@ -165,6 +165,9 @@ import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../componen
 
 export default {
   name: 'CreditNotes',
+  metaInfo: {
+    title: 'Avoirs',
+  },
   components: {
     'ni-datetime-picker': DatetimePicker,
     'ni-modal-input': ModalInput,

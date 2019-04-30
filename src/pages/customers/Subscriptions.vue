@@ -159,6 +159,7 @@ import cgs from '../../statics/CGS.html';
 
 export default {
   name: 'Subscriptions',
+  metaInfo: { title: 'Souscriptions' },
   components: {
     'ni-input': Input,
     'ni-multiple-files-uploader': MultipleFilesUploader,

@@ -27,6 +27,7 @@ import { openURL } from 'quasar';
 
 export default {
   name: 'DebitArchive',
+  metaInfo: { title: 'Archive prélèvements' },
   data () {
     return {
       withdrawals: [],

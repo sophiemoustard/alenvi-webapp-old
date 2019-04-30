@@ -25,6 +25,7 @@ import PlanningNavigation from '../../components/planning/PlanningNavigation';
 
 export default {
   name: 'CustomerAgenda',
+  metaInfo: { title: 'Agenda' },
   components: {
     'agenda': Agenda,
     'planning-navigation': PlanningNavigation,

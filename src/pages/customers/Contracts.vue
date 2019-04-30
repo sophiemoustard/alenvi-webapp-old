@@ -13,6 +13,7 @@ import { CUSTOMER } from '../../data/constants';
 
 export default {
   name: 'CustomerContracts',
+  metaInfo: { title: 'Contracts' },
   mixins: [contractMixin],
   components: {
     'ni-contracts': Contracts,

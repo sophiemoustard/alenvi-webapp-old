@@ -112,9 +112,8 @@ import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../../componen
 import { DEFAULT_AVATAR, AUXILIARY, PLANNING_REFERENT, REQUIRED_LABEL } from '../../../data/constants';
 import { validationMixin } from '../../../mixins/validationMixin.js';
 export default {
-  metaInfo: {
-    title: 'Répertoire'
-  },
+  metaInfo: { title: 'Répertoire auxiliaires' },
+  name: 'Directory',
   components: {
     NiSelectSector: SelectSector,
     NiSelectManager: SelectManager,

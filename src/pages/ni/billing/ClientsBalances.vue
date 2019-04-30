@@ -58,6 +58,9 @@ import { formatPrice } from '../../../helpers/utils.js';
 
 export default {
   name: 'ClientsBalances',
+  metaInfo: {
+    title: 'Balances clients',
+  },
   components: {
     'ni-billing-pagination': BillingPagination,
     'ni-prefixed-cell-content': PrefixedCellContent,

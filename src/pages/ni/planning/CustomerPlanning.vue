@@ -91,6 +91,7 @@ import { mapGetters, mapActions } from 'vuex';
 
 export default {
   name: 'CustomerPlanning',
+  metaInfo: { title: 'Planning bénéficiaire' },
   mixins: [planningModalMixin],
   components: {
     'ni-planning-manager': Planning,
