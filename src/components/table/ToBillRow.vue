@@ -31,10 +31,10 @@
       <template v-else-if="col.name === 'discount'">
         <div class="cursor-pointer text-primary" @click="$emit('discount:click', $refs[bill._id])"
           v-show="!bill.editDiscount">
-          {{ `${bill.discount}€` }}
+          {{ formatPrice(bill.discount) }}
         </div>
         <q-input :ref="bill._id" v-show="bill.editDiscount" class="datatable-inner-input" :value="bill.discount"
-          @input="setDiscount($event, bill)" suffix="€" inverted-light color="white" no-parent-field type="number"
+          @change="setDiscount($event, bill)" suffix="€" inverted-light color="white" no-parent-field type="number"
           @blur="disableDiscountEditing(bill)" @keyup.enter="disableDiscountEditing(bill)"
           @keyup.esc="disableDiscountEditing(bill)" />
       </template>
