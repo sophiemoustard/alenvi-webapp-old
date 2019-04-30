@@ -54,7 +54,7 @@ import PrefixedCellContent from '../../../components/table/PrefixedCellContent';
 import PaymentCreationModal from '../../../components/customers/PaymentCreationModal';
 import { paymentMixin } from '../../../mixins/paymentMixin.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
-import { formatPrice } from '../../../helpers/utils.js';
+import { formatPrice, getLastVersion } from '../../../helpers/utils.js';
 
 export default {
   name: 'ClientsBalances',
@@ -157,6 +157,9 @@ export default {
         if (this.$v.newPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
         if (this.newPayment.customer === this.newPayment.client) delete this.newPayment.client;
         const payload = this.newPayment;
+        if (this.newPayment.type === this.WITHDRAWAL) {
+          payload.rum = getLastVersion(this.selectedClient.payment.mandates, 'createdAt').rum;
+        }
         await this.$payments.create(payload);
         NotifyPositive('Règlement créé');
         await this.getBalances();
@@ -184,6 +187,7 @@ export default {
             netInclTaxes: row.toPay,
             type: this.PAYMENT_OPTIONS[0].value,
             date: this.$moment().toDate(),
+            rum: getLastVersion(row.customer.payment.mandates, 'createdAt').rum,
           }
         });
         await this.$payments.createList(payload);
