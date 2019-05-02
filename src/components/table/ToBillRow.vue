@@ -1,8 +1,8 @@
 <template>
   <q-tr :props="props" :class="{'datatable-row-border-top': index === 0 }">
-    <q-td v-for="col in props.cols" :key="col.name" :props="props" style="width: 200px">
-      <template v-if="col.name === 'externalBilling' && bill.thirdPartyPayer">
-        <q-checkbox v-model="bill.externalBilling" />
+    <q-td v-for="col in props.cols" :key="col.name" :props="props" :style="{width: col.name === 'externalBilling' ? '100px' : '200px'}">
+      <template v-if="index === 0 && col.name === 'externalBilling' && bill.thirdPartyPayer">
+        <q-checkbox v-model="bill.externalBilling" color="grey"/>
       </template>
       <template v-if="index === 0 && col.name === 'customer'">
         <span class="uppercase text-weight-bold">

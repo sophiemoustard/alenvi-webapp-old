@@ -24,13 +24,14 @@
         </q-tr>
         <template v-if="props.row.thirdPartyPayerBills">
           <template v-for="tpp in props.row.thirdPartyPayerBills">
-            <ni-to-bill-row v-for="bill in tpp.bills" :key="bill._id" :props="props" :bill="bill" display-checkbox
+            <ni-to-bill-row v-for="(bill, index) in tpp.bills" :key="bill._id" :props="props" :bill.sync="bill"
               @discount:click="discountEdit($event, bill)" @datetime:input="refreshBill(props.row, bill)"
-              @discount:input="computeTotalAmount(tpp)" />
+              @discount:input="computeTotalAmount(tpp)" display-checkbox :index="index" />
           </template>
         </template>
       </template>
-      <ni-billing-pagination slot="bottom" slot-scope="props" :props="props" :pagination.sync="pagination" :data="draftBills"/>
+      <ni-billing-pagination slot="bottom" slot-scope="props" :props="props" :pagination.sync="pagination"
+        :data="draftBills"/>
     </q-table>
     <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
       :label="totalToBillLabel" @click="createBills" />
@@ -146,7 +147,7 @@ export default {
             }
           }
         }
-        return `Facturer ${total.toFixed(2).toLocaleString('fr-FR')} €`;
+        return `Facturer ${formatPrice(total)}`;
       }
       return 'Facturer';
     },
@@ -193,7 +194,7 @@ export default {
             ...draft,
             customerBills: { total: draft.customerBills.total, bills: this.addEditDiscountToBills(draft.customerBills.bills) },
             ...(!!draft.thirdPartyPayerBills && {
-              thirdPartyPayerBills: draft.thirdPartyPayerBills.map(tpp => ({ total: tpp.total, bills: this.addEditDiscountToBills(tpp.bills) }))
+              thirdPartyPayerBills: draft.thirdPartyPayerBills.map(tpp => ({ ...tpp, bills: this.addEditDiscountToBills(tpp.bills) }))
             }),
           }
         });
@@ -249,6 +250,10 @@ export default {
 
   /deep/ .q-table
     border-collapse: separate
+    td:first-child
+    th:first-child
+      width: 100px;
+      padding: 7px !important;
     & tbody tr.selected
       background: $white
     &-bottom > .q-icon
