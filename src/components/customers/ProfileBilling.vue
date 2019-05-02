@@ -225,11 +225,12 @@ export default {
         this.loading = true;
         this.$v.newPayment.$touch();
         if (this.$v.newPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
-        if (this.newPayment.customer === this.newPayment.client) delete this.newPayment.client;
-        await this.$payments.create(this.newPayment);
+
+        const payload = this.formatPayload(this.newPayment, this.customer);
+        await this.$payments.create(payload);
+        this.paymentCreationModal = false;
         NotifyPositive('Règlement créé');
         await this.refresh();
-        this.paymentCreationModal = false;
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création du règlement');
