@@ -1,14 +1,15 @@
 import { required } from 'vuelidate/lib/validators';
-import { PAYMENT, PAYMENT_OPTIONS } from '../data/constants';
+import { PAYMENT, WITHDRAWAL, PAYMENT_OPTIONS } from '../data/constants';
 
 export const paymentMixin = {
   data () {
     return {
       creationLoading: false,
       paymentCreationModal: false,
-      selectedCustomer: '',
-      selectedClient: '',
+      selectedCustomer: { identity: {} },
+      selectedClientName: '',
       PAYMENT,
+      WITHDRAWAL,
       PAYMENT_OPTIONS,
       newPayment: {
         nature: PAYMENT,
@@ -29,8 +30,8 @@ export const paymentMixin = {
   },
   methods: {
     openPaymentCreationModal (customer, tpp) {
-      this.selectedCustomer = customer.identity.lastname;
-      this.selectedClient = tpp ? tpp.name : customer.identity.lastname;
+      this.selectedCustomer = { ...customer };
+      this.selectedClientName = tpp ? tpp.name : customer.identity.lastname;
       this.newPayment.customer = customer._id;
       this.newPayment.nature = PAYMENT;
       this.newPayment.client = tpp ? tpp._id : customer._id;
@@ -38,8 +39,8 @@ export const paymentMixin = {
     },
     resetPaymentCreationModal () {
       this.paymentCreationModal = false;
-      this.selectedCustomer = '';
-      this.selectedClient = '';
+      this.selectedCustomer = { identity: {} };
+      this.selectedClientName = '';
       this.newPayment = {
         nature: PAYMENT,
         customer: null,
