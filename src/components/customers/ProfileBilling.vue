@@ -28,12 +28,12 @@
     </template>
 
     <!-- Payment creation modal -->
-    <ni-payment-creation-modal :newPayment="newPayment" :validations="$v.newPayment" :selectedClient="selectedClient"
+    <ni-payment-creation-modal :newPayment="newPayment" :validations="$v.newPayment" :selectedClientName="selectedClientName"
       @createPayment="createPayment" :creationModal="paymentCreationModal" :selectedCustomer="selectedCustomer"
       :loading="loading" @resetForm="resetPaymentCreationModal" />
 
     <!-- Payment edition modal -->
-    <ni-payment-edition-modal :editedPayment="editedPayment" :validations="$v.editedPayment" :selectedClient="selectedClient"
+    <ni-payment-edition-modal :editedPayment="editedPayment" :validations="$v.editedPayment" :selectedClientName="selectedClientName"
       @updatePayment="updatePayment" :editionModal="paymentEditionModal" :selectedCustomer="selectedCustomer"
       :loading="loading" @resetForm="resetPaymentEditionModal" />
   </div>
@@ -248,13 +248,13 @@ export default {
       };
 
       this.paymentEditionModal = true;
-      this.selectedCustomer = payment.customer.identity.lastname;
-      this.selectedClient = payment.client ? payment.client.name : payment.customer.identity.lastname;
+      this.selectedCustomer = payment.customer;
+      this.selectedClientName = payment.client ? payment.client.name : payment.customer.identity.lastname;
     },
     resetPaymentEditionModal () {
       this.paymentEditionModal = false;
-      this.selectedCustomer = '';
-      this.selectedClient = '';
+      this.selectedCustomer = { identity: {} };
+      this.selectedClientName = '';
       this.editedPayment = {};
     },
     async updatePayment () {
