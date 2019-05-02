@@ -9,8 +9,8 @@
           <span><q-icon name="clear" @click.native="resetForm" /></span>
         </div>
       </div>
-      <ni-modal-input caption="Bénéficiaire" v-model="selectedCustomer" required-field read-only />
-      <ni-modal-input caption="Client" v-model="selectedClient" required-field read-only />
+      <ni-modal-input caption="Bénéficiaire" v-model="selectedCustomer.identity.lastname" required-field read-only />
+      <ni-modal-input caption="Client" v-model="selectedClientName" required-field read-only />
       <ni-modal-input :caption="`Montant du ${editionModalNature}`" suffix="€" type="number"
         v-model="editedPayment.netInclTaxes" required-field :error="validations.netInclTaxes.$error"
         @blur="validations.netInclTaxes.$touch" :error-label="netInclTaxesError" />
@@ -42,8 +42,8 @@ export default {
     editionModal: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
     validations: { type: Object, default: () => ({}) },
-    selectedCustomer: { type: String, default: '' },
-    selectedClient: { type: String, default: '' },
+    selectedCustomer: { type: Object, default: () => ({}) },
+    selectedClientName: { type: String, default: '' },
   },
   data () {
     return {
