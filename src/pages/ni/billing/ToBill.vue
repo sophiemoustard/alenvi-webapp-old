@@ -1,41 +1,37 @@
 <template>
-  <q-page class="neutral-background">
-    <div class="title layout-padding">
+  <q-page class="neutral-background q-pb-xl">
+    <div class="title-padding">
       <h4>À facturer</h4>
       <ni-date-range v-model="billingDates" @input="getDraftBills" />
     </div>
-    <div class="q-pa-sm">
-      <q-card class="q-mb-xl neutral-background" flat>
-        <q-table :data="draftBills" :columns="columns" row-key="customerId" binary-state-sort :loading="tableLoading"
-          :pagination.sync="pagination" separator="none" selection="multiple" :selected.sync="selected">
-          <q-tr slot="header" slot-scope="props">
-            <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
-            <q-th auto-width>
-              <q-checkbox v-model="props.selected" indeterminate-value="some" />
-            </q-th>
-          </q-tr>
-          <template slot="body" slot-scope="props">
-            <ni-to-bill-row v-for="(bill, index) in props.row.customerBills.bills" :key="bill._id" :props="props"
+    <q-table :data="draftBills" :columns="columns" row-key="customerId" binary-state-sort :loading="tableLoading"
+      :pagination.sync="pagination" separator="none" selection="multiple" :selected.sync="selected" class="q-pa-sm">
+      <q-tr slot="header" slot-scope="props">
+        <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
+        <q-th auto-width>
+          <q-checkbox v-model="props.selected" indeterminate-value="some" />
+        </q-th>
+      </q-tr>
+      <template slot="body" slot-scope="props">
+        <ni-to-bill-row v-for="(bill, index) in props.row.customerBills.bills" :key="bill._id" :props="props"
+          @discount:click="discountEdit($event, bill)" @datetime:input="refreshBill(props.row, bill)"
+          @discount:input="computeTotalAmount(props.row.customerBills)" :index="index" :bill.sync="bill"
+          display-checkbox />
+        <q-tr v-if="props.row.customerBills.bills.length > 1" :props="props">
+          <q-td colspan="10"><div class="text-right">Total :</div></q-td>
+          <q-td colspan="1" align="center">{{ formatPrice(props.row.customerBills.total) }}</q-td>
+          <q-td colspan="1" />
+        </q-tr>
+        <template v-if="props.row.thirdPartyPayerBills">
+          <template v-for="tpp in props.row.thirdPartyPayerBills">
+            <ni-to-bill-row v-for="bill in tpp.bills" :key="bill._id" :props="props" :bill="bill" display-checkbox
               @discount:click="discountEdit($event, bill)" @datetime:input="refreshBill(props.row, bill)"
-              @discount:input="computeTotalAmount(props.row.customerBills)" :index="index" :bill.sync="bill"
-              display-checkbox />
-            <q-tr v-if="props.row.customerBills.bills.length > 1" :props="props">
-              <q-td colspan="10"><div class="text-right">Total :</div></q-td>
-              <q-td colspan="1" align="center">{{ formatPrice(props.row.customerBills.total) }}</q-td>
-              <q-td colspan="1" />
-            </q-tr>
-            <template v-if="props.row.thirdPartyPayerBills">
-              <template v-for="tpp in props.row.thirdPartyPayerBills">
-                <ni-to-bill-row v-for="bill in tpp.bills" :key="bill._id" :props="props" :bill="bill" display-checkbox
-                  @discount:click="discountEdit($event, bill)" @datetime:input="refreshBill(props.row, bill)"
-                  @discount:input="computeTotalAmount(tpp)" />
-              </template>
-            </template>
+              @discount:input="computeTotalAmount(tpp)" />
           </template>
-          <ni-billing-pagination slot="bottom" slot-scope="props" :props="props" :pagination.sync="pagination" :data="draftBills"/>
-        </q-table>
-      </q-card>
-    </div>
+        </template>
+      </template>
+      <ni-billing-pagination slot="bottom" slot-scope="props" :props="props" :pagination.sync="pagination" :data="draftBills"/>
+    </q-table>
     <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
       :label="totalToBillLabel" @click="createBills" />
   </q-page>
@@ -246,11 +242,6 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables'
-
-  .title
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
 
   .editable
     color: $primary

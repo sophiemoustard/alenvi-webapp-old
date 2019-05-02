@@ -1,28 +1,25 @@
 <template>
-  <q-page class="neutral-background">
-    <div class="title layout-padding">
+  <q-page class="neutral-background q-pb-xl">
+    <div class="title-padding">
       <h4>Avoirs</h4>
     </div>
-    <div class="q-pa-sm">
-      <q-card class="q-mb-xl neutral-background" flat>
-        <q-table :data="creditNotes" :columns="creditNotesColumns" binary-state-sort :pagination.sync="pagination">
-          <q-tr slot="body" slot-scope="props" :props="props">
-            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-              <template v-if="col.name === 'actions'">
-                <div class="row no-wrap table-actions table-actions-margin">
-                  <q-btn flat round small color="grey" icon="edit" @click.native="openCreditNoteEditionModal(props.row)" />
-                  <q-btn flat round small color="grey" icon="delete"
-                    @click="deleteCreditNote(col.value, props.row.__index)" />
-                </div>
-              </template>
-              <template v-else>{{ col.value }}</template>
-            </q-td>
-          </q-tr>
-        </q-table>
-      </q-card>
-      <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer un avoir"
-        @click="creditNoteCreationModal = true" />
-    </div>
+    <q-table :data="creditNotes" :columns="creditNotesColumns" binary-state-sort :pagination.sync="pagination"
+      class="q-pa-sm">
+      <q-tr slot="body" slot-scope="props" :props="props">
+        <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+          <template v-if="col.name === 'actions'">
+            <div class="row no-wrap table-actions table-actions-margin">
+              <q-btn flat round small color="grey" icon="edit" @click.native="openCreditNoteEditionModal(props.row)" />
+              <q-btn flat round small color="grey" icon="delete"
+                @click="deleteCreditNote(col.value, props.row.__index)" />
+            </div>
+          </template>
+          <template v-else>{{ col.value }}</template>
+        </q-td>
+      </q-tr>
+    </q-table>
+    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer un avoir"
+      @click="creditNoteCreationModal = true" />
 
     <!-- Credit note creation modal -->
     <q-modal v-model="creditNoteCreationModal" content-classes="modal-container-md" @hide="resetCreationCreditNoteData">
@@ -629,12 +626,6 @@ export default {
 
 <style lang="stylus" scoped>
 @import '~variables';
-
-  .title
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-
   .light
     font-size: 14px;
 

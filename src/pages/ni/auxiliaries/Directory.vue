@@ -13,7 +13,7 @@
       </div>
     </div>
     <q-table :data="filteredUsers" :columns="columns" row-key="name" binary-state-sort :rows-per-page-options="[15, 25, 35]"
-      :pagination.sync="pagination" :loading="tableLoading" class="people-list">
+      :pagination.sync="pagination" :loading="tableLoading" class="people-list q-pa-sm">
       <q-tr slot="body" slot-scope="props" :props="props" :class="['datatable-row', { 'datatable-row-inactive': !props.row.isActive }]"
         @click.native="goToUserProfile(props.row.auxiliary._id)">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">

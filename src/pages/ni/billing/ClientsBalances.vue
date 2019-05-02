@@ -1,50 +1,47 @@
 <template>
-  <q-page class="neutral-background" padding>
-    <h4>Balances Clients</h4>
-    <div>
-      <q-card class="q-mb-xl neutral-background" flat>
-        <q-table :data="balances" :columns="columns" row-key="rowId" binary-state-sort :loading="tableLoading"
-          :pagination.sync="pagination" selection="multiple" :selected.sync="selected" >
-          <q-tr slot="header" slot-scope="props">
-            <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
-            <q-th auto-width>
-              <q-checkbox @input="selectRows(props.selected)" v-model="props.selected" indeterminate-value="some" />
-            </q-th>
-          </q-tr>
-          <template slot="body" slot-scope="props">
-            <q-tr :props="props">
-              <q-td v-for="col in props.cols" :key="col.name" :props="props">
-                <template v-if="col.name === 'client' || col.name === 'customer'">
-                  <span class="uppercase text-weight-bold">{{ col.value }}</span>
-                </template>
-                <template v-else-if="col.name === 'actions'">
-                  <div class="row no-wrap table-actions table-actions-margin">
-                    <q-btn flat round small color="grey" icon="remove_red_eye" @click="goToCustomerBillingPage(col.value)" />
-                    <q-btn flat round small color="grey" icon="add" @click="openPaymentCreationModal(props.row.customer, props.row.thirdPartyPayer)" />
-                  </div>
-                </template>
-                <template v-else-if="col.name === 'balance'">
-                  <ni-prefixed-cell-content :cell-value="col.value" />
-                </template>
-                <template v-else>{{ col.value }}</template>
-              </q-td>
-              <q-td v-if="props.row.toPay > 0" auto-width>
-                <q-checkbox v-model="props.selected" />
-              </q-td>
-              <q-td v-else />
-            </q-tr>
-          </template>
-          <ni-billing-pagination slot="bottom" slot-scope="props" :props="props" :pagination.sync="pagination" :data="balances" />
-        </q-table>
-      </q-card>
+  <q-page class="neutral-background q-pb-xl">
+    <div class="title-padding">
+      <h4>Balances Clients</h4>
     </div>
+    <q-table :data="balances" :columns="columns" row-key="rowId" binary-state-sort :loading="tableLoading"
+      :pagination.sync="pagination" selection="multiple" :selected.sync="selected" class="q-pa-sm" >
+      <q-tr slot="header" slot-scope="props">
+        <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
+        <q-th auto-width>
+          <q-checkbox @input="selectRows(props.selected)" v-model="props.selected" indeterminate-value="some" />
+        </q-th>
+      </q-tr>
+      <q-tr :props="props" slot="body" slot-scope="props">
+        <q-td v-for="col in props.cols" :key="col.name" :props="props">
+          <template v-if="col.name === 'client' || col.name === 'customer'">
+            <span class="uppercase text-weight-bold">{{ col.value }}</span>
+          </template>
+          <template v-else-if="col.name === 'actions'">
+            <div class="row no-wrap table-actions table-actions-margin">
+              <q-btn flat round small color="grey" icon="remove_red_eye" @click="goToCustomerBillingPage(col.value)" />
+              <q-btn flat round small color="grey" icon="add" @click="openPaymentCreationModal(props.row.customer, props.row.thirdPartyPayer)" />
+            </div>
+          </template>
+          <template v-else-if="col.name === 'balance'">
+            <ni-prefixed-cell-content :cell-value="col.value" />
+          </template>
+          <template v-else>{{ col.value }}</template>
+        </q-td>
+        <q-td v-if="props.row.toPay > 0" auto-width>
+          <q-checkbox v-model="props.selected" />
+        </q-td>
+        <q-td v-else />
+      </q-tr>
+      <ni-billing-pagination slot="bottom" slot-scope="props" :props="props" :pagination.sync="pagination" :data="balances" />
+    </q-table>
 
     <!-- Payment creation modal -->
     <ni-payment-creation-modal :newPayment="newPayment" :validations="$v.newPayment" :selectedClientName="selectedClientName"
       @createPayment="createPayment" :creationModal="paymentCreationModal" :selectedCustomer="selectedCustomer"
       :loading="creationLoading" @resetForm="resetPaymentCreationModal"  />
 
-    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer les prélèvements" :disable="selected.length === 0" @click="createPayments" />
+    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer les prélèvements"
+      :disable="selected.length === 0" @click="createPayments" />
   </q-page>
 </template>
 
