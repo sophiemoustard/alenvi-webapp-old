@@ -1,5 +1,6 @@
 import { required } from 'vuelidate/lib/validators';
 import { PAYMENT, WITHDRAWAL, PAYMENT_OPTIONS } from '../data/constants';
+import { getLastVersion } from '../helpers/utils.js';
 
 export const paymentMixin = {
   data () {
@@ -50,6 +51,18 @@ export const paymentMixin = {
         date: '',
       };
       this.$v.newPayment.$reset();
+    },
+    formatPayload (payment, customer) {
+      const payload = { ...payment };
+
+      if (payload.customer === payload.client) {
+        delete payload.client
+        if (payload.type === this.WITHDRAWAL && payload.nature === PAYMENT) {
+          payload.rum = getLastVersion(customer.payment.mandates, 'createdAt').rum;
+        }
+      }
+
+      return payload;
     },
   },
 };
