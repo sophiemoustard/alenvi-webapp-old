@@ -1,7 +1,9 @@
 <template>
-  <q-page class="neutral-background" padding>
-    <h4>Balances Clients</h4>
-    <div>
+  <q-page class="neutral-background">
+    <div class="title-padding">
+      <h4>Balances Clients</h4>
+    </div>
+    <div class="q-pa-sm">
       <q-card class="q-mb-xl neutral-background" flat>
         <q-table :data="balances" :columns="columns" row-key="rowId" binary-state-sort :loading="tableLoading"
           :pagination.sync="pagination" selection="multiple" :selected.sync="selected" >
@@ -44,7 +46,8 @@
       @createPayment="createPayment" :creationModal="paymentCreationModal" :selectedCustomer="selectedCustomer"
       :loading="creationLoading" @resetForm="resetPaymentCreationModal"  />
 
-    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer les prélèvements" :disable="selected.length === 0" @click="createPayments" />
+    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer les prélèvements"
+      :disable="selected.length === 0" @click="createPayments" />
   </q-page>
 </template>
 

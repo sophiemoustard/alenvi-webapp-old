@@ -1,6 +1,6 @@
 <template>
   <q-page class="neutral-background">
-    <div class="title layout-padding">
+    <div class="title-padding">
       <h4>À facturer</h4>
       <ni-date-range v-model="billingDates" @input="getDraftBills" />
     </div>
@@ -246,11 +246,6 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables'
-
-  .title
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
 
   .editable
     color: $primary

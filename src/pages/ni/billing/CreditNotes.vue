@@ -1,6 +1,6 @@
 <template>
   <q-page class="neutral-background">
-    <div class="title layout-padding">
+    <div class="title-padding">
       <h4>Avoirs</h4>
     </div>
     <div class="q-pa-sm">
@@ -629,12 +629,6 @@ export default {
 
 <style lang="stylus" scoped>
 @import '~variables';
-
-  .title
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-
   .light
     font-size: 14px;
 
