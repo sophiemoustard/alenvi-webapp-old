@@ -226,7 +226,7 @@ export default {
         this.$v.newPayment.$touch();
         if (this.$v.newPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        const payload = this.formatPayload(this.newPayment, this.customer);
+        const payload = this.formatPayload(this.newPayment);
         await this.$payments.create(payload);
         this.paymentCreationModal = false;
         NotifyPositive('Règlement créé');
