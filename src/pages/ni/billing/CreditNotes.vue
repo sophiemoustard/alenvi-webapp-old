@@ -205,7 +205,8 @@ export default {
           name: 'date',
           label: 'Date de l\'avoir',
           align: 'left',
-          field: row => row.date ? this.$moment(row.date).format('DD/MM/YYYY') : '',
+          field: row => row.date ? row.date : null,
+          format: val => val ? this.$moment(val).format('DD/MM/YYYY') : '',
         },
         {
           name: 'startDate',
@@ -382,10 +383,11 @@ export default {
       const selectedCustomer = this.customersOptions.find(cus => cus.value === customer);
       if (!selectedCustomer) return [];
 
-      return selectedCustomer.thirdPartyPayers.map(tpp => ({
-        label: tpp.name,
-        value: tpp._id,
-      }));
+      const uniqTppNames = Array.from(new Set(selectedCustomer.thirdPartyPayers.map(tpp => tpp.name)));
+      return uniqTppNames.map(tppName => {
+        const matchingTpp = selectedCustomer.thirdPartyPayers.find(origTpp => origTpp.name === tppName);
+        return { label: matchingTpp.name, value: matchingTpp._id }
+      });
     },
     disableCreationButton () {
       return !(this.newCreditNote.customer && this.newCreditNote.date &&
