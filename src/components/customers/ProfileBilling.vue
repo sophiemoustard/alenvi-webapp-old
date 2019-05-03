@@ -151,8 +151,7 @@ export default {
       this.loading = true;
       this.customerBillingDocuments = [];
       this.tppBillingDocuments = {};
-      await this.getCustomerBalance();
-      await Promise.all([this.getBills(), this.getCreditNotes(), this.getPayments()]);
+      await Promise.all([this.getBills(), this.getCreditNotes(), this.getPayments(), this.getCustomerBalance()]);
       this.computeCustomerBalance();
       this.computeTppBalances();
       this.loading = false;
@@ -264,9 +263,9 @@ export default {
         if (this.$v.editedPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         await this.$payments.update(this.editedPayment._id, this.$_.omit(this.editedPayment, '_id'));
+        this.paymentEditionModal = false;
         NotifyPositive('Règlement créé');
         await this.refresh();
-        this.paymentEditionModal = false;
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création du règlement');
