@@ -208,6 +208,13 @@ export default {
     },
     async createBills () {
       try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Cette opération est définitive. Confirmez-vous ?',
+          ok: 'Oui',
+          cancel: 'Non'
+        });
+
         if (!this.hasSelectedRows) return;
         const bills = this.selected.map(row => this.$_.omit(row, ['__index']));
         await this.$bills.create({ bills });
@@ -215,6 +222,7 @@ export default {
         await this.getDraftBills();
         this.selected = [];
       } catch (e) {
+        if (e.message === '') return;
         console.error(e);
         NotifyNegative('Erreur lors de la facturation des clients');
       }
