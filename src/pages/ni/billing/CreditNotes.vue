@@ -359,7 +359,6 @@ export default {
       let selectedCustomer;
       if (this.newCreditNote.customer) {
         selectedCustomer = this.customersOptions.find(cus => cus.value === this.newCreditNote.customer);
-        console.log('selected customer', selectedCustomer);
       }
       if (this.editedCreditNote.customer) {
         selectedCustomer = this.editedCreditNote.customer;
