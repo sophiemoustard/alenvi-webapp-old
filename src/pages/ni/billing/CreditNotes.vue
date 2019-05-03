@@ -205,7 +205,8 @@ export default {
           name: 'date',
           label: 'Date de l\'avoir',
           align: 'left',
-          field: row => row.date ? this.$moment(row.date).format('DD/MM/YYYY') : '',
+          field: row => row.date ? row.date : null,
+          format: val => val ? this.$moment(val).format('DD/MM/YYYY') : '',
         },
         {
           name: 'startDate',
