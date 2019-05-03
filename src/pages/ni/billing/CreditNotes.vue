@@ -359,6 +359,7 @@ export default {
       let selectedCustomer;
       if (this.newCreditNote.customer) {
         selectedCustomer = this.customersOptions.find(cus => cus.value === this.newCreditNote.customer);
+        console.log('selected customer', selectedCustomer);
       }
       if (this.editedCreditNote.customer) {
         selectedCustomer = this.editedCreditNote.customer;
@@ -383,11 +384,10 @@ export default {
       const selectedCustomer = this.customersOptions.find(cus => cus.value === customer);
       if (!selectedCustomer) return [];
 
-      const uniqTppNames = Array.from(new Set(selectedCustomer.thirdPartyPayers.map(tpp => tpp.name)));
-      return uniqTppNames.map(tppName => {
-        const matchingTpp = selectedCustomer.thirdPartyPayers.find(origTpp => origTpp.name === tppName);
-        return { label: matchingTpp.name, value: matchingTpp._id }
-      });
+      return selectedCustomer.thirdPartyPayers.map(tpp => ({
+        label: tpp.name,
+        value: tpp._id,
+      }));
     },
     disableCreationButton () {
       return !(this.newCreditNote.customer && this.newCreditNote.date &&
