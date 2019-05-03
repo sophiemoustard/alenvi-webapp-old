@@ -1,51 +1,50 @@
 <template>
-  <q-card class="q-mb-lg neutral-background" flat>
-    <q-table :data="documents" :columns="columns" binary-state-sort hide-bottom>
-      <q-tr slot="top-row" slot-scope="props">
-        <q-td class="bold">{{ formatDate(billingDates.startDate) }}</q-td>
-        <q-td class="bold">Début de période</q-td>
-        <q-td />
-        <td class="bold" align="center">{{ formatPrice(startBalance) }}</td>
-        <q-td />
-      </q-tr>
-      <q-tr v-if="Object.keys(documents).length > 0" slot="body" slot-scope="props" :props="props">
-        <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-          <template v-if="col.name === 'document'">
-            <div :class="{'download': props.row.billNumber}" v-if="props.row.type === BILL" @click="downloadBillPdf(props.row._id)">
-              Facture {{ props.row.billNumber || 'tiers' }}
-            </div>
-            <div class="download" v-else-if="props.row.type === CREDIT_NOTE" @click="downloadCreditNotePdf(props.row._id)">
-              Avoir {{ props.row.number }}
-            </div>
-            <div v-else>{{ getPaymentTitle(props.row) }}</div>
-          </template>
-          <template v-else-if="col.name === 'balance'">
-            <div v-if="!isNegative(col.value)" class="row no-wrap items-center justify-center">
-              <q-icon name="mdi-plus-circle-outline" color="grey" class="balance-icon" />
-              <div>{{ col.value }}</div>
-            </div>
-            <div v-else-if="isNegative(col.value)" class="row no-wrap items-center justify-center">
-              <q-icon name="mdi-minus-circle-outline" color="secondary" class="balance-icon" />
-              <div>{{ col.value.substring(1) }}</div>
-            </div>
-            <div v-else>{{ col.value }}</div>
-          </template>
-          <template v-else-if="col.name === 'actions'">
-            <q-btn v-if="displayActions && paymentTypes.includes(props.row.type)" flat small color="grey" icon="edit"
-              @click="openEditionModal(props.row)" />
-          </template>
-          <template v-else>{{ col.value }}</template>
-        </q-td>
-      </q-tr>
-      <q-tr slot="bottom-row" slot-scope="props">
-        <q-td class="bold">{{ formatDate(billingDates.endDate) }}</q-td>
-        <q-td class="bold">Fin de période</q-td>
-        <q-td />
-        <td class="bold" align="center">{{ formatPrice(endBalance) }}</td>
-        <q-td />
-      </q-tr>
-    </q-table>
-  </q-card>
+  <q-table :data="documents" :columns="columns" binary-state-sort hide-bottom :pagination.sync="pagination"
+    class="q-mb-lg">
+    <q-tr slot="top-row" slot-scope="props">
+      <q-td class="bold">{{ formatDate(billingDates.startDate) }}</q-td>
+      <q-td class="bold">Début de période</q-td>
+      <q-td />
+      <td class="bold" align="center">{{ formatPrice(startBalance) }}</td>
+      <q-td />
+    </q-tr>
+    <q-tr v-if="Object.keys(documents).length > 0" slot="body" slot-scope="props" :props="props">
+      <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+        <template v-if="col.name === 'document'">
+          <div :class="{'download': props.row.billNumber}" v-if="props.row.type === BILL" @click="downloadBillPdf(props.row._id)">
+            Facture {{ props.row.billNumber || 'tiers' }}
+          </div>
+          <div class="download" v-else-if="props.row.type === CREDIT_NOTE" @click="downloadCreditNotePdf(props.row._id)">
+            Avoir {{ props.row.number }}
+          </div>
+          <div v-else>{{ getPaymentTitle(props.row) }}</div>
+        </template>
+        <template v-else-if="col.name === 'balance'">
+          <div v-if="!isNegative(col.value)" class="row no-wrap items-center justify-center">
+            <q-icon name="mdi-plus-circle-outline" color="grey" class="balance-icon" />
+            <div>{{ col.value }}</div>
+          </div>
+          <div v-else-if="isNegative(col.value)" class="row no-wrap items-center justify-center">
+            <q-icon name="mdi-minus-circle-outline" color="secondary" class="balance-icon" />
+            <div>{{ col.value.substring(1) }}</div>
+          </div>
+          <div v-else>{{ col.value }}</div>
+        </template>
+        <template v-else-if="col.name === 'actions'">
+          <q-btn v-if="displayActions && paymentTypes.includes(props.row.type)" flat small color="grey" icon="edit"
+            @click="openEditionModal(props.row)" />
+        </template>
+        <template v-else>{{ col.value }}</template>
+      </q-td>
+    </q-tr>
+    <q-tr slot="bottom-row" slot-scope="props">
+      <q-td class="bold">{{ formatDate(billingDates.endDate) }}</q-td>
+      <q-td class="bold">Fin de période</q-td>
+      <q-td />
+      <td class="bold" align="center">{{ formatPrice(endBalance) }}</td>
+      <q-td />
+    </q-tr>
+  </q-table>
 </template>
 
 <script>
@@ -101,6 +100,7 @@ export default {
           align: 'center',
         },
       ],
+      pagination: { rowsPerPage: 0 },
       paymentTypes: PAYMENT_OPTIONS.map(op => op.value),
     }
   },
