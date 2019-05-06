@@ -96,8 +96,13 @@ export const planningModalMixin = {
     disableEditionButton () {
       switch (this.editedEvent.type) {
         case ABSENCE:
+          if (this.editedEvent.absenceNature === DAILY) {
+            return !this.editedEvent.auxiliary || !this.editedEvent.absence || !this.editedEvent.dates.startDate ||
+              !this.editedEvent.dates.endDate || !this.editedEvent.absenceNature;
+          }
+
           return !this.editedEvent.auxiliary || !this.editedEvent.absence || !this.editedEvent.dates.startDate ||
-            !this.editedEvent.dates.endDate || !this.editedEvent.startDuration;
+            !this.editedEvent.absenceNature || !this.editedEvent.dates.startHour || !this.editedEvent.dates.endHour;
         case INTERVENTION:
           const shouldDisableButton = !this.editedEvent.auxiliary || !this.editedEvent.subscription || !this.editedEvent.dates.startDate ||
             !this.editedEvent.dates.endDate || !this.editedEvent.dates.startHour || !this.editedEvent.dates.endHour;

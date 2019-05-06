@@ -169,7 +169,8 @@ export default {
       this.creationModal = true;
     },
     // Event edition
-    openEditionModal (event) {
+    openEditionModal (eventId) {
+      const event = this.events.find(ev => ev._id === eventId)
       const auxiliary = event.auxiliary._id;
       const can = this.canEditEvent(event, auxiliary);
       if (!can) return;

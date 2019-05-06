@@ -34,6 +34,8 @@ export const planningActionMixin = {
         dates: {
           startDate: { required },
           endDate: { required },
+          startHour: { required: requiredIf((item) => item.type === ABSENCE && item.absenceNature === HOURLY) },
+          endHour: { required: requiredIf((item) => item.type === ABSENCE && item.absenceNature === HOURLY) },
         },
         auxiliary: { required },
         sector: { required },
@@ -152,15 +154,6 @@ export const planningActionMixin = {
             .minute(this.$moment(event.dates.endHour).minute())
             .toISOString();
         }
-        // payload.startDate = this.$moment(event.dates.startDate).hours(event.startDuration[0].startHour).toISOString();
-        // if (event.endDuration !== '') {
-        //   payload.endDate = this.$moment(event.dates.endDate).hours(event.endDuration[0].endHour).toISOString();
-        // } else {
-        //   payload.endDate = this.$moment(event.dates.endDate).hours(event.startDuration[0].endHour).toISOString();
-        // }
-
-        // this.$_.unset(payload, 'startDuration');
-        // this.$_.unset(payload, 'endDuration');
       } else {
         payload.startDate = this.$moment(event.dates.startDate).hours(event.dates.startHour.split(':')[0])
           .minutes(event.dates.startHour.split(':')[1]).toISOString();
@@ -222,16 +215,20 @@ export const planningActionMixin = {
     // Event edition
     formatEditedEvent (event, auxiliary) {
       const { createdAt, updatedAt, startDate, endDate, ...eventData } = event;
-      const dates = {
-        startDate,
-        endDate,
-        startHour: `${this.$moment(startDate).hours() < 10
+      let startHour;
+      let endHour;
+      if (event.type === ABSENCE && event.absenceNature === HOURLY) {
+        startHour = startDate;
+        endHour = endDate;
+      } else {
+        startHour = `${this.$moment(startDate).hours() < 10
           ? `0${this.$moment(startDate).hours()}`
-          : this.$moment(startDate).hours()}:${this.$moment(startDate).minutes() || '00'}`,
-        endHour: `${this.$moment(endDate).hours() < 10
+          : this.$moment(startDate).hours()}:${this.$moment(startDate).minutes() || '00'}`;
+        endHour = `${this.$moment(endDate).hours() < 10
           ? `0${this.$moment(endDate).hours()}`
-          : this.$moment(endDate).hours()}:${this.$moment(endDate).minutes() || '00'}`,
-      };
+          : this.$moment(endDate).hours()}:${this.$moment(endDate).minutes() || '00'}`;
+      }
+      const dates = { startDate, endDate, startHour, endHour };
       switch (event.type) {
         case INTERVENTION:
           const subscription = event.subscription._id;
@@ -242,13 +239,12 @@ export const planningActionMixin = {
           this.editedEvent = { location: {}, shouldUpdateRepetition: false, ...eventData, auxiliary, internalHour, dates };
           break;
         case ABSENCE:
-          // const { startDuration, endDuration } = this.getAbsenceDurations(event);
           this.editedEvent = {
             location: {},
             attachment: {},
             ...eventData,
             auxiliary,
-            dates: { startDate, endDate },
+            dates,
           };
           break;
         case UNAVAILABILITY:
