@@ -1,7 +1,7 @@
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { frAddress } from '../helpers/vuelidateCustomVal.js';
 import { NotifyWarning, NotifyNegative, NotifyPositive } from '../components/popup/notify';
-import { INTERNAL_HOUR, ABSENCE, INTERVENTION, MORNING, AFTERNOON, ALL_DAY, NEVER, UNAVAILABILITY, ILLNESS, CUSTOMER_CONTRACT, COMPANY_CONTRACT } from '../data/constants';
+import { INTERNAL_HOUR, ABSENCE, INTERVENTION, MORNING, AFTERNOON, ALL_DAY, NEVER, UNAVAILABILITY, ILLNESS, CUSTOMER_CONTRACT, COMPANY_CONTRACT, DAILY } from '../data/constants';
 
 export const planningActionMixin = {
   validations () {
@@ -20,6 +20,7 @@ export const planningActionMixin = {
         subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
         internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
         absence: { required: requiredIf((item) => item.type === ABSENCE) },
+        absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
         location: { fullAddress: { frAddress } },
         repetition: {
           frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) }
@@ -42,6 +43,7 @@ export const planningActionMixin = {
         subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
         internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
         absence: { required: requiredIf((item) => item.type === ABSENCE) },
+        absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
         location: { fullAddress: { frAddress } },
         repetition: {
           frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
@@ -114,6 +116,7 @@ export const planningActionMixin = {
           absence: '',
           location: {},
           attachment: {},
+          ...(type === ABSENCE && { absenceNature: DAILY }),
         };
       }
     },
@@ -129,15 +132,19 @@ export const planningActionMixin = {
         payload.internalHour = internalHour;
       }
       if (event.type === ABSENCE) {
-        payload.startDate = this.$moment(event.dates.startDate).hours(event.startDuration[0].startHour).toISOString();
-        if (event.endDuration !== '') {
-          payload.endDate = this.$moment(event.dates.endDate).hours(event.endDuration[0].endHour).toISOString();
-        } else {
-          payload.endDate = this.$moment(event.dates.endDate).hours(event.startDuration[0].endHour).toISOString();
+        if (event.absenceNature === DAILY) {
+          payload.startDate = this.$moment(event.dates.startDate).hour(8).minute(0).toISOString();
+          payload.endDate = this.$moment(event.dates.endDate).hour(20).minute(0).toISOString();
         }
+        // payload.startDate = this.$moment(event.dates.startDate).hours(event.startDuration[0].startHour).toISOString();
+        // if (event.endDuration !== '') {
+        //   payload.endDate = this.$moment(event.dates.endDate).hours(event.endDuration[0].endHour).toISOString();
+        // } else {
+        //   payload.endDate = this.$moment(event.dates.endDate).hours(event.startDuration[0].endHour).toISOString();
+        // }
 
-        this.$_.unset(payload, 'startDuration');
-        this.$_.unset(payload, 'endDuration');
+        // this.$_.unset(payload, 'startDuration');
+        // this.$_.unset(payload, 'endDuration');
       } else {
         payload.startDate = this.$moment(event.dates.startDate).hours(event.dates.startHour.split(':')[0])
           .minutes(event.dates.startHour.split(':')[1]).toISOString();

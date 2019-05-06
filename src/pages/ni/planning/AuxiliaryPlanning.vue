@@ -1,13 +1,14 @@
 <template>
   <q-page class="neutral-background">
-    <ni-planning-manager :events="events" :persons="getActiveAuxiliaries()" @updateStartOfWeek="updateStartOfWeek" @createEvent="openCreationModal"
-      @editEvent="openEditionModal" @onDrop="updateEventOnDrop" />
+    <ni-planning-manager :events="events" :persons="getActiveAuxiliaries()" @updateStartOfWeek="updateStartOfWeek"
+      @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop" />
 
     <!-- Event creation modal -->
     <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
-      :creationModal="creationModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary" :auxiliaries="auxiliaries"
-      :customers="customers" @resetForm="resetCreationForm" @deleteDocument="deleteDocument" @documentUploaded="documentUploaded"
-      @createEvent="createEvent" @close="closeCreationModal" @selectedAddress="selectedAddress" />
+      :creationModal="creationModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary"
+      :auxiliaries="auxiliaries" :customers="customers" @resetForm="resetCreationForm" @deleteDocument="deleteDocument"
+      @documentUploaded="documentUploaded" @createEvent="createEvent" @close="closeCreationModal"
+      @selectedAddress="selectedAddress" />
 
     <!-- Event edition modal -->
     <ni-auxiliary-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
@@ -150,8 +151,6 @@ export default {
       this.newEvent = {
         type: INTERVENTION,
         repetition: { frequency: NEVER },
-        startDuration: '',
-        endDuration: '',
         customer: '',
         subscription: '',
         internalHour: '',

@@ -1,3 +1,18 @@
+// CUSTOMER FUNDING
+export const MONTHLY = 'monthly';
+export const ONCE = 'once';
+export const FIXED = 'fixed';
+export const HOURLY = 'hourly';
+
+export const FUNDING_FREQ_OPTIONS = [
+  { label: 'Mensuelle', value: MONTHLY },
+  { label: 'Une seule fois', value: ONCE }
+];
+export const NATURE_OPTIONS = [
+  { label: 'Horaire', value: HOURLY },
+  { label: 'Forfaitaire', value: FIXED },
+];
+
 // EVENTS
 export const INTERVENTION = 'intervention';
 export const ABSENCE = 'absence';
@@ -25,25 +40,15 @@ export const DATE_OPTIONS = [
 export const EDITION = 'edition';
 export const DELETION = 'deletion';
 export const CANCELLATION = 'cancellation';
+export const DAILY = 'daily';
+export const ABSENCE_NATURES = [
+  { label: 'Journalière', value: DAILY },
+  { label: 'Horaire', value: HOURLY },
+];
 
 // THIRD PARTY PAYERS
 export const BILLING_INDIRECT = 'indirect';
 export const BILLING_DIRECT = 'direct';
-
-// CUSTOMER FUNDING
-export const MONTHLY = 'monthly';
-export const ONCE = 'once';
-export const FIXED = 'fixed';
-export const HOURLY = 'hourly';
-
-export const FUNDING_FREQ_OPTIONS = [
-  { label: 'Mensuelle', value: MONTHLY },
-  { label: 'Une seule fois', value: ONCE }
-];
-export const NATURE_OPTIONS = [
-  { label: 'Horaire', value: HOURLY },
-  { label: 'Forfaitaire', value: FIXED },
-];
 
 // AVATAR
 export const DEFAULT_AVATAR = 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/images/users/default_avatar.png';

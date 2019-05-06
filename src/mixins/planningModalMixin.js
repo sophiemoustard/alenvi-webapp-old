@@ -21,6 +21,9 @@ import {
   AUXILIARY_INITIATIVE,
   DATE_OPTIONS,
   ABSENCE_TYPE,
+  ABSENCE_NATURES,
+  DAILY,
+  HOURLY,
   ILLNESS,
   REQUIRED_LABEL,
   CUSTOMER_CONTRACT,
@@ -45,7 +48,10 @@ export const planningModalMixin = {
       INTERNAL_HOUR,
       NEVER,
       ILLNESS,
+      DAILY,
+      HOURLY,
       absenceOptions: ABSENCE_TYPE,
+      absenceNatureOptions: ABSENCE_NATURES,
       dateOptions: DATE_OPTIONS,
       cancellationConditions: [
         { label: 'Facturée & payée', value: INVOICED_AND_PAYED },
@@ -64,7 +70,7 @@ export const planningModalMixin = {
       switch (this.newEvent.type) {
         case ABSENCE:
           return !this.newEvent.auxiliary || !this.newEvent.absence || !this.newEvent.dates.startDate ||
-            !this.newEvent.dates.endDate || !this.newEvent.startDuration;
+            (this.newEvent.absenceNature === DAILY && !this.newEvent.dates.endDate) || !this.newEvent.absenceNature;
         case INTERVENTION:
           return !this.newEvent.auxiliary || !this.newEvent.customer || !this.newEvent.subscription || !this.newEvent.dates.startDate ||
             !this.newEvent.dates.endDate || !this.newEvent.dates.startHour || !this.newEvent.dates.endHour;

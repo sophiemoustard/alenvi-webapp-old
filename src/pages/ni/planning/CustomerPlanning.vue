@@ -341,8 +341,6 @@ export default {
             endHour: partialReset ? this.newEvent.dates.endHour : '',
           },
           repetition: { frequency: NEVER },
-          startDuration: '',
-          endDuration: '',
           auxiliary: partialReset ? this.newEvent.auxiliary : '',
           customer: '',
           subscription: '',
