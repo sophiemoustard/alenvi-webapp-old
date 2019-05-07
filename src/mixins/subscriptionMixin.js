@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { getLastVersion } from '../helpers/utils';
 import { MONTHLY, FIXED, ONCE, HOURLY, NATURE_OPTIONS } from '../data/constants';
 
@@ -51,10 +52,11 @@ export const subscriptionMixin = {
       ],
       subscriptionHistoryColumns: [
         {
-          name: 'startDate',
-          label: 'Date d\'effet',
+          name: 'createdAt',
+          label: 'Date de modification',
           align: 'left',
-          field: 'startDate',
+          field: 'createdAt',
+          format: value => moment(value).format('DD/MM/YYYY')
         },
         {
           name: 'unitTTCRate',
@@ -145,11 +147,10 @@ export const subscriptionMixin = {
     refreshSubscriptions () {
       try {
         const { subscriptions } = this.customer;
-        this.subscriptions = subscriptions ? subscriptions.map(sub => {
-          const { versions } = sub;
-
-          return { ...getLastVersion(versions, 'startDate'), ...sub }
-        }) : [];
+        this.subscriptions = subscriptions ? subscriptions.map(sub => ({
+          ...getLastVersion(sub.versions, 'createdAt'),
+          ...sub,
+        })) : [];
       } catch (e) {
         console.error(e);
       }

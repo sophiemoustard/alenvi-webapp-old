@@ -108,8 +108,7 @@
           hide-bottom binary-state-sort :pagination.sync="paginationHistory">
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-              <template v-if="col.name === 'startDate'"> {{ $moment(col.value).format('DD/MM/YYYY') }} </template>
-              <template v-else>{{ col.value }}</template>
+              <template>{{ col.value }}</template>
             </q-td>
           </q-tr>
         </q-table>
@@ -330,7 +329,7 @@ export default {
       try {
         if (this.customer.subscriptionsAccepted) {
           const subscriptions = this.customer.subscriptions.map(subscription => {
-            const lastVersion = getLastVersion(subscription.versions);
+            const lastVersion = getLastVersion(subscription.versions, 'createdAt');
             const obj = {
               service: subscription.service.name,
               unitTTCRate: lastVersion.unitTTCRate,
