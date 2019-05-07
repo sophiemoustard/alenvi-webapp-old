@@ -100,8 +100,10 @@ export const planningActionMixin = {
         let startHour = this.newEvent.dates.startHour;
         let endHour = this.newEvent.dates.endHour;
         if (type === ABSENCE) {
-          startHour = this.$moment().hours(this.newEvent.dates.startHour.split(':')[0]).minutes(this.newEvent.dates.startHour.split(':')[1]).toISOString();
-          endHour = this.$moment().hours(this.newEvent.dates.endHour.split(':')[0]).minutes(this.newEvent.dates.endHour.split(':')[1]).toISOString();
+          const startHourSplit = this.newEvent.dates.startHour.split(':');
+          const endHourSplit = this.newEvent.dates.endHour.split(':');
+          startHour = this.$moment().hours(startHourSplit[0]).minutes(startHourSplit[1]).toISOString();
+          endHour = this.$moment().hours(endHourSplit[0]).minutes(endHourSplit[1]).toISOString();
         } else if (this.$moment(this.newEvent.dates.startHour).isValid()) { // Switch from absence to anoter event type
           startHour = this.$moment(this.newEvent.dates.startHour).format('HH:mm');
           endHour = this.$moment(this.newEvent.dates.endHour).format('HH:mm');
@@ -213,22 +215,20 @@ export const planningActionMixin = {
       }
     },
     // Event edition
+    formatHour (date) {
+      return `${this.$moment(date).hours() < 10
+        ? `0${this.$moment(date).hours()}`
+        : this.$moment(date).hours()}:${this.$moment(date).minutes() || '00'}`;
+    },
     formatEditedEvent (event, auxiliary) {
       const { createdAt, updatedAt, startDate, endDate, ...eventData } = event;
-      let startHour;
-      let endHour;
-      if (event.type === ABSENCE && event.absenceNature === HOURLY) {
-        startHour = startDate;
-        endHour = endDate;
-      } else {
-        startHour = `${this.$moment(startDate).hours() < 10
-          ? `0${this.$moment(startDate).hours()}`
-          : this.$moment(startDate).hours()}:${this.$moment(startDate).minutes() || '00'}`;
-        endHour = `${this.$moment(endDate).hours() < 10
-          ? `0${this.$moment(endDate).hours()}`
-          : this.$moment(endDate).hours()}:${this.$moment(endDate).minutes() || '00'}`;
-      }
-      const dates = { startDate, endDate, startHour, endHour };
+      const dates = {
+        startDate,
+        endDate,
+        startHour: event.type === ABSENCE && event.absenceNature === HOURLY ? startDate : this.formatHour(startDate),
+        endHour: event.type === ABSENCE && event.absenceNature === HOURLY ? endDate : this.formatHour(endDate),
+      };
+
       switch (event.type) {
         case INTERVENTION:
           const subscription = event.subscription._id;
