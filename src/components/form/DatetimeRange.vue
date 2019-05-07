@@ -27,6 +27,7 @@
 <script>
 import DateInput from './DateInput.vue';
 import SelectInput from './SelectInput.vue';
+import { PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR } from '../../data/constants.js';
 
 export default {
   components: {
@@ -48,12 +49,12 @@ export default {
   },
   computed: {
     hoursOptions () {
-      const range = this.$moment.range(this.$moment().hours(8).minutes(0), this.$moment().hours(20).minutes(0));
+      const range = this.$moment.range(this.$moment().hours(PLANNING_VIEW_START_HOUR).minutes(0), this.$moment().hours(PLANNING_VIEW_END_HOUR).minutes(0));
       const hours = Array.from(range.by('hours'));
       const selectOptions = [];
       hours.map((hour) => {
         selectOptions.push({ label: hour.format('HH:mm'), value: hour.format('HH:mm') });
-        if (hour.format('HH') !== '20') selectOptions.push({ label: hour.minutes(30).format('HH:mm'), value: hour.minutes(30).format('HH:mm') });
+        if (hour.format('HH') !== '22') selectOptions.push({ label: hour.minutes(30).format('HH:mm'), value: hour.minutes(30).format('HH:mm') });
       });
       return selectOptions;
     },
