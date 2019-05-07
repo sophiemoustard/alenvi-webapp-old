@@ -11,10 +11,10 @@
     <q-tr v-if="Object.keys(documents).length > 0" slot="body" slot-scope="props" :props="props">
       <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
         <template v-if="col.name === 'document'">
-          <div :class="{'download': props.row.billNumber}" v-if="props.row.type === BILL" @click="downloadBillPdf(props.row._id)">
+          <div :class="{'download': props.row.billNumber}" v-if="props.row.type === BILL" @click="downloadBillPdf(props.row._id, props.row.billNumber)">
             Facture {{ props.row.billNumber || 'tiers' }}
           </div>
-          <div class="download" v-else-if="props.row.type === CREDIT_NOTE" @click="downloadCreditNotePdf(props.row._id)">
+          <div class="download" v-else-if="props.row.type === CREDIT_NOTE" @click="downloadCreditNotePdf(props.row._id, props.row.number)">
             Avoir {{ props.row.number }}
           </div>
           <div v-else>{{ getPaymentTitle(props.row) }}</div>
@@ -134,20 +134,20 @@ export default {
     openEditionModal (payment) {
       this.$emit('openEditionModal', payment);
     },
-    async downloadBillPdf (billId) {
+    async downloadBillPdf (billId, number) {
       try {
         const pdf = await this.$bills.getPDF(billId);
-        await downloadPdf(pdf, 'your-file-name.pdf');
+        await downloadPdf(pdf, `${number}.pdf`);
         NotifyPositive('Facture téléchargée');
       } catch (e) {
         console.error(e);
         NotifyNegative('Impossible de télécharger la facture');
       }
     },
-    async downloadCreditNotePdf (creditNoteId) {
+    async downloadCreditNotePdf (creditNoteId, number) {
       try {
         const pdf = await this.$creditNotes.getPDF(creditNoteId);
-        await downloadPdf(pdf, 'your-file-name.pdf');
+        await downloadPdf(pdf, `${number}.pdf`);
         NotifyPositive('Facture téléchargée');
       } catch (e) {
         console.error(e);
