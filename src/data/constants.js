@@ -74,7 +74,9 @@ export const THREE_DAYS_VIEW = '3days';
 export const WEEK_VIEW = 'week';
 export const PLANNING = 'planning';
 export const AGENDA = 'agenda';
-export const PERCENTAGE_BY_MINUTES = 0.136; // ( = 100 / (12 * 60))
+export const PERCENTAGE_BY_MINUTES = 0.111; // ( = 100 / ((22 - 7) * 60))
+export const PLANNING_VIEW_START_HOUR = 7;
+export const PLANNING_VIEW_END_HOUR = 22;
 
 // INDICATORS
 export const WEEK_STATS = 'week_stats';
