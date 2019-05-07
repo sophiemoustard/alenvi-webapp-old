@@ -48,9 +48,11 @@
           <ni-datetime-picker caption="Date de début" v-model="newEvent.dates.startDate" type="date" requiredField
             :error="validations.dates.startDate.$error" inModal @blur="validations.dates.startDate.$touch" />
           <ni-datetime-picker caption="Heure de début" v-model="newEvent.dates.startHour" type="time" requiredField
-            :error="validations.dates.startHour.$error" inModal @blur="validations.dates.startHour.$touch" />
+            :error="validations.dates.startHour.$error" inModal @blur="validations.dates.startHour.$touch"
+            :max="newEvent.dates.endHour" />
           <ni-datetime-picker caption="Heure de fin" v-model="newEvent.dates.endHour" type="time" requiredField
-            :error="validations.dates.endHour.$error" inModal @blur="validations.dates.endHour.$touch" />
+            :error="validations.dates.endHour.$error" inModal @blur="validations.dates.endHour.$touch"
+            :min="newEvent.dates.startHour" />
           <ni-modal-select caption="Type d'absence" v-model="newEvent.absence" :options="absenceOptions"
             :error="validations.absence.$error" requiredField @blur="validations.absence.$touch" disable />
         </template>
