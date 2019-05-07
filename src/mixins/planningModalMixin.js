@@ -19,8 +19,11 @@ import {
   NOT_INVOICED_AND_NOT_PAYED,
   CUSTOMER_INITIATIVE,
   AUXILIARY_INITIATIVE,
-  DATE_OPTIONS,
   ABSENCE_TYPE,
+  ABSENCE_NATURES,
+  UNJUSTIFIED,
+  DAILY,
+  HOURLY,
   ILLNESS,
   REQUIRED_LABEL,
   CUSTOMER_CONTRACT,
@@ -45,8 +48,9 @@ export const planningModalMixin = {
       INTERNAL_HOUR,
       NEVER,
       ILLNESS,
-      absenceOptions: ABSENCE_TYPE,
-      dateOptions: DATE_OPTIONS,
+      DAILY,
+      HOURLY,
+      absenceNatureOptions: ABSENCE_NATURES,
       cancellationConditions: [
         { label: 'Facturée & payée', value: INVOICED_AND_PAYED },
         { label: 'Facturée & non payée', value: INVOICED_AND_NOT_PAYED },
@@ -59,12 +63,24 @@ export const planningModalMixin = {
     };
   },
   computed: {
+    absenceOptions () {
+      if (this.newEvent && this.newEvent.absenceNature === HOURLY) {
+        return ABSENCE_TYPE.filter(type => type.value === UNJUSTIFIED);
+      }
+
+      return ABSENCE_TYPE;
+    },
     disableCreationButton () {
       if (!this.newEvent.type) return true;
       switch (this.newEvent.type) {
         case ABSENCE:
+          if (this.newEvent.absenceNature === DAILY) {
+            return !this.newEvent.auxiliary || !this.newEvent.absence || !this.newEvent.dates.startDate ||
+              !this.newEvent.dates.endDate || !this.newEvent.absenceNature;
+          }
+
           return !this.newEvent.auxiliary || !this.newEvent.absence || !this.newEvent.dates.startDate ||
-            !this.newEvent.dates.endDate || !this.newEvent.startDuration;
+            !this.newEvent.absenceNature || !this.newEvent.dates.startHour || !this.newEvent.dates.endHour;
         case INTERVENTION:
           return !this.newEvent.auxiliary || !this.newEvent.customer || !this.newEvent.subscription || !this.newEvent.dates.startDate ||
             !this.newEvent.dates.endDate || !this.newEvent.dates.startHour || !this.newEvent.dates.endHour;
@@ -80,8 +96,13 @@ export const planningModalMixin = {
     disableEditionButton () {
       switch (this.editedEvent.type) {
         case ABSENCE:
+          if (this.editedEvent.absenceNature === DAILY) {
+            return !this.editedEvent.auxiliary || !this.editedEvent.absence || !this.editedEvent.dates.startDate ||
+              !this.editedEvent.dates.endDate || !this.editedEvent.absenceNature;
+          }
+
           return !this.editedEvent.auxiliary || !this.editedEvent.absence || !this.editedEvent.dates.startDate ||
-            !this.editedEvent.dates.endDate || !this.editedEvent.startDuration;
+            !this.editedEvent.absenceNature || !this.editedEvent.dates.startHour || !this.editedEvent.dates.endHour;
         case INTERVENTION:
           const shouldDisableButton = !this.editedEvent.auxiliary || !this.editedEvent.subscription || !this.editedEvent.dates.startDate ||
             !this.editedEvent.dates.endDate || !this.editedEvent.dates.startHour || !this.editedEvent.dates.endHour;

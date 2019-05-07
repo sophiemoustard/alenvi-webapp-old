@@ -36,7 +36,7 @@
               <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
                 @click="createEvent({ dayIndex, person })">
                 <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
-                  <div :id="event._id" draggable @dragstart="drag(event)" @click.stop="editEvent(event)"
+                  <div :id="event._id" draggable @dragstart="drag(event)" @click.stop="editEvent(event._id)"
                     :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-sm']" :key="eventIndex"
                     :style="{ left: `${PERCENTAGE_BY_MINUTES * event.staffingLeft + 2}%`, width: `${PERCENTAGE_BY_MINUTES * event.staffingWidth}%` }">
                   </div>
@@ -48,7 +48,7 @@
                 @click="createEvent({ dayIndex, person })">
                 <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
                   <div :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event)" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`]"
-                    :key="eventIndex" @click.stop="editEvent(event)">
+                    :key="eventIndex" @click.stop="editEvent(event._id)">
                     <div class="col-12 event-title">
                       <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">
                         {{eventTitle(event) }}

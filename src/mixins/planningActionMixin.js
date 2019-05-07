@@ -1,7 +1,7 @@
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { frAddress } from '../helpers/vuelidateCustomVal.js';
 import { NotifyWarning, NotifyNegative, NotifyPositive } from '../components/popup/notify';
-import { INTERNAL_HOUR, ABSENCE, INTERVENTION, MORNING, AFTERNOON, ALL_DAY, NEVER, UNAVAILABILITY, ILLNESS, CUSTOMER_CONTRACT, COMPANY_CONTRACT } from '../data/constants';
+import { INTERNAL_HOUR, ABSENCE, INTERVENTION, NEVER, UNAVAILABILITY, ILLNESS, CUSTOMER_CONTRACT, COMPANY_CONTRACT, DAILY, HOURLY } from '../data/constants';
 
 export const planningActionMixin = {
   validations () {
@@ -10,16 +10,17 @@ export const planningActionMixin = {
         type: { required },
         dates: {
           startDate: { required },
-          endDate: { required },
+          endDate: { required: requiredIf((item) => item.type !== ABSENCE || item.absenceNature === DAILY) },
+          startHour: { required: requiredIf((item) => item.type === ABSENCE && item.absenceNature === HOURLY) },
+          endHour: { required: requiredIf((item) => item.type === ABSENCE && item.absenceNature === HOURLY) },
         },
-        startDuration: { required: requiredIf((item) => item.type === ABSENCE) },
-        endDuration: { required: requiredIf((item) => item.type === ABSENCE) },
         auxiliary: { required },
         sector: { required },
         customer: { required: requiredIf((item) => item.type === INTERVENTION) },
         subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
         internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
         absence: { required: requiredIf((item) => item.type === ABSENCE) },
+        absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
         location: { fullAddress: { frAddress } },
         repetition: {
           frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) }
@@ -33,15 +34,16 @@ export const planningActionMixin = {
         dates: {
           startDate: { required },
           endDate: { required },
+          startHour: { required: requiredIf((item) => item.type === ABSENCE && item.absenceNature === HOURLY) },
+          endHour: { required: requiredIf((item) => item.type === ABSENCE && item.absenceNature === HOURLY) },
         },
-        startDuration: { required: requiredIf((item) => item.type === ABSENCE) },
-        endDuration: { required: requiredIf((item) => item.type === ABSENCE) },
         auxiliary: { required },
         sector: { required },
         customer: { required: requiredIf((item) => item.type === INTERVENTION) },
         subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
         internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
         absence: { required: requiredIf((item) => item.type === ABSENCE) },
+        absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
         location: { fullAddress: { frAddress } },
         repetition: {
           frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
@@ -95,13 +97,24 @@ export const planningActionMixin = {
       this.$v.newEvent.$reset();
       if (!partialReset) this.newEvent = {};
       else {
+        let startHour = this.newEvent.dates.startHour;
+        let endHour = this.newEvent.dates.endHour;
+        if (type === ABSENCE) {
+          const startHourSplit = this.newEvent.dates.startHour.split(':');
+          const endHourSplit = this.newEvent.dates.endHour.split(':');
+          startHour = this.$moment().hours(startHourSplit[0]).minutes(startHourSplit[1]).toISOString();
+          endHour = this.$moment().hours(endHourSplit[0]).minutes(endHourSplit[1]).toISOString();
+        } else if (this.$moment(this.newEvent.dates.startHour).isValid()) { // Switch from absence to anoter event type
+          startHour = this.$moment(this.newEvent.dates.startHour).format('HH:mm');
+          endHour = this.$moment(this.newEvent.dates.endHour).format('HH:mm');
+        }
         this.newEvent = {
           type,
           dates: {
             startDate: partialReset ? this.newEvent.dates.startDate : '',
-            startHour: partialReset ? this.newEvent.dates.startHour : '',
+            startHour: partialReset ? startHour : '',
             endDate: partialReset ? this.newEvent.dates.endDate : '',
-            endHour: partialReset ? this.newEvent.dates.endHour : '',
+            endHour: partialReset ? endHour : '',
           },
           repetition: { frequency: NEVER },
           startDuration: '',
@@ -114,6 +127,7 @@ export const planningActionMixin = {
           absence: '',
           location: {},
           attachment: {},
+          ...(type === ABSENCE && { absenceNature: DAILY }),
         };
       }
     },
@@ -129,15 +143,19 @@ export const planningActionMixin = {
         payload.internalHour = internalHour;
       }
       if (event.type === ABSENCE) {
-        payload.startDate = this.$moment(event.dates.startDate).hours(event.startDuration[0].startHour).toISOString();
-        if (event.endDuration !== '') {
-          payload.endDate = this.$moment(event.dates.endDate).hours(event.endDuration[0].endHour).toISOString();
+        if (event.absenceNature === DAILY) {
+          payload.startDate = this.$moment(event.dates.startDate).hour(8).minute(0).toISOString();
+          payload.endDate = this.$moment(event.dates.endDate).hour(20).minute(0).toISOString();
         } else {
-          payload.endDate = this.$moment(event.dates.endDate).hours(event.startDuration[0].endHour).toISOString();
+          payload.startDate = this.$moment(event.dates.startDate)
+            .hour(this.$moment(event.dates.startHour).hour())
+            .minute(this.$moment(event.dates.startHour).minute())
+            .toISOString();
+          payload.endDate = this.$moment(event.dates.startDate)
+            .hour(this.$moment(event.dates.endHour).hour())
+            .minute(this.$moment(event.dates.endHour).minute())
+            .toISOString();
         }
-
-        this.$_.unset(payload, 'startDuration');
-        this.$_.unset(payload, 'endDuration');
       } else {
         payload.startDate = this.$moment(event.dates.startDate).hours(event.dates.startHour.split(':')[0])
           .minutes(event.dates.startHour.split(':')[1]).toISOString();
@@ -170,28 +188,6 @@ export const planningActionMixin = {
             this.$moment(startDate).isBetween(event.startDate, event.endDate, 'minutes', '[)')
         });
     },
-    getAbsenceDurations (event) {
-      let startDuration;
-      let endDuration;
-
-      if (event.type !== ABSENCE) return { startDuration, endDuration }
-
-      const startHour = this.$moment(event.startDate).hours();
-      const endHour = this.$moment(event.endDate).hours();
-      if (this.$moment(event.startDate).isSame(this.$moment(event.endDate), 'days')) {
-        if (startHour === MORNING[0].startHour && endHour === MORNING[0].endHour) startDuration = MORNING;
-        else if (startHour === AFTERNOON[0].startHour && endHour === AFTERNOON[0].endHour) startDuration = AFTERNOON;
-        else startDuration = ALL_DAY;
-      } else {
-        if (startHour === AFTERNOON[0].startHour) startDuration = AFTERNOON;
-        else startDuration = ALL_DAY;
-
-        if (endHour === MORNING[0].endHour) endDuration = MORNING;
-        else endDuration = ALL_DAY;
-      }
-
-      return { startDuration, endDuration };
-    },
     async createEvent () {
       try {
         this.$v.newEvent.$touch();
@@ -219,18 +215,20 @@ export const planningActionMixin = {
       }
     },
     // Event edition
+    formatHour (date) {
+      return `${this.$moment(date).hours() < 10
+        ? `0${this.$moment(date).hours()}`
+        : this.$moment(date).hours()}:${this.$moment(date).minutes() || '00'}`;
+    },
     formatEditedEvent (event, auxiliary) {
       const { createdAt, updatedAt, startDate, endDate, ...eventData } = event;
       const dates = {
         startDate,
         endDate,
-        startHour: `${this.$moment(startDate).hours() < 10
-          ? `0${this.$moment(startDate).hours()}`
-          : this.$moment(startDate).hours()}:${this.$moment(startDate).minutes() || '00'}`,
-        endHour: `${this.$moment(endDate).hours() < 10
-          ? `0${this.$moment(endDate).hours()}`
-          : this.$moment(endDate).hours()}:${this.$moment(endDate).minutes() || '00'}`,
+        startHour: event.type === ABSENCE && event.absenceNature === HOURLY ? startDate : this.formatHour(startDate),
+        endHour: event.type === ABSENCE && event.absenceNature === HOURLY ? endDate : this.formatHour(endDate),
       };
+
       switch (event.type) {
         case INTERVENTION:
           const subscription = event.subscription._id;
@@ -241,15 +239,12 @@ export const planningActionMixin = {
           this.editedEvent = { location: {}, shouldUpdateRepetition: false, ...eventData, auxiliary, internalHour, dates };
           break;
         case ABSENCE:
-          const { startDuration, endDuration } = this.getAbsenceDurations(event);
           this.editedEvent = {
             location: {},
             attachment: {},
             ...eventData,
             auxiliary,
-            startDuration,
-            endDuration,
-            dates: { startDate, endDate },
+            dates,
           };
           break;
         case UNAVAILABILITY:
