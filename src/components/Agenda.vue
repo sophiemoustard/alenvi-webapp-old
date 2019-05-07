@@ -39,7 +39,7 @@
 
 <script>
 import { planningEventMixin } from '../mixins/planningEventMixin';
-import { ABSENCE, INTERVENTION, INTERNAL_HOUR, UNAVAILABILITY, PERCENTAGE_BY_MINUTES } from '../data/constants';
+import { ABSENCE, INTERVENTION, INTERNAL_HOUR, UNAVAILABILITY, PERCENTAGE_BY_MINUTES, PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR } from '../data/constants';
 
 export default {
   name: 'Agenda',
@@ -70,15 +70,15 @@ export default {
         .map((event) => {
           let dayEvent = { ...event };
 
-          let staffingTop = (this.$moment(event.startDate).hours() - 8) * 60 + this.$moment(event.startDate).minutes();
-          let staffingBottom = (this.$moment(event.endDate).hours() - 8) * 60 + this.$moment(event.endDate).minutes();
+          let staffingTop = (this.$moment(event.startDate).hours() - PLANNING_VIEW_START_HOUR) * 60 + this.$moment(event.startDate).minutes();
+          let staffingBottom = (this.$moment(event.endDate).hours() - PLANNING_VIEW_START_HOUR) * 60 + this.$moment(event.endDate).minutes();
           if (!this.$moment(day).isSame(event.startDate, 'day')) {
-            dayEvent.startDate = this.$moment(day).hour(8).toISOString();
+            dayEvent.startDate = this.$moment(day).hour(PLANNING_VIEW_START_HOUR).toISOString();
             staffingTop = 0;
           }
           if (!this.$moment(day).isSame(event.endDate, 'day')) {
-            dayEvent.endDate = this.$moment(day).hour(20).toISOString();
-            staffingBottom = 720;
+            dayEvent.endDate = this.$moment(day).hour(PLANNING_VIEW_END_HOUR).toISOString();
+            staffingBottom = (PLANNING_VIEW_END_HOUR - PLANNING_VIEW_START_HOUR) * 60;
           }
 
           dayEvent.staffingTop = staffingTop;
@@ -110,9 +110,9 @@ export default {
         background: repeating-linear-gradient(
           180deg,
           $white,
-          $white 16.2%,
+          $white 13.1%,
           $grey-3,
-          $grey-3 16.4%
+          $grey-3 13.3%
         )
         height: 100%;
         position: relative;
