@@ -26,7 +26,7 @@ export default {
     ProfileTabs,
     ProfileInfo
   },
-  name: 'Personnal info',
+  name: 'PersonalInfo',
   metaInfo: {
     title: 'Infos personnelles',
   },

@@ -24,7 +24,7 @@
       </template>
       <template v-else-if="col.name === 'endDate'">{{ formatDate(bill.endDate) }}</template>
       <template v-else-if="col.name === 'service'">
-        {{ bill.subscription.service.versions[bill.subscription.service.versions.length - 1].name }}
+        {{ getLastVersion(bill.subscription.service.versions).name }}
       </template>
       <template v-else-if="col.name === 'hours'">{{ formatHours(bill.hours) }}</template>
       <template v-else-if="col.name === 'unitExclTaxes'">{{ formatPrice(bill.unitExclTaxes) }}</template>
@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { formatPrice } from '../../helpers/utils.js';
+import { formatPrice, getLastVersion } from '../../helpers/utils.js';
 
 export default {
   name: 'ToBillRow',
@@ -62,6 +62,9 @@ export default {
   methods: {
     formatPrice (value) {
       return formatPrice(value)
+    },
+    getLastVersion (value) {
+      return getLastVersion(value, 'createdAt')
     },
     formatHours (value) {
       return value ? `${parseFloat(value).toFixed(2)}h` : '';

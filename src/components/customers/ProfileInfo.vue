@@ -39,7 +39,7 @@
               <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions table-actions-margin">
                   <q-btn flat round small color="grey" icon="history" @click.native="showHistory(col.value)" />
-                  <q-btn flat round small color="grey" icon="edit" @click.native="startEdition(col.value)" />
+                  <q-btn flat round small color="grey" icon="edit" @click.native="startSubscriptionEdition(col.value)" />
                   <q-btn flat round small color="grey" icon="delete" @click.native="removeSubscriptions(col.value)" />
                 </div>
               </template>
@@ -250,7 +250,7 @@
           </div>
         </div>
         <ni-modal-select caption="Service" :options="serviceOptions" v-model="newSubscription.service" :error="$v.newSubscription.service.$error"
-          @blur="$v.newSubscription.service.$touch" @input="updateNewSubscription" required-field />
+          @blur="$v.newSubscription.service.$touch" required-field />
         <ni-modal-input v-model="newSubscription.unitTTCRate" :error="$v.newSubscription.unitTTCRate.$error" caption="Prix unitaire TTC"
           @blur="$v.newSubscription.unitTTCRate.$touch" type="number" required-field />
         <ni-modal-input v-model="newSubscription.estimatedWeeklyVolume" :error="$v.newSubscription.estimatedWeeklyVolume.$error"
@@ -277,9 +277,6 @@
               <q-icon name="clear" @click.native="subscriptionEditionModal = false" /></span>
           </div>
         </div>
-        <ni-datetime-picker v-model="editedSubscription.startDate" :error="$v.editedSubscription.startDate.$error"
-          caption="Dated'effet" @blur="$v.editedSubscription.startDate.$touch" :min="minStartDate" required-field
-          in-modal />
         <ni-modal-input v-model="editedSubscription.unitTTCRate" :error="$v.editedSubscription.unitTTCRate.$error"
           caption="Prix unitaire TTC" @blur="$v.editedSubscription.unitTTCRate.$touch" type="number" required-field />
         <ni-modal-input v-model="editedSubscription.estimatedWeeklyVolume" :error="$v.editedSubscription.estimatedWeeklyVolume.$error"
@@ -311,8 +308,7 @@
           hide-bottom binary-state-sort :pagination.sync="paginationHistory">
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-              <template v-if="col.name === 'startDate'"> {{ $moment(col.value).format('DD/MM/YYYY') }} </template>
-              <template v-else>{{ col.value }}</template>
+              <template>{{ col.value }}</template>
             </q-td>
           </q-tr>
         </q-table>
@@ -731,10 +727,6 @@ export default {
         return `le ${this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} par ${this.acceptedBy}`;
       }
     },
-    minStartDate () {
-      const selectedSubscription = this.subscriptions.find(sub => sub._id === this.editedSubscription._id);
-      return selectedSubscription ? this.$moment(selectedSubscription.startDate).add(1, 'd').toISOString() : '';
-    },
     fundingHistoryVisibleColumns () {
       if (this.selectedFunding.nature === FIXED) {
         return ['startDate', 'endDate', 'frequency', 'amountTTC', 'customerParticipationRate', 'careDays'];
@@ -803,7 +795,6 @@ export default {
       estimatedWeeklyVolume: { required },
     },
     editedSubscription: {
-      startDate: { required },
       unitTTCRate: { required },
       estimatedWeeklyVolume: { required },
     },
@@ -970,13 +961,6 @@ export default {
         estimatedWeeklyVolume: '',
       };
     },
-    updateNewSubscription () {
-      if (this.newSubscription.service !== '') {
-        const selectedService = this.services.find(service => service._id === this.newSubscription.service);
-        this.newSubscription.unitTTCRate = selectedService.defaultUnitAmount;
-        this.newSubscription.nature = selectedService.nature;
-      }
-    },
     async submitSubscription () {
       try {
         this.$v.newSubscription.$touch();
@@ -997,7 +981,7 @@ export default {
         this.loading = false;
       }
     },
-    startEdition (id) {
+    startSubscriptionEdition (id) {
       const selectedSubscription = this.subscriptions.find(sub => sub._id === id);
       const { _id, service, unitTTCRate, estimatedWeeklyVolume, evenings, sundays } = selectedSubscription;
       this.editedSubscription = {
@@ -1005,7 +989,6 @@ export default {
         nature: service.nature,
         unitTTCRate,
         estimatedWeeklyVolume,
-        startDate: '',
         evenings,
         sundays
       };
