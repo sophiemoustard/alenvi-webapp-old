@@ -311,6 +311,10 @@ export const planningActionMixin = {
         const { toDay, toPerson, draggedObject } = vEvent;
         const daysBetween = this.$moment(draggedObject.endDate).diff(this.$moment(draggedObject.startDate), 'days');
 
+        if ([ABSENCE, UNAVAILABILITY].includes(draggedObject.type) && draggedObject.auxiliary._id !== toPerson._id) {
+          return NotifyNegative('Impossible de modifier l\'auxiliaire de cet évènement.');
+        }
+
         const payload = {
           startDate: this.$moment(toDay).hours(this.$moment(draggedObject.startDate).hours())
             .minutes(this.$moment(draggedObject.startDate).minutes()).toISOString(),
@@ -320,7 +324,7 @@ export const planningActionMixin = {
         };
 
         if (this.hasConflicts(payload)) {
-          return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
+          return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
         }
 
         const updatedEvent = await this.$events.updateById(draggedObject._id, payload);
