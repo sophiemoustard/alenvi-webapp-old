@@ -1,6 +1,5 @@
 import { days } from '../data/days';
 import { FUNDING_FREQ_OPTIONS, NATURE_OPTIONS } from '../data/constants.js';
-import { getLastVersion } from '../helpers/utils';
 
 export const fundingMixin = {
   data () {
@@ -107,10 +106,7 @@ export const fundingMixin = {
     refreshFundings () {
       try {
         const { fundings } = this.customer;
-        this.fundings = fundings ? fundings.map(fund => {
-          const { versions } = fund;
-          return { ...getLastVersion(versions, 'createdAt'), ...fund };
-        }) : [];
+        this.fundings = fundings || [];
       } catch (e) {
         console.error(e);
       }
