@@ -211,7 +211,7 @@
           :error="$v.newService.defaultUnitAmount.$error" @blur="$v.newService.defaultUnitAmount.$touch" required-field />
         <ni-modal-input caption="TVA" suffix="%" v-model="newService.vat" type="number" :error="$v.newService.vat.$error" @blur="$v.newService.vat.$touch"
           error-label="La TVA doit être positive ou nulle" />
-        <ni-modal-select caption="Plan de majoration" v-model="newService.surcharge" :options="surchargesOptions" clearable />
+        <ni-modal-select v-if="newService.nature !== FIXED" caption="Plan de majoration" v-model="newService.surcharge" :options="surchargesOptions" clearable />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer le service" icon-right="add" color="primary" :loading="loading" @click="createNewService"
         :disable="disableServiceCreationButton" />
@@ -236,7 +236,7 @@
           :error="$v.editedService.defaultUnitAmount.$error" @blur="$v.editedService.defaultUnitAmount.$touch" required-field />
         <ni-modal-input caption="TVA" suffix="%" v-model="editedService.vat" type="number" :error="$v.editedService.vat.$error" @blur="$v.editedService.vat.$touch"
           error-label="La TVA doit être positive ou nulle" />
-        <ni-modal-select caption="Plan de majoration" v-model="editedService.surcharge" :options="surchargesOptions" clearable />
+        <ni-modal-select v-if="editedService.nature !== FIXED" caption="Plan de majoration" v-model="editedService.surcharge" :options="surchargesOptions" clearable />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Editer le service" icon-right="check" color="primary" :loading="loading" @click="updateService"
         :disable="disableServiceEditionButton" />
@@ -326,7 +326,7 @@ import Input from '../../../components/form/Input.vue';
 import Select from '../../../components/form/Select.vue';
 import SearchAddress from '../../../components/form/SearchAddress.vue';
 import { frAddress, posDecimals, positiveNumber, iban, bic } from '../../../helpers/vuelidateCustomVal';
-import { BILLING_DIRECT, BILLING_INDIRECT, REQUIRED_LABEL, CONTRACT_STATUS_OPTIONS, TWO_WEEKS, MONTH, NATURE_OPTIONS } from '../../../data/constants.js';
+import { BILLING_DIRECT, BILLING_INDIRECT, REQUIRED_LABEL, CONTRACT_STATUS_OPTIONS, TWO_WEEKS, MONTH, NATURE_OPTIONS, FIXED } from '../../../data/constants.js';
 
 export default {
   name: 'CustomersConfig',
@@ -373,6 +373,7 @@ export default {
       loading: false,
       company: null,
       documents: null,
+      FIXED,
       billingPeriodOptions: [
         { value: TWO_WEEKS, label: 'Quinzaine' },
         { value: MONTH, label: 'Mois' },
@@ -510,6 +511,7 @@ export default {
         startDate: '',
         defaultUnitAmount: '',
         vat: '',
+        nature: '',
         surcharge: null
       },
       natureOptions: NATURE_OPTIONS,
@@ -1030,13 +1032,14 @@ export default {
     },
     openServiceEditionModal (id) {
       const selectedService = this.services.find(service => service._id === id);
-      const { name, defaultUnitAmount, vat, surcharge } = selectedService;
+      const { name, defaultUnitAmount, vat, surcharge, nature } = selectedService;
       this.editedService = {
         _id: selectedService._id,
         name: name || '',
         startDate: '',
         defaultUnitAmount: defaultUnitAmount || '',
         vat: vat || '',
+        nature,
         surcharge: surcharge ? surcharge._id : null
       };
 
@@ -1049,6 +1052,7 @@ export default {
         startDate: '',
         defaultUnitAmount: '',
         vat: '',
+        nature: '',
         surcharge: null
       };
       this.$v.editedService.$reset();
@@ -1060,6 +1064,7 @@ export default {
         const serviceId = this.editedService._id;
         const payload = this.$_.pickBy(this.editedService);
         delete payload._id;
+        delete payload.nature;
         await this.$services.updateById(serviceId, payload);
         NotifyPositive('Service modifié');
         this.resetEditionServiceData();
