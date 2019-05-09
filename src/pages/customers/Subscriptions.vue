@@ -21,7 +21,7 @@
             </q-tr>
           </q-table>
         </q-card>
-        <p v-if="subscriptions.length > 0" class="nota-bene">* intègre le financement et les éventuelles majorations
+        <p v-if="subscriptions.length > 0" class="nota-bene">* intègre les éventuelles majorations
           soir / dimanche</p>
         <div v-if="subscriptions && subscriptions.length > 0" class="row">
           <div class="col-xs-12">
