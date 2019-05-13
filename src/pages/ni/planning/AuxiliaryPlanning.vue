@@ -176,7 +176,7 @@ export default {
       if (!can) return;
       this.formatEditedEvent(event, auxiliary);
 
-      this.editionModal = true
+      this.editionModal = true;
     },
     // Filter
     handleElemAddedToFilter (el) {

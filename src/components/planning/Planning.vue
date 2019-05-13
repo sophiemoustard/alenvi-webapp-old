@@ -247,8 +247,8 @@ export default {
       }
       this.$emit('createEvent', eventInfo);
     },
-    editEvent (event) {
-      this.$emit('editEvent', event);
+    editEvent (eventId) {
+      this.$emit('editEvent', eventId);
     },
     addSavedTerms (endPath) {
       if (this.$q.localStorage.has(`lastSearch${endPath}`) && this.$q.localStorage.get.item(`lastSearch${endPath}`).length > 0) {
