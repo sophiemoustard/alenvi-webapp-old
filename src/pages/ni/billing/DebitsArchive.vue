@@ -1,6 +1,6 @@
 <template>
   <q-page class="neutral-background">
-    <div class="title layout-padding">
+    <div class="title-padding">
       <h4>Archive Prélèvements</h4>
     </div>
     <div class="q-pa-sm">
