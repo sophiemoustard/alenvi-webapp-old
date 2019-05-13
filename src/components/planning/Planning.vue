@@ -60,7 +60,10 @@
                       <p v-if="event.type === INTERNAL_HOUR" class="no-margin overflow-hidden-nowrap">{{
                         event.internalHour.name }}</p>
                     </div>
-                    <p class="no-margin event-period overflow-hidden-nowrap">{{ getEventHours(event) }}</p>
+                    <div class="event-subtitle">
+                      <p class="no-margin overflow-hidden-nowrap">{{ getEventHours(event) }}</p>
+                      <p v-if="event.isBilled" class="no-margin">F</p>
+                    </div>
                   </div>
                 </template>
               </td>
