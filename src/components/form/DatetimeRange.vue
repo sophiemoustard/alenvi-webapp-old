@@ -54,7 +54,7 @@ export default {
       const selectOptions = [];
       hours.map((hour) => {
         selectOptions.push({ label: hour.format('HH:mm'), value: hour.format('HH:mm') });
-        if (hour.format('HH') !== '22') selectOptions.push({ label: hour.minutes(30).format('HH:mm'), value: hour.minutes(30).format('HH:mm') });
+        if (hour.format('HH') !== `${PLANNING_VIEW_END_HOUR}`) selectOptions.push({ label: hour.minutes(30).format('HH:mm'), value: hour.minutes(30).format('HH:mm') });
       });
       return selectOptions;
     },
