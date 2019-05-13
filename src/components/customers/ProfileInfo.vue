@@ -1322,9 +1322,8 @@ export default {
         this.$v.editedFunding.$touch();
         if (this.$v.editedFunding.$error) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
-        const { folderNumber, endDate, frequency, amountTTC, unitTTCRate, careHours, careDays, customerParticipationRate, startDate, subscription, _id } = this.editedFunding;
+        const { folderNumber, endDate, frequency, amountTTC, unitTTCRate, careHours, careDays, customerParticipationRate, startDate, subscription } = this.editedFunding;
         const payload = {
-          fundingId: _id,
           folderNumber,
           frequency,
           careDays,
