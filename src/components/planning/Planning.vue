@@ -49,18 +49,21 @@
                 <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
                   <div :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event)" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`]"
                     :key="eventIndex" @click.stop="editEvent(event._id)">
-                    <div class="col-12 event-title">
-                      <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">
-                        {{eventTitle(event) }}
-                      </p>
-                      <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">
-                        {{ displayAbsenceType(event.absence) }}
-                      </p>
-                      <p v-if="event.type === UNAVAILABILITY" class="no-margin overflow-hidden-nowrap">Indispo.</p>
-                      <p v-if="event.type === INTERNAL_HOUR" class="no-margin overflow-hidden-nowrap">{{
-                        event.internalHour.name }}</p>
+                    <div class="event-container">
+                      <div class="event-title">
+                        <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">
+                          {{eventTitle(event) }}
+                        </p>
+                        <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">
+                          {{ displayAbsenceType(event.absence) }}
+                        </p>
+                        <p v-if="event.type === UNAVAILABILITY" class="no-margin overflow-hidden-nowrap">Indispo.</p>
+                        <p v-if="event.type === INTERNAL_HOUR" class="no-margin overflow-hidden-nowrap">{{
+                          event.internalHour.name }}</p>
+                      </div>
+                      <p class="no-margin event-subtitle overflow-hidden-nowrap">{{ getEventHours(event) }}</p>
+                      <p v-if="event.isBilled" class="no-margin event-subtitle event-billed">F</p>
                     </div>
-                    <p class="no-margin event-period overflow-hidden-nowrap">{{ getEventHours(event) }}</p>
                   </div>
                 </template>
               </td>
@@ -254,8 +257,8 @@ export default {
       }
       this.$emit('createEvent', eventInfo);
     },
-    editEvent (event) {
-      this.$emit('editEvent', event);
+    editEvent (eventId) {
+      this.$emit('editEvent', eventId);
     },
     addSavedTerms (endPath) {
       if (this.$q.localStorage.has(`lastSearch${endPath}`) && this.$q.localStorage.get.item(`lastSearch${endPath}`).length > 0) {

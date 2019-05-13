@@ -8,7 +8,7 @@
           <q-select filter v-model="editedEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions"
             :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
             :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`"
-            :disable="[UNAVAILABILITY, ABSENCE].includes(editedEvent.type)" ref="auxiliarySelect" />
+            :disable="[UNAVAILABILITY, ABSENCE].includes(editedEvent.type) || isDisabled" ref="auxiliarySelect" />
         </div>
         <div class="col-1 cursor-pointer modal-btn-close">
           <span>
@@ -19,17 +19,18 @@
       <div class="modal-subtitle">
         <q-btn-toggle no-wrap v-model="editedEvent.type" :options="eventType" toggle-color="primary" />
         <q-btn icon="delete" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" no-caps flat
-          color="grey" />
+          color="grey" v-if="!isDisabled" />
       </div>
       <template v-if="editedEvent.type !== ABSENCE">
-        <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" requiredField />
+        <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" requiredField
+          :disable="isDisabled" />
       </template>
       <template v-if="editedEvent.type === INTERVENTION">
         <ni-modal-select caption="Bénéficiaire" v-model="editedEvent.customer._id" :options="customersOptions"
           :error="validations.customer.$error" requiredField disable />
         <ni-modal-select caption="Service" :options="customerSubscriptionsOptions(editedEvent.customer._id)"
           v-model="editedEvent.subscription" :error="validations.subscription.$error"
-          @blur="validations.subscription.$touch" requiredField />
+          @blur="validations.subscription.$touch" requiredField :disable="isDisabled" />
       </template>
       <template v-if="editedEvent.type === INTERNAL_HOUR">
         <ni-modal-select caption="Type d'heure interne" v-model="editedEvent.internalHour"
@@ -39,7 +40,7 @@
           @blur="validations.location.fullAddress.$touch" :error="validations.location.fullAddress.$error"
           :error-label="addressError" />
       </template>
-      <template v-if="isRepetition(editedEvent)">
+      <template v-if="isRepetition(editedEvent) && !isDisabled">
         <div class="row q-mb-md light-checkbox">
           <q-checkbox v-model="editedEvent.shouldUpdateRepetition" label="Appliquer à la répétition"
             @input="toggleRepetition" />
@@ -74,8 +75,9 @@
             :error="validations.absence.$error" requiredField @blur="validations.absence.$touch" disable />
         </template>
       </template>
-      <ni-modal-input v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes" />
-      <template v-if="editedEvent.type === INTERVENTION && !editedEvent.shouldUpdateRepetition">
+      <ni-modal-input v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes"
+        :disable="isDisabled" />
+      <template v-if="editedEvent.type === INTERVENTION && !editedEvent.shouldUpdateRepetition && !isDisabled">
         <div class="row q-mb-md light-checkbox">
           <q-checkbox v-model="editedEvent.isCancelled" label="Annuler l'évènement" @input="toggleCancellationForm" />
         </div>
@@ -93,13 +95,13 @@
       <p class="input-caption">Infos bénéficiaire</p>
       <div>{{ editedEvent.customer.contact.address.fullAddress }}</div>
     </div>
-    <q-btn class="full-width modal-btn" no-caps color="primary" :loading="loading" label="Editer l'évènement"
+    <q-btn v-if="!isDisabled" class="full-width modal-btn" no-caps color="primary" :loading="loading" label="Editer l'évènement"
       @click="updateEvent" icon-right="check" :disable="disableEditionButton" />
   </q-modal>
 </template>
 
 <script>
-import { DEFAULT_AVATAR } from '../../data/constants';
+import { DEFAULT_AVATAR, INTERVENTION } from '../../data/constants';
 import { planningModalMixin } from '../../mixins/planningModalMixin';
 
 export default {
@@ -127,6 +129,9 @@ export default {
     eventType () {
       return this.eventTypeOptions.filter(option => option.value === this.editedEvent.type);
     },
+    isDisabled () {
+      return this.editedEvent.type === INTERVENTION && this.editedEvent.isBilled;
+    }
   },
   methods: {
     getAvatar (user) {

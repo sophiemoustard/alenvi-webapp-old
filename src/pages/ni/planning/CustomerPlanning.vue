@@ -47,20 +47,21 @@
           </div>
         </div>
         <div class="modal-subtitle">
-          <q-btn icon="delete" no-caps flat color="grey" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" />
+          <q-btn icon="delete" no-caps flat color="grey" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()"
+            v-if="!isDisabled" />
         </div>
-        <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" />
+        <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" :disable="isDisabled" />
         <ni-modal-select caption="Auxiliaire" v-model="editedEvent.auxiliary" :options="auxiliariesOptions" :error="$v.editedEvent.auxiliary.$error"
-          requiredField @input="setSector" />
+          requiredField @input="setSector" :disable="isDisabled" />
         <ni-modal-select caption="Service" v-model="editedEvent.subscription" :options="customerSubscriptionsOptions(editedEvent.customer._id)"
-          :error="$v.editedEvent.subscription.$error" @blur="$v.editedEvent.subscription.$touch" />
-        <template v-if="isRepetition(editedEvent)">
+          :error="$v.editedEvent.subscription.$error" @blur="$v.editedEvent.subscription.$touch" :disable="isDisabled" />
+        <template v-if="isRepetition(editedEvent) && !isDisabled">
           <div class="row q-mb-md light-checkbox">
             <q-checkbox v-model="editedEvent.shouldUpdateRepetition" label="Appliquer à la répétition" @input="toggleRepetition" />
           </div>
         </template>
-        <ni-modal-input v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes" />
-        <template v-if="!editedEvent.shouldUpdateRepetition">
+        <ni-modal-input v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes" :disable="isDisabled" />
+        <template v-if="!editedEvent.shouldUpdateRepetition && !isDisabled">
           <div class="row q-mb-md light-checkbox">
             <q-checkbox v-model="editedEvent.isCancelled" label="Annuler l'évènement" @input="toggleCancellationForm" />
           </div>
@@ -74,8 +75,8 @@
         <p class="input-caption">Infos bénéficiaire</p>
         <div>{{ editedEvent.customer.contact.address.fullAddress }}</div>
       </div>
-      <q-btn class="full-width modal-btn" no-caps color="primary" :loading="loading" label="Editer l'évènement" @click="updateEvent"
-        icon-right="check" :disable="disableEditionButton" />
+      <q-btn v-if="!isDisabled" class="full-width modal-btn" no-caps color="primary" :loading="loading"
+        label="Editer l'évènement" @click="updateEvent" icon-right="check" :disable="disableEditionButton" />
     </q-modal>
   </q-page>
 </template>
@@ -83,8 +84,9 @@
 <script>
 import Planning from '../../../components/planning/Planning.vue';
 import { planningModalMixin } from '../../../mixins/planningModalMixin';
+import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify.js';
-import { INTERVENTION, DEFAULT_AVATAR, NEVER, ABSENCE, INTERNAL_HOUR, ILLNESS, UNAVAILABILITY, AUXILIARY, PLANNING_REFERENT, CUSTOMER_CONTRACT, COMPANY_CONTRACT, CUSTOMER } from '../../../data/constants';
+import { INTERVENTION, DEFAULT_AVATAR, NEVER, ABSENCE, INTERNAL_HOUR, ILLNESS, AUXILIARY, PLANNING_REFERENT, CUSTOMER_CONTRACT, COMPANY_CONTRACT, CUSTOMER } from '../../../data/constants';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
 import { mapGetters, mapActions } from 'vuex';
@@ -92,7 +94,7 @@ import { mapGetters, mapActions } from 'vuex';
 export default {
   name: 'CustomerPlanning',
   metaInfo: { title: 'Planning bénéficiaire' },
-  mixins: [planningModalMixin],
+  mixins: [planningModalMixin, planningActionMixin],
   components: {
     'ni-planning-manager': Planning,
   },
@@ -222,6 +224,9 @@ export default {
       }
       return { picture: {}, identity: {} };
     },
+    isDisabled () {
+      return this.editedEvent.type === INTERVENTION && this.editedEvent.isBilled;
+    }
   },
   methods: {
     ...mapActions({
@@ -426,46 +431,14 @@ export default {
       }
     },
     // Event edition
-    openEditionModal (event) {
-      const { createdAt, updatedAt, startDate, endDate, ...eventData } = event;
+    openEditionModal (eventId) {
+      const event = this.events.find(ev => ev._id === eventId)
       const auxiliary = event.auxiliary._id;
-      const dates = {
-        startDate,
-        endDate,
-        startHour: `${this.$moment(startDate).hours() < 10
-          ? `0${this.$moment(startDate).hours()}`
-          : this.$moment(startDate).hours()}:${this.$moment(startDate).minutes() || '00'}`,
-        endHour: `${this.$moment(endDate).hours() < 10
-          ? `0${this.$moment(endDate).hours()}`
-          : this.$moment(endDate).hours()}:${this.$moment(endDate).minutes() || '00'}`,
-      };
-      switch (event.type) {
-        case INTERVENTION:
-          const subscription = event.subscription._id;
-          this.editedEvent = { isCancelled: false, cancel: {}, shouldUpdateRepetition: false, ...eventData, dates, auxiliary, subscription };
-          break;
-        case INTERNAL_HOUR:
-          const internalHour = event.internalHour._id;
-          this.editedEvent = { location: {}, shouldUpdateRepetition: false, ...eventData, auxiliary, internalHour, dates };
-          break;
-        case ABSENCE:
-          const { startDuration, endDuration } = this.getAbsenceDurations(event);
-          this.editedEvent = {
-            location: {},
-            attachment: {},
-            ...eventData,
-            auxiliary,
-            startDuration,
-            endDuration,
-            dates: { startDate, endDate },
-          };
-          break;
-        case UNAVAILABILITY:
-          this.editedEvent = { shouldUpdateRepetition: false, ...eventData, auxiliary, dates };
-          break;
-      }
+      const can = this.canEditEvent(event, auxiliary);
+      if (!can) return;
+      this.formatEditedEvent(event, auxiliary);
 
-      this.editionModal = true
+      this.editionModal = true;
     },
     resetEditionForm () {
       this.$v.editedEvent.$reset();

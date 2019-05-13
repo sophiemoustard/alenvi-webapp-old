@@ -221,7 +221,7 @@ export const planningActionMixin = {
         : this.$moment(date).hours()}:${this.$moment(date).minutes() || '00'}`;
     },
     formatEditedEvent (event, auxiliary) {
-      const { createdAt, updatedAt, startDate, endDate, ...eventData } = event;
+      const { createdAt, updatedAt, startDate, endDate, isBilled, ...eventData } = event;
       const dates = {
         startDate,
         endDate,
@@ -232,7 +232,7 @@ export const planningActionMixin = {
       switch (event.type) {
         case INTERVENTION:
           const subscription = event.subscription._id;
-          this.editedEvent = { isCancelled: false, cancel: {}, shouldUpdateRepetition: false, ...eventData, dates, auxiliary, subscription };
+          this.editedEvent = { isCancelled: false, cancel: {}, shouldUpdateRepetition: false, ...eventData, dates, auxiliary, subscription, isBilled };
           break;
         case INTERNAL_HOUR:
           const internalHour = event.internalHour._id;
