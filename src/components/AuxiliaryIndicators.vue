@@ -28,8 +28,6 @@
       </div>
     </div>
     <div class="quality-indicators">
-      <div class="quality-indicators-item"><span class="highlight">{{ `${Math.round(weeklyTotalTransports)}h` }}</span>
-        de transports dont <span class="highlight">{{ `${Math.round(weeklyPaidTransports)}h` }}</span> remunérées</div>
       <div class="quality-indicators-item"><span class="highlight">{{ customersCount }}</span> bénéficiaires
         accompagnés, <span class="highlight">{{ `${Math.round(averageTimeByCustomer)}h` }}</span> en moyenne</div>
       <div class="quality-indicators-item"><span class="highlight">{{ `${Math.round(weeklyBreak)}h` }}</span> de
@@ -46,7 +44,6 @@ export default {
     weeklyInterventions: { type: Number, default: 0 },
     weeklyInternalHours: { type: Number, default: 0 },
     weeklyPaidTransports: { type: Number, default: 0 },
-    weeklyTotalTransports: { type: Number, default: 0 },
     customersCount: { type: Number, default: 0 },
     averageTimeByCustomer: { type: Number, default: 0 },
     weeklyBreak: { type: Number, default: 0 },
