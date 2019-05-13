@@ -1,7 +1,7 @@
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { frAddress } from '../helpers/vuelidateCustomVal.js';
 import { NotifyWarning, NotifyNegative, NotifyPositive } from '../components/popup/notify';
-import { INTERNAL_HOUR, ABSENCE, INTERVENTION, NEVER, UNAVAILABILITY, ILLNESS, CUSTOMER_CONTRACT, COMPANY_CONTRACT, DAILY, HOURLY } from '../data/constants';
+import { INTERNAL_HOUR, ABSENCE, INTERVENTION, NEVER, UNAVAILABILITY, ILLNESS, CUSTOMER_CONTRACT, COMPANY_CONTRACT, DAILY, HOURLY, PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR } from '../data/constants';
 
 export const planningActionMixin = {
   validations () {
@@ -144,8 +144,8 @@ export const planningActionMixin = {
       }
       if (event.type === ABSENCE) {
         if (event.absenceNature === DAILY) {
-          payload.startDate = this.$moment(event.dates.startDate).hour(8).minute(0).toISOString();
-          payload.endDate = this.$moment(event.dates.endDate).hour(20).minute(0).toISOString();
+          payload.startDate = this.$moment(event.dates.startDate).hour(PLANNING_VIEW_START_HOUR).minute(0).toISOString();
+          payload.endDate = this.$moment(event.dates.endDate).hour(PLANNING_VIEW_END_HOUR).minute(0).toISOString();
         } else {
           payload.startDate = this.$moment(event.dates.startDate)
             .hour(this.$moment(event.dates.startHour).hour())
