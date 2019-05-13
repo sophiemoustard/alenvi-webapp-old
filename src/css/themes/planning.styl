@@ -3,6 +3,10 @@
   border-radius: 2px
   padding: 6px 4px
   margin-top: 6px
+  &-container
+    height: 100%;
+    position: relative;
+    width: -webkit-fill-available;
   &-title
     font-size: 0.875rem
     font-weight: 600
@@ -13,6 +17,11 @@
     justify-content: space-between;
     font-size: 0.6875rem
     color: $dark-grey
+  &-billed
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: fit-content;
   &-intervention
     background: $light-pink
   &-internalHour

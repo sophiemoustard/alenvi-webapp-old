@@ -49,20 +49,20 @@
                 <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
                   <div :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event)" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`]"
                     :key="eventIndex" @click.stop="editEvent(event._id)">
-                    <div class="col-12 event-title">
-                      <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">
-                        {{eventTitle(event) }}
-                      </p>
-                      <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">
-                        {{ displayAbsenceType(event.absence) }}
-                      </p>
-                      <p v-if="event.type === UNAVAILABILITY" class="no-margin overflow-hidden-nowrap">Indispo.</p>
-                      <p v-if="event.type === INTERNAL_HOUR" class="no-margin overflow-hidden-nowrap">{{
-                        event.internalHour.name }}</p>
-                    </div>
-                    <div class="event-subtitle">
-                      <p class="no-margin overflow-hidden-nowrap">{{ getEventHours(event) }}</p>
-                      <p v-if="event.isBilled" class="no-margin">F</p>
+                    <div class="event-container">
+                      <div class="event-title">
+                        <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">
+                          {{eventTitle(event) }}
+                        </p>
+                        <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">
+                          {{ displayAbsenceType(event.absence) }}
+                        </p>
+                        <p v-if="event.type === UNAVAILABILITY" class="no-margin overflow-hidden-nowrap">Indispo.</p>
+                        <p v-if="event.type === INTERNAL_HOUR" class="no-margin overflow-hidden-nowrap">{{
+                          event.internalHour.name }}</p>
+                      </div>
+                      <p class="no-margin event-subtitle overflow-hidden-nowrap">{{ getEventHours(event) }}</p>
+                      <p v-if="event.isBilled" class="no-margin event-subtitle event-billed">F</p>
                     </div>
                   </div>
                 </template>
