@@ -390,20 +390,6 @@ export default {
 
       return payload;
     },
-    async hasConflicts (scheduledEvent) {
-      let auxiliaryEvents = [];
-      try {
-        auxiliaryEvents = await this.$events.list({
-          auxiliary: JSON.stringify([scheduledEvent.auxiliary]),
-          startDate: scheduledEvent.startDate,
-          endDate: this.$moment(scheduledEvent.endDate).subtract(1, 'minutes').toISOString(),
-        });
-      } catch (e) {
-        if (e.data.statusCode !== 404) return NotifyNegative('Une erreur s\'est produite');
-      }
-
-      return auxiliaryEvents.filter(event => event._id !== scheduledEvent._id).length !== 0;
-    },
     async createEvent () {
       try {
         this.$v.newEvent.$touch();

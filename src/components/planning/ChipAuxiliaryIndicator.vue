@@ -24,7 +24,7 @@
         <q-tab-pane class="no-border" v-for="(tab, index) in tabsContent" :key="index" :name="tab.name">
           <ni-auxiliary-indicators :total-working-hours="totalWorkingHours" :weekly-interventions="weeklyInterventions"
             :weekly-internal-hours="weeklyInternalHours" :weekly-paid-transports="weeklyPaidTransports"
-            :weekly-total-transports="weeklyTotalTransports" :customers-count="customersCount" :average-time-by-customer="averageTimeByCustomer"
+            :customers-count="customersCount" :average-time-by-customer="averageTimeByCustomer"
             :weekly-break="weeklyBreak" />
         </q-tab-pane>
       </q-tabs>
@@ -61,7 +61,6 @@ export default {
       weeklyInternalHours: 0,
       weeklyInterventions: 0,
       weeklyPaidTransports: 0,
-      weeklyTotalTransports: 0,
       weeklyBreak: 0,
       customersCount: 0,
       averageTimeByCustomer: 0,
@@ -153,17 +152,14 @@ export default {
     // Compute indicators
     computeIndicatorsFromBreakInfo () {
       let weeklyPaidTransports = 0;
-      let weeklyTotalTransports = 0;
       let weeklyBreak = 0;
       for (const info of this.breakInfo) {
         if (info.timeBetween) weeklyBreak += info.timeBetween;
         if (!info.isFirstOrLast) weeklyPaidTransports += info.transportDuration;
-        weeklyTotalTransports += info.transportDuration;
       };
 
       this.weeklyBreak = weeklyBreak / 60;
       this.weeklyPaidTransports = weeklyPaidTransports / 60;
-      this.weeklyTotalTransports = weeklyTotalTransports / 60;
     },
     computeIndicatorsFromEvents () {
       let weeklyInternalHours = 0;
