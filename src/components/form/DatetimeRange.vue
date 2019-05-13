@@ -7,17 +7,18 @@
     <q-field :error="hasError" :error-label="errorMessage">
       <div class="datetime-container">
         <div class="datetime-item">
-          <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" @blur="blurDateHandler" />
-          <ni-select-input v-if="!disableHours" :value="value.startHour" @input="update($event, 'startHour')" class="time-item" align="center"
+          <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" @blur="blurDateHandler"
+            :disable="disable" />
+          <ni-select-input :value="value.startHour" @input="update($event, 'startHour')" class="time-item" align="center"
             @blur="blurHourHandler" :options="hoursOptions" filter :filter-placeholder="value.startHour" hide-underline
-            name="start-hour" />
+            name="start-hour" :disable="disable" />
         </div>
         <p class="delimiter">-</p>
         <div class="datetime-item end">
-          <ni-select-input v-if="!disableHours" :value="value.endHour" @input="update($event, 'endHour')" class="time-item" align="center"
-            @blur="blurHourHandler" :options="endHourOptions" />
+          <ni-select-input :value="value.endHour" @input="update($event, 'endHour')" class="time-item" align="center"
+            @blur="blurHourHandler" :options="endHourOptions" :disable="disable" />
           <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item" @blur="blurDateHandler"
-            :min="value.startDate" />
+            :min="value.startDate" :disable="disable" />
         </div>
       </div>
     </q-field>
@@ -38,7 +39,7 @@ export default {
     error: Boolean,
     value: Object,
     requiredField: { type: Boolean, default: false },
-    disableHours: { type: Boolean, default: false }
+    disable: { type: Boolean, default: false },
   },
   data () {
     return {

@@ -1,8 +1,8 @@
 <template>
   <div @click="datetimePopover = !datetimePopover">
     <q-input color="white" inverted-light :value="formattedDate" @input="update($event, 'DD/MM/YYYY')" placeholder="jj/mm/yyyy"
-      @blur="blurHandler" align="center" :class="[ datetimePopover ? 'underline' : '']" />
-    <q-popover v-model="datetimePopover">
+      @blur="blurHandler" align="center" :class="[ datetimePopover ? 'underline' : '']" :disable="disable" />
+    <q-popover v-model="datetimePopover" :disable="disable">
       <q-datetime-picker :value="value" format="DD MMM YYYY" color="white" inverted-light @input="update" minimal :min="min" />
     </q-popover>
   </div>
@@ -14,6 +14,7 @@ export default {
   props: {
     value: String,
     min: { type: String, default: '' },
+    disable: { type: Boolean, default: false },
   },
   data () {
     return {
