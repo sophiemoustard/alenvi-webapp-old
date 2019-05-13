@@ -47,8 +47,9 @@
               <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
                 @click="createEvent({ dayIndex, person })">
                 <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
-                  <div :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event)" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`]"
-                    :key="eventIndex" @click.stop="editEvent(event._id)">
+                  <div :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event)" :key="eventIndex"
+                    :class="['row', 'cursor-pointer', 'event', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]"
+                    @click.stop="editEvent(event._id)">
                     <div class="event-container">
                       <div class="event-title">
                         <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">
