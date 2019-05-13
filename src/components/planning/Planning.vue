@@ -38,7 +38,7 @@
                 <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
                   <div :id="event._id" draggable @dragstart="drag(event)" @click.stop="editEvent(event._id)"
                     :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-sm']" :key="eventIndex"
-                    :style="{ left: `${PERCENTAGE_BY_MINUTES * event.staffingLeft + 2}%`, width: `${PERCENTAGE_BY_MINUTES * event.staffingWidth}%` }">
+                    :style="{ left: `${PERCENTAGE_BY_MINUTES * event.staffingLeft}%`, width: `${PERCENTAGE_BY_MINUTES * event.staffingWidth}%` }">
                   </div>
                 </template>
               </td>
@@ -73,7 +73,17 @@
 </template>
 
 <script>
-import { INTERVENTION, ABSENCE, UNAVAILABILITY, INTERNAL_HOUR, PLANNING, PERCENTAGE_BY_MINUTES, AUXILIARY_ROLES } from '../../data/constants';
+import {
+  INTERVENTION,
+  ABSENCE,
+  UNAVAILABILITY,
+  INTERNAL_HOUR,
+  PLANNING,
+  PERCENTAGE_BY_MINUTES,
+  AUXILIARY_ROLES,
+  PLANNING_VIEW_START_HOUR,
+  PLANNING_VIEW_END_HOUR,
+} from '../../data/constants';
 import { NotifyNegative } from '../popup/notify';
 import NiChipAuxiliaryIndicator from '../planning/ChipAuxiliaryIndicator';
 import NiChipCustomerIndicator from '../planning/ChipCustomerIndicator';
@@ -182,15 +192,15 @@ export default {
           if (this.isCustomerPlanning) return event;
           let dayEvent = { ...event };
 
-          let staffingLeft = (this.$moment(event.startDate).hours() - 8) * 60 + this.$moment(event.startDate).minutes();
-          let staffingRight = (this.$moment(event.endDate).hours() - 8) * 60 + this.$moment(event.endDate).minutes();
+          let staffingLeft = (this.$moment(event.startDate).hours() - PLANNING_VIEW_START_HOUR) * 60 + this.$moment(event.startDate).minutes();
+          let staffingRight = (this.$moment(event.endDate).hours() - PLANNING_VIEW_START_HOUR) * 60 + this.$moment(event.endDate).minutes();
           if (!this.$moment(day).isSame(event.startDate, 'day')) {
-            dayEvent.startDate = this.$moment(day).hour(8).toISOString();
+            dayEvent.startDate = this.$moment(day).hour(PLANNING_VIEW_START_HOUR).toISOString();
             staffingLeft = 0;
           }
           if (!this.$moment(day).isSame(event.endDate, 'day')) {
-            dayEvent.endDate = this.$moment(day).hour(20).toISOString();
-            staffingRight = 720;
+            dayEvent.endDate = this.$moment(day).hour(PLANNING_VIEW_END_HOUR).toISOString();
+            staffingRight = (PLANNING_VIEW_END_HOUR - PLANNING_VIEW_START_HOUR) * 60;
           }
 
           dayEvent.staffingLeft = staffingLeft;

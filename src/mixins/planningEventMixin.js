@@ -1,10 +1,10 @@
-import { ABSENCE_TYPE } from '../data/constants';
+import { ABSENCE_TYPE, PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR } from '../data/constants';
 
 export const planningEventMixin = {
   data () {
     return {
       hours: [],
-      halfHourHeight: 4.1,
+      halfHourHeight: 100 / 30, // (100 => % total heigth - 30: nomber of half hours)
     };
   },
   computed: {
@@ -24,7 +24,7 @@ export const planningEventMixin = {
   },
   methods: {
     getTimelineHours () {
-      const range = this.$moment.range(this.$moment().hours(8).minutes(0), this.$moment().hours(20).minutes(0));
+      const range = this.$moment.range(this.$moment().hours(PLANNING_VIEW_START_HOUR).minutes(0), this.$moment().hours(PLANNING_VIEW_END_HOUR).minutes(0));
       this.hours = Array.from(range.by('hours', { step: 2 }));
     },
     isCurrentDay (momentDay) {
