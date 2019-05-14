@@ -14,7 +14,7 @@
           <template v-if="col.name === 'attachment'">
             <div v-if="props.row.attachment && props.row.attachment.link" class="row no-wrap table-actions">
               <q-btn flat round small color="primary">
-                <a :href="props.row.attachment.link">
+                <a :href="props.row.attachment.link" target="_blank">
                   <q-icon name="file download" />
                 </a>
               </q-btn>

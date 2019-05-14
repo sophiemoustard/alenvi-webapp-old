@@ -196,7 +196,7 @@
                     ]" />
                 </div>
                 <q-btn v-else flat round small color="primary">
-                  <a :href="props.row.drive.link" download>
+                  <a :href="props.row.drive.link" download target="_blank">
                     <q-icon name="file download" />
                   </a>
                 </q-btn>
