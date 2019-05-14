@@ -20,12 +20,14 @@
 </template>
 
 <script>
+import { required, requiredIf } from 'vuelidate/lib/validators';
+import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
 import ChipsAutocomplete from '../../../components/ChipsAutocomplete';
 import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryEventCreationModal';
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
 import Planning from '../../../components/planning/Planning.vue';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
-import { INTERVENTION, NEVER, AUXILIARY } from '../../../data/constants';
+import { INTERVENTION, NEVER, AUXILIARY, ABSENCE, DAILY, HOURLY, INTERNAL_HOUR, ILLNESS } from '../../../data/constants';
 import { mapGetters, mapActions } from 'vuex';
 import { NotifyNegative, NotifyWarning } from '../../../components/popup/notify';
 
@@ -57,6 +59,57 @@ export default {
       // Event edition
       editedEvent: {},
       editionModal: false,
+    };
+  },
+  validations () {
+    return {
+      newEvent: {
+        type: { required },
+        dates: {
+          startDate: { required },
+          endDate: { required: requiredIf((item, parent) => parent && (parent.type !== ABSENCE || parent.absenceNature === DAILY)) },
+          startHour: { required: requiredIf((item, parent) => parent && (parent.type === ABSENCE && parent.absenceNature === HOURLY)) },
+          endHour: { required: requiredIf((item, parent) => parent && (parent.type === ABSENCE && parent.absenceNature === HOURLY)) },
+        },
+        auxiliary: { required },
+        sector: { required },
+        customer: { required: requiredIf((item) => item.type === INTERVENTION) },
+        subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
+        internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
+        absence: { required: requiredIf((item) => item.type === ABSENCE) },
+        absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
+        location: { fullAddress: { frAddress } },
+        repetition: {
+          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) }
+        },
+        attachment: {
+          driveId: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absence === ILLNESS),
+          link: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absence === ILLNESS),
+        },
+      },
+      editedEvent: {
+        dates: {
+          startDate: { required },
+          endDate: { required },
+          startHour: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absenceNature === HOURLY) },
+          endHour: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absenceNature === HOURLY) },
+        },
+        auxiliary: { required },
+        sector: { required },
+        customer: { required: requiredIf((item) => item.type === INTERVENTION) },
+        subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
+        internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
+        absence: { required: requiredIf((item) => item.type === ABSENCE) },
+        absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
+        location: { fullAddress: { frAddress } },
+        repetition: {
+          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
+        },
+        cancel: {
+          condition: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
+          reason: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
+        },
+      },
     };
   },
   async mounted () {

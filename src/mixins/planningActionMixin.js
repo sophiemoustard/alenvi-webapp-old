@@ -1,60 +1,7 @@
-import { required, requiredIf } from 'vuelidate/lib/validators';
-import { frAddress } from '../helpers/vuelidateCustomVal.js';
 import { NotifyWarning, NotifyNegative, NotifyPositive } from '../components/popup/notify';
 import { INTERNAL_HOUR, ABSENCE, INTERVENTION, NEVER, UNAVAILABILITY, ILLNESS, CUSTOMER_CONTRACT, COMPANY_CONTRACT, DAILY, HOURLY, PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR } from '../data/constants';
 
 export const planningActionMixin = {
-  validations () {
-    return {
-      newEvent: {
-        type: { required },
-        dates: {
-          startDate: { required },
-          endDate: { required: requiredIf((item) => item.type !== ABSENCE || item.absenceNature === DAILY) },
-          startHour: { required: requiredIf((item) => item.type === ABSENCE && item.absenceNature === HOURLY) },
-          endHour: { required: requiredIf((item) => item.type === ABSENCE && item.absenceNature === HOURLY) },
-        },
-        auxiliary: { required },
-        sector: { required },
-        customer: { required: requiredIf((item) => item.type === INTERVENTION) },
-        subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
-        internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
-        absence: { required: requiredIf((item) => item.type === ABSENCE) },
-        absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
-        location: { fullAddress: { frAddress } },
-        repetition: {
-          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) }
-        },
-        attachment: {
-          driveId: requiredIf((item) => item.type === ABSENCE && item.absence === ILLNESS),
-          link: requiredIf((item) => item.type === ABSENCE && item.absence === ILLNESS),
-        },
-      },
-      editedEvent: {
-        dates: {
-          startDate: { required },
-          endDate: { required },
-          startHour: { required: requiredIf((item) => item.type === ABSENCE && item.absenceNature === HOURLY) },
-          endHour: { required: requiredIf((item) => item.type === ABSENCE && item.absenceNature === HOURLY) },
-        },
-        auxiliary: { required },
-        sector: { required },
-        customer: { required: requiredIf((item) => item.type === INTERVENTION) },
-        subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
-        internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
-        absence: { required: requiredIf((item) => item.type === ABSENCE) },
-        absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
-        location: { fullAddress: { frAddress } },
-        repetition: {
-          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
-        },
-        cancel: {
-          condition: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
-          reason: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
-        },
-      },
-    };
-  },
   methods: {
     setInternalHours () {
       const user = this.$store.getters['main/user'];

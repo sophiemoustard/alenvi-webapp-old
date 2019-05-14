@@ -82,13 +82,13 @@
 </template>
 
 <script>
+import { required, requiredIf } from 'vuelidate/lib/validators';
+import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
 import Planning from '../../../components/planning/Planning.vue';
 import { planningModalMixin } from '../../../mixins/planningModalMixin';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify.js';
-import { INTERVENTION, DEFAULT_AVATAR, NEVER, ABSENCE, INTERNAL_HOUR, ILLNESS, AUXILIARY, PLANNING_REFERENT, CUSTOMER_CONTRACT, COMPANY_CONTRACT, CUSTOMER } from '../../../data/constants';
-import { required, requiredIf } from 'vuelidate/lib/validators';
-import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
+import { INTERVENTION, DEFAULT_AVATAR, NEVER, ABSENCE, INTERNAL_HOUR, AUXILIARY, PLANNING_REFERENT, CUSTOMER_CONTRACT, COMPANY_CONTRACT, CUSTOMER } from '../../../data/constants';
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
@@ -142,21 +142,13 @@ export default {
           startDate: { required },
           endDate: { required },
         },
-        startDuration: { required: requiredIf((item) => item.type === ABSENCE) },
-        endDuration: { required: requiredIf((item) => item.type === ABSENCE) },
         auxiliary: { required },
         sector: { required },
-        customer: { required: requiredIf((item) => item.type === INTERVENTION) },
-        subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
-        internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
-        absence: { required: requiredIf((item) => item.type === ABSENCE) },
+        customer: { required },
+        subscription: { required },
         location: { fullAddress: { frAddress } },
         repetition: {
-          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) }
-        },
-        attachment: {
-          driveId: requiredIf((item) => item.type === ABSENCE && item.absence === ILLNESS),
-          link: requiredIf((item) => item.type === ABSENCE && item.absence === ILLNESS),
+          frequency: { required }
         },
       },
       editedEvent: {
@@ -164,17 +156,13 @@ export default {
           startDate: { required },
           endDate: { required },
         },
-        startDuration: { required: requiredIf((item) => item.type === ABSENCE) },
-        endDuration: { required: requiredIf((item) => item.type === ABSENCE) },
         auxiliary: { required },
         sector: { required },
-        customer: { required: requiredIf((item) => item.type === INTERVENTION) },
-        subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
-        internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
-        absence: { required: requiredIf((item) => item.type === ABSENCE) },
+        customer: { required },
+        subscription: { required },
         location: { fullAddress: { frAddress } },
         repetition: {
-          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
+          frequency: { required },
         },
         cancel: {
           condition: { required: requiredIf((item, parent) => parent && parent.isCancelled) },

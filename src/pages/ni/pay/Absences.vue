@@ -26,22 +26,39 @@
       <ni-billing-pagination slot="bottom" slot-scope="props" :props="props" :pagination.sync="pagination"
         :data="absences"/>
     </q-table>
+
+    <!-- Absence edition modal -->
+    <ni-auxiliary-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
+      :editionModal="editionModal" :selectedAuxiliary="selectedAuxiliary"
+      @resetForm="resetEditionForm" @deleteDocument="deleteDocument" @documentUploaded="documentUploaded"
+      @updateEvent="updateEvent" @close="closeEditionModal" @deleteEvent="deleteEvent"
+      @selectedAddress="selectedAddress" />
   </q-page>
 </template>
 
 <script>
-import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES } from '../../../data/constants';
+import { required, requiredIf } from 'vuelidate/lib/validators';
+import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
+import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES, HOURLY } from '../../../data/constants';
 import BillingPagination from '../../../components/table/BillingPagination';
+import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
+import { planningActionMixin } from '../../../mixins/planningActionMixin';
+import { planningModalMixin } from '../../../mixins/planningModalMixin.js';
 
 export default {
   name: 'Absences',
   metaInfo: { title: 'Absences' },
   components: {
     'ni-billing-pagination': BillingPagination,
+    'ni-auxiliary-event-edition-modal': AuxiliaryEventEditionModal,
   },
+  mixins: [planningActionMixin, planningModalMixin],
   data () {
     return {
+      loading: false,
       absences: [],
+      editedEvent: {},
+      editionModal: false,
       pagination: { rowsPerPage: 0 },
       columns: [
         {
@@ -110,8 +127,37 @@ export default {
       ],
     };
   },
+  validations () {
+    return {
+      editedEvent: {
+        dates: {
+          startDate: { required },
+          endDate: { required },
+          startHour: { required: requiredIf((item, parent) => parent && parent.absenceNature === HOURLY) },
+          endHour: { required: requiredIf((item, parent) => parent && parent.absenceNature === HOURLY) },
+        },
+        auxiliary: { required },
+        sector: { required },
+        absence: { required },
+        absenceNature: { required },
+        location: { fullAddress: { frAddress } },
+      },
+    };
+  },
   async mounted () {
     await this.refreshAbsences();
+  },
+  computed: {
+    selectedAuxiliary () {
+      if (this.editionModal && this.editedEvent.auxiliary) {
+        const aux = this.editedEvent.auxiliary;
+        const hasActiveCustomerContract = this.hasActiveCustomerContract(aux, this.editedEvent.dates.startDate);
+        const hasActiveCompanyContract = this.hasActiveCompanyContract(aux, this.editedEvent.dates.endDate);
+
+        return { ...aux, hasActiveCustomerContract, hasActiveCompanyContract };
+      }
+      return { picture: {}, identity: {} };
+    },
   },
   methods: {
     async refreshAbsences () {
