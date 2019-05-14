@@ -1,4 +1,4 @@
-import { ABSENCE_TYPE, PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR } from '../data/constants';
+import { ABSENCE_TYPES, PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR } from '../data/constants';
 
 export const planningEventMixin = {
   data () {
@@ -37,7 +37,7 @@ export const planningEventMixin = {
       return `${this.$moment(event.startDate).format('HH:mm')} - ${this.$moment(event.endDate).format('HH:mm')}`
     },
     displayAbsenceType (value) {
-      const absence = ABSENCE_TYPE.find(abs => abs.value === value);
+      const absence = ABSENCE_TYPES.find(abs => abs.value === value);
       return !absence ? '' : absence.label;
     },
     eventTitle (event) {

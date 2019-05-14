@@ -20,7 +20,7 @@ export const UNAVAILABILITY = 'unavailability';
 export const INTERNAL_HOUR = 'internalHour';
 export const ILLNESS = 'illness';
 export const UNJUSTIFIED = 'unjustified absence';
-export const ABSENCE_TYPE = [
+export const ABSENCE_TYPES = [
   { label: 'Congé', value: 'leave' },
   { label: 'Congé sans solde', value: 'unpaid leave' },
   { label: 'Congé maternité', value: 'maternity leave' },
