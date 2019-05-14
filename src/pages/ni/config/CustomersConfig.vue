@@ -32,9 +32,9 @@
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
-                    <q-btn flat round small color="grey" icon="history" @click.native="showHistory(col.value)" />
-                    <q-btn flat round small color="grey" icon="edit" @click.native="openServiceEditionModal(col.value)" />
-                    <q-btn disable flat round small color="grey" icon="delete" @click="deleteService(col.value, props.row.__index)" />
+                    <q-btn flat round small color="grey" icon="history" @click="showHistory(col.value)" />
+                    <q-btn flat round small color="grey" icon="edit" @click="openServiceEditionModal(col.value)" />
+                    <q-btn flat round small color="grey" icon="delete" :disable="props.row.subscriptionCount > 0" @click="deleteService(col.value, props.row.__index)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
