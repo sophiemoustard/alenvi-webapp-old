@@ -17,7 +17,7 @@
             <span class="uppercase text-weight-bold">{{ col.value }}</span>
           </template>
           <template v-else-if="col.name === 'actions'">
-            <div class="row no-wrap table-actions table-actions-margin">
+            <div class="row no-wrap table-actions">
               <q-btn flat round small color="grey" icon="remove_red_eye" @click="goToCustomerBillingPage(col.value)" />
               <q-btn flat round small color="grey" icon="add" @click="openPaymentCreationModal(props.row.customer, props.row.thirdPartyPayer)" />
             </div>

@@ -99,7 +99,7 @@
             <q-tr slot="body" slot-scope="props" :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
                 <template v-if="col.name === 'actions'">
-                  <div class="row no-wrap table-actions table-actions-margin">
+                  <div class="row no-wrap table-actions">
                     <q-btn flat round small color="grey" icon="edit" @click.native="openEditionModal(col.value._id)" />
                     <q-btn flat round small color="grey" icon="delete" :disable="col.value.auxiliaryCount > 0" @click="deleteSector(col.value._id, props.row.__index)" />
                   </div>

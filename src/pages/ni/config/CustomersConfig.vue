@@ -9,7 +9,7 @@
             <q-tr slot="body" slot-scope="props" :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
                 <template v-if="col.name === 'actions'">
-                  <div class="row no-wrap table-actions table-actions-margin">
+                  <div class="row no-wrap table-actions">
                     <q-btn flat round small color="grey" icon="edit" @click.native="openSurchargeEditionModal(col.value)" />
                     <q-btn flat round small color="grey" icon="delete" @click="deleteSurcharge(col.value, props.row.__index)" />
                   </div>
@@ -31,7 +31,7 @@
             <q-tr slot="body" slot-scope="props" :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
                 <template v-if="col.name === 'actions'">
-                  <div class="row no-wrap table-actions table-actions-margin">
+                  <div class="row no-wrap table-actions">
                     <q-btn flat round small color="grey" icon="history" @click.native="showHistory(col.value)" />
                     <q-btn flat round small color="grey" icon="edit" @click.native="openServiceEditionModal(col.value)" />
                     <q-btn disable flat round small color="grey" icon="delete" @click="deleteService(col.value, props.row.__index)" />
@@ -89,7 +89,7 @@
                   <div class="capitalize">{{ col.value }}</div>
                 </template>
                 <template v-else-if="col.name === 'actions'">
-                  <div class="row no-wrap table-actions table-actions-margin">
+                  <div class="row no-wrap table-actions">
                     <q-btn :disable="isTppUsedInFundings(props.row.__index)" flat round small color="grey" icon="delete" @click="deleteThirdPartyPayer(col.value, props.row.__index)" />
                     <q-btn flat round small color="grey" icon="edit" @click="openThirdPartyPayerEditionModal(col.value)" />
                   </div>
