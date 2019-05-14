@@ -5,7 +5,7 @@
       <div class="row q-mb-md">
         <div class="col-11 row auxiliary-name" v-if="selectedAuxiliary">
           <img :src="getAvatar(selectedAuxiliary)" class="avatar">
-          <div v-if="[UNAVAILABILITY, ABSENCE].includes(editedEvent.type)">
+          <div class="auxiliary-name-text" v-if="[UNAVAILABILITY, ABSENCE].includes(editedEvent.type)">
             {{ selectedAuxiliary.identity.firstname }} {{ selectedAuxiliary.identity.lastname.toUpperCase() }}
           </div>
           <q-select v-else v-model="editedEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions"
