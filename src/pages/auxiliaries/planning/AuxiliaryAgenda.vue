@@ -31,11 +31,13 @@
 </template>
 
 <script>
+import { required, requiredIf } from 'vuelidate/lib/validators';
+import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
 import Agenda from '../../../components/Agenda';
 import PlanningNavigation from '../../../components/planning/PlanningNavigation';
 import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryEventCreationModal';
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
-import { DEFAULT_AVATAR, INTERVENTION, NEVER, AGENDA, WEEK_VIEW, THREE_DAYS_VIEW, ABSENCE } from '../../../data/constants';
+import { DEFAULT_AVATAR, INTERVENTION, NEVER, AGENDA, WEEK_VIEW, THREE_DAYS_VIEW, ABSENCE, DAILY, HOURLY, INTERNAL_HOUR, ILLNESS } from '../../../data/constants';
 import { planningTimelineMixin } from '../../../mixins/planningTimelineMixin';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { NotifyWarning } from '../../../components/popup/notify';
@@ -81,6 +83,57 @@ export default {
       }));
     },
   },
+  validations () {
+    return {
+      newEvent: {
+        type: { required },
+        dates: {
+          startDate: { required },
+          endDate: { required: requiredIf((item, parent) => parent && (parent.type !== ABSENCE || parent.absenceNature === DAILY)) },
+          startHour: { required: requiredIf((item, parent) => parent && (parent.type === ABSENCE && parent.absenceNature === HOURLY)) },
+          endHour: { required: requiredIf((item, parent) => parent && (parent.type === ABSENCE && parent.absenceNature === HOURLY)) },
+        },
+        auxiliary: { required },
+        sector: { required },
+        customer: { required: requiredIf((item) => item.type === INTERVENTION) },
+        subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
+        internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
+        absence: { required: requiredIf((item) => item.type === ABSENCE) },
+        absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
+        location: { fullAddress: { frAddress } },
+        repetition: {
+          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) }
+        },
+        attachment: {
+          driveId: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absence === ILLNESS),
+          link: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absence === ILLNESS),
+        },
+      },
+      editedEvent: {
+        dates: {
+          startDate: { required },
+          endDate: { required },
+          startHour: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absenceNature === HOURLY) },
+          endHour: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absenceNature === HOURLY) },
+        },
+        auxiliary: { required },
+        sector: { required },
+        customer: { required: requiredIf((item) => item.type === INTERVENTION) },
+        subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
+        internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
+        absence: { required: requiredIf((item) => item.type === ABSENCE) },
+        absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
+        location: { fullAddress: { frAddress } },
+        repetition: {
+          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
+        },
+        cancel: {
+          condition: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
+          reason: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
+        },
+      },
+    };
+  },
   async mounted () {
     this.viewMode = this.$q.platform.is.mobile ? THREE_DAYS_VIEW : WEEK_VIEW;
     this.height = window.innerHeight;
@@ -88,7 +141,7 @@ export default {
     this.selectedAuxiliary = this.currentUser;
     this.getTimelineDays();
     await this.getAuxiliaries();
-    await this.refreshPlanning();
+    await this.refresh();
     await this.getCustomers();
     this.setInternalHours();
   },
@@ -101,14 +154,14 @@ export default {
     },
     async updateAuxiliary (auxiliaryId) {
       this.selectedAuxiliary = this.auxiliaries.find(aux => aux._id === auxiliaryId);
-      await this.refreshPlanning();
+      await this.refresh();
     },
     async updateTimeline () {
       this.getTimelineDays();
-      await this.refreshPlanning();
+      await this.refresh();
     },
     // Refresh data
-    async refreshPlanning () {
+    async refresh () {
       try {
         const params = {
           startDate: this.startOfWeek.format('YYYYMMDD'),
@@ -175,10 +228,9 @@ export default {
     },
     // Event edition
     openEditionModal (event) {
-      const auxiliary = event.auxiliary._id;
-      const can = this.canEditEvent(event, auxiliary);
+      const can = this.canEditEvent(event);
       if (!can) return;
-      this.formatEditedEvent(event, auxiliary);
+      this.formatEditedEvent(event);
       if (event.type !== ABSENCE) {
         this.selectedAuxiliary.hasActiveCustomerContract = this.hasActiveCustomerContract(this.selectedAuxiliary, event.startDate);
         this.selectedAuxiliary.hasActiveCompanyContract = this.hasActiveCompanyContract(this.selectedAuxiliary, event.startDate);

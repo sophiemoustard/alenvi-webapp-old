@@ -10,7 +10,7 @@
             <q-tr slot="body" slot-scope="props" :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
                 <template v-if="col.name === 'actions'">
-                  <div class="row no-wrap table-actions table-actions-margin">
+                  <div class="row no-wrap table-actions">
                     <q-btn flat round small color="grey" icon="history" @click="showHistory(col.value)" />
                     <q-btn :disable="!getFunding(col.value)" flat round small color="grey" icon="mdi-calculator"
                       @click="showFunding(col.value)" />

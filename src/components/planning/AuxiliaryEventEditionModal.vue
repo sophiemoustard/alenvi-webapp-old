@@ -5,10 +5,13 @@
       <div class="row q-mb-md">
         <div class="col-11 row auxiliary-name" v-if="selectedAuxiliary">
           <img :src="getAvatar(selectedAuxiliary)" class="avatar">
-          <q-select filter v-model="editedEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions"
+          <div class="auxiliary-name-text" v-if="[UNAVAILABILITY, ABSENCE].includes(editedEvent.type)">
+            {{ selectedAuxiliary.identity.firstname }} {{ selectedAuxiliary.identity.lastname.toUpperCase() }}
+          </div>
+          <q-select v-else v-model="editedEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions"
             :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
             :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`"
-            :disable="[UNAVAILABILITY, ABSENCE].includes(editedEvent.type) || isDisabled" ref="auxiliarySelect" />
+            :disable="isDisabled" ref="auxiliarySelect" filter />
         </div>
         <div class="col-1 cursor-pointer modal-btn-close">
           <span>

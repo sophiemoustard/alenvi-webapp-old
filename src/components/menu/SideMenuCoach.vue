@@ -29,6 +29,27 @@
       <ni-menu-item name="customers directory" icon="contacts" label="Répertoire bénéficiaires" />
     </q-collapsible>
     <q-item-separator />
+    <q-collapsible v-if="user.role.name === 'Admin'" ref="billing" v-model="activeRoutes.billing.open"
+      collapseIcon="expand_more">
+      <template slot="header">
+        <q-item-main :class="{'text-weight-bold': activeRoutes.billing.highlight }" label="Facturation" />
+      </template>
+      <ni-menu-item name="to bill" :params="{ id: user._id }" icon="credit_card" label="À facturer" />
+      <ni-menu-item name="credit note" :params="{ id: user._id }" icon="mdi-credit-card-refund" label="Avoirs" />
+      <ni-menu-item name="clients balances" :params="{ id: user._id }" icon="mdi-scale-balance" label="Balances clients" />
+      <ni-menu-item name="debits archive" :params="{ id: user._id }" icon="mdi-archive" label="Archive prélèvements" />
+    </q-collapsible>
+    <q-item-separator />
+    <q-collapsible v-if="user.role.name === 'Admin'" ref="pay" v-model="activeRoutes.pay.open"
+      collapseIcon="expand_more">
+      <template slot="header">
+        <q-item-main :class="{'text-weight-bold': activeRoutes.pay.highlight }" label="Paie" />
+      </template>
+      <ni-menu-item name="to pay" :params="{ id: user._id }" icon="euro_symbol" label="À payer" />
+      <ni-menu-item name="contract ends" :params="{ id: user._id }" icon="description" label="Fins de contrats" />
+      <ni-menu-item name="absences" :params="{ id: user._id }" icon="calendar_today" label="Absences" />
+    </q-collapsible>
+    <q-item-separator />
     <q-collapsible v-if="user.role.name === 'Admin'" ref="configuration" v-model="activeRoutes.configuration.open"
       collapseIcon="expand_more">
       <template slot="header">
@@ -37,17 +58,6 @@
       <ni-menu-item name="rh config" :params="{ id: user._id }" icon="settings" label="Configuration RH" />
       <ni-menu-item name="customers config" :params="{ id: user._id }" icon="settings" label="Configuration bénéficiaires" />
       <ni-menu-item name="tags config" :params="{ id: user._id }" icon="list_alt" label="Tags" />
-    </q-collapsible>
-    <q-item-separator />
-    <q-collapsible v-if="user.role.name === 'Admin'" ref="billing" v-model="activeRoutes.billing.open"
-      collapseIcon="expand_more">
-      <template slot="header">
-        <q-item-main :class="{'text-weight-bold': activeRoutes.billing.highlight }" label="Facturation" />
-      </template>
-      <ni-menu-item name="to bill" :params="{ id: user._id }" icon="credit_card" label="A facturer" />
-      <ni-menu-item name="credit note" :params="{ id: user._id }" icon="mdi-credit-card-refund" label="Avoirs" />
-      <ni-menu-item name="clients balances" :params="{ id: user._id }" icon="mdi-scale-balance" label="Balances clients" />
-      <ni-menu-item name="debits archive" :params="{ id: user._id }" icon="mdi-archive" label="Archive prélèvements" />
     </q-collapsible>
     <q-item-separator />
     <ni-side-menu-footer :label="userFirstnameUpper" :userId="user._id" />
@@ -73,23 +83,27 @@ export default {
       activeRoutes: {
         planning: {
           open: false,
-          highlight: false
+          highlight: false,
         },
         benef: {
           open: false,
-          highlight: false
+          highlight: false,
         },
         administrative: {
           open: false,
-          highlight: false
-        },
-        configuration: {
-          open: false,
-          highlight: false
+          highlight: false,
         },
         billing: {
           open: false,
-          highlight: false
+          highlight: false,
+        },
+        pay: {
+          open: false,
+          highlight: false,
+        },
+        configuration: {
+          open: false,
+          highlight: false,
         },
       },
     };

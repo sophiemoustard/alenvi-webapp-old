@@ -82,13 +82,13 @@
 </template>
 
 <script>
+import { required, requiredIf } from 'vuelidate/lib/validators';
+import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
 import Planning from '../../../components/planning/Planning.vue';
 import { planningModalMixin } from '../../../mixins/planningModalMixin';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify.js';
-import { INTERVENTION, DEFAULT_AVATAR, NEVER, ABSENCE, INTERNAL_HOUR, ILLNESS, AUXILIARY, PLANNING_REFERENT, CUSTOMER_CONTRACT, COMPANY_CONTRACT, CUSTOMER } from '../../../data/constants';
-import { required, requiredIf } from 'vuelidate/lib/validators';
-import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
+import { INTERVENTION, DEFAULT_AVATAR, NEVER, ABSENCE, INTERNAL_HOUR, AUXILIARY, PLANNING_REFERENT, CUSTOMER_CONTRACT, COMPANY_CONTRACT, CUSTOMER } from '../../../data/constants';
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
@@ -142,21 +142,13 @@ export default {
           startDate: { required },
           endDate: { required },
         },
-        startDuration: { required: requiredIf((item) => item.type === ABSENCE) },
-        endDuration: { required: requiredIf((item) => item.type === ABSENCE) },
         auxiliary: { required },
         sector: { required },
-        customer: { required: requiredIf((item) => item.type === INTERVENTION) },
-        subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
-        internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
-        absence: { required: requiredIf((item) => item.type === ABSENCE) },
+        customer: { required },
+        subscription: { required },
         location: { fullAddress: { frAddress } },
         repetition: {
-          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) }
-        },
-        attachment: {
-          driveId: requiredIf((item) => item.type === ABSENCE && item.absence === ILLNESS),
-          link: requiredIf((item) => item.type === ABSENCE && item.absence === ILLNESS),
+          frequency: { required }
         },
       },
       editedEvent: {
@@ -164,17 +156,13 @@ export default {
           startDate: { required },
           endDate: { required },
         },
-        startDuration: { required: requiredIf((item) => item.type === ABSENCE) },
-        endDuration: { required: requiredIf((item) => item.type === ABSENCE) },
         auxiliary: { required },
         sector: { required },
-        customer: { required: requiredIf((item) => item.type === INTERVENTION) },
-        subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
-        internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
-        absence: { required: requiredIf((item) => item.type === ABSENCE) },
+        customer: { required },
+        subscription: { required },
         location: { fullAddress: { frAddress } },
         repetition: {
-          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
+          frequency: { required },
         },
         cancel: {
           condition: { required: requiredIf((item, parent) => parent && parent.isCancelled) },
@@ -243,7 +231,7 @@ export default {
       const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
       this.days = Array.from(range.by('days'));
       if (this.filteredSectors.length !== 0 || this.filteredCustomers.length !== 0) await this.refreshCustomers();
-      if (this.customers.length !== 0) await this.refreshPlanning();
+      if (this.customers.length !== 0) await this.refresh();
     },
     hasActiveCustomerContract (auxiliary, selectedDay) {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
@@ -288,7 +276,7 @@ export default {
         }
       }
     },
-    async refreshPlanning () {
+    async refresh () {
       try {
         this.events = await this.$events.list({
           startDate: this.startOfWeek.format('YYYYMMDD'),
@@ -406,7 +394,7 @@ export default {
 
         await this.$events.create(payload);
 
-        this.refreshPlanning();
+        this.refresh();
         this.creationModal = false;
         this.resetCreationForm(false);
         NotifyPositive('Évènement créé');
@@ -418,11 +406,10 @@ export default {
     },
     // Event edition
     openEditionModal (eventId) {
-      const event = this.events.find(ev => ev._id === eventId)
-      const auxiliary = event.auxiliary._id;
-      const can = this.canEditEvent(event, auxiliary);
+      const event = this.events.find(ev => ev._id === eventId);
+      const can = this.canEditEvent(event);
       if (!can) return;
-      this.formatEditedEvent(event, auxiliary);
+      this.formatEditedEvent(event);
 
       this.editionModal = true;
     },
@@ -450,7 +437,7 @@ export default {
         delete payload._id
         await this.$events.updateById(this.editedEvent._id, payload);
 
-        this.refreshPlanning();
+        this.refresh();
         this.editionModal = false;
         this.resetEditionForm();
         NotifyPositive('Évènement modifié');
@@ -528,7 +515,7 @@ export default {
         this.loading = true
         if (shouldDeleteRepetition) {
           await this.$events.deleteRepetition(this.editedEvent._id);
-          this.refreshPlanning();
+          this.refresh();
         } else {
           await this.$events.deleteById(this.editedEvent._id);
           this.events = this.events.filter(event => event._id !== this.editedEvent._id);
@@ -561,12 +548,12 @@ export default {
             this.customers.push(customersBySector[i]);
           }
         }
-        this.refreshPlanning();
+        this.refresh();
       } else { // el = auxiliary
         if (!this.customers.some(cust => cust._id === el._id)) {
           this.filteredCustomers.push(el);
           this.customers.push(el);
-          this.refreshPlanning();
+          this.refresh();
         }
       }
     },
@@ -574,7 +561,7 @@ export default {
       if (el.sectorId) {
         this.filteredSectors = this.filteredSectors.filter(sec => sec !== el.sectorId);
         await this.refreshCustomers();
-        await this.refreshPlanning();
+        await this.refresh();
       } else {
         this.filteredCustomers = this.filteredCustomers.filter(cus => cus._id !== el._id);
         this.customers = this.customers.filter(customer => customer._id !== el._id);

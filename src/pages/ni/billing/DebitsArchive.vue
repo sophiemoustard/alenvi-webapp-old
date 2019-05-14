@@ -1,6 +1,6 @@
 <template>
   <q-page class="neutral-background">
-    <div class="title layout-padding">
+    <div class="title-padding">
       <h4>Archive Prélèvements</h4>
     </div>
     <div class="q-pa-sm">
@@ -9,7 +9,7 @@
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
               <template v-if="col.name === 'download'">
-                <div class="row no-wrap table-actions table-actions-margin">
+                <div class="row no-wrap table-actions">
                   <q-btn flat round small icon="file download" color="primary" @click="goToUrl(col.value)" />
                 </div>
               </template>

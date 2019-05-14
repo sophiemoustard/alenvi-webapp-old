@@ -19,7 +19,7 @@ import {
   NOT_INVOICED_AND_NOT_PAYED,
   CUSTOMER_INITIATIVE,
   AUXILIARY_INITIATIVE,
-  ABSENCE_TYPE,
+  ABSENCE_TYPES,
   ABSENCE_NATURES,
   UNJUSTIFIED,
   DAILY,
@@ -65,10 +65,10 @@ export const planningModalMixin = {
   computed: {
     absenceOptions () {
       if (this.newEvent && this.newEvent.absenceNature === HOURLY) {
-        return ABSENCE_TYPE.filter(type => type.value === UNJUSTIFIED);
+        return ABSENCE_TYPES.filter(type => type.value === UNJUSTIFIED);
       }
 
-      return ABSENCE_TYPE;
+      return ABSENCE_TYPES;
     },
     disableCreationButton () {
       if (!this.newEvent.type) return true;
