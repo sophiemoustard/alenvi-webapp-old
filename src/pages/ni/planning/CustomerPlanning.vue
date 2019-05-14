@@ -231,7 +231,7 @@ export default {
       const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
       this.days = Array.from(range.by('days'));
       if (this.filteredSectors.length !== 0 || this.filteredCustomers.length !== 0) await this.refreshCustomers();
-      if (this.customers.length !== 0) await this.refreshPlanning();
+      if (this.customers.length !== 0) await this.refresh();
     },
     hasActiveCustomerContract (auxiliary, selectedDay) {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
@@ -276,7 +276,7 @@ export default {
         }
       }
     },
-    async refreshPlanning () {
+    async refresh () {
       try {
         this.events = await this.$events.list({
           startDate: this.startOfWeek.format('YYYYMMDD'),
@@ -394,7 +394,7 @@ export default {
 
         await this.$events.create(payload);
 
-        this.refreshPlanning();
+        this.refresh();
         this.creationModal = false;
         this.resetCreationForm(false);
         NotifyPositive('Évènement créé');
@@ -437,7 +437,7 @@ export default {
         delete payload._id
         await this.$events.updateById(this.editedEvent._id, payload);
 
-        this.refreshPlanning();
+        this.refresh();
         this.editionModal = false;
         this.resetEditionForm();
         NotifyPositive('Évènement modifié');
@@ -515,7 +515,7 @@ export default {
         this.loading = true
         if (shouldDeleteRepetition) {
           await this.$events.deleteRepetition(this.editedEvent._id);
-          this.refreshPlanning();
+          this.refresh();
         } else {
           await this.$events.deleteById(this.editedEvent._id);
           this.events = this.events.filter(event => event._id !== this.editedEvent._id);
@@ -548,12 +548,12 @@ export default {
             this.customers.push(customersBySector[i]);
           }
         }
-        this.refreshPlanning();
+        this.refresh();
       } else { // el = auxiliary
         if (!this.customers.some(cust => cust._id === el._id)) {
           this.filteredCustomers.push(el);
           this.customers.push(el);
-          this.refreshPlanning();
+          this.refresh();
         }
       }
     },
@@ -561,7 +561,7 @@ export default {
       if (el.sectorId) {
         this.filteredSectors = this.filteredSectors.filter(sec => sec !== el.sectorId);
         await this.refreshCustomers();
-        await this.refreshPlanning();
+        await this.refresh();
       } else {
         this.filteredCustomers = this.filteredCustomers.filter(cus => cus._id !== el._id);
         this.customers = this.customers.filter(customer => customer._id !== el._id);

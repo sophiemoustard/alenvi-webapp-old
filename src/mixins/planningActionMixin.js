@@ -82,7 +82,7 @@ export const planningActionMixin = {
       this.creationModal = false;
     },
     getPayload (event) {
-      let payload = { ...this.$_.omit(event, ['dates', '__v']) }
+      let payload = { ...this.$_.omit(event, ['dates', '__v', '__index']) }
       payload = this.$_.pickBy(payload);
 
       if (event.type === INTERNAL_HOUR) {
@@ -149,7 +149,7 @@ export const planningActionMixin = {
 
         await this.$events.create(payload);
 
-        this.refreshPlanning();
+        this.refresh();
         this.creationModal = false;
         this.resetCreationForm(false);
         NotifyPositive('Évènement créé');
@@ -199,7 +199,7 @@ export const planningActionMixin = {
             location: {},
             attachment: {},
             ...eventData,
-            auxiliary,
+            auxiliary: auxiliary._id,
             dates,
           };
           break;
@@ -249,10 +249,11 @@ export const planningActionMixin = {
         await this.$events.updateById(this.editedEvent._id, payload);
         NotifyPositive('Évènement modifié');
 
-        this.refreshPlanning();
+        this.refresh();
         this.editionModal = false;
         this.resetEditionForm();
       } catch (e) {
+        console.error(e)
         if (e.data && e.data.statusCode === 422) {
           this.$v.editedEvent.$reset();
           return NotifyNegative('Cette modification n\'est pas autorisée');
@@ -361,7 +362,7 @@ export const planningActionMixin = {
         this.loading = true
         if (shouldDeleteRepetition) {
           await this.$events.deleteRepetition(this.editedEvent._id);
-          this.refreshPlanning();
+          this.refresh();
         } else {
           await this.$events.deleteById(this.editedEvent._id);
           this.events = this.events.filter(event => event._id !== this.editedEvent._id);

@@ -54,10 +54,12 @@ export default {
   mixins: [planningActionMixin],
   data () {
     return {
+      events: [],
       loading: false,
       absences: [],
       editedEvent: {},
       editionModal: false,
+      selectedAuxiliary: { picture: {}, identity: {} },
       pagination: { rowsPerPage: 0 },
       columns: [
         {
@@ -144,15 +146,10 @@ export default {
     };
   },
   async mounted () {
-    await this.refreshAbsences();
-  },
-  computed: {
-    selectedAuxiliary () {
-      return this.editionModal && this.editedEvent.auxiliary ? this.editedEvent.auxiliary : { picture: {}, identity: {} };
-    },
+    await this.refresh();
   },
   methods: {
-    async refreshAbsences () {
+    async refresh () {
       try {
         this.absences = await this.$events.list({ type: ABSENCE });
       } catch (e) {
@@ -164,6 +161,7 @@ export default {
     openEditionModal (event) {
       const can = this.canEditEvent(event);
       if (!can) return;
+      this.selectedAuxiliary = event.auxiliary ? event.auxiliary : { picture: {}, identity: {} };
       this.formatEditedEvent(event);
 
       this.editionModal = true

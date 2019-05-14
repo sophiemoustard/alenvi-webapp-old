@@ -169,10 +169,10 @@ export default {
 
       const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
       this.days = Array.from(range.by('days'));
-      if (this.auxiliaries && this.auxiliaries.length) await this.refreshPlanning();
+      if (this.auxiliaries && this.auxiliaries.length) await this.refresh();
     },
     // Refresh data
-    async refreshPlanning () {
+    async refresh () {
       try {
         this.events = await this.$events.list({
           startDate: this.startOfWeek.format('YYYYMMDD'),
@@ -240,12 +240,12 @@ export default {
             this.auxiliaries.push(auxBySector[i]);
           }
         }
-        this.refreshPlanning();
+        this.refresh();
       } else { // el = auxiliary
         if (!this.filteredAuxiliaries.some(aux => aux._id === el._id)) this.filteredAuxiliaries.push(el);
         if (!this.auxiliaries.some(aux => aux._id === el._id)) {
           this.auxiliaries.push(el);
-          this.refreshPlanning();
+          this.refresh();
         }
       }
     },
