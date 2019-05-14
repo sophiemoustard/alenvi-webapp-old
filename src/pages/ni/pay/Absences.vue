@@ -60,7 +60,11 @@ export default {
       editedEvent: {},
       editionModal: false,
       selectedAuxiliary: { picture: {}, identity: {} },
-      pagination: { rowsPerPage: 0 },
+      pagination: {
+        rowsPerPage: 0,
+        sortBy: 'startDate',
+        descending: true,
+      },
       columns: [
         {
           name: 'auxiliary',
