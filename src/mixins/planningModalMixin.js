@@ -16,7 +16,6 @@ import {
   EVERY_WEEK,
   INVOICED_AND_PAYED,
   INVOICED_AND_NOT_PAYED,
-  NOT_INVOICED_AND_NOT_PAYED,
   CUSTOMER_INITIATIVE,
   AUXILIARY_INITIATIVE,
   ABSENCE_TYPES,
@@ -54,7 +53,6 @@ export const planningModalMixin = {
       cancellationConditions: [
         { label: 'Facturée & payée', value: INVOICED_AND_PAYED },
         { label: 'Facturée & non payée', value: INVOICED_AND_NOT_PAYED },
-        { label: 'Non facturée & non payée', value: NOT_INVOICED_AND_NOT_PAYED },
       ],
       cancellationReasons: [
         { label: 'Initiative du client', value: CUSTOMER_INITIATIVE },
