@@ -356,8 +356,7 @@
           binary-state-sort :pagination.sync="paginationFundingHistory" :visible-columns="fundingHistoryVisibleColumns">
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-              <template v-if="col.name === 'startDate'">{{ $moment(col.value).format('DD/MM/YYYY') }}</template>
-              <template v-else>{{ col.value }}</template>
+              <template>{{ col.value }}</template>
             </q-td>
           </q-tr>
         </q-table>
@@ -1229,6 +1228,8 @@ export default {
     },
     showFundingHistory (id) {
       this.selectedFunding = this.fundings.find(sub => sub._id === id);
+      this.selectedFunding.versions = this.selectedFunding.versions && this.selectedFunding.versions.length > 0
+        ? [this.selectedFunding, ...this.selectedFunding.versions] : [this.selectedFunding];
       this.fundingHistoryModal = true;
     },
     resetFundingHistoryData () {
@@ -1252,23 +1253,13 @@ export default {
         subscription: '',
       };
     },
-    formatCreatedFunding () {
-      const cleanPayload = this.$_.pickBy(this.newFunding);
-      const { nature, thirdPartyPayer, subscription, ...version } = cleanPayload;
-      return {
-        nature,
-        thirdPartyPayer,
-        subscription,
-        versions: [{...version}]
-      };
-    },
     async submitFunding () {
       try {
         this.$v.newFunding.$touch();
         if (this.$v.newFunding.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        const payload = this.formatCreatedFunding();
+        const payload = this.$_.pickBy(this.newFunding);
         await this.$customers.addFunding(this.customer._id, payload);
         this.resetCreationFundingData();
         await this.refreshCustomer();
@@ -1323,9 +1314,8 @@ export default {
         this.$v.editedFunding.$touch();
         if (this.$v.editedFunding.$error) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
-        const { folderNumber, endDate, frequency, amountTTC, unitTTCRate, careHours, careDays, customerParticipationRate, startDate, subscription, _id } = this.editedFunding;
+        const { folderNumber, endDate, frequency, amountTTC, unitTTCRate, careHours, careDays, customerParticipationRate, startDate, subscription } = this.editedFunding;
         const payload = {
-          fundingId: _id,
           folderNumber,
           frequency,
           careDays,
