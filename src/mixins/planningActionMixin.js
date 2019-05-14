@@ -167,8 +167,8 @@ export const planningActionMixin = {
         ? `0${this.$moment(date).hours()}`
         : this.$moment(date).hours()}:${this.$moment(date).minutes() || '00'}`;
     },
-    formatEditedEvent (event, auxiliary) {
-      const { createdAt, updatedAt, startDate, endDate, isBilled, ...eventData } = event;
+    formatEditedEvent (event) {
+      const { createdAt, updatedAt, startDate, endDate, isBilled, auxiliary, ...eventData } = event;
       const dates = {
         startDate,
         endDate,
@@ -179,11 +179,20 @@ export const planningActionMixin = {
       switch (event.type) {
         case INTERVENTION:
           const subscription = event.subscription._id;
-          this.editedEvent = { isCancelled: false, cancel: {}, shouldUpdateRepetition: false, ...eventData, dates, auxiliary, subscription, isBilled };
+          this.editedEvent = {
+            isCancelled: false,
+            cancel: {},
+            shouldUpdateRepetition: false,
+            ...eventData,
+            dates,
+            auxiliary: auxiliary._id,
+            subscription,
+            isBilled
+          };
           break;
         case INTERNAL_HOUR:
           const internalHour = event.internalHour._id;
-          this.editedEvent = { location: {}, shouldUpdateRepetition: false, ...eventData, auxiliary, internalHour, dates };
+          this.editedEvent = { location: {}, shouldUpdateRepetition: false, ...eventData, auxiliary: auxiliary._id, internalHour, dates };
           break;
         case ABSENCE:
           this.editedEvent = {
@@ -195,14 +204,14 @@ export const planningActionMixin = {
           };
           break;
         case UNAVAILABILITY:
-          this.editedEvent = { shouldUpdateRepetition: false, ...eventData, auxiliary, dates };
+          this.editedEvent = { shouldUpdateRepetition: false, ...eventData, auxiliary: auxiliary._id, dates };
           break;
       }
     },
-    canEditEvent (event, auxiliary) {
+    canEditEvent (event) {
       return this.$can({
         user: this.$store.getters['main/user'],
-        auxiliaryIdEvent: auxiliary,
+        auxiliaryIdEvent: event.auxiliary._id,
         auxiliarySectorEvent: event.sector,
         permissions: [
           { name: 'planning:edit:user', rule: 'isInSameSector' },

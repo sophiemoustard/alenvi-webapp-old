@@ -406,11 +406,10 @@ export default {
     },
     // Event edition
     openEditionModal (eventId) {
-      const event = this.events.find(ev => ev._id === eventId)
-      const auxiliary = event.auxiliary._id;
-      const can = this.canEditEvent(event, auxiliary);
+      const event = this.events.find(ev => ev._id === eventId);
+      const can = this.canEditEvent(event);
       if (!can) return;
-      this.formatEditedEvent(event, auxiliary);
+      this.formatEditedEvent(event);
 
       this.editionModal = true;
     },

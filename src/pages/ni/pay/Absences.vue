@@ -8,7 +8,7 @@
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
           <template v-if="col.name === 'actions'">
             <div class="row no-wrap table-actions">
-              <q-btn flat round small color="grey" icon="edit" />
+              <q-btn flat round small color="grey" icon="edit" @click="openEditionModal(props.row)" />
             </div>
           </template>
           <template v-if="col.name === 'attachment'">
@@ -29,7 +29,7 @@
 
     <!-- Absence edition modal -->
     <ni-auxiliary-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
-      :editionModal="editionModal" :selectedAuxiliary="selectedAuxiliary"
+      :editionModal="editionModal" :selectedAuxiliary="selectedAuxiliary" :auxiliaries="[selectedAuxiliary]"
       @resetForm="resetEditionForm" @deleteDocument="deleteDocument" @documentUploaded="documentUploaded"
       @updateEvent="updateEvent" @close="closeEditionModal" @deleteEvent="deleteEvent"
       @selectedAddress="selectedAddress" />
@@ -43,7 +43,6 @@ import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES, HOURLY } from '../../../data/c
 import BillingPagination from '../../../components/table/BillingPagination';
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
-import { planningModalMixin } from '../../../mixins/planningModalMixin.js';
 
 export default {
   name: 'Absences',
@@ -52,7 +51,7 @@ export default {
     'ni-billing-pagination': BillingPagination,
     'ni-auxiliary-event-edition-modal': AuxiliaryEventEditionModal,
   },
-  mixins: [planningActionMixin, planningModalMixin],
+  mixins: [planningActionMixin],
   data () {
     return {
       loading: false,
@@ -149,14 +148,7 @@ export default {
   },
   computed: {
     selectedAuxiliary () {
-      if (this.editionModal && this.editedEvent.auxiliary) {
-        const aux = this.editedEvent.auxiliary;
-        const hasActiveCustomerContract = this.hasActiveCustomerContract(aux, this.editedEvent.dates.startDate);
-        const hasActiveCompanyContract = this.hasActiveCompanyContract(aux, this.editedEvent.dates.endDate);
-
-        return { ...aux, hasActiveCustomerContract, hasActiveCompanyContract };
-      }
-      return { picture: {}, identity: {} };
+      return this.editionModal && this.editedEvent.auxiliary ? this.editedEvent.auxiliary : { picture: {}, identity: {} };
     },
   },
   methods: {
@@ -167,6 +159,14 @@ export default {
         this.absences = [];
         console.error(e);
       }
+    },
+    // Event edition
+    openEditionModal (event) {
+      const can = this.canEditEvent(event);
+      if (!can) return;
+      this.formatEditedEvent(event);
+
+      this.editionModal = true
     },
   },
 }

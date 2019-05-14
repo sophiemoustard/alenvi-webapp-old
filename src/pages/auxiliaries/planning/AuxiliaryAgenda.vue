@@ -228,10 +228,9 @@ export default {
     },
     // Event edition
     openEditionModal (event) {
-      const auxiliary = event.auxiliary._id;
-      const can = this.canEditEvent(event, auxiliary);
+      const can = this.canEditEvent(event);
       if (!can) return;
-      this.formatEditedEvent(event, auxiliary);
+      this.formatEditedEvent(event);
       if (event.type !== ABSENCE) {
         this.selectedAuxiliary.hasActiveCustomerContract = this.hasActiveCustomerContract(this.selectedAuxiliary, event.startDate);
         this.selectedAuxiliary.hasActiveCompanyContract = this.hasActiveCompanyContract(this.selectedAuxiliary, event.startDate);
