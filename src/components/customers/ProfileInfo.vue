@@ -1228,6 +1228,8 @@ export default {
     },
     showFundingHistory (id) {
       this.selectedFunding = this.fundings.find(sub => sub._id === id);
+      this.selectedFunding.versions = this.selectedFunding.versions && this.selectedFunding.versions.length > 0
+        ? [this.selectedFunding, ...this.selectedFunding.versions] : [this.selectedFunding];
       this.fundingHistoryModal = true;
     },
     resetFundingHistoryData () {
@@ -1251,23 +1253,13 @@ export default {
         subscription: '',
       };
     },
-    formatCreatedFunding () {
-      const cleanPayload = this.$_.pickBy(this.newFunding);
-      const { nature, thirdPartyPayer, subscription, ...version } = cleanPayload;
-      return {
-        nature,
-        thirdPartyPayer,
-        subscription,
-        versions: [{...version}]
-      };
-    },
     async submitFunding () {
       try {
         this.$v.newFunding.$touch();
         if (this.$v.newFunding.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        const payload = this.formatCreatedFunding();
+        const payload = this.$_.pickBy(this.newFunding);
         await this.$customers.addFunding(this.customer._id, payload);
         this.resetCreationFundingData();
         await this.refreshCustomer();
