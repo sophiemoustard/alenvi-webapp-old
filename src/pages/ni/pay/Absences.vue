@@ -77,7 +77,10 @@ export default {
           name: 'nature',
           label: 'Nature',
           field: 'absenceNature',
-          format: value => ABSENCE_NATURES.find(abs => abs.value === value).label,
+          format: value => {
+            const nature = ABSENCE_NATURES.find(abs => abs.value === value);
+            return nature ? nature.label : '';
+          },
           align: 'left',
         },
         {
@@ -112,7 +115,10 @@ export default {
           name: 'type',
           label: 'Type',
           field: 'absence',
-          format: value => ABSENCE_TYPES.find(abs => abs.value === value).label,
+          format: value => {
+            const type = ABSENCE_TYPES.find(abs => abs.value === value);
+            return type ? type.label : '';
+          },
           align: 'left',
         },
         {
