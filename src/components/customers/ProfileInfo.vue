@@ -37,10 +37,10 @@
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
               <template v-if="col.name === 'actions'">
-                <div class="row no-wrap table-actions">
-                  <q-btn flat round small color="grey" icon="history" @click.native="showHistory(col.value)" />
-                  <q-btn flat round small color="grey" icon="edit" @click.native="startSubscriptionEdition(col.value)" />
-                  <q-btn flat round small color="grey" icon="delete" @click.native="removeSubscriptions(col.value)" />
+                <div class="row no-wrap table-actions table-actions-margin">
+                  <q-btn flat round small color="grey" icon="history" @click="showHistory(col.value)" />
+                  <q-btn flat round small color="grey" icon="edit" @click="startSubscriptionEdition(col.value)" />
+                  <q-btn flat round small color="grey" icon="delete" :disable="props.row.eventCount > 0" @click="removeSubscriptions(col.value)" />
                 </div>
               </template>
               <template v-else>{{ col.value }}</template>
