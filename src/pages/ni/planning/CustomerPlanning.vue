@@ -17,13 +17,13 @@
               <q-icon name="clear" @click.native="creationModal = false" /></span>
           </div>
         </div>
-        <ni-datetime-range caption="Dates et heures de l'intervention" v-model="newEvent.dates" requiredField />
+        <ni-datetime-range caption="Dates et heures de l'intervention" v-model="newEvent.dates" required-field />
         <ni-modal-select caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions" :error="$v.newEvent.auxiliary.$error"
-          requiredField @blur="$v.newEvent.auxiliary.$touch" @input="setSector" />
+          required-field @blur="$v.newEvent.auxiliary.$touch" @input="setSector" />
         <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions(newEvent.customer)"
-          :error="$v.newEvent.subscription.$error" requiredField @blur="$v.newEvent.subscription.$touch" />
+          :error="$v.newEvent.subscription.$error" required-field @blur="$v.newEvent.subscription.$touch" />
         <ni-modal-select caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency" :options="repetitionOptions"
-          requiredField @blur="$v.newEvent.repetition.frequency.$touch" />
+          required-field @blur="$v.newEvent.repetition.frequency.$touch" />
         <ni-modal-input v-model="newEvent.misc" caption="Notes" />
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary" @click="createEvent"
@@ -52,7 +52,7 @@
         </div>
         <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" :disable="isDisabled" />
         <ni-modal-select caption="Auxiliaire" v-model="editedEvent.auxiliary" :options="auxiliariesOptions" :error="$v.editedEvent.auxiliary.$error"
-          requiredField @input="setSector" :disable="isDisabled" />
+          required-field @input="setSector" :disable="isDisabled" />
         <ni-modal-select caption="Service" v-model="editedEvent.subscription" :options="customerSubscriptionsOptions(editedEvent.customer._id)"
           :error="$v.editedEvent.subscription.$error" @blur="$v.editedEvent.subscription.$touch" :disable="isDisabled" />
         <template v-if="isRepetition(editedEvent) && !isDisabled">
@@ -66,9 +66,9 @@
             <q-checkbox v-model="editedEvent.isCancelled" label="Annuler l'évènement" @input="toggleCancellationForm" />
           </div>
           <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.condition" caption="Conditions"
-            :options="cancellationConditions" requiredField @blur="$v.editedEvent.cancel.condition.$touch" />
+            :options="cancellationConditions" required-field @blur="$v.editedEvent.cancel.condition.$touch" />
           <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.reason" caption="Motif" :options="cancellationReasons"
-            requiredField @blur="$v.editedEvent.cancel.reason.$touch" />
+            required-field @blur="$v.editedEvent.cancel.reason.$touch" />
         </template>
       </div>
       <div class="cutomer-info">

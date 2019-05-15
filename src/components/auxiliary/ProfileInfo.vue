@@ -142,7 +142,7 @@
           <div class="row justify-between">
             <p v-if="isAuxiliary" class="input-caption">Merci de nous indiquer le type de document d'identité que tu possèdes.</p>
           </div>
-          <q-field :error="$v.user.administrative.identityDocs.$error" :error-label="requiredField">
+          <q-field :error="$v.user.administrative.identityDocs.$error" :error-label="requiredLabel">
             <q-option-group color="primary" v-model="user.administrative.identityDocs" @input="updateUser('administrative.identityDocs')"
               :options="identityDocsOptions" />
           </q-field>
@@ -216,7 +216,7 @@
             <p class="input-caption">Veux-tu adhérer à la mutuelle d'entreprise ?</p>
             <q-icon v-if="$v.user.administrative.mutualFund.has.$error" name="error_outline" color="secondary" />
           </div>
-          <q-field :error="$v.user.administrative.mutualFund.has.$error" :error-label="requiredField">
+          <q-field :error="$v.user.administrative.mutualFund.has.$error" :error-label="requiredLabel">
             <q-btn-toggle class="full-width" color="white" text-color="black" toggle-color="primary" v-model="user.administrative.mutualFund.has"
               @input="updateUser('administrative.mutualFund.has')" :options="[
                   { label: 'Oui', value: false },
@@ -247,7 +247,7 @@
             <q-icon v-if="$v.user.administrative.transportInvoice.transportType.$error" name="error_outline"
               color="secondary" />
           </div>
-          <q-field :error="$v.user.administrative.transportInvoice.transportType.$error" :error-label="requiredField">
+          <q-field :error="$v.user.administrative.transportInvoice.transportType.$error" :error-label="requiredLabel">
             <q-option-group color="primary" v-model="user.administrative.transportInvoice.transportType" :options="transportOptions"
               @input="updateUser('administrative.transportInvoice.transportType')" />
           </q-field>
@@ -315,7 +315,7 @@ export default {
   data () {
     return {
       transportOptions: TRANSPORT_OPTIONS,
-      requiredField: REQUIRED_LABEL,
+      requiredLabel: REQUIRED_LABEL,
       requiredDoc: 'Document requis',
       disablePictureEdition: true,
       docsThmbnails: {},
