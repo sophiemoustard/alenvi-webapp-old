@@ -26,7 +26,7 @@
       <template v-else-if="col.name === 'service'">
         {{ getLastVersion(bill.subscription.service.versions).name }}
       </template>
-      <template v-else-if="col.name === 'hours'">{{ formatHours(bill.hours) }}</template>
+      <template v-else-if="col.name === 'hours'">{{ formatHours(bill) }}</template>
       <template v-else-if="col.name === 'unitExclTaxes'">{{ formatPrice(bill.unitExclTaxes) }}</template>
       <template v-else-if="col.name === 'discount'">
         <div class="cursor-pointer text-primary" @click="$emit('discount:click', $refs[bill._id])"
@@ -50,6 +50,7 @@
 
 <script>
 import { formatPrice, getLastVersion } from '../../helpers/utils.js';
+import { FIXED } from '../../data/constants.js';
 
 export default {
   name: 'ToBillRow',
@@ -66,8 +67,11 @@ export default {
     getLastVersion (value) {
       return getLastVersion(value, 'createdAt')
     },
-    formatHours (value) {
-      return value ? `${parseFloat(value).toFixed(2)}h` : '';
+    formatHours (bill) {
+      if (bill.subscription.service && bill.subscription.service.nature === FIXED) {
+        return bill.eventsList.length;
+      }
+      return bill.hours ? `${parseFloat(bill.hours).toFixed(2)}h` : '';
     },
     formatDate (value) {
       return value ? `${this.$moment(value).format('DD/MM/YY')}` : '';
