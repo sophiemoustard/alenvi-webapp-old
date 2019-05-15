@@ -43,7 +43,7 @@
           @blur="validations.location.fullAddress.$touch" :error="validations.location.fullAddress.$error"
           :error-label="addressError" />
       </template>
-      <template v-if="isRepetition(editedEvent) && !isDisabled">
+      <template v-if="isRepetition(editedEvent) && !isDisabled && !editedEvent.isCancelled">
         <div class="row q-mb-md light-checkbox">
           <q-checkbox v-model="editedEvent.shouldUpdateRepetition" label="Appliquer à la répétition"
             @input="toggleRepetition" />

@@ -112,9 +112,6 @@ export const planningActionMixin = {
 
       if (event.location && event.location.fullAddress) delete payload.location.location;
       if (event.location && Object.keys(event.location).length === 0) delete payload.location;
-      if (event.cancel && Object.keys(event.cancel).length === 0) delete payload.cancel;
-      if (event.cancel && Object.keys(event.cancel).length === 0) delete payload.attachment;
-      if (event.shouldUpdateRepetition) delete payload.misc;
       if (event.type === ABSENCE && event.absence !== ILLNESS) payload.attachment = {};
 
       return payload;
@@ -229,6 +226,9 @@ export const planningActionMixin = {
     getEditionPayload (event) {
       let payload = this.getCreationPayload(event);
 
+      if (event.cancel && Object.keys(event.cancel).length === 0) delete payload.cancel;
+      if (event.attachment && Object.keys(event.attachment).length === 0) delete payload.attachment;
+      if (event.shouldUpdateRepetition) delete payload.misc;
       delete payload.customer;
       delete payload.repetition;
       delete payload.staffingLeft;
