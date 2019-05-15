@@ -1227,7 +1227,7 @@ export default {
       return this.subscriptions.map(sub => ({ label: sub.service.name, value: sub._id }));
     },
     showFundingHistory (id) {
-      this.selectedFunding = this.fundings.find(sub => sub._id === id);
+      this.selectedFunding = { ...this.fundings.find(sub => sub._id === id) };
       this.selectedFunding.versions = this.selectedFunding.versions && this.selectedFunding.versions.length > 0
         ? [this.selectedFunding, ...this.selectedFunding.versions] : [this.selectedFunding];
       this.fundingHistoryModal = true;
