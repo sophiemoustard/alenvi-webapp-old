@@ -87,6 +87,7 @@ import {
   AUXILIARY_ROLES,
   PLANNING_VIEW_START_HOUR,
   PLANNING_VIEW_END_HOUR,
+  INVOICED_AND_PAYED,
 } from '../../data/constants';
 import { NotifyNegative } from '../popup/notify';
 import NiChipAuxiliaryIndicator from '../planning/ChipAuxiliaryIndicator';
@@ -216,7 +217,10 @@ export default {
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
     },
     getPersonEvents (person) {
-      return this.events.filter(event => (event[this.personKey] ? event[this.personKey]._id === person._id : false));
+      return this.events.filter(event =>
+        (event[this.personKey] ? event[this.personKey]._id === person._id : false) &&
+        (this.isCustomerPlanning || !event.isCancelled || event.cancel.condition === INVOICED_AND_PAYED)
+      );
     },
     // Drag & drop
     drag (event) {

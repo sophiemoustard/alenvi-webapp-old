@@ -122,7 +122,7 @@ export const planningActionMixin = {
     hasConflicts (scheduledEvent) {
       const auxiliaryEvents = this.getAuxiliaryEventsBetweenDates(scheduledEvent.auxiliary, scheduledEvent.startDate, scheduledEvent.endDate);
       return auxiliaryEvents.some(ev => {
-        if (scheduledEvent._id && scheduledEvent._id === ev._id) return false;
+        if ((scheduledEvent._id && scheduledEvent._id === ev._id) || ev.isCancelled) return false;
         return this.$moment(scheduledEvent.startDate).isBetween(ev.startDate, ev.endDate, 'minutes', '[]') ||
           this.$moment(ev.startDate).isBetween(scheduledEvent.startDate, scheduledEvent.endDate, 'minutes', '[]');
       });
@@ -234,7 +234,7 @@ export const planningActionMixin = {
         this.loading = true;
         const payload = this.getPayload(this.editedEvent);
 
-        if (this.hasConflicts(payload)) {
+        if (!payload.isCancelled && this.hasConflicts(payload)) {
           this.$v.editedEvent.$reset();
           return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
         }
