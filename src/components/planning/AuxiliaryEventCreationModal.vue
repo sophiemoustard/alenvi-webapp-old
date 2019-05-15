@@ -19,7 +19,7 @@
       <q-btn-toggle no-wrap v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions"
         @input="resetForm(true, newEvent.type)" />
       <template v-if="newEvent.type !== ABSENCE">
-        <ni-datetime-range caption="Dates et heures de l'intervention" v-model="newEvent.dates" requiredField />
+        <ni-datetime-range caption="Dates et heures de l'évènement" v-model="newEvent.dates" requiredField />
       </template>
       <template v-if="newEvent.type === INTERVENTION">
         <ni-modal-select caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions"
@@ -45,14 +45,7 @@
             @delete="deleteDocument(newEvent.attachment.driveId)" :disable="!selectedAuxiliary._id" />
         </template>
         <template v-if="newEvent.absenceNature === HOURLY">
-          <ni-datetime-picker caption="Date de début" v-model="newEvent.dates.startDate" type="date" requiredField
-            :error="validations.dates.startDate.$error" inModal @blur="validations.dates.startDate.$touch" />
-          <ni-datetime-picker caption="Heure de début" v-model="newEvent.dates.startHour" type="time" requiredField
-            :error="validations.dates.startHour.$error" inModal @blur="validations.dates.startHour.$touch"
-            :max="newEvent.dates.endHour" />
-          <ni-datetime-picker caption="Heure de fin" v-model="newEvent.dates.endHour" type="time" requiredField
-            :error="validations.dates.endHour.$error" inModal @blur="validations.dates.endHour.$touch"
-            :min="newEvent.dates.startHour" />
+          <ni-datetime-range caption="Dates et heures de l'évènement" v-model="newEvent.dates" requiredField />
           <ni-modal-select caption="Type d'absence" v-model="newEvent.absence" :options="absenceOptions"
             :error="validations.absence.$error" requiredField @blur="validations.absence.$touch" disable />
         </template>

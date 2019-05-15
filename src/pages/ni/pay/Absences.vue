@@ -59,7 +59,7 @@ export default {
       absences: [],
       editedEvent: {},
       editionModal: false,
-      selectedAuxiliary: { picture: {}, identity: {} },
+      selectedAuxiliary: { picture: {}, identity: { lastname: '' } },
       pagination: {
         rowsPerPage: 0,
         sortBy: 'startDate',
@@ -171,7 +171,7 @@ export default {
     openEditionModal (event) {
       const can = this.canEditEvent(event);
       if (!can) return;
-      this.selectedAuxiliary = event.auxiliary ? event.auxiliary : { picture: {}, identity: {} };
+      this.selectedAuxiliary = event.auxiliary ? event.auxiliary : { picture: {}, identity: { lastname: '' } };
       this.formatEditedEvent(event);
 
       this.editionModal = true

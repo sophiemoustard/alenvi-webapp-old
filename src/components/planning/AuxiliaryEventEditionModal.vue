@@ -25,7 +25,7 @@
           color="grey" v-if="!isDisabled" />
       </div>
       <template v-if="editedEvent.type !== ABSENCE">
-        <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" requiredField
+        <ni-datetime-range caption="Dates et heures de l'évènement" v-model="editedEvent.dates" requiredField
           :disable="isDisabled" />
       </template>
       <template v-if="editedEvent.type === INTERVENTION">
@@ -66,14 +66,8 @@
             @delete="deleteDocument(editedEvent.attachment.driveId)" :disable="!selectedAuxiliary._id" />
         </template>
         <template v-if="editedEvent.absenceNature === HOURLY">
-          <ni-datetime-picker caption="Date de début" v-model="editedEvent.dates.startDate" type="date" requiredField
-            :error="validations.dates.startDate.$error" inModal @blur="validations.dates.startDate.$touch" />
-          <ni-datetime-picker caption="Heure de début" v-model="editedEvent.dates.startHour" type="time" requiredField
-            :error="validations.dates.startHour.$error" inModal @blur="validations.dates.startHour.$touch"
-            :max="editedEvent.dates.endHour" />
-          <ni-datetime-picker caption="Heure de fin" v-model="editedEvent.dates.endHour" type="time" requiredField
-            :error="validations.dates.endHour.$error" inModal @blur="validations.dates.endHour.$touch"
-            :min="editedEvent.dates.startHour" />
+          <ni-datetime-range caption="Dates et heures de l'évènement" v-model="editedEvent.dates" requiredField
+            :disable="isDisabled" />
           <ni-modal-select caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions"
             :error="validations.absence.$error" requiredField @blur="validations.absence.$touch" disable />
         </template>

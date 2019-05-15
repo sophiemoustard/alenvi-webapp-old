@@ -210,7 +210,7 @@ export default {
 
         return { ...aux, hasActiveCustomerContract, hasActiveCompanyContract };
       }
-      return { picture: {}, identity: {} };
+      return { picture: {}, identity: { lastname: '' } };
     },
     isDisabled () {
       return this.editedEvent.type === INTERVENTION && this.editedEvent.isBilled;
