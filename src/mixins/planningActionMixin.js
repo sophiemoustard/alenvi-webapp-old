@@ -81,7 +81,7 @@ export const planningActionMixin = {
     closeCreationModal () {
       this.creationModal = false;
     },
-    getPayload (event) {
+    getCreationPayload (event) {
       let payload = { ...this.$_.omit(event, ['dates', '__v', '__index']) }
       payload = this.$_.pickBy(payload);
 
@@ -141,7 +141,7 @@ export const planningActionMixin = {
         if (this.$v.newEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        const payload = this.getPayload(this.newEvent);
+        const payload = this.getCreationPayload(this.newEvent);
 
         if (this.hasConflicts(payload)) {
           return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
@@ -226,25 +226,31 @@ export const planningActionMixin = {
     closeEditionModal () {
       this.editionModal = false;
     },
+    getEditionPayload (event) {
+      let payload = this.getCreationPayload(event);
+
+      delete payload.customer;
+      delete payload.repetition;
+      delete payload.staffingLeft;
+      delete payload.staffingWidth;
+      delete payload.staffingTop;
+      delete payload.staffingHeight;
+      delete payload.type;
+
+      return payload;
+    },
     async updateEvent () {
       try {
         this.$v.editedEvent.$touch();
         if (this.$v.editedEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        const payload = this.getPayload(this.editedEvent);
+        const payload = this.getEditionPayload(this.editedEvent);
 
         if (!payload.isCancelled && this.hasConflicts(payload)) {
           this.$v.editedEvent.$reset();
           return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
         }
-
-        delete payload.customer;
-        delete payload.staffingLeft;
-        delete payload.staffingWidth;
-        delete payload.staffingTop;
-        delete payload.staffingHeight;
-        delete payload.type;
         delete payload._id;
         await this.$events.updateById(this.editedEvent._id, payload);
         NotifyPositive('Évènement modifié');
