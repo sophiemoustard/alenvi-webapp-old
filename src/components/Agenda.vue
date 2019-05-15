@@ -19,7 +19,7 @@
               </template>
               <template v-for="(event, eventId) in getOneDayEvents(days[dayIndex])">
                 <div :style="{ top: `${PERCENTAGE_BY_MINUTES * event.staffingTop}%`, height: `${PERCENTAGE_BY_MINUTES * event.staffingHeight - 0.2}%` }"
-                  :key="eventId"  :class="[!isCustomerPlanning && 'cursor-pointer', 'event', `event-${event.type}`]" @click.stop="editEvent(event)">
+                  :key="eventId"  :class="[!isCustomerPlanning && 'cursor-pointer', 'event', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]" @click.stop="editEvent(event)">
                   <div class="event-container">
                     <div class="col-12 event-title">
                       <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">{{ eventTitle(event) }}</p>
