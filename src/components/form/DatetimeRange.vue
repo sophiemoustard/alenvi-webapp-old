@@ -18,7 +18,7 @@
           <ni-select-input :value="value.endHour" @input="update($event, 'endHour')" class="time-item" align="center"
             @blur="blurHourHandler" :options="endHourOptions" :disable="disable" />
           <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item" @blur="blurDateHandler"
-            :min="value.startDate" :disable="disable" />
+            :min="value.startDate" :disable="disable || disableEndDate" />
         </div>
       </div>
     </q-field>
@@ -41,6 +41,7 @@ export default {
     value: Object,
     requiredField: { type: Boolean, default: false },
     disable: { type: Boolean, default: false },
+    disableEndDate: { type: Boolean, default: false },
   },
   data () {
     return {

@@ -45,7 +45,8 @@
             @delete="deleteDocument(newEvent.attachment.driveId)" :disable="!selectedAuxiliary._id" />
         </template>
         <template v-if="newEvent.absenceNature === HOURLY">
-          <ni-datetime-range caption="Dates et heures de l'évènement" v-model="newEvent.dates" requiredField />
+          <ni-datetime-range caption="Dates et heures de l'évènement" v-model="newEvent.dates" required-field
+            disable-end-date />
           <ni-modal-select caption="Type d'absence" v-model="newEvent.absence" :options="absenceOptions"
             :error="validations.absence.$error" requiredField @blur="validations.absence.$touch" disable />
         </template>

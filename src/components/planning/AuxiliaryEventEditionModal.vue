@@ -67,7 +67,7 @@
         </template>
         <template v-if="editedEvent.absenceNature === HOURLY">
           <ni-datetime-range caption="Dates et heures de l'évènement" v-model="editedEvent.dates" requiredField
-            :disable="isDisabled" />
+            :disable="isDisabled" disable-end-date />
           <ni-modal-select caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions"
             :error="validations.absence.$error" requiredField @blur="validations.absence.$touch" disable />
         </template>
