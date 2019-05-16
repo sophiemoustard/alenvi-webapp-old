@@ -129,6 +129,26 @@ const routes = [
         },
       },
       {
+        path: 'ni/exports/data',
+        name: 'data',
+        component: () => import('pages/ni/exports/DataExports'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['exports:edit'],
+          parent: 'exports',
+        },
+      },
+      {
+        path: 'ni/exports/history',
+        name: 'history',
+        component: () => import('pages/ni/exports/HistoryExports'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['exports:edit'],
+          parent: 'exports',
+        },
+      },
+      {
         path: 'ni/auxiliaries',
         name: 'administrative directory',
         component: () => import('pages/ni/auxiliaries/Directory'),
