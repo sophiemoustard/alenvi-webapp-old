@@ -29,7 +29,7 @@
       <ni-menu-item name="customers directory" icon="contacts" label="Répertoire bénéficiaires" />
     </q-collapsible>
     <q-item-separator />
-    <q-collapsible v-if="user.role.name === 'Admin'" ref="billing" v-model="activeRoutes.billing.open"
+    <q-collapsible v-if="user.role.name === ADMIN" ref="billing" v-model="activeRoutes.billing.open"
       collapseIcon="expand_more">
       <template slot="header">
         <q-item-main :class="{'text-weight-bold': activeRoutes.billing.highlight }" label="Facturation" />
@@ -40,7 +40,7 @@
       <ni-menu-item name="debits archive" :params="{ id: user._id }" icon="mdi-archive" label="Archive prélèvements" />
     </q-collapsible>
     <q-item-separator />
-    <q-collapsible v-if="user.role.name === 'Admin'" ref="pay" v-model="activeRoutes.pay.open"
+    <q-collapsible v-if="user.role.name === ADMIN" ref="pay" v-model="activeRoutes.pay.open"
       collapseIcon="expand_more">
       <template slot="header">
         <q-item-main :class="{'text-weight-bold': activeRoutes.pay.highlight }" label="Paie" />
@@ -50,7 +50,15 @@
       <ni-menu-item name="absences" :params="{ id: user._id }" icon="calendar_today" label="Absences" />
     </q-collapsible>
     <q-item-separator />
-    <q-collapsible v-if="user.role.name === 'Admin'" ref="configuration" v-model="activeRoutes.configuration.open"
+    <q-collapsible ref="exports" v-model="activeRoutes.exports.open" collapseIcon="expand_more">
+      <template slot="header">
+        <q-item-main :class="{'text-weight-bold': activeRoutes.exports.highlight }" label="Exports" />
+      </template>
+      <ni-menu-item name="data" :params="{ id: user._id }" icon="list_alt" label="Données" />
+      <ni-menu-item name="history" :params="{ id: user._id }" icon="history" label="Historique" />
+    </q-collapsible>
+    <q-item-separator />
+    <q-collapsible v-if="user.role.name === ADMIN" ref="configuration" v-model="activeRoutes.configuration.open"
       collapseIcon="expand_more">
       <template slot="header">
         <q-item-main :class="{'text-weight-bold': activeRoutes.configuration.highlight }" label="Configuration" />
@@ -68,6 +76,7 @@
 import { sideMenuMixin } from '../../mixins/sideMenuMixin';
 import MenuItem from './MenuItem.vue';
 import SideMenuFooter from './SideMenuFooter.vue';
+import { ADMIN } from '../../data/constants';
 
 export default {
   props: {
@@ -80,6 +89,7 @@ export default {
   },
   data () {
     return {
+      ADMIN,
       activeRoutes: {
         planning: {
           open: false,
@@ -98,6 +108,10 @@ export default {
           highlight: false,
         },
         pay: {
+          open: false,
+          highlight: false,
+        },
+        exports: {
           open: false,
           highlight: false,
         },
