@@ -1,23 +1,38 @@
 <template>
-  <q-page class="neutral-background q-pb-xl">
-    <div class="title-padding">
-      <h4>Données</h4>
-      <q-btn label="Exporter" @click="exportCsv" />
+  <q-page padding class="neutral-background q-pb-xl">
+    <h4>Données</h4>
+    <div class="row">
+      <ni-select caption="Type d'export" :options="exportTypeOptions" v-model="type" />
     </div>
+    <q-btn label="Exporter" no-caps flat color="white" icon="import_export" @click="exportCsv" />
   </q-page>
 </template>
 
 <script>
 import { NotifyNegative, NotifyPositive } from '../../../components/popup/notify';
 import { downloadFile } from '../../../helpers/downloadFile';
+import Select from '../../../components/form/Select';
+import { EXPORT_TYPES, SERVICE } from '../../../data/constants';
 
 export default {
   name: 'DataExports',
   metaInfo: { title: 'Données' },
+  components: {
+    'ni-select': Select,
+  },
+  data () {
+    return {
+      exportTypeOptions: EXPORT_TYPES,
+      type: SERVICE,
+    }
+  },
   methods: {
     async exportCsv () {
       try {
-        const csv = await this.$exports.getCsv({ type: 'service' });
+        const type = EXPORT_TYPES.find(t => t.value === this.type);
+        if (!type) NotifyNegative('Impossible de téléchager le document');
+
+        const csv = await this.$exports.getCsv({ type: type.value });
         await downloadFile(csv, 'services.csv');
 
         NotifyPositive('Document téléchargé');
@@ -31,4 +46,9 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+@import '~variables';
+
+  .q-btn
+    background-color: $primary;
+
 </style>
