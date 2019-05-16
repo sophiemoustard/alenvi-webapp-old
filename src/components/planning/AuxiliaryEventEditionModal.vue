@@ -26,7 +26,7 @@
       </div>
       <template v-if="editedEvent.type !== ABSENCE">
         <ni-datetime-range caption="Dates et heures de l'évènement" v-model="editedEvent.dates" required-field
-          :disable="isDisabled" />
+          :disable="isDisabled" :error="validations.dates.$error" @blur="validations.dates.$touch" />
       </template>
       <template v-if="editedEvent.type === INTERVENTION">
         <ni-modal-select caption="Bénéficiaire" v-model="editedEvent.customer._id" :options="customersOptions"
@@ -67,7 +67,7 @@
         </template>
         <template v-if="editedEvent.absenceNature === HOURLY">
           <ni-datetime-range caption="Dates et heures de l'évènement" v-model="editedEvent.dates" required-field
-            :disable="isDisabled" disable-end-date />
+            :disable="isDisabled" disable-end-date :error="validations.dates.$error" @blur="validations.dates.$touch" />
           <ni-modal-select caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions"
             :error="validations.absence.$error" required-field @blur="validations.absence.$touch" disable />
         </template>

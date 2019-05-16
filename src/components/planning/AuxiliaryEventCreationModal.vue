@@ -19,7 +19,8 @@
       <q-btn-toggle no-wrap v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions"
         @input="resetForm(true, newEvent.type)" />
       <template v-if="newEvent.type !== ABSENCE">
-        <ni-datetime-range caption="Dates et heures de l'évènement" v-model="newEvent.dates" required-field />
+        <ni-datetime-range caption="Dates et heures de l'évènement" v-model="newEvent.dates" required-field
+          :error="validations.dates.$error" @blur="validations.dates.$touch" />
       </template>
       <template v-if="newEvent.type === INTERVENTION">
         <ni-modal-select caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions"
@@ -46,7 +47,7 @@
         </template>
         <template v-if="newEvent.absenceNature === HOURLY">
           <ni-datetime-range caption="Dates et heures de l'évènement" v-model="newEvent.dates" required-field
-            disable-end-date />
+            disable-end-date :error="validations.dates.$error" @blur="validations.dates.$touch" />
           <ni-modal-select caption="Type d'absence" v-model="newEvent.absence" :options="absenceOptions"
             :error="validations.absence.$error" required-field @blur="validations.absence.$touch" disable />
         </template>

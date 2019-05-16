@@ -1,6 +1,6 @@
 <template>
   <div @click="selectPopover = !selectPopover">
-    <q-input color="white" inverted-light :value="value" @blur="blurHandler" align="center" @input="update" :class="[ selectPopover ? 'underline' : '']"
+    <q-input color="white" inverted-light :value="value" @change="blurHandler" align="center" @input="update" :class="[ selectPopover ? 'underline' : '']"
       :disable="disable" />
     <q-popover v-model="selectPopover" :disable="disable">
       <q-list>
@@ -27,11 +27,10 @@ export default {
   },
   methods: {
     blurHandler (hour) {
-      if (hour instanceof String) this.$emit('blur', { hour });
+      this.$emit('blur', { hour });
     },
     update (hour) {
-      this.$emit('blur', { hour });
-      if (hour.match(/[0-2][0-9]:([0-5]|[0-9])/)) this.$emit('input', hour);
+      this.$emit('input', hour);
       this.selectPopover = false;
     },
   },
