@@ -1,7 +1,7 @@
 <template>
   <div @click="datetimePopover = !datetimePopover">
     <q-input color="white" inverted-light :value="formattedDate" @input="update($event, 'DD/MM/YYYY')" placeholder="jj/mm/yyyy"
-      @blur="blurHandler" align="center" :class="[ datetimePopover ? 'underline' : '']" :disable="disable" />
+      @change="blurHandler" align="center" :class="[ datetimePopover ? 'underline' : '']" :disable="disable" />
     <q-popover v-model="datetimePopover" :disable="disable">
       <q-datetime-picker :value="value" format="DD MMM YYYY" color="white" inverted-light @input="update" minimal :min="min" />
     </q-popover>
@@ -31,25 +31,9 @@ export default {
       this.$emit('blur');
     },
     update (value, format) {
-      // update from input component
-      if (format) {
-        if (this.$moment(value, 'DD/MM/YYYY', true).isValid()) {
-          const date = this.$moment(value, format).toISOString();
-          if (this.min && this.$moment(value, 'DD/MM/YYYY', true).isBefore(this.$moment(this.min))) {
-            this.$emit('blur', { date, min: this.min });
-          } else {
-            this.$emit('blur');
-            this.$emit('input', date);
-          }
-        } else {
-          this.$emit('blur', { date: value });
-        }
-      // update from datetime component
-      } else {
-        this.datetimePopover = false;
-        this.$emit('blur');
-        this.$emit('input', value);
-      }
+      this.datetimePopover = false;
+      this.$emit('blur');
+      this.$emit('input', value);
     },
   },
 }

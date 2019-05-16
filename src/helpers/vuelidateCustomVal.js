@@ -1,6 +1,7 @@
 import sectors from '../api/Sectors';
 const ibantools = require('ibantools');
 const axios = require('axios');
+const moment = require('moment');
 
 export const frPhoneNumber = (value) => {
   if (!value) return true;
@@ -63,4 +64,12 @@ export const strictPositiveNumber = (value) => {
   if (isNaN(parseFloat(value)) || !isFinite(value)) return false;
 
   return value > 0;
+}
+
+export const validHour = (value) => {
+  return !!value.match(/^[0-1][0-9]:[0-5][0-9]$|^2[0-2]:[0-5][0-9]$/);
+}
+
+export const minDate = (value, parent) => {
+  return moment(value).isSameOrAfter(moment(parent.startDate));
 }

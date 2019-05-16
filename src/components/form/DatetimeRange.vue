@@ -7,18 +7,18 @@
     <q-field :error="hasError" :error-label="errorMessage">
       <div class="datetime-container">
         <div class="datetime-item">
-          <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" @blur="blurDateHandler"
-            :disable="disable" />
-          <ni-select-input :value="value.startHour" @input="update($event, 'startHour')" class="time-item" align="center"
-            @blur="blurHourHandler" :options="hoursOptions" filter :filter-placeholder="value.startHour" hide-underline
-            name="start-hour" :disable="disable" />
+          <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item"
+            @blur="blurHandler" :disable="disable" />
+          <ni-select-input :value="value.startHour" @input="update($event, 'startHour')" class="time-item"
+            @blur="blurHandler" :options="hoursOptions" filter :filter-placeholder="value.startHour" hide-underline
+            name="start-hour" :disable="disable" align="center" />
         </div>
         <p class="delimiter">-</p>
         <div class="datetime-item end">
           <ni-select-input :value="value.endHour" @input="update($event, 'endHour')" class="time-item" align="center"
-            @blur="blurHourHandler" :options="endHourOptions" :disable="disable" />
-          <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item" @blur="blurDateHandler"
-            :min="value.startDate" :disable="disable" />
+            @blur="blurHandler" :options="endHourOptions" :disable="disable" />
+          <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
+            @blur="blurHandler" :min="value.startDate" :disable="disable || disableEndDate" />
         </div>
       </div>
     </q-field>
@@ -26,9 +26,11 @@
 </template>
 
 <script>
+import { required } from 'vuelidate/lib/validators';
 import DateInput from './DateInput.vue';
 import SelectInput from './SelectInput.vue';
 import { PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR } from '../../data/constants.js';
+import { minDate, validHour } from '../../helpers/vuelidateCustomVal.js';
 
 export default {
   components: {
@@ -37,16 +39,27 @@ export default {
   },
   props: {
     caption: { type: String, default: '' },
-    error: Boolean,
-    value: Object,
+    error: { type: Boolean, default: false },
+    value: { type: Object, default: () => ({}) },
     requiredField: { type: Boolean, default: false },
     disable: { type: Boolean, default: false },
+    disableEndDate: { type: Boolean, default: false },
   },
   data () {
     return {
       errorMessage: 'Date(s) et heure(s) invalide(s)',
       childError: false,
     };
+  },
+  validations () {
+    return {
+      value: {
+        startDate: { required },
+        startHour: { required, validHour },
+        endDate: { required, minDate },
+        endHour: { required, validHour },
+      },
+    }
   },
   computed: {
     hoursOptions () {
@@ -60,7 +73,7 @@ export default {
       return selectOptions;
     },
     hasError () {
-      return this.error || this.childError;
+      return this.error || this.$v.value.startDate.$error || this.$v.value.startHour.$error || this.$v.value.endDate.$error || this.$v.value.endHour.$error;
     },
     endHourOptions () {
       return this.hoursOptions.map(option => {
@@ -69,20 +82,13 @@ export default {
     },
   },
   methods: {
-    blurDateHandler (event) {
-      if (event && event.date === '') this.childError = true;
-      else if (event && event.date && !(this.$moment(event.date, 'DD/MM/YYYY', true).isValid())) this.childError = true;
-      else if (event && event.date && event.min && this.$moment(event.date).isBefore(this.$moment(event.min))) this.childError = true;
-      else this.childError = false;
-    },
-    blurHourHandler (event) {
-      if (event && event.hour === '') this.childError = true;
-      else if (event && event.hour && !event.hour.match(/[0-2][0-9]:([0-5]|[0-9])/)) this.childError = true;
-      else this.childError = false;
+    blurHandler () {
+      this.$v.value.$touch();
+      this.$emit('blur');
     },
     update (value, key) {
+      this.blurHandler();
       const dates = { ...this.value, [key]: value }
-      this.$emit('blur');
       if (key === 'startDate') dates.endDate = value;
       if (key === 'startHour' && this.$moment(value, 'HH:mm').isSameOrAfter(this.$moment(this.value.endHour, 'HH:mm'))) {
         dates.endHour = this.$moment(value, 'HH:mm').add(2, 'H').format('HH:mm');

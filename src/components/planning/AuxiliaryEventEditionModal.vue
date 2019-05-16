@@ -25,15 +25,15 @@
           color="grey" v-if="!isDisabled" />
       </div>
       <template v-if="editedEvent.type !== ABSENCE">
-        <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" requiredField
-          :disable="isDisabled" />
+        <ni-datetime-range caption="Dates et heures de l'évènement" v-model="editedEvent.dates" required-field
+          :disable="isDisabled" :error="validations.dates.$error" @blur="validations.dates.$touch" />
       </template>
       <template v-if="editedEvent.type === INTERVENTION">
         <ni-modal-select caption="Bénéficiaire" v-model="editedEvent.customer._id" :options="customersOptions"
-          :error="validations.customer.$error" requiredField disable />
+          :error="validations.customer.$error" required-field disable />
         <ni-modal-select caption="Service" :options="customerSubscriptionsOptions(editedEvent.customer._id)"
           v-model="editedEvent.subscription" :error="validations.subscription.$error"
-          @blur="validations.subscription.$touch" requiredField :disable="isDisabled" />
+          @blur="validations.subscription.$touch" required-field :disable="isDisabled" />
       </template>
       <template v-if="editedEvent.type === INTERNAL_HOUR">
         <ni-modal-select caption="Type d'heure interne" v-model="editedEvent.internalHour"
@@ -51,31 +51,25 @@
       </template>
       <template v-if="editedEvent.type === ABSENCE">
         <ni-modal-select caption="Nature" v-model="editedEvent.absenceNature" :options="absenceNatureOptions"
-          requiredField disable />
+          required-field disable />
         <template v-if="editedEvent.absenceNature === DAILY">
-          <ni-datetime-picker caption="Date de début" v-model="editedEvent.dates.startDate" type="date" requiredField
+          <ni-datetime-picker caption="Date de début" v-model="editedEvent.dates.startDate" type="date" required-field
             :error="validations.dates.startDate.$error" inModal @blur="validations.dates.startDate.$touch" />
-          <ni-datetime-picker caption="Date de fin" v-model="editedEvent.dates.endDate" type="date" requiredField inModal
+          <ni-datetime-picker caption="Date de fin" v-model="editedEvent.dates.endDate" type="date" required-field inModal
             :error="validations.dates.endDate.$error" @blur="validations.dates.endDate.$touch"
             :min="editedEvent.dates.startDate" />
           <ni-modal-select caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions"
-            :error="validations.absence.$error" requiredField @blur="validations.absence.$touch" />
+            :error="validations.absence.$error" required-field @blur="validations.absence.$touch" />
           <ni-file-uploader v-if="editedEvent.absence && editedEvent.absence === ILLNESS" caption="Justificatif d'absence"
             path="attachment" :entity="editedEvent" alt="justificatif absence" name="proofOfAbsence" :url="docsUploadUrl"
-            @uploaded="documentUploaded" :additionalValue="additionalValue" requiredField withBorders
+            @uploaded="documentUploaded" :additionalValue="additionalValue" required-field withBorders
             @delete="deleteDocument(editedEvent.attachment.driveId)" :disable="!selectedAuxiliary._id" />
         </template>
         <template v-if="editedEvent.absenceNature === HOURLY">
-          <ni-datetime-picker caption="Date de début" v-model="editedEvent.dates.startDate" type="date" requiredField
-            :error="validations.dates.startDate.$error" inModal @blur="validations.dates.startDate.$touch" />
-          <ni-datetime-picker caption="Heure de début" v-model="editedEvent.dates.startHour" type="time" requiredField
-            :error="validations.dates.startHour.$error" inModal @blur="validations.dates.startHour.$touch"
-            :max="editedEvent.dates.endHour" />
-          <ni-datetime-picker caption="Heure de fin" v-model="editedEvent.dates.endHour" type="time" requiredField
-            :error="validations.dates.endHour.$error" inModal @blur="validations.dates.endHour.$touch"
-            :min="editedEvent.dates.startHour" />
+          <ni-datetime-range caption="Dates et heures de l'évènement" v-model="editedEvent.dates" required-field
+            :disable="isDisabled" disable-end-date :error="validations.dates.$error" @blur="validations.dates.$touch" />
           <ni-modal-select caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions"
-            :error="validations.absence.$error" requiredField @blur="validations.absence.$touch" disable />
+            :error="validations.absence.$error" required-field @blur="validations.absence.$touch" disable />
         </template>
       </template>
       <ni-modal-input v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes"
@@ -86,10 +80,10 @@
         </div>
         <div class="row justify-between">
           <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.condition" caption="Conditions"
-            :options="cancellationConditions" requiredField @blur="validations.cancel.condition.$touch" class="col-6"
+            :options="cancellationConditions" required-field @blur="validations.cancel.condition.$touch" class="col-6"
             style="padding-right: 3px" />
           <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.reason" caption="Motif"
-            :options="cancellationReasons" requiredField @blur="validations.cancel.reason.$touch" class="col-6"
+            :options="cancellationReasons" required-field @blur="validations.cancel.reason.$touch" class="col-6"
             style="padding-left: 3px" />
         </div>
       </template>

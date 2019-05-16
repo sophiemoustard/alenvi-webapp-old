@@ -19,51 +19,46 @@
       <q-btn-toggle no-wrap v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions"
         @input="resetForm(true, newEvent.type)" />
       <template v-if="newEvent.type !== ABSENCE">
-        <ni-datetime-range caption="Dates et heures de l'intervention" v-model="newEvent.dates" requiredField />
+        <ni-datetime-range caption="Dates et heures de l'évènement" v-model="newEvent.dates" required-field
+          :error="validations.dates.$error" @blur="validations.dates.$touch" />
       </template>
       <template v-if="newEvent.type === INTERVENTION">
         <ni-modal-select caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions"
-          :error="validations.customer.$error" requiredField @blur="validations.customer.$touch" />
+          :error="validations.customer.$error" required-field @blur="validations.customer.$touch" />
         <ni-modal-select caption="Service" v-model="newEvent.subscription" :error="validations.subscription.$error"
-          :options="customerSubscriptionsOptions(newEvent.customer)" requiredField @blur="validations.subscription.$touch" />
+          :options="customerSubscriptionsOptions(newEvent.customer)" required-field @blur="validations.subscription.$touch" />
       </template>
       <template v-if="newEvent.type === ABSENCE">
         <ni-modal-select caption="Nature" v-model="newEvent.absenceNature" :options="absenceNatureOptions"
-          :error="validations.absenceNature.$error" requiredField @blur="validations.absenceNature.$touch"
+          :error="validations.absenceNature.$error" required-field @blur="validations.absenceNature.$touch"
           @input="resetAbsenceType" />
         <template v-if="newEvent.absenceNature === DAILY">
-          <ni-datetime-picker caption="Date de début" v-model="newEvent.dates.startDate" type="date" requiredField
+          <ni-datetime-picker caption="Date de début" v-model="newEvent.dates.startDate" type="date" required-field
             :error="validations.dates.startDate.$error" inModal @blur="validations.dates.startDate.$touch" />
-          <ni-datetime-picker caption="Date de fin" v-model="newEvent.dates.endDate" type="date" requiredField inModal
+          <ni-datetime-picker caption="Date de fin" v-model="newEvent.dates.endDate" type="date" required-field inModal
             :error="validations.dates.endDate.$error" @blur="validations.dates.endDate.$touch"
             :min="newEvent.dates.startDate" />
           <ni-modal-select caption="Type d'absence" v-model="newEvent.absence" :options="absenceOptions"
-            :error="validations.absence.$error" requiredField @blur="validations.absence.$touch" />
+            :error="validations.absence.$error" required-field @blur="validations.absence.$touch" />
           <ni-file-uploader v-if="newEvent.absence && newEvent.absence === ILLNESS" caption="Justificatif d'absence"
             path="attachment" :entity="newEvent" alt="justificatif absence" name="proofOfAbsence" :url="docsUploadUrl"
-            @uploaded="documentUploaded" :additionalValue="additionalValue" requiredField withBorders
+            @uploaded="documentUploaded" :additionalValue="additionalValue" required-field withBorders
             @delete="deleteDocument(newEvent.attachment.driveId)" :disable="!selectedAuxiliary._id" />
         </template>
         <template v-if="newEvent.absenceNature === HOURLY">
-          <ni-datetime-picker caption="Date de début" v-model="newEvent.dates.startDate" type="date" requiredField
-            :error="validations.dates.startDate.$error" inModal @blur="validations.dates.startDate.$touch" />
-          <ni-datetime-picker caption="Heure de début" v-model="newEvent.dates.startHour" type="time" requiredField
-            :error="validations.dates.startHour.$error" inModal @blur="validations.dates.startHour.$touch"
-            :max="newEvent.dates.endHour" />
-          <ni-datetime-picker caption="Heure de fin" v-model="newEvent.dates.endHour" type="time" requiredField
-            :error="validations.dates.endHour.$error" inModal @blur="validations.dates.endHour.$touch"
-            :min="newEvent.dates.startHour" />
+          <ni-datetime-range caption="Dates et heures de l'évènement" v-model="newEvent.dates" required-field
+            disable-end-date :error="validations.dates.$error" @blur="validations.dates.$touch" />
           <ni-modal-select caption="Type d'absence" v-model="newEvent.absence" :options="absenceOptions"
-            :error="validations.absence.$error" requiredField @blur="validations.absence.$touch" disable />
+            :error="validations.absence.$error" required-field @blur="validations.absence.$touch" disable />
         </template>
       </template>
       <template v-if="newEvent.type === INTERNAL_HOUR">
         <ni-modal-select caption="Type d'heure interne" v-model="newEvent.internalHour" :options="internalHourOptions"
-          requiredField :error="validations.internalHour.$error" @blur="validations.internalHour.$touch" />
+          required-field :error="validations.internalHour.$error" @blur="validations.internalHour.$touch" />
       </template>
       <template v-if="newEvent.type !== ABSENCE">
         <ni-modal-select caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency"
-          :options="repetitionOptions" requiredField @blur="validations.repetition.frequency.$touch" />
+          :options="repetitionOptions" required-field @blur="validations.repetition.frequency.$touch" />
       </template>
       <template v-if="newEvent.type === INTERNAL_HOUR">
         <ni-search-address v-model="newEvent.location.fullAddress" @selected="selectedAddress" :error-label="addressError"

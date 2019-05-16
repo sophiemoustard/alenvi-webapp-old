@@ -1,5 +1,5 @@
 import { NotifyWarning, NotifyNegative, NotifyPositive } from '../components/popup/notify';
-import { INTERNAL_HOUR, ABSENCE, INTERVENTION, NEVER, UNAVAILABILITY, ILLNESS, CUSTOMER_CONTRACT, COMPANY_CONTRACT, DAILY, HOURLY, PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR } from '../data/constants';
+import { INTERNAL_HOUR, ABSENCE, INTERVENTION, NEVER, UNAVAILABILITY, ILLNESS, CUSTOMER_CONTRACT, COMPANY_CONTRACT, DAILY, PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR } from '../data/constants';
 
 export const planningActionMixin = {
   methods: {
@@ -44,24 +44,13 @@ export const planningActionMixin = {
       this.$v.newEvent.$reset();
       if (!partialReset) this.newEvent = {};
       else {
-        let startHour = this.newEvent.dates.startHour;
-        let endHour = this.newEvent.dates.endHour;
-        if (type === ABSENCE) {
-          const startHourSplit = this.newEvent.dates.startHour.split(':');
-          const endHourSplit = this.newEvent.dates.endHour.split(':');
-          startHour = this.$moment().hours(startHourSplit[0]).minutes(startHourSplit[1]).toISOString();
-          endHour = this.$moment().hours(endHourSplit[0]).minutes(endHourSplit[1]).toISOString();
-        } else if (this.$moment(this.newEvent.dates.startHour).isValid()) { // Switch from absence to anoter event type
-          startHour = this.$moment(this.newEvent.dates.startHour).format('HH:mm');
-          endHour = this.$moment(this.newEvent.dates.endHour).format('HH:mm');
-        }
         this.newEvent = {
           type,
           dates: {
             startDate: partialReset ? this.newEvent.dates.startDate : '',
-            startHour: partialReset ? startHour : '',
+            startHour: partialReset ? this.newEvent.dates.startHour : '',
             endDate: partialReset ? this.newEvent.dates.endDate : '',
-            endHour: partialReset ? endHour : '',
+            endHour: partialReset ? this.newEvent.dates.endHour : '',
           },
           repetition: { frequency: NEVER },
           startDuration: '',
@@ -89,20 +78,9 @@ export const planningActionMixin = {
         const internalHour = this.internalHours.find(hour => hour._id === event.internalHour);
         payload.internalHour = internalHour;
       }
-      if (event.type === ABSENCE) {
-        if (event.absenceNature === DAILY) {
-          payload.startDate = this.$moment(event.dates.startDate).hour(PLANNING_VIEW_START_HOUR).minute(0).toISOString();
-          payload.endDate = this.$moment(event.dates.endDate).hour(PLANNING_VIEW_END_HOUR).minute(0).toISOString();
-        } else {
-          payload.startDate = this.$moment(event.dates.startDate)
-            .hour(this.$moment(event.dates.startHour).hour())
-            .minute(this.$moment(event.dates.startHour).minute())
-            .toISOString();
-          payload.endDate = this.$moment(event.dates.startDate)
-            .hour(this.$moment(event.dates.endHour).hour())
-            .minute(this.$moment(event.dates.endHour).minute())
-            .toISOString();
-        }
+      if (event.type === ABSENCE && event.absenceNature === DAILY) {
+        payload.startDate = this.$moment(event.dates.startDate).hour(PLANNING_VIEW_START_HOUR).minute(0).toISOString();
+        payload.endDate = this.$moment(event.dates.endDate).hour(PLANNING_VIEW_END_HOUR).minute(0).toISOString();
       } else {
         payload.startDate = this.$moment(event.dates.startDate).hours(event.dates.startHour.split(':')[0])
           .minutes(event.dates.startHour.split(':')[1]).toISOString();
@@ -169,8 +147,8 @@ export const planningActionMixin = {
       const dates = {
         startDate,
         endDate,
-        startHour: event.type === ABSENCE && event.absenceNature === HOURLY ? startDate : this.formatHour(startDate),
-        endHour: event.type === ABSENCE && event.absenceNature === HOURLY ? endDate : this.formatHour(endDate),
+        startHour: this.formatHour(startDate),
+        endHour: this.formatHour(endDate),
       };
 
       switch (event.type) {
