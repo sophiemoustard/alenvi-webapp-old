@@ -33,7 +33,7 @@ export default {
         if (!type) NotifyNegative('Impossible de téléchager le document');
 
         const csv = await this.$exports.getCsv({ type: type.value });
-        await downloadFile(csv, 'services.csv');
+        await downloadFile(csv, `${type.label}.csv`);
 
         NotifyPositive('Document téléchargé');
       } catch (e) {
