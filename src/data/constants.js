@@ -65,6 +65,7 @@ export const COACH = 'Coach';
 export const ADMIN = 'Admin';
 export const CUSTOMER = 'Customer';
 export const AUXILIARY = 'Auxiliaire';
+export const HELPER = 'Aidants';
 export const PLANNING_REFERENT = 'Référent(e) planning';
 export const AUXILIARY_ROLES = [AUXILIARY, PLANNING_REFERENT];
 
@@ -146,15 +147,15 @@ export const THIRD_PARTY_PAYER = 'ThirdPartyPayer';
 // EXPORTS
 export const SERVICE = 'service';
 export const SUBSCRIPTION = 'subscription';
-export const HELPER = 'helper';
+export const HELPER_TYPE = 'helper';
 export const FUNDING = 'funding';
-export const AUXILIARY_TYPE = 'funding';
+export const AUXILIARY_TYPE = 'auxiliary';
 export const CUSTOMER_TYPE = 'customer';
 export const EXPORT_TYPES = [
-  { label: 'Service', value: SERVICE },
-  { label: 'Souscription', value: SUBSCRIPTION },
-  { label: 'Financement', value: FUNDING },
-  { label: 'Auxiliaire', value: AUXILIARY_TYPE },
-  { label: 'Bénéficiaire', value: CUSTOMER_TYPE },
-  { label: 'Aidant', value: HELPER },
+  { label: 'Services', value: SERVICE },
+  { label: 'Souscriptions', value: SUBSCRIPTION },
+  { label: 'Financements', value: FUNDING },
+  { label: 'Auxiliaires', value: AUXILIARY_TYPE },
+  { label: 'Bénéficiaires', value: CUSTOMER_TYPE },
+  { label: 'Aidants', value: HELPER_TYPE },
 ];
