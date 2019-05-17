@@ -781,7 +781,10 @@ export default {
     async getAuxiliaryRoles () {
       try {
         const roles = await this.$roles.showAll({ name: JSON.stringify([AUXILIARY, PLANNING_REFERENT]) });
-        this.auxiliaryRolesOptions = roles.data.roles.map((role) => ({ label: role.name, value: role._id }));
+        this.auxiliaryRolesOptions = roles.data.roles.map((role) => ({
+          label: role.name === AUXILIARY ? 'Auxiliaire' : 'Référent(e) planning',
+          value: role._id,
+        }));
       } catch (e) {
         console.error(e);
       }

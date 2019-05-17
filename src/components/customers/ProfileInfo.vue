@@ -468,7 +468,7 @@ import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
 import { validationMixin } from '../../mixins/validationMixin.js';
 import { days } from '../../data/days.js';
-import { FUNDING_FREQ_OPTIONS, NATURE_OPTIONS, FIXED, HOURLY, REQUIRED_LABEL, ONCE } from '../../data/constants.js';
+import { FUNDING_FREQ_OPTIONS, NATURE_OPTIONS, FIXED, HOURLY, REQUIRED_LABEL, ONCE, HELPER } from '../../data/constants.js';
 import { financialCertificatesMixin } from '../../mixins/financialCertificatesMixin.js';
 import { fundingMixin } from '../../mixins/fundingMixin.js';
 
@@ -1045,7 +1045,7 @@ export default {
     async createAlenviHelper () {
       this.newHelper.local.password = randomize('0', 6);
       this.newHelper.customers = [this.userProfile._id];
-      this.newHelper.role = 'Aidants';
+      this.newHelper.role = HELPER;
       this.newHelper.company = this.company.name;
       this.newHelper.identity = this.$_.pickBy(this.newHelper.identity);
       const payload = this.$_.pickBy(this.newHelper);
