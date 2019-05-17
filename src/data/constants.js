@@ -142,3 +142,19 @@ export const PAYMENT_NATURE_OPTIONS = [
 
 // FUNDINGS
 export const THIRD_PARTY_PAYER = 'ThirdPartyPayer';
+
+// EXPORTS
+export const SERVICE = 'service';
+export const SUBSCRIPTION = 'subscription';
+export const HELPER = 'helper';
+export const FUNDING = 'funding';
+export const AUXILIARY_TYPE = 'funding';
+export const CUSTOMER_TYPE = 'customer';
+export const EXPORT_TYPES = [
+  { label: 'Service', value: SERVICE },
+  { label: 'Souscription', value: SUBSCRIPTION },
+  { label: 'Financement', value: FUNDING },
+  { label: 'Auxiliaire', value: AUXILIARY_TYPE },
+  { label: 'Bénéficiaire', value: CUSTOMER_TYPE },
+  { label: 'Aidant', value: HELPER },
+];
