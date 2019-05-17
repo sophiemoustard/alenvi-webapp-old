@@ -2,7 +2,7 @@ import { Cookies } from 'quasar'
 
 import store from '../store/index'
 import alenvi from '../helpers/alenvi'
-import { AUXILIARY, PLANNING_REFERENT } from '../data/constants.js';
+import { AUXILIARY, PLANNING_REFERENT, HELPER } from '../data/constants.js';
 
 const routes = [
   {
@@ -14,11 +14,11 @@ const routes = [
         if (await alenvi.refreshAlenviCookies()) {
           await store.dispatch('main/getUser', Cookies.get('user_id'));
         }
-        if (store.getters['main/user'] && store.getters['main/user'].role.name === 'Aidants') {
+        if (store.getters['main/user'] && store.getters['main/user'].role.name === HELPER) {
           return next({ name: 'customer agenda' });
         } else if (store.getters['main/user'] && (store.getters['main/user'].role.name === AUXILIARY || store.getters['main/user'].role.name === PLANNING_REFERENT)) {
           return next({ name: 'auxiliary agenda' });
-        } else if (store.getters['main/user'] && store.getters['main/user'].role.name !== AUXILIARY && store.getters['main/user'].role.name !== 'Aidants') {
+        } else if (store.getters['main/user'] && store.getters['main/user'].role.name !== AUXILIARY && store.getters['main/user'].role.name !== HELPER) {
           return next({ name: 'administrative directory' });
         } else {
           next({ path: '/login' });

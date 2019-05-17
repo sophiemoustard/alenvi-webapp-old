@@ -39,7 +39,7 @@
 <script>
 import CompaniHeader from '../../components/CompaniHeader';
 import { NotifyNegative } from '../../components/popup/notify';
-import { AUXILIARY, PLANNING_REFERENT } from '../../data/constants.js';
+import { AUXILIARY, PLANNING_REFERENT, HELPER } from '../../data/constants.js';
 
 export default {
   metaInfo: {
@@ -89,7 +89,7 @@ export default {
           return this.$router.replace({ path: this.$route.query.from });
         }
 
-        if (this.getUser.role.name === 'Aidants') {
+        if (this.getUser.role.name === HELPER) {
           const customer = await this.$customers.getById(this.getUser.customers[0]._id);
           this.$store.commit('rh/saveUserProfile', customer);
           this.$router.replace({ name: 'customer agenda' });

@@ -31,7 +31,7 @@ export default {
   },
   async mounted () {
     try {
-      const coaches = await this.$users.showAll({ role: 'Coach' });
+      const coaches = await this.$users.showAll({ role: 'coach' });
       for (let i = 0, l = coaches.length; i < l; i++) {
         if (!coaches[i].isConstrained) {
           coaches[i].isConstrained = false;

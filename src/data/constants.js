@@ -61,12 +61,12 @@ export const CUSTOMER_INITIATIVE = 'customer_initiative';
 export const AUXILIARY_INITIATIVE = 'auxiliary_initiative';
 
 // ROLES
-export const COACH = 'Coach';
-export const ADMIN = 'Admin';
-export const CUSTOMER = 'Customer';
-export const AUXILIARY = 'Auxiliaire';
-export const HELPER = 'Aidants';
-export const PLANNING_REFERENT = 'Référent(e) planning';
+export const COACH = 'coach';
+export const ADMIN = 'admin';
+export const CUSTOMER = 'customer';
+export const AUXILIARY = 'auxiliary';
+export const HELPER = 'helper';
+export const PLANNING_REFERENT = 'planningReferent';
 export const AUXILIARY_ROLES = [AUXILIARY, PLANNING_REFERENT];
 
 // PLANNING
@@ -147,15 +147,12 @@ export const THIRD_PARTY_PAYER = 'ThirdPartyPayer';
 // EXPORTS
 export const SERVICE = 'service';
 export const SUBSCRIPTION = 'subscription';
-export const HELPER_TYPE = 'helper';
 export const FUNDING = 'funding';
-export const AUXILIARY_TYPE = 'auxiliary';
-export const CUSTOMER_TYPE = 'customer';
 export const EXPORT_TYPES = [
   { label: 'Services', value: SERVICE },
   { label: 'Souscriptions', value: SUBSCRIPTION },
   { label: 'Financements', value: FUNDING },
-  { label: 'Auxiliaires', value: AUXILIARY_TYPE },
-  { label: 'Bénéficiaires', value: CUSTOMER_TYPE },
-  { label: 'Aidants', value: HELPER_TYPE },
+  { label: 'Auxiliaires', value: AUXILIARY },
+  { label: 'Bénéficiaires', value: CUSTOMER },
+  { label: 'Aidants', value: HELPER },
 ];
