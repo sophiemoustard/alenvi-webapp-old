@@ -10,6 +10,27 @@
 export default {
   name: 'ToPay',
   metaInfo: { title: 'À payer' },
+  data () {
+    return {
+      darftPay: [],
+    };
+  },
+  async mounted () {
+    await this.refreshDraftPay();
+  },
+  methods: {
+    async refreshDraftPay () {
+      try {
+        this.darftPay = await this.$pay.getDraftPay({
+          startDate: this.$moment().startOf('m').startOf('d').toISOString(),
+          endDate: this.$moment().endOf('m').endOf('d').toISOString(),
+        });
+      } catch (e) {
+        this.darftPay = [];
+        console.error(e);
+      }
+    },
+  },
 }
 </script>
 
