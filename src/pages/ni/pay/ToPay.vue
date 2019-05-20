@@ -59,6 +59,38 @@ export default {
           field: 'workedHours',
           format: value => this.formatHours(value),
         },
+        //     notSurchargedAndExempt,
+        // surchargedAndExempt,
+        // notSurchargedAndNotExempt,
+        // surchargedAndNotExempt,
+        {
+          name: 'notSurchargedAndExempt',
+          label: 'Dont exo SAP non majorées',
+          align: 'center',
+          field: 'notSurchargedAndExempt',
+          format: value => this.formatHours(value),
+        },
+        {
+          name: 'surchargedAndExempt',
+          label: 'Dont majorées et exo SAP',
+          align: 'center',
+          field: 'surchargedAndExempt',
+          format: value => this.formatHours(value),
+        },
+        {
+          name: 'notSurchargedAndNotExempt',
+          label: 'Dont non majorées non exo SAP',
+          align: 'center',
+          field: 'notSurchargedAndNotExempt',
+          format: value => this.formatHours(value),
+        },
+        {
+          name: 'surchargedAndNotExempt',
+          label: 'Dont majorées et non exo SAP',
+          align: 'center',
+          field: 'surchargedAndNotExempt',
+          format: value => this.formatHours(value),
+        },
         {
           name: 'mutual',
           label: 'Mutuelle',
@@ -98,7 +130,7 @@ export default {
       }
     },
     formatHours (value) {
-      return value ? `${parseFloat(value).toFixed(2)}h` : '';
+      return value ? `${parseFloat(value).toFixed(2)}h` : '0.00h';
     },
   },
 }
