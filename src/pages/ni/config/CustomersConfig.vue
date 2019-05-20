@@ -524,8 +524,8 @@ export default {
       },
       natureOptions: NATURE_OPTIONS,
       serviceTypeOptions: CONTRACT_STATUS_OPTIONS,
-      visibleColumnsServices: ['name', 'nature', 'defaultUnitAmount', 'vat', 'surcharge', 'actions'],
-      visibleHistoryColumns: ['startDate', 'name', 'defaultUnitAmount', 'vat', 'surcharge'],
+      visibleColumnsServices: ['name', 'nature', 'defaultUnitAmount', 'vat', 'surcharge', 'exemptFromCharges', 'actions'],
+      visibleHistoryColumns: ['startDate', 'name', 'defaultUnitAmount', 'vat', 'surcharge', 'exemptFromCharges'],
       serviceColumns: [
         {
           name: 'startDate',
@@ -566,6 +566,12 @@ export default {
           label: 'Plan de majoration',
           align: 'left',
           field: row => row.surcharge ? row.surcharge.name : '',
+        },
+        {
+          name: 'exemptFromCharges',
+          label: 'Exonération de charges',
+          align: 'center',
+          field: row => row.exemptFromCharges ? 'Oui' : 'Non',
         },
         {
           name: 'actions',
