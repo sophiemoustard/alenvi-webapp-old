@@ -58,7 +58,7 @@
       </template>
       <template v-if="newEvent.type !== ABSENCE">
         <ni-modal-select caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency"
-          :options="repetitionOptions" required-field @blur="validations.repetition.frequency.$touch" />
+          :options="repetitionOptions" required-field @blur="validations.repetition.frequency.$touch" :disable="cannotRepeatEvent" />
       </template>
       <template v-if="newEvent.type === INTERNAL_HOUR">
         <ni-search-address v-model="newEvent.location.fullAddress" @selected="selectedAddress" :error-label="addressError"
@@ -72,7 +72,7 @@
 </template>
 
 <script>
-import { ABSENCE, DEFAULT_AVATAR, INTERNAL_HOUR, INTERVENTION, HOURLY, UNJUSTIFIED } from '../../data/constants';
+import { ABSENCE, DEFAULT_AVATAR, INTERNAL_HOUR, INTERVENTION, HOURLY, UNJUSTIFIED, CUSTOMER_CONTRACT, COMPANY_CONTRACT, NEVER } from '../../data/constants';
 import { planningModalMixin } from '../../mixins/planningModalMixin';
 
 export default {
@@ -102,10 +102,29 @@ export default {
         ? ''
         : `${process.env.API_HOSTNAME}/events/${this.selectedAuxiliary._id}/gdrive/${this.selectedAuxiliary.administrative.driveFolder.id}/upload`;
     },
+    cannotRepeatEvent () {
+      if (this.newEvent.subscription !== '' && this.newEvent.customer !== '') {
+        const selectedCustomer = this.customers.find(cus => cus._id === this.newEvent.customer);
+        if (!selectedCustomer) return false;
+        const selectedSubscription = selectedCustomer.subscriptions.find(sub => sub._id === this.newEvent.subscription);
+        if (!selectedSubscription) return false;
+        if (selectedSubscription.service.type === COMPANY_CONTRACT) return this.selectedAuxiliary.hasActiveCompanyContract;
+        if (selectedSubscription.service.type === CUSTOMER_CONTRACT) {
+          const correspContract = this.selectedAuxiliary.contracts.find(ctr => ctr.customer === this.newEvent.customer);
+          if (!correspContract) return false;
+          return this.$moment(correspContract.startDate).isSameOrBefore(this.newEvent.endDate) &&
+          ((!correspContract.endDate && correspContract.versions.some(version => version.isActive)) || this.$moment(correspContract.endDate).isSameOrAfter(this.newEvent.startDate));
+        }
+      }
+      return false;
+    },
   },
   watch: {
     selectedAuxiliary (value) {
       if (!this.selectedAuxiliary.hasActiveCompanyContract && this.newEvent.type === INTERNAL_HOUR) this.newEvent.type = INTERVENTION;
+    },
+    cannotRepeatEvent (value) {
+      if (value) this.newEvent.repetition.frequency = NEVER;
     }
   },
   methods: {
