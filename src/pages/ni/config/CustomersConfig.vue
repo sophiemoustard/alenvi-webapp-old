@@ -212,6 +212,9 @@
         <ni-modal-input caption="TVA" suffix="%" v-model="newService.vat" type="number" :error="$v.newService.vat.$error" @blur="$v.newService.vat.$touch"
           error-label="La TVA doit être positive ou nulle" />
         <ni-modal-select v-if="newService.nature !== FIXED" caption="Plan de majoration" v-model="newService.surcharge" :options="surchargesOptions" clearable />
+        <div class="row q-mb-md">
+          <q-checkbox label="Exonération de charges" v-model="newService.exemptFromCharges" />
+        </div>
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer le service" icon-right="add" color="primary" :loading="loading" @click="createNewService"
         :disable="disableServiceCreationButton" />
@@ -237,6 +240,9 @@
         <ni-modal-input caption="TVA" suffix="%" v-model="editedService.vat" type="number" :error="$v.editedService.vat.$error" @blur="$v.editedService.vat.$touch"
           error-label="La TVA doit être positive ou nulle" />
         <ni-modal-select v-if="editedService.nature !== FIXED" caption="Plan de majoration" v-model="editedService.surcharge" :options="surchargesOptions" clearable />
+        <div class="row q-mb-md">
+          <q-checkbox label="Exonération de charges" v-model="editedService.exemptFromCharges" />
+        </div>
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Editer le service" icon-right="check" color="primary" :loading="loading" @click="updateService"
         :disable="disableServiceEditionButton" />
@@ -504,7 +510,8 @@ export default {
         nature: '',
         defaultUnitAmount: '',
         vat: '',
-        surcharge: null
+        surcharge: null,
+        exemptFromCharges: false,
       },
       editedService: {
         name: '',
@@ -512,7 +519,8 @@ export default {
         defaultUnitAmount: '',
         vat: '',
         nature: '',
-        surcharge: null
+        surcharge: null,
+        exemptFromCharges: false,
       },
       natureOptions: NATURE_OPTIONS,
       serviceTypeOptions: CONTRACT_STATUS_OPTIONS,
@@ -1009,7 +1017,8 @@ export default {
         nature: '',
         defaultUnitAmount: '',
         vat: '',
-        surcharge: null
+        surcharge: null,
+        exemptFromCharges: false,
       };
       this.$v.newService.$reset();
     },
@@ -1032,7 +1041,7 @@ export default {
     },
     openServiceEditionModal (id) {
       const selectedService = this.services.find(service => service._id === id);
-      const { name, defaultUnitAmount, vat, surcharge, nature } = selectedService;
+      const { name, defaultUnitAmount, vat, surcharge, nature, exemptFromCharges } = selectedService;
       this.editedService = {
         _id: selectedService._id,
         name: name || '',
@@ -1040,7 +1049,8 @@ export default {
         defaultUnitAmount: defaultUnitAmount || '',
         vat: vat || '',
         nature,
-        surcharge: surcharge ? surcharge._id : null
+        surcharge: surcharge ? surcharge._id : null,
+        exemptFromCharges,
       };
 
       this.serviceEditionModal = true;
@@ -1053,7 +1063,8 @@ export default {
         defaultUnitAmount: '',
         vat: '',
         nature: '',
-        surcharge: null
+        surcharge: null,
+        exemptFromCharges: false,
       };
       this.$v.editedService.$reset();
     },
