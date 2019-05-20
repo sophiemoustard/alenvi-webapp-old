@@ -8,6 +8,8 @@
 </template>
 
 <script>
+import { formatPrice } from '../../../helpers/utils';
+
 export default {
   name: 'ToPay',
   metaInfo: { title: 'À payer' },
@@ -56,6 +58,26 @@ export default {
           align: 'center',
           field: 'workedHours',
           format: value => this.formatHours(value),
+        },
+        {
+          name: 'mutual',
+          label: 'Mutuelle',
+          align: 'center',
+          field: 'mutual',
+          format: value => value ? 'Oui' : 'Non',
+        },
+        {
+          name: 'otherFees',
+          label: 'Autres frais',
+          align: 'center',
+          field: 'otherFees',
+          format: value => formatPrice(value),
+        },
+        {
+          name: 'bonus',
+          label: 'Prime',
+          align: 'center',
+          field: 'bonus',
         },
       ],
     };
