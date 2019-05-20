@@ -48,12 +48,14 @@ export default {
           label: 'Heures contrat',
           align: 'center',
           field: 'contractHours',
+          format: value => this.formatHours(value),
         },
         {
           name: 'workedHours',
           label: 'Total heures travaillées',
           align: 'center',
           field: 'workedHours',
+          format: value => this.formatHours(value),
         },
       ],
     };
@@ -72,6 +74,9 @@ export default {
         this.darftPay = [];
         console.error(e);
       }
+    },
+    formatHours (value) {
+      return value ? `${parseFloat(value).toFixed(2)}h` : '';
     },
   },
 }
