@@ -198,17 +198,17 @@ export default {
     selectedAuxiliary () {
       if (this.creationModal && this.newEvent.auxiliary) {
         const aux = this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
-        const hasActiveCustomerContract = this.hasActiveCustomerContract(aux, this.newEvent.dates.startDate);
-        const hasActiveCompanyContract = this.hasActiveCompanyContract(aux, this.newEvent.dates.endDate);
+        const hasActiveCustomerContractOnEvent = this.hasActiveCustomerContractOnEvent(aux, this.newEvent.dates.startDate);
+        const hasActiveCompanyContractOnEvent = this.hasActiveCompanyContractOnEvent(aux, this.newEvent.dates.endDate);
 
-        return { ...aux, hasActiveCustomerContract, hasActiveCompanyContract };
+        return { ...aux, hasActiveCustomerContractOnEvent, hasActiveCompanyContractOnEvent };
       }
       if (this.editionModal && this.editedEvent.auxiliary) {
         const aux = this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
-        const hasActiveCustomerContract = this.hasActiveCustomerContract(aux, this.editedEvent.dates.startDate);
-        const hasActiveCompanyContract = this.hasActiveCompanyContract(aux, this.editedEvent.dates.endDate);
+        const hasActiveCustomerContractOnEvent = this.hasActiveCustomerContractOnEvent(aux, this.editedEvent.dates.startDate);
+        const hasActiveCompanyContractOnEvent = this.hasActiveCompanyContractOnEvent(aux, this.editedEvent.dates.endDate);
 
-        return { ...aux, hasActiveCustomerContract, hasActiveCompanyContract };
+        return { ...aux, hasActiveCustomerContractOnEvent, hasActiveCompanyContractOnEvent };
       }
       return { picture: {}, identity: { lastname: '' } };
     },
@@ -233,7 +233,7 @@ export default {
       if (this.filteredSectors.length !== 0 || this.filteredCustomers.length !== 0) await this.refreshCustomers();
       if (this.customers.length !== 0) await this.refresh();
     },
-    hasActiveCustomerContract (auxiliary, selectedDay) {
+    hasActiveCustomerContractOnEvent (auxiliary, selectedDay) {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
       if (!auxiliary.contracts.some(contract => contract.status === CUSTOMER_CONTRACT)) return false;
       const customerContracts = auxiliary.contracts.filter(contract => contract.status === CUSTOMER_CONTRACT);
@@ -243,7 +243,7 @@ export default {
           ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(selectedDay));
       });
     },
-    hasActiveCompanyContract (auxiliary, selectedDay) {
+    hasActiveCompanyContractOnEvent (auxiliary, selectedDay) {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
       if (!auxiliary.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
       const companyContracts = auxiliary.contracts.filter(contract => contract.status === COMPANY_CONTRACT);

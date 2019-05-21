@@ -140,17 +140,17 @@ export default {
     selectedAuxiliary () {
       if (this.creationModal && this.newEvent.auxiliary) {
         const aux = this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
-        const hasActiveCustomerContract = this.hasActiveCustomerContract(aux, this.newEvent.dates.startDate);
-        const hasActiveCompanyContract = this.hasActiveCompanyContract(aux, this.newEvent.dates.endDate);
+        const hasActiveCustomerContractOnEvent = this.hasActiveCustomerContractOnEvent(aux, this.newEvent.dates.startDate);
+        const hasActiveCompanyContractOnEvent = this.hasActiveCompanyContractOnEvent(aux, this.newEvent.dates.endDate);
 
-        return { ...aux, hasActiveCustomerContract, hasActiveCompanyContract };
+        return { ...aux, hasActiveCustomerContractOnEvent, hasActiveCompanyContractOnEvent };
       }
       if (this.editionModal && this.editedEvent.auxiliary) {
         const aux = this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
-        const hasActiveCustomerContract = this.hasActiveCustomerContract(aux, this.editedEvent.dates.startDate);
-        const hasActiveCompanyContract = this.hasActiveCompanyContract(aux, this.editedEvent.dates.endDate);
+        const hasActiveCustomerContractOnEvent = this.hasActiveCustomerContractOnEvent(aux, this.editedEvent.dates.startDate);
+        const hasActiveCompanyContractOnEvent = this.hasActiveCompanyContractOnEvent(aux, this.editedEvent.dates.endDate);
 
-        return { ...aux, hasActiveCustomerContract, hasActiveCompanyContract };
+        return { ...aux, hasActiveCustomerContractOnEvent, hasActiveCompanyContractOnEvent };
       }
       return { picture: {}, identity: { lastname: '' } };
     },
@@ -191,8 +191,8 @@ export default {
       }
     },
     getActiveAuxiliaries () {
-      return this.auxiliaries.filter(aux => this.hasActiveCustomerContract(aux, this.startOfWeek, this.endOfWeek()) ||
-        this.hasActiveCompanyContract(aux, this.startOfWeek, this.endOfWeek()));
+      return this.auxiliaries.filter(aux => this.hasActiveCustomerContractOnEvent(aux, this.startOfWeek, this.endOfWeek()) ||
+        this.hasActiveCompanyContractOnEvent(aux, this.startOfWeek, this.endOfWeek()));
     },
     // Event creation
     openCreationModal (vEvent) {

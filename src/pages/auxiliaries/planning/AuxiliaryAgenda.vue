@@ -221,8 +221,8 @@ export default {
         },
       };
 
-      this.selectedAuxiliary.hasActiveCustomerContract = this.hasActiveCustomerContract(this.selectedAuxiliary, selectedDay);
-      this.selectedAuxiliary.hasActiveCompanyContract = this.hasActiveCompanyContract(this.selectedAuxiliary, selectedDay);
+      this.selectedAuxiliary.hasActiveCustomerContractOnEvent = this.hasActiveCustomerContractOnEvent(this.selectedAuxiliary, selectedDay);
+      this.selectedAuxiliary.hasActiveCompanyContractOnEvent = this.hasActiveCompanyContractOnEvent(this.selectedAuxiliary, selectedDay);
 
       this.creationModal = true;
     },
@@ -232,8 +232,8 @@ export default {
       if (!can) return;
       this.formatEditedEvent(event);
       if (event.type !== ABSENCE) {
-        this.selectedAuxiliary.hasActiveCustomerContract = this.hasActiveCustomerContract(this.selectedAuxiliary, event.startDate);
-        this.selectedAuxiliary.hasActiveCompanyContract = this.hasActiveCompanyContract(this.selectedAuxiliary, event.startDate);
+        this.selectedAuxiliary.hasActiveCustomerContractOnEvent = this.hasActiveCustomerContractOnEvent(this.selectedAuxiliary, event.startDate);
+        this.selectedAuxiliary.hasActiveCompanyContractOnEvent = this.hasActiveCompanyContractOnEvent(this.selectedAuxiliary, event.startDate);
       }
 
       this.editionModal = true

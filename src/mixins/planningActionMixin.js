@@ -9,7 +9,7 @@ export const planningActionMixin = {
         this.internalHours = user.company.rhConfig.internalHours;
       }
     },
-    hasActiveCustomerContract (auxiliary, startDate, endDate = startDate) {
+    hasActiveCustomerContractOnEvent (auxiliary, startDate, endDate = startDate) {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
       if (!auxiliary.contracts.some(contract => contract.status === CUSTOMER_CONTRACT)) return false;
       const customerContracts = auxiliary.contracts.filter(contract => contract.status === CUSTOMER_CONTRACT);
@@ -19,7 +19,7 @@ export const planningActionMixin = {
           ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isSameOrAfter(startDate));
       });
     },
-    hasActiveCompanyContract (auxiliary, startDate, endDate) {
+    hasActiveCompanyContractOnEvent (auxiliary, startDate, endDate) {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
       if (!auxiliary.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
       const companyContracts = auxiliary.contracts.filter(contract => contract.status === COMPANY_CONTRACT);
@@ -31,10 +31,10 @@ export const planningActionMixin = {
     },
     // Event creation
     canCreateEvent (person, selectedDay) {
-      const hasActiveCustomerContract = this.hasActiveCustomerContract(person, selectedDay);
-      const hasActiveCompanyContract = this.hasActiveCompanyContract(person, selectedDay);
+      const hasActiveCustomerContractOnEvent = this.hasActiveCustomerContractOnEvent(person, selectedDay);
+      const hasActiveCompanyContractOnEvent = this.hasActiveCompanyContractOnEvent(person, selectedDay);
 
-      return hasActiveCustomerContract || hasActiveCompanyContract;
+      return hasActiveCustomerContractOnEvent || hasActiveCompanyContractOnEvent;
     },
     selectedAddress (item) {
       if (this.creationModal) this.newEvent.location = Object.assign({}, this.newEvent.location, item);
