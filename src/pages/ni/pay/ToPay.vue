@@ -3,7 +3,44 @@
     <div class="title-padding">
       <h4>À payer</h4>
     </div>
-    <q-table :data="darftPay" :columns="columns" class="q-pa-sm" />
+    <q-table :data="draftPay" :columns="columns" class="q-pa-sm">
+      <q-tr slot="body" slot-scope="props" :props="props">
+        <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+          <template v-if="col.name === 'surchargedAndExempt'">
+            <div v-if="props.row.surchargedAndExempt" class="cursor-pointer text-primary" @click="openSurchargeDetailModal(props.row.auxiliary._id, 'surchargedAndExemptDetails')">
+              {{ col.value }}
+            </div>
+            <div v-else>{{ col.value }}</div>
+          </template>
+          <template v-else-if="col.name === 'surchargedAndNotExempt'">
+            <div v-if="props.row.surchargedAndNotExempt" class="cursor-pointer text-primary" @click="openSurchargeDetailModal(props.row.auxiliary._id, 'surchargedAndNotExemptDetails')">
+              {{ col.value }}
+            </div>
+            <div v-else>{{ col.value }}</div>
+          </template>
+          <template v-else>{{ col.value }}</template>
+        </q-td>
+      </q-tr>
+    </q-table>
+    <q-modal v-model="surchargeDetailModal" content-classes="modal-container-sm" @hide="resetSurchargeDetail">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-11">
+            <h5>Détails des <span class="text-weight-bold">majorations</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer modal-btn-close">
+            <span><q-icon name="clear" @click.native="surchargeDetailModal = false" /></span>
+          </div>
+        </div>
+        <div v-for="surchargePlan in Object.keys(surchargeDetails)" :key="surchargePlan" class="q-mb-xl">
+          <div class="text-primary capitalize text-weight-bold q-mb-md">{{ surchargePlan }}</div>
+          <div v-for="surcharge in Object.keys(surchargeDetails[surchargePlan])" :key="surcharge" class="surcharge-line">
+            <div class="surcharge-type q-pa-sm">{{ surcharge }}</div>
+            <div class="q-pa-sm">{{ formatHours(surchargeDetails[surchargePlan][surcharge]) }}</div>
+          </div>
+        </div>
+      </div>
+    </q-modal>
   </q-page>
 </template>
 
@@ -15,7 +52,7 @@ export default {
   metaInfo: { title: 'À payer' },
   data () {
     return {
-      darftPay: [],
+      draftPay: [],
       columns: [
         {
           name: 'auxiliary',
@@ -136,6 +173,8 @@ export default {
           field: 'bonus',
         },
       ],
+      surchargeDetailModal: false,
+      surchargeDetails: {},
     };
   },
   async mounted () {
@@ -144,21 +183,50 @@ export default {
   methods: {
     async refreshDraftPay () {
       try {
-        this.darftPay = await this.$pay.getDraftPay({
+        this.draftPay = await this.$pay.getDraftPay({
           startDate: this.$moment().startOf('M').startOf('d').toISOString(),
           endDate: this.$moment().endOf('M').endOf('d').toISOString(),
         });
       } catch (e) {
-        this.darftPay = [];
+        this.draftPay = [];
         console.error(e);
       }
     },
     formatHours (value) {
       return value ? `${parseFloat(value).toFixed(2)}h` : '0.00h';
     },
+    openSurchargeDetailModal (id, details) {
+      const draft = this.draftPay.find(dp => dp.auxiliary._id === id);
+      if (!draft) return;
+
+      this.surchargeDetails = draft[details];
+      this.surchargeDetailModal = true;
+    },
+    resetSurchargeDetail () {
+      this.surchargeDetails = {};
+    },
   },
 }
 </script>
 
 <style lang="stylus" scoped>
+  @import '~variables';
+
+  /deep/ .q-table
+    th
+      white-space: normal;
+      padding: 10px 20px;
+      vertical-align: middle;
+
+  .surcharge-line
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    border: 1px solid $light-grey;
+    &:not(:nth-child(2)) // first-child is title
+      border-top: none;
+
+  .surcharge-type
+    width: 60%
+    border-right: 1px solid $light-grey;
 </style>
