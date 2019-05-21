@@ -7,13 +7,15 @@
       <q-tr slot="body" slot-scope="props" :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
           <template v-if="col.name === 'surchargedAndExempt'">
-            <div v-if="props.row.surchargedAndExempt" class="cursor-pointer text-primary" @click="openSurchargeDetailModal(props.row.auxiliary._id, 'surchargedAndExemptDetails')">
+            <div v-if="props.row.surchargedAndExempt" class="cursor-pointer text-primary"
+              @click="openSurchargeDetailModal(props.row.auxiliary._id, 'surchargedAndExemptDetails')">
               {{ col.value }}
             </div>
             <div v-else>{{ col.value }}</div>
           </template>
           <template v-else-if="col.name === 'surchargedAndNotExempt'">
-            <div v-if="props.row.surchargedAndNotExempt" class="cursor-pointer text-primary" @click="openSurchargeDetailModal(props.row.auxiliary._id, 'surchargedAndNotExemptDetails')">
+            <div v-if="props.row.surchargedAndNotExempt" class="cursor-pointer text-primary"
+              @click="openSurchargeDetailModal(props.row.auxiliary._id, 'surchargedAndNotExemptDetails')">
               {{ col.value }}
             </div>
             <div v-else>{{ col.value }}</div>
@@ -29,12 +31,14 @@
             <h5>Détails des <span class="text-weight-bold">majorations</span></h5>
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
-            <span><q-icon name="clear" @click.native="surchargeDetailModal = false" /></span>
+            <span>
+              <q-icon name="clear" @click.native="surchargeDetailModal = false" /></span>
           </div>
         </div>
         <div v-for="surchargePlan in Object.keys(surchargeDetails)" :key="surchargePlan" class="q-mb-xl">
           <div class="text-primary capitalize text-weight-bold q-mb-md">{{ surchargePlan }}</div>
-          <div v-for="surcharge in Object.keys(surchargeDetails[surchargePlan])" :key="surcharge" class="surcharge-line">
+          <div v-for="surcharge in Object.keys(surchargeDetails[surchargePlan])" :key="surcharge"
+            class="surcharge-line">
             <div class="surcharge-type q-pa-sm">{{ surcharge }}</div>
             <div class="q-pa-sm">{{ formatHours(surchargeDetails[surchargePlan][surcharge]) }}</div>
           </div>
