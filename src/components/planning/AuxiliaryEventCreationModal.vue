@@ -102,25 +102,22 @@ export default {
         ? ''
         : `${process.env.API_HOSTNAME}/events/${this.selectedAuxiliary._id}/gdrive/${this.selectedAuxiliary.administrative.driveFolder.id}/upload`;
     },
-    hasOnlyActiveCompanyContract () {
+    isCompanyContractActive () {
       if (!this.selectedAuxiliary.contracts || this.selectedAuxiliary.contracts.length === 0) return false;
       if (!this.selectedAuxiliary.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
       if (!this.newEvent.dates || !this.newEvent.dates.endDate) return false;
-      const companyContracts = this.selectedAuxiliary.contracts.filter(contract => contract.status === COMPANY_CONTRACT);
+      const companyContract = this.selectedAuxiliary.contracts.find(contract => contract.status === COMPANY_CONTRACT);
+      if (!companyContract) return false;
 
-      return companyContracts.some(contract => {
-        return this.$moment(contract.startDate).isSameOrBefore(this.newEvent.dates.endDate) &&
-          ((!contract.endDate && contract.versions.some(version => version.isActive)));
-      });
+      return !companyContract.endDate && companyContract.versions.some(version => version.isActive);
     },
-    hasOnlyActiveCustomerContract () {
+    isCustomerContractActive () {
       if (!this.selectedAuxiliary.contracts || this.selectedAuxiliary.contracts.length === 0) return false;
       if (!this.selectedAuxiliary.contracts.some(contract => contract.status === CUSTOMER_CONTRACT)) return false;
       if (!this.newEvent.dates || !this.newEvent.dates.endDate) return false;
       const correspContract = this.selectedAuxiliary.contracts.find(ctr => ctr.customer === this.newEvent.customer);
       if (!correspContract) return false;
-      return this.$moment(correspContract.startDate).isSameOrBefore(this.newEvent.dates.endDate) &&
-          ((!correspContract.endDate && correspContract.versions.some(version => version.isActive)));
+      return !correspContract.endDate && correspContract.versions.some(version => version.isActive);
     },
     isRepetitionAllowed () {
       if (this.newEvent.subscription !== '' && this.newEvent.customer !== '') {
@@ -128,15 +125,15 @@ export default {
         if (!selectedCustomer) return true;
         const selectedSubscription = selectedCustomer.subscriptions.find(sub => sub._id === this.newEvent.subscription);
         if (!selectedSubscription) return true;
-        if (selectedSubscription.service.type === COMPANY_CONTRACT) return this.hasOnlyActiveCompanyContract;
-        if (selectedSubscription.service.type === CUSTOMER_CONTRACT) return this.hasOnlyActiveCustomerContract;
+        if (selectedSubscription.service.type === COMPANY_CONTRACT) return this.isCompanyContractActive;
+        if (selectedSubscription.service.type === CUSTOMER_CONTRACT) return this.isCustomerContractActive;
       }
       return true;
     },
   },
   watch: {
     selectedAuxiliary (value) {
-      if (!this.selectedAuxiliary.hasActiveCompanyContract && this.newEvent.type === INTERNAL_HOUR) this.newEvent.type = INTERVENTION;
+      if (!this.selectedAuxiliary.hasActiveCompanyContractOnEvent && this.newEvent.type === INTERNAL_HOUR) this.newEvent.type = INTERVENTION;
     },
     isRepetitionAllowed (value) {
       if (!value) this.newEvent.repetition.frequency = NEVER;

@@ -116,7 +116,7 @@ export const planningModalMixin = {
       }
     },
     eventTypeOptions () {
-      if (this.selectedAuxiliary && !this.selectedAuxiliary.hasActiveCompanyContract) {
+      if (this.selectedAuxiliary && !this.selectedAuxiliary.hasActiveCompanyContractOnEvent) {
         return [
           {label: 'Intervention', value: INTERVENTION},
           {label: 'Absence', value: ABSENCE},
@@ -140,7 +140,7 @@ export const planningModalMixin = {
       if (this.customers.length === 0 || !this.selectedAuxiliary || !this.selectedAuxiliary.contracts) return [];
 
       let customers = this.customers;
-      if (this.selectedAuxiliary && !this.selectedAuxiliary.hasActiveCompanyContract) {
+      if (this.selectedAuxiliary && !this.selectedAuxiliary.hasActiveCompanyContractOnEvent) {
         const auxiliaryCustomers = [];
         for (const contract of this.selectedAuxiliary.contracts) {
           if (contract.customer && !auxiliaryCustomers.includes(contract.customer)) auxiliaryCustomers.push(contract.customer);
@@ -189,8 +189,8 @@ export const planningModalMixin = {
       if (!selectedCustomer || !selectedCustomer.subscriptions || selectedCustomer.subscriptions.length === 0) return [];
 
       let subscriptions = selectedCustomer.subscriptions;
-      if (!this.selectedAuxiliary.hasActiveCustomerContract) subscriptions = subscriptions.filter(sub => sub.service.type !== CUSTOMER_CONTRACT)
-      if (!this.selectedAuxiliary.hasActiveCompanyContract) subscriptions = subscriptions.filter(sub => sub.service.type !== COMPANY_CONTRACT)
+      if (!this.selectedAuxiliary.hasActiveCustomerContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== CUSTOMER_CONTRACT)
+      if (!this.selectedAuxiliary.hasActiveCompanyContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== COMPANY_CONTRACT)
 
       return subscriptions.map(sub => ({
         label: sub.service.name,

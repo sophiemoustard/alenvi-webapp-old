@@ -1,8 +1,8 @@
 <template>
-  <div :class="[{ 'highlight': hasActiveCompanyContract },  'full-width', 'row', 'relative-position', 'chip-container']"
+  <div :class="[{ 'highlight': hasActiveCompanyContractOnEvent },  'full-width', 'row', 'relative-position', 'chip-container']"
     @click="openIndicatorsModal">
     <img :src="getAvatar(person.picture)" class="avatar">
-    <q-chip v-if="hasActiveCompanyContract" :class="['absolute-center', { 'busy': isBusy }]" small text-color="white">
+    <q-chip v-if="hasActiveCompanyContractOnEvent" :class="['absolute-center', { 'busy': isBusy }]" small text-color="white">
       <span class="chip-indicator">{{ ratio.weeklyHours }}h / {{ ratio.contractHours }}</span>
     </q-chip>
 
@@ -91,7 +91,7 @@ export default {
     selectedEvents () {
       return this.selectedTab === WEEK_STATS ? this.events : this.monthEvents;
     },
-    hasActiveCompanyContract () {
+    hasActiveCompanyContractOnEvent () {
       if (!this.person.contracts || this.person.contracts.length === 0) return false;
       if (!this.person.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
       const companyContracts = this.person.contracts.filter(contract => contract.status === COMPANY_CONTRACT);
@@ -108,16 +108,16 @@ export default {
     }
   },
   async mounted () {
-    if (!this.hasActiveCompanyContract) return;
+    if (!this.hasActiveCompanyContractOnEvent) return;
     await this.getRatio();
   },
   watch: {
     async selectedEvents () {
-      if (!this.hasActiveCompanyContract) return;
+      if (!this.hasActiveCompanyContractOnEvent) return;
       await this.computeIndicators();
     },
     async events () {
-      if (!this.hasActiveCompanyContract) return;
+      if (!this.hasActiveCompanyContractOnEvent) return;
       this.selectedTab = WEEK_STATS;
       await this.getRatio();
     },
@@ -136,7 +136,7 @@ export default {
       this.ratio = { weeklyHours: Math.round(this.totalWorkingHours), contractHours: this.getContractHours() };
     },
     async openIndicatorsModal () {
-      if (!this.hasActiveCompanyContract) return;
+      if (!this.hasActiveCompanyContractOnEvent) return;
       try {
         this.monthEvents = await this.$events.list({
           startDate: this.$moment(this.startOfWeek).startOf('month').format('YYYYMMDD'),
