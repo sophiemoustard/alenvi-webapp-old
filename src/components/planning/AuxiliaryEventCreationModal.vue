@@ -105,7 +105,6 @@ export default {
     isCompanyContractActive () {
       if (!this.selectedAuxiliary.contracts || this.selectedAuxiliary.contracts.length === 0) return false;
       if (!this.selectedAuxiliary.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
-      if (!this.newEvent.dates || !this.newEvent.dates.endDate) return false;
       const companyContract = this.selectedAuxiliary.contracts.find(contract => contract.status === COMPANY_CONTRACT);
       if (!companyContract) return false;
 
@@ -114,7 +113,6 @@ export default {
     isCustomerContractActive () {
       if (!this.selectedAuxiliary.contracts || this.selectedAuxiliary.contracts.length === 0) return false;
       if (!this.selectedAuxiliary.contracts.some(contract => contract.status === CUSTOMER_CONTRACT)) return false;
-      if (!this.newEvent.dates || !this.newEvent.dates.endDate) return false;
       const correspContract = this.selectedAuxiliary.contracts.find(ctr => ctr.customer === this.newEvent.customer);
       if (!correspContract) return false;
       return !correspContract.endDate && correspContract.versions.some(version => version.isActive);
