@@ -23,7 +23,7 @@
         <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions(newEvent.customer)"
           :error="$v.newEvent.subscription.$error" required-field @blur="$v.newEvent.subscription.$touch" />
         <ni-modal-select caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency" :options="repetitionOptions"
-          required-field @blur="$v.newEvent.repetition.frequency.$touch" />
+          required-field @blur="$v.newEvent.repetition.frequency.$touch" :disable="!isRepetitionAllowed" />
         <ni-modal-input v-model="newEvent.misc" caption="Notes" />
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary" @click="createEvent"
@@ -132,6 +132,9 @@ export default {
     },
     getElemRemoved (val) {
       this.handleElemRemovedFromFilter(val);
+    },
+    isRepetitionAllowed (value) {
+      if (!value) this.newEvent.repetition.frequency = NEVER;
     }
   },
   validations () {
@@ -200,8 +203,10 @@ export default {
         const aux = this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
         const hasActiveCustomerContractOnEvent = this.hasActiveCustomerContractOnEvent(aux, this.newEvent.dates.startDate);
         const hasActiveCompanyContractOnEvent = this.hasActiveCompanyContractOnEvent(aux, this.newEvent.dates.endDate);
+        const isCompanyContractActive = this.isCompanyContractActive(aux);
+        const isCustomerContractActive = this.isCustomerContractActive(aux);
 
-        return { ...aux, hasActiveCustomerContractOnEvent, hasActiveCompanyContractOnEvent };
+        return { ...aux, hasActiveCustomerContractOnEvent, hasActiveCompanyContractOnEvent, isCompanyContractActive, isCustomerContractActive };
       }
       if (this.editionModal && this.editedEvent.auxiliary) {
         const aux = this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
@@ -214,6 +219,17 @@ export default {
     },
     isDisabled () {
       return this.editedEvent.type === INTERVENTION && this.editedEvent.isBilled;
+    },
+    isRepetitionAllowed () {
+      if (this.newEvent.subscription !== '' && this.newEvent.auxiliary !== '') {
+        const selectedCustomer = this.customers.find(cus => cus._id === this.newEvent.customer);
+        if (!selectedCustomer) return true;
+        const selectedSubscription = selectedCustomer.subscriptions.find(sub => sub._id === this.newEvent.subscription);
+        if (!selectedSubscription) return true;
+        if (selectedSubscription.service.type === COMPANY_CONTRACT) return this.selectedAuxiliary.isCompanyContractActive;
+        if (selectedSubscription.service.type === CUSTOMER_CONTRACT) return this.selectedAuxiliary.isCustomerContractActive;
+      }
+      return true;
     }
   },
   methods: {
@@ -252,6 +268,21 @@ export default {
         return this.$moment(contract.startDate).isSameOrBefore(selectedDay) &&
           ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(selectedDay));
       });
+    },
+    isCompanyContractActive (aux) {
+      if (!aux.contracts.length === 0) return false;
+      if (!aux.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
+      const companyContract = aux.contracts.find(contract => contract.status === COMPANY_CONTRACT);
+      if (!companyContract) return false;
+
+      return !companyContract.endDate && companyContract.versions.some(version => version.isActive);
+    },
+    isCustomerContractActive (aux) {
+      if (aux.contracts.length === 0) return false;
+      if (!aux.contracts.some(contract => contract.status === CUSTOMER_CONTRACT)) return false;
+      const correspContract = aux.contracts.find(ctr => ctr.customer === this.newEvent.customer);
+      if (!correspContract) return false;
+      return !correspContract.endDate && correspContract.versions.some(version => version.isActive);
     },
     // Refresh data
     async refreshCustomers () {
