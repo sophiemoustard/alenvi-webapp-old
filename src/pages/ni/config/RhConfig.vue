@@ -52,6 +52,14 @@
         </div>
       </div>
       <div class="q-mb-xl">
+        <p class="text-weight-bold">Taux kilométrique</p>
+        <div class="row gutter-profile">
+          <ni-input caption="Montant par kilomètre" :error="$v.company.rhConfig.amountPerKm.$error"
+            type="number" v-model="company.rhConfig.amountPerKm" @focus="saveTmp('rhConfig.amountPerKm')" suffix="€" @blur="updateCompany('rhConfig.amountPerKm')"
+          />
+        </div>
+      </div>
+      <div class="q-mb-xl">
         <p class="text-weight-bold">Abonnements transports en commun</p>
         <div class="row gutter-profile">
           <template v-for="(transportSub, index) in company.rhConfig.transportSubs">
@@ -183,7 +191,6 @@ import ModalInput from '../../../components/form/ModalInput.vue';
 import FileUploader from '../../../components/form/FileUploader.vue';
 import { configMixin } from '../../../mixins/configMixin';
 import { REQUIRED_LABEL } from '../../../data/constants';
-import { validationMixin } from '../../../mixins/validationMixin.js';
 
 export default {
   name: 'RhConfig',
@@ -194,7 +201,7 @@ export default {
     'ni-modal-input': ModalInput,
     'ni-file-uploader': FileUploader,
   },
-  mixins: [configMixin, validationMixin],
+  mixins: [configMixin],
   data () {
     return {
       MAX_INTERNAL_HOURS_NUMBER: 9,
@@ -267,40 +274,44 @@ export default {
       return this.tmpInput === this.editedSector.name;
     }
   },
-  validations: {
-    company: {
-      rhConfig: {
-        contractWithCompany: {
-          grossHourlyRate: { required, posDecimals, maxValue: maxValue(999) }
-        },
-        contractWithCustomer: {
-          grossHourlyRate: { required, posDecimals, maxValue: maxValue(999) }
-        },
-        phoneSubRefunding: { required, posDecimals, maxValue: maxValue(999) },
-        transportSubs: {
-          $each: {
-            price: { required, posDecimals, maxValue: maxValue(999) }
+  validations () {
+    return {
+      company: {
+        rhConfig: {
+          contractWithCompany: {
+            grossHourlyRate: { required, posDecimals, maxValue: maxValue(999) }
+          },
+          contractWithCustomer: {
+            grossHourlyRate: { required, posDecimals, maxValue: maxValue(999) }
+          },
+          phoneSubRefunding: { required, posDecimals, maxValue: maxValue(999) },
+          amountPerKm: { required },
+          transportSubs: {
+            $each: {
+              price: { required, posDecimals, maxValue: maxValue(999) }
+            },
           },
         },
       },
-    },
-    newInternalHour: {
-      name: { required },
-    },
-    newSector: {
-      name: { required, sector }
-    },
-    editedSector: {
-      name: { required, sector }
+      newInternalHour: {
+        name: { required },
+      },
+      newSector: {
+        name: { required, sector }
+      },
+      editedSector: {
+        name: { required, sector }
+      }
     }
   },
   async mounted () {
-    this.company = this.user.company;
+    this.company = { ...this.user.company };
     if (!this.company.rhConfig.templates) {
       this.company.rhConfig.templates = {};
     }
     this.internalHours = this.company.rhConfig && this.company.rhConfig.internalHours ? this.company.rhConfig.internalHours : [];
     await this.getSectors();
+    this.$v.company.$touch();
   },
   methods: {
     saveTmp (path) {
@@ -330,7 +341,7 @@ export default {
       try {
         this.$_.get(this.$v.company, params.vuelidatePath).$touch();
         if (this.$_.get(this.$v.company, params.vuelidatePath).$error) {
-          NotifyWarning('Champ(s) invalide(s)');
+          return NotifyWarning('Champ(s) invalide(s)');
         }
 
         const price = this.company.rhConfig.transportSubs[params.index].price
