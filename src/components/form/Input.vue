@@ -45,7 +45,13 @@ export default {
   },
   methods: {
     blurHandler (event) {
-      this.$emit('blur');
+      if (this.type === 'number') {
+        this.$nextTick(() => {
+          this.$emit('blur');
+        });
+      } else {
+        this.$emit('blur');
+      }
     },
     focusHandler (event) {
       this.$emit('focus');
