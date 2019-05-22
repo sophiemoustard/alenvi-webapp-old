@@ -93,9 +93,9 @@
           </div>
         </div>
         <ni-datetime-picker caption="Date de notification" v-model="endContract.endNotificationDate" in-modal
-          required-field @blur="$v.endContract.endNotificationDate.$touch" :error="$v.endContract.endNotificationDate.$error" />
+          required-field @blur="$v.endContract.endNotificationDate.$touch" :error="$v.endContract.endNotificationDate.$error" date-moment="end" />
         <ni-datetime-picker caption="Date de fin de contrat" v-model="endContract.endDate" :min="minEndContractDate"
-          in-modal required-field @blur="$v.endContract.endDate.$touch" :error="$v.endContract.endDate.$error" />
+          in-modal required-field @blur="$v.endContract.endDate.$touch" :error="$v.endContract.endDate.$error" date-moment="end" />
         <ni-modal-select caption="Motif" :options="endContractReasons" v-model="endContract.endReason" required-field
           @blur="$v.endContract.endReason.$touch" :error="$v.endContract.endReason.$error" @input="resetOtherMisc" />
         <ni-modal-input caption="Autres" v-if="endContract.endReason === OTHER" v-model="endContract.otherMisc"
