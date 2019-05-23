@@ -429,7 +429,9 @@ export default {
         if (this.$v.endContract.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        await this.$contracts.update(this.endContract.contract._id, this.$_.omit(this.endContract, ['contract']));
+        const payload = { ...this.$_.omit(this.endContract, ['contract']) };
+        payload.endDate = this.$moment(payload.endDate).endOf('day').toISOString();
+        await this.$contracts.update(this.endContract.contract._id, payload);
         await this.refreshContracts();
         this.resetEndContractModal();
         NotifyPositive('Contrat terminé');
