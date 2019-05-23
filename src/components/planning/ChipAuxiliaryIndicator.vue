@@ -155,7 +155,7 @@ export default {
       let weeklyBreak = 0;
       for (const info of this.breakInfo) {
         if (info.timeBetween) weeklyBreak += info.timeBetween;
-        if (!info.isFirstOrLast) weeklyPaidTransports += info.transportDuration;
+        if (!info.isFirstOrLast) weeklyPaidTransports += (info.timeBetween > info.transportDuration + 15) ? info.transportDuration : info.timeBetween;
       };
 
       this.weeklyBreak = weeklyBreak / 60;
