@@ -20,15 +20,19 @@ export const UNAVAILABILITY = 'unavailability';
 export const INTERNAL_HOUR = 'internalHour';
 export const ILLNESS = 'illness';
 export const UNJUSTIFIED = 'unjustified absence';
+export const PAID_LEAVE = 'leave';
+export const WEDDING = 'wedding';
+export const BIRTH = 'birth';
+export const DEATH = 'death';
 export const ABSENCE_TYPES = [
-  { label: 'Congé', value: 'leave' },
+  { label: 'Congé', value: PAID_LEAVE },
   { label: 'Congé sans solde', value: 'unpaid leave' },
   { label: 'Congé maternité', value: 'maternity leave' },
   { label: 'Maladie', value: ILLNESS },
   { label: 'Absence injustifiée', value: UNJUSTIFIED },
-  { label: 'Mariage', value: 'mariage' },
-  { label: 'Naissance', value: 'birth' },
-  { label: 'Décès', value: 'death' },
+  { label: 'Mariage', value: WEDDING },
+  { label: 'Naissance', value: BIRTH },
+  { label: 'Décès', value: DEATH },
 ];
 export const EDITION = 'edition';
 export const DELETION = 'deletion';

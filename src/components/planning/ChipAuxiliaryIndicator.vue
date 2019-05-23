@@ -34,7 +34,7 @@
 
 <script>
 import AuxiliaryIndicators from '../AuxiliaryIndicators';
-import { DEFAULT_AVATAR, ABSENCE, INTERVENTION, INTERNAL_HOUR, TRANSIT, DRIVING, PUBLIC_TRANSPORT, WEEK_STATS, COMPANY_CONTRACT } from '../../data/constants.js';
+import { DEFAULT_AVATAR, ABSENCE, INTERVENTION, INTERNAL_HOUR, TRANSIT, DRIVING, PUBLIC_TRANSPORT, WEEK_STATS, COMPANY_CONTRACT, DEATH, BIRTH, WEDDING, PAID_LEAVE } from '../../data/constants.js';
 import googleMaps from '../../api/GoogleMaps';
 
 export default {
@@ -269,15 +269,17 @@ export default {
     getContractHours () {
       let contractHours = 0;
       for (const day of this.days) {
-        const absences = this.getAbsencesOnDay(day);
-        if (absences.morning && absences.afternoon) continue;
+        const absences = this.events.find(event =>
+          event.type === ABSENCE &&
+          day.isSameOrAfter(event.startDate, 'd') && day.isSameOrBefore(event.endDate, 'd') &&
+          [DEATH, BIRTH, WEDDING, PAID_LEAVE].includes(event.absence)
+        );
+        if (absences) continue;
 
         const version = this.getContractVersionOnDay(day);
         if (!version) continue;
 
-        /* 12 : from Monday to Saturday, there are 12 half days */
-        if (!absences.morning) contractHours += version.weeklyHours / 12 || 0;
-        if (!absences.afternoon) contractHours += version.weeklyHours / 12 || 0;
+        contractHours += version.weeklyHours / 6 || 0; // 6 : from Monday to Saturday, there are 6 half days
       };
       return Math.round(contractHours);
     },
