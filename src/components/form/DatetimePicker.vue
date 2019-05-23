@@ -28,11 +28,6 @@ export default {
     inModal: { type: Boolean, default: false },
     requiredField: { type: Boolean, default: false },
     clearable: { type: Boolean, default: false },
-    dateMoment: {
-      type: String,
-      default: 'start',
-      validator: value => ['start', 'end'].includes(value),
-    },
   },
   computed: {
     format () {
@@ -52,9 +47,6 @@ export default {
       this.$emit('focus');
     },
     update (value) {
-      if (this.type === 'date') {
-        value = this.$moment(value)[`${this.dateMoment}Of`]('day').toISOString();
-      }
       this.$emit('input', value);
     },
   },
