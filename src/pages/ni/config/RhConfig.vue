@@ -61,9 +61,9 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Taux kilométrique</p>
         <div class="row gutter-profile">
-          <ni-input caption="Montant par kilomètre" :error="$v.company.rhConfig.amountPerKm.$error" type="number"
-            v-model="company.rhConfig.amountPerKm" @focus="saveTmp('rhConfig.amountPerKm')" suffix="€"
-            @blur="updateCompany('rhConfig.amountPerKm')" />
+          <ni-input caption="Montant par kilomètre" :error="$v.company.rhConfig.amountPerKm.$error"
+            :error-label="nbrError('amountPerKm')" type="number" v-model="company.rhConfig.amountPerKm"
+            @focus="saveTmp('rhConfig.amountPerKm')" suffix="€" @blur="updateCompany('rhConfig.amountPerKm')" />
         </div>
       </div>
       <div class="q-mb-xl">
@@ -304,7 +304,7 @@ export default {
             grossHourlyRate: { required, posDecimals, maxValue: maxValue(999) }
           },
           phoneSubRefunding: { required, posDecimals, maxValue: maxValue(999) },
-          amountPerKm: { required },
+          amountPerKm: { required, posDecimals, maxValue: maxValue(999) },
           transportSubs: {
             $each: {
               price: { required, posDecimals, maxValue: maxValue(999) }
@@ -330,7 +330,6 @@ export default {
     }
     this.internalHours = this.company.rhConfig && this.company.rhConfig.internalHours ? this.company.rhConfig.internalHours : [];
     await this.getSectors();
-    this.$v.company.$touch();
   },
   methods: {
     saveTmp (path) {
