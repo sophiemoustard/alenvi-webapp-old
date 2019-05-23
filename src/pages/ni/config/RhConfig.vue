@@ -5,50 +5,65 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Heures internes</p>
         <q-card style="background: white">
-          <q-table :data="internalHours" :columns="internalHoursColumns" hide-bottom binary-state-sort :pagination.sync="pagination" class="table-responsive">
+          <q-table :data="internalHours" :columns="internalHoursColumns" hide-bottom binary-state-sort
+            :pagination.sync="pagination" class="table-responsive">
             <q-tr slot="body" slot-scope="props" :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
                 <template v-if="col.name === 'default'">
-                  <q-checkbox :disable="col.value" :value="col.value" @input="updateDefaultInternalHour(props.row._id)" />
+                  <q-checkbox :disable="col.value" :value="col.value"
+                    @input="updateDefaultInternalHour(props.row._id)" />
                 </template>
                 <template v-else-if="col.name === 'actions'">
-                  <q-btn :disable="props.row.default" flat round small color="grey" icon="delete" @click="deleteInternalHour(col.value, props.row.__index)" />
+                  <q-btn :disable="props.row.default" flat round small color="grey" icon="delete"
+                    @click="deleteInternalHour(col.value, props.row.__index)" />
                 </template>
                 <template v-else>{{ col.value }}</template>
               </q-td>
             </q-tr>
           </q-table>
           <q-card-actions align="end">
-            <q-btn no-caps flat color="primary" icon="add" label="Ajouter une heure interne" @click="newInternalHourModal = true"
-              :disable="internalHours.length >= MAX_INTERNAL_HOURS_NUMBER" />
+            <q-btn no-caps flat color="primary" icon="add" label="Ajouter une heure interne"
+              @click="newInternalHourModal = true" :disable="internalHours.length >= MAX_INTERNAL_HOURS_NUMBER" />
           </q-card-actions>
         </q-card>
       </div>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Contrats prestataires</p>
         <div class="row gutter-profile">
-          <ni-input caption="Taux horaire brut par défaut" :error="$v.company.rhConfig.contractWithCompany.grossHourlyRate.$error"
-            :error-label="nbrError('contractWithCompany.grossHourlyRate')" type="number" v-model="company.rhConfig.contractWithCompany.grossHourlyRate"
-            @focus="saveTmp('rhConfig.contractWithCompany.grossHourlyRate')" suffix="€" @blur="updateCompany('rhConfig.contractWithCompany.grossHourlyRate')"
-          />
+          <ni-input caption="Taux horaire brut par défaut"
+            :error="$v.company.rhConfig.contractWithCompany.grossHourlyRate.$error"
+            :error-label="nbrError('contractWithCompany.grossHourlyRate')" type="number"
+            v-model="company.rhConfig.contractWithCompany.grossHourlyRate"
+            @focus="saveTmp('rhConfig.contractWithCompany.grossHourlyRate')" suffix="€"
+            @blur="updateCompany('rhConfig.contractWithCompany.grossHourlyRate')" />
         </div>
       </div>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Contrats mandataires</p>
         <div class="row gutter-profile">
-          <ni-input caption="Taux horaire brut par défaut" :error="$v.company.rhConfig.contractWithCustomer.grossHourlyRate.$error"
-            :error-label="nbrError('contractWithCustomer.grossHourlyRate')" type="number" v-model="company.rhConfig.contractWithCustomer.grossHourlyRate"
-            @focus="saveTmp('rhConfig.contractWithCustomer.grossHourlyRate')" suffix="€" @blur="updateCompany('rhConfig.contractWithCustomer.grossHourlyRate')"
-          />
+          <ni-input caption="Taux horaire brut par défaut"
+            :error="$v.company.rhConfig.contractWithCustomer.grossHourlyRate.$error"
+            :error-label="nbrError('contractWithCustomer.grossHourlyRate')" type="number"
+            v-model="company.rhConfig.contractWithCustomer.grossHourlyRate"
+            @focus="saveTmp('rhConfig.contractWithCustomer.grossHourlyRate')" suffix="€"
+            @blur="updateCompany('rhConfig.contractWithCustomer.grossHourlyRate')" />
         </div>
       </div>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Remboursement téléphone</p>
         <div class="row gutter-profile">
-          <ni-input caption="Montant du remboursement" :error="$v.company.rhConfig.phoneSubRefunding.$error" :error-label="nbrError('phoneSubRefunding')"
-            type="number" v-model="company.rhConfig.phoneSubRefunding" @focus="saveTmp('rhConfig.phoneSubRefunding')" suffix="€"
-            @blur="updateCompany('rhConfig.phoneSubRefunding')"
-          />
+          <ni-input caption="Montant du remboursement" :error="$v.company.rhConfig.phoneSubRefunding.$error"
+            :error-label="nbrError('phoneSubRefunding')" type="number" v-model="company.rhConfig.phoneSubRefunding"
+            @focus="saveTmp('rhConfig.phoneSubRefunding')" suffix="€"
+            @blur="updateCompany('rhConfig.phoneSubRefunding')" />
+        </div>
+      </div>
+      <div class="q-mb-xl">
+        <p class="text-weight-bold">Taux kilométrique</p>
+        <div class="row gutter-profile">
+          <ni-input caption="Montant par kilomètre" :error="$v.company.rhConfig.amountPerKm.$error" type="number"
+            v-model="company.rhConfig.amountPerKm" @focus="saveTmp('rhConfig.amountPerKm')" suffix="€"
+            @blur="updateCompany('rhConfig.amountPerKm')" />
         </div>
       </div>
       <div class="q-mb-xl">
@@ -56,9 +71,10 @@
         <div class="row gutter-profile">
           <template v-for="(transportSub, index) in company.rhConfig.transportSubs">
             <ni-input :caption="transportSub.department" :error="$v.company.rhConfig.transportSubs.$each[index].$error"
-              type="number" v-model="company.rhConfig.transportSubs[index].price" @focus="saveTmp(`rhConfig.transportSubs[${index}].price`)" suffix="€"
-              @blur="updateCompanyTransportSubs({ vuelidatePath: `rhConfig.transportSubs.$each[${index}]`, index })" :key="index"
-            />
+              type="number" v-model="company.rhConfig.transportSubs[index].price"
+              @focus="saveTmp(`rhConfig.transportSubs[${index}].price`)" suffix="€"
+              @blur="updateCompanyTransportSubs({ vuelidatePath: `rhConfig.transportSubs.$each[${index}]`, index })"
+              :key="index" />
           </template>
         </div>
       </div>
@@ -66,42 +82,49 @@
         <p class="text-weight-bold">Documents</p>
         <div class="row gutter-profile">
           <div class="col-xs-12 col-md-6">
-            <ni-file-uploader caption="Modèle de contrat prestataire" path="rhConfig.templates.contractWithCompany" :entity="company" alt="template contrat prestataire"
-              name="contractWithCompany" @delete="deleteDocument(company.rhConfig.templates.contractWithCompany.driveId, 'contractWithCompany', 'rhConfig')"
-              @uploaded="documentUploaded" :additional-value="`modele_contrat_prestataire_${company.name}`" :url="docsUploadUrl"
-            />
+            <ni-file-uploader caption="Modèle de contrat prestataire" path="rhConfig.templates.contractWithCompany"
+              :entity="company" alt="template contrat prestataire" name="contractWithCompany"
+              @delete="deleteDocument(company.rhConfig.templates.contractWithCompany.driveId, 'contractWithCompany', 'rhConfig')"
+              @uploaded="documentUploaded" :additional-value="`modele_contrat_prestataire_${company.name}`"
+              :url="docsUploadUrl" />
           </div>
           <div class="col-xs-12 col-md-6">
-            <ni-file-uploader caption="Modèle d'avenant au contrat prestataire" path="rhConfig.templates.contractWithCompanyVersion" :entity="company" alt="template avenant prestataire"
-              name="contractWithCompanyVersion" @delete="deleteDocument(company.rhConfig.templates.contractWithCompanyVersion.driveId, 'contractWithCompanyVersion', 'rhConfig')"
-              @uploaded="documentUploaded" :additional-value="`modele_avenant_prestataire_${company.name}`" :url="docsUploadUrl"
-            />
+            <ni-file-uploader caption="Modèle d'avenant au contrat prestataire"
+              path="rhConfig.templates.contractWithCompanyVersion" :entity="company" alt="template avenant prestataire"
+              name="contractWithCompanyVersion"
+              @delete="deleteDocument(company.rhConfig.templates.contractWithCompanyVersion.driveId, 'contractWithCompanyVersion', 'rhConfig')"
+              @uploaded="documentUploaded" :additional-value="`modele_avenant_prestataire_${company.name}`"
+              :url="docsUploadUrl" />
           </div>
           <div class="col-xs-12 col-md-6">
-            <ni-file-uploader caption="Modèle de contrat mandataire" path="rhConfig.templates.contractWithCustomer" :entity="company" alt="template contrat mandataire"
-              name="contractWithCustomer" @delete="deleteDocument(company.rhConfig.templates.contractWithCustomer.driveId, 'contractWithCustomer', 'rhConfig')"
-              @uploaded="documentUploaded" :additional-value="`modele_contrat_mandataire_${company.name}`" :url="docsUploadUrl"
-            />
+            <ni-file-uploader caption="Modèle de contrat mandataire" path="rhConfig.templates.contractWithCustomer"
+              :entity="company" alt="template contrat mandataire" name="contractWithCustomer"
+              @delete="deleteDocument(company.rhConfig.templates.contractWithCustomer.driveId, 'contractWithCustomer', 'rhConfig')"
+              @uploaded="documentUploaded" :additional-value="`modele_contrat_mandataire_${company.name}`"
+              :url="docsUploadUrl" />
           </div>
           <div class="col-xs-12 col-md-6">
-            <ni-file-uploader caption="Modèle d'avenant au contrat mandataire" path="rhConfig.templates.contractWithCustomerVersion" :entity="company" alt="template avenant mandataire"
-              name="contractWithCustomerVersion" @delete="deleteDocument(company.rhConfig.templates.contractWithCustomerVersion.driveId, 'contractWithCustomerVersion', 'rhConfig')"
-              @uploaded="documentUploaded" :additional-value="`modele_avenant_mandataire_${company.name}`" :url="docsUploadUrl"
-            />
+            <ni-file-uploader caption="Modèle d'avenant au contrat mandataire"
+              path="rhConfig.templates.contractWithCustomerVersion" :entity="company" alt="template avenant mandataire"
+              name="contractWithCustomerVersion"
+              @delete="deleteDocument(company.rhConfig.templates.contractWithCustomerVersion.driveId, 'contractWithCustomerVersion', 'rhConfig')"
+              @uploaded="documentUploaded" :additional-value="`modele_avenant_mandataire_${company.name}`"
+              :url="docsUploadUrl" />
           </div>
         </div>
       </div>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Equipes</p>
         <q-card style="background: white">
-          <q-table :data="sectors" :columns="sectorsColumns" hide-bottom binary-state-sort :pagination.sync="sectorPagination"
-            class="table-responsive">
+          <q-table :data="sectors" :columns="sectorsColumns" hide-bottom binary-state-sort
+            :pagination.sync="sectorPagination" class="table-responsive">
             <q-tr slot="body" slot-scope="props" :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
                     <q-btn flat round small color="grey" icon="edit" @click.native="openEditionModal(col.value._id)" />
-                    <q-btn flat round small color="grey" icon="delete" :disable="col.value.auxiliaryCount > 0" @click="deleteSector(col.value._id, props.row.__index)" />
+                    <q-btn flat round small color="grey" icon="delete" :disable="col.value.auxiliaryCount > 0"
+                      @click="deleteSector(col.value._id, props.row.__index)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -109,13 +132,14 @@
             </q-tr>
           </q-table>
           <q-card-actions align="end">
-            <q-btn no-caps flat color="primary" icon="add" label="Ajouter une équipe" @click="sectorCreationModal = true" />
+            <q-btn no-caps flat color="primary" icon="add" label="Ajouter une équipe"
+              @click="sectorCreationModal = true" />
           </q-card-actions>
         </q-card>
       </div>
     </div>
 
-     <!-- Internal hour creation modal -->
+    <!-- Internal hour creation modal -->
     <q-modal v-model="newInternalHourModal" content-classes="modal-container-sm">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
@@ -123,12 +147,15 @@
             <h5>Créer une <span class="text-weight-bold">heure interne</span></h5>
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
-            <span><q-icon name="clear" @click.native="newInternalHourModal = false" /></span>
+            <span>
+              <q-icon name="clear" @click.native="newInternalHourModal = false" /></span>
           </div>
         </div>
-        <ni-modal-input caption="Nom" v-model="newInternalHour.name" :error="$v.newInternalHour.name.$error" @blur="$v.newInternalHour.name.$touch" />
+        <ni-modal-input caption="Nom" v-model="newInternalHour.name" :error="$v.newInternalHour.name.$error"
+          @blur="$v.newInternalHour.name.$touch" />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Créer l'heure interne" icon-right="add" color="primary" :loading="loading" @click="createInternalHour" />
+      <q-btn no-caps class="full-width modal-btn" label="Créer l'heure interne" icon-right="add" color="primary"
+        :loading="loading" @click="createInternalHour" />
     </q-modal>
 
     <!-- Sector creation modal -->
@@ -143,11 +170,11 @@
               <q-icon name="clear" @click.native="sectorCreationModal = false" /></span>
           </div>
         </div>
-        <ni-modal-input caption="Nom" v-model="newSector.name" :error="$v.newSector.name.$error" :error-label="nameError($v.newSector)"
-          @blur="$v.newSector.name.$touch" required-field />
+        <ni-modal-input caption="Nom" v-model="newSector.name" :error="$v.newSector.name.$error"
+          :error-label="nameError($v.newSector)" @blur="$v.newSector.name.$touch" required-field />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Ajouter une équipe" icon-right="add" color="primary" :disable="newSector.name === ''"
-        :loading="loading" @click="createNewSector" />
+      <q-btn no-caps class="full-width modal-btn" label="Ajouter une équipe" icon-right="add" color="primary"
+        :disable="newSector.name === ''" :loading="loading" @click="createNewSector" />
     </q-modal>
 
     <!-- Sector edition modal -->
@@ -162,11 +189,11 @@
               <q-icon name="clear" @click.native="sectorEditionModal = false" /></span>
           </div>
         </div>
-        <ni-modal-input caption="Nom" v-model="editedSector.name" :error="$v.editedSector.name.$error" :error-label="nameError($v.editedSector)"
-          required-field />
+        <ni-modal-input caption="Nom" v-model="editedSector.name" :error="$v.editedSector.name.$error"
+          :error-label="nameError($v.editedSector)" required-field />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Editer l'équipe" icon-right="add" color="primary" :disable="isSameThanEditedSector"
-        :loading="loading" @click="updateSector" />
+      <q-btn no-caps class="full-width modal-btn" label="Editer l'équipe" icon-right="add" color="primary"
+        :disable="isSameThanEditedSector" :loading="loading" @click="updateSector" />
     </q-modal>
   </q-page>
 </template>
@@ -183,7 +210,6 @@ import ModalInput from '../../../components/form/ModalInput.vue';
 import FileUploader from '../../../components/form/FileUploader.vue';
 import { configMixin } from '../../../mixins/configMixin';
 import { REQUIRED_LABEL } from '../../../data/constants';
-import { validationMixin } from '../../../mixins/validationMixin.js';
 
 export default {
   name: 'RhConfig',
@@ -194,7 +220,7 @@ export default {
     'ni-modal-input': ModalInput,
     'ni-file-uploader': FileUploader,
   },
-  mixins: [configMixin, validationMixin],
+  mixins: [configMixin],
   data () {
     return {
       MAX_INTERNAL_HOURS_NUMBER: 9,
@@ -267,40 +293,44 @@ export default {
       return this.tmpInput === this.editedSector.name;
     }
   },
-  validations: {
-    company: {
-      rhConfig: {
-        contractWithCompany: {
-          grossHourlyRate: { required, posDecimals, maxValue: maxValue(999) }
-        },
-        contractWithCustomer: {
-          grossHourlyRate: { required, posDecimals, maxValue: maxValue(999) }
-        },
-        phoneSubRefunding: { required, posDecimals, maxValue: maxValue(999) },
-        transportSubs: {
-          $each: {
-            price: { required, posDecimals, maxValue: maxValue(999) }
+  validations () {
+    return {
+      company: {
+        rhConfig: {
+          contractWithCompany: {
+            grossHourlyRate: { required, posDecimals, maxValue: maxValue(999) }
+          },
+          contractWithCustomer: {
+            grossHourlyRate: { required, posDecimals, maxValue: maxValue(999) }
+          },
+          phoneSubRefunding: { required, posDecimals, maxValue: maxValue(999) },
+          amountPerKm: { required },
+          transportSubs: {
+            $each: {
+              price: { required, posDecimals, maxValue: maxValue(999) }
+            },
           },
         },
       },
-    },
-    newInternalHour: {
-      name: { required },
-    },
-    newSector: {
-      name: { required, sector }
-    },
-    editedSector: {
-      name: { required, sector }
+      newInternalHour: {
+        name: { required },
+      },
+      newSector: {
+        name: { required, sector }
+      },
+      editedSector: {
+        name: { required, sector }
+      }
     }
   },
   async mounted () {
-    this.company = this.user.company;
+    this.company = this.$_.cloneDeep(this.user.company);
     if (!this.company.rhConfig.templates) {
       this.company.rhConfig.templates = {};
     }
     this.internalHours = this.company.rhConfig && this.company.rhConfig.internalHours ? this.company.rhConfig.internalHours : [];
     await this.getSectors();
+    this.$v.company.$touch();
   },
   methods: {
     saveTmp (path) {
@@ -330,7 +360,7 @@ export default {
       try {
         this.$_.get(this.$v.company, params.vuelidatePath).$touch();
         if (this.$_.get(this.$v.company, params.vuelidatePath).$error) {
-          NotifyWarning('Champ(s) invalide(s)');
+          return NotifyWarning('Champ(s) invalide(s)');
         }
 
         const price = this.company.rhConfig.transportSubs[params.index].price
