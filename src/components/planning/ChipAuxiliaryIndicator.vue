@@ -185,37 +185,15 @@ export default {
       const breakInfo = [];
       for (const day of this.days) {
         const eventsOnDay = this.getEventsOnDay(day);
-        const eventsOnDayCount = eventsOnDay.length;
-        if (eventsOnDayCount < 1) continue;
+        if (eventsOnDay.length <= 1) continue;
 
-        const firstTransportInfo = await this.getFirstTransportInfo(eventsOnDay[0]);
-        if (firstTransportInfo) breakInfo.push(firstTransportInfo);
-        const lastTransportInfo = await this.getLastTransportInfo(eventsOnDay[eventsOnDayCount - 1]);
-        if (lastTransportInfo) breakInfo.push(lastTransportInfo);
-
-        for (let i = 0; i < eventsOnDayCount - 1; i++) {
+        for (let i = 0; i < eventsOnDay.length - 1; i++) {
           const transportInfo = await this.getBreakInfoBetweenTwoEvents(eventsOnDay[i], eventsOnDay[i + 1]);
           if (transportInfo) breakInfo.push(transportInfo);
         }
       }
 
       this.breakInfo = breakInfo;
-    },
-    async getFirstTransportInfo (event) {
-      if (!this.person.contact || !this.person.contact.address || !this.person.contact.address.fullAddress) return null;
-      const destinations = this.getEventAddress(event);
-      if (!destinations) return null;
-      const transportDuration = await this.getTransportDuration(this.person.contact.address.fullAddress, destinations);
-
-      return { destination: event._id, transportDuration, isFirstOrLast: true };
-    },
-    async getLastTransportInfo (event) {
-      if (!this.person.contact || !this.person.contact.address || !this.person.contact.address.fullAddress) return null;
-      const origins = this.getEventAddress(event);
-      if (!origins) return null;
-      const transportDuration = await this.getTransportDuration(origins, this.person.contact.address.fullAddress);
-
-      return { origin: event._id, transportDuration, isFirstOrLast: true };
     },
     getEventAddress (event) {
       let address;
