@@ -50,12 +50,12 @@
         </div>
       </div>
       <div class="q-mb-xl">
-        <p class="text-weight-bold">Remboursement téléphone</p>
+        <p class="text-weight-bold">Remboursement frais</p>
         <div class="row gutter-profile">
-          <ni-input caption="Montant du remboursement" :error="$v.company.rhConfig.phoneSubRefunding.$error"
-            :error-label="nbrError('phoneSubRefunding')" type="number" v-model="company.rhConfig.phoneSubRefunding"
-            @focus="saveTmp('rhConfig.phoneSubRefunding')" suffix="€"
-            @blur="updateCompany('rhConfig.phoneSubRefunding')" />
+          <ni-input caption="Montant des frais" :error="$v.company.rhConfig.feeAmount.$error"
+            :error-label="nbrError('feeAmount')" type="number" v-model="company.rhConfig.feeAmount"
+            @focus="saveTmp('rhConfig.feeAmount')" suffix="€"
+            @blur="updateCompany('rhConfig.feeAmount')" />
         </div>
       </div>
       <div class="q-mb-xl">
