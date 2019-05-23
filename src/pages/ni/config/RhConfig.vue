@@ -303,7 +303,7 @@ export default {
           contractWithCustomer: {
             grossHourlyRate: { required, posDecimals, maxValue: maxValue(999) }
           },
-          phoneSubRefunding: { required, posDecimals, maxValue: maxValue(999) },
+          feeAmount: { required, posDecimals, maxValue: maxValue(999) },
           amountPerKm: { required, posDecimals, maxValue: maxValue(999) },
           transportSubs: {
             $each: {
