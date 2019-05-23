@@ -164,6 +164,13 @@ export default {
           format: value => value ? 'Oui' : 'Non',
         },
         {
+          name: 'transport',
+          label: 'Transport',
+          align: 'center',
+          field: 'transport',
+          format: value => formatPrice(value),
+        },
+        {
           name: 'otherFees',
           label: 'Autres frais',
           align: 'center',
