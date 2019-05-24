@@ -31,47 +31,24 @@
             <div v-else>{{ col.value }}</div>
           </template>
           <template v-else-if="col.name === 'hoursCounter'">
-            <div class="cursor-pointer text-primary" v-show="!props.row.hoursCounterEdition"
-              @click="editField($refs[`${props.row.auxiliaryId}Counter`], props.row, 'hoursCounterEdition')">
-              {{ col.value }}
-            </div>
-            <q-input v-show="props.row.hoursCounterEdition" class="datatable-inner-input" :value="props.row.hoursCounter"
-              :ref="`${props.row.auxiliaryId}Counter`" @change="setEditionField($event, props.row, 'hoursCounter')" suffix="h" type="number"
-              inverted-light color="white" no-parent-field @keyup.esc="disableEditionField(props.row, 'hoursCounterEdition')"
-              @keyup.enter="disableEditionField(props.row, 'hoursCounterEdition')" @blur="disableEditionField(props.row, 'hoursCounterEdition')" />
+            <ni-editable-td :props="props.row" edited-field="hoursCounter" edition-boolean="hoursCounterEdition"
+              :refName="`${props.row.auxiliaryId}Counter`" :value="col.value" @disable="disableEditionField($event)"
+              @click="editField($event)" @change="setEditionField($event)" suffix="h" />
           </template>
           <template v-else-if="col.name === 'overtimeHours'">
-            <div class="cursor-pointer text-primary" v-show="!props.row.overtimeHoursEdition"
-              @click="editField($refs[props.row.auxiliaryId], props.row, 'overtimeHoursEdition')">
-              {{ col.value }}
-            </div>
-            <q-input v-show="props.row.overtimeHoursEdition" class="datatable-inner-input" :ref="props.row.auxiliaryId"
-              :value="props.row.overtimeHours" @change="setEditionField($event, props.row, 'overtimeHours')" suffix="h" type="number"
-              inverted-light color="white" @blur="disableEditionField(props.row, 'overtimeHoursEdition')"
-              @keyup.esc="disableEditionField(props.row, 'overtimeHoursEdition')" no-parent-field
-              @keyup.enter="disableEditionField(props.row, 'overtimeHoursEdition')" />
+              <ni-editable-td :props="props.row" edited-field="overtimeHours" edition-boolean="overtimeHoursEdition"
+                :refName="`${props.row.auxiliaryId}Overtime`" :value="col.value" @disable="disableEditionField($event)"
+                @click="editField($event)" @change="setEditionField($event)" suffix="h" />
           </template>
           <template v-else-if="col.name === 'additionalHours'">
-            <div class="cursor-pointer text-primary" v-show="!props.row.additionalHoursEdition"
-              @click="editField($refs[props.row.auxiliaryId], props.row, 'additionalHoursEdition')">
-              {{ col.value }}
-            </div>
-            <q-input v-show="props.row.additionalHoursEdition" class="datatable-inner-input" :ref="props.row.auxiliaryId"
-              :value="props.row.additionalHours" @change="setEditionField($event, props.row, 'additionalHours')" suffix="h" type="number"
-              inverted-light color="white" @blur="disableEditionField(props.row, 'additionalHoursEdition')"
-              @keyup.esc="disableEditionField(props.row, 'additionalHoursEdition')" no-parent-field
-              @keyup.enter="disableEditionField(props.row, 'additionalHoursEdition')" />
+            <ni-editable-td :props="props.row" edited-field="additionalHours" edition-boolean="additionalHoursEdition"
+              :refName="`${props.row.auxiliaryId}Additional`" :value="col.value" @disable="disableEditionField($event)"
+              @click="editField($event)" @change="setEditionField($event)" suffix="h" />
           </template>
           <template v-else-if="col.name === 'bonus'">
-            <div class="cursor-pointer text-primary" v-show="!props.row.bonusEdition"
-              @click="editField($refs[props.row.auxiliaryId], props.row, 'bonusEdition')">
-              {{ col.value }}
-            </div>
-            <q-input v-show="props.row.bonusEdition" class="datatable-inner-input" :ref="props.row.auxiliaryId"
-              :value="props.row.bonus" @change="setEditionField($event, props.row, 'bonus')" suffix="h" type="number"
-              inverted-light color="white" @blur="disableEditionField(props.row, 'bonusEdition')"
-              @keyup.esc="disableEditionField(props.row, 'bonusEdition')" no-parent-field
-              @keyup.enter="disableEditionField(props.row, 'bonusEdition')" />
+            <ni-editable-td :props="props.row" edited-field="bonus" edition-boolean="bonusEdition"
+              :refName="`${props.row.auxiliaryId}Bonus`" :value="col.value" @disable="disableEditionField($event)"
+              @click="editField($event)" @change="setEditionField($event)" suffix="€" />
           </template>
           <template v-else>{{ col.value }}</template>
         </q-td>
@@ -112,12 +89,14 @@
 import { formatPrice } from '../../../helpers/utils';
 import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
 import SelectSector from '../../../components/form/SelectSector';
+import EditableTd from '../../../components/table/EditableTd';
 
 export default {
   name: 'ToPay',
   metaInfo: { title: 'À payer' },
   components: {
     'ni-select-sector': SelectSector,
+    'ni-editable-td': EditableTd,
   },
   data () {
     return {
@@ -206,7 +185,7 @@ export default {
           name: 'hoursCounter',
           label: 'Compteur d\'heures',
           align: 'center',
-          field: 'hoursCounter',
+          field: row => row.hoursCounter - row.additionalHours - row.overtimeHours,
           format: value => this.formatHours(value),
         },
         {
@@ -298,17 +277,17 @@ export default {
     formatHours (value) {
       return value ? `${parseFloat(value).toFixed(2)}h` : '0.00h';
     },
-    editField (event, pay, path) {
-      pay[path] = true;
+    editField ({ obj, path, ref }) {
+      obj[path] = true;
       this.$nextTick(() => {
-        event[0].focus();
+        ref.focus();
       })
     },
-    setEditionField (event, pay, path) {
-      pay[path] = !event || isNaN(event) ? 0 : event;
+    setEditionField ({ value, obj, path }) {
+      obj[path] = !value || isNaN(value) ? 0 : value;
     },
-    disableEditionField (pay, path) {
-      pay[path] = false;
+    disableEditionField ({ obj, path }) {
+      obj[path] = false;
     },
     // Surcharge modal
     openSurchargeDetailModal (id, details) {
