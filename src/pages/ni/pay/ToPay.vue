@@ -3,8 +3,11 @@
     <div class="title-padding">
       <h4>À payer</h4>
     </div>
-    <q-table :data="draftPay" :columns="columns" class="q-pa-sm" selection="multiple" :selected.sync="selected"
-      row-key="auxiliaryId">
+    <div class="sector-filter">
+      <ni-select-sector v-model="selectedSector" allow-null-option />
+    </div>
+    <q-table :data="displayedDraftPay" :columns="columns" class="q-pa-sm" selection="multiple" row-key="auxiliaryId"
+      :selected.sync="selected">
       <q-tr slot="header" slot-scope="props">
         <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
         <q-th auto-width>
@@ -65,17 +68,18 @@
 <script>
 import { formatPrice } from '../../../helpers/utils';
 import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
-import Select from '../../../components/form/Select';
+import SelectSector from '../../../components/form/SelectSector';
 
 export default {
   name: 'ToPay',
   metaInfo: { title: 'À payer' },
   components: {
-    'ni-select': Select,
+    'ni-select-sector': SelectSector,
   },
   data () {
     return {
       draftPay: [],
+      displayedDraftPay: [],
       selected: [],
       columns: [
         {
@@ -206,12 +210,20 @@ export default {
       ],
       surchargeDetailModal: false,
       surchargeDetails: {},
+      selectedSector: '',
     };
   },
   computed: {
     hasSelectedRows () {
       return this.selected.length > 0;
     },
+  },
+  watch: {
+    selectedSector (value) {
+      if (value === '') this.displayedDraftPay = [...this.draftPay];
+      else this.displayedDraftPay = [...this.draftPay].filter(dp => dp.auxiliary.sector._id === value);
+      this.selected = [];
+    }
   },
   async mounted () {
     await this.refreshDraftPay();
@@ -223,6 +235,7 @@ export default {
           startDate: this.$moment().startOf('M').startOf('d').toISOString(),
           endDate: this.$moment().endOf('M').endOf('d').toISOString(),
         });
+        this.displayedDraftPay = [...this.draftPay];
       } catch (e) {
         this.draftPay = [];
         console.error(e);
@@ -286,4 +299,12 @@ export default {
   .surcharge-type
     width: 60%
     border-right: 1px solid $light-grey;
+
+  .sector-filter
+    padding: 1rem 3rem;
+    display: flex;
+    flex-direction: row;
+
+    .q-select
+      width: 250px
 </style>

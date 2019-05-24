@@ -1,6 +1,7 @@
 <template>
-  <q-select :value="value" color="white" :error="myError" inverted-light :stack-label="stackLabel" ref="selectSector" @change="updateSector"
-    :options="sectors" @blur="blurHandler" @focus="focusHandler" filter filter-placeholder="Rechercher" separator :class="{border: inModal}" :company-id="companyId" />
+  <q-select :value="value" color="white" :error="myError" inverted-light :stack-label="stackLabel" ref="selectSector"
+    @change="updateSector" :options="sectors" @blur="blurHandler" @focus="focusHandler" filter
+    filter-placeholder="Rechercher" separator :class="{border: inModal}" :company-id="companyId" />
 </template>
 
 <script>
@@ -12,7 +13,8 @@ export default {
     stackLabel: String,
     myError: { type: String, default: null },
     inModal: { type: Boolean, default: false },
-    companyId: String
+    companyId: String,
+    allowNullOption: { type: Boolean, default: false },
   },
   data () {
     return {
@@ -31,7 +33,12 @@ export default {
     async getSectors () {
       try {
         const sectors = await this.$sectors.showAll({ company: this.currentUser.company._id });
-        this.sectors = this.$_.sortBy(sectors.map(sector => ({ label: sector.name, value: sector._id })), ['label']);
+        this.sectors = this.allowNullOption
+          ? this.$_.sortBy([
+            ...sectors.map(sector => ({ label: sector.name, value: sector._id })),
+            { label: 'Toutes les communautés', value: '' }
+          ], ['label'])
+          : this.$_.sortBy(sectors.map(sector => ({ label: sector.name, value: sector._id })), ['label']);
       } catch (e) {
         console.error(e);
       }
