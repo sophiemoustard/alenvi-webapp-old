@@ -34,7 +34,7 @@
 
 <script>
 import AuxiliaryIndicators from '../AuxiliaryIndicators';
-import { DEFAULT_AVATAR, ABSENCE, INTERVENTION, INTERNAL_HOUR, TRANSIT, DRIVING, PUBLIC_TRANSPORT, WEEK_STATS, COMPANY_CONTRACT } from '../../data/constants.js';
+import { DEFAULT_AVATAR, ABSENCE, INTERVENTION, INTERNAL_HOUR, TRANSIT, DRIVING, PUBLIC_TRANSPORT, WEEK_STATS, COMPANY_CONTRACT, DEATH, BIRTH, WEDDING, PAID_LEAVE } from '../../data/constants.js';
 import googleMaps from '../../api/GoogleMaps';
 
 export default {
@@ -155,7 +155,7 @@ export default {
       let weeklyBreak = 0;
       for (const info of this.breakInfo) {
         if (info.timeBetween) weeklyBreak += info.timeBetween;
-        if (!info.isFirstOrLast) weeklyPaidTransports += info.transportDuration;
+        if (!info.isFirstOrLast) weeklyPaidTransports += (info.timeBetween > info.transportDuration + 15) ? info.transportDuration : info.timeBetween;
       };
 
       this.weeklyBreak = weeklyBreak / 60;
@@ -185,37 +185,15 @@ export default {
       const breakInfo = [];
       for (const day of this.days) {
         const eventsOnDay = this.getEventsOnDay(day);
-        const eventsOnDayCount = eventsOnDay.length;
-        if (eventsOnDayCount < 1) continue;
+        if (eventsOnDay.length <= 1) continue;
 
-        const firstTransportInfo = await this.getFirstTransportInfo(eventsOnDay[0]);
-        if (firstTransportInfo) breakInfo.push(firstTransportInfo);
-        const lastTransportInfo = await this.getLastTransportInfo(eventsOnDay[eventsOnDayCount - 1]);
-        if (lastTransportInfo) breakInfo.push(lastTransportInfo);
-
-        for (let i = 0; i < eventsOnDayCount - 1; i++) {
+        for (let i = 0; i < eventsOnDay.length - 1; i++) {
           const transportInfo = await this.getBreakInfoBetweenTwoEvents(eventsOnDay[i], eventsOnDay[i + 1]);
           if (transportInfo) breakInfo.push(transportInfo);
         }
       }
 
       this.breakInfo = breakInfo;
-    },
-    async getFirstTransportInfo (event) {
-      if (!this.person.contact || !this.person.contact.address || !this.person.contact.address.fullAddress) return null;
-      const destinations = this.getEventAddress(event);
-      if (!destinations) return null;
-      const transportDuration = await this.getTransportDuration(this.person.contact.address.fullAddress, destinations);
-
-      return { destination: event._id, transportDuration, isFirstOrLast: true };
-    },
-    async getLastTransportInfo (event) {
-      if (!this.person.contact || !this.person.contact.address || !this.person.contact.address.fullAddress) return null;
-      const origins = this.getEventAddress(event);
-      if (!origins) return null;
-      const transportDuration = await this.getTransportDuration(origins, this.person.contact.address.fullAddress);
-
-      return { origin: event._id, transportDuration, isFirstOrLast: true };
     },
     getEventAddress (event) {
       let address;
@@ -291,15 +269,17 @@ export default {
     getContractHours () {
       let contractHours = 0;
       for (const day of this.days) {
-        const absences = this.getAbsencesOnDay(day);
-        if (absences.morning && absences.afternoon) continue;
+        const absences = this.events.find(event =>
+          event.type === ABSENCE &&
+          day.isSameOrAfter(event.startDate, 'd') && day.isSameOrBefore(event.endDate, 'd') &&
+          [DEATH, BIRTH, WEDDING, PAID_LEAVE].includes(event.absence)
+        );
+        if (absences) continue;
 
         const version = this.getContractVersionOnDay(day);
         if (!version) continue;
 
-        /* 12 : from Monday to Saturday, there are 12 half days */
-        if (!absences.morning) contractHours += version.weeklyHours / 12 || 0;
-        if (!absences.afternoon) contractHours += version.weeklyHours / 12 || 0;
+        contractHours += version.weeklyHours / 6 || 0; // 6 : from Monday to Saturday, there are 6 half days
       };
       return Math.round(contractHours);
     },
