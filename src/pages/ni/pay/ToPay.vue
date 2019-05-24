@@ -3,7 +3,14 @@
     <div class="title-padding">
       <h4>À payer</h4>
     </div>
-    <q-table :data="draftPay" :columns="columns" class="q-pa-sm">
+    <q-table :data="draftPay" :columns="columns" class="q-pa-sm" selection="multiple" :selected.sync="selected"
+      row-key="auxiliaryId">
+      <q-tr slot="header" slot-scope="props">
+        <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
+        <q-th auto-width>
+          <q-checkbox v-model="props.selected" indeterminate-value="some" />
+        </q-th>
+      </q-tr>
       <q-tr slot="body" slot-scope="props" :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
           <template v-if="col.name === 'surchargedAndExempt'">
@@ -22,8 +29,15 @@
           </template>
           <template v-else>{{ col.value }}</template>
         </q-td>
+        <q-td auto-width style="width: 50px">
+          <q-checkbox v-model="props.selected" />
+        </q-td>
       </q-tr>
     </q-table>
+    <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
+      label="Payer" @click="createList" />
+
+    <!-- Surcharge detail modal -->
     <q-modal v-model="surchargeDetailModal" content-classes="modal-container-sm" @hide="resetSurchargeDetail">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
@@ -50,13 +64,19 @@
 
 <script>
 import { formatPrice } from '../../../helpers/utils';
+import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
+import Select from '../../../components/form/Select';
 
 export default {
   name: 'ToPay',
   metaInfo: { title: 'À payer' },
+  components: {
+    'ni-select': Select,
+  },
   data () {
     return {
       draftPay: [],
+      selected: [],
       columns: [
         {
           name: 'auxiliary',
@@ -188,6 +208,11 @@ export default {
       surchargeDetails: {},
     };
   },
+  computed: {
+    hasSelectedRows () {
+      return this.selected.length > 0;
+    },
+  },
   async mounted () {
     await this.refreshDraftPay();
   },
@@ -215,6 +240,27 @@ export default {
     },
     resetSurchargeDetail () {
       this.surchargeDetails = {};
+    },
+    async createList () {
+      try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Cette opération est définitive. Confirmez-vous ?',
+          ok: 'Oui',
+          cancel: 'Non'
+        });
+
+        if (!this.hasSelectedRows) return;
+        const pay = this.selected.map(row => this.$_.omit(row, ['__index']));
+        await this.$pay.createList(pay);
+        NotifyPositive('Clients facturés');
+        await this.refreshDraftPay();
+        this.selected = [];
+      } catch (e) {
+        if (e.message === '') return;
+        console.error(e);
+        NotifyNegative('Erreur lors de la facturation des clients');
+      }
     },
   },
 }
