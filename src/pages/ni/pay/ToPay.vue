@@ -30,6 +30,49 @@
             </div>
             <div v-else>{{ col.value }}</div>
           </template>
+          <template v-else-if="col.name === 'hoursCounter'">
+            <div class="cursor-pointer text-primary" v-show="!props.row.hoursCounterEdition"
+              @click="editField($refs[`${props.row.auxiliaryId}Counter`], props.row, 'hoursCounterEdition')">
+              {{ col.value }}
+            </div>
+            <q-input v-show="props.row.hoursCounterEdition" class="datatable-inner-input" :value="props.row.hoursCounter"
+              :ref="`${props.row.auxiliaryId}Counter`" @change="setEditionField($event, props.row, 'hoursCounter')" suffix="h" type="number"
+              inverted-light color="white" no-parent-field @keyup.esc="disableEditionField(props.row, 'hoursCounterEdition')"
+              @keyup.enter="disableEditionField(props.row, 'hoursCounterEdition')" @blur="disableEditionField(props.row, 'hoursCounterEdition')" />
+          </template>
+          <template v-else-if="col.name === 'overtimeHours'">
+            <div class="cursor-pointer text-primary" v-show="!props.row.overtimeHoursEdition"
+              @click="editField($refs[props.row.auxiliaryId], props.row, 'overtimeHoursEdition')">
+              {{ col.value }}
+            </div>
+            <q-input v-show="props.row.overtimeHoursEdition" class="datatable-inner-input" :ref="props.row.auxiliaryId"
+              :value="props.row.overtimeHours" @change="setEditionField($event, props.row, 'overtimeHours')" suffix="h" type="number"
+              inverted-light color="white" @blur="disableEditionField(props.row, 'overtimeHoursEdition')"
+              @keyup.esc="disableEditionField(props.row, 'overtimeHoursEdition')" no-parent-field
+              @keyup.enter="disableEditionField(props.row, 'overtimeHoursEdition')" />
+          </template>
+          <template v-else-if="col.name === 'additionalHours'">
+            <div class="cursor-pointer text-primary" v-show="!props.row.additionalHoursEdition"
+              @click="editField($refs[props.row.auxiliaryId], props.row, 'additionalHoursEdition')">
+              {{ col.value }}
+            </div>
+            <q-input v-show="props.row.additionalHoursEdition" class="datatable-inner-input" :ref="props.row.auxiliaryId"
+              :value="props.row.additionalHours" @change="setEditionField($event, props.row, 'additionalHours')" suffix="h" type="number"
+              inverted-light color="white" @blur="disableEditionField(props.row, 'additionalHoursEdition')"
+              @keyup.esc="disableEditionField(props.row, 'additionalHoursEdition')" no-parent-field
+              @keyup.enter="disableEditionField(props.row, 'additionalHoursEdition')" />
+          </template>
+          <template v-else-if="col.name === 'bonus'">
+            <div class="cursor-pointer text-primary" v-show="!props.row.bonusEdition"
+              @click="editField($refs[props.row.auxiliaryId], props.row, 'bonusEdition')">
+              {{ col.value }}
+            </div>
+            <q-input v-show="props.row.bonusEdition" class="datatable-inner-input" :ref="props.row.auxiliaryId"
+              :value="props.row.bonus" @change="setEditionField($event, props.row, 'bonus')" suffix="h" type="number"
+              inverted-light color="white" @blur="disableEditionField(props.row, 'bonusEdition')"
+              @keyup.esc="disableEditionField(props.row, 'bonusEdition')" no-parent-field
+              @keyup.enter="disableEditionField(props.row, 'bonusEdition')" />
+          </template>
           <template v-else>{{ col.value }}</template>
         </q-td>
         <q-td auto-width style="width: 50px">
@@ -206,6 +249,7 @@ export default {
           label: 'Prime',
           align: 'center',
           field: 'bonus',
+          format: value => formatPrice(value),
         },
       ],
       surchargeDetailModal: false,
@@ -231,19 +275,42 @@ export default {
   methods: {
     async refreshDraftPay () {
       try {
-        this.draftPay = await this.$pay.getDraftPay({
+        const draftPay = await this.$pay.getDraftPay({
           startDate: this.$moment().startOf('M').startOf('d').toISOString(),
           endDate: this.$moment().endOf('M').endOf('d').toISOString(),
         });
+        this.draftPay = draftPay.map(dp => ({
+          ...dp,
+          hoursCounterEdition: false,
+          overtimeHoursEdition: false,
+          additionalHoursEdition: false,
+          bonusEdition: false,
+        }));
         this.displayedDraftPay = [...this.draftPay];
       } catch (e) {
         this.draftPay = [];
         console.error(e);
       }
     },
+    formatPrice (value) {
+      return formatPrice(value);
+    },
     formatHours (value) {
       return value ? `${parseFloat(value).toFixed(2)}h` : '0.00h';
     },
+    editField (event, pay, path) {
+      pay[path] = true;
+      this.$nextTick(() => {
+        event[0].focus();
+      })
+    },
+    setEditionField (event, pay, path) {
+      pay[path] = !event || isNaN(event) ? 0 : event;
+    },
+    disableEditionField (pay, path) {
+      pay[path] = false;
+    },
+    // Surcharge modal
     openSurchargeDetailModal (id, details) {
       const draft = this.draftPay.find(dp => dp.auxiliary._id === id);
       if (!draft) return;
@@ -254,6 +321,7 @@ export default {
     resetSurchargeDetail () {
       this.surchargeDetails = {};
     },
+    // Creation
     async createList () {
       try {
         await this.$q.dialog({
