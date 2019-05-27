@@ -160,3 +160,5 @@ export const EXPORT_TYPES = [
   { label: 'Bénéficiaires', value: CUSTOMER },
   { label: 'Aidants', value: HELPER },
 ];
+export const EXPORT_HISTORY_TYPES = [
+];
