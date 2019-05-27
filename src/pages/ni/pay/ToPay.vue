@@ -3,7 +3,17 @@
     <div class="title-padding">
       <h4>À payer</h4>
     </div>
-    <q-table :data="draftPay" :columns="columns" class="q-pa-sm">
+    <div class="sector-filter">
+      <ni-select-sector v-model="selectedSector" allow-null-option />
+    </div>
+    <q-table :data="displayedDraftPay" :columns="columns" class="q-pa-sm" selection="multiple" row-key="auxiliaryId"
+      :selected.sync="selected">
+      <q-tr slot="header" slot-scope="props">
+        <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
+        <q-th auto-width>
+          <q-checkbox v-model="props.selected" indeterminate-value="some" />
+        </q-th>
+      </q-tr>
       <q-tr slot="body" slot-scope="props" :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
           <template v-if="col.name === 'surchargedAndExempt'">
@@ -20,10 +30,37 @@
             </div>
             <div v-else>{{ col.value }}</div>
           </template>
+          <template v-else-if="col.name === 'hoursCounter'">
+            <ni-editable-td :props="props.row" edited-field="hoursCounter" edition-boolean-name="hoursCounterEdition"
+              :refName="`${props.row.auxiliaryId}Counter`" :value="col.value" @disable="disableEditionField($event)"
+              @click="editField($event)" @change="setEditionField($event)" suffix="h" />
+          </template>
+          <template v-else-if="col.name === 'overtimeHours'">
+              <ni-editable-td :props="props.row" edited-field="overtimeHours" edition-boolean-name="overtimeHoursEdition"
+                :refName="`${props.row.auxiliaryId}Overtime`" :value="col.value" @disable="disableEditionField($event)"
+                @click="editField($event)" @change="setEditionField($event)" suffix="h" />
+          </template>
+          <template v-else-if="col.name === 'additionalHours'">
+            <ni-editable-td :props="props.row" edited-field="additionalHours" edition-boolean-name="additionalHoursEdition"
+              :refName="`${props.row.auxiliaryId}Additional`" :value="col.value" @disable="disableEditionField($event)"
+              @click="editField($event)" @change="setEditionField($event)" suffix="h" />
+          </template>
+          <template v-else-if="col.name === 'bonus'">
+            <ni-editable-td :props="props.row" edited-field="bonus" edition-boolean-name="bonusEdition"
+              :refName="`${props.row.auxiliaryId}Bonus`" :value="col.value" @disable="disableEditionField($event)"
+              @click="editField($event)" @change="setEditionField($event)" suffix="€" />
+          </template>
           <template v-else>{{ col.value }}</template>
+        </q-td>
+        <q-td auto-width style="width: 50px">
+          <q-checkbox v-model="props.selected" />
         </q-td>
       </q-tr>
     </q-table>
+    <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
+      label="Payer" @click="createList" />
+
+    <!-- Surcharge detail modal -->
     <q-modal v-model="surchargeDetailModal" content-classes="modal-container-sm" @hide="resetSurchargeDetail">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
@@ -50,13 +87,22 @@
 
 <script>
 import { formatPrice } from '../../../helpers/utils';
+import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
+import SelectSector from '../../../components/form/SelectSector';
+import EditableTd from '../../../components/table/EditableTd';
 
 export default {
   name: 'ToPay',
   metaInfo: { title: 'À payer' },
+  components: {
+    'ni-select-sector': SelectSector,
+    'ni-editable-td': EditableTd,
+  },
   data () {
     return {
       draftPay: [],
+      displayedDraftPay: [],
+      selected: [],
       columns: [
         {
           name: 'auxiliary',
@@ -139,7 +185,7 @@ export default {
           name: 'hoursCounter',
           label: 'Compteur d\'heures',
           align: 'center',
-          field: 'hoursCounter',
+          field: row => row.hoursCounter - row.additionalHours - row.overtimeHours,
           format: value => this.formatHours(value),
         },
         {
@@ -182,11 +228,25 @@ export default {
           label: 'Prime',
           align: 'center',
           field: 'bonus',
+          format: value => formatPrice(value),
         },
       ],
       surchargeDetailModal: false,
       surchargeDetails: {},
+      selectedSector: '',
     };
+  },
+  computed: {
+    hasSelectedRows () {
+      return this.selected.length > 0;
+    },
+  },
+  watch: {
+    selectedSector (value) {
+      if (value === '') this.displayedDraftPay = [...this.draftPay];
+      else this.displayedDraftPay = this.draftPay.filter(dp => dp.auxiliary.sector._id === value);
+      this.selected = [];
+    }
   },
   async mounted () {
     await this.refreshDraftPay();
@@ -194,18 +254,42 @@ export default {
   methods: {
     async refreshDraftPay () {
       try {
-        this.draftPay = await this.$pay.getDraftPay({
+        const draftPay = await this.$pay.getDraftPay({
           startDate: this.$moment().startOf('M').startOf('d').toISOString(),
           endDate: this.$moment().endOf('M').endOf('d').toISOString(),
         });
+        this.draftPay = draftPay.map(dp => ({
+          ...dp,
+          hoursCounterEdition: false,
+          overtimeHoursEdition: false,
+          additionalHoursEdition: false,
+          bonusEdition: false,
+        }));
+        this.displayedDraftPay = [...this.draftPay];
       } catch (e) {
         this.draftPay = [];
         console.error(e);
       }
     },
+    formatPrice (value) {
+      return formatPrice(value);
+    },
     formatHours (value) {
       return value ? `${parseFloat(value).toFixed(2)}h` : '0.00h';
     },
+    editField ({ obj, path, ref }) {
+      obj[path] = true;
+      this.$nextTick(() => {
+        ref.focus();
+      })
+    },
+    setEditionField ({ value, obj, path }) {
+      obj[path] = !value || isNaN(value) ? 0 : value;
+    },
+    disableEditionField ({ obj, path }) {
+      obj[path] = false;
+    },
+    // Surcharge modal
     openSurchargeDetailModal (id, details) {
       const draft = this.draftPay.find(dp => dp.auxiliary._id === id);
       if (!draft) return;
@@ -215,6 +299,36 @@ export default {
     },
     resetSurchargeDetail () {
       this.surchargeDetails = {};
+    },
+    // Creation
+    formatPayload (payload) {
+      return {
+        ...this.$_.omit(payload, ['auxiliaryId', 'additionalHoursEdition', 'overtimeHoursEdition', 'bonusEdition', 'hoursCounterEdition', 'paidKm', '__index']),
+        hoursCounter: payload.hoursCounter - payload.overtimeHours - payload.additionalHours,
+        auxiliary: payload.auxiliary._id,
+      };
+    },
+    async createList () {
+      try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Cette opération est définitive. Confirmez-vous ?',
+          ok: 'Oui',
+          cancel: 'Non'
+        });
+
+        if (!this.hasSelectedRows) return;
+
+        const pay = this.selected.map(row => this.formatPayload(row));
+        await this.$pay.createList(pay);
+        NotifyPositive('Fiches de paie crées');
+        await this.refreshDraftPay();
+        this.selected = [];
+      } catch (e) {
+        if (e.message === '') return;
+        console.error(e);
+        NotifyNegative('Erreur lors de la création des fiches de paie');
+      }
     },
   },
 }
@@ -240,4 +354,12 @@ export default {
   .surcharge-type
     width: 60%
     border-right: 1px solid $light-grey;
+
+  .sector-filter
+    padding: 1rem 3rem;
+    display: flex;
+    flex-direction: row;
+
+    .q-select
+      width: 250px
 </style>

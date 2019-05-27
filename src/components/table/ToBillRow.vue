@@ -29,14 +29,9 @@
       <template v-else-if="col.name === 'hours'">{{ formatHours(bill) }}</template>
       <template v-else-if="col.name === 'unitExclTaxes'">{{ formatPrice(bill.unitExclTaxes) }}</template>
       <template v-else-if="col.name === 'discount'">
-        <div class="cursor-pointer text-primary" @click="$emit('discount:click', $refs[bill._id])"
-          v-show="!bill.editDiscount">
-          {{ formatPrice(bill.discount) }}
-        </div>
-        <q-input :ref="bill._id" v-show="bill.editDiscount" class="datatable-inner-input" :value="bill.discount"
-          @change="setDiscount($event, bill)" suffix="€" inverted-light color="white" no-parent-field type="number"
-          @blur="disableDiscountEditing(bill)" @keyup.enter="disableDiscountEditing(bill)"
-          @keyup.esc="disableDiscountEditing(bill)" />
+        <ni-editable-td :props="bill" edited-field="discount" edition-boolean-name="discountEdition"
+          :refName="bill._id" :value="formatPrice(bill.discount)" @disable="disableDiscountEditing(bill)"
+          @click="$emit('discount:click', $event)" @change="setDiscount" suffix="€" />
       </template>
       <template v-else-if="col.name === 'exclTaxes'">{{ formatPrice(getNetExclTaxes(bill)) }}</template>
       <template v-else-if="col.name === 'inclTaxes'">{{ formatPrice(getNetInclTaxes(bill)) }}</template>
@@ -51,9 +46,13 @@
 <script>
 import { formatPrice, getLastVersion } from '../../helpers/utils.js';
 import { FIXED } from '../../data/constants.js';
+import EditableTd from './EditableTd';
 
 export default {
   name: 'ToBillRow',
+  components: {
+    'ni-editable-td': EditableTd,
+  },
   props: {
     props: Object,
     bill: Object,
@@ -91,12 +90,12 @@ export default {
     getNetInclTaxes (bill) {
       return bill.inclTaxes - bill.discount;
     },
-    setDiscount (event, bill) {
-      bill.discount = !event || isNaN(event) ? 0 : event;
+    setDiscount ({ value, obj, path }) {
+      obj[path] = !value || isNaN(value) ? 0 : value;
       this.$emit('discount:input');
     },
     disableDiscountEditing (bill) {
-      bill.editDiscount = false;
+      bill.discountEdition = false;
     },
   }
 }

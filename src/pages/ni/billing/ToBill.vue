@@ -62,7 +62,6 @@ export default {
   data () {
     return {
       tableLoading: false,
-      editDiscount: false,
       pagination: { rowsPerPage: 0 },
       billingDates: {
         startDate: null,
@@ -165,14 +164,14 @@ export default {
       data.total = total;
       return total;
     },
-    discountEdit (event, bill) {
-      bill.editDiscount = true;
+    discountEdit ({ ref }, bill) {
+      bill.discountEdition = true;
       this.$nextTick(() => {
-        event[0].focus();
-      });
+        ref.focus();
+      })
     },
     addEditDiscountToBills (bills) {
-      return bills.map(bill => ({ ...bill, editDiscount: false }));
+      return bills.map(bill => ({ ...bill, discountEdition: false }));
     },
     async getDraftBills (params) {
       try {
