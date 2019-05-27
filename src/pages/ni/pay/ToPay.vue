@@ -301,6 +301,13 @@ export default {
       this.surchargeDetails = {};
     },
     // Creation
+    formatPayload (payload) {
+      return {
+        ...this.$_.omit(payload, ['auxiliaryId', 'additionalHoursEdition', 'overtimeHoursEdition', 'bonusEdition', 'hoursCounterEdition', 'paidKm', '__index']),
+        hoursCounter: payload.hoursCounter - payload.overtimeHours - payload.additionalHours,
+        auxiliary: payload.auxiliary._id,
+      };
+    },
     async createList () {
       try {
         await this.$q.dialog({
@@ -311,7 +318,8 @@ export default {
         });
 
         if (!this.hasSelectedRows) return;
-        const pay = this.selected.map(row => this.$_.omit(row, ['__index']));
+
+        const pay = this.selected.map(row => this.formatPayload(row));
         await this.$pay.createList(pay);
         NotifyPositive('Clients facturés');
         await this.refreshDraftPay();
