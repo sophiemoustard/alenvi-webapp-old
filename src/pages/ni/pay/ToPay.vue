@@ -321,13 +321,13 @@ export default {
 
         const pay = this.selected.map(row => this.formatPayload(row));
         await this.$pay.createList(pay);
-        NotifyPositive('Clients facturés');
+        NotifyPositive('Fiches de paie crées');
         await this.refreshDraftPay();
         this.selected = [];
       } catch (e) {
         if (e.message === '') return;
         console.error(e);
-        NotifyNegative('Erreur lors de la facturation des clients');
+        NotifyNegative('Erreur lors de la création des fiches de paie');
       }
     },
   },
