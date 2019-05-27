@@ -29,7 +29,7 @@ export default {
   props: {
     caption: { type: String, default: '' },
     error: Boolean,
-    value: { type: Object, default: () => ({ startDate: this.$moment().toISOString(), endDate: this.$moment().toISOString() }) },
+    value: { type: Object, default: function () { return { startDate: this.$moment().toISOString(), endDate: this.$moment().toISOString() } } },
     requiredField: { type: Boolean, default: false },
   },
   data () {
