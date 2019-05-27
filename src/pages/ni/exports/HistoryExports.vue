@@ -10,8 +10,6 @@
 </template>
 
 <script>
-import _ from 'lodash';
-
 import { NotifyNegative, NotifyPositive } from '../../../components/popup/notify';
 import { downloadFile } from '../../../helpers/downloadFile';
 import Select from '../../../components/form/Select';
@@ -35,11 +33,8 @@ export default {
   methods: {
     async exportCsv () {
       try {
-        const type = _.find(EXPORT_HISTORY_TYPES, ['value', this.type]);
-        if (!type) {
-          NotifyNegative('Impossible de téléchager le document');
-          return;
-        }
+        const type = EXPORT_HISTORY_TYPES.find(type => type.value === this.type);
+        if (!type) return NotifyNegative('Impossible de téléchager le document');
 
         const csv = await this.$exports.getHistoryCsv({ ...this.dateRange, type: type.value });
         await downloadFile(csv, `${type.label}.csv`);
