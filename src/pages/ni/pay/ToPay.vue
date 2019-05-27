@@ -31,22 +31,22 @@
             <div v-else>{{ col.value }}</div>
           </template>
           <template v-else-if="col.name === 'hoursCounter'">
-            <ni-editable-td :props="props.row" edited-field="hoursCounter" edition-boolean="hoursCounterEdition"
+            <ni-editable-td :props="props.row" edited-field="hoursCounter" edition-boolean-name="hoursCounterEdition"
               :refName="`${props.row.auxiliaryId}Counter`" :value="col.value" @disable="disableEditionField($event)"
               @click="editField($event)" @change="setEditionField($event)" suffix="h" />
           </template>
           <template v-else-if="col.name === 'overtimeHours'">
-              <ni-editable-td :props="props.row" edited-field="overtimeHours" edition-boolean="overtimeHoursEdition"
+              <ni-editable-td :props="props.row" edited-field="overtimeHours" edition-boolean-name="overtimeHoursEdition"
                 :refName="`${props.row.auxiliaryId}Overtime`" :value="col.value" @disable="disableEditionField($event)"
                 @click="editField($event)" @change="setEditionField($event)" suffix="h" />
           </template>
           <template v-else-if="col.name === 'additionalHours'">
-            <ni-editable-td :props="props.row" edited-field="additionalHours" edition-boolean="additionalHoursEdition"
+            <ni-editable-td :props="props.row" edited-field="additionalHours" edition-boolean-name="additionalHoursEdition"
               :refName="`${props.row.auxiliaryId}Additional`" :value="col.value" @disable="disableEditionField($event)"
               @click="editField($event)" @change="setEditionField($event)" suffix="h" />
           </template>
           <template v-else-if="col.name === 'bonus'">
-            <ni-editable-td :props="props.row" edited-field="bonus" edition-boolean="bonusEdition"
+            <ni-editable-td :props="props.row" edited-field="bonus" edition-boolean-name="bonusEdition"
               :refName="`${props.row.auxiliaryId}Bonus`" :value="col.value" @disable="disableEditionField($event)"
               @click="editField($event)" @change="setEditionField($event)" suffix="€" />
           </template>
@@ -244,7 +244,7 @@ export default {
   watch: {
     selectedSector (value) {
       if (value === '') this.displayedDraftPay = [...this.draftPay];
-      else this.displayedDraftPay = [...this.draftPay].filter(dp => dp.auxiliary.sector._id === value);
+      else this.displayedDraftPay = this.draftPay.filter(dp => dp.auxiliary.sector._id === value);
       this.selected = [];
     }
   },

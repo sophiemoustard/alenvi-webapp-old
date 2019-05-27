@@ -3,7 +3,7 @@
     <div class="cursor-pointer text-primary" v-show="!props[editionBooleanName]" @click="startEdition">
       {{ value }}
     </div>
-    <q-input v-show="props[editionBooleanName]" class="datatable-inner-input" :ref="refName" :value="props[this.editedField]"
+    <q-input v-show="props[editionBooleanName]" class="datatable-inner-input" :ref="refName" :value="props[editedField]"
       @change="setEdition($event)" :suffix="suffix" type="number" @blur="disableEdition" inverted-light color="white"
       @keyup.esc="disableEdition" no-parent-field @keyup.enter="disableEdition" />
   </div>

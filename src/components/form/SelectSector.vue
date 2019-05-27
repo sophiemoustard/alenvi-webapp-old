@@ -33,12 +33,8 @@ export default {
     async getSectors () {
       try {
         const sectors = await this.$sectors.showAll({ company: this.currentUser.company._id });
-        this.sectors = this.allowNullOption
-          ? this.$_.sortBy([
-            ...sectors.map(sector => ({ label: sector.name, value: sector._id })),
-            { label: 'Toutes les communautés', value: '' }
-          ], ['label'])
-          : this.$_.sortBy(sectors.map(sector => ({ label: sector.name, value: sector._id })), ['label']);
+        if (this.allowNullOption) sectors.push({ name: 'Toutes les communautés', _id: '' });
+        this.sectors = this.$_.sortBy(sectors.map(sector => ({ label: sector.name, value: sector._id })), ['label']);
       } catch (e) {
         console.error(e);
       }

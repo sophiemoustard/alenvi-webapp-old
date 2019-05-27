@@ -29,7 +29,7 @@
       <template v-else-if="col.name === 'hours'">{{ formatHours(bill) }}</template>
       <template v-else-if="col.name === 'unitExclTaxes'">{{ formatPrice(bill.unitExclTaxes) }}</template>
       <template v-else-if="col.name === 'discount'">
-        <ni-editable-td :props="bill" edited-field="discount" edition-boolean="discountEdition"
+        <ni-editable-td :props="bill" edited-field="discount" edition-boolean-name="discountEdition"
           :refName="bill._id" :value="formatPrice(bill.discount)" @disable="disableDiscountEditing(bill)"
           @click="$emit('discount:click', $event)" @change="setDiscount" suffix="€" />
       </template>
