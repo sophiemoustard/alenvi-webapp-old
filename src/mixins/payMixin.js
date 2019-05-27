@@ -1,4 +1,5 @@
 import { formatPrice } from '../helpers/utils';
+import { END_CONTRACT_REASONS } from '../data/constants';
 
 export const payMixin = {
   data () {
@@ -24,6 +25,23 @@ export const payMixin = {
           align: 'left',
           field: 'startDate',
           format: value => value ? this.$moment(value).format('DD/MM/YYYY') : '',
+        },
+        {
+          name: 'endNotificationDate',
+          label: 'Date de notification',
+          align: 'left',
+          field: 'endNotificationDate',
+          format: value => value ? this.$moment(value).format('DD/MM/YYYY') : '',
+        },
+        {
+          name: 'endReason',
+          label: 'Motif',
+          align: 'left',
+          field: 'endReason',
+          format: (value) => {
+            const reason = END_CONTRACT_REASONS.find(r => r.value === value);
+            return reason ? reason.label : '';
+          },
         },
         {
           name: 'endDate',
@@ -129,6 +147,12 @@ export const payMixin = {
           align: 'center',
           field: 'bonus',
           format: value => formatPrice(value),
+        },
+        {
+          name: 'compensation',
+          label: 'Indémnité',
+          align: 'center',
+          field: 'compensation',
         },
       ],
     }

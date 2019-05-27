@@ -5,7 +5,7 @@
       <ni-select-sector v-model="selectedSector" allow-null-option />
     </div>
     <q-table :data="displayedDraftPay" :columns="columns" class="q-pa-sm" selection="multiple" row-key="auxiliaryId"
-      :selected.sync="selected" :pagination.sync="pagination">
+      :selected.sync="selected" :pagination.sync="pagination" :visible-columns="visibleColumns" >
       <q-tr slot="header" slot-scope="props">
         <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
         <q-th auto-width>
