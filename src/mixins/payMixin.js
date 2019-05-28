@@ -14,7 +14,7 @@ export const payMixin = {
         },
         {
           name: 'sector',
-          label: 'Secteur',
+          label: 'Équipe',
           align: 'left',
           field: 'auxiliary',
           format: value => value && value.sector ? value.sector.name : '',
