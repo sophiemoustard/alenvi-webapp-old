@@ -88,6 +88,14 @@ export const planningActionMixin = {
           .minutes(event.dates.endHour.split(':')[1]).toISOString();
       }
 
+      if (event.type === INTERVENTION) {
+        const customer = this.customers.find(cus => cus._id === event.customer);
+        if (customer) {
+          const subscription = customer.subscriptions.find(sub => sub._id === event.subscription);
+          if (subscription && subscription.service) payload.status = subscription.service.type;
+        }
+      }
+
       if (event.location && event.location.fullAddress) delete payload.location.location;
       if (event.location && Object.keys(event.location).length === 0) delete payload.location;
       if (event.type === ABSENCE && event.absence !== ILLNESS) payload.attachment = {};
@@ -130,7 +138,7 @@ export const planningActionMixin = {
         NotifyPositive('Évènement créé');
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode === 422) return NotifyNegative('La creation de cet evenement n\'est pas autorisée');
+        if (e.data && e.data.statusCode === 422) return NotifyNegative('La creation de cet evenement n\'est pas autorisée');
         NotifyNegative('Erreur lors de la création de l\'évènement');
       } finally {
         this.loading = false
@@ -203,6 +211,14 @@ export const planningActionMixin = {
     },
     getEditionPayload (event) {
       let payload = this.getCreationPayload(event);
+
+      if (event.type === INTERVENTION) {
+        const customer = this.customers.find(cus => cus._id === event.customer);
+        if (customer) {
+          const subscription = customer.subscriptions.find(sub => sub._id === event.subscription);
+          if (subscription && subscription.service) payload.status = subscription.service.type;
+        }
+      }
 
       if (event.cancel && Object.keys(event.cancel).length === 0) delete payload.cancel;
       if (event.attachment && Object.keys(event.attachment).length === 0) delete payload.attachment;

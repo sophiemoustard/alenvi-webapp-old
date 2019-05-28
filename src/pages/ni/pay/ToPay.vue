@@ -2,12 +2,10 @@
   <q-page class="neutral-background q-pb-xl">
     <div class="title-padding">
       <h4>À payer</h4>
-    </div>
-    <div class="sector-filter">
       <ni-select-sector v-model="selectedSector" allow-null-option />
     </div>
     <q-table :data="displayedDraftPay" :columns="columns" class="q-pa-sm" selection="multiple" row-key="auxiliaryId"
-      :selected.sync="selected">
+      :selected.sync="selected" :pagination.sync="pagination">
       <q-tr slot="header" slot-scope="props">
         <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
         <q-th auto-width>
@@ -56,6 +54,8 @@
           <q-checkbox v-model="props.selected" />
         </q-td>
       </q-tr>
+      <ni-billing-pagination slot="bottom" slot-scope="props" :props="props" :pagination.sync="pagination"
+        :data="displayedDraftPay"/>
     </q-table>
     <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
       label="Payer" @click="createList" />
@@ -90,6 +90,7 @@ import { formatPrice } from '../../../helpers/utils';
 import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
 import SelectSector from '../../../components/form/SelectSector';
 import EditableTd from '../../../components/table/EditableTd';
+import BillingPagination from '../../../components/table/BillingPagination';
 
 export default {
   name: 'ToPay',
@@ -97,12 +98,14 @@ export default {
   components: {
     'ni-select-sector': SelectSector,
     'ni-editable-td': EditableTd,
+    'ni-billing-pagination': BillingPagination,
   },
   data () {
     return {
       draftPay: [],
       displayedDraftPay: [],
       selected: [],
+      pagination: { rowsPerPage: 0 },
       columns: [
         {
           name: 'auxiliary',
@@ -355,11 +358,8 @@ export default {
     width: 60%
     border-right: 1px solid $light-grey;
 
-  .sector-filter
-    padding: 1rem 3rem;
-    display: flex;
-    flex-direction: row;
-
+  .title-padding
     .q-select
       width: 250px
+      height: fit-content;
 </style>

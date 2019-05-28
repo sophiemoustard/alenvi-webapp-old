@@ -88,7 +88,7 @@ import Planning from '../../../components/planning/Planning.vue';
 import { planningModalMixin } from '../../../mixins/planningModalMixin';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify.js';
-import { INTERVENTION, DEFAULT_AVATAR, NEVER, ABSENCE, INTERNAL_HOUR, AUXILIARY, PLANNING_REFERENT, CUSTOMER_CONTRACT, COMPANY_CONTRACT, CUSTOMER } from '../../../data/constants';
+import { INTERVENTION, DEFAULT_AVATAR, NEVER, AUXILIARY, PLANNING_REFERENT, CUSTOMER_CONTRACT, COMPANY_CONTRACT, CUSTOMER } from '../../../data/constants';
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
@@ -380,26 +380,16 @@ export default {
       let payload = { ...this.$_.omit(event, ['dates', '__v']) }
       payload = this.$_.pickBy(payload);
 
-      if (event.type === INTERNAL_HOUR) {
-        const internalHour = this.internalHours.find(hour => hour._id === event.internalHour);
-        payload.internalHour = internalHour;
+      const customer = this.customers.find(cus => cus._id === event.customer);
+      if (customer) {
+        const subscription = customer.subscriptions.find(sub => sub._id === event.subscription);
+        if (subscription && subscription.service) payload.status = subscription.service.type;
       }
-      if (event.type === ABSENCE) {
-        payload.startDate = this.$moment(event.dates.startDate).hours(event.startDuration[0].startHour).toISOString();
-        if (event.endDuration !== '') {
-          payload.endDate = this.$moment(event.dates.endDate).hours(event.endDuration[0].endHour).toISOString();
-        } else {
-          payload.endDate = this.$moment(event.dates.endDate).hours(event.startDuration[0].endHour).toISOString();
-        }
 
-        this.$_.unset(payload, 'startDuration');
-        this.$_.unset(payload, 'endDuration');
-      } else {
-        payload.startDate = this.$moment(event.dates.startDate).hours(event.dates.startHour.split(':')[0])
-          .minutes(event.dates.startHour.split(':')[1]).toISOString();
-        payload.endDate = this.$moment(event.dates.endDate).hours(event.dates.endHour.split(':')[0])
-          .minutes(event.dates.endHour.split(':')[1]).toISOString();
-      }
+      payload.startDate = this.$moment(event.dates.startDate).hours(event.dates.startHour.split(':')[0])
+        .minutes(event.dates.startHour.split(':')[1]).toISOString();
+      payload.endDate = this.$moment(event.dates.endDate).hours(event.dates.endHour.split(':')[0])
+        .minutes(event.dates.endHour.split(':')[1]).toISOString();
 
       if (event.location && event.location.fullAddress) delete payload.location.location;
       if (event.location && Object.keys(event.location).length === 0) delete payload.location;
