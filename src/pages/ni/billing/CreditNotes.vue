@@ -157,7 +157,7 @@ import ModalSelect from '../../../components/form/ModalSelect';
 import OptionGroup from '../../../components/form/OptionGroup';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { positiveNumber } from '../../../helpers/vuelidateCustomVal.js';
-import { formatPrice } from '../../../helpers/utils.js';
+import { formatPrice, getLastVersion } from '../../../helpers/utils.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
 
 export default {
@@ -522,7 +522,14 @@ export default {
           payload.exclTaxesTpp = Number.parseFloat((creditNote.inclTaxesTpp / (1 + (vat / 100))).toFixed(2));
           payload.thirdPartyPayer = creditNote.thirdPartyPayer;
         }
-        payload.subscription = { _id: subscription._id, service: subscription.service.name, vat };
+        payload.subscription = {
+          _id: subscription._id,
+          service: subscription.service.name,
+          vat,
+          unitExclTaxes: subscription.versions && subscription.versions.length > 0
+            ? getLastVersion(subscription.versions, 'createdAt').unitTTCRate / (1 + (vat / 100))
+            : 0,
+        };
       } else {
         payload.startDate = creditNote.startDate;
         payload.endDate = creditNote.endDate;
