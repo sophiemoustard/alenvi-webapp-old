@@ -165,6 +165,13 @@ export const payMixin = {
     formatHours (value) {
       return value ? `${parseFloat(value).toFixed(2)}h` : '0.00h';
     },
+    formatPayload (payload) {
+      return {
+        ...this.$_.omit(payload, ['auxiliaryId', 'additionalHoursEdition', 'overtimeHoursEdition', 'bonusEdition', 'hoursCounterEdition', 'paidKm', '__index']),
+        hoursCounter: payload.hoursCounter - payload.overtimeHours - payload.additionalHours,
+        auxiliary: payload.auxiliary._id,
+      };
+    },
     // Editable td
     editField ({ obj, path, ref }) {
       obj[path] = true;

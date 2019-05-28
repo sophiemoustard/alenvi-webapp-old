@@ -5,4 +5,7 @@ export default {
     const draftStc = await alenviAxios.get(`${process.env.API_HOSTNAME}/stc/draft`, { params });
     return draftStc.data.data.draftStc;
   },
+  async createList (payload) {
+    return alenviAxios.post(`${process.env.API_HOSTNAME}/stc`, payload);
+  }
 }

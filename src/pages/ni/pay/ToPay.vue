@@ -162,13 +162,6 @@ export default {
       this.surchargeDetails = {};
     },
     // Creation
-    formatPayload (payload) {
-      return {
-        ...this.$_.omit(payload, ['auxiliaryId', 'additionalHoursEdition', 'overtimeHoursEdition', 'bonusEdition', 'hoursCounterEdition', 'paidKm', '__index']),
-        hoursCounter: payload.hoursCounter - payload.overtimeHours - payload.additionalHours,
-        auxiliary: payload.auxiliary._id,
-      };
-    },
     async createList () {
       try {
         await this.$q.dialog({

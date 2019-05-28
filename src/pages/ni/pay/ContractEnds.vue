@@ -60,8 +60,8 @@
       <ni-billing-pagination slot="bottom" slot-scope="props" :props="props" :pagination.sync="pagination"
         :data="draftStc"/>
     </q-table>
-    <!-- <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
-      label="Payer" @click="createList" /> -->
+    <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
+      label="Payer" @click="createList" />
 
     <!-- Surcharge detail modal -->
     <q-modal v-model="surchargeDetailModal" content-classes="modal-container-sm" @hide="resetSurchargeDetail">
@@ -92,6 +92,7 @@
 import { payMixin } from '../../../mixins/payMixin';
 import EditableTd from '../../../components/table/EditableTd';
 import BillingPagination from '../../../components/table/BillingPagination';
+import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
 
 export default {
   name: 'ContractEnds',
@@ -112,6 +113,11 @@ export default {
       surchargeDetailModal: false,
       surchargeDetails: {},
     };
+  },
+  computed: {
+    hasSelectedRows () {
+      return this.selected.length > 0;
+    },
   },
   async mounted () {
     await this.refreshStc();
@@ -147,7 +153,28 @@ export default {
       this.surchargeDetails = {};
     },
     // Creation
-    // TODO : add creation action
+    async createList () {
+      try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Cette opération est définitive. Confirmez-vous ?',
+          ok: 'Oui',
+          cancel: 'Non'
+        });
+
+        if (!this.hasSelectedRows) return;
+
+        const stc = this.selected.map(row => this.formatPayload(row));
+        await this.$stc.createList(stc);
+        NotifyPositive('Solde tout compte crées');
+        await this.refreshStc();
+        this.selected = [];
+      } catch (e) {
+        if (e.message === '') return;
+        console.error(e);
+        NotifyNegative('Erreur lors de la création des soldes tout compte');
+      }
+    },
   }
 }
 </script>
