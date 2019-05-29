@@ -162,5 +162,6 @@ export const EXPORT_TYPES = [
   { label: 'Aidants', value: HELPER },
 ];
 export const EXPORT_HISTORY_TYPES = [
-  { label: 'Interventions et heures internes', value: WORKING_EVENTS }
+  { label: 'Interventions et heures internes', value: WORKING_EVENTS },
+  { label: 'Factures', value: BILL },
 ];
