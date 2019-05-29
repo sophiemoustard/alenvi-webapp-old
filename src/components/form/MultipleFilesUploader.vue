@@ -12,7 +12,7 @@
       <div class="col-xs-12 col-md-6" v-for="(certificate, index) in documents" :key="index">
         <div v-if="certificate.driveId" class="justify-between row" style="background: white">
           <div class="doc-thumbnail">
-            <ni-custom-img :driveId="certificate.driveId" alt="diplôme" :key="certificate.driveId" />
+            <ni-custom-img :driveId="certificate.driveId" :alt="alt" :key="certificate.driveId" />
           </div>
           <div class="self-end doc-delete">
             <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(certificate.driveId)" />
