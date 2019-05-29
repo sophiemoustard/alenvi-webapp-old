@@ -95,6 +95,7 @@
 
 <script>
 import { payMixin } from '../../../mixins/payMixin';
+import { editableTdMixin } from '../../../mixins/editableTdMixin';
 import EditableTd from '../../../components/table/EditableTd';
 import BillingPagination from '../../../components/table/BillingPagination';
 import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
@@ -102,7 +103,7 @@ import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify
 export default {
   name: 'ContractEnds',
   metaInfo: { title: 'Fins de contract' },
-  mixins: [payMixin],
+  mixins: [payMixin, editableTdMixin],
   components: {
     'ni-editable-td': EditableTd,
     'ni-billing-pagination': BillingPagination,
@@ -172,7 +173,7 @@ export default {
 
         const finalPayList = this.selected.map(row => this.formatPayload(row));
         await this.$finalPay.createList(finalPayList);
-        NotifyPositive('Solde tout compte crées');
+        NotifyPositive('Soldes tout compte créés');
         await this.refreshFinalPay();
         this.selected = [];
       } catch (e) {

@@ -91,11 +91,12 @@ import SelectSector from '../../../components/form/SelectSector';
 import EditableTd from '../../../components/table/EditableTd';
 import BillingPagination from '../../../components/table/BillingPagination';
 import { payMixin } from '../../../mixins/payMixin';
+import { editableTdMixin } from '../../../mixins/editableTdMixin';
 
 export default {
   name: 'ToPay',
   metaInfo: { title: 'À payer' },
-  mixins: [payMixin],
+  mixins: [payMixin, editableTdMixin],
   components: {
     'ni-select-sector': SelectSector,
     'ni-editable-td': EditableTd,
