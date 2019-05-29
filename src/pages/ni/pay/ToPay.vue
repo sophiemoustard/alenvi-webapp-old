@@ -5,7 +5,7 @@
       <ni-select-sector v-model="selectedSector" allow-null-option />
     </div>
     <q-table :data="displayedDraftPay" :columns="columns" class="q-pa-sm" selection="multiple" row-key="auxiliaryId"
-      :selected.sync="selected" :pagination.sync="pagination">
+      :selected.sync="selected" :pagination.sync="pagination" :visible-columns="visibleColumns" >
       <q-tr slot="header" slot-scope="props">
         <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
         <q-th auto-width>
@@ -86,15 +86,17 @@
 </template>
 
 <script>
-import { formatPrice } from '../../../helpers/utils';
 import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
 import SelectSector from '../../../components/form/SelectSector';
 import EditableTd from '../../../components/table/EditableTd';
 import BillingPagination from '../../../components/table/BillingPagination';
+import { payMixin } from '../../../mixins/payMixin';
+import { editableTdMixin } from '../../../mixins/editableTdMixin';
 
 export default {
   name: 'ToPay',
   metaInfo: { title: 'À payer' },
+  mixins: [payMixin, editableTdMixin],
   components: {
     'ni-select-sector': SelectSector,
     'ni-editable-td': EditableTd,
@@ -106,134 +108,9 @@ export default {
       displayedDraftPay: [],
       selected: [],
       pagination: { rowsPerPage: 0 },
-      columns: [
-        {
-          name: 'auxiliary',
-          label: 'Auxiliaire',
-          align: 'left',
-          field: 'auxiliary',
-          format: value => value && value.identity ? `${value.identity.firstname.slice(0, 1)}. ${value.identity.lastname}` : ''
-        },
-        {
-          name: 'sector',
-          label: 'Secteur',
-          align: 'left',
-          field: 'auxiliary',
-          format: value => value && value.sector ? value.sector.name : '',
-        },
-        {
-          name: 'startDate',
-          label: 'Début de paye',
-          align: 'left',
-          field: 'startDate',
-          format: value => value ? this.$moment(value).format('DD/MM/YYYY') : '',
-        },
-        {
-          name: 'endDate',
-          label: 'Fin de paye',
-          align: 'left',
-          field: 'endDate',
-          format: value => value ? this.$moment(value).format('DD/MM/YYYY') : '',
-        },
-        {
-          name: 'contractHours',
-          label: 'Heures contrat',
-          align: 'center',
-          field: 'contractHours',
-          format: value => this.formatHours(value),
-        },
-        {
-          name: 'workedHours',
-          label: 'Total heures travaillées',
-          align: 'center',
-          field: 'workedHours',
-          format: value => this.formatHours(value),
-        },
-        {
-          name: 'notSurchargedAndExempt',
-          label: 'Dont exo SAP non majorées',
-          align: 'center',
-          field: 'notSurchargedAndExempt',
-          format: value => this.formatHours(value),
-        },
-        {
-          name: 'surchargedAndExempt',
-          label: 'Dont majorées et exo SAP',
-          align: 'center',
-          field: 'surchargedAndExempt',
-          format: value => this.formatHours(value),
-        },
-        {
-          name: 'notSurchargedAndNotExempt',
-          label: 'Dont non majorées non exo SAP',
-          align: 'center',
-          field: 'notSurchargedAndNotExempt',
-          format: value => this.formatHours(value),
-        },
-        {
-          name: 'surchargedAndNotExempt',
-          label: 'Dont majorées et non exo SAP',
-          align: 'center',
-          field: 'surchargedAndNotExempt',
-          format: value => this.formatHours(value),
-        },
-        {
-          name: 'hoursBalance',
-          label: 'Solde heures période',
-          align: 'center',
-          field: 'hoursBalance',
-          format: value => this.formatHours(value),
-        },
-        {
-          name: 'hoursCounter',
-          label: 'Compteur d\'heures',
-          align: 'center',
-          field: row => row.hoursCounter - row.additionalHours - row.overtimeHours,
-          format: value => this.formatHours(value),
-        },
-        {
-          name: 'overtimeHours',
-          label: 'Heures sup à payer',
-          align: 'center',
-          field: 'overtimeHours',
-          format: value => this.formatHours(value),
-        },
-        {
-          name: 'additionalHours',
-          label: 'Heures complémentaires à payer',
-          align: 'center',
-          field: 'additionalHours',
-          format: value => this.formatHours(value),
-        },
-        {
-          name: 'mutual',
-          label: 'Mutuelle',
-          align: 'center',
-          field: 'mutual',
-          format: value => value ? 'Oui' : 'Non',
-        },
-        {
-          name: 'transport',
-          label: 'Transport',
-          align: 'center',
-          field: 'transport',
-          format: value => formatPrice(value),
-        },
-        {
-          name: 'otherFees',
-          label: 'Autres frais',
-          align: 'center',
-          field: 'otherFees',
-          format: value => formatPrice(value),
-        },
-        {
-          name: 'bonus',
-          label: 'Prime',
-          align: 'center',
-          field: 'bonus',
-          format: value => formatPrice(value),
-        },
-      ],
+      visibleColumns: ['auxiliary', 'sector', 'startDate', 'endDate', 'contractHours', 'workedHours', 'notSurchargedAndExempt', 'surchargedAndExempt',
+        'notSurchargedAndNotExempt', 'surchargedAndNotExempt', 'hoursBalance', 'hoursCounter', 'overtimeHours', 'additionalHours', 'mutual', 'transport',
+        'otherFees', 'bonus'],
       surchargeDetailModal: false,
       surchargeDetails: {},
       selectedSector: '',
@@ -274,24 +151,6 @@ export default {
         console.error(e);
       }
     },
-    formatPrice (value) {
-      return formatPrice(value);
-    },
-    formatHours (value) {
-      return value ? `${parseFloat(value).toFixed(2)}h` : '0.00h';
-    },
-    editField ({ obj, path, ref }) {
-      obj[path] = true;
-      this.$nextTick(() => {
-        ref.focus();
-      })
-    },
-    setEditionField ({ value, obj, path }) {
-      obj[path] = !value || isNaN(value) ? 0 : value;
-    },
-    disableEditionField ({ obj, path }) {
-      obj[path] = false;
-    },
     // Surcharge modal
     openSurchargeDetailModal (id, details) {
       const draft = this.draftPay.find(dp => dp.auxiliary._id === id);
@@ -304,13 +163,6 @@ export default {
       this.surchargeDetails = {};
     },
     // Creation
-    formatPayload (payload) {
-      return {
-        ...this.$_.omit(payload, ['auxiliaryId', 'additionalHoursEdition', 'overtimeHoursEdition', 'bonusEdition', 'hoursCounterEdition', 'paidKm', '__index']),
-        hoursCounter: payload.hoursCounter - payload.overtimeHours - payload.additionalHours,
-        auxiliary: payload.auxiliary._id,
-      };
-    },
     async createList () {
       try {
         await this.$q.dialog({
