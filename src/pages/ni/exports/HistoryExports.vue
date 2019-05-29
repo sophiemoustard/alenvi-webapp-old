@@ -14,7 +14,7 @@ import { NotifyNegative, NotifyPositive } from '../../../components/popup/notify
 import { downloadFile } from '../../../helpers/downloadFile';
 import Select from '../../../components/form/Select';
 import DateRange from '../../../components/form/DateRange';
-import { EXPORT_HISTORY_TYPES, WORKING_EVENTS } from '../../../data/constants';
+import { EXPORT_HISTORY_TYPES, WORKING_EVENT } from '../../../data/constants';
 
 export default {
   name: 'History',
@@ -26,7 +26,7 @@ export default {
   data () {
     return {
       exportTypeOptions: EXPORT_HISTORY_TYPES,
-      type: WORKING_EVENTS,
+      type: WORKING_EVENT,
       dateRange: { startDate: this.$moment().subtract(1, 'year').toISOString(), endDate: this.$moment().toISOString() }
     }
   },

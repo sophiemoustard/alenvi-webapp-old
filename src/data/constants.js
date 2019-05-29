@@ -152,7 +152,7 @@ export const THIRD_PARTY_PAYER = 'ThirdPartyPayer';
 export const SERVICE = 'service';
 export const SUBSCRIPTION = 'subscription';
 export const FUNDING = 'funding';
-export const WORKING_EVENTS = 'working_events';
+export const WORKING_EVENT = 'working_event';
 export const EXPORT_TYPES = [
   { label: 'Services', value: SERVICE },
   { label: 'Souscriptions', value: SUBSCRIPTION },
@@ -162,5 +162,6 @@ export const EXPORT_TYPES = [
   { label: 'Aidants', value: HELPER },
 ];
 export const EXPORT_HISTORY_TYPES = [
-  { label: 'Interventions et heures internes', value: WORKING_EVENTS }
+  { label: 'Interventions et heures internes', value: WORKING_EVENT },
+  { label: 'Factures', value: BILL },
 ];
