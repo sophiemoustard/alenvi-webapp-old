@@ -3,7 +3,7 @@
     <div class="title-padding">
       <h4>Fins de contrats</h4>
     </div>
-    <q-table :data="draftStc" :columns="columns" class="q-pa-sm" selection="multiple" row-key="auxiliaryId"
+    <q-table :data="draftFinalPay" :columns="columns" class="q-pa-sm" selection="multiple" row-key="auxiliaryId"
       :selected.sync="selected" :pagination.sync="pagination" :visible-columns="visibleColumns">
       <q-tr slot="header" slot-scope="props">
         <q-th v-for="col in props.cols" :key="col.name" :props="props">
@@ -63,7 +63,7 @@
         </q-td>
       </q-tr>
       <ni-billing-pagination slot="bottom" slot-scope="props" :props="props" :pagination.sync="pagination"
-        :data="draftStc"/>
+        :data="draftFinalPay"/>
     </q-table>
     <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
       label="Payer" @click="createList" />
@@ -109,7 +109,7 @@ export default {
   },
   data () {
     return {
-      draftStc: [],
+      draftFinalPay: [],
       selected: [],
       pagination: { rowsPerPage: 0 },
       visibleColumns: ['auxiliary', 'sector', 'startDate', 'endNotificationDate', 'endReason', 'endDate', 'contractHours', 'workedHours',
@@ -125,16 +125,16 @@ export default {
     },
   },
   async mounted () {
-    await this.refreshStc();
+    await this.refreshFinalPay();
   },
   methods: {
-    async refreshStc () {
+    async refreshFinalPay () {
       try {
-        const draftStc = await this.$stc.getDraftStc({
+        const draftFinalPay = await this.$finalPay.getDraftFinalPay({
           startDate: this.$moment().startOf('M').startOf('d').toISOString(),
           endDate: this.$moment().endOf('M').endOf('d').toISOString(),
         });
-        this.draftStc = draftStc.map(dp => ({
+        this.draftFinalPay = draftFinalPay.map(dp => ({
           ...dp,
           hoursCounterEdition: false,
           overtimeHoursEdition: false,
@@ -143,13 +143,13 @@ export default {
           compensationEdition: false,
         }));
       } catch (e) {
-        this.draftStc = [];
+        this.draftFinalPay = [];
         console.error(e);
       }
     },
     // Surcharge modal
     openSurchargeDetailModal (id, details) {
-      const draft = this.draftStc.find(ds => ds.auxiliary._id === id);
+      const draft = this.draftFinalPay.find(ds => ds.auxiliary._id === id);
       if (!draft) return;
 
       this.surchargeDetails = draft[details];
@@ -170,10 +170,10 @@ export default {
 
         if (!this.hasSelectedRows) return;
 
-        const stc = this.selected.map(row => this.formatPayload(row));
-        await this.$stc.createList(stc);
+        const finalPayList = this.selected.map(row => this.formatPayload(row));
+        await this.$finalPay.createList(finalPayList);
         NotifyPositive('Solde tout compte crées');
-        await this.refreshStc();
+        await this.refreshFinalPay();
         this.selected = [];
       } catch (e) {
         if (e.message === '') return;
