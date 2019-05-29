@@ -153,6 +153,7 @@ export const payMixin = {
           label: 'Indémnité',
           align: 'center',
           field: 'compensation',
+          format: value => formatPrice(value),
         },
       ],
     }

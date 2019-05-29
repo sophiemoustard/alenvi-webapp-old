@@ -51,6 +51,11 @@
               :refName="`${props.row.auxiliaryId}Bonus`" :value="col.value" @disable="disableEditionField($event)"
               @click="editField($event)" @change="setEditionField($event)" suffix="€" />
           </template>
+          <template v-else-if="col.name === 'compensation'">
+            <ni-editable-td :props="props.row" edited-field="compensation" edition-boolean-name="compensationEdition"
+              :refName="`${props.row.auxiliaryId}Compensation`" :value="col.value" @disable="disableEditionField($event)"
+              @click="editField($event)" @change="setEditionField($event)" suffix="€" />
+          </template>
           <template v-else>{{ col.value }}</template>
         </q-td>
         <q-td auto-width style="width: 50px">
@@ -135,6 +140,7 @@ export default {
           overtimeHoursEdition: false,
           additionalHoursEdition: false,
           bonusEdition: false,
+          compensationEdition: false,
         }));
       } catch (e) {
         this.draftStc = [];
