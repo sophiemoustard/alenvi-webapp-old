@@ -526,8 +526,8 @@ export default {
           _id: subscription._id,
           service: subscription.service.name,
           vat,
-          unitExclTaxes: subscription.versions && subscription.versions.length > 0
-            ? getLastVersion(subscription.versions, 'createdAt').unitTTCRate / (1 + (vat / 100))
+          unitInclTaxes: subscription.versions && subscription.versions.length > 0
+            ? getLastVersion(subscription.versions, 'createdAt').unitTTCRate
             : 0,
         };
       } else {
