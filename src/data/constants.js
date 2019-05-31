@@ -148,6 +148,9 @@ export const PAYMENT_NATURE_OPTIONS = [
 // FUNDINGS
 export const THIRD_PARTY_PAYER = 'ThirdPartyPayer';
 
+// Pay
+export const PAY = 'pay';
+
 // EXPORTS
 export const SERVICE = 'service';
 export const SUBSCRIPTION = 'subscription';
@@ -166,4 +169,5 @@ export const EXPORT_HISTORY_TYPES = [
   { label: 'Factures', value: BILL },
   { label: 'Paiements', value: PAYMENT },
   { label: 'Absences', value: ABSENCE },
+  { label: 'Paies', value: PAY },
 ];
