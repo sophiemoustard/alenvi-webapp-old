@@ -5,7 +5,7 @@
       <q-icon v-if="hasError" name="error_outline" color="secondary" />
     </div>
     <q-field :error="hasError" :error-label="errorMessage">
-      <div class="date-container">
+      <div class="date-container" :class="{ borderless: borderless }">
         <div class="date-item">
           <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" @blur="blurDateHandler" />
         </div>
@@ -31,6 +31,7 @@ export default {
     error: Boolean,
     value: { type: Object, default: function () { return { startDate: this.$moment().toISOString(), endDate: this.$moment().toISOString() } } },
     requiredField: { type: Boolean, default: false },
+    borderless: { type: Boolean, default: false },
   },
   data () {
     return {
@@ -80,6 +81,8 @@ export default {
       padding: 10px 0;
       margin: 0;
       width: 4%;
+  & .borderless
+    border: none;
 
   .date-item
     /deep/ .q-input.q-if-inverted

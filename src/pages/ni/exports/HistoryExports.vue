@@ -3,7 +3,7 @@
     <h4>Historique</h4>
     <div class="row gutter-sm">
       <ni-select caption="Type d'export" :options="exportTypeOptions" v-model="type" />
-      <ni-date-range class="col-12 col-md-auto" caption="Période" v-model="dateRange" />
+      <ni-date-range class="col-12 col-md-6" caption="Période" v-model="dateRange" borderless />
     </div>
     <q-btn label="Exporter" no-caps flat color="white" icon="import_export" @click="exportCsv" />
   </q-page>

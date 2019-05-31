@@ -2,7 +2,7 @@
   <q-page class="neutral-background q-pb-xl">
     <div class="title-padding">
       <h4>À facturer</h4>
-      <ni-date-range v-model="billingDates" @input="getDraftBills" />
+      <ni-date-range v-model="billingDates" @input="getDraftBills" borderless />
     </div>
     <q-table :data="draftBills" :columns="columns" row-key="customerId" binary-state-sort :loading="tableLoading"
       :pagination.sync="pagination" separator="none" selection="multiple" :selected.sync="selected" class="q-pa-sm">
