@@ -21,6 +21,7 @@
 
 <script>
 import DateInput from './DateInput.vue';
+import moment from 'moment';
 
 export default {
   components: {
@@ -57,6 +58,9 @@ export default {
     },
     update (value, key) {
       const dates = { ...this.value, [key]: value }
+      if (key === 'startDate' && moment(dates.startDate).isAfter(dates.endDate)) {
+        dates.endDate = dates.startDate;
+      }
       this.$emit('blur');
       this.$emit('input', dates);
     },
