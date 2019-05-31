@@ -197,6 +197,8 @@ export default {
       white-space: normal;
       padding: 10px 20px;
       vertical-align: middle;
+    & tbody tr.selected
+      background: $white
 
   .surcharge-line
     display: flex;
