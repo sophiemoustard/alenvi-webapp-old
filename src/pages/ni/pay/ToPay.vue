@@ -135,8 +135,8 @@ export default {
     async refreshDraftPay () {
       try {
         const draftPay = await this.$pay.getDraftPay({
-          startDate: this.$moment().startOf('M').startOf('d').toISOString(),
-          endDate: this.$moment().endOf('M').endOf('d').toISOString(),
+          startDate: this.$moment().startOf('M').toISOString(),
+          endDate: this.$moment().endOf('M').toISOString(),
         });
         this.draftPay = draftPay.map(dp => ({
           ...dp,
