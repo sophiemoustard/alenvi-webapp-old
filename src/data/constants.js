@@ -148,8 +148,11 @@ export const PAYMENT_NATURE_OPTIONS = [
 // FUNDINGS
 export const THIRD_PARTY_PAYER = 'ThirdPartyPayer';
 
-// Pay
+// PAY
 export const PAY = 'pay';
+
+// FINAL PAY
+export const FINAL_PAY = 'finalpay';
 
 // EXPORTS
 export const SERVICE = 'service';
@@ -170,4 +173,5 @@ export const EXPORT_HISTORY_TYPES = [
   { label: 'Paiements', value: PAYMENT },
   { label: 'Absences', value: ABSENCE },
   { label: 'Paies', value: PAY },
+  { label: 'Soldes tout compte', value: FINAL_PAY },
 ];
