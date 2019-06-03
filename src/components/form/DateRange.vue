@@ -80,6 +80,7 @@ export default {
     border-radius: 3px;
     display: flex;
     flex-direction: row;
+    justify-content: space-evenly;
     background-color: $white;
     & .delimiter
       padding: 10px 0;
