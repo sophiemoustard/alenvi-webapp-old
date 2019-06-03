@@ -197,6 +197,9 @@ export default {
       white-space: normal;
       padding: 10px 20px;
       vertical-align: middle;
+      padding: 6px
+    td
+      padding: 6px
     & tbody tr.selected
       background: $white
 

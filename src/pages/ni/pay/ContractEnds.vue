@@ -6,11 +6,7 @@
     <q-table :data="draftFinalPay" :columns="columns" class="q-pa-sm" selection="multiple" row-key="auxiliaryId"
       :selected.sync="selected" :pagination.sync="pagination" :visible-columns="visibleColumns">
       <q-tr slot="header" slot-scope="props">
-        <q-th v-for="col in props.cols" :key="col.name" :props="props">
-          <template v-if="col.name === 'startDate'">Début de STC</template>
-          <template v-else-if="col.name === 'endDate'">Fin de contrat</template>
-          <template v-else>{{ col.label }}</template>
-        </q-th>
+        <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
         <q-th auto-width>
           <q-checkbox v-model="props.selected" indeterminate-value="some" />
         </q-th>
@@ -194,6 +190,9 @@ export default {
       white-space: normal;
       padding: 10px 20px;
       vertical-align: middle;
+      padding: 6px
+    td
+      padding: 6px
 
   .surcharge-line
     display: flex;
