@@ -95,6 +95,12 @@ export const fundingMixin = {
           field: 'subscription',
         },
         {
+          name: 'createdAt',
+          label: '',
+          align: 'left',
+          field: 'createdAt'
+        },
+        {
           name: 'actions',
           label: '',
           align: 'left',
