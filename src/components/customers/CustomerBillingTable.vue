@@ -15,7 +15,8 @@
             @click="props.row.billNumber && downloadBillPdf(props.row._id, props.row.billNumber)">
             Facture {{ props.row.billNumber || 'tiers' }}
           </div>
-          <div :class="{'download': props.row.number}" v-else-if="props.row.type === CREDIT_NOTE"
+          <div :class="{'download': props.row.number && props.row.origin === COMPANI}"
+            v-else-if="props.row.type === CREDIT_NOTE"
             @click="props.row.number && downloadCreditNotePdf(props.row._id, props.row.number)">
             Avoir {{ props.row.number }}
           </div>
