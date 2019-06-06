@@ -11,7 +11,7 @@
     <q-tr v-if="Object.keys(documents).length > 0" slot="body" slot-scope="props" :props="props">
       <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
         <template v-if="col.name === 'document'">
-          <div :class="{'download': props.row.billNumber}" v-if="props.row.type === BILL"
+          <div :class="{'download': props.row.billNumber && COMPANI === props.row.origin}" v-if="props.row.type === BILL"
             @click="props.row.billNumber && downloadBillPdf(props.row._id, props.row.billNumber)">
             Facture {{ props.row.billNumber || 'tiers' }}
           </div>
@@ -50,7 +50,19 @@
 </template>
 
 <script>
-import { CREDIT_NOTE, BILL, BANK_TRANSFER, WITHDRAWAL, CHECK, CESU, REFUND, PAYMENT_OPTIONS, CUSTOMER, PAYMENT } from '../../data/constants';
+import {
+  CREDIT_NOTE,
+  BILL,
+  BANK_TRANSFER,
+  WITHDRAWAL,
+  CHECK,
+  CESU,
+  REFUND,
+  PAYMENT_OPTIONS,
+  CUSTOMER,
+  PAYMENT,
+  COMPANI,
+} from '../../data/constants';
 import { NotifyNegative, NotifyPositive } from '../popup/notify.js';
 import { downloadPdf } from '../../helpers/downloadFile.js';
 import { formatPrice } from '../../helpers/utils';
@@ -69,6 +81,7 @@ export default {
     return {
       CREDIT_NOTE,
       BILL,
+      COMPANI,
       columns: [
         {
           name: 'date',
