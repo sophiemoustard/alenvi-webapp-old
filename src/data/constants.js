@@ -175,3 +175,8 @@ export const EXPORT_HISTORY_TYPES = [
   { label: 'Paies', value: PAY },
   { label: 'Soldes tout compte', value: FINAL_PAY },
 ];
+
+// ORIGINS
+export const COMPANI = 'compani';
+export const THIRD_PARTY = 'third_party';
+export const OGUST = 'ogust';
