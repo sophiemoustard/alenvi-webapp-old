@@ -11,11 +11,13 @@
     <q-tr v-if="Object.keys(documents).length > 0" slot="body" slot-scope="props" :props="props">
       <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
         <template v-if="col.name === 'document'">
-          <div :class="{'download': props.row.billNumber && COMPANI === props.row.origin}" v-if="props.row.type === BILL"
+          <div :class="{'download': props.row.billNumber && props.row.origin === COMPANI}"
+            v-if="props.row.type === BILL"
             @click="props.row.billNumber && downloadBillPdf(props.row._id, props.row.billNumber)">
             Facture {{ props.row.billNumber || 'tiers' }}
           </div>
-          <div :class="{'download': props.row.number}" v-else-if="props.row.type === CREDIT_NOTE"
+          <div :class="{'download': props.row.number && props.row.origin === COMPANI}"
+            v-else-if="props.row.type === CREDIT_NOTE"
             @click="props.row.number && downloadCreditNotePdf(props.row._id, props.row.number)">
             Avoir {{ props.row.number }}
           </div>
