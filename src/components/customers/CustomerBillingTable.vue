@@ -11,7 +11,8 @@
     <q-tr v-if="Object.keys(documents).length > 0" slot="body" slot-scope="props" :props="props">
       <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
         <template v-if="col.name === 'document'">
-          <div :class="{'download': props.row.billNumber && COMPANI === props.row.origin}" v-if="props.row.type === BILL"
+          <div :class="{'download': props.row.billNumber && props.row.origin === COMPANI}"
+            v-if="props.row.type === BILL"
             @click="props.row.billNumber && downloadBillPdf(props.row._id, props.row.billNumber)">
             Facture {{ props.row.billNumber || 'tiers' }}
           </div>
