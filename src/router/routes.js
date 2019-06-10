@@ -208,6 +208,7 @@ const routes = [
         component: () => import('pages/ni/planning/AuxiliaryPlanning'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['planning:read'],
         },
       },
       {
@@ -216,6 +217,7 @@ const routes = [
         component: () => import('pages/ni/planning/CustomerPlanning'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
+          permissions: ['profiles:read'],
         },
       },
       // Auxiliary view routes
