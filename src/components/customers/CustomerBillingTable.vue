@@ -11,14 +11,14 @@
     <q-tr v-if="Object.keys(documents).length > 0" slot="body" slot-scope="props" :props="props">
       <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
         <template v-if="col.name === 'document'">
-          <div :class="{'download': props.row.billNumber && props.row.origin === COMPANI}"
+          <div :class="{'download': canDownloadBill(props.row)}"
             v-if="props.row.type === BILL"
-            @click="props.row.billNumber && downloadBillPdf(props.row._id, props.row.billNumber)">
+            @click="canDownloadBill(props.row) && downloadBillPdf(props.row._id, props.row.billNumber)">
             Facture {{ props.row.billNumber || 'tiers' }}
           </div>
-          <div :class="{'download': props.row.number && props.row.origin === COMPANI}"
+          <div :class="{'download': canDownloadCreditNote(props.row)}"
             v-else-if="props.row.type === CREDIT_NOTE"
-            @click="props.row.number && downloadCreditNotePdf(props.row._id, props.row.number)">
+            @click="canDownloadCreditNote(props.row) && downloadCreditNotePdf(props.row._id, props.row.number)">
             Avoir {{ props.row.number }}
           </div>
           <div v-else>{{ getPaymentTitle(props.row) }}</div>
@@ -160,6 +160,12 @@ export default {
         console.error(e);
         NotifyNegative('Impossible de télécharger la facture');
       }
+    },
+    canDownloadBill (bill) {
+      return bill.billNumber && bill.origin === COMPANI;
+    },
+    canDownloadCreditNote (creditNote) {
+      return creditNote.number && creditNote.origin === COMPANI;
     },
     async downloadCreditNotePdf (creditNoteId, number) {
       try {
