@@ -10,7 +10,7 @@
       <template slot="header">
         <q-item-main :class="{'text-weight-bold': activeRoutes.administrative.highlight }" label="Administratif" />
       </template>
-      <ni-menu-item name="administrative directory" icon="contacts" label="Répertoire" />
+      <ni-menu-item name="administrative directory" icon="contacts" label="Répertoire auxiliaires" />
     </q-collapsible>
     <q-item-separator />
     <q-collapsible ref="planning" v-model="activeRoutes.planning.open" collapseIcon="expand_more">
