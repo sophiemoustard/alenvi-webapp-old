@@ -2,7 +2,7 @@
   <q-page class="neutral-background" padding>
     <div class="row items-center directory-header">
       <div class="col-xs-12 col-md-5">
-        <h4 class="no-margin">Répertoire</h4>
+        <h4 class="no-margin">Répertoire auxiliaires</h4>
       </div>
       <div class="col-xs-12 col-md-5">
         <q-search class="no-border input-search" v-model="searchStr" placeholder="Rechercher un profil" color="white"
