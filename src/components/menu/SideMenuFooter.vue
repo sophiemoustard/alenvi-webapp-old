@@ -3,7 +3,7 @@
       <q-item class="sidemenu-footer-border full-width">
         <q-item-main class="sidemenu-footer-user" :label="label" />
         <q-item-side v-if="userCanFeedback">
-          <q-btn icon="mdi-lightbulb-on-outline" class="text-warning" flat round dense
+          <q-btn icon="mdi-lightbulb-on-outline" class="feedback-btn" flat round dense
             @click="openExtenalUrl('https://compani.atlassian.net/servicedesk/customer/portal/2')" />
         </q-item-side>
         <q-item-side v-if="isAuxiliary">
@@ -48,4 +48,6 @@ export default {
   @import '~variables'
   .messenger-blue-text
     color: $messenger-blue
+  .feedback-btn
+    color: $secondary
 </style>
