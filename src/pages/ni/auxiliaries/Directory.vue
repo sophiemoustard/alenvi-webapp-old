@@ -75,17 +75,6 @@
         </div>
         <div class="row margin-input last">
           <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption required">Géré par</p>
-              <q-icon v-if="$v.newUser.ogustManagerId.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newUser.ogustManagerId.$error" :error-label="REQUIRED_LABEL">
-              <ni-select-manager v-model="newUser.ogustManagerId" @blur="$v.newUser.ogustManagerId.$touch" in-modal />
-            </q-field>
-        </div>
-        </div>
-        <div class="row margin-input last">
-          <div class="col-12">
             <q-checkbox v-model="sendWelcomeMsg" label="Envoyer SMS d'accueil" />
           </div>
         </div>
@@ -108,7 +97,7 @@ import SelectManager from '../../../components/form/SelectManager.vue';
 import NiModalInput from '../../../components/form/ModalInput';
 import NiModalSelect from '../../../components/form/ModalSelect';
 import NiSearchAddress from '../../../components/form/SearchAddress';
-import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../../components/popup/notify.js';
+import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify.js';
 import { DEFAULT_AVATAR, AUXILIARY, PLANNING_REFERENT, REQUIRED_LABEL } from '../../../data/constants';
 import { validationMixin } from '../../../mixins/validationMixin.js';
 export default {
@@ -162,7 +151,6 @@ export default {
             transportType: 'public'
           }
         },
-        ogustManagerId: ''
       },
       userList: [],
       searchStr: '',
@@ -262,7 +250,6 @@ export default {
         email: { required, email }
       },
       sector: { required },
-      ogustManagerId: { required }
     }
   },
   mounted () {
@@ -397,28 +384,10 @@ export default {
     async createAlenviUser () {
       this.newUser.local.password = randomize('*', 10);
       this.newUser.role = AUXILIARY;
-      this.newUser.ogustManagerId = this.currentUser._id;
       this.newUser.company = this.company.name;
       const newUser = await this.$users.create(this.newUser);
       await this.$users.createDriveFolder({ _id: newUser.data.data.user._id });
       return newUser;
-    },
-    async createOgustUser () {
-      const ogustPayload = {
-        title: this.newUser.identity.title,
-        last_name: this.newUser.identity.lastname,
-        first_name: this.newUser.identity.firstname,
-        main_address: {
-          line: this.newUser.contact.address.street,
-          zip: this.newUser.contact.address.zipCode,
-          city: this.newUser.contact.address.city
-        },
-        email: this.newUser.local.email,
-        mobile_phone: this.newUser.mobilePhone,
-        manager: this.newUser.ogustManagerId
-      };
-      const newEmployee = await this.$ogust.createEmployee(ogustPayload);
-      return newEmployee;
     },
     async sendSms (newUserId) {
       const activationDataRaw = await this.$activationCode.create({ newUserId, userEmail: this.newUser.local.email });
@@ -434,29 +403,16 @@ export default {
         this.$v.newUser.$touch();
         const isValid = await this.waitForFormValidation(this.$v.newUser);
         if (!isValid) throw new Error('Invalid fields');
-        const existingEmployee = await this.$ogust.getEmployees({ email: this.newUser.local.email });
-        if (Object.keys(existingEmployee).length !== 0) throw new Error('Existing email');
-        const newEmployee = await this.createOgustUser();
-        this.newUser.employee_id = newEmployee.data.data.employee.id_employee;
-        const employee = await this.$ogust.getEmployeeById(this.newUser.employee_id);
-        this.newUser.contact.addressId = employee.main_address.id_address;
+
         this.userCreated = await this.createAlenviUser();
         if (this.sendWelcomeMsg) {
-          await this.sendSms(this.userCreated.data.data.user._id);
+          await this.sendSms(this.userCreated.data._id);
         }
         await this.getUserList();
         NotifyPositive('Fiche auxiliaire créée');
         this.opened = false;
       } catch (e) {
         console.error(e);
-        if (e && e.message === 'Invalid fields') {
-          NotifyWarning('Champ(s) invalide(s)');
-          return;
-        }
-        if (e && e.message === 'Existing email') {
-          NotifyNegative('Cet email est déjà utilisé par un compte existant');
-          return;
-        }
         if (e && e.response) {
           console.error(e.response);
           if (e.response.status === 409) {
