@@ -6,8 +6,7 @@
       :data="documents"
       :columns="columns"
       row-key="name"
-      hide-bottom
-      :loading="tableLoading">
+      hide-bottom>
         <q-td slot="body-cell-title" slot-scope="props" :props="props">
           {{ props.value }}
         </q-td>
@@ -29,9 +28,20 @@ export default {
   },
   data () {
     return {
-      tableLoading: true,
-      user: {},
-      documents: [],
+      documents: [
+        {
+          title: 'Conditions de remboursement de mutuelle',
+          link: 'https://drive.google.com/file/d/0B9x9rvBHVX1TTWlPbHpFZlpUVzQ/view?usp=sharing'
+        },
+        {
+          title: 'Convention collective des services à la personne',
+          link: 'https://drive.google.com/open?id=0B3bqjy-Bj6OHeWx5RVZLYjM5eGM'
+        },
+        {
+          title: 'Evaluation des risques professionnels',
+          link: 'https://drive.google.com/drive/folders/0B9x9rvBHVX1TQ2VVZ3cxb0ZsYVE'
+        }
+      ],
       pagination: {
         sortBy: 'title',
         descending: false,
@@ -57,29 +67,6 @@ export default {
       ]
     }
   },
-  async created () {
-    try {
-      this.user = await this.$users.getById(this.$route.params.id);
-      this.documents = [
-        {
-          title: 'Conditions de remboursement de mutuelle',
-          link: 'https://drive.google.com/file/d/0B9x9rvBHVX1TTWlPbHpFZlpUVzQ/view?usp=sharing'
-        },
-        {
-          title: 'Convention collective des services à la personne',
-          link: 'https://drive.google.com/open?id=0B3bqjy-Bj6OHeWx5RVZLYjM5eGM'
-        },
-        {
-          title: 'Evaluation des risques professionnels',
-          link: 'https://drive.google.com/drive/folders/0B9x9rvBHVX1TQ2VVZ3cxb0ZsYVE'
-        }
-      ];
-      this.tableLoading = false;
-    } catch (e) {
-      console.error(e);
-      this.tableLoading = false;
-    }
-  }
 }
 </script>
 
