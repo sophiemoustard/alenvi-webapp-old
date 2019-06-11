@@ -420,7 +420,7 @@ export default {
 
         this.userCreated = await this.createAlenviUser();
         if (this.sendWelcomeMsg) {
-          await this.sendSms(this.userCreated.data.data.user._id);
+          await this.sendSms(this.userCreated.data._id);
         }
         await this.getUserList();
         NotifyPositive('Fiche auxiliaire créée');
