@@ -75,17 +75,6 @@
         </div>
         <div class="row margin-input last">
           <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption required">Géré par</p>
-              <q-icon v-if="$v.newUser.ogustManagerId.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newUser.ogustManagerId.$error" :error-label="REQUIRED_LABEL">
-              <ni-select-manager v-model="newUser.ogustManagerId" @blur="$v.newUser.ogustManagerId.$touch" in-modal />
-            </q-field>
-        </div>
-        </div>
-        <div class="row margin-input last">
-          <div class="col-12">
             <q-checkbox v-model="sendWelcomeMsg" label="Envoyer SMS d'accueil" />
           </div>
         </div>
@@ -162,7 +151,6 @@ export default {
             transportType: 'public'
           }
         },
-        ogustManagerId: ''
       },
       userList: [],
       searchStr: '',
@@ -262,7 +250,6 @@ export default {
         email: { required, email }
       },
       sector: { required },
-      ogustManagerId: { required }
     }
   },
   mounted () {
@@ -397,7 +384,6 @@ export default {
     async createAlenviUser () {
       this.newUser.local.password = randomize('*', 10);
       this.newUser.role = AUXILIARY;
-      this.newUser.ogustManagerId = this.currentUser._id;
       this.newUser.company = this.company.name;
       const newUser = await this.$users.create(this.newUser);
       await this.$users.createDriveFolder({ _id: newUser.data.data.user._id });
