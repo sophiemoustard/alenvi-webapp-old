@@ -29,7 +29,7 @@ export default {
   },
   data () {
     return {
-      tableLoading: true,
+      tableLoading: false,
       salaries: [],
       pagination: {
         sortBy: 'periodStart',
@@ -65,6 +65,9 @@ export default {
   },
   async mounted () {
     try {
+      if (!this.user.employee_id) return;
+
+      this.tableLoading = true;
       const salaries = await this.$ogust.getEmployeeSalaries(this.user.employee_id);
       for (const k in salaries) {
         this.salaries.push(salaries[k]);

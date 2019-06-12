@@ -378,7 +378,6 @@ export default {
           socialSecurityNumber: ''
         },
         contact: {
-          addressId: '',
           address: { fullAddress: '' }
         },
         role: { _id: '' },
