@@ -377,7 +377,7 @@ export default {
       }
     },
     getPayload (event) {
-      let payload = { ...this.$_.omit(event, ['dates', '__v']) }
+      let payload = { ...this.$_.omit(event, ['dates', '__v', 'repetition']) }
       payload = this.$_.pickBy(payload);
 
       const customer = this.customers.find(cus => cus._id === event.customer);
