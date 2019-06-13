@@ -93,10 +93,9 @@ import { clear } from '../../../helpers/utils.js';
 import { userProfileValidation } from '../../../helpers/userProfileValidation';
 import { taskValidation } from '../../../helpers/taskValidation';
 import SelectSector from '../../../components/form/SelectSector';
-import SelectManager from '../../../components/form/SelectManager.vue';
-import NiModalInput from '../../../components/form/ModalInput';
-import NiModalSelect from '../../../components/form/ModalSelect';
-import NiSearchAddress from '../../../components/form/SearchAddress';
+import ModalInput from '../../../components/form/ModalInput';
+import ModalSelect from '../../../components/form/ModalSelect';
+import SearchAddress from '../../../components/form/SearchAddress';
 import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify.js';
 import { DEFAULT_AVATAR, AUXILIARY, PLANNING_REFERENT, REQUIRED_LABEL } from '../../../data/constants';
 import { validationMixin } from '../../../mixins/validationMixin.js';
@@ -104,11 +103,10 @@ export default {
   metaInfo: { title: 'Répertoire auxiliaires' },
   name: 'Directory',
   components: {
-    NiSelectSector: SelectSector,
-    NiSelectManager: SelectManager,
-    NiModalInput,
-    NiModalSelect,
-    NiSearchAddress
+    'ni-select-sector': SelectSector,
+    'ni-modal-input': ModalInput,
+    'ni-modal-select': ModalSelect,
+    'ni-search-address': SearchAddress
   },
   mixins: [validationMixin],
   data () {
@@ -290,9 +288,6 @@ export default {
       }
       return 'Adresse non valide';
     },
-    hasPicture () {
-      return !this.user.picture || (this.user.picture && !this.user.picture.link) ? DEFAULT_AVATAR : this.user.picture.link;
-    }
   },
   methods: {
     selectedAddress (item) {
