@@ -13,6 +13,16 @@ export const NATURE_OPTIONS = [
   { label: 'Forfaitaire', value: FIXED },
 ];
 
+export const SURCHARGES = {
+  'saturday': 'Samedi',
+  'sunday': 'Dimanche',
+  'publicHoliday': 'Jours fériés',
+  'twentyFifthOfDecember': '25 décembre',
+  'firstOfMay': '1er mai',
+  'evening': 'Soirée',
+  'custom': 'Personnalisée',
+};
+
 // EVENTS
 export const INTERVENTION = 'intervention';
 export const ABSENCE = 'absence';
