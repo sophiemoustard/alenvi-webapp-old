@@ -2,7 +2,7 @@
   <q-page class="neutral-background" padding>
     <div class="row items-center directory-header">
       <div class="col-xs-12 col-md-5">
-        <h4 class="no-margin">Répertoire</h4>
+        <h4 class="no-margin">Répertoire auxiliaires</h4>
       </div>
       <div class="col-xs-12 col-md-5">
         <q-search class="no-border input-search" v-model="searchStr" placeholder="Rechercher un profil" color="white"
@@ -13,7 +13,7 @@
       </div>
     </div>
     <q-table :data="filteredUsers" :columns="columns" row-key="name" binary-state-sort :rows-per-page-options="[15, 25, 35]"
-      :pagination.sync="pagination" :loading="tableLoading" class="people-list">
+      :pagination.sync="pagination" :loading="tableLoading" class="people-list q-pa-sm">
       <q-tr slot="body" slot-scope="props" :props="props" :class="['datatable-row', { 'datatable-row-inactive': !props.row.isActive }]"
         @click.native="goToUserProfile(props.row.auxiliary._id)">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
@@ -36,10 +36,10 @@
         </q-td>
       </q-tr>
     </q-table>
-    <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Ajouter une personne" @click="opened = true" />
+    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une personne" @click="auxiliaryCreationModal = true" />
 
     <!-- User creation modal -->
-    <q-modal v-model="opened" @hide="resetForm" content-classes="modal-container-sm">
+    <q-modal v-model="auxiliaryCreationModal" @hide="resetForm" content-classes="modal-container-sm">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-8">
@@ -47,44 +47,29 @@
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
             <span>
-              <q-icon name="clear" @click.native="opened = false" /></span>
+              <q-icon name="clear" @click.native="auxiliaryCreationModal = false" /></span>
           </div>
         </div>
         <ni-modal-select v-model="newUser.identity.title" :error="$v.newUser.identity.title.$error" :options="civilityOptions"
-          caption="Civilité" @blur="$v.newUser.identity.title.$touch" errorLabel="Champ requis" requiredField />
+          caption="Civilité" @blur="$v.newUser.identity.title.$touch" required-field />
         <ni-modal-input v-model="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error" caption="Nom"
-          @blur="$v.newUser.identity.lastname.$touch" errorLabel="Champ requis" requiredField />
+          @blur="$v.newUser.identity.lastname.$touch" required-field />
         <ni-modal-input v-model="newUser.identity.firstname" :error="$v.newUser.identity.firstname.$error" caption="Prénom"
-          @blur="$v.newUser.identity.firstname.$touch" errorLabel="Champ requis" requiredField />
+          @blur="$v.newUser.identity.firstname.$touch" required-field />
         <ni-modal-input v-model="newUser.mobilePhone" :error="$v.newUser.mobilePhone.$error" caption="Numéro de téléphone"
-          @blur="$v.newUser.mobilePhone.$touch" :errorLabel="mobilePhoneError" requiredField />
-        <ni-modal-input v-model="newUser.contact.address" :error="$v.newUser.contact.address.$error" caption="Addresse"
-          @blur="$v.newUser.contact.address.$touch" errorLabel="Champ requis" requiredField />
-        <ni-modal-input v-model="newUser.contact.zipCode" :error="$v.newUser.contact.zipCode.$error" caption="Code postal"
-          @blur="$v.newUser.contact.zipCode.$touch" :errorLabel="zipCodeError" requiredField />
-        <ni-modal-input v-model="newUser.contact.city" :error="$v.newUser.contact.city.$error" caption="Ville" @blur="$v.newUser.contact.city.$touch"
-          errorLabel="Champ requis" requiredField />
+          @blur="$v.newUser.mobilePhone.$touch" :error-label="mobilePhoneError" required-field />
+        <ni-search-address v-model="newUser.contact.address.fullAddress" color="white" inverted-light @selected="selectedAddress"
+          :error-label="addressError" :error="$v.newUser.contact.address.fullAddress.$error" required-field in-modal />
         <ni-modal-input v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email" @blur="$v.newUser.local.email.$touch"
-          :errorLabel="emailError" requiredField />
+          :error-label="emailError" required-field />
         <div class="row margin-input">
           <div class="col-12">
             <div class="row justify-between">
               <p class="input-caption required">Communauté</p>
               <q-icon v-if="$v.newUser.sector.$error" name="error_outline" color="secondary" />
             </div>
-            <q-field :error="$v.newUser.sector.$error" error-label="Champ requis">
-              <ni-select-sector v-model="newUser.sector" @myBlur="$v.newUser.sector.$touch" inModal />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input last">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption required">Géré par</p>
-              <q-icon v-if="$v.newUser.ogustManagerId.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newUser.ogustManagerId.$error" error-label="Champ requis">
-              <ni-select-manager v-model="newUser.ogustManagerId" @myBlur="$v.newUser.ogustManagerId.$touch" inModal />
+            <q-field :error="$v.newUser.sector.$error" :error-label="REQUIRED_LABEL">
+              <ni-select-sector v-model="newUser.sector" @blur="$v.newUser.sector.$touch" in-modal :company-id="company._id" />
             </q-field>
           </div>
         </div>
@@ -103,44 +88,36 @@
 <script>
 import { required, email, maxLength } from 'vuelidate/lib/validators';
 import randomize from 'randomatic';
-
-import { frPhoneNumber, frZipCode } from '../../../helpers/vuelidateCustomVal';
+import { frPhoneNumber, frAddress } from '../../../helpers/vuelidateCustomVal';
 import { clear } from '../../../helpers/utils.js';
 import { userProfileValidation } from '../../../helpers/userProfileValidation';
 import { taskValidation } from '../../../helpers/taskValidation';
 import SelectSector from '../../../components/form/SelectSector';
-import SelectManager from '../../../components/form/SelectManager.vue';
-import NiModalInput from '../../../components/form/ModalInput';
-import NiModalSelect from '../../../components/form/ModalSelect';
-import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../../components/popup/notify.js';
-import { DEFAULT_AVATAR } from '../../../data/constants';
-
+import ModalInput from '../../../components/form/ModalInput';
+import ModalSelect from '../../../components/form/ModalSelect';
+import SearchAddress from '../../../components/form/SearchAddress';
+import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify.js';
+import { DEFAULT_AVATAR, AUXILIARY, PLANNING_REFERENT, REQUIRED_LABEL } from '../../../data/constants';
+import { validationMixin } from '../../../mixins/validationMixin.js';
 export default {
-  metaInfo: {
-    title: 'Répertoire'
-  },
+  metaInfo: { title: 'Répertoire auxiliaires' },
+  name: 'Directory',
   components: {
-    NiSelectSector: SelectSector,
-    NiSelectManager: SelectManager,
-    NiModalInput,
-    NiModalSelect
+    'ni-select-sector': SelectSector,
+    'ni-modal-input': ModalInput,
+    'ni-modal-select': ModalSelect,
+    'ni-search-address': SearchAddress
   },
+  mixins: [validationMixin],
   data () {
     return {
-      userCreated: null,
       tableLoading: true,
       loading: false,
-      opened: false,
+      auxiliaryCreationModal: false,
       sendWelcomeMsg: true,
       civilityOptions: [
-        {
-          label: 'Monsieur',
-          value: 'M.'
-        },
-        {
-          label: 'Madame',
-          value: 'Mme'
-        }
+        { label: 'Monsieur', value: 'M.' },
+        { label: 'Madame', value: 'Mme' }
       ],
       newUser: {
         identity: {
@@ -149,25 +126,15 @@ export default {
           title: '',
         },
         contact: {
-          addressId: '',
-          address: '',
-          city: '',
-          zipCode: ''
+          address: { fullAddress: '' },
         },
-        employee_id: '',
         mobilePhone: '',
-        local: {
-          email: '',
-          password: ''
-        },
+        local: { email: '', password: '' },
         company: '',
         sector: '',
         administrative: {
-          transportInvoice: {
-            transportType: 'public'
-          }
+          transportInvoice: { transportType: 'public' },
         },
-        ogustManagerId: ''
       },
       userList: [],
       searchStr: '',
@@ -242,7 +209,8 @@ export default {
           sortable: false,
           style: 'width: 30px'
         }
-      ]
+      ],
+      REQUIRED_LABEL,
     }
   },
   validations: {
@@ -258,19 +226,14 @@ export default {
         maxLength: maxLength(10)
       },
       contact: {
-        address: { required },
-        zipCode: {
-          required,
-          frZipCode,
-          maxLength: maxLength(5)
+        address: {
+          fullAddress: { required, frAddress }
         },
-        city: { required }
       },
       local: {
         email: { required, email }
       },
       sector: { required },
-      ogustManagerId: { required }
     }
   },
   mounted () {
@@ -300,50 +263,53 @@ export default {
     },
     mobilePhoneError () {
       if (!this.$v.newUser.mobilePhone.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.newUser.mobilePhone.frPhoneNumber || !this.$v.newUser.mobilePhone.maxLength) {
         return 'Numéro de téléphone non valide';
       }
     },
     zipCodeError () {
       if (!this.$v.newUser.contact.zipCode.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.newUser.contact.zipCode.frZipCode || !this.$v.newUser.contact.zipCode.maxLength) {
         return 'Code postal non valide';
       }
     },
     emailError () {
       if (!this.$v.newUser.local.email.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.newUser.local.email.email) {
         return 'Email non valide';
       }
     },
-    hasPicture () {
-      return !this.user.picture || (this.user.picture && !this.user.picture.link) ? DEFAULT_AVATAR : this.user.picture.link;
-    }
+    addressError () {
+      if (!this.$v.newUser.contact.address.fullAddress.required) {
+        return REQUIRED_LABEL;
+      }
+      return 'Adresse non valide';
+    },
   },
   methods: {
+    selectedAddress (item) {
+      this.newUser.contact.address = Object.assign({}, this.newUser.contact.address, item);
+    },
     getHiringDate (user) {
       let hiringDate = null;
-      if (user.administrative && user.administrative.contracts.length > 0) {
-        const contracts = user.administrative.contracts;
+      if (user.contracts && user.contracts.length > 0) {
+        const contracts = user.contracts;
         if (contracts.length === 1) {
           hiringDate = contracts[0].startDate;
         } else {
           hiringDate = this.$_.orderBy(contracts, ['startDate'], ['asc'])[0].startDate;
         }
       }
-
       return hiringDate;
     },
     async getUserList () {
       try {
-        const users = await this.$users.showAll({ role: 'Auxiliaire' });
-        const sectors = await this.$ogust.getList('employee.sector');
+        const users = await this.$users.showAll({ role: [AUXILIARY, PLANNING_REFERENT] });
         this.userList = users.map((user) => {
           const hiringDate = this.getHiringDate(user);
-
           if (user.isActive) {
             const checkProfileErrors = userProfileValidation(user);
             this.$store.commit('rh/saveNotification', {
@@ -366,7 +332,7 @@ export default {
               profileErrors: checkProfileErrors.error,
               tasksErrors: checkTasks,
               startDate: user.createdAt,
-              sector: sectors[user.sector],
+              sector: user.sector ? user.sector.name : 'N/A',
               isActive: user.isActive,
               hiringDate,
             }
@@ -378,7 +344,7 @@ export default {
               picture: user.picture ? user.picture.link : null
             },
             startDate: user.createdAt,
-            sector: sectors[user.sector],
+            sector: user.sector ? user.sector.name : 'N/A',
             isActive: user.isActive,
             hiringDate,
           }
@@ -398,30 +364,11 @@ export default {
     },
     async createAlenviUser () {
       this.newUser.local.password = randomize('*', 10);
-      this.newUser.role = 'Auxiliaire';
-      this.newUser.ogustManagerId = this.currentUser._id;
+      this.newUser.role = AUXILIARY;
       this.newUser.company = this.company.name;
       const newUser = await this.$users.create(this.newUser);
-      await this.$users.createDriveFolder({ _id: newUser.data.data.user._id });
+      await this.$users.createDriveFolder({ _id: newUser._id });
       return newUser;
-    },
-    async createOgustUser () {
-      const ogustPayload = {
-        title: this.newUser.identity.title,
-        last_name: this.newUser.identity.lastname,
-        first_name: this.newUser.identity.firstname,
-        main_address: {
-          line: this.newUser.contact.address,
-          zip: this.newUser.contact.zipCode,
-          city: this.newUser.contact.city
-        },
-        email: this.newUser.local.email,
-        sector: this.newUser.sector,
-        mobile_phone: this.newUser.mobilePhone,
-        manager: this.newUser.ogustManagerId
-      };
-      const newEmployee = await this.$ogust.createEmployee(ogustPayload);
-      return newEmployee;
     },
     async sendSms (newUserId) {
       const activationDataRaw = await this.$activationCode.create({ newUserId, userEmail: this.newUser.local.email });
@@ -435,39 +382,22 @@ export default {
       try {
         this.loading = true;
         this.$v.newUser.$touch();
-        if (this.$v.newUser.$error) throw new Error('Invalid fields');
+        const isValid = await this.waitForFormValidation(this.$v.newUser);
+        if (!isValid) throw new Error('Invalid fields');
 
-        const existingEmployee = await this.$ogust.getEmployees({ email: this.newUser.local.email });
-        if (Object.keys(existingEmployee).length !== 0) throw new Error('Existing email');
-
-        const newEmployee = await this.createOgustUser();
-        this.newUser.employee_id = newEmployee.data.data.employee.id_employee;
-        const employee = await this.$ogust.getEmployeeById(this.newUser.employee_id);
-        this.newUser.contact.addressId = employee.main_address.id_address;
-        this.userCreated = await this.createAlenviUser();
+        const userCreated = await this.createAlenviUser();
         if (this.sendWelcomeMsg) {
-          await this.sendSms(this.userCreated.data.data.user._id);
+          await this.sendSms(userCreated._id);
         }
         await this.getUserList();
         NotifyPositive('Fiche auxiliaire créée');
-        this.opened = false;
+        this.auxiliaryCreationModal = false;
       } catch (e) {
-        console.error(e);
-        if (e && e.message === 'Invalid fields') {
-          NotifyWarning('Champ(s) invalide(s)');
-          return;
-        }
-        if (e && e.message === 'Existing email') {
-          NotifyNegative('Cet email est déjà utilisé par un compte existant');
-          return;
-        }
         if (e && e.response) {
           console.error(e.response);
-          if (e.response.status === 409) {
-            NotifyNegative('Email déjà existant');
-            return;
-          }
+          if (e.response.status === 409) return NotifyNegative('Email déjà existant');
         }
+        console.error(e);
         NotifyNegative('Erreur lors de la création de la fiche auxiliaire');
       } finally {
         this.loading = false;
@@ -482,10 +412,6 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables'
-
-  .input-caption
-    margin-bottom: 4px
-
   /deep/ .q-option .q-option-label
     font-size: 14px
 </style>

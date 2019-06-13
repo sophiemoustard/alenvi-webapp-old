@@ -1,22 +1,16 @@
 <template>
-  <q-layout view="hHh Lpr lff">
-    <q-layout-header>
-      <q-toolbar class="row justify-between lt-md" color="white">
-        <q-btn color="primary" flat round dense big @click="toggleLeft">
-          <q-icon name="menu" style="width: 24px; height: 24px" />
-        </q-btn>
-        <img style="height: 20px" src="https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_texte_rose_1000.png" alt="">
-      </q-toolbar>
-    </q-layout-header>
+  <q-layout view="hhh Lpr lff">
+    <q-page-sticky v-if="$q.platform.is.mobile" position="bottom-left" :offset="[18, 18]">
+      <q-btn class="menu-icon" color="primary" round dense big @click="toggleLeft" icon="menu" size="lg" />
+    </q-page-sticky>
 
-    <q-btn v-if="toggleDrawer" flat round icon="chevron_left" @click="toggleLeft" class="chevron chevron-left" />
-    <q-btn v-else flat round icon="view_headline" @click="toggleLeft" class="chevron chevron-right" />
-    <q-layout-drawer v-if="toggleDrawer" :width="250" side="left" v-model="toggleDrawer">
-      <side-menu-coach :ref="sidemenusRefs" v-if="user && user.role.name !== 'Auxiliaire' && user.role.name !== 'Aidants'" :user="user" />
-      <side-menu-auxiliary :ref="sidemenusRefs" v-if="user && user.role.name === 'Auxiliaire'" :user="user" />
-      <side-menu-customer :ref="sidemenusRefs" v-if="user && user.role.name === 'Aidants'" :user="user" />
+    <q-btn v-if="!enableMini" flat round icon="chevron_left" @click="enableMini = !enableMini" class="chevron chevron-left" />
+    <q-btn v-else flat round icon="view_headline" @click="enableMini = !enableMini" class="chevron chevron-right" />
+    <q-layout-drawer :mini="enableMini" :mini-width="30" :width="250" side="left" v-model="toggleDrawer">
+      <side-menu-coach :ref="sidemenusRefs" v-if="user && !isAuxiliary && user.role.name !== HELPER && !enableMini" :user="user" />
+      <side-menu-auxiliary :ref="sidemenusRefs" v-if="user && isAuxiliary && !enableMini" :user="user" />
+      <side-menu-customer :ref="sidemenusRefs" v-if="user && user.role.name === HELPER && !enableMini" :user="user" />
     </q-layout-drawer>
-    <q-layout-drawer v-else :width="0" side="left" class="hidden-menu"></q-layout-drawer>
 
     <q-page-container>
       <router-view :key="$route.fullPath"/>
@@ -31,6 +25,7 @@ import { mapGetters } from 'vuex'
 import SideMenuCoach from '../components/menu/SideMenuCoach'
 import SideMenuAuxiliary from '../components/menu/SideMenuAuxiliary'
 import SideMenuCustomer from '../components/menu/SideMenuCustomer'
+import { AUXILIARY, PLANNING_REFERENT, HELPER } from '../data/constants.js';
 
 export default {
   components: {
@@ -38,10 +33,19 @@ export default {
     SideMenuAuxiliary,
     SideMenuCustomer
   },
+  data () {
+    return {
+      HELPER,
+      enableMini: false,
+    }
+  },
   computed: {
     ...mapGetters({
       user: 'main/user'
     }),
+    isAuxiliary () {
+      return this.user.role.name === AUXILIARY || this.user.role.name === PLANNING_REFERENT;
+    },
     toggleDrawer: {
       get () {
         return this.$store.state.main.toggleDrawer;
@@ -51,7 +55,7 @@ export default {
       }
     },
     sidemenusRefs () {
-      if (this.user && this.user.role.name !== 'Auxiliaire') {
+      if (this.user && !this.isAuxiliary) {
         return 'defaultMenu';
       }
       return 'auxiliaryMenu';
@@ -60,10 +64,10 @@ export default {
   methods: {
     toggleLeft () {
       this.$store.commit('main/setToggleDrawer', !this.toggleDrawer);
-    }
+    },
   },
   beforeRouteUpdate (to, from, next) {
-    if (this.toggleDrawer) {
+    if (this.toggleDrawer && !this.enableMini) {
       this.$refs[this.sidemenusRefs].collapsibleClosing(to, from);
       this.$refs[this.sidemenusRefs].collapsibleEntering(to);
     }
@@ -75,6 +79,11 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables'
+
+  .q-page-sticky
+    z-index: 10
+    @media (min-width: 768px)
+      display: none;
 
   .chevron
     background-color: white
@@ -98,12 +107,4 @@ export default {
     color: $dark-grey
     &:hover
       color: $primary
-
-  .hidden-menu
-    @media (max-width: 767px)
-      display: none
-
-  @media (max-width: 991px) and (min-width: 768px)
-    /deep/ .layout-padding
-      padding-left: 3em !important;
   </style>

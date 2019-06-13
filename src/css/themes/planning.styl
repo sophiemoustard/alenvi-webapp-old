@@ -1,0 +1,159 @@
+.event
+  user-select: none
+  border-radius: 2px
+  padding: 6px 4px
+  margin-top: 6px
+  &-container
+    height: 100%;
+    position: relative;
+    width: -webkit-fill-available;
+  &-title
+    font-size: 0.875rem
+    font-weight: 600
+  &-subtitle
+    display: flex;
+    flex-direction: row;
+    width: 100%
+    justify-content: space-between;
+    font-size: 0.6875rem
+    color: $dark-grey
+  &-billed
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: fit-content;
+  &-intervention
+    background: $light-pink
+  &-internalHour
+    background: $light-purple
+  &-absence
+    background: $grey-3
+  &-unavailability
+    background: repeating-linear-gradient(
+      45deg,
+      $grey-3,
+      $grey-3 3px,
+      $white 3px,
+      $white 7px
+    )
+  &-cancelled
+    background: repeating-linear-gradient(
+      45deg,
+      $light-pink,
+      $light-pink 3px,
+      $white 3px,
+      $white 7px
+    )
+
+.planning-table
+.agenda-table
+  border-collapse: collapse;
+  table-layout: fixed;
+  border-style: hidden;
+
+  td, th
+    border-left: 1px solid $light-grey;
+    border-right: 1px solid $light-grey;
+
+  td
+    padding: 0px 6px 6px 6px;
+  td:first-child
+    padding: 0px 4px 4px 4px;
+  td
+    &:before
+      content: "";
+      display: block;
+      width: 98%;
+      border-bottom: 1px solid $light-grey;
+
+  .days
+    &-header
+      padding: 8px 0px 8px 0px
+      width: 100%
+    &-name
+      font-size: 1.125rem
+      color: #777777
+    &-number
+      font-size: 1.5rem
+      font-weight: 600
+  .current-day
+    border-radius: 4px
+    padding: 0px 5px
+    background: $primary
+    color: white
+
+.planning
+  padding-left: 30px;
+  @media screen and (max-width: 767px)
+      padding-left: 0px;
+  &-container
+    background: white;
+    padding: 5px;
+    @media screen and (max-width: 767px)
+      padding: 2px;
+  &-header
+    margin: 0 30px 16px;
+    font-size: 1.2em;
+    @media screen and (max-width: 767px)
+      margin: 0 16px 16px;
+  &-navigation
+    margin-top: 10px
+  &-month
+    display: flex;
+    @media screen and (min-width: 768px)
+      justify-content: center;
+    @media screen and (max-width: 767px)
+      width: 60%;
+    .q-icon
+      font-size: 0.8em;
+      margin: 5px;
+  &-search
+    @media screen and (max-width: 767px)
+      margin-bottom: 5px;
+  &-actions
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    @media screen and (max-width: 767px)
+      justify-content: space-between;
+
+.auxiliary-name
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  &-text
+    padding: 9px 14px 11px;
+    margin-left: 5px;
+    font-size: 1.3rem
+  .q-if-inverted
+    border: none;
+    margin-left: 5px;
+    font-size: 1.3rem
+    &.q-if-focused
+      box-shadow: none;
+  .q-input-target
+    line-height: normal
+  .q-icon
+    display: none;
+
+
+.avatar
+  @media screen and (max-width: 1024px)
+    height: 30px !important;
+    width: 30px !important;
+
+.cutomer-info
+  background: $light-grey;
+  padding: 10px 25px;
+  /deep/ .q-if-inverted
+    background: $light-grey !important;
+    border: none;
+
+.person-name
+  font-size: 1.3rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  div
+    margin-left: 5px;

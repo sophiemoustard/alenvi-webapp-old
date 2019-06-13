@@ -11,8 +11,7 @@ export async function getUserProfile ({ commit }, params) {
       user = await users.getById(params.userId);
       user.mobilePhone = user.mobilePhone.split(' ').join('');
     } else {
-      const userRaw = await customers.getById(params.customerId);
-      user = userRaw.data.data.customer;
+      user = await customers.getById(params.customerId);
     }
     commit('saveUserProfile', user);
   } catch (e) {

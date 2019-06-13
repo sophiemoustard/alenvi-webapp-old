@@ -7,9 +7,6 @@
       <div class="col-xs-12 col-md-5 margin-bottom-mobile">
         <q-search class="no-border input-search" v-model="searchStr" placeholder="Rechercher un bénéficiaire" color="white" inverted-light />
       </div>
-      <div class="col-xs-12 col-md-3 row justify-end-custom">
-        <q-toggle v-model="ownCustomers" color="primary" label="Mes bénéficiaires" @input="getCustomersList" />
-      </div>
     </div>
     <q-table :data="filteredUsers" :columns="columns" row-key="name" :rows-per-page-options="[]" :pagination.sync="pagination" :loading="tableLoading"
       class="people-list">
@@ -23,12 +20,13 @@
 </template>
 
 <script>
+import { AUXILIARY } from '../../../data/constants.js'
 
 export default {
   props: {
     role: {
       type: String,
-      default: 'Auxiliaire'
+      default: AUXILIARY
     }
   },
   metaInfo: {
@@ -77,9 +75,8 @@ export default {
     async getCustomersList () {
       try {
         this.tableLoading = true;
-        const customers = this.ownCustomers ? await this.$ogust.getEmployeeCustomers(this.currentUser.employee_id) : await this.$ogust.getCustomers({ sector: this.currentUser.sector });
-        const filteredCustomers = this.$_.filter(customers, customer => !customer.last_name.match(/^ALENVI/i));
-        this.customersList = filteredCustomers.map(customer => ({ name: `${customer.title} ${customer.last_name}`, customerId: customer.id_customer }));
+        const customers = await this.$customers.showAll();
+        this.customersList = customers.map(customer => ({ name: `${customer.identity.title} ${customer.identity.lastname}`, customerId: customer._id }));
         this.tableLoading = false;
       } catch (e) {
         this.tableLoading = false;

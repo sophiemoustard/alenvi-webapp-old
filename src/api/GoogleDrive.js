@@ -5,6 +5,10 @@ export default {
     const file = await alenviAxios.get(`${process.env.API_HOSTNAME}/gdrive/file/${params.id}`);
     return file;
   },
+  async getList (params) {
+    const list = await alenviAxios.get(`${process.env.API_HOSTNAME}/gdrive/list`, { params });
+    return list.data.data.files;
+  },
   async removeFileById (params) {
     const file = await alenviAxios.delete(`${process.env.API_HOSTNAME}/gdrive/file/${params.id}`);
     return file;

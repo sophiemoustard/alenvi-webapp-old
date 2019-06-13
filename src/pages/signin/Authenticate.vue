@@ -37,11 +37,9 @@
 </template>
 
 <script>
-
-import { date } from 'quasar'
-
 import CompaniHeader from '../../components/CompaniHeader';
 import { NotifyNegative } from '../../components/popup/notify';
+import { AUXILIARY, PLANNING_REFERENT, HELPER } from '../../data/constants.js';
 
 export default {
   metaInfo: {
@@ -65,6 +63,9 @@ export default {
   computed: {
     getUser () {
       return this.$store.getters['main/user'];
+    },
+    isAuxiliary () {
+      return this.getUser ? this.getUser.role.name === AUXILIARY || this.getUser.role.name === PLANNING_REFERENT : false;
     }
   },
   methods: {
@@ -74,10 +75,11 @@ export default {
           email: this.credentials.email.toLowerCase(),
           password: this.credentials.password
         });
-        this.$q.cookies.set('alenvi_token', user.data.data.token, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV !== 'development' });
-        this.$q.cookies.set('alenvi_token_expires_in', user.data.data.expiresIn, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV !== 'development' });
+        const expiresInDays = parseInt(user.data.data.expiresIn / 3600 / 24, 10) >= 1 ? parseInt(user.data.data.expiresIn / 3600 / 24, 10) : 1;
+        this.$q.cookies.set('alenvi_token', user.data.data.token, { path: '/', expires: expiresInDays, secure: process.env.NODE_ENV !== 'development' });
+        this.$q.cookies.set('alenvi_token_expires_in', user.data.data.expiresIn, { path: '/', expires: expiresInDays, secure: process.env.NODE_ENV !== 'development' });
         this.$q.cookies.set('refresh_token', user.data.data.refreshToken, { path: '/', expires: 365, secure: process.env.NODE_ENV !== 'development' });
-        this.$q.cookies.set('user_id', user.data.data.user._id, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV !== 'development' });
+        this.$q.cookies.set('user_id', user.data.data.user._id, { path: '/', expires: expiresInDays, secure: process.env.NODE_ENV !== 'development' });
         await this.$store.dispatch('main/getUser', this.$q.cookies.get('user_id'));
         if (this.$q.platform.is.desktop) {
           this.$store.commit('main/setToggleDrawer', true);
@@ -87,10 +89,12 @@ export default {
           return this.$router.replace({ path: this.$route.query.from });
         }
 
-        if (this.getUser.role.name === 'Aidants') {
-          this.$router.replace({ name: 'customer planning' });
-        } else if (this.getUser.role.name === 'Auxiliaire') {
-          this.$router.replace({ name: 'profile planning', params: { id: this.$q.cookies.get('user_id') }, query: { auxiliary: 'true', self: 'true' } });
+        if (this.getUser.role.name === HELPER) {
+          const customer = await this.$customers.getById(this.getUser.customers[0]._id);
+          this.$store.commit('rh/saveUserProfile', customer);
+          this.$router.replace({ name: 'customer agenda' });
+        } else if (this.isAuxiliary) {
+          this.$router.replace({ name: 'auxiliary agenda' });
         } else {
           this.$router.replace({ name: 'administrative directory' });
         }

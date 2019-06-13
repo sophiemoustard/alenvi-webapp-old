@@ -7,15 +7,18 @@
     <q-field :error="hasError" :error-label="errorMessage">
       <div class="datetime-container">
         <div class="datetime-item">
-          <ni-datetime-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" @blur="blurDateHandler" />
-          <ni-select-input :value="value.startHour" @input="update($event, 'startHour')" class="time-item" align="center"
-            @blur="blurHourHandler" :options="hoursOptions" filter :filter-placeholder="value.startHour" hide-underline name="start-hour" />
+          <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item"
+            @blur="blurHandler" :disable="disable" />
+          <ni-select-input :value="value.startHour" @input="update($event, 'startHour')" class="time-item"
+            @blur="blurHandler" :options="hoursOptions" filter :filter-placeholder="value.startHour" hide-underline
+            name="start-hour" :disable="disable" align="center" />
         </div>
         <p class="delimiter">-</p>
         <div class="datetime-item end">
           <ni-select-input :value="value.endHour" @input="update($event, 'endHour')" class="time-item" align="center"
-            @blur="blurHourHandler" :options="endHourOptions" />
-          <ni-datetime-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item" @blur="blurDateHandler" :min="value.startDate" />
+            @blur="blurHandler" :options="endHourOptions" :disable="disable" />
+          <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
+            @blur="blurHandler" :min="value.startDate" :disable="disable || disableEndDate" />
         </div>
       </div>
     </q-field>
@@ -23,19 +26,24 @@
 </template>
 
 <script>
-import DatetimeInput from './DatetimeInput.vue';
+import { required } from 'vuelidate/lib/validators';
+import DateInput from './DateInput.vue';
 import SelectInput from './SelectInput.vue';
+import { PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR } from '../../data/constants.js';
+import { minDate, validHour } from '../../helpers/vuelidateCustomVal.js';
 
 export default {
   components: {
-    'ni-datetime-input': DatetimeInput,
+    'ni-date-input': DateInput,
     'ni-select-input': SelectInput,
   },
   props: {
     caption: { type: String, default: '' },
-    error: Boolean,
-    value: Object,
+    error: { type: Boolean, default: false },
+    value: { type: Object, default: () => ({}) },
     requiredField: { type: Boolean, default: false },
+    disable: { type: Boolean, default: false },
+    disableEndDate: { type: Boolean, default: false },
   },
   data () {
     return {
@@ -43,19 +51,29 @@ export default {
       childError: false,
     };
   },
+  validations () {
+    return {
+      value: {
+        startDate: { required },
+        startHour: { required, validHour },
+        endDate: { required, minDate },
+        endHour: { required, validHour },
+      },
+    }
+  },
   computed: {
     hoursOptions () {
-      const range = this.$moment.range(this.$moment().hours(8).minutes(0), this.$moment().hours(20).minutes(0));
+      const range = this.$moment.range(this.$moment().hours(PLANNING_VIEW_START_HOUR).minutes(0), this.$moment().hours(PLANNING_VIEW_END_HOUR).minutes(0));
       const hours = Array.from(range.by('hours'));
       const selectOptions = [];
       hours.map((hour) => {
         selectOptions.push({ label: hour.format('HH:mm'), value: hour.format('HH:mm') });
-        if (hour.format('HH') !== '20') selectOptions.push({ label: hour.minutes(30).format('HH:mm'), value: hour.minutes(30).format('HH:mm') });
+        if (hour.format('HH') !== `${PLANNING_VIEW_END_HOUR}`) selectOptions.push({ label: hour.minutes(30).format('HH:mm'), value: hour.minutes(30).format('HH:mm') });
       });
       return selectOptions;
     },
     hasError () {
-      return this.error || this.childError;
+      return this.error || this.$v.value.startDate.$error || this.$v.value.startHour.$error || this.$v.value.endDate.$error || this.$v.value.endHour.$error;
     },
     endHourOptions () {
       return this.hoursOptions.map(option => {
@@ -64,24 +82,18 @@ export default {
     },
   },
   methods: {
-    blurDateHandler (event) {
-      if (event && event.date === '') this.childError = true;
-      else if (event && event.date && !(this.$moment(event.date, 'DD/MM/YYYY', true).isValid())) this.childError = true;
-      else if (event && event.date && event.min && this.$moment(event.date).isBefore(this.$moment(event.min))) this.childError = true;
-      else this.childError = false;
-    },
-    blurHourHandler (event) {
-      if (event && event.hour === '') this.childError = true;
-      else if (event && event.hour && !event.hour.match(/[0-2][0-9]:(00|30)/)) this.childError = true;
-      else this.childError = false;
+    blurHandler () {
+      this.$v.value.$touch();
+      this.$emit('blur');
     },
     update (value, key) {
+      this.blurHandler();
       const dates = { ...this.value, [key]: value }
-      this.$emit('blur');
       if (key === 'startDate') dates.endDate = value;
       if (key === 'startHour' && this.$moment(value, 'HH:mm').isSameOrAfter(this.$moment(this.value.endHour, 'HH:mm'))) {
         dates.endHour = this.$moment(value, 'HH:mm').add(2, 'H').format('HH:mm');
       }
+
       this.$emit('input', dates);
     },
   },
@@ -91,18 +103,22 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables'
 
+  /deep/ .q-field-content
+    padding: 0;
+
   /deep/ .datetime-container
     border: 1px solid $light-grey;
     border-radius: 3px;
     display: flex;
     flex-direction: row;
-    justify-content: center;
-    @media screen and (min-width: 678px)
+    justify-content: space-evenly;
+    background-color: $white;
+    @media screen and (min-width: 768px)
       & .delimiter
         padding: 10px 14px;
         margin: 0;
         width: 4%;
-    @media screen and (max-width: 677px)
+    @media screen and (max-width: 767px)
       flex-direction: column;
       & .delimiter
         display: none;
@@ -110,21 +126,27 @@ export default {
   .time-item
     /deep/ .q-input.q-if-inverted
       padding: 10px;
-      max-width: 120px
+      max-width: 100px
+      /deep/ .q-if-inner
+        div
+          width: 100%
 
   .date-item
     /deep/ .q-input.q-if-inverted
       padding: 10px;
-      max-width: 120px;
+      max-width: 120px
+      /deep/ .q-if-inner
+        div
+          width: 100%
     /deep/ .q-field-content
       padding-top: 0px;
 
   .datetime-item
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: center;
     &.end
-      @media screen and (max-width: 677px)
+      @media screen and (max-width: 767px)
         border-top: 1px solid $light-grey;
         flex-direction: row-reverse;
 

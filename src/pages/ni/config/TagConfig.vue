@@ -15,6 +15,8 @@
 
 <script>
 export default {
+  name: 'TagConfig',
+  metaInfo: { title: 'Tags' },
   data () {
     return {
       tags: {

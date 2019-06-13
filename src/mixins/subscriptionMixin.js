@@ -1,5 +1,6 @@
+import moment from 'moment';
 import { getLastVersion } from '../helpers/utils';
-import { MONTHLY, FIXED, ONCE, HOURLY } from '../data/constants';
+import { MONTHLY, FIXED, ONCE, HOURLY, NATURE_OPTIONS } from '../data/constants';
 
 export const subscriptionMixin = {
   data () {
@@ -18,19 +19,23 @@ export const subscriptionMixin = {
           name: 'nature',
           label: 'Nature',
           align: 'left',
+          format: (value) => {
+            const nature = NATURE_OPTIONS.find(option => option.value === value);
+            return nature ? this.$_.capitalize(nature.label) : '';
+          },
           field: row => row.service.nature,
         },
         {
           name: 'unitTTCRate',
           label: 'Prix unitaire TTC',
           align: 'center',
-          field: row => `${this.formatNumber(row.unitTTCRate)}€`,
+          field: row => row.unitTTCRate && `${this.formatNumber(row.unitTTCRate)}€`,
         },
         {
           name: 'estimatedWeeklyVolume',
           label: 'Volume hebdomadaire estimatif',
           align: 'center',
-          field: row => row.service.nature === 'Horaire' ? `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume,
+          field: row => row.service.nature === HOURLY ? row.estimatedWeeklyVolume && `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume,
         },
         {
           name: 'weeklyRate',
@@ -47,10 +52,11 @@ export const subscriptionMixin = {
       ],
       subscriptionHistoryColumns: [
         {
-          name: 'startDate',
-          label: 'Date d\'effet',
+          name: 'createdAt',
+          label: 'Date de modification',
           align: 'left',
-          field: 'startDate',
+          field: 'createdAt',
+          format: value => moment(value).format('DD/MM/YYYY')
         },
         {
           name: 'unitTTCRate',
@@ -62,7 +68,7 @@ export const subscriptionMixin = {
           name: 'estimatedWeeklyVolume',
           label: 'Volume hebdomadaire estimatif',
           align: 'center',
-          field: row => this.selectedSubscription.service && this.selectedSubscription.service.nature === 'Horaire'
+          field: row => this.selectedSubscription.service && this.selectedSubscription.service.nature === HOURLY
             ? `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume,
         },
         {
@@ -91,13 +97,14 @@ export const subscriptionMixin = {
     },
     computeWeeklyRate (subscription, funding) {
       let weeklyRate = subscription.unitTTCRate * subscription.estimatedWeeklyVolume;
-      if (subscription.sundays && subscription.service.holidaySurcharge) {
-        weeklyRate += subscription.sundays * subscription.unitTTCRate * subscription.service.holidaySurcharge / 100;
+      if (subscription.service.surcharge) {
+        if (subscription.sundays && subscription.service.surcharge.sunday) {
+          weeklyRate += subscription.sundays * subscription.unitTTCRate * subscription.service.surcharge.sunday / 100;
+        }
+        if (subscription.evenings && subscription.service.surcharge.evening) {
+          weeklyRate += subscription.evenings * subscription.unitTTCRate * subscription.service.surcharge.evening / 100;
+        }
       }
-      if (subscription.evenings && subscription.service.eveningSurcharge) {
-        weeklyRate += subscription.evenings * subscription.unitTTCRate * subscription.service.eveningSurcharge / 100;
-      }
-
       let fundingReduction = 0;
       if (this.isCompleteFunding(funding)) {
         if (funding.frequency !== ONCE) {
@@ -125,8 +132,7 @@ export const subscriptionMixin = {
       return true;
     },
     getMatchingFunding (subscription) {
-      return this.fundings.find(fd =>
-        fd.services.some(ser => ser._id === subscription.service._id) &&
+      return this.fundings.find(fd => fd.subscription === subscription._id &&
         (fd.endDate ? this.$moment().isBetween(fd.startDate, fd.endDate) : this.$moment().isSameOrAfter(fd.startDate))
       );
     },
@@ -141,11 +147,10 @@ export const subscriptionMixin = {
     refreshSubscriptions () {
       try {
         const { subscriptions } = this.customer;
-        this.subscriptions = subscriptions ? subscriptions.map(sub => {
-          const { versions } = sub;
-
-          return { ...getLastVersion(versions, 'startDate'), ...sub }
-        }) : [];
+        this.subscriptions = subscriptions ? subscriptions.map(sub => ({
+          ...getLastVersion(sub.versions, 'createdAt'),
+          ...sub,
+        })) : [];
       } catch (e) {
         console.error(e);
       }

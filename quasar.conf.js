@@ -9,6 +9,7 @@ module.exports = function (ctx) {
       'alenviAxios',
       'bot',
       'can',
+      'creditNotes',
       'companies',
       'customers',
       'googleDrive',
@@ -21,12 +22,23 @@ module.exports = function (ctx) {
       'planningUpdates',
       'resize',
       'roles',
+      'sectors',
+      'services',
+      'surcharges',
+      'thirdPartyPayers',
       'twilio',
       'vue-croppa',
       'vMask',
       'users',
       'vuelidate',
       'events',
+      'contracts',
+      'bills',
+      'balances',
+      'payments',
+      'exports',
+      'pay',
+      'finalPay',
       process.env.NODE_ENV === 'production' ? 'vue-analytics' : null
     ],
     css: [
@@ -68,7 +80,8 @@ module.exports = function (ctx) {
         CLOUDINARY_API_KEY: JSON.stringify(process.env.CLOUDINARY_API_KEY),
         CLOUDINARY_API_SECRET: JSON.stringify(process.env.CLOUDINARY_API_SECRET),
         CLOUDINARY_CLOUD_NAME: JSON.stringify(process.env.CLOUDINARY_CLOUD_NAME),
-        GA_TRACKING_ID: JSON.stringify(process.env.GA_TRACKING_ID)
+        GA_TRACKING_ID: JSON.stringify(process.env.GA_TRACKING_ID),
+        GOOGLE_DRIVE_WITHDRAWAL_FOLDER_ID: JSON.stringify(process.env.GOOGLE_DRIVE_WITHDRAWAL_FOLDER_ID),
       }
     },
     devServer: {
@@ -133,7 +146,9 @@ module.exports = function (ctx) {
         'QCollapsible',
         'QBtnToggle',
         'QOptionGroup',
-        'QChip'
+        'QChip',
+        'QPageSticky',
+        'QProgress',
       ],
       directives: [
         'Ripple'
@@ -142,7 +157,8 @@ module.exports = function (ctx) {
         'Notify',
         'Cookies',
         'Loading',
-        'Dialog'
+        'Dialog',
+        'LocalStorage'
       ]
     },
     animations: [

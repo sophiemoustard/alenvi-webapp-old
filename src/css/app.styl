@@ -9,6 +9,8 @@
 @import './themes/header'
 @import './themes/icon'
 @import './themes/card'
+@import './themes/planning'
+@import './themes/chip'
 
 body
   color: $black
@@ -51,3 +53,16 @@ div h4:only-child
 .overflow-hidden-nowrap
   overflow: hidden
   white-space: nowrap
+
+.full-height
+  height: 100% !important
+
+.layout-padding
+  @media(min-width: 1200px)
+    padding: 2rem 3rem 3rem;
+
+.title-padding
+  padding: 2rem 3rem 1rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;

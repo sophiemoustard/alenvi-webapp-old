@@ -13,7 +13,7 @@
       </div>
     </div>
     <q-table :data="filteredCustomers" :columns="columns" row-key="name" binary-state-sort :rows-per-page-options="[15, 25, 35]"
-      :pagination.sync="pagination" :loading="tableLoading" class="people-list">
+      :pagination.sync="pagination" :loading="tableLoading" class="people-list q-pa-sm">
       <q-tr slot="body" slot-scope="props" :props="props" :class="['datatable-row', { 'datatable-row-inactive': !props.row.isActive }]"
         @click.native="goToCustomerProfile(props.row.customer._id)">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
@@ -30,7 +30,7 @@
         </q-td>
       </q-tr>
     </q-table>
-    <q-btn class="fixed fab-add-person" no-caps rounded color="primary" icon="add" label="Ajouter un bénéficiaire"
+    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un bénéficiaire"
       @click="opened = true" />
 
     <!-- Customer creation modal -->
@@ -41,18 +41,18 @@
             <h5>Créer une nouvelle <span class="text-weight-bold">fiche bénéficiaire</span></h5>
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
-            <span><q-icon name="clear" @click.native="opened = false" /></span>
+            <span>
+              <q-icon name="clear" @click.native="opened = false" /></span>
           </div>
         </div>
         <ni-modal-select v-model="newCustomer.identity.title" :error="$v.newCustomer.identity.title.$error" :options="civilityOptions"
-          caption="Civilité" @blur="$v.newCustomer.identity.title.$touch" errorLabel="Champ requis" requiredField />
+          caption="Civilité" @blur="$v.newCustomer.identity.title.$touch" required-field />
         <ni-modal-input v-model="newCustomer.identity.lastname" :error="$v.newCustomer.identity.lastname.$error"
-          caption="Nom" @blur="$v.newCustomer.identity.lastname.$touch" errorLabel="Champ requis" requiredField />
+          caption="Nom" @blur="$v.newCustomer.identity.lastname.$touch" required-field />
         <ni-modal-input v-model="newCustomer.identity.firstname" caption="Prénom" />
         <div class="row margin-input last">
           <ni-search-address v-model="newCustomer.contact.address.fullAddress" @selected="selectedAddress" @blur="$v.newCustomer.contact.address.fullAddress.$touch"
-            :error="$v.newCustomer.contact.address.fullAddress.$error" :error-label="addressError" inModal
-            requiredField />
+            :error="$v.newCustomer.contact.address.fullAddress.$error" :error-label="addressError" in-modal required-field />
         </div>
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary" :loading="loading"
@@ -71,6 +71,7 @@ import NiModalInput from '../../../components/form/ModalInput';
 import NiModalSelect from '../../../components/form/ModalSelect';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../../components/popup/notify.js';
 import { customerProfileValidation } from '../../../helpers/customerProfileValidation.js';
+import { REQUIRED_LABEL } from '../../../data/constants';
 
 export default {
   metaInfo: {
@@ -99,12 +100,8 @@ export default {
           firstname: ''
         },
         email: '',
-        customerId: '',
         contact: {
-          ogustAddressId: '',
-          address: {
-            fullAddress: '',
-          }
+          address: { fullAddress: '' }
         },
         isActive: true
       },
@@ -193,21 +190,21 @@ export default {
     },
     zipCodeError () {
       if (!this.$v.newCustomer.contact.address.zipCode.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.newCustomer.contact.address.zipCode.frZipCode || !this.$v.newCustomer.contact.address.zipCode.maxLength) {
         return 'Code postal non valide';
       }
     },
     emailError () {
       if (!this.$v.newCustomer.email.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.newCustomer.email.email) {
         return 'Email non valide';
       }
     },
     addressError () {
       if (!this.$v.newCustomer.contact.address.fullAddress.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       }
       return 'Adresse non valide';
     }
@@ -243,49 +240,21 @@ export default {
       this.$v.newCustomer.$reset();
       this.newCustomer = Object.assign({}, clear(this.newCustomer));
     },
-    async createAlenviCustomer () {
-      const payload = this.$_.pickBy(this.newCustomer);
-      const newCustomer = await this.$customers.create(payload);
-      await this.$customers.createDriveFolder(newCustomer.data.data.customer._id);
-      return newCustomer;
-    },
-    async createOgustCustomer () {
-      const ogustPayload = {
-        title: this.newCustomer.identity.title,
-        last_name: this.newCustomer.identity.lastname,
-        first_name: this.newCustomer.identity.firstname,
-        email: this.newCustomer.email,
-        main_address: {
-          line: this.newCustomer.contact.address.street,
-          zip: this.newCustomer.contact.address.zipCode,
-          city: this.newCustomer.contact.address.city
-        },
-      };
-      const cleanPayload = this.$_.pickBy(ogustPayload);
-      const newCustomer = await this.$ogust.createCustomer(cleanPayload);
-      return newCustomer;
-    },
     async submit () {
       try {
         this.loading = true;
         this.$v.newCustomer.$touch();
-        if (this.$v.newCustomer.$error) {
-          throw new Error('Invalid fields');
-        }
-        const newCustomer = await this.createOgustCustomer();
-        this.newCustomer.customerId = newCustomer.data.data.customer.id_customer;
-        const customer = await this.$ogust.getCustomerById(this.newCustomer.customerId);
-        this.newCustomer.contact.ogustAddressId = customer.main_address.id_address;
-        this.customerCreated = await this.createAlenviCustomer();
+        if (this.$v.newCustomer.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        const payload = this.$_.pickBy(this.newCustomer);
+        const newCustomer = await this.$customers.create(payload);
+        await this.$customers.createDriveFolder(newCustomer.data.data.customer._id);
         await this.getCustomersList();
-        NotifyPositive('Fiche bénéficiaire créée')
+        NotifyPositive('Fiche bénéficiaire créée');
         this.opened = false;
       } catch (e) {
         console.error(e);
-        if (e && e.message === 'Invalid fields') {
-          NotifyWarning('Champ(s) invalide(s)');
-          return;
-        }
+        if (e && e.message === 'Invalid fields') return NotifyWarning('Champ(s) invalide(s)');
         NotifyNegative('Erreur lors de la création de la fiche bénéficiaire');
       } finally {
         this.loading = false;
@@ -300,9 +269,6 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables'
-
-  .input-caption
-    margin-bottom: 4px
 
   /deep/ .q-option .q-option-label
     font-size: 14px

@@ -10,9 +10,10 @@
             <q-tr slot="body" slot-scope="props" :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
                 <template v-if="col.name === 'actions'">
-                  <div class="row no-wrap table-actions table-actions-margin">
+                  <div class="row no-wrap table-actions">
                     <q-btn flat round small color="grey" icon="history" @click="showHistory(col.value)" />
-                    <q-btn :disable="!hasFunding(col.value)" flat round small color="grey" icon="mdi-calculator" @click="showFunding(col.value)" />
+                    <q-btn :disable="!getFunding(col.value)" flat round small color="grey" icon="mdi-calculator"
+                      @click="showFunding(col.value)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -20,7 +21,7 @@
             </q-tr>
           </q-table>
         </q-card>
-        <p v-if="subscriptions.length > 0" class="nota-bene">* intègre le financement et les éventuelles majorations
+        <p v-if="subscriptions.length > 0" class="nota-bene">* intègre les éventuelles majorations
           soir / dimanche</p>
         <div v-if="subscriptions && subscriptions.length > 0" class="row">
           <div class="col-xs-12">
@@ -34,18 +35,18 @@
       <div class="q-mb-lg">
         <p class="title">Justificatifs APA ou autres financements</p>
         <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement" @uploaded="documentUploaded"
-          name="financialCertificates" collapsibleLabel="Ajouter un justificatif" :userProfile="customer"
-          :url="docsUploadUrl" @delete="deleteDocument($event)" additionalFieldsName="financialCertificate" />
+          name="financialCertificates" collapsible-label="Ajouter un justificatif" :user-profile="customer"
+          :url="docsUploadUrl" @delete="deleteDocument($event)" additional-fields-name="financialCertificate" />
       </div>
       <div class="q-mb-lg">
         <p class="title">Paiement</p>
         <div class="row gutter-profile">
           <ni-input caption="Nom associé au compte bancaire" v-model="customer.payment.bankAccountOwner" :error="$v.customer.payment.bankAccountOwner.$error"
-            @focus="saveTmp('payment.bankAccountOwner')" @blur="updateCustomer({ alenvi: 'payment.bankAccountOwner', ogust: 'holder' })" />
-          <ni-input caption="IBAN" v-model="customer.payment.iban" :error="$v.customer.payment.iban.$error" :errorLabel="ibanError"
-            @focus="saveTmp('payment.iban')" @blur="updateCustomer({ alenvi: 'payment.iban', ogust: 'iban_number' })" />
-          <ni-input caption="BIC" v-model="customer.payment.bic" :error="$v.customer.payment.bic.$error" :errorLabel="bicError"
-            @focus="saveTmp('payment.bic')" @blur="updateCustomer({ alenvi: 'payment.bic', ogust: 'bic_number' })" />
+            @focus="saveTmp('payment.bankAccountOwner')" @blur="updateCustomer('payment.bankAccountOwner')" />
+          <ni-input caption="IBAN" v-model="customer.payment.iban" :error="$v.customer.payment.iban.$error" :error-label="ibanError"
+            @focus="saveTmp('payment.iban')" @blur="updateCustomer('payment.iban')" />
+          <ni-input caption="BIC" v-model="customer.payment.bic" :error="$v.customer.payment.bic.$error" :error-label="bicError"
+            @focus="saveTmp('payment.bic')" @blur="updateCustomer('payment.bic')" />
         </div>
       </div>
       <div class="q-mb-lg">
@@ -107,8 +108,7 @@
           hide-bottom binary-state-sort :pagination.sync="paginationHistory">
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-              <template v-if="col.name === 'startDate'"> {{ $moment(col.value).format('DD/MM/YYYY') }} </template>
-              <template v-else>{{ col.value }}</template>
+              <template>{{ col.value }}</template>
             </q-td>
           </q-tr>
         </q-table>
@@ -142,26 +142,26 @@
 
 <script>
 import { required } from 'vuelidate/lib/validators';
+
+import esign from '../../api/Esign.js';
 import Input from '../../components/form/Input.vue';
-import NiModalInput from '../../components/form/ModalInput';
 import MultipleFilesUploader from '../../components/form/MultipleFilesUploader.vue';
+import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify';
+import { FIXED, REQUIRED_LABEL } from '../../data/constants';
 import { bic, iban } from '../../helpers/vuelidateCustomVal';
 import { getLastVersion } from '../../helpers/utils';
-import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
 import { financialCertificatesMixin } from '../../mixins/financialCertificatesMixin.js';
 import { fundingMixin } from '../../mixins/fundingMixin.js';
-import esign from '../../api/Esign.js';
 import cgs from '../../statics/CGS.html';
-import { FIXED } from '../../data/constants';
 
 export default {
   name: 'Subscriptions',
+  metaInfo: { title: 'Souscriptions' },
   components: {
     'ni-input': Input,
     'ni-multiple-files-uploader': MultipleFilesUploader,
-    NiModalInput
   },
   mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin, fundingMixin],
   data () {
@@ -230,14 +230,14 @@ export default {
     },
     ibanError () {
       if (!this.$v.customer.payment.iban.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.customer.payment.iban.iban) {
         return 'IBAN non valide';
       }
     },
     bicError () {
       if (!this.$v.customer.payment.bic.required) {
-        return 'Champ requis';
+        return REQUIRED_LABEL;
       } else if (!this.$v.customer.payment.bic.bic) {
         return 'BIC non valide';
       }
@@ -279,8 +279,7 @@ export default {
   methods: {
     async refreshCustomer () {
       try {
-        const customerRaw = await this.$customers.getById(this.helper.customers[0]._id);
-        this.customer = customerRaw.data.data.customer;
+        this.customer = await this.$customers.getById(this.helper.customers[0]._id);
         this.refreshSubscriptions();
         this.refreshFundings();
 
@@ -295,22 +294,6 @@ export default {
       this.tmpInput = this.$_.get(this.customer, path);
     },
     // Customer
-    async updateOgustCustomer (paths) {
-      let value = this.$_.get(this.customer, paths.alenvi);
-      if (paths.ogust.match(/iban_number/i)) value = value.split(' ').join('');
-
-      const payload = this.$_.set({}, paths.ogust, value);
-      if (paths.ogust.match(/((iban|bic)_number)|holder/i)) {
-        if (this.customer.payment && this.customer.payment.bankAccountOwner && this.customer.payment.iban && this.customer.payment.bic) {
-          payload.bic_number = this.customer.payment.bic;
-          payload.iban_number = this.customer.payment.iban;
-          payload.id_tiers = this.customer.customerId;
-          await this.$ogust.setBankInfo(payload);
-        }
-      } else {
-        await this.$ogust.editOgustCustomer(this.userProfile.customerId, payload);
-      }
-    },
     async updateAlenviCustomer (path) {
       let value = this.$_.get(this.customer, path);
       if (path.match(/iban/i)) value = value.split(' ').join('');
@@ -319,30 +302,23 @@ export default {
       payload._id = this.customer._id;
       await this.$customers.updateById(payload);
     },
-    async updateCustomer (paths) {
+    async updateCustomer (path) {
       try {
-        if (this.tmpInput === this.$_.get(this.customer, paths.alenvi)) return;
-        this.$_.get(this.$v.customer, paths.alenvi).$touch();
-        if (this.$_.get(this.$v.customer, paths.alenvi).$error) {
-          return NotifyWarning('Champ(s) invalide(s)');
-        }
-        if (paths.alenvi) await this.updateAlenviCustomer(paths.alenvi);
-        if (paths.ogust) await this.updateOgustCustomer(paths);
+        if (this.tmpInput === this.$_.get(this.customer, path)) return;
+        this.$_.get(this.$v.customer, path).$touch();
+        if (this.$_.get(this.$v.customer, path).$error) return NotifyWarning('Champ(s) invalide(s)');
 
+        await this.updateAlenviCustomer(path);
         await this.$store.dispatch('main/getUser', this.helper._id);
         await this.refreshCustomer();
         NotifyPositive('Modification enregistrée');
-        if (paths.alenvi === 'payment.iban') {
+        if (path === 'payment.iban') {
           this.$v.customer.payment.bic.$touch();
-          if (!this.$v.customer.payment.bic.required) {
-            return NotifyWarning('Merci de renseigner votre BIC');
-          }
+          if (!this.$v.customer.payment.bic.required) return NotifyWarning('Merci de renseigner votre BIC');
         }
       } catch (e) {
         console.error(e);
-        if (e.message === 'Champ(s) invalide(s)') {
-          return NotifyWarning(e.message)
-        }
+        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message)
         NotifyNegative('Erreur lors de la modification');
       } finally {
         this.tmpInput = '';
@@ -353,7 +329,7 @@ export default {
       try {
         if (this.customer.subscriptionsAccepted) {
           const subscriptions = this.customer.subscriptions.map(subscription => {
-            const lastVersion = getLastVersion(subscription.versions);
+            const lastVersion = getLastVersion(subscription.versions, 'createdAt');
             const obj = {
               service: subscription.service.name,
               unitTTCRate: lastVersion.unitTTCRate,
@@ -369,7 +345,7 @@ export default {
             helper: {
               firstname: this.helper.identity.firstname || '',
               lastname: this.helper.identity.lastname || '',
-              title: this.helper.identity ? this.helper.administrative.identity.title : ''
+              title: this.helper.identity ? this.helper.identity.title : ''
             }
           };
           await this.$customers.addSubscriptionHistory(this.customer._id, payload);
@@ -386,7 +362,7 @@ export default {
     async preOpenESignModal (data) {
       try {
         this.$q.loading.show({ message: 'Contact du support de signature en ligne...' });
-        const sign = await this.$customers.generateMandateSignatureRequest({ mandateId: data._id, _id: this.customer._id }, {
+        const signatureRequest = await this.$customers.generateMandateSignatureRequest({ mandateId: data._id, _id: this.customer._id }, {
           customer: {
             name: this.customer.identity.lastname,
             email: this.helper.local.email
@@ -406,8 +382,7 @@ export default {
           ...this.esignRedirection
         });
         await this.refreshCustomer();
-        this.$q.loading.hide();
-        this.embeddedUrl = sign.data.data.signatureRequest.embeddedUrl;
+        this.embeddedUrl = signatureRequest.embeddedUrl;
         if (this.$q.platform.is.mobile) {
           window.location.href = this.embeddedUrl;
         } else {
@@ -418,6 +393,8 @@ export default {
         this.$q.loading.hide();
         this.newESignModal = false;
         NotifyNegative('Erreur lors de la requête de signature en ligne du mandat');
+      } finally {
+        this.$q.loading.hide();
       }
     },
     async checkMandates () {
@@ -425,15 +402,12 @@ export default {
         if (this.customer.payment.mandates.length === 0) return;
         const mandates = this.customer.payment.mandates.filter(mandate => !mandate.drive && mandate.everSignId);
         if (mandates.length === 0) return;
-        const hasSignedPromises = [];
         for (const mandate of mandates) {
           const hasSigned = await this.hasSignedDoc(mandate.everSignId);
           if (hasSigned) {
-            hasSignedPromises.push(this.$customers.saveSignedDoc({ _id: this.customer._id, mandateId: mandate._id }),
-              this.$ogust.createSepaInfo({ id_tiers: this.customer.customerId, rum: mandate.rum, signature_date: this.$moment().format('YYYYMMDD') }));
+            this.$customers.saveSignedDoc({ _id: this.customer._id, mandateId: mandate._id });
           }
         }
-        await Promise.all(hasSignedPromises);
         await this.refreshCustomer();
       } catch (e) {
         console.error(e);
@@ -441,24 +415,17 @@ export default {
     },
     async hasSignedDoc (docId) {
       try {
-        const docRaw = await esign.getDocument(docId);
-        return docRaw.data.data.document.log.some(el => el.event === 'document_signed');
+        const document = await esign.getDocument(docId);
+        return document.log.some(el => el.event === 'document_signed');
       } catch (e) {
         console.error(e);
       }
     },
-    getSubscriptionServiceId (subscriptionId) {
-      const subscription = this.subscriptions.find(sub => sub._id === subscriptionId);
-      if (!subscription) return undefined;
-      return subscription.service._id;
-    },
-    hasFunding (subscriptionId) {
-      const serviceId = this.getSubscriptionServiceId(subscriptionId);
-      if (!serviceId) return;
-      return this.fundings.find(fund => fund.services.some(service => service._id === serviceId));
+    getFunding (subscriptionId) {
+      return this.fundings.find(fund => fund.subscription._id === subscriptionId);
     },
     showFunding (subscriptionId) {
-      this.selectedFunding = this.hasFunding(subscriptionId);
+      this.selectedFunding = this.getFunding(subscriptionId);
       this.fundingData.push(this.selectedFunding);
       this.fundingModal = true;
     },

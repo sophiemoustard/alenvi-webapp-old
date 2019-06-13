@@ -5,21 +5,6 @@ export default {
     const companyRaw = await alenviAxios.put(`${process.env.API_HOSTNAME}/companies/${data._id}`, data);
     return companyRaw.data.data;
   },
-  async getServices (id) {
-    const services = await alenviAxios.get(`${process.env.API_HOSTNAME}/companies/${id}/services`);
-    return services.data.data.services;
-  },
-  async createService (id, payload) {
-    const services = await alenviAxios.post(`${process.env.API_HOSTNAME}/companies/${id}/services`, payload);
-    return services.data.data.services;
-  },
-  async updateService (params, payload) {
-    const services = await alenviAxios.put(`${process.env.API_HOSTNAME}/companies/${params.id}/services/${params.serviceId}`, payload);
-    return services.data.data.services;
-  },
-  async deleteService (queries) {
-    await alenviAxios.delete(`${process.env.API_HOSTNAME}/companies/${queries.id}/services/${queries.serviceId}`);
-  },
   async createInternalHour (id, payload) {
     const internalHours = await alenviAxios.post(`${process.env.API_HOSTNAME}/companies/${id}/internalHours`, payload);
     return internalHours.data.data.internalHours;
@@ -35,15 +20,4 @@ export default {
   async deleteInternalHour (queries) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/companies/${queries.id}/internalHours/${queries.internalHourId}`);
   },
-  async createThirdPartyPayer (id, data) {
-    const newThirdPartyPayer = await alenviAxios.post(`${process.env.API_HOSTNAME}/companies/${id}/thirdpartypayers`, data);
-    return newThirdPartyPayer.data.data.thirdPartyPayers;
-  },
-  async deleteThirdPartyPayer (queries) {
-    await alenviAxios.delete(`${process.env.API_HOSTNAME}/companies/${queries.id}/thirdpartypayers/${queries.thirdPartyPayerId}`);
-  },
-  async updateThirdPartyPayer (params, payload) {
-    const thirdPartyPayer = await alenviAxios.put(`${process.env.API_HOSTNAME}/companies/${params.id}/thirdpartypayers/${params.thirdPartyPayerId}`, payload);
-    return thirdPartyPayer.data.data.thirdPartyPayers;
-  }
 }

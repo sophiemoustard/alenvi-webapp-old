@@ -11,9 +11,9 @@
       <template slot="header">
         <q-item-main :class="{'text-weight-bold': activeRoutes.planning.highlight }" label="Planning" />
       </template>
-      <ni-menu-item name="profile planning" :params="{ id: user._id }" :query="{ auxiliary: 'true', self: 'true' }" icon="event" label="Le mien" />
-      <ni-menu-item name="profile planning" :params="{ id: user._id }" :query="{ auxiliary: 'true' }" icon="face" label="Auxiliaires" />
-      <ni-menu-item name="profile planning" :params="{ id: user._id }" :query="{ customer: 'true' }" icon="people" label="Bénéficiaires" />
+      <ni-menu-item name="auxiliary agenda" icon="event" label="Le mien" />
+      <ni-menu-item name="auxiliaries planning" icon="face" label="Auxiliaires" />
+      <ni-menu-item name="customers planning" icon="people" label="Bénéficiaires" />
     </q-collapsible>
     <q-item-separator />
     <q-collapsible ref="benef" v-model="activeRoutes.benef.open" collapseIcon="expand_more">
@@ -30,6 +30,7 @@
       <ni-menu-item name="auxiliary personal info" :params="{ id: user._id }" icon="person" label="Infos personnelles" />
       <ni-menu-item name="profile salaries" :params="{ id: user._id }" icon="layers" label="Paye" />
       <ni-menu-item name="profile docs" :params="{ id: user._id }" icon="insert_drive_file" label="Documents" />
+      <ni-menu-item name="profile contracts" icon="description" label="Contrats" />
     </q-collapsible>
     <q-item-separator />
     <q-collapsible ref="team" v-model="activeRoutes.team.open" collapseIcon="expand_more">

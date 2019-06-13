@@ -95,6 +95,7 @@ export default {
       this.$q.cookies.remove('alenvi_token_expires_in', { path: '/' });
       this.$q.cookies.remove('refresh_token', { path: '/' });
       this.$q.cookies.remove('user_id', { path: '/' });
+      this.$q.localStorage.clear();
       this.$router.replace('/login');
     }
   }

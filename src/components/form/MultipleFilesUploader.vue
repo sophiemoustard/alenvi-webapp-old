@@ -12,7 +12,7 @@
       <div class="col-xs-12 col-md-6" v-for="(certificate, index) in documents" :key="index">
         <div v-if="certificate.driveId" class="justify-between row" style="background: white">
           <div class="doc-thumbnail">
-            <ni-custom-img :driveId="certificate.driveId" alt="diplôme" :key="certificate.driveId" />
+            <ni-custom-img :driveId="certificate.driveId" :alt="alt" :key="certificate.driveId" />
           </div>
           <div class="self-end doc-delete">
             <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(certificate.driveId)" />
@@ -38,14 +38,9 @@ import CustomImg from './CustomImg';
 import { NotifyNegative } from '../popup/notify';
 
 export default {
+  name: 'MultipleFilesUploader',
   components: {
     'ni-custom-img': CustomImg,
-  },
-  data () {
-    return {
-      extensions: 'image/jpg, image/jpeg, image/gif, image/png, application/pdf',
-      collapsibleOpened: false,
-    };
   },
   props: {
     caption: String,
@@ -57,6 +52,26 @@ export default {
     additionalFieldsName: String,
     userProfile: Object,
     collapsibleLabel: String,
+  },
+  data () {
+    return {
+      extensions: 'image/jpg, image/jpeg, image/gif, image/png, application/pdf',
+      collapsibleOpened: false,
+    };
+  },
+  computed: {
+    headers () {
+      return { 'x-access-token': Cookies.get('alenvi_token') || '' };
+    },
+    collapsibleIcon () {
+      return !this.collapsibleOpened ? 'add' : 'mdi-close';
+    },
+    additionalFields () {
+      return [{ name: 'fileName', value: `${this.additionalFieldsName}_${this.userProfile.identity.firstname}_${this.userProfile.identity.lastname}` }];
+    },
+    documents () {
+      return this.$_.get(this.userProfile, this.path) || [];
+    },
   },
   methods: {
     deleteDocument (documentId) {
@@ -81,20 +96,6 @@ export default {
       } else {
         this.$refs[this.name].upload();
       }
-    },
-  },
-  computed: {
-    headers () {
-      return { 'x-access-token': Cookies.get('alenvi_token') || '' };
-    },
-    collapsibleIcon () {
-      return !this.collapsibleOpened ? 'add' : 'mdi-close';
-    },
-    additionalFields () {
-      return [{ name: 'fileName', value: `${this.additionalFieldsName}_${this.userProfile.identity.firstname}_${this.userProfile.identity.lastname}` }];
-    },
-    documents () {
-      return this.$_.get(this.userProfile, this.path);
     },
   },
 };

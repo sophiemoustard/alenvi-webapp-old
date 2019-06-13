@@ -1,7 +1,8 @@
 <template>
   <div @click="selectPopover = !selectPopover">
-    <q-input color="white" inverted-light :value="value" @blur="blurHandler" align="center" @input="update" :class="[ selectPopover ? 'underline' : '']" />
-    <q-popover v-model="selectPopover">
+    <q-input color="white" inverted-light :value="value" @change="blurHandler" align="center" @input="update" :class="[ selectPopover ? 'underline' : '']"
+      :disable="disable" />
+    <q-popover v-model="selectPopover" :disable="disable">
       <q-list>
         <q-item link v-for="option in options" :key="option.value">
           <div :class="[option.disable && 'disable']" @click="!option.disable && update(option.value)">{{ option. label }}</div>
@@ -17,6 +18,7 @@ export default {
   props: {
     value: String,
     options: { type: Array, default: () => [] },
+    disable: { type: Boolean, default: false },
   },
   data () {
     return {
@@ -25,11 +27,10 @@ export default {
   },
   methods: {
     blurHandler (hour) {
-      if (hour instanceof String) this.$emit('blur', { hour });
+      this.$emit('blur', { hour });
     },
     update (hour) {
-      this.$emit('blur', { hour });
-      if (hour.match(/[0-2][0-9]:(00|30)/)) this.$emit('input', hour);
+      this.$emit('input', hour);
       this.selectPopover = false;
     },
   },

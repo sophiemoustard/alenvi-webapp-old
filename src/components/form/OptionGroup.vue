@@ -5,20 +5,23 @@
         <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
         <q-icon v-if="error" name="error_outline" color="secondary" />
       </div>
-      <q-field :error="error" :error-label="errorLabel">
-        <q-option-group :value="value" @input="inputHandler" @blur="blurHandler" :options="options" :readonly="readOnly" :type="type" :inline="inline" />
+      <q-field :error="error" :error-label="errorLabel" class="col-12">
+        <q-option-group :value="value" @input="inputHandler" @blur="blurHandler" :options="options" :readonly="readOnly"
+          :type="type" :inline="inline" />
       </q-field>
     </div>
   </div>
 </template>
 
 <script>
+import { REQUIRED_LABEL } from '../../data/constants';
+
 export default {
-  name: 'NiModalInput',
+  name: 'NiOptionGroup',
   props: {
     caption: String,
     error: Boolean,
-    errorLabel: { type: String, default: 'Champ requis' },
+    errorLabel: { type: String, default: REQUIRED_LABEL },
     value: [String, Array],
     last: Boolean,
     readOnly: { type: Boolean, default: false },

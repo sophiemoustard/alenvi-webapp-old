@@ -48,7 +48,13 @@ export const clear = (obj) => {
 
 export const getLastVersion = (versions, dateKey) => {
   if (versions.length === 0) return null;
-  if (versions.length === 1) return versions[0];
+  if (versions.length === 1) return {...versions[0]};
 
-  return versions.sort((a, b) => new Date(b[dateKey]) - new Date(a[dateKey]))[0];
+  return [...versions].sort((a, b) => new Date(b[dateKey]) - new Date(a[dateKey]))[0];
+};
+
+export const roundFrenchNumber = number => number.toLocaleString('fr-FR', { minimumFractionDigits: 2, style: 'currency', currency: 'EUR', currencyDisplay: 'symbol' });
+
+export const formatPrice = (val) => {
+  return val ? roundFrenchNumber(val) : roundFrenchNumber(0);
 };

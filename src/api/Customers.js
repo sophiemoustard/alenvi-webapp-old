@@ -9,8 +9,17 @@ export default {
     const customersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/customers/sectors`, { params });
     return customersRaw.data.data.customers;
   },
+  async showAllWithBilledEvents (params) {
+    const customersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/customers/billed-events`, { params });
+    return customersRaw.data.data.customers;
+  },
+  async showAllWithCustomerContractSubscriptions () {
+    const customersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/customers/customer-contract-subscriptions`);
+    return customersRaw.data.data.customers;
+  },
   async getById (id) {
-    return alenviAxios.get(`${process.env.API_HOSTNAME}/customers/${id}`);
+    const customerRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/customers/${id}`);
+    return customerRaw.data.data.customer;
   },
   async create (data) {
     return alenviAxios.post(`${process.env.API_HOSTNAME}/customers`, data);
@@ -55,7 +64,8 @@ export default {
     return alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${id}/subscriptionshistory`, data);
   },
   async generateMandateSignatureRequest (params, data) {
-    return alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${params._id}/mandates/${params.mandateId}/esign`, data);
+    const signatureRequest = await alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${params._id}/mandates/${params.mandateId}/esign`, data);
+    return signatureRequest.data.data.signatureRequest;
   },
   async saveSignedDoc (params, data) {
     return alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${params._id}/mandates/${params.mandateId}/savesigneddoc`, data);

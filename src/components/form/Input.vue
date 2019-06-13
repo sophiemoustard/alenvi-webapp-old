@@ -25,11 +25,13 @@
 </template>
 
 <script>
+import { REQUIRED_LABEL } from '../../data/constants';
+
 export default {
   props: {
     caption: String,
     error: Boolean,
-    errorLabel: { type: String, default: 'Champ requis' },
+    errorLabel: { type: String, default: REQUIRED_LABEL },
     value: [String, Number],
     upperCase: { type: Boolean, default: false },
     lowerCase: { type: Boolean, default: false },
@@ -43,7 +45,13 @@ export default {
   },
   methods: {
     blurHandler (event) {
-      this.$emit('blur');
+      if (this.type === 'number') {
+        this.$nextTick(() => {
+          this.$emit('blur');
+        });
+      } else {
+        this.$emit('blur');
+      }
     },
     focusHandler (event) {
       this.$emit('focus');

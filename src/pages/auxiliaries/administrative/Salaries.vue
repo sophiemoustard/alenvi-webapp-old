@@ -29,8 +29,7 @@ export default {
   },
   data () {
     return {
-      tableLoading: true,
-      user: {},
+      tableLoading: false,
       salaries: [],
       pagination: {
         sortBy: 'periodStart',
@@ -59,9 +58,16 @@ export default {
       ]
     }
   },
-  async created () {
+  computed: {
+    user () {
+      return this.$store.getters['main/user'];
+    }
+  },
+  async mounted () {
     try {
-      this.user = await this.$users.getById(this.$route.params.id);
+      if (!this.user.employee_id) return;
+
+      this.tableLoading = true;
       const salaries = await this.$ogust.getEmployeeSalaries(this.user.employee_id);
       for (const k in salaries) {
         this.salaries.push(salaries[k]);

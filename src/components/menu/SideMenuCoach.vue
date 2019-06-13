@@ -10,15 +10,15 @@
       <template slot="header">
         <q-item-main :class="{'text-weight-bold': activeRoutes.administrative.highlight }" label="Administratif" />
       </template>
-      <ni-menu-item name="administrative directory" icon="contacts" label="Répertoire" />
+      <ni-menu-item name="administrative directory" icon="contacts" label="Répertoire auxiliaires" />
     </q-collapsible>
     <q-item-separator />
     <q-collapsible ref="planning" v-model="activeRoutes.planning.open" collapseIcon="expand_more">
       <template slot="header">
         <q-item-main :class="{'text-weight-bold': activeRoutes.planning.highlight }" label="Planning" />
       </template>
-      <ni-menu-item name="view planning" icon="date range" label="Vue planning" />
-      <ni-menu-item name="modification planning" icon="update" label="Modifications planning" />
+      <ni-menu-item name="auxiliaries planning" icon="date range" label="Auxiliaires" />
+      <ni-menu-item name="customers planning" icon="date range" label="Bénéficiaires" />
       <ni-menu-item name="constrained coaches" icon="perm contact calendar" label="Coach(s) de permanence" />
     </q-collapsible>
     <q-item-separator />
@@ -29,9 +29,37 @@
       <ni-menu-item name="customers directory" icon="contacts" label="Répertoire bénéficiaires" />
     </q-collapsible>
     <q-item-separator />
-    <q-collapsible v-if="user.role.name === 'Admin'" ref="configuration" v-model="activeRoutes.configuration.open"
-      collapseIcon="expand_more"
-    >
+    <q-collapsible v-if="user.role.name === ADMIN" ref="billing" v-model="activeRoutes.billing.open"
+      collapseIcon="expand_more">
+      <template slot="header">
+        <q-item-main :class="{'text-weight-bold': activeRoutes.billing.highlight }" label="Facturation" />
+      </template>
+      <ni-menu-item name="to bill" :params="{ id: user._id }" icon="credit_card" label="À facturer" />
+      <ni-menu-item name="credit note" :params="{ id: user._id }" icon="mdi-credit-card-refund" label="Avoirs" />
+      <ni-menu-item name="clients balances" :params="{ id: user._id }" icon="mdi-scale-balance" label="Balances clients" />
+      <ni-menu-item name="debits archive" :params="{ id: user._id }" icon="mdi-archive" label="Archive prélèvements" />
+    </q-collapsible>
+    <q-item-separator />
+    <q-collapsible v-if="user.role.name === ADMIN" ref="pay" v-model="activeRoutes.pay.open"
+      collapseIcon="expand_more">
+      <template slot="header">
+        <q-item-main :class="{'text-weight-bold': activeRoutes.pay.highlight }" label="Paie" />
+      </template>
+      <ni-menu-item name="to pay" :params="{ id: user._id }" icon="euro_symbol" label="À payer" />
+      <ni-menu-item name="contract ends" :params="{ id: user._id }" icon="description" label="Fins de contrats" />
+      <ni-menu-item name="absences" :params="{ id: user._id }" icon="calendar_today" label="Absences" />
+    </q-collapsible>
+    <q-item-separator />
+    <q-collapsible ref="exports" v-model="activeRoutes.exports.open" collapseIcon="expand_more">
+      <template slot="header">
+        <q-item-main :class="{'text-weight-bold': activeRoutes.exports.highlight }" label="Exports" />
+      </template>
+      <ni-menu-item name="data" :params="{ id: user._id }" icon="list_alt" label="Données" />
+      <ni-menu-item name="history" :params="{ id: user._id }" icon="history" label="Historique" />
+    </q-collapsible>
+    <q-item-separator />
+    <q-collapsible v-if="user.role.name === ADMIN" ref="configuration" v-model="activeRoutes.configuration.open"
+      collapseIcon="expand_more">
       <template slot="header">
         <q-item-main :class="{'text-weight-bold': activeRoutes.configuration.highlight }" label="Configuration" />
       </template>
@@ -48,6 +76,7 @@
 import { sideMenuMixin } from '../../mixins/sideMenuMixin';
 import MenuItem from './MenuItem.vue';
 import SideMenuFooter from './SideMenuFooter.vue';
+import { ADMIN } from '../../data/constants';
 
 export default {
   props: {
@@ -60,22 +89,35 @@ export default {
   },
   data () {
     return {
+      ADMIN,
       activeRoutes: {
         planning: {
           open: false,
-          highlight: false
+          highlight: false,
         },
         benef: {
           open: false,
-          highlight: false
+          highlight: false,
         },
         administrative: {
           open: false,
-          highlight: false
+          highlight: false,
+        },
+        billing: {
+          open: false,
+          highlight: false,
+        },
+        pay: {
+          open: false,
+          highlight: false,
+        },
+        exports: {
+          open: false,
+          highlight: false,
         },
         configuration: {
           open: false,
-          highlight: false
+          highlight: false,
         },
       },
     };

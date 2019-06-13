@@ -6,12 +6,16 @@
       </q-item>
     </q-list-header>
     <q-item-separator />
-    <ni-menu-item class="customer-menu-size" name="customer planning" icon="date range" label="Planning" />
+    <ni-menu-item class="customer-menu-size" name="customer agenda" icon="date range" label="Planning" />
     <q-item-separator />
     <ni-menu-item class="customer-menu-size" name="customer documents" icon="euro_symbol" label="Facturation" />
     <q-item-separator />
     <ni-menu-item class="customer-menu-size" name="customer subscription" icon="playlist_add" label="Abonnement" />
     <q-item-separator />
+    <template v-if="hasContracts">
+      <ni-menu-item class="customer-menu-size" name="customer contracts" icon="description" label="Contrats" />
+      <q-item-separator />
+    </template>
     <ni-side-menu-footer :label="user.identity.lastname" :userId="user._id" />
   </q-list>
 </template>
@@ -47,6 +51,11 @@ export default {
         }
       }
     }
+  },
+  computed: {
+    hasContracts () {
+      return this.user && this.user.customers && this.user.customers.length > 0 && this.user.customers[0].contracts && this.user.customers[0].contracts.length > 0;
+    },
   },
   mounted () {
     this.collapsibleOpening();

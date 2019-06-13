@@ -1,10 +1,14 @@
 import { alenviAxios } from './ressources/alenviAxios'
 import axios from 'axios'
+import qs from 'qs'
 
 export default {
   async showAll (params = null) {
     try {
-      const employeeIdRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users`, { params });
+      const employeeIdRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users`, {
+        params,
+        paramsSerializer: params => qs.stringify(params, { indices: false })
+      });
       return employeeIdRaw.data.data.users;
     } catch (e) {
       console.error(e.response);
@@ -12,7 +16,10 @@ export default {
   },
   async showAllActive (params = null) {
     try {
-      const employeeIdRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/active`, { params });
+      const employeeIdRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/active`, {
+        params,
+        paramsSerializer: params => qs.stringify(params, { indices: false })
+      });
       return employeeIdRaw.data.data.users;
     } catch (e) {
       console.error(e.response);
@@ -24,7 +31,7 @@ export default {
   },
   async create (data) {
     const newUser = await axios.post(`${process.env.API_HOSTNAME}/users`, data);
-    return newUser;
+    return newUser.data.data.user;
   },
   async deleteById (id) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/users/${id}`);
@@ -65,27 +72,6 @@ export default {
   async getTasks (userId) {
     const tasks = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/${userId}/tasks`);
     return tasks.data.data.tasks;
-  },
-  // Contracts
-  async createContract (queries, data) {
-    const contractCreated = await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${queries.userId}/contracts`, data);
-    return contractCreated;
-  },
-  async endContract (queries, payload) {
-    await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${queries.userId}/contracts/${queries.contractId}`, payload);
-  },
-  async getContracts (userId) {
-    const contracts = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/${userId}/contracts`);
-    return contracts.data.data.contracts;
-  },
-  // Contracts version
-  async updateContractVersion (queries, data) {
-    const versionUpdated = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${queries.userId}/contracts/${queries.contractId}/versions/${queries.versionId}`, data);
-    return versionUpdated;
-  },
-  async createContractVersion (queries, data) {
-    const versionCreated = await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${queries.userId}/contracts/${queries.mainContractId}/versions`, data);
-    return versionCreated;
   },
   // Absences
   async createAbsence (userId, payload) {

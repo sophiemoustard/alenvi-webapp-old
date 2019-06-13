@@ -1,10 +1,10 @@
 <template>
-  <q-select :value="value" color="white" :error="myError" inverted-light :stack-label="stackLabel" ref="selectSector" @change="updateSector"
-    :options="orderedSectors" @blur="blurHandler" filter filter-placeholder="Rechercher" separator :class="{border: inModal}" />
+  <q-select :value="value" color="white" :error="myError" inverted-light :stack-label="stackLabel" ref="selectSector"
+    @change="updateSector" :options="sectors" @blur="blurHandler" @focus="focusHandler" filter
+    filter-placeholder="Rechercher" separator :class="{border: inModal}" :company-id="companyId" />
 </template>
 
 <script>
-import _ from 'lodash';
 
 export default {
   name: 'SelectSector',
@@ -13,6 +13,8 @@ export default {
     stackLabel: String,
     myError: { type: String, default: null },
     inModal: { type: Boolean, default: false },
+    companyId: String,
+    allowNullOption: { type: Boolean, default: false },
   },
   data () {
     return {
@@ -23,23 +25,16 @@ export default {
     await this.getSectors();
   },
   computed: {
-    orderedSectors () {
-      return _.sortBy(this.sectors, ['value']);
-    },
+    currentUser () {
+      return this.$store.getters['main/user'];
+    }
   },
   methods: {
     async getSectors () {
       try {
-        const allSectorsRaw = await this.$ogust.getList('employee.sector');
-        for (const k in allSectorsRaw) {
-          if (k === '*') {
-            continue;
-          }
-          this.sectors.push({
-            label: allSectorsRaw[k],
-            value: k
-          });
-        }
+        const sectors = await this.$sectors.showAll({ company: this.currentUser.company._id });
+        if (this.allowNullOption) sectors.push({ name: 'Toutes les communautés', _id: '' });
+        this.sectors = this.$_.sortBy(sectors.map(sector => ({ label: sector.name, value: sector._id })), ['label']);
       } catch (e) {
         console.error(e);
       }
@@ -48,7 +43,10 @@ export default {
       this.$emit('input', value);
     },
     blurHandler () {
-      this.$emit('myBlur');
+      this.$emit('blur');
+    },
+    focusHandler () {
+      this.$emit('focus');
     }
   }
 };
