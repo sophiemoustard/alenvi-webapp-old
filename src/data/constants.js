@@ -89,9 +89,9 @@ export const WEEK_STATS = 'week_stats';
 export const PUBLIC_TRANSPORT = 'public';
 export const PRIVATE_TRANSPORT = 'private';
 export const TRANSPORT_OPTIONS = [
-  { label: 'Abonnement transports en commun', value: PUBLIC_TRANSPORT, ogustValue: 'C' },
-  { label: 'Voiture personnelle', value: PRIVATE_TRANSPORT, ogustValue: 'V' },
-  { label: 'Aucun', value: 'none', ogustValue: 'P' }
+  { label: 'Abonnement transports en commun', value: PUBLIC_TRANSPORT },
+  { label: 'Voiture personnelle', value: PRIVATE_TRANSPORT },
+  { label: 'Aucun', value: 'none' }
 ];
 export const TRANSIT = 'transit';
 export const DRIVING = 'driving';

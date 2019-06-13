@@ -3,7 +3,7 @@
     <div :class="[{ 'planning': !toggleDrawer, 'full-height' : true }]">
       <div class="row items-center planning-header">
         <div class="col-xs-12 col-md-5 auxiliary-name" v-if="Object.keys(selectedAuxiliary).length > 0">
-          <img :src="getAvatar(selectedAuxiliary.picture.link)" class="avatar">
+          <img :src="getAvatar(selectedAuxiliary)" class="avatar">
           <q-select filter :value="selectedAuxiliary._id" color="white" inverted-light :options="auxiliariesOptions"
             @input="updateAuxiliary" ref="auxiliarySelect" :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
             :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`" />
@@ -146,8 +146,8 @@ export default {
     this.setInternalHours();
   },
   methods: {
-    getAvatar (link) {
-      return link || DEFAULT_AVATAR;
+    getAvatar (aux) {
+      return aux.picture && aux.picture.link ? aux.picture.link : DEFAULT_AVATAR;
     },
     toggleAuxiliarySelect () {
       return this.$refs['auxiliarySelect'].show();
