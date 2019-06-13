@@ -72,16 +72,16 @@
               <q-icon name="clear" @click.native="surchargeDetailModal = false" /></span>
           </div>
         </div>
-        <div v-for="surchargePlanId in Object.keys(surchargeDetails)" :key="surchargePlanId" class="q-mb-xl">
+        <div v-for="(surchargePlanDetails, surchargePlanId) in surchargeDetails" :key="surchargePlanId" class="q-mb-xl">
           <div class="text-primary capitalize text-weight-bold q-mb-md">
-            {{ surchargeDetails[surchargePlanId].planName }}
+            {{ surchargePlanDetails.planName }}
           </div>
-          <div v-for="surcharge in Object.keys(getSurcharges(surchargeDetails[surchargePlanId]))" :key="surcharge"
+          <div v-for="(surchage, surchargeName) in getSurcharges(surchargePlanDetails)" :key="surchargeName"
             class="surcharge-line">
             <div class="surcharge-type q-pa-sm">
-              {{ SURCHARGES[surcharge] }} - {{ surchargeDetails[surchargePlanId][surcharge].percentage }}%
+              {{ SURCHARGES[surchargeName] }} - {{ surchage.percentage }}%
             </div>
-            <div class="q-pa-sm">{{ formatHours(surchargeDetails[surchargePlanId][surcharge].hours) }}</div>
+            <div class="q-pa-sm">{{ formatHours(surchage.hours) }}</div>
           </div>
         </div>
       </div>
