@@ -36,10 +36,10 @@
         </q-td>
       </q-tr>
     </q-table>
-    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une personne" @click="opened = true" />
+    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une personne" @click="auxiliaryCreationModal = true" />
 
     <!-- User creation modal -->
-    <q-modal v-model="opened" @hide="resetForm" content-classes="modal-container-sm">
+    <q-modal v-model="auxiliaryCreationModal" @hide="resetForm" content-classes="modal-container-sm">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-8">
@@ -47,7 +47,7 @@
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
             <span>
-              <q-icon name="clear" @click.native="opened = false" /></span>
+              <q-icon name="clear" @click.native="auxiliaryCreationModal = false" /></span>
           </div>
         </div>
         <ni-modal-select v-model="newUser.identity.title" :error="$v.newUser.identity.title.$error" :options="civilityOptions"
@@ -113,20 +113,13 @@ export default {
   mixins: [validationMixin],
   data () {
     return {
-      userCreated: null,
       tableLoading: true,
       loading: false,
-      opened: false,
+      auxiliaryCreationModal: false,
       sendWelcomeMsg: true,
       civilityOptions: [
-        {
-          label: 'Monsieur',
-          value: 'M.'
-        },
-        {
-          label: 'Madame',
-          value: 'Mme'
-        }
+        { label: 'Monsieur', value: 'M.' },
+        { label: 'Madame', value: 'Mme' }
       ],
       newUser: {
         identity: {
@@ -138,16 +131,11 @@ export default {
           address: { fullAddress: '' },
         },
         mobilePhone: '',
-        local: {
-          email: '',
-          password: ''
-        },
+        local: { email: '', password: '' },
         company: '',
         sector: '',
         administrative: {
-          transportInvoice: {
-            transportType: 'public'
-          }
+          transportInvoice: { transportType: 'public' },
         },
       },
       userList: [],
@@ -402,22 +390,19 @@ export default {
         const isValid = await this.waitForFormValidation(this.$v.newUser);
         if (!isValid) throw new Error('Invalid fields');
 
-        this.userCreated = await this.createAlenviUser();
+        const userCreated = await this.createAlenviUser();
         if (this.sendWelcomeMsg) {
-          await this.sendSms(this.userCreated._id);
+          await this.sendSms(userCreated._id);
         }
         await this.getUserList();
         NotifyPositive('Fiche auxiliaire créée');
-        this.opened = false;
+        this.auxiliaryCreationModal = false;
       } catch (e) {
-        console.error(e);
         if (e && e.response) {
           console.error(e.response);
-          if (e.response.status === 409) {
-            NotifyNegative('Email déjà existant');
-            return;
-          }
+          if (e.response.status === 409) return NotifyNegative('Email déjà existant');
         }
+        console.error(e);
         NotifyNegative('Erreur lors de la création de la fiche auxiliaire');
       } finally {
         this.loading = false;
