@@ -135,10 +135,8 @@ export default {
           title: '',
         },
         contact: {
-          addressId: '',
           address: { fullAddress: '' },
         },
-        employee_id: '',
         mobilePhone: '',
         local: {
           email: '',
@@ -386,7 +384,7 @@ export default {
       this.newUser.role = AUXILIARY;
       this.newUser.company = this.company.name;
       const newUser = await this.$users.create(this.newUser);
-      await this.$users.createDriveFolder({ _id: newUser.data.data.user._id });
+      await this.$users.createDriveFolder({ _id: newUser._id });
       return newUser;
     },
     async sendSms (newUserId) {
@@ -406,7 +404,7 @@ export default {
 
         this.userCreated = await this.createAlenviUser();
         if (this.sendWelcomeMsg) {
-          await this.sendSms(this.userCreated.data._id);
+          await this.sendSms(this.userCreated._id);
         }
         await this.getUserList();
         NotifyPositive('Fiche auxiliaire créée');
