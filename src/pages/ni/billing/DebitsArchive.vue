@@ -58,6 +58,11 @@ export default {
       }
     }
   },
+  computed: {
+    user () {
+      return this.$store.getters['main/user'];
+    }
+  },
   async mounted () {
     await this.getWithdrawals();
   },
@@ -67,7 +72,7 @@ export default {
     },
     async getWithdrawals () {
       try {
-        this.withdrawals = await this.$gdrive.getList({ folderId: process.env.GOOGLE_DRIVE_WITHDRAWAL_FOLDER_ID });
+        this.withdrawals = await this.$gdrive.getList({ folderId: this.user.company.withdrawalFolderId });
       } catch (e) {
         this.withdrawals = [];
         console.error(e);
