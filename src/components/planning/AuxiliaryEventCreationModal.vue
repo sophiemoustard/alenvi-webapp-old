@@ -20,7 +20,7 @@
         @input="resetForm(true, newEvent.type)" />
       <template v-if="newEvent.type !== ABSENCE">
         <ni-datetime-range caption="Dates et heures de l'évènement" v-model="newEvent.dates" required-field
-          :error="validations.dates.$error" @blur="validations.dates.$touch" />
+          :error="validations.dates.$error" @blur="validations.dates.$touch" disable-end-date />
       </template>
       <template v-if="newEvent.type === INTERVENTION">
         <ni-modal-select caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions"
