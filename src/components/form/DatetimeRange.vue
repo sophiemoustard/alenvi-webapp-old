@@ -73,7 +73,16 @@ export default {
       return selectOptions;
     },
     hasError () {
-      return this.error || this.$v.value.startDate.$error || this.$v.value.startHour.$error || this.$v.value.endDate.$error || this.$v.value.endHour.$error;
+      if (this.error || this.$v.value.startDate.$error || this.$v.value.startHour.$error || this.$v.value.endDate.$error || this.$v.value.endHour.$error) {
+        return true;
+      }
+
+      const startTime = this.value.startHour.split(':')
+      const startDatetime = this.$moment(this.value.startDate).hours(startTime[0]).minutes(startTime[1]);
+      const endTime = this.value.endHour.split(':')
+      const endDatetime = this.$moment(this.value.endDate).hours(endTime[0]).minutes(endTime[1]);
+
+      return startDatetime.isAfter(endDatetime);
     },
     endHourOptions () {
       return this.hoursOptions.map(option => {
@@ -91,7 +100,9 @@ export default {
       const dates = { ...this.value, [key]: value }
       if (key === 'startDate') dates.endDate = value;
       if (key === 'startHour' && this.$moment(value, 'HH:mm').isSameOrAfter(this.$moment(this.value.endHour, 'HH:mm'))) {
-        dates.endHour = this.$moment(value, 'HH:mm').add(2, 'H').format('HH:mm');
+        const startHour = this.$moment(value, 'HH:mm');
+        const max = this.$moment(startHour).endOf('d');
+        dates.endHour = this.$moment.min(startHour.add(2, 'H'), max).format('HH:mm');
       }
 
       this.$emit('input', dates);
