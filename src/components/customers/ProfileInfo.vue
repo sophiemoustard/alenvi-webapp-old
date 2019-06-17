@@ -1036,11 +1036,6 @@ export default {
         console.error(e);
       }
     },
-    isHourlyService (serviceId) {
-      if (!serviceId) return true;
-      const correspondingService = this.services.find(service => service._id === serviceId);
-      return correspondingService ? correspondingService.nature === FIXED : true;
-    },
     // Helpers
     resetHelperForm () {
       this.$v.newHelper.$reset();
