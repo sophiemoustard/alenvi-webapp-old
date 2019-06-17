@@ -177,13 +177,13 @@ export default {
       try {
         if (!params) {
           params = {
-            endDate: this.billingDates.endDate,
-            billingStartDate: this.billingDates.startDate,
+            endDate: this.$moment(this.billingDates.endDate).endOf('d').toISOString(),
+            billingStartDate: this.$moment(this.billingDates.startDate).startOf('d').toISOString(),
             billingPeriod: this.user.company.customersConfig.billingPeriod,
           }
         }
-        if (!params.billingStartDate) params.billingStartDate = this.billingDates.startDate;
-        if (!params.endDate) params.endDate = this.billingDates.endDate;
+        if (!params.billingStartDate) params.billingStartDate = this.$moment(this.billingDates.startDate).startOf('d').toISOString();
+        if (!params.endDate) params.endDate = this.$moment(this.billingDates.endDate).endOf('d').toISOString();
         if (!params.billingPeriod) params.billingPeriod = this.user.company.customersConfig.billingPeriod;
 
         this.tableLoading = true;
@@ -232,8 +232,8 @@ export default {
         const { startDate, endDate } = bill;
         const draftBills = await this.$bills.getDraftBills({
           billingStartDate: startDate,
-          startDate,
-          endDate,
+          startDate: this.$moment(startDate).startOf('d').toISOString(),
+          endDate: this.$moment(endDate).endOf('d').toISOString(),
           billingPeriod: this.user.company.customersConfig.billingPeriod,
           customer: customer._id
         });
