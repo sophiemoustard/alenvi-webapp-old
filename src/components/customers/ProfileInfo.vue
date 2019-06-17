@@ -983,7 +983,6 @@ export default {
     },
     startSubscriptionEdition (id) {
       const selectedSubscription = this.subscriptions.find(sub => sub._id === id);
-      console.log('selected subs', selectedSubscription);
       const { _id, service, unitTTCRate, estimatedWeeklyVolume, evenings, sundays } = selectedSubscription;
       this.editedSubscription = {
         _id,
