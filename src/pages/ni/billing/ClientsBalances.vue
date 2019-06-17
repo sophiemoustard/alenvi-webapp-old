@@ -131,7 +131,7 @@ export default {
       return `${customer.identity.firstname ? `${customer.identity.firstname.charAt(0, 1)}. ` : ''}${customer.identity.lastname}`;
     },
     goToCustomerBillingPage (customerId) {
-      this.$router.replace({ name: 'customers profile', params: { id: customerId, defaultTab: 'billing' } });
+      this.$router.push({ name: 'customers profile', params: { id: customerId, defaultTab: 'billing' } });
     },
     selectRows (oldValue) {
       if (oldValue) this.selected = [];
