@@ -976,7 +976,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.data.statusCode === 409) return NotifyNegative(e.data.message);
-        NotifyNegative("Erreur lors de l'ajout d'un souscription");
+        NotifyNegative("Erreur lors de l'ajout d'une souscription");
       } finally {
         this.loading = false;
       }
@@ -1016,7 +1016,7 @@ export default {
         NotifyPositive('Souscription modifiée');
       } catch (e) {
         console.error(e);
-        NotifyNegative("Erreur lors de la modification d'un souscription")
+        NotifyNegative("Erreur lors de la modification d'une souscription")
       } finally {
         this.loading = false;
       }
