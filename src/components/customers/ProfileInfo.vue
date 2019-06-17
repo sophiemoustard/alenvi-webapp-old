@@ -969,7 +969,6 @@ export default {
         this.loading = true;
         const payload = this.formatCreatedSubscription();
         await this.$customers.addSubscription(this.customer._id, payload);
-        this.resetCreationSubscriptionData();
         await this.refreshCustomer();
         this.subscriptionCreationModal = false;
         NotifyPositive('Souscription ajoutée');
@@ -996,7 +995,6 @@ export default {
       this.subscriptionEditionModal = true;
     },
     resetEditionSubscriptionData () {
-      this.subscriptionEditionModal = false;
       this.editedSubscription = {};
       this.$v.editedSubscription.$reset();
     },
@@ -1011,8 +1009,8 @@ export default {
         delete payload._id;
         delete payload.nature;
         await this.$customers.updateSubscription({ _id: this.customer._id, subscriptionId }, payload);
-        this.resetEditionSubscriptionData();
         this.refreshCustomer();
+        this.subscriptionEditionModal = false;
         NotifyPositive('Souscription modifiée');
       } catch (e) {
         console.error(e);
