@@ -3,7 +3,8 @@
     @click="openIndicatorsModal">
     <img :src="getAvatar(person.picture)" class="avatar">
     <q-chip v-if="hasActiveCompanyContractOnEvent" :class="['absolute-center', { 'busy': isBusy }]" small text-color="white">
-      <span class="chip-indicator">{{ ratio.weeklyHours }}h / {{ ratio.contractHours }}</span>
+      <q-spinner-dots v-if="loading" />
+      <span v-else class="chip-indicator">{{ ratio.weeklyHours }}h / {{ ratio.contractHours }}</span>
     </q-chip>
 
     <!-- Indicators modal -->
@@ -52,6 +53,7 @@ export default {
   },
   data () {
     return {
+      loading: false,
       ratio: { weeklyHours: 0, contractHours: 0 },
       indicatorsModal: false,
       tabsContent: [
@@ -133,8 +135,16 @@ export default {
       this.computeIndicatorsFromEvents();
     },
     async getRatio () {
-      await this.computeIndicators();
-      this.ratio = { weeklyHours: Math.round(this.totalWorkingHours), contractHours: this.getContractHours() };
+      try {
+        this.loading = true;
+        this.ratio = { weeklyHours: 0, contractHours: 0 };
+        await this.computeIndicators();
+        this.ratio = { weeklyHours: Math.round(this.totalWorkingHours), contractHours: this.getContractHours() };
+      } catch (e) {
+        this.ratio = { weeklyHours: 0, contractHours: 0 };
+      } finally {
+        this.loading = false;
+      }
     },
     async openIndicatorsModal () {
       if (!this.hasActiveCompanyContractOnEvent) return;

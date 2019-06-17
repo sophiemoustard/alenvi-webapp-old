@@ -4,7 +4,7 @@
       <div class="planning-month col-xs-6 col-md-6" @click="datimeModal = !datimeModal">
         <span class="capitalize">{{ timelineTitle }}</span>
         <q-icon name="arrow_drop_down" />
-        <q-popover v-model="datimeModal">
+        <q-popover v-model="datimeModal" self="top middle" anchor="bottom middle">
           <q-datetime-picker minimal @input="goToWeek" :value="targetDate" />
         </q-popover>
       </div>
