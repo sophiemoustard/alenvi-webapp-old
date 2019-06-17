@@ -36,6 +36,7 @@
 import AuxiliaryIndicators from '../AuxiliaryIndicators';
 import { DEFAULT_AVATAR, ABSENCE, INTERVENTION, INTERNAL_HOUR, TRANSIT, DRIVING, PUBLIC_TRANSPORT, WEEK_STATS, COMPANY_CONTRACT, DEATH, BIRTH, WEDDING, PAID_LEAVE } from '../../data/constants.js';
 import googleMaps from '../../api/GoogleMaps';
+import { getPaidTransport } from '../../helpers/planning';
 
 export default {
   name: 'ChipAuxiliaryIndicator',
@@ -155,7 +156,7 @@ export default {
       let weeklyBreak = 0;
       for (const info of this.breakInfo) {
         if (info.timeBetween) weeklyBreak += info.timeBetween;
-        if (!info.isFirstOrLast) weeklyPaidTransports += (info.timeBetween > info.transportDuration + 15) ? info.transportDuration : info.timeBetween;
+        if (!info.isFirstOrLast) weeklyPaidTransports += getPaidTransport(info.transportDuration, info.timeBetween);
       };
 
       this.weeklyBreak = weeklyBreak / 60;
