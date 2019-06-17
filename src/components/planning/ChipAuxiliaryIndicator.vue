@@ -135,11 +135,16 @@ export default {
       this.computeIndicatorsFromEvents();
     },
     async getRatio () {
-      this.loading = true;
-      this.ratio = { weeklyHours: 0, contractHours: 0 };
-      await this.computeIndicators();
-      this.ratio = { weeklyHours: Math.round(this.totalWorkingHours), contractHours: this.getContractHours() };
-      this.loading = false;
+      try {
+        this.loading = true;
+        this.ratio = { weeklyHours: 0, contractHours: 0 };
+        await this.computeIndicators();
+        this.ratio = { weeklyHours: Math.round(this.totalWorkingHours), contractHours: this.getContractHours() };
+      } catch (e) {
+        this.ratio = { weeklyHours: 0, contractHours: 0 };
+      } finally {
+        this.loading = false;
+      }
     },
     async openIndicatorsModal () {
       if (!this.hasActiveCompanyContractOnEvent) return;
