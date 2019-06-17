@@ -30,7 +30,7 @@ export default {
   props: {
     caption: { type: String, default: '' },
     error: Boolean,
-    value: { type: Object, default: function () { return { startDate: this.$moment().toISOString(), endDate: this.$moment().toISOString() } } },
+    value: { type: Object, default: function () { return { startDate: this.$moment().startOf('d').toISOString(), endDate: this.$moment().endOf('d').toISOString() } } },
     requiredField: { type: Boolean, default: false },
     borderless: { type: Boolean, default: false },
   },
@@ -60,7 +60,7 @@ export default {
     update (value, key) {
       const dates = { ...this.value, [key]: value }
       if (key === 'startDate' && moment(dates.startDate).isAfter(dates.endDate)) {
-        dates.endDate = dates.startDate;
+        dates.endDate = this.$moment(dates.startDate).endOf('d').toISOString();
       }
       this.$emit('blur');
       this.$emit('input', dates);

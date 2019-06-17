@@ -17,7 +17,7 @@
               <q-icon name="clear" @click.native="creationModal = false" /></span>
           </div>
         </div>
-        <ni-datetime-range caption="Dates et heures de l'intervention" v-model="newEvent.dates" required-field />
+        <ni-datetime-range caption="Dates et heures de l'intervention" v-model="newEvent.dates" required-field disable-end-date />
         <ni-modal-select caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions" :error="$v.newEvent.auxiliary.$error"
           required-field @blur="$v.newEvent.auxiliary.$touch" @input="setSector" />
         <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions(newEvent.customer)"
@@ -50,7 +50,7 @@
           <q-btn icon="delete" no-caps flat color="grey" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()"
             v-if="!isDisabled" />
         </div>
-        <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" :disable="isDisabled" />
+        <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" :disable="isDisabled" disable-end-date />
         <ni-modal-select caption="Auxiliaire" v-model="editedEvent.auxiliary" :options="auxiliariesOptions" :error="$v.editedEvent.auxiliary.$error"
           required-field @input="setSector" :disable="isDisabled" />
         <ni-modal-select caption="Service" v-model="editedEvent.subscription" :options="customerSubscriptionsOptions(editedEvent.customer._id)"

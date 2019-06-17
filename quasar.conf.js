@@ -118,6 +118,7 @@ module.exports = function (ctx) {
         'QCheckbox',
         'QRadio',
         'QSpinner',
+        'QSpinnerDots',
         'QPopover',
         'QDatetime',
         'QDatetimePicker',

@@ -256,9 +256,9 @@
         <ni-modal-input v-model="newSubscription.estimatedWeeklyVolume" :error="$v.newSubscription.estimatedWeeklyVolume.$error"
           caption="Volume hebdomadaire estimatif" @blur="$v.newSubscription.estimatedWeeklyVolume.$touch" type="number"
           required-field />
-        <ni-modal-input v-if="newSubscription.nature !== 'Forfaitaire'" v-model="newSubscription.sundays" caption="Dont dimanche (h)"
+        <ni-modal-input v-if="newSubscription.service.nature !== FIXED" v-model="newSubscription.sundays" caption="Dont dimanche (h)"
           type="number" />
-        <ni-modal-input v-if="newSubscription.nature !== 'Forfaitaire'" v-model="newSubscription.evenings" caption="Dont soirée (h)"
+        <ni-modal-input v-if="newSubscription.service.nature !== FIXED" v-model="newSubscription.evenings" caption="Dont soirée (h)"
           last type="number" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter une souscription" icon-right="add" color="primary"
@@ -282,9 +282,9 @@
         <ni-modal-input v-model="editedSubscription.estimatedWeeklyVolume" :error="$v.editedSubscription.estimatedWeeklyVolume.$error"
           caption="Volume hebdomadaire estimatif" @blur="$v.editedSubscription.estimatedWeeklyVolume.$touch" type="number"
           required-field />
-        <ni-modal-input v-if="editedSubscription.nature !== 'Forfaitaire'" v-model="editedSubscription.sundays" caption="Dont dimanche (h)"
+        <ni-modal-input v-if="editedSubscription.nature !== FIXED" v-model="editedSubscription.sundays" caption="Dont dimanche (h)"
           type="number" />
-        <ni-modal-input v-if="editedSubscription.nature !== 'Forfaitaire'" v-model="editedSubscription.evenings"
+        <ni-modal-input v-if="editedSubscription.nature !== FIXED" v-model="editedSubscription.evenings"
           caption="Dont soirée (h)" last type="number" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Editer la souscription" icon-right="check" color="primary"
@@ -486,6 +486,7 @@ export default {
   mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin, fundingMixin, validationMixin],
   data () {
     return {
+      FIXED,
       days,
       loading: false,
       addHelper: false,
@@ -688,7 +689,7 @@ export default {
 
       return availableServices.map(service => ({
         label: this.getServiceLastVersion(service).name,
-        value: service._id,
+        value: { _id: service._id, nature: service.nature },
       }));
     },
     userProfile () {
@@ -945,7 +946,7 @@ export default {
     // Subscriptions
     formatCreatedSubscription () {
       const { service, unitTTCRate, estimatedWeeklyVolume, sundays, evenings } = this.newSubscription;
-      const formattedService = { service, versions: [{ unitTTCRate, estimatedWeeklyVolume }] }
+      const formattedService = { service: service._id, versions: [{ unitTTCRate, estimatedWeeklyVolume }] }
 
       if (sundays) formattedService.versions[0].sundays = sundays;
       if (evenings) formattedService.versions[0].evenings = evenings;
@@ -968,14 +969,13 @@ export default {
         this.loading = true;
         const payload = this.formatCreatedSubscription();
         await this.$customers.addSubscription(this.customer._id, payload);
-        this.resetCreationSubscriptionData();
         await this.refreshCustomer();
         this.subscriptionCreationModal = false;
         NotifyPositive('Souscription ajoutée');
       } catch (e) {
         console.error(e);
         if (e.data.statusCode === 409) return NotifyNegative(e.data.message);
-        NotifyNegative("Erreur lors de l'ajout d'un souscription");
+        NotifyNegative("Erreur lors de l'ajout d'une souscription");
       } finally {
         this.loading = false;
       }
@@ -995,7 +995,6 @@ export default {
       this.subscriptionEditionModal = true;
     },
     resetEditionSubscriptionData () {
-      this.subscriptionEditionModal = false;
       this.editedSubscription = {};
       this.$v.editedSubscription.$reset();
     },
@@ -1010,12 +1009,12 @@ export default {
         delete payload._id;
         delete payload.nature;
         await this.$customers.updateSubscription({ _id: this.customer._id, subscriptionId }, payload);
-        this.resetEditionSubscriptionData();
         this.refreshCustomer();
+        this.subscriptionEditionModal = false;
         NotifyPositive('Souscription modifiée');
       } catch (e) {
         console.error(e);
-        NotifyNegative("Erreur lors de la modification d'un souscription")
+        NotifyNegative("Erreur lors de la modification d'une souscription")
       } finally {
         this.loading = false;
       }

@@ -26,7 +26,7 @@
       </div>
       <template v-if="editedEvent.type !== ABSENCE">
         <ni-datetime-range caption="Dates et heures de l'évènement" v-model="editedEvent.dates" required-field
-          :disable="isDisabled" :error="validations.dates.$error" @blur="validations.dates.$touch" />
+          :disable="isDisabled" :error="validations.dates.$error" @blur="validations.dates.$touch" disable-end-date />
       </template>
       <template v-if="editedEvent.type === INTERVENTION">
         <ni-modal-select caption="Bénéficiaire" v-model="editedEvent.customer._id" :options="customersOptions"
