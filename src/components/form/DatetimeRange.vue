@@ -77,8 +77,11 @@ export default {
         return true;
       }
 
-      const startDatetime = this.$moment(`${this.value.startDate.slice(0, 10)}T${this.value.startHour}`);
-      const endDatetime = this.$moment(`${this.value.endDate.slice(0, 10)}T${this.value.endHour}`);
+      const startTime = this.value.startHour.split(':')
+      const startDatetime = this.$moment(this.value.startDate).hours(startTime[0]).minutes(startTime[1]);
+      const endTime = this.value.endHour.split(':')
+      const endDatetime = this.$moment(this.value.endDate).hours(endTime[0]).minutes(endTime[1]);
+
       return startDatetime.isAfter(endDatetime);
     },
     endHourOptions () {
