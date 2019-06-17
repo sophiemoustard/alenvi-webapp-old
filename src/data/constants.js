@@ -34,6 +34,7 @@ export const PAID_LEAVE = 'leave';
 export const WEDDING = 'wedding';
 export const BIRTH = 'birth';
 export const DEATH = 'death';
+export const WORK_ACCIDENT = 'work accident';
 export const ABSENCE_TYPES = [
   { label: 'Congé', value: PAID_LEAVE },
   { label: 'Congé sans solde', value: 'unpaid leave' },
@@ -43,6 +44,7 @@ export const ABSENCE_TYPES = [
   { label: 'Mariage', value: WEDDING },
   { label: 'Naissance', value: BIRTH },
   { label: 'Décès', value: DEATH },
+  { label: 'Accident du travail', value: WORK_ACCIDENT },
 ];
 export const EDITION = 'edition';
 export const DELETION = 'deletion';
