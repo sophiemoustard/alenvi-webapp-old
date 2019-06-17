@@ -24,6 +24,7 @@
 
 <script>
 import { openURL } from 'quasar';
+import { NotifyNegative } from '../../../components/popup/notify'
 
 export default {
   name: 'DebitArchive',
@@ -72,10 +73,12 @@ export default {
     },
     async getWithdrawals () {
       try {
+        if (!this.user.company && !this.user.company.withdrawalFolderId) return NotifyNegative('Dossier de prélèvement manquant');
         this.withdrawals = await this.$gdrive.getList({ folderId: this.user.company.withdrawalFolderId });
       } catch (e) {
         this.withdrawals = [];
         console.error(e);
+        NotifyNegative("Erreur lors de la récupération des prélèvements d'archive");
       }
     }
   }
