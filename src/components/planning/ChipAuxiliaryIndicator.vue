@@ -150,12 +150,18 @@ export default {
       }
     },
     // Compute indicators
+    /**
+     * Considering 2 events, we pay the transport duration when :
+     * 1. transport duration is smaller than time between those events
+     * 2. the time between those events is greater than transort duration + 15 minutes
+     * Otherwise, we pay the time between those events
+     */
     computeIndicatorsFromBreakInfo () {
       let weeklyPaidTransports = 0;
       let weeklyBreak = 0;
       for (const info of this.breakInfo) {
         if (info.timeBetween) weeklyBreak += info.timeBetween;
-        if (!info.isFirstOrLast) weeklyPaidTransports += (info.timeBetween > info.transportDuration + 15) ? info.transportDuration : info.timeBetween;
+        if (!info.isFirstOrLast) weeklyPaidTransports += (info.timeBetween > info.transportDuration + 15 || info.timeBetween < info.transportDuration) ? info.transportDuration : info.timeBetween;
       };
 
       this.weeklyBreak = weeklyBreak / 60;
