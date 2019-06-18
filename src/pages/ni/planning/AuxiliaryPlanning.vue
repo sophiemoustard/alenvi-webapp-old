@@ -1,6 +1,6 @@
 <template>
   <q-page class="neutral-background">
-    <ni-planning-manager :events="events" :persons="getActiveAuxiliaries()" @updateStartOfWeek="updateStartOfWeek"
+    <ni-planning-manager :events="events" :persons="activeAuxiliaries" @updateStartOfWeek="updateStartOfWeek"
       @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop" />
 
     <!-- Event creation modal -->
@@ -154,6 +154,10 @@ export default {
       }
       return { picture: {}, identity: { lastname: '' } };
     },
+    activeAuxiliaries () {
+      return this.auxiliaries.filter(aux => this.hasActiveCustomerContractOnEvent(aux, this.startOfWeek, this.endOfWeek()) ||
+        this.hasActiveCompanyContractOnEvent(aux, this.startOfWeek, this.endOfWeek()));
+    }
   },
   methods: {
     ...mapActions({
@@ -189,10 +193,6 @@ export default {
       } catch (e) {
         this.customers = [];
       }
-    },
-    getActiveAuxiliaries () {
-      return this.auxiliaries.filter(aux => this.hasActiveCustomerContractOnEvent(aux, this.startOfWeek, this.endOfWeek()) ||
-        this.hasActiveCompanyContractOnEvent(aux, this.startOfWeek, this.endOfWeek()));
     },
     // Event creation
     openCreationModal (vEvent) {
