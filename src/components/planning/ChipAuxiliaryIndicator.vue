@@ -216,7 +216,7 @@ export default {
     },
     async getTransportDuration (origins, destinations) {
       let distanceMatrix = this.distanceMatrix
-        .find(dm => dm.origin === origins && dm.destination === destinations && dm.mode === this.transportMode);
+        .find(dm => dm.origins === origins && dm.destinations === destinations && dm.mode === this.transportMode);
       if (!distanceMatrix) {
         distanceMatrix = await googleMaps.getDistanceMatrix({ origins, destinations, mode: this.transportMode });
       }
