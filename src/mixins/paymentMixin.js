@@ -1,5 +1,5 @@
 import { required } from 'vuelidate/lib/validators';
-import { PAYMENT, WITHDRAWAL, PAYMENT_OPTIONS } from '../data/constants';
+import { PAYMENT, DIRECT_DEBIT, PAYMENT_OPTIONS } from '../data/constants';
 
 export const paymentMixin = {
   data () {
@@ -9,7 +9,7 @@ export const paymentMixin = {
       selectedCustomer: { identity: {} },
       selectedClientName: '',
       PAYMENT,
-      WITHDRAWAL,
+      DIRECT_DEBIT,
       PAYMENT_OPTIONS,
       newPayment: {
         nature: PAYMENT,

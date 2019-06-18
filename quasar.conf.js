@@ -81,7 +81,6 @@ module.exports = function (ctx) {
         CLOUDINARY_API_SECRET: JSON.stringify(process.env.CLOUDINARY_API_SECRET),
         CLOUDINARY_CLOUD_NAME: JSON.stringify(process.env.CLOUDINARY_CLOUD_NAME),
         GA_TRACKING_ID: JSON.stringify(process.env.GA_TRACKING_ID),
-        GOOGLE_DRIVE_WITHDRAWAL_FOLDER_ID: JSON.stringify(process.env.GOOGLE_DRIVE_WITHDRAWAL_FOLDER_ID),
       }
     },
     devServer: {

@@ -5,7 +5,7 @@
     </div>
     <div class="q-pa-sm">
       <q-card class="q-mb-xl neutral-background" flat>
-        <q-table :data="withdrawals" :columns="columns" binary-state-sort :pagination.sync="pagination" hide-bottom>
+        <q-table :data="directDebits" :columns="columns" binary-state-sort :pagination.sync="pagination" hide-bottom>
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
               <template v-if="col.name === 'download'">
@@ -31,7 +31,7 @@ export default {
   metaInfo: { title: 'Archive prélèvements' },
   data () {
     return {
-      withdrawals: [],
+      directDebits: [],
       columns: [
         {
           name: 'name',
@@ -73,10 +73,10 @@ export default {
     },
     async getWithdrawals () {
       try {
-        if (!this.user.company || !this.user.company.withdrawalFolderId) return NotifyNegative('Dossier de prélèvement manquant');
-        this.withdrawals = await this.$gdrive.getList({ folderId: this.user.company.withdrawalFolderId });
+        if (!this.user.company || !this.user.company.directDebitsFolderId) return NotifyNegative('Dossier de prélèvement manquant');
+        this.directDebits = await this.$gdrive.getList({ folderId: this.user.company.directDebitsFolderId });
       } catch (e) {
-        this.withdrawals = [];
+        this.directDebits = [];
         console.error(e);
         NotifyNegative("Erreur lors de la récupération des prélèvements d'archive");
       }
