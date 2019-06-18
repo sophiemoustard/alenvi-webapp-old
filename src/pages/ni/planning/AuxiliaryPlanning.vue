@@ -48,7 +48,6 @@ export default {
       events: [],
       customers: [],
       auxiliaries: [],
-      startDate: '',
       internalHours: [],
       // Filters
       filteredSectors: [],
@@ -59,6 +58,7 @@ export default {
       // Event edition
       editedEvent: {},
       editionModal: false,
+      startOfWeekAsString: null,
     };
   },
   validations () {
@@ -155,8 +155,8 @@ export default {
       return { picture: {}, identity: { lastname: '' } };
     },
     activeAuxiliaries () {
-      return this.auxiliaries.filter(aux => this.hasActiveCustomerContractOnEvent(aux, this.startOfWeek, this.endOfWeek()) ||
-        this.hasActiveCompanyContractOnEvent(aux, this.startOfWeek, this.endOfWeek()));
+      return this.auxiliaries.filter(aux => this.hasActiveCustomerContractOnEvent(aux, this.$moment(this.startOfWeekAsString), this.endOfWeek()) ||
+        this.hasActiveCompanyContractOnEvent(aux, this.$moment(this.startOfWeekAsString), this.endOfWeek()));
     }
   },
   methods: {
@@ -165,13 +165,13 @@ export default {
     }),
     // Dates
     endOfWeek () {
-      return this.$moment(this.startOfWeek).add(6, 'd');
+      return this.$moment(this.startOfWeekAsString).add(6, 'd');
     },
     async updateStartOfWeek (vEvent) {
       const { startOfWeek } = vEvent;
-      this.startOfWeek = startOfWeek;
+      this.startOfWeekAsString = startOfWeek.toISOString();
 
-      const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
+      const range = this.$moment.range(this.startOfWeekAsString, this.$moment(this.startOfWeekAsString).add(6, 'd'));
       this.days = Array.from(range.by('days'));
       if (this.auxiliaries && this.auxiliaries.length) await this.refresh();
     },
@@ -179,7 +179,7 @@ export default {
     async refresh () {
       try {
         this.events = await this.$events.list({
-          startDate: this.startOfWeek.format('YYYYMMDD'),
+          startDate: this.$moment(this.startOfWeekAsString).format('YYYYMMDD'),
           endDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
           auxiliary: JSON.stringify(this.auxiliaries.map(aux => aux._id))
         });
