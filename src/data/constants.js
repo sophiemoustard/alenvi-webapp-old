@@ -140,12 +140,12 @@ export const BILL = 'bill';
 export const CREDIT_NOTE = 'creditNote';
 
 // Payments
-export const WITHDRAWAL = 'withdrawal';
+export const DIRECT_DEBIT = 'direct_debit';
 export const BANK_TRANSFER = 'bank_transfer';
 export const CHECK = 'check';
 export const CESU = 'cesu';
 export const PAYMENT_OPTIONS = [
-  { label: 'Prélèvement', value: WITHDRAWAL },
+  { label: 'Prélèvement', value: DIRECT_DEBIT },
   { label: 'Virement', value: BANK_TRANSFER },
   { label: 'Chèque', value: CHECK },
   { label: 'CESU', value: CESU },
