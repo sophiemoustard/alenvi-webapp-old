@@ -65,13 +65,13 @@ export default {
     }
   },
   async mounted () {
-    await this.getWithdrawals();
+    await this.getDirectDebits();
   },
   methods: {
     goToUrl (url) {
       openURL(url);
     },
-    async getWithdrawals () {
+    async getDirectDebits () {
       try {
         if (!this.user.company || !this.user.company.directDebitsFolderId) return NotifyNegative('Dossier de prélèvement manquant');
         this.directDebits = await this.$gdrive.getList({ folderId: this.user.company.directDebitsFolderId });
