@@ -155,18 +155,18 @@ export default {
       return { picture: {}, identity: { lastname: '' } };
     },
     activeAuxiliaries () {
-      return this.auxiliaries.filter(aux => this.hasActiveCustomerContractOnEvent(aux, this.$moment(this.startOfWeekAsString), this.endOfWeek()) ||
-        this.hasActiveCompanyContractOnEvent(aux, this.$moment(this.startOfWeekAsString), this.endOfWeek()));
-    }
+      return this.auxiliaries.filter(aux => this.hasActiveCustomerContractOnEvent(aux, this.$moment(this.startOfWeekAsString), this.endOfWeek) ||
+        this.hasActiveCompanyContractOnEvent(aux, this.$moment(this.startOfWeekAsString), this.endOfWeek));
+    },
+    endOfWeek () {
+      return this.$moment(this.startOfWeekAsString).add(6, 'd');
+    },
   },
   methods: {
     ...mapActions({
       fillFilter: 'planning/fillFilter',
     }),
     // Dates
-    endOfWeek () {
-      return this.$moment(this.startOfWeekAsString).add(6, 'd');
-    },
     async updateStartOfWeek (vEvent) {
       const { startOfWeek } = vEvent;
       this.startOfWeekAsString = startOfWeek.toISOString();
@@ -180,7 +180,7 @@ export default {
       try {
         this.events = await this.$events.list({
           startDate: this.$moment(this.startOfWeekAsString).format('YYYYMMDD'),
-          endDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
+          endDate: this.endOfWeek.add(1, 'd').format('YYYYMMDD'),
           auxiliary: JSON.stringify(this.auxiliaries.map(aux => aux._id))
         });
       } catch (e) {
