@@ -47,8 +47,7 @@ export default {
   props: {
     person: { type: Object, default: () => ({ picture: { link: '' }, administrative: {}, contracts: [] }) },
     events: { type: Array, default: () => [] },
-    startOfWeek: { type: Object, default: () => ({}) },
-    endOfWorkingWeek: { type: Object, default: () => ({}) }, // Saturday
+    startOfWeekAsString: { type: String, default: '' },
     distanceMatrix: { type: Array, default: () => [] },
   },
   data () {
@@ -75,12 +74,15 @@ export default {
     isBusy () {
       return this.ratio.contractHours !== 0 && this.ratio.weeklyHours > this.ratio.contractHours;
     },
+    endOfWeek () {
+      return this.$moment(this.startOfWeekAsString).add(6, 'd').toISOString();
+    },
     days () {
       let range;
-      if (this.selectedTab === WEEK_STATS) range = this.$moment.range(this.startOfWeek, this.endOfWorkingWeek);
+      if (this.selectedTab === WEEK_STATS) range = this.$moment.range(this.startOfWeekAsString, this.endOfWeek);
       else {
-        const start = this.$moment(this.startOfWeek).startOf('month');
-        const end = this.$moment(this.startOfWeek).endOf('month');
+        const start = this.$moment(this.startOfWeekAsString).startOf('month');
+        const end = this.$moment(this.startOfWeekAsString).endOf('month');
         range = this.$moment.range(start, end);
       }
       return Array.from(range.by('days'));
@@ -100,10 +102,10 @@ export default {
       const companyContracts = this.person.contracts.filter(contract => contract.status === COMPANY_CONTRACT);
 
       return companyContracts.some(contract => {
-        return (this.$moment(contract.startDate).isSameOrBefore(this.endOfWorkingWeek) &&
-          ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(this.endOfWorkingWeek))) ||
-          (this.$moment(contract.startDate).isSameOrBefore(this.startOfWeek) &&
-          ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(this.startOfWeek)));
+        return (this.$moment(contract.startDate).isSameOrBefore(this.endOfWeek) &&
+          ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(this.endOfWeek))) ||
+          (this.$moment(contract.startDate).isSameOrBefore(this.startOfWeekAsString) &&
+          ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(this.startOfWeekAsString)));
       });
     },
     companyContracts () {
@@ -150,8 +152,8 @@ export default {
       if (!this.hasActiveCompanyContractOnEvent) return;
       try {
         this.monthEvents = await this.$events.list({
-          startDate: this.$moment(this.startOfWeek).startOf('month').format('YYYYMMDD'),
-          endDate: this.$moment(this.startOfWeek).endOf('month').add(1, 'd').format('YYYYMMDD'),
+          startDate: this.$moment(this.startOfWeekAsString).startOf('month').format('YYYYMMDD'),
+          endDate: this.$moment(this.startOfWeekAsString).endOf('month').add(1, 'd').format('YYYYMMDD'),
           auxiliary: this.person._id,
         });
       } catch (e) {
@@ -246,22 +248,6 @@ export default {
       };
     },
     // Compute contract hours
-    getAbsencesOnDay (day) {
-      const absences = this.events.filter(event =>
-        event.type === ABSENCE && day.isSameOrAfter(event.startDate, 'd') && day.isSameOrBefore(event.endDate, 'd')
-      );
-
-      let morning = false;
-      let afternoon = false;
-      if (!absences || absences.length === 0) return { morning, afternoon };
-
-      for (const abs of absences) {
-        if (day.hours(8).isSameOrAfter(abs.startDate)) morning = true;
-        if (day.hours(20).isSameOrBefore(abs.endDate)) afternoon = true;
-      };
-
-      return { morning, afternoon };
-    },
     getCurrentContract (contracts, day) {
       if (!contracts || contracts.length === 0) return [];
       return contracts.find(contract =>
@@ -279,7 +265,8 @@ export default {
     },
     getContractHours () {
       let contractHours = 0;
-      for (const day of this.days) {
+      const contractDaysRange = Array.from(this.$moment.range(this.startOfWeekAsString, this.$moment(this.endOfWeek).subtract(1, 'd')).by('days')) // from m\Monday to Saturday
+      for (const day of contractDaysRange) {
         const absences = this.events.find(event =>
           event.type === ABSENCE &&
           day.isSameOrAfter(event.startDate, 'd') && day.isSameOrBefore(event.endDate, 'd') &&
