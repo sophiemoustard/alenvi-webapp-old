@@ -157,7 +157,7 @@ import ModalSelect from '../../../components/form/ModalSelect';
 import OptionGroup from '../../../components/form/OptionGroup';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { positiveNumber } from '../../../helpers/vuelidateCustomVal.js';
-import { formatPrice, getLastVersion } from '../../../helpers/utils.js';
+import { formatPrice, getLastVersion, formatIdentityShort } from '../../../helpers/utils.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
 import { COMPANI } from '../../../data/constants';
 
@@ -225,7 +225,7 @@ export default {
           name: 'customer',
           label: 'Bénéficiaire',
           align: 'left',
-          field: row => this.getCustomerName(row.customer),
+          field: row => formatIdentityShort(row.customer.identity),
         },
         {
           name: 'thirdPartyPayer',
@@ -407,9 +407,6 @@ export default {
     },
   },
   methods: {
-    getCustomerName (customer) {
-      return `${customer.identity.firstname ? `${customer.identity.firstname.charAt(0, 1)}. ` : ''}${customer.identity.lastname}`;
-    },
     formatPrice (value) {
       return formatPrice(value);
     },
@@ -422,7 +419,7 @@ export default {
           this.customersOptions.push({
             subscriptions: customers[i].subscriptions,
             thirdPartyPayers: customers[i].thirdPartyPayers,
-            label: customers[i].identity.lastname,
+            label: formatIdentityShort(customers[i].identity),
             value: customers[i]._id
           });
         }

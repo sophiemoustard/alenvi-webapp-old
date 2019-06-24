@@ -76,7 +76,7 @@ export default {
       try {
         this.tableLoading = true;
         const customers = await this.$customers.showAll();
-        this.customersList = customers.map(customer => ({ name: `${customer.identity.title} ${customer.identity.lastname}`, customerId: customer._id }));
+        this.customersList = customers.map(customer => ({ name: `${customer.identity.firstname} ${customer.identity.lastname.toUpperCase()}`, customerId: customer._id }));
         this.tableLoading = false;
       } catch (e) {
         this.tableLoading = false;
