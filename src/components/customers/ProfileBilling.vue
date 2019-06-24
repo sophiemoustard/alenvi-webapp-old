@@ -41,7 +41,7 @@
 
 <script>
 import { required } from 'vuelidate/lib/validators';
-import { CREDIT_NOTE, BILL, WITHDRAWAL, BANK_TRANSFER, CHECK, CESU, REFUND, ADMIN, COACH, CUSTOMER, THIRD_PARTY_PAYER } from '../../data/constants';
+import { CREDIT_NOTE, BILL, DIRECT_DEBIT, BANK_TRANSFER, CHECK, CESU, REFUND, ADMIN, COACH, CUSTOMER, THIRD_PARTY_PAYER } from '../../data/constants';
 import CustomerBillingTable from '../../components/customers/CustomerBillingTable';
 import PaymentCreationModal from '../../components/customers/PaymentCreationModal';
 import PaymentEditionModal from '../../components/customers/PaymentEditionModal';
@@ -139,7 +139,7 @@ export default {
         case CREDIT_NOTE:
           return type === CUSTOMER ? doc.inclTaxesCustomer : doc.inclTaxesTpp;
         case BANK_TRANSFER:
-        case WITHDRAWAL:
+        case DIRECT_DEBIT:
         case CHECK:
         case CESU:
           if (doc.nature === REFUND) return -doc.netInclTaxes;

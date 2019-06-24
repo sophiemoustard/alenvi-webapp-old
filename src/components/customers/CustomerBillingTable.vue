@@ -56,7 +56,7 @@ import {
   CREDIT_NOTE,
   BILL,
   BANK_TRANSFER,
-  WITHDRAWAL,
+  DIRECT_DEBIT,
   CHECK,
   CESU,
   REFUND,
@@ -141,7 +141,7 @@ export default {
         case CREDIT_NOTE:
           return this.type === CUSTOMER ? doc.inclTaxesCustomer : doc.inclTaxesTpp;
         case BANK_TRANSFER:
-        case WITHDRAWAL:
+        case DIRECT_DEBIT:
         case CHECK:
         case CESU:
           if (doc.nature === REFUND) return -doc.netInclTaxes;

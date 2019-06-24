@@ -173,20 +173,15 @@ export default {
     addEditDiscountToBills (bills) {
       return bills.map(bill => ({ ...bill, discountEdition: false }));
     },
-    async getDraftBills (params) {
+    async getDraftBills () {
       try {
-        if (!params) {
-          params = {
-            endDate: this.$moment(this.billingDates.endDate).endOf('d').toISOString(),
-            billingStartDate: this.$moment(this.billingDates.startDate).startOf('d').toISOString(),
-            billingPeriod: this.user.company.customersConfig.billingPeriod,
-          }
-        }
-        if (!params.billingStartDate) params.billingStartDate = this.$moment(this.billingDates.startDate).startOf('d').toISOString();
-        if (!params.endDate) params.endDate = this.$moment(this.billingDates.endDate).endOf('d').toISOString();
-        if (!params.billingPeriod) params.billingPeriod = this.user.company.customersConfig.billingPeriod;
-
         this.tableLoading = true;
+        const params = {
+          endDate: this.$moment(this.billingDates.endDate).endOf('d').toISOString(),
+          billingStartDate: this.$moment(this.billingDates.startDate).startOf('d').toISOString(),
+          billingPeriod: this.user.company.customersConfig.billingPeriod,
+        }
+
         const draftBills = await this.$bills.getDraftBills(params);
         this.draftBills = draftBills.map((draft) => {
           return {
