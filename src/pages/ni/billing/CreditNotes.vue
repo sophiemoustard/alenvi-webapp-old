@@ -8,7 +8,7 @@
       <q-tr slot="body" slot-scope="props" :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
           <template v-if="col.name === 'actions'">
-            <div class="row no-wrap table-actions">
+            <div class="row no-wrap table-actions" v-if="props.row.origin === COMPANI">
               <q-btn flat round small color="grey" icon="edit" @click.native="openCreditNoteEditionModal(props.row)" />
               <q-btn flat round small color="grey" icon="delete"
                 @click="deleteCreditNote(col.value, props.row.__index)" />
@@ -159,6 +159,7 @@ import { required, requiredIf } from 'vuelidate/lib/validators';
 import { positiveNumber } from '../../../helpers/vuelidateCustomVal.js';
 import { formatPrice, getLastVersion } from '../../../helpers/utils.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
+import { COMPANI } from '../../../data/constants';
 
 export default {
   name: 'CreditNotes',
@@ -258,6 +259,7 @@ export default {
         sortBy: 'date',
         descending: true,
       },
+      COMPANI,
     }
   },
   watch: {
