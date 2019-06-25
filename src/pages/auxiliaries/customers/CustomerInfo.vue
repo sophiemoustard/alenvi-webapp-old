@@ -6,7 +6,7 @@
           <q-icon class="on-left cursor-pointer self-center" size="1rem" name="arrow_back" color="primary"
             @click.native="$router.push({ name: 'profile customers', params: { id } })" />
         </div>
-        <h4 class="no-margin">{{ customer.identity.title }} {{ customer.identity.lastname }}</h4>
+        <h4 class="no-margin">{{ formatFullIdentity(customer.identity) }}</h4>
       </div>
       <div class="row">
         <p class="text-weight-bold">Informations</p>
@@ -39,6 +39,7 @@ import pathologies from '../../../data/pathologies';
 import { followUpMixin } from '../../../mixins/followUpMixin.js';
 import Input from '../../../components/form/Input.vue';
 import Select from '../../../components/form/Select.vue';
+import { formatFullIdentity } from '../../helpers/utils';
 
 export default {
   components: {
@@ -68,6 +69,9 @@ export default {
   async mounted () {
     await this.getCustomer(this.customerId);
   },
+  methods: {
+    formatFullIdentity,
+  }
 }
 </script>
 

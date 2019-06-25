@@ -29,7 +29,7 @@
                   <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)" :startOfWeekAsString="startOfWeek.toISOString()"
                     :distanceMatrix="distanceMatrix" />
                 </div>
-                <div class="person-name overflow-hidden-nowrap">{{ formatIdentityShort(person.identity) }}</div>
+                <div class="person-name overflow-hidden-nowrap">{{ formatShortIdentity(person.identity) }}</div>
               </div>
             </td>
             <template v-if="staffingView && !isCustomerPlanning">
@@ -97,7 +97,7 @@ import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import { planningEventMixin } from '../../mixins/planningEventMixin';
 import PlanningNavigation from './PlanningNavigation.vue';
 import distanceMatrix from '../../api/DistanceMatrix';
-import { formatIdentityShort } from '../../helpers/utils';
+import { formatShortIdentity } from '../../helpers/utils';
 
 export default {
   name: 'PlanningManager',
@@ -182,7 +182,7 @@ export default {
       this.getTimelineDays();
       this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
     },
-    formatIdentityShort: formatIdentityShort,
+    formatShortIdentity,
     // Event display
     getOneDayPersonEvents (person, day) {
       return this.events

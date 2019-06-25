@@ -4,9 +4,7 @@
       <div class="row items-center planning-header">
         <div class="col-xs-12 col-md-5 person-name" v-if="customer && customer.identity">
           <img :src="getAvatar()" class="avatar">
-          <div>
-            {{ customer.identity.title }} {{ customer.identity.lastname.toUpperCase() }}
-          </div>
+          <div>{{ formatFullIdentity(customer.identity) }}</div>
         </div>
         <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
           @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :viewMode="viewMode" @updateViewMode="updateViewMode"
@@ -22,6 +20,7 @@ import { DEFAULT_AVATAR, WEEK_VIEW, AGENDA } from '../../data/constants';
 import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import Agenda from '../../components/Agenda';
 import PlanningNavigation from '../../components/planning/PlanningNavigation';
+import { formatFullIdentity } from '../../helpers/utils';
 
 export default {
   name: 'CustomerAgenda',
@@ -82,6 +81,7 @@ export default {
         this.events = [];
       }
     },
+    formatFullIdentity,
   },
 }
 </script>

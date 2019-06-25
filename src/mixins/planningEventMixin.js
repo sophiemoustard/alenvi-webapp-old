@@ -1,5 +1,5 @@
 import { ABSENCE_TYPES, PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR } from '../data/constants';
-import { formatIdentityShort } from '../helpers/utils';
+import { formatShortIdentity } from '../helpers/utils';
 
 export const planningEventMixin = {
   data () {
@@ -40,7 +40,7 @@ export const planningEventMixin = {
     },
     eventTitle (event) {
       const person = this.isCustomerPlanning ? 'auxiliary' : 'customer';
-      return formatIdentityShort(event[person].identity);
+      return formatShortIdentity(event[person].identity);
     },
   },
 };

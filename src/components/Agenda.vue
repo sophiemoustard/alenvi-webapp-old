@@ -43,7 +43,6 @@
 <script>
 import { planningEventMixin } from '../mixins/planningEventMixin';
 import { ABSENCE, INTERVENTION, INTERNAL_HOUR, UNAVAILABILITY, PERCENTAGE_BY_MINUTES, PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR } from '../data/constants';
-import { formatIdentityShort } from '../helpers/utils';
 
 export default {
   name: 'Agenda',
@@ -97,8 +96,7 @@ export default {
     },
     editEvent (value) {
       this.$emit('editEvent', value);
-    },
-    formatIdentityShort: formatIdentityShort,
+    }
   },
 }
 </script>
