@@ -30,9 +30,6 @@ export const planningEventMixin = {
     isCurrentDay (momentDay) {
       return this.$moment(momentDay).isSame(new Date(), 'day');
     },
-    endOfWeek () {
-      return this.$moment(this.startOfWeek).add(6, 'd');
-    },
     getEventHours (event) {
       return `${this.$moment(event.startDate).format('HH:mm')} - ${this.$moment(event.endDate).format('HH:mm')}`
     },
