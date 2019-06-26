@@ -4,7 +4,7 @@
       <div class="row items-center planning-header">
         <div class="col-xs-12 col-md-5 person-name" v-if="customer && customer.identity">
           <img :src="getAvatar()" class="avatar">
-          <div>{{ formatFullIdentity(customer.identity) }}</div>
+          <div>{{ customer.identity | formatFullIdentity }}</div>
         </div>
         <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
           @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :viewMode="viewMode" @updateViewMode="updateViewMode"
@@ -81,8 +81,10 @@ export default {
         this.events = [];
       }
     },
-    formatFullIdentity,
   },
+  filters: {
+    formatFullIdentity,
+  }
 }
 </script>
 

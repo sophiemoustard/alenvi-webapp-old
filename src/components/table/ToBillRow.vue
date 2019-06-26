@@ -6,7 +6,7 @@
       </template>
       <template v-if="index === 0 && col.name === 'customer'">
         <span class="uppercase text-weight-bold">
-          {{ formatShortIdentity(props.row.customer.identity) }}
+          {{ props.row.customer.identity | formatShortIdentity }}
         </span>
       </template>
       <template v-else-if="index === 0 && col.name === 'client'">
@@ -79,7 +79,6 @@ export default {
       if (!bill.thirdPartyPayer) return formatShortIdentity(customer.identity);
       return bill.thirdPartyPayer.name.length > 35 ? `${bill.thirdPartyPayer.name.substring(0, 35)}...` : bill.thirdPartyPayer.name;
     },
-    formatShortIdentity,
     getExclTaxesDiscount (bill) {
       return bill.discount / (1 + bill.vat);
     },
@@ -96,7 +95,10 @@ export default {
     disableDiscountEditing (bill) {
       bill.discountEdition = false;
     },
-  }
+  },
+  filters: {
+    formatShortIdentity,
+  },
 }
 </script>
 

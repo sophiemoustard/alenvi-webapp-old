@@ -29,7 +29,7 @@
                   <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)" :startOfWeekAsString="startOfWeek.toISOString()"
                     :distanceMatrix="distanceMatrix" />
                 </div>
-                <div class="person-name overflow-hidden-nowrap">{{ formatShortIdentity(person.identity) }}</div>
+                <div class="person-name overflow-hidden-nowrap">{{ person.identity | formatShortIdentity }}</div>
               </div>
             </td>
             <template v-if="staffingView && !isCustomerPlanning">
@@ -182,7 +182,6 @@ export default {
       this.getTimelineDays();
       this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
     },
-    formatShortIdentity,
     // Event display
     getOneDayPersonEvents (person, day) {
       return this.events
@@ -271,6 +270,9 @@ export default {
         }
       }
     },
+  },
+  filters: {
+    formatShortIdentity,
   },
 }
 </script>

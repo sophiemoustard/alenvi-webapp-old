@@ -5,10 +5,10 @@
         {{ cardTitle(contract.endDate).msg }}
       </q-card-title>
       <p v-if="contract.status === CUSTOMER_CONTRACT && personKey !== CUSTOMER" class="card-sub-title">
-        Statut : {{ getContractStatus(contract) }} - Bénéficiaire : {{ formatFullIdentity(contract.customer.identity) }}
+        Statut : {{ getContractStatus(contract) }} - Bénéficiaire : {{ contract.customer.identity | formatFullIdentity }}
       </p>
       <p v-if="contract.status === CUSTOMER_CONTRACT && personKey === CUSTOMER" class="card-sub-title">
-        Statut : {{ getContractStatus(contract) }} - Auxiliaire : {{ formatFullIdentity(contract.user.identity) }}
+        Statut : {{ getContractStatus(contract) }} - Auxiliaire : {{ contract.user.identity | formatFullIdentity }}
       </p>
       <p v-if="contract.status === COMPANY_CONTRACT" class="card-sub-title">Statut : {{ getContractStatus(contract) }}</p>
       <q-table :data="contract.versions" :columns="contractColumns" row-key="name" :pagination.sync="pagination"
@@ -337,8 +337,10 @@ export default {
       }
       return contract.auxiliaryDoc ? contract.auxiliaryDoc.link : false;
     },
+  },
+  filters: {
     formatFullIdentity,
-  }
+  },
 }
 </script>
 

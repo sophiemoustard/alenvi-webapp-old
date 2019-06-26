@@ -10,7 +10,7 @@
         <div class="row q-mb-md">
           <div class="col-11 row person-name">
             <img :src="DEFAULT_AVATAR" class="avatar">
-            <div>{{ formatFullIdentity(selectedCustomer.identity) }}</div>
+            <div>{{ selectedCustomer.identity | formatFullIdentity }}</div>
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
             <span>
@@ -37,7 +37,7 @@
         <div class="row q-mb-md">
           <div class="col-11 row person-name">
             <img :src="DEFAULT_AVATAR" class="avatar">
-            <div>{{ formatFullIdentity(selectedCustomer.identity) }}</div>
+            <div>{{ selectedCustomer.identity | formatFullIdentity }}</div>
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
             <span>
@@ -89,7 +89,7 @@ import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify.js';
 import { INTERVENTION, DEFAULT_AVATAR, NEVER, AUXILIARY, PLANNING_REFERENT, CUSTOMER_CONTRACT, COMPANY_CONTRACT, CUSTOMER } from '../../../data/constants';
 import { mapGetters, mapActions } from 'vuex';
-import { formatFullIdentity } from '../../helpers/utils';
+import { formatFullIdentity } from '../../../helpers/utils';
 
 export default {
   name: 'CustomerPlanning',
@@ -588,8 +588,10 @@ export default {
         this.customers = this.customers.filter(customer => customer._id !== el._id);
       }
     },
-    formatFullIdentity,
   },
+  filters: {
+    formatFullIdentity,
+  }
 }
 </script>
 

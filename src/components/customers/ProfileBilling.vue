@@ -2,7 +2,7 @@
   <div>
     <div class="q-pa-sm q-mb-lg">
       <div class="title">
-        <p class="text-weight-bold">{{ formatFullIdentity(this.customer.identity) }}</p>
+        <p class="text-weight-bold">{{ this.customer.identity | formatFullIdentity }}</p>
         <ni-date-range v-model="billingDates" @input="refresh" />
       </div>
       <ni-customer-billing-table v-if="!loading" :documents="customerBillingDocuments" :billingDates="billingDates"
@@ -274,6 +274,8 @@ export default {
         this.loading = false;
       }
     },
+  },
+  filters: {
     formatFullIdentity,
   },
 }
