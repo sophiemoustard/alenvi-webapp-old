@@ -5,12 +5,10 @@
         {{ cardTitle(contract.endDate).msg }}
       </q-card-title>
       <p v-if="contract.status === CUSTOMER_CONTRACT && personKey !== CUSTOMER" class="card-sub-title">
-        Statut : {{ getContractStatus(contract) }} - Bénéficiaire : {{ contract.customer.identity.title }} {{
-        contract.customer.identity.lastname }}
+        Statut : {{ getContractStatus(contract) }} - Bénéficiaire : {{ contract.customer.identity | formatFullIdentity }}
       </p>
       <p v-if="contract.status === CUSTOMER_CONTRACT && personKey === CUSTOMER" class="card-sub-title">
-        Statut : {{ getContractStatus(contract) }} - Auxiliaire : {{ contract.user.identity.firstname }} {{
-        contract.user.identity.lastname }}
+        Statut : {{ getContractStatus(contract) }} - Auxiliaire : {{ contract.user.identity | formatFullIdentity }}
       </p>
       <p v-if="contract.status === COMPANY_CONTRACT" class="card-sub-title">Statut : {{ getContractStatus(contract) }}</p>
       <q-table :data="contract.versions" :columns="contractColumns" row-key="name" :pagination.sync="pagination"
@@ -80,6 +78,7 @@ import { CONTRACT_STATUS_OPTIONS, CUSTOMER_CONTRACT, COACH, CUSTOMER, AUXILIARY,
 import { NotifyPositive, NotifyNegative } from '../../components/popup/notify.js';
 import { downloadDocxFile } from '../../helpers/downloadFile';
 import { generateContractFields } from '../../helpers/generateContractFields';
+import { formatFullIdentity } from '../../helpers/utils';
 import esign from '../../api/Esign.js';
 
 export default {
@@ -338,7 +337,10 @@ export default {
       }
       return contract.auxiliaryDoc ? contract.auxiliaryDoc.link : false;
     },
-  }
+  },
+  filters: {
+    formatFullIdentity,
+  },
 }
 </script>
 

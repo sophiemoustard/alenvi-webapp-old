@@ -58,3 +58,21 @@ export const roundFrenchNumber = number => number.toLocaleString('fr-FR', { mini
 export const formatPrice = (val) => {
   return val ? roundFrenchNumber(val) : roundFrenchNumber(0);
 };
+
+export const formatShortIdentity = (identity) => {
+  if (!identity) return '';
+
+  const firstname = (identity.firstname || '').trim();
+  let identityShort = firstname ? `${firstname.slice(0, 1)}. ` : '';
+  identityShort += (identity.lastname || '').trim();
+
+  return identityShort.toUpperCase();
+};
+
+export const formatFullIdentity = (identity) => {
+  if (!identity) return '';
+
+  const firstname = (identity.firstname || '').trim();
+  const lastname = (identity.lastname || '').trim().toUpperCase();
+  return `${firstname} ${lastname}`;
+}

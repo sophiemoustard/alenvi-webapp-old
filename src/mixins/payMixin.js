@@ -1,4 +1,4 @@
-import { formatPrice } from '../helpers/utils';
+import { formatPrice, formatShortIdentity } from '../helpers/utils';
 import { END_CONTRACT_REASONS } from '../data/constants';
 
 export const payMixin = {
@@ -10,7 +10,7 @@ export const payMixin = {
           label: 'Auxiliaire',
           align: 'left',
           field: 'auxiliary',
-          format: value => value && value.identity ? `${value.identity.firstname.slice(0, 1)}. ${value.identity.lastname}` : ''
+          format: value => value ? formatShortIdentity(value.identity) : '',
         },
         {
           name: 'sector',

@@ -179,8 +179,8 @@ export default {
     async refresh () {
       try {
         this.events = await this.$events.list({
-          startDate: this.$moment(this.startOfWeekAsString).format('YYYYMMDD'),
-          endDate: this.endOfWeek.add(1, 'd').format('YYYYMMDD'),
+          startDate: this.$moment(this.startOfWeekAsString).startOf('d').format('YYYYMMDD'),
+          endDate: this.endOfWeek.endOf('d').format('YYYYMMDD'),
           auxiliary: JSON.stringify(this.auxiliaries.map(aux => aux._id))
         });
       } catch (e) {

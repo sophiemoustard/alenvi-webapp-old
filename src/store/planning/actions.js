@@ -2,6 +2,7 @@ import Sectors from '../../api/Sectors'
 import Users from '../../api/Users'
 import Customers from '../../api/Customers'
 import store from '../../store/index'
+import { formatFullIdentity } from '../../helpers/utils';
 
 import { AUXILIARY, PLANNING_REFERENT } from '../../data/constants';
 
@@ -23,22 +24,9 @@ export const fillFilter = async ({ commit }, roleToSearch) => {
     });
   }
 
-  if (roleToSearch === AUXILIARY) {
-    for (let i = 0, l = persons.length; i < l; i++) {
-      elems.push({
-        label: `${persons[i].identity.firstname} ${persons[i].identity.lastname}`,
-        value: `${persons[i].identity.firstname} ${persons[i].identity.lastname}`,
-        ...persons[i],
-      })
-    }
-  } else { // customers
-    for (let i = 0, l = persons.length; i < l; i++) {
-      elems.push({
-        label: `${persons[i].identity.title} ${persons[i].identity.lastname}`,
-        value: `${persons[i].identity.title} ${persons[i].identity.lastname}`,
-        ...persons[i]
-      })
-    }
+  for (let i = 0, l = persons.length; i < l; i++) {
+    const value = formatFullIdentity(persons[i].identity);
+    elems.push({ label: value, value: value, ...persons[i] });
   }
   commit('setFilter', elems);
 }

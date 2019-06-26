@@ -4,7 +4,7 @@
       <h4>Avoirs</h4>
     </div>
     <q-table :data="creditNotes" :columns="creditNotesColumns" binary-state-sort :pagination.sync="pagination"
-      class="q-pa-sm">
+      :loading="tableLoading" class="q-pa-sm">
       <q-tr slot="body" slot-scope="props" :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
           <template v-if="col.name === 'actions'">
@@ -98,7 +98,7 @@
             <span><q-icon name="clear" @click.native="creditNoteEditionModal = false" /></span>
           </div>
         </div>
-        <ni-modal-input caption="Bénéficiaire" v-model="editedCreditNote.customer.identity.lastname" required-field disable />
+        <ni-modal-input caption="Bénéficiaire" :value="formatFullIdentity(editedCreditNote.customer.identity)" required-field disable />
         <ni-modal-input v-if="editedCreditNote.thirdPartyPayer" caption="Tiers payeur"
           v-model="editedCreditNote.thirdPartyPayer.name" required-field disable />
         <ni-datetime-picker caption="Date de l'avoir" v-model="editedCreditNote.date" in-modal type="date"
@@ -157,7 +157,7 @@ import ModalSelect from '../../../components/form/ModalSelect';
 import OptionGroup from '../../../components/form/OptionGroup';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { positiveNumber } from '../../../helpers/vuelidateCustomVal.js';
-import { formatPrice, getLastVersion } from '../../../helpers/utils.js';
+import { formatPrice, getLastVersion, formatShortIdentity, formatFullIdentity } from '../../../helpers/utils.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
 import { COMPANI } from '../../../data/constants';
 
@@ -225,7 +225,7 @@ export default {
           name: 'customer',
           label: 'Bénéficiaire',
           align: 'left',
-          field: row => this.getCustomerName(row.customer),
+          field: row => formatShortIdentity(row.customer.identity),
         },
         {
           name: 'thirdPartyPayer',
@@ -259,6 +259,7 @@ export default {
         sortBy: 'date',
         descending: true,
       },
+      tableLoading: false,
       COMPANI,
     }
   },
@@ -305,7 +306,9 @@ export default {
     }
   },
   async mounted () {
+    this.tableLoading = true;
     await Promise.all([this.refreshCreditNotes(), this.refreshCustomersOptions()]);
+    this.tableLoading = false;
   },
   validations () {
     return {
@@ -373,7 +376,8 @@ export default {
       }));
     },
     eventsOptions () {
-      return this.events.map(event => ({
+      const events = [...this.events].sort((e1, e2) => (new Date(e1.startDate)) - (new Date(e2.startDate)));
+      return events.map(event => ({
         label: `${this.$moment(event.startDate).format('DD/MM/YYYY HH:mm')} - ${this.$moment(event.endDate).format('HH:mm')}`,
         value: event._id,
       }))
@@ -407,9 +411,6 @@ export default {
     },
   },
   methods: {
-    getCustomerName (customer) {
-      return `${customer.identity.firstname ? `${customer.identity.firstname.charAt(0, 1)}. ` : ''}${customer.identity.lastname}`;
-    },
     formatPrice (value) {
       return formatPrice(value);
     },
@@ -422,7 +423,7 @@ export default {
           this.customersOptions.push({
             subscriptions: customers[i].subscriptions,
             thirdPartyPayers: customers[i].thirdPartyPayers,
-            label: customers[i].identity.lastname,
+            label: formatFullIdentity(customers[i].identity),
             value: customers[i]._id
           });
         }
@@ -629,7 +630,8 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression de l\'avoir');
       }
-    }
+    },
+    formatFullIdentity,
   }
 }
 </script>

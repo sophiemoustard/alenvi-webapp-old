@@ -9,7 +9,7 @@
           <span><q-icon name="clear" @click.native="resetForm" /></span>
         </div>
       </div>
-      <ni-modal-input caption="Bénéficiaire" v-model="selectedCustomer.identity.lastname" required-field read-only />
+      <ni-modal-input caption="Bénéficiaire" :value="customerFullname" required-field read-only />
       <ni-modal-input caption="Client" v-model="selectedClientName" required-field read-only />
       <ni-modal-input :caption="`Montant du ${editionModalNature}`" suffix="€" type="number"
         v-model="editedPayment.netInclTaxes" required-field :error="validations.netInclTaxes.$error"
@@ -29,6 +29,7 @@ import { REQUIRED_LABEL, PAYMENT_OPTIONS, PAYMENT_NATURE_OPTIONS } from '../../d
 import ModalSelect from '../form/ModalSelect';
 import ModalInput from '../form/ModalInput';
 import DatetimePicker from '../form/DatetimePicker';
+import { formatFullIdentity } from '../../helpers/utils.js';
 
 export default {
   name: 'PaymentEditionModal',
@@ -65,7 +66,10 @@ export default {
     },
     editionButtonLabel () {
       return `Editer le ${this.editionModalNature.toLowerCase()}`;
-    }
+    },
+    customerFullname () {
+      return formatFullIdentity(this.selectedCustomer.identity);
+    },
   },
   methods: {
     resetForm (partialReset, type) {

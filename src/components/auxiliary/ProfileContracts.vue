@@ -118,6 +118,7 @@ import { END_CONTRACT_REASONS, OTHER, CONTRACT_STATUS_OPTIONS, CUSTOMER_CONTRACT
 import { translate } from '../../data/translate';
 import { contractMixin } from '../../mixins/contractMixin.js';
 import { generateContractFields } from '../../helpers/generateContractFields.js';
+import { formatFullIdentity } from '../../helpers/utils';
 
 export default {
   name: 'ProfileContracts',
@@ -232,7 +233,7 @@ export default {
     },
     customerOptions () {
       return this.customers.map(cus => ({
-        label: `${cus.identity.title} ${cus.identity.lastname}`,
+        label: formatFullIdentity(cus.identity),
         value: cus._id
       }));
     },

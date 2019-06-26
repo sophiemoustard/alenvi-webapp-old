@@ -5,7 +5,7 @@
       <ni-select-sector v-model="selectedSector" allow-null-option />
     </div>
     <q-table :data="displayedDraftPay" :columns="columns" class="q-pa-sm" selection="multiple" row-key="auxiliaryId"
-      :selected.sync="selected" :pagination.sync="pagination" :visible-columns="visibleColumns" >
+      :selected.sync="selected" :pagination.sync="pagination" :visible-columns="visibleColumns" :loading="tableLoading">
       <q-tr slot="header" slot-scope="props">
         <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
         <q-th auto-width>
@@ -121,6 +121,7 @@ export default {
       surchargeDetailModal: false,
       surchargeDetails: {},
       selectedSector: '',
+      tableLoading: false,
       SURCHARGES,
     };
   },
@@ -137,7 +138,9 @@ export default {
     }
   },
   async mounted () {
+    this.tableLoading = true;
     await this.refreshDraftPay();
+    this.tableLoading = false;
   },
   methods: {
     async refreshDraftPay () {
@@ -155,6 +158,7 @@ export default {
         }));
         this.displayedDraftPay = [...this.draftPay];
       } catch (e) {
+        NotifyNegative('Impossible de récupérer les payes');
         this.draftPay = [];
         console.error(e);
       }

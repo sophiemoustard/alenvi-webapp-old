@@ -2,7 +2,7 @@
   <div>
     <div class="q-pa-sm q-mb-lg">
       <div class="title">
-        <p class="text-weight-bold">{{ this.customer.identity.title }} {{ this.customer.identity.lastname }}</p>
+        <p class="text-weight-bold">{{ this.customer.identity | formatFullIdentity }}</p>
         <ni-date-range v-model="billingDates" @input="refresh" />
       </div>
       <ni-customer-billing-table v-if="!loading" :documents="customerBillingDocuments" :billingDates="billingDates"
@@ -48,6 +48,7 @@ import PaymentEditionModal from '../../components/customers/PaymentEditionModal'
 import DateRange from '../../components/form/DateRange';
 import { paymentMixin } from '../../mixins/paymentMixin.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../components/popup/notify';
+import { formatFullIdentity } from '../../helpers/utils';
 
 export default {
   name: 'ProfileBilling',
@@ -248,7 +249,7 @@ export default {
 
       this.paymentEditionModal = true;
       this.selectedCustomer = payment.customer;
-      this.selectedClientName = payment.client ? payment.client.name : payment.customer.identity.lastname;
+      this.selectedClientName = payment.client ? payment.client.name : formatFullIdentity(payment.customer.identity);
     },
     resetPaymentEditionModal () {
       this.paymentEditionModal = false;
@@ -273,6 +274,9 @@ export default {
         this.loading = false;
       }
     },
+  },
+  filters: {
+    formatFullIdentity,
   },
 }
 </script>
