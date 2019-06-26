@@ -376,7 +376,8 @@ export default {
       }));
     },
     eventsOptions () {
-      return this.events.map(event => ({
+      const events = [...this.events].sort((e1, e2) => (new Date(e1.startDate)) - (new Date(e2.startDate)));
+      return events.map(event => ({
         label: `${this.$moment(event.startDate).format('DD/MM/YYYY HH:mm')} - ${this.$moment(event.endDate).format('HH:mm')}`,
         value: event._id,
       }))
