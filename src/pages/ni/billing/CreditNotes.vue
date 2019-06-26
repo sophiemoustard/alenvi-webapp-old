@@ -4,7 +4,7 @@
       <h4>Avoirs</h4>
     </div>
     <q-table :data="creditNotes" :columns="creditNotesColumns" binary-state-sort :pagination.sync="pagination"
-      class="q-pa-sm">
+      :loading="tableLoading" class="q-pa-sm">
       <q-tr slot="body" slot-scope="props" :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
           <template v-if="col.name === 'actions'">
@@ -259,6 +259,7 @@ export default {
         sortBy: 'date',
         descending: true,
       },
+      tableLoading: false,
       COMPANI,
     }
   },
@@ -305,7 +306,9 @@ export default {
     }
   },
   async mounted () {
+    this.tableLoading = true;
     await Promise.all([this.refreshCreditNotes(), this.refreshCustomersOptions()]);
+    this.tableLoading = false;
   },
   validations () {
     return {
