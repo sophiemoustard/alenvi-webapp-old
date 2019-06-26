@@ -61,12 +61,17 @@ export const formatPrice = (val) => {
 
 export const formatShortIdentity = (identity) => {
   if (!identity) return '';
-  let identityShort = identity.firstname ? `${identity.firstname.slice(0, 1)}. ` : '';
-  identityShort += identity.lastname;
+
+  const firstname = (identity.firstname || '').trim();
+  let identityShort = firstname ? `${firstname.slice(0, 1)}. ` : '';
+  identityShort += (identity.lastname || '').trim();
+
   return identityShort.toUpperCase();
 };
 
 export const formatFullIdentity = (identity) => {
   if (!identity) return '';
-  return `${identity.firstname} ${identity.lastname.toUpperCase()}`.trim();
+  const firstname = (identity.firstname || '').trim();
+  const lastname = (identity.lastname || '').trim().toUpperCase();
+  return `${firstname} ${lastname}`;
 }
