@@ -12,7 +12,7 @@
       <div class="modal-subtitle">
         <q-btn-toggle no-wrap v-model="newPayment.nature" :options="paymentNatureOptions" toggle-color="primary" />
       </div>
-      <ni-modal-input caption="Bénéficiaire" v-model="selectedCustomer.identity.lastname" required-field read-only />
+      <ni-modal-input caption="Bénéficiaire" :value="customerFullname" required-field read-only />
       <ni-modal-input caption="Client" v-model="selectedClientName" required-field read-only />
       <ni-modal-input :caption="`Montant du ${creationModalNature}`" suffix="€" type="number"
         v-model="newPayment.netInclTaxes" required-field :error="validations.netInclTaxes.$error"
@@ -32,6 +32,7 @@ import { REQUIRED_LABEL, PAYMENT_OPTIONS, PAYMENT_NATURE_OPTIONS } from '../../d
 import ModalSelect from '../form/ModalSelect';
 import ModalInput from '../form/ModalInput';
 import DatetimePicker from '../form/DatetimePicker';
+import { formatFullIdentity } from '../../helpers/utils.js';
 
 export default {
   name: 'PaymentCreationModal',
@@ -68,7 +69,10 @@ export default {
     },
     creationButtonLabel () {
       return `Créer le ${this.creationModalNature.toLowerCase()}`;
-    }
+    },
+    customerFullname () {
+      return formatFullIdentity(this.selectedCustomer.identity);
+    },
   },
   methods: {
     resetForm (partialReset, type) {

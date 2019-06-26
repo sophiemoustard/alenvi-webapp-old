@@ -43,6 +43,7 @@ import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES, HOURLY } from '../../../data/c
 import BillingPagination from '../../../components/table/BillingPagination';
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
+import { formatShortIdentity } from '../../../helpers/utils';
 
 export default {
   name: 'Absences',
@@ -70,7 +71,7 @@ export default {
           name: 'auxiliary',
           label: 'Auxiliaire',
           field: 'auxiliary',
-          format: value => `${value.identity.firstname.slice(0, 1)}. ${value.identity.lastname}`,
+          format: value => formatShortIdentity(value.identity),
           align: 'left',
         },
         {

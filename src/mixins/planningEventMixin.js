@@ -1,4 +1,5 @@
 import { ABSENCE_TYPES, PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR } from '../data/constants';
+import { formatShortIdentity } from '../helpers/utils';
 
 export const planningEventMixin = {
   data () {
@@ -38,10 +39,7 @@ export const planningEventMixin = {
       return !absence ? '' : absence.label;
     },
     eventTitle (event) {
-      if (this.isCustomerPlanning) {
-        return `${event.auxiliary.identity.firstname.slice(0, 1)}. ${event.auxiliary.identity.lastname}`.toUpperCase();
-      }
-      return event.customer.identity.lastname.toUpperCase();
+      return formatShortIdentity(this.isCustomerPlanning ? event.auxiliary.identity : event.customer.identity);
     },
   },
 };

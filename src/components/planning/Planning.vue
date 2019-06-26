@@ -29,7 +29,7 @@
                   <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)" :startOfWeekAsString="startOfWeek.toISOString()"
                     :distanceMatrix="distanceMatrix" />
                 </div>
-                <div class="person-name overflow-hidden-nowrap">{{ formatPersonName(person) }}</div>
+                <div class="person-name overflow-hidden-nowrap">{{ person.identity | formatShortIdentity }}</div>
               </div>
             </td>
             <template v-if="staffingView && !isCustomerPlanning">
@@ -53,7 +53,7 @@
                     <div class="event-container">
                       <div class="event-title">
                         <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">
-                          {{eventTitle(event) }}
+                          {{ eventTitle(event) }}
                         </p>
                         <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">
                           {{ displayAbsenceType(event.absence) }}
@@ -97,6 +97,7 @@ import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import { planningEventMixin } from '../../mixins/planningEventMixin';
 import PlanningNavigation from './PlanningNavigation.vue';
 import distanceMatrix from '../../api/DistanceMatrix';
+import { formatShortIdentity } from '../../helpers/utils';
 
 export default {
   name: 'PlanningManager',
@@ -180,11 +181,6 @@ export default {
     updateTimeline () {
       this.getTimelineDays();
       this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
-    },
-    formatPersonName (person) {
-      return this.isCustomerPlanning
-        ? `${person.identity.title} ${person.identity.lastname}`.toUpperCase()
-        : `${person.identity.firstname.slice(0, 1)}. ${person.identity.lastname}`.toUpperCase();
     },
     // Event display
     getOneDayPersonEvents (person, day) {
@@ -274,6 +270,9 @@ export default {
         }
       }
     },
+  },
+  filters: {
+    formatShortIdentity,
   },
 }
 </script>
