@@ -71,6 +71,7 @@ export const formatShortIdentity = (identity) => {
 
 export const formatFullIdentity = (identity) => {
   if (!identity) return '';
+
   const firstname = (identity.firstname || '').trim();
   const lastname = (identity.lastname || '').trim().toUpperCase();
   return `${firstname} ${lastname}`;

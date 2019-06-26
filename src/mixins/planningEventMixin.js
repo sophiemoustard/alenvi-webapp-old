@@ -39,8 +39,7 @@ export const planningEventMixin = {
       return !absence ? '' : absence.label;
     },
     eventTitle (event) {
-      const person = this.isCustomerPlanning ? 'auxiliary' : 'customer';
-      return formatShortIdentity(event[person].identity);
+      return formatShortIdentity(this.isCustomerPlanning ? event.auxiliary.identity : event.customer.identity);
     },
   },
 };
