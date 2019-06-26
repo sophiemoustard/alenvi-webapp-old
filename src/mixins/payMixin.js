@@ -1,5 +1,6 @@
-import { formatPrice } from '../helpers/utils';
+import { formatPrice, formatShortIdentity } from '../helpers/utils';
 import { END_CONTRACT_REASONS } from '../data/constants';
+import get from 'lodash/get';
 
 export const payMixin = {
   data () {
@@ -10,7 +11,7 @@ export const payMixin = {
           label: 'Auxiliaire',
           align: 'left',
           field: 'auxiliary',
-          format: value => value && value.identity ? `${value.identity.firstname.slice(0, 1)}. ${value.identity.lastname}` : ''
+          format: value => formatShortIdentity(get(value, 'identity')),
         },
         {
           name: 'sector',
