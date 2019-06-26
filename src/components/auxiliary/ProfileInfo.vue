@@ -65,7 +65,7 @@
           v-model="user.identity.birthDate" @focus="saveTmp('identity.birthDate')"
           @blur="updateUser('identity.birthDate')"
         />
-        <ni-select caption="Pays de naissance" :error="$v.user.identity.birthCountry.$error" :options="nationalitiesOptions"
+        <ni-select caption="Pays de naissance" :error="$v.user.identity.birthCountry.$error" :options="countriesOptions"
           v-model="user.identity.birthCountry" @focus="saveTmp('identity.birthCountry')"
           @blur="updateUser('identity.birthCountry')"
         />
