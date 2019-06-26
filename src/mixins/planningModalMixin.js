@@ -182,7 +182,7 @@ export const planningModalMixin = {
     },
     customerAddress () {
       return this.$_.get(this.editedEvent, 'customer.contact.address.fullAddress', '');
-    }
+    },
   },
   methods: {
     // Event creation
