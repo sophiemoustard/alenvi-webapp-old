@@ -88,9 +88,9 @@
         </div>
       </template>
     </div>
-    <div v-if="editedEvent.type === INTERVENTION" class="cutomer-info">
+    <div v-if="editedEvent.type === INTERVENTION" class="customer-info">
       <p class="input-caption">Infos bénéficiaire</p>
-      <div>{{ editedEvent.customer.contact.address.fullAddress }}</div>
+      <div>{{ customerAddress }}</div>
     </div>
     <q-btn v-if="!isDisabled" class="full-width modal-btn" no-caps color="primary" :loading="loading" label="Editer l'évènement"
       @click="updateEvent" icon-right="check" :disable="disableEditionButton" />
@@ -128,6 +128,9 @@ export default {
     },
     isDisabled () {
       return this.editedEvent.type === INTERVENTION && this.editedEvent.isBilled;
+    },
+    customerAddress () {
+      return this.$_.get(this.editedEvent, 'customer.contact.address.fullAddress', '');
     }
   },
   methods: {
@@ -197,7 +200,7 @@ export default {
       flex-direction: row;
       align-items: center;
 
-  .cutomer-info
+  .customer-info
     background: $light-grey;
     padding: 10px 25px;
     /deep/ .q-if-inverted
