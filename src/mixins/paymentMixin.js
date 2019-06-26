@@ -1,5 +1,6 @@
 import { required } from 'vuelidate/lib/validators';
 import { PAYMENT, DIRECT_DEBIT, PAYMENT_OPTIONS } from '../data/constants';
+import { formatFullIdentity } from '../helpers/utils.js';
 
 export const paymentMixin = {
   data () {
@@ -31,7 +32,7 @@ export const paymentMixin = {
   methods: {
     openPaymentCreationModal (customer, tpp) {
       this.selectedCustomer = { ...customer };
-      this.selectedClientName = tpp ? tpp.name : customer.identity.lastname;
+      this.selectedClientName = tpp ? tpp.name : formatFullIdentity(customer.identity);
       this.newPayment.customer = customer._id;
       this.newPayment.nature = PAYMENT;
       this.newPayment.client = tpp ? tpp._id : customer._id;

@@ -249,7 +249,7 @@ export default {
 
       this.paymentEditionModal = true;
       this.selectedCustomer = payment.customer;
-      this.selectedClientName = payment.client ? payment.client.name : payment.customer.identity.lastname;
+      this.selectedClientName = payment.client ? payment.client.name : formatFullIdentity(payment.customer.identity);
     },
     resetPaymentEditionModal () {
       this.paymentEditionModal = false;

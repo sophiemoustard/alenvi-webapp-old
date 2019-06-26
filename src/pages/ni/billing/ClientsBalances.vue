@@ -51,7 +51,7 @@ import PrefixedCellContent from '../../../components/table/PrefixedCellContent';
 import PaymentCreationModal from '../../../components/customers/PaymentCreationModal';
 import { paymentMixin } from '../../../mixins/paymentMixin.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
-import { formatPrice, getLastVersion } from '../../../helpers/utils.js';
+import { formatPrice, getLastVersion, formatShortIdentity } from '../../../helpers/utils.js';
 
 export default {
   name: 'ClientsBalances',
@@ -74,14 +74,14 @@ export default {
           name: 'client',
           label: 'Client',
           align: 'left',
-          field: row => row.thirdPartyPayer ? row.thirdPartyPayer.name : row.customer.identity.lastname,
+          field: row => row.thirdPartyPayer ? row.thirdPartyPayer.name : formatShortIdentity(row.customer.identity),
           format: val => val.length > 30 ? `${val.slice(0, 30)}...` : val,
         },
         {
           name: 'customer',
           label: 'Bénéficiaire',
           align: 'left',
-          field: row => this.getCustomerName(row.customer),
+          field: row => formatShortIdentity(row.customer.identity),
         },
         {
           name: 'billed',
@@ -127,9 +127,6 @@ export default {
     await this.getBalances();
   },
   methods: {
-    getCustomerName (customer) {
-      return `${customer.identity.firstname ? `${customer.identity.firstname.charAt(0, 1)}. ` : ''}${customer.identity.lastname}`;
-    },
     goToCustomerBillingPage (customerId) {
       this.$router.push({ name: 'customers profile', params: { id: customerId, defaultTab: 'billing' } });
     },
