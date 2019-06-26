@@ -72,7 +72,7 @@
       </div>
       <div class="cutomer-info">
         <p class="input-caption">Infos bénéficiaire</p>
-        <div>{{ editedEvent.customer.contact.address.fullAddress }}</div>
+        <div>{{ customerAddress }}</div>
       </div>
       <q-btn v-if="!isDisabled" class="full-width modal-btn" no-caps color="primary" :loading="loading"
         label="Editer l'évènement" @click="updateEvent" icon-right="check" :disable="disableEditionButton" />

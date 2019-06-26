@@ -180,6 +180,9 @@ export const planningModalMixin = {
     addressError () {
       return !this.validations.location.fullAddress.required ? REQUIRED_LABEL : 'Adresse non valide';
     },
+    customerAddress () {
+      return this.$_.get(this.editedEvent, 'customer.contact.address.fullAddress', '');
+    }
   },
   methods: {
     // Event creation

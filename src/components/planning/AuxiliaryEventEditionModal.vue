@@ -129,9 +129,6 @@ export default {
     isDisabled () {
       return this.editedEvent.type === INTERVENTION && this.editedEvent.isBilled;
     },
-    customerAddress () {
-      return this.$_.get(this.editedEvent, 'customer.contact.address.fullAddress', '');
-    }
   },
   methods: {
     getAvatar (user) {
