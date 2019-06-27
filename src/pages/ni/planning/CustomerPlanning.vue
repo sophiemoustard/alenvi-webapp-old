@@ -4,8 +4,8 @@
       @editEvent="openEditionModal" @createEvent="openCreationModal" @onDrop="updateEventOnDrop" />
 
     <!-- Event creation modal -->
-    <q-modal v-if="Object.keys(newEvent).length !== 0 && Object.keys(selectedCustomer.identity).length !== 0" v-model="creationModal"
-      content-classes="modal-container-md" @hide="resetCreationForm(false)">
+    <q-modal v-if="Object.keys(newEvent).length !== 0" v-model="creationModal" content-classes="modal-container-md"
+      @hide="resetCreationForm(false)">
       <div class="modal-padding">
         <div class="row q-mb-md">
           <div class="col-11 row person-name">
@@ -31,8 +31,8 @@
     </q-modal>
 
     <!-- Event edition modal -->
-    <q-modal v-if="Object.keys(editedEvent).length !== 0 && Object.keys(selectedCustomer.identity).length !== 0" v-model="editionModal"
-      content-classes="modal-container-md" @hide="resetEditionForm()">
+    <q-modal v-if="Object.keys(editedEvent).length !== 0" v-model="editionModal" content-classes="modal-container-md"
+      @hide="resetEditionForm()">
       <div class="modal-padding">
         <div class="row q-mb-md">
           <div class="col-11 row person-name">
