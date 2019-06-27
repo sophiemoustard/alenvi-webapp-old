@@ -52,6 +52,7 @@ export default {
         startDate: false,
         endDate: false,
       },
+      blur: false,
     };
   },
   validations () {
@@ -76,6 +77,8 @@ export default {
       return selectOptions;
     },
     hasError () {
+      if (!this.blur) return false;
+
       if (this.error || Object.values(this.childErrors).indexOf(true) !== -1 ||
         this.$v.value.startDate.$error || this.$v.value.startHour.$error || this.$v.value.endDate.$error || this.$v.value.endHour.$error) {
         return true;
@@ -98,9 +101,10 @@ export default {
     blurHandler () {
       this.$v.value.$touch();
       this.$emit('blur');
+      this.blur = true;
     },
     update (value, key) {
-      this.blurHandler();
+      this.blur = false;
       const dates = { ...this.value, [key]: value }
       if (key === 'startDate') dates.endDate = value;
       if (key === 'startHour' && this.$moment(value, 'HH:mm').isSameOrAfter(this.$moment(this.value.endHour, 'HH:mm'))) {

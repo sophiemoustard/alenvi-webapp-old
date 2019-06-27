@@ -1,7 +1,7 @@
 <template>
   <div @click="datetimePopover = !datetimePopover">
     <q-input color="white" inverted-light :value="formattedDate" @input="updateInput" placeholder="jj/mm/yyyy"
-      @change="blurHandler" align="center" :class="[ datetimePopover ? 'underline' : '']" :disable="disable" />
+      @blur="blurHandler" align="center" :class="[ datetimePopover ? 'underline' : '']" :disable="disable" />
     <q-popover v-model="datetimePopover" :disable="disable">
       <q-datetime-picker :value="model" color="white" inverted-light @input="update" minimal :min="min" />
     </q-popover>
@@ -32,7 +32,7 @@ export default {
   },
   methods: {
     blurHandler (event) {
-      this.$emit('blur');
+      if (!this.datetimePopover) this.$emit('blur');
     },
     updateInput (value) {
       const momentValue = this.$moment(value, 'D/M/YYYY', true)
@@ -44,7 +44,6 @@ export default {
     },
     update (value) {
       this.datetimePopover = false;
-      this.model = value;
       this.$emit('error', false);
       this.$emit('input', value);
     },

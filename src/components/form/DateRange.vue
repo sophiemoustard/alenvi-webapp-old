@@ -43,6 +43,7 @@ export default {
         startDate: false,
         endDate: false,
       },
+      blur: false,
     };
   },
   computed: {
@@ -50,14 +51,16 @@ export default {
       return Object.values(this.childErrors).indexOf(true) !== -1;
     },
     hasError () {
-      return this.error || this.orderError || this.childrenHaveError;
+      return this.blur && (this.error || this.orderError || this.childrenHaveError);
     },
   },
   methods: {
     blurDateHandler (event) {
+      this.blur = true;
       this.$emit('blur');
     },
     update (value, key) {
+      this.blur = false;
       const dates = { ...this.value, [key]: value }
       const start = moment(dates.startDate);
       let end = moment(dates.endDate);
