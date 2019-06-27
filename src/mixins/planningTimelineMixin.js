@@ -30,7 +30,7 @@ export const planningTimelineMixin = {
     },
     endOfWeek () {
       const gapDays = this.isThreeDaysView ? 2 : 6;
-      return this.$moment(this.startOfWeek).add(gapDays, 'd');
+      return this.$moment(this.startOfWeek).add(gapDays, 'd').endOf('d');
     },
     timelineTitle () {
       if (this.startOfWeek === '') return '';

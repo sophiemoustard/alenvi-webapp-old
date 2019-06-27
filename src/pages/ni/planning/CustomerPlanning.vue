@@ -238,13 +238,13 @@ export default {
     }),
     // Dates
     endOfWeek () {
-      return this.$moment(this.startOfWeek).add(6, 'd');
+      return this.$moment(this.startOfWeek).endOf('w');
     },
     async updateStartOfWeek (vEvent) {
       const { startOfWeek } = vEvent;
-      this.startOfWeek = startOfWeek;
+      this.startOfWeek = startOfWeek.startOf('d');
 
-      const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
+      const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).endOf('w'));
       this.days = Array.from(range.by('days'));
       if (this.filteredSectors.length !== 0 || this.filteredCustomers.length !== 0) await this.refreshCustomers();
       if (this.customers.length !== 0) await this.refresh();
@@ -310,8 +310,8 @@ export default {
     async refresh () {
       try {
         this.events = await this.$events.list({
-          startDate: this.startOfWeek.format('YYYYMMDD'),
-          endDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
+          startDate: this.startOfWeek.toDate(),
+          endDate: this.endOfWeek().toDate(),
           customer: JSON.stringify(this.customers.map(cus => cus._id)),
         });
       } catch (e) {
@@ -554,8 +554,8 @@ export default {
     },
     async getCustomersBySectors (sectors) {
       return sectors.length === 0 ? [] : this.$customers.showAllBySector({
-        startDate: this.startOfWeek.format('YYYYMMDD'),
-        endDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
+        startDate: this.startOfWeek.toDate(),
+        endDate: this.endOfWeek().toDate(),
         sector: JSON.stringify(sectors),
       });
     },

@@ -164,8 +164,8 @@ export default {
     async refresh () {
       try {
         const params = {
-          startDate: this.startOfWeek.format('YYYYMMDD'),
-          endDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
+          startDate: this.startOfWeek.toDate(),
+          endDate: this.endOfWeek().toDate(),
           auxiliary: JSON.stringify([this.selectedAuxiliary._id]),
         }
         this.events = await this.$events.list(params);
