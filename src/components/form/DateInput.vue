@@ -37,7 +37,7 @@ export default {
     updateInput (value) {
       const momentValue = this.$moment(value, 'D/M/YYYY', true)
       if (!momentValue.isValid()) {
-        this.$emit('input', null);
+        this.$emit('error', true);
         return;
       }
       this.update(momentValue.toISOString());
@@ -45,6 +45,7 @@ export default {
     update (value) {
       this.datetimePopover = false;
       this.model = value;
+      this.$emit('error', false);
       this.$emit('input', value);
     },
     setModel (value) {

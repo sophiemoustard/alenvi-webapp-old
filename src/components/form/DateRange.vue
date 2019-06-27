@@ -7,12 +7,13 @@
     <q-field :error="hasError" :error-label="errorMessage">
       <div class="date-container" :class="{ borderless: borderless }">
         <div class="date-item">
-          <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" @blur="blurDateHandler" />
+          <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item"
+            @blur="blurDateHandler" @error="childErrors.startDate = $event" />
         </div>
         <p class="delimiter">-</p>
         <div class="date-item">
-          <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item" @blur="blurDateHandler"
-            :min="value.startDate" />
+          <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
+            @blur="blurDateHandler" :min="value.startDate" @error="childErrors.endDate = $event" />
         </div>
       </div>
     </q-field>
@@ -37,12 +38,19 @@ export default {
   data () {
     return {
       errorMessage: 'Date(s) invalide(s)',
-      childError: false,
+      orderError: false,
+      childErrors: {
+        startDate: false,
+        endDate: false,
+      },
     };
   },
   computed: {
+    childrenHaveError () {
+      return Object.values(this.childErrors).indexOf(true) !== -1;
+    },
     hasError () {
-      return this.error || this.childError;
+      return this.error || this.orderError || this.childrenHaveError;
     },
   },
   methods: {
@@ -51,15 +59,17 @@ export default {
     },
     update (value, key) {
       const dates = { ...this.value, [key]: value }
-
       const start = moment(dates.startDate);
-      const end = moment(dates.endDate);
-      this.childError = !start.isValid() || !end.isValid() || start.isAfter(end);
-      this.$emit('update:error', this.childError);
+      let end = moment(dates.endDate);
 
-      if (key === 'startDate' && moment(dates.startDate).isAfter(dates.endDate)) {
-        dates.endDate = this.$moment(dates.startDate).endOf('d').toISOString();
+      if (!this.childrenHaveError && key === 'startDate' && start.isAfter(end)) {
+        end = moment(start).endOf('d');
+        dates.endDate = end.toISOString();
       }
+
+      this.orderError = start.isAfter(end);
+
+      this.$emit('update:error', this.orderError || this.childrenHaveError);
       this.$emit('blur');
       this.$emit('input', dates);
     },
