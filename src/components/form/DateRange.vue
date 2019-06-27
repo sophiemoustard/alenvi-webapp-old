@@ -47,18 +47,16 @@ export default {
   },
   methods: {
     blurDateHandler (event) {
-      if (event && event.date === '') this.childError = true;
-      else if (event && event.date && !(this.$moment(event.date, 'DD/MM/YYYY', true).isValid())) this.childError = true;
-      else if (event && event.date && event.min && this.$moment(event.date).isBefore(this.$moment(event.min))) this.childError = true;
-      else this.childError = false;
-    },
-    blurHourHandler (event) {
-      if (event && event.hour === '') this.childError = true;
-      else if (event && event.hour && !event.hour.match(/[0-2][0-9]:([0-5]|[0-9])/)) this.childError = true;
-      else this.childError = false;
+      this.$emit('blur');
     },
     update (value, key) {
       const dates = { ...this.value, [key]: value }
+
+      const start = moment(dates.startDate);
+      const end = moment(dates.endDate);
+      this.childError = !start.isValid() || !end.isValid() || start.isAfter(end);
+      this.$emit('update:error', this.childError);
+
       if (key === 'startDate' && moment(dates.startDate).isAfter(dates.endDate)) {
         dates.endDate = this.$moment(dates.startDate).endOf('d').toISOString();
       }

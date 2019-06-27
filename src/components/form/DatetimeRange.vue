@@ -82,7 +82,7 @@ export default {
       const endTime = this.value.endHour.split(':')
       const endDatetime = this.$moment(this.value.endDate).hours(endTime[0]).minutes(endTime[1]);
 
-      return startDatetime.isAfter(endDatetime);
+      return !startDatetime.isValid() || !endDatetime.isValid() || startDatetime.isAfter(endDatetime);
     },
     endHourOptions () {
       return this.hoursOptions.map(option => {
