@@ -352,30 +352,6 @@ export default {
       };
       this.creationModal = true;
     },
-    resetCreationForm (partialReset, type = INTERVENTION) {
-      this.$v.newEvent.$reset();
-      if (!partialReset) this.newEvent = {};
-      else {
-        this.newEvent = {
-          type,
-          dates: {
-            startDate: partialReset ? this.newEvent.dates.startDate : '',
-            startHour: partialReset ? this.newEvent.dates.startHour : '',
-            endDate: partialReset ? this.newEvent.dates.endDate : '',
-            endHour: partialReset ? this.newEvent.dates.endHour : '',
-          },
-          repetition: { frequency: NEVER },
-          auxiliary: partialReset ? this.newEvent.auxiliary : '',
-          customer: '',
-          subscription: '',
-          sector: partialReset ? this.newEvent.sector : '',
-          internalHour: '',
-          absence: '',
-          location: {},
-          attachment: {},
-        };
-      }
-    },
     getPayload (event) {
       let payload = { ...this.$_.omit(event, ['dates', '__v', 'repetition']) }
       payload = this.$_.pickBy(payload);
@@ -417,9 +393,10 @@ export default {
 
         this.refresh();
         this.creationModal = false;
-        this.resetCreationForm(false);
         NotifyPositive('Évènement créé');
       } catch (e) {
+        console.error(e);
+        if (e.data && e.data.statusCode === 422) return NotifyNegative('La creation de cet evenement n\'est pas autorisée');
         NotifyNegative('Erreur lors de la création de l\'évènement');
       } finally {
         this.loading = false
@@ -433,10 +410,6 @@ export default {
       this.formatEditedEvent(event);
 
       this.editionModal = true;
-    },
-    resetEditionForm () {
-      this.$v.editedEvent.$reset();
-      this.editedEvent = {};
     },
     async updateEvent () {
       try {
