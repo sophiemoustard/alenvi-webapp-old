@@ -152,8 +152,8 @@ export default {
       if (!this.hasActiveCompanyContractOnEvent) return;
       try {
         this.monthEvents = await this.$events.list({
-          startDate: this.$moment(this.startOfWeekAsString).startOf('month').format('YYYYMMDD'),
-          endDate: this.$moment(this.startOfWeekAsString).endOf('month').add(1, 'd').format('YYYYMMDD'),
+          startDate: this.$moment(this.startOfWeekAsString).startOf('month').toDate(),
+          endDate: this.$moment(this.startOfWeekAsString).endOf('month').toDate(),
           auxiliary: this.person._id,
         });
       } catch (e) {

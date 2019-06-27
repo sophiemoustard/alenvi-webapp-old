@@ -159,7 +159,7 @@ export default {
         this.hasActiveCompanyContractOnEvent(aux, this.$moment(this.startOfWeekAsString), this.endOfWeek));
     },
     endOfWeek () {
-      return this.$moment(this.startOfWeekAsString).add(6, 'd');
+      return this.$moment(this.startOfWeekAsString).endOf('w');
     },
   },
   methods: {
@@ -169,7 +169,7 @@ export default {
     // Dates
     async updateStartOfWeek (vEvent) {
       const { startOfWeek } = vEvent;
-      this.startOfWeekAsString = startOfWeek.toISOString();
+      this.startOfWeekAsString = startOfWeek.startOf('d').toISOString();
 
       const range = this.$moment.range(this.startOfWeekAsString, this.$moment(this.startOfWeekAsString).add(6, 'd'));
       this.days = Array.from(range.by('days'));
@@ -179,8 +179,8 @@ export default {
     async refresh () {
       try {
         this.events = await this.$events.list({
-          startDate: this.$moment(this.startOfWeekAsString).startOf('d').format('YYYYMMDD'),
-          endDate: this.endOfWeek.endOf('d').format('YYYYMMDD'),
+          startDate: this.$moment(this.startOfWeekAsString).toDate(),
+          endDate: this.endOfWeek.toDate(),
           auxiliary: JSON.stringify(this.auxiliaries.map(aux => aux._id))
         });
       } catch (e) {

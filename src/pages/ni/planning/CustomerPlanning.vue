@@ -105,7 +105,7 @@ export default {
       events: [],
       customers: [],
       auxiliaries: [],
-      startDate: '',
+      startOfWeekAsString: '',
       filteredSectors: [],
       filteredCustomers: [],
       DEFAULT_AVATAR,
@@ -181,6 +181,9 @@ export default {
       getElemAdded: 'planning/getElemAdded',
       getElemRemoved: 'planning/getElemRemoved'
     }),
+    endOfWeek () {
+      return this.$moment(this.startOfWeekAsString).endOf('w');
+    },
     selectedCustomer () {
       if (this.creationModal && this.newEvent.customer !== '') return this.customers.find(cus => cus._id === this.newEvent.customer);
       if (this.editionModal && this.editedEvent.auxiliary !== '') return this.customers.find(cus => cus._id === this.editedEvent.customer._id);
@@ -237,14 +240,11 @@ export default {
       fillFilter: 'planning/fillFilter',
     }),
     // Dates
-    endOfWeek () {
-      return this.$moment(this.startOfWeek).add(6, 'd');
-    },
     async updateStartOfWeek (vEvent) {
       const { startOfWeek } = vEvent;
-      this.startOfWeek = startOfWeek;
+      this.startOfWeekAsString = startOfWeek.startOf('d').toISOString();
 
-      const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
+      const range = this.$moment.range(this.startOfWeekAsString, this.$moment(this.startOfWeekAsString).endOf('w'));
       this.days = Array.from(range.by('days'));
       if (this.filteredSectors.length !== 0 || this.filteredCustomers.length !== 0) await this.refreshCustomers();
       if (this.customers.length !== 0) await this.refresh();
@@ -310,8 +310,8 @@ export default {
     async refresh () {
       try {
         this.events = await this.$events.list({
-          startDate: this.startOfWeek.format('YYYYMMDD'),
-          endDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
+          startDate: this.$moment(this.startOfWeekAsString).toDate(),
+          endDate: this.endOfWeek.toDate(),
           customer: JSON.stringify(this.customers.map(cus => cus._id)),
         });
       } catch (e) {
@@ -554,8 +554,8 @@ export default {
     },
     async getCustomersBySectors (sectors) {
       return sectors.length === 0 ? [] : this.$customers.showAllBySector({
-        startDate: this.startOfWeek.format('YYYYMMDD'),
-        endDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
+        startDate: this.$moment(this.startOfWeekAsString).toDate(),
+        endDate: this.endOfWeek.toDate(),
         sector: JSON.stringify(sectors),
       });
     },

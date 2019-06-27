@@ -72,8 +72,8 @@ export default {
     async getEvents () {
       try {
         const params = {
-          startDate: this.startOfWeek.format('YYYYMMDD'),
-          endDate: this.endOfWeek().add(1, 'd').format('YYYYMMDD'),
+          startDate: this.startOfWeek.toDate(),
+          endDate: this.endOfWeek().toDate(),
           customer: JSON.stringify([this.customer._id]),
         }
         this.events = await this.$events.list(params);

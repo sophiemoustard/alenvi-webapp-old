@@ -12,7 +12,7 @@
         <q-btn icon="chevron_left" flat round @click="goToPreviousWeek()"></q-btn>
         <q-btn icon="chevron_right" flat round @click="goToNextWeek()"></q-btn>
         <q-btn icon="today" flat round @click="goToToday"></q-btn>
-        <template v-if="$q.platform.is.mobile" && isAgenda()>
+        <template v-if="$q.platform.is.mobile && isAgenda">
           <q-btn class="col-2 planning-view" sizs="sm" flat v-if="!isThreeDaysView" label="3J" @click="updateViewMode(THREE_DAYS_VIEW)" />
           <q-btn class="col-2 planning-view" sizs="sm" flat v-else label="7J" @click="updateViewMode(WEEK_VIEW)" />
         </template>
