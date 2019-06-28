@@ -1,7 +1,7 @@
 <template>
   <q-layout view="hhh Lpr lff">
     <q-page-sticky v-if="$q.platform.is.mobile" position="bottom-left" :offset="[18, 18]">
-      <q-btn class="menu-icon" color="primary" round dense big @click="toggleLeft" icon="menu" size="lg" />
+      <q-btn class="menu-icon" color="primary" round dense @click="toggleLeft" icon="menu" />
     </q-page-sticky>
 
     <q-btn v-if="!enableMini" flat round icon="chevron_left" @click="enableMini = !enableMini" class="chevron chevron-left" />
@@ -107,4 +107,7 @@ export default {
     color: $dark-grey
     &:hover
       color: $primary
+
+  .menu-icon
+    font-size: 17px;
   </style>
