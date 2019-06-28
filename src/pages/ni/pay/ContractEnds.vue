@@ -4,7 +4,8 @@
       <h4>Fins de contrats</h4>
     </div>
     <q-table :data="draftFinalPay" :columns="columns" class="q-pa-sm large-table" selection="multiple"
-      row-key="auxiliaryId" :selected.sync="selected" :pagination.sync="pagination" :visible-columns="visibleColumns">
+      row-key="auxiliaryId" :selected.sync="selected" :pagination.sync="pagination" :visible-columns="visibleColumns"
+      :loading="tableLoading">
       <q-tr slot="header" slot-scope="props">
         <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
         <q-th auto-width>
@@ -109,6 +110,7 @@ export default {
       draftFinalPay: [],
       selected: [],
       pagination: { rowsPerPage: 0 },
+      tableLoading: false,
       visibleColumns: ['auxiliary', 'sector', 'startDate', 'endNotificationDate', 'endReason', 'endDate', 'contractHours', 'workedHours',
         'notSurchargedAndExempt', 'surchargedAndExempt', 'notSurchargedAndNotExempt', 'surchargedAndNotExempt', 'hoursBalance', 'hoursCounter',
         'overtimeHours', 'additionalHours', 'mutual', 'transport', 'otherFees', 'bonus', 'compensation'],
@@ -122,7 +124,9 @@ export default {
     },
   },
   async mounted () {
+    this.tableLoading = true;
     await this.refreshFinalPay();
+    this.tableLoading = false;
   },
   methods: {
     async refreshFinalPay () {
