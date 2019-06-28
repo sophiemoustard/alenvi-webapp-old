@@ -168,7 +168,7 @@ export default {
       let weeklyBreak = 0;
       for (const info of this.breakInfo) {
         if (info.timeBetween) weeklyBreak += info.timeBetween;
-        if (!info.isFirstOrLast) weeklyPaidTransports += getPaidTransport(info.transportDuration, info.timeBetween);
+        if (info.transportDuration > 0) weeklyPaidTransports += getPaidTransport(info.transportDuration, info.timeBetween);
       };
 
       this.weeklyBreak = weeklyBreak / 60;
@@ -232,20 +232,22 @@ export default {
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
     },
     async getBreakInfoBetweenTwoEvents (eventOrigin, eventDestination) {
-      const origins = this.getEventAddress(eventOrigin);
-      const destinations = this.getEventAddress(eventDestination);
-      if (!origins || !destinations) return null;
-
-      const transportDuration = await this.getTransportDuration(origins, destinations);
       const timeBetween = this.$moment(eventDestination.startDate).diff(this.$moment(eventOrigin.endDate), 'minutes');
-
-      return {
+      const breakInfo = {
         origin: eventOrigin._id,
         destination: eventDestination._id,
-        transportDuration,
         timeBetween,
-        isFirstOrLast: false,
-      };
+      }
+
+      const origins = this.getEventAddress(eventOrigin);
+      const destinations = this.getEventAddress(eventDestination);
+      if (!origins || !destinations) {
+        return { ...breakInfo, transportDuration: 0 };
+      }
+
+      const transportDuration = await this.getTransportDuration(origins, destinations);
+
+      return { ...breakInfo, transportDuration };
     },
     // Compute contract hours
     getCurrentContract (contracts, day) {
