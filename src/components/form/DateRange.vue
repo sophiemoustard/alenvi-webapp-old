@@ -8,12 +8,12 @@
       <div class="date-container" :class="{ borderless: borderless }">
         <div class="date-item">
           <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item"
-            @blur="blurDateHandler" @error="childErrors.startDate = $event" />
+            @blur="blurDateHandler" @error="setFieldError('startDate', $event)" />
         </div>
         <p class="delimiter">-</p>
         <div class="date-item">
           <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
-            @blur="blurDateHandler" :min="value.startDate" @error="childErrors.endDate = $event" />
+            @blur="blurDateHandler" :min="value.startDate" @error="setFieldError('endDate', $event)" />
         </div>
       </div>
     </q-field>
@@ -60,22 +60,28 @@ export default {
       this.$emit('blur');
     },
     update (value, key) {
-      this.blur = false;
       const dates = { ...this.value, [key]: value }
-      const start = moment(dates.startDate);
-      let end = moment(dates.endDate);
+      this.blur = false;
 
-      if (!this.childrenHaveError && key === 'startDate' && start.isAfter(end)) {
-        end = moment(start).endOf('d');
-        dates.endDate = end.toISOString();
+      if (!this.childrenHaveError) {
+        const start = moment(dates.startDate);
+        let end = moment(dates.endDate);
+
+        if (key === 'startDate' && start.isAfter(end)) {
+          end = moment(start).endOf('d');
+          dates.endDate = end.toISOString();
+        }
+
+        this.orderError = start.isAfter(end);
       }
 
-      this.orderError = start.isAfter(end);
-
       this.$emit('update:error', this.orderError || this.childrenHaveError);
-      this.$emit('blur');
       this.$emit('input', dates);
     },
+    setFieldError (field, error) {
+      this.childErrors[field] = error;
+      this.$emit('update:error', this.orderError || this.childrenHaveError);
+    }
   },
 }
 </script>
