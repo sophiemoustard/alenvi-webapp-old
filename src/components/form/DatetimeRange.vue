@@ -8,7 +8,7 @@
       <div class="datetime-container">
         <div class="datetime-item">
           <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item"
-            @blur="blurHandler" :disable="disable" />
+            @blur="blurHandler" :disable="disable" @error="childErrors.startDate = $event" />
           <ni-select-input :value="value.startHour" @input="update($event, 'startHour')" class="time-item"
             @blur="blurHandler" :options="hoursOptions" filter :filter-placeholder="value.startHour" hide-underline
             name="start-hour" :disable="disable" align="center" />
@@ -16,7 +16,7 @@
         <p class="delimiter">-</p>
         <div class="datetime-item end">
           <ni-select-input :value="value.endHour" @input="update($event, 'endHour')" class="time-item" align="center"
-            @blur="blurHandler" :options="endHourOptions" :disable="disable" />
+            @blur="blurHandler" :options="endHourOptions" :disable="disable" @error="childErrors.endDate = $event" />
           <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
             @blur="blurHandler" :min="value.startDate" :disable="disable || disableEndDate" />
         </div>
@@ -48,7 +48,11 @@ export default {
   data () {
     return {
       errorMessage: 'Date(s) et heure(s) invalide(s)',
-      childError: false,
+      childErrors: {
+        startDate: false,
+        endDate: false,
+      },
+      blur: false,
     };
   },
   validations () {
@@ -73,7 +77,10 @@ export default {
       return selectOptions;
     },
     hasError () {
-      if (this.error || this.$v.value.startDate.$error || this.$v.value.startHour.$error || this.$v.value.endDate.$error || this.$v.value.endHour.$error) {
+      if (!this.blur) return false;
+
+      if (this.error || Object.values(this.childErrors).indexOf(true) !== -1 ||
+        this.$v.value.startDate.$error || this.$v.value.startHour.$error || this.$v.value.endDate.$error || this.$v.value.endHour.$error) {
         return true;
       }
 
@@ -94,9 +101,10 @@ export default {
     blurHandler () {
       this.$v.value.$touch();
       this.$emit('blur');
+      this.blur = true;
     },
     update (value, key) {
-      this.blurHandler();
+      this.blur = false;
       const dates = { ...this.value, [key]: value }
       if (key === 'startDate') dates.endDate = value;
       if (key === 'startHour' && this.$moment(value, 'HH:mm').isSameOrAfter(this.$moment(this.value.endHour, 'HH:mm'))) {

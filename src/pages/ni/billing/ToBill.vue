@@ -2,7 +2,8 @@
   <q-page class="neutral-background q-pb-xl">
     <div class="title-padding">
       <h4>À facturer</h4>
-      <ni-date-range v-model="billingDates" @input="getDraftBills" borderless />
+      <ni-date-range v-model="billingDates" @input="getDraftBills" borderless
+        :error.sync="billingDatesHasError" />
     </div>
     <q-table :data="draftBills" :columns="columns" row-key="customerId" binary-state-sort :loading="tableLoading"
       :pagination.sync="pagination" separator="none" selection="multiple" :selected.sync="selected"
@@ -68,6 +69,7 @@ export default {
         startDate: null,
         endDate: null,
       },
+      billingDatesHasError: false,
       draftBills: [],
       selected: [],
       columns: [
@@ -175,6 +177,8 @@ export default {
       return bills.map(bill => ({ ...bill, discountEdition: false }));
     },
     async getDraftBills () {
+      if (this.billingDatesHasError) return;
+
       try {
         this.tableLoading = true;
         const params = {
