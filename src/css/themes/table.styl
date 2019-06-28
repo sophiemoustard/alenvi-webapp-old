@@ -174,10 +174,12 @@
         & .q-item-section + .q-item-section
           margin-left: 20px
     &-container
-      & .q-table-bottom
-        padding-left: 12px
       & .q-table-nodata > i
         display: none
+  .q-table-bottom
+    @media (max-width: 767px)
+      padding-left: 4px;
+      padding-right: 4px;
 
 .datatable
   &-row
