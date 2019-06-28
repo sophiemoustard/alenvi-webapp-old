@@ -527,7 +527,11 @@ export default {
         }
         payload.subscription = {
           _id: subscription._id,
-          service: subscription.service.name,
+          service: {
+            serviceId: subscription.service._id,
+            nature: subscription.service.nature,
+            name: subscription.service.name,
+          },
           vat,
           unitInclTaxes: subscription.versions && subscription.versions.length > 0
             ? getLastVersion(subscription.versions, 'createdAt').unitTTCRate
@@ -536,15 +540,27 @@ export default {
       } else {
         payload.startDate = creditNote.startDate;
         payload.endDate = creditNote.endDate;
-        payload.events = creditNote.events.length > 0 ? creditNote.events : null;
         payload.exclTaxesCustomer = creditNote.exclTaxesCustomer;
         payload.inclTaxesCustomer = creditNote.inclTaxesCustomer;
         payload.exclTaxesTpp = creditNote.exclTaxesTpp;
         payload.inclTaxesTpp = creditNote.inclTaxesTpp;
         payload.thirdPartyPayer = creditNote.thirdPartyPayer;
+
+        if (creditNote.events.length > 0) {
+          payload.events = payload.events.map(eventId => {
+            const event = this.events.find(ev => ev._id === eventId);
+            return {
+              eventId: event._id,
+              auxiliary: event.auxiliary,
+              startDate: event.startDate,
+              endDate: event.endDate,
+              bills: { ...event.bills },
+            };
+          });
+        }
       }
 
-      return this.$_.pickBy(payload);
+      return this.$_.pickBy(payload, prop => prop != null);
     },
     async createNewCreditNote () {
       try {
@@ -574,11 +590,13 @@ export default {
       if (this.hasLinkedEvents) {
         await this.getEvents();
         for (let i = 0, l = creditNote.events.length; i < l; i++) {
-          if (!this.events.some(event => creditNote.events[i]._id === event._id)) {
-            this.events.push(creditNote.events[i]);
+          if (!this.events.some(event => creditNote.events[i].eventId === event._id)) {
+            const event = { ...creditNote.events[i] };
+            event._id = event.eventId;
+            this.events.push(event);
           }
         }
-        this.editedCreditNote.events = creditNote.events.map(ev => ev._id);
+        this.editedCreditNote.events = creditNote.events.map(ev => ev.eventId);
       } else {
         this.editedCreditNote.subscription = creditNote.subscription._id;
       }
