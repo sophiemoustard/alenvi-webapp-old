@@ -3,8 +3,8 @@
     <div class="title-padding">
       <h4>Fins de contrats</h4>
     </div>
-    <q-table :data="draftFinalPay" :columns="columns" class="q-pa-sm" selection="multiple" row-key="auxiliaryId"
-      :selected.sync="selected" :pagination.sync="pagination" :visible-columns="visibleColumns">
+    <q-table :data="draftFinalPay" :columns="columns" class="q-pa-sm large-table" selection="multiple"
+      row-key="auxiliaryId" :selected.sync="selected" :pagination.sync="pagination" :visible-columns="visibleColumns">
       <q-tr slot="header" slot-scope="props">
         <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
         <q-th auto-width>
@@ -184,15 +184,6 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables';
-
-  /deep/ .q-table
-    th
-      white-space: normal;
-      padding: 10px 20px;
-      vertical-align: middle;
-      padding: 6px
-    td
-      padding: 6px
 
   .surcharge-line
     display: flex;
