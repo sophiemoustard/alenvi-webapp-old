@@ -60,7 +60,7 @@ export default {
       isLoaded: false,
       customer: {
         identity: {},
-        contact: {},
+        contact: { address: {} },
         followUp: {},
       },
       selectOptions: pathologies,
