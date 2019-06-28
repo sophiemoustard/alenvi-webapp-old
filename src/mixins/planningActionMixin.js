@@ -12,6 +12,7 @@ export const planningActionMixin = {
     hasActiveCustomerContractOnEvent (auxiliary, startDate, endDate = startDate) {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
       if (!auxiliary.contracts.some(contract => contract.status === CUSTOMER_CONTRACT)) return false;
+
       const customerContracts = auxiliary.contracts.filter(contract => contract.status === CUSTOMER_CONTRACT);
 
       return customerContracts.some(contract => {
@@ -19,9 +20,10 @@ export const planningActionMixin = {
           ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isSameOrAfter(startDate));
       });
     },
-    hasActiveCompanyContractOnEvent (auxiliary, startDate, endDate) {
+    hasActiveCompanyContractOnEvent (auxiliary, startDate, endDate = startDate) {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
       if (!auxiliary.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
+
       const companyContracts = auxiliary.contracts.filter(contract => contract.status === COMPANY_CONTRACT);
 
       return companyContracts.some(contract => {
