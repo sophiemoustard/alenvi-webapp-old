@@ -56,8 +56,8 @@ export default {
       ratio: { weeklyHours: 0, contractHours: 0 },
       indicatorsModal: false,
       tabsContent: [
-        { label: 'Stats de la semaine', default: true, name: WEEK_STATS, disable: false },
-        { label: 'Stats du mois', default: false, name: 'month_stat', disable: true },
+        { label: 'Stats de la semaine', default: true, name: WEEK_STATS },
+        { label: 'Stats du mois', default: false, name: 'month_stat' },
       ],
       breakInfo: [],
       weeklyInternalHours: 0,
@@ -75,7 +75,7 @@ export default {
       return this.ratio.contractHours !== 0 && this.ratio.weeklyHours > this.ratio.contractHours;
     },
     endOfWeek () {
-      return this.$moment(this.startOfWeekAsString).add(6, 'd').toISOString();
+      return this.$moment(this.startOfWeekAsString).endOf('w').toISOString();
     },
     days () {
       let range;
@@ -85,6 +85,7 @@ export default {
         const end = this.$moment(this.startOfWeekAsString).endOf('month');
         range = this.$moment.range(start, end);
       }
+
       return Array.from(range.by('days'));
     },
     totalWorkingHours () {
@@ -179,12 +180,12 @@ export default {
       let weeklyInterventions = 0;
       let hoursByCustomer = {}
       for (const event of this.selectedEvents) {
-        if (event.type === INTERNAL_HOUR) weeklyInternalHours += this.$moment(event.endDate).diff(event.startDate, 'm', true);
+        const interventionTime = this.$moment(event.endDate).diff(event.startDate, 'm', true);
+        if (event.type === INTERNAL_HOUR) weeklyInternalHours += interventionTime;
         if (event.type === INTERVENTION) {
-          weeklyInterventions += this.$moment(event.endDate).diff(event.startDate, 'm', true);
           if (!Object.keys(hoursByCustomer).includes(event.customer._id)) hoursByCustomer[event.customer._id] = 0;
-          const interventionTime = this.$moment(event.endDate).diff(event.startDate, 'm', true);
           hoursByCustomer[event.customer._id] += interventionTime;
+          weeklyInterventions += interventionTime;
         }
       };
 
