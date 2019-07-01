@@ -141,14 +141,14 @@ export default {
       if (this.creationModal && this.newEvent.auxiliary) {
         const aux = this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
         const hasActiveCustomerContractOnEvent = this.hasActiveCustomerContractOnEvent(aux, this.newEvent.dates.startDate);
-        const hasActiveCompanyContractOnEvent = this.hasActiveCompanyContractOnEvent(aux, this.newEvent.dates.endDate);
+        const hasActiveCompanyContractOnEvent = this.hasActiveCompanyContractOnEvent(aux, this.newEvent.dates.startDate);
 
         return { ...aux, hasActiveCustomerContractOnEvent, hasActiveCompanyContractOnEvent };
       }
       if (this.editionModal && this.editedEvent.auxiliary) {
         const aux = this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
         const hasActiveCustomerContractOnEvent = this.hasActiveCustomerContractOnEvent(aux, this.editedEvent.dates.startDate);
-        const hasActiveCompanyContractOnEvent = this.hasActiveCompanyContractOnEvent(aux, this.editedEvent.dates.endDate);
+        const hasActiveCompanyContractOnEvent = this.hasActiveCompanyContractOnEvent(aux, this.editedEvent.dates.startDate);
 
         return { ...aux, hasActiveCustomerContractOnEvent, hasActiveCompanyContractOnEvent };
       }
