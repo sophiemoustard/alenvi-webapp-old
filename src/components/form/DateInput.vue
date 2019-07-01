@@ -1,9 +1,9 @@
 <template>
   <div @click="datetimePopover = !datetimePopover">
-    <q-input color="white" inverted-light :value="formattedDate" @input="update($event, 'DD/MM/YYYY')" placeholder="jj/mm/yyyy"
-      @change="blurHandler" align="center" :class="[ datetimePopover ? 'underline' : '']" :disable="disable" />
+    <q-input color="white" inverted-light :value="formattedDate" @input="updateInput" placeholder="jj/mm/yyyy"
+      @blur="blurHandler" align="center" :class="[ datetimePopover ? 'underline' : '']" :disable="disable" />
     <q-popover v-model="datetimePopover" :disable="disable">
-      <q-datetime-picker :value="value" format="DD MMM YYYY" color="white" inverted-light @input="update" minimal :min="min" />
+      <q-datetime-picker :value="model" color="white" inverted-light @input="update" minimal :min="min" />
     </q-popover>
   </div>
 </template>
@@ -19,23 +19,44 @@ export default {
   data () {
     return {
       datetimePopover: false,
+      model: null,
     };
   },
   computed: {
     formattedDate () {
-      return this.$moment(this.value).format('DD/MM/YYYY');
+      return this.$moment(this.model).format('DD/MM/YYYY');
     },
+  },
+  mounted () {
+    this.setModel(this.value);
   },
   methods: {
     blurHandler (event) {
-      this.$emit('blur');
+      if (!this.datetimePopover) this.$emit('blur');
     },
-    update (value, format) {
+    updateInput (value) {
+      const momentValue = this.$moment(value, 'D/M/YYYY', true)
+      if (!momentValue.isValid()) {
+        this.$emit('error', true);
+        return;
+      }
+      this.update(momentValue.toISOString());
+    },
+    update (value) {
       this.datetimePopover = false;
-      this.$emit('blur');
+      this.$emit('error', false);
       this.$emit('input', value);
     },
+    setModel (value) {
+      if (!this.$moment(value).isValid()) return;
+      this.model = value;
+    }
   },
+  watch: {
+    value (value) {
+      this.setModel(value);
+    }
+  }
 }
 </script>
 

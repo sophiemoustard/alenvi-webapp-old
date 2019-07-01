@@ -56,8 +56,8 @@ export default {
       ratio: { weeklyHours: 0, contractHours: 0 },
       indicatorsModal: false,
       tabsContent: [
-        { label: 'Stats de la semaine', default: true, name: WEEK_STATS, disable: false },
-        { label: 'Stats du mois', default: false, name: 'month_stat', disable: true },
+        { label: 'Stats de la semaine', default: true, name: WEEK_STATS },
+        { label: 'Stats du mois', default: false, name: 'month_stat' },
       ],
       breakInfo: [],
       weeklyInternalHours: 0,
@@ -75,7 +75,7 @@ export default {
       return this.ratio.contractHours !== 0 && this.ratio.weeklyHours > this.ratio.contractHours;
     },
     endOfWeek () {
-      return this.$moment(this.startOfWeekAsString).add(6, 'd').toISOString();
+      return this.$moment(this.startOfWeekAsString).endOf('w').toISOString();
     },
     days () {
       let range;
@@ -85,6 +85,7 @@ export default {
         const end = this.$moment(this.startOfWeekAsString).endOf('month');
         range = this.$moment.range(start, end);
       }
+
       return Array.from(range.by('days'));
     },
     totalWorkingHours () {
@@ -152,8 +153,8 @@ export default {
       if (!this.hasActiveCompanyContractOnEvent) return;
       try {
         this.monthEvents = await this.$events.list({
-          startDate: this.$moment(this.startOfWeekAsString).startOf('month').format('YYYYMMDD'),
-          endDate: this.$moment(this.startOfWeekAsString).endOf('month').add(1, 'd').format('YYYYMMDD'),
+          startDate: this.$moment(this.startOfWeekAsString).startOf('month').toDate(),
+          endDate: this.$moment(this.startOfWeekAsString).endOf('month').toDate(),
           auxiliary: this.person._id,
         });
       } catch (e) {
@@ -168,7 +169,7 @@ export default {
       let weeklyBreak = 0;
       for (const info of this.breakInfo) {
         if (info.timeBetween) weeklyBreak += info.timeBetween;
-        if (!info.isFirstOrLast) weeklyPaidTransports += getPaidTransport(info.transportDuration, info.timeBetween);
+        if (info.transportDuration > 0) weeklyPaidTransports += getPaidTransport(info.transportDuration, info.timeBetween);
       };
 
       this.weeklyBreak = weeklyBreak / 60;
@@ -179,12 +180,12 @@ export default {
       let weeklyInterventions = 0;
       let hoursByCustomer = {}
       for (const event of this.selectedEvents) {
-        if (event.type === INTERNAL_HOUR) weeklyInternalHours += this.$moment(event.endDate).diff(event.startDate, 'm', true);
+        const interventionTime = this.$moment(event.endDate).diff(event.startDate, 'm', true);
+        if (event.type === INTERNAL_HOUR) weeklyInternalHours += interventionTime;
         if (event.type === INTERVENTION) {
-          weeklyInterventions += this.$moment(event.endDate).diff(event.startDate, 'm', true);
           if (!Object.keys(hoursByCustomer).includes(event.customer._id)) hoursByCustomer[event.customer._id] = 0;
-          const interventionTime = this.$moment(event.endDate).diff(event.startDate, 'm', true);
           hoursByCustomer[event.customer._id] += interventionTime;
+          weeklyInterventions += interventionTime;
         }
       };
 
@@ -232,20 +233,22 @@ export default {
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
     },
     async getBreakInfoBetweenTwoEvents (eventOrigin, eventDestination) {
-      const origins = this.getEventAddress(eventOrigin);
-      const destinations = this.getEventAddress(eventDestination);
-      if (!origins || !destinations) return null;
-
-      const transportDuration = await this.getTransportDuration(origins, destinations);
       const timeBetween = this.$moment(eventDestination.startDate).diff(this.$moment(eventOrigin.endDate), 'minutes');
-
-      return {
+      const breakInfo = {
         origin: eventOrigin._id,
         destination: eventDestination._id,
-        transportDuration,
         timeBetween,
-        isFirstOrLast: false,
-      };
+      }
+
+      const origins = this.getEventAddress(eventOrigin);
+      const destinations = this.getEventAddress(eventDestination);
+      if (!origins || !destinations) {
+        return { ...breakInfo, transportDuration: 0 };
+      }
+
+      const transportDuration = await this.getTransportDuration(origins, destinations);
+
+      return { ...breakInfo, transportDuration };
     },
     // Compute contract hours
     getCurrentContract (contracts, day) {

@@ -3,7 +3,7 @@
     <div class="q-pa-sm q-mb-lg">
       <div class="title">
         <p class="text-weight-bold">{{ this.customer.identity | formatFullIdentity }}</p>
-        <ni-date-range v-model="billingDates" @input="refresh" />
+        <ni-date-range v-model="billingDates" @input="refresh" :error.sync="billingDatesHasError" />
       </div>
       <ni-customer-billing-table v-if="!loading" :documents="customerBillingDocuments" :billingDates="billingDates"
         :displayActions="user.role.name === ADMIN || user.role.name === COACH" @openEditionModal="openEditionModal"
@@ -66,6 +66,7 @@ export default {
       customerBillingDocuments: [],
       tppBillingDocuments: {},
       billingDates: { startDate: this.$moment().toISOString(), endDate: this.$moment().toISOString() },
+      billingDatesHasError: false,
       balances: [],
       COACH,
       ADMIN,
@@ -149,6 +150,8 @@ export default {
     },
     // Refresh data
     async refresh () {
+      if (this.billingDatesHasError) return;
+
       this.loading = true;
       this.customerBillingDocuments = [];
       this.tppBillingDocuments = {};

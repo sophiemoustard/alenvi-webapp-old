@@ -7,12 +7,13 @@
     <q-field :error="hasError" :error-label="errorMessage">
       <div class="date-container" :class="{ borderless: borderless }">
         <div class="date-item">
-          <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" @blur="blurDateHandler" />
+          <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item"
+            @blur="blurDateHandler" @error="setFieldError('startDate', $event)" />
         </div>
         <p class="delimiter">-</p>
         <div class="date-item">
-          <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item" @blur="blurDateHandler"
-            :min="value.startDate" />
+          <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
+            @blur="blurDateHandler" :min="value.startDate" @error="setFieldError('endDate', $event)" />
         </div>
       </div>
     </q-field>
@@ -37,34 +38,50 @@ export default {
   data () {
     return {
       errorMessage: 'Date(s) invalide(s)',
-      childError: false,
+      orderError: false,
+      childErrors: {
+        startDate: false,
+        endDate: false,
+      },
+      blur: false,
     };
   },
   computed: {
+    childrenHaveError () {
+      return Object.values(this.childErrors).indexOf(true) !== -1;
+    },
     hasError () {
-      return this.error || this.childError;
+      return this.blur && (this.error || this.orderError || this.childrenHaveError);
     },
   },
   methods: {
     blurDateHandler (event) {
-      if (event && event.date === '') this.childError = true;
-      else if (event && event.date && !(this.$moment(event.date, 'DD/MM/YYYY', true).isValid())) this.childError = true;
-      else if (event && event.date && event.min && this.$moment(event.date).isBefore(this.$moment(event.min))) this.childError = true;
-      else this.childError = false;
-    },
-    blurHourHandler (event) {
-      if (event && event.hour === '') this.childError = true;
-      else if (event && event.hour && !event.hour.match(/[0-2][0-9]:([0-5]|[0-9])/)) this.childError = true;
-      else this.childError = false;
+      this.blur = true;
+      this.$emit('blur');
     },
     update (value, key) {
       const dates = { ...this.value, [key]: value }
-      if (key === 'startDate' && moment(dates.startDate).isAfter(dates.endDate)) {
-        dates.endDate = this.$moment(dates.startDate).endOf('d').toISOString();
+      this.blur = false;
+
+      if (!this.childrenHaveError) {
+        const start = moment(dates.startDate);
+        let end = moment(dates.endDate);
+
+        if (key === 'startDate' && start.isAfter(end)) {
+          end = moment(start).endOf('d');
+          dates.endDate = end.toISOString();
+        }
+
+        this.orderError = start.isAfter(end);
       }
-      this.$emit('blur');
+
+      this.$emit('update:error', this.orderError || this.childrenHaveError);
       this.$emit('input', dates);
     },
+    setFieldError (field, error) {
+      this.childErrors[field] = error;
+      this.$emit('update:error', this.orderError || this.childrenHaveError);
+    }
   },
 }
 </script>

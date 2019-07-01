@@ -3,9 +3,11 @@
     <h4>Historique</h4>
     <div class="row gutter-sm">
       <ni-select caption="Type d'export" :options="exportTypeOptions" v-model="type" />
-      <ni-date-range class="col-12 col-md-6" caption="Période" v-model="dateRange" borderless />
+      <ni-date-range class="col-12 col-md-6" caption="Période" v-model="dateRange" borderless
+        :error.sync="dateRangeHasError" />
     </div>
-    <q-btn label="Exporter" no-caps flat color="white" icon="import_export" @click="exportCsv" />
+    <q-btn label="Exporter" no-caps flat color="white" icon="import_export" @click="exportCsv"
+      :disable="dateRangeHasError" />
   </q-page>
 </template>
 
@@ -27,7 +29,8 @@ export default {
     return {
       exportTypeOptions: EXPORT_HISTORY_TYPES,
       type: WORKING_EVENT,
-      dateRange: { startDate: this.$moment().subtract(1, 'year').toISOString(), endDate: this.$moment().toISOString() }
+      dateRange: { startDate: this.$moment().subtract(1, 'year').toISOString(), endDate: this.$moment().toISOString() },
+      dateRangeHasError: false,
     }
   },
   methods: {

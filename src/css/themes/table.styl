@@ -174,10 +174,12 @@
         & .q-item-section + .q-item-section
           margin-left: 20px
     &-container
-      & .q-table-bottom
-        padding-left: 12px
       & .q-table-nodata > i
         display: none
+  .q-table-bottom
+    @media (max-width: 767px)
+      padding-left: 4px;
+      padding-right: 4px;
 
 .datatable
   &-row
@@ -208,3 +210,12 @@
       font-size: 13px
     & span.q-if-addon
       font-size: 13px
+
+.large-table
+  table
+    th
+      white-space: normal;
+      vertical-align: middle;
+      padding: 6px
+    td
+      padding: 6px

@@ -2,10 +2,12 @@
   <q-page class="neutral-background q-pb-xl">
     <div class="title-padding">
       <h4>À facturer</h4>
-      <ni-date-range v-model="billingDates" @input="getDraftBills" borderless />
+      <ni-date-range v-model="billingDates" @input="getDraftBills" borderless
+        :error.sync="billingDatesHasError" />
     </div>
     <q-table :data="draftBills" :columns="columns" row-key="customerId" binary-state-sort :loading="tableLoading"
-      :pagination.sync="pagination" separator="none" selection="multiple" :selected.sync="selected" class="q-pa-sm">
+      :pagination.sync="pagination" separator="none" selection="multiple" :selected.sync="selected"
+      class="q-pa-sm large-table">
       <q-tr slot="header" slot-scope="props">
         <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
         <q-th auto-width>
@@ -67,6 +69,7 @@ export default {
         startDate: null,
         endDate: null,
       },
+      billingDatesHasError: false,
       draftBills: [],
       selected: [],
       columns: [
@@ -174,6 +177,8 @@ export default {
       return bills.map(bill => ({ ...bill, discountEdition: false }));
     },
     async getDraftBills () {
+      if (this.billingDatesHasError) return;
+
       try {
         this.tableLoading = true;
         const params = {
@@ -242,22 +247,3 @@ export default {
   }
 }
 </script>
-
-<style lang="stylus" scoped>
-  @import '~variables'
-
-  .editable
-    color: $primary
-    cursor: pointer
-
-  /deep/ .q-table
-    border-collapse: separate
-    td:first-child
-    th:first-child
-      width: 100px;
-      padding: 7px !important;
-    & tbody tr.selected
-      background: $white
-    &-bottom > .q-icon
-      display: none
-</style>

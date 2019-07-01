@@ -101,9 +101,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-
-  /deep/ .datatable-inner-input
-    min-width: 50px
-</style>
