@@ -175,7 +175,7 @@ export default {
     },
     async getAuxiliaries () {
       try {
-        this.auxiliaries = await this.$users.showAll({ sector: this.currentUser.sector });
+        this.auxiliaries = await this.$users.showAllActive({ sector: this.currentUser.sector });
       } catch (e) {
         this.auxiliaries = [];
       }
