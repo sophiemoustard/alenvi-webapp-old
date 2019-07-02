@@ -474,11 +474,11 @@ export default {
       }
     },
     // Compute
-    computePrices (events) {
+    computePrices (eventIds) {
       let exclTaxesCustomer = 0, inclTaxesCustomer = 0;
       let exclTaxesTpp = 0, inclTaxesTpp = 0;
       if (this.events) {
-        const creditNoteEvents = this.events.filter(ev => events.includes(ev._id));
+        const creditNoteEvents = this.events.filter(ev => eventIds.includes(ev._id));
         for (let i = 0, l = creditNoteEvents.length; i < l; i++) {
           if (creditNoteEvents[i].bills.exclTaxesCustomer) {
             exclTaxesCustomer += creditNoteEvents[i].bills.exclTaxesCustomer;
@@ -547,7 +547,7 @@ export default {
         payload.thirdPartyPayer = creditNote.thirdPartyPayer;
 
         if (creditNote.events.length > 0) {
-          payload.events = payload.events.map(eventId => {
+          payload.events = creditNote.events.map(eventId => {
             const event = this.events.find(ev => ev._id === eventId);
             return {
               eventId: event._id,
