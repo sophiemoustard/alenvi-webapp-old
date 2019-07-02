@@ -19,7 +19,6 @@
       </template>
       <ni-menu-item name="auxiliaries planning" icon="date range" label="Auxiliaires" />
       <ni-menu-item name="customers planning" icon="date range" label="Bénéficiaires" />
-      <ni-menu-item name="constrained coaches" icon="perm contact calendar" label="Coach(s) de permanence" />
     </q-collapsible>
     <q-item-separator />
     <q-collapsible ref="benef" v-model="activeRoutes.benef.open" collapseIcon="expand_more">
