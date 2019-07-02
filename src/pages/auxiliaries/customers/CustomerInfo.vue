@@ -47,8 +47,8 @@ export default {
     'ni-select': Select,
   },
   props: {
-    id: String,
-    customerId: String
+    id: { type: String },
+    customerId: { type: String },
   },
   mixins: [followUpMixin],
   metaInfo: {

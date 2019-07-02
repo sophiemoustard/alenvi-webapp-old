@@ -26,7 +26,7 @@ export const followUpMixin = {
 
         const value = this.$_.get(this.customer, path);
         const payload = this.$_.set({}, path, value);
-        payload._id = this.userProfile._id;
+        payload._id = this.customer._id;
 
         await this.$customers.updateById(payload);
         NotifyPositive('Modification enregistrée');
