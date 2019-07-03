@@ -19,7 +19,6 @@ module.exports = function (ctx) {
       'messages',
       'moment',
       'ogust',
-      'planningUpdates',
       'resize',
       'roles',
       'sectors',
