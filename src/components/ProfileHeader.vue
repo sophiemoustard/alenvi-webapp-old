@@ -160,19 +160,6 @@ export default {
       this.loading = false;
       this.opened = false;
     },
-    async sendMessageToBotUser () {
-      try {
-        await this.$message.sendMessage({
-          message: this.messageComp,
-          address: this.user.facebook.address
-        });
-        NotifyPositive('Message par Pigi bien envoyé');
-      } catch (e) {
-        console.error(e);
-        this.loading = false;
-        NotifyNegative('Erreur lors de l\'envoi du message par Pigi');
-      }
-    },
     async sendSMS () {
       try {
         await this.$twilio.sendSMS({
