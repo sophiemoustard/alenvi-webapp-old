@@ -312,7 +312,7 @@ export default {
         this.events = await this.$events.list({
           startDate: this.$moment(this.startOfWeekAsString).toDate(),
           endDate: this.endOfWeek.toDate(),
-          customer: JSON.stringify(this.customers.map(cus => cus._id)),
+          customer: this.customers.map(cus => cus._id),
         });
       } catch (e) {
         this.events = [];

@@ -181,7 +181,7 @@ export default {
         this.events = await this.$events.list({
           startDate: this.$moment(this.startOfWeekAsString).toDate(),
           endDate: this.endOfWeek.toDate(),
-          auxiliary: JSON.stringify(this.auxiliaries.map(aux => aux._id))
+          auxiliary: this.auxiliaries.map(aux => aux._id),
         });
       } catch (e) {
         this.events = [];
