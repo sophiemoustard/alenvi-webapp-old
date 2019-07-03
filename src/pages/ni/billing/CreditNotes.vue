@@ -50,11 +50,11 @@
           <ni-datetime-picker caption="Fin période concernée" v-model="newCreditNote.endDate"
             :error="$v.newCreditNote.endDate.$error" @blur="$v.newCreditNote.endDate.$touch" in-modal type="date"
             :disable="!hasLinkedEvents" @input="getEvents" required-field />
-          <template v-if="events.length > 0">
-            <ni-option-group v-model="newCreditNote.events" :options="eventsOptions" caption="Évènements"
+          <template v-if="creditNoteEvents.length > 0">
+            <ni-option-group v-model="newCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
               type="checkbox" required-field inline />
           </template>
-          <div v-if="newCreditNote.customer && newCreditNote.startDate && newCreditNote.endDate && events.length === 0"
+          <div v-if="newCreditNote.customer && newCreditNote.startDate && newCreditNote.endDate && creditNoteEvents.length === 0"
             class="light warning">
             <p>{{ eventsNotFoundMessage }}</p>
           </div>
@@ -111,11 +111,11 @@
           <ni-datetime-picker caption="Fin période concernée" v-model="editedCreditNote.endDate" in-modal type="date"
             :disable="!editedCreditNote.events" @input="getEvents" required-field
             :error="$v.editedCreditNote.endDate.$error" @blur="$v.editedCreditNote.endDate.$touch" />
-          <template v-if="events.length > 0">
-            <ni-option-group v-model="editedCreditNote.events" :options="eventsOptions" caption="Évènements"
+          <template v-if="creditNoteEvents.length > 0">
+            <ni-option-group v-model="editedCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
               type="checkbox" required-field inline />
           </template>
-          <div v-if="editedCreditNote.customer && editedCreditNote.startDate && editedCreditNote.endDate && events.length === 0"
+          <div v-if="editedCreditNote.customer && editedCreditNote.startDate && editedCreditNote.endDate && creditNoteEvents.length === 0"
             class="light warning">
             <p>{{ eventsNotFoundMessage }}</p>
           </div>
@@ -181,7 +181,7 @@ export default {
       creditNoteEditionModal: false,
       hasLinkedEvents: false,
       customersOptions: [],
-      events: [],
+      creditNoteEvents: [],
       newCreditNote: {
         customer: null,
         thirdPartyPayer: null,
@@ -265,7 +265,7 @@ export default {
   },
   watch: {
     hasLinkedEvents () {
-      this.events = [];
+      this.creditNoteEvents = [];
       this.newCreditNote.events = [];
       this.newCreditNote.subscription = null;
       this.newCreditNote.startDate = null;
@@ -296,12 +296,12 @@ export default {
     },
     'newCreditNote.startDate' (value) {
       if (value === null) {
-        this.events = [];
+        this.creditNoteEvents = [];
       }
     },
     'newCreditNote.endDate' (value) {
       if (value === null) {
-        this.events = [];
+        this.creditNoteEvents = [];
       }
     }
   },
@@ -375,11 +375,11 @@ export default {
         value: sub._id,
       }));
     },
-    eventsOptions () {
-      const events = [...this.events].sort((e1, e2) => (new Date(e1.startDate)) - (new Date(e2.startDate)));
-      return events.map(event => ({
-        label: `${this.$moment(event.startDate).format('DD/MM/YYYY HH:mm')} - ${this.$moment(event.endDate).format('HH:mm')}`,
-        value: event._id,
+    creditNoteEventsOptions () {
+      const creditNoteEvents = [...this.creditNoteEvents].sort((e1, e2) => (new Date(e1.startDate)) - (new Date(e2.startDate)));
+      return creditNoteEvents.map(cnEvent => ({
+        label: `${this.$moment(cnEvent.startDate).format('DD/MM/YYYY HH:mm')} - ${this.$moment(cnEvent.endDate).format('HH:mm')}`,
+        value: cnEvent.eventId,
       }))
     },
     thirdPartyPayerOptions () {
@@ -442,6 +442,14 @@ export default {
         NotifyNegative('Impossible de récupérer les avoirs');
       }
     },
+    formatEventsAsCreditNoteEvents (events) {
+      return events.map(event => {
+        const cnEvent = this.$_.cloneDeep(event);
+        cnEvent.eventId = event._id;
+        delete event._id;
+        return cnEvent;
+      });
+    },
     async getEvents () {
       try {
         if (this.hasLinkedEvents && this.newCreditNote.customer && this.newCreditNote.startDate && this.newCreditNote.endDate) {
@@ -452,7 +460,7 @@ export default {
             isBilled: true
           };
           if (this.newCreditNote.thirdPartyPayer) query.thirdPartyPayer = this.newCreditNote.thirdPartyPayer;
-          this.events = await this.$events.listForCreditNotes(query);
+          this.creditNoteEvents = this.formatEventsAsCreditNoteEvents(await this.$events.listForCreditNotes(query));
         } else if (this.hasLinkedEvents && this.editedCreditNote.customer && this.editedCreditNote.startDate && this.editedCreditNote.endDate) {
           const query = {
             startDate: this.editedCreditNote.startDate,
@@ -465,10 +473,10 @@ export default {
             const creditNote = this.creditNotes.find(cd => cd._id === this.editedCreditNote.linkedCreditNote);
             query.thirdPartyPayer = creditNote.thirdPartyPayer._id;
           }
-          this.events = await this.$events.listForCreditNotes(query);
+          this.creditNoteEvents = this.formatEventsAsCreditNoteEvents(await this.$events.listForCreditNotes(query));
         }
       } catch (e) {
-        this.events = [];
+        this.creditNoteEvents = [];
         console.error(e);
         NotifyNegative('Impossible de récupérer les évènements facturés de ce bénéficiaire');
       }
@@ -477,16 +485,16 @@ export default {
     computePrices (eventIds) {
       let exclTaxesCustomer = 0, inclTaxesCustomer = 0;
       let exclTaxesTpp = 0, inclTaxesTpp = 0;
-      if (this.events) {
-        const creditNoteEvents = this.events.filter(ev => eventIds.includes(ev._id));
-        for (let i = 0, l = creditNoteEvents.length; i < l; i++) {
-          if (creditNoteEvents[i].bills.exclTaxesCustomer) {
-            exclTaxesCustomer += creditNoteEvents[i].bills.exclTaxesCustomer;
-            inclTaxesCustomer += creditNoteEvents[i].bills.inclTaxesCustomer;
+      if (this.creditNoteEvents) {
+        const selectedEvents = this.creditNoteEvents.filter(ev => eventIds.includes(ev.eventId));
+        for (let i = 0, l = selectedEvents.length; i < l; i++) {
+          if (selectedEvents[i].bills.exclTaxesCustomer) {
+            exclTaxesCustomer += selectedEvents[i].bills.exclTaxesCustomer;
+            inclTaxesCustomer += selectedEvents[i].bills.inclTaxesCustomer;
           }
-          if (creditNoteEvents[i].bills.exclTaxesTpp) {
-            exclTaxesTpp += creditNoteEvents[i].bills.exclTaxesTpp;
-            inclTaxesTpp += creditNoteEvents[i].bills.inclTaxesTpp;
+          if (selectedEvents[i].bills.exclTaxesTpp) {
+            exclTaxesTpp += selectedEvents[i].bills.exclTaxesTpp;
+            inclTaxesTpp += selectedEvents[i].bills.inclTaxesTpp;
           }
         }
       }
@@ -505,7 +513,7 @@ export default {
         inclTaxesCustomer: 0,
         subscription: null
       };
-      this.events = [];
+      this.creditNoteEvents = [];
       this.hasLinkedEvents = false;
       this.$v.newCreditNote.$reset();
     },
@@ -548,14 +556,8 @@ export default {
 
         if (creditNote.events.length > 0) {
           payload.events = creditNote.events.map(eventId => {
-            const event = this.events.find(ev => ev._id === eventId);
-            return {
-              eventId: event._id,
-              auxiliary: event.auxiliary,
-              startDate: event.startDate,
-              endDate: event.endDate,
-              bills: { ...event.bills },
-            };
+            const cnEvent = this.creditNoteEvents.find(ev => ev.eventId === eventId);
+            return this.$_.pick(cnEvent, ['eventId', 'auxiliary', 'startDate', 'endDate', 'bills']);
           });
         }
       }
@@ -590,10 +592,8 @@ export default {
       if (this.hasLinkedEvents) {
         await this.getEvents();
         for (let i = 0, l = creditNote.events.length; i < l; i++) {
-          if (!this.events.some(event => creditNote.events[i].eventId === event._id)) {
-            const event = { ...creditNote.events[i] };
-            event._id = event.eventId;
-            this.events.push(event);
+          if (!this.creditNoteEvents.some(event => creditNote.events[i].eventId === event.eventId)) {
+            this.creditNoteEvents.push(creditNote.events[i]);
           }
         }
         this.editedCreditNote.events = creditNote.events.map(ev => ev.eventId);
@@ -606,7 +606,7 @@ export default {
     resetEditionCreditNoteData () {
       this.creditNoteEditionModal = false;
       this.editedCreditNote = {};
-      this.events = [];
+      this.creditNoteEvents = [];
       this.hasLinkedEvents = false;
       this.$v.editedCreditNote.$reset();
     },
