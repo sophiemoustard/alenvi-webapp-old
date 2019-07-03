@@ -4,16 +4,16 @@ import axios from 'axios'
 export default {
   async showAll (params = null) {
     try {
-      const employeeIdRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users`, { params });
-      return employeeIdRaw.data.data.users;
+      const usersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users`, { params });
+      return usersRaw.data.data.users;
     } catch (e) {
       console.error(e.response);
     }
   },
   async showAllActive (params = null) {
     try {
-      const employeeIdRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/active`, { params });
-      return employeeIdRaw.data.data.users;
+      const usersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/active`, { params });
+      return usersRaw.data.data.users;
     } catch (e) {
       console.error(e.response);
     }
