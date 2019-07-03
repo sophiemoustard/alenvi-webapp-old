@@ -1047,7 +1047,7 @@ export default {
       const roles = await this.$roles.showAll({ name: HELPER });
       if (roles.length === 0) throw new Error('Role not found');
       this.newHelper.role = roles[0]._id;
-      this.newHelper.compny = this.company._id;
+      this.newHelper.company = this.company._id;
       this.newHelper.identity = this.$_.pickBy(this.newHelper.identity);
       const payload = this.$_.pickBy(this.newHelper);
       await this.$users.create(payload);
