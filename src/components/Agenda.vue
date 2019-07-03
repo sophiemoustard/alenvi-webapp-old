@@ -20,7 +20,7 @@
               <template v-for="(event, eventId) in getOneDayEvents(days[dayIndex])">
                 <div :style="{ top: `${PERCENTAGE_BY_MINUTES * event.staffingTop}%`, height: `${PERCENTAGE_BY_MINUTES * event.staffingHeight - 0.2}%` }"
                   :key="eventId"  :class="[!isCustomerPlanning && 'cursor-pointer', 'event', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]" @click.stop="editEvent(event)">
-                  <div class="event-container">
+                  <div class="event-container" :style="{ top: event.staffingHeight < 90 ? '10%' : '6px' }">
                     <div class="col-12 event-title">
                       <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">{{ eventTitle(event) }}</p>
                       <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">{{ displayAbsenceType(event.absence) }}</p>
@@ -129,6 +129,11 @@ export default {
         right: 3px;
         margin: 0;
         border: 1px solid $white;
+        overflow: hidden;
+        padding-top: 0;
+        padding-bottom: 0;
+        &-container
+          height: auto;
 
       .planning-hour
         position: absolute;
