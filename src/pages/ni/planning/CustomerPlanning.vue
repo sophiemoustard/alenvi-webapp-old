@@ -353,7 +353,8 @@ export default {
       this.creationModal = true;
     },
     getPayload (event) {
-      let payload = { ...this.$_.omit(event, ['dates', '__v', 'repetition']) }
+      const isEdition = !!event._id;
+      let payload = { ...this.$_.omit(event, ['dates', '__v']) };
       payload = this.$_.pickBy(payload);
 
       const customer = this.customers.find(cus => cus._id === event.customer);
@@ -372,6 +373,7 @@ export default {
       if (event.cancel && Object.keys(event.cancel).length === 0) delete payload.cancel;
       if (event.cancel && Object.keys(event.cancel).length === 0) delete payload.attachment;
       if (event.shouldUpdateRepetition) delete payload.misc;
+      if (isEdition) delete payload.repetition;
 
       return payload;
     },
