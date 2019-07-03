@@ -16,7 +16,6 @@ module.exports = function (ctx) {
       'email',
       'features',
       'lodash',
-      'messages',
       'moment',
       'ogust',
       'resize',
