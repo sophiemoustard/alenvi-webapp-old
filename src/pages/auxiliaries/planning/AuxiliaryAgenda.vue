@@ -77,8 +77,7 @@ export default {
       return this.$store.getters['main/user'];
     },
     activeAuxiliaries () {
-      return this.auxiliaries.filter(aux => !aux.inactivityDate ||
-      (aux.inactivityDate && this.$moment(aux.inactivityDate).isSameOrAfter(this.days[0])));
+      return this.auxiliaries.filter(aux => this.hasActiveCompanyContractOnEvent(aux, this.days[0]) || this.hasActiveCustomerContractOnEvent(aux, this.days[0]));
     },
     auxiliariesOptions () {
       return this.activeAuxiliaries.length === 0 ? [] : this.activeAuxiliaries.map(aux => ({
