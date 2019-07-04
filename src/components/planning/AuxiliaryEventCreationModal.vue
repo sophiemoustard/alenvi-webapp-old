@@ -102,30 +102,33 @@ export default {
         ? ''
         : `${process.env.API_HOSTNAME}/events/${this.selectedAuxiliary._id}/gdrive/${this.selectedAuxiliary.administrative.driveFolder.id}/upload`;
     },
-    isCompanyContractActive () {
+    isCompanyContractValidForRepetition () {
       if (!this.selectedAuxiliary.contracts || this.selectedAuxiliary.contracts.length === 0) return false;
       if (!this.selectedAuxiliary.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
-      const companyContract = this.selectedAuxiliary.contracts.find(contract => contract.status === COMPANY_CONTRACT);
-      if (!companyContract) return false;
+      const companyContracts = this.selectedAuxiliary.contracts.filter(contract => contract.status === COMPANY_CONTRACT);
+      if (!companyContracts || companyContracts.length === 0) return false;
 
-      return !companyContract.endDate && companyContract.versions.some(version => version.isActive);
+      return companyContracts.some(contract => !contract.endDate && contract.versions.some(version => version.isActive));
     },
-    isCustomerContractActive () {
+    isCustomerContractValidForRepetition () {
       if (!this.selectedAuxiliary.contracts || this.selectedAuxiliary.contracts.length === 0) return false;
       if (!this.selectedAuxiliary.contracts.some(contract => contract.status === CUSTOMER_CONTRACT)) return false;
-      const correspContract = this.selectedAuxiliary.contracts.find(ctr => ctr.customer === this.newEvent.customer);
-      if (!correspContract) return false;
-      return !correspContract.endDate && correspContract.versions.some(version => version.isActive);
+      const correspContracts = this.selectedAuxiliary.contracts.find(ctr => ctr.customer === this.newEvent.customer);
+      if (!correspContracts) return false;
+
+      return correspContracts.some(contract => !contract.endDate && contract.versions.some(version => version.isActive));
     },
     isRepetitionAllowed () {
       if (this.newEvent.subscription !== '' && this.newEvent.customer !== '') {
         const selectedCustomer = this.customers.find(cus => cus._id === this.newEvent.customer);
         if (!selectedCustomer) return true;
+
         const selectedSubscription = selectedCustomer.subscriptions.find(sub => sub._id === this.newEvent.subscription);
         if (!selectedSubscription) return true;
-        if (selectedSubscription.service.type === COMPANY_CONTRACT) return this.isCompanyContractActive;
-        if (selectedSubscription.service.type === CUSTOMER_CONTRACT) return this.isCustomerContractActive;
+        if (selectedSubscription.service.type === COMPANY_CONTRACT) return this.isCompanyContractValidForRepetition;
+        if (selectedSubscription.service.type === CUSTOMER_CONTRACT) return this.isCustomerContractValidForRepetition;
       }
+
       return true;
     },
   },

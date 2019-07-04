@@ -206,10 +206,10 @@ export default {
         const aux = this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
         const hasActiveCustomerContractOnEvent = this.hasActiveCustomerContractOnEvent(aux, this.newEvent.dates.startDate);
         const hasActiveCompanyContractOnEvent = this.hasActiveCompanyContractOnEvent(aux, this.newEvent.dates.startDate);
-        const isCompanyContractActive = this.isCompanyContractActive(aux);
-        const isCustomerContractActive = this.isCustomerContractActive(aux);
+        const isCustomerContractValidForRepetition = this.isCustomerContractValidForRepetition(aux);
+        const isCompanyContractValidForRepetition = this.isCompanyContractValidForRepetition(aux);
 
-        return { ...aux, hasActiveCustomerContractOnEvent, hasActiveCompanyContractOnEvent, isCompanyContractActive, isCustomerContractActive };
+        return { ...aux, hasActiveCustomerContractOnEvent, hasActiveCompanyContractOnEvent, isCustomerContractValidForRepetition, isCompanyContractValidForRepetition };
       }
       if (this.editionModal && this.editedEvent.auxiliary) {
         const aux = this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
@@ -229,8 +229,8 @@ export default {
         if (!selectedCustomer) return true;
         const selectedSubscription = selectedCustomer.subscriptions.find(sub => sub._id === this.newEvent.subscription);
         if (!selectedSubscription) return true;
-        if (selectedSubscription.service.type === COMPANY_CONTRACT) return this.selectedAuxiliary.isCompanyContractActive;
-        if (selectedSubscription.service.type === CUSTOMER_CONTRACT) return this.selectedAuxiliary.isCustomerContractActive;
+        if (selectedSubscription.service.type === COMPANY_CONTRACT) return this.selectedAuxiliary.isCustomerContractValidForRepetition;
+        if (selectedSubscription.service.type === CUSTOMER_CONTRACT) return this.selectedAuxiliary.isCompanyContractValidForRepetition;
       }
       return true;
     }
@@ -269,7 +269,7 @@ export default {
           ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(selectedDay));
       });
     },
-    isCompanyContractActive (aux) {
+    isCustomerContractValidForRepetition (aux) {
       if (!aux.contracts.length === 0) return false;
       if (!aux.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
       const companyContract = aux.contracts.find(contract => contract.status === COMPANY_CONTRACT);
@@ -277,7 +277,7 @@ export default {
 
       return !companyContract.endDate && companyContract.versions.some(version => version.isActive);
     },
-    isCustomerContractActive (aux) {
+    isCompanyContractValidForRepetition (aux) {
       if (aux.contracts.length === 0) return false;
       if (!aux.contracts.some(contract => contract.status === CUSTOMER_CONTRACT)) return false;
       const correspContract = aux.contracts.find(ctr => ctr.customer === this.newEvent.customer);
