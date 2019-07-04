@@ -17,13 +17,13 @@
 
     <!-- Event creation modal -->
     <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
-      :creationModal="creationModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary" :auxiliaries="auxiliaries"
+      :creationModal="creationModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary" :auxiliaries="activeAuxiliaries"
       :customers="customers" @resetForm="resetCreationForm" @deleteDocument="deleteDocument" @documentUploaded="documentUploaded"
       @createEvent="createEvent" @close="closeCreationModal" @selectedAddress="selectedAddress" />
 
     <!-- Event edition modal -->
     <ni-auxiliary-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
-      :editionModal="editionModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary" :auxiliaries="auxiliaries"
+      :editionModal="editionModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary" :auxiliaries="activeAuxiliaries"
       :customers="customers" @resetForm="resetEditionForm" @deleteDocument="deleteDocument" @documentUploaded="documentUploaded"
       @updateEvent="updateEvent" @close="closeEditionModal" @deleteEvent="deleteEvent" @deleteEventRepetition="deleteEventRepetition"
       @selectedAddress="selectedAddress" />
@@ -76,8 +76,11 @@ export default {
     currentUser () {
       return this.$store.getters['main/user'];
     },
+    activeAuxiliaries () {
+      return this.auxiliaries.filter(aux => this.hasActiveCompanyContractOnEvent(aux, this.days[0]) || this.hasActiveCustomerContractOnEvent(aux, this.days[0]));
+    },
     auxiliariesOptions () {
-      return this.auxiliaries.length === 0 ? [] : this.auxiliaries.map(aux => ({
+      return this.activeAuxiliaries.length === 0 ? [] : this.activeAuxiliaries.map(aux => ({
         label: `${aux.identity.firstname || ''} ${aux.identity.lastname}`,
         value: aux._id,
       }));
