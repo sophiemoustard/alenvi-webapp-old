@@ -166,7 +166,7 @@ export default {
         const params = {
           startDate: this.startOfWeek.toDate(),
           endDate: this.endOfWeek().toDate(),
-          auxiliary: JSON.stringify([this.selectedAuxiliary._id]),
+          auxiliary: this.selectedAuxiliary._id,
         }
         this.events = await this.$events.list(params);
       } catch (e) {

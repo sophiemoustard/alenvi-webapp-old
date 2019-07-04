@@ -1,26 +1,19 @@
 import { alenviAxios } from './ressources/alenviAxios'
 import axios from 'axios'
-import qs from 'qs'
 
 export default {
   async showAll (params = null) {
     try {
-      const employeeIdRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users`, {
-        params,
-        paramsSerializer: params => qs.stringify(params, { indices: false })
-      });
-      return employeeIdRaw.data.data.users;
+      const usersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users`, { params });
+      return usersRaw.data.data.users;
     } catch (e) {
       console.error(e.response);
     }
   },
   async showAllActive (params = null) {
     try {
-      const employeeIdRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/active`, {
-        params,
-        paramsSerializer: params => qs.stringify(params, { indices: false })
-      });
-      return employeeIdRaw.data.data.users;
+      const usersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/active`, { params });
+      return usersRaw.data.data.users;
     } catch (e) {
       console.error(e.response);
     }
