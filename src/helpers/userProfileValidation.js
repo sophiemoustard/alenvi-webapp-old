@@ -13,10 +13,12 @@ const userProfileSchema = Joi.object().keys({
     socialSecurityNumber: Joi.number().required()
   }),
   contact: Joi.object().keys({
-    address: Joi.string().required(),
-    additionalAddress: Joi.string().allow('', null),
-    zipCode: Joi.string().required(),
-    city: Joi.string().required()
+    address: Joi.object().keys({
+      fullAddress: Joi.string().required(),
+      street: Joi.string(),
+      zipCode: Joi.string(),
+      city: Joi.string(),
+    }),
   }),
   local: {
     email: Joi.string().required()
