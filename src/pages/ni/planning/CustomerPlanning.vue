@@ -19,7 +19,7 @@
         </div>
         <ni-datetime-range caption="Dates et heures de l'intervention" v-model="newEvent.dates" required-field disable-end-date />
         <ni-modal-select caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions" :error="$v.newEvent.auxiliary.$error"
-          required-field @blur="$v.newEvent.auxiliary.$touch" @input="setSector" />
+          required-field @blur="$v.newEvent.auxiliary.$touch" @input="toggleServiceSelection(newEvent.customer)" />
         <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions(newEvent.customer)"
           :error="$v.newEvent.subscription.$error" required-field @blur="$v.newEvent.subscription.$touch" />
         <ni-modal-select caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency" :options="repetitionOptions"
@@ -50,8 +50,8 @@
             v-if="!isDisabled" />
         </div>
         <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" :disable="isDisabled" disable-end-date />
-        <ni-modal-select caption="Auxiliaire" v-model="editedEvent.auxiliary" :options="auxiliariesOptions" :error="$v.editedEvent.auxiliary.$error"
-          required-field @input="setSector" :disable="isDisabled" />
+        <ni-modal-select caption="Auxiliaire" v-model="editedEvent.auxiliary" :options="auxiliariesOptions"
+          :error="$v.editedEvent.auxiliary.$error" required-field :disable="isDisabled" />
         <ni-modal-select caption="Service" v-model="editedEvent.subscription" :options="customerSubscriptionsOptions(editedEvent.customer._id)"
           :error="$v.editedEvent.subscription.$error" @blur="$v.editedEvent.subscription.$touch" :disable="isDisabled" />
         <template v-if="isRepetition(editedEvent) && !isDisabled">
@@ -322,11 +322,6 @@ export default {
       this.auxiliaries = await this.$users.showAllActive({ role: [AUXILIARY, PLANNING_REFERENT] });
     },
     // Event creation
-    setSector (auxiliaryId) {
-      const auxiliary = this.auxiliaries.find(aux => aux._id === auxiliaryId);
-      if (this.creationModal) this.newEvent.sector = auxiliary.sector._id;
-      if (this.editionModal) this.editedEvent.sector = auxiliary.sector._id;
-    },
     openCreationModal (vEvent) {
       const { dayIndex, person } = vEvent;
       const selectedDay = this.days[dayIndex];
@@ -362,6 +357,9 @@ export default {
         const subscription = customer.subscriptions.find(sub => sub._id === event.subscription);
         if (subscription && subscription.service) payload.status = subscription.service.type;
       }
+
+      const auxiliary = this.auxiliaries.find(aux => aux._id === event.auxiliary);
+      payload.sector = auxiliary.sector._id;
 
       payload.startDate = this.$moment(event.dates.startDate).hours(event.dates.startHour.split(':')[0])
         .minutes(event.dates.startHour.split(':')[1]).toISOString();
