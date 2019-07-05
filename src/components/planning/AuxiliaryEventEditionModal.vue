@@ -100,7 +100,7 @@
 </template>
 
 <script>
-import { DEFAULT_AVATAR, INTERVENTION, ADMIN, COACH } from '../../data/constants';
+import { DEFAULT_AVATAR, INTERVENTION } from '../../data/constants';
 import { planningModalMixin } from '../../mixins/planningModalMixin';
 
 export default {
@@ -117,9 +117,6 @@ export default {
     validations: { type: Object, default: () => ({}) },
   },
   computed: {
-    currentUser () {
-      return this.$store.getters['main/user'];
-    },
     additionalValue () {
       return !this.selectedAuxiliary._id ? '' : `justificatif_absence_${this.selectedAuxiliary.identity.lastname}`;
     },
@@ -134,10 +131,6 @@ export default {
     isDisabled () {
       return this.editedEvent.type === INTERVENTION && this.editedEvent.isBilled;
     },
-    customerProfileRedirect () {
-      if (this.currentUser.role.name === COACH || this.currentUser.role.name === ADMIN) return { name: 'customers profile', params: { id: this.editedEvent.customer._id } };
-      return { name: 'profile customers info', params: { customerId: this.editedEvent.customer._id } };
-    }
   },
   methods: {
     getAvatar (user) {

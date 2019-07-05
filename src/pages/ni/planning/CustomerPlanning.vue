@@ -178,7 +178,6 @@ export default {
   },
   computed: {
     ...mapGetters({
-      getUser: 'main/user',
       getFilter: 'planning/getFilter',
       getElemAdded: 'planning/getElemAdded',
       getElemRemoved: 'planning/getElemRemoved'
