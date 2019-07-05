@@ -89,8 +89,17 @@
       </template>
     </div>
     <div v-if="editedEvent.type === INTERVENTION" class="customer-info">
-      <p class="input-caption">Infos bénéficiaire</p>
-      <div>{{ customerAddress }}</div>
+      <p v-if="customerAddress" class="input-caption">Infos bénéficiaire</p>
+      <div v-else class="row justify-between items-center">
+        <p class="input-caption">Infos bénéficiaire</p>
+        <q-btn flat round size="md" color="grey" icon="remove_red_eye"
+          :to="customerProfileRedirect" />
+      </div>
+      <div v-if="customerAddress" class="row justify-between items-center">
+        <div>{{ customerAddress }}</div>
+        <q-btn flat round size="md" color="grey" icon="remove_red_eye"
+          :to="customerProfileRedirect" />
+      </div>
     </div>
     <q-btn v-if="!isDisabled" class="full-width modal-btn" no-caps color="primary" :loading="loading" label="Editer l'évènement"
       @click="updateEvent" icon-right="check" :disable="disableEditionButton" />
@@ -98,7 +107,7 @@
 </template>
 
 <script>
-import { DEFAULT_AVATAR, INTERVENTION } from '../../data/constants';
+import { DEFAULT_AVATAR, INTERVENTION, ADMIN, COACH } from '../../data/constants';
 import { planningModalMixin } from '../../mixins/planningModalMixin';
 
 export default {
@@ -115,6 +124,9 @@ export default {
     validations: { type: Object, default: () => ({}) },
   },
   computed: {
+    currentUser () {
+      return this.$store.getters['main/user'];
+    },
     additionalValue () {
       return !this.selectedAuxiliary._id ? '' : `justificatif_absence_${this.selectedAuxiliary.identity.lastname}`;
     },
@@ -129,6 +141,10 @@ export default {
     isDisabled () {
       return this.editedEvent.type === INTERVENTION && this.editedEvent.isBilled;
     },
+    customerProfileRedirect () {
+      if (this.currentUser.role.name === COACH || this.currentUser.role.name === ADMIN) return { name: 'customers profile', params: { id: this.editedEvent.customer._id } };
+      return { name: 'profile customers info', params: { customerId: this.editedEvent.customer._id } };
+    }
   },
   methods: {
     getAvatar (user) {
