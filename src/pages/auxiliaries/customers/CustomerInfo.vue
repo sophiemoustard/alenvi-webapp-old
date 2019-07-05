@@ -4,7 +4,7 @@
       <div class="row items-center col-xs-12 header-margin">
         <div>
           <q-icon class="on-left cursor-pointer self-center" size="1rem" name="arrow_back" color="primary"
-            @click.native="$router.push({ name: 'profile customers', params: { id } })" />
+            @click.native="$router.go(-1)" />
         </div>
         <h4 class="no-margin">{{ customer.identity | formatFullIdentity }}</h4>
       </div>

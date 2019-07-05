@@ -70,9 +70,11 @@
             required-field @blur="$v.editedEvent.cancel.reason.$touch" />
         </template>
       </div>
-      <div class="cutomer-info">
-        <p class="input-caption">Infos bénéficiaire</p>
-        <div>{{ customerAddress }}</div>
+      <div class="customer-info">
+        <div class="row items-center">
+        <div v-if="customerAddress" class="customer-address">{{ customerAddress }}</div>
+          <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect" />
+        </div>
       </div>
       <q-btn v-if="!isDisabled" class="full-width modal-btn" no-caps color="primary" :loading="loading"
         label="Editer l'évènement" @click="updateEvent" icon-right="check" :disable="disableEditionButton" />
@@ -176,7 +178,6 @@ export default {
   },
   computed: {
     ...mapGetters({
-      getUser: 'main/user',
       getFilter: 'planning/getFilter',
       getElemAdded: 'planning/getElemAdded',
       getElemRemoved: 'planning/getElemRemoved'
