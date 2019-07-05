@@ -211,5 +211,9 @@ export const planningModalMixin = {
     isRepetition (event) {
       return ABSENCE !== event.type && event.repetition && event.repetition.frequency !== NEVER;
     },
+    toggleServiceSelection (customerId) {
+      const customerSubscriptionsOptions = this.customerSubscriptionsOptions(customerId);
+      if (customerSubscriptionsOptions.length === 1 && this.creationModal) this.newEvent.subscription = customerSubscriptionsOptions[0].value;
+    },
   },
 };
