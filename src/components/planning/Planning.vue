@@ -22,15 +22,17 @@
           </th>
         </thead>
         <tbody>
-          <tr v-if="!isCustomerPlanning && filteredSectors.length > 0" class="person-row">
-            <td valign="top">
-              <div class="person-inner-cell">
-                <div class="person-name overflow-hidden-nowrap">À AFFECTER</div>
-              </div>
-            </td>
-            <td v-for="(day, dayIndex) in days" :key="dayIndex" valign="top">
-            </td>
-          </tr>
+          <template v-if="!isCustomerPlanning && filteredSectors.length > 0">
+            <tr v-for="sector in filteredSectors" :key="sector.sectorId" class="person-row">
+              <td valign="top">
+                <div class="person-inner-cell">
+                  <div class="person-name overflow-hidden">À AFFECTER - {{ sector.label }}</div>
+                </div>
+              </td>
+              <td v-for="(day, dayIndex) in days" :key="dayIndex" valign="top">
+              </td>
+            </tr>
+          </template>
           <tr class="person-row" v-for="(person, index) in persons" :key="index">
             <td valign="top">
               <div class="person-inner-cell">
