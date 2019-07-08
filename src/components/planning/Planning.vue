@@ -11,7 +11,8 @@
       <table style="width: 100%" :class="[staffingView && 'staffing', 'planning-table']">
         <thead>
           <th>
-            <q-btn v-if="!isCustomerPlanning" flat round icon="view_week" :color="staffingView ? 'primary' : ''" @click="staffingView = !staffingView" />
+            <q-btn v-if="!isCustomerPlanning" flat round icon="view_week" :color="staffingView ? 'primary' : ''"
+              @click="staffingView = !staffingView" />
           </th>
           <th class="capitalize" v-for="(day, index) in daysHeader" :key="index">
             <div class="row justify-center items-baseline days-header">
@@ -34,16 +35,17 @@
             <td valign="top">
               <div class="person-inner-cell">
                 <div :class="[!staffingView && 'q-mb-md']">
-                  <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person" :events="getPersonEvents(person)" />
-                  <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)" :startOfWeekAsString="startOfWeek.toISOString()"
-                    :distanceMatrix="distanceMatrix" />
+                  <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person"
+                    :events="getPersonEvents(person)" />
+                  <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)"
+                    :startOfWeekAsString="startOfWeek.toISOString()" :distanceMatrix="distanceMatrix" />
                 </div>
                 <div class="person-name overflow-hidden-nowrap">{{ person.identity | formatShortIdentity }}</div>
               </div>
             </td>
             <template v-if="staffingView && !isCustomerPlanning">
-              <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
-                @click="createEvent({ dayIndex, person })">
+              <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
+                valign="top" @click="createEvent({ dayIndex, person })">
                 <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
                   <div :id="event._id" draggable="true" @dragstart="drag(event, $event)" @click.stop="editEvent(event._id)"
                     :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-sm']" :key="eventIndex"
@@ -53,12 +55,12 @@
               </td>
             </template>
             <template v-else>
-              <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
-                @click="createEvent({ dayIndex, person })">
+              <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
+                valign="top" @click="createEvent({ dayIndex, person })">
                 <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
-                  <div :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event, $event)" :key="eventIndex"
+                  <div :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event, $event)"
                     :class="['row', 'cursor-pointer', 'event', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]"
-                    @click.stop="editEvent(event._id)">
+                    @click.stop="editEvent(event._id)" :key="eventIndex" >
                     <div class="event-container">
                       <div class="event-title">
                         <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">
