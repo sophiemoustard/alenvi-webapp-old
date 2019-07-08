@@ -21,6 +21,15 @@
           </th>
         </thead>
         <tbody>
+          <tr class="person-row">
+            <td valign="top">
+              <div class="person-inner-cell">
+                <div class="person-name overflow-hidden-nowrap">À AFFECTER</div>
+              </div>
+            </td>
+            <td v-for="(day, dayIndex) in days" :key="dayIndex" valign="top">
+            </td>
+          </tr>
           <tr class="person-row" v-for="(person, index) in persons" :key="index">
             <td valign="top">
               <div class="person-inner-cell">
