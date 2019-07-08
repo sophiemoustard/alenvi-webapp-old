@@ -5,6 +5,7 @@ import ModalSelect from '../components/form/ModalSelect';
 import ModalInput from '../components/form/ModalInput';
 import SearchAddress from '../components/form/SearchAddress';
 import FileUploader from '../components/form/FileUploader';
+import { formatFullIdentity } from '../helpers/utils';
 import {
   INTERVENTION,
   ABSENCE,
@@ -135,15 +136,12 @@ export const planningModalMixin = {
     auxiliariesOptions () {
       return this.auxiliaries.length === 0 ? [] : [
         { label: 'À affecter', value: '' },
-        ...this.auxiliaries.map(aux => ({
-          label: `${aux.identity.firstname || ''} ${aux.identity.lastname}`,
-          value: aux._id,
-        }))
+        ...this.auxiliaries.map(aux => this.formatPersonOptions(aux)),
       ];
     },
     customersOptions () {
       if (this.customers.length === 0 || !this.selectedAuxiliary) return [];
-      if (!this.selectedAuxiliary._id) return this.customers.map(cus => this.formatCustomerOptions(cus)); // Event to assign
+      if (!this.selectedAuxiliary._id) return this.customers.map(cus => this.formatPersonOptions(cus)); // Unassigned event
       if (!this.selectedAuxiliary.contracts) return [];
 
       let customers = this.customers;
@@ -156,7 +154,7 @@ export const planningModalMixin = {
         customers = this.customers.filter(cus => auxiliaryCustomers.includes(cus._id));
       }
 
-      return customers.map(cus => this.formatCustomerOptions(cus));
+      return customers.map(cus => this.formatPersonOptions(cus));
     },
     internalHourOptions () {
       return this.internalHours.map(hour => ({
@@ -188,10 +186,10 @@ export const planningModalMixin = {
     }
   },
   methods: {
-    formatCustomerOptions (customer) {
+    formatPersonOptions (person) {
       return {
-        label: `${customer.identity.firstname || ''} ${customer.identity.lastname}`,
-        value: customer._id,
+        label: formatFullIdentity(person.identity),
+        value: person._id,
       };
     },
     // Event creation

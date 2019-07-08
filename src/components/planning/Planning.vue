@@ -251,13 +251,13 @@ export default {
         auxiliarySectorEvent: event.sector,
         permissions: [
           { name: 'planning:edit:user', rule: 'isInSameSector' },
-          { name: 'planning:edit', rule: 'isOwner' }
+          { name: 'planning:edit', rule: 'isOwner' },
         ],
       });
     },
     createEvent (eventInfo) {
       let can = true;
-      if (this.personKey === 'auxiliary' && eventInfo.sectorId) { // To assign event
+      if (this.personKey === 'auxiliary' && eventInfo.sectorId) { // Unassigned event
         can = this.$can({
           user: this.$store.getters['main/user'],
           auxiliarySectorEvent: eventInfo.sectorId,
