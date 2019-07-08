@@ -233,7 +233,7 @@ export default {
     // Filter
     handleElemAddedToFilter (el) {
       if (el.sectorId) { // el = sector
-        this.filteredSectors.push(el.sector);
+        this.filteredSectors.push(el.sectorId);
         const auxBySector = this.getFilter.filter(aux => aux.sector && aux.sector._id === el.sectorId);
         for (let i = 0, l = auxBySector.length; i < l; i++) {
           if (!this.auxiliaries.some(aux => auxBySector[i]._id === aux._id)) {
@@ -251,13 +251,13 @@ export default {
     },
     handleElemRemovedFromFilter (el) {
       if (el.sectorId) {
-        this.filteredSectors.filter(sec => sec !== el.sectorId);
+        this.filteredSectors = this.filteredSectors.filter(sec => sec !== el.sectorId);
         this.auxiliaries = this.auxiliaries.filter(auxiliary =>
           auxiliary.sector._id !== el.sectorId || this.filteredAuxiliaries.some(filteredAux => filteredAux._id === auxiliary._id)
         );
       } else {
         this.filteredAuxiliaries = this.filteredAuxiliaries.filter(auxiliary => auxiliary._id !== el._id);
-        if (this.filteredSectors.includes(el.sector)) return;
+        if (this.filteredSectors.includes(el.sector._id)) return;
         this.auxiliaries = this.auxiliaries.filter(auxiliary => auxiliary._id !== el._id);
       }
     },

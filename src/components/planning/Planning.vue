@@ -160,16 +160,11 @@ export default {
     getFilter (val) {
       if (val.length > 0) {
         if (!AUXILIARY_ROLES.includes(this.getUser.role.name)) {
-          if (!this.isCustomerPlanning) {
-            this.addSavedTerms('Auxiliaries');
-          } else {
-            this.addSavedTerms('Customers');
-          }
+          if (!this.isCustomerPlanning) this.addSavedTerms('Auxiliaries');
+          else this.addSavedTerms('Customers');
         } else {
           const userSector = this.getFilter.find(filter => filter.sectorId === this.getUser.sector);
-          if (userSector) {
-            this.$refs.refFilter.add(userSector.label);
-          }
+          if (userSector) this.$refs.refFilter.add(userSector.label);
         }
       }
     }
