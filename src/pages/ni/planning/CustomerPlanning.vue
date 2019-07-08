@@ -544,7 +544,7 @@ export default {
           }
         }
         this.refresh();
-      } else { // el = auxiliary
+      } else { // el = customer
         if (!this.customers.some(cust => cust._id === el._id)) {
           this.filteredCustomers.push(el);
           this.customers.push(el);

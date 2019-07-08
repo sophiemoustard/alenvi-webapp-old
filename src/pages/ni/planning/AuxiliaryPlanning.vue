@@ -1,7 +1,8 @@
 <template>
   <q-page class="neutral-background">
     <ni-planning-manager :events="events" :persons="activeAuxiliaries" @updateStartOfWeek="updateStartOfWeek"
-      @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop" />
+      @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop"
+      :filteredSectors="filteredSectors" />
 
     <!-- Event creation modal -->
     <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
@@ -233,7 +234,7 @@ export default {
     // Filter
     handleElemAddedToFilter (el) {
       if (el.sectorId) { // el = sector
-        this.filteredSectors.push(el.sector);
+        this.filteredSectors.push(el);
         const auxBySector = this.getFilter.filter(aux => aux.sector && aux.sector._id === el.sectorId);
         for (let i = 0, l = auxBySector.length; i < l; i++) {
           if (!this.auxiliaries.some(aux => auxBySector[i]._id === aux._id)) {
@@ -250,14 +251,14 @@ export default {
       }
     },
     handleElemRemovedFromFilter (el) {
-      if (el.sectorId) {
-        this.filteredSectors.filter(sec => sec !== el.sectorId);
+      if (el.sectorId) { // el = sector
+        this.filteredSectors = this.filteredSectors.filter(sec => sec.sectorId !== el.sectorId);
         this.auxiliaries = this.auxiliaries.filter(auxiliary =>
           auxiliary.sector._id !== el.sectorId || this.filteredAuxiliaries.some(filteredAux => filteredAux._id === auxiliary._id)
         );
-      } else {
+      } else { // el = auxiliary
         this.filteredAuxiliaries = this.filteredAuxiliaries.filter(auxiliary => auxiliary._id !== el._id);
-        if (this.filteredSectors.includes(el.sector)) return;
+        if (this.filteredSectors.some(sector => sector.sectorId === el.sector._id)) return;
         this.auxiliaries = this.auxiliaries.filter(auxiliary => auxiliary._id !== el._id);
       }
     },
