@@ -1,11 +1,14 @@
 import axios from 'axios'
 import { Cookies } from 'quasar'
+import qs from 'qs'
 
 import alenvi from '../../helpers/alenvi'
 import ogustToken from '../../helpers/getOgustToken'
 import redirect from '../../router/redirect'
 
-const instance = axios.create();
+const instance = axios.create({
+  paramsSerializer: params => qs.stringify(params, { indices: false }),
+});
 
 instance.interceptors.request.use(async function (config) {
   // Ignore routes that don't need automatic token

@@ -89,8 +89,10 @@
       </template>
     </div>
     <div v-if="editedEvent.type === INTERVENTION" class="customer-info">
-      <p class="input-caption">Infos bénéficiaire</p>
-      <div>{{ customerAddress }}</div>
+      <div class="row items-center">
+        <div v-if="customerAddress" class="customer-address">{{ customerAddress }}</div>
+        <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect" />
+      </div>
     </div>
     <q-btn v-if="!isDisabled" class="full-width modal-btn" no-caps color="primary" :loading="loading" label="Editer l'évènement"
       @click="updateEvent" icon-right="check" :disable="disableEditionButton" />
@@ -196,13 +198,6 @@ export default {
       display: flex;
       flex-direction: row;
       align-items: center;
-
-  .customer-info
-    background: $light-grey;
-    padding: 10px 25px;
-    /deep/ .q-if-inverted
-      background: $light-grey !important;
-      border: none;
 
   .light-checkbox
     color: $grey

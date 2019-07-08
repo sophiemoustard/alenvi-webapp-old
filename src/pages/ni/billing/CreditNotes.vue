@@ -443,10 +443,17 @@ export default {
       }
     },
     formatEventsAsCreditNoteEvents (events) {
+      let customer;
+      if (this.newCreditNote.customer) customer = this.customersOptions.find(cus => cus.value === this.newCreditNote.customer);
+      else if (this.editedCreditNote.customer) customer = this.editedCreditNote.customer;
+
       return events.map(event => {
         const cnEvent = this.$_.cloneDeep(event);
+        const subscription = customer.subscriptions.find(sub => sub._id === cnEvent.subscription);
         cnEvent.eventId = event._id;
+        cnEvent.serviceName = subscription.service.name;
         delete event._id;
+
         return cnEvent;
       });
     },
@@ -517,49 +524,68 @@ export default {
       this.hasLinkedEvents = false;
       this.$v.newCreditNote.$reset();
     },
+    formatPayloadWithSubscription (creditNote, customer) {
+      const payload = {};
+      const subscription = customer.subscriptions.find(sub => sub._id === creditNote.subscription);
+      const vat = subscription.service.vat;
+
+      if (creditNote.inclTaxesCustomer) {
+        payload.inclTaxesCustomer = creditNote.inclTaxesCustomer;
+        payload.exclTaxesCustomer = Number.parseFloat((creditNote.inclTaxesCustomer / (1 + (vat / 100))).toFixed(2));
+      } else {
+        payload.inclTaxesTpp = creditNote.inclTaxesTpp;
+        payload.exclTaxesTpp = Number.parseFloat((creditNote.inclTaxesTpp / (1 + (vat / 100))).toFixed(2));
+        payload.thirdPartyPayer = creditNote.thirdPartyPayer;
+      }
+
+      payload.subscription = {
+        _id: subscription._id,
+        service: {
+          serviceId: subscription.service._id,
+          nature: subscription.service.nature,
+          name: subscription.service.name,
+        },
+        vat,
+        unitInclTaxes: subscription.versions && subscription.versions.length > 0
+          ? getLastVersion(subscription.versions, 'createdAt').unitTTCRate
+          : 0,
+      };
+
+      return payload;
+    },
+    formatCreditNoteEvents (creditNoteEvents, customer) {
+      return creditNoteEvents.map(eventId => {
+        const cnEvent = this.creditNoteEvents.find(ev => ev.eventId === eventId);
+
+        return this.$_.pick(cnEvent, ['eventId', 'auxiliary', 'startDate', 'endDate', 'bills', 'serviceName']);
+      });
+    },
+    formatPayloadWithLinkedEvents (creditNote, customer) {
+      const payload = {
+        startDate: creditNote.startDate,
+        endDate: creditNote.endDate,
+        exclTaxesCustomer: creditNote.exclTaxesCustomer,
+        inclTaxesCustomer: creditNote.inclTaxesCustomer,
+        exclTaxesTpp: creditNote.exclTaxesTpp,
+        inclTaxesTpp: creditNote.inclTaxesTpp,
+        thirdPartyPayer: creditNote.thirdPartyPayer,
+      }
+
+      if (creditNote.events.length > 0) {
+        payload.events = this.formatCreditNoteEvents(creditNote.events, customer);
+      }
+
+      return payload;
+    },
     formatPayload (creditNote) {
       const { date, customer } = creditNote;
-      const payload = { date, customer };
+      let payload = { date, customer };
+      const selectedCustomer = customer._id ? customer : this.customersOptions.find(cus => cus.value === customer) || customer;
 
       if (!this.hasLinkedEvents) {
-        const selectedCustomer = customer._id ? customer : this.customersOptions.find(cus => cus.value === customer) || customer;
-        const subscription = selectedCustomer.subscriptions.find(sub => sub._id === creditNote.subscription);
-        const vat = subscription.service.vat;
-        if (creditNote.inclTaxesCustomer) {
-          payload.inclTaxesCustomer = creditNote.inclTaxesCustomer;
-          payload.exclTaxesCustomer = Number.parseFloat((creditNote.inclTaxesCustomer / (1 + (vat / 100))).toFixed(2));
-        } else {
-          payload.inclTaxesTpp = creditNote.inclTaxesTpp;
-          payload.exclTaxesTpp = Number.parseFloat((creditNote.inclTaxesTpp / (1 + (vat / 100))).toFixed(2));
-          payload.thirdPartyPayer = creditNote.thirdPartyPayer;
-        }
-        payload.subscription = {
-          _id: subscription._id,
-          service: {
-            serviceId: subscription.service._id,
-            nature: subscription.service.nature,
-            name: subscription.service.name,
-          },
-          vat,
-          unitInclTaxes: subscription.versions && subscription.versions.length > 0
-            ? getLastVersion(subscription.versions, 'createdAt').unitTTCRate
-            : 0,
-        };
+        payload = { ...payload, ...this.formatPayloadWithSubscription(creditNote, selectedCustomer) };
       } else {
-        payload.startDate = creditNote.startDate;
-        payload.endDate = creditNote.endDate;
-        payload.exclTaxesCustomer = creditNote.exclTaxesCustomer;
-        payload.inclTaxesCustomer = creditNote.inclTaxesCustomer;
-        payload.exclTaxesTpp = creditNote.exclTaxesTpp;
-        payload.inclTaxesTpp = creditNote.inclTaxesTpp;
-        payload.thirdPartyPayer = creditNote.thirdPartyPayer;
-
-        if (creditNote.events.length > 0) {
-          payload.events = creditNote.events.map(eventId => {
-            const cnEvent = this.creditNoteEvents.find(ev => ev.eventId === eventId);
-            return this.$_.pick(cnEvent, ['eventId', 'auxiliary', 'startDate', 'endDate', 'bills']);
-          });
-        }
+        payload = { ...payload, ...this.formatPayloadWithLinkedEvents(creditNote, selectedCustomer) };
       }
 
       return this.$_.pickBy(payload, prop => prop != null);

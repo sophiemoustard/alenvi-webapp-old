@@ -364,8 +364,10 @@ export default {
     },
     async createAlenviUser () {
       this.newUser.local.password = randomize('*', 10);
-      this.newUser.role = AUXILIARY;
-      this.newUser.company = this.company.name;
+      const roles = await this.$roles.showAll({ name: AUXILIARY });
+      if (roles.length === 0) throw new Error('Role not found');
+      this.newUser.role = roles[0]._id;
+      this.newUser.company = this.company._id;
       const newUser = await this.$users.create(this.newUser);
       await this.$users.createDriveFolder({ _id: newUser._id });
       return newUser;
