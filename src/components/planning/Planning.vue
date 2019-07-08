@@ -29,10 +29,10 @@
                   <div class="person-name overflow-hidden">À AFFECTER - {{ sector.label }}</div>
                 </div>
               </td>
-              <td v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
-                @click="createEvent({ dayIndex, sectorId: sector.sectorId })">
+              <td @drop="dropToSector(day, sector)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
+                valign="top" @click="createEvent({ dayIndex, sectorId: sector.sectorId })">
                 <template v-for="(event, eventIndex) in getUnassignedEvents(sector, days[dayIndex])">
-                  <div :id="event._id"
+                  <div :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event, $event)"
                     :class="['row', 'cursor-pointer', 'event', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]"
                     @click.stop="editEvent(event._id)" :key="eventIndex" >
                     <div class="event-container">
@@ -62,7 +62,7 @@
               </div>
             </td>
             <template v-if="staffingView && !isCustomerPlanning">
-              <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
+              <td @drop="dropToPerson(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
                 valign="top" @click="createEvent({ dayIndex, person })">
                 <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
                   <div :id="event._id" draggable="true" @dragstart="drag(event, $event)" @click.stop="editEvent(event._id)"
@@ -73,7 +73,7 @@
               </td>
             </template>
             <template v-else>
-              <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
+              <td @drop="dropToPerson(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
                 valign="top" @click="createEvent({ dayIndex, person })">
                 <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
                   <div :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event, $event)"
@@ -148,7 +148,7 @@ export default {
       terms: [],
       loading: false,
       draggedObject: {},
-      startOfWeek: {},
+      startOfWeek: this.$moment(),
       days: [],
       maxDays: 7,
       INTERVENTION,
@@ -258,7 +258,7 @@ export default {
       nativeEvent.dataTransfer.setData('text', ''); // Mandatory on Firefox
       this.draggedObject = event;
     },
-    async drop (toDay, toPerson) {
+    async dropToPerson (toDay, toPerson) {
       try {
         if (this.draggedObject[this.personKey]._id === toPerson._id && toDay.isSame(this.draggedObject.startDate, 'd')) return;
         this.$emit('onDrop', { toDay, toPerson, draggedObject: this.draggedObject });
@@ -269,7 +269,28 @@ export default {
         this.draggedObject = {};
       }
     },
+    async dropToSector (toDay, toSector) {
+      try {
+        if (this.draggedObject.sector === toSector._id && toDay.isSame(this.draggedObject.startDate, 'd')) return;
+        this.$emit('onDrop', { toDay, toSector, draggedObject: this.draggedObject });
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Problème lors de la modification de l\'évènement');
+      } finally {
+        this.draggedObject = {};
+      }
+    },
     canDrag (event) {
+      if (!event.auxiliary) {
+        return this.$can({
+          user: this.$store.getters['main/user'],
+          auxiliarySectorEvent: event.sector,
+          permissions: [
+            { name: 'planning:edit:user', rule: 'isInSameSector' },
+          ],
+        });
+      }
+
       return this.$can({
         user: this.$store.getters['main/user'],
         auxiliaryIdEvent: event.auxiliary._id,

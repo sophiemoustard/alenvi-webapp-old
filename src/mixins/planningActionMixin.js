@@ -109,6 +109,8 @@ export const planningActionMixin = {
       return payload;
     },
     hasConflicts (scheduledEvent) {
+      if (!scheduledEvent.auxiliary) return false;
+
       const auxiliaryEvents = this.getAuxiliaryEventsBetweenDates(scheduledEvent.auxiliary, scheduledEvent.startDate, scheduledEvent.endDate);
       return auxiliaryEvents.some(ev => {
         if ((scheduledEvent._id && scheduledEvent._id === ev._id) || ev.isCancelled) return false;
@@ -118,7 +120,7 @@ export const planningActionMixin = {
     },
     getAuxiliaryEventsBetweenDates (auxiliaryId, startDate, endDate) {
       return this.events
-        .filter(event => event.auxiliary._id === auxiliaryId)
+        .filter(event => event.auxiliary && event.auxiliary._id === auxiliaryId)
         .filter(event => {
           return this.$moment(event.startDate).isBetween(startDate, endDate, 'minutes', '[)') ||
             this.$moment(startDate).isBetween(event.startDate, event.endDate, 'minutes', '[)')
@@ -132,7 +134,7 @@ export const planningActionMixin = {
         this.loading = true;
         const payload = this.getCreationPayload(this.newEvent);
 
-        if (payload.auxiliary && this.hasConflicts(payload)) {
+        if (this.hasConflicts(payload)) {
           return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
         }
 
@@ -271,7 +273,7 @@ export const planningActionMixin = {
     },
     async updateEventOnDrop (vEvent) {
       try {
-        const { toDay, toPerson, draggedObject } = vEvent;
+        const { toDay, toPerson, toSector, draggedObject } = vEvent;
         const daysBetween = this.$moment(draggedObject.endDate).diff(this.$moment(draggedObject.startDate), 'days');
 
         if ([ABSENCE, UNAVAILABILITY].includes(draggedObject.type) && draggedObject.auxiliary._id !== toPerson._id) {
@@ -283,8 +285,10 @@ export const planningActionMixin = {
             .minutes(this.$moment(draggedObject.startDate).minutes()).toISOString(),
           endDate: this.$moment(toDay).add(daysBetween, 'days').hours(this.$moment(draggedObject.endDate).hours())
             .minutes(this.$moment(draggedObject.endDate).minutes()).toISOString(),
-          auxiliary: toPerson._id
         };
+
+        if (toPerson) payload.auxiliary = toPerson._id;
+        else if (toSector) payload.sector = toSector.sectorId;
 
         if (this.hasConflicts(payload)) {
           return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
@@ -293,9 +297,9 @@ export const planningActionMixin = {
         const updatedEvent = await this.$events.updateById(draggedObject._id, payload);
         this.events = this.events.map(event => (event._id === updatedEvent._id) ? updatedEvent : event);
 
-        NotifyPositive('Évènement modifié');
+        return NotifyPositive('Évènement modifié');
       } catch (e) {
-        if (e.data.statusCode === 422) return NotifyNegative('Cette modification n\'est pas autorisée');
+        if (e.data && e.data.statusCode === 422) return NotifyNegative('Cette modification n\'est pas autorisée');
       }
     },
     // Event files
