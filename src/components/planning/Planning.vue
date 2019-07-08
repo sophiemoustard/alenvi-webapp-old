@@ -21,7 +21,7 @@
           </th>
         </thead>
         <tbody>
-          <tr class="person-row">
+          <tr v-if="!isCustomerPlanning && filteredSectors.length > 0" class="person-row">
             <td valign="top">
               <div class="person-inner-cell">
                 <div class="person-name overflow-hidden-nowrap">À AFFECTER</div>
@@ -120,6 +120,7 @@ export default {
   props: {
     events: { type: Array, default: () => [] },
     persons: { type: Array, default: () => [] },
+    filteredSectors: { type: Array, default: () => [] },
     personKey: { type: String, default: 'auxiliary' },
   },
   data () {
@@ -307,6 +308,7 @@ export default {
         margin: 2px 0 4px;
     td
       position: relative;
+      height: 75px;
     .event
       position: absolute;
       top: 2px;
