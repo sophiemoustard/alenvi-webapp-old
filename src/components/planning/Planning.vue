@@ -29,7 +29,8 @@
                   <div class="person-name overflow-hidden">À AFFECTER - {{ sector.label }}</div>
                 </div>
               </td>
-              <td v-for="(day, dayIndex) in days" :key="dayIndex" valign="top">
+              <td v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
+                @click="createEvent({ dayIndex, sectorId: sector.sectorId })">
               </td>
             </tr>
           </template>
@@ -255,10 +256,10 @@ export default {
       });
     },
     createEvent (eventInfo) {
-      if (this.personKey === 'auxiliary') {
+      if (this.personKey === 'auxiliary' && eventInfo.person) {
         const can = this.$can({
           user: this.$store.getters['main/user'],
-          auxiliaryIdEvent: eventInfo.person.id,
+          auxiliaryIdEvent: eventInfo.person._id,
           auxiliarySectorEvent: eventInfo.person.sector._id,
           permissions: [
             { name: 'planning:create:user', rule: 'isInSameSector' },
@@ -267,6 +268,7 @@ export default {
         });
         if (!can) return;
       }
+
       this.$emit('createEvent', eventInfo);
     },
     editEvent (eventId) {

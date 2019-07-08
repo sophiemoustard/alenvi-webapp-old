@@ -197,10 +197,10 @@ export default {
     },
     // Event creation
     openCreationModal (vEvent) {
-      const { dayIndex, person } = vEvent;
+      const { dayIndex, person, sectorId } = vEvent;
       const selectedDay = this.days[dayIndex];
 
-      if (!this.canCreateEvent(person, selectedDay)) return NotifyWarning('Impossible de créer un évènement à cette date à cette auxiliaire.');
+      if (person && !this.canCreateEvent(person, selectedDay)) return NotifyWarning('Impossible de créer un évènement à cette date à cette auxiliaire.');
 
       this.newEvent = {
         type: INTERVENTION,
@@ -211,8 +211,8 @@ export default {
         absence: '',
         location: {},
         attachment: {},
-        auxiliary: person._id,
-        sector: person.sector._id,
+        auxiliary: person ? person._id : '',
+        sector: person ? person.sector._id : sectorId,
         dates: {
           startDate: selectedDay.toISOString(),
           startHour: '08:00',
