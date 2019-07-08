@@ -29,6 +29,7 @@ import {
   COMPANY_CONTRACT,
   ADMIN,
   COACH,
+  EVENT_TYPES,
 } from '../data/constants';
 
 export const planningModalMixin = {
@@ -121,28 +122,29 @@ export const planningModalMixin = {
       }
     },
     eventTypeOptions () {
-      if (this.selectedAuxiliary && !this.selectedAuxiliary.hasActiveCompanyContractOnEvent) {
-        return [
-          {label: 'Intervention', value: INTERVENTION},
-          {label: 'Absence', value: ABSENCE},
-          {label: 'Indispo', value: UNAVAILABILITY}
-        ]
+      if (this.selectedAuxiliary && !this.selectedAuxiliary._id) {
+        return EVENT_TYPES.filter(type => type.value === INTERVENTION);
       }
-      return [
-        {label: 'Intervention', value: INTERVENTION},
-        {label: 'Interne', value: INTERNAL_HOUR},
-        {label: 'Absence', value: ABSENCE},
-        {label: 'Indispo', value: UNAVAILABILITY}
-      ]
+
+      if (this.selectedAuxiliary && !this.selectedAuxiliary.hasActiveCompanyContractOnEvent) {
+        return EVENT_TYPES.filter(type => type.value !== INTERNAL_HOUR);
+      }
+
+      return EVENT_TYPES;
     },
     auxiliariesOptions () {
-      return this.auxiliaries.length === 0 ? [] : this.auxiliaries.map(aux => ({
-        label: `${aux.identity.firstname || ''} ${aux.identity.lastname}`,
-        value: aux._id,
-      }));
+      return this.auxiliaries.length === 0 ? [] : [
+        { label: 'À affecter', value: '' },
+        ...this.auxiliaries.map(aux => ({
+          label: `${aux.identity.firstname || ''} ${aux.identity.lastname}`,
+          value: aux._id,
+        }))
+      ];
     },
     customersOptions () {
-      if (this.customers.length === 0 || !this.selectedAuxiliary || !this.selectedAuxiliary.contracts) return [];
+      if (this.customers.length === 0 || !this.selectedAuxiliary) return [];
+      if (!this.selectedAuxiliary._id) return this.customers.map(cus => this.formatCustomerOptions(cus)); // Event to assign
+      if (!this.selectedAuxiliary.contracts) return [];
 
       let customers = this.customers;
       if (this.selectedAuxiliary && !this.selectedAuxiliary.hasActiveCompanyContractOnEvent) {
@@ -154,21 +156,13 @@ export const planningModalMixin = {
         customers = this.customers.filter(cus => auxiliaryCustomers.includes(cus._id));
       }
 
-      return customers.map(customer => ({
-        label: `${customer.identity.firstname || ''} ${customer.identity.lastname}`,
-        value: customer._id,
-      }));
+      return customers.map(cus => this.formatCustomerOptions(cus));
     },
     internalHourOptions () {
       return this.internalHours.map(hour => ({
         label: hour.name,
         value: hour._id,
       }));
-    },
-    oneDayRepetitionLabel () {
-      if (this.creationModal) return `Tous les ${this.$moment(this.newEvent.dates.startDate).day()}`;
-      if (this.editionModal) return `Tous les ${this.$moment(this.editedEvent.dates.startDate).day()}`;
-      return 'Tous les lundis';
     },
     repetitionOptions () {
       const oneDayRepetitionLabel = this.creationModal
@@ -194,6 +188,12 @@ export const planningModalMixin = {
     }
   },
   methods: {
+    formatCustomerOptions (customer) {
+      return {
+        label: `${customer.identity.firstname || ''} ${customer.identity.lastname}`,
+        value: customer._id,
+      };
+    },
     // Event creation
     customerSubscriptionsOptions (customerId) {
       if (!customerId) return [];
@@ -201,8 +201,10 @@ export const planningModalMixin = {
       if (!selectedCustomer || !selectedCustomer.subscriptions || selectedCustomer.subscriptions.length === 0) return [];
 
       let subscriptions = selectedCustomer.subscriptions;
-      if (!this.selectedAuxiliary.hasActiveCustomerContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== CUSTOMER_CONTRACT)
-      if (!this.selectedAuxiliary.hasActiveCompanyContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== COMPANY_CONTRACT)
+      if (this.selectedAuxiliary._id) {
+        if (!this.selectedAuxiliary.hasActiveCustomerContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== CUSTOMER_CONTRACT);
+        if (!this.selectedAuxiliary.hasActiveCompanyContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== COMPANY_CONTRACT);
+      }
 
       return subscriptions.map(sub => ({
         label: sub.service.name,

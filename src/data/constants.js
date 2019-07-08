@@ -54,6 +54,12 @@ export const ABSENCE_NATURES = [
   { label: 'Journalière', value: DAILY },
   { label: 'Horaire', value: HOURLY },
 ];
+export const EVENT_TYPES = [
+  {label: 'Intervention', value: INTERVENTION},
+  {label: 'Interne', value: INTERNAL_HOUR},
+  {label: 'Absence', value: ABSENCE},
+  {label: 'Indispo', value: UNAVAILABILITY},
+];
 
 // THIRD PARTY PAYERS
 export const BILLING_INDIRECT = 'indirect';

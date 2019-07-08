@@ -177,7 +177,7 @@ export default {
       display: inline-flex;
       flex-wrap: wrap;
     & .q-btn-item
-      width: 45%
+      width: 45%;
       border-radius: 20px;
       margin: 5px;
       background-color: $light-grey;

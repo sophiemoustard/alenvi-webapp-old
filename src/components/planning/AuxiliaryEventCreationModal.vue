@@ -120,6 +120,8 @@ export default {
       return correspContracts.some(contract => !contract.endDate && contract.versions.some(version => version.isActive));
     },
     isRepetitionAllowed () {
+      if (!this.newEvent.auxiliary) return true;
+
       if (this.newEvent.subscription !== '' && this.newEvent.customer !== '') {
         const selectedCustomer = this.customers.find(cus => cus._id === this.newEvent.customer);
         if (!selectedCustomer) return true;
@@ -185,9 +187,11 @@ export default {
       display: inline-flex;
       flex-wrap: wrap;
     & .q-btn-item
-      width: 45%
+      width: 24%;
       border-radius: 20px;
       margin: 5px;
       background-color: $light-grey;
+      @media screen and (max-width: 767px)
+        width: 45%;
 
 </style>
