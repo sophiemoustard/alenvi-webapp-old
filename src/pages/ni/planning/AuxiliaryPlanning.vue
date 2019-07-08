@@ -183,6 +183,7 @@ export default {
           startDate: this.$moment(this.startOfWeekAsString).toDate(),
           endDate: this.endOfWeek.toDate(),
           auxiliary: this.auxiliaries.map(aux => aux._id),
+          sector: this.filteredSectors.map(sector => sector.sectorId),
         });
       } catch (e) {
         this.events = [];

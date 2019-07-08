@@ -87,7 +87,7 @@ export const planningModalMixin = {
           return !this.newEvent.auxiliary || !this.newEvent.absence || !this.newEvent.dates.startDate ||
             !this.newEvent.absenceNature || !this.newEvent.dates.startHour || !this.newEvent.dates.endHour;
         case INTERVENTION:
-          return !this.newEvent.auxiliary || !this.newEvent.customer || !this.newEvent.subscription || !this.newEvent.dates.startDate ||
+          return !this.newEvent.customer || !this.newEvent.subscription || !this.newEvent.dates.startDate ||
             !this.newEvent.dates.endDate || !this.newEvent.dates.startHour || !this.newEvent.dates.endHour;
         case INTERNAL_HOUR:
           return !this.newEvent.auxiliary || !this.newEvent.dates.startDate || !this.newEvent.dates.endDate ||

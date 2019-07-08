@@ -74,8 +74,10 @@ export const planningActionMixin = {
       let payload = { ...this.$_.omit(event, ['dates', '__v', '__index']) }
       payload = this.$_.pickBy(payload);
 
-      const auxiliary = this.auxiliaries.find(aux => aux._id === event.auxiliary);
-      payload.sector = auxiliary.sector._id;
+      if (event.auxiliary) {
+        const auxiliary = this.auxiliaries.find(aux => aux._id === event.auxiliary);
+        payload.sector = auxiliary.sector._id;
+      }
 
       if (event.type === INTERNAL_HOUR) {
         const internalHour = this.internalHours.find(hour => hour._id === event.internalHour);
@@ -130,7 +132,7 @@ export const planningActionMixin = {
         this.loading = true;
         const payload = this.getCreationPayload(this.newEvent);
 
-        if (this.hasConflicts(payload)) {
+        if (payload.auxiliary && this.hasConflicts(payload)) {
           return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
         }
 

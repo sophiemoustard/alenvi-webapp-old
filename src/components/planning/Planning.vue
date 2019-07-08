@@ -31,6 +31,21 @@
               </td>
               <td v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
                 @click="createEvent({ dayIndex, sectorId: sector.sectorId })">
+                <template v-for="(event, eventIndex) in getUnassignedEvents(sector, days[dayIndex])">
+                  <div :id="event._id"
+                    :class="['row', 'cursor-pointer', 'event', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]"
+                    @click.stop="editEvent(event._id)" :key="eventIndex" >
+                    <div class="event-container">
+                      <div class="event-title">
+                        <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">
+                          {{ eventTitle(event) }}
+                        </p>
+                      </div>
+                      <p class="no-margin event-subtitle overflow-hidden-nowrap">{{ getEventHours(event) }}</p>
+                      <p v-if="event.isBilled" class="no-margin event-subtitle event-billed">F</p>
+                    </div>
+                  </div>
+                </template>
               </td>
             </tr>
           </template>
@@ -193,6 +208,16 @@ export default {
       this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
     },
     // Event display
+    getUnassignedEvents (sector, day) {
+      return this.events
+        .filter(event =>
+          !event.auxiliary && event.sector === sector.sectorId &&
+          this.$moment(day).isSameOrAfter(event.startDate, 'day') && this.$moment(day).isSameOrBefore(event.endDate, 'day') &&
+          (!this.staffingView || !event.isCancelled)
+        )
+        .map((event) => this.isCustomerPlanning ? event : this.getEventWithStyleInfo(event, day))
+        .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+    },
     getOneDayPersonEvents (person, day) {
       return this.events
         .filter(event =>
@@ -200,27 +225,27 @@ export default {
           this.$moment(day).isSameOrAfter(event.startDate, 'day') && this.$moment(day).isSameOrBefore(event.endDate, 'day') &&
           (!this.staffingView || !event.isCancelled)
         )
-        .map((event) => {
-          if (this.isCustomerPlanning) return event;
-          let dayEvent = { ...event };
-
-          let staffingLeft = (this.$moment(event.startDate).hours() - PLANNING_VIEW_START_HOUR) * 60 + this.$moment(event.startDate).minutes();
-          let staffingRight = (this.$moment(event.endDate).hours() - PLANNING_VIEW_START_HOUR) * 60 + this.$moment(event.endDate).minutes();
-          if (!this.$moment(day).isSame(event.startDate, 'day')) {
-            dayEvent.startDate = this.$moment(day).hour(PLANNING_VIEW_START_HOUR).toISOString();
-            staffingLeft = 0;
-          }
-          if (!this.$moment(day).isSame(event.endDate, 'day')) {
-            dayEvent.endDate = this.$moment(day).hour(PLANNING_VIEW_END_HOUR).toISOString();
-            staffingRight = (PLANNING_VIEW_END_HOUR - PLANNING_VIEW_START_HOUR) * 60;
-          }
-
-          dayEvent.staffingLeft = staffingLeft;
-          dayEvent.staffingWidth = staffingRight - staffingLeft;
-
-          return dayEvent;
-        })
+        .map((event) => this.isCustomerPlanning ? event : this.getEventWithStyleInfo(event, day))
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+    },
+    getEventWithStyleInfo (event, day) {
+      let dayEvent = { ...event };
+
+      let staffingLeft = (this.$moment(event.startDate).hours() - PLANNING_VIEW_START_HOUR) * 60 + this.$moment(event.startDate).minutes();
+      let staffingRight = (this.$moment(event.endDate).hours() - PLANNING_VIEW_START_HOUR) * 60 + this.$moment(event.endDate).minutes();
+      if (!this.$moment(day).isSame(event.startDate, 'day')) {
+        dayEvent.startDate = this.$moment(day).hour(PLANNING_VIEW_START_HOUR).toISOString();
+        staffingLeft = 0;
+      }
+      if (!this.$moment(day).isSame(event.endDate, 'day')) {
+        dayEvent.endDate = this.$moment(day).hour(PLANNING_VIEW_END_HOUR).toISOString();
+        staffingRight = (PLANNING_VIEW_END_HOUR - PLANNING_VIEW_START_HOUR) * 60;
+      }
+
+      dayEvent.staffingLeft = staffingLeft;
+      dayEvent.staffingWidth = staffingRight - staffingLeft;
+
+      return dayEvent;
     },
     getPersonEvents (person) {
       return this.events.filter(event =>
