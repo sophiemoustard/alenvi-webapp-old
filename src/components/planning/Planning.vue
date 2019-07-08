@@ -256,8 +256,17 @@ export default {
       });
     },
     createEvent (eventInfo) {
-      if (this.personKey === 'auxiliary' && eventInfo.person) {
-        const can = this.$can({
+      let can = true;
+      if (this.personKey === 'auxiliary' && eventInfo.sectorId) { // To assign event
+        can = this.$can({
+          user: this.$store.getters['main/user'],
+          auxiliarySectorEvent: eventInfo.sectorId,
+          permissions: [
+            { name: 'planning:create:user', rule: 'isInSameSector' },
+          ],
+        });
+      } else if (this.personKey === 'auxiliary') {
+        can = this.$can({
           user: this.$store.getters['main/user'],
           auxiliaryIdEvent: eventInfo.person._id,
           auxiliarySectorEvent: eventInfo.person.sector._id,
@@ -266,8 +275,8 @@ export default {
             { name: 'planning:create', rule: 'isOwner' }
           ],
         });
-        if (!can) return;
       }
+      if (!can) return;
 
       this.$emit('createEvent', eventInfo);
     },
