@@ -36,7 +36,7 @@
               <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
                 @click="createEvent({ dayIndex, person })">
                 <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
-                  <div :id="event._id" draggable @dragstart="drag(event)" @click.stop="editEvent(event._id)"
+                  <div :id="event._id" draggable="true" @dragstart="drag(event, $event)" @click.stop="editEvent(event._id)"
                     :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-sm']" :key="eventIndex"
                     :style="{ left: `${PERCENTAGE_BY_MINUTES * event.staffingLeft}%`, width: `${PERCENTAGE_BY_MINUTES * event.staffingWidth}%` }">
                   </div>
@@ -47,7 +47,7 @@
               <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
                 @click="createEvent({ dayIndex, person })">
                 <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
-                  <div :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event)" :key="eventIndex"
+                  <div :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event, $event)" :key="eventIndex"
                     :class="['row', 'cursor-pointer', 'event', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]"
                     @click.stop="editEvent(event._id)">
                     <div class="event-container">
@@ -219,7 +219,8 @@ export default {
       );
     },
     // Drag & drop
-    drag (event) {
+    drag (event, nativeEvent) {
+      nativeEvent.dataTransfer.setData('text', ''); // Mandatory on Firefox
       this.draggedObject = event;
     },
     async drop (toDay, toPerson) {

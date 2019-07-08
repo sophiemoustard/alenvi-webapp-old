@@ -194,15 +194,6 @@ const routes = [
         }
       },
       {
-        path: 'ni/planning/permanences',
-        name: 'constrained coaches',
-        component: () => import('pages/ni/planning/ConstrainedCoaches'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['duty:read'],
-        },
-      },
-      {
         path: 'ni/planning/auxiliaries',
         name: 'auxiliaries planning',
         component: () => import('pages/ni/planning/AuxiliaryPlanning'),

@@ -6,7 +6,7 @@
   &-container
     height: 100%;
     position: relative;
-    width: -webkit-fill-available;
+    width: stretch;
   &-title
     font-size: 0.875rem
     font-weight: 600
@@ -143,12 +143,15 @@
     height: 30px !important;
     width: 30px !important;
 
-.cutomer-info
-  background: $light-grey;
-  padding: 10px 25px;
-  /deep/ .q-if-inverted
-    background: $light-grey !important;
-    border: none;
+.customer
+  &-info
+    background: $light-grey;
+    padding: 5px 25px;
+    & .q-if-inverted
+      background: $light-grey !important;
+      border: none;
+  &-address
+    margin-right: 6px
 
 .person-name
   font-size: 1.3rem;

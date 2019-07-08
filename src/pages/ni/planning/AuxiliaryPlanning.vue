@@ -6,13 +6,13 @@
     <!-- Event creation modal -->
     <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
       :creationModal="creationModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary"
-      :auxiliaries="auxiliaries" :customers="customers" @resetForm="resetCreationForm" @deleteDocument="deleteDocument"
+      :auxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetCreationForm" @deleteDocument="deleteDocument"
       @documentUploaded="documentUploaded" @createEvent="createEvent" @close="closeCreationModal"
       @selectedAddress="selectedAddress" />
 
     <!-- Event edition modal -->
     <ni-auxiliary-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
-      :editionModal="editionModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary" :auxiliaries="auxiliaries"
+      :editionModal="editionModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary" :auxiliaries="activeAuxiliaries"
       :customers="customers" @resetForm="resetEditionForm" @deleteDocument="deleteDocument" @documentUploaded="documentUploaded"
       @updateEvent="updateEvent" @close="closeEditionModal" @deleteEvent="deleteEvent" @deleteEventRepetition="deleteEventRepetition"
       @selectedAddress="selectedAddress" />
@@ -181,7 +181,7 @@ export default {
         this.events = await this.$events.list({
           startDate: this.$moment(this.startOfWeekAsString).toDate(),
           endDate: this.endOfWeek.toDate(),
-          auxiliary: JSON.stringify(this.auxiliaries.map(aux => aux._id))
+          auxiliary: this.auxiliaries.map(aux => aux._id),
         });
       } catch (e) {
         this.events = [];

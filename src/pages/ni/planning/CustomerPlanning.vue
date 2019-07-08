@@ -19,7 +19,7 @@
         </div>
         <ni-datetime-range caption="Dates et heures de l'intervention" v-model="newEvent.dates" required-field disable-end-date />
         <ni-modal-select caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions" :error="$v.newEvent.auxiliary.$error"
-          required-field @blur="$v.newEvent.auxiliary.$touch" @input="setSector" />
+          required-field @blur="$v.newEvent.auxiliary.$touch" @input="toggleServiceSelection(newEvent.customer)" />
         <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions(newEvent.customer)"
           :error="$v.newEvent.subscription.$error" required-field @blur="$v.newEvent.subscription.$touch" />
         <ni-modal-select caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency" :options="repetitionOptions"
@@ -50,8 +50,8 @@
             v-if="!isDisabled" />
         </div>
         <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" :disable="isDisabled" disable-end-date />
-        <ni-modal-select caption="Auxiliaire" v-model="editedEvent.auxiliary" :options="auxiliariesOptions" :error="$v.editedEvent.auxiliary.$error"
-          required-field @input="setSector" :disable="isDisabled" />
+        <ni-modal-select caption="Auxiliaire" v-model="editedEvent.auxiliary" :options="auxiliariesOptions"
+          :error="$v.editedEvent.auxiliary.$error" required-field :disable="isDisabled" />
         <ni-modal-select caption="Service" v-model="editedEvent.subscription" :options="customerSubscriptionsOptions(editedEvent.customer._id)"
           :error="$v.editedEvent.subscription.$error" @blur="$v.editedEvent.subscription.$touch" :disable="isDisabled" />
         <template v-if="isRepetition(editedEvent) && !isDisabled">
@@ -70,9 +70,11 @@
             required-field @blur="$v.editedEvent.cancel.reason.$touch" />
         </template>
       </div>
-      <div class="cutomer-info">
-        <p class="input-caption">Infos bénéficiaire</p>
-        <div>{{ customerAddress }}</div>
+      <div class="customer-info">
+        <div class="row items-center">
+        <div v-if="customerAddress" class="customer-address">{{ customerAddress }}</div>
+          <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect" />
+        </div>
       </div>
       <q-btn v-if="!isDisabled" class="full-width modal-btn" no-caps color="primary" :loading="loading"
         label="Editer l'évènement" @click="updateEvent" icon-right="check" :disable="disableEditionButton" />
@@ -176,7 +178,6 @@ export default {
   },
   computed: {
     ...mapGetters({
-      getUser: 'main/user',
       getFilter: 'planning/getFilter',
       getElemAdded: 'planning/getElemAdded',
       getElemRemoved: 'planning/getElemRemoved'
@@ -206,10 +207,10 @@ export default {
         const aux = this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
         const hasActiveCustomerContractOnEvent = this.hasActiveCustomerContractOnEvent(aux, this.newEvent.dates.startDate);
         const hasActiveCompanyContractOnEvent = this.hasActiveCompanyContractOnEvent(aux, this.newEvent.dates.startDate);
-        const isCompanyContractActive = this.isCompanyContractActive(aux);
-        const isCustomerContractActive = this.isCustomerContractActive(aux);
+        const isCustomerContractValidForRepetition = this.isCustomerContractValidForRepetition(aux);
+        const isCompanyContractValidForRepetition = this.isCompanyContractValidForRepetition(aux);
 
-        return { ...aux, hasActiveCustomerContractOnEvent, hasActiveCompanyContractOnEvent, isCompanyContractActive, isCustomerContractActive };
+        return { ...aux, hasActiveCustomerContractOnEvent, hasActiveCompanyContractOnEvent, isCustomerContractValidForRepetition, isCompanyContractValidForRepetition };
       }
       if (this.editionModal && this.editedEvent.auxiliary) {
         const aux = this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
@@ -229,8 +230,8 @@ export default {
         if (!selectedCustomer) return true;
         const selectedSubscription = selectedCustomer.subscriptions.find(sub => sub._id === this.newEvent.subscription);
         if (!selectedSubscription) return true;
-        if (selectedSubscription.service.type === COMPANY_CONTRACT) return this.selectedAuxiliary.isCompanyContractActive;
-        if (selectedSubscription.service.type === CUSTOMER_CONTRACT) return this.selectedAuxiliary.isCustomerContractActive;
+        if (selectedSubscription.service.type === COMPANY_CONTRACT) return this.selectedAuxiliary.isCustomerContractValidForRepetition;
+        if (selectedSubscription.service.type === CUSTOMER_CONTRACT) return this.selectedAuxiliary.isCompanyContractValidForRepetition;
       }
       return true;
     }
@@ -269,7 +270,7 @@ export default {
           ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(selectedDay));
       });
     },
-    isCompanyContractActive (aux) {
+    isCustomerContractValidForRepetition (aux) {
       if (!aux.contracts.length === 0) return false;
       if (!aux.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
       const companyContract = aux.contracts.find(contract => contract.status === COMPANY_CONTRACT);
@@ -277,7 +278,7 @@ export default {
 
       return !companyContract.endDate && companyContract.versions.some(version => version.isActive);
     },
-    isCustomerContractActive (aux) {
+    isCompanyContractValidForRepetition (aux) {
       if (aux.contracts.length === 0) return false;
       if (!aux.contracts.some(contract => contract.status === CUSTOMER_CONTRACT)) return false;
       const correspContract = aux.contracts.find(ctr => ctr.customer === this.newEvent.customer);
@@ -312,7 +313,7 @@ export default {
         this.events = await this.$events.list({
           startDate: this.$moment(this.startOfWeekAsString).toDate(),
           endDate: this.endOfWeek.toDate(),
-          customer: JSON.stringify(this.customers.map(cus => cus._id)),
+          customer: this.customers.map(cus => cus._id),
         });
       } catch (e) {
         this.events = [];
@@ -322,11 +323,6 @@ export default {
       this.auxiliaries = await this.$users.showAllActive({ role: [AUXILIARY, PLANNING_REFERENT] });
     },
     // Event creation
-    setSector (auxiliaryId) {
-      const auxiliary = this.auxiliaries.find(aux => aux._id === auxiliaryId);
-      if (this.creationModal) this.newEvent.sector = auxiliary.sector._id;
-      if (this.editionModal) this.editedEvent.sector = auxiliary.sector._id;
-    },
     openCreationModal (vEvent) {
       const { dayIndex, person } = vEvent;
       const selectedDay = this.days[dayIndex];
@@ -362,6 +358,9 @@ export default {
         const subscription = customer.subscriptions.find(sub => sub._id === event.subscription);
         if (subscription && subscription.service) payload.status = subscription.service.type;
       }
+
+      const auxiliary = this.auxiliaries.find(aux => aux._id === event.auxiliary);
+      payload.sector = auxiliary.sector._id;
 
       payload.startDate = this.$moment(event.dates.startDate).hours(event.dates.startHour.split(':')[0])
         .minutes(event.dates.startHour.split(':')[1]).toISOString();

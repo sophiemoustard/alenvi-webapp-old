@@ -74,10 +74,14 @@ export const planningActionMixin = {
       let payload = { ...this.$_.omit(event, ['dates', '__v', '__index']) }
       payload = this.$_.pickBy(payload);
 
+      const auxiliary = this.auxiliaries.find(aux => aux._id === event.auxiliary);
+      payload.sector = auxiliary.sector._id;
+
       if (event.type === INTERNAL_HOUR) {
         const internalHour = this.internalHours.find(hour => hour._id === event.internalHour);
         payload.internalHour = internalHour;
       }
+
       if (event.type === ABSENCE && event.absenceNature === DAILY) {
         payload.startDate = this.$moment(event.dates.startDate).hour(PLANNING_VIEW_START_HOUR).minute(0).toISOString();
         payload.endDate = this.$moment(event.dates.endDate).hour(PLANNING_VIEW_END_HOUR).minute(0).toISOString();

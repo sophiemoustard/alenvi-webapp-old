@@ -27,6 +27,8 @@ import {
   REQUIRED_LABEL,
   CUSTOMER_CONTRACT,
   COMPANY_CONTRACT,
+  ADMIN,
+  COACH,
 } from '../data/constants';
 
 export const planningModalMixin = {
@@ -61,6 +63,9 @@ export const planningModalMixin = {
     };
   },
   computed: {
+    getUser () {
+      return this.$store.getters['main/user'];
+    },
     absenceOptions () {
       if (this.newEvent && this.newEvent.absenceNature === HOURLY) {
         return ABSENCE_TYPES.filter(type => type.value === UNJUSTIFIED);
@@ -183,6 +188,10 @@ export const planningModalMixin = {
     customerAddress () {
       return this.$_.get(this.editedEvent, 'customer.contact.address.fullAddress', '');
     },
+    customerProfileRedirect () {
+      if (this.getUser.role.name === COACH || this.getUser.role.name === ADMIN) return { name: 'customers profile', params: { id: this.editedEvent.customer._id } };
+      return { name: 'profile customers info', params: { customerId: this.editedEvent.customer._id } };
+    }
   },
   methods: {
     // Event creation
@@ -210,6 +219,10 @@ export const planningModalMixin = {
     },
     isRepetition (event) {
       return ABSENCE !== event.type && event.repetition && event.repetition.frequency !== NEVER;
+    },
+    toggleServiceSelection (customerId) {
+      const customerSubscriptionsOptions = this.customerSubscriptionsOptions(customerId);
+      if (customerSubscriptionsOptions.length === 1 && this.creationModal) this.newEvent.subscription = customerSubscriptionsOptions[0].value;
     },
   },
 };

@@ -3,7 +3,7 @@
     <div class="row col-xs-12 q-mb-md">
       <div :class="[customer ? 'col-xs-12': 'col-xs-8', 'row', 'items-baseline', 'col-md-10']">
         <div class="row">
-          <q-icon v-if="isExternalUser" class="on-left cursor-pointer self-center" size="1rem" name="arrow_back" color="primary" @click.native="goToDirectory" />
+          <q-icon v-if="isExternalUser" class="on-left cursor-pointer self-center" size="1rem" name="arrow_back" color="primary" @click.native="$router.go(-1)" />
           <h4>{{ user.identity.firstname }} {{ user.identity.lastname }}</h4>
         </div>
       </div>
@@ -160,19 +160,6 @@ export default {
       this.loading = false;
       this.opened = false;
     },
-    async sendMessageToBotUser () {
-      try {
-        await this.$message.sendMessage({
-          message: this.messageComp,
-          address: this.user.facebook.address
-        });
-        NotifyPositive('Message par Pigi bien envoyé');
-      } catch (e) {
-        console.error(e);
-        this.loading = false;
-        NotifyNegative('Erreur lors de l\'envoi du message par Pigi');
-      }
-    },
     async sendSMS () {
       try {
         await this.$twilio.sendSMS({
@@ -186,13 +173,6 @@ export default {
         NotifyNegative('Erreur lors de l\'envoi du SMS');
       }
     },
-    goToDirectory () {
-      if (this.customer) {
-        this.$router.push({ name: 'customers directory' });
-      } else {
-        this.$router.push({ name: 'administrative directory' });
-      }
-    }
   }
 }
 </script>

@@ -1044,8 +1044,10 @@ export default {
     async createAlenviHelper () {
       this.newHelper.local.password = randomize('0', 6);
       this.newHelper.customers = [this.userProfile._id];
-      this.newHelper.role = HELPER;
-      this.newHelper.company = this.company.name;
+      const roles = await this.$roles.showAll({ name: HELPER });
+      if (roles.length === 0) throw new Error('Role not found');
+      this.newHelper.role = roles[0]._id;
+      this.newHelper.company = this.company._id;
       this.newHelper.identity = this.$_.pickBy(this.newHelper.identity);
       const payload = this.$_.pickBy(this.newHelper);
       await this.$users.create(payload);
@@ -1072,7 +1074,7 @@ export default {
         await this.getUserHelpers();
         this.addHelper = false
       } catch (e) {
-        console.error(e);
+        e.response ? console.error(e.response) : console.error(e);
         if (e && e.message === 'Invalid fields') return NotifyWarning('Champ(s) invalide(s)');
         if (e && e.response && e.response.status === 409) return NotifyNegative('Cet email est déjà utilisé par un compte existant');
         NotifyNegative('Erreur lors de la création de l\'aidant');

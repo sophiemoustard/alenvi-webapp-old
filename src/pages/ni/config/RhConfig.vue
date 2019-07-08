@@ -389,10 +389,6 @@ export default {
         return 'Nombre non valide';
       }
     },
-    async refreshCompany () {
-      await this.$store.dispatch('main/getUser', this.user._id);
-      this.company = this.user.company;
-    },
     // Internal hours
     async refreshInternalHours () {
       this.internalHours = await this.$companies.getInternalHours(this.company._id);
@@ -406,6 +402,7 @@ export default {
         if (!this.internalHours || this.internalHours.length === 0) this.newInternalHour.default = true;
         const payload = this.$_.pickBy(this.newInternalHour);
         await this.$companies.createInternalHour(this.company._id, payload);
+        await this.$store.dispatch('main/getUser', this.user._id);
         NotifyPositive('Heure interne créée');
 
         this.newInternalHourModal = false;
@@ -430,6 +427,7 @@ export default {
 
         const queries = { id: this.company._id, internalHourId };
         await this.$companies.deleteInternalHour(queries);
+        await this.$store.dispatch('main/getUser', this.user._id);
         this.internalHours.splice(cell, 1);
         NotifyPositive('Heure interne supprimée.');
       } catch (e) {
@@ -452,6 +450,7 @@ export default {
       params.internalHourId = internalHourId;
       await this.$companies.updateInternalHour(params, { default: true });
       await this.refreshInternalHours();
+      await this.$store.dispatch('main/getUser', this.user._id);
     },
     // Sectors
     async getSectors () {
