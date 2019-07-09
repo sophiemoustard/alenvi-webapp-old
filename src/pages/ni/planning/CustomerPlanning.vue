@@ -89,7 +89,7 @@ import Planning from '../../../components/planning/Planning.vue';
 import { planningModalMixin } from '../../../mixins/planningModalMixin';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify.js';
-import { INTERVENTION, DEFAULT_AVATAR, NEVER, AUXILIARY, PLANNING_REFERENT, CUSTOMER_CONTRACT, COMPANY_CONTRACT, CUSTOMER } from '../../../data/constants';
+import { INTERVENTION, DEFAULT_AVATAR, NEVER, AUXILIARY, PLANNING_REFERENT, CUSTOMER_CONTRACT, COMPANY_CONTRACT, CUSTOMER, SECTOR } from '../../../data/constants';
 import { mapGetters, mapActions } from 'vuex';
 import { formatFullIdentity } from '../../../helpers/utils';
 
@@ -180,7 +180,7 @@ export default {
     ...mapGetters({
       getFilter: 'planning/getFilter',
       getElemAdded: 'planning/getElemAdded',
-      getElemRemoved: 'planning/getElemRemoved'
+      getElemRemoved: 'planning/getElemRemoved',
     }),
     endOfWeek () {
       return this.$moment(this.startOfWeekAsString).endOf('w');
@@ -535,8 +535,8 @@ export default {
     },
     // Filter
     async handleElemAddedToFilter (el) {
-      if (el.sectorId) { // el = sector
-        this.filteredSectors.push(el.sectorId);
+      if (el.type === SECTOR) {
+        this.filteredSectors.push(el._id);
         const customersBySector = await this.getCustomersBySectors(this.filteredSectors);
         for (let i = 0, l = customersBySector.length; i < l; i++) {
           if (!this.customers.some(cus => customersBySector[i]._id === cus._id)) {
@@ -553,8 +553,8 @@ export default {
       }
     },
     async handleElemRemovedFromFilter (el) {
-      if (el.sectorId) {
-        this.filteredSectors = this.filteredSectors.filter(sec => sec !== el.sectorId);
+      if (el.type === SECTOR) {
+        this.filteredSectors = this.filteredSectors.filter(sec => sec !== el._id);
         await this.refreshCustomers();
         await this.refresh();
       } else {

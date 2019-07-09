@@ -28,7 +28,7 @@ import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryE
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
 import Planning from '../../../components/planning/Planning.vue';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
-import { INTERVENTION, NEVER, AUXILIARY, ABSENCE, DAILY, HOURLY, INTERNAL_HOUR, ILLNESS } from '../../../data/constants';
+import { INTERVENTION, NEVER, AUXILIARY, ABSENCE, DAILY, HOURLY, INTERNAL_HOUR, ILLNESS, SECTOR } from '../../../data/constants';
 import { mapGetters, mapActions } from 'vuex';
 import { NotifyNegative, NotifyWarning } from '../../../components/popup/notify';
 
@@ -183,7 +183,7 @@ export default {
           startDate: this.$moment(this.startOfWeekAsString).toDate(),
           endDate: this.endOfWeek.toDate(),
           auxiliary: this.auxiliaries.map(aux => aux._id),
-          sector: this.filteredSectors.map(sector => sector.sectorId),
+          sector: this.filteredSectors.map(sector => sector._id),
         });
       } catch (e) {
         this.events = [];
@@ -234,9 +234,9 @@ export default {
     },
     // Filter
     handleElemAddedToFilter (el) {
-      if (el.sectorId) { // el = sector
+      if (el.type === SECTOR) {
         this.filteredSectors.push(el);
-        const auxBySector = this.getFilter.filter(aux => aux.sector && aux.sector._id === el.sectorId);
+        const auxBySector = this.getFilter.filter(aux => aux.sector && aux.sector._id === el._id);
         for (let i = 0, l = auxBySector.length; i < l; i++) {
           if (!this.auxiliaries.some(aux => auxBySector[i]._id === aux._id)) {
             this.auxiliaries.push(auxBySector[i]);
@@ -252,14 +252,14 @@ export default {
       }
     },
     handleElemRemovedFromFilter (el) {
-      if (el.sectorId) { // el = sector
-        this.filteredSectors = this.filteredSectors.filter(sec => sec.sectorId !== el.sectorId);
+      if (el.type === SECTOR) {
+        this.filteredSectors = this.filteredSectors.filter(sec => sec._id !== el._id);
         this.auxiliaries = this.auxiliaries.filter(auxiliary =>
-          auxiliary.sector._id !== el.sectorId || this.filteredAuxiliaries.some(filteredAux => filteredAux._id === auxiliary._id)
+          auxiliary.sector._id !== el._id || this.filteredAuxiliaries.some(filteredAux => filteredAux._id === auxiliary._id)
         );
       } else { // el = auxiliary
         this.filteredAuxiliaries = this.filteredAuxiliaries.filter(auxiliary => auxiliary._id !== el._id);
-        if (this.filteredSectors.some(sector => sector.sectorId === el.sector._id)) return;
+        if (this.filteredSectors.some(sector => sector._id === el.sector._id)) return;
         this.auxiliaries = this.auxiliaries.filter(auxiliary => auxiliary._id !== el._id);
       }
     },

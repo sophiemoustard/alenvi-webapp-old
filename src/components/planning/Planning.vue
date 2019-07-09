@@ -23,14 +23,14 @@
         </thead>
         <tbody>
           <template v-if="!isCustomerPlanning && filteredSectors.length > 0">
-            <tr v-for="sector in filteredSectors" :key="sector.sectorId" class="person-row">
+            <tr v-for="sector in filteredSectors" :key="sector._id" class="person-row">
               <td valign="top">
                 <div class="person-inner-cell">
                   <div class="person-name overflow-hidden">À AFFECTER - {{ sector.label }}</div>
                 </div>
               </td>
-              <td @drop="dropToSector(day, sector)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
-                valign="top" @click="createEvent({ dayIndex, sectorId: sector.sectorId })">
+              <td @drop="drop(day, sector)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
+                valign="top" @click="createEvent({ dayIndex, sectorId: sector._id })">
                 <template v-for="(event, eventIndex) in getUnassignedEvents(sector, days[dayIndex])">
                   <div :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event, $event)"
                     :class="['row', 'cursor-pointer', 'event', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]"
@@ -62,7 +62,7 @@
               </div>
             </td>
             <template v-if="staffingView && !isCustomerPlanning">
-              <td @drop="dropToPerson(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
+              <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
                 valign="top" @click="createEvent({ dayIndex, person })">
                 <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
                   <div :id="event._id" draggable="true" @dragstart="drag(event, $event)" @click.stop="editEvent(event._id)"
@@ -73,7 +73,7 @@
               </td>
             </template>
             <template v-else>
-              <td @drop="dropToPerson(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
+              <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
                 valign="top" @click="createEvent({ dayIndex, person })">
                 <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
                   <div :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event, $event)"
@@ -117,6 +117,7 @@ import {
   PLANNING_VIEW_START_HOUR,
   PLANNING_VIEW_END_HOUR,
   INVOICED_AND_PAYED,
+  SECTOR,
 } from '../../data/constants';
 import { NotifyNegative } from '../popup/notify';
 import NiChipAuxiliaryIndicator from '../planning/ChipAuxiliaryIndicator';
@@ -184,7 +185,7 @@ export default {
           if (!this.isCustomerPlanning) this.addSavedTerms('Auxiliaries');
           else this.addSavedTerms('Customers');
         } else {
-          const userSector = this.getFilter.find(filter => filter.sectorId === this.getUser.sector);
+          const userSector = this.getFilter.find(filter => filter.type === SECTOR && filter._id === this.getUser.sector);
           if (userSector) this.$refs.refFilter.add(userSector.label);
         }
       }
@@ -211,7 +212,7 @@ export default {
     getUnassignedEvents (sector, day) {
       return this.events
         .filter(event =>
-          !event.auxiliary && event.sector === sector.sectorId &&
+          !event.auxiliary && event.sector === sector._id &&
           this.$moment(day).isSameOrAfter(event.startDate, 'day') && this.$moment(day).isSameOrBefore(event.endDate, 'day') &&
           (!this.staffingView || !event.isCancelled)
         )
@@ -258,21 +259,15 @@ export default {
       nativeEvent.dataTransfer.setData('text', ''); // Mandatory on Firefox
       this.draggedObject = event;
     },
-    async dropToPerson (toDay, toPerson) {
+    async drop (toDay, target) {
       try {
-        if (this.draggedObject[this.personKey]._id === toPerson._id && toDay.isSame(this.draggedObject.startDate, 'd')) return;
-        this.$emit('onDrop', { toDay, toPerson, draggedObject: this.draggedObject });
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Problème lors de la modification de l\'évènement');
-      } finally {
-        this.draggedObject = {};
-      }
-    },
-    async dropToSector (toDay, toSector) {
-      try {
-        if (this.draggedObject.sector === toSector._id && toDay.isSame(this.draggedObject.startDate, 'd')) return;
-        this.$emit('onDrop', { toDay, toSector, draggedObject: this.draggedObject });
+        if (target.type === SECTOR) { // Unassign event
+          if (this.draggedObject.sector === target._id && toDay.isSame(this.draggedObject.startDate, 'd')) return;
+        } else { // Update event auxiliary
+          if (this.draggedObject[this.personKey]._id === target._id && toDay.isSame(this.draggedObject.startDate, 'd')) return;
+        }
+
+        this.$emit('onDrop', { toDay, target, draggedObject: this.draggedObject });
       } catch (e) {
         console.error(e);
         NotifyNegative('Problème lors de la modification de l\'évènement');

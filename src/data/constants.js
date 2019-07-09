@@ -99,6 +99,8 @@ export const AGENDA = 'agenda';
 export const PLANNING_VIEW_START_HOUR = 7;
 export const PLANNING_VIEW_END_HOUR = 22;
 export const PERCENTAGE_BY_MINUTES = 100 / ((PLANNING_VIEW_END_HOUR - PLANNING_VIEW_START_HOUR) * 60);
+export const SECTOR = 'sector';
+export const PERSON = 'person';
 
 // INDICATORS
 export const WEEK_STATS = 'week_stats';

@@ -1,5 +1,18 @@
 import { NotifyWarning, NotifyNegative, NotifyPositive } from '../components/popup/notify';
-import { INTERNAL_HOUR, ABSENCE, INTERVENTION, NEVER, UNAVAILABILITY, ILLNESS, CUSTOMER_CONTRACT, COMPANY_CONTRACT, DAILY, PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR } from '../data/constants';
+import {
+  INTERNAL_HOUR,
+  ABSENCE,
+  INTERVENTION,
+  NEVER,
+  UNAVAILABILITY,
+  ILLNESS,
+  CUSTOMER_CONTRACT,
+  COMPANY_CONTRACT,
+  DAILY,
+  PLANNING_VIEW_START_HOUR,
+  PLANNING_VIEW_END_HOUR,
+  SECTOR
+} from '../data/constants';
 
 export const planningActionMixin = {
   methods: {
@@ -273,10 +286,10 @@ export const planningActionMixin = {
     },
     async updateEventOnDrop (vEvent) {
       try {
-        const { toDay, toPerson, toSector, draggedObject } = vEvent;
+        const { toDay, target, draggedObject } = vEvent;
         const daysBetween = this.$moment(draggedObject.endDate).diff(this.$moment(draggedObject.startDate), 'days');
 
-        if ([ABSENCE, UNAVAILABILITY].includes(draggedObject.type) && draggedObject.auxiliary._id !== toPerson._id) {
+        if ([ABSENCE, UNAVAILABILITY].includes(draggedObject.type) && draggedObject.auxiliary._id !== target._id) {
           return NotifyNegative('Impossible de modifier l\'auxiliaire de cet évènement.');
         }
 
@@ -287,8 +300,8 @@ export const planningActionMixin = {
             .minutes(this.$moment(draggedObject.endDate).minutes()).toISOString(),
         };
 
-        if (toPerson) payload.auxiliary = toPerson._id;
-        else if (toSector) payload.sector = toSector.sectorId;
+        if (target.type === SECTOR) payload.sector = target._id;
+        else payload.auxiliary = target._id;
 
         if (this.hasConflicts(payload)) {
           return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
