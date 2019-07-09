@@ -32,19 +32,8 @@
               <td @drop="drop(day, sector)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
                 valign="top" @click="createEvent({ dayIndex, sectorId: sector._id })">
                 <template v-for="(event, eventIndex) in getUnassignedEvents(sector, days[dayIndex])">
-                  <div :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event, $event)"
-                    :class="['row', 'cursor-pointer', 'event', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]"
-                    @click.stop="editEvent(event._id)" :key="eventIndex" >
-                    <div class="event-container">
-                      <div class="event-title">
-                        <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">
-                          {{ eventTitle(event) }}
-                        </p>
-                      </div>
-                      <p class="no-margin event-subtitle overflow-hidden-nowrap">{{ getEventHours(event) }}</p>
-                      <p v-if="event.isBilled" class="no-margin event-subtitle event-billed">F</p>
-                    </div>
-                  </div>
+                  <ni-planning-event-cell :event="event" :display-staffing-view="staffingView && !isCustomerPlanning"
+                    :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canDrag" />
                 </template>
               </td>
             </tr>
@@ -61,43 +50,13 @@
                 <div class="person-name overflow-hidden-nowrap">{{ person.identity | formatShortIdentity }}</div>
               </div>
             </td>
-            <template v-if="staffingView && !isCustomerPlanning">
-              <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
-                valign="top" @click="createEvent({ dayIndex, person })">
-                <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
-                  <div :id="event._id" draggable="true" @dragstart="drag(event, $event)" @click.stop="editEvent(event._id)"
-                    :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-sm']" :key="eventIndex"
-                    :style="{ left: `${PERCENTAGE_BY_MINUTES * event.staffingLeft}%`, width: `${PERCENTAGE_BY_MINUTES * event.staffingWidth}%` }">
-                  </div>
-                </template>
-              </td>
-            </template>
-            <template v-else>
-              <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
-                valign="top" @click="createEvent({ dayIndex, person })">
-                <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
-                  <div :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event, $event)"
-                    :class="['row', 'cursor-pointer', 'event', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]"
-                    @click.stop="editEvent(event._id)" :key="eventIndex" >
-                    <div class="event-container">
-                      <div class="event-title">
-                        <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">
-                          {{ eventTitle(event) }}
-                        </p>
-                        <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">
-                          {{ displayAbsenceType(event.absence) }}
-                        </p>
-                        <p v-if="event.type === UNAVAILABILITY" class="no-margin overflow-hidden-nowrap">Indispo.</p>
-                        <p v-if="event.type === INTERNAL_HOUR" class="no-margin overflow-hidden-nowrap">{{
-                          event.internalHour.name }}</p>
-                      </div>
-                      <p class="no-margin event-subtitle overflow-hidden-nowrap">{{ getEventHours(event) }}</p>
-                      <p v-if="event.isBilled" class="no-margin event-subtitle event-billed">F</p>
-                    </div>
-                  </div>
-                </template>
-              </td>
-            </template>
+            <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
+              valign="top" @click="createEvent({ dayIndex, person })">
+              <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
+                <ni-planning-event-cell :event="event" :display-staffing-view="staffingView && !isCustomerPlanning"
+                  :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canDrag" />
+              </template>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -120,8 +79,9 @@ import {
   SECTOR,
 } from '../../data/constants';
 import { NotifyNegative } from '../popup/notify';
-import NiChipAuxiliaryIndicator from '../planning/ChipAuxiliaryIndicator';
-import NiChipCustomerIndicator from '../planning/ChipCustomerIndicator';
+import NiChipAuxiliaryIndicator from './ChipAuxiliaryIndicator';
+import NiChipCustomerIndicator from './ChipCustomerIndicator';
+import NiPLanningEventCell from './PlanningEventCell';
 import ChipsAutocomplete from '../ChipsAutocomplete';
 import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import { planningEventMixin } from '../../mixins/planningEventMixin';
@@ -135,6 +95,7 @@ export default {
   components: {
     'ni-chip-customer-indicator': NiChipCustomerIndicator,
     'ni-chip-auxiliary-indicator': NiChipAuxiliaryIndicator,
+    'ni-planning-event-cell': NiPLanningEventCell,
     'ni-chips-autocomplete': ChipsAutocomplete,
     'planning-navigation': PlanningNavigation,
   },
@@ -255,7 +216,7 @@ export default {
       );
     },
     // Drag & drop
-    drag (event, nativeEvent) {
+    drag ({ event, nativeEvent }) {
       nativeEvent.dataTransfer.setData('text', ''); // Mandatory on Firefox
       this.draggedObject = event;
     },
@@ -365,11 +326,5 @@ export default {
     td
       position: relative;
       height: 75px;
-    .event
-      position: absolute;
-      top: 2px;
-      bottom: 1px;
-      padding: 0;
-      margin: 0;
-      border: 1px solid white;
+
 </style>
