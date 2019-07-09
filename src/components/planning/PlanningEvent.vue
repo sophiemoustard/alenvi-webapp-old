@@ -1,0 +1,71 @@
+<template>
+  <div v-if="displayStaffingView" :id="event._id" draggable="true" @dragstart="drag(event, $event)" @click.stop="editEvent(event._id)"
+    :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-sm']"
+    :style="{ left: `${PERCENTAGE_BY_MINUTES * event.staffingLeft}%`, width: `${PERCENTAGE_BY_MINUTES * event.staffingWidth}%` }">
+  </div>
+  <div v-else :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event, $event)"
+    :class="['row', 'cursor-pointer', 'event', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]"
+    @click.stop="editEvent(event._id)" >
+    <div class="event-container">
+      <div class="event-title">
+        <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">
+          {{ eventTitle(event) }}
+        </p>
+        <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">
+          {{ displayAbsenceType(event.absence) }}
+        </p>
+        <p v-if="event.type === UNAVAILABILITY" class="no-margin overflow-hidden-nowrap">Indispo.</p>
+        <p v-if="event.type === INTERNAL_HOUR" class="no-margin overflow-hidden-nowrap">{{
+          event.internalHour.name }}</p>
+      </div>
+      <p class="no-margin event-subtitle overflow-hidden-nowrap">{{ getEventHours(event) }}</p>
+      <p v-if="event.isBilled" class="no-margin event-subtitle event-billed">F</p>
+    </div>
+  </div>
+</template>
+
+<script>
+import { PERCENTAGE_BY_MINUTES, INTERNAL_HOUR, INTERVENTION, ABSENCE, UNAVAILABILITY } from '../../data/constants';
+import { planningEventMixin } from '../../mixins/planningEventMixin';
+
+export default {
+  name: 'PlanningEvent',
+  mixins: [planningEventMixin],
+  props: {
+    displayStaffingView: { type: Boolean, default: false },
+    event: { type: Object, default: () => ({}) },
+    canDrag: { type: Function, default: () => {} },
+  },
+  data () {
+    return {
+      PERCENTAGE_BY_MINUTES,
+      INTERNAL_HOUR,
+      INTERVENTION,
+      ABSENCE,
+      UNAVAILABILITY,
+    }
+  },
+  methods: {
+    drag (event, nativeEvent) {
+      nativeEvent.dataTransfer.setData('text', ''); // Mandatory on Firefox
+      this.$emit('drag', event);
+    },
+    editEvent (eventId) {
+      this.$emit('editEvent', eventId);
+    }
+  }
+}
+</script>
+
+<style lang="stylus" scoped>
+
+.staffing
+  .event
+    position: absolute;
+    top: 2px;
+    bottom: 1px;
+    padding: 0;
+    margin: 0;
+    border: 1px solid white;
+
+</style>

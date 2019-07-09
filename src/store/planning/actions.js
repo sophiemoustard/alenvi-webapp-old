@@ -4,7 +4,7 @@ import Customers from '../../api/Customers'
 import store from '../../store/index'
 import { formatFullIdentity } from '../../helpers/utils';
 
-import { AUXILIARY, PLANNING_REFERENT } from '../../data/constants';
+import { AUXILIARY, PLANNING_REFERENT, SECTOR, PERSON } from '../../data/constants';
 
 export const fillFilter = async ({ commit }, roleToSearch) => {
   const rawPromises = [];
@@ -20,13 +20,15 @@ export const fillFilter = async ({ commit }, roleToSearch) => {
     elems.push({
       label: sectors[i].name,
       value: sectors[i].name,
-      sectorId: sectors[i]._id,
+      _id: sectors[i]._id,
+      type: SECTOR,
     });
   }
 
   for (let i = 0, l = persons.length; i < l; i++) {
     const value = formatFullIdentity(persons[i].identity);
-    elems.push({ label: value, value: value, ...persons[i] });
+    elems.push({ label: value, value: value, ...persons[i], type: PERSON });
   }
+
   commit('setFilter', elems);
 }

@@ -18,7 +18,7 @@ export const planningTimelineMixin = {
     }
   },
   watch: {
-    startOfWeek: function () {
+    startOfWeek () {
       this.targetDate = this.startOfWeek.toISOString();
     },
   },

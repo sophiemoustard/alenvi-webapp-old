@@ -5,6 +5,7 @@ import ModalSelect from '../components/form/ModalSelect';
 import ModalInput from '../components/form/ModalInput';
 import SearchAddress from '../components/form/SearchAddress';
 import FileUploader from '../components/form/FileUploader';
+import { formatFullIdentity } from '../helpers/utils';
 import {
   INTERVENTION,
   ABSENCE,
@@ -29,6 +30,7 @@ import {
   COMPANY_CONTRACT,
   ADMIN,
   COACH,
+  EVENT_TYPES,
 } from '../data/constants';
 
 export const planningModalMixin = {
@@ -85,7 +87,7 @@ export const planningModalMixin = {
           return !this.newEvent.auxiliary || !this.newEvent.absence || !this.newEvent.dates.startDate ||
             !this.newEvent.absenceNature || !this.newEvent.dates.startHour || !this.newEvent.dates.endHour;
         case INTERVENTION:
-          return !this.newEvent.auxiliary || !this.newEvent.customer || !this.newEvent.subscription || !this.newEvent.dates.startDate ||
+          return !this.newEvent.customer || !this.newEvent.subscription || !this.newEvent.dates.startDate ||
             !this.newEvent.dates.endDate || !this.newEvent.dates.startHour || !this.newEvent.dates.endHour;
         case INTERNAL_HOUR:
           return !this.newEvent.auxiliary || !this.newEvent.dates.startDate || !this.newEvent.dates.endDate ||
@@ -107,7 +109,7 @@ export const planningModalMixin = {
           return !this.editedEvent.auxiliary || !this.editedEvent.absence || !this.editedEvent.dates.startDate ||
             !this.editedEvent.absenceNature || !this.editedEvent.dates.startHour || !this.editedEvent.dates.endHour;
         case INTERVENTION:
-          const shouldDisableButton = !this.editedEvent.auxiliary || !this.editedEvent.subscription || !this.editedEvent.dates.startDate ||
+          const shouldDisableButton = !this.editedEvent.subscription || !this.editedEvent.dates.startDate ||
             !this.editedEvent.dates.endDate || !this.editedEvent.dates.startHour || !this.editedEvent.dates.endHour;
           if (this.editedEvent.isCancelled) return shouldDisableButton || !this.editedEvent.cancel.condition || !this.editedEvent.cancel.reason;
           else return shouldDisableButton;
@@ -121,28 +123,26 @@ export const planningModalMixin = {
       }
     },
     eventTypeOptions () {
-      if (this.selectedAuxiliary && !this.selectedAuxiliary.hasActiveCompanyContractOnEvent) {
-        return [
-          {label: 'Intervention', value: INTERVENTION},
-          {label: 'Absence', value: ABSENCE},
-          {label: 'Indispo', value: UNAVAILABILITY}
-        ]
+      if (this.selectedAuxiliary && !this.selectedAuxiliary._id) {
+        return EVENT_TYPES.filter(type => type.value === INTERVENTION);
       }
-      return [
-        {label: 'Intervention', value: INTERVENTION},
-        {label: 'Interne', value: INTERNAL_HOUR},
-        {label: 'Absence', value: ABSENCE},
-        {label: 'Indispo', value: UNAVAILABILITY}
-      ]
+
+      if (this.selectedAuxiliary && !this.selectedAuxiliary.hasActiveCompanyContractOnEvent) {
+        return EVENT_TYPES.filter(type => type.value !== INTERNAL_HOUR);
+      }
+
+      return EVENT_TYPES;
     },
     auxiliariesOptions () {
-      return this.auxiliaries.length === 0 ? [] : this.auxiliaries.map(aux => ({
-        label: `${aux.identity.firstname || ''} ${aux.identity.lastname}`,
-        value: aux._id,
-      }));
+      return this.auxiliaries.length === 0 ? [] : [
+        { label: 'À affecter', value: '' },
+        ...this.auxiliaries.map(aux => this.formatPersonOptions(aux)),
+      ];
     },
     customersOptions () {
-      if (this.customers.length === 0 || !this.selectedAuxiliary || !this.selectedAuxiliary.contracts) return [];
+      if (this.customers.length === 0 || !this.selectedAuxiliary) return [];
+      if (!this.selectedAuxiliary._id) return this.customers.map(cus => this.formatPersonOptions(cus)); // Unassigned event
+      if (!this.selectedAuxiliary.contracts) return [];
 
       let customers = this.customers;
       if (this.selectedAuxiliary && !this.selectedAuxiliary.hasActiveCompanyContractOnEvent) {
@@ -154,21 +154,13 @@ export const planningModalMixin = {
         customers = this.customers.filter(cus => auxiliaryCustomers.includes(cus._id));
       }
 
-      return customers.map(customer => ({
-        label: `${customer.identity.firstname || ''} ${customer.identity.lastname}`,
-        value: customer._id,
-      }));
+      return customers.map(cus => this.formatPersonOptions(cus));
     },
     internalHourOptions () {
       return this.internalHours.map(hour => ({
         label: hour.name,
         value: hour._id,
       }));
-    },
-    oneDayRepetitionLabel () {
-      if (this.creationModal) return `Tous les ${this.$moment(this.newEvent.dates.startDate).day()}`;
-      if (this.editionModal) return `Tous les ${this.$moment(this.editedEvent.dates.startDate).day()}`;
-      return 'Tous les lundis';
     },
     repetitionOptions () {
       const oneDayRepetitionLabel = this.creationModal
@@ -194,6 +186,12 @@ export const planningModalMixin = {
     }
   },
   methods: {
+    formatPersonOptions (person) {
+      return {
+        label: formatFullIdentity(person.identity),
+        value: person._id,
+      };
+    },
     // Event creation
     customerSubscriptionsOptions (customerId) {
       if (!customerId) return [];
@@ -201,8 +199,10 @@ export const planningModalMixin = {
       if (!selectedCustomer || !selectedCustomer.subscriptions || selectedCustomer.subscriptions.length === 0) return [];
 
       let subscriptions = selectedCustomer.subscriptions;
-      if (!this.selectedAuxiliary.hasActiveCustomerContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== CUSTOMER_CONTRACT)
-      if (!this.selectedAuxiliary.hasActiveCompanyContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== COMPANY_CONTRACT)
+      if (this.selectedAuxiliary._id) {
+        if (!this.selectedAuxiliary.hasActiveCustomerContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== CUSTOMER_CONTRACT);
+        if (!this.selectedAuxiliary.hasActiveCompanyContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== COMPANY_CONTRACT);
+      }
 
       return subscriptions.map(sub => ({
         label: sub.service.name,
