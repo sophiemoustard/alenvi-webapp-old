@@ -234,7 +234,7 @@ export default {
       const can = this.canEditEvent(event);
       if (!can) return;
       this.formatEditedEvent(event);
-      if (event.type !== ABSENCE) {
+      if (event.type !== ABSENCE && this.selectedAuxiliary) {
         this.selectedAuxiliary.hasActiveCustomerContractOnEvent = this.hasActiveCustomerContractOnEvent(this.selectedAuxiliary, event.startDate);
         this.selectedAuxiliary.hasActiveCompanyContractOnEvent = this.hasActiveCompanyContractOnEvent(this.selectedAuxiliary, event.startDate);
       }

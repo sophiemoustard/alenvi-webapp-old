@@ -33,7 +33,7 @@
                 valign="top" @click="createEvent({ dayIndex, sectorId: sector._id })">
                 <template v-for="(event, eventIndex) in getUnassignedEvents(sector, days[dayIndex])">
                   <ni-planning-event-cell :event="event" :display-staffing-view="staffingView && !isCustomerPlanning"
-                    :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canDrag" />
+                    :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canEdit" />
                 </template>
               </td>
             </tr>
@@ -54,7 +54,7 @@
               valign="top" @click="createEvent({ dayIndex, person })">
               <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
                 <ni-planning-event-cell :event="event" :display-staffing-view="staffingView && !isCustomerPlanning"
-                  :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canDrag" />
+                  :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canEdit" />
               </template>
             </td>
           </tr>
@@ -104,6 +104,7 @@ export default {
     persons: { type: Array, default: () => [] },
     filteredSectors: { type: Array, default: () => [] },
     personKey: { type: String, default: 'auxiliary' },
+    canEdit: { type: Function, default: () => {} },
   },
   data () {
     return {
@@ -235,27 +236,6 @@ export default {
       } finally {
         this.draggedObject = {};
       }
-    },
-    canDrag (event) {
-      if (!event.auxiliary) {
-        return this.$can({
-          user: this.$store.getters['main/user'],
-          auxiliarySectorEvent: event.sector,
-          permissions: [
-            { name: 'planning:edit:user', rule: 'isInSameSector' },
-          ],
-        });
-      }
-
-      return this.$can({
-        user: this.$store.getters['main/user'],
-        auxiliaryIdEvent: event.auxiliary._id,
-        auxiliarySectorEvent: event.sector,
-        permissions: [
-          { name: 'planning:edit:user', rule: 'isInSameSector' },
-          { name: 'planning:edit', rule: 'isOwner' },
-        ],
-      });
     },
     createEvent (eventInfo) {
       let can = true;

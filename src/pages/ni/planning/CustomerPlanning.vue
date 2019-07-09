@@ -1,7 +1,8 @@
 <template>
   <q-page class="neutral-background">
-    <ni-planning-manager :events="events" :persons="customers" personKey="customer" @updateStartOfWeek="updateStartOfWeek"
-      @editEvent="openEditionModal" @createEvent="openCreationModal" @onDrop="updateEventOnDrop" />
+    <ni-planning-manager :events="events" :persons="customers" personKey="customer" :can-edit="canEditEvent"
+      @updateStartOfWeek="updateStartOfWeek" @editEvent="openEditionModal" @createEvent="openCreationModal"
+      @onDrop="updateEventOnDrop"  />
 
     <!-- Event creation modal -->
     <q-modal v-if="Object.keys(newEvent).length !== 0" v-model="creationModal" content-classes="modal-container-md"

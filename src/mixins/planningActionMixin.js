@@ -189,7 +189,7 @@ export const planningActionMixin = {
             shouldUpdateRepetition: false,
             ...eventData,
             dates,
-            auxiliary: auxiliary._id,
+            auxiliary: auxiliary ? auxiliary._id : '',
             subscription,
             isBilled
           };
@@ -213,6 +213,16 @@ export const planningActionMixin = {
       }
     },
     canEditEvent (event) {
+      if (!event.auxiliary) { // Unassigned event
+        return this.$can({
+          user: this.$store.getters['main/user'],
+          auxiliarySectorEvent: event.sector,
+          permissions: [
+            { name: 'planning:edit:user', rule: 'isInSameSector' },
+          ],
+        });
+      }
+
       return this.$can({
         user: this.$store.getters['main/user'],
         auxiliaryIdEvent: event.auxiliary._id,
