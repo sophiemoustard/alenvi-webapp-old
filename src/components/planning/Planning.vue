@@ -81,7 +81,7 @@ import {
 import { NotifyNegative } from '../popup/notify';
 import NiChipAuxiliaryIndicator from './ChipAuxiliaryIndicator';
 import NiChipCustomerIndicator from './ChipCustomerIndicator';
-import NiPLanningEventCell from './PlanningEventCell';
+import NiPlanningEvent from './PlanningEvent';
 import ChipsAutocomplete from '../ChipsAutocomplete';
 import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import { planningEventMixin } from '../../mixins/planningEventMixin';
@@ -95,7 +95,7 @@ export default {
   components: {
     'ni-chip-customer-indicator': NiChipCustomerIndicator,
     'ni-chip-auxiliary-indicator': NiChipAuxiliaryIndicator,
-    'ni-planning-event-cell': NiPLanningEventCell,
+    'ni-planning-event-cell': NiPlanningEvent,
     'ni-chips-autocomplete': ChipsAutocomplete,
     'planning-navigation': PlanningNavigation,
   },
@@ -149,7 +149,7 @@ export default {
           if (userSector) this.$refs.refFilter.add(userSector.label);
         }
       }
-    }
+    },
   },
   computed: {
     getFilter () {
@@ -175,7 +175,7 @@ export default {
           const lineFilter = cell.type === SECTOR
             ? !event.auxiliary && event.sector === cell._id
             : event[this.personKey] && event[this.personKey]._id === cell._id;
-          const dayFilter = this.$moment(day).isSameOrAfter(event.startDate, 'day') && this.$moment(day).isSameOrBefore(event.endDate, 'day');
+          const dayFilter = this.$moment(day).isBetween(event.startDate, event.endDate, 'day', '[]');
 
           return lineFilter && dayFilter && (!this.staffingView || !event.isCancelled)
         })
@@ -208,8 +208,7 @@ export default {
       );
     },
     // Drag & drop
-    drag ({ event, nativeEvent }) {
-      nativeEvent.dataTransfer.setData('text', ''); // Mandatory on Firefox
+    drag (event) {
       this.draggedObject = event;
     },
     async drop (toDay, target) {
@@ -245,7 +244,7 @@ export default {
           auxiliarySectorEvent: eventInfo.person.sector._id,
           permissions: [
             { name: 'planning:create:user', rule: 'isInSameSector' },
-            { name: 'planning:create', rule: 'isOwner' }
+            { name: 'planning:create', rule: 'isOwner' },
           ],
         });
       }

@@ -191,7 +191,7 @@ export const planningActionMixin = {
             dates,
             auxiliary: auxiliary ? auxiliary._id : '',
             subscription,
-            isBilled
+            isBilled,
           };
           break;
         case INTERNAL_HOUR:
@@ -229,7 +229,7 @@ export const planningActionMixin = {
         auxiliarySectorEvent: event.sector,
         permissions: [
           { name: 'planning:edit:user', rule: 'isInSameSector' },
-          { name: 'planning:edit', rule: 'isOwner' }
+          { name: 'planning:edit', rule: 'isOwner' },
         ],
       });
     },
@@ -320,7 +320,7 @@ export const planningActionMixin = {
         const updatedEvent = await this.$events.updateById(draggedObject._id, payload);
         this.events = this.events.map(event => (event._id === updatedEvent._id) ? updatedEvent : event);
 
-        return NotifyPositive('Évènement modifié');
+        NotifyPositive('Évènement modifié');
       } catch (e) {
         if (e.data && e.data.statusCode === 422) return NotifyNegative('Cette modification n\'est pas autorisée');
       }
@@ -332,8 +332,8 @@ export const planningActionMixin = {
       const json = JSON.parse(uploadedInfo.xhr.response);
       if (!json || !json.data || !json.data.payload) return;
 
-      if (this.creationModal) this.newEvent.attachment = { ...json.data.payload.attachment }
-      if (this.editionModal) this.editedEvent.attachment = { ...json.data.payload.attachment }
+      if (this.creationModal) this.newEvent.attachment = { ...json.data.payload.attachment };
+      if (this.editionModal) this.editedEvent.attachment = { ...json.data.payload.attachment };
     },
     async deleteDocument (driveId) {
       try {
@@ -341,7 +341,7 @@ export const planningActionMixin = {
           title: 'Confirmation',
           message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
           ok: true,
-          cancel: 'Annuler'
+          cancel: 'Annuler',
         });
         await this.$gdrive.removeFileById({ id: driveId });
         if (this.creationModal) this.newEvent.attachment = {};

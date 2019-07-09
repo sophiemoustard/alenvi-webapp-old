@@ -29,7 +29,7 @@ import { PERCENTAGE_BY_MINUTES, INTERNAL_HOUR, INTERVENTION, ABSENCE, UNAVAILABI
 import { planningEventMixin } from '../../mixins/planningEventMixin';
 
 export default {
-  name: 'PlanningEventCell',
+  name: 'PlanningEvent',
   mixins: [planningEventMixin],
   props: {
     displayStaffingView: { type: Boolean, default: false },
@@ -47,7 +47,8 @@ export default {
   },
   methods: {
     drag (event, nativeEvent) {
-      this.$emit('drag', { event, nativeEvent });
+      nativeEvent.dataTransfer.setData('text', ''); // Mandatory on Firefox
+      this.$emit('drag', event);
     },
     editEvent (eventId) {
       this.$emit('editEvent', eventId);
