@@ -77,16 +77,12 @@
               <q-icon name="clear" @click.native="surchargeDetailModal = false" /></span>
           </div>
         </div>
-        <div v-for="(surchargePlanDetails, surchargePlanId) in surchargeDetails" :key="surchargePlanId" class="q-mb-xl">
-          <div class="text-primary capitalize text-weight-bold q-mb-md">
-            {{ surchargePlanDetails.planName }}
-          </div>
-          <div v-for="(surchage, surchargeName) in getSurcharges(surchargePlanDetails)" :key="surchargeName"
+        <div v-for="surchargePlan in Object.keys(surchargeDetails)" :key="surchargePlan" class="q-mb-xl">
+          <div class="text-primary capitalize text-weight-bold q-mb-md">{{ surchargePlan }}</div>
+          <div v-for="surcharge in Object.keys(surchargeDetails[surchargePlan])" :key="surcharge"
             class="surcharge-line">
-            <div class="surcharge-type q-pa-sm">
-              {{ SURCHARGES[surchargeName] }} - {{ surchage.percentage }}%
-            </div>
-            <div class="q-pa-sm">{{ formatHours(surchage.hours) }}</div>
+            <div class="surcharge-type q-pa-sm">{{ surcharge }}</div>
+            <div class="q-pa-sm">{{ formatHours(surchargeDetails[surchargePlan][surcharge]) }}</div>
           </div>
         </div>
       </div>
@@ -100,7 +96,6 @@ import { editableTdMixin } from '../../../mixins/editableTdMixin';
 import EditableTd from '../../../components/table/EditableTd';
 import BillingPagination from '../../../components/table/BillingPagination';
 import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
-import { SURCHARGES } from '../../../data/constants';
 
 export default {
   name: 'ContractEnds',
@@ -121,7 +116,6 @@ export default {
         'overtimeHours', 'additionalHours', 'mutual', 'transport', 'otherFees', 'bonus', 'compensation'],
       surchargeDetailModal: false,
       surchargeDetails: {},
-      SURCHARGES,
     };
   },
   computed: {
@@ -164,9 +158,6 @@ export default {
     },
     resetSurchargeDetail () {
       this.surchargeDetails = {};
-    },
-    getSurcharges (surchargesPlanDetails) {
-      return this.$_.pick(surchargesPlanDetails, Object.keys(SURCHARGES));
     },
     // Creation
     async createList () {
