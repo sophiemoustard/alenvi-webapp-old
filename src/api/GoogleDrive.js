@@ -18,7 +18,7 @@ export default {
       url: `${process.env.API_HOSTNAME}/gdrive/${params.driveId}/generatedocx`,
       method: 'POST',
       responseType: 'blob',
-      data
+      data,
     });
     return file;
   },

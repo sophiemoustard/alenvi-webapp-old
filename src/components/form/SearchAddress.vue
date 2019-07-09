@@ -24,15 +24,15 @@ export default {
     errorLabel: { type: String, default: REQUIRED_LABEL },
     error: { type: Boolean, default: false },
     inModal: { type: Boolean, default: false },
-    requiredField: { type: Boolean, default: false }
+    requiredField: { type: Boolean, default: false },
   },
   methods: {
     async searchAddress (terms, done) {
       try {
         const res = await this.$axios.get('https://api-adresse.data.gouv.fr/search', {
           params: {
-            q: terms
-          }
+            q: terms,
+          },
         });
         const resultsList = res.data.features.sort((a, b) => b.properties.score - a.properties.score).map(result => {
           return {
@@ -41,7 +41,7 @@ export default {
             street: result.properties.name,
             zipCode: result.properties.postcode,
             city: result.properties.city,
-            location: result.geometry
+            location: result.geometry,
           }
         });
         done(resultsList);
@@ -62,8 +62,8 @@ export default {
     },
     focusEvent () {
       this.$emit('focus');
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -105,7 +105,7 @@ export default {
         absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
         location: { fullAddress: { frAddress } },
         repetition: {
-          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) }
+          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
         },
         attachment: {
           driveId: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absence === ILLNESS),
@@ -197,8 +197,8 @@ export default {
         auxiliaryIdEvent: this.selectedAuxiliary._id,
         permissions: [
           'planning:create:user',
-          { name: 'planning:create', rule: 'isOwner' }
-        ]
+          { name: 'planning:create', rule: 'isOwner' },
+        ],
       });
       if (!can) return;
 

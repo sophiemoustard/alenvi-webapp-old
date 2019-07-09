@@ -2,7 +2,7 @@ export const sideMenuMixin = {
   computed: {
     userFirstnameUpper () {
       return this.user.identity.firstname.toUpperCase();
-    }
+    },
   },
   methods: {
     collapsibleOpening () {
@@ -21,6 +21,6 @@ export const sideMenuMixin = {
       if (this.$refs[to.meta.parent]) {
         this.activeRoutes[to.meta.parent].highlight = true;
       }
-    }
-  }
+    },
+  },
 };

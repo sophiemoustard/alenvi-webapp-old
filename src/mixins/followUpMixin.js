@@ -34,6 +34,6 @@ export const followUpMixin = {
         console.error(e);
         NotifyNegative('Erreur lors de l\'édition de la fiche bénéficiaire :/');
       }
-    }
-  }
+    },
+  },
 };

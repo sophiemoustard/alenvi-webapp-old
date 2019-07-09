@@ -171,7 +171,7 @@ export default {
           title: 'Confirmation',
           message: 'Cette opération est définitive. Confirmez-vous ?',
           ok: 'Oui',
-          cancel: 'Non'
+          cancel: 'Non',
         });
         const payload = this.selected.map((row) => {
           return {
@@ -195,8 +195,8 @@ export default {
         this.selected = [];
         this.creationLoading = false;
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

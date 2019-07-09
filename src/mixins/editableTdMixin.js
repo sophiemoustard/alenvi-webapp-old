@@ -12,5 +12,5 @@ export const editableTdMixin = {
     disableEditionField ({ obj, path }) {
       obj[path] = false;
     },
-  }
+  },
 };

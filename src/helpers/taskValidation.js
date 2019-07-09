@@ -4,7 +4,7 @@ import moment from 'moment';
 const nationalityValidation = (userNationality) => {
   if (!userNationality) return;
   return Object.keys(euSpace).indexOf(userNationality);
-}
+};
 
 export const taskValidation = (user = null) => {
   if (!user) throw new Error('No user.');

@@ -63,21 +63,21 @@ export default {
       activeRoutes: {
         planning: {
           open: false,
-          highlight: false
+          highlight: false,
         },
         benef: {
           open: false,
-          highlight: false
+          highlight: false,
         },
         administrative: {
           open: false,
-          highlight: false
+          highlight: false,
         },
         team: {
           open: false,
-          hightlight: false
-        }
-      }
+          hightlight: false,
+        },
+      },
     }
   },
   mounted () {
@@ -87,8 +87,8 @@ export default {
     connectToBotMessenger () {
       const token = Cookies.get('alenvi_token');
       window.location.href = `${process.env.MESSENGER_LINK}?ref=${token}`
-    }
-  }
+    },
+  },
 }
 
 </script>

@@ -21,7 +21,7 @@ const Router = new VueRouter({
   routes,
 
   mode: process.env.VUE_ROUTER_MODE,
-  base: process.env.VUE_ROUTER_BASE
+  base: process.env.VUE_ROUTER_BASE,
 })
 
 Router.beforeEach(async (to, from, next) => {

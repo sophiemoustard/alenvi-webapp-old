@@ -84,7 +84,7 @@ export default {
   },
   filters: {
     formatFullIdentity,
-  }
+  },
 }
 </script>
 

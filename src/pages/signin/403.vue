@@ -16,7 +16,7 @@
 export default {
   data () {
     return {
-      canGoBack: window.history.length > 1
+      canGoBack: window.history.length > 1,
     }
   },
   methods: {
@@ -25,7 +25,7 @@ export default {
     },
     goToForgot () {
       this.$router.push({ path: '/forgotPassword' });
-    }
-  }
+    },
+  },
 }
 </script>

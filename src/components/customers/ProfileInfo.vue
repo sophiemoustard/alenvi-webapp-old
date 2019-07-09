@@ -497,7 +497,7 @@ export default {
       customer: {
         identity: {},
         contact: {
-          address: {}
+          address: {},
         },
         payment: {
           mandates: [],
@@ -541,7 +541,7 @@ export default {
           label: '',
           align: 'left',
           field: '_id',
-        }
+        },
       ],
       quoteColumns: [
         {
@@ -584,7 +584,7 @@ export default {
           lastname: '',
           firstname: '',
         },
-        local: { email: '' }
+        local: { email: '' },
       },
       newSubscription: {
         service: '',
@@ -756,7 +756,7 @@ export default {
     daysOptions () {
       return days.map((day, i) => ({
         label: day !== 'Jours fériés' ? day.slice(0, 2) : day,
-        value: i
+        value: i,
       }));
     },
     editedFundingMaxStartDate () {
@@ -764,30 +764,30 @@ export default {
         return this.$moment(this.editedFunding.endDate).subtract(1, 'day').toISOString();
       }
       return '';
-    }
+    },
   },
   validations: {
     customer: {
       identity: {
-        lastname: { required }
+        lastname: { required },
       },
       contact: {
         phone: { frPhoneNumber },
         address: {
-          fullAddress: { required, frAddress }
-        }
+          fullAddress: { required, frAddress },
+        },
       },
       payment: {
         bankAccountOwner: { required },
         bic: { required, bic },
-        iban: { required, iban }
-      }
+        iban: { required, iban },
+      },
     },
     newHelper: {
       identity: { lastname: { required } },
       local: {
-        email: { required, email }
-      }
+        email: { required, email },
+      },
     },
     newSubscription: {
       service: { required },
@@ -834,14 +834,14 @@ export default {
       customerParticipationRate: { required: requiredIf((item) => {
         return item.nature === HOURLY;
       }) },
-    }
+    },
   },
   watch: {
     userProfile (value) {
       if (!this.$_.isEqual(value, this.customer)) {
         this.mergeUser(value);
       }
-    }
+    },
   },
   async mounted () {
     await this.getUserHelpers();
@@ -989,7 +989,7 @@ export default {
         unitTTCRate,
         estimatedWeeklyVolume,
         evenings,
-        sundays
+        sundays,
       };
 
       this.subscriptionEditionModal = true;
@@ -1025,7 +1025,7 @@ export default {
           title: 'Confirmation',
           message: 'Es-tu sûr(e) de vouloir supprimer cette souscription ?',
           ok: true,
-          cancel: 'Annuler'
+          cancel: 'Annuler',
         });
 
         const params = { subscriptionId, _id: this.customer._id };
@@ -1057,8 +1057,8 @@ export default {
         sender: { email: 'support@alenvi.io' },
         receiver: {
           email: this.newHelper.local.email,
-          password: this.newHelper.local.password
-        }
+          password: this.newHelper.local.password,
+        },
       });
     },
     async submitHelper () {
@@ -1088,7 +1088,7 @@ export default {
           title: 'Confirmation',
           message: 'Es-tu sûr(e) de vouloir supprimer cet aidant ?',
           ok: true,
-          cancel: 'Annuler'
+          cancel: 'Annuler',
         });
         await this.$users.deleteById(helperId);
         NotifyPositive('Aidant supprimé');
@@ -1259,7 +1259,7 @@ export default {
         nature,
         thirdPartyPayer,
         subscription,
-        versions: [{...version}]
+        versions: [{...version}],
       };
     },
     async submitFunding () {
@@ -1287,7 +1287,7 @@ export default {
           title: 'Confirmation',
           message: 'Es-tu sûr(e) de vouloir supprimer ce financement ?',
           ok: true,
-          cancel: 'Annuler'
+          cancel: 'Annuler',
         });
 
         const params = { fundingId, _id: this.customer._id };
@@ -1350,8 +1350,8 @@ export default {
       } finally {
         this.loading = false;
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

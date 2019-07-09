@@ -136,7 +136,7 @@ export default {
       if (value === '') this.displayedDraftPay = [...this.draftPay];
       else this.displayedDraftPay = this.draftPay.filter(dp => dp.auxiliary.sector._id === value);
       this.selected = [];
-    }
+    },
   },
   async mounted () {
     this.tableLoading = true;
@@ -185,7 +185,7 @@ export default {
           title: 'Confirmation',
           message: 'Cette opération est définitive. Confirmez-vous ?',
           ok: 'Oui',
-          cancel: 'Non'
+          cancel: 'Non',
         });
 
         if (!this.hasSelectedRows) return;

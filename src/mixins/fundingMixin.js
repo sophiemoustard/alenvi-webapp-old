@@ -57,7 +57,7 @@ export const fundingMixin = {
           label: 'Montant forfaitaire TTC',
           align: 'left',
           format: (value) => value ? `${value}€` : '',
-          field: 'amountTTC'
+          field: 'amountTTC',
         },
         {
           name: 'unitTTCRate',
@@ -98,15 +98,15 @@ export const fundingMixin = {
           name: 'createdAt',
           label: '',
           align: 'left',
-          field: 'createdAt'
+          field: 'createdAt',
         },
         {
           name: 'actions',
           label: '',
           align: 'left',
           field: '_id',
-        }
-      ]
+        },
+      ],
     }
   },
   methods: {
@@ -132,6 +132,6 @@ export const fundingMixin = {
     frequencyFormat (value) {
       const freq = FUNDING_FREQ_OPTIONS.find(option => option.value === value);
       return freq ? this.$_.capitalize(freq.label) : ''
-    }
-  }
+    },
+  },
 };

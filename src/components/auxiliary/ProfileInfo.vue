@@ -310,7 +310,7 @@ export default {
     'ni-file-uploader': FileUploader,
     'ni-multiple-files-uploader': MultipleFilesUploader,
     'ni-datetime-picker': DatetimePicker,
-    'ni-search-address': SearchAddress
+    'ni-search-address': SearchAddress,
   },
   data () {
     return {
@@ -334,20 +334,20 @@ export default {
         'user.identity.birthCountry',
         'user.identity.birthState',
         'user.identity.birthCity',
-        'user.identity.socialSecurityNumber'
+        'user.identity.socialSecurityNumber',
       ],
       contactGroup: [
         'user.contact.address',
         'user.contact.zipCode',
-        'user.contact.city'
+        'user.contact.city',
       ],
       emergencyContactGroup: [
         'user.administrative.emergencyContact.name',
-        'user.administrative.emergencyContact.phoneNumber'
+        'user.administrative.emergencyContact.phoneNumber',
       ],
       ibanGroup: [
         'user.administrative.payment.rib.iban',
-        'user.administrative.payment.rib.bic'
+        'user.administrative.payment.rib.bic',
       ],
       documentsGroup: [
         'user.administrative.identityDocs',
@@ -375,10 +375,10 @@ export default {
           birthCountry: '',
           birthState: '',
           birthCity: '',
-          socialSecurityNumber: ''
+          socialSecurityNumber: '',
         },
         contact: {
-          address: { fullAddress: '' }
+          address: { fullAddress: '' },
         },
         role: { _id: '' },
         administrative: {
@@ -398,14 +398,14 @@ export default {
           payment: {
             rib: { iban: '', bic: '' },
           },
-        }
+        },
       },
       extensions: 'image/jpg, image/jpeg, image/gif, image/png, application/pdf',
       auxiliaryRolesOptions: [],
       identityDocsOptions: [
         { label: 'Carte Nationale d\'Identité', value: 'cni' },
         { label: 'Passeport', value: 'pp' },
-        { label: 'Titre de séjour', value: 'ts' }
+        { label: 'Titre de séjour', value: 'ts' },
       ],
     }
   },
@@ -414,15 +414,15 @@ export default {
       identityType: { required },
       user: {
         local: {
-          email: { required, email }
+          email: { required, email },
         },
         picture: {
-          link: { required }
+          link: { required },
         },
         mobilePhone: {
           required,
           frPhoneNumber,
-          maxLength: maxLength(10)
+          maxLength: maxLength(10),
         },
         sector: { required },
         mentorId: { required },
@@ -438,20 +438,20 @@ export default {
             }),
             numeric,
             minLength: minLength(2),
-            maxLength: maxLength(3)
+            maxLength: maxLength(3),
           },
           birthCity: { required },
           socialSecurityNumber: {
             required,
             numeric,
             minLength: minLength(15),
-            maxLength: maxLength(15)
-          }
+            maxLength: maxLength(15),
+          },
         },
         contact: {
           address: {
             fullAddress: { required, frAddress },
-          }
+          },
         },
         administrative: {
           identityDocs: { required },
@@ -460,51 +460,51 @@ export default {
             phoneNumber: {
               required,
               frPhoneNumber,
-              maxLength: maxLength(10)
-            }
+              maxLength: maxLength(10),
+            },
           },
           idCardRecto: {
             driveId: {
               required: requiredIf(() => {
                 return this.user.administrative.identityDocs === 'cni';
-              })
-            }
+              }),
+            },
           },
           passport: {
             driveId: {
               required: requiredIf(() => {
                 return this.user.administrative.identityDocs === 'pp';
-              })
-            }
+              }),
+            },
           },
           residencePermitRecto: {
             driveId: {
               required: requiredIf(() => {
                 return this.user.administrative.identityDocs === 'ts';
-              })
-            }
+              }),
+            },
           },
           healthAttest: {
-            driveId: { required }
+            driveId: { required },
           },
           phoneInvoice: {
-            driveId: { required }
+            driveId: { required },
           },
           payment: {
             rib: {
               iban: { required, iban },
-              bic: { required, bic }
-            }
+              bic: { required, bic },
+            },
           },
           transportInvoice: {
             transportType: { required },
-            driveId: { required: requiredIf(item => item.transportType === 'public') }
+            driveId: { required: requiredIf(item => item.transportType === 'public') },
           },
           mutualFund: {
             has: { required },
-            driveId: { required: requiredIf(item => item.has) }
-          }
-        }
+            driveId: { required: requiredIf(item => item.has) },
+          },
+        },
       },
       pictureGroup: this.pictureGroup,
       identityGroup: this.identityGroup,
@@ -519,7 +519,7 @@ export default {
   computed: {
     ...mapGetters({
       userProfile: 'rh/getUserProfile',
-      mainUser: 'main/user'
+      mainUser: 'main/user',
     }),
     currentUser () {
       return this.userProfile ? this.userProfile : this.mainUser;
@@ -607,7 +607,7 @@ export default {
     },
     isAuxiliary () {
       return this.mainUser.role.name === AUXILIARY || this.mainUser.role.name === PLANNING_REFERENT;
-    }
+    },
   },
   async mounted () {
     const user = await this.$users.getById(this.currentUser._id);
@@ -621,7 +621,7 @@ export default {
       if (!this.$_.isEqual(value, this.user)) {
         this.mergeUser(value);
       }
-    }
+    },
   },
   methods: {
     mergeUser (value = null) {
@@ -697,7 +697,7 @@ export default {
           title: 'Confirmation',
           message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
           ok: true,
-          cancel: 'Annuler'
+          cancel: 'Annuler',
         });
         await gdrive.removeFileById({ id: driveId });
         let payload = { _id: this.currentUser._id };
@@ -724,7 +724,7 @@ export default {
           title: 'Confirmation',
           message: 'Es-tu sûr(e) de vouloir supprimer ta photo ?',
           ok: true,
-          cancel: 'Annuler'
+          cancel: 'Annuler',
         });
         if (this.currentUser.picture && this.currentUser.picture.publicId) {
           await cloudinary.deleteImageById({ id: this.currentUser.picture.publicId });
@@ -756,8 +756,8 @@ export default {
       }
       return {
         errors: j,
-        msg: j > 0 ? `${j} information(s) manquante(s)` : 'Informations complètes'
-      }
+        msg: j > 0 ? `${j} information(s) manquante(s)` : 'Informations complètes',
+      };
     },
     choosePicture () {
       this.fileChosen = true;
@@ -787,8 +787,8 @@ export default {
       } catch (e) {
         console.error(e);
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -111,7 +111,7 @@ export default {
     },
     companyContracts () {
       return this.person.contracts ? this.person.contracts.filter(contract => contract.status === COMPANY_CONTRACT) : [];
-    }
+    },
   },
   async mounted () {
     if (!this.hasActiveCompanyContractOnEvent) return;
@@ -284,7 +284,7 @@ export default {
       };
       return Math.round(contractHours);
     },
-  }
+  },
 }
 </script>
 

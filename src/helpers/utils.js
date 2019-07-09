@@ -75,4 +75,4 @@ export const formatFullIdentity = (identity) => {
   const firstname = (identity.firstname || '').trim();
   const lastname = (identity.lastname || '').trim().toUpperCase();
   return `${firstname} ${lastname}`;
-}
+};

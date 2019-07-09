@@ -52,8 +52,8 @@ export default {
     },
     editEvent (eventId) {
       this.$emit('editEvent', eventId);
-    }
-  }
+    },
+  },
 }
 </script>
 

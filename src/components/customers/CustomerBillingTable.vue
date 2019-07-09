@@ -177,7 +177,7 @@ export default {
         NotifyNegative('Impossible de télécharger la facture');
       }
     },
-  }
+  },
 }
 </script>
 

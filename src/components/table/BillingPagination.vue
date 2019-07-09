@@ -32,8 +32,8 @@ export default {
         { label: '200', value: 200 },
         { label: '300', value: 300 },
         { label: 'Tous', value: 0 },
-      ]
-    }
+      ],
+    };
   },
   computed: {
     firstRowIndex () {
@@ -56,7 +56,7 @@ export default {
         ? `${this.firstRowIndex + 1}-${Math.min(this.lastRowIndex, this.computedRowNumber)} de ${this.data.length}`
         : `1-${this.data.length} de ${this.data.length}`;
     },
-  }
+  },
 }
 </script>
 

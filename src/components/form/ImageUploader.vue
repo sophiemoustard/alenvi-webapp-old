@@ -39,12 +39,7 @@ export default {
     name: String,
     additionalFields: {
       type: Array,
-      default () {
-        return [{
-          label: '',
-          value: ''
-        }]
-      }
+      default: () => [{ label: '', value: '' }],
     },
     entity: Object,
     url: String,
@@ -86,7 +81,7 @@ export default {
     },
     hasImage () {
       return this.image && this.image.publicId
-    }
+    },
   },
 };
 </script>

@@ -183,7 +183,7 @@ export const planningModalMixin = {
     customerProfileRedirect () {
       if (this.getUser.role.name === COACH || this.getUser.role.name === ADMIN) return { name: 'customers profile', params: { id: this.editedEvent.customer._id } };
       return { name: 'profile customers info', params: { customerId: this.editedEvent.customer._id } };
-    }
+    },
   },
   methods: {
     formatPersonOptions (person) {

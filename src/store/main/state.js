@@ -1,5 +1,5 @@
 export default {
   user: null,
   refreshState: true,
-  toggleDrawer: true
-}
+  toggleDrawer: true,
+};

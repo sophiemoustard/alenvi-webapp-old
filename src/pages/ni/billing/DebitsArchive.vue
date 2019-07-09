@@ -56,13 +56,13 @@ export default {
         rowsPerPage: 0,
         sortBy: 'createdTime',
         descending: true,
-      }
+      },
     }
   },
   computed: {
     user () {
       return this.$store.getters['main/user'];
-    }
+    },
   },
   async mounted () {
     await this.getDirectDebits();
@@ -80,7 +80,7 @@ export default {
         console.error(e);
         NotifyNegative("Erreur lors de la récupération des prélèvements d'archive");
       }
-    }
-  }
+    },
+  },
 }
 </script>

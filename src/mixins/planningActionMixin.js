@@ -11,7 +11,7 @@ import {
   DAILY,
   PLANNING_VIEW_START_HOUR,
   PLANNING_VIEW_END_HOUR,
-  SECTOR
+  SECTOR,
 } from '../data/constants';
 
 export const planningActionMixin = {

@@ -21,10 +21,10 @@ export const generateContractFields = (type, data) => {
       weeklyHours: data.contract.weeklyHours,
       yearlyHours: data.contract.weeklyHours * 52,
       uploadDate: moment().format('DD/MM/YYYY'),
-      initialContractStartDate: moment(data.initialContractStartDate).format('DD/MM/YYYY')
-    }
+      initialContractStartDate: moment(data.initialContractStartDate).format('DD/MM/YYYY'),
+    };
   }
   return {
-    test: 'test'
+    test: 'test',
   }
 }

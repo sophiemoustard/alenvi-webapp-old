@@ -29,7 +29,7 @@ export default {
     getUser () {
       const helper = this.$store.getters['main/user'];
       return helper && helper.customers && helper.customers.length > 0 ? helper.customers[0] : {};
-    }
+    },
   },
   async mounted () {
     await this.refreshContracts({ customer: this.getUser._id });
