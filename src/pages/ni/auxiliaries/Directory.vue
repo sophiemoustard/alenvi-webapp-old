@@ -106,7 +106,7 @@ export default {
     'ni-select-sector': SelectSector,
     'ni-modal-input': ModalInput,
     'ni-modal-select': ModalSelect,
-    'ni-search-address': SearchAddress
+    'ni-search-address': SearchAddress,
   },
   mixins: [validationMixin],
   data () {
@@ -117,7 +117,7 @@ export default {
       sendWelcomeMsg: true,
       civilityOptions: [
         { label: 'Monsieur', value: 'M.' },
-        { label: 'Madame', value: 'Mme' }
+        { label: 'Madame', value: 'Mme' },
       ],
       newUser: {
         identity: {
@@ -143,7 +143,7 @@ export default {
         sortBy: 'startDate',
         descending: true,
         page: 1,
-        rowsPerPage: 15
+        rowsPerPage: 15,
       },
       columns: [
         {
@@ -157,7 +157,7 @@ export default {
             const bArr = b.name.split(' ');
             return aArr[aArr.length - 1].toLowerCase() < bArr[bArr.length - 1].toLowerCase() ? -1 : 1
           },
-          style: 'width: 450px'
+          style: 'width: 450px',
         },
         {
           name: 'profileErrors',
@@ -181,7 +181,7 @@ export default {
           sortable: true,
           format: (value) => this.$moment(value).format('DD/MM/YYYY'),
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
-          style: 'width: 170px'
+          style: 'width: 170px',
         },
         {
           name: 'hiringDate',
@@ -191,7 +191,7 @@ export default {
           sortable: true,
           format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : null,
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
-          style: 'width: 170px'
+          style: 'width: 170px',
         },
         {
           name: 'team',
@@ -199,7 +199,7 @@ export default {
           field: 'sector',
           align: 'left',
           sortable: true,
-          style: 'width: 170px'
+          style: 'width: 170px',
         },
         {
           name: 'active',
@@ -207,8 +207,8 @@ export default {
           field: 'isActive',
           align: 'right',
           sortable: false,
-          style: 'width: 30px'
-        }
+          style: 'width: 30px',
+        },
       ],
       REQUIRED_LABEL,
     }
@@ -223,18 +223,18 @@ export default {
       mobilePhone: {
         required,
         frPhoneNumber,
-        maxLength: maxLength(10)
+        maxLength: maxLength(10),
       },
       contact: {
         address: {
-          fullAddress: { required, frAddress }
+          fullAddress: { required, frAddress },
         },
       },
       local: {
-        email: { required, email }
+        email: { required, email },
       },
       sector: { required },
-    }
+    },
   },
   mounted () {
     this.getUserList();
@@ -315,19 +315,19 @@ export default {
             this.$store.commit('rh/saveNotification', {
               type: 'profiles',
               _id: user._id,
-              exists: !!checkProfileErrors.error
+              exists: !!checkProfileErrors.error,
             });
             const checkTasks = taskValidation(user);
             this.$store.commit('rh/saveNotification', {
               type: 'tasks',
               _id: user._id,
-              exists: checkTasks
+              exists: checkTasks,
             });
             return {
               auxiliary: {
                 _id: user._id,
                 name: `${user.identity.firstname} ${user.identity.lastname}`,
-                picture: user.picture ? user.picture.link : null
+                picture: user.picture ? user.picture.link : null,
               },
               profileErrors: checkProfileErrors.error,
               tasksErrors: checkTasks,
@@ -341,7 +341,7 @@ export default {
             auxiliary: {
               _id: user._id,
               name: `${user.identity.firstname} ${user.identity.lastname}`,
-              picture: user.picture ? user.picture.link : null
+              picture: user.picture ? user.picture.link : null,
             },
             startDate: user.createdAt,
             sector: user.sector ? user.sector.name : 'N/A',
@@ -407,8 +407,8 @@ export default {
     },
     getAvatar (link) {
       return link || DEFAULT_AVATAR;
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -31,7 +31,7 @@ module.exports = {
     'import/export': 2,
     'func-names': 0,
     'semi': 0,
-    'comma-dangle': ['error', {
+    'comma-dangle': ['warn', {
       'arrays': 'always-multiline',
       'objects': 'always-multiline',
       'imports': 'always-multiline',
