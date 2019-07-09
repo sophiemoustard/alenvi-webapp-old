@@ -31,7 +31,7 @@
               </td>
               <td @drop="drop(day, sector)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
                 valign="top" @click="createEvent({ dayIndex, sectorId: sector._id })">
-                <template v-for="(event, eventIndex) in getUnassignedEvents(sector, days[dayIndex])">
+                <template v-for="(event, eventIndex) in getCellEvents(sector, days[dayIndex])">
                   <ni-planning-event-cell :event="event" :display-staffing-view="staffingView && !isCustomerPlanning"
                     :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canEdit" />
                 </template>
@@ -52,7 +52,7 @@
             </td>
             <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
               valign="top" @click="createEvent({ dayIndex, person })">
-              <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
+              <template v-for="(event, eventIndex) in getCellEvents(person, days[dayIndex])">
                 <ni-planning-event-cell :event="event" :display-staffing-view="staffingView && !isCustomerPlanning"
                   :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canEdit" />
               </template>
@@ -111,7 +111,7 @@ export default {
       terms: [],
       loading: false,
       draggedObject: {},
-      startOfWeek: this.$moment(),
+      startOfWeek: this.$moment().startOf('week'),
       days: [],
       maxDays: 7,
       INTERVENTION,
@@ -134,9 +134,7 @@ export default {
     }
   },
   async mounted () {
-    this.startOfWeek = this.$moment().startOf('week');
-    this.getTimelineDays();
-    this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
+    this.updateTimeline();
     if (!this.isCustomerPlanning) await this.getDistanceMatrix();
   },
   watch: {
@@ -171,23 +169,16 @@ export default {
       this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
     },
     // Event display
-    getUnassignedEvents (sector, day) {
+    getCellEvents (cell, day) {
       return this.events
-        .filter(event =>
-          !event.auxiliary && event.sector === sector._id &&
-          this.$moment(day).isSameOrAfter(event.startDate, 'day') && this.$moment(day).isSameOrBefore(event.endDate, 'day') &&
-          (!this.staffingView || !event.isCancelled)
-        )
-        .map((event) => this.isCustomerPlanning ? event : this.getEventWithStyleInfo(event, day))
-        .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-    },
-    getOneDayPersonEvents (person, day) {
-      return this.events
-        .filter(event =>
-          event[this.personKey] && event[this.personKey]._id === person._id &&
-          this.$moment(day).isSameOrAfter(event.startDate, 'day') && this.$moment(day).isSameOrBefore(event.endDate, 'day') &&
-          (!this.staffingView || !event.isCancelled)
-        )
+        .filter(event => {
+          const lineFilter = cell.type === SECTOR
+            ? !event.auxiliary && event.sector === cell._id
+            : event[this.personKey] && event[this.personKey]._id === cell._id;
+          const dayFilter = this.$moment(day).isSameOrAfter(event.startDate, 'day') && this.$moment(day).isSameOrBefore(event.endDate, 'day');
+
+          return lineFilter && dayFilter && (!this.staffingView || !event.isCancelled)
+        })
         .map((event) => this.isCustomerPlanning ? event : this.getEventWithStyleInfo(event, day))
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
     },
