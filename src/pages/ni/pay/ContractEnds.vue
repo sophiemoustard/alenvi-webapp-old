@@ -166,7 +166,7 @@ export default {
           title: 'Confirmation',
           message: 'Cette opération est définitive. Confirmez-vous ?',
           ok: 'Oui',
-          cancel: 'Non'
+          cancel: 'Non',
         });
 
         if (!this.hasSelectedRows) return;
@@ -182,7 +182,7 @@ export default {
         NotifyNegative('Erreur lors de la création des soldes tout compte');
       }
     },
-  }
+  },
 }
 </script>
 

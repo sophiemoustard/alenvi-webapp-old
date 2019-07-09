@@ -372,7 +372,7 @@ export default {
         this.newSurcharge.customStartTime = null;
         this.newSurcharge.customEndTime = null;
       }
-    }
+    },
   },
   data () {
     return {
@@ -587,7 +587,7 @@ export default {
           label: 'Nom',
           field: 'name',
           align: 'left',
-          sortable: true
+          sortable: true,
         },
         {
           name: 'address',
@@ -599,20 +599,20 @@ export default {
           name: 'email',
           label: 'Email',
           field: 'email',
-          align: 'left'
+          align: 'left',
         },
         {
           name: 'unitTTCRate',
           label: 'Prix unitaire TTC par défaut',
           field: 'unitTTCRate',
           format: val => val ? `${val}€` : '',
-          align: 'center'
+          align: 'center',
         },
         {
           name: 'billingMode',
           label: 'Facturation',
           field: 'billingMode',
-          align: 'left'
+          align: 'left',
         },
         {
           name: 'actions',
@@ -627,7 +627,7 @@ export default {
         email: '',
         address: {},
         unitTTCRate: '',
-        billingMode: ''
+        billingMode: '',
       },
       billingModeOptions: [
         { label: 'Indirecte', value: BILLING_INDIRECT },
@@ -657,23 +657,23 @@ export default {
       eveningStartTime: {
         required: requiredIf((item) => {
           return item.evening;
-        })
+        }),
       },
       eveningEndTime: {
         required: requiredIf((item) => {
           return item.evening;
-        })
+        }),
       },
       custom: { numeric },
       customStartTime: {
         required: requiredIf((item) => {
           return item.custom;
-        })
+        }),
       },
       customEndTime: {
         required: requiredIf((item) => {
           return item.custom;
-        })
+        }),
       },
     },
     editedSurcharge: {
@@ -687,23 +687,23 @@ export default {
       eveningStartTime: {
         required: requiredIf((item) => {
           return item.evening;
-        })
+        }),
       },
       eveningEndTime: {
         required: requiredIf((item) => {
           return item.evening;
-        })
+        }),
       },
       custom: { numeric },
       customStartTime: {
         required: requiredIf((item) => {
           return item.custom;
-        })
+        }),
       },
       customEndTime: {
         required: requiredIf((item) => {
           return item.custom;
-        })
+        }),
       },
     },
     newService: {
@@ -728,27 +728,27 @@ export default {
       address: {
         fullAddress: {
           required,
-          frAddress
+          frAddress,
         },
       },
       customersConfig: {
         bllingPeriod: { required },
-      }
+      },
     },
     newThirdPartyPayer: {
       name: { required },
       address: {
-        fullAddress: { frAddress }
+        fullAddress: { frAddress },
       },
-      unitTTCRate: { posDecimals }
+      unitTTCRate: { posDecimals },
     },
     editedThirdPartyPayer: {
       name: { required },
       address: {
-        fullAddress: { frAddress }
+        fullAddress: { frAddress },
       },
-      unitTTCRate: { posDecimals }
-    }
+      unitTTCRate: { posDecimals },
+    },
   },
   computed: {
     user () {
@@ -822,7 +822,7 @@ export default {
           if (this.surcharges[i].customStartTime) this.surcharges[i].customStartTime = this.$moment(this.surcharges[i].customStartTime, 'HH:mm');
           if (this.surcharges[i].customEndTime) this.surcharges[i].customEndTime = this.$moment(this.surcharges[i].customEndTime, 'HH:mm');
           this.surchargesOptions.push({
-            label: this.surcharges[i].name, value: this.surcharges[i]._id
+            label: this.surcharges[i].name, value: this.surcharges[i]._id,
           });
         }
       } catch (e) {
@@ -929,7 +929,7 @@ export default {
     openSurchargeEditionModal (id) {
       const selectedSurcharge = this.surcharges.find(surcharge => surcharge._id === id);
       const { _id, name, saturday, sunday, publicHoliday, twentyFifthOfDecember, firstOfMay,
-        evening, eveningStartTime, eveningEndTime, custom, customStartTime, customEndTime
+        evening, eveningStartTime, eveningEndTime, custom, customStartTime, customEndTime,
       } = selectedSurcharge;
       this.editedSurcharge = {
         _id,
@@ -944,7 +944,7 @@ export default {
         eveningEndTime: eveningEndTime ? eveningEndTime.toISOString() : '',
         custom,
         customStartTime: customStartTime ? customStartTime.toISOString() : '',
-        customEndTime: customEndTime ? customEndTime.toISOString() : ''
+        customEndTime: customEndTime ? customEndTime.toISOString() : '',
       };
       this.surchargeEditionModal = true;
     },
@@ -992,7 +992,7 @@ export default {
           title: 'Confirmation',
           message: 'Etes-vous sûr de vouloir supprimer ce plan de majoration ?',
           ok: 'OK',
-          cancel: 'Annuler'
+          cancel: 'Annuler',
         });
         await this.$surcharges.remove(surchargeId);
         this.surcharges.splice(cell, 1);
@@ -1099,7 +1099,7 @@ export default {
           title: 'Confirmation',
           message: 'Etes-vous sûr de vouloir supprimer ce service ?',
           ok: 'OK',
-          cancel: 'Annuler'
+          cancel: 'Annuler',
         });
 
         await this.$services.remove(serviceId);
@@ -1164,7 +1164,7 @@ export default {
     resetThirdPartyPayerUpdateModalData () {
       this.$v.editedThirdPartyPayer.$reset();
       this.editedThirdPartyPayer = {
-        address: {}
+        address: {},
       }
     },
     async updateThirdPartyPayer () {
@@ -1195,7 +1195,7 @@ export default {
           title: 'Confirmation',
           message: 'Etes-vous sûr de vouloir supprimer ce tiers payeur ?',
           ok: 'OK',
-          cancel: 'Annuler'
+          cancel: 'Annuler',
         });
 
         await this.$thirdPartyPayers.removeById(thirdPartyPayerId);
@@ -1209,8 +1209,8 @@ export default {
     },
     isTppUsedInFundings (tppIndex) {
       return this.thirdPartyPayers[tppIndex].isUsedInFundings;
-    }
-  }
+    },
+  },
 }
 </script>
 

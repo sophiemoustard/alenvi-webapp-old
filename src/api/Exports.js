@@ -16,7 +16,7 @@ export default {
       params: {
         startDate: params.startDate,
         endDate: params.endDate,
-      }
+      },
     });
   },
 }

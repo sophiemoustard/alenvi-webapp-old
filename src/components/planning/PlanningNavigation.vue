@@ -49,7 +49,7 @@ export default {
     },
     isThreeDaysView () {
       return this.viewMode === THREE_DAYS_VIEW;
-    }
+    },
   },
   methods: {
     goToNextWeek (value) {
@@ -67,7 +67,7 @@ export default {
     updateViewMode (value) {
       this.$emit('updateViewMode', value);
     },
-  }
+  },
 }
 </script>
 

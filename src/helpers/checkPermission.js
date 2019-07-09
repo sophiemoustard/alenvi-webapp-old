@@ -9,8 +9,8 @@ const findPermission = (right, paramsId) => {
     } else if (paramsId && typeof permission.name === 'string' && typeof permission.when === 'function') {
       return permission.name === right.permission && right.hasAccess && permission.when(paramsId, Cookies.get('user_id'));
     }
-  }
-}
+  };
+};
 
 export const checkPermission = async (to, user) => {
   try {

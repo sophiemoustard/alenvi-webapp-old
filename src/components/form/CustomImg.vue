@@ -11,16 +11,16 @@ export default {
   props: {
     driveId: {
       type: String,
-      required: true
+      required: true,
     },
     alt: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   data () {
     return {
-      link: ''
+      link: '',
     }
   },
   mounted () {
@@ -34,8 +34,8 @@ export default {
       } catch (e) {
         console.error(e);
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

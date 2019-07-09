@@ -14,10 +14,10 @@ import { AUXILIARY } from '../../../data/constants';
 export default {
   mixins: [contractMixin],
   components: {
-    NiContracts
+    NiContracts,
   },
   metaInfo: {
-    title: 'Contrats'
+    title: 'Contrats',
   },
   data () {
     return {
@@ -29,7 +29,7 @@ export default {
   computed: {
     getUser () {
       return this.$store.getters['main/user'];
-    }
+    },
   },
   async mounted () {
     await this.refreshContracts();

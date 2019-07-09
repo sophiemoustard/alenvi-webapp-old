@@ -32,7 +32,7 @@ export default {
     getAvatar (picture) {
       return (!picture || !picture.link) ? DEFAULT_AVATAR : picture.link;
     },
-  }
+  },
 }
 </script>
 

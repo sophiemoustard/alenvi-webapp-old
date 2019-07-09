@@ -13,5 +13,5 @@ export default {
   async delete (accessToken, mobilePhone) {
     const activationCodeRaw = await axios.delete(`${process.env.API_HOSTNAME}/activation/${mobilePhone}`, { headers: { 'x-access-token': accessToken } });
     return activationCodeRaw.data.data;
-  }
+  },
 }

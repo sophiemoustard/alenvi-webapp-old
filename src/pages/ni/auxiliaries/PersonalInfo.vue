@@ -23,7 +23,7 @@ export default {
   components: {
     ProfileHeader,
     ProfileTabs,
-    ProfileInfo
+    ProfileInfo,
   },
   name: 'PersonalInfo',
   metaInfo: {
@@ -38,7 +38,7 @@ export default {
     },
     isAuxiliary () {
       return this.currentUser.role.name === AUXILIARY || this.currentUser.role.name === PLANNING_REFERENT;
-    }
+    },
   },
   data () {
     return {
@@ -48,14 +48,14 @@ export default {
           name: 'info',
           default: true,
           component: ProfileInfo,
-          notification: 'profiles'
+          notification: 'profiles',
         },
         {
           label: 'Tâches',
           name: 'tasks',
           default: false,
           component: ProfileTasks,
-          notification: 'tasks'
+          notification: 'tasks',
         },
         {
           label: 'Contrats',
@@ -63,7 +63,7 @@ export default {
           default: false,
           component: ProfileContracts,
         },
-      ]
+      ],
     }
   },
   async mounted () {
@@ -72,11 +72,11 @@ export default {
   watch: {
     async userProfile () {
       await this.$store.dispatch('rh/updateNotifications', 'user');
-    }
+    },
   },
   beforeDestroy () {
     this.$store.commit('rh/saveUserProfile', null);
-  }
+  },
 }
 </script>
 

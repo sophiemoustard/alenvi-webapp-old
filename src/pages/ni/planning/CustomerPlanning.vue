@@ -138,7 +138,7 @@ export default {
     },
     isRepetitionAllowed (value) {
       if (!value) this.newEvent.repetition.frequency = NEVER;
-    }
+    },
   },
   validations () {
     return {
@@ -154,7 +154,7 @@ export default {
         subscription: { required },
         location: { fullAddress: { frAddress } },
         repetition: {
-          frequency: { required }
+          frequency: { required },
         },
       },
       editedEvent: {
@@ -235,7 +235,7 @@ export default {
         if (selectedSubscription.service.type === CUSTOMER_CONTRACT) return this.selectedAuxiliary.isCompanyContractValidForRepetition;
       }
       return true;
-    }
+    },
   },
   methods: {
     ...mapActions({
@@ -566,7 +566,7 @@ export default {
   },
   filters: {
     formatFullIdentity,
-  }
+  },
 }
 </script>
 

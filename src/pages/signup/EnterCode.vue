@@ -24,8 +24,8 @@ export default {
       code: '',
       boxesStyle: {
         style: 'color: #E2007A; height: 40px',
-        autocorrect: 'off'
-      }
+        autocorrect: 'off',
+      },
     }
   },
   methods: {
@@ -40,11 +40,11 @@ export default {
         NotifyNegative('Code invalide');
         console.error(e.response);
       }
-    }
+    },
   },
   beforeDestroy () {
     clearTimeout(this.timeout);
-  }
+  },
 }
 </script>
 

@@ -3,6 +3,6 @@ export default {
   notifications: {
     profiles: {},
     contracts: {},
-    tasks: {}
-  }
-}
+    tasks: {},
+  },
+};

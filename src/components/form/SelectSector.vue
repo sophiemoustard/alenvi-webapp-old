@@ -18,7 +18,7 @@ export default {
   },
   data () {
     return {
-      sectors: []
+      sectors: [],
     };
   },
   async mounted () {
@@ -27,7 +27,7 @@ export default {
   computed: {
     currentUser () {
       return this.$store.getters['main/user'];
-    }
+    },
   },
   methods: {
     async getSectors () {
@@ -47,8 +47,8 @@ export default {
     },
     focusHandler () {
       this.$emit('focus');
-    }
-  }
+    },
+  },
 };
 </script>
 

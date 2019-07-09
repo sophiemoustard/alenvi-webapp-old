@@ -46,18 +46,18 @@ export default {
     title: 'Connexion',
     meta: [
       { name: 'description', content: 'Espace personnalisé pour accéder à vos documents et informations liés aux interventions réalisées par Alenvi.' },
-    ]
+    ],
   },
   name: 'Authentication',
   components: {
-    CompaniHeader
+    CompaniHeader,
   },
   data () {
     return {
       credentials: {
         email: '',
-        password: ''
-      }
+        password: '',
+      },
     }
   },
   computed: {
@@ -66,14 +66,14 @@ export default {
     },
     isAuxiliary () {
       return this.getUser ? this.getUser.role.name === AUXILIARY || this.getUser.role.name === PLANNING_REFERENT : false;
-    }
+    },
   },
   methods: {
     async submit () {
       try {
         const user = await this.$axios.post(`${process.env.API_HOSTNAME}/users/authenticate`, {
           email: this.credentials.email.toLowerCase(),
-          password: this.credentials.password
+          password: this.credentials.password,
         });
         const expiresInDays = parseInt(user.data.data.expiresIn / 3600 / 24, 10) >= 1 ? parseInt(user.data.data.expiresIn / 3600 / 24, 10) : 1;
         this.$q.cookies.set('alenvi_token', user.data.data.token, { path: '/', expires: expiresInDays, secure: process.env.NODE_ENV !== 'development' });
@@ -102,8 +102,8 @@ export default {
         NotifyNegative('Impossible de se connecter.');
         console.error(e);
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

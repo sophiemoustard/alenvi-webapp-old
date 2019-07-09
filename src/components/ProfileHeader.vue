@@ -81,7 +81,7 @@ export default {
       typeMessageOptions: [
         { label: 'Pièces manquantes', value: 'PM' },
         { label: 'Envoi code d\'activation', value: 'CA' },
-        { label: 'Autres', value: 'Autres' }
+        { label: 'Autres', value: 'Autres' },
       ],
     }
   },
@@ -90,7 +90,7 @@ export default {
   computed: {
     ...mapGetters({
       currentUser: 'main/user',
-      user: 'rh/getUserProfile'
+      user: 'rh/getUserProfile',
     }),
     userStatus () {
       if (this.user.isActive) return 'Profil actif';
@@ -117,13 +117,13 @@ export default {
       const options = [
         {
           label: 'SMS',
-          value: 'sms'
-        }
+          value: 'sms',
+        },
       ];
       if (this.user.facebook && this.user.facebook.address) {
         options.push({
           label: 'Pigi',
-          value: 'pigi'
+          value: 'pigi',
         });
       }
       return options
@@ -144,7 +144,7 @@ export default {
       },
       set (value) {
         this.message = value;
-      }
+      },
     },
     hasPicture () {
       return !this.user.picture || (this.user.picture && !this.user.picture.link) ? DEFAULT_AVATAR : this.user.picture.link;
@@ -173,7 +173,7 @@ export default {
         NotifyNegative('Erreur lors de l\'envoi du SMS');
       }
     },
-  }
+  },
 }
 </script>
 

@@ -27,15 +27,15 @@ import { NotifyPositive, NotifyNegative } from '../../components/popup/notify';
 
 export default {
   components: {
-    CompaniHeader
+    CompaniHeader,
   },
   data () {
     return {
-      email: ''
+      email: '',
     }
   },
   validations: {
-    email: { email, required }
+    email: { email, required },
   },
   methods: {
     async submit () {
@@ -57,11 +57,11 @@ export default {
         NotifyNegative(content);
         console.error(e.response);
       }
-    }
+    },
   },
   beforeDestroy () {
     clearTimeout(this.timeout);
-  }
+  },
 }
 </script>
 

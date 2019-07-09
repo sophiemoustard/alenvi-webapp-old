@@ -15,13 +15,13 @@ export const planningEventMixin = {
         return {
           name: this.$moment(day).format('dd'),
           number: this.$moment(day).format('DD'),
-          moment: day
+          moment: day,
         }
       });
     },
     isCustomerPlanning () {
       return this.personKey === 'customer';
-    }
+    },
   },
   methods: {
     getTimelineHours () {

@@ -22,7 +22,7 @@ export default {
     errorLabel: { type: String, default: REQUIRED_LABEL },
     options: Array,
     value: [String, Number],
-    requiredField: { type: Boolean, default: false }
+    requiredField: { type: Boolean, default: false },
   },
   methods: {
     focusHandler () {

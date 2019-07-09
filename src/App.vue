@@ -11,9 +11,9 @@ export default {
   metaInfo: {
     titleTemplate: (titleChunk) => titleChunk ? `Compani - ${titleChunk}` : 'Compani',
     htmlAttrs: {
-      lang: 'fr'
-    }
-  }
+      lang: 'fr',
+    },
+  },
 }
 </script>
 

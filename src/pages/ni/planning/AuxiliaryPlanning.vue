@@ -81,7 +81,7 @@ export default {
         absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
         location: { fullAddress: { frAddress } },
         repetition: {
-          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) }
+          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
         },
         attachment: {
           driveId: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absence === ILLNESS),
@@ -136,7 +136,7 @@ export default {
       getUser: 'main/user',
       getFilter: 'planning/getFilter',
       getElemAdded: 'planning/getElemAdded',
-      getElemRemoved: 'planning/getElemRemoved'
+      getElemRemoved: 'planning/getElemRemoved',
     }),
     selectedAuxiliary () {
       if (this.creationModal && this.newEvent.auxiliary) {

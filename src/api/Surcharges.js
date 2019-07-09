@@ -15,5 +15,5 @@ export default {
   },
   async remove (id) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/surcharges/${id}`);
-  }
+  },
 }

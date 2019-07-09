@@ -141,7 +141,7 @@ export default {
     },
     isRepetitionAllowed (value) {
       if (!value) this.newEvent.repetition.frequency = NEVER;
-    }
+    },
   },
   methods: {
     getAvatar (user) {

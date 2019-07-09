@@ -96,7 +96,7 @@ export default {
     },
     editEvent (value) {
       this.$emit('editEvent', value);
-    }
+    },
   },
 }
 </script>

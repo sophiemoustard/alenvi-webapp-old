@@ -97,7 +97,7 @@ export default {
       netInclTaxes: { required },
       type: { required },
       date: { required },
-    }
+    },
   },
   methods: {
     // Billing dates

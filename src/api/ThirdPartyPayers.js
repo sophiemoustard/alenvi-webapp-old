@@ -15,5 +15,5 @@ export default {
   async updateById (id, payload) {
     const thirdPartyPayer = await alenviAxios.put(`${process.env.API_HOSTNAME}/thirdpartypayers/${id}`, payload);
     return thirdPartyPayer.data.data.thirdPartyPayer;
-  }
+  },
 }

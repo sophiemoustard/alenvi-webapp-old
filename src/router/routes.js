@@ -1,7 +1,7 @@
-import { Cookies } from 'quasar'
+import { Cookies } from 'quasar';
 
-import store from '../store/index'
-import alenvi from '../helpers/alenvi'
+import store from '../store/index';
+import alenvi from '../helpers/alenvi';
 import { AUXILIARY, PLANNING_REFERENT, HELPER } from '../data/constants.js';
 
 const routes = [
@@ -15,10 +15,18 @@ const routes = [
           await store.dispatch('main/getUser', Cookies.get('user_id'));
         }
         if (store.getters['main/user'] && store.getters['main/user'].role.name === HELPER) {
-          return next({ name: 'customer agenda' });
-        } else if (store.getters['main/user'] && (store.getters['main/user'].role.name === AUXILIARY || store.getters['main/user'].role.name === PLANNING_REFERENT)) {
-          return next({ name: 'auxiliary agenda' });
-        } else if (store.getters['main/user'] && store.getters['main/user'].role.name !== AUXILIARY && store.getters['main/user'].role.name !== HELPER) {
+          return next({name: 'customer agenda'});
+        } else if (
+          store.getters['main/user'] &&
+          (store.getters['main/user'].role.name === AUXILIARY ||
+            store.getters['main/user'].role.name === PLANNING_REFERENT)
+        ) {
+          return next({name: 'auxiliary agenda'});
+        } else if (
+          store.getters['main/user'] &&
+          store.getters['main/user'].role.name !== AUXILIARY &&
+          store.getters['main/user'].role.name !== HELPER
+        ) {
           return next({ name: 'administrative directory' });
         } else {
           next({ path: '/login' });
@@ -165,10 +173,13 @@ const routes = [
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: [{
-            name: 'profiles:edit',
-            when: (paramsId, cookieId) => paramsId === cookieId
-          }, 'profiles:edit:user'],
+          permissions: [
+            {
+              name: 'profiles:edit',
+              when: (paramsId, cookieId) => paramsId === cookieId,
+            },
+            'profiles:edit:user',
+          ],
           parent: 'administrative',
         },
       },
@@ -179,8 +190,8 @@ const routes = [
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['profiles:read'],
-          parent: 'benef'
-        }
+          parent: 'benef',
+        },
       },
       {
         path: 'ni/customers/:id',
@@ -190,8 +201,8 @@ const routes = [
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['profiles:read'],
-          parent: 'benef'
-        }
+          parent: 'benef',
+        },
       },
       {
         path: 'ni/planning/auxiliaries',
@@ -219,7 +230,7 @@ const routes = [
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['planning:read'],
-        }
+        },
       },
       {
         path: 'auxiliaries/team',
@@ -228,8 +239,8 @@ const routes = [
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['profiles:read'],
-          parent: 'team'
-        }
+          parent: 'team',
+        },
       },
       {
         path: 'auxiliaries/customers',
@@ -238,8 +249,8 @@ const routes = [
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['profiles:read'],
-          parent: 'benef'
-        }
+          parent: 'benef',
+        },
       },
       {
         path: 'auxiliaries/customers/:customerId',
@@ -248,8 +259,8 @@ const routes = [
         component: () => import('pages/auxiliaries/customers/CustomerInfo'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['profiles:read']
-        }
+          permissions: ['profiles:read'],
+        },
       },
       {
         path: 'auxiliaries/paye',
@@ -258,8 +269,8 @@ const routes = [
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['profiles:read'],
-          parent: 'administrative'
-        }
+          parent: 'administrative',
+        },
       },
       {
         path: 'auxiliaries/docs',
@@ -268,8 +279,8 @@ const routes = [
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['profiles:read'],
-          parent: 'administrative'
-        }
+          parent: 'administrative',
+        },
       },
       {
         path: 'auxiliaries/contracts',
@@ -278,8 +289,8 @@ const routes = [
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: ['profiles:read'],
-          parent: 'administrative'
-        }
+          parent: 'administrative',
+        },
       },
       {
         path: 'auxiliaries/:id',
@@ -288,10 +299,13 @@ const routes = [
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: [{
-            name: 'profiles:edit',
-            when: (paramsId, cookieId) => paramsId === cookieId
-          }, 'profiles:edit:user'],
+          permissions: [
+            {
+              name: 'profiles:edit',
+              when: (paramsId, cookieId) => paramsId === cookieId,
+            },
+            'profiles:edit:user',
+          ],
           parent: 'administrative',
         },
       },
@@ -301,32 +315,32 @@ const routes = [
         name: 'customer agenda',
         component: () => import('pages/customers/CustomerAgenda'),
         meta: {
-          cookies: ['alenvi_token', 'refresh_token']
-        }
+          cookies: ['alenvi_token', 'refresh_token'],
+        },
       },
       {
         path: 'customers/documents',
         name: 'customer documents',
         component: () => import('pages/customers/Billing'),
         meta: {
-          cookies: ['alenvi_token', 'refresh_token']
-        }
+          cookies: ['alenvi_token', 'refresh_token'],
+        },
       },
       {
         path: 'customers/subscriptions',
         name: 'customer subscription',
         component: () => import('pages/customers/Subscriptions'),
         meta: {
-          cookies: ['alenvi_token', 'refresh_token']
-        }
+          cookies: ['alenvi_token', 'refresh_token'],
+        },
       },
       {
         path: 'customers/contracts',
         name: 'customer contracts',
         component: () => import('pages/customers/Contracts'),
         meta: {
-          cookies: ['alenvi_token', 'refresh_token']
-        }
+          cookies: ['alenvi_token', 'refresh_token'],
+        },
       },
       // All profiles
       {
@@ -335,23 +349,24 @@ const routes = [
         component: () => import('pages/AccountInfo'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['profiles:read', 'profiles:edit']
-        }
-      }
-    ]
+          permissions: ['profiles:read', 'profiles:edit'],
+        },
+      },
+    ],
   },
   {
     path: '/login',
     name: 'login',
     component: () => import('pages/signin/Authenticate'),
     beforeEnter: (to, from, next) => {
-      if (Cookies.get('refresh_token')) return next({ path: '/' });
+      if (Cookies.get('refresh_token')) return next({path: '/'});
       return next();
-    }
+    },
   },
   { path: '/enterCode', component: () => import('pages/signup/EnterCode') },
   { path: '/messenger', component: () => import('pages/signup/ChooseMessengerPlatform') },
-  { path: '/createPassword',
+  {
+    path: '/createPassword',
     component: () => import('pages/signup/CreatePassword'),
     beforeEnter: (to, from, next) => {
       if (Cookies.get('signup_token') && Cookies.get('signup_userId') && Cookies.get('signup_userEmail')) {
@@ -359,25 +374,26 @@ const routes = [
       } else {
         next({ path: '/enterCode' });
       }
-    }
+    },
   },
   { path: '/forgotPassword', component: () => import('pages/signin/ForgotPwd') },
   { path: '/resetPassword/:token', component: () => import('pages/signin/ResetPwd') },
   { path: '/error403Pwd', component: () => import('pages/signin/403') },
   { path: '/401', component: () => import('pages/401') },
-  { path: '/docsigned', component: () => import('pages/DocumentSigned'), props: (route) => ({ signed: route.query.signed }) },
-  { // Always leave this as last one
+  { path: '/docsigned', component: () => import('pages/DocumentSigned'), props: route => ({signed: route.query.signed}) },
+  {
+    // Always leave this as last one
     path: '*',
-    component: () => import('pages/404')
-  }
-]
+    component: () => import('pages/404'),
+  },
+];
 
 // Always leave this as last one
 if (process.env.MODE !== 'ssr') {
   routes.push({
     path: '*',
-    component: () => import('pages/Error404.vue')
-  })
+    component: () => import('pages/Error404.vue'),
+  });
 }
 
-export default routes
+export default routes;

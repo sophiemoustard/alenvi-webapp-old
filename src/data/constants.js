@@ -6,7 +6,7 @@ export const HOURLY = 'hourly';
 
 export const FUNDING_FREQ_OPTIONS = [
   { label: 'Mensuelle', value: MONTHLY },
-  { label: 'Une seule fois', value: ONCE }
+  { label: 'Une seule fois', value: ONCE },
 ];
 export const NATURE_OPTIONS = [
   { label: 'Horaire', value: HOURLY },
@@ -111,7 +111,7 @@ export const PRIVATE_TRANSPORT = 'private';
 export const TRANSPORT_OPTIONS = [
   { label: 'Abonnement transports en commun', value: PUBLIC_TRANSPORT },
   { label: 'Voiture personnelle', value: PRIVATE_TRANSPORT },
-  { label: 'Aucun', value: 'none' }
+  { label: 'Aucun', value: 'none' },
 ];
 export const TRANSIT = 'transit';
 export const DRIVING = 'driving';
