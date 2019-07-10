@@ -188,20 +188,11 @@ export default {
     },
     selectedCustomer () {
       if (this.creationModal && this.newEvent.customer !== '') return this.customers.find(cus => cus._id === this.newEvent.customer);
-      if (this.editionModal && this.editedEvent.auxiliary !== '') return this.customers.find(cus => cus._id === this.editedEvent.customer._id);
+      if (this.editionModal && this.editedEvent.customer !== '') return this.customers.find(cus => cus._id === this.editedEvent.customer._id);
       return { picture: {}, identity: {} };
     },
-    auxiliariesOptions () {
-      return this.auxiliaries.length === 0 ? [] : this.auxiliaries.map(aux => ({
-        label: `${aux.identity.firstname || ''} ${aux.identity.lastname}`,
-        value: aux._id,
-      }));
-    },
     customersOptions () {
-      return this.customers.length === 0 ? [] : this.customers.map(customer => ({
-        label: `${customer.identity.firstname || ''} ${customer.identity.lastname}`,
-        value: customer._id,
-      }));
+      return this.customers.length === 0 ? [] : this.customers.map(customer => this.formatPersonOptions(customer));
     },
     selectedAuxiliary () {
       if (this.creationModal && this.newEvent.auxiliary) {
@@ -438,6 +429,7 @@ export default {
         this.resetEditionForm();
         NotifyPositive('Évènement modifié');
       } catch (e) {
+        console.error(e);
         NotifyNegative('Erreur lors de l\'édition de l\'évènement');
       } finally {
         this.loading = false;

@@ -22,8 +22,10 @@ export default {
       const auxiliaries = [];
       let weeklyHours = 0;
       this.events.forEach((event) => {
-        if (!auxiliaries.includes(event.auxiliary._id)) auxiliaries.push(event.auxiliary._id);
-        weeklyHours += this.$moment(event.endDate).diff(event.startDate, 'h', true);
+        if (event.auxiliary) {
+          if (!auxiliaries.includes(event.auxiliary._id)) auxiliaries.push(event.auxiliary._id);
+          weeklyHours += this.$moment(event.endDate).diff(event.startDate, 'h', true);
+        }
       });
       return { auxiliariesNumber: auxiliaries.length, weeklyHours: Math.round(weeklyHours) };
     },
