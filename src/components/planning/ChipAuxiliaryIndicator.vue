@@ -26,7 +26,7 @@
           <ni-auxiliary-indicators :total-working-hours="totalWorkingHours" :weekly-interventions="weeklyInterventions"
             :weekly-internal-hours="weeklyInternalHours" :weekly-paid-transports="weeklyPaidTransports"
             :customers-count="customersCount" :average-time-by-customer="averageTimeByCustomer"
-            :weekly-break="weeklyBreak" />
+            :weekly-break="weeklyBreak" :time-unit="tab.name" />
         </q-tab-pane>
       </q-tabs>
     </q-modal>
@@ -35,7 +35,8 @@
 
 <script>
 import AuxiliaryIndicators from '../AuxiliaryIndicators';
-import { DEFAULT_AVATAR, ABSENCE, INTERVENTION, INTERNAL_HOUR, TRANSIT, DRIVING, PUBLIC_TRANSPORT, WEEK_STATS, COMPANY_CONTRACT, DEATH, BIRTH, WEDDING, PAID_LEAVE } from '../../data/constants.js';
+import { DEFAULT_AVATAR, ABSENCE, INTERVENTION, INTERNAL_HOUR, TRANSIT, DRIVING, PUBLIC_TRANSPORT, WEEK_STATS,
+  MONTH_STATS, COMPANY_CONTRACT, DEATH, BIRTH, WEDDING, PAID_LEAVE} from '../../data/constants.js';
 import googleMaps from '../../api/GoogleMaps';
 import { getPaidTransport } from '../../helpers/planning';
 
@@ -57,7 +58,7 @@ export default {
       indicatorsModal: false,
       tabsContent: [
         { label: 'Stats de la semaine', default: true, name: WEEK_STATS },
-        { label: 'Stats du mois', default: false, name: 'month_stat' },
+        { label: 'Stats du mois', default: false, name: MONTH_STATS },
       ],
       breakInfo: [],
       weeklyInternalHours: 0,

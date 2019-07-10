@@ -1,44 +1,54 @@
 <template>
   <div>
     <div class="economic-indicators">
-      <p style="font-weight:bold">Heures travaillées</p>
+      <p style="font-weight:bold">
+        {{ `${totalWorkingHours.toFixed(1)}` }} Heures travaillées
+      </p>
       <div class="progress-indicator">
         <q-progress :percentage="Math.round(weeklyInterventionsPercentage)" class="intervention" />
         <div class="progress-caption">
           <div>Interventions</div>
-          <div> {{ `${Math.round(weeklyInterventions)}h` }} -
-            {{`${Math.round(weeklyInterventionsPercentage)}%`}}</div>
+          <div>{{ `${weeklyInterventions.toFixed(1)}h` }}</div>
         </div>
       </div>
       <div class="progress-indicator">
         <q-progress :percentage="Math.round(weeklyInternalHoursPercentage)" class="internal-hours" />
         <div class="progress-caption">
           <div>Interne</div>
-          <div>{{ `${Math.round(weeklyInternalHours)}h` }} -
-            {{`${Math.round(weeklyInternalHoursPercentage)}%`}} </div>
+          <div>{{ `${weeklyInternalHours.toFixed(1)}h` }}</div>
         </div>
       </div>
       <div class="progress-indicator">
         <q-progress :percentage="Math.round(weeklyPaidTransportsPercentage)" class="transports" />
         <div class="progress-caption">
           <div>Transports</div>
-          <div>{{ `${Math.round(weeklyPaidTransports)}h` }} -
-            {{`${Math.round(weeklyPaidTransportsPercentage)}%`}}</div>
+          <div>{{ `${weeklyPaidTransports.toFixed(1)}h` }}</div>
         </div>
       </div>
     </div>
     <div class="quality-indicators">
-      <div class="quality-indicators-item"><span class="highlight">{{ customersCount }}</span> bénéficiaires
-        accompagnés, <span class="highlight">{{ `${Math.round(averageTimeByCustomer)}h` }}</span> en moyenne</div>
-      <div class="quality-indicators-item"><span class="highlight">{{ `${Math.round(weeklyBreak)}h` }}</span> de
-        coupure, incluant transport</div>
+      <div class="quality-indicators-item">
+        <span class="highlight">{{ customersCount }}</span> bénéficiaires accompagnés,
+        <span class="highlight">{{ `${Math.round(averageTimeByCustomer)}h` }}</span>
+        par {{ averageHoursLabels[timeUnit] }} en moyenne
+      </div>
+      <div class="quality-indicators-item">
+        <span class="highlight">{{ `${Math.round(weeklyBreak)}h` }}</span> de coupure, incluant transport
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import { WEEK_STATS, MONTH_STATS } from '../data/constants';
+
 export default {
   name: 'AuxiliaryIndicators',
+  data () {
+    return {
+      averageHoursLabels: { [WEEK_STATS]: 'jour', [MONTH_STATS]: 'semaine' },
+    };
+  },
   props: {
     totalWorkingHours: { type: Number, default: 0 },
     weeklyInterventions: { type: Number, default: 0 },
@@ -47,6 +57,7 @@ export default {
     customersCount: { type: Number, default: 0 },
     averageTimeByCustomer: { type: Number, default: 0 },
     weeklyBreak: { type: Number, default: 0 },
+    timeUnit: { type: String, default: WEEK_STATS },
   },
   computed: {
     weeklyInternalHoursPercentage () {
