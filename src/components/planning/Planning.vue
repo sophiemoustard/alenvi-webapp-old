@@ -68,10 +68,10 @@
 import {
   PLANNING,
   AUXILIARY_ROLES,
-  PLANNING_VIEW_START_HOUR,
-  PLANNING_VIEW_END_HOUR,
   INVOICED_AND_PAYED,
   SECTOR,
+  STAFFING_VIEW_START_HOUR,
+  STAFFING_VIEW_END_HOUR,
 } from '../../data/constants';
 import { NotifyNegative } from '../popup/notify';
 import NiChipAuxiliaryIndicator from './ChipAuxiliaryIndicator';
@@ -175,15 +175,17 @@ export default {
     getEventWithStyleInfo (event, day) {
       let dayEvent = { ...event };
 
-      let staffingLeft = (this.$moment(event.startDate).hours() - PLANNING_VIEW_START_HOUR) * 60 + this.$moment(event.startDate).minutes();
-      let staffingRight = (this.$moment(event.endDate).hours() - PLANNING_VIEW_START_HOUR) * 60 + this.$moment(event.endDate).minutes();
+      const displayedStartHour = Math.max((this.$moment(event.startDate).hours()), STAFFING_VIEW_START_HOUR);
+      const displayedEndHour = Math.min(this.$moment(event.endDate).hours(), STAFFING_VIEW_END_HOUR);
+      let staffingLeft = (displayedStartHour - STAFFING_VIEW_START_HOUR) * 60 + this.$moment(event.startDate).minutes();
+      let staffingRight = (displayedEndHour - STAFFING_VIEW_START_HOUR) * 60 + this.$moment(event.endDate).minutes();
       if (!this.$moment(day).isSame(event.startDate, 'day')) {
-        dayEvent.startDate = this.$moment(day).hour(PLANNING_VIEW_START_HOUR).toISOString();
+        dayEvent.startDate = this.$moment(day).hour(STAFFING_VIEW_START_HOUR).toISOString();
         staffingLeft = 0;
       }
       if (!this.$moment(day).isSame(event.endDate, 'day')) {
-        dayEvent.endDate = this.$moment(day).hour(PLANNING_VIEW_END_HOUR).toISOString();
-        staffingRight = (PLANNING_VIEW_END_HOUR - PLANNING_VIEW_START_HOUR) * 60;
+        dayEvent.endDate = this.$moment(day).hour(STAFFING_VIEW_END_HOUR).toISOString();
+        staffingRight = (STAFFING_VIEW_END_HOUR - STAFFING_VIEW_START_HOUR) * 60;
       }
 
       dayEvent.staffingLeft = staffingLeft;
