@@ -212,11 +212,11 @@ export default {
   .custom-justify
     &-end
       justify-content: flex-end
-      @media (max-width: 768px)
+      @media (max-width: 767px)
         justify-content: center
     &-center
       justify-content: flex-start
-      @media (max-width: 768px)
+      @media (max-width: 767px)
         justify-content: center
 
 </style>

@@ -267,6 +267,12 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables';
 
+  th:first-child
+    @media (min-width: 768px) and (max-width: 1024px)
+      width: 100px;
+    @media (min-width: 1025px)
+      width: 110px;
+
   .person
     &-row
       border-right: 1px solid $light-grey;
@@ -274,9 +280,9 @@ export default {
     &-name
       font-weight: 600
       font-size: 14px
-      @media(max-width: 1024px)
+      @media (max-width: 1024px)
         font-size: 12px
-      @media(max-width: 420px)
+      @media (max-width: 420px)
         font-size: 8px
     &-inner-cell
       margin-top: 4px
