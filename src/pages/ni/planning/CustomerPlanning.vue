@@ -1,6 +1,6 @@
 <template>
   <q-page class="neutral-background">
-    <ni-planning-manager :events="events" :persons="customers" personKey="customer" :can-edit="canEditEvent"
+    <ni-planning-manager :events="events" :persons="customers" :personKey="personKey" :can-edit="canEditEvent"
       @updateStartOfWeek="updateStartOfWeek" @editEvent="openEditionModal" @createEvent="openCreationModal"
       @onDrop="updateEventOnDrop"  />
 
@@ -118,6 +118,7 @@ export default {
       // Event edition
       editedEvent: {},
       editionModal: false,
+      personKey: CUSTOMER,
     };
   },
   async mounted () {

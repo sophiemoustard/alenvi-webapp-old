@@ -12,7 +12,7 @@
           @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :viewMode="viewMode" @updateViewMode="updateViewMode"
           :type="AGENDA" />
       </div>
-      <agenda :events="events" :days="days" personKey="auxiliary" @createEvent="openCreationModal" @editEvent="openEditionModal" />
+      <agenda :events="events" :days="days" :personKey="personKey" @createEvent="openCreationModal" @editEvent="openEditionModal" />
     </div>
 
     <!-- Event creation modal -->
@@ -37,7 +37,7 @@ import Agenda from '../../../components/Agenda';
 import PlanningNavigation from '../../../components/planning/PlanningNavigation';
 import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryEventCreationModal';
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
-import { DEFAULT_AVATAR, INTERVENTION, NEVER, AGENDA, WEEK_VIEW, THREE_DAYS_VIEW, ABSENCE, DAILY, HOURLY, INTERNAL_HOUR, ILLNESS } from '../../../data/constants';
+import { DEFAULT_AVATAR, INTERVENTION, NEVER, AGENDA, WEEK_VIEW, THREE_DAYS_VIEW, ABSENCE, DAILY, HOURLY, INTERNAL_HOUR, ILLNESS, AUXILIARY } from '../../../data/constants';
 import { planningTimelineMixin } from '../../../mixins/planningTimelineMixin';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { NotifyWarning } from '../../../components/popup/notify';
@@ -70,6 +70,7 @@ export default {
       // Event edition
       editedEvent: {},
       editionModal: false,
+      personKey: AUXILIARY,
     };
   },
   computed: {
