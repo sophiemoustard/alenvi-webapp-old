@@ -1,7 +1,13 @@
 <template>
-  <div v-if="displayStaffingView" :id="event._id" draggable="true" @dragstart="drag(event, $event)" @click.stop="editEvent(event._id)"
+  <div v-if="displayStaffingView" :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event, $event)" @click.stop="editEvent(event._id)"
     :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-sm']"
     :style="{ left: `${STAFFING_PERCENTAGE_BY_MINUTES * event.staffingLeft}%`, width: `${STAFFING_PERCENTAGE_BY_MINUTES * event.staffingWidth}%` }">
+    <div class="event-container">
+      <div class="event-title">
+        <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap" :style="{ 'font-size': '0.5 rem' }">
+          {{ event.customer.identity.lastname.trim().toUpperCase() }}</p>
+      </div>
+    </div>
   </div>
   <div v-else :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event, $event)"
     :class="['row', 'cursor-pointer', 'event', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]"
@@ -54,6 +60,11 @@ export default {
     editEvent (eventId) {
       this.$emit('editEvent', eventId);
     },
+    eventTitleForStaffing (event) {
+      const lastname = this.$_.get(event, 'customer.identity.lastname', '');
+
+      return lastname.trim().toUpperCase();
+    },
   },
 }
 </script>
@@ -65,8 +76,9 @@ export default {
     position: absolute;
     top: 2px;
     bottom: 1px;
-    padding: 0;
+    padding: 1px;
     margin: 0;
     border: 1px solid white;
+    font-size: 0.5rem
 
 </style>
