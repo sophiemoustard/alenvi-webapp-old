@@ -214,9 +214,11 @@ export default {
     async drop (toDay, target) {
       try {
         if (target.type === SECTOR) { // Unassign event
-          if (this.draggedObject.sector === target._id && toDay.isSame(this.draggedObject.startDate, 'd')) return;
+          if (this.draggedObject.sector === target._id && (!this.draggedObject.auxiliary || !this.draggedObject.auxiliary._id) &&
+            toDay.isSame(this.draggedObject.startDate, 'd')) return;
         } else { // Update event auxiliary
-          if (this.draggedObject[this.personKey]._id === target._id && toDay.isSame(this.draggedObject.startDate, 'd')) return;
+          if (this.draggedObject[this.personKey] && this.draggedObject[this.personKey]._id === target._id &&
+            toDay.isSame(this.draggedObject.startDate, 'd')) return;
         }
 
         this.$emit('onDrop', { toDay, target, draggedObject: this.draggedObject });
