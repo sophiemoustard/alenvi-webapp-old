@@ -33,7 +33,7 @@
                 valign="top" @click="createEvent({ dayIndex, sectorId: sector._id })">
                 <template v-for="(event, eventIndex) in getCellEvents(sector, days[dayIndex])">
                   <ni-planning-event-cell :event="event" :display-staffing-view="staffingView && !isCustomerPlanning"
-                    :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canEdit" />
+                    :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canEdit" :person-key="personKey" />
                 </template>
               </td>
             </tr>
@@ -54,7 +54,7 @@
               valign="top" @click="createEvent({ dayIndex, person })">
               <template v-for="(event, eventIndex) in getCellEvents(person, days[dayIndex])">
                 <ni-planning-event-cell :event="event" :display-staffing-view="staffingView && !isCustomerPlanning"
-                  :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canEdit" />
+                  :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canEdit" :person-key="personKey" />
               </template>
             </td>
           </tr>

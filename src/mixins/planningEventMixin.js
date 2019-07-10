@@ -39,6 +39,8 @@ export const planningEventMixin = {
       return !absence ? '' : absence.label;
     },
     eventTitle (event) {
+      if (!event.auxiliary && this.isCustomerPlanning) return 'À affecter';
+
       return formatShortIdentity(this.isCustomerPlanning ? event.auxiliary.identity : event.customer.identity);
     },
   },
