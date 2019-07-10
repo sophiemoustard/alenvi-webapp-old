@@ -1,9 +1,9 @@
 import euSpace from '../data/euSpace';
 import moment from 'moment';
 
-const nationalityValidation = (userNationality) => {
+const isNotFromEU = (userNationality) => {
   if (!userNationality) return;
-  return Object.keys(euSpace).indexOf(userNationality);
+  return !Object.keys(euSpace).includes(userNationality);
 };
 
 export const taskValidation = (user = null) => {
@@ -28,11 +28,8 @@ export const taskValidation = (user = null) => {
 
 export const displayTask = (task, user = null) => {
   if (task.task.name.match(/titre de séjour/i)) {
-    if (user.administrative && user.administrative.identity) {
-      if (nationalityValidation(user.administrative.identity.nationality) === -1) {
-        return true;
-      }
-      return false;
+    if (user.identity && user.identity.nationality) {
+      return isNotFromEU(user.identity.nationality);
     }
   }
   if (task.task.name.match(/inscription mutuelle/i)) {
