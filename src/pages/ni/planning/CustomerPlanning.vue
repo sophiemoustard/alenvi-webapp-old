@@ -123,7 +123,7 @@ export default {
   async mounted () {
     try {
       await this.fillFilter(CUSTOMER);
-      await this.getEmployeesBySector();
+      await this.getAuxiliaries();
     } catch (e) {
       console.error(e);
       NotifyNegative('Erreur lors de la récupération des personnes');
@@ -227,6 +227,9 @@ export default {
       }
       return true;
     },
+    activeAuxiliaries () {
+      return this.auxiliaries.filter(aux => this.hasActiveCompanyContractOnEvent(aux, this.days[0]) || this.hasActiveCustomerContractOnEvent(aux, this.days[0]));
+    },
   },
   methods: {
     ...mapActions({
@@ -311,8 +314,8 @@ export default {
         this.events = [];
       }
     },
-    async getEmployeesBySector () {
-      this.auxiliaries = await this.$users.showAllActive({ role: [AUXILIARY, PLANNING_REFERENT] });
+    async getAuxiliaries () {
+      this.auxiliaries = await this.$users.showAll({ role: [AUXILIARY, PLANNING_REFERENT] });
     },
     // Event creation
     openCreationModal (vEvent) {

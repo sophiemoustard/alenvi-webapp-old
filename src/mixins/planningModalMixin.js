@@ -134,9 +134,9 @@ export const planningModalMixin = {
       return EVENT_TYPES;
     },
     auxiliariesOptions () {
-      return this.auxiliaries.length === 0 ? [] : [
+      return this.activeAuxiliaries.length === 0 ? [] : [
         { label: 'À affecter', value: '' },
-        ...this.auxiliaries.map(aux => this.formatPersonOptions(aux)),
+        ...this.activeAuxiliaries.map(aux => this.formatPersonOptions(aux)),
       ];
     },
     customersOptions () {

@@ -84,7 +84,7 @@ export default {
     creationModal: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
     selectedAuxiliary: { type: Object, default: () => ({}) },
-    auxiliaries: { type: Array, default: () => [] },
+    activeAuxiliaries: { type: Array, default: () => [] },
     customers: { type: Array, default: () => [] },
     internalHours: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
