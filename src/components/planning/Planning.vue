@@ -19,6 +19,12 @@
               <div class="days-name q-mr-md">{{ day.name }}</div>
               <div :class="['days-number', { 'current-day': isCurrentDay(day.moment) }]">{{ day.number }}</div>
             </div>
+            <div class="planning-background">
+              <template v-for="(hour, hourIndex) in hours">
+                <div class="planning-hour" v-if="hourIndex !== 0"  :key="`hour_${hourIndex}`"
+                  :style="{ left: `${(hourIndex * hourWidth * 2) - 3}%` }">{{ hour.format('H') }}</div>
+              </template>
+            </div>
           </th>
         </thead>
         <tbody>
@@ -30,7 +36,11 @@
                 </div>
               </td>
               <td @drop="drop(day, sector)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
-                valign="top" @click="createEvent({ dayIndex, sectorId: sector._id })">
+                valign="top" @click="createEvent({ dayIndex, sectorId: sector._id })" class="planning-background">
+                <template v-for="hourIndex in 5">
+                  <div class="line" :style="{ left: `${(hourIndex * hourWidth * 2)}%` }"
+                    :key="`hour_${hourIndex}`" />
+                </template>
                 <template v-for="(event, eventIndex) in getCellEvents(sector, days[dayIndex])">
                   <ni-planning-event-cell :event="event" :display-staffing-view="staffingView && !isCustomerPlanning"
                     :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canEdit" :person-key="personKey" />
@@ -51,7 +61,11 @@
               </div>
             </td>
             <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
-              valign="top" @click="createEvent({ dayIndex, person })">
+              valign="top" @click="createEvent({ dayIndex, person })" class="planning-background">
+              <template v-for="hourIndex in 5">
+                <div class="line" :style="{ left: `${(hourIndex * hourWidth * 2)}%` }"
+                  :key="`hour_${hourIndex}`" />
+              </template>
               <template v-for="(event, eventIndex) in getCellEvents(person, days[dayIndex])">
                 <ni-planning-event-cell :event="event" :display-staffing-view="staffingView && !isCustomerPlanning"
                   :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canEdit" :person-key="personKey" />
@@ -112,6 +126,7 @@ export default {
       staffingView: false,
       PLANNING,
       distanceMatrix: [],
+      hourWidth: 100 / 12,
     }
   },
   beforeDestroy () {
@@ -125,6 +140,7 @@ export default {
   },
   async mounted () {
     this.updateTimeline();
+    this.getTimelineHours();
     if (!this.isCustomerPlanning) await this.getDistanceMatrix();
   },
   watch: {
@@ -150,6 +166,10 @@ export default {
     },
   },
   methods: {
+    getTimelineHours () {
+      const range = this.$moment.range(this.$moment().hours(STAFFING_VIEW_START_HOUR).minutes(0), this.$moment().hours(STAFFING_VIEW_END_HOUR).minutes(0));
+      this.hours = Array.from(range.by('hours', { step: 2, excludeEnd: true }));
+    },
     async getDistanceMatrix () {
       this.distanceMatrix = await distanceMatrix.list();
     },
@@ -296,5 +316,21 @@ export default {
     td
       position: relative;
       height: 75px;
+      z-index: 0;
+    .planning-background
+      position: relative;
+      .line
+        width: 1px;
+        height: 100%;
+        background: $grey-3;
+        margin: 0;
+        position: absolute;
+        z-index: -1;
+
+  .planning-hour
+    position: absolute;
+    color: $light-grey;
+    font-size: 12px;
+    bottom: -3px
 
 </style>

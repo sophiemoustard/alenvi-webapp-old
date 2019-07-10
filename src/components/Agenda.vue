@@ -59,12 +59,17 @@ export default {
       INTERNAL_HOUR,
       UNAVAILABILITY,
       PLANNING_PERCENTAGE_BY_MINUTES,
+      halfHourHeight: 100 / 30, // (100 => % total heigth - 30: nomber of half hours)
     };
   },
   mounted () {
     this.getTimelineHours();
   },
   methods: {
+    getTimelineHours () {
+      const range = this.$moment.range(this.$moment().hours(PLANNING_VIEW_START_HOUR).minutes(0), this.$moment().hours(PLANNING_VIEW_END_HOUR).minutes(0));
+      this.hours = Array.from(range.by('hours', { step: 2 }));
+    },
     getOneDayEvents (day) {
       return this.events
         .filter(event =>

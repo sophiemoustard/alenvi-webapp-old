@@ -79,6 +79,6 @@ export default {
     padding: 1px;
     margin: 0;
     border: 1px solid white;
-    font-size: 0.5rem
+    font-size: 0.5rem;
 
 </style>
