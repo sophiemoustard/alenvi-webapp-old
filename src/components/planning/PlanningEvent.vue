@@ -1,7 +1,7 @@
 <template>
   <div v-if="displayStaffingView" :id="event._id" draggable="true" @dragstart="drag(event, $event)" @click.stop="editEvent(event._id)"
     :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-sm']"
-    :style="{ left: `${PERCENTAGE_BY_MINUTES * event.staffingLeft}%`, width: `${PERCENTAGE_BY_MINUTES * event.staffingWidth}%` }">
+    :style="{ left: `${STAFFING_PERCENTAGE_BY_MINUTES * event.staffingLeft}%`, width: `${STAFFING_PERCENTAGE_BY_MINUTES * event.staffingWidth}%` }">
   </div>
   <div v-else :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event, $event)"
     :class="['row', 'cursor-pointer', 'event', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]"
@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { PERCENTAGE_BY_MINUTES, INTERNAL_HOUR, INTERVENTION, ABSENCE, UNAVAILABILITY, AUXILIARY } from '../../data/constants';
+import { INTERNAL_HOUR, INTERVENTION, ABSENCE, UNAVAILABILITY, AUXILIARY, STAFFING_PERCENTAGE_BY_MINUTES } from '../../data/constants';
 import { planningEventMixin } from '../../mixins/planningEventMixin';
 
 export default {
@@ -39,7 +39,7 @@ export default {
   },
   data () {
     return {
-      PERCENTAGE_BY_MINUTES,
+      STAFFING_PERCENTAGE_BY_MINUTES,
       INTERNAL_HOUR,
       INTERVENTION,
       ABSENCE,

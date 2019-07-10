@@ -66,12 +66,7 @@
 
 <script>
 import {
-  INTERVENTION,
-  ABSENCE,
-  UNAVAILABILITY,
-  INTERNAL_HOUR,
   PLANNING,
-  PERCENTAGE_BY_MINUTES,
   AUXILIARY_ROLES,
   PLANNING_VIEW_START_HOUR,
   PLANNING_VIEW_END_HOUR,
@@ -114,13 +109,8 @@ export default {
       startOfWeek: this.$moment().startOf('week'),
       days: [],
       maxDays: 7,
-      INTERVENTION,
-      UNAVAILABILITY,
-      ABSENCE,
-      INTERNAL_HOUR,
       staffingView: false,
       PLANNING,
-      PERCENTAGE_BY_MINUTES,
       distanceMatrix: [],
     }
   },

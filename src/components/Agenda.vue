@@ -18,7 +18,7 @@
                   :style="{ top: `${(hourIndex * halfHourHeight * 4) - 1.5}%` }">{{ hour.format('HH:mm') }}</div>
               </template>
               <template v-for="(event, eventId) in getOneDayEvents(days[dayIndex])">
-                <div :style="{ top: `${PERCENTAGE_BY_MINUTES * event.staffingTop}%`, height: `${PERCENTAGE_BY_MINUTES * event.staffingHeight - 0.2}%` }"
+                <div :style="{ top: `${PLANNING_PERCENTAGE_BY_MINUTES * event.staffingTop}%`, height: `${PLANNING_PERCENTAGE_BY_MINUTES * event.staffingHeight - 0.2}%` }"
                   :key="eventId"  :class="[!isCustomerPlanning && 'cursor-pointer', 'event', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]" @click.stop="editEvent(event)">
                   <div class="event-container" :style="{ top: event.staffingHeight < 90 ? '10%' : '6px' }">
                     <div class="col-12 event-title">
@@ -42,7 +42,7 @@
 
 <script>
 import { planningEventMixin } from '../mixins/planningEventMixin';
-import { ABSENCE, INTERVENTION, INTERNAL_HOUR, UNAVAILABILITY, PERCENTAGE_BY_MINUTES, PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR } from '../data/constants';
+import { ABSENCE, INTERVENTION, INTERNAL_HOUR, UNAVAILABILITY, PLANNING_PERCENTAGE_BY_MINUTES, PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR } from '../data/constants';
 
 export default {
   name: 'Agenda',
@@ -58,7 +58,7 @@ export default {
       INTERVENTION,
       INTERNAL_HOUR,
       UNAVAILABILITY,
-      PERCENTAGE_BY_MINUTES,
+      PLANNING_PERCENTAGE_BY_MINUTES,
     };
   },
   mounted () {
