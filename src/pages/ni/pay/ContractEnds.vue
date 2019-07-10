@@ -65,32 +65,9 @@
     <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
       label="Payer" @click="createList" />
 
-    <!-- Surcharge detail modal -->
-    <q-modal v-model="surchargeDetailModal" content-classes="modal-container-sm" @hide="resetSurchargeDetail">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5>Détails des <span class="text-weight-bold">majorations</span></h5>
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span>
-              <q-icon name="clear" @click.native="surchargeDetailModal = false" /></span>
-          </div>
-        </div>
-        <div v-for="(surchargePlanDetails, surchargePlanId) in surchargeDetails" :key="surchargePlanId" class="q-mb-xl">
-          <div class="text-primary capitalize text-weight-bold q-mb-md">
-            {{ surchargePlanDetails.planName }}
-          </div>
-          <div v-for="(surchage, surchargeName) in getSurcharges(surchargePlanDetails)" :key="surchargeName"
-            class="surcharge-line">
-            <div class="surcharge-type q-pa-sm">
-              {{ SURCHARGES[surchargeName] }} - {{ surchage.percentage }}%
-            </div>
-            <div class="q-pa-sm">{{ formatHours(surchage.hours) }}</div>
-          </div>
-        </div>
-      </div>
-    </q-modal>
+    <ni-pay-surcharge-details-modal :paySurchargeDetailsModal.sync="surchargeDetailModal"
+      @update:surchargeDetailModal="resetSurchargeDetail" :surchargeDetails="surchargeDetails">
+    </ni-pay-surcharge-details-modal>
   </q-page>
 </template>
 
@@ -99,8 +76,8 @@ import { payMixin } from '../../../mixins/payMixin';
 import { editableTdMixin } from '../../../mixins/editableTdMixin';
 import EditableTd from '../../../components/table/EditableTd';
 import BillingPagination from '../../../components/table/BillingPagination';
+import PaySurchargeDetailsModal from '../../../components/pay/PaySurchargeDetailsModal';
 import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
-import { SURCHARGES } from '../../../data/constants';
 
 export default {
   name: 'ContractEnds',
@@ -109,6 +86,7 @@ export default {
   components: {
     'ni-editable-td': EditableTd,
     'ni-billing-pagination': BillingPagination,
+    'ni-pay-surcharge-details-modal': PaySurchargeDetailsModal,
   },
   data () {
     return {
@@ -121,7 +99,6 @@ export default {
         'overtimeHours', 'additionalHours', 'mutual', 'transport', 'otherFees', 'bonus', 'compensation'],
       surchargeDetailModal: false,
       surchargeDetails: {},
-      SURCHARGES,
     };
   },
   computed: {
@@ -165,9 +142,6 @@ export default {
     resetSurchargeDetail () {
       this.surchargeDetails = {};
     },
-    getSurcharges (surchargesPlanDetails) {
-      return this.$_.pick(surchargesPlanDetails, Object.keys(SURCHARGES));
-    },
     // Creation
     async createList () {
       try {
@@ -196,20 +170,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  @import '~variables';
-
-  .surcharge-line
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    border: 1px solid $light-grey;
-    &:not(:nth-child(2)) // first-child is title
-      border-top: none;
-
-  .surcharge-type
-    width: 60%
-    border-right: 1px solid $light-grey;
-
   .title-padding
     .q-select
       width: 250px
