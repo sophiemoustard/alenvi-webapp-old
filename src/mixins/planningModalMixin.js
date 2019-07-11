@@ -184,8 +184,9 @@ export const planningModalMixin = {
       return this.$_.get(this.editedEvent, 'customer.contact.address.fullAddress', '');
     },
     customerProfileRedirect () {
-      if (this.getUser.role.name === COACH || this.getUser.role.name === ADMIN) return { name: 'customers profile', params: { id: this.editedEvent.customer._id } };
-      return { name: 'profile customers info', params: { customerId: this.editedEvent.customer._id } };
+      return this.getUser.role.name === COACH || this.getUser.role.name === ADMIN
+        ? { name: 'customers profile', params: { id: this.editedEvent.customer._id } }
+        : { name: 'profile customers info', params: { customerId: this.editedEvent.customer._id } };
     },
   },
   methods: {

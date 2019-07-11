@@ -193,7 +193,7 @@ export default {
       return { picture: {}, identity: {} };
     },
     customersOptions () {
-      return this.customers.length === 0 ? [] : this.customers.map(customer => this.formatPersonOptions(customer));
+      return this.customers.map(customer => this.formatPersonOptions(customer));
     },
     selectedAuxiliary () {
       if (this.creationModal && this.newEvent.auxiliary) {
