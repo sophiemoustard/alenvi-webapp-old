@@ -2,27 +2,27 @@
   <div>
     <div class="economic-indicators">
       <p style="font-weight:bold">
-        {{ `${totalWorkingHours.toFixed(1)}` }} Heures travaillées
+        {{ totalWorkingHours | formatHours }} Heures travaillées
       </p>
       <div class="progress-indicator">
         <q-progress :percentage="Math.round(weeklyInterventionsPercentage)" class="intervention" />
         <div class="progress-caption">
           <div>Interventions</div>
-          <div>{{ `${weeklyInterventions.toFixed(1)}h` }}</div>
+          <div>{{ weeklyInterventions | formatHours }}</div>
         </div>
       </div>
       <div class="progress-indicator">
         <q-progress :percentage="Math.round(weeklyInternalHoursPercentage)" class="internal-hours" />
         <div class="progress-caption">
           <div>Interne</div>
-          <div>{{ `${weeklyInternalHours.toFixed(1)}h` }}</div>
+          <div>{{ weeklyInternalHours | formatHours }}</div>
         </div>
       </div>
       <div class="progress-indicator">
         <q-progress :percentage="Math.round(weeklyPaidTransportsPercentage)" class="transports" />
         <div class="progress-caption">
           <div>Transports</div>
-          <div>{{ `${weeklyPaidTransports.toFixed(1)}h` }}</div>
+          <div>{{ weeklyPaidTransports | formatHours }}</div>
         </div>
       </div>
     </div>
@@ -41,12 +41,13 @@
 
 <script>
 import { WEEK_STATS, MONTH_STATS } from '../data/constants';
+import { formatHours } from '../helpers/utils';
 
 export default {
   name: 'AuxiliaryIndicators',
   data () {
     return {
-      averageHoursLabels: { [WEEK_STATS]: 'jour', [MONTH_STATS]: 'semaine' },
+      averageHoursLabels: { [WEEK_STATS]: 'semaine', [MONTH_STATS]: 'mois' },
     };
   },
   props: {
@@ -72,6 +73,9 @@ export default {
       if (this.totalWorkingHours === 0) return 0;
       return this.weeklyPaidTransports / this.totalWorkingHours * 100;
     },
+  },
+  filters: {
+    formatHours: hours => formatHours(hours, 1),
   },
 }
 </script>
