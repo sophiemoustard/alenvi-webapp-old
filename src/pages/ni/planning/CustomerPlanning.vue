@@ -438,9 +438,9 @@ export default {
       }
     },
     async updateEventOnDrop (vEvent) {
-      const { toDay, toPerson, draggedObject } = vEvent;
+      const { toDay, target, draggedObject } = vEvent;
 
-      if (toPerson._id !== draggedObject.customer._id) return NotifyNegative('Impossible de modifier le bénéficiaire de l\'intervention');
+      if (target._id !== draggedObject.customer._id) return NotifyNegative('Impossible de modifier le bénéficiaire de l\'intervention');
 
       const daysBetween = this.$moment(draggedObject.endDate).diff(this.$moment(draggedObject.startDate), 'days');
       const payload = {
