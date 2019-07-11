@@ -100,7 +100,7 @@
 </template>
 
 <script>
-import { DEFAULT_AVATAR, INTERVENTION } from '../../data/constants';
+import { DEFAULT_AVATAR, INTERVENTION, AUXILIARY } from '../../data/constants';
 import { planningModalMixin } from '../../mixins/planningModalMixin';
 
 export default {
@@ -111,10 +111,15 @@ export default {
     editionModal: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
     selectedAuxiliary: { type: Object, default: () => ({}) },
-    auxiliaries: { type: Array, default: () => [] },
+    activeAuxiliaries: { type: Array, default: () => [] },
     customers: { type: Array, default: () => [] },
     internalHours: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
+  },
+  data () {
+    return {
+      personKey: AUXILIARY,
+    };
   },
   computed: {
     additionalValue () {

@@ -1,6 +1,6 @@
 <template>
   <q-page class="neutral-background">
-    <ni-planning-manager :events="events" :persons="customers" personKey="customer" :can-edit="canEditEvent"
+    <ni-planning-manager :events="events" :persons="customers" :personKey="personKey" :can-edit="canEditEvent"
       @updateStartOfWeek="updateStartOfWeek" @editEvent="openEditionModal" @createEvent="openCreationModal"
       @onDrop="updateEventOnDrop"  />
 
@@ -118,12 +118,13 @@ export default {
       // Event edition
       editedEvent: {},
       editionModal: false,
+      personKey: CUSTOMER,
     };
   },
   async mounted () {
     try {
       await this.fillFilter(CUSTOMER);
-      await this.getEmployeesBySector();
+      await this.getAuxiliaries();
     } catch (e) {
       console.error(e);
       NotifyNegative('Erreur lors de la récupération des personnes');
@@ -149,7 +150,6 @@ export default {
           endDate: { required },
         },
         auxiliary: { required },
-        sector: { required },
         customer: { required },
         subscription: { required },
         location: { fullAddress: { frAddress } },
@@ -163,7 +163,6 @@ export default {
           endDate: { required },
         },
         auxiliary: { required },
-        sector: { required },
         customer: { required },
         subscription: { required },
         location: { fullAddress: { frAddress } },
@@ -188,20 +187,11 @@ export default {
     },
     selectedCustomer () {
       if (this.creationModal && this.newEvent.customer !== '') return this.customers.find(cus => cus._id === this.newEvent.customer);
-      if (this.editionModal && this.editedEvent.auxiliary !== '') return this.customers.find(cus => cus._id === this.editedEvent.customer._id);
+      if (this.editionModal && this.editedEvent.customer !== '') return this.customers.find(cus => cus._id === this.editedEvent.customer._id);
       return { picture: {}, identity: {} };
     },
-    auxiliariesOptions () {
-      return this.auxiliaries.length === 0 ? [] : this.auxiliaries.map(aux => ({
-        label: `${aux.identity.firstname || ''} ${aux.identity.lastname}`,
-        value: aux._id,
-      }));
-    },
     customersOptions () {
-      return this.customers.length === 0 ? [] : this.customers.map(customer => ({
-        label: `${customer.identity.firstname || ''} ${customer.identity.lastname}`,
-        value: customer._id,
-      }));
+      return this.customers.map(customer => this.formatPersonOptions(customer));
     },
     selectedAuxiliary () {
       if (this.creationModal && this.newEvent.auxiliary) {
@@ -235,6 +225,9 @@ export default {
         if (selectedSubscription.service.type === CUSTOMER_CONTRACT) return this.selectedAuxiliary.isCompanyContractValidForRepetition;
       }
       return true;
+    },
+    activeAuxiliaries () {
+      return this.auxiliaries.filter(aux => this.hasActiveCompanyContractOnEvent(aux, this.days[0]) || this.hasActiveCustomerContractOnEvent(aux, this.days[0]));
     },
   },
   methods: {
@@ -320,8 +313,8 @@ export default {
         this.events = [];
       }
     },
-    async getEmployeesBySector () {
-      this.auxiliaries = await this.$users.showAllActive({ role: [AUXILIARY, PLANNING_REFERENT] });
+    async getAuxiliaries () {
+      this.auxiliaries = await this.$users.showAll({ role: [AUXILIARY, PLANNING_REFERENT] });
     },
     // Event creation
     openCreationModal (vEvent) {
@@ -438,15 +431,16 @@ export default {
         this.resetEditionForm();
         NotifyPositive('Évènement modifié');
       } catch (e) {
+        console.error(e);
         NotifyNegative('Erreur lors de l\'édition de l\'évènement');
       } finally {
         this.loading = false;
       }
     },
     async updateEventOnDrop (vEvent) {
-      const { toDay, toPerson, draggedObject } = vEvent;
+      const { toDay, target, draggedObject } = vEvent;
 
-      if (toPerson._id !== draggedObject.customer._id) return NotifyNegative('Impossible de modifier le bénéficiaire de l\'intervention');
+      if (target._id !== draggedObject.customer._id) return NotifyNegative('Impossible de modifier le bénéficiaire de l\'intervention');
 
       const daysBetween = this.$moment(draggedObject.endDate).diff(this.$moment(draggedObject.startDate), 'days');
       const payload = {

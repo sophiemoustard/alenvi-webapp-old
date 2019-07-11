@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { PERCENTAGE_BY_MINUTES, INTERNAL_HOUR, INTERVENTION, ABSENCE, UNAVAILABILITY } from '../../data/constants';
+import { PERCENTAGE_BY_MINUTES, INTERNAL_HOUR, INTERVENTION, ABSENCE, UNAVAILABILITY, AUXILIARY } from '../../data/constants';
 import { planningEventMixin } from '../../mixins/planningEventMixin';
 
 export default {
@@ -35,6 +35,7 @@ export default {
     displayStaffingView: { type: Boolean, default: false },
     event: { type: Object, default: () => ({}) },
     canDrag: { type: Function, default: () => {} },
+    personKey: { type: String, default: AUXILIARY },
   },
   data () {
     return {

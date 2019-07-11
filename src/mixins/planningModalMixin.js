@@ -31,6 +31,7 @@ import {
   ADMIN,
   COACH,
   EVENT_TYPES,
+  CUSTOMER,
 } from '../data/constants';
 
 export const planningModalMixin = {
@@ -87,7 +88,8 @@ export const planningModalMixin = {
           return !this.newEvent.auxiliary || !this.newEvent.absence || !this.newEvent.dates.startDate ||
             !this.newEvent.absenceNature || !this.newEvent.dates.startHour || !this.newEvent.dates.endHour;
         case INTERVENTION:
-          return !this.newEvent.customer || !this.newEvent.subscription || !this.newEvent.dates.startDate ||
+          return (this.personKey === CUSTOMER && !this.newEvent.auxiliary) || !this.newEvent.customer ||
+            !this.newEvent.subscription || !this.newEvent.dates.startDate ||
             !this.newEvent.dates.endDate || !this.newEvent.dates.startHour || !this.newEvent.dates.endHour;
         case INTERNAL_HOUR:
           return !this.newEvent.auxiliary || !this.newEvent.dates.startDate || !this.newEvent.dates.endDate ||
@@ -109,7 +111,8 @@ export const planningModalMixin = {
           return !this.editedEvent.auxiliary || !this.editedEvent.absence || !this.editedEvent.dates.startDate ||
             !this.editedEvent.absenceNature || !this.editedEvent.dates.startHour || !this.editedEvent.dates.endHour;
         case INTERVENTION:
-          const shouldDisableButton = !this.editedEvent.subscription || !this.editedEvent.dates.startDate ||
+          const shouldDisableButton = (this.personKey === CUSTOMER && !this.editedEvent.auxiliary) ||
+            !this.editedEvent.subscription || !this.editedEvent.dates.startDate ||
             !this.editedEvent.dates.endDate || !this.editedEvent.dates.startHour || !this.editedEvent.dates.endHour;
           if (this.editedEvent.isCancelled) return shouldDisableButton || !this.editedEvent.cancel.condition || !this.editedEvent.cancel.reason;
           else return shouldDisableButton;
@@ -134,9 +137,9 @@ export const planningModalMixin = {
       return EVENT_TYPES;
     },
     auxiliariesOptions () {
-      return this.auxiliaries.length === 0 ? [] : [
+      return this.activeAuxiliaries.length === 0 ? [] : [
         { label: 'À affecter', value: '' },
-        ...this.auxiliaries.map(aux => this.formatPersonOptions(aux)),
+        ...this.activeAuxiliaries.map(aux => this.formatPersonOptions(aux)),
       ];
     },
     customersOptions () {
@@ -181,8 +184,9 @@ export const planningModalMixin = {
       return this.$_.get(this.editedEvent, 'customer.contact.address.fullAddress', '');
     },
     customerProfileRedirect () {
-      if (this.getUser.role.name === COACH || this.getUser.role.name === ADMIN) return { name: 'customers profile', params: { id: this.editedEvent.customer._id } };
-      return { name: 'profile customers info', params: { customerId: this.editedEvent.customer._id } };
+      return this.getUser.role.name === COACH || this.getUser.role.name === ADMIN
+        ? { name: 'customers profile', params: { id: this.editedEvent.customer._id } }
+        : { name: 'profile customers info', params: { customerId: this.editedEvent.customer._id } };
     },
   },
   methods: {
