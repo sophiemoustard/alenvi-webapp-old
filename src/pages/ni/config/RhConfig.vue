@@ -389,6 +389,10 @@ export default {
         return 'Nombre non valide';
       }
     },
+    async refreshCompany () {
+      await this.$store.dispatch('main/getUser', this.user._id);
+      this.company = this.user.company;
+    },
     // Internal hours
     async refreshInternalHours () {
       this.internalHours = await this.$companies.getInternalHours(this.company._id);
