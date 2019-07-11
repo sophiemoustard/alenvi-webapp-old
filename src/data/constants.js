@@ -104,6 +104,7 @@ export const PERSON = 'person';
 
 // INDICATORS
 export const WEEK_STATS = 'week_stats';
+export const MONTH_STATS = 'month_stat';
 
 // TRANSORT
 export const PUBLIC_TRANSPORT = 'public';

@@ -77,6 +77,7 @@ export const formatFullIdentity = (identity) => {
   return `${firstname} ${lastname}`;
 };
 
-export const formatHours = (value) => {
-  return value ? `${parseFloat(value).toFixed(2)}h` : '0.00h';
+export const formatHours = (value, digits = 2) => {
+  if (!value) return '0,00h';
+  return `${parseFloat(value).toFixed(digits).replace('.', ',')}h`
 };
