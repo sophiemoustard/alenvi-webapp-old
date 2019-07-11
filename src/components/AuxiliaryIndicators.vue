@@ -2,7 +2,7 @@
   <div>
     <div class="economic-indicators">
       <p style="font-weight:bold">
-        {{ totalWorkingHours | formatHours }} Heures travaillées
+        {{ totalWorkingHours | formatHours }} travaillées
       </p>
       <div class="progress-indicator">
         <q-progress :percentage="Math.round(weeklyInterventionsPercentage)" class="intervention" />
@@ -14,7 +14,7 @@
       <div class="progress-indicator">
         <q-progress :percentage="Math.round(weeklyInternalHoursPercentage)" class="internal-hours" />
         <div class="progress-caption">
-          <div>Interne</div>
+          <div>Heures internes</div>
           <div>{{ weeklyInternalHours | formatHours }}</div>
         </div>
       </div>
