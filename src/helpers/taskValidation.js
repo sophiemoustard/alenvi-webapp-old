@@ -1,10 +1,7 @@
 import euSpace from '../data/euSpace';
 import moment from 'moment';
 
-const isNotFromEU = (userNationality) => {
-  if (!userNationality) return;
-  return !Object.keys(euSpace).includes(userNationality);
-};
+const isNotFromEU = (userNationality) => !Object.keys(euSpace).includes(userNationality);
 
 export const taskValidation = (user = null) => {
   if (!user) throw new Error('No user.');
