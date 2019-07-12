@@ -571,7 +571,7 @@ export default {
           name: 'signed',
           label: 'Signé',
           align: 'center',
-          field: row => row.drive && row.drive.id,
+          field: row => row.drive && row.drive.driveId,
         },
         {
           name: 'createdAt',
@@ -678,7 +678,7 @@ export default {
     docsUploadUrl () {
       if (!this.customer.driveFolder) return '';
 
-      return `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.id}/upload`;
+      return `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.driveId}/upload`;
     },
     headers () {
       return { 'x-access-token': Cookies.get('alenvi_token') || '' };

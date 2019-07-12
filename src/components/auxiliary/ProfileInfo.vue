@@ -531,7 +531,7 @@ export default {
       return ['FR', ...Object.keys(countries).filter(country => country !== 'FR')].map(country => ({ value: country, label: countries[country] }));
     },
     docsUploadUrl () {
-      return `${process.env.API_HOSTNAME}/users/${this.currentUser._id}/gdrive/${this.currentUser.administrative.driveFolder.id}/upload`;
+      return `${process.env.API_HOSTNAME}/users/${this.currentUser._id}/gdrive/${this.currentUser.administrative.driveFolder.driveId}/upload`;
     },
     pictureUploadUrl () {
       return `${process.env.API_HOSTNAME}/users/${this.currentUser._id}/cloudinary/upload`;
