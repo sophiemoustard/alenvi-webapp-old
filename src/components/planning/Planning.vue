@@ -19,6 +19,12 @@
               <div class="days-name q-mr-md">{{ day.name }}</div>
               <div :class="['days-number', { 'current-day': isCurrentDay(day.moment) }]">{{ day.number }}</div>
             </div>
+            <div class="planning-background" v-if="staffingView">
+              <template v-for="(hour, hourIndex) in hours">
+                <div class="planning-hour" v-if="hourIndex !== 0"  :key="hourIndex"
+                  :style="{ left: `${(hourIndex * hourWidth * 2) - 3}%` }">{{ hour.format('H') }}</div>
+              </template>
+            </div>
           </th>
         </thead>
         <tbody>
@@ -30,7 +36,11 @@
                 </div>
               </td>
               <td @drop="drop(day, sector)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
-                valign="top" @click="createEvent({ dayIndex, sectorId: sector._id })">
+                valign="top" @click="createEvent({ dayIndex, sectorId: sector._id })" class="planning-background">
+                <template v-for="hourIndex in 5">
+                  <div class="line" :style="{ left: `${(hourIndex * hourWidth * 2)}%` }"
+                    :key="`hour_${hourIndex}`" />
+                </template>
                 <template v-for="(event, eventIndex) in getCellEvents(sector, days[dayIndex])">
                   <ni-planning-event-cell :event="event" :display-staffing-view="staffingView && !isCustomerPlanning"
                     :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canEdit" :person-key="personKey" />
@@ -51,7 +61,11 @@
               </div>
             </td>
             <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
-              valign="top" @click="createEvent({ dayIndex, person })">
+              valign="top" @click="createEvent({ dayIndex, person })" class="planning-background">
+              <template v-for="hourIndex in hours.length">
+                <div class="line" :style="{ left: `${(hourIndex * hourWidth * 2)}%` }"
+                  :key="`hour_${hourIndex}`" />
+              </template>
               <template v-for="(event, eventIndex) in getCellEvents(person, days[dayIndex])">
                 <ni-planning-event-cell :event="event" :display-staffing-view="staffingView && !isCustomerPlanning"
                   :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canEdit" :person-key="personKey" />
@@ -66,17 +80,12 @@
 
 <script>
 import {
-  INTERVENTION,
-  ABSENCE,
-  UNAVAILABILITY,
-  INTERNAL_HOUR,
   PLANNING,
-  PERCENTAGE_BY_MINUTES,
   AUXILIARY_ROLES,
-  PLANNING_VIEW_START_HOUR,
-  PLANNING_VIEW_END_HOUR,
   INVOICED_AND_PAYED,
   SECTOR,
+  STAFFING_VIEW_START_HOUR,
+  STAFFING_VIEW_END_HOUR,
 } from '../../data/constants';
 import { NotifyNegative } from '../popup/notify';
 import NiChipAuxiliaryIndicator from './ChipAuxiliaryIndicator';
@@ -114,14 +123,10 @@ export default {
       startOfWeek: this.$moment().startOf('week'),
       days: [],
       maxDays: 7,
-      INTERVENTION,
-      UNAVAILABILITY,
-      ABSENCE,
-      INTERNAL_HOUR,
       staffingView: false,
       PLANNING,
-      PERCENTAGE_BY_MINUTES,
       distanceMatrix: [],
+      hourWidth: 100 / 12,
     }
   },
   beforeDestroy () {
@@ -135,6 +140,7 @@ export default {
   },
   async mounted () {
     this.updateTimeline();
+    this.getTimelineHours();
     if (!this.isCustomerPlanning) await this.getDistanceMatrix();
   },
   watch: {
@@ -160,6 +166,10 @@ export default {
     },
   },
   methods: {
+    getTimelineHours () {
+      const range = this.$moment.range(this.$moment().hours(STAFFING_VIEW_START_HOUR).minutes(0), this.$moment().hours(STAFFING_VIEW_END_HOUR).minutes(0));
+      this.hours = Array.from(range.by('hours', { step: 2, excludeEnd: true }));
+    },
     async getDistanceMatrix () {
       this.distanceMatrix = await distanceMatrix.list();
     },
@@ -185,15 +195,17 @@ export default {
     getEventWithStyleInfo (event, day) {
       let dayEvent = { ...event };
 
-      let staffingLeft = (this.$moment(event.startDate).hours() - PLANNING_VIEW_START_HOUR) * 60 + this.$moment(event.startDate).minutes();
-      let staffingRight = (this.$moment(event.endDate).hours() - PLANNING_VIEW_START_HOUR) * 60 + this.$moment(event.endDate).minutes();
+      const displayedStartHour = Math.max((this.$moment(event.startDate).hours()), STAFFING_VIEW_START_HOUR);
+      const displayedEndHour = Math.min(this.$moment(event.endDate).hours(), STAFFING_VIEW_END_HOUR);
+      let staffingLeft = (displayedStartHour - STAFFING_VIEW_START_HOUR) * 60 + this.$moment(event.startDate).minutes();
+      let staffingRight = (displayedEndHour - STAFFING_VIEW_START_HOUR) * 60 + this.$moment(event.endDate).minutes();
       if (!this.$moment(day).isSame(event.startDate, 'day')) {
-        dayEvent.startDate = this.$moment(day).hour(PLANNING_VIEW_START_HOUR).toISOString();
+        dayEvent.startDate = this.$moment(day).hour(STAFFING_VIEW_START_HOUR).toISOString();
         staffingLeft = 0;
       }
       if (!this.$moment(day).isSame(event.endDate, 'day')) {
-        dayEvent.endDate = this.$moment(day).hour(PLANNING_VIEW_END_HOUR).toISOString();
-        staffingRight = (PLANNING_VIEW_END_HOUR - PLANNING_VIEW_START_HOUR) * 60;
+        dayEvent.endDate = this.$moment(day).hour(STAFFING_VIEW_END_HOUR).toISOString();
+        staffingRight = (STAFFING_VIEW_END_HOUR - STAFFING_VIEW_START_HOUR) * 60;
       }
 
       dayEvent.staffingLeft = staffingLeft;
@@ -275,28 +287,51 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables';
 
+  th:first-child
+    @media (min-width: 768px) and (max-width: 1024px)
+      width: 100px;
+    @media (min-width: 1025px)
+      width: 110px;
+
   .person
     &-row
       border-right: 1px solid $light-grey;
       height: 100px;
     &-name
-      font-weight: 600
-      font-size: 14px
-      @media(max-width: 1024px)
-        font-size: 12px
-      @media(max-width: 420px)
-        font-size: 8px
+      font-weight: 600;
+      font-size: 14px;
+      @media (max-width: 1024px)
+        font-size: 12px;
+      @media (max-width: 420px)
+        font-size: 8px;
     &-inner-cell
-      margin-top: 4px
+      margin-top: 4px;
 
   .staffing
     .person
       &-row
-        height: auto
+        height: auto;
       &-name
         margin: 2px 0 4px;
     td
       position: relative;
       height: 75px;
+      z-index: 0;
+    .planning-background
+      position: relative;
+      margin-top: 2px;
+      .line
+        width: 1px;
+        height: 100%;
+        background: $grey-3;
+        margin: 0;
+        position: absolute;
+        z-index: -1;
+
+  .planning-hour
+    position: absolute;
+    color: $light-grey;
+    font-size: 12px;
+    bottom: -3px;
 
 </style>

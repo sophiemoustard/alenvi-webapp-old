@@ -98,7 +98,10 @@ export const PLANNING = 'planning';
 export const AGENDA = 'agenda';
 export const PLANNING_VIEW_START_HOUR = 7;
 export const PLANNING_VIEW_END_HOUR = 22;
-export const PERCENTAGE_BY_MINUTES = 100 / ((PLANNING_VIEW_END_HOUR - PLANNING_VIEW_START_HOUR) * 60);
+export const PLANNING_PERCENTAGE_BY_MINUTES = 100 / ((PLANNING_VIEW_END_HOUR - PLANNING_VIEW_START_HOUR) * 60);
+export const STAFFING_VIEW_START_HOUR = 8;
+export const STAFFING_VIEW_END_HOUR = 20;
+export const STAFFING_PERCENTAGE_BY_MINUTES = 100 / ((STAFFING_VIEW_END_HOUR - STAFFING_VIEW_START_HOUR) * 60);
 export const SECTOR = 'sector';
 export const PERSON = 'person';
 

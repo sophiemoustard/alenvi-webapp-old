@@ -1,7 +1,14 @@
 <template>
-  <div v-if="displayStaffingView" :id="event._id" draggable="true" @dragstart="drag(event, $event)" @click.stop="editEvent(event._id)"
-    :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-sm']"
-    :style="{ left: `${PERCENTAGE_BY_MINUTES * event.staffingLeft}%`, width: `${PERCENTAGE_BY_MINUTES * event.staffingWidth}%` }">
+  <div v-if="displayStaffingView" :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event, $event)"
+    @click.stop="editEvent(event._id)" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-sm']"
+    :style="getEventStyleForStaffing(event)">
+    <div class="event-container">
+      <div class="event-title">
+        <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap"
+          :style="{ 'font-size': '0.5 rem' }">
+          {{ eventTitleForStaffing(event) }}</p>
+      </div>
+    </div>
   </div>
   <div v-else :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event, $event)"
     :class="['row', 'cursor-pointer', 'event', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]"
@@ -25,7 +32,7 @@
 </template>
 
 <script>
-import { PERCENTAGE_BY_MINUTES, INTERNAL_HOUR, INTERVENTION, ABSENCE, UNAVAILABILITY, AUXILIARY } from '../../data/constants';
+import { INTERNAL_HOUR, INTERVENTION, ABSENCE, UNAVAILABILITY, AUXILIARY, STAFFING_PERCENTAGE_BY_MINUTES } from '../../data/constants';
 import { planningEventMixin } from '../../mixins/planningEventMixin';
 
 export default {
@@ -39,7 +46,7 @@ export default {
   },
   data () {
     return {
-      PERCENTAGE_BY_MINUTES,
+      STAFFING_PERCENTAGE_BY_MINUTES,
       INTERNAL_HOUR,
       INTERVENTION,
       ABSENCE,
@@ -47,12 +54,23 @@ export default {
     }
   },
   methods: {
+    getEventStyleForStaffing (event) {
+      return {
+        left: `${STAFFING_PERCENTAGE_BY_MINUTES * event.staffingLeft}%`,
+        width: `${STAFFING_PERCENTAGE_BY_MINUTES * event.staffingWidth}%`,
+      };
+    },
     drag (event, nativeEvent) {
       nativeEvent.dataTransfer.setData('text', ''); // Mandatory on Firefox
       this.$emit('drag', event);
     },
     editEvent (eventId) {
       this.$emit('editEvent', eventId);
+    },
+    eventTitleForStaffing (event) {
+      const lastname = this.$_.get(event, 'customer.identity.lastname', '');
+
+      return lastname.trim().toUpperCase();
     },
   },
 }
@@ -65,8 +83,9 @@ export default {
     position: absolute;
     top: 2px;
     bottom: 1px;
-    padding: 0;
+    padding: 1px;
     margin: 0;
     border: 1px solid white;
+    font-size: 0.5rem;
 
 </style>
