@@ -73,6 +73,7 @@ export const NEVER = 'never';
 export const EVERY_DAY = 'every_day';
 export const EVERY_WEEK_DAY = 'every_week_day';
 export const EVERY_WEEK = 'every_week';
+export const EVERY_TWO_WEEKS = 'every_two_weeks';
 
 // CANCELLATION OPTIONS
 export const INVOICED_AND_PAYED = 'invoiced_and_payed';
