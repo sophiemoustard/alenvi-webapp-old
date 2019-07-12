@@ -67,7 +67,10 @@ export default {
   },
   methods: {
     getTimelineHours () {
-      const range = this.$moment.range(this.$moment().hours(PLANNING_VIEW_START_HOUR).minutes(0), this.$moment().hours(PLANNING_VIEW_END_HOUR).minutes(0));
+      const range = this.$moment.range(
+        this.$moment().hours(PLANNING_VIEW_START_HOUR).startOf('h'),
+        this.$moment().hours(PLANNING_VIEW_END_HOUR).startOf('h')
+      );
       this.hours = Array.from(range.by('hours', { step: 2 }));
     },
     getOneDayEvents (day) {

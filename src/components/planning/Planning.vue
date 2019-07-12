@@ -21,7 +21,7 @@
             </div>
             <div class="planning-background" v-if="staffingView">
               <template v-for="(hour, hourIndex) in hours">
-                <div class="planning-hour" v-if="hourIndex !== 0"  :key="`hour_${hourIndex}`"
+                <div class="planning-hour" v-if="hourIndex !== 0"  :key="`${hourIndex}`"
                   :style="{ left: `${(hourIndex * hourWidth * 2) - 3}%` }">{{ hour.format('H') }}</div>
               </template>
             </div>
@@ -62,7 +62,7 @@
             </td>
             <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
               valign="top" @click="createEvent({ dayIndex, person })" class="planning-background">
-              <template v-for="hourIndex in 5">
+              <template v-for="hourIndex in hours.length">
                 <div class="line" :style="{ left: `${(hourIndex * hourWidth * 2)}%` }"
                   :key="`hour_${hourIndex}`" />
               </template>
@@ -298,19 +298,19 @@ export default {
       border-right: 1px solid $light-grey;
       height: 100px;
     &-name
-      font-weight: 600
-      font-size: 14px
+      font-weight: 600;
+      font-size: 14px;
       @media (max-width: 1024px)
-        font-size: 12px
+        font-size: 12px;
       @media (max-width: 420px)
-        font-size: 8px
+        font-size: 8px;
     &-inner-cell
-      margin-top: 4px
+      margin-top: 4px;
 
   .staffing
     .person
       &-row
-        height: auto
+        height: auto;
       &-name
         margin: 2px 0 4px;
     td
@@ -319,6 +319,7 @@ export default {
       z-index: 0;
     .planning-background
       position: relative;
+      margin-top: 2px;
       .line
         width: 1px;
         height: 100%;
@@ -331,6 +332,6 @@ export default {
     position: absolute;
     color: $light-grey;
     font-size: 12px;
-    bottom: -3px
+    bottom: -3px;
 
 </style>
