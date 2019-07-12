@@ -214,7 +214,7 @@ export default {
         location: {},
         attachment: {},
         auxiliary: person ? person._id : '',
-        sector: person ? person.sector._id : sectorId,
+        sector: this.$_.get(person, 'sector._id') || sectorId,
         dates: {
           startDate: selectedDay.toISOString(),
           startHour: '08:00',

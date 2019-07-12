@@ -255,7 +255,7 @@ export default {
         can = this.$can({
           user: this.$store.getters['main/user'],
           auxiliaryIdEvent: eventInfo.person._id,
-          auxiliarySectorEvent: eventInfo.person.sector._id,
+          auxiliarySectorEvent: eventInfo.person.sector ? eventInfo.person.sector._id : null,
           permissions: [
             { name: 'planning:create:user', rule: 'isInSameSector' },
             { name: 'planning:create', rule: 'isOwner' },
