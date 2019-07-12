@@ -295,7 +295,7 @@ export default {
     background-color: $primary;
 
   .text-weight-bold
-    color: $primary
+    color: $primary;
 
   .title
     display: flex;
@@ -304,5 +304,5 @@ export default {
     align-items: flex-end;
 
   .message
-    font-style: italic
+    font-style: italic;
 </style>
