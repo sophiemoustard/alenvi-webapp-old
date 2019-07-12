@@ -15,6 +15,7 @@ import {
   EVERY_DAY,
   EVERY_WEEK_DAY,
   EVERY_WEEK,
+  EVERY_TWO_WEEKS,
   INVOICED_AND_PAYED,
   INVOICED_AND_NOT_PAYED,
   CUSTOMER_INITIATIVE,
@@ -175,6 +176,7 @@ export const planningModalMixin = {
         { label: 'Tous les jours', value: EVERY_DAY },
         { label: 'Tous les jours de la semaine (lundi au vendredi)', value: EVERY_WEEK_DAY },
         { label: oneDayRepetitionLabel, value: EVERY_WEEK },
+        { label: 'Toutes les 2 semaines', value: EVERY_TWO_WEEKS },
       ];
     },
     addressError () {
