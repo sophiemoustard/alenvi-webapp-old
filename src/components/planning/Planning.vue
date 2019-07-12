@@ -19,7 +19,7 @@
               <div class="days-name q-mr-md">{{ day.name }}</div>
               <div :class="['days-number', { 'current-day': isCurrentDay(day.moment) }]">{{ day.number }}</div>
             </div>
-            <div class="planning-background">
+            <div class="planning-background" v-if="staffingView">
               <template v-for="(hour, hourIndex) in hours">
                 <div class="planning-hour" v-if="hourIndex !== 0"  :key="`hour_${hourIndex}`"
                   :style="{ left: `${(hourIndex * hourWidth * 2) - 3}%` }">{{ hour.format('H') }}</div>
