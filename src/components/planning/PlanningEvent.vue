@@ -1,11 +1,12 @@
 <template>
-  <div v-if="displayStaffingView" :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event, $event)" @click.stop="editEvent(event._id)"
-    :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-sm']"
-    :style="{ left: `${STAFFING_PERCENTAGE_BY_MINUTES * event.staffingLeft}%`, width: `${STAFFING_PERCENTAGE_BY_MINUTES * event.staffingWidth}%` }">
+  <div v-if="displayStaffingView" :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event, $event)"
+    @click.stop="editEvent(event._id)" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-sm']"
+    :style="getEventStyleForStaffing(event)">
     <div class="event-container">
       <div class="event-title">
-        <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap" :style="{ 'font-size': '0.5 rem' }">
-          {{ event.customer.identity.lastname.trim().toUpperCase() }}</p>
+        <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap"
+          :style="{ 'font-size': '0.5 rem' }">
+          {{ eventTitleForStaffing(event) }}</p>
       </div>
     </div>
   </div>
@@ -53,6 +54,12 @@ export default {
     }
   },
   methods: {
+    getEventStyleForStaffing (event) {
+      return {
+        left: `${STAFFING_PERCENTAGE_BY_MINUTES * event.staffingLeft}%`,
+        width: `${STAFFING_PERCENTAGE_BY_MINUTES * event.staffingWidth}%`,
+      };
+    },
     drag (event, nativeEvent) {
       nativeEvent.dataTransfer.setData('text', ''); // Mandatory on Firefox
       this.$emit('drag', event);

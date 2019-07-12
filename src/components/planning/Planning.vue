@@ -21,7 +21,7 @@
             </div>
             <div class="planning-background" v-if="staffingView">
               <template v-for="(hour, hourIndex) in hours">
-                <div class="planning-hour" v-if="hourIndex !== 0"  :key="`${hourIndex}`"
+                <div class="planning-hour" v-if="hourIndex !== 0"  :key="hourIndex"
                   :style="{ left: `${(hourIndex * hourWidth * 2) - 3}%` }">{{ hour.format('H') }}</div>
               </template>
             </div>
