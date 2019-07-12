@@ -51,25 +51,26 @@
           </div>
         </div>
         <ni-modal-select v-model="newUser.identity.title" :error="$v.newUser.identity.title.$error" :options="civilityOptions"
-          caption="Civilité" @blur="$v.newUser.identity.title.$touch" required-field />
+          caption="Civilité" @blur="$v.newUser.identity.title.$touch" />
         <ni-modal-input v-model="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error" caption="Nom"
           @blur="$v.newUser.identity.lastname.$touch" required-field />
         <ni-modal-input v-model="newUser.identity.firstname" :error="$v.newUser.identity.firstname.$error" caption="Prénom"
           @blur="$v.newUser.identity.firstname.$touch" required-field />
         <ni-modal-input v-model="newUser.mobilePhone" :error="$v.newUser.mobilePhone.$error" caption="Numéro de téléphone"
           @blur="$v.newUser.mobilePhone.$touch" :error-label="mobilePhoneError" required-field />
-        <ni-search-address v-model="newUser.contact.address.fullAddress" color="white" inverted-light @selected="selectedAddress"
-          :error-label="addressError" :error="$v.newUser.contact.address.fullAddress.$error" required-field in-modal />
         <ni-modal-input v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email" @blur="$v.newUser.local.email.$touch"
           :error-label="emailError" required-field />
+        <ni-search-address v-model="newUser.contact.address.fullAddress" color="white" inverted-light @selected="selectedAddress"
+          :error-label="addressError" :error="$v.newUser.contact.address.fullAddress.$error" in-modal />
         <div class="row margin-input">
           <div class="col-12">
             <div class="row justify-between">
-              <p class="input-caption required">Communauté</p>
+              <p class="input-caption">Communauté</p>
               <q-icon v-if="$v.newUser.sector.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newUser.sector.$error" :error-label="REQUIRED_LABEL">
-              <ni-select-sector v-model="newUser.sector" @blur="$v.newUser.sector.$touch" in-modal :company-id="company._id" />
+              <ni-select-sector v-model="newUser.sector" @blur="$v.newUser.sector.$touch" in-modal :company-id="company._id"
+                allowNullOption />
             </q-field>
           </div>
         </div>
@@ -89,7 +90,6 @@
 import { required, email, maxLength } from 'vuelidate/lib/validators';
 import randomize from 'randomatic';
 import { frPhoneNumber, frAddress } from '../../../helpers/vuelidateCustomVal';
-import { clear } from '../../../helpers/utils.js';
 import { userProfileValidation } from '../../../helpers/userProfileValidation';
 import { taskValidation } from '../../../helpers/taskValidation';
 import SelectSector from '../../../components/form/SelectSector';
@@ -119,11 +119,11 @@ export default {
         { label: 'Monsieur', value: 'M.' },
         { label: 'Madame', value: 'Mme' },
       ],
-      newUser: {
+      defaultNewUser: {
         identity: {
           lastname: '',
           firstname: '',
-          title: '',
+          title: null,
         },
         contact: {
           address: { fullAddress: '' },
@@ -131,11 +131,12 @@ export default {
         mobilePhone: '',
         local: { email: '', password: '' },
         company: '',
-        sector: '',
+        sector: null,
         administrative: {
           transportInvoice: { transportType: 'public' },
         },
       },
+      newUser: null,
       userList: [],
       searchStr: '',
       activeUsers: true,
@@ -218,7 +219,7 @@ export default {
       identity: {
         lastname: { required },
         firstname: { required },
-        title: { required },
+        title: {},
       },
       mobilePhone: {
         required,
@@ -227,14 +228,17 @@ export default {
       },
       contact: {
         address: {
-          fullAddress: { required, frAddress },
+          fullAddress: { frAddress },
         },
       },
       local: {
         email: { required, email },
       },
-      sector: { required },
+      sector: {},
     },
+  },
+  created () {
+    this.newUser = this.$_.cloneDeep(this.defaultNewUser);
   },
   mounted () {
     this.getUserList();
@@ -360,15 +364,22 @@ export default {
     },
     resetForm () {
       this.$v.newUser.$reset();
-      this.newUser = Object.assign({}, clear(this.newUser));
+      this.newUser = this.$_.cloneDeep(this.defaultNewUser);
     },
     async createAlenviUser () {
-      this.newUser.local.password = randomize('*', 10);
+      const userFormValue = this.$_.cloneDeep(this.newUser);
+
+      userFormValue.local.password = randomize('*', 10);
       const roles = await this.$roles.showAll({ name: AUXILIARY });
       if (roles.length === 0) throw new Error('Role not found');
-      this.newUser.role = roles[0]._id;
-      this.newUser.company = this.company._id;
-      const newUser = await this.$users.create(this.newUser);
+      userFormValue.role = roles[0]._id;
+      userFormValue.company = this.company._id;
+
+      if (!userFormValue.sector) delete userFormValue.sector;
+      if (!userFormValue.identity.title) delete userFormValue.identity.title;
+      if (!userFormValue.contact.address.fullAddress) delete userFormValue.contact.address;
+
+      const newUser = await this.$users.create(userFormValue);
       await this.$users.createDriveFolder({ _id: newUser._id });
       return newUser;
     },
