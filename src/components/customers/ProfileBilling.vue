@@ -12,6 +12,9 @@
         <q-btn class="add-payment" label="Ajouter un réglement" @click="openPaymentCreationModal(customer)"
           no-caps flat color="white" icon="add" />
       </div>
+    <span v-if="user.role.name === HELPER && !loading" class="message">
+      Si vous souhaitez obtenir une facture non disponible sur cette page, adressez un email à support@alenvi.io.
+    </span>
     </div>
     <template v-for="(tpp, index) in Object.keys(tppBillingDocuments)">
       <div class="q-pa-sm q-mb-lg" :key="index">
@@ -41,7 +44,7 @@
 
 <script>
 import { required } from 'vuelidate/lib/validators';
-import { CREDIT_NOTE, BILL, DIRECT_DEBIT, BANK_TRANSFER, CHECK, CESU, REFUND, ADMIN, COACH, CUSTOMER, THIRD_PARTY_PAYER } from '../../data/constants';
+import { CREDIT_NOTE, BILL, DIRECT_DEBIT, BANK_TRANSFER, CHECK, CESU, REFUND, ADMIN, COACH, CUSTOMER, THIRD_PARTY_PAYER, HELPER } from '../../data/constants';
 import CustomerBillingTable from '../../components/customers/CustomerBillingTable';
 import PaymentCreationModal from '../../components/customers/PaymentCreationModal';
 import PaymentEditionModal from '../../components/customers/PaymentEditionModal';
@@ -73,6 +76,7 @@ export default {
       CUSTOMER,
       THIRD_PARTY_PAYER,
       editedPayment: {},
+      HELPER,
     }
   },
   computed: {
@@ -291,11 +295,14 @@ export default {
     background-color: $primary;
 
   .text-weight-bold
-    color: $primary
+    color: $primary;
 
   .title
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: flex-end;
+
+  .message
+    font-style: italic;
 </style>
