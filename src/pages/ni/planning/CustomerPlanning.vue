@@ -73,10 +73,14 @@
           <div class="row q-mb-md light-checkbox">
             <q-checkbox v-model="editedEvent.isCancelled" label="Annuler l'évènement" @input="toggleCancellationForm" />
           </div>
-          <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.condition" caption="Conditions"
-            :options="cancellationConditions" required-field @blur="$v.editedEvent.cancel.condition.$touch" />
-          <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.reason" caption="Motif"
-            :options="cancellationReasons" required-field @blur="$v.editedEvent.cancel.reason.$touch" />
+          <div class="row justify-between">
+            <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.condition" caption="Conditions"
+              :options="cancellationConditions" required-field @blur="$v.editedEvent.cancel.condition.$touch"
+              class="col-6 cancel" />
+            <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.reason" caption="Motif"
+              :options="cancellationReasons" required-field @blur="$v.editedEvent.cancel.reason.$touch"
+              class="col-6 cancel" />
+          </div>
         </template>
       </div>
       <div class="customer-info">
@@ -585,5 +589,8 @@ export default {
   .light-checkbox
     color: $grey
     font-size: 14px
+
+  .cancel
+    padding-right: 3px;
 
 </style>
