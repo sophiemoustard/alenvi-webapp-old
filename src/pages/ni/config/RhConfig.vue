@@ -152,7 +152,7 @@
           </div>
         </div>
         <ni-modal-input caption="Nom" v-model="newInternalHour.name" :error="$v.newInternalHour.name.$error"
-          @blur="$v.newInternalHour.name.$touch" />
+          @blur="$v.newInternalHour.name.$touch" required-field />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer l'heure interne" icon-right="add" color="primary"
         :loading="loading" @click="createInternalHour" />
