@@ -57,7 +57,7 @@
         <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" disable-end-date
           :disable="isDisabled" />
         <ni-modal-select caption="Auxiliaire" v-model="editedEvent.auxiliary" :options="auxiliariesOptions"
-          :error="$v.editedEvent.auxiliary.$error" required-field :disable="isDisabled" />
+          :error="$v.editedEvent.sector.$error" required-field :disable="isDisabled" />
         <ni-modal-select caption="Service" v-model="editedEvent.subscription" required-field :disable="isDisabled"
           :options="customerSubscriptionsOptions(editedEvent.customer._id)"
           :error="$v.editedEvent.subscription.$error" @blur="$v.editedEvent.subscription.$touch" />
@@ -174,7 +174,7 @@ export default {
           startDate: { required },
           endDate: { required },
         },
-        auxiliary: { required },
+        sector: { required },
         customer: { required },
         subscription: { required },
         location: { fullAddress: { frAddress } },
@@ -365,8 +365,10 @@ export default {
         if (subscription && subscription.service) payload.status = subscription.service.type;
       }
 
-      const auxiliary = this.auxiliaries.find(aux => aux._id === event.auxiliary);
-      payload.sector = auxiliary.sector._id;
+      if (event.auxiliary) {
+        const auxiliary = this.auxiliaries.find(aux => aux._id === event.auxiliary);
+        payload.sector = auxiliary.sector._id;
+      }
 
       payload.startDate = this.$moment(event.dates.startDate).hours(event.dates.startHour.split(':')[0])
         .minutes(event.dates.startHour.split(':')[1]).toISOString();

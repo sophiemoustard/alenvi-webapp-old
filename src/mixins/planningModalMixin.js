@@ -112,7 +112,7 @@ export const planningModalMixin = {
           return !this.editedEvent.auxiliary || !this.editedEvent.absence || !this.editedEvent.dates.startDate ||
             !this.editedEvent.absenceNature || !this.editedEvent.dates.startHour || !this.editedEvent.dates.endHour;
         case INTERVENTION:
-          const shouldDisableButton = (this.personKey === CUSTOMER && !this.editedEvent.auxiliary) ||
+          const shouldDisableButton = (this.personKey === CUSTOMER && !this.editedEvent.sector) ||
             !this.editedEvent.subscription || !this.editedEvent.dates.startDate ||
             !this.editedEvent.dates.endDate || !this.editedEvent.dates.startHour || !this.editedEvent.dates.endHour;
           if (this.editedEvent.isCancelled) return shouldDisableButton || !this.editedEvent.cancel.condition || !this.editedEvent.cancel.reason;
@@ -138,7 +138,13 @@ export const planningModalMixin = {
       return EVENT_TYPES;
     },
     auxiliariesOptions () {
-      return this.activeAuxiliaries.length === 0 ? [] : [
+      if (this.activeAuxiliaries.length === 0) return [];
+
+      if (this.personKey === CUSTOMER && this.creationModal) {
+        return this.activeAuxiliaries.map(aux => this.formatPersonOptions(aux));
+      }
+
+      return [
         { label: 'À affecter', value: '' },
         ...this.activeAuxiliaries.map(aux => this.formatPersonOptions(aux)),
       ];
