@@ -10,7 +10,7 @@
           </div>
           <q-select v-else v-model="editedEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions"
             :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
-            :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`"
+            :filter-placeholder="auxiliaryFilterPlaceholder"
             :disable="isDisabled" ref="auxiliarySelect" filter />
         </div>
         <div class="col-1 cursor-pointer modal-btn-close">
@@ -102,6 +102,7 @@
 <script>
 import { DEFAULT_AVATAR, INTERVENTION, AUXILIARY } from '../../data/constants';
 import { planningModalMixin } from '../../mixins/planningModalMixin';
+import { formatFullIdentity } from '../../helpers/utils';
 
 export default {
   name: 'AuxiliaryEventEditionModal',
@@ -135,6 +136,11 @@ export default {
     },
     isDisabled () {
       return this.editedEvent.type === INTERVENTION && this.editedEvent.isBilled;
+    },
+    auxiliaryFilterPlaceholder () {
+      return this.selectedAuxiliary.identity
+        ? formatFullIdentity(this.selectedAuxiliary.identity)
+        : 'À affecter';
     },
   },
   methods: {
