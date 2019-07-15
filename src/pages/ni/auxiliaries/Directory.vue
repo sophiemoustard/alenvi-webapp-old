@@ -65,12 +65,11 @@
         <div class="row margin-input">
           <div class="col-12">
             <div class="row justify-between">
-              <p class="input-caption">Communauté</p>
+              <p class="input-caption required">Communauté</p>
               <q-icon v-if="$v.newUser.sector.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newUser.sector.$error" :error-label="REQUIRED_LABEL">
-              <ni-select-sector v-model="newUser.sector" @blur="$v.newUser.sector.$touch" in-modal :company-id="company._id"
-                allowNullOption />
+              <ni-select-sector v-model="newUser.sector" @blur="$v.newUser.sector.$touch" in-modal :company-id="company._id" />
             </q-field>
           </div>
         </div>
@@ -234,7 +233,7 @@ export default {
       local: {
         email: { required, email },
       },
-      sector: {},
+      sector: { required },
     },
   },
   created () {
@@ -375,7 +374,6 @@ export default {
       userFormValue.role = roles[0]._id;
       userFormValue.company = this.company._id;
 
-      if (!userFormValue.sector) delete userFormValue.sector;
       if (!userFormValue.identity.title) delete userFormValue.identity.title;
       if (!userFormValue.contact.address.fullAddress) delete userFormValue.contact.address;
 
