@@ -51,8 +51,8 @@
           </div>
         </div>
         <div class="modal-subtitle">
-          <q-btn icon="delete" no-caps @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()"
-            v-if="!isDisabled" color="grey" flat />
+          <q-btn icon="delete" no-caps flat color="grey"  v-if="!isDisabled"
+            @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" />
         </div>
         <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" disable-end-date
           :disable="isDisabled" />
