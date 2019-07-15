@@ -3,7 +3,8 @@
     <div class="row col-xs-12 q-mb-md">
       <div :class="[customer ? 'col-xs-12': 'col-xs-8', 'row', 'items-baseline', 'col-md-10']">
         <div class="row">
-          <q-icon v-if="isExternalUser" class="on-left cursor-pointer self-center" size="1rem" name="arrow_back" color="primary" @click.native="$router.go(-1)" />
+          <q-icon v-if="isExternalUser" class="on-left cursor-pointer self-center" size="1rem" name="arrow_back"
+            color="primary" @click.native="$router.go(-1)" />
           <h4>{{ user.identity.firstname }} {{ user.identity.lastname }}</h4>
         </div>
       </div>
@@ -48,10 +49,11 @@
             <span><q-icon name="clear" @click.native="opened = false" /></span>
           </div>
         </div>
-        <ni-modal-select caption="Modèle" :options="typeMessageOptions" v-model="typeMessage" />
-        <ni-modal-input caption="Message" v-model="messageComp" type="textarea" :rows="7" />
+        <ni-modal-select caption="Modèle" :options="typeMessageOptions" v-model="typeMessage" required-field />
+        <ni-modal-input caption="Message" v-model="messageComp" type="textarea" :rows="7" required-field />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary" :loading="loading" @click.native="sendMessage" />
+      <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary"
+        :loading="loading" @click.native="sendMessage" />
     </q-modal>
   </div>
 </template>
@@ -84,8 +86,6 @@ export default {
         { label: 'Autres', value: 'Autres' },
       ],
     }
-  },
-  mounted () {
   },
   computed: {
     ...mapGetters({

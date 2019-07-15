@@ -18,17 +18,21 @@
               <q-icon name="clear" @click.native="creationModal = false" /></span>
           </div>
         </div>
-        <ni-datetime-range caption="Dates et heures de l'intervention" v-model="newEvent.dates" required-field disable-end-date />
-        <ni-modal-select caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions" :error="$v.newEvent.auxiliary.$error"
-          required-field @blur="$v.newEvent.auxiliary.$touch" @input="toggleServiceSelection(newEvent.customer)" />
-        <ni-modal-select caption="Service" v-model="newEvent.subscription" :options="customerSubscriptionsOptions(newEvent.customer)"
-          :error="$v.newEvent.subscription.$error" required-field @blur="$v.newEvent.subscription.$touch" />
-        <ni-modal-select caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency" :options="repetitionOptions"
-          required-field @blur="$v.newEvent.repetition.frequency.$touch" :disable="!isRepetitionAllowed" />
+        <ni-datetime-range caption="Dates et heures de l'intervention" v-model="newEvent.dates" required-field
+          disable-end-date />
+        <ni-modal-select caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions"
+          :error="$v.newEvent.auxiliary.$error" required-field @blur="$v.newEvent.auxiliary.$touch"
+          @input="toggleServiceSelection(newEvent.customer)" />
+        <ni-modal-select caption="Service" v-model="newEvent.subscription" :error="$v.newEvent.subscription.$error"
+          :options="customerSubscriptionsOptions(newEvent.customer)" required-field
+          @blur="$v.newEvent.subscription.$touch" />
+        <ni-modal-select caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency"
+          :options="repetitionOptions" required-field @blur="$v.newEvent.repetition.frequency.$touch"
+          :disable="!isRepetitionAllowed" />
         <ni-modal-input v-model="newEvent.misc" caption="Notes" />
       </div>
-      <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary" @click="createEvent"
-        :disable="disableCreationButton" icon-right="add" />
+      <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary"
+        @click="createEvent" :disable="disableCreationButton" icon-right="add" />
     </q-modal>
 
     <!-- Event edition modal -->
@@ -47,28 +51,36 @@
           </div>
         </div>
         <div class="modal-subtitle">
-          <q-btn icon="delete" no-caps flat color="grey" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()"
-            v-if="!isDisabled" />
+          <q-btn icon="delete" no-caps @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()"
+            v-if="!isDisabled" color="grey" flat />
         </div>
-        <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" :disable="isDisabled" disable-end-date />
+        <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" disable-end-date
+          :disable="isDisabled" />
         <ni-modal-select caption="Auxiliaire" v-model="editedEvent.auxiliary" :options="auxiliariesOptions"
           :error="$v.editedEvent.auxiliary.$error" required-field :disable="isDisabled" />
-        <ni-modal-select caption="Service" v-model="editedEvent.subscription" :options="customerSubscriptionsOptions(editedEvent.customer._id)"
-          :error="$v.editedEvent.subscription.$error" @blur="$v.editedEvent.subscription.$touch" :disable="isDisabled" />
+        <ni-modal-select caption="Service" v-model="editedEvent.subscription" required-field :disable="isDisabled"
+          :options="customerSubscriptionsOptions(editedEvent.customer._id)"
+          :error="$v.editedEvent.subscription.$error" @blur="$v.editedEvent.subscription.$touch" />
         <template v-if="isRepetition(editedEvent) && !isDisabled">
           <div class="row q-mb-md light-checkbox">
-            <q-checkbox v-model="editedEvent.shouldUpdateRepetition" label="Appliquer à la répétition" @input="toggleRepetition" />
+            <q-checkbox v-model="editedEvent.shouldUpdateRepetition" label="Appliquer à la répétition"
+              @input="toggleRepetition" />
           </div>
         </template>
-        <ni-modal-input v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes" :disable="isDisabled" />
+        <ni-modal-input v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes"
+          :disable="isDisabled" />
         <template v-if="!editedEvent.shouldUpdateRepetition && !isDisabled">
           <div class="row q-mb-md light-checkbox">
             <q-checkbox v-model="editedEvent.isCancelled" label="Annuler l'évènement" @input="toggleCancellationForm" />
           </div>
-          <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.condition" caption="Conditions"
-            :options="cancellationConditions" required-field @blur="$v.editedEvent.cancel.condition.$touch" />
-          <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.reason" caption="Motif" :options="cancellationReasons"
-            required-field @blur="$v.editedEvent.cancel.reason.$touch" />
+          <div class="row justify-between">
+            <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.condition" caption="Conditions"
+              :options="cancellationConditions" required-field @blur="$v.editedEvent.cancel.condition.$touch"
+              class="col-6 cancel" />
+            <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.reason" caption="Motif"
+              :options="cancellationReasons" required-field @blur="$v.editedEvent.cancel.reason.$touch"
+              class="col-6 cancel" />
+          </div>
         </template>
       </div>
       <div class="customer-info">
@@ -577,5 +589,8 @@ export default {
   .light-checkbox
     color: $grey
     font-size: 14px
+
+  .cancel
+    padding-right: 3px;
 
 </style>
