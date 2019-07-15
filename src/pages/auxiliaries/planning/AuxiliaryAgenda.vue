@@ -12,7 +12,7 @@
           @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :viewMode="viewMode" @updateViewMode="updateViewMode"
           :type="AGENDA" />
       </div>
-      <agenda :events="events" :days="days" :personKey="personKey" @createEvent="openCreationModal" @editEvent="openEditionModal" />
+      <agenda :events="filteredEvents" :days="days" :personKey="personKey" @createEvent="openCreationModal" @editEvent="openEditionModal" />
     </div>
 
     <!-- Event creation modal -->
@@ -87,6 +87,9 @@ export default {
         label: `${aux.identity.firstname || ''} ${aux.identity.lastname}`,
         value: aux._id,
       }));
+    },
+    filteredEvents () {
+      return this.events.filter(ev => !ev.isCancelled);
     },
   },
   validations () {
