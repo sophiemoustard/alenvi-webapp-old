@@ -167,16 +167,19 @@ export const planningModalMixin = {
       }));
     },
     repetitionOptions () {
-      const oneDayRepetitionLabel = this.creationModal
+      const oneWeekRepetitionLabel = this.creationModal
         ? `Tous les ${this.$moment(this.newEvent.dates.startDate).format('dddd')}s`
         : 'Tous les lundis';
+      const twoWeeksRepetitionLabel = this.creationModal
+        ? `Le ${this.$moment(this.newEvent.dates.startDate).format('dddd')} une semaine sur deux`
+        : 'Le lundi une semaine sur deux';
 
       return [
         { label: 'Jamais', value: NEVER },
         { label: 'Tous les jours', value: EVERY_DAY },
         { label: 'Tous les jours de la semaine (lundi au vendredi)', value: EVERY_WEEK_DAY },
-        { label: oneDayRepetitionLabel, value: EVERY_WEEK },
-        { label: 'Toutes les 2 semaines', value: EVERY_TWO_WEEKS },
+        { label: oneWeekRepetitionLabel, value: EVERY_WEEK },
+        { label: twoWeeksRepetitionLabel, value: EVERY_TWO_WEEKS },
       ];
     },
     addressError () {
