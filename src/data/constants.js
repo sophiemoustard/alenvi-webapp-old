@@ -67,6 +67,7 @@ export const BILLING_DIRECT = 'direct';
 
 // AVATAR
 export const DEFAULT_AVATAR = 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/images/users/default_avatar.png';
+export const DEFAULT_UNKNOWN_AVATAR = 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1563288281/images/users/unknown_avatar.png';
 
 // REPETITION FREQUENCY
 export const NEVER = 'never';
