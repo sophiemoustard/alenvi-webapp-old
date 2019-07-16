@@ -29,10 +29,10 @@
         </thead>
         <tbody>
           <template v-if="!isCustomerPlanning && filteredSectors.length > 0">
-            <tr v-for="sector in filteredSectors" :key="sector._id" class="person-row">
+            <tr v-for="sector in filteredSectors" :key="sector._id" class="to-assign person-row">
               <td valign="top">
                 <div class="person-inner-cell">
-                  <div class="person-name overflow-hidden">À AFFECTER - {{ sector.label }}</div>
+                  <div class="person-name overflow-hidden">À AFFECTER {{ sector.label }}</div>
                 </div>
               </td>
               <td @drop="drop(day, sector)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
@@ -340,5 +340,8 @@ export default {
         padding-bottom: 2rem;
       @media screen and (min-width: 1025px)
         padding-bottom: 1rem;
+
+  .to-assign
+    background-color: rgba(253, 243, 229, 0.5);
 
 </style>
