@@ -57,7 +57,8 @@
         <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" disable-end-date
           :disable="isDisabled" />
         <ni-modal-select caption="Auxiliaire" v-model="editedEvent.auxiliary" :options="auxiliariesOptions"
-          :error="$v.editedEvent.sector.$error" required-field :disable="isDisabled" />
+          :error="$v.editedEvent.sector.$error" required-field :disable="isDisabled"
+          @blur="$v.editedEvent.sector.$touch" />
         <ni-modal-select caption="Service" v-model="editedEvent.subscription" required-field :disable="isDisabled"
           :options="customerSubscriptionsOptions(editedEvent.customer._id)"
           :error="$v.editedEvent.subscription.$error" @blur="$v.editedEvent.subscription.$touch" />
@@ -280,7 +281,7 @@ export default {
       if (!aux.contracts.length === 0) return false;
       if (!aux.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
       const companyContracts = aux.contracts.filter(ctr => ctr.status === COMPANY_CONTRACT);
-      if (!companyContracts || companyContracts.length === 0) return false;
+      if (companyContracts.length === 0) return false;
 
       return companyContracts.some(contract => !contract.endDate && contract.versions.some(version => version.isActive));
     },
@@ -288,7 +289,7 @@ export default {
       if (aux.contracts.length === 0) return false;
       if (!aux.contracts.some(contract => contract.status === CUSTOMER_CONTRACT)) return false;
       const customerContracts = aux.contracts.filter(ctr => ctr.customer === this.newEvent.customer);
-      if (!customerContracts || customerContracts.length === 0) return false;
+      if (customerContracts.length === 0) return false;
 
       return customerContracts.some(contract => !contract.endDate && contract.versions.some(version => version.isActive));
     },
