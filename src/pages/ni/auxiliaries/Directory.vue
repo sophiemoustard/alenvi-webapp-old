@@ -50,18 +50,18 @@
               <q-icon name="clear" @click.native="auxiliaryCreationModal = false" /></span>
           </div>
         </div>
-        <ni-modal-select v-model="newUser.identity.title" :error="$v.newUser.identity.title.$error" :options="civilityOptions"
-          caption="Civilité" @blur="$v.newUser.identity.title.$touch" required-field />
+        <ni-modal-select v-model="newUser.identity.title" :options="civilityOptions"
+          caption="Civilité" />
         <ni-modal-input v-model="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error" caption="Nom"
           @blur="$v.newUser.identity.lastname.$touch" required-field />
         <ni-modal-input v-model="newUser.identity.firstname" :error="$v.newUser.identity.firstname.$error" caption="Prénom"
           @blur="$v.newUser.identity.firstname.$touch" required-field />
         <ni-modal-input v-model="newUser.mobilePhone" :error="$v.newUser.mobilePhone.$error" caption="Numéro de téléphone"
           @blur="$v.newUser.mobilePhone.$touch" :error-label="mobilePhoneError" required-field />
-        <ni-search-address v-model="newUser.contact.address.fullAddress" color="white" inverted-light @selected="selectedAddress"
-          :error-label="addressError" :error="$v.newUser.contact.address.fullAddress.$error" required-field in-modal />
         <ni-modal-input v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email" @blur="$v.newUser.local.email.$touch"
           :error-label="emailError" required-field />
+        <ni-search-address v-model="newUser.contact.address.fullAddress" color="white" inverted-light @selected="selectedAddress"
+          :error-label="addressError" :error="$v.newUser.contact.address.fullAddress.$error" in-modal />
         <div class="row margin-input">
           <div class="col-12">
             <div class="row justify-between">
@@ -89,7 +89,6 @@
 import { required, email, maxLength } from 'vuelidate/lib/validators';
 import randomize from 'randomatic';
 import { frPhoneNumber, frAddress } from '../../../helpers/vuelidateCustomVal';
-import { clear } from '../../../helpers/utils.js';
 import { userProfileValidation } from '../../../helpers/userProfileValidation';
 import { taskValidation } from '../../../helpers/taskValidation';
 import SelectSector from '../../../components/form/SelectSector';
@@ -119,7 +118,7 @@ export default {
         { label: 'Monsieur', value: 'M.' },
         { label: 'Madame', value: 'Mme' },
       ],
-      newUser: {
+      defaultNewUser: {
         identity: {
           lastname: '',
           firstname: '',
@@ -131,11 +130,12 @@ export default {
         mobilePhone: '',
         local: { email: '', password: '' },
         company: '',
-        sector: '',
+        sector: null,
         administrative: {
           transportInvoice: { transportType: 'public' },
         },
       },
+      newUser: null,
       userList: [],
       searchStr: '',
       activeUsers: true,
@@ -218,7 +218,6 @@ export default {
       identity: {
         lastname: { required },
         firstname: { required },
-        title: { required },
       },
       mobilePhone: {
         required,
@@ -227,7 +226,7 @@ export default {
       },
       contact: {
         address: {
-          fullAddress: { required, frAddress },
+          fullAddress: { frAddress },
         },
       },
       local: {
@@ -235,6 +234,9 @@ export default {
       },
       sector: { required },
     },
+  },
+  created () {
+    this.newUser = this.$_.cloneDeep(this.defaultNewUser);
   },
   mounted () {
     this.getUserList();
@@ -360,15 +362,27 @@ export default {
     },
     resetForm () {
       this.$v.newUser.$reset();
-      this.newUser = Object.assign({}, clear(this.newUser));
+      this.newUser = this.$_.cloneDeep(this.defaultNewUser);
+    },
+    formatPayloadForUserCreation (roles) {
+      const payload = this.$_.cloneDeep(this.newUser);
+
+      payload.local.password = randomize('*', 10);
+      payload.role = roles[0]._id;
+      payload.company = this.company._id;
+
+      if (!payload.identity.title) delete payload.identity.title;
+      if (!payload.contact.address.fullAddress) delete payload.contact.address;
+
+      return payload;
     },
     async createAlenviUser () {
-      this.newUser.local.password = randomize('*', 10);
       const roles = await this.$roles.showAll({ name: AUXILIARY });
       if (roles.length === 0) throw new Error('Role not found');
-      this.newUser.role = roles[0]._id;
-      this.newUser.company = this.company._id;
-      const newUser = await this.$users.create(this.newUser);
+
+      const payload = this.formatPayloadForUserCreation(roles);
+
+      const newUser = await this.$users.create(payload);
       await this.$users.createDriveFolder({ _id: newUser._id });
       return newUser;
     },
