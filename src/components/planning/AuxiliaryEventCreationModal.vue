@@ -73,7 +73,7 @@
 </template>
 
 <script>
-import { ABSENCE, DEFAULT_AVATAR, INTERNAL_HOUR, INTERVENTION, HOURLY, UNJUSTIFIED, CUSTOMER_CONTRACT, COMPANY_CONTRACT, NEVER, AUXILIARY } from '../../data/constants';
+import { ABSENCE, INTERNAL_HOUR, INTERVENTION, HOURLY, UNJUSTIFIED, CUSTOMER_CONTRACT, COMPANY_CONTRACT, NEVER, AUXILIARY } from '../../data/constants';
 import { planningModalMixin } from '../../mixins/planningModalMixin';
 
 export default {
@@ -149,9 +149,6 @@ export default {
     },
   },
   methods: {
-    getAvatar (user) {
-      return user && user.picture && user.picture.link ? user.picture.link : DEFAULT_AVATAR;
-    },
     toggleAuxiliarySelect () {
       return this.$refs['auxiliarySelect'].show();
     },

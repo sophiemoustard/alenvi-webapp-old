@@ -33,6 +33,8 @@ import {
   COACH,
   EVENT_TYPES,
   CUSTOMER,
+  UNKNOWN_AVATAR,
+  DEFAULT_AVATAR,
 } from '../data/constants';
 
 export const planningModalMixin = {
@@ -201,6 +203,11 @@ export const planningModalMixin = {
     },
   },
   methods: {
+    getAvatar (user) {
+      if (!user || !user._id) return UNKNOWN_AVATAR;
+
+      return user && user.picture && user.picture.link ? user.picture.link : DEFAULT_AVATAR;
+    },
     formatPersonOptions (person) {
       return {
         label: formatFullIdentity(person.identity),

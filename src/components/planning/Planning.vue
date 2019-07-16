@@ -33,7 +33,7 @@
               <td valign="top">
                 <div class="person-inner-cell">
                   <div :class="[!staffingView && 'q-mb-md', 'chip-container']">
-                    <img :src="DEFAULT_UNKNOWN_AVATAR" class="avatar" >
+                    <img :src="UNKNOWN_AVATAR" class="avatar" >
                   </div>
                   <div class="person-name overflow-hidden">{{ sector.label }}</div>
                 </div>
@@ -89,7 +89,7 @@ import {
   SECTOR,
   STAFFING_VIEW_START_HOUR,
   STAFFING_VIEW_END_HOUR,
-  DEFAULT_UNKNOWN_AVATAR,
+  UNKNOWN_AVATAR,
 } from '../../data/constants';
 import { NotifyNegative } from '../popup/notify';
 import NiChipAuxiliaryIndicator from './ChipAuxiliaryIndicator';
@@ -131,7 +131,7 @@ export default {
       PLANNING,
       distanceMatrix: [],
       hourWidth: 100 / 12,
-      DEFAULT_UNKNOWN_AVATAR,
+      UNKNOWN_AVATAR,
     }
   },
   beforeDestroy () {
