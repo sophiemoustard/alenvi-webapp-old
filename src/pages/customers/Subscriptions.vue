@@ -263,7 +263,7 @@ export default {
       return this.$v.customer.payment.bic.bic && this.$v.customer.payment.iban.iban
     },
     docsUploadUrl () {
-      return this.customer.driveFolder ? `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.id}/upload` : '';
+      return this.customer.driveFolder ? `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.driveId}/upload` : '';
     },
     fundingVisibleColumns () {
       if (this.selectedFunding.nature === FIXED) {

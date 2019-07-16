@@ -275,7 +275,7 @@ export default {
       return !!templates.contractWithCustomerVersion && !!templates.contractWithCustomerVersion.driveId;
     },
     docsUploadUrl (contractId) {
-      return `${process.env.API_HOSTNAME}/contracts/${contractId}/gdrive/${this.user.administrative.driveFolder.id}/upload`;
+      return `${process.env.API_HOSTNAME}/contracts/${contractId}/gdrive/${this.user.administrative.driveFolder.driveId}/upload`;
     },
     uploadDocument (files, refName) {
       if (files[0].size > 5000000) {

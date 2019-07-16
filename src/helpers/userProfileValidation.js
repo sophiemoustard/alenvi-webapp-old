@@ -28,7 +28,7 @@ const userProfileSchema = Joi.object().keys({
   },
   administrative: Joi.object().keys({
     driveFolder: Joi.object().keys({
-      id: Joi.string(),
+      driveId: Joi.string(),
     }),
     emergencyContact: Joi.object().keys({
       name: Joi.string().required(),
