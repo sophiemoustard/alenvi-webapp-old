@@ -50,8 +50,8 @@
               <q-icon name="clear" @click.native="auxiliaryCreationModal = false" /></span>
           </div>
         </div>
-        <ni-modal-select v-model="newUser.identity.title" :error="$v.newUser.identity.title.$error" :options="civilityOptions"
-          caption="Civilité" @blur="$v.newUser.identity.title.$touch" />
+        <ni-modal-select v-model="newUser.identity.title" :options="civilityOptions"
+          caption="Civilité" />
         <ni-modal-input v-model="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error" caption="Nom"
           @blur="$v.newUser.identity.lastname.$touch" required-field />
         <ni-modal-input v-model="newUser.identity.firstname" :error="$v.newUser.identity.firstname.$error" caption="Prénom"
@@ -122,7 +122,7 @@ export default {
         identity: {
           lastname: '',
           firstname: '',
-          title: null,
+          title: '',
         },
         contact: {
           address: { fullAddress: '' },
@@ -218,7 +218,6 @@ export default {
       identity: {
         lastname: { required },
         firstname: { required },
-        title: {},
       },
       mobilePhone: {
         required,
@@ -365,19 +364,25 @@ export default {
       this.$v.newUser.$reset();
       this.newUser = this.$_.cloneDeep(this.defaultNewUser);
     },
-    async createAlenviUser () {
-      const userFormValue = this.$_.cloneDeep(this.newUser);
+    formatPayloadForUserCreation (roles) {
+      const payload = this.$_.cloneDeep(this.newUser);
 
-      userFormValue.local.password = randomize('*', 10);
+      payload.local.password = randomize('*', 10);
+      payload.role = roles[0]._id;
+      payload.company = this.company._id;
+
+      if (!payload.identity.title) delete payload.identity.title;
+      if (!payload.contact.address.fullAddress) delete payload.contact.address;
+
+      return payload;
+    },
+    async createAlenviUser () {
       const roles = await this.$roles.showAll({ name: AUXILIARY });
       if (roles.length === 0) throw new Error('Role not found');
-      userFormValue.role = roles[0]._id;
-      userFormValue.company = this.company._id;
 
-      if (!userFormValue.identity.title) delete userFormValue.identity.title;
-      if (!userFormValue.contact.address.fullAddress) delete userFormValue.contact.address;
+      const payload = this.formatPayloadForUserCreation(roles);
 
-      const newUser = await this.$users.create(userFormValue);
+      const newUser = await this.$users.create(payload);
       await this.$users.createDriveFolder({ _id: newUser._id });
       return newUser;
     },
