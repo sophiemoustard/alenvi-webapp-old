@@ -51,13 +51,14 @@
           </div>
         </div>
         <div class="modal-subtitle">
-          <q-btn icon="delete" no-caps @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()"
-            v-if="!isDisabled" color="grey" flat />
+          <q-btn icon="delete" no-caps flat color="grey"  v-if="!isDisabled"
+            @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" />
         </div>
         <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" disable-end-date
           :disable="isDisabled" />
         <ni-modal-select caption="Auxiliaire" v-model="editedEvent.auxiliary" :options="auxiliariesOptions"
-          :error="$v.editedEvent.auxiliary.$error" required-field :disable="isDisabled" />
+          :error="$v.editedEvent.sector.$error" required-field :disable="isDisabled"
+          @blur="$v.editedEvent.sector.$touch" />
         <ni-modal-select caption="Service" v-model="editedEvent.subscription" required-field :disable="isDisabled"
           :options="customerSubscriptionsOptions(editedEvent.customer._id)"
           :error="$v.editedEvent.subscription.$error" @blur="$v.editedEvent.subscription.$touch" />
@@ -174,7 +175,7 @@ export default {
           startDate: { required },
           endDate: { required },
         },
-        auxiliary: { required },
+        sector: { required },
         customer: { required },
         subscription: { required },
         location: { fullAddress: { frAddress } },
@@ -233,8 +234,8 @@ export default {
         if (!selectedCustomer) return true;
         const selectedSubscription = selectedCustomer.subscriptions.find(sub => sub._id === this.newEvent.subscription);
         if (!selectedSubscription) return true;
-        if (selectedSubscription.service.type === COMPANY_CONTRACT) return this.selectedAuxiliary.isCustomerContractValidForRepetition;
-        if (selectedSubscription.service.type === CUSTOMER_CONTRACT) return this.selectedAuxiliary.isCompanyContractValidForRepetition;
+        if (selectedSubscription.service.type === CUSTOMER_CONTRACT) return this.selectedAuxiliary.isCustomerContractValidForRepetition;
+        if (selectedSubscription.service.type === COMPANY_CONTRACT) return this.selectedAuxiliary.isCompanyContractValidForRepetition;
       }
       return true;
     },
@@ -276,20 +277,21 @@ export default {
           ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(selectedDay));
       });
     },
-    isCustomerContractValidForRepetition (aux) {
+    isCompanyContractValidForRepetition (aux) {
       if (!aux.contracts.length === 0) return false;
       if (!aux.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
-      const companyContract = aux.contracts.find(contract => contract.status === COMPANY_CONTRACT);
-      if (!companyContract) return false;
+      const companyContracts = aux.contracts.filter(ctr => ctr.status === COMPANY_CONTRACT);
+      if (companyContracts.length === 0) return false;
 
-      return !companyContract.endDate && companyContract.versions.some(version => version.isActive);
+      return companyContracts.some(contract => !contract.endDate && contract.versions.some(version => version.isActive));
     },
-    isCompanyContractValidForRepetition (aux) {
+    isCustomerContractValidForRepetition (aux) {
       if (aux.contracts.length === 0) return false;
       if (!aux.contracts.some(contract => contract.status === CUSTOMER_CONTRACT)) return false;
-      const correspContract = aux.contracts.find(ctr => ctr.customer === this.newEvent.customer);
-      if (!correspContract) return false;
-      return !correspContract.endDate && correspContract.versions.some(version => version.isActive);
+      const customerContracts = aux.contracts.filter(ctr => ctr.customer === this.newEvent.customer);
+      if (customerContracts.length === 0) return false;
+
+      return customerContracts.some(contract => !contract.endDate && contract.versions.some(version => version.isActive));
     },
     // Refresh data
     async refreshCustomers () {
@@ -365,8 +367,10 @@ export default {
         if (subscription && subscription.service) payload.status = subscription.service.type;
       }
 
-      const auxiliary = this.auxiliaries.find(aux => aux._id === event.auxiliary);
-      payload.sector = auxiliary.sector._id;
+      if (event.auxiliary) {
+        const auxiliary = this.auxiliaries.find(aux => aux._id === event.auxiliary);
+        payload.sector = auxiliary.sector._id;
+      }
 
       payload.startDate = this.$moment(event.dates.startDate).hours(event.dates.startHour.split(':')[0])
         .minutes(event.dates.startHour.split(':')[1]).toISOString();
