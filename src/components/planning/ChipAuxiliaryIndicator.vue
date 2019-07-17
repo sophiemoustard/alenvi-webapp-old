@@ -281,11 +281,11 @@ export default {
       let contractHours = 0;
       const contractDaysRange = Array.from(this.$moment.range(this.startOfWeekAsString, this.$moment(this.endOfWeek).subtract(1, 'd')).by('days')) // from m\Monday to Saturday
       for (const day of contractDaysRange) {
-        const absences = this.events.find(event =>
+        const absence = this.events.find(event =>
           event.type === ABSENCE &&
           day.isSameOrAfter(event.startDate, 'd') && day.isSameOrBefore(event.endDate, 'd')
         );
-        if (absences) continue;
+        if (absence) continue;
 
         const version = this.getContractVersionOnDay(day);
         if (!version) continue;
