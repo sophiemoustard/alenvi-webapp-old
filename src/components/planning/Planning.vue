@@ -8,7 +8,7 @@
         @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :type="PLANNING" />
     </div>
     <div class="planning-container full-width">
-      <table style="width: 100%" :class="[staffingView && 'staffing', 'planning-table']">
+      <table style="width: 100%" :class="[staffingView ? 'staffing' : 'non-staffing', 'planning-table']">
         <thead>
           <th>
             <q-btn v-if="!isCustomerPlanning" flat round icon="view_week" :color="staffingView ? 'primary' : ''"
@@ -333,5 +333,12 @@ export default {
     color: $light-grey;
     font-size: 12px;
     bottom: -3px;
+
+  .non-staffing
+    .planning-background
+      @media screen and (max-width: 1024px)
+        padding-bottom: 2rem;
+      @media screen and (min-width: 1025px)
+        padding-bottom: 1rem;
 
 </style>
