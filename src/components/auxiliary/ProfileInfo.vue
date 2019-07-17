@@ -654,7 +654,7 @@ export default {
     async emailErrorHandler (path) {
       try {
         NotifyNegative('Email déjà existant');
-        this.$_.set(this.user, path, this.tmpInput);
+        await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });
         await this.$nextTick();
         this.$refs[this.emailInputRef].select();
       } catch (e) {
