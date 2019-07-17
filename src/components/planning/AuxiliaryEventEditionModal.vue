@@ -100,7 +100,7 @@
 </template>
 
 <script>
-import { DEFAULT_AVATAR, INTERVENTION, AUXILIARY } from '../../data/constants';
+import { INTERVENTION, AUXILIARY } from '../../data/constants';
 import { planningModalMixin } from '../../mixins/planningModalMixin';
 import { formatFullIdentity } from '../../helpers/utils';
 
@@ -144,9 +144,6 @@ export default {
     },
   },
   methods: {
-    getAvatar (user) {
-      return user && user.picture && user.picture.link ? user.picture.link : DEFAULT_AVATAR;
-    },
     toggleAuxiliarySelect () {
       return this.$refs['auxiliarySelect'].show();
     },

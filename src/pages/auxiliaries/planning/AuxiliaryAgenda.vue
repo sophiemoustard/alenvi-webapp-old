@@ -39,7 +39,7 @@ import Agenda from '../../../components/Agenda';
 import PlanningNavigation from '../../../components/planning/PlanningNavigation';
 import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryEventCreationModal';
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
-import { DEFAULT_AVATAR, INTERVENTION, NEVER, AGENDA, WEEK_VIEW, THREE_DAYS_VIEW, ABSENCE, DAILY, HOURLY, INTERNAL_HOUR, ILLNESS, AUXILIARY } from '../../../data/constants';
+import { DEFAULT_AVATAR, INTERVENTION, NEVER, AGENDA, WEEK_VIEW, THREE_DAYS_VIEW, ABSENCE, DAILY, HOURLY, INTERNAL_HOUR, ILLNESS, AUXILIARY, UNKNOWN_AVATAR } from '../../../data/constants';
 import { planningTimelineMixin } from '../../../mixins/planningTimelineMixin';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { NotifyWarning } from '../../../components/popup/notify';
@@ -156,6 +156,8 @@ export default {
   },
   methods: {
     getAvatar (aux) {
+      if (!aux || !aux._id) return UNKNOWN_AVATAR;
+
       return aux.picture && aux.picture.link ? aux.picture.link : DEFAULT_AVATAR;
     },
     toggleAuxiliarySelect () {
