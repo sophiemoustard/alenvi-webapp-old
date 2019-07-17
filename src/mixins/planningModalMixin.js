@@ -206,7 +206,7 @@ export const planningModalMixin = {
     getAvatar (user) {
       if (!user || !user._id) return UNKNOWN_AVATAR;
 
-      return user && user.picture && user.picture.link ? user.picture.link : DEFAULT_AVATAR;
+      return this.$_.get(user, 'picture.link') || DEFAULT_AVATAR;
     },
     formatPersonOptions (person) {
       return {
