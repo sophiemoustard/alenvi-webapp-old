@@ -64,6 +64,9 @@ export default {
     focus () {
       return this.$refs[this.name].focus();
     },
+    select () {
+      return this.$refs[this.name].select();
+    },
   },
 }
 </script>

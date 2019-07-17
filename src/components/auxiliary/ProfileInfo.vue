@@ -93,7 +93,7 @@
           v-model.trim="user.mobilePhone" @blur="updateUser('mobilePhone')" @focus="saveTmp('mobilePhone')" />
         <div class="col-12 col-md-6 row items-center">
           <div class="col-xs-11">
-            <ni-input ref="emailInput" name="emailInput" caption="Adresse email" :error="$v.user.local.email.$error" :error-label="emailError" type="email" lower-case :disable="lock"
+            <ni-input :ref="emailInputRef" :name="emailInputRef" caption="Adresse email" :error="$v.user.local.email.$error" :error-label="emailError" type="email" lower-case :disable="lock"
               v-model.trim="user.local.email" @blur="updateUser('local.email')" @focus="saveTmp('local.email')"
               :display-input="!isAuxiliary" />
           </div>
@@ -321,6 +321,7 @@ export default {
   },
   data () {
     return {
+      emailInputRef: 'emailInput',
       lock: true,
       transportOptions: TRANSPORT_OPTIONS,
       requiredLabel: REQUIRED_LABEL,
@@ -635,11 +636,10 @@ export default {
     },
   },
   methods: {
-    toggleLock (ref) {
+    async toggleLock (ref) {
       this.lock = !this.lock;
-      this.$nextTick(() => {
-        if (!this.lock) this.$refs[ref].focus();
-      });
+      await this.$nextTick();
+      if (!this.lock) this.$refs[ref].focus();
     },
     mergeUser (value = null) {
       const args = [this.user, value];
@@ -651,9 +651,19 @@ export default {
     selectedAddress (item) {
       this.user.contact.address = Object.assign({}, this.user.contact.address, item);
     },
+    async emailErrorHandler (path) {
+      try {
+        NotifyNegative('Email déjà existant');
+        this.$_.set(this.user, path, this.tmpInput);
+        await this.$nextTick();
+        this.$refs[this.emailInputRef].select();
+      } catch (e) {
+        console.error(e);
+      }
+    },
     async updateUser (path) {
       try {
-        if (this.tmpInput === this.$_.get(this.user, path)) {
+        if (this.tmpInput === this.$_.get(this.user, path) && this.tmpInput !== '') {
           if (path === 'local.email') this.lock = true;
           return;
         }
@@ -668,6 +678,10 @@ export default {
         this.lock = true;
       } catch (e) {
         console.error(e);
+        if (e.status === 409) {
+          await this.emailErrorHandler(path);
+          return;
+        }
         NotifyNegative('Erreur lors de la modification');
       } finally {
         this.$store.commit('rh/saveUserProfile', this.user);
