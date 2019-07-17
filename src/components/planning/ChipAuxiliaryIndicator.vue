@@ -35,8 +35,18 @@
 
 <script>
 import AuxiliaryIndicators from '../AuxiliaryIndicators';
-import { DEFAULT_AVATAR, ABSENCE, INTERVENTION, INTERNAL_HOUR, TRANSIT, DRIVING, PUBLIC_TRANSPORT, WEEK_STATS,
-  MONTH_STATS, COMPANY_CONTRACT, DEATH, BIRTH, WEDDING, PAID_LEAVE} from '../../data/constants.js';
+import {
+  DEFAULT_AVATAR,
+  ABSENCE,
+  INTERVENTION,
+  INTERNAL_HOUR,
+  TRANSIT,
+  DRIVING,
+  PUBLIC_TRANSPORT,
+  WEEK_STATS,
+  MONTH_STATS,
+  COMPANY_CONTRACT,
+} from '../../data/constants.js';
 import googleMaps from '../../api/GoogleMaps';
 import { getPaidTransport } from '../../helpers/planning';
 
@@ -273,8 +283,7 @@ export default {
       for (const day of contractDaysRange) {
         const absences = this.events.find(event =>
           event.type === ABSENCE &&
-          day.isSameOrAfter(event.startDate, 'd') && day.isSameOrBefore(event.endDate, 'd') &&
-          [DEATH, BIRTH, WEDDING, PAID_LEAVE].includes(event.absence)
+          day.isSameOrAfter(event.startDate, 'd') && day.isSameOrBefore(event.endDate, 'd')
         );
         if (absences) continue;
 
