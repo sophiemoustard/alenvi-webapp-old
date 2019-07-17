@@ -91,9 +91,16 @@
       <div class="row gutter-profile">
         <ni-input caption="Numéro de téléphone" :error="$v.user.mobilePhone.$error" :error-label="phoneNbrError" type="tel"
           v-model.trim="user.mobilePhone" @blur="updateUser('mobilePhone')" @focus="saveTmp('mobilePhone')" />
-        <ni-input caption="Adresse email" :error="$v.user.local.email.$error" :error-label="emailError" type="email" lower-case disable
-          v-model.trim="user.local.email" @blur="updateUser(-'local.email')" @focus="saveTmp('local.email')"
-          :display-input="!isAuxiliary" />
+        <div class="col-12 col-md-6 row items-center">
+          <div class="col-xs-11">
+            <ni-input ref="emailInput" name="emailInput" caption="Adresse email" :error="$v.user.local.email.$error" :error-label="emailError" type="email" lower-case :disable="lock"
+              v-model.trim="user.local.email" @blur="updateUser('local.email')" @focus="saveTmp('local.email')"
+              :display-input="!isAuxiliary" />
+          </div>
+          <div class="col-xs-1 row justify-end cursor-pointer">
+            <q-icon size="1.5rem" :name="lockIcon" @click.native="toggleLock('emailInput')" />
+          </div>
+        </div>
         <ni-search-address v-model="user.contact.address.fullAddress" color="white" inverted-light @focus="saveTmp('contact.address.fullAddress')"
           @blur="updateUser('contact.address.fullAddress')" @selected="selectedAddress" :error-label="addressError"
           :error="$v.user.contact.address.fullAddress.$error"
@@ -314,6 +321,7 @@ export default {
   },
   data () {
     return {
+      lock: true,
       transportOptions: TRANSPORT_OPTIONS,
       requiredLabel: REQUIRED_LABEL,
       requiredDoc: 'Document requis',
@@ -608,6 +616,9 @@ export default {
     isAuxiliary () {
       return this.mainUser.role.name === AUXILIARY || this.mainUser.role.name === PLANNING_REFERENT;
     },
+    lockIcon () {
+      return this.lock ? 'lock' : 'lock_open';
+    },
   },
   async mounted () {
     const user = await this.$users.getById(this.currentUser._id);
@@ -624,6 +635,12 @@ export default {
     },
   },
   methods: {
+    toggleLock (ref) {
+      this.lock = !this.lock;
+      this.$nextTick(() => {
+        if (!this.lock) this.$refs[ref].focus();
+      });
+    },
     mergeUser (value = null) {
       const args = [this.user, value];
       this.user = Object.assign({}, extend(true, ...args));
@@ -636,7 +653,10 @@ export default {
     },
     async updateUser (path) {
       try {
-        if (this.tmpInput === this.$_.get(this.user, path)) return;
+        if (this.tmpInput === this.$_.get(this.user, path)) {
+          if (path === 'local.email') this.lock = true;
+          return;
+        }
         if (this.$_.get(this.$v.user, path)) {
           this.$_.get(this.$v.user, path).$touch();
           const isValid = await this.waitForValidation(this.$v.user, path);
@@ -645,6 +665,7 @@ export default {
         await this.updateAlenviUser(path);
 
         NotifyPositive('Modification enregistrée');
+        this.lock = true;
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la modification');
