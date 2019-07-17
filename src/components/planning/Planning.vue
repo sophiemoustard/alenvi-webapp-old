@@ -6,6 +6,7 @@
       </div>
       <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
         @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :type="PLANNING" />
+      <q-checkbox label="Filter toutes les communautés" :value="displayAllSectors" @input="toggleAllSectors" />
     </div>
     <div class="planning-container full-width">
       <table style="width: 100%" :class="[staffingView ? 'staffing' : 'non-staffing', 'planning-table']">
@@ -118,6 +119,7 @@ export default {
     filteredSectors: { type: Array, default: () => [] },
     personKey: { type: String, default: 'auxiliary' },
     canEdit: { type: Function, default: () => {} },
+    displayAllSectors: { type: Boolean, default: false },
   },
   data () {
     return {
@@ -148,6 +150,10 @@ export default {
     this.getTimelineHours();
     if (!this.isCustomerPlanning) await this.getDistanceMatrix();
   },
+  updated () {
+    console.timeEnd('toto');
+    console.time('toto');
+  },
   watch: {
     // Initial filter getter
     getFilter (val) {
@@ -171,6 +177,9 @@ export default {
     },
   },
   methods: {
+    toggleAllSectors (value) {
+      this.$emit('update:displayAllSectors', value);
+    },
     getTimelineHours () {
       const range = this.$moment.range(this.$moment().hours(STAFFING_VIEW_START_HOUR).minutes(0), this.$moment().hours(STAFFING_VIEW_END_HOUR).minutes(0));
       this.hours = Array.from(range.by('hours', { step: 2, excludeEnd: true }));
@@ -185,15 +194,14 @@ export default {
     },
     // Event display
     getCellEvents (cell, day) {
-      return this.events
-        .filter(event => {
-          const lineFilter = cell.type === SECTOR
-            ? !event.auxiliary && event.sector === cell._id
-            : event[this.personKey] && event[this.personKey]._id === cell._id;
-          const dayFilter = this.$moment(day).isBetween(event.startDate, event.endDate, 'day', '[]');
+      const lineEvents = this.events.find(group => group._id === cell._id);
+      if (!lineEvents || !lineEvents.events) return [];
 
-          return lineFilter && dayFilter && (!this.staffingView || !event.isCancelled)
-        })
+      return lineEvents.events
+        .filter(event =>
+          this.$moment(day).isBetween(event.startDate, event.endDate, 'day', '[]') &&
+          (!this.staffingView || !event.isCancelled)
+        )
         .map((event) => this.isCustomerPlanning ? event : this.getEventWithStyleInfo(event, day))
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
     },
