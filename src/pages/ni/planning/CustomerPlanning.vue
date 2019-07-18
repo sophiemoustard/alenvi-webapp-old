@@ -318,7 +318,7 @@ export default {
     },
     async refresh () {
       try {
-        this.events = await this.$events.list({
+        this.events = await this.$events.listByCustomers({
           startDate: this.$moment(this.startOfWeekAsString).toDate(),
           endDate: this.endOfWeek.toDate(),
           customer: this.customers.map(cus => cus._id),

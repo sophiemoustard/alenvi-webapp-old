@@ -6,7 +6,7 @@
       </div>
       <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
         @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :type="PLANNING" />
-      <q-checkbox label="Filter toutes les communautés" :value="displayAllSectors" @input="toggleAllSectors" />
+      <q-checkbox v-if="!isCustomerPlanning" label="Filter toutes les communautés" :value="displayAllSectors" @input="toggleAllSectors" />
     </div>
     <div class="planning-container full-width">
       <table style="width: 100%" :class="[staffingView ? 'staffing' : 'non-staffing', 'planning-table']">
