@@ -695,8 +695,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.status === 409) {
-          await this.emailErrorHandler(path);
-          return;
+          return this.emailErrorHandler(path);
         }
         NotifyNegative('Erreur lors de la modification');
       } finally {
