@@ -150,10 +150,6 @@ export default {
     this.getTimelineHours();
     if (!this.isCustomerPlanning) await this.getDistanceMatrix();
   },
-  updated () {
-    console.timeEnd('toto');
-    console.time('toto');
-  },
   watch: {
     // Initial filter getter
     getFilter (val) {
@@ -193,11 +189,13 @@ export default {
       this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
     },
     // Event display
-    getCellEvents (cell, day) {
-      const lineEvents = this.events.find(group => group._id === cell._id);
-      if (!lineEvents || !lineEvents.events) return [];
+    getLineEvents (line) {
+      const lineEvents = this.events.find(group => group._id === line._id);
 
-      return lineEvents.events
+      return (!lineEvents || !lineEvents.events) ? [] : lineEvents.events;
+    },
+    getCellEvents (cell, day) {
+      return this.getLineEvents(cell)
         .filter(event =>
           this.$moment(day).isBetween(event.startDate, event.endDate, 'day', '[]') &&
           (!this.staffingView || !event.isCancelled)
@@ -227,10 +225,8 @@ export default {
       return dayEvent;
     },
     getPersonEvents (person) {
-      return this.events.filter(event =>
-        (event[this.personKey] ? event[this.personKey]._id === person._id : false) &&
-        (this.isCustomerPlanning || !event.isCancelled || event.cancel.condition === INVOICED_AND_PAYED)
-      );
+      return this.getLineEvents(person).filter(event =>
+        (this.isCustomerPlanning || !event.isCancelled || event.cancel.condition === INVOICED_AND_PAYED));
     },
     // Drag & drop
     drag (event) {

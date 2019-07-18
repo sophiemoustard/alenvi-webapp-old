@@ -6,9 +6,7 @@ export default {
     return events.data.data.events;
   },
   async listByAuxiliaries (params = null) {
-    console.time('requete')
     const events = await alenviAxios.get(`${process.env.API_HOSTNAME}/events/auxiliaries`, { params });
-    console.timeEnd('requete')
     return events.data.data.events;
   },
   async listForCreditNotes (params = null) {
