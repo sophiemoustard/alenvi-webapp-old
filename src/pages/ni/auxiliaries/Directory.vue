@@ -50,18 +50,18 @@
               <q-icon name="clear" @click.native="auxiliaryCreationModal = false" /></span>
           </div>
         </div>
-        <ni-modal-select v-model="newUser.identity.title" :error="$v.newUser.identity.title.$error" :options="civilityOptions"
-          caption="Civilité" @blur="$v.newUser.identity.title.$touch" required-field />
+        <ni-modal-select v-model="newUser.identity.title" :options="civilityOptions"
+          caption="Civilité" />
         <ni-modal-input v-model="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error" caption="Nom"
           @blur="$v.newUser.identity.lastname.$touch" required-field />
         <ni-modal-input v-model="newUser.identity.firstname" :error="$v.newUser.identity.firstname.$error" caption="Prénom"
           @blur="$v.newUser.identity.firstname.$touch" required-field />
         <ni-modal-input v-model="newUser.mobilePhone" :error="$v.newUser.mobilePhone.$error" caption="Numéro de téléphone"
           @blur="$v.newUser.mobilePhone.$touch" :error-label="mobilePhoneError" required-field />
-        <ni-search-address v-model="newUser.contact.address.fullAddress" color="white" inverted-light @selected="selectedAddress"
-          :error-label="addressError" :error="$v.newUser.contact.address.fullAddress.$error" required-field in-modal />
         <ni-modal-input v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email" @blur="$v.newUser.local.email.$touch"
           :error-label="emailError" required-field />
+        <ni-search-address v-model="newUser.contact.address.fullAddress" color="white" inverted-light @selected="selectedAddress"
+          :error-label="addressError" :error="$v.newUser.contact.address.fullAddress.$error" in-modal />
         <div class="row margin-input">
           <div class="col-12">
             <div class="row justify-between">
@@ -89,7 +89,6 @@
 import { required, email, maxLength } from 'vuelidate/lib/validators';
 import randomize from 'randomatic';
 import { frPhoneNumber, frAddress } from '../../../helpers/vuelidateCustomVal';
-import { clear } from '../../../helpers/utils.js';
 import { userProfileValidation } from '../../../helpers/userProfileValidation';
 import { taskValidation } from '../../../helpers/taskValidation';
 import SelectSector from '../../../components/form/SelectSector';
@@ -106,7 +105,7 @@ export default {
     'ni-select-sector': SelectSector,
     'ni-modal-input': ModalInput,
     'ni-modal-select': ModalSelect,
-    'ni-search-address': SearchAddress
+    'ni-search-address': SearchAddress,
   },
   mixins: [validationMixin],
   data () {
@@ -117,9 +116,9 @@ export default {
       sendWelcomeMsg: true,
       civilityOptions: [
         { label: 'Monsieur', value: 'M.' },
-        { label: 'Madame', value: 'Mme' }
+        { label: 'Madame', value: 'Mme' },
       ],
-      newUser: {
+      defaultNewUser: {
         identity: {
           lastname: '',
           firstname: '',
@@ -131,11 +130,12 @@ export default {
         mobilePhone: '',
         local: { email: '', password: '' },
         company: '',
-        sector: '',
+        sector: null,
         administrative: {
           transportInvoice: { transportType: 'public' },
         },
       },
+      newUser: null,
       userList: [],
       searchStr: '',
       activeUsers: true,
@@ -143,7 +143,7 @@ export default {
         sortBy: 'startDate',
         descending: true,
         page: 1,
-        rowsPerPage: 15
+        rowsPerPage: 15,
       },
       columns: [
         {
@@ -157,7 +157,7 @@ export default {
             const bArr = b.name.split(' ');
             return aArr[aArr.length - 1].toLowerCase() < bArr[bArr.length - 1].toLowerCase() ? -1 : 1
           },
-          style: 'width: 450px'
+          style: 'width: 450px',
         },
         {
           name: 'profileErrors',
@@ -181,7 +181,7 @@ export default {
           sortable: true,
           format: (value) => this.$moment(value).format('DD/MM/YYYY'),
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
-          style: 'width: 170px'
+          style: 'width: 170px',
         },
         {
           name: 'hiringDate',
@@ -191,7 +191,7 @@ export default {
           sortable: true,
           format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : null,
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
-          style: 'width: 170px'
+          style: 'width: 170px',
         },
         {
           name: 'team',
@@ -199,7 +199,7 @@ export default {
           field: 'sector',
           align: 'left',
           sortable: true,
-          style: 'width: 170px'
+          style: 'width: 170px',
         },
         {
           name: 'active',
@@ -207,8 +207,8 @@ export default {
           field: 'isActive',
           align: 'right',
           sortable: false,
-          style: 'width: 30px'
-        }
+          style: 'width: 30px',
+        },
       ],
       REQUIRED_LABEL,
     }
@@ -218,23 +218,25 @@ export default {
       identity: {
         lastname: { required },
         firstname: { required },
-        title: { required },
       },
       mobilePhone: {
         required,
         frPhoneNumber,
-        maxLength: maxLength(10)
+        maxLength: maxLength(10),
       },
       contact: {
         address: {
-          fullAddress: { required, frAddress }
+          fullAddress: { frAddress },
         },
       },
       local: {
-        email: { required, email }
+        email: { required, email },
       },
       sector: { required },
-    }
+    },
+  },
+  created () {
+    this.newUser = this.$_.cloneDeep(this.defaultNewUser);
   },
   mounted () {
     this.getUserList();
@@ -315,19 +317,19 @@ export default {
             this.$store.commit('rh/saveNotification', {
               type: 'profiles',
               _id: user._id,
-              exists: !!checkProfileErrors.error
+              exists: !!checkProfileErrors.error,
             });
             const checkTasks = taskValidation(user);
             this.$store.commit('rh/saveNotification', {
               type: 'tasks',
               _id: user._id,
-              exists: checkTasks
+              exists: checkTasks,
             });
             return {
               auxiliary: {
                 _id: user._id,
                 name: `${user.identity.firstname} ${user.identity.lastname}`,
-                picture: user.picture ? user.picture.link : null
+                picture: user.picture ? user.picture.link : null,
               },
               profileErrors: checkProfileErrors.error,
               tasksErrors: checkTasks,
@@ -341,7 +343,7 @@ export default {
             auxiliary: {
               _id: user._id,
               name: `${user.identity.firstname} ${user.identity.lastname}`,
-              picture: user.picture ? user.picture.link : null
+              picture: user.picture ? user.picture.link : null,
             },
             startDate: user.createdAt,
             sector: user.sector ? user.sector.name : 'N/A',
@@ -360,15 +362,27 @@ export default {
     },
     resetForm () {
       this.$v.newUser.$reset();
-      this.newUser = Object.assign({}, clear(this.newUser));
+      this.newUser = this.$_.cloneDeep(this.defaultNewUser);
+    },
+    formatPayloadForUserCreation (roles) {
+      const payload = this.$_.cloneDeep(this.newUser);
+
+      payload.local.password = randomize('*', 10);
+      payload.role = roles[0]._id;
+      payload.company = this.company._id;
+
+      if (!payload.identity.title) delete payload.identity.title;
+      if (!payload.contact.address.fullAddress) delete payload.contact.address;
+
+      return payload;
     },
     async createAlenviUser () {
-      this.newUser.local.password = randomize('*', 10);
       const roles = await this.$roles.showAll({ name: AUXILIARY });
       if (roles.length === 0) throw new Error('Role not found');
-      this.newUser.role = roles[0]._id;
-      this.newUser.company = this.company._id;
-      const newUser = await this.$users.create(this.newUser);
+
+      const payload = this.formatPayloadForUserCreation(roles);
+
+      const newUser = await this.$users.create(payload);
       await this.$users.createDriveFolder({ _id: newUser._id });
       return newUser;
     },
@@ -407,8 +421,8 @@ export default {
     },
     getAvatar (link) {
       return link || DEFAULT_AVATAR;
-    }
-  }
+    },
+  },
 }
 </script>
 

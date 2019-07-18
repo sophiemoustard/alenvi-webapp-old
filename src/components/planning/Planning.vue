@@ -8,67 +8,72 @@
         @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :type="PLANNING" />
     </div>
     <div class="planning-container full-width">
-      <table style="width: 100%" :class="[staffingView && 'staffing', 'planning-table']">
+      <table style="width: 100%" :class="[staffingView ? 'staffing' : 'non-staffing', 'planning-table']">
         <thead>
           <th>
-            <q-btn v-if="!isCustomerPlanning" flat round icon="view_week" :color="staffingView ? 'primary' : ''" @click="staffingView = !staffingView" />
+            <q-btn v-if="!isCustomerPlanning" flat round icon="view_week" :color="staffingView ? 'primary' : ''"
+              @click="staffingView = !staffingView" />
           </th>
           <th class="capitalize" v-for="(day, index) in daysHeader" :key="index">
             <div class="row justify-center items-baseline days-header">
               <div class="days-name q-mr-md">{{ day.name }}</div>
               <div :class="['days-number', { 'current-day': isCurrentDay(day.moment) }]">{{ day.number }}</div>
             </div>
+            <div class="planning-background" v-if="staffingView">
+              <template v-for="(hour, hourIndex) in hours">
+                <div class="planning-hour" v-if="hourIndex !== 0"  :key="hourIndex"
+                  :style="{ left: `${(hourIndex * hourWidth * 2) - 3}%` }">{{ hour.format('H') }}</div>
+              </template>
+            </div>
           </th>
         </thead>
         <tbody>
+          <template v-if="!isCustomerPlanning && filteredSectors.length > 0">
+            <tr v-for="sector in filteredSectors" :key="sector._id" class="to-assign person-row">
+              <td valign="top">
+                <div class="person-inner-cell">
+                  <div :class="[!staffingView && 'q-mb-md', 'chip-container']">
+                    <img :src="UNKNOWN_AVATAR" class="avatar" >
+                  </div>
+                  <div class="person-name overflow-hidden">{{ sector.label }}</div>
+                </div>
+              </td>
+              <td @drop="drop(day, sector)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
+                valign="top" @click="createEvent({ dayIndex, sectorId: sector._id })" class="planning-background">
+                <template v-for="hourIndex in 5">
+                  <div class="line" :style="{ left: `${(hourIndex * hourWidth * 2)}%` }"
+                    :key="`hour_${hourIndex}`" />
+                </template>
+                <template v-for="(event, eventIndex) in getCellEvents(sector, days[dayIndex])">
+                  <ni-planning-event-cell :event="event" :display-staffing-view="staffingView && !isCustomerPlanning"
+                    :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canEdit" :person-key="personKey" />
+                </template>
+              </td>
+            </tr>
+          </template>
           <tr class="person-row" v-for="(person, index) in persons" :key="index">
             <td valign="top">
               <div class="person-inner-cell">
                 <div :class="[!staffingView && 'q-mb-md']">
-                  <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person" :events="getPersonEvents(person)" />
-                  <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)" :startOfWeekAsString="startOfWeek.toISOString()"
-                    :distanceMatrix="distanceMatrix" />
+                  <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person"
+                    :events="getPersonEvents(person)" />
+                  <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)"
+                    :startOfWeekAsString="startOfWeek.toISOString()" :distanceMatrix="distanceMatrix" />
                 </div>
                 <div class="person-name overflow-hidden-nowrap">{{ person.identity | formatShortIdentity }}</div>
               </div>
             </td>
-            <template v-if="staffingView && !isCustomerPlanning">
-              <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
-                @click="createEvent({ dayIndex, person })">
-                <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
-                  <div :id="event._id" draggable="true" @dragstart="drag(event, $event)" @click.stop="editEvent(event._id)"
-                    :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-sm']" :key="eventIndex"
-                    :style="{ left: `${PERCENTAGE_BY_MINUTES * event.staffingLeft}%`, width: `${PERCENTAGE_BY_MINUTES * event.staffingWidth}%` }">
-                  </div>
-                </template>
-              </td>
-            </template>
-            <template v-else>
-              <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex" valign="top"
-                @click="createEvent({ dayIndex, person })">
-                <template v-for="(event, eventIndex) in getOneDayPersonEvents(person, days[dayIndex])">
-                  <div :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event, $event)" :key="eventIndex"
-                    :class="['row', 'cursor-pointer', 'event', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]"
-                    @click.stop="editEvent(event._id)">
-                    <div class="event-container">
-                      <div class="event-title">
-                        <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">
-                          {{ eventTitle(event) }}
-                        </p>
-                        <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">
-                          {{ displayAbsenceType(event.absence) }}
-                        </p>
-                        <p v-if="event.type === UNAVAILABILITY" class="no-margin overflow-hidden-nowrap">Indispo.</p>
-                        <p v-if="event.type === INTERNAL_HOUR" class="no-margin overflow-hidden-nowrap">{{
-                          event.internalHour.name }}</p>
-                      </div>
-                      <p class="no-margin event-subtitle overflow-hidden-nowrap">{{ getEventHours(event) }}</p>
-                      <p v-if="event.isBilled" class="no-margin event-subtitle event-billed">F</p>
-                    </div>
-                  </div>
-                </template>
-              </td>
-            </template>
+            <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
+              valign="top" @click="createEvent({ dayIndex, person })" class="planning-background">
+              <template v-for="hourIndex in hours.length">
+                <div class="line" :style="{ left: `${(hourIndex * hourWidth * 2)}%` }"
+                  :key="`hour_${hourIndex}`" />
+              </template>
+              <template v-for="(event, eventIndex) in getCellEvents(person, days[dayIndex])">
+                <ni-planning-event-cell :event="event" :display-staffing-view="staffingView && !isCustomerPlanning"
+                  :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canEdit" :person-key="personKey" />
+              </template>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -78,20 +83,18 @@
 
 <script>
 import {
-  INTERVENTION,
-  ABSENCE,
-  UNAVAILABILITY,
-  INTERNAL_HOUR,
   PLANNING,
-  PERCENTAGE_BY_MINUTES,
   AUXILIARY_ROLES,
-  PLANNING_VIEW_START_HOUR,
-  PLANNING_VIEW_END_HOUR,
   INVOICED_AND_PAYED,
+  SECTOR,
+  STAFFING_VIEW_START_HOUR,
+  STAFFING_VIEW_END_HOUR,
+  UNKNOWN_AVATAR,
 } from '../../data/constants';
 import { NotifyNegative } from '../popup/notify';
-import NiChipAuxiliaryIndicator from '../planning/ChipAuxiliaryIndicator';
-import NiChipCustomerIndicator from '../planning/ChipCustomerIndicator';
+import NiChipAuxiliaryIndicator from './ChipAuxiliaryIndicator';
+import NiChipCustomerIndicator from './ChipCustomerIndicator';
+import NiPlanningEvent from './PlanningEvent';
 import ChipsAutocomplete from '../ChipsAutocomplete';
 import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import { planningEventMixin } from '../../mixins/planningEventMixin';
@@ -105,30 +108,30 @@ export default {
   components: {
     'ni-chip-customer-indicator': NiChipCustomerIndicator,
     'ni-chip-auxiliary-indicator': NiChipAuxiliaryIndicator,
+    'ni-planning-event-cell': NiPlanningEvent,
     'ni-chips-autocomplete': ChipsAutocomplete,
     'planning-navigation': PlanningNavigation,
   },
   props: {
     events: { type: Array, default: () => [] },
     persons: { type: Array, default: () => [] },
+    filteredSectors: { type: Array, default: () => [] },
     personKey: { type: String, default: 'auxiliary' },
+    canEdit: { type: Function, default: () => {} },
   },
   data () {
     return {
       terms: [],
       loading: false,
       draggedObject: {},
-      startOfWeek: {},
+      startOfWeek: this.$moment().startOf('week'),
       days: [],
       maxDays: 7,
-      INTERVENTION,
-      UNAVAILABILITY,
-      ABSENCE,
-      INTERNAL_HOUR,
       staffingView: false,
       PLANNING,
-      PERCENTAGE_BY_MINUTES,
       distanceMatrix: [],
+      hourWidth: 100 / 12,
+      UNKNOWN_AVATAR,
     }
   },
   beforeDestroy () {
@@ -141,9 +144,8 @@ export default {
     }
   },
   async mounted () {
-    this.startOfWeek = this.$moment().startOf('week');
-    this.getTimelineDays();
-    this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
+    this.updateTimeline();
+    this.getTimelineHours();
     if (!this.isCustomerPlanning) await this.getDistanceMatrix();
   },
   watch: {
@@ -151,19 +153,14 @@ export default {
     getFilter (val) {
       if (val.length > 0) {
         if (!AUXILIARY_ROLES.includes(this.getUser.role.name)) {
-          if (!this.isCustomerPlanning) {
-            this.addSavedTerms('Auxiliaries');
-          } else {
-            this.addSavedTerms('Customers');
-          }
+          if (!this.isCustomerPlanning) this.addSavedTerms('Auxiliaries');
+          else this.addSavedTerms('Customers');
         } else {
-          const userSector = this.getFilter.find(filter => filter.sectorId === this.getUser.sector);
-          if (userSector) {
-            this.$refs.refFilter.add(userSector.label);
-          }
+          const userSector = this.getFilter.find(filter => filter.type === SECTOR && filter._id === this.getUser.sector);
+          if (userSector) this.$refs.refFilter.add(userSector.label);
         }
       }
-    }
+    },
   },
   computed: {
     getFilter () {
@@ -174,6 +171,10 @@ export default {
     },
   },
   methods: {
+    getTimelineHours () {
+      const range = this.$moment.range(this.$moment().hours(STAFFING_VIEW_START_HOUR).minutes(0), this.$moment().hours(STAFFING_VIEW_END_HOUR).minutes(0));
+      this.hours = Array.from(range.by('hours', { step: 2, excludeEnd: true }));
+    },
     async getDistanceMatrix () {
       this.distanceMatrix = await distanceMatrix.list();
     },
@@ -183,34 +184,39 @@ export default {
       this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
     },
     // Event display
-    getOneDayPersonEvents (person, day) {
+    getCellEvents (cell, day) {
       return this.events
-        .filter(event =>
-          event[this.personKey] && event[this.personKey]._id === person._id &&
-          this.$moment(day).isSameOrAfter(event.startDate, 'day') && this.$moment(day).isSameOrBefore(event.endDate, 'day') &&
-          (!this.staffingView || !event.isCancelled)
-        )
-        .map((event) => {
-          if (this.isCustomerPlanning) return event;
-          let dayEvent = { ...event };
+        .filter(event => {
+          const lineFilter = cell.type === SECTOR
+            ? !event.auxiliary && event.sector === cell._id
+            : event[this.personKey] && event[this.personKey]._id === cell._id;
+          const dayFilter = this.$moment(day).isBetween(event.startDate, event.endDate, 'day', '[]');
 
-          let staffingLeft = (this.$moment(event.startDate).hours() - PLANNING_VIEW_START_HOUR) * 60 + this.$moment(event.startDate).minutes();
-          let staffingRight = (this.$moment(event.endDate).hours() - PLANNING_VIEW_START_HOUR) * 60 + this.$moment(event.endDate).minutes();
-          if (!this.$moment(day).isSame(event.startDate, 'day')) {
-            dayEvent.startDate = this.$moment(day).hour(PLANNING_VIEW_START_HOUR).toISOString();
-            staffingLeft = 0;
-          }
-          if (!this.$moment(day).isSame(event.endDate, 'day')) {
-            dayEvent.endDate = this.$moment(day).hour(PLANNING_VIEW_END_HOUR).toISOString();
-            staffingRight = (PLANNING_VIEW_END_HOUR - PLANNING_VIEW_START_HOUR) * 60;
-          }
-
-          dayEvent.staffingLeft = staffingLeft;
-          dayEvent.staffingWidth = staffingRight - staffingLeft;
-
-          return dayEvent;
+          return lineFilter && dayFilter && (!this.staffingView || !event.isCancelled)
         })
+        .map((event) => this.isCustomerPlanning ? event : this.getEventWithStyleInfo(event, day))
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+    },
+    getEventWithStyleInfo (event, day) {
+      let dayEvent = { ...event };
+
+      const displayedStartHour = Math.max((this.$moment(event.startDate).hours()), STAFFING_VIEW_START_HOUR);
+      const displayedEndHour = Math.min(this.$moment(event.endDate).hours(), STAFFING_VIEW_END_HOUR);
+      let staffingLeft = (displayedStartHour - STAFFING_VIEW_START_HOUR) * 60 + this.$moment(event.startDate).minutes();
+      let staffingRight = (displayedEndHour - STAFFING_VIEW_START_HOUR) * 60 + this.$moment(event.endDate).minutes();
+      if (!this.$moment(day).isSame(event.startDate, 'day')) {
+        dayEvent.startDate = this.$moment(day).hour(STAFFING_VIEW_START_HOUR).toISOString();
+        staffingLeft = 0;
+      }
+      if (!this.$moment(day).isSame(event.endDate, 'day')) {
+        dayEvent.endDate = this.$moment(day).hour(STAFFING_VIEW_END_HOUR).toISOString();
+        staffingRight = (STAFFING_VIEW_END_HOUR - STAFFING_VIEW_START_HOUR) * 60;
+      }
+
+      dayEvent.staffingLeft = staffingLeft;
+      dayEvent.staffingWidth = staffingRight - staffingLeft;
+
+      return dayEvent;
     },
     getPersonEvents (person) {
       return this.events.filter(event =>
@@ -219,14 +225,20 @@ export default {
       );
     },
     // Drag & drop
-    drag (event, nativeEvent) {
-      nativeEvent.dataTransfer.setData('text', ''); // Mandatory on Firefox
+    drag (event) {
       this.draggedObject = event;
     },
-    async drop (toDay, toPerson) {
+    async drop (toDay, target) {
       try {
-        if (this.draggedObject[this.personKey]._id === toPerson._id && toDay.isSame(this.draggedObject.startDate, 'd')) return;
-        this.$emit('onDrop', { toDay, toPerson, draggedObject: this.draggedObject });
+        if (target.type === SECTOR) { // Unassign event
+          if (this.draggedObject.sector === target._id && (!this.draggedObject.auxiliary || !this.draggedObject.auxiliary._id) &&
+            toDay.isSame(this.draggedObject.startDate, 'd')) return;
+        } else { // Update event auxiliary
+          if (this.draggedObject[this.personKey] && this.draggedObject[this.personKey]._id === target._id &&
+            toDay.isSame(this.draggedObject.startDate, 'd')) return;
+        }
+
+        this.$emit('onDrop', { toDay, target, draggedObject: this.draggedObject });
       } catch (e) {
         console.error(e);
         NotifyNegative('Problème lors de la modification de l\'évènement');
@@ -234,30 +246,29 @@ export default {
         this.draggedObject = {};
       }
     },
-    canDrag (event) {
-      return this.$can({
-        user: this.$store.getters['main/user'],
-        auxiliaryIdEvent: event.auxiliary._id,
-        auxiliarySectorEvent: event.sector,
-        permissions: [
-          { name: 'planning:edit:user', rule: 'isInSameSector' },
-          { name: 'planning:edit', rule: 'isOwner' }
-        ],
-      });
-    },
     createEvent (eventInfo) {
-      if (this.personKey === 'auxiliary') {
-        const can = this.$can({
+      let can = true;
+      if (this.personKey === 'auxiliary' && eventInfo.sectorId) { // Unassigned event
+        can = this.$can({
           user: this.$store.getters['main/user'],
-          auxiliaryIdEvent: eventInfo.person.id,
+          auxiliarySectorEvent: eventInfo.sectorId,
+          permissions: [
+            { name: 'planning:create:user', rule: 'isInSameSector' },
+          ],
+        });
+      } else if (this.personKey === 'auxiliary') {
+        can = this.$can({
+          user: this.$store.getters['main/user'],
+          auxiliaryIdEvent: eventInfo.person._id,
           auxiliarySectorEvent: eventInfo.person.sector._id,
           permissions: [
             { name: 'planning:create:user', rule: 'isInSameSector' },
-            { name: 'planning:create', rule: 'isOwner' }
+            { name: 'planning:create', rule: 'isOwner' },
           ],
         });
-        if (!can) return;
       }
+      if (!can) return;
+
       this.$emit('createEvent', eventInfo);
     },
     editEvent (eventId) {
@@ -281,33 +292,61 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables';
 
+  th:first-child
+    @media (min-width: 768px) and (max-width: 1024px)
+      width: 100px;
+    @media (min-width: 1025px)
+      width: 110px;
+
   .person
     &-row
       border-right: 1px solid $light-grey;
       height: 100px;
     &-name
-      font-weight: 600
-      font-size: 14px
-      @media(max-width: 1024px)
-        font-size: 12px
-      @media(max-width: 420px)
-        font-size: 8px
+      font-weight: 600;
+      font-size: 14px;
+      @media (max-width: 1024px)
+        font-size: 12px;
+      @media (max-width: 420px)
+        font-size: 8px;
     &-inner-cell
-      margin-top: 4px
+      margin-top: 4px;
 
   .staffing
     .person
       &-row
-        height: auto
+        height: auto;
       &-name
         margin: 2px 0 4px;
     td
       position: relative;
-    .event
-      position: absolute;
-      top: 2px;
-      bottom: 1px;
-      padding: 0;
-      margin: 0;
-      border: 1px solid white;
+      height: 75px;
+      z-index: 0;
+    .planning-background
+      position: relative;
+      margin-top: 2px;
+      .line
+        width: 1px;
+        height: 100%;
+        background: $grey-3;
+        margin: 0;
+        position: absolute;
+        z-index: -1;
+
+  .planning-hour
+    position: absolute;
+    color: $light-grey;
+    font-size: 12px;
+    bottom: -3px;
+
+  .non-staffing
+    .planning-background
+      @media screen and (max-width: 1024px)
+        padding-bottom: 2rem;
+      @media screen and (min-width: 1025px)
+        padding-bottom: 1rem;
+
+  .to-assign
+    background-color: rgba(253, 243, 229, 0.5);
+
 </style>

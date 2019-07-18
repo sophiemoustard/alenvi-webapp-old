@@ -31,7 +31,7 @@ import { NotifyPositive, NotifyNegative } from '../components/popup/notify';
 
 export default {
   metaInfo: {
-    title: 'Mon compte'
+    title: 'Mon compte',
   },
   data () {
     return {
@@ -39,10 +39,10 @@ export default {
         credentials: {
           email: '',
           password: '',
-          passwordConfirm: ''
+          passwordConfirm: '',
         },
-        alenvi: {}
-      }
+        alenvi: {},
+      },
     }
   },
   validations: {
@@ -51,13 +51,13 @@ export default {
         email: { required, email },
         password: {
           minLength: minLength(6),
-          maxLength: maxLength(20)
+          maxLength: maxLength(20),
         },
         passwordConfirm: {
-          sameAsPassword: sameAs('password')
-        }
-      }
-    }
+          sameAsPassword: sameAs('password'),
+        },
+      },
+    },
   },
   async mounted () {
     try {
@@ -73,8 +73,8 @@ export default {
         const userToSend = {
           _id: this.$route.params.id,
           local: {
-            email: this.user.credentials.email
-          }
+            email: this.user.credentials.email,
+          },
         };
         if (this.user.credentials.password) {
           userToSend.local.password = this.user.credentials.password
@@ -97,8 +97,8 @@ export default {
       this.$q.cookies.remove('user_id', { path: '/' });
       this.$q.localStorage.clear();
       this.$router.replace('/login');
-    }
-  }
+    },
+  },
 }
 </script>
 

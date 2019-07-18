@@ -56,7 +56,7 @@ export const subscriptionMixin = {
           label: 'Date de modification',
           align: 'left',
           field: 'createdAt',
-          format: value => moment(value).format('DD/MM/YYYY')
+          format: value => moment(value).format('DD/MM/YYYY'),
         },
         {
           name: 'unitTTCRate',
@@ -113,7 +113,7 @@ export const subscriptionMixin = {
           } else {
             const refundedHours = Math.min(
               funding.frequency === MONTHLY ? funding.careHours / 4.33 : funding.careHours,
-              subscription.estimatedWeeklyVolume,
+              subscription.estimatedWeeklyVolume
             );
             fundingReduction = refundedHours * funding.unitTTCRate;
           }

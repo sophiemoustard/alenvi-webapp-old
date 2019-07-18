@@ -30,7 +30,7 @@ export default {
     disable: { type: Boolean, default: false },
     requiredField: { type: Boolean, default: false },
     clearable: { type: Boolean, default: false },
-    multiple: { type: Boolean, default: false }
+    multiple: { type: Boolean, default: false },
   },
   methods: {
     inputHandler (value) {
@@ -39,7 +39,7 @@ export default {
     blurHandler () {
       this.$emit('blur');
     },
-  }
+  },
 }
 </script>
 

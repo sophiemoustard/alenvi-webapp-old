@@ -11,7 +11,7 @@ export default {
   props: ['value', 'icon'],
   data () {
     return {
-      roles: []
+      roles: [],
     };
   },
   async mounted () {
@@ -20,7 +20,7 @@ export default {
   computed: {
     orderedRoles () {
       return _.sortBy(this.roles, ['value']);
-    }
+    },
   },
   methods: {
     async getRoles () {
@@ -29,7 +29,7 @@ export default {
         for (const k in allRoles) {
           this.roles.push({
             label: allRoles[k].name,
-            value: allRoles[k].name
+            value: allRoles[k].name,
           });
         }
       } catch (e) {
@@ -38,7 +38,7 @@ export default {
     },
     updateRoles (value) {
       this.$emit('input', value);
-    }
-  }
+    },
+  },
 };
 </script>

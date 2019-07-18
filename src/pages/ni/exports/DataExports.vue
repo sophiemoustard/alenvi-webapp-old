@@ -41,7 +41,7 @@ export default {
         NotifyNegative('Erreur lors du téléchagement du document');
       }
     },
-  }
+  },
 }
 </script>
 

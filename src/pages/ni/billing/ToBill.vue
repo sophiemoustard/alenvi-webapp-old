@@ -193,7 +193,7 @@ export default {
             ...draft,
             customerBills: { total: draft.customerBills.total, bills: this.addEditDiscountToBills(draft.customerBills.bills) },
             ...(!!draft.thirdPartyPayerBills && {
-              thirdPartyPayerBills: draft.thirdPartyPayerBills.map(tpp => ({ ...tpp, bills: this.addEditDiscountToBills(tpp.bills) }))
+              thirdPartyPayerBills: draft.thirdPartyPayerBills.map(tpp => ({ ...tpp, bills: this.addEditDiscountToBills(tpp.bills) })),
             }),
           }
         });
@@ -211,7 +211,7 @@ export default {
           title: 'Confirmation',
           message: 'Cette opération est définitive. Confirmez-vous ?',
           ok: 'Oui',
-          cancel: 'Non'
+          cancel: 'Non',
         });
 
         if (!this.hasSelectedRows) return;
@@ -235,7 +235,7 @@ export default {
           startDate: this.$moment(startDate).startOf('d').toISOString(),
           endDate: this.$moment(endDate).endOf('d').toISOString(),
           billingPeriod: this.user.company.customersConfig.billingPeriod,
-          customer: customer._id
+          customer: customer._id,
         });
         this.draftBills.splice(__index, 1, ...draftBills);
         NotifyPositive('Date de début de facturation modifiée');
@@ -244,6 +244,6 @@ export default {
         NotifyNegative('Erreur lors de la modification de la date de début de facturation');
       }
     },
-  }
+  },
 }
 </script>

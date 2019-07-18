@@ -191,7 +191,7 @@ export default {
         endDate: null,
         exclTaxesCustomer: 0,
         inclTaxesCustomer: 0,
-        subscription: null
+        subscription: null,
       },
       editedCreditNote: {},
       creditNotes: [],
@@ -303,7 +303,7 @@ export default {
       if (value === null) {
         this.creditNoteEvents = [];
       }
-    }
+    },
   },
   async mounted () {
     this.tableLoading = true;
@@ -316,13 +316,13 @@ export default {
         date: { required },
         customer: { required },
         startDate: {
-          required: requiredIf(() => this.hasLinkedEvents)
+          required: requiredIf(() => this.hasLinkedEvents),
         },
         endDate: {
-          required: requiredIf(() => this.hasLinkedEvents)
+          required: requiredIf(() => this.hasLinkedEvents),
         },
         subscription: {
-          required: requiredIf(() => !this.hasLinkedEvents)
+          required: requiredIf(() => !this.hasLinkedEvents),
         },
         inclTaxesCustomer: {
           positiveNumber,
@@ -337,13 +337,13 @@ export default {
         date: { required },
         customer: { required },
         startDate: {
-          required: requiredIf(() => this.hasLinkedEvents)
+          required: requiredIf(() => this.hasLinkedEvents),
         },
         endDate: {
-          required: requiredIf(() => this.hasLinkedEvents)
+          required: requiredIf(() => this.hasLinkedEvents),
         },
         subscription: {
-          required: requiredIf(() => !this.hasLinkedEvents)
+          required: requiredIf(() => !this.hasLinkedEvents),
         },
         inclTaxesCustomer: {
           required: requiredIf(() => !this.thirdPartyPayer),
@@ -424,7 +424,7 @@ export default {
             subscriptions: customers[i].subscriptions,
             thirdPartyPayers: customers[i].thirdPartyPayers,
             label: formatFullIdentity(customers[i].identity),
-            value: customers[i]._id
+            value: customers[i]._id,
           });
         }
       } catch (e) {
@@ -464,7 +464,7 @@ export default {
             startDate: this.newCreditNote.startDate,
             endDate: this.newCreditNote.endDate,
             customer: this.newCreditNote.customer,
-            isBilled: true
+            isBilled: true,
           };
           if (this.newCreditNote.thirdPartyPayer) query.thirdPartyPayer = this.newCreditNote.thirdPartyPayer;
           this.creditNoteEvents = this.formatEventsAsCreditNoteEvents(await this.$events.listForCreditNotes(query));
@@ -473,7 +473,7 @@ export default {
             startDate: this.editedCreditNote.startDate,
             endDate: this.editedCreditNote.endDate,
             customer: this.editedCreditNote.customer._id,
-            isBilled: true
+            isBilled: true,
           };
           if (this.editedCreditNote.thirdPartyPayer) query.thirdPartyPayer = this.editedCreditNote.thirdPartyPayer._id;
           else if (this.editedCreditNote.linkedCreditNote) {
@@ -518,7 +518,7 @@ export default {
         endDate: null,
         exclTaxesCustomer: 0,
         inclTaxesCustomer: 0,
-        subscription: null
+        subscription: null,
       };
       this.creditNoteEvents = [];
       this.hasLinkedEvents = false;
@@ -664,7 +664,7 @@ export default {
           title: 'Confirmation',
           message: `Etes-vous sûr de vouloir supprimer cet avoir ${deletedCreditNote.linkedCreditNote ? 'et l\'avoir relié aux mêmes évènements' : ''} ?`,
           ok: 'OK',
-          cancel: 'Annuler'
+          cancel: 'Annuler',
         });
         await this.$creditNotes.remove(id);
         await this.refreshCreditNotes();
@@ -676,7 +676,7 @@ export default {
       }
     },
     formatFullIdentity,
-  }
+  },
 }
 </script>
 

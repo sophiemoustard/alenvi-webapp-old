@@ -17,5 +17,5 @@ export const contractMixin = {
       await this.refreshContracts();
       this.timeout = setTimeout(() => this.refreshContracts(), 10000);
     },
-  }
+  },
 };

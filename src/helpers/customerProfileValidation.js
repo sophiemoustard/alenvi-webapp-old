@@ -5,28 +5,28 @@ import { getCustomerLastMandateOrQuote } from './getCustomerLastMandateOrQuote';
 
 const customerProfileSchema = Joi.object().keys({
   identity: {
-    lastname: Joi.string().required()
+    lastname: Joi.string().required(),
   },
   contact: {
     address: {
-      fullAddress: Joi.string().required()
-    }
+      fullAddress: Joi.string().required(),
+    },
   },
   payment: {
     iban: Joi.string().required(),
     bic: Joi.string().required(),
     mandates: Joi.array().items(Joi.object().keys({
-      signedAt: Joi.date().required()
-    }))
+      signedAt: Joi.date().required(),
+    })),
   },
   subscriptions: Joi.array().min(1).required(),
   subscriptionsAccepted: Joi.boolean().when('quotes', { is: Joi.array().length(0), then: Joi.valid(true) }),
   quotes: Joi.array().items(Joi.object({
     drive: Joi.object().keys({
       id: Joi.string(),
-      link: Joi.string()
-    }).when('quotes', { is: Joi.array().min(1), then: Joi.required() })
-  }))
+      link: Joi.string(),
+    }).when('quotes', { is: Joi.array().min(1), then: Joi.required() }),
+  })),
 });
 
 export const customerProfileValidation = (profile, options = {}) => {

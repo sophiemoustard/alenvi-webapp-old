@@ -39,8 +39,8 @@ export default {
     },
     focusHandler () {
       this.$emit('focus');
-    }
-  }
+    },
+  },
 }
 </script>
 

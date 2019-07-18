@@ -26,7 +26,7 @@
           <ni-auxiliary-indicators :total-working-hours="totalWorkingHours" :weekly-interventions="weeklyInterventions"
             :weekly-internal-hours="weeklyInternalHours" :weekly-paid-transports="weeklyPaidTransports"
             :customers-count="customersCount" :average-time-by-customer="averageTimeByCustomer"
-            :weekly-break="weeklyBreak" />
+            :weekly-break="weeklyBreak" :time-unit="tab.name" />
         </q-tab-pane>
       </q-tabs>
     </q-modal>
@@ -35,7 +35,18 @@
 
 <script>
 import AuxiliaryIndicators from '../AuxiliaryIndicators';
-import { DEFAULT_AVATAR, ABSENCE, INTERVENTION, INTERNAL_HOUR, TRANSIT, DRIVING, PUBLIC_TRANSPORT, WEEK_STATS, COMPANY_CONTRACT, DEATH, BIRTH, WEDDING, PAID_LEAVE } from '../../data/constants.js';
+import {
+  DEFAULT_AVATAR,
+  ABSENCE,
+  INTERVENTION,
+  INTERNAL_HOUR,
+  TRANSIT,
+  DRIVING,
+  PUBLIC_TRANSPORT,
+  WEEK_STATS,
+  MONTH_STATS,
+  COMPANY_CONTRACT,
+} from '../../data/constants.js';
 import googleMaps from '../../api/GoogleMaps';
 import { getPaidTransport } from '../../helpers/planning';
 
@@ -57,7 +68,7 @@ export default {
       indicatorsModal: false,
       tabsContent: [
         { label: 'Stats de la semaine', default: true, name: WEEK_STATS },
-        { label: 'Stats du mois', default: false, name: 'month_stat' },
+        { label: 'Stats du mois', default: false, name: MONTH_STATS },
       ],
       breakInfo: [],
       weeklyInternalHours: 0,
@@ -111,7 +122,7 @@ export default {
     },
     companyContracts () {
       return this.person.contracts ? this.person.contracts.filter(contract => contract.status === COMPANY_CONTRACT) : [];
-    }
+    },
   },
   async mounted () {
     if (!this.hasActiveCompanyContractOnEvent) return;
@@ -270,12 +281,11 @@ export default {
       let contractHours = 0;
       const contractDaysRange = Array.from(this.$moment.range(this.startOfWeekAsString, this.$moment(this.endOfWeek).subtract(1, 'd')).by('days')) // from m\Monday to Saturday
       for (const day of contractDaysRange) {
-        const absences = this.events.find(event =>
+        const absence = this.events.find(event =>
           event.type === ABSENCE &&
-          day.isSameOrAfter(event.startDate, 'd') && day.isSameOrBefore(event.endDate, 'd') &&
-          [DEATH, BIRTH, WEDDING, PAID_LEAVE].includes(event.absence)
+          day.isSameOrAfter(event.startDate, 'd') && day.isSameOrBefore(event.endDate, 'd')
         );
-        if (absences) continue;
+        if (absence) continue;
 
         const version = this.getContractVersionOnDay(day);
         if (!version) continue;
@@ -284,7 +294,7 @@ export default {
       };
       return Math.round(contractHours);
     },
-  }
+  },
 }
 </script>
 

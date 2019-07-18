@@ -152,7 +152,7 @@
           </div>
         </div>
         <ni-modal-input caption="Nom" v-model="newInternalHour.name" :error="$v.newInternalHour.name.$error"
-          @blur="$v.newInternalHour.name.$touch" />
+          @blur="$v.newInternalHour.name.$touch" required-field />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer l'heure interne" icon-right="add" color="primary"
         :loading="loading" @click="createInternalHour" />
@@ -258,14 +258,14 @@ export default {
           name: 'name',
           label: 'Nom',
           align: 'left',
-          field: 'name'
+          field: 'name',
         },
         {
           name: 'actions',
           label: '',
           align: 'center',
-          field: row => ({ _id: row._id, auxiliaryCount: row.auxiliaryCount })
-        }
+          field: row => ({ _id: row._id, auxiliaryCount: row.auxiliaryCount }),
+        },
       ],
       sectorPagination: {
         rowsPerPage: 0,
@@ -274,7 +274,7 @@ export default {
       sectorCreationModal: false,
       newSector: { name: '' },
       sectorEditionModal: false,
-      editedSector: { name: '' }
+      editedSector: { name: '' },
     }
   },
   computed: {
@@ -286,28 +286,28 @@ export default {
     },
     headers () {
       return {
-        'x-access-token': Cookies.get('alenvi_token') || ''
+        'x-access-token': Cookies.get('alenvi_token') || '',
       }
     },
     isSameThanEditedSector () {
       return this.tmpInput === this.editedSector.name;
-    }
+    },
   },
   validations () {
     return {
       company: {
         rhConfig: {
           contractWithCompany: {
-            grossHourlyRate: { required, posDecimals, maxValue: maxValue(999) }
+            grossHourlyRate: { required, posDecimals, maxValue: maxValue(999) },
           },
           contractWithCustomer: {
-            grossHourlyRate: { required, posDecimals, maxValue: maxValue(999) }
+            grossHourlyRate: { required, posDecimals, maxValue: maxValue(999) },
           },
           feeAmount: { required, posDecimals, maxValue: maxValue(999) },
           amountPerKm: { required, posDecimals, maxValue: maxValue(999) },
           transportSubs: {
             $each: {
-              price: { required, posDecimals, maxValue: maxValue(999) }
+              price: { required, posDecimals, maxValue: maxValue(999) },
             },
           },
         },
@@ -316,11 +316,11 @@ export default {
         name: { required },
       },
       newSector: {
-        name: { required, sector }
+        name: { required, sector },
       },
       editedSector: {
-        name: { required, sector }
-      }
+        name: { required, sector },
+      },
     }
   },
   async mounted () {
@@ -368,9 +368,9 @@ export default {
           rhConfig: {
             transportSubs: {
               subId: this.company.rhConfig.transportSubs[params.index]._id,
-              price: this.company.rhConfig.transportSubs[params.index].price
-            }
-          }
+              price: this.company.rhConfig.transportSubs[params.index].price,
+            },
+          },
         };
         payload._id = this.company._id;
         await this.$companies.updateById(payload);
@@ -388,6 +388,10 @@ export default {
       } else if (!this.$_.get(this.$v.company.rhConfig, path).numeric) {
         return 'Nombre non valide';
       }
+    },
+    async refreshCompany () {
+      await this.$store.dispatch('main/getUser', this.user._id);
+      this.company = this.user.company;
     },
     // Internal hours
     async refreshInternalHours () {
@@ -422,7 +426,7 @@ export default {
           title: 'Confirmation',
           message: 'Etes-vous sûr de vouloir supprimer cette heure interne ?',
           ok: 'OK',
-          cancel: 'Annuler'
+          cancel: 'Annuler',
         });
 
         const queries = { id: this.company._id, internalHourId };
@@ -516,7 +520,7 @@ export default {
           title: 'Confirmation',
           message: 'Etes-vous sûr de vouloir supprimer cette équipe ?',
           ok: 'OK',
-          cancel: 'Annuler'
+          cancel: 'Annuler',
         });
 
         await this.$sectors.deleteById(sectorId);
@@ -534,8 +538,8 @@ export default {
       } else if (!obj.name.sector) {
         return 'Nom déjà existant';
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -6,7 +6,7 @@ export const HOURLY = 'hourly';
 
 export const FUNDING_FREQ_OPTIONS = [
   { label: 'Mensuelle', value: MONTHLY },
-  { label: 'Une seule fois', value: ONCE }
+  { label: 'Une seule fois', value: ONCE },
 ];
 export const NATURE_OPTIONS = [
   { label: 'Horaire', value: HOURLY },
@@ -54,6 +54,12 @@ export const ABSENCE_NATURES = [
   { label: 'Journalière', value: DAILY },
   { label: 'Horaire', value: HOURLY },
 ];
+export const EVENT_TYPES = [
+  {label: 'Intervention', value: INTERVENTION},
+  {label: 'Interne', value: INTERNAL_HOUR},
+  {label: 'Absence', value: ABSENCE},
+  {label: 'Indispo', value: UNAVAILABILITY},
+];
 
 // THIRD PARTY PAYERS
 export const BILLING_INDIRECT = 'indirect';
@@ -61,12 +67,14 @@ export const BILLING_DIRECT = 'direct';
 
 // AVATAR
 export const DEFAULT_AVATAR = 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/images/users/default_avatar.png';
+export const UNKNOWN_AVATAR = 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1563288281/images/users/unknown_avatar.png';
 
 // REPETITION FREQUENCY
 export const NEVER = 'never';
 export const EVERY_DAY = 'every_day';
 export const EVERY_WEEK_DAY = 'every_week_day';
 export const EVERY_WEEK = 'every_week';
+export const EVERY_TWO_WEEKS = 'every_two_weeks';
 
 // CANCELLATION OPTIONS
 export const INVOICED_AND_PAYED = 'invoiced_and_payed';
@@ -92,10 +100,16 @@ export const PLANNING = 'planning';
 export const AGENDA = 'agenda';
 export const PLANNING_VIEW_START_HOUR = 7;
 export const PLANNING_VIEW_END_HOUR = 22;
-export const PERCENTAGE_BY_MINUTES = 100 / ((PLANNING_VIEW_END_HOUR - PLANNING_VIEW_START_HOUR) * 60);
+export const PLANNING_PERCENTAGE_BY_MINUTES = 100 / ((PLANNING_VIEW_END_HOUR - PLANNING_VIEW_START_HOUR) * 60);
+export const STAFFING_VIEW_START_HOUR = 8;
+export const STAFFING_VIEW_END_HOUR = 20;
+export const STAFFING_PERCENTAGE_BY_MINUTES = 100 / ((STAFFING_VIEW_END_HOUR - STAFFING_VIEW_START_HOUR) * 60);
+export const SECTOR = 'sector';
+export const PERSON = 'person';
 
 // INDICATORS
 export const WEEK_STATS = 'week_stats';
+export const MONTH_STATS = 'month_stat';
 
 // TRANSORT
 export const PUBLIC_TRANSPORT = 'public';
@@ -103,7 +117,7 @@ export const PRIVATE_TRANSPORT = 'private';
 export const TRANSPORT_OPTIONS = [
   { label: 'Abonnement transports en commun', value: PUBLIC_TRANSPORT },
   { label: 'Voiture personnelle', value: PRIVATE_TRANSPORT },
-  { label: 'Aucun', value: 'none' }
+  { label: 'Aucun', value: 'none' },
 ];
 export const TRANSIT = 'transit';
 export const DRIVING = 'driving';

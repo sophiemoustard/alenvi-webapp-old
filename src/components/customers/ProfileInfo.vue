@@ -10,8 +10,8 @@
         <ni-input caption="Nom" :error="$v.customer.identity.lastname.$error" v-model="customer.identity.lastname"
           @focus="saveTmp('identity.lastname')" @blur="updateUser('identity.lastname')" />
         <div class="col-xs-12 col-md-6">
-          <ni-datetime-picker v-model="customer.identity.birthDate" @focus="saveTmp('identity.birthDate')" caption="Date de naissance"
-            @blur="updateUser('identity.birthDate')" />
+          <ni-datetime-picker v-model="customer.identity.birthDate" @focus="saveTmp('identity.birthDate')"
+            caption="Date de naissance" @blur="updateUser('identity.birthDate')" />
         </div>
       </div>
     </div>
@@ -20,11 +20,13 @@
         <p class="text-weight-bold">Contact</p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="Téléphone" type="tel" :error="$v.customer.contact.phone.$error" error-label="Numéro de téléphone non valide"
-          v-model.trim="customer.contact.phone" @focus="saveTmp('contact.phone')" @blur="updateUser('contact.phone')" />
-        <ni-search-address v-model="customer.contact.address.fullAddress" color="white" inverted-light @focus="saveTmp('contact.address.fullAddress')"
-          @blur="updateUser('contact.address.fullAddress')" @selected="selectedAddress"
-          :error-label="addressError" :error="$v.customer.contact.address.fullAddress.$error" />
+        <ni-input caption="Téléphone" type="tel" :error="$v.customer.contact.phone.$error"
+          error-label="Numéro de téléphone non valide" v-model.trim="customer.contact.phone"
+          @focus="saveTmp('contact.phone')" @blur="updateUser('contact.phone')" />
+        <ni-search-address v-model="customer.contact.address.fullAddress" color="white" inverted-light
+          :error-label="addressError" :error="$v.customer.contact.address.fullAddress.$error"
+          @focus="saveTmp('contact.address.fullAddress')" @blur="updateUser('contact.address.fullAddress')"
+          @selected="selectedAddress" />
         <ni-input caption="Code porte" v-model="customer.contact.doorCode" @focus="saveTmp('contact.doorCode')"
           @blur="updateUser('contact.doorCode')" />
       </div>
@@ -40,7 +42,8 @@
                 <div class="row no-wrap table-actions">
                   <q-btn flat round small color="grey" icon="history" @click="showHistory(col.value)" />
                   <q-btn flat round small color="grey" icon="edit" @click="startSubscriptionEdition(col.value)" />
-                  <q-btn flat round small color="grey" icon="delete" :disable="props.row.eventCount > 0" @click="removeSubscriptions(col.value)" />
+                  <q-btn flat round small color="grey" icon="delete" :disable="props.row.eventCount > 0"
+                    @click="removeSubscriptions(col.value)" />
                 </div>
               </template>
               <template v-else>{{ col.value }}</template>
@@ -48,15 +51,19 @@
           </q-tr>
         </q-table>
         <q-card-actions align="end">
-          <q-btn :disable="serviceOptions.length === 0" flat no-caps color="primary" icon="add" label="Ajouter une souscription"
-            @click="subscriptionCreationModal = true" />
+          <q-btn :disable="serviceOptions.length === 0" flat no-caps color="primary" icon="add"
+            label="Ajouter une souscription" @click="subscriptionCreationModal = true" />
         </q-card-actions>
       </q-card>
       <div v-if="subscriptions && subscriptions.length > 0" class="row">
         <div class="col-xs-12">
           <q-checkbox v-model="customer.subscriptionsAccepted" disable class="q-mr-sm" />
-          <span style="vertical-align: middle">Validation en ligne des souscriptions<span class="text-weight-thin text-italic">
-              {{ acceptedByHelper }}</span></span>
+          <span style="vertical-align: middle">
+            Validation en ligne des souscriptions
+            <span class="text-weight-thin text-italic">
+              {{ acceptedByHelper }}
+            </span>
+          </span>
         </div>
       </div>
     </div>
@@ -86,12 +93,13 @@
         <p class="text-weight-bold">Moyen de paiement</p>
       </div>
       <div class="row gutter-profile q-mb-lg">
-        <ni-input caption="Nom associé au compte bancaire" :error="$v.customer.payment.bankAccountOwner.$error" v-model="customer.payment.bankAccountOwner"
-          @focus="saveTmp('payment.bankAccountOwner')" @blur="updateUser('payment.bankAccountOwner')" />
-        <ni-input caption="IBAN" :error="$v.customer.payment.iban.$error" error-label="IBAN non valide" v-model="customer.payment.iban"
-          @focus="saveTmp('payment.iban')" @blur="updateUser('payment.iban')" />
-        <ni-input caption="BIC" :error="$v.customer.payment.bic.$error" error-label="BIC non valide" v-model="customer.payment.bic"
-          @focus="saveTmp('payment.bic')" @blur="updateUser('payment.bic')" />
+        <ni-input caption="Nom associé au compte bancaire" :error="$v.customer.payment.bankAccountOwner.$error"
+          v-model="customer.payment.bankAccountOwner" @focus="saveTmp('payment.bankAccountOwner')"
+          @blur="updateUser('payment.bankAccountOwner')" />
+        <ni-input caption="IBAN" :error="$v.customer.payment.iban.$error" error-label="IBAN non valide"
+          v-model="customer.payment.iban" @focus="saveTmp('payment.iban')" @blur="updateUser('payment.iban')" />
+        <ni-input caption="BIC" :error="$v.customer.payment.bic.$error" error-label="BIC non valide"
+          v-model="customer.payment.bic" @focus="saveTmp('payment.bic')" @blur="updateUser('payment.bic')" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -115,12 +123,9 @@
               <template v-else-if="col.name === 'signedMandate'">
                 <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-center table-actions">
                   <q-uploader :ref="`signedMandate_${props.row._id}`" name="signedMandate" :url="docsUploadUrl"
-                    :headers="headers" hide-underline extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
-                    hide-upload-button @add="uploadDocument($event, `signedMandate_${props.row._id}`)" @uploaded="refreshMandates"
-                    @fail="failMsg" :additional-fields="[
-                      { name: 'mandateId', value: props.row._id },
-                      { name: 'fileName', value: `mandat_signe_${customer.identity.firstname}_${customer.identity.lastname}` }
-                    ]" />
+                    extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" :headers="headers"
+                    hide-underline hide-upload-button @add="uploadDocument($event, `signedMandate_${props.row._id}`)"
+                    @uploaded="refreshMandates" @fail="failMsg" :additional-fields="formatAdditionalFields(props.row)" />
                 </div>
                 <q-btn v-else flat round small color="primary">
                   <a :href="props.row.drive.link" download target="_blank">
@@ -228,10 +233,10 @@
           </div>
         </div>
         <ni-modal-input v-model="newHelper.identity.lastname" :error="$v.newHelper.identity.lastname.$error" caption="Nom"
-          @blur="$v.newHelper.identity.lastname.$touch" />
+          @blur="$v.newHelper.identity.lastname.$touch" required-field />
         <ni-modal-input v-model="newHelper.identity.firstname" caption="Prénom" />
         <ni-modal-input v-model="newHelper.local.email" last :error="$v.newHelper.local.email.$error" caption="Email"
-          @blur="$v.newHelper.local.email.$touch" :error-label="emailError" />
+          @blur="$v.newHelper.local.email.$touch" :error-label="emailError" required-field />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter un aidant" icon-right="add" color="primary" :loading="loading"
         @click="submitHelper" />
@@ -497,7 +502,7 @@ export default {
       customer: {
         identity: {},
         contact: {
-          address: {}
+          address: {},
         },
         payment: {
           mandates: [],
@@ -541,7 +546,7 @@ export default {
           label: '',
           align: 'left',
           field: '_id',
-        }
+        },
       ],
       quoteColumns: [
         {
@@ -566,7 +571,7 @@ export default {
           name: 'signed',
           label: 'Signé',
           align: 'center',
-          field: row => row.drive && row.drive.id,
+          field: row => row.drive && row.drive.driveId,
         },
         {
           name: 'createdAt',
@@ -584,7 +589,7 @@ export default {
           lastname: '',
           firstname: '',
         },
-        local: { email: '' }
+        local: { email: '' },
       },
       newSubscription: {
         service: '',
@@ -673,7 +678,7 @@ export default {
     docsUploadUrl () {
       if (!this.customer.driveFolder) return '';
 
-      return `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.id}/upload`;
+      return `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.driveId}/upload`;
     },
     headers () {
       return { 'x-access-token': Cookies.get('alenvi_token') || '' };
@@ -756,7 +761,7 @@ export default {
     daysOptions () {
       return days.map((day, i) => ({
         label: day !== 'Jours fériés' ? day.slice(0, 2) : day,
-        value: i
+        value: i,
       }));
     },
     editedFundingMaxStartDate () {
@@ -764,30 +769,30 @@ export default {
         return this.$moment(this.editedFunding.endDate).subtract(1, 'day').toISOString();
       }
       return '';
-    }
+    },
   },
   validations: {
     customer: {
       identity: {
-        lastname: { required }
+        lastname: { required },
       },
       contact: {
         phone: { frPhoneNumber },
         address: {
-          fullAddress: { required, frAddress }
-        }
+          fullAddress: { required, frAddress },
+        },
       },
       payment: {
         bankAccountOwner: { required },
         bic: { required, bic },
-        iban: { required, iban }
-      }
+        iban: { required, iban },
+      },
     },
     newHelper: {
       identity: { lastname: { required } },
       local: {
-        email: { required, email }
-      }
+        email: { required, email },
+      },
     },
     newSubscription: {
       service: { required },
@@ -834,14 +839,14 @@ export default {
       customerParticipationRate: { required: requiredIf((item) => {
         return item.nature === HOURLY;
       }) },
-    }
+    },
   },
   watch: {
     userProfile (value) {
       if (!this.$_.isEqual(value, this.customer)) {
         this.mergeUser(value);
       }
-    }
+    },
   },
   async mounted () {
     await this.getUserHelpers();
@@ -850,6 +855,15 @@ export default {
     this.isLoaded = true;
   },
   methods: {
+    formatAdditionalFields (row) {
+      return [
+        { name: 'mandateId', value: row._id },
+        {
+          name: 'fileName',
+          value: `mandat_signe_${this.customer.identity.firstname}_${this.customer.identity.lastname}`,
+        },
+      ]
+    },
     getServiceLastVersion (service) {
       if (!service.versions || service.versions.length === 0) return {};
 
@@ -989,7 +1003,7 @@ export default {
         unitTTCRate,
         estimatedWeeklyVolume,
         evenings,
-        sundays
+        sundays,
       };
 
       this.subscriptionEditionModal = true;
@@ -1025,7 +1039,7 @@ export default {
           title: 'Confirmation',
           message: 'Es-tu sûr(e) de vouloir supprimer cette souscription ?',
           ok: true,
-          cancel: 'Annuler'
+          cancel: 'Annuler',
         });
 
         const params = { subscriptionId, _id: this.customer._id };
@@ -1057,8 +1071,8 @@ export default {
         sender: { email: 'support@alenvi.io' },
         receiver: {
           email: this.newHelper.local.email,
-          password: this.newHelper.local.password
-        }
+          password: this.newHelper.local.password,
+        },
       });
     },
     async submitHelper () {
@@ -1088,7 +1102,7 @@ export default {
           title: 'Confirmation',
           message: 'Es-tu sûr(e) de vouloir supprimer cet aidant ?',
           ok: true,
-          cancel: 'Annuler'
+          cancel: 'Annuler',
         });
         await this.$users.deleteById(helperId);
         NotifyPositive('Aidant supprimé');
@@ -1259,7 +1273,7 @@ export default {
         nature,
         thirdPartyPayer,
         subscription,
-        versions: [{...version}]
+        versions: [{...version}],
       };
     },
     async submitFunding () {
@@ -1287,7 +1301,7 @@ export default {
           title: 'Confirmation',
           message: 'Es-tu sûr(e) de vouloir supprimer ce financement ?',
           ok: true,
-          cancel: 'Annuler'
+          cancel: 'Annuler',
         });
 
         const params = { fundingId, _id: this.customer._id };
@@ -1350,8 +1364,8 @@ export default {
       } finally {
         this.loading = false;
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

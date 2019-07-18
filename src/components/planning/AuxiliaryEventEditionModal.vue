@@ -10,7 +10,7 @@
           </div>
           <q-select v-else v-model="editedEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions"
             :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
-            :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`"
+            :filter-placeholder="auxiliaryFilterPlaceholder"
             :disable="isDisabled" ref="auxiliarySelect" filter />
         </div>
         <div class="col-1 cursor-pointer modal-btn-close">
@@ -55,15 +55,15 @@
         <template v-if="editedEvent.absenceNature === DAILY">
           <ni-datetime-picker caption="Date de début" v-model="editedEvent.dates.startDate" type="date" required-field
             :error="validations.dates.startDate.$error" inModal @blur="validations.dates.startDate.$touch" />
-          <ni-datetime-picker caption="Date de fin" v-model="editedEvent.dates.endDate" type="date" required-field inModal
-            :error="validations.dates.endDate.$error" @blur="validations.dates.endDate.$touch"
+          <ni-datetime-picker caption="Date de fin" v-model="editedEvent.dates.endDate" type="date" required-field
+            inModal :error="validations.dates.endDate.$error" @blur="validations.dates.endDate.$touch"
             :min="editedEvent.dates.startDate" />
           <ni-modal-select caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions"
             :error="validations.absence.$error" required-field @blur="validations.absence.$touch" />
-          <ni-file-uploader v-if="editedEvent.absence && editedEvent.absence === ILLNESS" caption="Justificatif d'absence"
-            path="attachment" :entity="editedEvent" alt="justificatif absence" name="proofOfAbsence" :url="docsUploadUrl"
-            @uploaded="documentUploaded" :additionalValue="additionalValue" required-field withBorders
-            @delete="deleteDocument(editedEvent.attachment.driveId)" :disable="!selectedAuxiliary._id" />
+          <ni-file-uploader v-if="editedEvent.absence && editedEvent.absence === ILLNESS" path="attachment"
+            caption="Justificatif d'absence" :entity="editedEvent" alt="justificatif absence" name="proofOfAbsence"
+            :url="docsUploadUrl" @uploaded="documentUploaded" :additionalValue="additionalValue" required-field
+            withBorders @delete="deleteDocument(editedEvent.attachment.driveId)" :disable="!selectedAuxiliary._id" />
         </template>
         <template v-if="editedEvent.absenceNature === HOURLY">
           <ni-datetime-range caption="Dates et heures de l'évènement" v-model="editedEvent.dates" required-field
@@ -80,11 +80,11 @@
         </div>
         <div class="row justify-between">
           <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.condition" caption="Conditions"
-            :options="cancellationConditions" required-field @blur="validations.cancel.condition.$touch" class="col-6"
-            style="padding-right: 3px" />
+            :options="cancellationConditions" required-field @blur="validations.cancel.condition.$touch"
+            class="col-6 cancel" />
           <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.reason" caption="Motif"
-            :options="cancellationReasons" required-field @blur="validations.cancel.reason.$touch" class="col-6"
-            style="padding-left: 3px" />
+            :options="cancellationReasons" required-field @blur="validations.cancel.reason.$touch"
+            class="col-6 cancel" />
         </div>
       </template>
     </div>
@@ -94,14 +94,15 @@
         <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect" />
       </div>
     </div>
-    <q-btn v-if="!isDisabled" class="full-width modal-btn" no-caps color="primary" :loading="loading" label="Editer l'évènement"
-      @click="updateEvent" icon-right="check" :disable="disableEditionButton" />
+    <q-btn v-if="!isDisabled" class="full-width modal-btn" no-caps color="primary" :loading="loading"
+      label="Editer l'évènement" @click="updateEvent" icon-right="check" :disable="disableEditionButton" />
   </q-modal>
 </template>
 
 <script>
-import { DEFAULT_AVATAR, INTERVENTION } from '../../data/constants';
+import { INTERVENTION, AUXILIARY } from '../../data/constants';
 import { planningModalMixin } from '../../mixins/planningModalMixin';
+import { formatFullIdentity } from '../../helpers/utils';
 
 export default {
   name: 'AuxiliaryEventEditionModal',
@@ -111,10 +112,15 @@ export default {
     editionModal: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
     selectedAuxiliary: { type: Object, default: () => ({}) },
-    auxiliaries: { type: Array, default: () => [] },
+    activeAuxiliaries: { type: Array, default: () => [] },
     customers: { type: Array, default: () => [] },
     internalHours: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
+  },
+  data () {
+    return {
+      personKey: AUXILIARY,
+    };
   },
   computed: {
     additionalValue () {
@@ -123,7 +129,7 @@ export default {
     docsUploadUrl () {
       return !this.selectedAuxiliary._id
         ? ''
-        : `${process.env.API_HOSTNAME}/events/${this.selectedAuxiliary._id}/gdrive/${this.selectedAuxiliary.administrative.driveFolder.id}/upload`;
+        : `${process.env.API_HOSTNAME}/events/${this.selectedAuxiliary._id}/gdrive/${this.selectedAuxiliary.administrative.driveFolder.driveId}/upload`;
     },
     eventType () {
       return this.eventTypeOptions.filter(option => option.value === this.editedEvent.type);
@@ -131,11 +137,13 @@ export default {
     isDisabled () {
       return this.editedEvent.type === INTERVENTION && this.editedEvent.isBilled;
     },
+    auxiliaryFilterPlaceholder () {
+      return this.selectedAuxiliary.identity
+        ? formatFullIdentity(this.selectedAuxiliary.identity)
+        : 'À affecter';
+    },
   },
   methods: {
-    getAvatar (user) {
-      return user && user.picture && user.picture.link ? user.picture.link : DEFAULT_AVATAR;
-    },
     toggleAuxiliarySelect () {
       return this.$refs['auxiliarySelect'].show();
     },
@@ -177,7 +185,7 @@ export default {
       display: inline-flex;
       flex-wrap: wrap;
     & .q-btn-item
-      width: 45%
+      width: 45%;
       border-radius: 20px;
       margin: 5px;
       background-color: $light-grey;
@@ -202,5 +210,8 @@ export default {
   .light-checkbox
     color: $grey
     font-size: 14px
+
+  .cancel
+    padding-right: 3px;
 
 </style>

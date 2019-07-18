@@ -1,4 +1,4 @@
-import { formatPrice, formatShortIdentity } from '../helpers/utils';
+import { formatPrice, formatShortIdentity, formatHours } from '../helpers/utils';
 import { END_CONTRACT_REASONS } from '../data/constants';
 
 export const payMixin = {
@@ -55,70 +55,70 @@ export const payMixin = {
           label: 'Heures contrat',
           align: 'center',
           field: 'contractHours',
-          format: value => this.formatHours(value),
+          format: formatHours,
         },
         {
           name: 'workedHours',
           label: 'Heures travaillées',
           align: 'center',
           field: 'workedHours',
-          format: value => this.formatHours(value),
+          format: formatHours,
         },
         {
           name: 'notSurchargedAndExempt',
           label: 'Dont exo non majo',
           align: 'center',
           field: 'notSurchargedAndExempt',
-          format: value => this.formatHours(value),
+          format: formatHours,
         },
         {
           name: 'surchargedAndExempt',
           label: 'Dont exo et majo',
           align: 'center',
           field: 'surchargedAndExempt',
-          format: value => this.formatHours(value),
+          format: formatHours,
         },
         {
           name: 'notSurchargedAndNotExempt',
           label: 'Dont non exo et non majo ',
           align: 'center',
           field: 'notSurchargedAndNotExempt',
-          format: value => this.formatHours(value),
+          format: formatHours,
         },
         {
           name: 'surchargedAndNotExempt',
           label: 'Dont non exo et majo',
           align: 'center',
           field: 'surchargedAndNotExempt',
-          format: value => this.formatHours(value),
+          format: formatHours,
         },
         {
           name: 'hoursBalance',
           label: 'Solde heures',
           align: 'center',
           field: 'hoursBalance',
-          format: value => this.formatHours(value),
+          format: formatHours,
         },
         {
           name: 'hoursCounter',
           label: 'Compteur',
           align: 'center',
           field: row => row.hoursCounter - row.additionalHours - row.overtimeHours,
-          format: value => this.formatHours(value),
+          format: formatHours,
         },
         {
           name: 'overtimeHours',
           label: 'Heures sup à payer',
           align: 'center',
           field: 'overtimeHours',
-          format: value => this.formatHours(value),
+          format: formatHours,
         },
         {
           name: 'additionalHours',
           label: 'Heures comp à payer',
           align: 'center',
           field: 'additionalHours',
-          format: value => this.formatHours(value),
+          format: formatHours,
         },
         {
           name: 'mutual',
@@ -132,40 +132,33 @@ export const payMixin = {
           label: 'Transport',
           align: 'center',
           field: 'transport',
-          format: value => formatPrice(value),
+          format: formatPrice,
         },
         {
           name: 'otherFees',
           label: 'Autres frais',
           align: 'center',
           field: 'otherFees',
-          format: value => formatPrice(value),
+          format: formatPrice,
         },
         {
           name: 'bonus',
           label: 'Prime',
           align: 'center',
           field: 'bonus',
-          format: value => formatPrice(value),
+          format: formatPrice,
         },
         {
           name: 'compensation',
           label: 'Indémnité',
           align: 'center',
           field: 'compensation',
-          format: value => formatPrice(value),
+          format: formatPrice,
         },
       ],
     }
   },
   methods: {
-    // Format value
-    formatPrice (value) {
-      return formatPrice(value);
-    },
-    formatHours (value) {
-      return value ? `${parseFloat(value).toFixed(2)}h` : '0.00h';
-    },
     formatPayload (payload) {
       return {
         ...this.$_.omit(payload, ['auxiliaryId', 'additionalHoursEdition', 'overtimeHoursEdition', 'bonusEdition', 'hoursCounterEdition', 'compensationEdition', 'paidKm', '__index']),

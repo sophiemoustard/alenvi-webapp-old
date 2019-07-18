@@ -31,7 +31,7 @@ export default {
   components: {
     SideMenuCoach,
     SideMenuAuxiliary,
-    SideMenuCustomer
+    SideMenuCustomer,
   },
   data () {
     return {
@@ -41,7 +41,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      user: 'main/user'
+      user: 'main/user',
     }),
     isAuxiliary () {
       return this.user.role.name === AUXILIARY || this.user.role.name === PLANNING_REFERENT;
@@ -52,14 +52,14 @@ export default {
       },
       set (val) {
         this.$store.commit('main/setToggleDrawer', !this.toggleDrawer)
-      }
+      },
     },
     sidemenusRefs () {
       if (this.user && !this.isAuxiliary) {
         return 'defaultMenu';
       }
       return 'auxiliaryMenu';
-    }
+    },
   },
   methods: {
     toggleLeft () {
@@ -73,7 +73,7 @@ export default {
     }
 
     next();
-  }
+  },
 }
 </script>
 

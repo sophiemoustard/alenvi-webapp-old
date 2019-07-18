@@ -22,7 +22,7 @@ export default {
       const auxiliaries = [];
       let weeklyHours = 0;
       this.events.forEach((event) => {
-        if (!auxiliaries.includes(event.auxiliary._id)) auxiliaries.push(event.auxiliary._id);
+        if (event.auxiliary && !auxiliaries.includes(event.auxiliary._id)) auxiliaries.push(event.auxiliary._id);
         weeklyHours += this.$moment(event.endDate).diff(event.startDate, 'h', true);
       });
       return { auxiliariesNumber: auxiliaries.length, weeklyHours: Math.round(weeklyHours) };
@@ -32,7 +32,7 @@ export default {
     getAvatar (picture) {
       return (!picture || !picture.link) ? DEFAULT_AVATAR : picture.link;
     },
-  }
+  },
 }
 </script>
 

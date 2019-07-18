@@ -20,13 +20,13 @@ import { NotifyPositive, NotifyNegative } from '../popup/notify.js';
 export default {
   data () {
     return {
-      tasks: null
+      tasks: null,
     }
   },
   computed: {
     getUser () {
       return this.$store.getters['rh/getUserProfile'];
-    }
+    },
   },
   async mounted () {
     try {
@@ -46,8 +46,8 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la mise à jour de la tâche');
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

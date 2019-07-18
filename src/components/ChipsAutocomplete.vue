@@ -16,14 +16,14 @@ export default {
   data () {
     return {
       searchIcon: [{
-        icon: 'search'
+        icon: 'search',
       }],
     }
   },
   computed: {
     ...mapGetters({
       getFilter: 'planning/getFilter',
-      getElemAdded: 'planning/getElemAdded'
+      getElemAdded: 'planning/getElemAdded',
     }),
   },
   methods: {

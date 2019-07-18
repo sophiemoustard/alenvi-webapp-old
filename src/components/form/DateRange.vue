@@ -81,7 +81,7 @@ export default {
     setFieldError (field, error) {
       this.childErrors[field] = error;
       this.$emit('update:error', this.orderError || this.childrenHaveError);
-    }
+    },
   },
 }
 </script>

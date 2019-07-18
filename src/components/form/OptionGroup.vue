@@ -28,7 +28,7 @@ export default {
     requiredField: { type: Boolean, default: false },
     options: Array,
     type: String,
-    inline: { type: Boolean, default: false }
+    inline: { type: Boolean, default: false },
   },
   methods: {
     inputHandler (value) {
@@ -36,8 +36,8 @@ export default {
     },
     blurHandler () {
       this.$emit('blur');
-    }
-  }
+    },
+  },
 }
 </script>
 

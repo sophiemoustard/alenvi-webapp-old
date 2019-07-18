@@ -17,13 +17,13 @@ export default {
   name: 'Error404',
   data () {
     return {
-      canGoBack: window.history.length > 1
+      canGoBack: window.history.length > 1,
     }
   },
   methods: {
     goBack () {
       window.history.go(-1);
-    }
-  }
+    },
+  },
 }
 </script>

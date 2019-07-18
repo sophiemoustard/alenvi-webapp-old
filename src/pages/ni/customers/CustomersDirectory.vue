@@ -75,12 +75,12 @@ import { REQUIRED_LABEL } from '../../../data/constants';
 
 export default {
   metaInfo: {
-    title: 'Répertoire bénéficiaires'
+    title: 'Répertoire bénéficiaires',
   },
   components: {
     NiSearchAddress: SearchAddress,
     NiModalInput,
-    NiModalSelect
+    NiModalSelect,
   },
   data () {
     return {
@@ -91,19 +91,19 @@ export default {
       sendWelcomeMsg: true,
       civilityOptions: [
         { label: 'Monsieur', value: 'M.' },
-        { label: 'Madame', value: 'Mme' }
+        { label: 'Madame', value: 'Mme' },
       ],
       newCustomer: {
         identity: {
           title: '',
           lastname: '',
-          firstname: ''
+          firstname: '',
         },
         email: '',
         contact: {
-          address: { fullAddress: '' }
+          address: { fullAddress: '' },
         },
-        isActive: true
+        isActive: true,
       },
       customersList: [],
       searchStr: '',
@@ -112,7 +112,7 @@ export default {
         sortBy: 'startDate',
         descending: true,
         page: 1,
-        rowsPerPage: 15
+        rowsPerPage: 15,
       },
       columns: [
         {
@@ -126,7 +126,7 @@ export default {
             const bArr = b.name.split(' ');
             return aArr[aArr.length - 1].toLowerCase() < bArr[bArr.length - 1].toLowerCase() ? -1 : 1
           },
-          style: 'width: 350px'
+          style: 'width: 350px',
         },
         {
           name: 'startDate',
@@ -136,7 +136,7 @@ export default {
           sortable: true,
           format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : 'N/A',
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
-          style: 'width: 170px'
+          style: 'width: 170px',
         },
         {
           name: 'info',
@@ -145,7 +145,7 @@ export default {
           align: 'left',
           sortable: true,
           sort: (a, b) => a - b,
-          style: 'width: 30px'
+          style: 'width: 30px',
         },
         {
           name: 'active',
@@ -153,24 +153,24 @@ export default {
           field: 'isActive',
           align: 'right',
           sortable: false,
-          style: 'width: 30px'
-        }
-      ]
+          style: 'width: 30px',
+        },
+      ],
     }
   },
   validations: {
     newCustomer: {
       identity: {
         title: { required },
-        lastname: { required }
+        lastname: { required },
       },
       email: { email },
       contact: {
         address: {
-          fullAddress: { required, frAddress }
-        }
+          fullAddress: { required, frAddress },
+        },
       },
-    }
+    },
   },
   async mounted () {
     this.getCustomersList();
@@ -207,7 +207,7 @@ export default {
         return REQUIRED_LABEL;
       }
       return 'Adresse non valide';
-    }
+    },
   },
   methods: {
     async getCustomersList () {
@@ -220,7 +220,7 @@ export default {
               name: customer.identity.firstname ? `${customer.identity.firstname} ${customer.identity.lastname}` : customer.identity.lastname,
             },
             startDate: customer.createdAt,
-            isActive: customer.isActive
+            isActive: customer.isActive,
           }
           if (customer.isActive) {
             formattedCustomer.missingInfo = customerProfileValidation(customer).error !== null;
@@ -262,8 +262,8 @@ export default {
     },
     selectedAddress (item) {
       this.newCustomer.contact.address = Object.assign({}, this.newCustomer.contact.address, item);
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -184,7 +184,7 @@ export default {
           name: 'rum',
           label: 'RUM',
           align: 'left',
-          field: 'rum'
+          field: 'rum',
         },
         {
           name: 'sign',
@@ -198,12 +198,12 @@ export default {
           field: 'createdAt',
           sortable: true,
           format: (value) => this.$moment(value).format('DD/MM/YYYY'),
-          sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate())
+          sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
         },
         {
           name: '_id',
           field: '_id',
-        }
+        },
       ],
       visibleColumnsMandates: ['rum', 'sign'],
       fundingModal: false,
@@ -212,7 +212,7 @@ export default {
         sortBy: 'createdAt',
         ascending: true,
         rowsPerPage: 0,
-      }
+      },
     }
   },
   validations: {
@@ -220,9 +220,9 @@ export default {
       payment: {
         bankAccountOwner: { required },
         bic: { required, bic },
-        iban: { required, iban }
-      }
-    }
+        iban: { required, iban },
+      },
+    },
   },
   computed: {
     helper () {
@@ -251,26 +251,26 @@ export default {
       if (this.$q.platform.is.desktop) {
         return {
           redirect: `${process.env.COMPANI_HOSTNAME}/docsigned?signed=true`,
-          redirectDecline: `${process.env.COMPANI_HOSTNAME}/docsigned?signed=false`
+          redirectDecline: `${process.env.COMPANI_HOSTNAME}/docsigned?signed=false`,
         }
       }
       return {
         redirect: `${process.env.COMPANI_HOSTNAME}/customers/subscriptions`,
-        redirectDecline: `${process.env.COMPANI_HOSTNAME}/customers/subscriptions`
+        redirectDecline: `${process.env.COMPANI_HOSTNAME}/customers/subscriptions`,
       }
     },
     isValidPayment () {
       return this.$v.customer.payment.bic.bic && this.$v.customer.payment.iban.iban
     },
     docsUploadUrl () {
-      return this.customer.driveFolder ? `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.id}/upload` : '';
+      return this.customer.driveFolder ? `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.driveId}/upload` : '';
     },
     fundingVisibleColumns () {
       if (this.selectedFunding.nature === FIXED) {
         return ['thirdPartyPayer', 'folderNumber', 'startDate', 'frequency', 'amountTTC', 'customerParticipationRate'];
       }
       return ['thirdPartyPayer', 'folderNumber', 'startDate', 'frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate'];
-    }
+    },
   },
   async mounted () {
     await this.refreshCustomer();
@@ -345,8 +345,8 @@ export default {
             helper: {
               firstname: this.helper.identity.firstname || '',
               lastname: this.helper.identity.lastname || '',
-              title: this.helper.identity ? this.helper.identity.title : ''
-            }
+              title: this.helper.identity ? this.helper.identity.title : '',
+            },
           };
           await this.$customers.addSubscriptionHistory(this.customer._id, payload);
           await this.refreshCustomer();
@@ -365,7 +365,7 @@ export default {
         const signatureRequest = await this.$customers.generateMandateSignatureRequest({ mandateId: data._id, _id: this.customer._id }, {
           customer: {
             name: this.customer.identity.lastname,
-            email: this.helper.local.email
+            email: this.helper.local.email,
           },
           fileId: this.helper.company.customersConfig.templates.debitMandate.driveId,
           fields: {
@@ -377,9 +377,9 @@ export default {
             iban: this.customer.payment.iban || '',
             companyName: this.helper.company.name || '',
             companyAddress: this.helper.company.address.fullAddress || '',
-            downloadDate: this.$moment().format('DD/MM/YYYY')
+            downloadDate: this.$moment().format('DD/MM/YYYY'),
           },
-          ...this.esignRedirection
+          ...this.esignRedirection,
         });
         await this.refreshCustomer();
         this.embeddedUrl = signatureRequest.embeddedUrl;
@@ -433,7 +433,7 @@ export default {
       this.selectedFunding = {};
       this.fundingData = [];
       this.fundingModal = false;
-    }
+    },
   },
 }
 </script>

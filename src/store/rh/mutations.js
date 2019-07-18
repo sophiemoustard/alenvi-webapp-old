@@ -4,6 +4,6 @@ export function saveUserProfile (state, data) {
 
 export function saveNotification (state, notification) {
   state.notifications[notification.type] = Object.assign({}, state.notifications[notification.type], {
-    [notification._id]: notification.exists
+    [notification._id]: notification.exists,
   });
 }

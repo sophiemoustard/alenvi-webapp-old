@@ -5,6 +5,7 @@ import ModalSelect from '../components/form/ModalSelect';
 import ModalInput from '../components/form/ModalInput';
 import SearchAddress from '../components/form/SearchAddress';
 import FileUploader from '../components/form/FileUploader';
+import { formatFullIdentity } from '../helpers/utils';
 import {
   INTERVENTION,
   ABSENCE,
@@ -14,6 +15,7 @@ import {
   EVERY_DAY,
   EVERY_WEEK_DAY,
   EVERY_WEEK,
+  EVERY_TWO_WEEKS,
   INVOICED_AND_PAYED,
   INVOICED_AND_NOT_PAYED,
   CUSTOMER_INITIATIVE,
@@ -29,6 +31,10 @@ import {
   COMPANY_CONTRACT,
   ADMIN,
   COACH,
+  EVENT_TYPES,
+  CUSTOMER,
+  UNKNOWN_AVATAR,
+  DEFAULT_AVATAR,
 } from '../data/constants';
 
 export const planningModalMixin = {
@@ -85,7 +91,8 @@ export const planningModalMixin = {
           return !this.newEvent.auxiliary || !this.newEvent.absence || !this.newEvent.dates.startDate ||
             !this.newEvent.absenceNature || !this.newEvent.dates.startHour || !this.newEvent.dates.endHour;
         case INTERVENTION:
-          return !this.newEvent.auxiliary || !this.newEvent.customer || !this.newEvent.subscription || !this.newEvent.dates.startDate ||
+          return (this.personKey === CUSTOMER && !this.newEvent.auxiliary) || !this.newEvent.customer ||
+            !this.newEvent.subscription || !this.newEvent.dates.startDate ||
             !this.newEvent.dates.endDate || !this.newEvent.dates.startHour || !this.newEvent.dates.endHour;
         case INTERNAL_HOUR:
           return !this.newEvent.auxiliary || !this.newEvent.dates.startDate || !this.newEvent.dates.endDate ||
@@ -107,7 +114,8 @@ export const planningModalMixin = {
           return !this.editedEvent.auxiliary || !this.editedEvent.absence || !this.editedEvent.dates.startDate ||
             !this.editedEvent.absenceNature || !this.editedEvent.dates.startHour || !this.editedEvent.dates.endHour;
         case INTERVENTION:
-          const shouldDisableButton = !this.editedEvent.auxiliary || !this.editedEvent.subscription || !this.editedEvent.dates.startDate ||
+          const shouldDisableButton = (this.personKey === CUSTOMER && !this.editedEvent.sector) ||
+            !this.editedEvent.subscription || !this.editedEvent.dates.startDate ||
             !this.editedEvent.dates.endDate || !this.editedEvent.dates.startHour || !this.editedEvent.dates.endHour;
           if (this.editedEvent.isCancelled) return shouldDisableButton || !this.editedEvent.cancel.condition || !this.editedEvent.cancel.reason;
           else return shouldDisableButton;
@@ -121,28 +129,32 @@ export const planningModalMixin = {
       }
     },
     eventTypeOptions () {
-      if (this.selectedAuxiliary && !this.selectedAuxiliary.hasActiveCompanyContractOnEvent) {
-        return [
-          {label: 'Intervention', value: INTERVENTION},
-          {label: 'Absence', value: ABSENCE},
-          {label: 'Indispo', value: UNAVAILABILITY}
-        ]
+      if (this.selectedAuxiliary && !this.selectedAuxiliary._id) {
+        return EVENT_TYPES.filter(type => type.value === INTERVENTION);
       }
-      return [
-        {label: 'Intervention', value: INTERVENTION},
-        {label: 'Interne', value: INTERNAL_HOUR},
-        {label: 'Absence', value: ABSENCE},
-        {label: 'Indispo', value: UNAVAILABILITY}
-      ]
+
+      if (this.selectedAuxiliary && !this.selectedAuxiliary.hasActiveCompanyContractOnEvent) {
+        return EVENT_TYPES.filter(type => type.value !== INTERNAL_HOUR);
+      }
+
+      return EVENT_TYPES;
     },
     auxiliariesOptions () {
-      return this.auxiliaries.length === 0 ? [] : this.auxiliaries.map(aux => ({
-        label: `${aux.identity.firstname || ''} ${aux.identity.lastname}`,
-        value: aux._id,
-      }));
+      if (this.activeAuxiliaries.length === 0) return [];
+
+      if (this.personKey === CUSTOMER && this.creationModal) {
+        return this.activeAuxiliaries.map(aux => this.formatPersonOptions(aux));
+      }
+
+      return [
+        { label: 'À affecter', value: '' },
+        ...this.activeAuxiliaries.map(aux => this.formatPersonOptions(aux)),
+      ];
     },
     customersOptions () {
-      if (this.customers.length === 0 || !this.selectedAuxiliary || !this.selectedAuxiliary.contracts) return [];
+      if (this.customers.length === 0 || !this.selectedAuxiliary) return [];
+      if (!this.selectedAuxiliary._id) return this.customers.map(cus => this.formatPersonOptions(cus)); // Unassigned event
+      if (!this.selectedAuxiliary.contracts) return [];
 
       let customers = this.customers;
       if (this.selectedAuxiliary && !this.selectedAuxiliary.hasActiveCompanyContractOnEvent) {
@@ -154,10 +166,7 @@ export const planningModalMixin = {
         customers = this.customers.filter(cus => auxiliaryCustomers.includes(cus._id));
       }
 
-      return customers.map(customer => ({
-        label: `${customer.identity.firstname || ''} ${customer.identity.lastname}`,
-        value: customer._id,
-      }));
+      return customers.map(cus => this.formatPersonOptions(cus));
     },
     internalHourOptions () {
       return this.internalHours.map(hour => ({
@@ -165,21 +174,20 @@ export const planningModalMixin = {
         value: hour._id,
       }));
     },
-    oneDayRepetitionLabel () {
-      if (this.creationModal) return `Tous les ${this.$moment(this.newEvent.dates.startDate).day()}`;
-      if (this.editionModal) return `Tous les ${this.$moment(this.editedEvent.dates.startDate).day()}`;
-      return 'Tous les lundis';
-    },
     repetitionOptions () {
-      const oneDayRepetitionLabel = this.creationModal
+      const oneWeekRepetitionLabel = this.creationModal
         ? `Tous les ${this.$moment(this.newEvent.dates.startDate).format('dddd')}s`
         : 'Tous les lundis';
+      const twoWeeksRepetitionLabel = this.creationModal
+        ? `Le ${this.$moment(this.newEvent.dates.startDate).format('dddd')} une semaine sur deux`
+        : 'Le lundi une semaine sur deux';
 
       return [
         { label: 'Jamais', value: NEVER },
         { label: 'Tous les jours', value: EVERY_DAY },
         { label: 'Tous les jours de la semaine (lundi au vendredi)', value: EVERY_WEEK_DAY },
-        { label: oneDayRepetitionLabel, value: EVERY_WEEK },
+        { label: oneWeekRepetitionLabel, value: EVERY_WEEK },
+        { label: twoWeeksRepetitionLabel, value: EVERY_TWO_WEEKS },
       ];
     },
     addressError () {
@@ -189,11 +197,23 @@ export const planningModalMixin = {
       return this.$_.get(this.editedEvent, 'customer.contact.address.fullAddress', '');
     },
     customerProfileRedirect () {
-      if (this.getUser.role.name === COACH || this.getUser.role.name === ADMIN) return { name: 'customers profile', params: { id: this.editedEvent.customer._id } };
-      return { name: 'profile customers info', params: { customerId: this.editedEvent.customer._id } };
-    }
+      return this.getUser.role.name === COACH || this.getUser.role.name === ADMIN
+        ? { name: 'customers profile', params: { id: this.editedEvent.customer._id } }
+        : { name: 'profile customers info', params: { customerId: this.editedEvent.customer._id } };
+    },
   },
   methods: {
+    getAvatar (user) {
+      if (!user || !user._id) return UNKNOWN_AVATAR;
+
+      return this.$_.get(user, 'picture.link') || DEFAULT_AVATAR;
+    },
+    formatPersonOptions (person) {
+      return {
+        label: formatFullIdentity(person.identity),
+        value: person._id,
+      };
+    },
     // Event creation
     customerSubscriptionsOptions (customerId) {
       if (!customerId) return [];
@@ -201,8 +221,10 @@ export const planningModalMixin = {
       if (!selectedCustomer || !selectedCustomer.subscriptions || selectedCustomer.subscriptions.length === 0) return [];
 
       let subscriptions = selectedCustomer.subscriptions;
-      if (!this.selectedAuxiliary.hasActiveCustomerContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== CUSTOMER_CONTRACT)
-      if (!this.selectedAuxiliary.hasActiveCompanyContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== COMPANY_CONTRACT)
+      if (this.selectedAuxiliary._id) {
+        if (!this.selectedAuxiliary.hasActiveCustomerContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== CUSTOMER_CONTRACT);
+        if (!this.selectedAuxiliary.hasActiveCompanyContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== COMPANY_CONTRACT);
+      }
 
       return subscriptions.map(sub => ({
         label: sub.service.name,

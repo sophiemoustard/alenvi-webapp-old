@@ -41,7 +41,7 @@ export default {
     displayInput: { type: Boolean, default: true },
     suffix: { type: String, default: '' },
     borders: { type: Boolean, default: false },
-    requiredField: { type: Boolean, default: false }
+    requiredField: { type: Boolean, default: false },
   },
   methods: {
     blurHandler (event) {

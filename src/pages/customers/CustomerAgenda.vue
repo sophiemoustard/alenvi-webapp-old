@@ -10,13 +10,13 @@
           @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :viewMode="viewMode" @updateViewMode="updateViewMode"
           :type="AGENDA" />
       </div>
-      <agenda :events="events" :days="days" personKey="customer" />
+      <agenda :events="events" :days="days" :personKey="personKey" />
     </div>
   </q-page>
 </template>
 
 <script>
-import { DEFAULT_AVATAR, WEEK_VIEW, AGENDA } from '../../data/constants';
+import { DEFAULT_AVATAR, WEEK_VIEW, AGENDA, CUSTOMER } from '../../data/constants';
 import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import Agenda from '../../components/Agenda';
 import PlanningNavigation from '../../components/planning/PlanningNavigation';
@@ -38,6 +38,7 @@ export default {
       height: 0,
       viewMode: WEEK_VIEW,
       AGENDA,
+      personKey: CUSTOMER,
     };
   },
   computed: {
@@ -84,7 +85,7 @@ export default {
   },
   filters: {
     formatFullIdentity,
-  }
+  },
 }
 </script>
 

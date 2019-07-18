@@ -166,12 +166,12 @@ export default {
       if (this.$moment().isBefore(contractEndDate)) {
         return {
           msg: `Le contrat se termine le ${this.$moment(contractEndDate).format('DD MMMM YYYY')}`,
-          color: 'orange'
+          color: 'orange',
         }
       } else {
         return {
           msg: `Contrat terminé le: ${this.$moment(contractEndDate).format('DD MMMM YYYY')}`,
-          color: 'red'
+          color: 'red',
         }
       }
     },
@@ -183,7 +183,7 @@ export default {
         { name: 'fileName', value: `contrat_signe_${this.user.identity.firstname}_${this.user.identity.lastname}` },
         { name: 'contractId', value: contract._id },
         { name: 'versionId', value: version._id },
-        { name: 'type', value: contract.status }
+        { name: 'type', value: contract.status },
       ]
     },
     getLastVersion (contract) {
@@ -214,11 +214,11 @@ export default {
           title: 'Confirmation',
           message: 'Es-tu sûr(e) de vouloir activer ce contrat ?',
           ok: true,
-          cancel: 'Annuler'
+          cancel: 'Annuler',
         });
         await this.updateEndDateOfPreviousVersion(contract._id, contractIndex);
 
-        const queries = { contractId: contract._id, versionId: version._id, };
+        const queries = { contractId: contract._id, versionId: version._id };
         await this.$contracts.updateVersion(queries, { 'isActive': isActive });
 
         // Update manually checkbox because it's not dynamic
@@ -255,7 +255,7 @@ export default {
       if (lastActiveVersion) {
         const queries = {
           contractId: contractId,
-          versionId: lastActiveVersion._id
+          versionId: lastActiveVersion._id,
         };
         const payload = { endDate: this.$moment(lastVersion.startDate).toDate() };
         await this.$contracts.updateVersion(queries, payload);
@@ -275,7 +275,7 @@ export default {
       return !!templates.contractWithCustomerVersion && !!templates.contractWithCustomerVersion.driveId;
     },
     docsUploadUrl (contractId) {
-      return `${process.env.API_HOSTNAME}/contracts/${contractId}/gdrive/${this.user.administrative.driveFolder.id}/upload`;
+      return `${process.env.API_HOSTNAME}/contracts/${contractId}/gdrive/${this.user.administrative.driveFolder.driveId}/upload`;
     },
     uploadDocument (files, refName) {
       if (files[0].size > 5000000) {

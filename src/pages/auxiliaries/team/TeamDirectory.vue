@@ -43,7 +43,7 @@ export default {
         sortBy: 'name',
         descending: false,
         page: 1,
-        rowsPerPage: 15
+        rowsPerPage: 15,
       },
       columns: [
         {
@@ -57,7 +57,7 @@ export default {
             const bArr = b.name.split(' ');
             return aArr[aArr.length - 1].toLowerCase() < bArr[bArr.length - 1].toLowerCase() ? -1 : 1
           },
-          style: 'width: 400px'
+          style: 'width: 400px',
         },
         {
           name: 'phone',
@@ -66,9 +66,9 @@ export default {
           align: 'left',
           sortable: false,
           format: (value) => this.formatPhone(value),
-          style: 'width: 100px'
-        }
-      ]
+          style: 'width: 100px',
+        },
+      ],
     }
   },
   mounted () {
@@ -80,7 +80,7 @@ export default {
     },
     filteredUsers () {
       return this.userList.filter(user => user.auxiliary.name.match(new RegExp(this.searchStr, 'i')));
-    }
+    },
   },
   methods: {
     async getUserList () {
@@ -89,9 +89,9 @@ export default {
         this.userList = users.map(user => ({
           auxiliary: {
             name: `${user.identity.firstname} ${user.identity.lastname}`,
-            picture: user.picture ? user.picture.link : null
+            picture: user.picture ? user.picture.link : null,
           },
-          phone: user.mobilePhone
+          phone: user.mobilePhone,
         }));
         this.tableLoading = false;
       } catch (e) {
@@ -116,8 +116,8 @@ export default {
     },
     getPhoneLink (link) {
       return link ? `tel:+33${link.split(' ').join('').substring(1)}` : '-';
-    }
-  }
+    },
+  },
 }
 </script>
 

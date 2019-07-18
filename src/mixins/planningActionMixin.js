@@ -1,5 +1,18 @@
 import { NotifyWarning, NotifyNegative, NotifyPositive } from '../components/popup/notify';
-import { INTERNAL_HOUR, ABSENCE, INTERVENTION, NEVER, UNAVAILABILITY, ILLNESS, CUSTOMER_CONTRACT, COMPANY_CONTRACT, DAILY, PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR } from '../data/constants';
+import {
+  INTERNAL_HOUR,
+  ABSENCE,
+  INTERVENTION,
+  NEVER,
+  UNAVAILABILITY,
+  ILLNESS,
+  CUSTOMER_CONTRACT,
+  COMPANY_CONTRACT,
+  DAILY,
+  PLANNING_VIEW_START_HOUR,
+  PLANNING_VIEW_END_HOUR,
+  SECTOR,
+} from '../data/constants';
 
 export const planningActionMixin = {
   methods: {
@@ -74,8 +87,10 @@ export const planningActionMixin = {
       let payload = { ...this.$_.omit(event, ['dates', '__v', '__index']) }
       payload = this.$_.pickBy(payload);
 
-      const auxiliary = this.auxiliaries.find(aux => aux._id === event.auxiliary);
-      payload.sector = auxiliary.sector._id;
+      if (event.auxiliary) {
+        const auxiliary = this.auxiliaries.find(aux => aux._id === event.auxiliary);
+        payload.sector = auxiliary.sector._id;
+      }
 
       if (event.type === INTERNAL_HOUR) {
         const internalHour = this.internalHours.find(hour => hour._id === event.internalHour);
@@ -107,6 +122,8 @@ export const planningActionMixin = {
       return payload;
     },
     hasConflicts (scheduledEvent) {
+      if (!scheduledEvent.auxiliary) return false;
+
       const auxiliaryEvents = this.getAuxiliaryEventsBetweenDates(scheduledEvent.auxiliary, scheduledEvent.startDate, scheduledEvent.endDate);
       return auxiliaryEvents.some(ev => {
         if ((scheduledEvent._id && scheduledEvent._id === ev._id) || ev.isCancelled) return false;
@@ -116,7 +133,7 @@ export const planningActionMixin = {
     },
     getAuxiliaryEventsBetweenDates (auxiliaryId, startDate, endDate) {
       return this.events
-        .filter(event => event.auxiliary._id === auxiliaryId)
+        .filter(event => event.auxiliary && event.auxiliary._id === auxiliaryId)
         .filter(event => {
           return this.$moment(event.startDate).isBetween(startDate, endDate, 'minutes', '[)') ||
             this.$moment(startDate).isBetween(event.startDate, event.endDate, 'minutes', '[)')
@@ -172,9 +189,9 @@ export const planningActionMixin = {
             shouldUpdateRepetition: false,
             ...eventData,
             dates,
-            auxiliary: auxiliary._id,
+            auxiliary: auxiliary ? auxiliary._id : '',
             subscription,
-            isBilled
+            isBilled,
           };
           break;
         case INTERNAL_HOUR:
@@ -196,13 +213,23 @@ export const planningActionMixin = {
       }
     },
     canEditEvent (event) {
+      if (!event.auxiliary) { // Unassigned event
+        return this.$can({
+          user: this.$store.getters['main/user'],
+          auxiliarySectorEvent: event.sector,
+          permissions: [
+            { name: 'planning:edit:user', rule: 'isInSameSector' },
+          ],
+        });
+      }
+
       return this.$can({
         user: this.$store.getters['main/user'],
         auxiliaryIdEvent: event.auxiliary._id,
         auxiliarySectorEvent: event.sector,
         permissions: [
           { name: 'planning:edit:user', rule: 'isInSameSector' },
-          { name: 'planning:edit', rule: 'isOwner' }
+          { name: 'planning:edit', rule: 'isOwner' },
         ],
       });
     },
@@ -269,10 +296,10 @@ export const planningActionMixin = {
     },
     async updateEventOnDrop (vEvent) {
       try {
-        const { toDay, toPerson, draggedObject } = vEvent;
+        const { toDay, target, draggedObject } = vEvent;
         const daysBetween = this.$moment(draggedObject.endDate).diff(this.$moment(draggedObject.startDate), 'days');
 
-        if ([ABSENCE, UNAVAILABILITY].includes(draggedObject.type) && draggedObject.auxiliary._id !== toPerson._id) {
+        if ([ABSENCE, UNAVAILABILITY].includes(draggedObject.type) && draggedObject.auxiliary._id !== target._id) {
           return NotifyNegative('Impossible de modifier l\'auxiliaire de cet évènement.');
         }
 
@@ -281,8 +308,10 @@ export const planningActionMixin = {
             .minutes(this.$moment(draggedObject.startDate).minutes()).toISOString(),
           endDate: this.$moment(toDay).add(daysBetween, 'days').hours(this.$moment(draggedObject.endDate).hours())
             .minutes(this.$moment(draggedObject.endDate).minutes()).toISOString(),
-          auxiliary: toPerson._id
         };
+
+        if (target.type === SECTOR) payload.sector = target._id;
+        else payload.auxiliary = target._id;
 
         if (this.hasConflicts(payload)) {
           return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
@@ -293,7 +322,7 @@ export const planningActionMixin = {
 
         NotifyPositive('Évènement modifié');
       } catch (e) {
-        if (e.data.statusCode === 422) return NotifyNegative('Cette modification n\'est pas autorisée');
+        if (e.data && e.data.statusCode === 422) return NotifyNegative('Cette modification n\'est pas autorisée');
       }
     },
     // Event files
@@ -303,8 +332,8 @@ export const planningActionMixin = {
       const json = JSON.parse(uploadedInfo.xhr.response);
       if (!json || !json.data || !json.data.payload) return;
 
-      if (this.creationModal) this.newEvent.attachment = { ...json.data.payload.attachment }
-      if (this.editionModal) this.editedEvent.attachment = { ...json.data.payload.attachment }
+      if (this.creationModal) this.newEvent.attachment = { ...json.data.payload.attachment };
+      if (this.editionModal) this.editedEvent.attachment = { ...json.data.payload.attachment };
     },
     async deleteDocument (driveId) {
       try {
@@ -312,7 +341,7 @@ export const planningActionMixin = {
           title: 'Confirmation',
           message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
           ok: true,
-          cancel: 'Annuler'
+          cancel: 'Annuler',
         });
         await this.$gdrive.removeFileById({ id: driveId });
         if (this.creationModal) this.newEvent.attachment = {};
