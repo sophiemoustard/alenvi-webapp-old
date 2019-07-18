@@ -46,6 +46,7 @@ import {
   WEEK_STATS,
   MONTH_STATS,
   COMPANY_CONTRACT,
+  DAILY,
 } from '../../data/constants.js';
 import googleMaps from '../../api/GoogleMaps';
 import { getPaidTransport } from '../../helpers/planning';
@@ -279,10 +280,11 @@ export default {
     },
     getContractHours () {
       let contractHours = 0;
-      const contractDaysRange = Array.from(this.$moment.range(this.startOfWeekAsString, this.$moment(this.endOfWeek).subtract(1, 'd')).by('days')) // from m\Monday to Saturday
+      const contractDaysRange = Array.from(this.$moment.range(this.startOfWeekAsString, this.$moment(this.endOfWeek).subtract(1, 'd')).by('days')) // from Monday to Saturday
       for (const day of contractDaysRange) {
         const absence = this.events.find(event =>
           event.type === ABSENCE &&
+          event.absenceNature === DAILY &&
           day.isSameOrAfter(event.startDate, 'd') && day.isSameOrBefore(event.endDate, 'd')
         );
         if (absence) continue;
