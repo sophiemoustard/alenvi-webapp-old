@@ -196,13 +196,14 @@ export default {
         let params = {
           startDate: this.$moment(this.startOfWeekAsString).toDate(),
           endDate: this.endOfWeek.toDate(),
+          groupBy: AUXILIARY,
         };
         if (!this.displayAllSectors) {
           params.auxiliary = this.auxiliaries.map(aux => aux._id);
           params.sector = this.filteredSectors.map(sector => sector._id);
         }
 
-        this.events = await this.$events.listByAuxiliaries(params);
+        this.events = await this.$events.list(params);
       } catch (e) {
         this.events = [];
       }
