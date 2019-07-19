@@ -644,16 +644,18 @@ export default {
   },
   watch: {
     currentUser (value) {
-      if (!this.$_.isEqual(value, this.user)) {
+      if (this.emailLock && !this.$_.isEqual(value, this.user)) {
         this.mergeUser(value);
       }
     },
   },
   methods: {
     async openEmailLock (event) {
-      this.emailLock = false;
-      await this.$nextTick();
-      if (!this.emailLock) this.$refs.userEmail.focus();
+      if (this.emailLock) {
+        this.emailLock = false;
+        await this.$nextTick();
+        this.$refs.userEmail.focus();
+      }
     },
     mergeUser (value = null) {
       const args = [this.user, value];
@@ -690,8 +692,9 @@ export default {
         }
         await this.updateAlenviUser(path);
 
-        NotifyPositive('Modification enregistrée');
+        this.$store.commit('rh/saveUserProfile', this.user);
         this.emailLock = true;
+        NotifyPositive('Modification enregistrée');
       } catch (e) {
         console.error(e);
         if (e.status === 409) {
@@ -699,7 +702,6 @@ export default {
         }
         NotifyNegative('Erreur lors de la modification');
       } finally {
-        this.$store.commit('rh/saveUserProfile', this.user);
         this.tmpInput = '';
       }
     },
