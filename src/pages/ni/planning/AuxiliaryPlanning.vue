@@ -9,15 +9,13 @@
     <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
       :creationModal="creationModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary"
       :activeAuxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetCreationForm" @deleteDocument="deleteDocument"
-      @documentUploaded="documentUploaded" @createEvent="createEvent" @close="closeCreationModal"
-      @selectedAddress="selectedAddress" />
+      @documentUploaded="documentUploaded" @createEvent="createEvent" @close="closeCreationModal" />
 
     <!-- Event edition modal -->
     <ni-auxiliary-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
       :editionModal="editionModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary" :activeAuxiliaries="activeAuxiliaries"
       :customers="customers" @resetForm="resetEditionForm" @deleteDocument="deleteDocument" @documentUploaded="documentUploaded"
-      @updateEvent="updateEvent" @close="closeEditionModal" @deleteEvent="deleteEvent" @deleteEventRepetition="deleteEventRepetition"
-      @selectedAddress="selectedAddress" />
+      @updateEvent="updateEvent" @close="closeEditionModal" @deleteEvent="deleteEvent" @deleteEventRepetition="deleteEventRepetition" />
   </q-page>
 </template>
 
@@ -83,7 +81,12 @@ export default {
         internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
         absence: { required: requiredIf((item) => item.type === ABSENCE) },
         absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
-        location: { fullAddress: { frAddress } },
+        location: {
+          zipCode: { required: requiredIf(item => !!item.fullAddress) },
+          street: { required: requiredIf(item => !!item.fullAddress) },
+          city: { required: requiredIf(item => !!item.fullAddress) },
+          fullAddress: { frAddress },
+        },
         repetition: {
           frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
         },

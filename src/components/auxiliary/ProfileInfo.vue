@@ -87,9 +87,8 @@
           {{ groupErrors('contact').msg }}</p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="Numéro de téléphone" :error="$v.user.mobilePhone.$error" :error-label="phoneNbrError"
-          type="tel" v-model.trim="user.mobilePhone" @blur="updateUser('mobilePhone')"
-          @focus="saveTmp('mobilePhone')" />
+        <ni-input caption="Numéro de téléphone" :error="$v.user.mobilePhone.$error" :error-label="phoneNbrError" type="tel"
+          v-model.trim="user.mobilePhone" @blur="updateUser('mobilePhone')" @focus="saveTmp('mobilePhone')" />
         <div v-if="!isAuxiliary" class="col-12 col-md-6 row items-center">
           <div class="col-xs-11">
             <ni-input ref="userEmail" :name="emailInputRef" caption="Adresse email" :error="$v.user.local.email.$error"
@@ -100,9 +99,8 @@
             <q-icon size="1.5rem" :name="lockIcon" @click.native="toggleEmailLock" />
           </div>
         </div>
-        <ni-search-address v-model="user.contact.address.fullAddress" color="white" inverted-light
-          @focus="saveTmp('contact.address.fullAddress')" @blur="updateUser('contact.address.fullAddress')"
-          @selected="selectedAddress" :error-label="addressError" :error="$v.user.contact.address.fullAddress.$error" />
+        <ni-search-address v-model="user.contact.address" color="white" inverted-light @focus="saveTmp('contact.address.fullAddress')"
+          @blur="updateUser('contact.address')" :error-label="addressError" :error="$v.user.contact.address.$error" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -473,6 +471,9 @@ export default {
         },
         contact: {
           address: {
+            zipCode: { required },
+            street: { required },
+            city: { required },
             fullAddress: { required, frAddress },
           },
         },
@@ -664,9 +665,6 @@ export default {
     saveTmp (path) {
       this.tmpInput = this.$_.get(this.user, path);
     },
-    selectedAddress (item) {
-      this.user.contact.address = Object.assign({}, this.user.contact.address, item);
-    },
     async emailErrorHandler (path) {
       try {
         NotifyNegative('Email déjà existant');
@@ -706,7 +704,6 @@ export default {
       }
     },
     async updateAlenviUser (path) {
-      if (path.match(/fullAddress/)) path = 'contact.address';
       let value = this.$_.get(this.user, path);
       if (path.match(/iban/i)) value = value.split(' ').join('');
 

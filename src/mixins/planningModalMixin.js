@@ -26,7 +26,6 @@ import {
   DAILY,
   HOURLY,
   ILLNESS,
-  REQUIRED_LABEL,
   CUSTOMER_CONTRACT,
   COMPANY_CONTRACT,
   ADMIN,
@@ -66,6 +65,7 @@ export const planningModalMixin = {
         { label: 'Initiative du client', value: CUSTOMER_INITIATIVE },
         { label: 'Initiative du de l\'intervenant', value: AUXILIARY_INITIATIVE },
       ],
+      addressError: 'Adresse non valide',
     };
   },
   computed: {
@@ -189,9 +189,6 @@ export const planningModalMixin = {
         { label: oneWeekRepetitionLabel, value: EVERY_WEEK },
         { label: twoWeeksRepetitionLabel, value: EVERY_TWO_WEEKS },
       ];
-    },
-    addressError () {
-      return !this.validations.location.fullAddress.required ? REQUIRED_LABEL : 'Adresse non valide';
     },
     customerAddress () {
       return this.$_.get(this.editedEvent, 'customer.contact.address.fullAddress', '');

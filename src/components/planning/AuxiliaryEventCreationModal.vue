@@ -62,8 +62,7 @@
           :options="repetitionOptions" required-field @blur="validations.repetition.frequency.$touch" :disable="!isRepetitionAllowed" />
       </template>
       <template v-if="newEvent.type === INTERNAL_HOUR">
-        <ni-search-address v-model="newEvent.location.fullAddress" @selected="selectedAddress" :error-label="addressError"
-          @blur="validations.location.fullAddress.$touch" :error="validations.location.fullAddress.$error" inModal />
+        <ni-search-address v-model="newEvent.location" :error-label="addressError" @blur="validations.location.$touch" :error="validations.location.$error" inModal />
       </template>
       <ni-modal-input v-model="newEvent.misc" caption="Notes" />
     </div>
@@ -166,9 +165,6 @@ export default {
     },
     createEvent (value) {
       this.$emit('createEvent', value);
-    },
-    selectedAddress (value) {
-      this.$emit('selectedAddress', value);
     },
     resetAbsenceType () {
       if (this.newEvent.type === ABSENCE && this.newEvent.absenceNature === HOURLY) {

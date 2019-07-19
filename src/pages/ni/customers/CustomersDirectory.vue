@@ -51,7 +51,7 @@
           caption="Nom" @blur="$v.newCustomer.identity.lastname.$touch" required-field />
         <ni-modal-input v-model="newCustomer.identity.firstname" caption="Prénom" />
         <div class="row margin-input last">
-          <ni-search-address v-model="newCustomer.contact.address.fullAddress" @selected="selectedAddress" @blur="$v.newCustomer.contact.address.$touch"
+          <ni-search-address v-model="newCustomer.contact.address" @blur="$v.newCustomer.contact.address.$touch"
             :error="$v.newCustomer.contact.address.$error" :error-label="addressError" in-modal required-field />
         </div>
       </div>
@@ -75,6 +75,7 @@ import { REQUIRED_LABEL } from '../../../data/constants';
 import { validationMixin } from '../../../mixins/validationMixin.js';
 
 export default {
+  name: 'CustomersDirectory',
   metaInfo: {
     title: 'Répertoire bénéficiaires',
   },
@@ -265,9 +266,6 @@ export default {
       } finally {
         this.loading = false;
       }
-    },
-    selectedAddress (item) {
-      this.newCustomer.contact.address = Object.assign({}, this.newCustomer.contact.address, item);
     },
   },
 }

@@ -56,10 +56,6 @@ export const planningActionMixin = {
 
       return hasActiveCustomerContractOnEvent || hasActiveCompanyContractOnEvent;
     },
-    selectedAddress (item) {
-      if (this.creationModal) this.newEvent.location = Object.assign({}, this.newEvent.location, item);
-      if (this.editionModal) this.editedEvent.location = Object.assign({}, this.editedEvent.location, item);
-    },
     resetCreationForm ({ partialReset, type = INTERVENTION }) {
       this.$v.newEvent.$reset();
       if (!partialReset) this.newEvent = {};
