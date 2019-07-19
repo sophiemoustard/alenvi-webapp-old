@@ -403,7 +403,7 @@ export default {
 
         await this.$events.create(payload);
 
-        this.refresh();
+        await this.refresh();
         this.creationModal = false;
         NotifyPositive('Évènement créé');
       } catch (e) {
@@ -415,10 +415,9 @@ export default {
       }
     },
     // Event edition
-    openEditionModal ({ eventId, lineId }) {
-      const lineEvents = this.getLineEvents(lineId);
-
-      const event = lineEvents.find(ev => ev._id === eventId);
+    openEditionModal ({ eventId, rowId }) {
+      const rowEvents = this.getRowEvents(rowId);
+      const event = rowEvents.find(ev => ev._id === eventId);
       const can = this.canEditEvent(event);
       if (!can) return;
       this.formatEditedEvent(event);
@@ -451,34 +450,41 @@ export default {
         NotifyPositive('Évènement modifié');
       } catch (e) {
         console.error(e);
+        if (e.data && e.data.statusCode === 422) return NotifyNegative('Cette modification n\'est pas autorisée');
         NotifyNegative('Erreur lors de l\'édition de l\'évènement');
       } finally {
         this.loading = false;
       }
     },
     async updateEventOnDrop (vEvent) {
-      const { toDay, target, draggedObject } = vEvent;
+      try {
+        const { toDay, target, draggedObject } = vEvent;
 
-      if (target._id !== draggedObject.customer._id) return NotifyNegative('Impossible de modifier le bénéficiaire de l\'intervention');
+        if (target._id !== draggedObject.customer._id) return NotifyNegative('Impossible de modifier le bénéficiaire de l\'intervention');
 
-      const daysBetween = this.$moment(draggedObject.endDate).diff(this.$moment(draggedObject.startDate), 'days');
-      const payload = {
-        startDate: this.$moment(toDay).hours(this.$moment(draggedObject.startDate).hours())
-          .minutes(this.$moment(draggedObject.startDate).minutes()).toISOString(),
-        endDate: this.$moment(toDay).add(daysBetween, 'days').hours(this.$moment(draggedObject.endDate).hours())
-          .minutes(this.$moment(draggedObject.endDate).minutes()).toISOString(),
-      };
-      if (draggedObject.auxiliary) payload.auxiliary = draggedObject.auxiliary._id;
+        const daysBetween = this.$moment(draggedObject.endDate).diff(this.$moment(draggedObject.startDate), 'days');
+        const payload = {
+          startDate: this.$moment(toDay).hours(this.$moment(draggedObject.startDate).hours())
+            .minutes(this.$moment(draggedObject.startDate).minutes()).toISOString(),
+          endDate: this.$moment(toDay).add(daysBetween, 'days').hours(this.$moment(draggedObject.endDate).hours())
+            .minutes(this.$moment(draggedObject.endDate).minutes()).toISOString(),
+        };
+        if (draggedObject.auxiliary) payload.auxiliary = draggedObject.auxiliary._id;
 
-      const hasConflicts = await this.hasConflicts(payload);
-      if (hasConflicts) {
-        return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
+        const hasConflicts = await this.hasConflicts(payload);
+        if (hasConflicts) {
+          return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
+        }
+
+        await this.$events.updateById(draggedObject._id, payload);
+        await this.refresh();
+
+        NotifyPositive('Évènement modifié');
+      } catch (e) {
+        console.error(e);
+        if (e.data && e.data.statusCode === 422) return NotifyNegative('Cette modification n\'est pas autorisée');
+        NotifyNegative('Erreur lors de l\'édition de l\'évènement');
       }
-
-      await this.$events.updateById(draggedObject._id, payload);
-      await this.refresh();
-
-      NotifyPositive('Évènement modifié');
     },
     // Event deletion
     async deleteEvent () {
@@ -524,7 +530,7 @@ export default {
         this.loading = true
         if (shouldDeleteRepetition) {
           await this.$events.deleteRepetition(this.editedEvent._id);
-          this.refresh();
+          await this.refresh();
         } else {
           await this.$events.deleteById(this.editedEvent._id);
           await this.refresh();
@@ -557,12 +563,12 @@ export default {
             this.customers.push(customersBySector[i]);
           }
         }
-        this.refresh();
+        await this.refresh();
       } else { // el = customer
         if (!this.customers.some(cust => cust._id === el._id)) {
           this.filteredCustomers.push(el);
           this.customers.push(el);
-          this.refresh();
+          await this.refresh();
         }
       }
     },
@@ -570,7 +576,7 @@ export default {
       if (el.type === SECTOR) {
         this.filteredSectors = this.filteredSectors.filter(sec => sec !== el._id);
         await this.refreshCustomers();
-        await this.refresh();
+        await await this.refresh();
       } else {
         this.filteredCustomers = this.filteredCustomers.filter(cus => cus._id !== el._id);
         this.customers = this.customers.filter(customer => customer._id !== el._id);

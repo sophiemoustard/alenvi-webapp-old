@@ -243,10 +243,10 @@ export default {
       this.creationModal = true;
     },
     // Event edition
-    openEditionModal ({ eventId, lineId }) {
-      const lineEvents = this.getLineEvents(lineId);
+    openEditionModal ({ eventId, rowId }) {
+      const rowEvents = this.getRowEvents(rowId);
 
-      const event = lineEvents.find(ev => ev._id === eventId);
+      const event = rowEvents.find(ev => ev._id === eventId);
       const can = this.canEditEvent(event);
       if (!can) return;
       this.formatEditedEvent(event);

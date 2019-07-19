@@ -6,7 +6,7 @@
       </div>
       <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
         @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :type="PLANNING" />
-      <q-checkbox v-if="!isCustomerPlanning" label="Filter toutes les communautés" :value="displayAllSectors" @input="toggleAllSectors" />
+      <q-checkbox v-if="!isCustomerPlanning" label="Filtrer toutes les communautés" :value="displayAllSectors" @input="toggleAllSectors" />
     </div>
     <div class="planning-container full-width">
       <table style="width: 100%" :class="[staffingView ? 'staffing' : 'non-staffing', 'planning-table']">
@@ -189,13 +189,13 @@ export default {
       this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
     },
     // Event display
-    getLineEvents (lineId) {
-      const lineEvents = this.events.find(group => group._id === lineId);
+    getRowEvents (rowId) {
+      const rowEvents = this.events.find(group => group._id === rowId);
 
-      return (!lineEvents || !lineEvents.events) ? [] : lineEvents.events;
+      return (!rowEvents || !rowEvents.events) ? [] : rowEvents.events;
     },
     getCellEvents (cell, day) {
-      return this.getLineEvents(cell._id)
+      return this.getRowEvents(cell._id)
         .filter(event =>
           this.$moment(day).isBetween(event.startDate, event.endDate, 'day', '[]') &&
           (!this.staffingView || !event.isCancelled)
@@ -225,7 +225,7 @@ export default {
       return dayEvent;
     },
     getPersonEvents (person) {
-      return this.getLineEvents(person._id).filter(event =>
+      return this.getRowEvents(person._id).filter(event =>
         (this.isCustomerPlanning || !event.isCancelled || event.cancel.condition === INVOICED_AND_PAYED));
     },
     // Drag & drop

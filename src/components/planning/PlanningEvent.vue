@@ -54,7 +54,7 @@ export default {
     }
   },
   computed: {
-    lineId () {
+    rowId () {
       if (this.personKey === CUSTOMER) return this.event.customer._id;
 
       return this.event.auxiliary ? this.event.auxiliary._id : this.event.sector
@@ -72,7 +72,7 @@ export default {
       this.$emit('drag', event);
     },
     editEvent (eventId) {
-      this.$emit('editEvent', { eventId, lineId: this.lineId });
+      this.$emit('editEvent', { eventId, rowId: this.rowId });
     },
     eventTitleForStaffing (event) {
       const lastname = this.$_.get(event, 'customer.identity.lastname', '');

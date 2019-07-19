@@ -44,10 +44,10 @@ export const planningActionMixin = {
           ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(startDate));
       });
     },
-    getLineEvents (lineId) {
-      const lineEvents = this.events.find(group => group._id === lineId);
+    getRowEvents (rowId) {
+      const rowEvents = this.events.find(group => group._id === rowId);
 
-      return (!lineEvents || !lineEvents.events) ? [] : lineEvents.events;
+      return (!rowEvents || !rowEvents.events) ? [] : rowEvents.events;
     },
     // Event creation
     canCreateEvent (person, selectedDay) {
@@ -137,8 +137,7 @@ export const planningActionMixin = {
       });
     },
     getAuxiliaryEventsBetweenDates (auxiliaryId, startDate, endDate) {
-      return this.events
-        .filter(group => group._id === auxiliaryId)
+      return this.getRowEvents(auxiliaryId)
         .filter(event => {
           return this.$moment(event.startDate).isBetween(startDate, endDate, 'minutes', '[)') ||
             this.$moment(startDate).isBetween(event.startDate, event.endDate, 'minutes', '[)')
@@ -158,7 +157,7 @@ export const planningActionMixin = {
 
         await this.$events.create(payload);
 
-        this.refresh();
+        await this.refresh();
         this.creationModal = false;
         this.resetCreationForm(false);
         NotifyPositive('Évènement créé');
@@ -400,7 +399,7 @@ export const planningActionMixin = {
         this.loading = true
         if (shouldDeleteRepetition) {
           await this.$events.deleteRepetition(this.editedEvent._id);
-          this.refresh();
+          await this.refresh();
         } else {
           await this.$events.deleteById(this.editedEvent._id);
           await this.refresh();
