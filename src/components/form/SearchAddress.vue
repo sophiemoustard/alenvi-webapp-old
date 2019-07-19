@@ -5,9 +5,9 @@
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <q-field :error="error" :error-label="errorLabel">
-      <q-search :value="value" inverted-light color="white" placeholder=" " no-icon @input="inputEvent"
+      <q-search :value="value.fullAddress" inverted-light color="white" placeholder=" " no-icon @input="update"
         @blur="blurEvent" @focus="focusEvent" :class="{'borders': inModal}">
-        <q-autocomplete @search="searchAddress" @selected="selectedAddress" />
+        <q-autocomplete @search="searchAddress" @selected="selectedAddress" @show="showEvent" />
       </q-search>
     </q-field>
   </div>
@@ -19,12 +19,22 @@ import { REQUIRED_LABEL } from '../../data/constants';
 export default {
   name: 'SearchAddress',
   props: {
-    value: String,
+    value: Object,
     caption: { type: String, default: 'Adresse' },
     errorLabel: { type: String, default: REQUIRED_LABEL },
     error: { type: Boolean, default: false },
     inModal: { type: Boolean, default: false },
     requiredField: { type: Boolean, default: false },
+  },
+  data () {
+    return {
+      addressObj: {
+        street: '',
+        zipCode: '',
+        city: '',
+        location: {},
+      },
+    };
   },
   methods: {
     async searchAddress (terms, done) {
@@ -50,18 +60,27 @@ export default {
         done([]);
       }
     },
-    selectedAddress (item) {
-      const { label, value, ...payload } = item;
-      this.$emit('selected', payload);
-    },
     inputEvent (value) {
       this.$emit('input', value);
+    },
+    selectedAddress (item) {
+      const { label, value, ...payload } = item;
+      this.inputEvent({ ...this.value, ...payload });
     },
     blurEvent () {
       this.$emit('blur');
     },
     focusEvent () {
       this.$emit('focus');
+    },
+    showEvent () {
+      this.inputEvent({ ...this.addressObj, fullAddress: this.value.fullAddress });
+    },
+    update (value) {
+      this.inputEvent({
+        ...(value === '' ? this.addressObj : this.value),
+        fullAddress: value,
+      });
     },
   },
 }
