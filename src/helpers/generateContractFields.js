@@ -1,11 +1,11 @@
 import moment from 'moment';
 
-import { COMPANY_CONTRACT } from '../data/constants';
+import { COMPANY_CONTRACT, WEEKS_PER_MONTH } from '../data/constants';
 import nationalities from '../data/nationalities';
 
 export const generateContractFields = (type, data) => {
   if (type === COMPANY_CONTRACT) {
-    const monthlyHours = Number.parseFloat(data.contract.weeklyHours * 4.33).toFixed(1);
+    const monthlyHours = Number.parseFloat(data.contract.weeklyHours * WEEKS_PER_MONTH).toFixed(1);
     return {
       auxiliaryTitle: data.user.identity.title,
       auxiliaryFirstname: data.user.identity.firstname,
