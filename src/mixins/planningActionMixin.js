@@ -44,6 +44,11 @@ export const planningActionMixin = {
           ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(startDate));
       });
     },
+    getLineEvents (lineId) {
+      const lineEvents = this.events.find(group => group._id === lineId);
+
+      return (!lineEvents || !lineEvents.events) ? [] : lineEvents.events;
+    },
     // Event creation
     canCreateEvent (person, selectedDay) {
       const hasActiveCustomerContractOnEvent = this.hasActiveCustomerContractOnEvent(person, selectedDay);
@@ -133,7 +138,7 @@ export const planningActionMixin = {
     },
     getAuxiliaryEventsBetweenDates (auxiliaryId, startDate, endDate) {
       return this.events
-        .filter(event => event.auxiliary && event.auxiliary._id === auxiliaryId)
+        .filter(group => group._id === auxiliaryId)
         .filter(event => {
           return this.$moment(event.startDate).isBetween(startDate, endDate, 'minutes', '[)') ||
             this.$moment(startDate).isBetween(event.startDate, event.endDate, 'minutes', '[)')
@@ -317,8 +322,8 @@ export const planningActionMixin = {
           return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
         }
 
-        const updatedEvent = await this.$events.updateById(draggedObject._id, payload);
-        this.events = this.events.map(event => (event._id === updatedEvent._id) ? updatedEvent : event);
+        await this.$events.updateById(draggedObject._id, payload);
+        await this.refresh();
 
         NotifyPositive('Évènement modifié');
       } catch (e) {
@@ -364,7 +369,7 @@ export const planningActionMixin = {
 
         this.loading = true
         await this.$events.deleteById(this.editedEvent._id);
-        this.events = this.events.filter(event => event._id !== this.editedEvent._id);
+        await this.refresh();
         this.editionModal = false;
         this.resetEditionForm();
         NotifyPositive('Évènement supprimé.');
@@ -398,7 +403,7 @@ export const planningActionMixin = {
           this.refresh();
         } else {
           await this.$events.deleteById(this.editedEvent._id);
-          this.events = this.events.filter(event => event._id !== this.editedEvent._id);
+          await this.refresh();
         }
 
         this.editionModal = false;

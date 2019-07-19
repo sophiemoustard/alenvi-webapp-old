@@ -415,8 +415,10 @@ export default {
       }
     },
     // Event edition
-    openEditionModal (eventId) {
-      const event = this.events.find(ev => ev._id === eventId);
+    openEditionModal ({ eventId, lineId }) {
+      const lineEvents = this.getLineEvents(lineId);
+
+      const event = lineEvents.find(ev => ev._id === eventId);
       const can = this.canEditEvent(event);
       if (!can) return;
       this.formatEditedEvent(event);
@@ -442,8 +444,8 @@ export default {
         delete payload.type;
         delete payload._id
         await this.$events.updateById(this.editedEvent._id, payload);
+        await this.refresh();
 
-        this.refresh();
         this.editionModal = false;
         this.resetEditionForm();
         NotifyPositive('Évènement modifié');
@@ -473,8 +475,8 @@ export default {
         return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
       }
 
-      const updatedEvent = await this.$events.updateById(draggedObject._id, payload);
-      this.events = this.events.map(event => (event._id === updatedEvent._id) ? updatedEvent : event);
+      await this.$events.updateById(draggedObject._id, payload);
+      await this.refresh();
 
       NotifyPositive('Évènement modifié');
     },
@@ -490,7 +492,7 @@ export default {
 
         this.loading = true
         await this.$events.deleteById(this.editedEvent._id);
-        this.events = this.events.filter(event => event._id !== this.editedEvent._id);
+        await this.refresh();
 
         this.editionModal = false;
         this.resetEditionForm();
@@ -525,7 +527,7 @@ export default {
           this.refresh();
         } else {
           await this.$events.deleteById(this.editedEvent._id);
-          this.events = this.events.filter(event => event._id !== this.editedEvent._id);
+          await this.refresh();
         }
 
         this.editionModal = false;

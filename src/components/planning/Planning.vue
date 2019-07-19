@@ -189,13 +189,13 @@ export default {
       this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
     },
     // Event display
-    getLineEvents (line) {
-      const lineEvents = this.events.find(group => group._id === line._id);
+    getLineEvents (lineId) {
+      const lineEvents = this.events.find(group => group._id === lineId);
 
       return (!lineEvents || !lineEvents.events) ? [] : lineEvents.events;
     },
     getCellEvents (cell, day) {
-      return this.getLineEvents(cell)
+      return this.getLineEvents(cell._id)
         .filter(event =>
           this.$moment(day).isBetween(event.startDate, event.endDate, 'day', '[]') &&
           (!this.staffingView || !event.isCancelled)
@@ -225,7 +225,7 @@ export default {
       return dayEvent;
     },
     getPersonEvents (person) {
-      return this.getLineEvents(person).filter(event =>
+      return this.getLineEvents(person._id).filter(event =>
         (this.isCustomerPlanning || !event.isCancelled || event.cancel.condition === INVOICED_AND_PAYED));
     },
     // Drag & drop
