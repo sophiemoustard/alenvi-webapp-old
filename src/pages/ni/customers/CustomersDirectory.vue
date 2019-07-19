@@ -51,8 +51,8 @@
           caption="Nom" @blur="$v.newCustomer.identity.lastname.$touch" required-field />
         <ni-modal-input v-model="newCustomer.identity.firstname" caption="Prénom" />
         <div class="row margin-input last">
-          <ni-search-address v-model="newCustomer.contact.address.fullAddress" @selected="selectedAddress" @blur="$v.newCustomer.contact.address.fullAddress.$touch"
-            :error="$v.newCustomer.contact.address.fullAddress.$error" :error-label="addressError" in-modal required-field />
+          <ni-search-address v-model="newCustomer.contact.address.fullAddress" @selected="selectedAddress" @blur="$v.newCustomer.contact.address.$touch"
+            :error="$v.newCustomer.contact.address.$error" :error-label="addressError" in-modal required-field />
         </div>
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary" :loading="loading"
@@ -72,11 +72,13 @@ import NiModalSelect from '../../../components/form/ModalSelect';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../../components/popup/notify.js';
 import { customerProfileValidation } from '../../../helpers/customerProfileValidation.js';
 import { REQUIRED_LABEL } from '../../../data/constants';
+import { validationMixin } from '../../../mixins/validationMixin.js';
 
 export default {
   metaInfo: {
     title: 'Répertoire bénéficiaires',
   },
+  mixins: [validationMixin],
   components: {
     NiSearchAddress: SearchAddress,
     NiModalInput,
@@ -167,6 +169,9 @@ export default {
       email: { email },
       contact: {
         address: {
+          zipCode: { required },
+          street: { required },
+          city: { required },
           fullAddress: { required, frAddress },
         },
       },
@@ -244,7 +249,8 @@ export default {
       try {
         this.loading = true;
         this.$v.newCustomer.$touch();
-        if (this.$v.newCustomer.$error) return NotifyWarning('Champ(s) invalide(s)');
+        const isValid = await this.waitForFormValidation(this.$v.newCustomer);
+        if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         const payload = this.$_.pickBy(this.newCustomer);
         const newCustomer = await this.$customers.create(payload);
