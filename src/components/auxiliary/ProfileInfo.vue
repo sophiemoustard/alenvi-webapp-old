@@ -97,7 +97,7 @@
               @blur="updateUser('local.email')" @focus="saveTmp('local.email')" />
           </div>
           <div :class="['col-xs-1', 'row', 'justify-end', { 'cursor-pointer': emailLock }]">
-            <q-icon size="1.5rem" :name="lockIcon" @click.native="openEmailLock" />
+            <q-icon size="1.5rem" :name="lockIcon" @click.native="toggleEmailLock" />
           </div>
         </div>
         <ni-search-address v-model="user.contact.address.fullAddress" color="white" inverted-light
@@ -650,7 +650,7 @@ export default {
     },
   },
   methods: {
-    async openEmailLock (event) {
+    async toggleEmailLock (event) {
       if (this.emailLock) {
         this.emailLock = false;
         await this.$nextTick();
