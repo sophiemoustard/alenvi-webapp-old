@@ -6,6 +6,7 @@
     </div>
     <q-field :error="error" :error-label="errorLabel">
       <q-input
+        :ref="name"
         :value="value"
         color="white"
         inverted-light
@@ -42,6 +43,7 @@ export default {
     suffix: { type: String, default: '' },
     borders: { type: Boolean, default: false },
     requiredField: { type: Boolean, default: false },
+    name: String,
   },
   methods: {
     blurHandler (event) {
@@ -58,6 +60,12 @@ export default {
     },
     update (value) {
       this.$emit('input', value);
+    },
+    focus () {
+      return this.$refs[this.name].focus();
+    },
+    select () {
+      return this.$refs[this.name].select();
     },
   },
 }

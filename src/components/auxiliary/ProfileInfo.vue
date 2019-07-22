@@ -3,15 +3,19 @@
     <div v-if="!isAuxiliary" class="row gutter-profile q-mb-xl">
       <div class="col-xs-12 col-md-6">
         <p class="input-caption">Communauté</p>
-        <ni-select-sector v-model="user.sector" @blur="updateUser('sector')" @focus="saveTmp('sector')" :company-id="mainUser.company._id" />
+        <ni-select-sector v-model="user.sector" @blur="updateUser('sector')" @focus="saveTmp('sector')"
+          :company-id="mainUser.company._id" />
       </div>
-      <ni-input v-model="user.mentor" caption="Marraine/parrain" @focus="saveTmp('mentor')" @blur="updateUser('mentor')" />
-      <ni-select v-model="user.role._id" caption="Rôle" :options="auxiliaryRolesOptions" @focus="saveTmp('role._id')" @blur="updateUser('role._id')" />
+      <ni-input v-model="user.mentor" caption="Marraine/parrain" @focus="saveTmp('mentor')"
+        @blur="updateUser('mentor')" />
+      <ni-select v-model="user.role._id" caption="Rôle" :options="auxiliaryRolesOptions" @focus="saveTmp('role._id')"
+        @blur="updateUser('role._id')" />
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Photo</p>
-        <p :class="[groupErrors('picture').errors > 0 ? 'group-error' : 'group-error-ok']">{{groupErrors('picture').msg }}</p>
+        <p :class="[groupErrors('picture').errors > 0 ? 'group-error' : 'group-error-ok']">
+          {{groupErrors('picture').msg }}</p>
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
@@ -24,8 +28,8 @@
                 :disable-pinch-to-zoom="disablePictureEdition" @file-choose="choosePicture" />
             </div>
             <div class="row justify-center col-xs-12">
-              <q-btn v-if="disablePictureEdition && hasPicture" color="primary" round flat icon="mdi-square-edit-outline"
-                size="1rem" @click="disablePictureEdition = false" />
+              <q-btn v-if="disablePictureEdition && hasPicture" color="primary" round flat
+                icon="mdi-square-edit-outline" size="1rem" @click="disablePictureEdition = false" />
               <q-btn v-if="disablePictureEdition && hasPicture" color="primary" round flat icon="delete" size="1rem"
                 @click="deleteImage" />
               <q-btn v-if="!disablePictureEdition" color="primary" icon="clear" @click="closePictureEdition" round flat
@@ -34,10 +38,11 @@
                 flat size="1rem" />
               <q-btn v-if="!disablePictureEdition" color="primary" icon="rotate right" @click="croppa.rotate(1)" round
                 flat size="1rem" />
-              <q-btn v-if="!disablePictureEdition" :loading="loadingImage" color="primary" icon="done" @click="uploadImage"
-                round flat size="1rem" />
+              <q-btn v-if="!disablePictureEdition" :loading="loadingImage" color="primary" icon="done"
+                @click="uploadImage" round flat size="1rem" />
               <a :href="pictureDlLink(hasPicture)" target="_blank">
-                <q-btn v-if="hasPicture && disablePictureEdition" color="primary" round flat icon="save_alt" size="1rem" />
+                <q-btn v-if="hasPicture && disablePictureEdition" color="primary" round flat icon="save_alt"
+                  size="1rem" />
               </a>
             </div>
           </div>
@@ -52,163 +57,171 @@
       </div>
       <div class="row gutter-profile">
         <ni-input caption="Prénom" :error="$v.user.identity.firstname.$error" v-model="user.identity.firstname"
-          @blur="updateUser('identity.firstname')" @focus="saveTmp('identity.firstname')"
-        />
+          @blur="updateUser('identity.firstname')" @focus="saveTmp('identity.firstname')" />
         <ni-input caption="Nom" :error="$v.user.identity.lastname.$error" v-model="user.identity.lastname"
-          @blur="updateUser('identity.lastname')" @focus="saveTmp('identity.lastname')"
-        />
+          @blur="updateUser('identity.lastname')" @focus="saveTmp('identity.lastname')" />
         <ni-select caption="Nationalité" :error="$v.user.identity.nationality.$error" :options="nationalitiesOptions"
           v-model="user.identity.nationality" @focus="saveTmp('identity.nationality')"
-          @blur="updateUser('identity.nationality')"
-        />
+          @blur="updateUser('identity.nationality')" />
         <ni-datetime-picker caption="Date de naissance" :error="$v.user.identity.birthDate.$error"
           v-model="user.identity.birthDate" @focus="saveTmp('identity.birthDate')"
-          @blur="updateUser('identity.birthDate')"
-        />
+          @blur="updateUser('identity.birthDate')" />
         <ni-select caption="Pays de naissance" :error="$v.user.identity.birthCountry.$error" :options="countriesOptions"
           v-model="user.identity.birthCountry" @focus="saveTmp('identity.birthCountry')"
-          @blur="updateUser('identity.birthCountry')"
-        />
-        <ni-input caption="Département de naissance" :error="$v.user.identity.birthState.$error" :error-label="birthStateError"
-          v-model="user.identity.birthState" @blur="updateUser('identity.birthState')"
-          @focus="saveTmp('identity.birthState')" :displayInput="this.user.identity.birthCountry === 'FR'"
-        />
+          @blur="updateUser('identity.birthCountry')" />
+        <ni-input caption="Département de naissance" :error="$v.user.identity.birthState.$error"
+          :error-label="birthStateError" v-model="user.identity.birthState" @blur="updateUser('identity.birthState')"
+          @focus="saveTmp('identity.birthState')" :displayInput="this.user.identity.birthCountry === 'FR'" />
         <ni-input caption="Ville de naissance" :error="$v.user.identity.birthCity.$error"
           v-model="user.identity.birthCity" @focus="saveTmp('identity.birthCity')"
-          @blur="updateUser('identity.birthCity')"
-        />
+          @blur="updateUser('identity.birthCity')" />
         <ni-input caption="Numéro de sécurité sociale" :error="$v.user.identity.socialSecurityNumber.$error"
           v-model="user.identity.socialSecurityNumber" @focus="saveTmp('identity.socialSecurityNumber')"
-          @blur="updateUser('identity.socialSecurityNumber')" :error-label="ssnError"
-        />
+          @blur="updateUser('identity.socialSecurityNumber')" :error-label="ssnError" />
       </div>
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Contact</p>
-        <p :class="[groupErrors('contact').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('contact').msg }}</p>
+        <p :class="[groupErrors('contact').errors > 0 ? 'group-error' : 'group-error-ok']">
+          {{ groupErrors('contact').msg }}</p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="Numéro de téléphone" :error="$v.user.mobilePhone.$error" :error-label="phoneNbrError" type="tel"
-          v-model.trim="user.mobilePhone" @blur="updateUser('mobilePhone')" @focus="saveTmp('mobilePhone')" />
-        <ni-input caption="Adresse email" :error="$v.user.local.email.$error" :error-label="emailError" type="email" lower-case disable
-          v-model.trim="user.local.email" @blur="updateUser(-'local.email')" @focus="saveTmp('local.email')"
-          :display-input="!isAuxiliary" />
-        <ni-search-address v-model="user.contact.address.fullAddress" color="white" inverted-light @focus="saveTmp('contact.address.fullAddress')"
-          @blur="updateUser('contact.address.fullAddress')" @selected="selectedAddress" :error-label="addressError"
-          :error="$v.user.contact.address.fullAddress.$error"
-        />
+        <ni-input caption="Numéro de téléphone" :error="$v.user.mobilePhone.$error" :error-label="phoneNbrError"
+          type="tel" v-model.trim="user.mobilePhone" @blur="updateUser('mobilePhone')"
+          @focus="saveTmp('mobilePhone')" />
+        <div v-if="!isAuxiliary" class="col-12 col-md-6 row items-center">
+          <div class="col-xs-11">
+            <ni-input ref="userEmail" :name="emailInputRef" caption="Adresse email" :error="$v.user.local.email.$error"
+              :error-label="emailError" type="email" lower-case :disable="emailLock" v-model.trim="user.local.email"
+              @blur="updateUser('local.email')" @focus="saveTmp('local.email')" />
+          </div>
+          <div :class="['col-xs-1', 'row', 'justify-end', { 'cursor-pointer': emailLock }]">
+            <q-icon size="1.5rem" :name="lockIcon" @click.native="toggleEmailLock" />
+          </div>
+        </div>
+        <ni-search-address v-model="user.contact.address.fullAddress" color="white" inverted-light
+          @focus="saveTmp('contact.address.fullAddress')" @blur="updateUser('contact.address.fullAddress')"
+          @selected="selectedAddress" :error-label="addressError" :error="$v.user.contact.address.fullAddress.$error" />
       </div>
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Contact d'urgence</p>
-        <p :class="[groupErrors('emergencyContact').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('emergencyContact').msg }}</p>
+        <p :class="[groupErrors('emergencyContact').errors > 0 ? 'group-error' : 'group-error-ok']">
+          {{ groupErrors('emergencyContact').msg }}</p>
       </div>
       <div class="row gutter-profile">
         <ni-input caption="Prénom et nom" :error="$v.user.administrative.emergencyContact.name.$error"
           v-model="user.administrative.emergencyContact.name" @focus="saveTmp('administrative.emergencyContact.name')"
-          @blur="updateUser('administrative.emergencyContact.name')"
-        />
+          @blur="updateUser('administrative.emergencyContact.name')" />
         <ni-input caption="Numéro de téléphone" :error="$v.user.administrative.emergencyContact.phoneNumber.$error"
-          v-model.trim="user.administrative.emergencyContact.phoneNumber" @focus="saveTmp('administrative.emergencyContact.phoneNumber')"
-          @blur="updateUser('administrative.emergencyContact.phoneNumber')" :error-label="emergencyPhoneNbrError"
-        />
+          v-model.trim="user.administrative.emergencyContact.phoneNumber"
+          @focus="saveTmp('administrative.emergencyContact.phoneNumber')"
+          @blur="updateUser('administrative.emergencyContact.phoneNumber')" :error-label="emergencyPhoneNbrError" />
       </div>
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">IBAN</p>
-        <p :class="[groupErrors('iban').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('iban').msg }}</p>
+        <p :class="[groupErrors('iban').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('iban').msg }}
+        </p>
       </div>
       <div class="row gutter-profile">
         <ni-input caption="IBAN" :error="$v.user.administrative.payment.rib.iban.$error" :error-label="ibanError"
           v-model="user.administrative.payment.rib.iban" @focus="saveTmp('administrative.payment.rib.iban')" upper-case
-          @blur="updateUser('administrative.payment.rib.iban')"
-        />
-        <ni-input caption="BIC" :error="$v.user.administrative.payment.rib.bic.$error" :error-label="bicError" upper-case
-          v-model.trim="user.administrative.payment.rib.bic" @focus="saveTmp('administrative.payment.rib.bic')"
-          @blur="updateUser('administrative.payment.rib.bic')"
-        />
+          @blur="updateUser('administrative.payment.rib.iban')" />
+        <ni-input caption="BIC" :error="$v.user.administrative.payment.rib.bic.$error" :error-label="bicError"
+          upper-case v-model.trim="user.administrative.payment.rib.bic"
+          @focus="saveTmp('administrative.payment.rib.bic')" @blur="updateUser('administrative.payment.rib.bic')" />
       </div>
     </div>
     <div v-if="user.administrative.driveFolder" class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Documents</p>
-        <p :class="[groupErrors('documents').errors > 0 ? 'group-error' : 'group-error-ok']">{{groupErrors('documents').msg }}</p>
+        <p :class="[groupErrors('documents').errors > 0 ? 'group-error' : 'group-error-ok']">
+          {{groupErrors('documents').msg }}</p>
       </div>
       <div class="row gutter-profile items-stretch">
         <div class="col-xs-12">
           <div class="row justify-between">
-            <p v-if="isAuxiliary" class="input-caption">Merci de nous indiquer le type de document d'identité que tu possèdes.</p>
+            <p v-if="isAuxiliary" class="input-caption">Merci de nous indiquer le type de document d'identité que tu
+              possèdes.</p>
           </div>
           <q-field :error="$v.user.administrative.identityDocs.$error" :error-label="requiredLabel">
-            <q-option-group color="primary" v-model="user.administrative.identityDocs" @input="updateUser('administrative.identityDocs')"
-              :options="identityDocsOptions" />
+            <q-option-group color="primary" v-model="user.administrative.identityDocs"
+              @input="updateUser('administrative.identityDocs')" :options="identityDocsOptions" />
           </q-field>
         </div>
         <div v-if="user.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
-          <ni-file-uploader caption="Carte d'identité (recto)" path="administrative.idCardRecto" alt="cni recto" :entity="currentUser"
-            @delete="deleteDocument(user.administrative.idCardRecto.driveId, 'administrative.idCardRecto')" name="idCardRecto"
-            @uploaded="refreshUser" :url="docsUploadUrl" :error="$v.user.administrative.idCardRecto.driveId.$error"
-            :additional-value="`cni_recto_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" :extensions="extensions"
-          />
+          <ni-file-uploader caption="Carte d'identité (recto)" path="administrative.idCardRecto" alt="cni recto"
+            :entity="currentUser"
+            @delete="deleteDocument(user.administrative.idCardRecto.driveId, 'administrative.idCardRecto')"
+            name="idCardRecto" @uploaded="refreshUser" :url="docsUploadUrl"
+            :error="$v.user.administrative.idCardRecto.driveId.$error"
+            :additional-value="`cni_recto_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
+            :extensions="extensions" />
         </div>
         <div v-if="user.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
-          <ni-file-uploader caption="Carte d'identité (verso)" path="administrative.idCardVerso" alt="cni verso" :entity="currentUser" :url="docsUploadUrl"
-            @delete="deleteDocument(user.administrative.idCardVerso.driveId, 'administrative.idCardVerso')" name="idCardVerso"
-            @uploaded="refreshUser" :additional-value="`cni_verso_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
-            :extensions="extensions"
-          />
+          <ni-file-uploader caption="Carte d'identité (verso)" path="administrative.idCardVerso" alt="cni verso"
+            :entity="currentUser" :url="docsUploadUrl"
+            @delete="deleteDocument(user.administrative.idCardVerso.driveId, 'administrative.idCardVerso')"
+            name="idCardVerso" @uploaded="refreshUser"
+            :additional-value="`cni_verso_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
+            :extensions="extensions" />
         </div>
         <div v-if="user.administrative.identityDocs === 'pp'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Passeport" path="administrative.passport" alt="passeport" :entity="currentUser"
-            @delete="deleteDocument(user.administrative.passport.driveId, 'administrative.passport')" name="passport" :url="docsUploadUrl"
-            @uploaded="refreshUser" :error="$v.user.administrative.passport.driveId.$error" :extensions="extensions"
-            :additional-value="`passport_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
-          />
-        </div>
-        <div v-if="user.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
-          <ni-file-uploader caption="Titre de séjour (recto)" path="administrative.residencePermitRecto" alt="titre de séjour (recto)" :entity="currentUser"
-            @delete="deleteDocument(user.administrative.residencePermitRecto.driveId, 'administrative.residencePermitRecto')"
-            @uploaded="refreshUser" :url="docsUploadUrl" :error="$v.user.administrative.residencePermitRecto.driveId.$error"
-            name="residencePermitRecto" :additional-value="`titre_de_séjour_recto_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
+            @delete="deleteDocument(user.administrative.passport.driveId, 'administrative.passport')" name="passport"
+            :url="docsUploadUrl" @uploaded="refreshUser" :error="$v.user.administrative.passport.driveId.$error"
             :extensions="extensions"
-          />
+            :additional-value="`passport_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
         </div>
         <div v-if="user.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
-          <ni-file-uploader caption="Titre de séjour (verso)" path="administrative.residencePermitVerso" alt="titre de séjour (verso)" name="residencePermitVerso"
-            @delete="deleteDocument(user.administrative.residencePermitVerso.driveId, 'administrative.residencePermitVerso')" :entity="currentUser"
-            @uploaded="refreshUser" :url="docsUploadUrl" :extensions="extensions"
-            :additional-value="`titre_de_séjour_verso_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
-          />
+          <ni-file-uploader caption="Titre de séjour (recto)" path="administrative.residencePermitRecto"
+            alt="titre de séjour (recto)" :entity="currentUser"
+            @delete="deleteDocument(user.administrative.residencePermitRecto.driveId, 'administrative.residencePermitRecto')"
+            @uploaded="refreshUser" :url="docsUploadUrl"
+            :error="$v.user.administrative.residencePermitRecto.driveId.$error" name="residencePermitRecto"
+            :additional-value="`titre_de_séjour_recto_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
+            :extensions="extensions" />
+        </div>
+        <div v-if="user.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
+          <ni-file-uploader caption="Titre de séjour (verso)" path="administrative.residencePermitVerso"
+            alt="titre de séjour (verso)" name="residencePermitVerso"
+            @delete="deleteDocument(user.administrative.residencePermitVerso.driveId, 'administrative.residencePermitVerso')"
+            :entity="currentUser" @uploaded="refreshUser" :url="docsUploadUrl" :extensions="extensions"
+            :additional-value="`titre_de_séjour_verso_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
         </div>
         <div class="col-xs-12 col-md-6">
-          <ni-file-uploader caption="Attestation de sécurité sociale" path="administrative.healthAttest" alt="attestation secu" :entity="currentUser"
-            @delete="deleteDocument(user.administrative.healthAttest.driveId, 'administrative.healthAttest')" name="healthAttest"
-            @uploaded="refreshUser" :error="$v.user.administrative.healthAttest.driveId.$error"
-            :additional-value="`attestation_secu_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" :url="docsUploadUrl" :extensions="extensions"
-          />
+          <ni-file-uploader caption="Attestation de sécurité sociale" path="administrative.healthAttest"
+            alt="attestation secu" :entity="currentUser"
+            @delete="deleteDocument(user.administrative.healthAttest.driveId, 'administrative.healthAttest')"
+            name="healthAttest" @uploaded="refreshUser" :error="$v.user.administrative.healthAttest.driveId.$error"
+            :additional-value="`attestation_secu_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
+            :url="docsUploadUrl" :extensions="extensions" />
         </div>
         <div class="col-xs-12 col-md-6">
-          <ni-file-uploader caption="Facture téléphonique" path="administrative.phoneInvoice" alt="facture téléphone" :entity="currentUser"
-            @delete="deleteDocument(user.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')" name="phoneInvoice"
-            @uploaded="refreshUser" :error="$v.user.administrative.phoneInvoice.driveId.$error"
-            :additional-value="`facture_telephone_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" :url="docsUploadUrl" :extensions="extensions"
-          />
+          <ni-file-uploader caption="Facture téléphonique" path="administrative.phoneInvoice" alt="facture téléphone"
+            :entity="currentUser"
+            @delete="deleteDocument(user.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')"
+            name="phoneInvoice" @uploaded="refreshUser" :error="$v.user.administrative.phoneInvoice.driveId.$error"
+            :additional-value="`facture_telephone_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
+            :url="docsUploadUrl" :extensions="extensions" />
         </div>
       </div>
       <div class="q-mt-lg">
-        <ni-multiple-files-uploader caption="Diplome(s) ou certificat(s)" path="administrative.certificates" alt="facture téléphone"
-          @delete="deleteDocument($event, 'certificates')" name="certificates" collapsible-label="Ajouter un diplôme" :user-profile="currentUser"
-          :url="docsUploadUrl" additional-fields-name="diplomes" @uploaded="refreshUser"
-        />
+        <ni-multiple-files-uploader caption="Diplome(s) ou certificat(s)" path="administrative.certificates"
+          alt="facture téléphone" @delete="deleteDocument($event, 'certificates')" name="certificates"
+          collapsible-label="Ajouter un diplôme" :user-profile="currentUser" :url="docsUploadUrl"
+          additional-fields-name="diplomes" @uploaded="refreshUser" />
       </div>
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between">
         <p class="text-weight-bold">Mutuelle</p>
-        <p :class="[groupErrors('mutualFund').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('mutualFund').msg }}</p>
+        <p :class="[groupErrors('mutualFund').errors > 0 ? 'group-error' : 'group-error-ok']">
+          {{ groupErrors('mutualFund').msg }}</p>
       </div>
       <div class="row gutter-profile-x">
         <div class="col-xs-12">
@@ -217,28 +230,33 @@
             <q-icon v-if="$v.user.administrative.mutualFund.has.$error" name="error_outline" color="secondary" />
           </div>
           <q-field :error="$v.user.administrative.mutualFund.has.$error" :error-label="requiredLabel">
-            <q-btn-toggle class="full-width" color="white" text-color="black" toggle-color="primary" v-model="user.administrative.mutualFund.has"
-              @input="updateUser('administrative.mutualFund.has')" :options="[
+            <q-btn-toggle class="full-width" color="white" text-color="black" toggle-color="primary"
+              v-model="user.administrative.mutualFund.has" @input="updateUser('administrative.mutualFund.has')"
+              :options="[
                   { label: 'Oui', value: false },
                   { label: 'Non', value: true }
                 ]" />
           </q-field>
         </div>
         <div class="col-xs-12">
-          <ni-file-uploader caption="Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle"
+          <ni-file-uploader
+            caption="Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle"
             path="administrative.mutualFund" alt="justif mutuelle" :entity="currentUser"
-            @delete="deleteDocument(user.administrative.mutualFund.driveId, 'administrative.mutualFund')" name="mutualFund" @uploaded="refreshUser"
-            :display-upload="user.administrative.mutualFund.has && !user.administrative.mutualFund.driveId" entity-url="users"
-            :error="$v.user.administrative.mutualFund.driveId.$error" :display-caption="isAuxiliary"
-            :url="docsUploadUrl" :additional-value="`mutuelle_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" :extensions="extensions"
-          />
-      </div>
+            @delete="deleteDocument(user.administrative.mutualFund.driveId, 'administrative.mutualFund')"
+            name="mutualFund" @uploaded="refreshUser"
+            :display-upload="user.administrative.mutualFund.has && !user.administrative.mutualFund.driveId"
+            entity-url="users" :error="$v.user.administrative.mutualFund.driveId.$error" :display-caption="isAuxiliary"
+            :url="docsUploadUrl"
+            :additional-value="`mutuelle_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
+            :extensions="extensions" />
         </div>
+      </div>
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between">
         <p class="text-weight-bold">Transports</p>
-        <p :class="[groupErrors('transportInvoice').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('transportInvoice').msg }}</p>
+        <p :class="[groupErrors('transportInvoice').errors > 0 ? 'group-error' : 'group-error-ok']">
+          {{ groupErrors('transportInvoice').msg }}</p>
       </div>
       <div class="row gutter-profile-x">
         <div class="col-xs-12">
@@ -248,16 +266,18 @@
               color="secondary" />
           </div>
           <q-field :error="$v.user.administrative.transportInvoice.transportType.$error" :error-label="requiredLabel">
-            <q-option-group color="primary" v-model="user.administrative.transportInvoice.transportType" :options="transportOptions"
-              @input="updateUser('administrative.transportInvoice.transportType')" />
+            <q-option-group color="primary" v-model="user.administrative.transportInvoice.transportType"
+              :options="transportOptions" @input="updateUser('administrative.transportInvoice.transportType')" />
           </q-field>
         </div>
         <div v-if="user.administrative.transportInvoice.transportType === 'public'" class="col-xs-12 col-md-6">
-          <ni-file-uploader caption="Merci de nous transmettre ton justificatif d'abonnement" path="administrative.transportInvoice"
-            alt="justif transport" :entity="currentUser" name="transportInvoice" @uploaded="refreshUser"
-            :error="$v.user.administrative.transportInvoice.driveId.$error" :display-caption="isAuxiliary"
+          <ni-file-uploader caption="Merci de nous transmettre ton justificatif d'abonnement"
+            path="administrative.transportInvoice" alt="justif transport" :entity="currentUser" name="transportInvoice"
+            @uploaded="refreshUser" :error="$v.user.administrative.transportInvoice.driveId.$error"
+            :display-caption="isAuxiliary"
             @delete="deleteDocument(user.administrative.transportInvoice.driveId, 'administrative.transportInvoice')"
-            :url="docsUploadUrl" :additional-value="`justif_transport_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
+            :url="docsUploadUrl"
+            :additional-value="`justif_transport_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
             :extensions="extensions" />
         </div>
       </div>
@@ -266,11 +286,12 @@
       <p class="text-weight-bold">Visite médicale</p>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <ni-file-uploader caption="Certificat d'aptitude" path="administrative.medicalCertificate" alt="certificat médical" :entity="user"
-            @delete="deleteDocument(user.administrative.medicalCertificate.driveId, 'administrative.medicalCertificate')" name="medicalCertificate"
-            @uploaded="refreshUser" :additional-value="`certificat_medical_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
-            :url="docsUploadUrl" :extensions="extensions"
-          />
+          <ni-file-uploader caption="Certificat d'aptitude" path="administrative.medicalCertificate"
+            alt="certificat médical" :entity="user"
+            @delete="deleteDocument(user.administrative.medicalCertificate.driveId, 'administrative.medicalCertificate')"
+            name="medicalCertificate" @uploaded="refreshUser"
+            :additional-value="`certificat_medical_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
+            :url="docsUploadUrl" :extensions="extensions" />
         </div>
       </div>
     </div>
@@ -314,6 +335,8 @@ export default {
   },
   data () {
     return {
+      emailInputRef: 'emailInput',
+      emailLock: true,
       transportOptions: TRANSPORT_OPTIONS,
       requiredLabel: REQUIRED_LABEL,
       requiredDoc: 'Document requis',
@@ -608,6 +631,9 @@ export default {
     isAuxiliary () {
       return this.mainUser.role.name === AUXILIARY || this.mainUser.role.name === PLANNING_REFERENT;
     },
+    lockIcon () {
+      return this.emailLock ? 'lock' : 'lock_open';
+    },
   },
   async mounted () {
     const user = await this.$users.getById(this.currentUser._id);
@@ -618,12 +644,19 @@ export default {
   },
   watch: {
     currentUser (value) {
-      if (!this.$_.isEqual(value, this.user)) {
+      if (this.emailLock && !this.$_.isEqual(value, this.user)) {
         this.mergeUser(value);
       }
     },
   },
   methods: {
+    async toggleEmailLock (event) {
+      if (this.emailLock) {
+        this.emailLock = false;
+        await this.$nextTick();
+        this.$refs.userEmail.focus();
+      }
+    },
     mergeUser (value = null) {
       const args = [this.user, value];
       this.user = Object.assign({}, extend(true, ...args));
@@ -634,22 +667,41 @@ export default {
     selectedAddress (item) {
       this.user.contact.address = Object.assign({}, this.user.contact.address, item);
     },
+    async emailErrorHandler (path) {
+      try {
+        NotifyNegative('Email déjà existant');
+        this.user.local.email = this.currentUser.local.email;
+        await this.$nextTick();
+        this.$refs.userEmail.select();
+      } catch (e) {
+        console.error(e);
+      }
+    },
     async updateUser (path) {
       try {
-        if (this.tmpInput === this.$_.get(this.user, path)) return;
+        if (this.tmpInput === this.$_.get(this.user, path)) {
+          if (path === 'local.email' && this.tmpInput !== '') this.emailLock = true;
+          return;
+        }
         if (this.$_.get(this.$v.user, path)) {
           this.$_.get(this.$v.user, path).$touch();
           const isValid = await this.waitForValidation(this.$v.user, path);
-          if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
+          if (!isValid) {
+            return NotifyWarning('Champ(s) invalide(s)');
+          }
         }
         await this.updateAlenviUser(path);
 
+        this.$store.commit('rh/saveUserProfile', this.user);
+        this.emailLock = true;
         NotifyPositive('Modification enregistrée');
       } catch (e) {
         console.error(e);
+        if (e.status === 409) {
+          return this.emailErrorHandler(path);
+        }
         NotifyNegative('Erreur lors de la modification');
       } finally {
-        this.$store.commit('rh/saveUserProfile', this.user);
         this.tmpInput = '';
       }
     },

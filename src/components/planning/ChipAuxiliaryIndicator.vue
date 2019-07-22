@@ -46,6 +46,7 @@ import {
   WEEK_STATS,
   MONTH_STATS,
   COMPANY_CONTRACT,
+  DAILY,
 } from '../../data/constants.js';
 import googleMaps from '../../api/GoogleMaps';
 import { getPaidTransport } from '../../helpers/planning';
@@ -279,18 +280,25 @@ export default {
     },
     getContractHours () {
       let contractHours = 0;
-      const contractDaysRange = Array.from(this.$moment.range(this.startOfWeekAsString, this.$moment(this.endOfWeek).subtract(1, 'd')).by('days')) // from m\Monday to Saturday
+      const contractDaysRange = Array.from(this.$moment.range(this.startOfWeekAsString, this.$moment(this.endOfWeek).subtract(1, 'd')).by('days')) // from Monday to Saturday
       for (const day of contractDaysRange) {
-        const absence = this.events.find(event =>
+        const absences = this.events.filter(event =>
           event.type === ABSENCE &&
           day.isSameOrAfter(event.startDate, 'd') && day.isSameOrBefore(event.endDate, 'd')
         );
-        if (absence) continue;
+        const dailyAbsence = absences.find(abs => abs.absenceNature === DAILY);
+        if (dailyAbsence) continue;
+
+        const hourlyAbsence = absences.length === 0 ? 0 : absences.reduce(
+          (total, abs) => total + (this.$moment(abs.endDate).diff(abs.startDate, 'm') / 60),
+          0
+        );
 
         const version = this.getContractVersionOnDay(day);
         if (!version) continue;
 
         contractHours += version.weeklyHours / 6 || 0; // 6 : from Monday to Saturday, there are 6 half days
+        contractHours -= hourlyAbsence;
       };
       return Math.round(contractHours);
     },
