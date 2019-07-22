@@ -6,6 +6,7 @@
       </div>
       <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
         @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :type="PLANNING" />
+      <q-checkbox v-if="!isCustomerPlanning" label="Filtrer toutes les communautés" :value="displayAllSectors" @input="toggleAllSectors" />
     </div>
     <div class="planning-container full-width">
       <table style="width: 100%" :class="[staffingView ? 'staffing' : 'non-staffing', 'planning-table']">
@@ -118,6 +119,7 @@ export default {
     filteredSectors: { type: Array, default: () => [] },
     personKey: { type: String, default: 'auxiliary' },
     canEdit: { type: Function, default: () => {} },
+    displayAllSectors: { type: Boolean, default: false },
   },
   data () {
     return {
@@ -171,6 +173,9 @@ export default {
     },
   },
   methods: {
+    toggleAllSectors (value) {
+      this.$emit('update:displayAllSectors', value);
+    },
     getTimelineHours () {
       const range = this.$moment.range(this.$moment().hours(STAFFING_VIEW_START_HOUR).minutes(0), this.$moment().hours(STAFFING_VIEW_END_HOUR).minutes(0));
       this.hours = Array.from(range.by('hours', { step: 2, excludeEnd: true }));
@@ -184,16 +189,17 @@ export default {
       this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
     },
     // Event display
-    getCellEvents (cell, day) {
-      return this.events
-        .filter(event => {
-          const lineFilter = cell.type === SECTOR
-            ? !event.auxiliary && event.sector === cell._id
-            : event[this.personKey] && event[this.personKey]._id === cell._id;
-          const dayFilter = this.$moment(day).isBetween(event.startDate, event.endDate, 'day', '[]');
+    getRowEvents (rowId) {
+      const rowEvents = this.events.find(group => group._id === rowId);
 
-          return lineFilter && dayFilter && (!this.staffingView || !event.isCancelled)
-        })
+      return (!rowEvents || !rowEvents.events) ? [] : rowEvents.events;
+    },
+    getCellEvents (cell, day) {
+      return this.getRowEvents(cell._id)
+        .filter(event =>
+          this.$moment(day).isBetween(event.startDate, event.endDate, 'day', '[]') &&
+          (!this.staffingView || !event.isCancelled)
+        )
         .map((event) => this.isCustomerPlanning ? event : this.getEventWithStyleInfo(event, day))
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
     },
@@ -219,10 +225,8 @@ export default {
       return dayEvent;
     },
     getPersonEvents (person) {
-      return this.events.filter(event =>
-        (event[this.personKey] ? event[this.personKey]._id === person._id : false) &&
-        (this.isCustomerPlanning || !event.isCancelled || event.cancel.condition === INVOICED_AND_PAYED)
-      );
+      return this.getRowEvents(person._id).filter(event =>
+        (this.isCustomerPlanning || !event.isCancelled || event.cancel.condition === INVOICED_AND_PAYED));
     },
     // Drag & drop
     drag (event) {

@@ -44,6 +44,11 @@ export const planningActionMixin = {
           ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(startDate));
       });
     },
+    getRowEvents (rowId) {
+      const rowEvents = this.events.find(group => group._id === rowId);
+
+      return (!rowEvents || !rowEvents.events) ? [] : rowEvents.events;
+    },
     // Event creation
     canCreateEvent (person, selectedDay) {
       const hasActiveCustomerContractOnEvent = this.hasActiveCustomerContractOnEvent(person, selectedDay);
@@ -132,8 +137,7 @@ export const planningActionMixin = {
       });
     },
     getAuxiliaryEventsBetweenDates (auxiliaryId, startDate, endDate) {
-      return this.events
-        .filter(event => event.auxiliary && event.auxiliary._id === auxiliaryId)
+      return this.getRowEvents(auxiliaryId)
         .filter(event => {
           return this.$moment(event.startDate).isBetween(startDate, endDate, 'minutes', '[)') ||
             this.$moment(startDate).isBetween(event.startDate, event.endDate, 'minutes', '[)')
@@ -153,7 +157,7 @@ export const planningActionMixin = {
 
         await this.$events.create(payload);
 
-        this.refresh();
+        await this.refresh();
         this.creationModal = false;
         this.resetCreationForm(false);
         NotifyPositive('Évènement créé');
@@ -317,8 +321,8 @@ export const planningActionMixin = {
           return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
         }
 
-        const updatedEvent = await this.$events.updateById(draggedObject._id, payload);
-        this.events = this.events.map(event => (event._id === updatedEvent._id) ? updatedEvent : event);
+        await this.$events.updateById(draggedObject._id, payload);
+        await this.refresh();
 
         NotifyPositive('Évènement modifié');
       } catch (e) {
@@ -364,7 +368,7 @@ export const planningActionMixin = {
 
         this.loading = true
         await this.$events.deleteById(this.editedEvent._id);
-        this.events = this.events.filter(event => event._id !== this.editedEvent._id);
+        await this.refresh();
         this.editionModal = false;
         this.resetEditionForm();
         NotifyPositive('Évènement supprimé.');
@@ -395,10 +399,10 @@ export const planningActionMixin = {
         this.loading = true
         if (shouldDeleteRepetition) {
           await this.$events.deleteRepetition(this.editedEvent._id);
-          this.refresh();
+          await this.refresh();
         } else {
           await this.$events.deleteById(this.editedEvent._id);
-          this.events = this.events.filter(event => event._id !== this.editedEvent._id);
+          await this.refresh();
         }
 
         this.editionModal = false;

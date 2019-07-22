@@ -2,7 +2,8 @@
   <q-page class="neutral-background">
     <ni-planning-manager :events="events" :persons="activeAuxiliaries" @updateStartOfWeek="updateStartOfWeek"
       @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop"
-      :filteredSectors="filteredSectors" :can-edit="canEditEvent" :personKey="personKey" />
+      :filteredSectors="filteredSectors" :can-edit="canEditEvent" :personKey="personKey"
+      :displayAllSectors.sync="displayAllSectors" />
 
     <!-- Event creation modal -->
     <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
@@ -28,7 +29,7 @@ import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryE
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
 import Planning from '../../../components/planning/Planning.vue';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
-import { INTERVENTION, NEVER, AUXILIARY, ABSENCE, DAILY, HOURLY, INTERNAL_HOUR, ILLNESS, SECTOR } from '../../../data/constants';
+import { INTERVENTION, NEVER, PERSON, AUXILIARY, ABSENCE, DAILY, HOURLY, INTERNAL_HOUR, ILLNESS, SECTOR } from '../../../data/constants';
 import { mapGetters, mapActions } from 'vuex';
 import { NotifyNegative, NotifyWarning } from '../../../components/popup/notify';
 
@@ -61,6 +62,7 @@ export default {
       editionModal: false,
       startOfWeekAsString: null,
       personKey: AUXILIARY,
+      displayAllSectors: false,
     };
   },
   validations () {
@@ -131,6 +133,17 @@ export default {
     getElemRemoved (val) {
       this.handleElemRemovedFromFilter(val);
     },
+    async displayAllSectors (value) {
+      if (!value) {
+        this.auxiliaries = [];
+        this.filteredSectors = [];
+        this.events = [];
+      } else {
+        this.auxiliaries = this.getFilter.filter(fil => fil.type === PERSON);
+        this.filteredSectors = this.getFilter.filter(fil => fil.type === SECTOR);
+        await this.refresh();
+      }
+    },
   },
   computed: {
     ...mapGetters({
@@ -180,12 +193,17 @@ export default {
     // Refresh data
     async refresh () {
       try {
-        this.events = await this.$events.list({
+        let params = {
           startDate: this.$moment(this.startOfWeekAsString).toDate(),
           endDate: this.endOfWeek.toDate(),
-          auxiliary: this.auxiliaries.map(aux => aux._id),
-          sector: this.filteredSectors.map(sector => sector._id),
-        });
+          groupBy: AUXILIARY,
+        };
+        if (!this.displayAllSectors) {
+          params.auxiliary = this.auxiliaries.map(aux => aux._id);
+          params.sector = this.filteredSectors.map(sector => sector._id);
+        }
+
+        this.events = await this.$events.list(params);
       } catch (e) {
         this.events = [];
       }
@@ -225,8 +243,10 @@ export default {
       this.creationModal = true;
     },
     // Event edition
-    openEditionModal (eventId) {
-      const event = this.events.find(ev => ev._id === eventId);
+    openEditionModal ({ eventId, rowId }) {
+      const rowEvents = this.getRowEvents(rowId);
+
+      const event = rowEvents.find(ev => ev._id === eventId);
       const can = this.canEditEvent(event);
       if (!can) return;
       this.formatEditedEvent(event);

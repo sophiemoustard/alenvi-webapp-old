@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { INTERNAL_HOUR, INTERVENTION, ABSENCE, UNAVAILABILITY, AUXILIARY, STAFFING_PERCENTAGE_BY_MINUTES } from '../../data/constants';
+import { INTERNAL_HOUR, INTERVENTION, ABSENCE, UNAVAILABILITY, AUXILIARY, STAFFING_PERCENTAGE_BY_MINUTES, CUSTOMER } from '../../data/constants';
 import { planningEventMixin } from '../../mixins/planningEventMixin';
 
 export default {
@@ -53,6 +53,13 @@ export default {
       UNAVAILABILITY,
     }
   },
+  computed: {
+    rowId () {
+      if (this.personKey === CUSTOMER) return this.event.customer._id;
+
+      return this.event.auxiliary ? this.event.auxiliary._id : this.event.sector
+    },
+  },
   methods: {
     getEventStyleForStaffing (event) {
       return {
@@ -65,7 +72,7 @@ export default {
       this.$emit('drag', event);
     },
     editEvent (eventId) {
-      this.$emit('editEvent', eventId);
+      this.$emit('editEvent', { eventId, rowId: this.rowId });
     },
     eventTitleForStaffing (event) {
       const lastname = this.$_.get(event, 'customer.identity.lastname', '');
