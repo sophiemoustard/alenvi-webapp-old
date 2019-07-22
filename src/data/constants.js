@@ -206,3 +206,5 @@ export const EXPORT_HISTORY_TYPES = [
 export const COMPANI = 'compani';
 export const THIRD_PARTY = 'third_party';
 export const OGUST = 'ogust';
+
+export const WEEKS_PER_MONTH = (52 / 12);
