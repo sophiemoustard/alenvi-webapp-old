@@ -16,6 +16,7 @@
           <q-btn class="col-2 planning-view" sizs="sm" flat v-if="!isThreeDaysView" label="3J" @click="updateViewMode(THREE_DAYS_VIEW)" />
           <q-btn class="col-2 planning-view" sizs="sm" flat v-else label="7J" @click="updateViewMode(WEEK_VIEW)" />
         </template>
+        <q-btn icon="playlist_play" flat round @click="toggleHistory"></q-btn>
       </div>
     </div>
   </div>
@@ -66,6 +67,9 @@ export default {
     },
     updateViewMode (value) {
       this.$emit('updateViewMode', value);
+    },
+    toggleHistory (value) {
+      this.$emit('toggleHistory');
     },
   },
 }

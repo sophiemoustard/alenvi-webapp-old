@@ -4,9 +4,11 @@
       <div class="col-xs-12 col-md-5 planning-search">
         <ni-chips-autocomplete ref="refFilter" v-model="terms" class="planning-search" />
       </div>
-      <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
-        @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :type="PLANNING" />
-      <q-checkbox v-if="!isCustomerPlanning" label="Filtrer toutes les communautés" :value="displayAllSectors" @input="toggleAllSectors" />
+      <planning-navigation :timelineTitle="timelineTitle()" :targetDate="targetDate" :type="PLANNING"
+        @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
+        @goToWeek="goToWeek" @toggleHistory="toggleHistory" />
+      <q-checkbox v-if="!isCustomerPlanning" label="Filtrer toutes les communautés" :value="displayAllSectors"
+        @input="toggleAllSectors" />
     </div>
     <div class="planning-container full-width">
       <table style="width: 100%" :class="[staffingView ? 'staffing' : 'non-staffing', 'planning-table']">
@@ -79,6 +81,12 @@
         </tbody>
       </table>
     </div>
+    <q-page-sticky v-if="displayHistory" expand position="right">
+      <div class="event-history-container">
+        <q-scroll-area>
+        </q-scroll-area>
+      </div>
+    </q-page-sticky>
   </div>
 </template>
 
@@ -134,6 +142,7 @@ export default {
       distanceMatrix: [],
       hourWidth: 100 / 12,
       UNKNOWN_AVATAR,
+      displayHistory: false,
     }
   },
   beforeDestroy () {
@@ -227,6 +236,10 @@ export default {
     getPersonEvents (person) {
       return this.getRowEvents(person._id).filter(event =>
         (this.isCustomerPlanning || !event.isCancelled || event.cancel.condition === INVOICED_AND_PAYED));
+    },
+    // History
+    toggleHistory () {
+      this.displayHistory = !this.displayHistory;
     },
     // Drag & drop
     drag (event) {
@@ -352,5 +365,16 @@ export default {
 
   .to-assign
     background-color: rgba(253, 243, 229, 0.5);
+
+  .event-history-container
+    background-color: $white;
+    width: 300px;
+    height: 100%;
+    top: 75px;
+    right: 0;
+    position: absolute;
+    box-shadow: 0 3px 5px -1px rgba(0,0,0,0.2), 0 5px 8px rgba(0,0,0,0.14), 0 1px 14px rgba(0,0,0,0.12)
+    .q-scroll-area
+      height: 100%;
 
 </style>
