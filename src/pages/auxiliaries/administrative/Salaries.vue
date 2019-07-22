@@ -25,7 +25,7 @@
 <script>
 export default {
   metaInfo: {
-    title: 'Fiches de paie'
+    title: 'Fiches de paie',
   },
   data () {
     return {
@@ -35,7 +35,7 @@ export default {
         sortBy: 'periodStart',
         descending: true,
         page: 1,
-        rowsPerPage: 10
+        rowsPerPage: 10,
       },
       columns: [
         {
@@ -46,22 +46,22 @@ export default {
           sortable: true,
           format: (value) => this.$moment(value, 'YYYYMMDDHHmm').format('MMMM YYYY'),
           sort: (a, b) => (this.$moment(a, 'YYYYMMDDHHmm').toDate()) - (this.$moment(b, 'YYYYMMDDHHmm').toDate()),
-          style: 'width: 170px'
+          style: 'width: 170px',
         },
         {
           name: 'link',
           label: 'Visualiser',
           field: 'print_url',
           align: 'left',
-          style: 'width: 30px'
-        }
-      ]
+          style: 'width: 30px',
+        },
+      ],
     }
   },
   computed: {
     user () {
       return this.$store.getters['main/user'];
-    }
+    },
   },
   async mounted () {
     try {
@@ -77,7 +77,7 @@ export default {
       console.error(e);
       this.tableLoading = false;
     }
-  }
+  },
 }
 </script>
 

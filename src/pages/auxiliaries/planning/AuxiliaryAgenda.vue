@@ -17,16 +17,18 @@
 
     <!-- Event creation modal -->
     <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
-      :creationModal="creationModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary" :auxiliaries="activeAuxiliaries"
-      :customers="customers" @resetForm="resetCreationForm" @deleteDocument="deleteDocument" @documentUploaded="documentUploaded"
-      @createEvent="createEvent" @close="closeCreationModal" @selectedAddress="selectedAddress" />
+      :creationModal="creationModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary"
+      :auxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetCreationForm"
+      @deleteDocument="deleteDocument" @documentUploaded="documentUploaded" @createEvent="createEvent"
+      @close="closeCreationModal" @selectedAddress="selectedAddress"  />
 
     <!-- Event edition modal -->
     <ni-auxiliary-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
-      :editionModal="editionModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary" :auxiliaries="activeAuxiliaries"
-      :customers="customers" @resetForm="resetEditionForm" @deleteDocument="deleteDocument" @documentUploaded="documentUploaded"
-      @updateEvent="updateEvent" @close="closeEditionModal" @deleteEvent="deleteEvent" @deleteEventRepetition="deleteEventRepetition"
-      @selectedAddress="selectedAddress" />
+      :editionModal="editionModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary"
+      :auxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetEditionForm"
+      @deleteDocument="deleteDocument" @documentUploaded="documentUploaded" @updateEvent="updateEvent"
+      @close="closeEditionModal" @deleteEvent="deleteEvent" @deleteEventRepetition="deleteEventRepetition"
+      @selectedAddress="selectedAddress"  />
   </q-page>
 </template>
 
@@ -37,7 +39,7 @@ import Agenda from '../../../components/Agenda';
 import PlanningNavigation from '../../../components/planning/PlanningNavigation';
 import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryEventCreationModal';
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
-import { DEFAULT_AVATAR, INTERVENTION, NEVER, AGENDA, WEEK_VIEW, THREE_DAYS_VIEW, ABSENCE, DAILY, HOURLY, INTERNAL_HOUR, ILLNESS } from '../../../data/constants';
+import { DEFAULT_AVATAR, INTERVENTION, NEVER, AGENDA, WEEK_VIEW, THREE_DAYS_VIEW, ABSENCE, DAILY, HOURLY, INTERNAL_HOUR, ILLNESS, AUXILIARY, UNKNOWN_AVATAR } from '../../../data/constants';
 import { planningTimelineMixin } from '../../../mixins/planningTimelineMixin';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { NotifyWarning } from '../../../components/popup/notify';
@@ -70,6 +72,7 @@ export default {
       // Event edition
       editedEvent: {},
       editionModal: false,
+      personKey: AUXILIARY,
     };
   },
   computed: {
@@ -108,7 +111,7 @@ export default {
         absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
         location: { fullAddress: { frAddress } },
         repetition: {
-          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) }
+          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
         },
         attachment: {
           driveId: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absence === ILLNESS),
@@ -153,6 +156,8 @@ export default {
   },
   methods: {
     getAvatar (aux) {
+      if (!aux || !aux._id) return UNKNOWN_AVATAR;
+
       return aux.picture && aux.picture.link ? aux.picture.link : DEFAULT_AVATAR;
     },
     toggleAuxiliarySelect () {
@@ -200,8 +205,8 @@ export default {
         auxiliaryIdEvent: this.selectedAuxiliary._id,
         permissions: [
           'planning:create:user',
-          { name: 'planning:create', rule: 'isOwner' }
-        ]
+          { name: 'planning:create', rule: 'isOwner' },
+        ],
       });
       if (!can) return;
 
@@ -237,7 +242,7 @@ export default {
       const can = this.canEditEvent(event);
       if (!can) return;
       this.formatEditedEvent(event);
-      if (event.type !== ABSENCE) {
+      if (event.type !== ABSENCE && this.selectedAuxiliary) {
         this.selectedAuxiliary.hasActiveCustomerContractOnEvent = this.hasActiveCustomerContractOnEvent(this.selectedAuxiliary, event.startDate);
         this.selectedAuxiliary.hasActiveCompanyContractOnEvent = this.hasActiveCompanyContractOnEvent(this.selectedAuxiliary, event.startDate);
       }

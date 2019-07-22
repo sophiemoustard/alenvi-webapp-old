@@ -10,7 +10,7 @@ export const financialCertificatesMixin = {
           title: 'Confirmation',
           message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
           ok: true,
-          cancel: 'Annuler'
+          cancel: 'Annuler',
         });
         await gdrive.removeFileById({ id: driveId });
 

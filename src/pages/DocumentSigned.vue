@@ -13,8 +13,8 @@ export default {
   props: {
     signed: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   computed: {
     acknowledgement () {
@@ -24,7 +24,7 @@ export default {
       }
       if (this.signed) return "Merci d'avoir signé ! Vous pouvez à présent revenir à l'accueil";
       return "Vous pouvez à présent revenir à l'accueil";
-    }
-  }
+    },
+  },
 }
 </script>

@@ -19,7 +19,7 @@ export const paymentMixin = {
         netInclTaxes: 0,
         type: '',
         date: '',
-      }
+      },
     }
   },
   validations: {
@@ -27,7 +27,7 @@ export const paymentMixin = {
       netInclTaxes: { required },
       type: { required },
       date: { required },
-    }
+    },
   },
   methods: {
     openPaymentCreationModal (customer, tpp) {

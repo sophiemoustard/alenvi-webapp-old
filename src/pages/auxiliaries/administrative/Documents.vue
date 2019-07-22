@@ -24,29 +24,29 @@
 <script>
 export default {
   metaInfo: {
-    title: 'Documents'
+    title: 'Documents',
   },
   data () {
     return {
       documents: [
         {
           title: 'Conditions de remboursement de mutuelle',
-          link: 'https://drive.google.com/file/d/0B9x9rvBHVX1TTWlPbHpFZlpUVzQ/view?usp=sharing'
+          link: 'https://drive.google.com/file/d/0B9x9rvBHVX1TTWlPbHpFZlpUVzQ/view?usp=sharing',
         },
         {
           title: 'Convention collective des services à la personne',
-          link: 'https://drive.google.com/open?id=0B3bqjy-Bj6OHeWx5RVZLYjM5eGM'
+          link: 'https://drive.google.com/open?id=0B3bqjy-Bj6OHeWx5RVZLYjM5eGM',
         },
         {
           title: 'Evaluation des risques professionnels',
-          link: 'https://drive.google.com/drive/folders/0B9x9rvBHVX1TQ2VVZ3cxb0ZsYVE'
-        }
+          link: 'https://drive.google.com/drive/folders/0B9x9rvBHVX1TQ2VVZ3cxb0ZsYVE',
+        },
       ],
       pagination: {
         sortBy: 'title',
         descending: false,
         page: 1,
-        rowsPerPage: 10
+        rowsPerPage: 10,
       },
       columns: [
         {
@@ -55,16 +55,16 @@ export default {
           field: 'title',
           align: 'left',
           sortable: true,
-          style: 'width: 170px'
+          style: 'width: 170px',
         },
         {
           name: 'link',
           label: 'Visualiser',
           field: 'link',
           align: 'left',
-          style: 'width: 30px'
-        }
-      ]
+          style: 'width: 30px',
+        },
+      ],
     }
   },
 }

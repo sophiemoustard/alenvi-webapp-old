@@ -37,18 +37,18 @@ import { NotifyPositive, NotifyNegative } from '../../components/popup/notify';
 
 export default {
   components: {
-    CompaniHeader
+    CompaniHeader,
   },
   data () {
     return {
       passwords: {
         password: '',
-        passwordConfirm: ''
+        passwordConfirm: '',
       },
       token: null,
       userId: null,
       userEmail: '',
-      timeout: null
+      timeout: null,
     }
   },
   async beforeRouteEnter (to, from, next) {
@@ -73,13 +73,13 @@ export default {
       password: {
         required,
         minLength: minLength(6),
-        maxLength: maxLength(20)
+        maxLength: maxLength(20),
       },
       passwordConfirm: {
         required,
-        sameAsPassword: sameAs('password')
-      }
-    }
+        sameAsPassword: sameAs('password'),
+      },
+    },
 
   },
   methods: {
@@ -94,13 +94,13 @@ export default {
         const userPayload = {
           _id: this.userId,
           local: {
-            password: this.passwords.password
+            password: this.passwords.password,
           },
           resetPassword: {
             token: null,
             expiresIn: null,
-            from: null
-          }
+            from: null,
+          },
         };
         await this.$users.updateById(userPayload, this.token);
         let detail = '';
@@ -124,11 +124,11 @@ export default {
         NotifyNegative('Erreur, si le problème persiste, contactez le support technique');
         console.error(e.response);
       }
-    }
+    },
   },
   beforeDestroy () {
     clearTimeout(this.timeout);
-  }
+  },
 }
 </script>
 

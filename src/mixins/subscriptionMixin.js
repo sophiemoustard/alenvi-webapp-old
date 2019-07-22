@@ -1,6 +1,6 @@
 import moment from 'moment';
 import { getLastVersion } from '../helpers/utils';
-import { MONTHLY, FIXED, ONCE, HOURLY, NATURE_OPTIONS } from '../data/constants';
+import { MONTHLY, FIXED, ONCE, HOURLY, NATURE_OPTIONS, WEEKS_PER_MONTH } from '../data/constants';
 
 export const subscriptionMixin = {
   data () {
@@ -56,7 +56,7 @@ export const subscriptionMixin = {
           label: 'Date de modification',
           align: 'left',
           field: 'createdAt',
-          format: value => moment(value).format('DD/MM/YYYY')
+          format: value => moment(value).format('DD/MM/YYYY'),
         },
         {
           name: 'unitTTCRate',
@@ -109,11 +109,11 @@ export const subscriptionMixin = {
       if (this.isCompleteFunding(funding)) {
         if (funding.frequency !== ONCE) {
           if (funding.nature === FIXED) {
-            fundingReduction = funding.frequency === MONTHLY ? funding.amountTTC / 4.33 : funding.amountTTC;
+            fundingReduction = funding.frequency === MONTHLY ? funding.amountTTC / WEEKS_PER_MONTH : funding.amountTTC;
           } else {
             const refundedHours = Math.min(
-              funding.frequency === MONTHLY ? funding.careHours / 4.33 : funding.careHours,
-              subscription.estimatedWeeklyVolume,
+              funding.frequency === MONTHLY ? funding.careHours / WEEKS_PER_MONTH : funding.careHours,
+              subscription.estimatedWeeklyVolume
             );
             fundingReduction = refundedHours * funding.unitTTCRate;
           }

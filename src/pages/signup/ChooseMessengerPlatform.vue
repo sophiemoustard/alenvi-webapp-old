@@ -39,7 +39,7 @@ export default {
     title: 'Connexion',
     meta: [
       { name: 'description', content: 'Espace personnalisé pour accéder à vos documents et informations liés aux interventions réalisées par Alenvi.' },
-    ]
+    ],
   },
   name: 'Authentication',
   data () {
@@ -54,14 +54,14 @@ Voici les deux étapes à suivre:
 Si tu rencontres des difficultés, contacte dès aujourd'hui la personne qui t'a recruté chez Alenvi`,
       credentials: {
         email: '',
-        password: ''
-      }
+        password: '',
+      },
     }
   },
   computed: {
     getUser () {
       return this.$store.getters['main/user'];
-    }
+    },
   },
   methods: {
     async sendSMS () {
@@ -77,8 +77,8 @@ Si tu rencontres des difficultés, contacte dès aujourd'hui la personne qui t'a
         NotifyNegative('Erreur lors de l\'envoi du SMS');
         console.error(e);
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

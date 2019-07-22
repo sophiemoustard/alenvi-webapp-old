@@ -33,11 +33,11 @@ import {
   QCardActions,
   QCardMedia,
   QBtn,
-  QIcon
-} from 'quasar'
+  QIcon,
+} from 'quasar';
 
-import _ from 'lodash'
-import axios from 'axios'
+import _ from 'lodash';
+import axios from 'axios';
 
 export default {
   components: {
@@ -47,7 +47,7 @@ export default {
     QCardActions,
     QCardMedia,
     QBtn,
-    QIcon
+    QIcon,
   },
   filters: {
     truncate (string, value) {
@@ -55,11 +55,11 @@ export default {
         return string.substring(0, value) + '...';
       }
       return string;
-    }
+    },
   },
   data () {
     return {
-      lastArticles: []
+      lastArticles: [],
     }
   },
   mounted () {
@@ -84,8 +84,8 @@ export default {
     async getFeeds () {
       const feeds = await axios.get(`${process.env.API_HOSTNAME}/blog/rssFeeds`, {
         params: {
-          feed_url: 'http://blog.alenvi.io/tag/aidants-familiaux/rss/'
-        }
+          feed_url: 'http://blog.alenvi.io/tag/aidants-familiaux/rss/',
+        },
       });
       const orderedFeeds = _.sortBy(feeds.data.data, ['pubDate']).reverse().slice(0, 3);
       orderedFeeds.forEach(item => {
@@ -96,12 +96,12 @@ export default {
             link: this.getImgInfo(item.description, 'src'),
             alt: this.getImgInfo(item.description, 'alt'),
           },
-          link: item.link
+          link: item.link,
         };
         this.lastArticles.push(article);
       });
-    }
-  }
+    },
+  },
 }
 </script>
 

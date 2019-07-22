@@ -12,13 +12,13 @@ import { formatPrice } from '../../helpers/utils.js';
 export default {
   name: 'PrefixedCellContent',
   props: {
-    cellValue: { type: Number, default: () => 0 }
+    cellValue: { type: Number, default: () => 0 },
   },
   computed: {
     content () {
       return formatPrice(Math.abs(this.cellValue));
-    }
-  }
+    },
+  },
 }
 </script>
 

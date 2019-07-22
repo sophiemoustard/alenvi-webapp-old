@@ -1,32 +1,32 @@
 const pathologies = [
   {
     label: '-',
-    value: '-'
+    value: '-',
   },
   {
     label: 'Alzheimer',
-    value: 'Alzheimer'
+    value: 'Alzheimer',
   },
   {
     label: 'Parkinson',
-    value: 'Parkinson'
+    value: 'Parkinson',
   },
   {
     label: 'Corps de Lewy',
-    value: 'Corps de Lewy'
+    value: 'Corps de Lewy',
   },
   {
     label: 'Autres troubles cognitifs',
-    value: 'Autres troubles cognitifs'
+    value: 'Autres troubles cognitifs',
   },
   {
     label: 'AVC récent',
-    value: 'AVC récent'
+    value: 'AVC récent',
   },
   {
     label: 'Autre',
-    value: 'Autre'
-  }
+    value: 'Autre',
+  },
 ];
 
 export default pathologies;

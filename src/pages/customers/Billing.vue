@@ -36,7 +36,7 @@ export default {
         this.customer = {};
       }
     },
-  }
+  },
 }
 </script>
 

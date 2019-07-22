@@ -25,8 +25,8 @@ export default {
   computed: {
     notifications () {
       return this.$store.getters['rh/getNotifications'];
-    }
-  }
+    },
+  },
 }
 </script>
 

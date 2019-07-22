@@ -18,14 +18,22 @@
                   :style="{ top: `${(hourIndex * halfHourHeight * 4) - 1.5}%` }">{{ hour.format('HH:mm') }}</div>
               </template>
               <template v-for="(event, eventId) in getOneDayEvents(days[dayIndex])">
-                <div :style="{ top: `${PERCENTAGE_BY_MINUTES * event.staffingTop}%`, height: `${PERCENTAGE_BY_MINUTES * event.staffingHeight - 0.2}%` }"
-                  :key="eventId"  :class="[!isCustomerPlanning && 'cursor-pointer', 'event', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]" @click.stop="editEvent(event)">
+                <div :style="getEventStyle(event)" :key="eventId" @click.stop="editEvent(event)"
+                :class="[!isCustomerPlanning && 'cursor-pointer', 'event', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]">
                   <div class="event-container" :style="{ top: event.staffingHeight < 90 ? '10%' : '6px' }">
                     <div class="col-12 event-title">
-                      <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">{{ eventTitle(event) }}</p>
-                      <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">{{ displayAbsenceType(event.absence) }}</p>
-                      <p v-if="event.type === UNAVAILABILITY" class="no-margin overflow-hidden-nowrap">Indispo.</p>
-                      <p v-if="event.type === INTERNAL_HOUR" class="no-margin overflow-hidden-nowrap">{{ event.internalHour.name }}</p>
+                      <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">
+                        {{ eventTitle(event) }}
+                      </p>
+                      <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">
+                        {{ displayAbsenceType(event.absence) }}
+                      </p>
+                      <p v-if="event.type === UNAVAILABILITY" class="no-margin overflow-hidden-nowrap">
+                        Indispo.
+                      </p>
+                      <p v-if="event.type === INTERNAL_HOUR" class="no-margin overflow-hidden-nowrap">
+                        {{ event.internalHour.name }}
+                      </p>
                     </div>
                     <p class="no-margin event-subtitle overflow-hidden-nowrap">{{ getEventHours(event) }}</p>
                     <p v-if="event.isBilled" class="no-margin event-subtitle event-billed">F</p>
@@ -42,7 +50,7 @@
 
 <script>
 import { planningEventMixin } from '../mixins/planningEventMixin';
-import { ABSENCE, INTERVENTION, INTERNAL_HOUR, UNAVAILABILITY, PERCENTAGE_BY_MINUTES, PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR } from '../data/constants';
+import { ABSENCE, INTERVENTION, INTERNAL_HOUR, UNAVAILABILITY, PLANNING_PERCENTAGE_BY_MINUTES, PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR } from '../data/constants';
 
 export default {
   name: 'Agenda',
@@ -58,13 +66,27 @@ export default {
       INTERVENTION,
       INTERNAL_HOUR,
       UNAVAILABILITY,
-      PERCENTAGE_BY_MINUTES,
+      PLANNING_PERCENTAGE_BY_MINUTES,
+      halfHourHeight: 100 / 30, // (100 => % total height - 30: number of half hours)
     };
   },
   mounted () {
     this.getTimelineHours();
   },
   methods: {
+    getEventStyle (event) {
+      return {
+        top: `${PLANNING_PERCENTAGE_BY_MINUTES * event.staffingTop}%`,
+        height: `${PLANNING_PERCENTAGE_BY_MINUTES * event.staffingHeight - 0.2}%`,
+      };
+    },
+    getTimelineHours () {
+      const range = this.$moment.range(
+        this.$moment().hours(PLANNING_VIEW_START_HOUR).startOf('h'),
+        this.$moment().hours(PLANNING_VIEW_END_HOUR).startOf('h')
+      );
+      this.hours = Array.from(range.by('hours', { step: 2 }));
+    },
     getOneDayEvents (day) {
       return this.events
         .filter(event =>
@@ -96,7 +118,7 @@ export default {
     },
     editEvent (value) {
       this.$emit('editEvent', value);
-    }
+    },
   },
 }
 </script>

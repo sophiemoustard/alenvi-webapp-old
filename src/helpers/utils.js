@@ -75,4 +75,9 @@ export const formatFullIdentity = (identity) => {
   const firstname = (identity.firstname || '').trim();
   const lastname = (identity.lastname || '').trim().toUpperCase();
   return `${firstname} ${lastname}`;
-}
+};
+
+export const formatHours = (value, digits = 2) => {
+  if (!value) return '0,00h';
+  return `${parseFloat(value).toFixed(digits).replace('.', ',')}h`
+};

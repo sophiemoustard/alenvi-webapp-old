@@ -52,7 +52,7 @@ export default {
   },
   mixins: [followUpMixin],
   metaInfo: {
-    title: 'Fiche bénéficiaire'
+    title: 'Fiche bénéficiaire',
   },
   data () {
     return {
@@ -71,7 +71,7 @@ export default {
   },
   filters: {
     formatFullIdentity,
-  }
+  },
 }
 </script>
 

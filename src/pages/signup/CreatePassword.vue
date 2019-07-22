@@ -64,7 +64,7 @@ import { REQUIRED_LABEL } from '../../data/constants';
 export default {
   name: 'CreatePassword',
   components: {
-    CompaniHeader
+    CompaniHeader,
   },
   data () {
     return {
@@ -75,12 +75,12 @@ export default {
           _id: '',
           local: {
             email: '',
-            password: ''
+            password: '',
           },
-          isConfirmed: ''
-        }
+          isConfirmed: '',
+        },
       },
-      passwordConfirm: ''
+      passwordConfirm: '',
     }
   },
   validations () {
@@ -89,11 +89,11 @@ export default {
         alenvi: {
           local: {
             email: { required, email },
-            password: { required, minLength: minLength(4) }
-          }
-        }
+            password: { required, minLength: minLength(4) },
+          },
+        },
       },
-      passwordConfirm: { required, sameAsPassword: sameAs(() => this.user.alenvi.local.password) }
+      passwordConfirm: { required, sameAsPassword: sameAs(() => this.user.alenvi.local.password) },
     }
   },
   mounted () {
@@ -115,7 +115,7 @@ export default {
       } else if (!this.$v.passwordConfirm.sameAs) {
         return 'Le mot de passe doit être identique';
       }
-    }
+    },
   },
   methods: {
     async submit () {
@@ -127,7 +127,7 @@ export default {
         this.$q.cookies.remove('signup_userEmail', { path: '/' });
         const user = await this.$axios.post(`${process.env.API_HOSTNAME}/users/authenticate`, {
           email: this.user.alenvi.local.email.toLowerCase(),
-          password: this.user.alenvi.local.password
+          password: this.user.alenvi.local.password,
         });
         this.$q.cookies.set('alenvi_token', user.data.data.token, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV !== 'development' });
         this.$q.cookies.set('alenvi_token_expires_in', user.data.data.expiresIn, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV !== 'development' });
@@ -145,8 +145,8 @@ export default {
         console.error(e);
         NotifyNegative('Echec de la mise à jour de l\'utilisateur');
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

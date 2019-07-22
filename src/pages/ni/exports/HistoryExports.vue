@@ -23,7 +23,7 @@ export default {
   metaInfo: { title: 'Historique' },
   components: {
     'ni-select': Select,
-    'ni-date-range': DateRange
+    'ni-date-range': DateRange,
   },
   data () {
     return {
@@ -48,7 +48,7 @@ export default {
         NotifyNegative('Erreur lors du téléchagement du document');
       }
     },
-  }
+  },
 }
 </script>
 

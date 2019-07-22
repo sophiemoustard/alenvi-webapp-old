@@ -11,6 +11,6 @@ export const customerMixin = {
     },
     acceptedBy () {
       return `${this.lastSubscriptionHistory.helper.title || ''} ${this.lastSubscriptionHistory.helper.firstname || ''} ${this.lastSubscriptionHistory.helper.lastname}`;
-    }
-  }
+    },
+  },
 };

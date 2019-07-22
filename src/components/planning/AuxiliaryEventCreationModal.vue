@@ -73,7 +73,7 @@
 </template>
 
 <script>
-import { ABSENCE, DEFAULT_AVATAR, INTERNAL_HOUR, INTERVENTION, HOURLY, UNJUSTIFIED, CUSTOMER_CONTRACT, COMPANY_CONTRACT, NEVER } from '../../data/constants';
+import { ABSENCE, INTERNAL_HOUR, INTERVENTION, HOURLY, UNJUSTIFIED, CUSTOMER_CONTRACT, COMPANY_CONTRACT, NEVER, AUXILIARY } from '../../data/constants';
 import { planningModalMixin } from '../../mixins/planningModalMixin';
 
 export default {
@@ -84,10 +84,15 @@ export default {
     creationModal: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
     selectedAuxiliary: { type: Object, default: () => ({}) },
-    auxiliaries: { type: Array, default: () => [] },
+    activeAuxiliaries: { type: Array, default: () => [] },
     customers: { type: Array, default: () => [] },
     internalHours: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
+  },
+  data () {
+    return {
+      personKey: AUXILIARY,
+    };
   },
   computed: {
     isEndDurationRequired () {
@@ -101,7 +106,7 @@ export default {
     docsUploadUrl () {
       return !this.selectedAuxiliary._id
         ? ''
-        : `${process.env.API_HOSTNAME}/events/${this.selectedAuxiliary._id}/gdrive/${this.selectedAuxiliary.administrative.driveFolder.id}/upload`;
+        : `${process.env.API_HOSTNAME}/events/${this.selectedAuxiliary._id}/gdrive/${this.selectedAuxiliary.administrative.driveFolder.driveId}/upload`;
     },
     isCompanyContractValidForRepetition () {
       if (!this.selectedAuxiliary.contracts || this.selectedAuxiliary.contracts.length === 0) return false;
@@ -120,6 +125,8 @@ export default {
       return correspContracts.some(contract => !contract.endDate && contract.versions.some(version => version.isActive));
     },
     isRepetitionAllowed () {
+      if (!this.newEvent.auxiliary) return true;
+
       if (this.newEvent.subscription !== '' && this.newEvent.customer !== '') {
         const selectedCustomer = this.customers.find(cus => cus._id === this.newEvent.customer);
         if (!selectedCustomer) return true;
@@ -139,12 +146,9 @@ export default {
     },
     isRepetitionAllowed (value) {
       if (!value) this.newEvent.repetition.frequency = NEVER;
-    }
+    },
   },
   methods: {
-    getAvatar (user) {
-      return user && user.picture && user.picture.link ? user.picture.link : DEFAULT_AVATAR;
-    },
     toggleAuxiliarySelect () {
       return this.$refs['auxiliarySelect'].show();
     },
@@ -185,9 +189,11 @@ export default {
       display: inline-flex;
       flex-wrap: wrap;
     & .q-btn-item
-      width: 45%
+      width: 24%;
       border-radius: 20px;
       margin: 5px;
       background-color: $light-grey;
+      @media screen and (max-width: 767px)
+        width: 45%;
 
 </style>

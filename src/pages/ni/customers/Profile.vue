@@ -22,10 +22,10 @@ export default {
   },
   components: {
     ProfileHeader,
-    ProfileTabs
+    ProfileTabs,
   },
   metaInfo: {
-    title: 'Infos personnelles'
+    title: 'Infos personnelles',
   },
   computed: {
     userProfile () {
@@ -33,7 +33,7 @@ export default {
     },
     currentUser () {
       return this.$store.getters['main/user'];
-    }
+    },
   },
   data () {
     return {
@@ -57,7 +57,7 @@ export default {
           default: this.defaultTab === 'billing',
           component: ProfileBilling,
         },
-      ]
+      ],
     }
   },
   async mounted () {
@@ -66,11 +66,11 @@ export default {
   watch: {
     async userProfile () {
       await this.$store.dispatch('rh/updateNotifications', 'customer');
-    }
+    },
   },
   beforeDestroy () {
     this.$store.commit('rh/saveUserProfile', null);
-  }
+  },
 }
 </script>
 

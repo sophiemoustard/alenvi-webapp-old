@@ -8,5 +8,5 @@ export default {
   async getSMS (params) {
     const res = await alenviAxios.get(`${process.env.API_HOSTNAME}/sms`, { params });
     return res;
-  }
+  },
 }

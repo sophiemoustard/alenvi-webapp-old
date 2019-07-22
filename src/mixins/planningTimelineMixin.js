@@ -15,10 +15,10 @@ export const planningTimelineMixin = {
     isThreeDaysView () {
       if (this.viewMode) return this.viewMode === THREE_DAYS_VIEW;
       return false;
-    }
+    },
   },
   watch: {
-    startOfWeek: function () {
+    startOfWeek () {
       this.targetDate = this.startOfWeek.toISOString();
     },
   },

@@ -127,7 +127,7 @@ export default {
     NiModalSelect,
     NiModalInput,
     NiDatetimePicker,
-    NiContracts
+    NiContracts,
   },
   data () {
     return {
@@ -152,12 +152,12 @@ export default {
         customer: '',
         weeklyHours: '',
         startDate: '',
-        grossHourlyRate: ''
+        grossHourlyRate: '',
       },
       newContractVersion: {
         weeklyHours: '',
         startDate: '',
-        grossHourlyRate: ''
+        grossHourlyRate: '',
       },
       CUSTOMER_CONTRACT,
       COMPANY_CONTRACT,
@@ -234,7 +234,7 @@ export default {
     customerOptions () {
       return this.customers.map(cus => ({
         label: formatFullIdentity(cus.identity),
-        value: cus._id
+        value: cus._id,
       }));
     },
     userFullName () {
@@ -277,7 +277,7 @@ export default {
       const signers = [{
         id: '1',
         name: this.userFullName,
-        email: this.getUser.local.email
+        email: this.getUser.local.email,
       }];
       signers.push({ id: `${signers.length + 1}`, name: signer.name, email: signer.email });
       return signers;
@@ -316,7 +316,7 @@ export default {
           versions: [{
             startDate: this.newContract.startDate,
             grossHourlyRate: this.newContract.grossHourlyRate,
-            ...(this.newContract.status === COMPANY_CONTRACT && { weeklyHours: this.newContract.weeklyHours })
+            ...(this.newContract.status === COMPANY_CONTRACT && { weeklyHours: this.newContract.weeklyHours }),
           }],
         };
 
@@ -324,15 +324,15 @@ export default {
           payload.signature = {
             ...this.esignRedirection,
             templateId: this.userCompany.rhConfig.templates[this.$_.camelCase(this.newContract.status)].driveId,
-            meta: { type: this.newContract.status, auxiliaryDriveId: this.getUser.administrative.driveFolder.id },
-            fields: generateContractFields(this.newContract.status, { user: this.getUser, contract: this.newContract, initialContractStartDate: this.newContract.startDate })
+            meta: { type: this.newContract.status, auxiliaryDriveId: this.getUser.administrative.driveFolder.driveId },
+            fields: generateContractFields(this.newContract.status, { user: this.getUser, contract: this.newContract, initialContractStartDate: this.newContract.startDate }),
           };
           if (this.newContract.status === CUSTOMER_CONTRACT) {
             const helpers = await this.$users.showAll({ customers: this.newContract.customer });
             const currentCustomer = helpers[0].customers.find(cus => cus._id === this.newContract.customer);
             payload.signature.signers = this.generateContractSigners({ name: helpers[0].identity.lastname, email: helpers[0].local.email });
             payload.signature.title = `${translate[this.newContract.status]} - ${currentCustomer.identity.lastname}`;
-            payload.signature.meta.customerDriveId = currentCustomer.driveFolder.id
+            payload.signature.meta.customerDriveId = currentCustomer.driveFolder.driveId;
           } else {
             payload.signature.signers = this.generateContractSigners({ name: `${this.mainUser.identity.firstname} ${this.mainUser.identity.lastname}`, email: this.mainUser.local.email });
             payload.signature.title = `${translate[this.newContract.status]} - ${this.userFullName}`;
@@ -383,14 +383,14 @@ export default {
           payload.signature = {
             ...this.esignRedirection,
             templateId: this.userCompany.rhConfig.templates[`${this.$_.camelCase(contractVersionMix.status)}Version`].driveId,
-            meta: { type: contractVersionMix.status, auxiliaryDriveId: this.getUser.administrative.driveFolder.id },
-            fields: generateContractFields(contractVersionMix.status, { user: this.getUser, contract: contractVersionMix, initialContractStartDate: this.selectedContract.startDate })
+            meta: { type: contractVersionMix.status, auxiliaryDriveId: this.getUser.administrative.driveFolder.driveId },
+            fields: generateContractFields(contractVersionMix.status, { user: this.getUser, contract: contractVersionMix, initialContractStartDate: this.selectedContract.startDate }),
           };
           if (contractVersionMix.status === CUSTOMER_CONTRACT) {
             const helpers = await this.$users.showAll({ customers: contractVersionMix.customer._id });
             payload.signature.signers = this.generateContractSigners({ name: helpers[0].identity.lastname, email: helpers[0].local.email });
             payload.signature.title = `Avenant au ${translate[contractVersionMix.status]} - ${contractVersionMix.customer.identity.lastname}`;
-            payload.signature.meta.customerDriveId = contractVersionMix.customer.driveFolder.id
+            payload.signature.meta.customerDriveId = contractVersionMix.customer.driveFolder.driveId;
           } else {
             payload.signature.signers = this.generateContractSigners({ name: `${this.mainUser.identity.firstname} ${this.mainUser.identity.lastname}`, email: this.mainUser.local.email });
             payload.signature.title = `Avenant au ${translate[contractVersionMix.status]} - ${this.userFullName}`;

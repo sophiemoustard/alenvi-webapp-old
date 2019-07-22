@@ -1,11 +1,10 @@
-import { ABSENCE_TYPES, PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR } from '../data/constants';
+import { ABSENCE_TYPES } from '../data/constants';
 import { formatShortIdentity } from '../helpers/utils';
 
 export const planningEventMixin = {
   data () {
     return {
       hours: [],
-      halfHourHeight: 100 / 30, // (100 => % total heigth - 30: nomber of half hours)
     };
   },
   computed: {
@@ -15,19 +14,15 @@ export const planningEventMixin = {
         return {
           name: this.$moment(day).format('dd'),
           number: this.$moment(day).format('DD'),
-          moment: day
+          moment: day,
         }
       });
     },
     isCustomerPlanning () {
       return this.personKey === 'customer';
-    }
+    },
   },
   methods: {
-    getTimelineHours () {
-      const range = this.$moment.range(this.$moment().hours(PLANNING_VIEW_START_HOUR).minutes(0), this.$moment().hours(PLANNING_VIEW_END_HOUR).minutes(0));
-      this.hours = Array.from(range.by('hours', { step: 2 }));
-    },
     isCurrentDay (momentDay) {
       return this.$moment(momentDay).isSame(new Date(), 'day');
     },
@@ -39,6 +34,8 @@ export const planningEventMixin = {
       return !absence ? '' : absence.label;
     },
     eventTitle (event) {
+      if (!event.auxiliary && this.isCustomerPlanning) return 'À affecter';
+
       return formatShortIdentity(this.isCustomerPlanning ? event.auxiliary.identity : event.customer.identity);
     },
   },

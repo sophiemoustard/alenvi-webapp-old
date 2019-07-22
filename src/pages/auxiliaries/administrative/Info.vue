@@ -14,16 +14,16 @@ import ProfileInfo from '../../../components/auxiliary/ProfileInfo';
 export default {
   props: ['id'],
   components: {
-    ProfileInfo
+    ProfileInfo,
   },
   metaInfo: {
-    title: 'Infos personnelles'
+    title: 'Infos personnelles',
   },
   computed: {
     currentUser () {
       return this.$store.getters['main/user'];
-    }
-  }
+    },
+  },
 }
 </script>
 

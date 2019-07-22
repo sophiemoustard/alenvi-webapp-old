@@ -8,7 +8,7 @@ export const configMixin = {
           title: 'Confirmation',
           message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
           ok: true,
-          cancel: 'Annuler'
+          cancel: 'Annuler',
         });
         await this.$gdrive.removeFileById({ id: driveId });
         const payload = {
@@ -16,8 +16,8 @@ export const configMixin = {
           [key]: {
             templates: {
               [type]: { driveId: null, link: null },
-            }
-          }
+            },
+          },
         };
         await this.$companies.updateById(payload);
         this.refreshCompany();

@@ -50,13 +50,13 @@ export default {
     setModel (value) {
       if (!this.$moment(value).isValid()) return;
       this.model = value;
-    }
+    },
   },
   watch: {
     value (value) {
       this.setModel(value);
-    }
-  }
+    },
+  },
 }
 </script>
 

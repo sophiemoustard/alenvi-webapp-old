@@ -27,11 +27,11 @@ export default {
   props: {
     role: {
       type: String,
-      default: AUXILIARY
-    }
+      default: AUXILIARY,
+    },
   },
   metaInfo: {
-    title: 'Bénéficiaires'
+    title: 'Bénéficiaires',
   },
   data () {
     return {
@@ -43,7 +43,7 @@ export default {
         sortBy: 'name',
         descending: false,
         page: 1,
-        rowsPerPage: 15
+        rowsPerPage: 15,
       },
       columns: [
         {
@@ -58,7 +58,7 @@ export default {
             return aArr[aArr.length - 1].toLowerCase() < bArr[bArr.length - 1].toLowerCase() ? -1 : 1
           },
         },
-      ]
+      ],
     }
   },
   async mounted () {
@@ -86,8 +86,8 @@ export default {
     },
     goToCustomerProfile (customerId) {
       this.$router.push({ name: 'profile customers info', params: { id: this.currentUser._id, customerId } });
-    }
-  }
+    },
+  },
 }
 </script>
 
