@@ -63,6 +63,7 @@ export default {
       startOfWeekAsString: null,
       personKey: AUXILIARY,
       displayAllSectors: false,
+      eventHistories: [],
     };
   },
   validations () {
@@ -119,6 +120,7 @@ export default {
   async mounted () {
     try {
       await this.fillFilter(AUXILIARY);
+      await this.getEventHistories();
       await this.getCustomers();
       this.setInternalHours();
     } catch (e) {
@@ -192,6 +194,10 @@ export default {
     },
     // Refresh data
     async refresh () {
+      await this.refreshEvents();
+      await this.getEventHistories();
+    },
+    async refreshEvents () {
       try {
         let params = {
           startDate: this.$moment(this.startOfWeekAsString).toDate(),
@@ -205,6 +211,7 @@ export default {
 
         this.events = await this.$events.list(params);
       } catch (e) {
+        console.error(e);
         this.events = [];
       }
     },
@@ -212,7 +219,16 @@ export default {
       try {
         this.customers = await this.$customers.showAll({ subscriptions: true });
       } catch (e) {
+        console.error(e);
         this.customers = [];
+      }
+    },
+    async getEventHistories () {
+      try {
+        this.eventHistories = await this.$eventHistories.list();
+      } catch (e) {
+        console.error(e);
+        this.eventHistories = [];
       }
     },
     // Event creation

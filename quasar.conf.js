@@ -37,6 +37,7 @@ module.exports = function (ctx) {
       'exports',
       'pay',
       'finalPay',
+      'eventHistories',
       process.env.NODE_ENV === 'production' ? 'vue-analytics' : null,
     ],
     css: [
