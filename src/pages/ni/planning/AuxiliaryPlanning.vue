@@ -3,7 +3,7 @@
     <ni-planning-manager :events="events" :persons="activeAuxiliaries" @updateStartOfWeek="updateStartOfWeek"
       @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop"
       :filteredSectors="filteredSectors" :can-edit="canEditEvent" :personKey="personKey"
-      :displayAllSectors.sync="displayAllSectors" />
+      :displayAllSectors.sync="displayAllSectors" :eventHistories="eventHistories" />
 
     <!-- Event creation modal -->
     <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
@@ -63,6 +63,7 @@ export default {
       startOfWeekAsString: null,
       personKey: AUXILIARY,
       displayAllSectors: false,
+      eventHistories: [],
     };
   },
   validations () {
@@ -119,6 +120,7 @@ export default {
   async mounted () {
     try {
       await this.fillFilter(AUXILIARY);
+      await this.getEventHistories();
       await this.getCustomers();
       this.setInternalHours();
     } catch (e) {
@@ -192,6 +194,9 @@ export default {
     },
     // Refresh data
     async refresh () {
+      await Promise.all([this.refreshEvents(), this.getEventHistories()]);
+    },
+    async refreshEvents () {
       try {
         let params = {
           startDate: this.$moment(this.startOfWeekAsString).toDate(),
@@ -205,6 +210,7 @@ export default {
 
         this.events = await this.$events.list(params);
       } catch (e) {
+        console.error(e);
         this.events = [];
       }
     },
@@ -212,7 +218,19 @@ export default {
       try {
         this.customers = await this.$customers.showAll({ subscriptions: true });
       } catch (e) {
+        console.error(e);
         this.customers = [];
+      }
+    },
+    async getEventHistories () {
+      try {
+        this.eventHistories = await this.$eventHistories.list({
+          sectors: this.filteredSectors.map(sector => sector._id),
+          auxiliaries: this.auxiliaries.map(aux => aux._id),
+        });
+      } catch (e) {
+        console.error(e);
+        this.eventHistories = [];
       }
     },
     // Event creation
@@ -273,15 +291,21 @@ export default {
       }
     },
     handleElemRemovedFromFilter (el) {
+      console.log(this.eventHistories)
       if (el.type === SECTOR) {
         this.filteredSectors = this.filteredSectors.filter(sec => sec._id !== el._id);
         this.auxiliaries = this.auxiliaries.filter(auxiliary =>
           auxiliary.sector._id !== el._id || this.filteredAuxiliaries.some(filteredAux => filteredAux._id === auxiliary._id)
         );
+        this.eventHistories = this.eventHistories.filter(history =>
+          !history.sectors.includes(el._id) ||
+            this.filteredAuxiliaries.some(filteredAux => history.auxiliaries.map(aux => aux._id).includes(filteredAux._id))
+        );
       } else { // el = auxiliary
         this.filteredAuxiliaries = this.filteredAuxiliaries.filter(auxiliary => auxiliary._id !== el._id);
         if (this.filteredSectors.some(sector => sector._id === el.sector._id)) return;
         this.auxiliaries = this.auxiliaries.filter(auxiliary => auxiliary._id !== el._id);
+        this.eventHistories = this.eventHistories.filter(history => !history.auxiliaries.map(aux => aux._id).includes(el._id));
       }
     },
   },

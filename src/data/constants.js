@@ -107,6 +107,10 @@ export const STAFFING_PERCENTAGE_BY_MINUTES = 100 / ((STAFFING_VIEW_END_HOUR - S
 export const SECTOR = 'sector';
 export const PERSON = 'person';
 
+// EVENT HISTORY
+export const EVENT_CREATION = 'event_creation';
+export const EVENT_DELETION = 'event_deletion';
+
 // INDICATORS
 export const WEEK_STATS = 'week_stats';
 export const MONTH_STATS = 'month_stat';
@@ -146,14 +150,14 @@ export const CONTRACT_STATUS_OPTIONS = [
   { label: 'Mandataire', value: CUSTOMER_CONTRACT },
 ];
 
-// Billing
+// BILLING
 
 export const TWO_WEEKS = 'two_weeks';
 export const MONTH = 'month';
 export const BILL = 'bill';
 export const CREDIT_NOTE = 'creditNote';
 
-// Payments
+// PAYMENTS
 export const DIRECT_DEBIT = 'direct_debit';
 export const BANK_TRANSFER = 'bank_transfer';
 export const CHECK = 'check';

@@ -2,11 +2,17 @@
   <div :class="[{ 'planning': !toggleDrawer }]">
     <div class="row items-center planning-header">
       <div class="col-xs-12 col-md-5 planning-search">
-        <ni-chips-autocomplete ref="refFilter" v-model="terms" class="planning-search" />
+        <ni-chips-autocomplete ref="refFilter" v-model="terms" />
+        <q-btn v-if="!isCustomerPlanning" flat round icon="people" @click="toggleAllSectors"
+          :color="displayAllSectors ? 'primary' : ''" />
       </div>
-      <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
-        @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :type="PLANNING" />
-      <q-checkbox v-if="!isCustomerPlanning" label="Filtrer toutes les communautés" :value="displayAllSectors" @input="toggleAllSectors" />
+      <div class="col-xs-12 col-md-7 row planning-timeline">
+        <planning-navigation class="col-10" :timelineTitle="timelineTitle()" :targetDate="targetDate" :type="PLANNING"
+          @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
+          @goToWeek="goToWeek" />
+        <q-btn v-if="!isCustomerPlanning" class="planning-view" size="md" icon="playlist_play" flat round
+          @click="toggleHistory" :color="displayHistory ? 'primary' : ''" />
+      </div>
     </div>
     <div class="planning-container full-width">
       <table style="width: 100%" :class="[staffingView ? 'staffing' : 'non-staffing', 'planning-table']">
@@ -79,6 +85,13 @@
         </tbody>
       </table>
     </div>
+    <q-page-sticky v-if="displayHistory" expand position="right">
+      <div class="event-history-container">
+        <q-scroll-area>
+          <ni-event-history v-for="(history, index) in eventHistories" :key="index" :history="history" />
+        </q-scroll-area>
+      </div>
+    </q-page-sticky>
   </div>
 </template>
 
@@ -96,6 +109,7 @@ import { NotifyNegative } from '../popup/notify';
 import NiChipAuxiliaryIndicator from './ChipAuxiliaryIndicator';
 import NiChipCustomerIndicator from './ChipCustomerIndicator';
 import NiPlanningEvent from './PlanningEvent';
+import NiEventHistory from './EventHistory';
 import ChipsAutocomplete from '../ChipsAutocomplete';
 import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import { planningEventMixin } from '../../mixins/planningEventMixin';
@@ -112,6 +126,7 @@ export default {
     'ni-planning-event-cell': NiPlanningEvent,
     'ni-chips-autocomplete': ChipsAutocomplete,
     'planning-navigation': PlanningNavigation,
+    'ni-event-history': NiEventHistory,
   },
   props: {
     events: { type: Array, default: () => [] },
@@ -120,6 +135,7 @@ export default {
     personKey: { type: String, default: 'auxiliary' },
     canEdit: { type: Function, default: () => {} },
     displayAllSectors: { type: Boolean, default: false },
+    eventHistories: { type: Array, default: () => [] },
   },
   data () {
     return {
@@ -134,6 +150,7 @@ export default {
       distanceMatrix: [],
       hourWidth: 100 / 12,
       UNKNOWN_AVATAR,
+      displayHistory: false,
     }
   },
   beforeDestroy () {
@@ -173,8 +190,8 @@ export default {
     },
   },
   methods: {
-    toggleAllSectors (value) {
-      this.$emit('update:displayAllSectors', value);
+    toggleAllSectors () {
+      this.$emit('update:displayAllSectors', !this.displayAllSectors);
     },
     getTimelineHours () {
       const range = this.$moment.range(this.$moment().hours(STAFFING_VIEW_START_HOUR).minutes(0), this.$moment().hours(STAFFING_VIEW_END_HOUR).minutes(0));
@@ -227,6 +244,11 @@ export default {
     getPersonEvents (person) {
       return this.getRowEvents(person._id).filter(event =>
         (this.isCustomerPlanning || !event.isCancelled || event.cancel.condition === INVOICED_AND_PAYED));
+    },
+    // History
+    toggleHistory () {
+      if (this.persons.length === 0) return;
+      this.displayHistory = !this.displayHistory;
     },
     // Drag & drop
     drag (event) {
@@ -352,5 +374,16 @@ export default {
 
   .to-assign
     background-color: rgba(253, 243, 229, 0.5);
+
+  .event-history-container
+    background-color: $white;
+    width: 300px;
+    height: 100%;
+    top: 75px;
+    right: 0;
+    position: absolute;
+    box-shadow: 0 3px 5px -1px rgba(0,0,0,0.2), 0 5px 8px rgba(0,0,0,0.14), 0 1px 14px rgba(0,0,0,0.12)
+    .q-scrollarea
+      height: 100%;
 
 </style>
