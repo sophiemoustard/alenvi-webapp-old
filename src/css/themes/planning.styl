@@ -97,8 +97,6 @@
     font-size: 1.2em;
     @media screen and (max-width: 767px)
       margin: 0 16px 16px;
-  &-navigation
-    margin-top: 10px
   &-month
     display: flex;
     @media screen and (min-width: 768px)
@@ -109,8 +107,10 @@
       font-size: 0.8em;
       margin: 5px;
   &-search
+    display: flex;
+    align-items: center;
     @media screen and (max-width: 767px)
-      margin-bottom: 5px;
+      margin-bottom: 10px;
   &-actions
     display: flex;
     align-items: center;
@@ -118,6 +118,11 @@
     justify-content: space-around;
     @media screen and (max-width: 767px)
       justify-content: space-between;
+  &-view
+    padding: 4px;
+  &-timeline
+    display: flex;
+    justify-content: space-between;
 
 .auxiliary-name
   display: flex;

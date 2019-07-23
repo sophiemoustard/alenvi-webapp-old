@@ -2,13 +2,17 @@
   <div :class="[{ 'planning': !toggleDrawer }]">
     <div class="row items-center planning-header">
       <div class="col-xs-12 col-md-5 planning-search">
-        <ni-chips-autocomplete ref="refFilter" v-model="terms" class="planning-search" />
+        <ni-chips-autocomplete ref="refFilter" v-model="terms" />
+        <q-btn v-if="!isCustomerPlanning" flat round icon="people" @click="toggleAllSectors"
+          :color="displayAllSectors ? 'primary' : ''" />
       </div>
-      <planning-navigation :timelineTitle="timelineTitle()" :targetDate="targetDate" :type="PLANNING"
-        @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
-        @goToWeek="goToWeek" @toggleHistory="toggleHistory" />
-      <q-checkbox v-if="!isCustomerPlanning" label="Filtrer toutes les communautés" :value="displayAllSectors"
-        @input="toggleAllSectors" />
+      <div class="col-xs-12 col-md-7 row planning-timeline">
+        <planning-navigation class="col-10" :timelineTitle="timelineTitle()" :targetDate="targetDate" :type="PLANNING"
+          @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
+          @goToWeek="goToWeek" />
+        <q-btn v-if="!isCustomerPlanning" class="planning-view" size="md" icon="playlist_play" flat round
+          @click="toggleHistory" :color="displayHistory ? 'primary' : ''" />
+      </div>
     </div>
     <div class="planning-container full-width">
       <table style="width: 100%" :class="[staffingView ? 'staffing' : 'non-staffing', 'planning-table']">
@@ -186,8 +190,8 @@ export default {
     },
   },
   methods: {
-    toggleAllSectors (value) {
-      this.$emit('update:displayAllSectors', value);
+    toggleAllSectors () {
+      this.$emit('update:displayAllSectors', !this.displayAllSectors);
     },
     getTimelineHours () {
       const range = this.$moment.range(this.$moment().hours(STAFFING_VIEW_START_HOUR).minutes(0), this.$moment().hours(STAFFING_VIEW_END_HOUR).minutes(0));
@@ -243,6 +247,7 @@ export default {
     },
     // History
     toggleHistory () {
+      if (this.persons.length === 0) return;
       this.displayHistory = !this.displayHistory;
     },
     // Drag & drop
