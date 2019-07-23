@@ -311,11 +311,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-  @import '~variables';
-
-  .q-layout-page
-    padding-top: 20px;
-
-</style>
