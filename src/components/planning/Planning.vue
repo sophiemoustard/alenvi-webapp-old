@@ -85,13 +85,7 @@
         </tbody>
       </table>
     </div>
-    <q-page-sticky v-if="displayHistory" expand position="right">
-      <div class="event-history-container">
-        <q-scroll-area>
-          <ni-event-history v-for="(history, index) in eventHistories" :key="index" :history="history" />
-        </q-scroll-area>
-      </div>
-    </q-page-sticky>
+    <ni-event-history-feed v-if="displayHistory" :eventHistories="eventHistories" />
   </div>
 </template>
 
@@ -109,7 +103,7 @@ import { NotifyNegative } from '../popup/notify';
 import NiChipAuxiliaryIndicator from './ChipAuxiliaryIndicator';
 import NiChipCustomerIndicator from './ChipCustomerIndicator';
 import NiPlanningEvent from './PlanningEvent';
-import NiEventHistory from './EventHistory';
+import NiEventHistoryFeed from './EventHistoryFeed';
 import ChipsAutocomplete from '../ChipsAutocomplete';
 import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import { planningEventMixin } from '../../mixins/planningEventMixin';
@@ -126,7 +120,7 @@ export default {
     'ni-planning-event-cell': NiPlanningEvent,
     'ni-chips-autocomplete': ChipsAutocomplete,
     'planning-navigation': PlanningNavigation,
-    'ni-event-history': NiEventHistory,
+    'ni-event-history-feed': NiEventHistoryFeed,
   },
   props: {
     events: { type: Array, default: () => [] },
@@ -374,16 +368,5 @@ export default {
 
   .to-assign
     background-color: rgba(253, 243, 229, 0.5);
-
-  .event-history-container
-    background-color: $white;
-    width: 300px;
-    height: 100%;
-    top: 75px;
-    right: 0;
-    position: absolute;
-    box-shadow: 0 3px 5px -1px rgba(0,0,0,0.2), 0 5px 8px rgba(0,0,0,0.14), 0 1px 14px rgba(0,0,0,0.12)
-    .q-scrollarea
-      height: 100%;
 
 </style>

@@ -1,6 +1,7 @@
 <template>
   <div :class="['event-history', `event-${history.event.type}`]">
-    <q-icon size="20px" :name="iconName" />
+    <!-- <q-icon size="20px" :name="iconName" /> -->
+    <img :src="getAvatar(history.createdBy.picture)" class="avatar">
     <div class="title">
       <span>{{ historyTitle.title }}</span>
       <span v-if="this.history.action !== EVENT_DELETION">{{ historyTitle.subtitle }}</span>
@@ -10,7 +11,7 @@
 </template>
 
 <script>
-import { EVENT_CREATION, INTERVENTION, INTERNAL_HOUR, ABSENCE, UNAVAILABILITY, EVENT_DELETION } from '../../data/constants';
+import { EVENT_CREATION, INTERVENTION, INTERNAL_HOUR, ABSENCE, UNAVAILABILITY, EVENT_DELETION, DEFAULT_AVATAR } from '../../data/constants';
 import { formatShortIdentity, formatFullIdentity } from '../../helpers/utils';
 
 export default {
@@ -54,6 +55,9 @@ export default {
     },
   },
   methods: {
+    getAvatar (user) {
+      return this.$_.get(user, 'picture.link') || DEFAULT_AVATAR;
+    },
     // Creation
     getEventCreationHistoryTitle () {
       switch (this.history.event.type) {
@@ -83,7 +87,7 @@ export default {
           const startDate = this.$moment(this.history.event.startDate);
           const endDate = this.$moment(this.history.event.endDate);
 
-          return this.$moment(startDate).isSame(endDate)
+          return this.$moment(startDate).isSame(endDate, 'd')
             ? `${auxiliary} le ${startDate.format('DD/MM')}.`
             : `${auxiliary} du ${startDate.format('DD/MM')} au ${endDate.format('DD/MM')}.`;
       }
