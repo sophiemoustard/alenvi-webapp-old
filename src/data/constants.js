@@ -109,6 +109,7 @@ export const PERSON = 'person';
 
 // EVENT HISTORY
 export const EVENT_CREATION = 'event_creation';
+export const EVENT_DELETION = 'event_deletion';
 
 // INDICATORS
 export const WEEK_STATS = 'week_stats';
