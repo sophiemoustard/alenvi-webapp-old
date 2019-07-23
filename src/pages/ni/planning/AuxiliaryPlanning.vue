@@ -291,15 +291,21 @@ export default {
       }
     },
     handleElemRemovedFromFilter (el) {
+      console.log(this.eventHistories)
       if (el.type === SECTOR) {
         this.filteredSectors = this.filteredSectors.filter(sec => sec._id !== el._id);
         this.auxiliaries = this.auxiliaries.filter(auxiliary =>
           auxiliary.sector._id !== el._id || this.filteredAuxiliaries.some(filteredAux => filteredAux._id === auxiliary._id)
         );
+        this.eventHistories = this.eventHistories.filter(history =>
+          !history.sectors.includes(el._id) ||
+            this.filteredAuxiliaries.some(filteredAux => history.auxiliaries.map(aux => aux._id).includes(filteredAux._id))
+        );
       } else { // el = auxiliary
         this.filteredAuxiliaries = this.filteredAuxiliaries.filter(auxiliary => auxiliary._id !== el._id);
         if (this.filteredSectors.some(sector => sector._id === el.sector._id)) return;
         this.auxiliaries = this.auxiliaries.filter(auxiliary => auxiliary._id !== el._id);
+        this.eventHistories = this.eventHistories.filter(history => !history.auxiliaries.map(aux => aux._id).includes(el._id));
       }
     },
   },
