@@ -194,8 +194,7 @@ export default {
     },
     // Refresh data
     async refresh () {
-      await this.refreshEvents();
-      await this.getEventHistories();
+      await Promise.all([this.refreshEvents(), this.getEventHistories()]);
     },
     async refreshEvents () {
       try {
@@ -225,7 +224,10 @@ export default {
     },
     async getEventHistories () {
       try {
-        this.eventHistories = await this.$eventHistories.list();
+        this.eventHistories = await this.$eventHistories.list({
+          sectors: this.filteredSectors.map(sector => sector._id),
+          auxiliaries: this.auxiliaries.map(aux => aux._id),
+        });
       } catch (e) {
         console.error(e);
         this.eventHistories = [];
