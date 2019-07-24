@@ -1,11 +1,18 @@
 <template>
-  <div :class="['event-history', `event-${history.event.type}`]">
-    <!-- <q-icon size="20px" :name="iconName" /> -->
-    <img :src="getAvatar(history.createdBy.picture)" class="avatar">
-    <div class="title">
-      <span>{{ historyTitle.title }}</span>
-      <span v-if="this.history.action !== EVENT_DELETION">{{ historyTitle.subtitle }}</span>
-      <span class="history-info">{{ historyInfo }}</span>
+  <div class="event-history">
+    <div class="event-history-item">
+      <div class="icons">
+        <q-icon size="20px" :name="iconName" />
+        <img size="20px" :src="getAvatar(history.createdBy)" class="avatar">
+      </div>
+      <div class="title">
+        <span>{{ historyTitle.title }}</span>
+        <span v-if="this.history.action !== EVENT_DELETION">{{ historyTitle.subtitle }}</span>
+        <span class="history-info">{{ historyInfo }}</span>
+      </div>
+      <div class="icons ">
+        <q-btn size="10px" flat round icon="keyboard_arrow_down" />
+      </div>
     </div>
   </div>
 </template>
@@ -67,7 +74,7 @@ export default {
         case INTERNAL_HOUR:
           return 'Nouvelle heure interne.';
         case ABSENCE:
-          return 'Nouvelle absence.';
+          return `Nouvelle absence.`;
         case UNAVAILABILITY:
           return 'Nouvelle indispo.';
       }
@@ -122,23 +129,39 @@ export default {
 @import '~variables';
   .event-history
     margin: 2px;
-    padding: 5px;
     width: 100%;
-    display: flex;
+    display: block;
     font-size: 15px;
     @media (max-width: 767px)
       font-size: 14px
-
-    .q-icon
+    &:after
+      content: "";
+      display: block;
+      margin: auto;
+      width: 95%;
+      border-bottom: 1px solid $light-grey;
+    .avatar
+      height: 20px !important;
+      width: 20px !important;
+    .icons
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
       padding: 0 5px;
+
+  .event-history-item
+    margin: 2px;
+    padding: 5px;
+    display: flex;
 
     .title
       padding: 0 5px;
       display: flex;
       flex-direction column;
+      flex: 1;
 
     .history-info
       font-size: 12px;
       font-style: italic;
-      margin: 2px 0;
+      margin: 2px 0 3px;
 </style>

@@ -85,7 +85,9 @@
         </tbody>
       </table>
     </div>
-    <ni-event-history-feed v-if="displayHistory" :eventHistories="eventHistories" />
+    <q-page-sticky expand position="right">
+      <ni-event-history-feed v-if="displayHistory" :eventHistories="eventHistories" />
+    </q-page-sticky>
   </div>
 </template>
 
@@ -368,5 +370,8 @@ export default {
 
   .to-assign
     background-color: rgba(253, 243, 229, 0.5);
+
+  .q-page-sticky
+    z-index: 20;
 
 </style>
