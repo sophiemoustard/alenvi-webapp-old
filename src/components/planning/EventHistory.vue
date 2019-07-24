@@ -11,7 +11,7 @@
         <span class="history-info">{{ historySignature }}</span>
       </div>
       <div class="icons ">
-        <q-btn size="10px" flat round icon="keyboard_arrow_down" @click="toggleDetails" />
+        <q-btn v-if="historyInfo.details" size="10px" flat round icon="keyboard_arrow_down" @click="toggleDetails" />
       </div>
     </div>
     <div v-if="displayDetails" class="event-history-details">
@@ -22,8 +22,8 @@
 </template>
 
 <script>
-import { EVENT_CREATION, INTERVENTION, INTERNAL_HOUR, ABSENCE, UNAVAILABILITY, EVENT_DELETION, DEFAULT_AVATAR } from '../../data/constants';
-import { formatAuxiliaryShortIdentity, formatFullIdentity, formatCustomerShortIdentity } from '../../helpers/utils';
+import { EVENT_CREATION, INTERVENTION, INTERNAL_HOUR, ABSENCE, UNAVAILABILITY, EVENT_DELETION, DEFAULT_AVATAR, ABSENCE_TYPES } from '../../data/constants';
+import { formatAuxiliaryShortIdentity, formatCustomerShortIdentity } from '../../helpers/utils';
 
 export default {
   name: 'EventHistory',
@@ -64,8 +64,8 @@ export default {
     },
     historySignature () {
       const date = this.$moment(this.history.createdAt).format('DD/MM/YYYY');
-      const user = formatFullIdentity(this.history.createdBy.identity);
-      return `Le ${date} par ${user}.`;
+      const user = formatAuxiliaryShortIdentity(this.history.createdBy.identity);
+      return `Le ${date} par ${user}`;
     },
   },
   methods: {
@@ -122,10 +122,11 @@ export default {
         case ABSENCE:
           const startDate = this.$moment(this.history.event.startDate);
           const endDate = this.$moment(this.history.event.endDate);
+          const absenceName = ABSENCE_TYPES.find(abs => abs.value === absence);
 
           return this.$moment(startDate).isSame(endDate, 'd')
-            ? `${absence} le ${startDate.format('DD/MM')} de ${startHour} à ${endHour}.`
-            : `${absence} du ${startDate.format('DD/MM')} au ${endDate.format('DD/MM')}.`;
+            ? `${absenceName.label || 'Absence'} le ${startDate.format('DD/MM')} de ${startHour} à ${endHour}.`
+            : `${absenceName.label || 'Absence'} du ${startDate.format('DD/MM')} au ${endDate.format('DD/MM')}.`;
         case UNAVAILABILITY:
           return `${startHour} à ${endHour}.`;
       }
@@ -195,7 +196,7 @@ export default {
       padding: 0 5px;
 
   .event-history-title
-    margin: 2px;
+    margin: 2px 2px 0;
     padding: 5px;
     display: flex;
 
@@ -211,6 +212,7 @@ export default {
       margin: 2px 0 3px;
 
   .event-history-details
-    margin: 2px;
-    padding: 5px;
+    font-size: 14px;
+    margin: 0 2px 2px;
+    padding: 0 10px 5px;
 </style>
