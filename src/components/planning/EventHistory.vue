@@ -16,7 +16,7 @@
     </div>
     <div v-if="displayDetails" class="event-history-details">
       <div>{{ historyInfo.details }}</div>
-      <div>{{ history.event.misc }}</div>
+      <div class="history-misc">{{ history.event.misc }}</div>
     </div>
   </div>
 </template>
@@ -210,6 +210,9 @@ export default {
       font-size: 12px;
       font-style: italic;
       margin: 2px 0 3px;
+
+  .history-misc
+    font-style: italic;
 
   .event-history-details
     font-size: 14px;
