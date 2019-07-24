@@ -1,5 +1,5 @@
 <template>
-  <div class="event-history-container">
+  <div class="history-container" :style="{ height: `${height - 60}px` }" >
     <div></div>
     <q-scroll-area>
       <ni-event-history v-for="(history, index) in eventHistories" :key="index" :history="history" />
@@ -15,6 +15,11 @@ export default {
   props: {
     eventHistories: { type: Array, default: () => ([]) },
   },
+  data () {
+    return {
+      height: window.innerHeight,
+    }
+  },
   components: {
     'ni-event-history': NiEventHistory,
   },
@@ -23,10 +28,9 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables';
-  .event-history-container
+  .history-container
     background-color: $white;
     width: 300px;
-    height: 100%;
     top: 60px;
     right: 0;
     position: absolute;
