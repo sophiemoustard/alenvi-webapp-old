@@ -111,7 +111,7 @@ export default {
     },
     getEventCreationHistoryDetails () {
       const { type, internalHour, absence, location } = this.history.event;
-      console.log(this.history.event)
+
       const startHour = this.$moment(this.history.event.startDate).format('HH:mm');
       const endHour = this.$moment(this.history.event.endDate).format('HH:mm');
       switch (type) {
@@ -150,6 +150,20 @@ export default {
             : `Absence de ${auxiliary} du ${startDate} au ${endDate}`;
         case UNAVAILABILITY:
           return `Indispo de ${auxiliary} le ${startDate}`;
+      }
+    },
+    getEventDeletionHistoryDetails () {
+      const { type, internalHour, location } = this.history.event;
+
+      const startHour = this.$moment(this.history.event.startDate).format('HH:mm');
+      const endHour = this.$moment(this.history.event.endDate).format('HH:mm');
+      switch (type) {
+        case INTERVENTION:
+          return `Intervention initialement prévue de ${startHour} à ${endHour}.`;
+        case INTERNAL_HOUR:
+          return `${internalHour.name} initialement prévu(e) de ${startHour} à ${endHour}. ${location && location.fullAddress ? `${location.fullAddress}.` : ''}`;
+        case UNAVAILABILITY:
+          return `Initialement prévue de ${startHour} à ${endHour}.`;
       }
     },
   },
