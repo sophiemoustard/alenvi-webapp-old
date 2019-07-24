@@ -2,7 +2,7 @@
   <div class="history-container" :style="{ height: `${height}px`, top: `${this.top}px` }" >
     <div></div>
     <q-scroll-area>
-      <ni-event-history v-for="(history, index) in eventHistories" :key="index" :history="history" />
+      <ni-event-history v-for="history in eventHistories" :key="history._id" :history="history" />
     </q-scroll-area>
   </div>
 </template>

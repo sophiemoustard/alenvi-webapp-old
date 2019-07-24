@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { EVENT_CREATION, INTERNAL_HOUR, ABSENCE, EVENT_DELETION, DEFAULT_AVATAR, ABSENCE_TYPES, EVENT_TYPES, INTERVENTION, UNAVAILABILITY, NEVER, EVERY_DAY, EVERY_WEEK_DAY, EVERY_WEEK, EVERY_TWO_WEEKS } from '../../data/constants';
+import { EVENT_CREATION, INTERNAL_HOUR, ABSENCE, EVENT_DELETION, DEFAULT_AVATAR, ABSENCE_TYPES, EVENT_TYPES, INTERVENTION, UNAVAILABILITY, NEVER, EVERY_DAY, EVERY_WEEK_DAY, EVERY_WEEK, EVERY_TWO_WEEKS, EVENT_UPDATE } from '../../data/constants';
 import { formatAuxiliaryShortIdentity, formatCustomerShortIdentity } from '../../helpers/utils';
 
 export default {
@@ -33,14 +33,6 @@ export default {
     };
   },
   computed: {
-    iconName () {
-      switch (this.history.action) {
-        case EVENT_CREATION:
-          return 'add';
-        case EVENT_DELETION:
-          return 'delete';
-      }
-    },
     auxiliaryName () {
       return this.$_.has(this.history, 'event.auxiliary.identity')
         ? formatAuxiliaryShortIdentity(this.history.event.auxiliary.identity)
@@ -113,16 +105,19 @@ export default {
       switch (this.history.action) {
         case EVENT_CREATION:
           return {
-            iconName: 'add',
             title: this.getEventCreationTitle(),
             details: this.getEventCreationDetails(),
           };
         case EVENT_DELETION:
           return {
-            iconName: 'delete',
             title: this.getEventDeletionTitle(),
             details: this.getEventDeletionDetails(),
           };
+        case EVENT_UPDATE:
+          return {
+            title: this.getEventUpdateTitle(),
+            details: this.getEventUpdateDetails(),
+          }
       }
     },
     historySignature () {
@@ -130,7 +125,7 @@ export default {
       const hour = `${this.$moment(this.history.createdAt).hour()}h${this.$moment(this.history.createdAt).format('mm')}`;
       const user = formatAuxiliaryShortIdentity(this.history.createdBy.identity);
 
-      return `${user} le ${date} à ${hour}`;
+      return `${user} le ${date} à ${hour}.`;
     },
   },
   methods: {
@@ -142,32 +137,64 @@ export default {
     },
     // Creation
     getEventCreationTitle () {
-      if (!this.isOneDayEvent) return `Nouvelle ${this.eventType.toLowerCase()} de ${this.auxiliaryName} du ${this.startDate} au ${this.endDate}.`;
-      if (this.customerName) return `Nouvelle ${this.eventType.toLowerCase()} de ${this.auxiliaryName} le ${this.startDate} chez ${this.customerName}.`;
-      return `Nouvelle ${this.eventType.toLowerCase()} de ${this.auxiliaryName} le ${this.startDate}.`;
+      const typeAndAuxiliary = `Nouvelle ${this.eventType.toLowerCase()} de ${this.auxiliaryName}`;
+
+      if (!this.isOneDayEvent) return `${typeAndAuxiliary} du ${this.startDate} au ${this.endDate}.`;
+      if (this.isRepetition && this.customerName) return `${typeAndAuxiliary} ${this.repetitionFrequency} chez ${this.customerName}.`;
+      if (this.isRepetition) return `${typeAndAuxiliary} ${this.repetitionFrequency}.`;
+      if (this.customerName) return `${typeAndAuxiliary} le ${this.startDate} chez ${this.customerName}.`;
+      return `${typeAndAuxiliary} le ${this.startDate}.`;
     },
     getEventCreationDetails () {
-      const { location } = this.history.event;
-
       if (!this.isOneDayEvent) return `${this.eventName} planifiée du ${this.startDate} au ${this.endDate}.`;
-      if (this.isRepetition) return `${this.eventName}s ${this.repetitionFrequency} à partir du ${this.startDate}.`;
-      if (location && location.fullAddress) return `${this.eventName} planifiée le ${this.startDate} de ${this.startHour} à ${this.endHour}. ${location.fullAddress}.`
-      return `${this.eventName} planifiée le ${this.startDate} de ${this.startHour} à ${this.endHour}.`
+
+      const { location } = this.history.event;
+      let details;
+      if (this.isRepetition) details = `${this.eventName}s de ${this.startHour} à ${this.endHour} à partir du ${this.startDate}.`;
+      else details = `${this.eventName} planifiée le ${this.startDate} de ${this.startHour} à ${this.endHour}.`;
+
+      return location && location.fullAddress ? `${details} ${location.fullAddress}.` : details;
     },
     // Deletion
     getEventDeletionTitle () {
       const pronom = this.isRepetition && this.history.event.type === INTERVENTION ? 'la ' : 'l\'';
-      if (!this.isOneDayEvent) return `Suppression de l'${this.eventType.toLowerCase()} de ${this.auxiliaryName} du ${this.startDate} au ${this.endDate}.`;
       if (this.isRepetition) return `Suppression de ${pronom}${this.eventType.toLowerCase()} ${this.repetitionFrequency} à partir du ${this.startDate}.`;
-      if (this.customerName) return `Suppression de l'${this.eventType.toLowerCase()} de ${this.auxiliaryName} le ${this.startDate} chez ${this.customerName}.`
-      return `Suppression de l'${this.eventType.toLowerCase()} de ${this.auxiliaryName} le ${this.startDate}.`
+
+      const typeAndAuxiliary = `Suppression de l'${this.eventType.toLowerCase()} de ${this.auxiliaryName}`;
+      if (!this.isOneDayEvent) return `${typeAndAuxiliary} du ${this.startDate} au ${this.endDate}.`;
+
+      const title = `${typeAndAuxiliary} le ${this.startDate}`
+      return this.customerName ? `${title} chez ${this.customerName}.` : `${title}.`
     },
     getEventDeletionDetails () {
       if (this.history.event.type === ABSENCE) return;
 
-      if (this.isRepetition) return `${this.eventName}s initialement prévu(e)s de ${this.startHour} à ${this.endHour} à partir du ${this.startDate}.`;
-      if (location && location.fullAddress) return `${this.eventName} initialement prévu(e) de ${this.startHour} à ${this.endHour}. ${location.fullAddress}.`;
-      return `${this.eventName} initialement prévu(e) de ${this.startHour} à ${this.endHour}.`;
+      let details;
+      if (this.isRepetition) details = `${this.eventName}s initialement prévu(e)s de ${this.startHour} à ${this.endHour} à partir du ${this.startDate}.`;
+      else details = `${this.eventName} initialement prévu(e) de ${this.startHour} à ${this.endHour}.`;
+
+      return location && location.fullAddress ? `${details} ${location.fullAddress}.` : details;
+    },
+    // Update
+    getEventUpdateTitle () {
+      const { auxiliary } = this.history.update;
+      if (auxiliary) {
+        return this.formatAuxiliaryUpdateTitle();
+      }
+    },
+    formatAuxiliaryUpdateTitle () {
+      const { from, to } = this.history.update.auxiliary
+      const toAuxiliary = to && to.identity ? formatAuxiliaryShortIdentity(to.identity) : 'À affecter';
+      const fromAuxiliary = from && from.identity ? formatAuxiliaryShortIdentity(from.identity) : 'À affecter';
+      const title = `${toAuxiliary} remplace ${fromAuxiliary} ${this.eventType} du ${this.startDate}`;
+
+      return this.customerName ? `${title} chez ${this.customerName}` : `${title}`;
+    },
+    getEventUpdateDetails () {
+      const { auxiliary } = this.history.update;
+      if (auxiliary) {
+        return this.getEventCreationDetails();
+      }
     },
   },
 }
