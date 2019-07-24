@@ -1,25 +1,29 @@
 <template>
   <div class="event-history">
-    <div class="event-history-item">
+    <div class="event-history-title">
       <div class="icons">
         <q-icon size="20px" :name="iconName" />
         <img size="20px" :src="getAvatar(history.createdBy)" class="avatar">
       </div>
       <div class="title">
-        <span>{{ historyTitle.title }}</span>
-        <span v-if="this.history.action !== EVENT_DELETION">{{ historyTitle.subtitle }}</span>
-        <span class="history-info">{{ historyInfo }}</span>
+        <span>{{ historyInfo.title }}</span>
+        <span v-if="this.history.action !== EVENT_DELETION">{{ historyInfo.subtitle }}</span>
+        <span class="history-info">{{ historySignature }}</span>
       </div>
       <div class="icons ">
-        <q-btn size="10px" flat round icon="keyboard_arrow_down" />
+        <q-btn v-if="historyInfo.details" size="10px" flat round icon="keyboard_arrow_down" @click="toggleDetails" />
       </div>
+    </div>
+    <div v-if="displayDetails" class="event-history-details">
+      <div>{{ historyInfo.details }}</div>
+      <div class="history-misc">{{ history.event.misc }}</div>
     </div>
   </div>
 </template>
 
 <script>
-import { EVENT_CREATION, INTERVENTION, INTERNAL_HOUR, ABSENCE, UNAVAILABILITY, EVENT_DELETION, DEFAULT_AVATAR } from '../../data/constants';
-import { formatAuxiliaryShortIdentity, formatFullIdentity, formatCustomerShortIdentity } from '../../helpers/utils';
+import { EVENT_CREATION, INTERVENTION, INTERNAL_HOUR, ABSENCE, UNAVAILABILITY, EVENT_DELETION, DEFAULT_AVATAR, ABSENCE_TYPES } from '../../data/constants';
+import { formatAuxiliaryShortIdentity, formatCustomerShortIdentity } from '../../helpers/utils';
 
 export default {
   name: 'EventHistory',
@@ -29,6 +33,7 @@ export default {
   data () {
     return {
       EVENT_DELETION,
+      displayDetails: false,
     };
   },
   computed: {
@@ -40,30 +45,35 @@ export default {
           return 'delete';
       }
     },
-    historyTitle () {
+    historyInfo () {
       switch (this.history.action) {
         case EVENT_CREATION:
           return {
             iconName: 'add',
             title: this.getEventCreationHistoryTitle(),
             subtitle: this.getEventCreationHistorySubtitle(),
+            details: this.getEventCreationHistoryDetails(),
           };
         case EVENT_DELETION:
           return {
             iconName: 'delete',
             title: this.getEventDeletionHistoryTitle(),
+            details: this.getEventDeletionHistoryDetails(),
           };
       }
     },
-    historyInfo () {
+    historySignature () {
       const date = this.$moment(this.history.createdAt).format('DD/MM/YYYY');
-      const user = formatFullIdentity(this.history.createdBy.identity);
-      return `Le ${date} par ${user}.`;
+      const user = formatAuxiliaryShortIdentity(this.history.createdBy.identity);
+      return `Le ${date} par ${user}`;
     },
   },
   methods: {
     getAvatar (user) {
       return this.$_.get(user, 'picture.link') || DEFAULT_AVATAR;
+    },
+    toggleDetails () {
+      this.displayDetails = !this.displayDetails;
     },
     // Creation
     getEventCreationHistoryTitle () {
@@ -99,6 +109,28 @@ export default {
             : `${auxiliary} du ${startDate.format('DD/MM')} au ${endDate.format('DD/MM')}.`;
       }
     },
+    getEventCreationHistoryDetails () {
+      const { type, internalHour, absence, location } = this.history.event;
+
+      const startHour = this.$moment(this.history.event.startDate).format('HH:mm');
+      const endHour = this.$moment(this.history.event.endDate).format('HH:mm');
+      switch (type) {
+        case INTERVENTION:
+          return `Intervention planifiée de ${startHour} à ${endHour}.`;
+        case INTERNAL_HOUR:
+          return `${internalHour.name} de ${startHour} à ${endHour}. ${location && location.fullAddress ? `${location.fullAddress}.` : ''}`;
+        case ABSENCE:
+          const startDate = this.$moment(this.history.event.startDate);
+          const endDate = this.$moment(this.history.event.endDate);
+          const absenceName = ABSENCE_TYPES.find(abs => abs.value === absence);
+
+          return this.$moment(startDate).isSame(endDate, 'd')
+            ? `${absenceName.label || 'Absence'} le ${startDate.format('DD/MM')} de ${startHour} à ${endHour}.`
+            : `${absenceName.label || 'Absence'} du ${startDate.format('DD/MM')} au ${endDate.format('DD/MM')}.`;
+        case UNAVAILABILITY:
+          return `${startHour} à ${endHour}.`;
+      }
+    },
     // Deletion
     getEventDeletionHistoryTitle () {
       const startDate = this.$moment(this.history.event.startDate).format('DD/MM');
@@ -119,6 +151,20 @@ export default {
             : `Absence de ${auxiliary} du ${startDate} au ${endDate}`;
         case UNAVAILABILITY:
           return `Indispo de ${auxiliary} le ${startDate}`;
+      }
+    },
+    getEventDeletionHistoryDetails () {
+      const { type, internalHour, location } = this.history.event;
+
+      const startHour = this.$moment(this.history.event.startDate).format('HH:mm');
+      const endHour = this.$moment(this.history.event.endDate).format('HH:mm');
+      switch (type) {
+        case INTERVENTION:
+          return `Intervention initialement prévue de ${startHour} à ${endHour}.`;
+        case INTERNAL_HOUR:
+          return `${internalHour.name} initialement prévu(e) de ${startHour} à ${endHour}. ${location && location.fullAddress ? `${location.fullAddress}.` : ''}`;
+        case UNAVAILABILITY:
+          return `Initialement prévue de ${startHour} à ${endHour}.`;
       }
     },
   },
@@ -149,8 +195,8 @@ export default {
       justify-content: space-around;
       padding: 0 5px;
 
-  .event-history-item
-    margin: 2px;
+  .event-history-title
+    margin: 2px 2px 0;
     padding: 5px;
     display: flex;
 
@@ -164,4 +210,12 @@ export default {
       font-size: 12px;
       font-style: italic;
       margin: 2px 0 3px;
+
+  .history-misc
+    font-style: italic;
+
+  .event-history-details
+    font-size: 14px;
+    margin: 0 2px 2px;
+    padding: 0 10px 5px;
 </style>
