@@ -67,7 +67,12 @@
                   <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)"
                     :startOfWeekAsString="startOfWeek.toISOString()" :distanceMatrix="distanceMatrix" />
                 </div>
-                <div class="person-name overflow-hidden-nowrap">{{ person.identity | formatShortIdentity }}</div>
+                <div v-if="isCustomerPlanning" class="person-name overflow-hidden-nowrap">
+                  {{ person.identity | formatCustomerShortIdentity }}
+                </div>
+                <div v-else class="person-name overflow-hidden-nowrap">
+                  {{ person.identity | formatAuxiliaryShortIdentity }}
+                </div>
               </div>
             </td>
             <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
@@ -111,7 +116,7 @@ import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import { planningEventMixin } from '../../mixins/planningEventMixin';
 import PlanningNavigation from './PlanningNavigation.vue';
 import distanceMatrix from '../../api/DistanceMatrix';
-import { formatShortIdentity } from '../../helpers/utils';
+import { formatCustomerShortIdentity, formatAuxiliaryShortIdentity } from '../../helpers/utils';
 
 export default {
   name: 'PlanningManager',
@@ -306,7 +311,8 @@ export default {
     },
   },
   filters: {
-    formatShortIdentity,
+    formatCustomerShortIdentity,
+    formatAuxiliaryShortIdentity,
   },
 }
 </script>

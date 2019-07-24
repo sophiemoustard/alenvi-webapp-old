@@ -19,7 +19,7 @@
 
 <script>
 import { EVENT_CREATION, INTERVENTION, INTERNAL_HOUR, ABSENCE, UNAVAILABILITY, EVENT_DELETION, DEFAULT_AVATAR } from '../../data/constants';
-import { formatShortIdentity, formatFullIdentity } from '../../helpers/utils';
+import { formatAuxiliaryShortIdentity, formatFullIdentity, formatCustomerShortIdentity } from '../../helpers/utils';
 
 export default {
   name: 'EventHistory',
@@ -74,19 +74,19 @@ export default {
         case INTERNAL_HOUR:
           return 'Nouvelle heure interne.';
         case ABSENCE:
-          return `Nouvelle absence.`;
+          return 'Nouvelle absence.';
         case UNAVAILABILITY:
           return 'Nouvelle indispo.';
       }
     },
     getEventCreationHistorySubtitle () {
       const auxiliary = this.$_.has(this.history, 'event.auxiliary.identity')
-        ? formatFullIdentity(this.history.event.auxiliary.identity)
+        ? formatAuxiliaryShortIdentity(this.history.event.auxiliary.identity)
         : 'À affecter';
 
       switch (this.history.event.type) {
         case INTERVENTION:
-          const customer = formatShortIdentity(this.history.event.customer.identity);
+          const customer = formatCustomerShortIdentity(this.history.event.customer.identity);
           return `${auxiliary} chez ${customer}.`;
         case INTERNAL_HOUR:
         case UNAVAILABILITY:
@@ -103,12 +103,12 @@ export default {
     getEventDeletionHistoryTitle () {
       const startDate = this.$moment(this.history.event.startDate).format('DD/MM');
       const auxiliary = this.$_.has(this.history, 'event.auxiliary.identity')
-        ? formatFullIdentity(this.history.event.auxiliary.identity)
+        ? formatAuxiliaryShortIdentity(this.history.event.auxiliary.identity)
         : 'À affecter';
 
       switch (this.history.event.type) {
         case INTERVENTION:
-          const customer = formatShortIdentity(this.history.event.customer.identity);
+          const customer = formatCustomerShortIdentity(this.history.event.customer.identity);
           return `Intervention du ${startDate} chez ${customer}.`;
         case INTERNAL_HOUR:
           return `Heure interne de ${auxiliary} le ${startDate}`;

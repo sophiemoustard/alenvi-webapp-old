@@ -59,7 +59,7 @@ export const formatPrice = (val) => {
   return val ? roundFrenchNumber(val) : roundFrenchNumber(0);
 };
 
-export const formatShortIdentity = (identity) => {
+export const formatCustomerShortIdentity = (identity) => {
   if (!identity) return '';
 
   const firstname = (identity.firstname || '').trim();
@@ -67,6 +67,15 @@ export const formatShortIdentity = (identity) => {
   identityShort += (identity.lastname || '').trim();
 
   return identityShort.toUpperCase();
+};
+
+export const formatAuxiliaryShortIdentity = (identity) => {
+  if (!identity) return '';
+
+  let identityShort = `${(identity.firstname || '').trim()} `;
+  identityShort += identity.lastname ? ` ${identity.lastname.trim().slice(0, 1).toUpperCase()}.` : '';
+
+  return identityShort;
 };
 
 export const formatFullIdentity = (identity) => {
