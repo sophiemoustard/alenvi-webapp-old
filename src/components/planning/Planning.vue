@@ -67,7 +67,12 @@
                   <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)"
                     :startOfWeekAsString="startOfWeek.toISOString()" :distanceMatrix="distanceMatrix" />
                 </div>
-                <div class="person-name overflow-hidden-nowrap">{{ person.identity | formatShortIdentity }}</div>
+                <div v-if="isCustomerPlanning" class="person-name overflow-hidden-nowrap">
+                  {{ person.identity | formatCustomerShortIdentity }}
+                </div>
+                <div v-else class="person-name overflow-hidden-nowrap">
+                  {{ person.identity | formatAuxiliaryShortIdentity }}
+                </div>
               </div>
             </td>
             <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
@@ -85,12 +90,8 @@
         </tbody>
       </table>
     </div>
-    <q-page-sticky v-if="displayHistory" expand position="right">
-      <div class="event-history-container">
-        <q-scroll-area>
-          <ni-event-history v-for="(history, index) in eventHistories" :key="index" :history="history" />
-        </q-scroll-area>
-      </div>
+    <q-page-sticky expand position="right">
+      <ni-event-history-feed v-if="displayHistory" :eventHistories="eventHistories" />
     </q-page-sticky>
   </div>
 </template>
@@ -109,13 +110,13 @@ import { NotifyNegative } from '../popup/notify';
 import NiChipAuxiliaryIndicator from './ChipAuxiliaryIndicator';
 import NiChipCustomerIndicator from './ChipCustomerIndicator';
 import NiPlanningEvent from './PlanningEvent';
-import NiEventHistory from './EventHistory';
+import NiEventHistoryFeed from './EventHistoryFeed';
 import ChipsAutocomplete from '../ChipsAutocomplete';
 import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import { planningEventMixin } from '../../mixins/planningEventMixin';
 import PlanningNavigation from './PlanningNavigation.vue';
 import distanceMatrix from '../../api/DistanceMatrix';
-import { formatShortIdentity } from '../../helpers/utils';
+import { formatCustomerShortIdentity, formatAuxiliaryShortIdentity } from '../../helpers/utils';
 
 export default {
   name: 'PlanningManager',
@@ -126,7 +127,7 @@ export default {
     'ni-planning-event-cell': NiPlanningEvent,
     'ni-chips-autocomplete': ChipsAutocomplete,
     'planning-navigation': PlanningNavigation,
-    'ni-event-history': NiEventHistory,
+    'ni-event-history-feed': NiEventHistoryFeed,
   },
   props: {
     events: { type: Array, default: () => [] },
@@ -310,7 +311,8 @@ export default {
     },
   },
   filters: {
-    formatShortIdentity,
+    formatCustomerShortIdentity,
+    formatAuxiliaryShortIdentity,
   },
 }
 </script>
@@ -375,15 +377,7 @@ export default {
   .to-assign
     background-color: rgba(253, 243, 229, 0.5);
 
-  .event-history-container
-    background-color: $white;
-    width: 300px;
-    height: 100%;
-    top: 75px;
-    right: 0;
-    position: absolute;
-    box-shadow: 0 3px 5px -1px rgba(0,0,0,0.2), 0 5px 8px rgba(0,0,0,0.14), 0 1px 14px rgba(0,0,0,0.12)
-    .q-scrollarea
-      height: 100%;
+  .q-page-sticky
+    z-index: 20;
 
 </style>

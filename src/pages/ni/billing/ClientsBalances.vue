@@ -51,7 +51,7 @@ import PrefixedCellContent from '../../../components/table/PrefixedCellContent';
 import PaymentCreationModal from '../../../components/customers/PaymentCreationModal';
 import { paymentMixin } from '../../../mixins/paymentMixin.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
-import { formatPrice, getLastVersion, formatShortIdentity } from '../../../helpers/utils.js';
+import { formatPrice, getLastVersion, formatCustomerShortIdentity } from '../../../helpers/utils.js';
 
 export default {
   name: 'ClientsBalances',
@@ -74,14 +74,14 @@ export default {
           name: 'client',
           label: 'Client',
           align: 'left',
-          field: row => row.thirdPartyPayer ? row.thirdPartyPayer.name : formatShortIdentity(row.customer.identity),
+          field: row => row.thirdPartyPayer ? row.thirdPartyPayer.name : formatCustomerShortIdentity(row.customer.identity),
           format: val => val.length > 30 ? `${val.slice(0, 30)}...` : val,
         },
         {
           name: 'customer',
           label: 'Bénéficiaire',
           align: 'left',
-          field: row => formatShortIdentity(row.customer.identity),
+          field: row => formatCustomerShortIdentity(row.customer.identity),
         },
         {
           name: 'billed',
