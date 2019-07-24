@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { EVENT_CREATION, INTERNAL_HOUR, ABSENCE, EVENT_DELETION, DEFAULT_AVATAR, ABSENCE_TYPES, EVENT_TYPES, INTERVENTION, UNAVAILABILITY, NEVER, EVERY_DAY, EVERY_WEEK_DAY, EVERY_WEEK, EVERY_TWO_WEEKS } from '../../data/constants';
+import { EVENT_CREATION, INTERNAL_HOUR, ABSENCE, EVENT_DELETION, DEFAULT_AVATAR, ABSENCE_TYPES, EVENT_TYPES, INTERVENTION, UNAVAILABILITY, NEVER, EVERY_DAY, EVERY_WEEK_DAY, EVERY_WEEK, EVERY_TWO_WEEKS, EVENT_UPDATE } from '../../data/constants';
 import { formatAuxiliaryShortIdentity, formatCustomerShortIdentity } from '../../helpers/utils';
 
 export default {
@@ -113,6 +113,11 @@ export default {
             title: this.getEventDeletionTitle(),
             details: this.getEventDeletionDetails(),
           };
+        case EVENT_UPDATE:
+          return {
+            title: this.getEventUpdateTitle(),
+            details: this.getEventCreationDetails(),
+          }
       }
     },
     historySignature () {
@@ -120,7 +125,7 @@ export default {
       const hour = `${this.$moment(this.history.createdAt).hour()}h${this.$moment(this.history.createdAt).format('mm')}`;
       const user = formatAuxiliaryShortIdentity(this.history.createdBy.identity);
 
-      return `${user} le ${date} à ${hour}`;
+      return `${user} le ${date} à ${hour}.`;
     },
   },
   methods: {
@@ -142,7 +147,7 @@ export default {
       const { location } = this.history.event;
 
       if (!this.isOneDayEvent) return `${this.eventName} planifiée du ${this.startDate} au ${this.endDate}.`;
-      if (this.isRepetition) return `${this.eventName}s ${this.repetitionFrequency} à partir du ${this.startDate}.`;
+      if (this.isRepetition) return `${this.eventName}s ${this.repetitionFrequency} à partir du ${this.startDate} de ${this.startHour} à ${this.endHour}.`;
       if (location && location.fullAddress) return `${this.eventName} planifiée le ${this.startDate} de ${this.startHour} à ${this.endHour}. ${location.fullAddress}.`
       return `${this.eventName} planifiée le ${this.startDate} de ${this.startHour} à ${this.endHour}.`
     },
@@ -160,6 +165,17 @@ export default {
       if (this.isRepetition) return `${this.eventName}s initialement prévu(e)s de ${this.startHour} à ${this.endHour} à partir du ${this.startDate}.`;
       if (location && location.fullAddress) return `${this.eventName} initialement prévu(e) de ${this.startHour} à ${this.endHour}. ${location.fullAddress}.`;
       return `${this.eventName} initialement prévu(e) de ${this.startHour} à ${this.endHour}.`;
+    },
+    // Update
+    getEventUpdateTitle () {
+      const { auxiliary } = this.history.update;
+      if (auxiliary) {
+        const { from, to } = auxiliary
+        const toAuxiliary = to && to.identity ? formatAuxiliaryShortIdentity(to.identity) : 'À affecter';
+        const fromAuxiliary = from && from.identity ? formatAuxiliaryShortIdentity(from.identity) : 'À affecter';
+
+        return `${toAuxiliary} remplace ${fromAuxiliary} ${this.eventType} du ${this.startDate} chez ${this.customerName}`;
+      }
     },
   },
 }
