@@ -33,14 +33,6 @@ export default {
     };
   },
   computed: {
-    iconName () {
-      switch (this.history.action) {
-        case EVENT_CREATION:
-          return 'add';
-        case EVENT_DELETION:
-          return 'delete';
-      }
-    },
     auxiliaryName () {
       return this.$_.has(this.history, 'event.auxiliary.identity')
         ? formatAuxiliaryShortIdentity(this.history.event.auxiliary.identity)
@@ -113,13 +105,11 @@ export default {
       switch (this.history.action) {
         case EVENT_CREATION:
           return {
-            iconName: 'add',
             title: this.getEventCreationTitle(),
             details: this.getEventCreationDetails(),
           };
         case EVENT_DELETION:
           return {
-            iconName: 'delete',
             title: this.getEventDeletionTitle(),
             details: this.getEventDeletionDetails(),
           };
