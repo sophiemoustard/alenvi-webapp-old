@@ -56,10 +56,10 @@ export default {
       return this.$moment(this.history.event.endDate).format('DD/MM');
     },
     startHour () {
-      return this.$moment(this.history.event.startDate).format('HH:mm');
+      return `${this.$moment(this.history.event.startDate).hour()}h${this.$moment(this.history.event.startDate).format('mm')}`;
     },
     endHour () {
-      return this.$moment(this.history.event.endDate).format('HH:mm');
+      return `${this.$moment(this.history.event.endDate).hour()}h${this.$moment(this.history.event.endDate).format('mm')}`;
     },
     isOneDayEvent () {
       return this.$moment(this.history.event.startDate).isSame(this.history.event.endDate, 'day');
@@ -127,7 +127,7 @@ export default {
     },
     historySignature () {
       const date = this.$moment(this.history.createdAt).format('DD/MM');
-      const hour = this.$moment(this.history.createdAt).format('HH:mm');
+      const hour = `${this.$moment(this.history.createdAt).hour()}h${this.$moment(this.history.createdAt).format('mm')}`;
       const user = formatAuxiliaryShortIdentity(this.history.createdBy.identity);
 
       return `${user} le ${date} à ${hour}`;
