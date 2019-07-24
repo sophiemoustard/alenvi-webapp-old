@@ -1,18 +1,22 @@
 <template>
   <div class="event-history">
-    <div class="event-history-item">
+    <div class="event-history-title">
       <div class="icons">
         <q-icon size="20px" :name="iconName" />
         <img size="20px" :src="getAvatar(history.createdBy)" class="avatar">
       </div>
       <div class="title">
-        <span>{{ historyTitle.title }}</span>
-        <span v-if="this.history.action !== EVENT_DELETION">{{ historyTitle.subtitle }}</span>
-        <span class="history-info">{{ historyInfo }}</span>
+        <span>{{ historyInfo.title }}</span>
+        <span v-if="this.history.action !== EVENT_DELETION">{{ historyInfo.subtitle }}</span>
+        <span class="history-info">{{ historySignature }}</span>
       </div>
       <div class="icons ">
-        <q-btn size="10px" flat round icon="keyboard_arrow_down" />
+        <q-btn size="10px" flat round icon="keyboard_arrow_down" @click="toggleDetails" />
       </div>
+    </div>
+    <div v-if="displayDetails" class="event-history-details">
+      <div>{{ historyInfo.details }}</div>
+      <div>{{ history.event.misc }}</div>
     </div>
   </div>
 </template>
@@ -29,6 +33,7 @@ export default {
   data () {
     return {
       EVENT_DELETION,
+      displayDetails: false,
     };
   },
   computed: {
@@ -40,22 +45,24 @@ export default {
           return 'delete';
       }
     },
-    historyTitle () {
+    historyInfo () {
       switch (this.history.action) {
         case EVENT_CREATION:
           return {
             iconName: 'add',
             title: this.getEventCreationHistoryTitle(),
             subtitle: this.getEventCreationHistorySubtitle(),
+            details: this.getEventCreationHistoryDetails(),
           };
         case EVENT_DELETION:
           return {
             iconName: 'delete',
             title: this.getEventDeletionHistoryTitle(),
+            details: this.getEventDeletionHistoryDetails(),
           };
       }
     },
-    historyInfo () {
+    historySignature () {
       const date = this.$moment(this.history.createdAt).format('DD/MM/YYYY');
       const user = formatFullIdentity(this.history.createdBy.identity);
       return `Le ${date} par ${user}.`;
@@ -64,6 +71,9 @@ export default {
   methods: {
     getAvatar (user) {
       return this.$_.get(user, 'picture.link') || DEFAULT_AVATAR;
+    },
+    toggleDetails () {
+      this.displayDetails = !this.displayDetails;
     },
     // Creation
     getEventCreationHistoryTitle () {
@@ -97,6 +107,27 @@ export default {
           return this.$moment(startDate).isSame(endDate, 'd')
             ? `${auxiliary} le ${startDate.format('DD/MM')}.`
             : `${auxiliary} du ${startDate.format('DD/MM')} au ${endDate.format('DD/MM')}.`;
+      }
+    },
+    getEventCreationHistoryDetails () {
+      const { type, internalHour, absence, location } = this.history.event;
+      console.log(this.history.event)
+      const startHour = this.$moment(this.history.event.startDate).format('HH:mm');
+      const endHour = this.$moment(this.history.event.endDate).format('HH:mm');
+      switch (type) {
+        case INTERVENTION:
+          return `Intervention planifiée de ${startHour} à ${endHour}.`;
+        case INTERNAL_HOUR:
+          return `${internalHour.name} de ${startHour} à ${endHour}. ${location && location.fullAddress ? `${location.fullAddress}.` : ''}`;
+        case ABSENCE:
+          const startDate = this.$moment(this.history.event.startDate);
+          const endDate = this.$moment(this.history.event.endDate);
+
+          return this.$moment(startDate).isSame(endDate, 'd')
+            ? `${absence} le ${startDate.format('DD/MM')} de ${startHour} à ${endHour}.`
+            : `${absence} du ${startDate.format('DD/MM')} au ${endDate.format('DD/MM')}.`;
+        case UNAVAILABILITY:
+          return `${startHour} à ${endHour}.`;
       }
     },
     // Deletion
@@ -149,7 +180,7 @@ export default {
       justify-content: space-around;
       padding: 0 5px;
 
-  .event-history-item
+  .event-history-title
     margin: 2px;
     padding: 5px;
     display: flex;
@@ -164,4 +195,8 @@ export default {
       font-size: 12px;
       font-style: italic;
       margin: 2px 0 3px;
+
+  .event-history-details
+    margin: 2px;
+    padding: 5px;
 </style>
