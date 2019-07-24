@@ -291,7 +291,6 @@ export default {
       }
     },
     handleElemRemovedFromFilter (el) {
-      console.log(this.eventHistories)
       if (el.type === SECTOR) {
         this.filteredSectors = this.filteredSectors.filter(sec => sec._id !== el._id);
         this.auxiliaries = this.auxiliaries.filter(auxiliary =>

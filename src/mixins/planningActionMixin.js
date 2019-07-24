@@ -315,7 +315,11 @@ export const planningActionMixin = {
         };
 
         if (target.type === SECTOR) payload.sector = target._id;
-        else payload.auxiliary = target._id;
+        else {
+          payload.auxiliary = target._id;
+          const auxiliary = this.auxiliaries.find(aux => aux._id === target._id);
+          payload.sector = auxiliary.sector._id;
+        }
 
         if (this.hasConflicts(payload)) {
           return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
