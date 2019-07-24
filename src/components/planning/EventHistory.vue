@@ -1,22 +1,18 @@
 <template>
-  <div class="event-history">
-    <div class="event-history-title">
-      <div class="icons">
-        <q-icon size="20px" :name="iconName" />
+  <div class="history">
+    <div class="history-title">
+      <div class="history-info">
+        <div>{{ historyInfo.title }} {{ historyInfo.subtitle }}</div>
+        <q-btn v-if="historyInfo.details" color="primary" size="10px" flat round icon="remove_red_eye" @click="toggleDetails" />
+      </div>
+      <div v-if="displayDetails" class="history-details">
+        <div>{{ historyInfo.details }}</div>
+        <div class="history-misc">{{ history.event.misc }}</div>
+      </div>
+      <div class="history-signature">
         <img size="20px" :src="getAvatar(history.createdBy)" class="avatar">
+        <div>{{ historySignature }}</div>
       </div>
-      <div class="title">
-        <span>{{ historyInfo.title }}</span>
-        <span v-if="this.history.action !== EVENT_DELETION">{{ historyInfo.subtitle }}</span>
-        <span class="history-info">{{ historySignature }}</span>
-      </div>
-      <div class="icons ">
-        <q-btn v-if="historyInfo.details" size="10px" flat round icon="keyboard_arrow_down" @click="toggleDetails" />
-      </div>
-    </div>
-    <div v-if="displayDetails" class="event-history-details">
-      <div>{{ historyInfo.details }}</div>
-      <div class="history-misc">{{ history.event.misc }}</div>
     </div>
   </div>
 </template>
@@ -63,9 +59,10 @@ export default {
       }
     },
     historySignature () {
-      const date = this.$moment(this.history.createdAt).format('DD/MM/YYYY');
+      const date = this.$moment(this.history.createdAt).format('DD/MM');
+      const hour = this.$moment(this.history.createdAt).format('HH:mm');
       const user = formatAuxiliaryShortIdentity(this.history.createdBy.identity);
-      return `Le ${date} par ${user}`;
+      return `${user} le ${date} à ${hour}`;
     },
   },
   methods: {
@@ -173,7 +170,7 @@ export default {
 
 <style lang="stylus" scoped>
 @import '~variables';
-  .event-history
+  .history
     margin: 2px;
     width: 100%;
     display: block;
@@ -189,33 +186,32 @@ export default {
     .avatar
       height: 20px !important;
       width: 20px !important;
-    .icons
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
-      padding: 0 5px;
 
-  .event-history-title
-    margin: 2px 2px 0;
+  .history-title
+    margin: 2px 10px 0 2px;
     padding: 5px;
-    display: flex;
-
-    .title
-      padding: 0 5px;
-      display: flex;
-      flex-direction column;
-      flex: 1;
 
     .history-info
+      display: flex;
+      div
+        flex: 1;
+      .q-btn-round
+        height: 20px;
+
+    .history-details
+      font-size: 14px;
+      margin: 3px 0 5px;
+
+      .history-misc
+        font-style: italic;
+
+    .history-signature
       font-size: 12px;
       font-style: italic;
+      display: flex;
+      align-items: center
       margin: 2px 0 3px;
+      div
+        margin-left: 5px
 
-  .history-misc
-    font-style: italic;
-
-  .event-history-details
-    font-size: 14px;
-    margin: 0 2px 2px;
-    padding: 0 10px 5px;
 </style>
