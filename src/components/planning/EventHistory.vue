@@ -133,6 +133,8 @@ export default {
     // Creation
     getEventCreationTitle () {
       if (!this.isOneDayEvent) return `Nouvelle ${this.eventType.toLowerCase()} de ${this.auxiliaryName} du ${this.startDate} au ${this.endDate}.`;
+      if (this.isRepetition && this.customerName) return `Nouvelle ${this.eventType.toLowerCase()} de ${this.auxiliaryName} ${this.repetitionFrequency} chez ${this.customerName}.`;
+      if (this.isRepetition) return `Nouvelle ${this.eventType.toLowerCase()} de ${this.auxiliaryName} ${this.repetitionFrequency}.`;
       if (this.customerName) return `Nouvelle ${this.eventType.toLowerCase()} de ${this.auxiliaryName} le ${this.startDate} chez ${this.customerName}.`;
       return `Nouvelle ${this.eventType.toLowerCase()} de ${this.auxiliaryName} le ${this.startDate}.`;
     },
