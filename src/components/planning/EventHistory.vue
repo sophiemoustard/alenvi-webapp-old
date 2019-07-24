@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { EVENT_CREATION, INTERNAL_HOUR, ABSENCE, EVENT_DELETION, DEFAULT_AVATAR, ABSENCE_TYPES, EVENT_TYPES, INTERVENTION, UNAVAILABILITY } from '../../data/constants';
+import { EVENT_CREATION, INTERNAL_HOUR, ABSENCE, EVENT_DELETION, DEFAULT_AVATAR, ABSENCE_TYPES, EVENT_TYPES, INTERVENTION, UNAVAILABILITY, NEVER, EVERY_DAY, EVERY_WEEK_DAY, EVERY_WEEK, EVERY_TWO_WEEKS } from '../../data/constants';
 import { formatAuxiliaryShortIdentity, formatCustomerShortIdentity } from '../../helpers/utils';
 
 export default {
@@ -61,24 +61,47 @@ export default {
     endHour () {
       return this.$moment(this.history.event.endDate).format('HH:mm');
     },
-    isMultipleDaysEvent () {
-      return !this.$moment(this.history.event.startDate).isSame(this.history.event.endDate, 'day');
+    isOneDayEvent () {
+      return this.$moment(this.history.event.startDate).isSame(this.history.event.endDate, 'day');
+    },
+    isRepetition () {
+      const { repetition } = this.history.event;
+      return !!repetition && repetition.frequency !== NEVER;
+    },
+    repetitionFrequency () {
+      if (!this.isRepetition) return;
+
+      const { repetition, startDate } = this.history.event;
+      const day = this.$moment(startDate).format('dddd');
+      switch (repetition.frequency) {
+        case EVERY_DAY:
+          return 'tous les jours';
+        case EVERY_WEEK_DAY:
+          return 'du lundi au vendredi';
+        case EVERY_WEEK:
+          return `tous les ${day}s`;
+        case EVERY_TWO_WEEKS:
+          return `le ${day} une semaine sur 2`;
+      }
     },
     eventType () {
       if (!this.$_.has(this.history, 'event.type')) return '';
 
-      if (this.history.event.type === INTERNAL_HOUR) return 'heure interne';
+      const { type } = this.history.event;
+      if (this.isRepetition && type === INTERVENTION) return 'Répétition';
+      else if (type === INTERNAL_HOUR) return 'Heure interne';
       else {
-        const type = EVENT_TYPES.find(type => type.value === this.history.event.type);
-        return type ? type.label : '';
+        const eventType = EVENT_TYPES.find(t => t.value === type);
+        return eventType ? eventType.label : '';
       }
     },
     eventName () {
       const { type, internalHour, absence } = this.history.event;
       switch (type) {
         case INTERVENTION:
+          return 'Intervention';
         case UNAVAILABILITY:
-          return this.eventType;
+          return 'Indispo';
         case INTERNAL_HOUR:
           return internalHour.name;
         case ABSENCE:
@@ -119,26 +142,30 @@ export default {
     },
     // Creation
     getEventCreationTitle () {
-      if (this.isMultipleDaysEvent) return `Nouvelle ${this.eventType.toLowerCase()} de ${this.auxiliaryName} du ${this.startDate} au ${this.endDate}.`;
+      if (!this.isOneDayEvent) return `Nouvelle ${this.eventType.toLowerCase()} de ${this.auxiliaryName} du ${this.startDate} au ${this.endDate}.`;
       if (this.customerName) return `Nouvelle ${this.eventType.toLowerCase()} de ${this.auxiliaryName} le ${this.startDate} chez ${this.customerName}.`;
       return `Nouvelle ${this.eventType.toLowerCase()} de ${this.auxiliaryName} le ${this.startDate}.`;
     },
     getEventCreationDetails () {
       const { location } = this.history.event;
 
-      if (this.isMultipleDaysEvent) return `${this.eventName} planifiée du ${this.startDate} au ${this.endDate}.`
+      if (!this.isOneDayEvent) return `${this.eventName} planifiée du ${this.startDate} au ${this.endDate}.`;
+      if (this.isRepetition) return `${this.eventName}s ${this.repetitionFrequency} à partir du ${this.startDate}.`;
       if (location && location.fullAddress) return `${this.eventName} planifiée le ${this.startDate} de ${this.startHour} à ${this.endHour}. ${location.fullAddress}.`
       return `${this.eventName} planifiée le ${this.startDate} de ${this.startHour} à ${this.endHour}.`
     },
     // Deletion
     getEventDeletionTitle () {
-      if (this.isMultipleDaysEvent) return `Suppression de l'${this.eventType.toLowerCase()} de ${this.auxiliaryName} du ${this.startDate} au ${this.endDate}.`;
+      const pronom = this.isRepetition && this.history.event.type === INTERVENTION ? 'la ' : 'l\'';
+      if (!this.isOneDayEvent) return `Suppression de l'${this.eventType.toLowerCase()} de ${this.auxiliaryName} du ${this.startDate} au ${this.endDate}.`;
+      if (this.isRepetition) return `Suppression de ${pronom}${this.eventType.toLowerCase()} ${this.repetitionFrequency} à partir du ${this.startDate}.`;
       if (this.customerName) return `Suppression de l'${this.eventType.toLowerCase()} de ${this.auxiliaryName} le ${this.startDate} chez ${this.customerName}.`
       return `Suppression de l'${this.eventType.toLowerCase()} de ${this.auxiliaryName} le ${this.startDate}.`
     },
     getEventDeletionDetails () {
       if (this.history.event.type === ABSENCE) return;
 
+      if (this.isRepetition) return `${this.eventName}s initialement prévu(e)s de ${this.startHour} à ${this.endHour} à partir du ${this.startDate}.`;
       if (location && location.fullAddress) return `${this.eventName} initialement prévu(e) de ${this.startHour} à ${this.endHour}. ${location.fullAddress}.`;
       return `${this.eventName} initialement prévu(e) de ${this.startHour} à ${this.endHour}.`;
     },
