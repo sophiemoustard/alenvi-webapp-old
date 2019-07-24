@@ -84,7 +84,7 @@ export default {
 
   .q-page-sticky
     z-index: 10
-    @media (min-width: 768px)
+    @media (min-width: 1025px)
       display: none;
 
   .chevron
@@ -99,7 +99,7 @@ export default {
       left: 235px
     &-right
       left: 15px
-    @media (max-width: 767px)
+    @media (max-width: 1024px)
       display: none
 
   .q-toolbar

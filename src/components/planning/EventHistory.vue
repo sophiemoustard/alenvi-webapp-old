@@ -1,28 +1,24 @@
 <template>
-  <div class="event-history">
-    <div class="event-history-title">
-      <div class="icons">
-        <q-icon size="20px" :name="iconName" />
+  <div class="history">
+    <div class="history-title">
+      <div class="history-info">
+        <div>{{ historyInfo.title }}</div>
+        <q-btn v-if="historyInfo.details" color="primary" size="10px" flat round icon="remove_red_eye" @click="toggleDetails" />
+      </div>
+      <div v-if="displayDetails" class="history-details">
+        <div>{{ historyInfo.details }}</div>
+        <div class="history-misc">{{ history.event.misc }}</div>
+      </div>
+      <div class="history-signature">
         <img size="20px" :src="getAvatar(history.createdBy)" class="avatar">
+        <div>{{ historySignature }}</div>
       </div>
-      <div class="title">
-        <span>{{ historyInfo.title }}</span>
-        <span v-if="this.history.action !== EVENT_DELETION">{{ historyInfo.subtitle }}</span>
-        <span class="history-info">{{ historySignature }}</span>
-      </div>
-      <div class="icons ">
-        <q-btn v-if="historyInfo.details" size="10px" flat round icon="keyboard_arrow_down" @click="toggleDetails" />
-      </div>
-    </div>
-    <div v-if="displayDetails" class="event-history-details">
-      <div>{{ historyInfo.details }}</div>
-      <div class="history-misc">{{ history.event.misc }}</div>
     </div>
   </div>
 </template>
 
 <script>
-import { EVENT_CREATION, INTERVENTION, INTERNAL_HOUR, ABSENCE, UNAVAILABILITY, EVENT_DELETION, DEFAULT_AVATAR, ABSENCE_TYPES } from '../../data/constants';
+import { EVENT_CREATION, INTERNAL_HOUR, ABSENCE, EVENT_DELETION, DEFAULT_AVATAR, ABSENCE_TYPES, EVENT_TYPES, INTERVENTION, UNAVAILABILITY, NEVER, EVERY_DAY, EVERY_WEEK_DAY, EVERY_WEEK, EVERY_TWO_WEEKS } from '../../data/constants';
 import { formatAuxiliaryShortIdentity, formatCustomerShortIdentity } from '../../helpers/utils';
 
 export default {
@@ -45,27 +41,96 @@ export default {
           return 'delete';
       }
     },
+    auxiliaryName () {
+      return this.$_.has(this.history, 'event.auxiliary.identity')
+        ? formatAuxiliaryShortIdentity(this.history.event.auxiliary.identity)
+        : 'À affecter';
+    },
+    customerName () {
+      return this.$_.has(this.history, 'event.customer.identity') && formatCustomerShortIdentity(this.history.event.customer.identity);
+    },
+    startDate () {
+      return this.$moment(this.history.event.startDate).format('DD/MM');
+    },
+    endDate () {
+      return this.$moment(this.history.event.endDate).format('DD/MM');
+    },
+    startHour () {
+      return `${this.$moment(this.history.event.startDate).hour()}h${this.$moment(this.history.event.startDate).format('mm')}`;
+    },
+    endHour () {
+      return `${this.$moment(this.history.event.endDate).hour()}h${this.$moment(this.history.event.endDate).format('mm')}`;
+    },
+    isOneDayEvent () {
+      return this.$moment(this.history.event.startDate).isSame(this.history.event.endDate, 'day');
+    },
+    isRepetition () {
+      const { repetition } = this.history.event;
+      return !!repetition && repetition.frequency !== NEVER;
+    },
+    repetitionFrequency () {
+      if (!this.isRepetition) return;
+
+      const { repetition, startDate } = this.history.event;
+      const day = this.$moment(startDate).format('dddd');
+      switch (repetition.frequency) {
+        case EVERY_DAY:
+          return 'tous les jours';
+        case EVERY_WEEK_DAY:
+          return 'du lundi au vendredi';
+        case EVERY_WEEK:
+          return `tous les ${day}s`;
+        case EVERY_TWO_WEEKS:
+          return `le ${day} une semaine sur 2`;
+      }
+    },
+    eventType () {
+      if (!this.$_.has(this.history, 'event.type')) return '';
+
+      const { type } = this.history.event;
+      if (this.isRepetition && type === INTERVENTION) return 'Répétition';
+      else if (type === INTERNAL_HOUR) return 'Heure interne';
+      else {
+        const eventType = EVENT_TYPES.find(t => t.value === type);
+        return eventType ? eventType.label : '';
+      }
+    },
+    eventName () {
+      const { type, internalHour, absence } = this.history.event;
+      switch (type) {
+        case INTERVENTION:
+          return 'Intervention';
+        case UNAVAILABILITY:
+          return 'Indispo';
+        case INTERNAL_HOUR:
+          return internalHour.name;
+        case ABSENCE:
+          const absenceName = ABSENCE_TYPES.find(abs => abs.value === absence);
+          return absenceName ? absenceName.label : 'Absence';
+      }
+    },
     historyInfo () {
       switch (this.history.action) {
         case EVENT_CREATION:
           return {
             iconName: 'add',
-            title: this.getEventCreationHistoryTitle(),
-            subtitle: this.getEventCreationHistorySubtitle(),
-            details: this.getEventCreationHistoryDetails(),
+            title: this.getEventCreationTitle(),
+            details: this.getEventCreationDetails(),
           };
         case EVENT_DELETION:
           return {
             iconName: 'delete',
-            title: this.getEventDeletionHistoryTitle(),
-            details: this.getEventDeletionHistoryDetails(),
+            title: this.getEventDeletionTitle(),
+            details: this.getEventDeletionDetails(),
           };
       }
     },
     historySignature () {
-      const date = this.$moment(this.history.createdAt).format('DD/MM/YYYY');
+      const date = this.$moment(this.history.createdAt).format('DD/MM');
+      const hour = `${this.$moment(this.history.createdAt).hour()}h${this.$moment(this.history.createdAt).format('mm')}`;
       const user = formatAuxiliaryShortIdentity(this.history.createdBy.identity);
-      return `Le ${date} par ${user}`;
+
+      return `${user} le ${date} à ${hour}`;
     },
   },
   methods: {
@@ -76,96 +141,33 @@ export default {
       this.displayDetails = !this.displayDetails;
     },
     // Creation
-    getEventCreationHistoryTitle () {
-      switch (this.history.event.type) {
-        case INTERVENTION:
-          const date = this.$moment(this.history.event.startDate).format('DD/MM');
-          return `Nouvelle intervention le ${date}.`;
-        case INTERNAL_HOUR:
-          return 'Nouvelle heure interne.';
-        case ABSENCE:
-          return 'Nouvelle absence.';
-        case UNAVAILABILITY:
-          return 'Nouvelle indispo.';
-      }
+    getEventCreationTitle () {
+      if (!this.isOneDayEvent) return `Nouvelle ${this.eventType.toLowerCase()} de ${this.auxiliaryName} du ${this.startDate} au ${this.endDate}.`;
+      if (this.customerName) return `Nouvelle ${this.eventType.toLowerCase()} de ${this.auxiliaryName} le ${this.startDate} chez ${this.customerName}.`;
+      return `Nouvelle ${this.eventType.toLowerCase()} de ${this.auxiliaryName} le ${this.startDate}.`;
     },
-    getEventCreationHistorySubtitle () {
-      const auxiliary = this.$_.has(this.history, 'event.auxiliary.identity')
-        ? formatAuxiliaryShortIdentity(this.history.event.auxiliary.identity)
-        : 'À affecter';
+    getEventCreationDetails () {
+      const { location } = this.history.event;
 
-      switch (this.history.event.type) {
-        case INTERVENTION:
-          const customer = formatCustomerShortIdentity(this.history.event.customer.identity);
-          return `${auxiliary} chez ${customer}.`;
-        case INTERNAL_HOUR:
-        case UNAVAILABILITY:
-        case ABSENCE:
-          const startDate = this.$moment(this.history.event.startDate);
-          const endDate = this.$moment(this.history.event.endDate);
-
-          return this.$moment(startDate).isSame(endDate, 'd')
-            ? `${auxiliary} le ${startDate.format('DD/MM')}.`
-            : `${auxiliary} du ${startDate.format('DD/MM')} au ${endDate.format('DD/MM')}.`;
-      }
-    },
-    getEventCreationHistoryDetails () {
-      const { type, internalHour, absence, location } = this.history.event;
-
-      const startHour = this.$moment(this.history.event.startDate).format('HH:mm');
-      const endHour = this.$moment(this.history.event.endDate).format('HH:mm');
-      switch (type) {
-        case INTERVENTION:
-          return `Intervention planifiée de ${startHour} à ${endHour}.`;
-        case INTERNAL_HOUR:
-          return `${internalHour.name} de ${startHour} à ${endHour}. ${location && location.fullAddress ? `${location.fullAddress}.` : ''}`;
-        case ABSENCE:
-          const startDate = this.$moment(this.history.event.startDate);
-          const endDate = this.$moment(this.history.event.endDate);
-          const absenceName = ABSENCE_TYPES.find(abs => abs.value === absence);
-
-          return this.$moment(startDate).isSame(endDate, 'd')
-            ? `${absenceName.label || 'Absence'} le ${startDate.format('DD/MM')} de ${startHour} à ${endHour}.`
-            : `${absenceName.label || 'Absence'} du ${startDate.format('DD/MM')} au ${endDate.format('DD/MM')}.`;
-        case UNAVAILABILITY:
-          return `${startHour} à ${endHour}.`;
-      }
+      if (!this.isOneDayEvent) return `${this.eventName} planifiée du ${this.startDate} au ${this.endDate}.`;
+      if (this.isRepetition) return `${this.eventName}s ${this.repetitionFrequency} à partir du ${this.startDate}.`;
+      if (location && location.fullAddress) return `${this.eventName} planifiée le ${this.startDate} de ${this.startHour} à ${this.endHour}. ${location.fullAddress}.`
+      return `${this.eventName} planifiée le ${this.startDate} de ${this.startHour} à ${this.endHour}.`
     },
     // Deletion
-    getEventDeletionHistoryTitle () {
-      const startDate = this.$moment(this.history.event.startDate).format('DD/MM');
-      const auxiliary = this.$_.has(this.history, 'event.auxiliary.identity')
-        ? formatAuxiliaryShortIdentity(this.history.event.auxiliary.identity)
-        : 'À affecter';
-
-      switch (this.history.event.type) {
-        case INTERVENTION:
-          const customer = formatCustomerShortIdentity(this.history.event.customer.identity);
-          return `Intervention du ${startDate} chez ${customer}.`;
-        case INTERNAL_HOUR:
-          return `Heure interne de ${auxiliary} le ${startDate}`;
-        case ABSENCE:
-          const endDate = this.$moment(this.history.event.endDate).format('DD/MM');
-          return this.$moment(startDate).isSame(endDate)
-            ? `Absence de ${auxiliary} le ${startDate}`
-            : `Absence de ${auxiliary} du ${startDate} au ${endDate}`;
-        case UNAVAILABILITY:
-          return `Indispo de ${auxiliary} le ${startDate}`;
-      }
+    getEventDeletionTitle () {
+      const pronom = this.isRepetition && this.history.event.type === INTERVENTION ? 'la ' : 'l\'';
+      if (!this.isOneDayEvent) return `Suppression de l'${this.eventType.toLowerCase()} de ${this.auxiliaryName} du ${this.startDate} au ${this.endDate}.`;
+      if (this.isRepetition) return `Suppression de ${pronom}${this.eventType.toLowerCase()} ${this.repetitionFrequency} à partir du ${this.startDate}.`;
+      if (this.customerName) return `Suppression de l'${this.eventType.toLowerCase()} de ${this.auxiliaryName} le ${this.startDate} chez ${this.customerName}.`
+      return `Suppression de l'${this.eventType.toLowerCase()} de ${this.auxiliaryName} le ${this.startDate}.`
     },
-    getEventDeletionHistoryDetails () {
-      const { type, internalHour, location } = this.history.event;
+    getEventDeletionDetails () {
+      if (this.history.event.type === ABSENCE) return;
 
-      const startHour = this.$moment(this.history.event.startDate).format('HH:mm');
-      const endHour = this.$moment(this.history.event.endDate).format('HH:mm');
-      switch (type) {
-        case INTERVENTION:
-          return `Intervention initialement prévue de ${startHour} à ${endHour}.`;
-        case INTERNAL_HOUR:
-          return `${internalHour.name} initialement prévu(e) de ${startHour} à ${endHour}. ${location && location.fullAddress ? `${location.fullAddress}.` : ''}`;
-        case UNAVAILABILITY:
-          return `Initialement prévue de ${startHour} à ${endHour}.`;
-      }
+      if (this.isRepetition) return `${this.eventName}s initialement prévu(e)s de ${this.startHour} à ${this.endHour} à partir du ${this.startDate}.`;
+      if (location && location.fullAddress) return `${this.eventName} initialement prévu(e) de ${this.startHour} à ${this.endHour}. ${location.fullAddress}.`;
+      return `${this.eventName} initialement prévu(e) de ${this.startHour} à ${this.endHour}.`;
     },
   },
 }
@@ -173,7 +175,7 @@ export default {
 
 <style lang="stylus" scoped>
 @import '~variables';
-  .event-history
+  .history
     margin: 2px;
     width: 100%;
     display: block;
@@ -189,33 +191,32 @@ export default {
     .avatar
       height: 20px !important;
       width: 20px !important;
-    .icons
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
-      padding: 0 5px;
 
-  .event-history-title
-    margin: 2px 2px 0;
+  .history-title
+    margin: 2px 10px 0 2px;
     padding: 5px;
-    display: flex;
-
-    .title
-      padding: 0 5px;
-      display: flex;
-      flex-direction column;
-      flex: 1;
 
     .history-info
+      display: flex;
+      div
+        flex: 1;
+      .q-btn-round
+        height: 20px;
+
+    .history-details
+      font-size: 14px;
+      margin: 3px 0 5px;
+
+      .history-misc
+        font-style: italic;
+
+    .history-signature
       font-size: 12px;
       font-style: italic;
+      display: flex;
+      align-items: center
       margin: 2px 0 3px;
+      div
+        margin-left: 5px
 
-  .history-misc
-    font-style: italic;
-
-  .event-history-details
-    font-size: 14px;
-    margin: 0 2px 2px;
-    padding: 0 10px 5px;
 </style>
