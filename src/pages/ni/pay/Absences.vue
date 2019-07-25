@@ -31,8 +31,7 @@
     <ni-auxiliary-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
       :editionModal="editionModal" :selectedAuxiliary="selectedAuxiliary" :auxiliaries="[selectedAuxiliary]"
       @resetForm="resetEditionForm" @deleteDocument="deleteDocument" @documentUploaded="documentUploaded"
-      @updateEvent="updateEvent" @close="closeEditionModal" @deleteEvent="deleteEvent"
-      @selectedAddress="selectedAddress" />
+      @updateEvent="updateEvent" @close="closeEditionModal" @deleteEvent="deleteEvent" />
   </q-page>
 </template>
 
@@ -152,7 +151,7 @@ export default {
         sector: { required },
         absence: { required },
         absenceNature: { required },
-        location: { fullAddress: { frAddress } },
+        address: { fullAddress: { frAddress } },
       },
     };
   },

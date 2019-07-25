@@ -165,7 +165,7 @@ export default {
         auxiliary: { required },
         customer: { required },
         subscription: { required },
-        location: { fullAddress: { frAddress } },
+        address: { fullAddress: { frAddress } },
         repetition: {
           frequency: { required },
         },
@@ -178,7 +178,7 @@ export default {
         sector: { required },
         customer: { required },
         subscription: { required },
-        location: { fullAddress: { frAddress } },
+        address: { fullAddress: { frAddress } },
         repetition: {
           frequency: { required },
         },
@@ -344,7 +344,7 @@ export default {
         subscription: '',
         internalHour: '',
         absence: '',
-        location: {},
+        address: {},
         attachment: {},
         auxiliary: '',
         sector: '',
@@ -378,8 +378,6 @@ export default {
       payload.endDate = this.$moment(event.dates.endDate).hours(event.dates.endHour.split(':')[0])
         .minutes(event.dates.endHour.split(':')[1]).toISOString();
 
-      if (event.location && event.location.fullAddress) delete payload.location.location;
-      if (event.location && Object.keys(event.location).length === 0) delete payload.location;
       if (event.cancel && Object.keys(event.cancel).length === 0) delete payload.cancel;
       if (event.cancel && Object.keys(event.cancel).length === 0) delete payload.attachment;
       if (event.shouldUpdateRepetition) delete payload.misc;
@@ -468,6 +466,7 @@ export default {
             .minutes(this.$moment(draggedObject.startDate).minutes()).toISOString(),
           endDate: this.$moment(toDay).add(daysBetween, 'days').hours(this.$moment(draggedObject.endDate).hours())
             .minutes(this.$moment(draggedObject.endDate).minutes()).toISOString(),
+          sector: draggedObject.sector,
         };
         if (draggedObject.auxiliary) payload.auxiliary = draggedObject.auxiliary._id;
 

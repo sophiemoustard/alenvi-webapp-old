@@ -75,7 +75,7 @@ export const planningActionMixin = {
           sector: partialReset ? this.newEvent.sector : '',
           internalHour: '',
           absence: '',
-          location: {},
+          address: {},
           attachment: {},
           ...(type === ABSENCE && { absenceNature: DAILY }),
         };
@@ -88,7 +88,7 @@ export const planningActionMixin = {
       let payload = { ...this.$_.omit(event, ['dates', '__v', '__index']) }
       payload = this.$_.pickBy(payload);
 
-      if (event.auxiliary) {
+      if ([INTERNAL_HOUR, INTERVENTION].includes(event.type) && event.auxiliary) {
         const auxiliary = this.auxiliaries.find(aux => aux._id === event.auxiliary);
         payload.sector = auxiliary.sector._id;
       }
@@ -116,7 +116,7 @@ export const planningActionMixin = {
         }
       }
 
-      if (event.location) delete payload.location.location;
+      if (event.address) delete payload.address.location;
       if (event.type === ABSENCE && event.absence !== ILLNESS) payload.attachment = {};
 
       return payload;
@@ -124,7 +124,7 @@ export const planningActionMixin = {
     getCreationPayload (event) {
       let payload = this.getPayload(event);
 
-      if (event.location && !event.location.fullAddress) delete payload.location;
+      if (event.address && !event.address.fullAddress) delete payload.address;
       if (event.type === ABSENCE && event.absence !== ILLNESS) payload.attachment = {};
 
       return payload;
@@ -203,11 +203,11 @@ export const planningActionMixin = {
           break;
         case INTERNAL_HOUR:
           const internalHour = event.internalHour._id;
-          this.editedEvent = { location: {}, shouldUpdateRepetition: false, ...eventData, auxiliary: auxiliary._id, internalHour, dates };
+          this.editedEvent = { address: {}, shouldUpdateRepetition: false, ...eventData, auxiliary: auxiliary._id, internalHour, dates };
           break;
         case ABSENCE:
           this.editedEvent = {
-            location: {},
+            address: {},
             attachment: {},
             ...eventData,
             auxiliary: auxiliary._id,

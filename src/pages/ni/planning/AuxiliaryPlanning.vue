@@ -81,7 +81,7 @@ export default {
         internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
         absence: { required: requiredIf((item) => item.type === ABSENCE) },
         absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
-        location: {
+        address: {
           zipCode: { required: requiredIf(item => !!item.fullAddress) },
           street: { required: requiredIf(item => !!item.fullAddress) },
           city: { required: requiredIf(item => !!item.fullAddress) },
@@ -109,7 +109,7 @@ export default {
         internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
         absence: { required: requiredIf((item) => item.type === ABSENCE) },
         absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
-        location: { fullAddress: { frAddress } },
+        address: { fullAddress: { frAddress } },
         repetition: {
           frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
         },
@@ -250,7 +250,7 @@ export default {
         subscription: '',
         internalHour: '',
         absence: '',
-        location: {},
+        address: {},
         attachment: {},
         auxiliary: person ? person._id : '',
         sector: person ? person.sector._id : sectorId,
