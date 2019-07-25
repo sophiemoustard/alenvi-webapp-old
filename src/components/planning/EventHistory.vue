@@ -186,7 +186,9 @@ export default {
       const { from, to } = this.history.update.auxiliary
       const toAuxiliary = to && to.identity ? formatAuxiliaryShortIdentity(to.identity) : 'À affecter';
       const fromAuxiliary = from && from.identity ? formatAuxiliaryShortIdentity(from.identity) : 'À affecter';
-      const title = `${toAuxiliary} remplace ${fromAuxiliary} ${this.eventType} du ${this.startDate}`;
+      let title;
+      if (this.isRepetition) title = `${toAuxiliary} remplace ${fromAuxiliary} ${this.eventType} ${this.repetitionFrequency}`;
+      else title = `${toAuxiliary} remplace ${fromAuxiliary} ${this.eventType} du ${this.startDate}`;
 
       return this.customerName ? `${title} chez ${this.customerName}` : `${title}`;
     },
