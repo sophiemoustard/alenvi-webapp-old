@@ -188,15 +188,18 @@ export default {
       const toAuxiliary = to && to.identity ? formatAuxiliaryShortIdentity(to.identity) : 'À affecter';
       const fromAuxiliary = from && from.identity ? formatAuxiliaryShortIdentity(from.identity) : 'À affecter';
 
-      let title;
-      if ((!to || !to.identity) && from && from.identity) title = `Passage en à affecter.`;
-      else if ((!from || !from.identity) && to && to.identity) title = `Affectation à ${toAuxiliary}`;
-      else title = `${toAuxiliary} remplace ${fromAuxiliary}`;
+      let title = '';
+      if (to && to.identity && from && from.identity) title = `${toAuxiliary} remplace ${fromAuxiliary} `;
 
-      if (this.isRepetition) title += ` ${this.eventType} ${this.repetitionFrequency}`;
+      if (this.isRepetition) title += `${this.eventType} ${this.repetitionFrequency}`;
       else title += ` ${this.eventType} du ${this.startDate}`;
 
-      return this.customerName ? `${title} chez ${this.customerName}` : `${title}`;
+      if (this.customerName) title += ` ${title} chez ${this.customerName}`;
+
+      if ((!to || !to.identity) && from && from.identity) title += ` passée en à affecter.`;
+      else if ((!from || !from.identity) && to && to.identity) title += ` affectée à ${toAuxiliary}`;
+
+      return title;
     },
     formatDatesUpdateTitle () {
       const { endDate, startDate } = this.history.update;
