@@ -148,12 +148,12 @@ export default {
     getEventCreationDetails () {
       if (!this.isOneDayEvent) return `${this.eventName} planifié(e) du ${this.startDate} au ${this.endDate}.`;
 
-      const { location } = this.history.event;
+      const { address } = this.history.event;
       let details;
       if (this.isRepetition) details = `${this.eventName}s de ${this.startHour} à ${this.endHour} à partir du ${this.startDate}.`;
       else details = `${this.eventName} planifié(e) le ${this.startDate} de ${this.startHour} à ${this.endHour}.`;
 
-      return location && location.fullAddress ? `${details} ${location.fullAddress}.` : details;
+      return address && address.fullAddress ? `${details} ${address.fullAddress}.` : details;
     },
     // Deletion
     getEventDeletionTitle () {
@@ -169,11 +169,12 @@ export default {
     getEventDeletionDetails () {
       if (this.history.event.type === ABSENCE) return;
 
+      const { address } = this.history.event;
       let details;
       if (this.isRepetition) details = `${this.eventName}s initialement prévu(e)s de ${this.startHour} à ${this.endHour} à partir du ${this.startDate}.`;
       else details = `${this.eventName} initialement prévu(e) de ${this.startHour} à ${this.endHour}.`;
 
-      return location && location.fullAddress ? `${details} ${location.fullAddress}.` : details;
+      return address && address.fullAddress ? `${details} ${address.fullAddress}.` : details;
     },
     // Update
     getEventUpdateTitle () {

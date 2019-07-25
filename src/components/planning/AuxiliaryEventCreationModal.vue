@@ -62,7 +62,7 @@
           :options="repetitionOptions" required-field @blur="validations.repetition.frequency.$touch" :disable="!isRepetitionAllowed" />
       </template>
       <template v-if="newEvent.type === INTERNAL_HOUR">
-        <ni-search-address v-model="newEvent.location" :error-label="addressError" @blur="validations.location.$touch" :error="validations.location.$error" inModal />
+        <ni-search-address v-model="newEvent.address" :error-label="addressError" @blur="validations.address.$touch" :error="validations.address.$error" inModal />
       </template>
       <ni-modal-input v-model="newEvent.misc" caption="Notes" />
     </div>

@@ -152,7 +152,7 @@ export default {
         sector: { required },
         absence: { required },
         absenceNature: { required },
-        location: { fullAddress: { frAddress } },
+        address: { fullAddress: { frAddress } },
       },
     };
   },

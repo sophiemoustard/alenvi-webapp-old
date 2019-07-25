@@ -39,8 +39,8 @@
         <ni-modal-select caption="Type d'heure interne" v-model="editedEvent.internalHour"
           :options="internalHourOptions" :error="validations.internalHour.$error"
           @blur="validations.internalHour.$touch" />
-        <ni-search-address v-model="editedEvent.location" inModal
-          @blur="validations.location.$touch" :error="validations.location.$error" :error-label="addressError" />
+        <ni-search-address v-model="editedEvent.address" inModal
+          @blur="validations.address.$touch" :error="validations.address.$error" :error-label="addressError" />
       </template>
       <template v-if="isRepetition(editedEvent) && !isDisabled && !editedEvent.isCancelled">
         <div class="row q-mb-md light-checkbox">
