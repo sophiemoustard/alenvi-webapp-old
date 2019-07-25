@@ -298,7 +298,7 @@ export const planningActionMixin = {
         const { toDay, target, draggedObject } = vEvent;
         const daysBetween = this.$moment(draggedObject.endDate).diff(this.$moment(draggedObject.startDate), 'days');
 
-        if (target.type === SECTOR && event.type !== INTERVENTION) return NotifyNegative('Cette modification n\'est pas autorisée');
+        if (target.type === SECTOR && draggedObject.type !== INTERVENTION) return NotifyNegative('Cette modification n\'est pas autorisée');
         if ([ABSENCE, UNAVAILABILITY].includes(draggedObject.type) && draggedObject.auxiliary._id !== target._id) {
           return NotifyNegative('Impossible de modifier l\'auxiliaire de cet évènement.');
         }

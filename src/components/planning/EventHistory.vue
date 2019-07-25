@@ -192,9 +192,9 @@ export default {
       if (to && to.identity && from && from.identity) title = `${toAuxiliary} remplace ${fromAuxiliary} `;
 
       if (this.isRepetition) title += `${this.eventType} ${this.repetitionFrequency}`;
-      else title += ` ${this.eventType} du ${this.startDate}`;
+      else title += `${this.eventType} du ${this.startDate}`;
 
-      if (this.customerName) title += ` ${title} chez ${this.customerName}`;
+      if (this.customerName) title += ` chez ${this.customerName}`;
 
       if ((!to || !to.identity) && from && from.identity) title += ` passée en à affecter.`;
       else if ((!from || !from.identity) && to && to.identity) title += ` affectée à ${toAuxiliary}`;
