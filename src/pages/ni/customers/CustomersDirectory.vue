@@ -51,8 +51,8 @@
           caption="Nom" @blur="$v.newCustomer.identity.lastname.$touch" required-field />
         <ni-modal-input v-model="newCustomer.identity.firstname" caption="Prénom" />
         <div class="row margin-input last">
-          <ni-search-address v-model="newCustomer.contact.address.fullAddress" @selected="selectedAddress" @blur="$v.newCustomer.contact.address.fullAddress.$touch"
-            :error="$v.newCustomer.contact.address.fullAddress.$error" :error-label="addressError" in-modal required-field />
+          <ni-search-address v-model="newCustomer.contact.address" @blur="$v.newCustomer.contact.address.$touch"
+            :error="$v.newCustomer.contact.address.$error" :error-label="addressError" in-modal required-field />
         </div>
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary" :loading="loading"
@@ -64,7 +64,6 @@
 <script>
 import { required, email } from 'vuelidate/lib/validators';
 
-import { clear } from '../../../helpers/utils.js';
 import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
 import SearchAddress from '../../../components/form/SearchAddress';
 import NiModalInput from '../../../components/form/ModalInput';
@@ -72,11 +71,14 @@ import NiModalSelect from '../../../components/form/ModalSelect';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../../components/popup/notify.js';
 import { customerProfileValidation } from '../../../helpers/customerProfileValidation.js';
 import { REQUIRED_LABEL } from '../../../data/constants';
+import { validationMixin } from '../../../mixins/validationMixin.js';
 
 export default {
+  name: 'CustomersDirectory',
   metaInfo: {
     title: 'Répertoire bénéficiaires',
   },
+  mixins: [validationMixin],
   components: {
     NiSearchAddress: SearchAddress,
     NiModalInput,
@@ -167,6 +169,9 @@ export default {
       email: { email },
       contact: {
         address: {
+          zipCode: { required },
+          street: { required },
+          city: { required },
           fullAddress: { required, frAddress },
         },
       },
@@ -238,13 +243,25 @@ export default {
     },
     resetForm () {
       this.$v.newCustomer.$reset();
-      this.newCustomer = Object.assign({}, clear(this.newCustomer));
+      this.newCustomer = {
+        identity: {
+          title: '',
+          lastname: '',
+          firstname: '',
+        },
+        email: '',
+        contact: {
+          address: { fullAddress: '' },
+        },
+        isActive: true,
+      };
     },
     async submit () {
       try {
         this.loading = true;
         this.$v.newCustomer.$touch();
-        if (this.$v.newCustomer.$error) return NotifyWarning('Champ(s) invalide(s)');
+        const isValid = await this.waitForFormValidation(this.$v.newCustomer);
+        if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         const payload = this.$_.pickBy(this.newCustomer);
         const newCustomer = await this.$customers.create(payload);
@@ -259,9 +276,6 @@ export default {
       } finally {
         this.loading = false;
       }
-    },
-    selectedAddress (item) {
-      this.newCustomer.contact.address = Object.assign({}, this.newCustomer.contact.address, item);
     },
   },
 }

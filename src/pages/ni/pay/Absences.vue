@@ -31,8 +31,7 @@
     <ni-auxiliary-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
       :editionModal="editionModal" :selectedAuxiliary="selectedAuxiliary" :auxiliaries="[selectedAuxiliary]"
       @resetForm="resetEditionForm" @deleteDocument="deleteDocument" @documentUploaded="documentUploaded"
-      @updateEvent="updateEvent" @close="closeEditionModal" @deleteEvent="deleteEvent"
-      @selectedAddress="selectedAddress" />
+      @updateEvent="updateEvent" @close="closeEditionModal" @deleteEvent="deleteEvent" />
   </q-page>
 </template>
 
@@ -43,7 +42,7 @@ import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES, HOURLY } from '../../../data/c
 import BillingPagination from '../../../components/table/BillingPagination';
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
-import { formatShortIdentity } from '../../../helpers/utils';
+import { formatAuxiliaryShortIdentity } from '../../../helpers/utils';
 
 export default {
   name: 'Absences',
@@ -71,7 +70,7 @@ export default {
           name: 'auxiliary',
           label: 'Auxiliaire',
           field: 'auxiliary',
-          format: value => formatShortIdentity(value.identity),
+          format: value => formatAuxiliaryShortIdentity(value.identity),
           align: 'left',
         },
         {
@@ -152,7 +151,7 @@ export default {
         sector: { required },
         absence: { required },
         absenceNature: { required },
-        location: { fullAddress: { frAddress } },
+        address: { fullAddress: { frAddress } },
       },
     };
   },

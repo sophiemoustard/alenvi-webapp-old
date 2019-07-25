@@ -2,10 +2,17 @@
   <div :class="[{ 'planning': !toggleDrawer }]">
     <div class="row items-center planning-header">
       <div class="col-xs-12 col-md-5 planning-search">
-        <ni-chips-autocomplete ref="refFilter" v-model="terms" class="planning-search" />
+        <ni-chips-autocomplete ref="refFilter" v-model="terms" />
+        <q-btn v-if="!isCustomerPlanning" flat round icon="people" @click="toggleAllSectors"
+          :color="displayAllSectors ? 'primary' : ''" />
       </div>
-      <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
-        @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :type="PLANNING" />
+      <div class="col-xs-12 col-md-7 row planning-timeline">
+        <planning-navigation class="col-10" :timelineTitle="timelineTitle()" :targetDate="targetDate" :type="PLANNING"
+          @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
+          @goToWeek="goToWeek" />
+        <q-btn v-if="!isCustomerPlanning" class="planning-view" size="md" icon="playlist_play" flat round
+          @click="toggleHistory" :color="displayHistory ? 'primary' : ''" />
+      </div>
     </div>
     <div class="planning-container full-width">
       <table style="width: 100%" :class="[staffingView ? 'staffing' : 'non-staffing', 'planning-table']">
@@ -60,7 +67,12 @@
                   <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)"
                     :startOfWeekAsString="startOfWeek.toISOString()" :distanceMatrix="distanceMatrix" />
                 </div>
-                <div class="person-name overflow-hidden-nowrap">{{ person.identity | formatShortIdentity }}</div>
+                <div v-if="isCustomerPlanning" class="person-name overflow-hidden-nowrap">
+                  {{ person.identity | formatCustomerShortIdentity }}
+                </div>
+                <div v-else class="person-name overflow-hidden-nowrap">
+                  {{ person.identity | formatAuxiliaryShortIdentity }}
+                </div>
               </div>
             </td>
             <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
@@ -78,6 +90,9 @@
         </tbody>
       </table>
     </div>
+    <q-page-sticky expand position="right">
+      <ni-event-history-feed v-if="displayHistory" :eventHistories="eventHistories" />
+    </q-page-sticky>
   </div>
 </template>
 
@@ -95,12 +110,13 @@ import { NotifyNegative } from '../popup/notify';
 import NiChipAuxiliaryIndicator from './ChipAuxiliaryIndicator';
 import NiChipCustomerIndicator from './ChipCustomerIndicator';
 import NiPlanningEvent from './PlanningEvent';
+import NiEventHistoryFeed from './EventHistoryFeed';
 import ChipsAutocomplete from '../ChipsAutocomplete';
 import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import { planningEventMixin } from '../../mixins/planningEventMixin';
 import PlanningNavigation from './PlanningNavigation.vue';
 import distanceMatrix from '../../api/DistanceMatrix';
-import { formatShortIdentity } from '../../helpers/utils';
+import { formatCustomerShortIdentity, formatAuxiliaryShortIdentity } from '../../helpers/utils';
 
 export default {
   name: 'PlanningManager',
@@ -111,6 +127,7 @@ export default {
     'ni-planning-event-cell': NiPlanningEvent,
     'ni-chips-autocomplete': ChipsAutocomplete,
     'planning-navigation': PlanningNavigation,
+    'ni-event-history-feed': NiEventHistoryFeed,
   },
   props: {
     events: { type: Array, default: () => [] },
@@ -118,6 +135,8 @@ export default {
     filteredSectors: { type: Array, default: () => [] },
     personKey: { type: String, default: 'auxiliary' },
     canEdit: { type: Function, default: () => {} },
+    displayAllSectors: { type: Boolean, default: false },
+    eventHistories: { type: Array, default: () => [] },
   },
   data () {
     return {
@@ -132,6 +151,7 @@ export default {
       distanceMatrix: [],
       hourWidth: 100 / 12,
       UNKNOWN_AVATAR,
+      displayHistory: false,
     }
   },
   beforeDestroy () {
@@ -171,6 +191,9 @@ export default {
     },
   },
   methods: {
+    toggleAllSectors () {
+      this.$emit('update:displayAllSectors', !this.displayAllSectors);
+    },
     getTimelineHours () {
       const range = this.$moment.range(this.$moment().hours(STAFFING_VIEW_START_HOUR).minutes(0), this.$moment().hours(STAFFING_VIEW_END_HOUR).minutes(0));
       this.hours = Array.from(range.by('hours', { step: 2, excludeEnd: true }));
@@ -184,16 +207,17 @@ export default {
       this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
     },
     // Event display
-    getCellEvents (cell, day) {
-      return this.events
-        .filter(event => {
-          const lineFilter = cell.type === SECTOR
-            ? !event.auxiliary && event.sector === cell._id
-            : event[this.personKey] && event[this.personKey]._id === cell._id;
-          const dayFilter = this.$moment(day).isBetween(event.startDate, event.endDate, 'day', '[]');
+    getRowEvents (rowId) {
+      const rowEvents = this.events.find(group => group._id === rowId);
 
-          return lineFilter && dayFilter && (!this.staffingView || !event.isCancelled)
-        })
+      return (!rowEvents || !rowEvents.events) ? [] : rowEvents.events;
+    },
+    getCellEvents (cell, day) {
+      return this.getRowEvents(cell._id)
+        .filter(event =>
+          this.$moment(day).isBetween(event.startDate, event.endDate, 'day', '[]') &&
+          (!this.staffingView || !event.isCancelled)
+        )
         .map((event) => this.isCustomerPlanning ? event : this.getEventWithStyleInfo(event, day))
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
     },
@@ -219,10 +243,13 @@ export default {
       return dayEvent;
     },
     getPersonEvents (person) {
-      return this.events.filter(event =>
-        (event[this.personKey] ? event[this.personKey]._id === person._id : false) &&
-        (this.isCustomerPlanning || !event.isCancelled || event.cancel.condition === INVOICED_AND_PAYED)
-      );
+      return this.getRowEvents(person._id).filter(event =>
+        (this.isCustomerPlanning || !event.isCancelled || event.cancel.condition === INVOICED_AND_PAYED));
+    },
+    // History
+    toggleHistory () {
+      if (this.persons.length === 0) return;
+      this.displayHistory = !this.displayHistory;
     },
     // Drag & drop
     drag (event) {
@@ -284,7 +311,8 @@ export default {
     },
   },
   filters: {
-    formatShortIdentity,
+    formatCustomerShortIdentity,
+    formatAuxiliaryShortIdentity,
   },
 }
 </script>
@@ -348,5 +376,8 @@ export default {
 
   .to-assign
     background-color: rgba(253, 243, 229, 0.5);
+
+  .q-page-sticky
+    z-index: 20;
 
 </style>

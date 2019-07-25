@@ -44,16 +44,17 @@ export const planningActionMixin = {
           ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(startDate));
       });
     },
+    getRowEvents (rowId) {
+      const rowEvents = this.events.find(group => group._id === rowId);
+
+      return (!rowEvents || !rowEvents.events) ? [] : rowEvents.events;
+    },
     // Event creation
     canCreateEvent (person, selectedDay) {
       const hasActiveCustomerContractOnEvent = this.hasActiveCustomerContractOnEvent(person, selectedDay);
       const hasActiveCompanyContractOnEvent = this.hasActiveCompanyContractOnEvent(person, selectedDay);
 
       return hasActiveCustomerContractOnEvent || hasActiveCompanyContractOnEvent;
-    },
-    selectedAddress (item) {
-      if (this.creationModal) this.newEvent.location = Object.assign({}, this.newEvent.location, item);
-      if (this.editionModal) this.editedEvent.location = Object.assign({}, this.editedEvent.location, item);
     },
     resetCreationForm ({ partialReset, type = INTERVENTION }) {
       this.$v.newEvent.$reset();
@@ -74,7 +75,7 @@ export const planningActionMixin = {
           sector: partialReset ? this.newEvent.sector : '',
           internalHour: '',
           absence: '',
-          location: {},
+          address: {},
           attachment: {},
           ...(type === ABSENCE && { absenceNature: DAILY }),
         };
@@ -83,11 +84,11 @@ export const planningActionMixin = {
     closeCreationModal () {
       this.creationModal = false;
     },
-    getCreationPayload (event) {
+    getPayload (event) {
       let payload = { ...this.$_.omit(event, ['dates', '__v', '__index']) }
       payload = this.$_.pickBy(payload);
 
-      if (event.auxiliary) {
+      if ([INTERNAL_HOUR, INTERVENTION].includes(event.type) && event.auxiliary) {
         const auxiliary = this.auxiliaries.find(aux => aux._id === event.auxiliary);
         payload.sector = auxiliary.sector._id;
       }
@@ -115,8 +116,15 @@ export const planningActionMixin = {
         }
       }
 
-      if (event.location && event.location.fullAddress) delete payload.location.location;
-      if (event.location && Object.keys(event.location).length === 0) delete payload.location;
+      if (event.address) delete payload.address.location;
+      if (event.type === ABSENCE && event.absence !== ILLNESS) payload.attachment = {};
+
+      return payload;
+    },
+    getCreationPayload (event) {
+      let payload = this.getPayload(event);
+
+      if (event.address && !event.address.fullAddress) delete payload.address;
       if (event.type === ABSENCE && event.absence !== ILLNESS) payload.attachment = {};
 
       return payload;
@@ -132,8 +140,7 @@ export const planningActionMixin = {
       });
     },
     getAuxiliaryEventsBetweenDates (auxiliaryId, startDate, endDate) {
-      return this.events
-        .filter(event => event.auxiliary && event.auxiliary._id === auxiliaryId)
+      return this.getRowEvents(auxiliaryId)
         .filter(event => {
           return this.$moment(event.startDate).isBetween(startDate, endDate, 'minutes', '[)') ||
             this.$moment(startDate).isBetween(event.startDate, event.endDate, 'minutes', '[)')
@@ -153,7 +160,7 @@ export const planningActionMixin = {
 
         await this.$events.create(payload);
 
-        this.refresh();
+        await this.refresh();
         this.creationModal = false;
         this.resetCreationForm(false);
         NotifyPositive('Évènement créé');
@@ -172,7 +179,7 @@ export const planningActionMixin = {
         : this.$moment(date).hours()}:${this.$moment(date).minutes() || '00'}`;
     },
     formatEditedEvent (event) {
-      const { createdAt, updatedAt, startDate, endDate, isBilled, auxiliary, ...eventData } = event;
+      const { createdAt, updatedAt, startDate, endDate, isBilled, auxiliary, subscription, ...eventData } = event;
       const dates = {
         startDate,
         endDate,
@@ -196,11 +203,11 @@ export const planningActionMixin = {
           break;
         case INTERNAL_HOUR:
           const internalHour = event.internalHour._id;
-          this.editedEvent = { location: {}, shouldUpdateRepetition: false, ...eventData, auxiliary: auxiliary._id, internalHour, dates };
+          this.editedEvent = { address: {}, shouldUpdateRepetition: false, ...eventData, auxiliary: auxiliary._id, internalHour, dates };
           break;
         case ABSENCE:
           this.editedEvent = {
-            location: {},
+            address: {},
             attachment: {},
             ...eventData,
             auxiliary: auxiliary._id,
@@ -241,15 +248,7 @@ export const planningActionMixin = {
       this.editionModal = false;
     },
     getEditionPayload (event) {
-      let payload = this.getCreationPayload(event);
-
-      if (event.type === INTERVENTION) {
-        const customer = this.customers.find(cus => cus._id === event.customer);
-        if (customer) {
-          const subscription = customer.subscriptions.find(sub => sub._id === event.subscription);
-          if (subscription && subscription.service) payload.status = subscription.service.type;
-        }
-      }
+      let payload = this.getPayload(event);
 
       if (event.cancel && Object.keys(event.cancel).length === 0) delete payload.cancel;
       if (event.attachment && Object.keys(event.attachment).length === 0) delete payload.attachment;
@@ -299,6 +298,7 @@ export const planningActionMixin = {
         const { toDay, target, draggedObject } = vEvent;
         const daysBetween = this.$moment(draggedObject.endDate).diff(this.$moment(draggedObject.startDate), 'days');
 
+        if (target.type === SECTOR && draggedObject.type !== INTERVENTION) return NotifyNegative('Cette modification n\'est pas autorisée');
         if ([ABSENCE, UNAVAILABILITY].includes(draggedObject.type) && draggedObject.auxiliary._id !== target._id) {
           return NotifyNegative('Impossible de modifier l\'auxiliaire de cet évènement.');
         }
@@ -311,14 +311,18 @@ export const planningActionMixin = {
         };
 
         if (target.type === SECTOR) payload.sector = target._id;
-        else payload.auxiliary = target._id;
+        else {
+          payload.auxiliary = target._id;
+          const auxiliary = this.auxiliaries.find(aux => aux._id === target._id);
+          payload.sector = auxiliary.sector._id;
+        }
 
         if (this.hasConflicts(payload)) {
           return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
         }
 
-        const updatedEvent = await this.$events.updateById(draggedObject._id, payload);
-        this.events = this.events.map(event => (event._id === updatedEvent._id) ? updatedEvent : event);
+        await this.$events.updateById(draggedObject._id, payload);
+        await this.refresh();
 
         NotifyPositive('Évènement modifié');
       } catch (e) {
@@ -364,7 +368,7 @@ export const planningActionMixin = {
 
         this.loading = true
         await this.$events.deleteById(this.editedEvent._id);
-        this.events = this.events.filter(event => event._id !== this.editedEvent._id);
+        await this.refresh();
         this.editionModal = false;
         this.resetEditionForm();
         NotifyPositive('Évènement supprimé.');
@@ -395,10 +399,10 @@ export const planningActionMixin = {
         this.loading = true
         if (shouldDeleteRepetition) {
           await this.$events.deleteRepetition(this.editedEvent._id);
-          this.refresh();
+          await this.refresh();
         } else {
           await this.$events.deleteById(this.editedEvent._id);
-          this.events = this.events.filter(event => event._id !== this.editedEvent._id);
+          await this.refresh();
         }
 
         this.editionModal = false;

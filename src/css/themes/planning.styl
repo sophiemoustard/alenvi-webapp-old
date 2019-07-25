@@ -6,7 +6,6 @@
   margin-top: 6px
   &-container
     height: 100%;
-    position: relative;
     width: stretch;
   &-title
     font-size: 0.875rem
@@ -85,20 +84,27 @@
 
 .planning
   padding-left: 30px;
-  @media screen and (max-width: 767px)
+  @media screen and (max-width: 1024px)
       padding-left: 0px;
   &-container
+    z-index: 0;
     background: white;
     padding: 5px;
     @media screen and (max-width: 767px)
       padding: 2px;
   &-header
-    margin: 0 30px 16px;
+    align-items: start;
     font-size: 1.2em;
-    @media screen and (max-width: 767px)
-      margin: 0 16px 16px;
-  &-navigation
-    margin-top: 10px
+    position: -webkit-sticky;
+    position: sticky;
+    background-color: #eee;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    padding: 0 20px 15px;
+    padding-top: 20px;
+    z-index: 10;
   &-month
     display: flex;
     @media screen and (min-width: 768px)
@@ -109,8 +115,10 @@
       font-size: 0.8em;
       margin: 5px;
   &-search
+    display: flex;
+    align-items: center;
     @media screen and (max-width: 767px)
-      margin-bottom: 5px;
+      margin-bottom: 10px;
   &-actions
     display: flex;
     align-items: center;
@@ -118,6 +126,11 @@
     justify-content: space-around;
     @media screen and (max-width: 767px)
       justify-content: space-between;
+  &-view
+    padding: 4px;
+  &-timeline
+    display: flex;
+    justify-content: space-between;
 
 .auxiliary-name
   display: flex;

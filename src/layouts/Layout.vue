@@ -4,10 +4,12 @@
       <q-btn class="menu-icon" color="primary" round dense @click="toggleLeft" icon="menu" />
     </q-page-sticky>
 
-    <q-btn v-if="!enableMini" flat round icon="chevron_left" @click="enableMini = !enableMini" class="chevron chevron-left" />
+    <q-btn v-if="!enableMini" flat round icon="chevron_left" @click="enableMini = !enableMini"
+      class="chevron chevron-left" />
     <q-btn v-else flat round icon="view_headline" @click="enableMini = !enableMini" class="chevron chevron-right" />
     <q-layout-drawer :mini="enableMini" :mini-width="30" :width="250" side="left" v-model="toggleDrawer">
-      <side-menu-coach :ref="sidemenusRefs" v-if="user && !isAuxiliary && user.role.name !== HELPER && !enableMini" :user="user" />
+      <side-menu-coach :ref="sidemenusRefs" v-if="user && !isAuxiliary && user.role.name !== HELPER && !enableMini"
+        :user="user" />
       <side-menu-auxiliary :ref="sidemenusRefs" v-if="user && isAuxiliary && !enableMini" :user="user" />
       <side-menu-customer :ref="sidemenusRefs" v-if="user && user.role.name === HELPER && !enableMini" :user="user" />
     </q-layout-drawer>
@@ -82,7 +84,7 @@ export default {
 
   .q-page-sticky
     z-index: 10
-    @media (min-width: 768px)
+    @media (min-width: 1025px)
       display: none;
 
   .chevron
@@ -97,7 +99,7 @@ export default {
       left: 235px
     &-right
       left: 15px
-    @media (max-width: 767px)
+    @media (max-width: 1024px)
       display: none
 
   .q-toolbar

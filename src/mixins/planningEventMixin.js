@@ -1,5 +1,5 @@
 import { ABSENCE_TYPES } from '../data/constants';
-import { formatShortIdentity } from '../helpers/utils';
+import { formatAuxiliaryShortIdentity, formatCustomerShortIdentity } from '../helpers/utils';
 
 export const planningEventMixin = {
   data () {
@@ -36,7 +36,7 @@ export const planningEventMixin = {
     eventTitle (event) {
       if (!event.auxiliary && this.isCustomerPlanning) return 'À affecter';
 
-      return formatShortIdentity(this.isCustomerPlanning ? event.auxiliary.identity : event.customer.identity);
+      return this.isCustomerPlanning ? formatAuxiliaryShortIdentity(event.auxiliary.identity) : formatCustomerShortIdentity(event.customer.identity);
     },
   },
 };

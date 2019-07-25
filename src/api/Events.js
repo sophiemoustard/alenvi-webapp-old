@@ -9,10 +9,6 @@ export default {
     const events = await alenviAxios.get(`${process.env.API_HOSTNAME}/events/credit-notes`, { params });
     return events.data.data.events;
   },
-  async listByCustomerFromSectors (params = null) {
-    const events = await alenviAxios.get(`${process.env.API_HOSTNAME}/events/customers`, { params });
-    return events.data.data;
-  },
   async create (data) {
     const event = await alenviAxios.post(`${process.env.API_HOSTNAME}/events`, data);
     return event.data.data.event;

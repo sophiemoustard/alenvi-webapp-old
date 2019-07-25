@@ -56,6 +56,7 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables';
   .q-chips-input
+    width: 100%
     background: white;
     box-shadow: none;
     padding: 6px 12px 6px 12px;
