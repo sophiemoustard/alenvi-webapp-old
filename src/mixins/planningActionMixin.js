@@ -88,7 +88,7 @@ export const planningActionMixin = {
       let payload = { ...this.$_.omit(event, ['dates', '__v', '__index']) }
       payload = this.$_.pickBy(payload);
 
-      if (event.auxiliary) {
+      if ([INTERNAL_HOUR, INTERVENTION].includes(event.type) && event.auxiliary) {
         const auxiliary = this.auxiliaries.find(aux => aux._id === event.auxiliary);
         payload.sector = auxiliary.sector._id;
       }
