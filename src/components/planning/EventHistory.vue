@@ -146,12 +146,12 @@ export default {
       return `${typeAndAuxiliary} le ${this.startDate}.`;
     },
     getEventCreationDetails () {
-      if (!this.isOneDayEvent) return `${this.eventName} planifiée du ${this.startDate} au ${this.endDate}.`;
+      if (!this.isOneDayEvent) return `${this.eventName} planifié(e) du ${this.startDate} au ${this.endDate}.`;
 
       const { location } = this.history.event;
       let details;
       if (this.isRepetition) details = `${this.eventName}s de ${this.startHour} à ${this.endHour} à partir du ${this.startDate}.`;
-      else details = `${this.eventName} planifiée le ${this.startDate} de ${this.startHour} à ${this.endHour}.`;
+      else details = `${this.eventName} planifié(e) le ${this.startDate} de ${this.startHour} à ${this.endHour}.`;
 
       return location && location.fullAddress ? `${details} ${location.fullAddress}.` : details;
     },
@@ -177,9 +177,10 @@ export default {
     },
     // Update
     getEventUpdateTitle () {
-      const { auxiliary } = this.history.update;
-      if (auxiliary) {
-        return this.formatAuxiliaryUpdateTitle();
+      const { auxiliary, startDate } = this.history.update;
+      if (auxiliary) return this.formatAuxiliaryUpdateTitle();
+      if (startDate) {
+        return this.formatDatesUpdateTitle();
       }
     },
     formatAuxiliaryUpdateTitle () {
@@ -187,19 +188,37 @@ export default {
       const toAuxiliary = to && to.identity ? formatAuxiliaryShortIdentity(to.identity) : 'À affecter';
       const fromAuxiliary = from && from.identity ? formatAuxiliaryShortIdentity(from.identity) : 'À affecter';
 
-      let title;
-      if ((!to || !to.identity) && from && from.identity) title = `Passage en à affecter.`;
-      else if ((!from || !from.identity) && to && to.identity) title = `Affectation à ${toAuxiliary}`;
-      else title = `${toAuxiliary} remplace ${fromAuxiliary}`;
+      let title = '';
+      if (to && to.identity && from && from.identity) title = `${toAuxiliary} remplace ${fromAuxiliary} `;
 
-      if (this.isRepetition) title += ` ${this.eventType} ${this.repetitionFrequency}`;
-      else title += ` ${this.eventType} du ${this.startDate}`;
+      if (this.isRepetition) title += `${this.eventType} ${this.repetitionFrequency}`;
+      else title += `${this.eventType} du ${this.startDate}`;
 
-      return this.customerName ? `${title} chez ${this.customerName}` : `${title}`;
+      if (this.customerName) title += ` chez ${this.customerName}`;
+
+      if ((!to || !to.identity) && from && from.identity) title += ` passée en à affecter.`;
+      else if ((!from || !from.identity) && to && to.identity) title += ` affectée à ${toAuxiliary}`;
+
+      return title;
+    },
+    formatDatesUpdateTitle () {
+      const { endDate, startDate } = this.history.update;
+      const { from: startDateFrom, to: startDateTo } = startDate;
+
+      let title = `${this.eventType} de ${this.auxiliaryName}`;
+
+      if (startDate && endDate) {
+        const { from: endDateFrom, to: endDateTo } = endDate;
+        return `${title} déplacée du ${this.$moment(startDateFrom).format('DD/MM')} - ${this.$moment(endDateFrom).format('DD/MM')} au ${this.$moment(startDateTo).format('DD/MM')} - ${this.$moment(endDateTo).format('DD/MM')}`
+      }
+
+      if (this.customerName) title += ` chez ${this.customerName}`;
+
+      return `${title} déplacée du ${this.$moment(startDateFrom).format('DD/MM')} au ${this.$moment(startDateTo).format('DD/MM')}`
     },
     getEventUpdateDetails () {
-      const { auxiliary } = this.history.update;
-      if (auxiliary) {
+      const { auxiliary, startDate } = this.history.update;
+      if (auxiliary || startDate) {
         return this.getEventCreationDetails();
       }
     },
