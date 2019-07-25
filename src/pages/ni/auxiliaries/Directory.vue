@@ -60,8 +60,8 @@
           @blur="$v.newUser.mobilePhone.$touch" :error-label="mobilePhoneError" required-field />
         <ni-modal-input v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email" @blur="$v.newUser.local.email.$touch"
           :error-label="emailError" required-field />
-        <ni-search-address v-model="newUser.contact.address.fullAddress" color="white" inverted-light @selected="selectedAddress"
-          :error-label="addressError" :error="$v.newUser.contact.address.fullAddress.$error" in-modal />
+        <ni-search-address v-model="newUser.contact.address" color="white" inverted-light @blur="$v.newUser.contact.address.$touch"
+          error-label="Adresse non valide" :error="$v.newUser.contact.address.$error" in-modal />
         <div class="row margin-input">
           <div class="col-12">
             <div class="row justify-between">
@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import { required, email, maxLength } from 'vuelidate/lib/validators';
+import { required, requiredIf, email, maxLength } from 'vuelidate/lib/validators';
 import randomize from 'randomatic';
 import { frPhoneNumber, frAddress } from '../../../helpers/vuelidateCustomVal';
 import { userProfileValidation } from '../../../helpers/userProfileValidation';
@@ -95,7 +95,7 @@ import SelectSector from '../../../components/form/SelectSector';
 import ModalInput from '../../../components/form/ModalInput';
 import ModalSelect from '../../../components/form/ModalSelect';
 import SearchAddress from '../../../components/form/SearchAddress';
-import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify.js';
+import { NotifyPositive, NotifyNegative, NotifyWarning } from '../../../components/popup/notify.js';
 import { DEFAULT_AVATAR, AUXILIARY, PLANNING_REFERENT, REQUIRED_LABEL } from '../../../data/constants';
 import { validationMixin } from '../../../mixins/validationMixin.js';
 export default {
@@ -226,6 +226,9 @@ export default {
       },
       contact: {
         address: {
+          zipCode: { required: requiredIf(item => !!item.fullAddress) },
+          street: { required: requiredIf(item => !!item.fullAddress) },
+          city: { required: requiredIf(item => !!item.fullAddress) },
           fullAddress: { frAddress },
         },
       },
@@ -284,17 +287,8 @@ export default {
         return 'Email non valide';
       }
     },
-    addressError () {
-      if (!this.$v.newUser.contact.address.fullAddress.required) {
-        return REQUIRED_LABEL;
-      }
-      return 'Adresse non valide';
-    },
   },
   methods: {
-    selectedAddress (item) {
-      this.newUser.contact.address = Object.assign({}, this.newUser.contact.address, item);
-    },
     getHiringDate (user) {
       let hiringDate = null;
       if (user.contracts && user.contracts.length > 0) {
@@ -372,7 +366,7 @@ export default {
       payload.company = this.company._id;
 
       if (!payload.identity.title) delete payload.identity.title;
-      if (!payload.contact.address.fullAddress) delete payload.contact.address;
+      if (!payload.contact.address.fullAddress) delete payload.contact;
 
       return payload;
     },
@@ -399,7 +393,7 @@ export default {
         this.loading = true;
         this.$v.newUser.$touch();
         const isValid = await this.waitForFormValidation(this.$v.newUser);
-        if (!isValid) throw new Error('Invalid fields');
+        if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         const userCreated = await this.createAlenviUser();
         if (this.sendWelcomeMsg) {

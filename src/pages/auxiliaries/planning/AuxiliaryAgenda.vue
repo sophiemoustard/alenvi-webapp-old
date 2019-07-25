@@ -18,17 +18,16 @@
     <!-- Event creation modal -->
     <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
       :creationModal="creationModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary"
-      :auxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetCreationForm"
+      :activeAuxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetCreationForm"
       @deleteDocument="deleteDocument" @documentUploaded="documentUploaded" @createEvent="createEvent"
-      @close="closeCreationModal" @selectedAddress="selectedAddress"  />
+      @close="closeCreationModal" />
 
     <!-- Event edition modal -->
     <ni-auxiliary-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
       :editionModal="editionModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary"
-      :auxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetEditionForm"
+      :activeAuxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetEditionForm"
       @deleteDocument="deleteDocument" @documentUploaded="documentUploaded" @updateEvent="updateEvent"
-      @close="closeEditionModal" @deleteEvent="deleteEvent" @deleteEventRepetition="deleteEventRepetition"
-      @selectedAddress="selectedAddress"  />
+      @close="closeEditionModal" @deleteEvent="deleteEvent" @deleteEventRepetition="deleteEventRepetition" />
   </q-page>
 </template>
 

@@ -56,10 +56,6 @@ export const planningActionMixin = {
 
       return hasActiveCustomerContractOnEvent || hasActiveCompanyContractOnEvent;
     },
-    selectedAddress (item) {
-      if (this.creationModal) this.newEvent.location = Object.assign({}, this.newEvent.location, item);
-      if (this.editionModal) this.editedEvent.location = Object.assign({}, this.editedEvent.location, item);
-    },
     resetCreationForm ({ partialReset, type = INTERVENTION }) {
       this.$v.newEvent.$reset();
       if (!partialReset) this.newEvent = {};
@@ -88,7 +84,7 @@ export const planningActionMixin = {
     closeCreationModal () {
       this.creationModal = false;
     },
-    getCreationPayload (event) {
+    getPayload (event) {
       let payload = { ...this.$_.omit(event, ['dates', '__v', '__index']) }
       payload = this.$_.pickBy(payload);
 
@@ -120,8 +116,15 @@ export const planningActionMixin = {
         }
       }
 
-      if (event.location && event.location.fullAddress) delete payload.location.location;
-      if (event.location && Object.keys(event.location).length === 0) delete payload.location;
+      if (event.location) delete payload.location.location;
+      if (event.type === ABSENCE && event.absence !== ILLNESS) payload.attachment = {};
+
+      return payload;
+    },
+    getCreationPayload (event) {
+      let payload = this.getPayload(event);
+
+      if (event.location && !event.location.fullAddress) delete payload.location;
       if (event.type === ABSENCE && event.absence !== ILLNESS) payload.attachment = {};
 
       return payload;
@@ -176,7 +179,7 @@ export const planningActionMixin = {
         : this.$moment(date).hours()}:${this.$moment(date).minutes() || '00'}`;
     },
     formatEditedEvent (event) {
-      const { createdAt, updatedAt, startDate, endDate, isBilled, auxiliary, ...eventData } = event;
+      const { createdAt, updatedAt, startDate, endDate, isBilled, auxiliary, subscription, ...eventData } = event;
       const dates = {
         startDate,
         endDate,
@@ -245,15 +248,7 @@ export const planningActionMixin = {
       this.editionModal = false;
     },
     getEditionPayload (event) {
-      let payload = this.getCreationPayload(event);
-
-      if (event.type === INTERVENTION) {
-        const customer = this.customers.find(cus => cus._id === event.customer);
-        if (customer) {
-          const subscription = customer.subscriptions.find(sub => sub._id === event.subscription);
-          if (subscription && subscription.service) payload.status = subscription.service.type;
-        }
-      }
+      let payload = this.getPayload(event);
 
       if (event.cancel && Object.keys(event.cancel).length === 0) delete payload.cancel;
       if (event.attachment && Object.keys(event.attachment).length === 0) delete payload.attachment;
