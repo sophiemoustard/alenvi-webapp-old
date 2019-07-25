@@ -466,6 +466,7 @@ export default {
             .minutes(this.$moment(draggedObject.startDate).minutes()).toISOString(),
           endDate: this.$moment(toDay).add(daysBetween, 'days').hours(this.$moment(draggedObject.endDate).hours())
             .minutes(this.$moment(draggedObject.endDate).minutes()).toISOString(),
+          sector: draggedObject.sector,
         };
         if (draggedObject.auxiliary) payload.auxiliary = draggedObject.auxiliary._id;
 
