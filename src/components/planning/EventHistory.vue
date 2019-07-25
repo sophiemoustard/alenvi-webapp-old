@@ -186,7 +186,14 @@ export default {
       const { from, to } = this.history.update.auxiliary
       const toAuxiliary = to && to.identity ? formatAuxiliaryShortIdentity(to.identity) : 'À affecter';
       const fromAuxiliary = from && from.identity ? formatAuxiliaryShortIdentity(from.identity) : 'À affecter';
-      const title = `${toAuxiliary} remplace ${fromAuxiliary} ${this.eventType} du ${this.startDate}`;
+
+      let title;
+      if ((!to || !to.identity) && from && from.identity) title = `Passage en à affecter.`;
+      else if ((!from || !from.identity) && to && to.identity) title = `Affectation à ${toAuxiliary}`;
+      else title = `${toAuxiliary} remplace ${fromAuxiliary}`;
+
+      if (this.isRepetition) title += ` ${this.eventType} ${this.repetitionFrequency}`;
+      else title += ` ${this.eventType} du ${this.startDate}`;
 
       return this.customerName ? `${title} chez ${this.customerName}` : `${title}`;
     },
