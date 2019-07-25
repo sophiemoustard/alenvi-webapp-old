@@ -64,7 +64,6 @@
 <script>
 import { required, email } from 'vuelidate/lib/validators';
 
-import { clear } from '../../../helpers/utils.js';
 import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
 import SearchAddress from '../../../components/form/SearchAddress';
 import NiModalInput from '../../../components/form/ModalInput';
@@ -244,7 +243,18 @@ export default {
     },
     resetForm () {
       this.$v.newCustomer.$reset();
-      this.newCustomer = Object.assign({}, clear(this.newCustomer));
+      this.newCustomer = {
+        identity: {
+          title: '',
+          lastname: '',
+          firstname: '',
+        },
+        email: '',
+        contact: {
+          address: { fullAddress: '' },
+        },
+        isActive: true,
+      };
     },
     async submit () {
       try {

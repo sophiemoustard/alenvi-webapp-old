@@ -654,27 +654,11 @@ export default {
       twentyFifthOfDecember: { numeric },
       firstOfMay: { numeric },
       evening: { numeric },
-      eveningStartTime: {
-        required: requiredIf((item) => {
-          return item.evening;
-        }),
-      },
-      eveningEndTime: {
-        required: requiredIf((item) => {
-          return item.evening;
-        }),
-      },
+      eveningStartTime: { required: requiredIf((item) => item.evening) },
+      eveningEndTime: { required: requiredIf((item) => item.evening) },
       custom: { numeric },
-      customStartTime: {
-        required: requiredIf((item) => {
-          return item.custom;
-        }),
-      },
-      customEndTime: {
-        required: requiredIf((item) => {
-          return item.custom;
-        }),
-      },
+      customStartTime: { required: requiredIf((item) => item.custom) },
+      customEndTime: { required: requiredIf((item) => item.custom) },
     },
     editedSurcharge: {
       name: { required },
@@ -684,27 +668,11 @@ export default {
       twentyFifthOfDecember: { numeric },
       firstOfMay: { numeric },
       evening: { numeric },
-      eveningStartTime: {
-        required: requiredIf((item) => {
-          return item.evening;
-        }),
-      },
-      eveningEndTime: {
-        required: requiredIf((item) => {
-          return item.evening;
-        }),
-      },
+      eveningStartTime: { required: requiredIf((item) => item.evening) },
+      eveningEndTime: { required: requiredIf((item) => item.evening) },
       custom: { numeric },
-      customStartTime: {
-        required: requiredIf((item) => {
-          return item.custom;
-        }),
-      },
-      customEndTime: {
-        required: requiredIf((item) => {
-          return item.custom;
-        }),
-      },
+      customStartTime: { required: requiredIf((item) => item.custom) },
+      customEndTime: { required: requiredIf((item) => item.custom) },
     },
     newService: {
       name: { required },
@@ -729,10 +697,7 @@ export default {
         zipCode: { required },
         street: { required },
         city: { required },
-        fullAddress: {
-          required,
-          frAddress,
-        },
+        fullAddress: { required, frAddress },
       },
       customersConfig: {
         bllingPeriod: { required },

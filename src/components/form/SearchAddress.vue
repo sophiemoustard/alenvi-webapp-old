@@ -19,7 +19,7 @@ import { REQUIRED_LABEL } from '../../data/constants';
 export default {
   name: 'SearchAddress',
   props: {
-    value: Object,
+    value: { type: Object, default: () => ({ street: '', zipCode: '', city: '' }) },
     caption: { type: String, default: 'Adresse' },
     errorLabel: { type: String, default: REQUIRED_LABEL },
     error: { type: Boolean, default: false },

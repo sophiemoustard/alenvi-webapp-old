@@ -366,7 +366,7 @@ export default {
       payload.company = this.company._id;
 
       if (!payload.identity.title) delete payload.identity.title;
-      if (!payload.contact.address.fullAddress) delete payload.contact.address;
+      if (!payload.contact.address.fullAddress) delete payload.contact;
 
       return payload;
     },

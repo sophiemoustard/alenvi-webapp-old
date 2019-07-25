@@ -454,9 +454,7 @@ export default {
           birthDate: { required },
           birthCountry: { required },
           birthState: {
-            required: requiredIf(() => {
-              return this.user.identity.birthCountry === 'FR';
-            }),
+            required: requiredIf(() => this.user.identity.birthCountry === 'FR'),
             numeric,
             minLength: minLength(2),
             maxLength: maxLength(3),
@@ -489,23 +487,17 @@ export default {
           },
           idCardRecto: {
             driveId: {
-              required: requiredIf(() => {
-                return this.user.administrative.identityDocs === 'cni';
-              }),
+              required: requiredIf(() => this.user.administrative.identityDocs === 'cni'),
             },
           },
           passport: {
             driveId: {
-              required: requiredIf(() => {
-                return this.user.administrative.identityDocs === 'pp';
-              }),
+              required: requiredIf(() => this.user.administrative.identityDocs === 'pp'),
             },
           },
           residencePermitRecto: {
             driveId: {
-              required: requiredIf(() => {
-                return this.user.administrative.identityDocs === 'ts';
-              }),
+              required: requiredIf(() => this.user.administrative.identityDocs === 'ts'),
             },
           },
           healthAttest: {

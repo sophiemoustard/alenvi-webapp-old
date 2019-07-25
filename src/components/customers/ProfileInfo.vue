@@ -954,7 +954,6 @@ export default {
       }
     },
     async updateAlenviCustomer (path) {
-      // if (path.match(/fullAddress/)) path = 'contact.address';
       let value = this.$_.get(this.customer, path);
       if (path.match(/iban/i)) value = value.split(' ').join('');
 
