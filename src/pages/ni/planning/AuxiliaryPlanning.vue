@@ -82,9 +82,9 @@ export default {
         absence: { required: requiredIf((item) => item.type === ABSENCE) },
         absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
         address: {
-          zipCode: { required: requiredIf(item => !!item.fullAddress) },
-          street: { required: requiredIf(item => !!item.fullAddress) },
-          city: { required: requiredIf(item => !!item.fullAddress) },
+          zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
+          street: { required: requiredIf(item => item && !!item.fullAddress) },
+          city: { required: requiredIf(item => item && !!item.fullAddress) },
           fullAddress: { frAddress },
         },
         repetition: {

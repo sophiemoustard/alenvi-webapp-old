@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 export const extend = (...sources) => {
   const extended = {};
   let deep = false;
@@ -89,4 +91,8 @@ export const formatFullIdentity = (identity) => {
 export const formatHours = (value, digits = 2) => {
   if (!value) return '0,00h';
   return `${parseFloat(value).toFixed(digits).replace('.', ',')}h`
+};
+
+export const formatHoursWithMinutes = (date) => {
+  return `${moment(date).hours()}h${moment(date).format('mm')}`;
 };
