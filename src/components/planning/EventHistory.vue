@@ -197,10 +197,11 @@ export default {
     },
     // Update
     getEventUpdateTitle () {
-      const { auxiliary, startDate, cancel } = this.history.update;
+      const { auxiliary, startDate, cancel, startHour } = this.history.update;
       if (auxiliary) return this.formatAuxiliaryUpdateTitle();
       if (startDate) return this.formatDatesUpdateTitle();
       if (cancel) return this.formatCancelUpdateTitle();
+      if (startHour) return this.formatHoursUpdateTitle();
     },
     formatAuxiliaryUpdateTitle () { // Auxiliary update : only for intervention and internal hour.
       const { from, to } = this.history.update.auxiliary
@@ -232,7 +233,20 @@ export default {
 
       if (this.customerName) title += ` chez ${this.customerName}`;
 
-      return `${title} déplacée du ${this.$moment(startDateFrom).format('DD/MM')} au ${this.$moment(startDateTo).format('DD/MM')}`
+      return `${title} déplacée du ${this.$moment(startDateFrom).format('DD/MM')} au ${this.$moment(startDateTo).format('DD/MM')}.`
+    },
+    formatHoursUpdateTitle () {
+      const { endHour, startHour } = this.history.update;
+      const { to: startHourTo } = startHour;
+      const { to: endHourTo } = endHour;
+
+      const pronom = this.isRepetition && this.history.event.type === INTERVENTION ? 'la ' : 'l\'';
+      let title = `Nouvel horaire pour ${pronom}${this.eventType.toLowerCase()} de ${this.auxiliaryName}`;
+      if (this.isRepetition) title += ` ${this.repetitionFrequency}`;
+      else title += ` le ${this.startDate}`
+      if (this.customerName) title += ` chez ${this.customerName}`;
+
+      return `${title} :  ${this.$moment(startHourTo).format('HH:mm')} - ${this.$moment(endHourTo).format('HH:mm')}.`
     },
     formatCancelUpdateTitle () { // Cancellation : only for intervention and not applied to repetitions.
       return `Annulation de l'${this.eventType.toLowerCase()} de ${this.auxiliaryName} le ${this.startDate} chez ${this.customerName}.`;
