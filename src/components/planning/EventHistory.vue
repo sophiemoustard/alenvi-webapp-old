@@ -36,7 +36,7 @@ import {
   EVENT_UPDATE,
   CANCELLATION_OPTIONS,
 } from '../../data/constants';
-import { formatAuxiliaryShortIdentity, formatCustomerShortIdentity } from '../../helpers/utils';
+import { formatAuxiliaryShortIdentity, formatCustomerShortIdentity, formatHoursWithMinutes } from '../../helpers/utils';
 
 export default {
   name: 'EventHistory',
@@ -65,10 +65,10 @@ export default {
       return this.$moment(this.history.event.endDate).format('DD/MM');
     },
     startHour () {
-      return `${this.$moment(this.history.event.startDate).hour()}h${this.$moment(this.history.event.startDate).format('mm')}`;
+      return formatHoursWithMinutes(this.history.event.startDate);
     },
     endHour () {
-      return `${this.$moment(this.history.event.endDate).hour()}h${this.$moment(this.history.event.endDate).format('mm')}`;
+      return formatHoursWithMinutes(this.history.event.endDate);
     },
     isOneDayEvent () {
       return this.$moment(this.history.event.startDate).isSame(this.history.event.endDate, 'day');
@@ -222,18 +222,14 @@ export default {
     },
     formatDatesUpdateTitle () {
       const { endDate, startDate } = this.history.update;
-      const { from: startDateFrom, to: startDateTo } = startDate;
-
-      let title = `${this.eventType} de ${this.auxiliaryName}`;
-
-      if (startDate && endDate) {
-        const { from: endDateFrom, to: endDateTo } = endDate;
-        return `${title} déplacée du ${this.$moment(startDateFrom).format('DD/MM')} - ${this.$moment(endDateFrom).format('DD/MM')} au ${this.$moment(startDateTo).format('DD/MM')} - ${this.$moment(endDateTo).format('DD/MM')}.`
-      }
-
+      let title = `Changement de dates pour l'${this.eventType.toLowerCase()} de ${this.auxiliaryName}`;
       if (this.customerName) title += ` chez ${this.customerName}`;
 
-      return `${title} déplacée du ${this.$moment(startDateFrom).format('DD/MM')} au ${this.$moment(startDateTo).format('DD/MM')}.`
+      if (startDate && endDate) {
+        title += ` : du ${this.$moment(startDate.to).format('DD/MM')} au ${this.$moment(endDate.to).format('DD/MM')}.`
+      } else title += ` : ${this.$moment(startDate.to).format('DD/MM')}.`
+
+      return title;
     },
     formatHoursUpdateTitle () {
       const { endHour, startHour } = this.history.update;
@@ -241,7 +237,7 @@ export default {
       const { to: endHourTo } = endHour;
 
       const pronom = this.isRepetition && this.history.event.type === INTERVENTION ? 'la ' : 'l\'';
-      let title = `Nouvel horaire pour ${pronom}${this.eventType.toLowerCase()} de ${this.auxiliaryName}`;
+      let title = `Changement d'heure pour ${pronom}${this.eventType.toLowerCase()} de ${this.auxiliaryName}`;
       if (this.isRepetition) title += ` ${this.repetitionFrequency}`;
       else title += ` le ${this.startDate}`
       if (this.customerName) title += ` chez ${this.customerName}`;
@@ -252,12 +248,40 @@ export default {
       return `Annulation de l'${this.eventType.toLowerCase()} de ${this.auxiliaryName} le ${this.startDate} chez ${this.customerName}.`;
     },
     getEventUpdateDetails () {
-      const { auxiliary, startDate, cancel } = this.history.update;
-      if (auxiliary || startDate) return this.getEventCreationDetails();
+      const { auxiliary, startDate, cancel, startHour } = this.history.update;
+      if (auxiliary) return this.getEventCreationDetails();
+      if (startDate) return this.formatDatesUpdateDetails();
       if (cancel) {
         const condition = CANCELLATION_OPTIONS.find(opt => opt.value === cancel.condition);
         return condition ? `${this.getEventDeletionDetails()} ${condition.label}.` : `${this.getEventDeletionDetails()}`;
       }
+      if (startHour) return this.formatHoursUpdateDetails();
+    },
+    formatDatesUpdateDetails () {
+      const { endDate, startDate } = this.history.update;
+      const startDateFrom = this.$moment(startDate.from).format('DD/MM');
+      const endDateFrom = endDate && this.$moment(endDate.from).format('DD/MM');
+
+      let details;
+      if (!this.isOneDayEvent) details = `${this.eventName}s initialement prévu(e)s du ${startDateFrom} au ${endDateFrom}.`;
+      else details = `${this.eventName} initialement prévu(e) le ${startDateFrom}.`;
+
+      const { address } = this.history.event;
+
+      return address && address.fullAddress ? `${details} ${address.fullAddress}.` : details;
+    },
+    formatHoursUpdateDetails () {
+      const { endHour, startHour } = this.history.update;
+      const startHourFrom = formatHoursWithMinutes(startHour.from);
+      const endHourFrom = formatHoursWithMinutes(endHour.from);
+
+      let details;
+      if (this.isRepetition) details = `${this.eventName}s initialement prévu(e)s de ${startHourFrom} à ${endHourFrom} à partir du ${this.startDate}.`;
+      else details = `${this.eventName} initialement prévu(e) de ${startHourFrom} à ${endHourFrom}.`;
+
+      const { address } = this.history.event;
+
+      return address && address.fullAddress ? `${details} ${address.fullAddress}.` : details;
     },
   },
 }
