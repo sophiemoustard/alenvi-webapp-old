@@ -16,10 +16,6 @@ import {
   EVERY_WEEK_DAY,
   EVERY_WEEK,
   EVERY_TWO_WEEKS,
-  INVOICED_AND_PAYED,
-  INVOICED_AND_NOT_PAYED,
-  CUSTOMER_INITIATIVE,
-  AUXILIARY_INITIATIVE,
   ABSENCE_TYPES,
   ABSENCE_NATURES,
   UNJUSTIFIED,
@@ -34,6 +30,8 @@ import {
   CUSTOMER,
   UNKNOWN_AVATAR,
   DEFAULT_AVATAR,
+  CANCELLATION_OPTIONS,
+  CANCELLATION_REASONS,
 } from '../data/constants';
 
 export const planningModalMixin = {
@@ -57,14 +55,8 @@ export const planningModalMixin = {
       DAILY,
       HOURLY,
       absenceNatureOptions: ABSENCE_NATURES,
-      cancellationConditions: [
-        { label: 'Facturée & payée', value: INVOICED_AND_PAYED },
-        { label: 'Facturée & non payée', value: INVOICED_AND_NOT_PAYED },
-      ],
-      cancellationReasons: [
-        { label: 'Initiative du client', value: CUSTOMER_INITIATIVE },
-        { label: 'Initiative du de l\'intervenant', value: AUXILIARY_INITIATIVE },
-      ],
+      cancellationConditions: CANCELLATION_OPTIONS,
+      cancellationReasons: CANCELLATION_REASONS,
       addressError: 'Adresse non valide',
     };
   },

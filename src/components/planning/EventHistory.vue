@@ -18,7 +18,24 @@
 </template>
 
 <script>
-import { EVENT_CREATION, INTERNAL_HOUR, ABSENCE, EVENT_DELETION, DEFAULT_AVATAR, ABSENCE_TYPES, EVENT_TYPES, INTERVENTION, UNAVAILABILITY, NEVER, EVERY_DAY, EVERY_WEEK_DAY, EVERY_WEEK, EVERY_TWO_WEEKS, EVENT_UPDATE } from '../../data/constants';
+import {
+  EVENT_CREATION,
+  INTERNAL_HOUR,
+  ABSENCE,
+  EVENT_DELETION,
+  DEFAULT_AVATAR,
+  ABSENCE_TYPES,
+  EVENT_TYPES,
+  INTERVENTION,
+  UNAVAILABILITY,
+  NEVER,
+  EVERY_DAY,
+  EVERY_WEEK_DAY,
+  EVERY_WEEK,
+  EVERY_TWO_WEEKS,
+  EVENT_UPDATE,
+  CANCELLATION_OPTIONS,
+} from '../../data/constants';
 import { formatAuxiliaryShortIdentity, formatCustomerShortIdentity } from '../../helpers/utils';
 
 export default {
@@ -148,12 +165,13 @@ export default {
     getEventCreationDetails () {
       if (!this.isOneDayEvent) return `${this.eventName} planifié(e) du ${this.startDate} au ${this.endDate}.`;
 
-      const { address } = this.history.event;
       let details;
-      if (this.isRepetition) details = `${this.eventName}s de ${this.startHour} à ${this.endHour} à partir du ${this.startDate}.`;
+      if (this.isRepetition) details = `${this.eventName}s planifié(e)s de ${this.startHour} à ${this.endHour} à partir du ${this.startDate}.`;
       else details = `${this.eventName} planifié(e) le ${this.startDate} de ${this.startHour} à ${this.endHour}.`;
 
-      return address && address.fullAddress ? `${details} ${address.fullAddress}.` : details;
+      const { address } = this.history.event;
+
+      return address && address ? `${details} ${address.fullAddress}.` : details;
     },
     // Deletion
     getEventDeletionTitle () {
@@ -169,22 +187,22 @@ export default {
     getEventDeletionDetails () {
       if (this.history.event.type === ABSENCE) return;
 
-      const { address } = this.history.event;
       let details;
       if (this.isRepetition) details = `${this.eventName}s initialement prévu(e)s de ${this.startHour} à ${this.endHour} à partir du ${this.startDate}.`;
       else details = `${this.eventName} initialement prévu(e) de ${this.startHour} à ${this.endHour}.`;
+
+      const { address } = this.history.event;
 
       return address && address.fullAddress ? `${details} ${address.fullAddress}.` : details;
     },
     // Update
     getEventUpdateTitle () {
-      const { auxiliary, startDate } = this.history.update;
+      const { auxiliary, startDate, cancel } = this.history.update;
       if (auxiliary) return this.formatAuxiliaryUpdateTitle();
-      if (startDate) {
-        return this.formatDatesUpdateTitle();
-      }
+      if (startDate) return this.formatDatesUpdateTitle();
+      if (cancel) return this.formatCancelUpdateTitle();
     },
-    formatAuxiliaryUpdateTitle () {
+    formatAuxiliaryUpdateTitle () { // Auxiliary update : only for intervention and internal hour.
       const { from, to } = this.history.update.auxiliary
       const toAuxiliary = to && to.identity ? formatAuxiliaryShortIdentity(to.identity) : 'À affecter';
       const fromAuxiliary = from && from.identity ? formatAuxiliaryShortIdentity(from.identity) : 'À affecter';
@@ -217,10 +235,15 @@ export default {
 
       return `${title} déplacée du ${this.$moment(startDateFrom).format('DD/MM')} au ${this.$moment(startDateTo).format('DD/MM')}`
     },
+    formatCancelUpdateTitle () { // Cancellation : only for intervention and not applied to repetitions.
+      return `Annulation de l'${this.eventType.toLowerCase()} de ${this.auxiliaryName} le ${this.startDate} chez ${this.customerName}.`;
+    },
     getEventUpdateDetails () {
-      const { auxiliary, startDate } = this.history.update;
-      if (auxiliary || startDate) {
-        return this.getEventCreationDetails();
+      const { auxiliary, startDate, cancel } = this.history.update;
+      if (auxiliary || startDate) return this.getEventCreationDetails();
+      if (cancel) {
+        const condition = CANCELLATION_OPTIONS.find(opt => opt.value === cancel.condition);
+        return condition ? `${this.getEventDeletionDetails()} ${condition.label}.` : `${this.getEventDeletionDetails()}`;
       }
     },
   },
