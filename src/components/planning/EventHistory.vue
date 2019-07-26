@@ -207,16 +207,15 @@ export default {
       const toAuxiliary = to && to.identity ? formatAuxiliaryShortIdentity(to.identity) : 'À affecter';
       const fromAuxiliary = from && from.identity ? formatAuxiliaryShortIdentity(from.identity) : 'À affecter';
 
-      let title = '';
-      if (to && to.identity && from && from.identity) title = `${toAuxiliary} remplace ${fromAuxiliary} `;
-
-      if (this.isRepetition) title += `${this.eventType} ${this.repetitionFrequency}`;
-      else title += `${this.eventType} du ${this.startDate}`;
-
+      let title = `Changement d'auxiliaire pour `;
+      const pronom = this.isRepetition && this.history.event.type === INTERVENTION ? 'la ' : 'l\'';
+      if (this.isRepetition) title += `${pronom}${this.eventType.toLowerCase()} ${this.repetitionFrequency}`;
+      else title += `${pronom}${this.eventType.toLowerCase()} du ${this.startDate}`;
       if (this.customerName) title += ` chez ${this.customerName}`;
 
-      if ((!to || !to.identity) && from && from.identity) title += ` passée en à affecter.`;
-      else if ((!from || !from.identity) && to && to.identity) title += ` affectée à ${toAuxiliary}`;
+      if (to && to.identity && from && from.identity) title += ` : ${toAuxiliary} remplace ${fromAuxiliary}`;
+      else if (to && to.identity) title += ` : affectée à ${toAuxiliary}`;
+      else title += ` : passée en à affecter.`;
 
       return title;
     },
@@ -228,7 +227,7 @@ export default {
 
       if (startDate && endDate) {
         const { from: endDateFrom, to: endDateTo } = endDate;
-        return `${title} déplacée du ${this.$moment(startDateFrom).format('DD/MM')} - ${this.$moment(endDateFrom).format('DD/MM')} au ${this.$moment(startDateTo).format('DD/MM')} - ${this.$moment(endDateTo).format('DD/MM')}`
+        return `${title} déplacée du ${this.$moment(startDateFrom).format('DD/MM')} - ${this.$moment(endDateFrom).format('DD/MM')} au ${this.$moment(startDateTo).format('DD/MM')} - ${this.$moment(endDateTo).format('DD/MM')}.`
       }
 
       if (this.customerName) title += ` chez ${this.customerName}`;
