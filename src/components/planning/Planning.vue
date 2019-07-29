@@ -91,7 +91,7 @@
       </table>
     </div>
     <q-page-sticky expand position="right">
-      <ni-event-history-feed v-if="displayHistory" :eventHistories="eventHistories" />
+      <ni-event-history-feed v-if="displayHistory" :eventHistories="eventHistories" :displayHistory.sync="displayHistory" />
     </q-page-sticky>
   </div>
 </template>

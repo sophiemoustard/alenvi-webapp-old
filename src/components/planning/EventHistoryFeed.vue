@@ -1,6 +1,11 @@
 <template>
   <div class="history-container" :style="{ height: `${height}px`, top: `${this.top}px` }" >
-    <div></div>
+    <div class="row q-pa-md">
+      <div class="col-11">Flux d'activité</div>
+      <div class="col-1 cursor-pointer">
+        <q-icon name="clear" size="16px" @click.native="close" />
+      </div>
+    </div>
     <q-scroll-area>
       <ni-event-history v-for="history in eventHistories" :key="history._id" :history="history" />
     </q-scroll-area>
@@ -25,6 +30,11 @@ export default {
   },
   components: {
     'ni-event-history': NiEventHistory,
+  },
+  methods: {
+    close () {
+      this.$emit('update:displayHistory', false);
+    },
   },
 }
 </script>
