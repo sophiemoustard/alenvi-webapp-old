@@ -84,7 +84,7 @@ export default {
   },
   computed: {
     isBusy () {
-      return this.ratio.contractHours !== 0 && this.ratio.weeklyHours > this.ratio.contractHours;
+      return this.ratio.contractHours !== 0 && this.ratio.weeklyHours >= this.ratio.contractHours;
     },
     endOfWeek () {
       return this.$moment(this.startOfWeekAsString).endOf('w').toISOString();
