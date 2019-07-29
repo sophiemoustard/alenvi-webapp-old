@@ -214,9 +214,9 @@ export default {
       else title += `${pronom}${this.eventType.toLowerCase()} du ${this.startDate}`;
       if (this.customerName) title += ` chez ${this.customerName}`;
 
-      if (to && to.identity && from && from.identity) title += ` : ${toAuxiliary} remplace ${fromAuxiliary}`;
-      else if (to && to.identity) title += ` : affectée à ${toAuxiliary}`;
-      else title += ` : passée en à affecter.`;
+      if (to && to.identity && from && from.identity) title += `\xa0: ${toAuxiliary} remplace ${fromAuxiliary}`;
+      else if (to && to.identity) title += `\xa0: affectée à ${toAuxiliary}`;
+      else title += `\xa0: passée en à affecter.`;
 
       return title;
     },
@@ -226,8 +226,8 @@ export default {
       if (this.customerName) title += ` chez ${this.customerName}`;
 
       if (startDate && endDate) {
-        title += ` : du ${this.$moment(startDate.to).format('DD/MM')} au ${this.$moment(endDate.to).format('DD/MM')}.`
-      } else title += ` : ${this.$moment(startDate.to).format('DD/MM')}.`
+        title += `\xa0: du ${this.$moment(startDate.to).format('DD/MM')} au ${this.$moment(endDate.to).format('DD/MM')}.`
+      } else title += `\xa0: ${this.$moment(startDate.to).format('DD/MM')}.`
 
       return title;
     },
@@ -242,7 +242,7 @@ export default {
       else title += ` le ${this.startDate}`
       if (this.customerName) title += ` chez ${this.customerName}`;
 
-      return `${title} :  ${this.$moment(startHourTo).format('HH:mm')} - ${this.$moment(endHourTo).format('HH:mm')}.`
+      return `${title}\xa0:  ${this.$moment(startHourTo).format('HH:mm')} - ${this.$moment(endHourTo).format('HH:mm')}.`
     },
     formatCancelUpdateTitle () { // Cancellation : only for intervention and not applied to repetitions.
       return `Annulation de l'${this.eventType.toLowerCase()} de ${this.auxiliaryName} le ${this.startDate} chez ${this.customerName}.`;
