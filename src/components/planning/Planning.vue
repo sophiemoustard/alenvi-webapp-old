@@ -108,7 +108,7 @@ import {
   COACH,
   ADMIN,
 } from '../../data/constants';
-import { NotifyNegative } from '../popup/notify';
+import { NotifyNegative, NotifyWarning } from '../popup/notify';
 import NiChipAuxiliaryIndicator from './ChipAuxiliaryIndicator';
 import NiChipCustomerIndicator from './ChipCustomerIndicator';
 import NiPlanningEvent from './PlanningEvent';
@@ -300,7 +300,7 @@ export default {
           ],
         });
       }
-      if (!can) return;
+      if (!can) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
 
       this.$emit('createEvent', eventInfo);
     },

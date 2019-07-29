@@ -417,7 +417,7 @@ export default {
       const rowEvents = this.getRowEvents(rowId);
       const event = rowEvents.find(ev => ev._id === eventId);
       const can = this.canEditEvent(event);
-      if (!can) return;
+      if (!can) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
       this.formatEditedEvent(event);
 
       this.editionModal = true;
