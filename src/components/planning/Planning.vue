@@ -2,7 +2,7 @@
   <div :class="[{ 'planning': !toggleDrawer }]">
     <div class="row items-center planning-header">
       <div class="col-xs-12 col-md-5 planning-search">
-        <ni-chips-autocomplete ref="refFilter" v-model="terms" />
+        <ni-chips-autocomplete ref="refFilter" v-model="terms" :disable="displayAllSectors" />
         <q-btn v-if="!isCustomerPlanning" flat round icon="people" @click="toggleAllSectors"
           :color="displayAllSectors ? 'primary' : ''" />
       </div>
