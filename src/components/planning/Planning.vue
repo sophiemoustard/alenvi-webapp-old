@@ -2,8 +2,8 @@
   <div :class="[{ 'planning': !toggleDrawer }]">
     <div class="row items-center planning-header">
       <div class="col-xs-12 col-md-5 planning-search">
-        <ni-chips-autocomplete ref="refFilter" v-model="terms" />
-        <q-btn v-if="!isCustomerPlanning" flat round icon="people" @click="toggleAllSectors"
+        <ni-chips-autocomplete ref="refFilter" v-model="terms" :disable="displayAllSectors" />
+        <q-btn v-if="!isCustomerPlanning && isCoach" flat round icon="people" @click="toggleAllSectors"
           :color="displayAllSectors ? 'primary' : ''" />
       </div>
       <div class="col-xs-12 col-md-7 row planning-timeline">
@@ -105,6 +105,8 @@ import {
   STAFFING_VIEW_START_HOUR,
   STAFFING_VIEW_END_HOUR,
   UNKNOWN_AVATAR,
+  COACH,
+  ADMIN,
 } from '../../data/constants';
 import { NotifyNegative } from '../popup/notify';
 import NiChipAuxiliaryIndicator from './ChipAuxiliaryIndicator';
@@ -189,10 +191,14 @@ export default {
     getUser () {
       return this.$store.getters['main/user'];
     },
+    isCoach () {
+      return [COACH, ADMIN].includes(this.getUser.role.name);
+    },
   },
   methods: {
     toggleAllSectors () {
       this.$emit('update:displayAllSectors', !this.displayAllSectors);
+      this.terms = [];
     },
     getTimelineHours () {
       const range = this.$moment.range(this.$moment().hours(STAFFING_VIEW_START_HOUR).minutes(0), this.$moment().hours(STAFFING_VIEW_END_HOUR).minutes(0));
