@@ -207,7 +207,7 @@ export default {
           { name: 'planning:create', rule: 'isOwner' },
         ],
       });
-      if (!can) return;
+      if (!can) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
 
       const selectedDay = this.days[dayIndex];
       if (!this.canCreateEvent(this.selectedAuxiliary, selectedDay)) return NotifyWarning('Impossible de créer un évènement à cette date à cette auxiliaire.');
@@ -239,7 +239,7 @@ export default {
     // Event edition
     openEditionModal (event) {
       const can = this.canEditEvent(event);
-      if (!can) return;
+      if (!can) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
       this.formatEditedEvent(event);
       if (event.type !== ABSENCE && this.selectedAuxiliary) {
         this.selectedAuxiliary.hasActiveCustomerContractOnEvent = this.hasActiveCustomerContractOnEvent(this.selectedAuxiliary, event.startDate);
