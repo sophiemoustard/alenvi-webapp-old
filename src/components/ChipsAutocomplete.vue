@@ -1,7 +1,7 @@
 <template>
   <q-chips-input ref="refFilter" class="input-search" :value="value" @input="input" @add="addEvent" @remove="removeEvent"
     :before="searchIcon" chips-bg-color="primary" inverted-light color="white" add-icon="x" :disable="disable"
-    :style="{ width: disable && '40px'}">
+    :style="disable && { width: '40px'}">
     <q-autocomplete ref="refAutocomplete" @search="search" :debounce='0'/>
   </q-chips-input>
 </template>

@@ -193,6 +193,7 @@ export default {
   methods: {
     toggleAllSectors () {
       this.$emit('update:displayAllSectors', !this.displayAllSectors);
+      this.terms = [];
     },
     getTimelineHours () {
       const range = this.$moment.range(this.$moment().hours(STAFFING_VIEW_START_HOUR).minutes(0), this.$moment().hours(STAFFING_VIEW_END_HOUR).minutes(0));

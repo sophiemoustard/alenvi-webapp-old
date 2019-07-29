@@ -144,6 +144,7 @@ export default {
         this.filteredSectors = [];
         this.events = [];
       } else {
+        this.filteredAuxiliaries = [];
         this.auxiliaries = this.getFilter.filter(fil => fil.type === PERSON);
         this.filteredSectors = this.getFilter.filter(fil => fil.type === SECTOR);
         await this.refresh();
