@@ -1,13 +1,13 @@
 <template>
   <div class="items-center row justify-center planning-navigation">
-    <div class="planning-month col-6" @click="datimeModal = !datimeModal">
+    <div class="planning-month col-7" @click="datimeModal = !datimeModal">
       <span class="capitalize">{{ timelineTitle }}</span>
       <q-icon name="arrow_drop_down" />
       <q-popover v-model="datimeModal" self="top middle" anchor="bottom middle">
         <q-datetime-picker minimal @input="goToWeek" :value="targetDate" />
       </q-popover>
     </div>
-    <div class="row planning-actions col-6">
+    <div class="row planning-actions col-5">
       <q-btn icon="chevron_left" flat round @click="goToPreviousWeek()"></q-btn>
       <q-btn icon="chevron_right" flat round @click="goToNextWeek()"></q-btn>
       <q-btn icon="today" flat round @click="goToToday"></q-btn>
