@@ -176,7 +176,10 @@ export default {
     // Deletion
     getEventDeletionTitle () {
       const pronom = this.isRepetition && this.history.event.type === INTERVENTION ? 'la ' : 'l\'';
-      if (this.isRepetition) return `Suppression de ${pronom}${this.eventType.toLowerCase()} ${this.repetitionFrequency} à partir du ${this.startDate}.`;
+      if (this.isRepetition) {
+        const title = `Suppression de ${pronom}${this.eventType.toLowerCase()} ${this.repetitionFrequency} à partir du ${this.startDate}.`;
+        return this.customerName ? `${title} chez ${this.customerName}.` : `${title}.`
+      }
 
       const typeAndAuxiliary = `Suppression de l'${this.eventType.toLowerCase()} de ${this.auxiliaryName}`;
       if (!this.isOneDayEvent) return `${typeAndAuxiliary} du ${this.startDate} au ${this.endDate}.`;
