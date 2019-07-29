@@ -175,8 +175,8 @@ export default {
     },
     // Deletion
     getEventDeletionTitle () {
-      const pronom = this.isRepetition && this.history.event.type === INTERVENTION ? 'la ' : 'l\'';
       if (this.isRepetition) {
+        const pronom = this.history.event.type === INTERVENTION ? 'la ' : 'l\'';
         const title = `Suppression de ${pronom}${this.eventType.toLowerCase()} ${this.repetitionFrequency} à partir du ${this.startDate}.`;
         return this.customerName ? `${title} chez ${this.customerName}.` : `${title}.`
       }
