@@ -240,7 +240,7 @@ export default {
       const { to: endHourTo } = endHour;
 
       const pronom = this.isRepetition && this.history.event.type === INTERVENTION ? 'la ' : 'l\'';
-      let title = `Changement d'heure pour ${pronom}${this.eventType.toLowerCase()} de ${this.auxiliaryName}`;
+      let title = `Changement d'horaire pour ${pronom}${this.eventType.toLowerCase()} de ${this.auxiliaryName}`;
       if (this.isRepetition) title += ` ${this.repetitionFrequency}`;
       else title += ` le ${this.startDate}`
       if (this.customerName) title += ` chez ${this.customerName}`;
