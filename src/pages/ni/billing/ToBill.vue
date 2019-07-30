@@ -47,7 +47,7 @@ import ToBillRow from '../../../components/table/ToBillRow';
 import BillingPagination from '../../../components/table/BillingPagination';
 import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
 import { billingMixin } from '../../../mixins/billingMixin.js';
-import { formatPrice, formatCustomerShortIdentityReverse } from '../../../helpers/utils';
+import { formatPrice, formatIdentity } from '../../../helpers/utils';
 
 export default {
   name: 'ToBill',
@@ -86,7 +86,7 @@ export default {
           name: 'customer',
           label: 'Bénéficiaire',
           align: 'left',
-          field: row => formatCustomerShortIdentityReverse(row.customer.identity),
+          field: row => formatIdentity(row.customer.identity, 'Lf'),
         },
         {
           name: 'client',

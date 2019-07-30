@@ -68,10 +68,10 @@
                     :startOfWeekAsString="startOfWeek.toISOString()" :distanceMatrix="distanceMatrix" />
                 </div>
                 <div v-if="isCustomerPlanning" class="person-name overflow-hidden-nowrap">
-                  {{ person.identity | formatCustomerShortIdentity }}
+                  {{ person.identity | formatIdentity('fL') }}
                 </div>
                 <div v-else class="person-name overflow-hidden-nowrap">
-                  {{ person.identity | formatAuxiliaryShortIdentity }}
+                  {{ person.identity | formatIdentity('Fl') }}
                 </div>
               </div>
             </td>
@@ -118,7 +118,7 @@ import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import { planningEventMixin } from '../../mixins/planningEventMixin';
 import PlanningNavigation from './PlanningNavigation.vue';
 import distanceMatrix from '../../api/DistanceMatrix';
-import { formatCustomerShortIdentity, formatAuxiliaryShortIdentity } from '../../helpers/utils';
+import { formatIdentity } from '../../helpers/utils';
 
 export default {
   name: 'PlanningManager',
@@ -317,8 +317,7 @@ export default {
     },
   },
   filters: {
-    formatCustomerShortIdentity,
-    formatAuxiliaryShortIdentity,
+    formatIdentity,
   },
 }
 </script>

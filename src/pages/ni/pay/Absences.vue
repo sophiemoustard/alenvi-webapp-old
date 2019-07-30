@@ -42,7 +42,7 @@ import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES, HOURLY } from '../../../data/c
 import BillingPagination from '../../../components/table/BillingPagination';
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
-import { formatAuxiliaryShortIdentity } from '../../../helpers/utils';
+import { formatIdentity } from '../../../helpers/utils';
 import { NotifyWarning } from '../../../components/popup/notify';
 
 export default {
@@ -71,7 +71,7 @@ export default {
           name: 'auxiliary',
           label: 'Auxiliaire',
           field: 'auxiliary',
-          format: value => formatAuxiliaryShortIdentity(value.identity),
+          format: value => formatIdentity(value.identity, 'Fl'),
           align: 'left',
         },
         {

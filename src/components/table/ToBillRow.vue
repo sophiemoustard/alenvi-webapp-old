@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import { formatPrice, getLastVersion, formatCustomerShortIdentityReverse } from '../../helpers/utils.js';
+import { formatPrice, getLastVersion, formatIdentity } from '../../helpers/utils.js';
 import { FIXED } from '../../data/constants.js';
 import EditableTd from './EditableTd';
 
@@ -76,7 +76,7 @@ export default {
       return value ? `${this.$moment(value).format('DD/MM/YY')}` : '';
     },
     getClientName (customer, bill) {
-      if (!bill.thirdPartyPayer) return formatCustomerShortIdentityReverse(customer.identity);
+      if (!bill.thirdPartyPayer) return formatIdentity(customer.identity, 'Lf');
       return bill.thirdPartyPayer.name.length > 35 ? `${bill.thirdPartyPayer.name.substring(0, 35)}...` : bill.thirdPartyPayer.name;
     },
     getExclTaxesDiscount (bill) {
@@ -95,9 +95,6 @@ export default {
     disableDiscountEditing (bill) {
       bill.discountEdition = false;
     },
-  },
-  filters: {
-    formatCustomerShortIdentityReverse,
   },
 }
 </script>

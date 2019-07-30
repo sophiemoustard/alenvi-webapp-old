@@ -21,7 +21,7 @@
 
 <script>
 import { AUXILIARY } from '../../../data/constants.js';
-import { formatFullIdentity } from '../../../helpers/utils';
+import { formatIdentity } from '../../../helpers/utils';
 
 export default {
   props: {
@@ -77,7 +77,7 @@ export default {
       try {
         this.tableLoading = true;
         const customers = await this.$customers.showAll();
-        this.customersList = customers.map(customer => ({ name: formatFullIdentity(customer.identity), customerId: customer._id }));
+        this.customersList = customers.map(customer => ({ name: formatIdentity(customer.identity, 'FL'), customerId: customer._id }));
         this.tableLoading = false;
       } catch (e) {
         this.tableLoading = false;
