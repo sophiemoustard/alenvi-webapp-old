@@ -157,7 +157,7 @@ import ModalSelect from '../../../components/form/ModalSelect';
 import OptionGroup from '../../../components/form/OptionGroup';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { positiveNumber } from '../../../helpers/vuelidateCustomVal.js';
-import { formatPrice, getLastVersion, formatCustomerShortIdentity, formatFullIdentity } from '../../../helpers/utils.js';
+import { formatPrice, getLastVersion, formatCustomerShortIdentityReverse, formatFullIdentity } from '../../../helpers/utils.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
 import { COMPANI } from '../../../data/constants';
 
@@ -225,7 +225,7 @@ export default {
           name: 'customer',
           label: 'Bénéficiaire',
           align: 'left',
-          field: row => formatCustomerShortIdentity(row.customer.identity),
+          field: row => formatCustomerShortIdentityReverse(row.customer.identity),
         },
         {
           name: 'thirdPartyPayer',

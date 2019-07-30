@@ -71,6 +71,16 @@ export const formatCustomerShortIdentity = (identity) => {
   return identityShort.toUpperCase();
 };
 
+export const formatCustomerShortIdentityReverse = (identity) => {
+  if (!identity) return '';
+
+  let identityShort = (identity.lastname || '').trim();
+  const firstname = (identity.firstname || '').trim();
+  identityShort += firstname ? ` ${firstname.slice(0, 1)}.` : '';
+
+  return identityShort.toUpperCase();
+};
+
 export const formatAuxiliaryShortIdentity = (identity) => {
   if (!identity) return '';
 
