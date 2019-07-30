@@ -84,7 +84,7 @@ export const formatIdentity = (identity, format) => {
 
       return `${firstname} ${lastname}`;
     case 'Lf':
-      firstname = (identity.firstname || '').trim().toUpperCase();
+      firstname = (identity.firstname || '').trim();
       firstname = firstname ? `${firstname.slice(0, 1).toUpperCase()}. ` : '';
       lastname = (identity.lastname || '').trim().toUpperCase();
 

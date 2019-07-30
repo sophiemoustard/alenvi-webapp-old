@@ -10,7 +10,7 @@ export const payMixin = {
           label: 'Auxiliaire',
           align: 'left',
           field: 'auxiliary',
-          format: value => value ? formatIdentity(value.identity, 'Fl') : '',
+          format: value => value ? formatIdentity(value.identity, 'FL') : '',
         },
         {
           name: 'sector',

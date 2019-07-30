@@ -71,7 +71,7 @@ export default {
           name: 'auxiliary',
           label: 'Auxiliaire',
           field: 'auxiliary',
-          format: value => formatIdentity(value.identity, 'Fl'),
+          format: value => formatIdentity(value.identity, 'FL'),
           align: 'left',
         },
         {
