@@ -12,15 +12,19 @@ export const paymentMixin = {
       PAYMENT,
       DIRECT_DEBIT,
       PAYMENT_OPTIONS,
-      newPayment: {
+      defaultPayment: {
         nature: PAYMENT,
         customer: null,
         client: null,
         netInclTaxes: 0,
         type: '',
-        date: '',
+        date: new Date(),
       },
+      newPayment: null,
     }
+  },
+  created () {
+    this.newPayment = { ...this.defaultPayment };
   },
   validations: {
     newPayment: {
@@ -42,14 +46,7 @@ export const paymentMixin = {
       this.paymentCreationModal = false;
       this.selectedCustomer = { identity: {} };
       this.selectedClientName = '';
-      this.newPayment = {
-        nature: PAYMENT,
-        customer: null,
-        client: null,
-        netInclTaxes: 0,
-        type: '',
-        date: '',
-      };
+      this.newPayment = { ...this.defaultPayment };
       this.$v.newPayment.$reset();
     },
     formatPayload (payment) {
