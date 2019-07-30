@@ -3,8 +3,8 @@
     <div class="row items-center planning-header">
       <div class="col-xs-12 col-md-5 planning-search">
         <ni-chips-autocomplete ref="refFilter" v-model="terms" :disable="displayAllSectors" />
-        <q-btn v-if="!isCustomerPlanning && isCoach" flat round icon="people" @click="toggleAllSectors"
-          :color="displayAllSectors ? 'primary' : ''" />
+        <q-btn v-if="!isCustomerPlanning && isCoach" flat round :icon="displayAllSectors ? 'arrow_forward' : 'people'"
+          @click="toggleAllSectors" :color="displayAllSectors ? 'primary' : ''" />
       </div>
       <div class="col-xs-12 col-md-7 row planning-timeline">
         <planning-navigation class="col-10" :timelineTitle="timelineTitle()" :targetDate="targetDate" :type="PLANNING"
