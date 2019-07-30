@@ -5,6 +5,9 @@
         <p class="text-weight-bold">{{ this.customer.identity | formatFullIdentity }}</p>
         <ni-date-range v-model="billingDates" @input="refresh" :error.sync="billingDatesHasError" />
       </div>
+      <div v-if="user.role.name === HELPER && !loading" class="message">
+        Si vous souhaitez obtenir une facture non disponible sur cette page, adressez un email à support@alenvi.io.
+      </div>
       <ni-customer-billing-table v-if="!loading" :documents="customerBillingDocuments" :billingDates="billingDates"
         :displayActions="user.role.name === ADMIN || user.role.name === COACH" @openEditionModal="openEditionModal"
         :type="CUSTOMER" :startBalance="getStartBalance()" :endBalance="getEndBalance(customerBillingDocuments)" />
@@ -12,9 +15,6 @@
         <q-btn class="add-payment" label="Ajouter un réglement" @click="openPaymentCreationModal(customer)"
           no-caps flat color="white" icon="add" />
       </div>
-    <span v-if="user.role.name === HELPER && !loading" class="message">
-      Si vous souhaitez obtenir une facture non disponible sur cette page, adressez un email à support@alenvi.io.
-    </span>
     </div>
     <template v-for="(tpp, index) in Object.keys(tppBillingDocuments)">
       <div class="q-pa-sm q-mb-lg" :key="index">
@@ -305,4 +305,5 @@ export default {
 
   .message
     font-style: italic;
+    margin: 5px 0;
 </style>
