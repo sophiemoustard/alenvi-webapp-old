@@ -123,7 +123,10 @@ export default {
   },
   methods: {
     getPaymentTitle (payment) {
-      return payment.nature === PAYMENT ? `Paiement ${payment.number}` : `Remboursement ${payment.number}`;
+      const titlePrefix = payment.nature === PAYMENT ? `Paiement ${payment.number}` : `Remboursement ${payment.number}`;
+      const paymentOption = PAYMENT_OPTIONS.find(opt => opt.value === payment.type);
+      const typeLabel = paymentOption ? ` (${paymentOption.label})` : '';
+      return `${titlePrefix}${typeLabel}`;
     },
     formatDate (value) {
       return value ? `${this.$moment(value).format('DD/MM/YY')}` : '';
