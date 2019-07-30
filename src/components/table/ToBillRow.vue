@@ -6,7 +6,7 @@
       </template>
       <template v-if="index === 0 && col.name === 'customer'">
         <span class="uppercase text-weight-bold">
-          {{ props.row.customer.identity | formatCustomerShortIdentityReverse }}
+          {{ col.value }}
         </span>
       </template>
       <template v-else-if="index === 0 && col.name === 'client'">
