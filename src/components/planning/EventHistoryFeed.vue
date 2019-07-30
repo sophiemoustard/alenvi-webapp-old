@@ -1,6 +1,6 @@
 <template>
   <div class="history-container" :style="{ height: `${height}px`, top: `${this.top}px` }" >
-    <div class="row q-pa-md">
+    <div class="row history-title">
       <div class="col-11">Flux d'activité</div>
       <div class="col-1 cursor-pointer">
         <q-icon name="clear" size="16px" @click.native="close" />
@@ -53,5 +53,9 @@ export default {
     box-shadow: 0 3px 5px -1px rgba(0,0,0,0.2), 0 5px 8px rgba(0,0,0,0.14), 0 1px 14px rgba(0,0,0,0.12)
     .q-scrollarea
       height: 100%;
+
+  .history-title
+    margin: 10px 2px;
+    padding: 5px;
 
 </style>
