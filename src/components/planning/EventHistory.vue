@@ -296,15 +296,13 @@ export default {
     margin: 2px;
     width: 100%;
     display: block;
-    font-size: 15px;
-    @media (max-width: 767px)
-      font-size: 14px
+    font-size: 13px;
     &:after
       content: "";
       display: block;
       margin: auto;
       width: 95%;
-      border-bottom: 1px solid $light-grey;
+      border-bottom: 1px solid $grey-3;
     .avatar
       height: 20px !important;
       width: 20px !important;
@@ -321,13 +319,15 @@ export default {
         height: 20px;
 
     .history-details
-      font-size: 14px;
+      font-size: 12px;
+      color: $dark-grey;
       margin: 3px 0 5px;
 
       .history-misc
         font-style: italic;
 
     .history-signature
+      color: $dark-grey;
       font-size: 12px;
       font-style: italic;
       display: flex;
