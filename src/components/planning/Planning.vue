@@ -65,7 +65,7 @@
                   <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person"
                     :events="getPersonEvents(person)" />
                   <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)"
-                    :startOfWeekAsString="startOfWeek.toISOString()" :distanceMatrix="distanceMatrix" />
+                    :startOfWeekAsString="startOfWeek.toISOString()" :dm="distanceMatrix" />
                 </div>
                 <div v-if="isCustomerPlanning" class="person-name overflow-hidden-nowrap">
                   {{ person.identity | formatIdentity('fL') }}
