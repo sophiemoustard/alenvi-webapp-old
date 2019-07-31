@@ -2,7 +2,11 @@
   <div class="history">
     <div class="history-title">
       <div class="history-info">
-        <div>{{ historyInfo.title }}</div>
+        <div>
+          {{ historyInfo.title.pre }}<span class="type">{{ eventType }}</span>
+          <template v-if="!isAuxiliaryUpdate"> de <span class="auxiliary">{{ auxiliaryName }}</span></template>
+          {{ historyInfo.title.post }}
+        </div>
         <q-btn v-if="historyInfo.details" color="primary" size="10px" flat round icon="remove_red_eye" @click="toggleDetails" />
       </div>
       <div v-if="displayDetails" class="history-details">
@@ -45,7 +49,6 @@ export default {
   },
   data () {
     return {
-      EVENT_DELETION,
       displayDetails: false,
     };
   },
@@ -77,6 +80,9 @@ export default {
       const { repetition } = this.history.event;
       return !!repetition && repetition.frequency !== NEVER;
     },
+    isAuxiliaryUpdate () {
+      return this.history.action === EVENT_UPDATE && !!this.history.update.auxiliary;
+    },
     repetitionFrequency () {
       if (!this.isRepetition) return;
 
@@ -97,11 +103,11 @@ export default {
       if (!this.$_.has(this.history, 'event.type')) return '';
 
       const { type } = this.history.event;
-      if (this.isRepetition && type === INTERVENTION) return 'Répétition';
-      else if (type === INTERNAL_HOUR) return 'Heure interne';
+      if (this.isRepetition && type === INTERVENTION) return 'répétition';
+      else if (type === INTERNAL_HOUR) return 'heure interne';
       else {
         const eventType = EVENT_TYPES.find(t => t.value === type);
-        return eventType ? eventType.label : '';
+        return eventType ? eventType.label.toLowerCase() : '';
       }
     },
     eventName () {
@@ -154,13 +160,15 @@ export default {
     },
     // Creation
     getEventCreationTitle () {
-      const typeAndAuxiliary = `Nouvelle ${this.eventType.toLowerCase()} de ${this.auxiliaryName}`;
+      const pre = 'Nouvelle ';
+      let post;
+      if (!this.isOneDayEvent) post = ` du ${this.startDate} au ${this.endDate}.`;
+      else if (this.isRepetition && this.customerName) post = ` ${this.repetitionFrequency} chez ${this.customerName}.`;
+      else if (this.isRepetition) post = ` ${this.repetitionFrequency}.`;
+      else if (this.customerName) post = ` le ${this.startDate} chez ${this.customerName}.`;
+      else post = ` le ${this.startDate}.`;
 
-      if (!this.isOneDayEvent) return `${typeAndAuxiliary} du ${this.startDate} au ${this.endDate}.`;
-      if (this.isRepetition && this.customerName) return `${typeAndAuxiliary} ${this.repetitionFrequency} chez ${this.customerName}.`;
-      if (this.isRepetition) return `${typeAndAuxiliary} ${this.repetitionFrequency}.`;
-      if (this.customerName) return `${typeAndAuxiliary} le ${this.startDate} chez ${this.customerName}.`;
-      return `${typeAndAuxiliary} le ${this.startDate}.`;
+      return { pre, post };
     },
     getEventCreationDetails () {
       if (!this.isOneDayEvent) return `${this.eventName} planifié(e) du ${this.startDate} au ${this.endDate}.`;
@@ -175,17 +183,14 @@ export default {
     },
     // Deletion
     getEventDeletionTitle () {
-      if (this.isRepetition) {
-        const pronom = this.history.event.type === INTERVENTION ? 'la ' : 'l\'';
-        const title = `Suppression de ${pronom}${this.eventType.toLowerCase()} ${this.repetitionFrequency} à partir du ${this.startDate}.`;
-        return this.customerName ? `${title} chez ${this.customerName}.` : `${title}.`
-      }
+      let post;
+      const pronom = this.history.event.type === INTERVENTION && this.isRepetition ? 'la ' : 'l\'';
+      const pre = `Suppression de ${pronom}`;
+      if (this.isRepetition) post = ` ${this.repetitionFrequency} à partir du ${this.startDate}`;
+      else if (!this.isOneDayEvent) post = ` du ${this.startDate} au ${this.endDate}.`;
+      else post = ` le ${this.startDate}`;
 
-      const typeAndAuxiliary = `Suppression de l'${this.eventType.toLowerCase()} de ${this.auxiliaryName}`;
-      if (!this.isOneDayEvent) return `${typeAndAuxiliary} du ${this.startDate} au ${this.endDate}.`;
-
-      const title = `${typeAndAuxiliary} le ${this.startDate}`
-      return this.customerName ? `${title} chez ${this.customerName}.` : `${title}.`
+      return { pre, post: this.customerName ? `${post} chez ${this.customerName}.` : `${post}.` };
     },
     getEventDeletionDetails () {
       if (this.history.event.type === ABSENCE) return;
@@ -211,28 +216,26 @@ export default {
       const toAuxiliary = to && to.identity ? formatAuxiliaryShortIdentity(to.identity) : 'À affecter';
       const fromAuxiliary = from && from.identity ? formatAuxiliaryShortIdentity(from.identity) : 'À affecter';
 
-      let title = `Changement d'auxiliaire pour `;
       const pronom = this.isRepetition && this.history.event.type === INTERVENTION ? 'la ' : 'l\'';
-      if (this.isRepetition) title += `${pronom}${this.eventType.toLowerCase()} ${this.repetitionFrequency}`;
-      else title += `${pronom}${this.eventType.toLowerCase()} du ${this.startDate}`;
-      if (this.customerName) title += ` chez ${this.customerName}`;
+      const pre = `Changement d'auxiliaire pour ${pronom}`;
+      let post = this.isRepetition ? ` ${this.repetitionFrequency}` : ` du ${this.startDate}`;
+      if (this.customerName) post += ` chez ${this.customerName}`;
+      if (to && to.identity && from && from.identity) post += `\xa0: ${toAuxiliary} remplace ${fromAuxiliary}`;
+      else if (to && to.identity) post += `\xa0: affectée à ${toAuxiliary}`;
+      else post += `\xa0: passée en à affecter.`;
 
-      if (to && to.identity && from && from.identity) title += `\xa0: ${toAuxiliary} remplace ${fromAuxiliary}`;
-      else if (to && to.identity) title += `\xa0: affectée à ${toAuxiliary}`;
-      else title += `\xa0: passée en à affecter.`;
-
-      return title;
+      return { pre, post };
     },
     formatDatesUpdateTitle () {
       const { endDate, startDate } = this.history.update;
-      let title = `Changement de dates pour l'${this.eventType.toLowerCase()} de ${this.auxiliaryName}`;
-      if (this.customerName) title += ` chez ${this.customerName}`;
 
-      if (startDate && endDate) {
-        title += `\xa0: du ${this.$moment(startDate.to).format('DD/MM')} au ${this.$moment(endDate.to).format('DD/MM')}.`
-      } else title += `\xa0: ${this.$moment(startDate.to).format('DD/MM')}.`
+      const pre = 'Changement de dates pour l\'';
+      let post = this.customerName ? ` chez ${this.customerName}` : '';
+      post += startDate && endDate
+        ? `\xa0: du ${this.$moment(startDate.to).format('DD/MM')} au ${this.$moment(endDate.to).format('DD/MM')}.`
+        : `\xa0: ${this.$moment(startDate.to).format('DD/MM')}.`;
 
-      return title;
+      return { pre, post };
     },
     formatHoursUpdateTitle () {
       const { endHour, startHour } = this.history.update;
@@ -240,15 +243,15 @@ export default {
       const { to: endHourTo } = endHour;
 
       const pronom = this.isRepetition && this.history.event.type === INTERVENTION ? 'la ' : 'l\'';
-      let title = `Changement d'horaire pour ${pronom}${this.eventType.toLowerCase()} de ${this.auxiliaryName}`;
-      if (this.isRepetition) title += ` ${this.repetitionFrequency}`;
-      else title += ` le ${this.startDate}`
-      if (this.customerName) title += ` chez ${this.customerName}`;
+      const pre = `Changement d'horaire pour ${pronom}`;
+      let post = this.isRepetition ? ` ${this.repetitionFrequency}` : ` le ${this.startDate}`;
+      if (this.customerName) post += ` chez ${this.customerName}`;
+      post += `\xa0:  ${this.$moment(startHourTo).format('HH:mm')} - ${this.$moment(endHourTo).format('HH:mm')}.`;
 
-      return `${title}\xa0:  ${this.$moment(startHourTo).format('HH:mm')} - ${this.$moment(endHourTo).format('HH:mm')}.`
+      return { pre, post };
     },
     formatCancelUpdateTitle () { // Cancellation : only for intervention and not applied to repetitions.
-      return `Annulation de l'${this.eventType.toLowerCase()} de ${this.auxiliaryName} le ${this.startDate} chez ${this.customerName}.`;
+      return { pre: 'Annulation de l\'', post: ` le ${this.startDate} chez ${this.customerName}.` };
     },
     getEventUpdateDetails () {
       const { auxiliary, startDate, cancel, startHour } = this.history.update;
@@ -336,4 +339,9 @@ export default {
       div
         margin-left: 5px
 
+  .type
+    color: $primary
+  .auxiliary
+    font-weight: bold;
+    color: #2E2E2E
 </style>
