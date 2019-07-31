@@ -2,7 +2,7 @@
   <div>
     <div class="q-pa-sm q-mb-lg">
       <div class="title">
-        <p class="text-weight-bold">{{ this.customer.identity | formatFullIdentity }}</p>
+        <p class="text-weight-bold">{{ this.customer.identity | formatIdentity('FL') }}</p>
         <ni-date-range v-model="billingDates" @input="refresh" :error.sync="billingDatesHasError" />
       </div>
       <div v-if="user.role.name === HELPER && !loading" class="message">
@@ -51,7 +51,7 @@ import PaymentEditionModal from '../../components/customers/PaymentEditionModal'
 import DateRange from '../../components/form/DateRange';
 import { paymentMixin } from '../../mixins/paymentMixin.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../components/popup/notify';
-import { formatFullIdentity } from '../../helpers/utils';
+import { formatIdentity } from '../../helpers/utils';
 
 export default {
   name: 'ProfileBilling',
@@ -256,7 +256,7 @@ export default {
 
       this.paymentEditionModal = true;
       this.selectedCustomer = payment.customer;
-      this.selectedClientName = payment.client ? payment.client.name : formatFullIdentity(payment.customer.identity);
+      this.selectedClientName = payment.client ? payment.client.name : formatIdentity(payment.customer.identity, 'FL');
     },
     resetPaymentEditionModal () {
       this.paymentEditionModal = false;
@@ -283,7 +283,7 @@ export default {
     },
   },
   filters: {
-    formatFullIdentity,
+    formatIdentity,
   },
 }
 </script>

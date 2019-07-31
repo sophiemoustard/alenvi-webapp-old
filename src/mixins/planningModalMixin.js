@@ -5,7 +5,7 @@ import ModalSelect from '../components/form/ModalSelect';
 import ModalInput from '../components/form/ModalInput';
 import SearchAddress from '../components/form/SearchAddress';
 import FileUploader from '../components/form/FileUploader';
-import { formatFullIdentity } from '../helpers/utils';
+import { formatIdentity } from '../helpers/utils';
 import {
   INTERVENTION,
   ABSENCE,
@@ -199,7 +199,7 @@ export const planningModalMixin = {
     },
     formatPersonOptions (person) {
       return {
-        label: formatFullIdentity(person.identity),
+        label: formatIdentity(person.identity, 'FL'),
         value: person._id,
       };
     },

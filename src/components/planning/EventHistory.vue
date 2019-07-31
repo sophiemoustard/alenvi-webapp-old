@@ -36,7 +36,7 @@ import {
   EVENT_UPDATE,
   CANCELLATION_OPTIONS,
 } from '../../data/constants';
-import { formatAuxiliaryShortIdentity, formatCustomerShortIdentity, formatHoursWithMinutes } from '../../helpers/utils';
+import { formatIdentity, formatHoursWithMinutes } from '../../helpers/utils';
 
 export default {
   name: 'EventHistory',
@@ -52,11 +52,11 @@ export default {
   computed: {
     auxiliaryName () {
       return this.$_.has(this.history, 'event.auxiliary.identity')
-        ? formatAuxiliaryShortIdentity(this.history.event.auxiliary.identity)
+        ? formatIdentity(this.history.event.auxiliary.identity, 'Fl')
         : 'À affecter';
     },
     customerName () {
-      return this.$_.has(this.history, 'event.customer.identity') && formatCustomerShortIdentity(this.history.event.customer.identity);
+      return this.$_.has(this.history, 'event.customer.identity') && formatIdentity(this.history.event.customer.identity, 'fL');
     },
     startDate () {
       return this.$moment(this.history.event.startDate).format('DD/MM');
@@ -140,7 +140,7 @@ export default {
     historySignature () {
       const date = this.$moment(this.history.createdAt).format('DD/MM');
       const hour = `${this.$moment(this.history.createdAt).hour()}h${this.$moment(this.history.createdAt).format('mm')}`;
-      const user = formatAuxiliaryShortIdentity(this.history.createdBy.identity);
+      const user = formatIdentity(this.history.createdBy.identity, 'Fl');
 
       return `${user} le ${date} à ${hour}.`;
     },
@@ -208,8 +208,8 @@ export default {
     },
     formatAuxiliaryUpdateTitle () { // Auxiliary update : only for intervention and internal hour.
       const { from, to } = this.history.update.auxiliary
-      const toAuxiliary = to && to.identity ? formatAuxiliaryShortIdentity(to.identity) : 'À affecter';
-      const fromAuxiliary = from && from.identity ? formatAuxiliaryShortIdentity(from.identity) : 'À affecter';
+      const toAuxiliary = to && to.identity ? formatIdentity(to.identity, 'Fl') : 'À affecter';
+      const fromAuxiliary = from && from.identity ? formatIdentity(from.identity, 'Fl') : 'À affecter';
 
       let title = `Changement d'auxiliaire pour `;
       const pronom = this.isRepetition && this.history.event.type === INTERVENTION ? 'la ' : 'l\'';
