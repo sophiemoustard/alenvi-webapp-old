@@ -9,7 +9,7 @@
         Si vous souhaitez obtenir une facture non disponible sur cette page, adressez un email à support@alenvi.io.
       </div>
       <ni-customer-billing-table v-if="!tableLoading" :documents="customerBillingDocuments" :billingDates="billingDates"
-        :displayActions="user.role.name === ADMIN || user.role.name === COACH" @openEditionModal="openEditionModal"
+        :displayActions="user.role.name === ADMIN" @openEditionModal="openEditionModal"
         :type="CUSTOMER" :startBalance="getStartBalance()" :endBalance="getEndBalance(customerBillingDocuments)" />
       <div v-if="user.role.name === ADMIN || user.role.name === COACH" align="right">
         <q-btn class="add-payment" label="Ajouter un réglement" @click="openPaymentCreationModal(customer)"
