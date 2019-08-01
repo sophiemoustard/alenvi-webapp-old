@@ -11,7 +11,7 @@
         <div class="row q-mb-md">
           <div class="col-11 row person-name">
             <img :src="DEFAULT_AVATAR" class="avatar">
-            <div>{{ selectedCustomer.identity | formatFullIdentity }}</div>
+            <div>{{ selectedCustomer.identity | formatIdentity('FL') }}</div>
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
             <span>
@@ -42,7 +42,7 @@
         <div class="row q-mb-md">
           <div class="col-11 row person-name">
             <img :src="DEFAULT_AVATAR" class="avatar">
-            <div>{{ selectedCustomer.identity | formatFullIdentity }}</div>
+            <div>{{ selectedCustomer.identity | formatIdentity('FL') }}</div>
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
             <span>
@@ -105,7 +105,7 @@ import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify.js';
 import { INTERVENTION, DEFAULT_AVATAR, NEVER, AUXILIARY, PLANNING_REFERENT, CUSTOMER_CONTRACT, COMPANY_CONTRACT, CUSTOMER, SECTOR } from '../../../data/constants';
 import { mapGetters, mapActions } from 'vuex';
-import { formatFullIdentity } from '../../../helpers/utils';
+import { formatIdentity } from '../../../helpers/utils';
 
 export default {
   name: 'CustomerPlanning',
@@ -417,7 +417,7 @@ export default {
       const rowEvents = this.getRowEvents(rowId);
       const event = rowEvents.find(ev => ev._id === eventId);
       const can = this.canEditEvent(event);
-      if (!can) return;
+      if (!can) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
       this.formatEditedEvent(event);
 
       this.editionModal = true;
@@ -583,7 +583,7 @@ export default {
     },
   },
   filters: {
-    formatFullIdentity,
+    formatIdentity,
   },
 }
 </script>

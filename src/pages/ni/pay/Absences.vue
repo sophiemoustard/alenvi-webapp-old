@@ -42,7 +42,8 @@ import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES, HOURLY } from '../../../data/c
 import BillingPagination from '../../../components/table/BillingPagination';
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
-import { formatAuxiliaryShortIdentity } from '../../../helpers/utils';
+import { formatIdentity } from '../../../helpers/utils';
+import { NotifyWarning } from '../../../components/popup/notify';
 
 export default {
   name: 'Absences',
@@ -70,7 +71,7 @@ export default {
           name: 'auxiliary',
           label: 'Auxiliaire',
           field: 'auxiliary',
-          format: value => formatAuxiliaryShortIdentity(value.identity),
+          format: value => formatIdentity(value.identity, 'FL'),
           align: 'left',
         },
         {
@@ -170,7 +171,7 @@ export default {
     // Event edition
     openEditionModal (event) {
       const can = this.canEditEvent(event);
-      if (!can) return;
+      if (!can) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
       this.selectedAuxiliary = event.auxiliary ? event.auxiliary : { picture: {}, identity: { lastname: '' } };
       this.formatEditedEvent(event);
 

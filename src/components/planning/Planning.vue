@@ -2,9 +2,9 @@
   <div :class="[{ 'planning': !toggleDrawer }]">
     <div class="row items-center planning-header">
       <div class="col-xs-12 col-md-5 planning-search">
-        <ni-chips-autocomplete ref="refFilter" v-model="terms" />
-        <q-btn v-if="!isCustomerPlanning" flat round icon="people" @click="toggleAllSectors"
-          :color="displayAllSectors ? 'primary' : ''" />
+        <ni-chips-autocomplete ref="refFilter" v-model="terms" :disable="displayAllSectors" />
+        <q-btn v-if="!isCustomerPlanning && isCoach" flat round :icon="displayAllSectors ? 'arrow_forward' : 'people'"
+          @click="toggleAllSectors" :color="displayAllSectors ? 'primary' : ''" />
       </div>
       <div class="col-xs-12 col-md-7 row planning-timeline">
         <planning-navigation class="col-10" :timelineTitle="timelineTitle()" :targetDate="targetDate" :type="PLANNING"
@@ -65,13 +65,13 @@
                   <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person"
                     :events="getPersonEvents(person)" />
                   <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)"
-                    :startOfWeekAsString="startOfWeek.toISOString()" :distanceMatrix="distanceMatrix" />
+                    :startOfWeekAsString="startOfWeek.toISOString()" :dm="distanceMatrix" />
                 </div>
                 <div v-if="isCustomerPlanning" class="person-name overflow-hidden-nowrap">
-                  {{ person.identity | formatCustomerShortIdentity }}
+                  {{ person.identity | formatIdentity('fL') }}
                 </div>
                 <div v-else class="person-name overflow-hidden-nowrap">
-                  {{ person.identity | formatAuxiliaryShortIdentity }}
+                  {{ person.identity | formatIdentity('Fl') }}
                 </div>
               </div>
             </td>
@@ -91,7 +91,7 @@
       </table>
     </div>
     <q-page-sticky expand position="right">
-      <ni-event-history-feed v-if="displayHistory" :eventHistories="eventHistories" />
+      <ni-event-history-feed v-if="displayHistory" :eventHistories="eventHistories" :displayHistory.sync="displayHistory" />
     </q-page-sticky>
   </div>
 </template>
@@ -105,8 +105,10 @@ import {
   STAFFING_VIEW_START_HOUR,
   STAFFING_VIEW_END_HOUR,
   UNKNOWN_AVATAR,
+  COACH,
+  ADMIN,
 } from '../../data/constants';
-import { NotifyNegative } from '../popup/notify';
+import { NotifyNegative, NotifyWarning } from '../popup/notify';
 import NiChipAuxiliaryIndicator from './ChipAuxiliaryIndicator';
 import NiChipCustomerIndicator from './ChipCustomerIndicator';
 import NiPlanningEvent from './PlanningEvent';
@@ -116,7 +118,7 @@ import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import { planningEventMixin } from '../../mixins/planningEventMixin';
 import PlanningNavigation from './PlanningNavigation.vue';
 import distanceMatrix from '../../api/DistanceMatrix';
-import { formatCustomerShortIdentity, formatAuxiliaryShortIdentity } from '../../helpers/utils';
+import { formatIdentity } from '../../helpers/utils';
 
 export default {
   name: 'PlanningManager',
@@ -189,10 +191,14 @@ export default {
     getUser () {
       return this.$store.getters['main/user'];
     },
+    isCoach () {
+      return [COACH, ADMIN].includes(this.getUser.role.name);
+    },
   },
   methods: {
     toggleAllSectors () {
       this.$emit('update:displayAllSectors', !this.displayAllSectors);
+      this.terms = [];
     },
     getTimelineHours () {
       const range = this.$moment.range(this.$moment().hours(STAFFING_VIEW_START_HOUR).minutes(0), this.$moment().hours(STAFFING_VIEW_END_HOUR).minutes(0));
@@ -294,7 +300,7 @@ export default {
           ],
         });
       }
-      if (!can) return;
+      if (!can) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
 
       this.$emit('createEvent', eventInfo);
     },
@@ -311,8 +317,7 @@ export default {
     },
   },
   filters: {
-    formatCustomerShortIdentity,
-    formatAuxiliaryShortIdentity,
+    formatIdentity,
   },
 }
 </script>

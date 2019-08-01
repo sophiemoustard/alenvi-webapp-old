@@ -88,7 +88,7 @@ export const planningActionMixin = {
       let payload = { ...this.$_.omit(event, ['dates', '__v', '__index']) }
       payload = this.$_.pickBy(payload);
 
-      if ([INTERNAL_HOUR, INTERVENTION].includes(event.type) && event.auxiliary) {
+      if (event.auxiliary) {
         const auxiliary = this.auxiliaries.find(aux => aux._id === event.auxiliary);
         payload.sector = auxiliary.sector._id;
       }
@@ -293,30 +293,34 @@ export const planningActionMixin = {
         this.loading = false;
       }
     },
+    getDragAndDropPayload (toDay, target, draggedObject) {
+      const daysBetween = this.$moment(draggedObject.endDate).diff(this.$moment(draggedObject.startDate), 'days');
+      const payload = {
+        startDate: this.$moment(toDay).hours(this.$moment(draggedObject.startDate).hours())
+          .minutes(this.$moment(draggedObject.startDate).minutes()).toISOString(),
+        endDate: this.$moment(toDay).add(daysBetween, 'days').hours(this.$moment(draggedObject.endDate).hours())
+          .minutes(this.$moment(draggedObject.endDate).minutes()).toISOString(),
+      };
+
+      if (target.type === SECTOR) payload.sector = target._id;
+      else {
+        payload.auxiliary = target._id;
+        const auxiliary = this.auxiliaries.find(aux => aux._id === target._id);
+        payload.sector = auxiliary.sector._id;
+      }
+
+      return payload;
+    },
     async updateEventOnDrop (vEvent) {
       try {
         const { toDay, target, draggedObject } = vEvent;
-        const daysBetween = this.$moment(draggedObject.endDate).diff(this.$moment(draggedObject.startDate), 'days');
 
         if (target.type === SECTOR && draggedObject.type !== INTERVENTION) return NotifyNegative('Cette modification n\'est pas autorisée');
         if ([ABSENCE, UNAVAILABILITY].includes(draggedObject.type) && draggedObject.auxiliary._id !== target._id) {
           return NotifyNegative('Impossible de modifier l\'auxiliaire de cet évènement.');
         }
 
-        const payload = {
-          startDate: this.$moment(toDay).hours(this.$moment(draggedObject.startDate).hours())
-            .minutes(this.$moment(draggedObject.startDate).minutes()).toISOString(),
-          endDate: this.$moment(toDay).add(daysBetween, 'days').hours(this.$moment(draggedObject.endDate).hours())
-            .minutes(this.$moment(draggedObject.endDate).minutes()).toISOString(),
-        };
-
-        if (target.type === SECTOR) payload.sector = target._id;
-        else {
-          payload.auxiliary = target._id;
-          const auxiliary = this.auxiliaries.find(aux => aux._id === target._id);
-          payload.sector = auxiliary.sector._id;
-        }
-
+        const payload = this.getDragAndDropPayload(toDay, target, draggedObject);
         if (this.hasConflicts(payload)) {
           return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
         }

@@ -6,7 +6,7 @@
           <q-icon class="on-left cursor-pointer self-center" size="1rem" name="arrow_back" color="primary"
             @click.native="$router.go(-1)" />
         </div>
-        <h4 class="no-margin">{{ customer.identity | formatFullIdentity }}</h4>
+        <h4 class="no-margin">{{ customer.identity | formatIdentity('FL') }}</h4>
       </div>
       <div class="row">
         <p class="text-weight-bold">Informations</p>
@@ -39,7 +39,7 @@ import pathologies from '../../../data/pathologies';
 import { followUpMixin } from '../../../mixins/followUpMixin.js';
 import Input from '../../../components/form/Input.vue';
 import Select from '../../../components/form/Select.vue';
-import { formatFullIdentity } from '../../../helpers/utils';
+import { formatIdentity } from '../../../helpers/utils';
 
 export default {
   components: {
@@ -70,7 +70,7 @@ export default {
     await this.getCustomer(this.customerId);
   },
   filters: {
-    formatFullIdentity,
+    formatIdentity,
   },
 }
 </script>

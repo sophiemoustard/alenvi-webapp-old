@@ -47,7 +47,7 @@ import ToBillRow from '../../../components/table/ToBillRow';
 import BillingPagination from '../../../components/table/BillingPagination';
 import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
 import { billingMixin } from '../../../mixins/billingMixin.js';
-import { formatPrice } from '../../../helpers/utils';
+import { formatPrice, formatIdentity } from '../../../helpers/utils';
 
 export default {
   name: 'ToBill',
@@ -64,7 +64,11 @@ export default {
   data () {
     return {
       tableLoading: false,
-      pagination: { rowsPerPage: 0 },
+      pagination: {
+        rowsPerPage: 0,
+        sortBy: 'customer',
+        ascending: true,
+      },
       billingDates: {
         startDate: null,
         endDate: null,
@@ -82,6 +86,7 @@ export default {
           name: 'customer',
           label: 'Bénéficiaire',
           align: 'left',
+          field: row => formatIdentity(row.customer.identity, 'Lf'),
         },
         {
           name: 'client',

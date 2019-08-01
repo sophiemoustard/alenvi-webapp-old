@@ -82,9 +82,9 @@ export default {
         absence: { required: requiredIf((item) => item.type === ABSENCE) },
         absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
         address: {
-          zipCode: { required: requiredIf(item => !!item.fullAddress) },
-          street: { required: requiredIf(item => !!item.fullAddress) },
-          city: { required: requiredIf(item => !!item.fullAddress) },
+          zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
+          street: { required: requiredIf(item => item && !!item.fullAddress) },
+          city: { required: requiredIf(item => item && !!item.fullAddress) },
           fullAddress: { frAddress },
         },
         repetition: {
@@ -144,6 +144,7 @@ export default {
         this.filteredSectors = [];
         this.events = [];
       } else {
+        this.filteredAuxiliaries = [];
         this.auxiliaries = this.getFilter.filter(fil => fil.type === PERSON);
         this.filteredSectors = this.getFilter.filter(fil => fil.type === SECTOR);
         await this.refresh();
@@ -269,7 +270,7 @@ export default {
 
       const event = rowEvents.find(ev => ev._id === eventId);
       const can = this.canEditEvent(event);
-      if (!can) return;
+      if (!can) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
       this.formatEditedEvent(event);
 
       this.editionModal = true;

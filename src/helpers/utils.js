@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 export const extend = (...sources) => {
   const extended = {};
   let deep = false;
@@ -59,34 +61,42 @@ export const formatPrice = (val) => {
   return val ? roundFrenchNumber(val) : roundFrenchNumber(0);
 };
 
-export const formatCustomerShortIdentity = (identity) => {
+export const formatIdentity = (identity, format) => {
   if (!identity) return '';
 
-  const firstname = (identity.firstname || '').trim();
-  let identityShort = firstname ? `${firstname.slice(0, 1)}. ` : '';
-  identityShort += (identity.lastname || '').trim();
+  let firstname;
+  let lastname;
+  switch (format) {
+    case 'FL':
+      firstname = (identity.firstname || '').trim();
+      lastname = (identity.lastname || '').trim().toUpperCase();
 
-  return identityShort.toUpperCase();
-};
+      return `${firstname} ${lastname}`;
+    case 'fL':
+      firstname = (identity.firstname || '').trim();
+      firstname = firstname ? `${firstname.slice(0, 1).toUpperCase()}. ` : '';
+      lastname = (identity.lastname || '').trim().toUpperCase();
 
-export const formatAuxiliaryShortIdentity = (identity) => {
-  if (!identity) return '';
+      return `${firstname} ${lastname}`;
+    case 'Fl':
+      firstname = `${(identity.firstname || '').trim()} `;
+      lastname = identity.lastname ? ` ${identity.lastname.trim().slice(0, 1).toUpperCase()}.` : '';
 
-  let identityShort = `${(identity.firstname || '').trim()} `;
-  identityShort += identity.lastname ? ` ${identity.lastname.trim().slice(0, 1).toUpperCase()}.` : '';
+      return `${firstname} ${lastname}`;
+    case 'Lf':
+      firstname = (identity.firstname || '').trim();
+      firstname = firstname ? `${firstname.slice(0, 1).toUpperCase()}. ` : '';
+      lastname = (identity.lastname || '').trim().toUpperCase();
 
-  return identityShort;
-};
-
-export const formatFullIdentity = (identity) => {
-  if (!identity) return '';
-
-  const firstname = (identity.firstname || '').trim();
-  const lastname = (identity.lastname || '').trim().toUpperCase();
-  return `${firstname} ${lastname}`;
+      return `${lastname} ${firstname}`;
+  }
 };
 
 export const formatHours = (value, digits = 2) => {
   if (!value) return '0,00h';
   return `${parseFloat(value).toFixed(digits).replace('.', ',')}h`
+};
+
+export const formatHoursWithMinutes = (date) => {
+  return `${moment(date).hours()}h${moment(date).format('mm')}`;
 };

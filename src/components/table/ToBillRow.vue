@@ -6,7 +6,7 @@
       </template>
       <template v-if="index === 0 && col.name === 'customer'">
         <span class="uppercase text-weight-bold">
-          {{ props.row.customer.identity | formatCustomerShortIdentity }}
+          {{ col.value }}
         </span>
       </template>
       <template v-else-if="index === 0 && col.name === 'client'">
@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import { formatPrice, getLastVersion, formatCustomerShortIdentity } from '../../helpers/utils.js';
+import { formatPrice, getLastVersion, formatIdentity } from '../../helpers/utils.js';
 import { FIXED } from '../../data/constants.js';
 import EditableTd from './EditableTd';
 
@@ -76,7 +76,7 @@ export default {
       return value ? `${this.$moment(value).format('DD/MM/YY')}` : '';
     },
     getClientName (customer, bill) {
-      if (!bill.thirdPartyPayer) return formatCustomerShortIdentity(customer.identity);
+      if (!bill.thirdPartyPayer) return formatIdentity(customer.identity, 'Lf');
       return bill.thirdPartyPayer.name.length > 35 ? `${bill.thirdPartyPayer.name.substring(0, 35)}...` : bill.thirdPartyPayer.name;
     },
     getExclTaxesDiscount (bill) {
@@ -95,9 +95,6 @@ export default {
     disableDiscountEditing (bill) {
       bill.discountEdition = false;
     },
-  },
-  filters: {
-    formatCustomerShortIdentity,
   },
 }
 </script>

@@ -101,7 +101,7 @@
 <script>
 import { INTERVENTION, AUXILIARY } from '../../data/constants';
 import { planningModalMixin } from '../../mixins/planningModalMixin';
-import { formatFullIdentity } from '../../helpers/utils';
+import { formatIdentity } from '../../helpers/utils';
 
 export default {
   name: 'AuxiliaryEventEditionModal',
@@ -138,7 +138,7 @@ export default {
     },
     auxiliaryFilterPlaceholder () {
       return this.selectedAuxiliary.identity
-        ? formatFullIdentity(this.selectedAuxiliary.identity)
+        ? formatIdentity(this.selectedAuxiliary.identity, 'FL')
         : 'À affecter';
     },
   },

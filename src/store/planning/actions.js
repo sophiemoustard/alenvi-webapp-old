@@ -2,7 +2,7 @@ import Sectors from '../../api/Sectors'
 import Users from '../../api/Users'
 import Customers from '../../api/Customers'
 import store from '../../store/index'
-import { formatFullIdentity } from '../../helpers/utils';
+import { formatIdentity } from '../../helpers/utils';
 
 import { AUXILIARY, PLANNING_REFERENT, SECTOR, PERSON } from '../../data/constants';
 
@@ -26,7 +26,7 @@ export const fillFilter = async ({ commit }, roleToSearch) => {
   }
 
   for (let i = 0, l = persons.length; i < l; i++) {
-    const value = formatFullIdentity(persons[i].identity);
+    const value = formatIdentity(persons[i].identity, 'FL');
     elems.push({ label: value, value: value, ...persons[i], type: PERSON });
   }
 
