@@ -16,6 +16,12 @@ import {
 
 export const planningActionMixin = {
   methods: {
+    addSavedTerms (endPath) {
+      if (this.$q.localStorage.has(`lastSearch${endPath}`) && this.$q.localStorage.get.item(`lastSearch${endPath}`).length > 0) {
+        const lastSearch = JSON.parse(this.$q.localStorage.get.item(`lastSearch${endPath}`));
+        this.$refs.planningManager.restoreFilter(lastSearch);
+      }
+    },
     setInternalHours () {
       const user = this.$store.getters['main/user'];
       if (user && user.company && user.company.rhConfig && user.company.rhConfig.internalHours) {
@@ -279,7 +285,7 @@ export const planningActionMixin = {
         await this.$events.updateById(this.editedEvent._id, payload);
         NotifyPositive('Évènement modifié');
 
-        this.refresh();
+        await this.refresh();
         this.editionModal = false;
         this.resetEditionForm();
       } catch (e) {

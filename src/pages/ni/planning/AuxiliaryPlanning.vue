@@ -3,7 +3,8 @@
     <ni-planning-manager :events="events" :persons="activeAuxiliaries" @updateStartOfWeek="updateStartOfWeek"
       @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop"
       :filteredSectors="filteredSectors" :can-edit="canEditEvent" :personKey="personKey"
-      :displayAllSectors.sync="displayAllSectors" :eventHistories="eventHistories" />
+      @toggleAllSectors="toggleAllSectors" :eventHistories="eventHistories" ref="planningManager"
+      :displayAllSectors="displayAllSectors" />
 
     <!-- Event creation modal -->
     <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
@@ -27,7 +28,7 @@ import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryE
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
 import Planning from '../../../components/planning/Planning.vue';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
-import { INTERVENTION, NEVER, PERSON, AUXILIARY, ABSENCE, DAILY, HOURLY, INTERNAL_HOUR, ILLNESS, SECTOR } from '../../../data/constants';
+import { INTERVENTION, NEVER, PERSON, AUXILIARY, ABSENCE, DAILY, HOURLY, INTERNAL_HOUR, ILLNESS, SECTOR, AUXILIARY_ROLES } from '../../../data/constants';
 import { mapGetters, mapActions } from 'vuex';
 import { NotifyNegative, NotifyWarning } from '../../../components/popup/notify';
 
@@ -52,6 +53,7 @@ export default {
       // Filters
       filteredSectors: [],
       filteredAuxiliaries: [],
+      savedSearch: [],
       // Event creation
       newEvent: {},
       creationModal: false,
@@ -125,6 +127,7 @@ export default {
       await this.fillFilter(AUXILIARY);
       await this.getEventHistories();
       await this.getCustomers();
+      this.initFilters();
       this.setInternalHours();
     } catch (e) {
       console.error(e);
@@ -132,31 +135,19 @@ export default {
     }
   },
   watch: {
-    getElemAdded (val) {
-      this.handleElemAddedToFilter(val);
+    elementToAdd (val) {
+      this.addElementToFilter(val);
     },
-    getElemRemoved (val) {
-      this.handleElemRemovedFromFilter(val);
-    },
-    async displayAllSectors (value) {
-      if (!value) {
-        this.auxiliaries = [];
-        this.filteredSectors = [];
-        this.events = [];
-      } else {
-        this.filteredAuxiliaries = [];
-        this.auxiliaries = this.getFilter.filter(fil => fil.type === PERSON);
-        this.filteredSectors = this.getFilter.filter(fil => fil.type === SECTOR);
-        await this.refresh();
-      }
+    elementToRemove (val) {
+      this.removeElementFromFilter(val);
     },
   },
   computed: {
     ...mapGetters({
-      getUser: 'main/user',
-      getFilter: 'planning/getFilter',
-      getElemAdded: 'planning/getElemAdded',
-      getElemRemoved: 'planning/getElemRemoved',
+      mainUser: 'main/user',
+      filters: 'planning/getFilters',
+      elementToAdd: 'planning/getElementToAdd',
+      elementToRemove: 'planning/getElementToRemove',
     }),
     selectedAuxiliary () {
       if (this.creationModal && this.newEvent.auxiliary) {
@@ -196,7 +187,31 @@ export default {
       this.days = Array.from(range.by('days'));
       if (this.auxiliaries && this.auxiliaries.length) await this.refresh();
     },
+    // Filters
+    initFilters () {
+      if (!AUXILIARY_ROLES.includes(this.mainUser.role.name)) {
+        this.addSavedTerms('Auxiliaries');
+      } else {
+        const userSector = this.filters.find(filter => filter.type === SECTOR && filter._id === this.mainUser.sector);
+        if (userSector) this.$refs.planningManager.restoreFilter([userSector.label]);
+      }
+    },
     // Refresh data
+    async toggleAllSectors (search) {
+      this.displayAllSectors = !this.displayAllSectors;
+      if (!this.displayAllSectors) {
+        this.auxiliaries = [];
+        this.filteredSectors = [];
+        this.events = [];
+        this.$refs.planningManager.restoreFilter(this.savedSearch);
+      } else {
+        this.savedSearch = search;
+        this.filteredAuxiliaries = [];
+        this.auxiliaries = this.filters.filter(fil => fil.type === PERSON);
+        this.filteredSectors = this.filters.filter(fil => fil.type === SECTOR);
+        await this.refresh();
+      }
+    },
     async refresh () {
       await Promise.all([this.refreshEvents(), this.getEventHistories()]);
     },
@@ -276,10 +291,10 @@ export default {
       this.editionModal = true;
     },
     // Filter
-    handleElemAddedToFilter (el) {
+    addElementToFilter (el) {
       if (el.type === SECTOR) {
         this.filteredSectors.push(el);
-        const auxBySector = this.getFilter.filter(aux => aux.sector && aux.sector._id === el._id);
+        const auxBySector = this.filters.filter(aux => aux.sector && aux.sector._id === el._id);
         for (let i = 0, l = auxBySector.length; i < l; i++) {
           if (!this.auxiliaries.some(aux => auxBySector[i]._id === aux._id)) {
             this.auxiliaries.push(auxBySector[i]);
@@ -294,7 +309,7 @@ export default {
         }
       }
     },
-    handleElemRemovedFromFilter (el) {
+    removeElementFromFilter (el) {
       if (el.type === SECTOR) {
         this.filteredSectors = this.filteredSectors.filter(sec => sec._id !== el._id);
         this.auxiliaries = this.auxiliaries.filter(auxiliary =>

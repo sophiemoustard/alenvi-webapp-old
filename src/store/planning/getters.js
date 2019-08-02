@@ -1,11 +1,11 @@
-export const getFilter = (state) => {
-  return state.filter;
+export const getFilters = (state) => {
+  return state.filters;
 }
 
-export const getElemAdded = (state) => {
-  return state.elemAdded;
+export const getElementToAdd = (state) => {
+  return state.elementToAdd;
 }
 
-export const getElemRemoved = (state) => {
-  return state.elemRemoved;
+export const getElementToRemove = (state) => {
+  return state.elementToRemove;
 }

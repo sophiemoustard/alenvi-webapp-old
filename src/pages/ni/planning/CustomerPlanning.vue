@@ -2,7 +2,7 @@
   <q-page class="neutral-background">
     <ni-planning-manager :events="events" :persons="customers" :personKey="personKey" :can-edit="canEditEvent"
       @updateStartOfWeek="updateStartOfWeek" @editEvent="openEditionModal" @createEvent="openCreationModal"
-      @onDrop="updateEventOnDrop"  />
+      @onDrop="updateEventOnDrop" ref="planningManager" />
 
     <!-- Event creation modal -->
     <q-modal v-if="Object.keys(newEvent).length !== 0" v-model="creationModal" content-classes="modal-container-md"
@@ -103,7 +103,7 @@ import Planning from '../../../components/planning/Planning.vue';
 import { planningModalMixin } from '../../../mixins/planningModalMixin';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify.js';
-import { INTERVENTION, DEFAULT_AVATAR, NEVER, AUXILIARY, PLANNING_REFERENT, CUSTOMER_CONTRACT, COMPANY_CONTRACT, CUSTOMER, SECTOR } from '../../../data/constants';
+import { INTERVENTION, DEFAULT_AVATAR, NEVER, AUXILIARY, PLANNING_REFERENT, CUSTOMER_CONTRACT, COMPANY_CONTRACT, CUSTOMER, SECTOR, AUXILIARY_ROLES } from '../../../data/constants';
 import { mapGetters, mapActions } from 'vuex';
 import { formatIdentity } from '../../../helpers/utils';
 
@@ -132,23 +132,25 @@ export default {
       editedEvent: {},
       editionModal: false,
       personKey: CUSTOMER,
+      sectorCustomers: [],
     };
   },
   async mounted () {
     try {
       await this.fillFilter(CUSTOMER);
       await this.getAuxiliaries();
+      this.initFilters();
     } catch (e) {
       console.error(e);
       NotifyNegative('Erreur lors de la récupération des personnes');
     }
   },
   watch: {
-    getElemAdded (val) {
-      this.handleElemAddedToFilter(val);
+    elementToAdd (val) {
+      this.addElementToFilter(val);
     },
-    getElemRemoved (val) {
-      this.handleElemRemovedFromFilter(val);
+    elementToRemove (val) {
+      this.removeElementFromFilter(val);
     },
     isRepetitionAllowed (value) {
       if (!value) this.newEvent.repetition.frequency = NEVER;
@@ -191,9 +193,10 @@ export default {
   },
   computed: {
     ...mapGetters({
-      getFilter: 'planning/getFilter',
-      getElemAdded: 'planning/getElemAdded',
-      getElemRemoved: 'planning/getElemRemoved',
+      mainUser: 'main/user',
+      filters: 'planning/getFilters',
+      elementToAdd: 'planning/getElementToAdd',
+      elementToRemove: 'planning/getElementToRemove',
     }),
     endOfWeek () {
       return this.$moment(this.startOfWeekAsString).endOf('w');
@@ -293,19 +296,27 @@ export default {
 
       return customerContracts.some(contract => !contract.endDate && contract.versions.some(version => version.isActive));
     },
-    // Refresh data
+    // Filters
+    initFilters () {
+      if (!AUXILIARY_ROLES.includes(this.mainUser.role.name)) {
+        this.addSavedTerms('Customers');
+      } else {
+        const userSector = this.filters.find(filter => filter.type === SECTOR && filter._id === this.mainUser.sector);
+        if (userSector) this.$refs.planningManager.restoreFilter([userSector.label]);
+      }
+    },
+    // Refresh
     async refreshCustomers () {
       this.customers = [];
-      let customersBySector = [];
       try {
-        customersBySector = await this.getCustomersBySectors(this.filteredSectors);
+        this.sectorCustomers = await this.getSectorCustomers(this.filteredSectors);
       } catch (e) {
-        customersBySector = []
+        this.sectorCustomers = []
       }
 
-      for (let i = 0, l = customersBySector.length; i < l; i++) {
-        if (!this.customers.some(cus => customersBySector[i]._id === cus._id)) {
-          this.customers.push(customersBySector[i]);
+      for (let i = 0, l = this.sectorCustomers.length; i < l; i++) {
+        if (!this.customers.some(cus => this.sectorCustomers[i]._id === cus._id)) {
+          this.customers.push(this.sectorCustomers[i]);
         }
       }
       if (this.filteredCustomers.length !== 0) {
@@ -545,7 +556,7 @@ export default {
         this.loading = false
       }
     },
-    async getCustomersBySectors (sectors) {
+    async getSectorCustomers (sectors) {
       return sectors.length === 0 ? [] : this.$customers.showAllBySector({
         startDate: this.$moment(this.startOfWeekAsString).toDate(),
         endDate: this.endOfWeek.toDate(),
@@ -553,32 +564,34 @@ export default {
       });
     },
     // Filter
-    async handleElemAddedToFilter (el) {
+    async addElementToFilter (el) {
       if (el.type === SECTOR) {
         this.filteredSectors.push(el._id);
-        const customersBySector = await this.getCustomersBySectors(this.filteredSectors);
-        for (let i = 0, l = customersBySector.length; i < l; i++) {
-          if (!this.customers.some(cus => customersBySector[i]._id === cus._id)) {
-            this.customers.push(customersBySector[i]);
+        this.sectorCustomers = await this.getSectorCustomers(this.filteredSectors);
+        for (let i = 0, l = this.sectorCustomers.length; i < l; i++) {
+          if (!this.customers.some(cus => this.sectorCustomers[i]._id === cus._id)) {
+            this.customers.push(this.sectorCustomers[i]);
           }
         }
         await this.refresh();
       } else { // el = customer
+        if (!this.filteredCustomers.some(cust => cust._id === el._id)) this.filteredCustomers.push(el);
         if (!this.customers.some(cust => cust._id === el._id)) {
-          this.filteredCustomers.push(el);
           this.customers.push(el);
           await this.refresh();
         }
       }
     },
-    async handleElemRemovedFromFilter (el) {
+    async removeElementFromFilter (el) {
       if (el.type === SECTOR) {
         this.filteredSectors = this.filteredSectors.filter(sec => sec !== el._id);
         await this.refreshCustomers();
-        await await this.refresh();
+        await this.refresh();
       } else {
         this.filteredCustomers = this.filteredCustomers.filter(cus => cus._id !== el._id);
-        this.customers = this.customers.filter(customer => customer._id !== el._id);
+        if (!this.sectorCustomers.some(cus => cus._id === el._id)) {
+          this.customers = this.customers.filter(customer => customer._id !== el._id);
+        }
       }
     },
   },

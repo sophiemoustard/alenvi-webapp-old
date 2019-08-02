@@ -30,5 +30,5 @@ export const fillFilter = async ({ commit }, roleToSearch) => {
     elems.push({ label: value, value: value, ...persons[i], type: PERSON });
   }
 
-  commit('setFilter', elems);
+  commit('setFilters', elems);
 }
