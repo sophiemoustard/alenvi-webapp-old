@@ -35,58 +35,50 @@
           </th>
         </thead>
         <tbody>
-          <template v-if="!isCustomerPlanning && filteredSectors.length > 0">
-            <tr v-for="sector in filteredSectors" :key="sector._id" class="to-assign person-row">
+          <template v-for="sectorId in Object.keys(personsGroupedBySector)">
+            <tr v-if="!isCustomerPlanning && getSector(sectorId)" :key="sectorId" class="to-assign person-row">
               <td valign="top">
                 <div class="person-inner-cell">
                   <div :class="[!staffingView && 'q-mb-md', 'chip-container']">
                     <img :src="UNKNOWN_AVATAR" class="avatar" >
                   </div>
-                  <div class="person-name overflow-hidden">{{ sector.label }}</div>
+                  <div class="person-name overflow-hidden">{{ getSector(sectorId).label }}</div>
                 </div>
               </td>
-              <td @drop="drop(day, sector)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
-                valign="top" @click="createEvent({ dayIndex, sectorId: sector._id })" class="planning-background">
-                <template v-for="hourIndex in 5">
-                  <div class="line" :style="{ left: `${(hourIndex * hourWidth * 2)}%` }"
-                    :key="`hour_${hourIndex}`" />
-                </template>
-                <template v-for="(event, eventIndex) in getCellEvents(sector, days[dayIndex])">
-                  <ni-planning-event-cell :event="event" :display-staffing-view="staffingView && !isCustomerPlanning"
-                    :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canEdit" :person-key="personKey" />
-                </template>
+              <td @drop="drop(day, getSector(sectorId))" @dragover.prevent v-for="(day, dayIndex) in days" valign="top"
+                :key="dayIndex" @click="createEvent({ dayIndex, sectorId })" class="planning-background">
+                <div v-for="hourIndex in 5" class="line" :style="{ left: `${(hourIndex * hourWidth * 2)}%` }"
+                  :key="`hour_${hourIndex}`" />
+                <ni-planning-event-cell v-for="(event, eventIndex) in getCellEvents(sectorId, days[dayIndex])"
+                  :event="event" :display-staffing-view="staffingView && !isCustomerPlanning" :person-key="personKey"
+                  :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canEdit" />
+              </td>
+            </tr>
+            <tr class="person-row" v-for="person in personsGroupedBySector[sectorId]" :key="person._id">
+              <td valign="top">
+                <div class="person-inner-cell">
+                  <div :class="[!staffingView && 'q-mb-md']">
+                    <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person"
+                      :events="getPersonEvents(person)" />
+                    <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)"
+                      :startOfWeekAsString="startOfWeek.toISOString()" :dm="distanceMatrix" />
+                  </div>
+                  <div class="person-name overflow-hidden-nowrap">
+                    <template v-if="isCustomerPlanning">{{ person.identity | formatIdentity('fL') }}</template>
+                    <template v-else>{{ person.identity | formatIdentity('Fl') }}</template>
+                  </div>
+                </div>
+              </td>
+              <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
+                valign="top" @click="createEvent({ dayIndex, person })" class="planning-background">
+                <div v-for="hourIndex in hours.length" class="line" :key="`hour_${hourIndex}`"
+                  :style="{ left: `${(hourIndex * hourWidth * 2)}%` }" />
+                <ni-planning-event-cell v-for="(event, eventIndex) in getCellEvents(person._id, days[dayIndex])"
+                  :event="event" :display-staffing-view="staffingView && !isCustomerPlanning" :person-key="personKey"
+                  :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canEdit" />
               </td>
             </tr>
           </template>
-          <tr class="person-row" v-for="(person, index) in persons" :key="index">
-            <td valign="top">
-              <div class="person-inner-cell">
-                <div :class="[!staffingView && 'q-mb-md']">
-                  <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person"
-                    :events="getPersonEvents(person)" />
-                  <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)"
-                    :startOfWeekAsString="startOfWeek.toISOString()" :dm="distanceMatrix" />
-                </div>
-                <div v-if="isCustomerPlanning" class="person-name overflow-hidden-nowrap">
-                  {{ person.identity | formatIdentity('fL') }}
-                </div>
-                <div v-else class="person-name overflow-hidden-nowrap">
-                  {{ person.identity | formatIdentity('Fl') }}
-                </div>
-              </div>
-            </td>
-            <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
-              valign="top" @click="createEvent({ dayIndex, person })" class="planning-background">
-              <template v-for="hourIndex in hours.length">
-                <div class="line" :style="{ left: `${(hourIndex * hourWidth * 2)}%` }"
-                  :key="`hour_${hourIndex}`" />
-              </template>
-              <template v-for="(event, eventIndex) in getCellEvents(person, days[dayIndex])">
-                <ni-planning-event-cell :event="event" :display-staffing-view="staffingView && !isCustomerPlanning"
-                  :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canEdit" :person-key="personKey" />
-              </template>
-            </td>
-          </tr>
         </tbody>
       </table>
     </div>
@@ -194,11 +186,17 @@ export default {
     isCoach () {
       return [COACH, ADMIN].includes(this.getUser.role.name);
     },
+    personsGroupedBySector () {
+      return this.$_.groupBy(this.persons, 'sector._id');
+    },
   },
   methods: {
     toggleAllSectors () {
       this.$emit('update:displayAllSectors', !this.displayAllSectors);
       this.terms = [];
+    },
+    getSector (sectorId) {
+      return this.filteredSectors.find(s => s._id === sectorId);
     },
     getTimelineHours () {
       const range = this.$moment.range(this.$moment().hours(STAFFING_VIEW_START_HOUR).minutes(0), this.$moment().hours(STAFFING_VIEW_END_HOUR).minutes(0));
@@ -218,8 +216,8 @@ export default {
 
       return (!rowEvents || !rowEvents.events) ? [] : rowEvents.events;
     },
-    getCellEvents (cell, day) {
-      return this.getRowEvents(cell._id)
+    getCellEvents (cellId, day) {
+      return this.getRowEvents(cellId)
         .filter(event =>
           this.$moment(day).isBetween(event.startDate, event.endDate, 'day', '[]') &&
           (!this.staffingView || !event.isCancelled)
