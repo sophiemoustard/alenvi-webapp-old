@@ -111,6 +111,7 @@ import { planningEventMixin } from '../../mixins/planningEventMixin';
 import PlanningNavigation from './PlanningNavigation.vue';
 import distanceMatrix from '../../api/DistanceMatrix';
 import { formatIdentity } from '../../helpers/utils';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'PlanningManager',
@@ -149,7 +150,7 @@ export default {
     }
   },
   beforeDestroy () {
-    if (!AUXILIARY_ROLES.includes(this.getUser.role.name)) {
+    if (!AUXILIARY_ROLES.includes(this.mainUser.role.name)) {
       if (!this.isCustomerPlanning) {
         this.$q.localStorage.set('lastSearchAuxiliaries', JSON.stringify(this.terms));
       } else {
@@ -162,29 +163,13 @@ export default {
     this.getTimelineHours();
     if (!this.isCustomerPlanning) await this.getDistanceMatrix();
   },
-  watch: {
-    // Initial filter getter
-    getFilter (val) {
-      if (val.length > 0) {
-        if (!AUXILIARY_ROLES.includes(this.getUser.role.name)) {
-          if (!this.isCustomerPlanning) this.addSavedTerms('Auxiliaries');
-          else this.addSavedTerms('Customers');
-        } else {
-          const userSector = this.getFilter.find(filter => filter.type === SECTOR && filter._id === this.getUser.sector);
-          if (userSector) this.$refs.refFilter.add(userSector.label);
-        }
-      }
-    },
-  },
   computed: {
-    getFilter () {
-      return this.$store.getters['planning/getFilter'];
-    },
-    getUser () {
-      return this.$store.getters['main/user'];
-    },
+    ...mapGetters({
+      mainUser: 'main/user',
+      filters: 'planning/getFilters',
+    }),
     isCoach () {
-      return [COACH, ADMIN].includes(this.getUser.role.name);
+      return [COACH, ADMIN].includes(this.mainUser.role.name);
     },
     personsGroupedBySector () {
       return this.$_.groupBy(this.persons, 'sector._id');
@@ -304,14 +289,6 @@ export default {
     },
     editEvent (eventId) {
       this.$emit('editEvent', eventId);
-    },
-    addSavedTerms (endPath) {
-      if (this.$q.localStorage.has(`lastSearch${endPath}`) && this.$q.localStorage.get.item(`lastSearch${endPath}`).length > 0) {
-        const lastSearch = JSON.parse(this.$q.localStorage.get.item(`lastSearch${endPath}`));
-        for (let i = 0, l = lastSearch.length; i < l; i++) {
-          setTimeout(() => this.$refs.refFilter.add(lastSearch[i]), 1);
-        }
-      }
     },
   },
   filters: {

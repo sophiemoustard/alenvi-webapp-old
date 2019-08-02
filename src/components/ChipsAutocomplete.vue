@@ -24,31 +24,31 @@ export default {
   },
   computed: {
     ...mapGetters({
-      getFilter: 'planning/getFilter',
-      getElemAdded: 'planning/getElemAdded',
+      filters: 'planning/getFilters',
+      elementToAdd: 'planning/getElementToAdd',
     }),
   },
   methods: {
     addEvent (el) {
-      this.$store.commit('planning/setElemAdded', this.getFilter.find(elem => elem.value === el.val));
+      this.$store.commit('planning/setElementToAdd', this.filters.find(elem => elem.value === el.val));
     },
     input (el) {
       this.$emit('input', el);
     },
     removeEvent (el) {
-      this.$store.commit('planning/setElemRemoved', this.getFilter.find(elem => elem.value === el.value[0]));
+      this.$store.commit('planning/setElementToRemove', this.filters.find(elem => elem.value === el.value[0]));
     },
     async search (terms, done) {
       try {
         const regex = new RegExp(terms, 'i');
-        done(this.getFilter.filter(el => el.value.match(regex)));
+        done(this.filters.filter(el => el.value.match(regex)));
       } catch (e) {
         done([]);
       }
     },
     // q-chips-input 'add' method called from Planning.vue only when planning starts for the first time
     add (el) {
-      this.$store.commit('planning/setElemAdded', this.getFilter.find(elem => elem.value === el));
+      this.$store.commit('planning/setElementToAdd', this.filters.find(elem => elem.value === el));
       return this.$refs.refFilter.add(el);
     },
   },

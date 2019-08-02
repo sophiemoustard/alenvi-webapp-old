@@ -1,15 +1,11 @@
-export const setFilter = (state, filterData) => {
-  state.filter = filterData;
+export const setFilters = (state, filterData) => {
+  state.filters = filterData;
 }
 
-export const addToFilter = (state, filterData) => {
-  state.filter.push(filterData);
+export const setElementToAdd = (state, elem) => {
+  state.elementToAdd = { ...elem };
 }
 
-export const setElemAdded = (state, elem) => {
-  state.elemAdded = { ...elem };
-}
-
-export const setElemRemoved = (state, elem) => {
-  state.elemRemoved = { ...elem };
+export const setElementToRemove = (state, elem) => {
+  state.elementToRemove = { ...elem };
 }

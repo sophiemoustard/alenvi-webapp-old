@@ -61,7 +61,7 @@ export const planningModalMixin = {
     };
   },
   computed: {
-    getUser () {
+    mainUser () {
       return this.$store.getters['main/user'];
     },
     absenceOptions () {
@@ -186,7 +186,7 @@ export const planningModalMixin = {
       return this.$_.get(this.editedEvent, 'customer.contact.address.fullAddress', '');
     },
     customerProfileRedirect () {
-      return this.getUser.role.name === COACH || this.getUser.role.name === ADMIN
+      return this.mainUser.role.name === COACH || this.mainUser.role.name === ADMIN
         ? { name: 'customers profile', params: { id: this.editedEvent.customer._id } }
         : { name: 'profile customers info', params: { customerId: this.editedEvent.customer._id } };
     },
