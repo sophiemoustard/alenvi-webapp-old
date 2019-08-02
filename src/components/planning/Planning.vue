@@ -192,7 +192,7 @@ export default {
   },
   methods: {
     toggleAllSectors () {
-      this.$emit('update:displayAllSectors', !this.displayAllSectors);
+      this.$emit('toggleAllSectors', this.terms);
       this.terms = [];
     },
     getSector (sectorId) {

@@ -3,7 +3,8 @@
     <ni-planning-manager :events="events" :persons="activeAuxiliaries" @updateStartOfWeek="updateStartOfWeek"
       @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop"
       :filteredSectors="filteredSectors" :can-edit="canEditEvent" :personKey="personKey"
-      :displayAllSectors.sync="displayAllSectors" :eventHistories="eventHistories" />
+      @toggleAllSectors="toggleAllSectors" :eventHistories="eventHistories" ref="planningManager"
+      :displayAllSectors="displayAllSectors" />
 
     <!-- Event creation modal -->
     <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
@@ -52,6 +53,7 @@ export default {
       // Filters
       filteredSectors: [],
       filteredAuxiliaries: [],
+      savedSearch: [],
       // Event creation
       newEvent: {},
       creationModal: false,
@@ -138,18 +140,6 @@ export default {
     getElemRemoved (val) {
       this.handleElemRemovedFromFilter(val);
     },
-    async displayAllSectors (value) {
-      if (!value) {
-        this.auxiliaries = [];
-        this.filteredSectors = [];
-        this.events = [];
-      } else {
-        this.filteredAuxiliaries = [];
-        this.auxiliaries = this.getFilter.filter(fil => fil.type === PERSON);
-        this.filteredSectors = this.getFilter.filter(fil => fil.type === SECTOR);
-        await this.refresh();
-      }
-    },
   },
   computed: {
     ...mapGetters({
@@ -197,6 +187,23 @@ export default {
       if (this.auxiliaries && this.auxiliaries.length) await this.refresh();
     },
     // Refresh data
+    async toggleAllSectors (search) {
+      this.displayAllSectors = !this.displayAllSectors;
+      if (!this.displayAllSectors) {
+        this.auxiliaries = [];
+        this.filteredSectors = [];
+        this.events = [];
+        for (let term of this.savedSearch) {
+          setTimeout(() => this.$refs.planningManager.$refs.refFilter.add(term), 100);
+        }
+      } else {
+        this.savedSearch = search;
+        this.filteredAuxiliaries = [];
+        this.auxiliaries = this.getFilter.filter(fil => fil.type === PERSON);
+        this.filteredSectors = this.getFilter.filter(fil => fil.type === SECTOR);
+        await this.refresh();
+      }
+    },
     async refresh () {
       await Promise.all([this.refreshEvents(), this.getEventHistories()]);
     },
