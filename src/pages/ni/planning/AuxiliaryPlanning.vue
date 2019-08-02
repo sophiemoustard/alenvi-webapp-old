@@ -193,7 +193,7 @@ export default {
         this.addSavedTerms('Auxiliaries');
       } else {
         const userSector = this.filters.find(filter => filter.type === SECTOR && filter._id === this.mainUser.sector);
-        if (userSector) this.$refs.planningManager.$refs.refFilter.add(userSector.label);
+        if (userSector) this.$refs.planningManager.restoreFilter([userSector.label]);
       }
     },
     // Refresh data
@@ -203,9 +203,7 @@ export default {
         this.auxiliaries = [];
         this.filteredSectors = [];
         this.events = [];
-        for (let term of this.savedSearch) {
-          setTimeout(() => this.$refs.planningManager.$refs.refFilter.add(term), 100);
-        }
+        this.$refs.planningManager.restoreFilter(this.savedSearch);
       } else {
         this.savedSearch = search;
         this.filteredAuxiliaries = [];

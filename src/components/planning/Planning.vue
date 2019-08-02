@@ -183,6 +183,11 @@ export default {
     getSector (sectorId) {
       return this.filteredSectors.find(s => s._id === sectorId);
     },
+    restoreFilter (terms) {
+      for (let term of terms) {
+        setTimeout(() => this.$refs.refFilter.add(term), 100);
+      }
+    },
     getTimelineHours () {
       const range = this.$moment.range(this.$moment().hours(STAFFING_VIEW_START_HOUR).minutes(0), this.$moment().hours(STAFFING_VIEW_END_HOUR).minutes(0));
       this.hours = Array.from(range.by('hours', { step: 2, excludeEnd: true }));

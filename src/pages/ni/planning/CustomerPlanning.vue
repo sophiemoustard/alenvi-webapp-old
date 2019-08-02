@@ -194,6 +194,7 @@ export default {
   computed: {
     ...mapGetters({
       mainUser: 'main/user',
+      filters: 'planning/getFilters',
       elementToAdd: 'planning/getElementToAdd',
       elementToRemove: 'planning/getElementToRemove',
     }),
@@ -301,7 +302,7 @@ export default {
         this.addSavedTerms('Customers');
       } else {
         const userSector = this.filters.find(filter => filter.type === SECTOR && filter._id === this.mainUser.sector);
-        if (userSector) this.$refs.planningManager.$refs.refFilter.add(userSector.label);
+        if (userSector) this.$refs.planningManager.restoreFilter([userSector.label]);
       }
     },
     // Refresh
