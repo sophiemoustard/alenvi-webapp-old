@@ -41,7 +41,6 @@
 </template>
 
 <script>
-import ModalInput from '../../../components/form/ModalInput';
 import DateRange from '../../../components/form/DateRange';
 import ToBillRow from '../../../components/table/ToBillRow';
 import BillingPagination from '../../../components/table/BillingPagination';
@@ -56,7 +55,6 @@ export default {
   },
   mixins: [billingMixin],
   components: {
-    'ni-modal-input': ModalInput,
     'ni-to-bill-row': ToBillRow,
     'ni-date-range': DateRange,
     'ni-billing-pagination': BillingPagination,

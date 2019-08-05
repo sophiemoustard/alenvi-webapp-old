@@ -71,7 +71,7 @@
           @blur="updateUser('identity.birthCountry')" />
         <ni-input caption="Département de naissance" :error="$v.user.identity.birthState.$error"
           :error-label="birthStateError" v-model="user.identity.birthState" @blur="updateUser('identity.birthState')"
-          @focus="saveTmp('identity.birthState')" :displayInput="this.user.identity.birthCountry === 'FR'" />
+          @focus="saveTmp('identity.birthState')" :hidden="this.user.identity.birthCountry !== 'FR'" />
         <ni-input caption="Ville de naissance" :error="$v.user.identity.birthCity.$error"
           v-model="user.identity.birthCity" @focus="saveTmp('identity.birthCity')"
           @blur="updateUser('identity.birthCity')" />

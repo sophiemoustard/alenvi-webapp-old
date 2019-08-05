@@ -231,10 +231,10 @@
               <q-icon name="clear" @click.native="addHelper = false" /></span>
           </div>
         </div>
-        <ni-modal-input v-model="newHelper.identity.lastname" :error="$v.newHelper.identity.lastname.$error" caption="Nom"
-          @blur="$v.newHelper.identity.lastname.$touch" required-field />
-        <ni-modal-input v-model="newHelper.identity.firstname" caption="Prénom" />
-        <ni-modal-input v-model="newHelper.local.email" last :error="$v.newHelper.local.email.$error" caption="Email"
+        <ni-input for-modal v-model="newHelper.identity.lastname" :error="$v.newHelper.identity.lastname.$error"
+          caption="Nom" @blur="$v.newHelper.identity.lastname.$touch" required-field />
+        <ni-input for-modal v-model="newHelper.identity.firstname" caption="Prénom" />
+        <ni-input for-modal v-model="newHelper.local.email" last :error="$v.newHelper.local.email.$error" caption="Email"
           @blur="$v.newHelper.local.email.$touch" :error-label="emailError" required-field />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter un aidant" icon-right="add" color="primary" :loading="loading"
@@ -255,14 +255,14 @@
         </div>
         <ni-modal-select caption="Service" :options="serviceOptions" v-model="newSubscription.service" :error="$v.newSubscription.service.$error"
           @blur="$v.newSubscription.service.$touch" required-field />
-        <ni-modal-input v-model="newSubscription.unitTTCRate" :error="$v.newSubscription.unitTTCRate.$error" caption="Prix unitaire TTC"
+        <ni-input for-modal v-model="newSubscription.unitTTCRate" :error="$v.newSubscription.unitTTCRate.$error" caption="Prix unitaire TTC"
           @blur="$v.newSubscription.unitTTCRate.$touch" type="number" required-field />
-        <ni-modal-input v-model="newSubscription.estimatedWeeklyVolume" :error="$v.newSubscription.estimatedWeeklyVolume.$error"
+        <ni-input for-modal v-model="newSubscription.estimatedWeeklyVolume" :error="$v.newSubscription.estimatedWeeklyVolume.$error"
           caption="Volume hebdomadaire estimatif" @blur="$v.newSubscription.estimatedWeeklyVolume.$touch" type="number"
           required-field />
-        <ni-modal-input v-if="newSubscription.service.nature !== FIXED" v-model="newSubscription.sundays" caption="Dont dimanche (h)"
+        <ni-input for-modal v-if="newSubscription.service.nature !== FIXED" v-model="newSubscription.sundays" caption="Dont dimanche (h)"
           type="number" />
-        <ni-modal-input v-if="newSubscription.service.nature !== FIXED" v-model="newSubscription.evenings" caption="Dont soirée (h)"
+        <ni-input for-modal v-if="newSubscription.service.nature !== FIXED" v-model="newSubscription.evenings" caption="Dont soirée (h)"
           last type="number" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter une souscription" icon-right="add" color="primary"
@@ -281,14 +281,14 @@
               <q-icon name="clear" @click.native="subscriptionEditionModal = false" /></span>
           </div>
         </div>
-        <ni-modal-input v-model="editedSubscription.unitTTCRate" :error="$v.editedSubscription.unitTTCRate.$error"
+        <ni-input for-modal v-model="editedSubscription.unitTTCRate" :error="$v.editedSubscription.unitTTCRate.$error"
           caption="Prix unitaire TTC" @blur="$v.editedSubscription.unitTTCRate.$touch" type="number" required-field />
-        <ni-modal-input v-model="editedSubscription.estimatedWeeklyVolume" :error="$v.editedSubscription.estimatedWeeklyVolume.$error"
+        <ni-input for-modal v-model="editedSubscription.estimatedWeeklyVolume" :error="$v.editedSubscription.estimatedWeeklyVolume.$error"
           caption="Volume hebdomadaire estimatif" @blur="$v.editedSubscription.estimatedWeeklyVolume.$touch" type="number"
           required-field />
-        <ni-modal-input v-if="editedSubscription.nature !== FIXED" v-model="editedSubscription.sundays" caption="Dont dimanche (h)"
+        <ni-input for-modal v-if="editedSubscription.nature !== FIXED" v-model="editedSubscription.sundays" caption="Dont dimanche (h)"
           type="number" />
-        <ni-modal-input v-if="editedSubscription.nature !== FIXED" v-model="editedSubscription.evenings"
+        <ni-input for-modal v-if="editedSubscription.nature !== FIXED" v-model="editedSubscription.evenings"
           caption="Dont soirée (h)" last type="number" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Editer la souscription" icon-right="check" color="primary"
@@ -387,20 +387,20 @@
           in-modal @blur="$v.newFunding.startDate.$touch" :error="$v.newFunding.startDate.$error" required-field />
         <ni-datetime-picker v-model="newFunding.endDate" :min="$moment(newFunding.startDate).add(1, 'day').toISOString()"
           in-modal caption="Date de fin de prise en charge" />
-        <ni-modal-input v-model="newFunding.folderNumber" caption="Numéro de dossier" />
+        <ni-input for-modal v-model="newFunding.folderNumber" caption="Numéro de dossier" />
         <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="newFunding.frequency" @blur="$v.newFunding.frequency.$touch"
           :error="$v.newFunding.frequency.$error" required-field />
         <ni-modal-select caption="Nature" :options="fundingNatureOptions" v-model="newFunding.nature" in-modal :error="$v.newFunding.nature.$error"
           @blur="$v.newFunding.nature.$touch" required-field @input="resetFundingFrequency" />
-        <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.unitTTCRate" caption="Prix unitaire TTC"
+        <ni-input for-modal v-if="!isOneTimeFundingNature" v-model="newFunding.unitTTCRate" caption="Prix unitaire TTC"
           type="number" @blur="$v.newFunding.unitTTCRate.$touch" :error="$v.newFunding.unitTTCRate.$error"
           required-field />
-        <ni-modal-input v-if="isOneTimeFundingNature" v-model="newFunding.amountTTC" caption="Montant forfaitaire TTC"
+        <ni-input for-modal v-if="isOneTimeFundingNature" v-model="newFunding.amountTTC" caption="Montant forfaitaire TTC"
           type="number" @blur="$v.newFunding.amountTTC.$touch" :error="$v.newFunding.amountTTC.$error" required-field />
-        <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.careHours" caption="Nb. heures prises en charge"
+        <ni-input for-modal v-if="!isOneTimeFundingNature" v-model="newFunding.careHours" caption="Nb. heures prises en charge"
           type="number" suffix="h" @blur="$v.newFunding.careHours.$touch" :error="$v.newFunding.careHours.$error"
           required-field />
-        <ni-modal-input v-if="!isOneTimeFundingNature" v-model="newFunding.customerParticipationRate" caption="Taux de participation du bénéficiaire"
+        <ni-input for-modal v-if="!isOneTimeFundingNature" v-model="newFunding.customerParticipationRate" caption="Taux de participation du bénéficiaire"
           type="number" suffix="%" @blur="$v.newFunding.customerParticipationRate.$touch" :error="$v.newFunding.customerParticipationRate.$error"
           required-field />
         <ni-option-group v-model="newFunding.careDays" :options="daysOptions" caption="Jours pris en charge" type="checkbox"
@@ -428,19 +428,19 @@
           required-field />
         <ni-datetime-picker v-model="editedFunding.endDate" caption="Date de fin de prise en charge" in-modal
           :min="$moment(editedFunding.startDate).add(1, 'day').toISOString()" />
-        <ni-modal-input v-model="editedFunding.folderNumber" caption="Numéro de dossier" />
+        <ni-input for-modal v-model="editedFunding.folderNumber" caption="Numéro de dossier" />
         <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="editedFunding.frequency" @blur="$v.editedFunding.frequency.$touch"
           :error="$v.editedFunding.frequency.$error" required-field />
-        <ni-modal-input v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.unitTTCRate" caption="Prix unitaire TTC"
+        <ni-input for-modal v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.unitTTCRate" caption="Prix unitaire TTC"
           type="number" @blur="$v.editedFunding.unitTTCRate.$touch" :error="$v.editedFunding.unitTTCRate.$error"
           required-field />
-        <ni-modal-input v-if="isOneTimeEditedFundingNature" v-model="editedFunding.amountTTC" caption="Montant forfaitaire TTC"
+        <ni-input for-modal v-if="isOneTimeEditedFundingNature" v-model="editedFunding.amountTTC" caption="Montant forfaitaire TTC"
           type="number" @blur="$v.editedFunding.amountTTC.$touch" :error="$v.editedFunding.amountTTC.$error"
           required-field />
-        <ni-modal-input v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.careHours" caption="Nb. heures prises en charge"
+        <ni-input for-modal v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.careHours" caption="Nb. heures prises en charge"
           type="number" @blur="$v.editedFunding.careHours.$touch" :error="$v.editedFunding.careHours.$error"
           required-field suffix="h" />
-        <ni-modal-input v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.customerParticipationRate" caption="Taux de participation du bénéficiaire"
+        <ni-input for-modal v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.customerParticipationRate" caption="Taux de participation du bénéficiaire"
           type="number" suffix="%" @blur="$v.editedFunding.customerParticipationRate.$touch" :error="$v.editedFunding.customerParticipationRate.$error"
           required-field />
         <ni-option-group v-model="editedFunding.careDays" :options="daysOptions" caption="Jours pris en charge" type="checkbox"
@@ -460,8 +460,7 @@ import randomize from 'randomatic';
 import { extend, clear } from '../../helpers/utils.js';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify.js';
 import SearchAddress from '../form/SearchAddress';
-import Input from '../form/Input.vue';
-import NiModalInput from '../form/ModalInput';
+import NiInput from '../form/Input';
 import NiModalSelect from '../form/ModalSelect';
 import NiOptionGroup from '../form/OptionGroup';
 import MultipleFilesUploader from '../form/MultipleFilesUploader.vue';
@@ -480,8 +479,7 @@ export default {
   name: 'ProfileInfo',
   components: {
     NiSearchAddress: SearchAddress,
-    NiInput: Input,
-    NiModalInput,
+    NiInput,
     NiModalSelect,
     'ni-datetime-picker': DatetimePicker,
     NiOptionGroup,

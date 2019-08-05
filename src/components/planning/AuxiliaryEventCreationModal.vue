@@ -64,7 +64,7 @@
       <template v-if="newEvent.type === INTERNAL_HOUR">
         <ni-search-address v-model="newEvent.address" :error-label="addressError" @blur="validations.address.$touch" :error="validations.address.$error" inModal />
       </template>
-      <ni-modal-input v-model="newEvent.misc" caption="Notes" />
+      <ni-input for-modal v-model="newEvent.misc" caption="Notes" />
     </div>
     <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary"
       @click="createEvent" :disable="disableCreationButton" icon-right="add" />

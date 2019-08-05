@@ -124,24 +124,24 @@
             <span><q-icon name="clear" @click.native="surchargeCreationModal = false" /></span>
           </div>
         </div>
-        <ni-modal-input caption="Nom" v-model="newSurcharge.name" :error="$v.newSurcharge.name.$error" @blur="$v.newSurcharge.name.$touch" required-field />
-        <ni-modal-input caption="Majoration samedi" suffix="%" type="number" v-model="newSurcharge.saturday"
+        <ni-input for-modal caption="Nom" v-model="newSurcharge.name" :error="$v.newSurcharge.name.$error" @blur="$v.newSurcharge.name.$touch" required-field />
+        <ni-input for-modal caption="Majoration samedi" suffix="%" type="number" v-model="newSurcharge.saturday"
           :error="$v.newSurcharge.saturday.$error" @blur="$v.newSurcharge.saturday.$touch" />
-        <ni-modal-input caption="Majoration dimanche" suffix="%" type="number" v-model="newSurcharge.sunday"
+        <ni-input for-modal caption="Majoration dimanche" suffix="%" type="number" v-model="newSurcharge.sunday"
           :error="$v.newSurcharge.sunday.$error" @blur="$v.newSurcharge.sunday.$touch" />
-        <ni-modal-input caption="Majoration jour férié" suffix="%" type="number" v-model="newSurcharge.publicHoliday"
+        <ni-input for-modal caption="Majoration jour férié" suffix="%" type="number" v-model="newSurcharge.publicHoliday"
           :error="$v.newSurcharge.publicHoliday.$error" @blur="$v.newSurcharge.publicHoliday.$touch" />
-        <ni-modal-input caption="Majoration 25 décembre" suffix="%" type="number" v-model="newSurcharge.twentyFifthOfDecember"
+        <ni-input for-modal caption="Majoration 25 décembre" suffix="%" type="number" v-model="newSurcharge.twentyFifthOfDecember"
           :error="$v.newSurcharge.twentyFifthOfDecember.$error" @blur="$v.newSurcharge.twentyFifthOfDecember.$touch" />
-        <ni-modal-input caption="Majoration 1er mai" suffix="%" type="number" v-model="newSurcharge.firstOfMay"
+        <ni-input for-modal caption="Majoration 1er mai" suffix="%" type="number" v-model="newSurcharge.firstOfMay"
           :error="$v.newSurcharge.firstOfMay.$error" @blur="$v.newSurcharge.firstOfMay.$touch" />
-        <ni-modal-input caption="Majoration soirée" suffix="%" type="number" v-model="newSurcharge.evening"
+        <ni-input for-modal caption="Majoration soirée" suffix="%" type="number" v-model="newSurcharge.evening"
           :error="$v.newSurcharge.evening.$error" @blur="$v.newSurcharge.evening.$touch" />
         <ni-datetime-picker caption="Début soirée" v-model="newSurcharge.eveningStartTime" :error="$v.newSurcharge.eveningStartTime.$error"
           @blur="$v.newSurcharge.eveningStartTime.$touch" in-modal type="time" :disable="!newSurcharge.evening" clearable />
         <ni-datetime-picker caption="Fin soirée" v-model="newSurcharge.eveningEndTime" :error="$v.newSurcharge.eveningEndTime.$error"
           @blur="$v.newSurcharge.eveningEndTime.$touch" in-modal type="time" :disable="!newSurcharge.evening" clearable />
-        <ni-modal-input caption="Majoration personnalisée" suffix="%" type="number" v-model="newSurcharge.custom"
+        <ni-input for-modal caption="Majoration personnalisée" suffix="%" type="number" v-model="newSurcharge.custom"
           :error="$v.newSurcharge.custom.$error" @blur="$v.newSurcharge.custom.$touch" />
         <ni-datetime-picker caption="Début personnalisé" v-model="newSurcharge.customStartTime" :error="$v.newSurcharge.customStartTime.$error"
           @blur="$v.newSurcharge.customStartTime.$touch" in-modal type="time" :disable="!newSurcharge.custom" clearable />
@@ -163,24 +163,24 @@
             <span><q-icon name="clear" @click.native="surchargeEditionModal = false" /></span>
           </div>
         </div>
-        <ni-modal-input caption="Nom" v-model="editedSurcharge.name" :error="$v.editedSurcharge.name.$error" @blur="$v.editedSurcharge.name.$touch" required-field />
-        <ni-modal-input caption="Majoration samedi" suffix="%" type="number" v-model="editedSurcharge.saturday"
+        <ni-input for-modal caption="Nom" v-model="editedSurcharge.name" :error="$v.editedSurcharge.name.$error" @blur="$v.editedSurcharge.name.$touch" required-field />
+        <ni-input for-modal caption="Majoration samedi" suffix="%" type="number" v-model="editedSurcharge.saturday"
           :error="$v.editedSurcharge.saturday.$error" @blur="$v.editedSurcharge.saturday.$touch" />
-        <ni-modal-input caption="Majoration dimanche" suffix="%" type="number" v-model="editedSurcharge.sunday"
+        <ni-input for-modal caption="Majoration dimanche" suffix="%" type="number" v-model="editedSurcharge.sunday"
           :error="$v.editedSurcharge.sunday.$error" @blur="$v.editedSurcharge.sunday.$touch" />
-        <ni-modal-input caption="Majoration jour férié" suffix="%" type="number" v-model="editedSurcharge.publicHoliday"
+        <ni-input for-modal caption="Majoration jour férié" suffix="%" type="number" v-model="editedSurcharge.publicHoliday"
           :error="$v.editedSurcharge.publicHoliday.$error" @blur="$v.editedSurcharge.publicHoliday.$touch" />
-        <ni-modal-input caption="Majoration 25 décembre" suffix="%" type="number" v-model="editedSurcharge.twentyFifthOfDecember"
+        <ni-input for-modal caption="Majoration 25 décembre" suffix="%" type="number" v-model="editedSurcharge.twentyFifthOfDecember"
           :error="$v.editedSurcharge.twentyFifthOfDecember.$error" @blur="$v.editedSurcharge.twentyFifthOfDecember.$touch" />
-        <ni-modal-input caption="Majoration 1er mai" suffix="%" type="number" v-model="editedSurcharge.firstOfMay"
+        <ni-input for-modal caption="Majoration 1er mai" suffix="%" type="number" v-model="editedSurcharge.firstOfMay"
           :error="$v.editedSurcharge.firstOfMay.$error" @blur="$v.editedSurcharge.firstOfMay.$touch" />
-        <ni-modal-input caption="Majoration soirée" suffix="%" type="number" v-model="editedSurcharge.evening"
+        <ni-input for-modal caption="Majoration soirée" suffix="%" type="number" v-model="editedSurcharge.evening"
           :error="$v.editedSurcharge.evening.$error" @blur="$v.editedSurcharge.evening.$touch" />
         <ni-datetime-picker caption="Début soirée" v-model="editedSurcharge.eveningStartTime" :error="$v.editedSurcharge.eveningStartTime.$error"
           @blur="$v.editedSurcharge.eveningStartTime.$touch" in-modal type="time" :disable="!editedSurcharge.evening" clearable />
         <ni-datetime-picker caption="Fin soirée" v-model="editedSurcharge.eveningEndTime" :error="$v.editedSurcharge.eveningEndTime.$error"
           @blur="$v.editedSurcharge.eveningEndTime.$touch" in-modal type="time" :disable="!editedSurcharge.evening" clearable />
-        <ni-modal-input caption="Majoration personnalisée" suffix="%" type="number" v-model="editedSurcharge.custom"
+        <ni-input for-modal caption="Majoration personnalisée" suffix="%" type="number" v-model="editedSurcharge.custom"
           :error="$v.editedSurcharge.custom.$error" @blur="$v.editedSurcharge.custom.$touch" />
         <ni-datetime-picker caption="Début personnalisé" v-model="editedSurcharge.customStartTime" :error="$v.editedSurcharge.customStartTime.$error"
           @blur="$v.editedSurcharge.customStartTime.$touch" in-modal type="time" :disable="!editedSurcharge.custom" clearable />
@@ -204,12 +204,12 @@
         </div>
         <ni-modal-select caption="Type" v-model="newService.type" :error="$v.newService.type.$error" @blur="$v.newService.type.$touch"
           :options="serviceTypeOptions" required-field />
-        <ni-modal-input caption="Nom" v-model="newService.name" :error="$v.newService.name.$error" @blur="$v.newService.name.$touch" required-field />
+        <ni-input for-modal caption="Nom" v-model="newService.name" :error="$v.newService.name.$error" @blur="$v.newService.name.$touch" required-field />
         <ni-modal-select caption="Nature" v-model="newService.nature" :error="$v.newService.nature.$error" @blur="$v.newService.nature.$touch"
           :options="natureOptions" required-field />
-        <ni-modal-input caption="Prix unitaire par défaut TTC" suffix="€" type="number" v-model="newService.defaultUnitAmount"
+        <ni-input for-modal caption="Prix unitaire par défaut TTC" suffix="€" type="number" v-model="newService.defaultUnitAmount"
           :error="$v.newService.defaultUnitAmount.$error" @blur="$v.newService.defaultUnitAmount.$touch" required-field />
-        <ni-modal-input caption="TVA" suffix="%" v-model="newService.vat" type="number" :error="$v.newService.vat.$error" @blur="$v.newService.vat.$touch"
+        <ni-input for-modal caption="TVA" suffix="%" v-model="newService.vat" type="number" :error="$v.newService.vat.$error" @blur="$v.newService.vat.$touch"
           error-label="La TVA doit être positive ou nulle" />
         <ni-modal-select v-if="newService.nature !== FIXED" caption="Plan de majoration" v-model="newService.surcharge" :options="surchargesOptions" clearable />
         <div class="row q-mb-md">
@@ -231,13 +231,13 @@
             <span><q-icon name="clear" @click.native="serviceEditionModal = false" /></span>
           </div>
         </div>
-        <ni-modal-input caption="Nom" v-model="editedService.name" :error="$v.editedService.name.$error" @blur="$v.editedService.name.$touch"
+        <ni-input for-modal caption="Nom" v-model="editedService.name" :error="$v.editedService.name.$error" @blur="$v.editedService.name.$touch"
           required-field />
         <ni-datetime-picker caption="Date d'effet" v-model="editedService.startDate" :error="$v.editedService.startDate.$error"
           @blur="$v.editedService.startDate.$touch" :min="minStartDate" in-modal required-field />
-        <ni-modal-input caption="Prix unitaire par défaut TTC" suffix="€" type="number" v-model="editedService.defaultUnitAmount"
+        <ni-input for-modal caption="Prix unitaire par défaut TTC" suffix="€" type="number" v-model="editedService.defaultUnitAmount"
           :error="$v.editedService.defaultUnitAmount.$error" @blur="$v.editedService.defaultUnitAmount.$touch" required-field />
-        <ni-modal-input caption="TVA" suffix="%" v-model="editedService.vat" type="number" :error="$v.editedService.vat.$error" @blur="$v.editedService.vat.$touch"
+        <ni-input for-modal caption="TVA" suffix="%" v-model="editedService.vat" type="number" :error="$v.editedService.vat.$error" @blur="$v.editedService.vat.$touch"
           error-label="La TVA doit être positive ou nulle" />
         <ni-modal-select v-if="editedService.nature !== FIXED" caption="Plan de majoration" v-model="editedService.surcharge" :options="surchargesOptions" clearable />
         <div class="row q-mb-md">
@@ -279,12 +279,12 @@
             <span><q-icon name="clear" @click.native="thirdPartyPayerCreationModal = false" /></span>
           </div>
         </div>
-        <ni-modal-input caption="Nom" v-model="newThirdPartyPayer.name" :error="$v.newThirdPartyPayer.name.$error" @blur="$v.newThirdPartyPayer.name.$touch"
+        <ni-input for-modal caption="Nom" v-model="newThirdPartyPayer.name" :error="$v.newThirdPartyPayer.name.$error" @blur="$v.newThirdPartyPayer.name.$touch"
           required-field />
         <ni-search-address v-model="newThirdPartyPayer.address" error-label="Adresse invalide" in-modal
           @blur="$v.newThirdPartyPayer.address.$touch" :error="$v.newThirdPartyPayer.address.$error" />
-        <ni-modal-input caption="Email" v-model.trim="newThirdPartyPayer.email" />
-        <ni-modal-input caption="Prix unitaire TTC par défaut" suffix="€" type="number" v-model="newThirdPartyPayer.unitTTCRate"
+        <ni-input for-modal caption="Email" v-model.trim="newThirdPartyPayer.email" />
+        <ni-input for-modal caption="Prix unitaire TTC par défaut" suffix="€" type="number" v-model="newThirdPartyPayer.unitTTCRate"
           :error="$v.newThirdPartyPayer.unitTTCRate.$error" error-label="Le prix unitaire doit être positif"/>
         <ni-modal-select v-model="newThirdPartyPayer.billingMode" :options="billingModeOptions" caption="Facturation" :filter="false" />
       </div>
@@ -303,13 +303,13 @@
             <span><q-icon name="clear" @click.native="thirdPartyPayerEditionModal = false" /></span>
           </div>
         </div>
-        <ni-modal-input caption="Nom" v-model="editedThirdPartyPayer.name" :error="$v.editedThirdPartyPayer.name.$error"
+        <ni-input for-modal caption="Nom" v-model="editedThirdPartyPayer.name" :error="$v.editedThirdPartyPayer.name.$error"
           @blur="$v.editedThirdPartyPayer.name.$touch" required-field />
         <ni-search-address v-model="editedThirdPartyPayer.address" error-label="Adresse invalide"
           @blur="$v.editedThirdPartyPayer.address.$touch" :error="$v.editedThirdPartyPayer.address.$error" in-modal
           />
-        <ni-modal-input caption="Email" v-model.trim="editedThirdPartyPayer.email" />
-        <ni-modal-input caption="Prix unitaire TTC par défaut" suffix="€" type="number" v-model="editedThirdPartyPayer.unitTTCRate"
+        <ni-input for-modal caption="Email" v-model.trim="editedThirdPartyPayer.email" />
+        <ni-input for-modal caption="Prix unitaire TTC par défaut" suffix="€" type="number" v-model="editedThirdPartyPayer.unitTTCRate"
           :error="$v.editedThirdPartyPayer.unitTTCRate.$error" error-label="Le prix unitaire doit être positif"/>
         <ni-modal-select v-model="editedThirdPartyPayer.billingMode" :options="billingModeOptions" caption="Facturation" :filter="false" />
       </div>
@@ -321,14 +321,13 @@
 <script>
 import { required, numeric, requiredIf } from 'vuelidate/lib/validators';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
-import ModalInput from '../../../components/form/ModalInput.vue';
 import ModalSelect from '../../../components/form/ModalSelect.vue';
 import DatetimePicker from '../../../components/form/DatetimePicker.vue';
 import CustomImg from '../../../components/form/CustomImg.vue';
 import FileUploader from '../../../components/form/FileUploader.vue';
 import { configMixin } from '../../../mixins/configMixin';
 import { validationMixin } from '../../../mixins/validationMixin.js';
-import Input from '../../../components/form/Input.vue';
+import NiInput from '../../../components/form/Input.vue';
 import Select from '../../../components/form/Select.vue';
 import SearchAddress from '../../../components/form/SearchAddress.vue';
 import { frAddress, posDecimals, positiveNumber, iban, bic } from '../../../helpers/vuelidateCustomVal';
@@ -338,11 +337,10 @@ export default {
   name: 'CustomersConfig',
   metaInfo: { title: 'Configuration bénéficiaire' },
   components: {
-    'ni-modal-input': ModalInput,
     'ni-custom-img': CustomImg,
     'ni-file-uploader': FileUploader,
     'ni-modal-select': ModalSelect,
-    'ni-input': Input,
+    'ni-input': NiInput,
     'ni-select': Select,
     'ni-search-address': SearchAddress,
     'ni-datetime-picker': DatetimePicker,

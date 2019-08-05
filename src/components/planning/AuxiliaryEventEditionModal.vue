@@ -71,7 +71,7 @@
             :error="validations.absence.$error" required-field @blur="validations.absence.$touch" disable />
         </template>
       </template>
-      <ni-modal-input v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes"
+      <ni-input for-modal v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes"
         :disable="isDisabled" />
       <template v-if="editedEvent.type === INTERVENTION && !editedEvent.shouldUpdateRepetition && !isDisabled">
         <div class="row q-mb-md light-checkbox">

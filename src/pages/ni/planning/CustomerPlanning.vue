@@ -29,7 +29,7 @@
         <ni-modal-select caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency"
           :options="repetitionOptions" required-field @blur="$v.newEvent.repetition.frequency.$touch"
           :disable="!isRepetitionAllowed" />
-        <ni-modal-input v-model="newEvent.misc" caption="Notes" />
+        <ni-input for-modal v-model="newEvent.misc" caption="Notes" />
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary"
         @click="createEvent" :disable="disableCreationButton" icon-right="add" />
@@ -68,7 +68,7 @@
               @input="toggleRepetition" />
           </div>
         </template>
-        <ni-modal-input v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes"
+        <ni-input for-modal v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes"
           :disable="isDisabled" />
         <template v-if="!editedEvent.shouldUpdateRepetition && !isDisabled">
           <div class="row q-mb-md light-checkbox">

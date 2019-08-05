@@ -9,9 +9,9 @@
           <span><q-icon name="clear" @click.native="resetForm" /></span>
         </div>
       </div>
-      <ni-modal-input caption="Bénéficiaire" :value="customerFullname" required-field read-only />
-      <ni-modal-input caption="Client" v-model="selectedClientName" required-field read-only />
-      <ni-modal-input :caption="`Montant du ${editionModalNature}`" suffix="€" type="number"
+      <ni-input for-modal caption="Bénéficiaire" :value="customerFullname" required-field read-only />
+      <ni-input for-modal caption="Client" v-model="selectedClientName" required-field read-only />
+      <ni-input for-modal :caption="`Montant du ${editionModalNature}`" suffix="€" type="number"
         v-model="editedPayment.netInclTaxes" required-field :error="validations.netInclTaxes.$error"
         @blur="validations.netInclTaxes.$touch" :error-label="netInclTaxesError" />
       <ni-modal-select :caption="`Type du ${editionModalNature}`" v-model="editedPayment.type" :options="paymentOptions"
@@ -27,7 +27,7 @@
 <script>
 import { REQUIRED_LABEL, PAYMENT_OPTIONS, PAYMENT_NATURE_OPTIONS } from '../../data/constants.js';
 import ModalSelect from '../form/ModalSelect';
-import ModalInput from '../form/ModalInput';
+import NiInput from '../form/Input';
 import DatetimePicker from '../form/DatetimePicker';
 import { formatIdentity } from '../../helpers/utils.js';
 
@@ -35,7 +35,7 @@ export default {
   name: 'PaymentEditionModal',
   components: {
     'ni-modal-select': ModalSelect,
-    'ni-modal-input': ModalInput,
+    'ni-input': NiInput,
     'ni-datetime-picker': DatetimePicker,
   },
   props: {
