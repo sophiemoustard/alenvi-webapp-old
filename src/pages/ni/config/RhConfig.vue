@@ -205,7 +205,7 @@ import { required, maxValue } from 'vuelidate/lib/validators';
 import { posDecimals, sector } from '../../../helpers/vuelidateCustomVal';
 import CustomImg from '../../../components/form/CustomImg';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
-import NiInput from '../../../components/form/Input.vue';
+import NiInput from '../../../components/form/Input';
 import FileUploader from '../../../components/form/FileUploader.vue';
 import { configMixin } from '../../../mixins/configMixin';
 import { REQUIRED_LABEL } from '../../../data/constants';
