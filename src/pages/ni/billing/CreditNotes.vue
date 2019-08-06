@@ -98,7 +98,7 @@
             <span><q-icon name="clear" @click.native="creditNoteEditionModal = false" /></span>
           </div>
         </div>
-        <ni-modal-input caption="Bénéficiaire" :value="formatFullIdentity(editedCreditNote.customer.identity)" required-field disable />
+        <ni-modal-input caption="Bénéficiaire" :value="formatIdentity(editedCreditNote.customer.identity, 'FL')" required-field disable />
         <ni-modal-input v-if="editedCreditNote.thirdPartyPayer" caption="Tiers payeur"
           v-model="editedCreditNote.thirdPartyPayer.name" required-field disable />
         <ni-datetime-picker caption="Date de l'avoir" v-model="editedCreditNote.date" in-modal type="date"
@@ -157,7 +157,7 @@ import ModalSelect from '../../../components/form/ModalSelect';
 import OptionGroup from '../../../components/form/OptionGroup';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { positiveNumber } from '../../../helpers/vuelidateCustomVal.js';
-import { formatPrice, getLastVersion, formatShortIdentity, formatFullIdentity } from '../../../helpers/utils.js';
+import { formatPrice, getLastVersion, formatIdentity } from '../../../helpers/utils.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
 import { COMPANI } from '../../../data/constants';
 
@@ -225,7 +225,7 @@ export default {
           name: 'customer',
           label: 'Bénéficiaire',
           align: 'left',
-          field: row => formatShortIdentity(row.customer.identity),
+          field: row => formatIdentity(row.customer.identity, 'Lf'),
         },
         {
           name: 'thirdPartyPayer',
@@ -423,7 +423,7 @@ export default {
           this.customersOptions.push({
             subscriptions: customers[i].subscriptions,
             thirdPartyPayers: customers[i].thirdPartyPayers,
-            label: formatFullIdentity(customers[i].identity),
+            label: formatIdentity(customers[i].identity, 'FL'),
             value: customers[i]._id,
           });
         }
@@ -675,7 +675,7 @@ export default {
         NotifyNegative('Erreur lors de la suppression de l\'avoir');
       }
     },
-    formatFullIdentity,
+    formatIdentity,
   },
 }
 </script>

@@ -29,7 +29,7 @@ import { REQUIRED_LABEL, PAYMENT_OPTIONS, PAYMENT_NATURE_OPTIONS } from '../../d
 import ModalSelect from '../form/ModalSelect';
 import ModalInput from '../form/ModalInput';
 import DatetimePicker from '../form/DatetimePicker';
-import { formatFullIdentity } from '../../helpers/utils.js';
+import { formatIdentity } from '../../helpers/utils.js';
 
 export default {
   name: 'PaymentEditionModal',
@@ -68,7 +68,7 @@ export default {
       return `Editer le ${this.editionModalNature.toLowerCase()}`;
     },
     customerFullname () {
-      return formatFullIdentity(this.selectedCustomer.identity);
+      return formatIdentity(this.selectedCustomer.identity, 'FL');
     },
   },
   methods: {

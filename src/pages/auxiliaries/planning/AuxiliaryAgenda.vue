@@ -18,17 +18,16 @@
     <!-- Event creation modal -->
     <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
       :creationModal="creationModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary"
-      :auxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetCreationForm"
+      :activeAuxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetCreationForm"
       @deleteDocument="deleteDocument" @documentUploaded="documentUploaded" @createEvent="createEvent"
-      @close="closeCreationModal" @selectedAddress="selectedAddress"  />
+      @close="closeCreationModal" />
 
     <!-- Event edition modal -->
     <ni-auxiliary-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
       :editionModal="editionModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary"
-      :auxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetEditionForm"
+      :activeAuxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetEditionForm"
       @deleteDocument="deleteDocument" @documentUploaded="documentUploaded" @updateEvent="updateEvent"
-      @close="closeEditionModal" @deleteEvent="deleteEvent" @deleteEventRepetition="deleteEventRepetition"
-      @selectedAddress="selectedAddress"  />
+      @close="closeEditionModal" @deleteEvent="deleteEvent" @deleteEventRepetition="deleteEventRepetition" />
   </q-page>
 </template>
 
@@ -102,14 +101,14 @@ export default {
           startHour: { required: requiredIf((item, parent) => parent && (parent.type === ABSENCE && parent.absenceNature === HOURLY)) },
           endHour: { required: requiredIf((item, parent) => parent && (parent.type === ABSENCE && parent.absenceNature === HOURLY)) },
         },
-        auxiliary: { required },
+        auxiliary: { required: requiredIf((item) => item.type !== INTERVENTION) },
         sector: { required },
         customer: { required: requiredIf((item) => item.type === INTERVENTION) },
         subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
         internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
         absence: { required: requiredIf((item) => item.type === ABSENCE) },
         absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
-        location: { fullAddress: { frAddress } },
+        address: { fullAddress: { frAddress } },
         repetition: {
           frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
         },
@@ -125,14 +124,14 @@ export default {
           startHour: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absenceNature === HOURLY) },
           endHour: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absenceNature === HOURLY) },
         },
-        auxiliary: { required },
+        auxiliary: { required: requiredIf((item) => item.type !== INTERVENTION) },
         sector: { required },
         customer: { required: requiredIf((item) => item.type === INTERVENTION) },
         subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
         internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
         absence: { required: requiredIf((item) => item.type === ABSENCE) },
         absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
-        location: { fullAddress: { frAddress } },
+        address: { fullAddress: { frAddress } },
         repetition: {
           frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
         },
@@ -208,7 +207,7 @@ export default {
           { name: 'planning:create', rule: 'isOwner' },
         ],
       });
-      if (!can) return;
+      if (!can) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
 
       const selectedDay = this.days[dayIndex];
       if (!this.canCreateEvent(this.selectedAuxiliary, selectedDay)) return NotifyWarning('Impossible de créer un évènement à cette date à cette auxiliaire.');
@@ -220,7 +219,7 @@ export default {
         subscription: '',
         internalHour: '',
         absence: '',
-        location: {},
+        address: {},
         attachment: {},
         auxiliary: this.selectedAuxiliary._id,
         sector: this.selectedAuxiliary.sector,
@@ -240,7 +239,7 @@ export default {
     // Event edition
     openEditionModal (event) {
       const can = this.canEditEvent(event);
-      if (!can) return;
+      if (!can) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
       this.formatEditedEvent(event);
       if (event.type !== ABSENCE && this.selectedAuxiliary) {
         this.selectedAuxiliary.hasActiveCustomerContractOnEvent = this.hasActiveCustomerContractOnEvent(this.selectedAuxiliary, event.startDate);

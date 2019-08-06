@@ -60,7 +60,7 @@ export default {
     person: { type: Object, default: () => ({ picture: { link: '' }, administrative: {}, contracts: [] }) },
     events: { type: Array, default: () => [] },
     startOfWeekAsString: { type: String, default: '' },
-    distanceMatrix: { type: Array, default: () => [] },
+    dm: { type: Array, default: () => [] },
   },
   data () {
     return {
@@ -80,11 +80,12 @@ export default {
       averageTimeByCustomer: 0,
       selectedTab: WEEK_STATS,
       monthEvents: [],
+      distanceMatrix: [],
     };
   },
   computed: {
     isBusy () {
-      return this.ratio.contractHours !== 0 && this.ratio.weeklyHours > this.ratio.contractHours;
+      return this.ratio.contractHours !== 0 && this.ratio.weeklyHours >= this.ratio.contractHours;
     },
     endOfWeek () {
       return this.$moment(this.startOfWeekAsString).endOf('w').toISOString();
@@ -128,6 +129,7 @@ export default {
   async mounted () {
     if (!this.hasActiveCompanyContractOnEvent) return;
     await this.getRatio();
+    this.distanceMatrix = this.$_.cloneDeep(this.dm);
   },
   watch: {
     async selectedEvents () {
@@ -225,7 +227,7 @@ export default {
       let address;
       if (event.type === INTERVENTION && event.customer && event.customer.contact && event.customer.contact.address) {
         address = event.customer.contact.address.fullAddress;
-      } else if (event.type === INTERNAL_HOUR && event.location) address = event.location.fullAddress;
+      } else if (event.type === INTERNAL_HOUR && event.address) address = event.address.fullAddress;
 
       return !address ? null : address;
     },
@@ -233,7 +235,13 @@ export default {
       let distanceMatrix = this.distanceMatrix
         .find(dm => dm.origins === origins && dm.destinations === destinations && dm.mode === this.transportMode);
       if (!distanceMatrix) {
-        distanceMatrix = await googleMaps.getDistanceMatrix({ origins, destinations, mode: this.transportMode });
+        const params = { origins, destinations, mode: this.transportMode };
+        distanceMatrix = await googleMaps.getDistanceMatrix(params);
+        this.distanceMatrix.push({
+          ...params,
+          duration: distanceMatrix ? distanceMatrix.duration : 0,
+          distance: distanceMatrix ? distanceMatrix.distance : 0,
+        });
       }
 
       return distanceMatrix && distanceMatrix.duration ? Math.round(distanceMatrix.duration / 60) : 0;

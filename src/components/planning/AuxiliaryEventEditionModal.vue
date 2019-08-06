@@ -39,9 +39,8 @@
         <ni-modal-select caption="Type d'heure interne" v-model="editedEvent.internalHour"
           :options="internalHourOptions" :error="validations.internalHour.$error"
           @blur="validations.internalHour.$touch" />
-        <ni-search-address v-model="editedEvent.location.fullAddress" @selected="selectedAddress" inModal
-          @blur="validations.location.fullAddress.$touch" :error="validations.location.fullAddress.$error"
-          :error-label="addressError" />
+        <ni-search-address v-model="editedEvent.address" inModal
+          @blur="validations.address.$touch" :error="validations.address.$error" :error-label="addressError" />
       </template>
       <template v-if="isRepetition(editedEvent) && !isDisabled && !editedEvent.isCancelled">
         <div class="row q-mb-md light-checkbox">
@@ -102,7 +101,7 @@
 <script>
 import { INTERVENTION, AUXILIARY } from '../../data/constants';
 import { planningModalMixin } from '../../mixins/planningModalMixin';
-import { formatFullIdentity } from '../../helpers/utils';
+import { formatIdentity } from '../../helpers/utils';
 
 export default {
   name: 'AuxiliaryEventEditionModal',
@@ -139,7 +138,7 @@ export default {
     },
     auxiliaryFilterPlaceholder () {
       return this.selectedAuxiliary.identity
-        ? formatFullIdentity(this.selectedAuxiliary.identity)
+        ? formatIdentity(this.selectedAuxiliary.identity, 'FL')
         : 'À affecter';
     },
   },
@@ -167,9 +166,6 @@ export default {
     },
     deleteEvent (value) {
       this.$emit('deleteEvent', value);
-    },
-    selectedAddress (value) {
-      this.$emit('selectedAddress', value);
     },
   },
 }

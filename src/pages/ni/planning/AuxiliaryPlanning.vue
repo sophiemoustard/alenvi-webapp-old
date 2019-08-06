@@ -2,21 +2,20 @@
   <q-page class="neutral-background">
     <ni-planning-manager :events="events" :persons="activeAuxiliaries" @updateStartOfWeek="updateStartOfWeek"
       @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop"
-      :filteredSectors="filteredSectors" :can-edit="canEditEvent" :personKey="personKey" />
+      :filteredSectors="filteredSectors" :can-edit="canEditEvent" :personKey="personKey"
+      :displayAllSectors.sync="displayAllSectors" :eventHistories="eventHistories" />
 
     <!-- Event creation modal -->
     <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
       :creationModal="creationModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary"
       :activeAuxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetCreationForm" @deleteDocument="deleteDocument"
-      @documentUploaded="documentUploaded" @createEvent="createEvent" @close="closeCreationModal"
-      @selectedAddress="selectedAddress" />
+      @documentUploaded="documentUploaded" @createEvent="createEvent" @close="closeCreationModal" />
 
     <!-- Event edition modal -->
     <ni-auxiliary-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
       :editionModal="editionModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary" :activeAuxiliaries="activeAuxiliaries"
       :customers="customers" @resetForm="resetEditionForm" @deleteDocument="deleteDocument" @documentUploaded="documentUploaded"
-      @updateEvent="updateEvent" @close="closeEditionModal" @deleteEvent="deleteEvent" @deleteEventRepetition="deleteEventRepetition"
-      @selectedAddress="selectedAddress" />
+      @updateEvent="updateEvent" @close="closeEditionModal" @deleteEvent="deleteEvent" @deleteEventRepetition="deleteEventRepetition" />
   </q-page>
 </template>
 
@@ -28,7 +27,7 @@ import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryE
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
 import Planning from '../../../components/planning/Planning.vue';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
-import { INTERVENTION, NEVER, AUXILIARY, ABSENCE, DAILY, HOURLY, INTERNAL_HOUR, ILLNESS, SECTOR } from '../../../data/constants';
+import { INTERVENTION, NEVER, PERSON, AUXILIARY, ABSENCE, DAILY, HOURLY, INTERNAL_HOUR, ILLNESS, SECTOR } from '../../../data/constants';
 import { mapGetters, mapActions } from 'vuex';
 import { NotifyNegative, NotifyWarning } from '../../../components/popup/notify';
 
@@ -61,6 +60,8 @@ export default {
       editionModal: false,
       startOfWeekAsString: null,
       personKey: AUXILIARY,
+      displayAllSectors: false,
+      eventHistories: [],
     };
   },
   validations () {
@@ -73,14 +74,19 @@ export default {
           startHour: { required: requiredIf((item, parent) => parent && (parent.type === ABSENCE && parent.absenceNature === HOURLY)) },
           endHour: { required: requiredIf((item, parent) => parent && (parent.type === ABSENCE && parent.absenceNature === HOURLY)) },
         },
-        auxiliary: { required },
+        auxiliary: { required: requiredIf((item) => item.type !== INTERVENTION) },
         sector: { required },
         customer: { required: requiredIf((item) => item.type === INTERVENTION) },
         subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
         internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
         absence: { required: requiredIf((item) => item.type === ABSENCE) },
         absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
-        location: { fullAddress: { frAddress } },
+        address: {
+          zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
+          street: { required: requiredIf(item => item && !!item.fullAddress) },
+          city: { required: requiredIf(item => item && !!item.fullAddress) },
+          fullAddress: { frAddress },
+        },
         repetition: {
           frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
         },
@@ -96,14 +102,14 @@ export default {
           startHour: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absenceNature === HOURLY) },
           endHour: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absenceNature === HOURLY) },
         },
-        auxiliary: { required },
+        auxiliary: { required: requiredIf((item) => item.type !== INTERVENTION) },
         sector: { required },
         customer: { required: requiredIf((item) => item.type === INTERVENTION) },
         subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
         internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
         absence: { required: requiredIf((item) => item.type === ABSENCE) },
         absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
-        location: { fullAddress: { frAddress } },
+        address: { fullAddress: { frAddress } },
         repetition: {
           frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
         },
@@ -117,6 +123,7 @@ export default {
   async mounted () {
     try {
       await this.fillFilter(AUXILIARY);
+      await this.getEventHistories();
       await this.getCustomers();
       this.setInternalHours();
     } catch (e) {
@@ -130,6 +137,18 @@ export default {
     },
     getElemRemoved (val) {
       this.handleElemRemovedFromFilter(val);
+    },
+    async displayAllSectors (value) {
+      if (!value) {
+        this.auxiliaries = [];
+        this.filteredSectors = [];
+        this.events = [];
+      } else {
+        this.filteredAuxiliaries = [];
+        this.auxiliaries = this.getFilter.filter(fil => fil.type === PERSON);
+        this.filteredSectors = this.getFilter.filter(fil => fil.type === SECTOR);
+        await this.refresh();
+      }
     },
   },
   computed: {
@@ -179,14 +198,23 @@ export default {
     },
     // Refresh data
     async refresh () {
+      await Promise.all([this.refreshEvents(), this.getEventHistories()]);
+    },
+    async refreshEvents () {
       try {
-        this.events = await this.$events.list({
+        let params = {
           startDate: this.$moment(this.startOfWeekAsString).toDate(),
           endDate: this.endOfWeek.toDate(),
-          auxiliary: this.auxiliaries.map(aux => aux._id),
-          sector: this.filteredSectors.map(sector => sector._id),
-        });
+          groupBy: AUXILIARY,
+        };
+        if (!this.displayAllSectors) {
+          params.auxiliary = this.auxiliaries.map(aux => aux._id);
+          params.sector = this.filteredSectors.map(sector => sector._id);
+        }
+
+        this.events = await this.$events.list(params);
       } catch (e) {
+        console.error(e);
         this.events = [];
       }
     },
@@ -194,7 +222,19 @@ export default {
       try {
         this.customers = await this.$customers.showAll({ subscriptions: true });
       } catch (e) {
+        console.error(e);
         this.customers = [];
+      }
+    },
+    async getEventHistories () {
+      try {
+        this.eventHistories = await this.$eventHistories.list({
+          sectors: this.filteredSectors.map(sector => sector._id),
+          auxiliaries: this.auxiliaries.map(aux => aux._id),
+        });
+      } catch (e) {
+        console.error(e);
+        this.eventHistories = [];
       }
     },
     // Event creation
@@ -211,7 +251,7 @@ export default {
         subscription: '',
         internalHour: '',
         absence: '',
-        location: {},
+        address: {},
         attachment: {},
         auxiliary: person ? person._id : '',
         sector: person ? person.sector._id : sectorId,
@@ -225,10 +265,12 @@ export default {
       this.creationModal = true;
     },
     // Event edition
-    openEditionModal (eventId) {
-      const event = this.events.find(ev => ev._id === eventId);
+    openEditionModal ({ eventId, rowId }) {
+      const rowEvents = this.getRowEvents(rowId);
+
+      const event = rowEvents.find(ev => ev._id === eventId);
       const can = this.canEditEvent(event);
-      if (!can) return;
+      if (!can) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
       this.formatEditedEvent(event);
 
       this.editionModal = true;
@@ -256,22 +298,19 @@ export default {
       if (el.type === SECTOR) {
         this.filteredSectors = this.filteredSectors.filter(sec => sec._id !== el._id);
         this.auxiliaries = this.auxiliaries.filter(auxiliary =>
-          auxiliary.sector._id !== el._id || this.filteredAuxiliaries.some(filteredAux => filteredAux._id === auxiliary._id)
-        );
+          auxiliary.sector._id !== el._id || this.filteredAuxiliaries.some(filteredAux => filteredAux._id === auxiliary._id));
+        this.eventHistories = this.eventHistories.filter(history =>
+          !history.sectors.includes(el._id) ||
+            this.filteredAuxiliaries.some(filteredAux => history.auxiliaries.map(aux => aux._id).includes(filteredAux._id)));
       } else { // el = auxiliary
         this.filteredAuxiliaries = this.filteredAuxiliaries.filter(auxiliary => auxiliary._id !== el._id);
         if (this.filteredSectors.some(sector => sector._id === el.sector._id)) return;
         this.auxiliaries = this.auxiliaries.filter(auxiliary => auxiliary._id !== el._id);
+        this.eventHistories = this.eventHistories.filter(history =>
+          !history.auxiliaries.map(aux => aux._id).includes(el._id) ||
+            this.filteredAuxiliaries.some(filteredAux => history.auxiliaries.map(aux => aux._id).includes(filteredAux._id)));
       }
     },
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-  @import '~variables';
-
-  .q-layout-page
-    padding-top: 20px;
-
-</style>

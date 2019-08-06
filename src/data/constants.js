@@ -79,10 +79,18 @@ export const EVERY_TWO_WEEKS = 'every_two_weeks';
 // CANCELLATION OPTIONS
 export const INVOICED_AND_PAYED = 'invoiced_and_payed';
 export const INVOICED_AND_NOT_PAYED = 'invoiced_and_not_payed';
+export const CANCELLATION_OPTIONS = [
+  { label: 'Facturée & payée', value: INVOICED_AND_PAYED },
+  { label: 'Facturée & non payée', value: INVOICED_AND_NOT_PAYED },
+];
 
 // CANCELLATION REASONS
 export const CUSTOMER_INITIATIVE = 'customer_initiative';
 export const AUXILIARY_INITIATIVE = 'auxiliary_initiative';
+export const CANCELLATION_REASONS = [
+  { label: 'Initiative du client', value: CUSTOMER_INITIATIVE },
+  { label: 'Initiative du de l\'intervenant', value: AUXILIARY_INITIATIVE },
+];
 
 // ROLES
 export const COACH = 'coach';
@@ -106,6 +114,11 @@ export const STAFFING_VIEW_END_HOUR = 20;
 export const STAFFING_PERCENTAGE_BY_MINUTES = 100 / ((STAFFING_VIEW_END_HOUR - STAFFING_VIEW_START_HOUR) * 60);
 export const SECTOR = 'sector';
 export const PERSON = 'person';
+
+// EVENT HISTORY
+export const EVENT_CREATION = 'event_creation';
+export const EVENT_DELETION = 'event_deletion';
+export const EVENT_UPDATE = 'event_update';
 
 // INDICATORS
 export const WEEK_STATS = 'week_stats';
@@ -146,14 +159,14 @@ export const CONTRACT_STATUS_OPTIONS = [
   { label: 'Mandataire', value: CUSTOMER_CONTRACT },
 ];
 
-// Billing
+// BILLING
 
 export const TWO_WEEKS = 'two_weeks';
 export const MONTH = 'month';
 export const BILL = 'bill';
 export const CREDIT_NOTE = 'creditNote';
 
-// Payments
+// PAYMENTS
 export const DIRECT_DEBIT = 'direct_debit';
 export const BANK_TRANSFER = 'bank_transfer';
 export const CHECK = 'check';

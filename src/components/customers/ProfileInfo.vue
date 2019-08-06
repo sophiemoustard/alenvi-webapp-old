@@ -23,10 +23,9 @@
         <ni-input caption="Téléphone" type="tel" :error="$v.customer.contact.phone.$error"
           error-label="Numéro de téléphone non valide" v-model.trim="customer.contact.phone"
           @focus="saveTmp('contact.phone')" @blur="updateUser('contact.phone')" />
-        <ni-search-address v-model="customer.contact.address.fullAddress" color="white" inverted-light
-          :error-label="addressError" :error="$v.customer.contact.address.fullAddress.$error"
-          @focus="saveTmp('contact.address.fullAddress')" @blur="updateUser('contact.address.fullAddress')"
-          @selected="selectedAddress" />
+        <ni-search-address v-model="customer.contact.address" color="white" inverted-light
+          :error-label="addressError" :error="$v.customer.contact.address.$error"
+          @focus="saveTmp('contact.address.fullAddress')" @blur="updateUser('contact.address')" />
         <ni-input caption="Code porte" v-model="customer.contact.doorCode" @focus="saveTmp('contact.doorCode')"
           @blur="updateUser('contact.doorCode')" />
       </div>
@@ -488,7 +487,13 @@ export default {
     NiOptionGroup,
     'ni-multiple-files-uploader': MultipleFilesUploader,
   },
-  mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin, fundingMixin, validationMixin],
+  mixins: [
+    customerMixin,
+    subscriptionMixin,
+    financialCertificatesMixin,
+    fundingMixin,
+    validationMixin,
+  ],
   data () {
     return {
       FIXED,
@@ -779,6 +784,9 @@ export default {
       contact: {
         phone: { frPhoneNumber },
         address: {
+          zipCode: { required },
+          street: { required },
+          city: { required },
           fullAddress: { required, frAddress },
         },
       },
@@ -873,9 +881,6 @@ export default {
       const args = [this.customer, value];
       this.customer = Object.assign({}, extend(true, ...args));
     },
-    selectedAddress (item) {
-      this.customer.contact.address = Object.assign({}, this.customer.contact.address, item);
-    },
     saveTmp (path) {
       this.tmpInput = this.$_.get(this.customer, path)
     },
@@ -949,7 +954,6 @@ export default {
       }
     },
     async updateAlenviCustomer (path) {
-      if (path.match(/fullAddress/)) path = 'contact.address';
       let value = this.$_.get(this.customer, path);
       if (path.match(/iban/i)) value = value.split(' ').join('');
 

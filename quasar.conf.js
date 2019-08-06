@@ -37,17 +37,18 @@ module.exports = function (ctx) {
       'exports',
       'pay',
       'finalPay',
-      process.env.NODE_ENV === 'production' ? 'vue-analytics' : null
+      'eventHistories',
+      process.env.NODE_ENV === 'production' ? 'vue-analytics' : null,
     ],
     css: [
-      'app.styl'
+      'app.styl',
     ],
     extras: [
       ctx.theme.mat ? 'roboto-font' : null,
       'material-icons',
       'ionicons',
       'mdi',
-      'fontawesome'
+      'fontawesome',
     ],
     supportIE: true,
     build: {
@@ -61,10 +62,10 @@ module.exports = function (ctx) {
           enforce: 'pre',
           test: /\.(js|vue)$/,
           loader: 'eslint-loader',
-          exclude: /(node_modules|quasar)/
+          exclude: /(node_modules|quasar)/,
         }, {
           test: /\.(html)$/,
-          use: { loader: 'html-loader' }
+          use: { loader: 'html-loader' },
         })
       },
       env: {
@@ -79,10 +80,10 @@ module.exports = function (ctx) {
         CLOUDINARY_API_SECRET: JSON.stringify(process.env.CLOUDINARY_API_SECRET),
         CLOUDINARY_CLOUD_NAME: JSON.stringify(process.env.CLOUDINARY_CLOUD_NAME),
         GA_TRACKING_ID: JSON.stringify(process.env.GA_TRACKING_ID),
-      }
+      },
     },
     devServer: {
-      open: true
+      open: true,
     },
     framework: {
       i18n: 'fr',
@@ -147,24 +148,25 @@ module.exports = function (ctx) {
         'QChip',
         'QPageSticky',
         'QProgress',
+        'QScrollArea',
       ],
       directives: [
-        'Ripple'
+        'Ripple',
       ],
       plugins: [
         'Notify',
         'Cookies',
         'Loading',
         'Dialog',
-        'LocalStorage'
-      ]
+        'LocalStorage',
+      ],
     },
     animations: [
       'fadeIn',
-      'fadeOut'
+      'fadeOut',
     ],
     ssr: {
-      pwa: false
+      pwa: false,
     },
     pwa: {
       manifest: {
@@ -176,56 +178,36 @@ module.exports = function (ctx) {
           {
             'src': 'statics/icons/icon-128x128.png',
             'sizes': '128x128',
-            'type': 'image/png'
+            'type': 'image/png',
           },
           {
             'src': 'statics/icons/icon-192x192.png',
             'sizes': '192x192',
-            'type': 'image/png'
+            'type': 'image/png',
           },
           {
             'src': 'statics/icons/icon-256x256.png',
             'sizes': '256x256',
-            'type': 'image/png'
+            'type': 'image/png',
           },
           {
             'src': 'statics/icons/icon-384x384.png',
             'sizes': '384x384',
-            'type': 'image/png'
+            'type': 'image/png',
           },
           {
             'src': 'statics/icons/icon-512x512.png',
             'sizes': '512x512',
-            'type': 'image/png'
-          }
-        ]
-      }
+            'type': 'image/png',
+          },
+        ],
+      },
     },
-    cordova: {
-      // id: 'org.cordova.quasar.app'
-    },
+    cordova: {},
     electron: {
-      // bundler: 'builder', // or 'packager'
-      extendWebpack (cfg) {
-        // do something with Electron process Webpack cfg
-      },
-      packager: {
-        // https://github.com/electron-userland/electron-packager/blob/master/docs/api.md#options
-
-        // OS X / Mac App Store
-        // appBundleId: '',
-        // appCategoryType: '',
-        // osxSign: '',
-        // protocol: 'myapp://path',
-
-        // Window only
-        // win32metadata: { ... }
-      },
-      builder: {
-        // https://www.electron.build/configuration/configuration
-
-        // appId: 'quasar-app'
-      }
-    }
+      extendWebpack (cfg) {},
+      packager: {},
+      builder: {},
+    },
   }
 }

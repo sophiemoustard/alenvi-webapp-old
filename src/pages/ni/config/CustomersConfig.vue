@@ -50,8 +50,8 @@
         <p class="text-weight-bold">Informations de l'organisation</p>
         <div class="row gutter-profile">
           <ni-input caption="Nom" v-model="company.name" @focus="saveTmp('name')" @blur="updateCompany('name')" />
-          <ni-search-address v-model="company.address.fullAddress" color="white" inverted-light @selected="selectedAddress" :error-label="addressError"
-            @focus="saveTmp('address.fullAddress')" @blur="updateCompany('address.fullAddress')" :error="$v.company.address.fullAddress.$error"
+          <ni-search-address v-model="company.address" color="white" inverted-light :error-label="addressError"
+            @focus="saveTmp('address.fullAddress')" @blur="updateCompany('address')" :error="$v.company.address.$error"
           />
           <ni-input caption="Numéro ICS" v-model="company.ics" @focus="saveTmp('ics')" @blur="updateCompany('ics')" />
           <ni-input caption="Numéro RCS" v-model="company.rcs" @focus="saveTmp('rcs')" @blur="updateCompany('rcs')" />
@@ -281,8 +281,8 @@
         </div>
         <ni-modal-input caption="Nom" v-model="newThirdPartyPayer.name" :error="$v.newThirdPartyPayer.name.$error" @blur="$v.newThirdPartyPayer.name.$touch"
           required-field />
-        <ni-search-address v-model="newThirdPartyPayer.address.fullAddress" @selected="selectedThirdPartyPayerCreationAddress" error-label="Adresse invalide" in-modal
-          @blur="$v.newThirdPartyPayer.address.fullAddress.$touch" :error="$v.newThirdPartyPayer.address.fullAddress.$error" />
+        <ni-search-address v-model="newThirdPartyPayer.address" error-label="Adresse invalide" in-modal
+          @blur="$v.newThirdPartyPayer.address.$touch" :error="$v.newThirdPartyPayer.address.$error" />
         <ni-modal-input caption="Email" v-model.trim="newThirdPartyPayer.email" />
         <ni-modal-input caption="Prix unitaire TTC par défaut" suffix="€" type="number" v-model="newThirdPartyPayer.unitTTCRate"
           :error="$v.newThirdPartyPayer.unitTTCRate.$error" error-label="Le prix unitaire doit être positif"/>
@@ -305,8 +305,8 @@
         </div>
         <ni-modal-input caption="Nom" v-model="editedThirdPartyPayer.name" :error="$v.editedThirdPartyPayer.name.$error"
           @blur="$v.editedThirdPartyPayer.name.$touch" required-field />
-        <ni-search-address v-model="editedThirdPartyPayer.address.fullAddress" @selected="selectedThirdPartyPayerEditionAddress" error-label="Adresse invalide"
-          @blur="$v.editedThirdPartyPayer.address.fullAddress.$touch" :error="$v.editedThirdPartyPayer.address.fullAddress.$error" in-modal
+        <ni-search-address v-model="editedThirdPartyPayer.address" error-label="Adresse invalide"
+          @blur="$v.editedThirdPartyPayer.address.$touch" :error="$v.editedThirdPartyPayer.address.$error" in-modal
           />
         <ni-modal-input caption="Email" v-model.trim="editedThirdPartyPayer.email" />
         <ni-modal-input caption="Prix unitaire TTC par défaut" suffix="€" type="number" v-model="editedThirdPartyPayer.unitTTCRate"
@@ -625,7 +625,7 @@ export default {
       newThirdPartyPayer: {
         name: '',
         email: '',
-        address: {},
+        address: { fullAddress: '' },
         unitTTCRate: '',
         billingMode: '',
       },
@@ -654,27 +654,11 @@ export default {
       twentyFifthOfDecember: { numeric },
       firstOfMay: { numeric },
       evening: { numeric },
-      eveningStartTime: {
-        required: requiredIf((item) => {
-          return item.evening;
-        }),
-      },
-      eveningEndTime: {
-        required: requiredIf((item) => {
-          return item.evening;
-        }),
-      },
+      eveningStartTime: { required: requiredIf((item) => item.evening) },
+      eveningEndTime: { required: requiredIf((item) => item.evening) },
       custom: { numeric },
-      customStartTime: {
-        required: requiredIf((item) => {
-          return item.custom;
-        }),
-      },
-      customEndTime: {
-        required: requiredIf((item) => {
-          return item.custom;
-        }),
-      },
+      customStartTime: { required: requiredIf((item) => item.custom) },
+      customEndTime: { required: requiredIf((item) => item.custom) },
     },
     editedSurcharge: {
       name: { required },
@@ -684,27 +668,11 @@ export default {
       twentyFifthOfDecember: { numeric },
       firstOfMay: { numeric },
       evening: { numeric },
-      eveningStartTime: {
-        required: requiredIf((item) => {
-          return item.evening;
-        }),
-      },
-      eveningEndTime: {
-        required: requiredIf((item) => {
-          return item.evening;
-        }),
-      },
+      eveningStartTime: { required: requiredIf((item) => item.evening) },
+      eveningEndTime: { required: requiredIf((item) => item.evening) },
       custom: { numeric },
-      customStartTime: {
-        required: requiredIf((item) => {
-          return item.custom;
-        }),
-      },
-      customEndTime: {
-        required: requiredIf((item) => {
-          return item.custom;
-        }),
-      },
+      customStartTime: { required: requiredIf((item) => item.custom) },
+      customEndTime: { required: requiredIf((item) => item.custom) },
     },
     newService: {
       name: { required },
@@ -726,10 +694,10 @@ export default {
       iban: { required, iban },
       bic: { required, bic },
       address: {
-        fullAddress: {
-          required,
-          frAddress,
-        },
+        zipCode: { required },
+        street: { required },
+        city: { required },
+        fullAddress: { required, frAddress },
       },
       customersConfig: {
         bllingPeriod: { required },
@@ -738,6 +706,9 @@ export default {
     newThirdPartyPayer: {
       name: { required },
       address: {
+        zipCode: { required: requiredIf(item => !!item.fullAddress) },
+        street: { required: requiredIf(item => !!item.fullAddress) },
+        city: { required: requiredIf(item => !!item.fullAddress) },
         fullAddress: { frAddress },
       },
       unitTTCRate: { posDecimals },
@@ -745,6 +716,9 @@ export default {
     editedThirdPartyPayer: {
       name: { required },
       address: {
+        zipCode: { required: requiredIf(item => !!item.fullAddress) },
+        street: { required: requiredIf(item => !!item.fullAddress) },
+        city: { required: requiredIf(item => !!item.fullAddress) },
         fullAddress: { frAddress },
       },
       unitTTCRate: { posDecimals },
@@ -799,15 +773,6 @@ export default {
 
       return service.versions.sort((a, b) => new Date(b.startDate) - new Date(a.startDate))[0];
     },
-    selectedAddress (item) {
-      this.company.address = Object.assign({}, this.company.address, item);
-    },
-    selectedThirdPartyPayerEditionAddress (item) {
-      this.editedThirdPartyPayer.address = Object.assign({}, this.editedThirdPartyPayer.address, this.$_.omit(item, ['location']));
-    },
-    selectedThirdPartyPayerCreationAddress (item) {
-      this.newThirdPartyPayer.address = Object.assign({}, this.newThirdPartyPayer.address, this.$_.omit(item, ['location']));
-    },
     saveTmp (path) {
       this.tmpInput = this.$_.get(this.company, path)
     },
@@ -848,7 +813,7 @@ export default {
       await this.$store.dispatch('main/getUser', this.user._id);
       this.company = this.user.company;
       this.documents = this.company.customersConfig.templates || {};
-      this.company.address = this.company.address || {};
+      this.company.address = this.company.address || { fullAddress: '' };
     },
     async refreshThirdPartyPayers () {
       try {
@@ -867,7 +832,6 @@ export default {
           const isValid = await this.waitForValidation(this.$v.company, path);
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
-        if (path.match(/fullAddress/)) path = 'address';
 
         const value = this.$_.get(this.company, path);
         const payload = this.$_.set({}, path, value);
@@ -1143,14 +1107,20 @@ export default {
         billingMode: '',
       }
     },
+    formatThirdPartyPayerPayload (payload) {
+      if (payload.address) {
+        payload.address = this.$_.omit(payload.address, ['location']);
+        if (!payload.address.fullAddress) payload.address = {};
+      }
+      return this.$_.pickBy(payload);
+    },
     async createNewThirdPartyPayer () {
       try {
         if (this.$v.newThirdPartyPayer.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         this.newThirdPartyPayer.company = this.company._id;
-        const payload = this.$_.pickBy(this.newThirdPartyPayer);
-        await this.$thirdPartyPayers.create(payload);
+        await this.$thirdPartyPayers.create(this.formatThirdPartyPayerPayload(this.newThirdPartyPayer));
         await this.refreshThirdPartyPayers();
         NotifyPositive('Tiers payeur créé.');
       } catch (e) {
@@ -1175,10 +1145,7 @@ export default {
         const thirdPartyPayerId = this.editedThirdPartyPayer._id;
         delete this.editedThirdPartyPayer._id;
         const payload = this.editedThirdPartyPayer;
-        if (payload.address && !payload.address.fullAddress) {
-          payload.address = {};
-        }
-        await this.$thirdPartyPayers.updateById(thirdPartyPayerId, payload);
+        await this.$thirdPartyPayers.updateById(thirdPartyPayerId, this.formatThirdPartyPayerPayload(payload));
         await this.refreshThirdPartyPayers();
         NotifyPositive('Tiers payeur modifié.');
       } catch (e) {

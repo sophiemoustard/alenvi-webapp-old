@@ -42,7 +42,7 @@ const routes = [
         component: () => import('pages/ni/config/RhConfig'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['rhconfig:edit'],
+          permissions: ['config:edit'],
           parent: 'configuration',
         },
       },
@@ -52,7 +52,7 @@ const routes = [
         component: () => import('pages/ni/config/CustomersConfig'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['rhconfig:edit'],
+          permissions: ['config:edit'],
           parent: 'configuration',
         },
       },
@@ -62,7 +62,7 @@ const routes = [
         component: () => import('pages/ni/config/TagConfig'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['rhconfig:edit'],
+          permissions: ['config:edit'],
           parent: 'configuration',
         },
       },
