@@ -49,8 +49,8 @@
             <span><q-icon name="clear" @click.native="opened = false" /></span>
           </div>
         </div>
-        <ni-modal-select caption="Modèle" :options="typeMessageOptions" v-model="typeMessage" required-field />
-        <ni-modal-input caption="Message" v-model="messageComp" type="textarea" :rows="7" required-field />
+        <ni-select for-modal caption="Modèle" :options="typeMessageOptions" v-model="typeMessage" required-field />
+        <ni-input for-modal caption="Message" v-model="messageComp" type="textarea" :rows="7" required-field />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary"
         :loading="loading" @click.native="sendMessage" />
@@ -61,16 +61,16 @@
 <script>
 import { mapGetters } from 'vuex';
 import randomize from 'randomatic';
-import ModalInput from './form/ModalInput.vue';
-import ModalSelect from './form/ModalSelect.vue';
+import NiInput from './form/Input';
+import NiSelect from './form/Select';
 import { NotifyPositive, NotifyNegative } from './popup/notify';
 import { DEFAULT_AVATAR } from '../data/constants';
 
 export default {
   name: 'ProfileHeader',
   components: {
-    'ni-modal-input': ModalInput,
-    'ni-modal-select': ModalSelect,
+    'ni-input': NiInput,
+    'ni-select': NiSelect,
   },
   props: ['profileId', 'customer'],
   data () {

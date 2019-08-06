@@ -20,16 +20,16 @@
         </div>
         <ni-datetime-range caption="Dates et heures de l'intervention" v-model="newEvent.dates" required-field
           disable-end-date />
-        <ni-modal-select caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions"
+        <ni-select for-modal caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions"
           :error="$v.newEvent.auxiliary.$error" required-field @blur="$v.newEvent.auxiliary.$touch"
           @input="toggleServiceSelection(newEvent.customer)" />
-        <ni-modal-select caption="Service" v-model="newEvent.subscription" :error="$v.newEvent.subscription.$error"
+        <ni-select for-modal caption="Service" v-model="newEvent.subscription" :error="$v.newEvent.subscription.$error"
           :options="customerSubscriptionsOptions(newEvent.customer)" required-field
           @blur="$v.newEvent.subscription.$touch" />
-        <ni-modal-select caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency"
+        <ni-select for-modal caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency"
           :options="repetitionOptions" required-field @blur="$v.newEvent.repetition.frequency.$touch"
           :disable="!isRepetitionAllowed" />
-        <ni-modal-input v-model="newEvent.misc" caption="Notes" />
+        <ni-input for-modal v-model="newEvent.misc" caption="Notes" />
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary"
         @click="createEvent" :disable="disableCreationButton" icon-right="add" />
@@ -56,10 +56,10 @@
         </div>
         <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" disable-end-date
           :disable="isDisabled" />
-        <ni-modal-select caption="Auxiliaire" v-model="editedEvent.auxiliary" :options="auxiliariesOptions"
+        <ni-select for-modal caption="Auxiliaire" v-model="editedEvent.auxiliary" :options="auxiliariesOptions"
           :error="$v.editedEvent.sector.$error" required-field :disable="isDisabled"
           @blur="$v.editedEvent.sector.$touch" />
-        <ni-modal-select caption="Service" v-model="editedEvent.subscription" required-field :disable="isDisabled"
+        <ni-select for-modal caption="Service" v-model="editedEvent.subscription" required-field :disable="isDisabled"
           :options="customerSubscriptionsOptions(editedEvent.customer._id)"
           :error="$v.editedEvent.subscription.$error" @blur="$v.editedEvent.subscription.$touch" />
         <template v-if="isRepetition(editedEvent) && !isDisabled">
@@ -68,17 +68,17 @@
               @input="toggleRepetition" />
           </div>
         </template>
-        <ni-modal-input v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes"
+        <ni-input for-modal v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes"
           :disable="isDisabled" />
         <template v-if="!editedEvent.shouldUpdateRepetition && !isDisabled">
           <div class="row q-mb-md light-checkbox">
             <q-checkbox v-model="editedEvent.isCancelled" label="Annuler l'évènement" @input="toggleCancellationForm" />
           </div>
           <div class="row justify-between">
-            <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.condition" caption="Conditions"
+            <ni-select for-modal v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.condition" caption="Conditions"
               :options="cancellationConditions" required-field @blur="$v.editedEvent.cancel.condition.$touch"
               class="col-6 cancel" />
-            <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.reason" caption="Motif"
+            <ni-select for-modal v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.reason" caption="Motif"
               :options="cancellationReasons" required-field @blur="$v.editedEvent.cancel.reason.$touch"
               class="col-6 cancel" />
           </div>

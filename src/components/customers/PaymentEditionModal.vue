@@ -9,12 +9,12 @@
           <span><q-icon name="clear" @click.native="resetForm" /></span>
         </div>
       </div>
-      <ni-modal-input caption="Bénéficiaire" :value="customerFullname" required-field read-only />
-      <ni-modal-input caption="Client" v-model="selectedClientName" required-field read-only />
-      <ni-modal-input :caption="`Montant du ${editionModalNature}`" suffix="€" type="number"
+      <ni-input for-modal caption="Bénéficiaire" :value="customerFullname" required-field read-only />
+      <ni-input for-modal caption="Client" v-model="selectedClientName" required-field read-only />
+      <ni-input for-modal :caption="`Montant du ${editionModalNature}`" suffix="€" type="number"
         v-model="editedPayment.netInclTaxes" required-field :error="validations.netInclTaxes.$error"
         @blur="validations.netInclTaxes.$touch" :error-label="netInclTaxesError" />
-      <ni-modal-select :caption="`Type du ${editionModalNature}`" v-model="editedPayment.type" :options="paymentOptions"
+      <ni-select for-modal :caption="`Type du ${editionModalNature}`" v-model="editedPayment.type" :options="paymentOptions"
         required-field @blur="validations.type.$touch" :error="validations.type.$error" />
       <ni-datetime-picker :caption="`Date du ${editionModalNature}`" v-model="editedPayment.date"
         :error="validations.date.$error" @blur="validations.date.$touch" in-modal type="date" required-field />
@@ -26,16 +26,16 @@
 
 <script>
 import { REQUIRED_LABEL, PAYMENT_OPTIONS, PAYMENT_NATURE_OPTIONS } from '../../data/constants.js';
-import ModalSelect from '../form/ModalSelect';
-import ModalInput from '../form/ModalInput';
+import NiSelect from '../form/Select';
+import NiInput from '../form/Input';
 import DatetimePicker from '../form/DatetimePicker';
 import { formatIdentity } from '../../helpers/utils.js';
 
 export default {
   name: 'PaymentEditionModal',
   components: {
-    'ni-modal-select': ModalSelect,
-    'ni-modal-input': ModalInput,
+    'ni-select': NiSelect,
+    'ni-input': NiInput,
     'ni-datetime-picker': DatetimePicker,
   },
   props: {

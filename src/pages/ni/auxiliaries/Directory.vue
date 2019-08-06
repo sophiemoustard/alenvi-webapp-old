@@ -50,15 +50,15 @@
               <q-icon name="clear" @click.native="auxiliaryCreationModal = false" /></span>
           </div>
         </div>
-        <ni-modal-select v-model="newUser.identity.title" :options="civilityOptions"
+        <ni-select for-modal v-model="newUser.identity.title" :options="civilityOptions"
           caption="Civilité" />
-        <ni-modal-input v-model="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error" caption="Nom"
-          @blur="$v.newUser.identity.lastname.$touch" required-field />
-        <ni-modal-input v-model="newUser.identity.firstname" :error="$v.newUser.identity.firstname.$error" caption="Prénom"
-          @blur="$v.newUser.identity.firstname.$touch" required-field />
-        <ni-modal-input v-model="newUser.mobilePhone" :error="$v.newUser.mobilePhone.$error" caption="Numéro de téléphone"
-          @blur="$v.newUser.mobilePhone.$touch" :error-label="mobilePhoneError" required-field />
-        <ni-modal-input v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email" @blur="$v.newUser.local.email.$touch"
+        <ni-input for-modal v-model="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error"
+          caption="Nom" @blur="$v.newUser.identity.lastname.$touch" required-field />
+        <ni-input for-modal v-model="newUser.identity.firstname" :error="$v.newUser.identity.firstname.$error"
+          caption="Prénom" @blur="$v.newUser.identity.firstname.$touch" required-field />
+        <ni-input for-modal v-model="newUser.mobilePhone" :error="$v.newUser.mobilePhone.$error" required-field
+          caption="Numéro de téléphone" @blur="$v.newUser.mobilePhone.$touch" :error-label="mobilePhoneError" />
+        <ni-input for-modal v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email" @blur="$v.newUser.local.email.$touch"
           :error-label="emailError" required-field />
         <ni-search-address v-model="newUser.contact.address" color="white" inverted-light @blur="$v.newUser.contact.address.$touch"
           error-label="Adresse non valide" :error="$v.newUser.contact.address.$error" in-modal />
@@ -92,8 +92,8 @@ import { frPhoneNumber, frAddress } from '../../../helpers/vuelidateCustomVal';
 import { userProfileValidation } from '../../../helpers/userProfileValidation';
 import { taskValidation } from '../../../helpers/taskValidation';
 import SelectSector from '../../../components/form/SelectSector';
-import ModalInput from '../../../components/form/ModalInput';
-import ModalSelect from '../../../components/form/ModalSelect';
+import NiInput from '../../../components/form/Input';
+import NiSelect from '../../../components/form/Select';
 import SearchAddress from '../../../components/form/SearchAddress';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../../../components/popup/notify.js';
 import { DEFAULT_AVATAR, AUXILIARY, PLANNING_REFERENT, REQUIRED_LABEL } from '../../../data/constants';
@@ -103,8 +103,8 @@ export default {
   name: 'Directory',
   components: {
     'ni-select-sector': SelectSector,
-    'ni-modal-input': ModalInput,
-    'ni-modal-select': ModalSelect,
+    'ni-input': NiInput,
+    'ni-select': NiSelect,
     'ni-search-address': SearchAddress,
   },
   mixins: [validationMixin],

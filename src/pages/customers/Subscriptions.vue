@@ -144,7 +144,7 @@
 import { required } from 'vuelidate/lib/validators';
 
 import esign from '../../api/Esign.js';
-import Input from '../../components/form/Input.vue';
+import Input from '../../components/form/Input';
 import MultipleFilesUploader from '../../components/form/MultipleFilesUploader.vue';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify';
 import { FIXED, REQUIRED_LABEL } from '../../data/constants';

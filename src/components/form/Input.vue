@@ -1,5 +1,9 @@
 <template>
-  <div v-if="displayInput" class="col-xs-12 col-md-6">
+  <div v-if="!hidden" :class="{
+    'col-xs-12 col-md-6': !forModal,
+    'margin-input full-width': forModal,
+    last: last
+    }">
     <div class="row justify-between">
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
@@ -10,16 +14,17 @@
         :value="value"
         color="white"
         inverted-light
-        @focus="focusHandler"
-        @blur="blurHandler"
+        @focus="onFocus"
+        @blur="onBlur"
         @input="update"
         :upper-case="upperCase"
         :lower-case="lowerCase"
         :type="type"
         :disable="disable"
+        :readOnly="readOnly"
         :rows="rows"
         :suffix="suffix"
-        :class="{'borders': borders}"
+        :class="{'borders': borders || forModal}"
       />
     </q-field>
   </div>
@@ -29,6 +34,7 @@
 import { REQUIRED_LABEL } from '../../data/constants';
 
 export default {
+  name: 'NiInput',
   props: {
     caption: String,
     error: Boolean,
@@ -37,16 +43,19 @@ export default {
     upperCase: { type: Boolean, default: false },
     lowerCase: { type: Boolean, default: false },
     disable: { type: Boolean, default: false },
+    readOnly: { type: Boolean, default: false },
     type: { type: String, default: 'text' },
     rows: { type: Number, default: 1 },
-    displayInput: { type: Boolean, default: true },
+    hidden: { type: Boolean, default: false },
     suffix: { type: String, default: '' },
     borders: { type: Boolean, default: false },
     requiredField: { type: Boolean, default: false },
     name: String,
+    forModal: { type: Boolean, default: false },
+    last: { type: Boolean, default: false },
   },
   methods: {
-    blurHandler (event) {
+    onBlur (event) {
       if (this.type === 'number') {
         this.$nextTick(() => {
           this.$emit('blur');
@@ -55,7 +64,7 @@ export default {
         this.$emit('blur');
       }
     },
-    focusHandler (event) {
+    onFocus (event) {
       this.$emit('focus');
     },
     update (value) {
