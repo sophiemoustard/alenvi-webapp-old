@@ -202,16 +202,16 @@
             <span><q-icon name="clear" @click.native="serviceCreationModal = false" /></span>
           </div>
         </div>
-        <ni-modal-select caption="Type" v-model="newService.type" :error="$v.newService.type.$error" @blur="$v.newService.type.$touch"
+        <ni-select for-modal caption="Type" v-model="newService.type" :error="$v.newService.type.$error" @blur="$v.newService.type.$touch"
           :options="serviceTypeOptions" required-field />
         <ni-input for-modal caption="Nom" v-model="newService.name" :error="$v.newService.name.$error" @blur="$v.newService.name.$touch" required-field />
-        <ni-modal-select caption="Nature" v-model="newService.nature" :error="$v.newService.nature.$error" @blur="$v.newService.nature.$touch"
+        <ni-select for-modal caption="Nature" v-model="newService.nature" :error="$v.newService.nature.$error" @blur="$v.newService.nature.$touch"
           :options="natureOptions" required-field />
         <ni-input for-modal caption="Prix unitaire par défaut TTC" suffix="€" type="number" v-model="newService.defaultUnitAmount"
           :error="$v.newService.defaultUnitAmount.$error" @blur="$v.newService.defaultUnitAmount.$touch" required-field />
         <ni-input for-modal caption="TVA" suffix="%" v-model="newService.vat" type="number" :error="$v.newService.vat.$error" @blur="$v.newService.vat.$touch"
           error-label="La TVA doit être positive ou nulle" />
-        <ni-modal-select v-if="newService.nature !== FIXED" caption="Plan de majoration" v-model="newService.surcharge" :options="surchargesOptions" clearable />
+        <ni-select for-modal v-if="newService.nature !== FIXED" caption="Plan de majoration" v-model="newService.surcharge" :options="surchargesOptions" clearable />
         <div class="row q-mb-md">
           <q-checkbox label="Exonération de charges" v-model="newService.exemptFromCharges" />
         </div>
@@ -239,7 +239,7 @@
           :error="$v.editedService.defaultUnitAmount.$error" @blur="$v.editedService.defaultUnitAmount.$touch" required-field />
         <ni-input for-modal caption="TVA" suffix="%" v-model="editedService.vat" type="number" :error="$v.editedService.vat.$error" @blur="$v.editedService.vat.$touch"
           error-label="La TVA doit être positive ou nulle" />
-        <ni-modal-select v-if="editedService.nature !== FIXED" caption="Plan de majoration" v-model="editedService.surcharge" :options="surchargesOptions" clearable />
+        <ni-select for-modal v-if="editedService.nature !== FIXED" caption="Plan de majoration" v-model="editedService.surcharge" :options="surchargesOptions" clearable />
         <div class="row q-mb-md">
           <q-checkbox label="Exonération de charges" v-model="editedService.exemptFromCharges" />
         </div>
@@ -286,7 +286,7 @@
         <ni-input for-modal caption="Email" v-model.trim="newThirdPartyPayer.email" />
         <ni-input for-modal caption="Prix unitaire TTC par défaut" suffix="€" type="number" v-model="newThirdPartyPayer.unitTTCRate"
           :error="$v.newThirdPartyPayer.unitTTCRate.$error" error-label="Le prix unitaire doit être positif"/>
-        <ni-modal-select v-model="newThirdPartyPayer.billingMode" :options="billingModeOptions" caption="Facturation" :filter="false" />
+        <ni-select for-modal v-model="newThirdPartyPayer.billingMode" :options="billingModeOptions" caption="Facturation" :filter="false" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter le tiers payeur" icon-right="add" color="primary" :loading="loading"
         @click="createNewThirdPartyPayer" />
@@ -311,7 +311,7 @@
         <ni-input for-modal caption="Email" v-model.trim="editedThirdPartyPayer.email" />
         <ni-input for-modal caption="Prix unitaire TTC par défaut" suffix="€" type="number" v-model="editedThirdPartyPayer.unitTTCRate"
           :error="$v.editedThirdPartyPayer.unitTTCRate.$error" error-label="Le prix unitaire doit être positif"/>
-        <ni-modal-select v-model="editedThirdPartyPayer.billingMode" :options="billingModeOptions" caption="Facturation" :filter="false" />
+        <ni-select for-modal v-model="editedThirdPartyPayer.billingMode" :options="billingModeOptions" caption="Facturation" :filter="false" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Editer le tiers payeur" icon-right="check" color="primary" :loading="loading" @click="updateThirdPartyPayer" />
     </q-modal>
@@ -321,14 +321,13 @@
 <script>
 import { required, numeric, requiredIf } from 'vuelidate/lib/validators';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
-import ModalSelect from '../../../components/form/ModalSelect.vue';
 import DatetimePicker from '../../../components/form/DatetimePicker.vue';
 import CustomImg from '../../../components/form/CustomImg.vue';
 import FileUploader from '../../../components/form/FileUploader.vue';
 import { configMixin } from '../../../mixins/configMixin';
 import { validationMixin } from '../../../mixins/validationMixin.js';
-import NiInput from '../../../components/form/Input.vue';
-import Select from '../../../components/form/Select.vue';
+import NiInput from '../../../components/form/Input';
+import NiSelect from '../../../components/form/Select';
 import SearchAddress from '../../../components/form/SearchAddress.vue';
 import { frAddress, posDecimals, positiveNumber, iban, bic } from '../../../helpers/vuelidateCustomVal';
 import { BILLING_DIRECT, BILLING_INDIRECT, REQUIRED_LABEL, CONTRACT_STATUS_OPTIONS, TWO_WEEKS, MONTH, NATURE_OPTIONS, FIXED } from '../../../data/constants.js';
@@ -339,9 +338,8 @@ export default {
   components: {
     'ni-custom-img': CustomImg,
     'ni-file-uploader': FileUploader,
-    'ni-modal-select': ModalSelect,
     'ni-input': NiInput,
-    'ni-select': Select,
+    'ni-select': NiSelect,
     'ni-search-address': SearchAddress,
     'ni-datetime-picker': DatetimePicker,
   },

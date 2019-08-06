@@ -29,14 +29,14 @@
           :disable="isDisabled" :error="validations.dates.$error" @blur="validations.dates.$touch" disable-end-date />
       </template>
       <template v-if="editedEvent.type === INTERVENTION">
-        <ni-modal-select caption="Bénéficiaire" v-model="editedEvent.customer._id" :options="customersOptions"
+        <ni-select for-modal caption="Bénéficiaire" v-model="editedEvent.customer._id" :options="customersOptions"
           :error="validations.customer.$error" required-field disable />
-        <ni-modal-select caption="Service" :options="customerSubscriptionsOptions(editedEvent.customer._id)"
+        <ni-select for-modal caption="Service" :options="customerSubscriptionsOptions(editedEvent.customer._id)"
           v-model="editedEvent.subscription" :error="validations.subscription.$error"
           @blur="validations.subscription.$touch" required-field :disable="isDisabled" />
       </template>
       <template v-if="editedEvent.type === INTERNAL_HOUR">
-        <ni-modal-select caption="Type d'heure interne" v-model="editedEvent.internalHour"
+        <ni-select for-modal caption="Type d'heure interne" v-model="editedEvent.internalHour"
           :options="internalHourOptions" :error="validations.internalHour.$error"
           @blur="validations.internalHour.$touch" />
         <ni-search-address v-model="editedEvent.address" inModal
@@ -49,7 +49,7 @@
         </div>
       </template>
       <template v-if="editedEvent.type === ABSENCE">
-        <ni-modal-select caption="Nature" v-model="editedEvent.absenceNature" :options="absenceNatureOptions"
+        <ni-select for-modal caption="Nature" v-model="editedEvent.absenceNature" :options="absenceNatureOptions"
           required-field disable />
         <template v-if="editedEvent.absenceNature === DAILY">
           <ni-datetime-picker caption="Date de début" v-model="editedEvent.dates.startDate" type="date" required-field
@@ -57,7 +57,7 @@
           <ni-datetime-picker caption="Date de fin" v-model="editedEvent.dates.endDate" type="date" required-field
             inModal :error="validations.dates.endDate.$error" @blur="validations.dates.endDate.$touch"
             :min="editedEvent.dates.startDate" />
-          <ni-modal-select caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions"
+          <ni-select for-modal caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions"
             :error="validations.absence.$error" required-field @blur="validations.absence.$touch" />
           <ni-file-uploader v-if="editedEvent.absence && editedEvent.absence === ILLNESS" path="attachment"
             caption="Justificatif d'absence" :entity="editedEvent" alt="justificatif absence" name="proofOfAbsence"
@@ -67,7 +67,7 @@
         <template v-if="editedEvent.absenceNature === HOURLY">
           <ni-datetime-range caption="Dates et heures de l'évènement" v-model="editedEvent.dates" required-field
             :disable="isDisabled" disable-end-date :error="validations.dates.$error" @blur="validations.dates.$touch" />
-          <ni-modal-select caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions"
+          <ni-select for-modal caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions"
             :error="validations.absence.$error" required-field @blur="validations.absence.$touch" disable />
         </template>
       </template>
@@ -78,10 +78,10 @@
           <q-checkbox v-model="editedEvent.isCancelled" label="Annuler l'évènement" @input="toggleCancellationForm" />
         </div>
         <div class="row justify-between">
-          <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.condition" caption="Conditions"
+          <ni-select for-modal v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.condition" caption="Conditions"
             :options="cancellationConditions" required-field @blur="validations.cancel.condition.$touch"
             class="col-6 cancel" />
-          <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.reason" caption="Motif"
+          <ni-select for-modal v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.reason" caption="Motif"
             :options="cancellationReasons" required-field @blur="validations.cancel.reason.$touch"
             class="col-6 cancel" />
         </div>

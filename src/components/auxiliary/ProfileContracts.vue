@@ -29,9 +29,9 @@
               <q-icon name="clear" @click.native="newContractModal = false" /></span>
           </div>
         </div>
-        <ni-modal-select caption="Statut" :error="$v.newContract.status.$error" :options="statusOptions" v-model="newContract.status"
+        <ni-select for-modal caption="Statut" :error="$v.newContract.status.$error" :options="statusOptions" v-model="newContract.status"
           @blur="$v.newContract.status.$touch" separator required-field @input="resetContract" />
-        <ni-modal-select v-if="newContract.status === CUSTOMER_CONTRACT" caption="Bénéficiaire" :error="$v.newContract.customer.$error"
+        <ni-select for-modal v-if="newContract.status === CUSTOMER_CONTRACT" caption="Bénéficiaire" :error="$v.newContract.customer.$error"
           :options="customerOptions" v-model="newContract.customer" @blur="$v.newContract.customer.$touch" separator
           required-field />
         <ni-input for-modal v-if="newContract.status === COMPANY_CONTRACT" caption="Volume horaire hebdomadaire" :error="$v.newContract.weeklyHours.$error"
@@ -97,7 +97,7 @@
           required-field @blur="$v.endContract.endNotificationDate.$touch" :error="$v.endContract.endNotificationDate.$error" />
         <ni-datetime-picker caption="Date de fin de contrat" v-model="endContract.endDate" :min="minEndContractDate"
           in-modal required-field @blur="$v.endContract.endDate.$touch" :error="$v.endContract.endDate.$error" />
-        <ni-modal-select caption="Motif" :options="endContractReasons" v-model="endContract.endReason" required-field
+        <ni-select for-modal caption="Motif" :options="endContractReasons" v-model="endContract.endReason" required-field
           @blur="$v.endContract.endReason.$touch" :error="$v.endContract.endReason.$error" @input="resetOtherMisc" />
         <ni-input for-modal caption="Autres" v-if="endContract.endReason === OTHER" v-model="endContract.otherMisc"
           required-field @blur="$v.endContract.otherMisc.$touch" :error="$v.endContract.otherMisc.$error" />
@@ -110,7 +110,7 @@
 
 <script>
 import { required, requiredIf } from 'vuelidate/lib/validators';
-import NiModalSelect from '../form/ModalSelect';
+import NiSelect from '../form/Select';
 import NiInput from '../form/Input';
 import NiDatetimePicker from '../form/DatetimePicker';
 import NiContracts from '../contracts/Contracts';
@@ -125,7 +125,7 @@ export default {
   name: 'ProfileContracts',
   mixins: [contractMixin],
   components: {
-    NiModalSelect,
+    NiSelect,
     NiInput,
     NiDatetimePicker,
     NiContracts,

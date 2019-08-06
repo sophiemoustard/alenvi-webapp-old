@@ -1,7 +1,7 @@
 import SelectSector from '../components/form/SelectSector';
 import DatetimePicker from '../components/form/DatetimePicker.vue';
 import DatetimeRange from '../components/form/DatetimeRange.vue';
-import ModalSelect from '../components/form/ModalSelect';
+import NiSelect from '../components/form/Select';
 import NiInput from '../components/form/Input';
 import SearchAddress from '../components/form/SearchAddress';
 import FileUploader from '../components/form/FileUploader';
@@ -39,7 +39,7 @@ export const planningModalMixin = {
     'ni-select-sector': SelectSector,
     'ni-datetime-picker': DatetimePicker,
     'ni-search-address': SearchAddress,
-    'ni-modal-select': ModalSelect,
+    'ni-select': NiSelect,
     'ni-input': NiInput,
     'ni-file-uploader': FileUploader,
     'ni-datetime-range': DatetimeRange,

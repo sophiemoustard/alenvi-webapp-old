@@ -253,7 +253,7 @@
               <q-icon name="clear" @click.native="subscriptionCreationModal = false" /></span>
           </div>
         </div>
-        <ni-modal-select caption="Service" :options="serviceOptions" v-model="newSubscription.service" :error="$v.newSubscription.service.$error"
+        <ni-select for-modal caption="Service" :options="serviceOptions" v-model="newSubscription.service" :error="$v.newSubscription.service.$error"
           @blur="$v.newSubscription.service.$touch" required-field />
         <ni-input for-modal v-model="newSubscription.unitTTCRate" :error="$v.newSubscription.unitTTCRate.$error" caption="Prix unitaire TTC"
           @blur="$v.newSubscription.unitTTCRate.$touch" type="number" required-field />
@@ -379,18 +379,18 @@
               <q-icon name="clear" @click.native="fundingCreationModal = false" /></span>
           </div>
         </div>
-        <ni-modal-select caption="Tiers payeur" :options="fundingTppOptions" v-model="newFunding.thirdPartyPayer"
+        <ni-select for-modal caption="Tiers payeur" :options="fundingTppOptions" v-model="newFunding.thirdPartyPayer"
           :error="$v.newFunding.thirdPartyPayer.$error" @blur="$v.newFunding.thirdPartyPayer.$touch" required-field />
-        <ni-modal-select v-model="newFunding.subscription" :options="fundingSubscriptionsOptions()" caption="Souscription"
+        <ni-select for-modal v-model="newFunding.subscription" :options="fundingSubscriptionsOptions()" caption="Souscription"
           @blur="$v.newFunding.subscription.$touch" :error="$v.newFunding.subscription.$error" required-field />
         <ni-datetime-picker v-model="newFunding.startDate" caption="Date de début de prise en charge"
           in-modal @blur="$v.newFunding.startDate.$touch" :error="$v.newFunding.startDate.$error" required-field />
         <ni-datetime-picker v-model="newFunding.endDate" :min="$moment(newFunding.startDate).add(1, 'day').toISOString()"
           in-modal caption="Date de fin de prise en charge" />
         <ni-input for-modal v-model="newFunding.folderNumber" caption="Numéro de dossier" />
-        <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="newFunding.frequency" @blur="$v.newFunding.frequency.$touch"
+        <ni-select for-modal caption="Fréquence" :options="fundingFreqOptions" v-model="newFunding.frequency" @blur="$v.newFunding.frequency.$touch"
           :error="$v.newFunding.frequency.$error" required-field />
-        <ni-modal-select caption="Nature" :options="fundingNatureOptions" v-model="newFunding.nature" in-modal :error="$v.newFunding.nature.$error"
+        <ni-select for-modal caption="Nature" :options="fundingNatureOptions" v-model="newFunding.nature" in-modal :error="$v.newFunding.nature.$error"
           @blur="$v.newFunding.nature.$touch" required-field @input="resetFundingFrequency" />
         <ni-input for-modal v-if="!isOneTimeFundingNature" v-model="newFunding.unitTTCRate" caption="Prix unitaire TTC"
           type="number" @blur="$v.newFunding.unitTTCRate.$touch" :error="$v.newFunding.unitTTCRate.$error"
@@ -429,7 +429,7 @@
         <ni-datetime-picker v-model="editedFunding.endDate" caption="Date de fin de prise en charge" in-modal
           :min="$moment(editedFunding.startDate).add(1, 'day').toISOString()" />
         <ni-input for-modal v-model="editedFunding.folderNumber" caption="Numéro de dossier" />
-        <ni-modal-select caption="Fréquence" :options="fundingFreqOptions" v-model="editedFunding.frequency" @blur="$v.editedFunding.frequency.$touch"
+        <ni-select for-modal caption="Fréquence" :options="fundingFreqOptions" v-model="editedFunding.frequency" @blur="$v.editedFunding.frequency.$touch"
           :error="$v.editedFunding.frequency.$error" required-field />
         <ni-input for-modal v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.unitTTCRate" caption="Prix unitaire TTC"
           type="number" @blur="$v.editedFunding.unitTTCRate.$touch" :error="$v.editedFunding.unitTTCRate.$error"
@@ -461,7 +461,7 @@ import { extend, clear } from '../../helpers/utils.js';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify.js';
 import SearchAddress from '../form/SearchAddress';
 import NiInput from '../form/Input';
-import NiModalSelect from '../form/ModalSelect';
+import NiSelect from '../form/Select';
 import NiOptionGroup from '../form/OptionGroup';
 import MultipleFilesUploader from '../form/MultipleFilesUploader.vue';
 import { frPhoneNumber, iban, bic, frAddress } from '../../helpers/vuelidateCustomVal';
@@ -480,7 +480,7 @@ export default {
   components: {
     NiSearchAddress: SearchAddress,
     NiInput,
-    NiModalSelect,
+    NiSelect,
     'ni-datetime-picker': DatetimePicker,
     NiOptionGroup,
     'ni-multiple-files-uploader': MultipleFilesUploader,

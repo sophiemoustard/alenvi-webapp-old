@@ -50,7 +50,7 @@
               <q-icon name="clear" @click.native="auxiliaryCreationModal = false" /></span>
           </div>
         </div>
-        <ni-modal-select v-model="newUser.identity.title" :options="civilityOptions"
+        <ni-select for-modal v-model="newUser.identity.title" :options="civilityOptions"
           caption="Civilité" />
         <ni-input for-modal v-model="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error"
           caption="Nom" @blur="$v.newUser.identity.lastname.$touch" required-field />
@@ -93,7 +93,7 @@ import { userProfileValidation } from '../../../helpers/userProfileValidation';
 import { taskValidation } from '../../../helpers/taskValidation';
 import SelectSector from '../../../components/form/SelectSector';
 import NiInput from '../../../components/form/Input';
-import ModalSelect from '../../../components/form/ModalSelect';
+import NiSelect from '../../../components/form/Select';
 import SearchAddress from '../../../components/form/SearchAddress';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../../../components/popup/notify.js';
 import { DEFAULT_AVATAR, AUXILIARY, PLANNING_REFERENT, REQUIRED_LABEL } from '../../../data/constants';
@@ -104,7 +104,7 @@ export default {
   components: {
     'ni-select-sector': SelectSector,
     'ni-input': NiInput,
-    'ni-modal-select': ModalSelect,
+    'ni-select': NiSelect,
     'ni-search-address': SearchAddress,
   },
   mixins: [validationMixin],

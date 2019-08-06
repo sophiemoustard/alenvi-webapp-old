@@ -45,7 +45,7 @@
               <q-icon name="clear" @click.native="opened = false" /></span>
           </div>
         </div>
-        <ni-modal-select v-model="newCustomer.identity.title" :error="$v.newCustomer.identity.title.$error" :options="civilityOptions"
+        <ni-select for-modal v-model="newCustomer.identity.title" :error="$v.newCustomer.identity.title.$error" :options="civilityOptions"
           caption="Civilité" @blur="$v.newCustomer.identity.title.$touch" required-field />
         <ni-input for-modal v-model="newCustomer.identity.lastname" :error="$v.newCustomer.identity.lastname.$error"
           caption="Nom" @blur="$v.newCustomer.identity.lastname.$touch" required-field />
@@ -67,7 +67,7 @@ import { required, email } from 'vuelidate/lib/validators';
 import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
 import SearchAddress from '../../../components/form/SearchAddress';
 import NiInput from '../../../components/form/Input';
-import NiModalSelect from '../../../components/form/ModalSelect';
+import NiSelect from '../../../components/form/Select';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../../components/popup/notify.js';
 import { customerProfileValidation } from '../../../helpers/customerProfileValidation.js';
 import { REQUIRED_LABEL } from '../../../data/constants';
@@ -82,7 +82,7 @@ export default {
   components: {
     NiSearchAddress: SearchAddress,
     NiInput,
-    NiModalSelect,
+    NiSelect,
   },
   data () {
     return {
