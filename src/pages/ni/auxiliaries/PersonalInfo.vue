@@ -16,6 +16,7 @@ import ProfileTabs from '../../../components/ProfileTabs';
 import ProfileInfo from '../../../components/auxiliary/ProfileInfo';
 import ProfileTasks from '../../../components/auxiliary/ProfileTasks';
 import ProfileContracts from '../../../components/auxiliary/ProfileContracts';
+import ProfilePay from '../../../components/auxiliary/ProfilePay';
 import { AUXILIARY, PLANNING_REFERENT } from '../../../data/constants.js';
 
 export default {
@@ -62,6 +63,12 @@ export default {
           name: 'contracts',
           default: false,
           component: ProfileContracts,
+        },
+        {
+          label: 'Paye',
+          name: 'pays',
+          default: false,
+          component: ProfilePay,
         },
       ],
     }
