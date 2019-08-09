@@ -1,7 +1,7 @@
 <template>
   <div :class="{
-    'col-xs-12 col-md-6': !forModal,
-    'margin-input full-width': forModal,
+    'col-xs-12 col-md-6': !inModal,
+    'margin-input full-width': inModal,
     last: last
   }">
     <div class="row justify-between">
@@ -21,7 +21,7 @@
         :filter-placeholder="filterPlaceholder"
         :clearable="clearable"
         :multiple="multiple"
-        :class="{'borders': forModal}"
+        :class="{'borders': inModal}"
       />
     </q-field>
   </div>
@@ -39,7 +39,7 @@ export default {
     options: Array,
     value: [String, Number],
     requiredField: { type: Boolean, default: false },
-    forModal: { type: Boolean, default: false },
+    inModal: { type: Boolean, default: false },
     last: { type: Boolean, default: false },
     filter: { type: Boolean, default: true },
     filterPlaceholder: { type: String, default: 'Rechercher' },
