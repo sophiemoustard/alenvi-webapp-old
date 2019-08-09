@@ -1,7 +1,7 @@
 <template>
   <div v-if="!hidden" :class="{
-    'col-xs-12 col-md-6': !forModal,
-    'margin-input full-width': forModal,
+    'col-xs-12 col-md-6': !inModal,
+    'margin-input full-width': inModal,
     last: last
     }">
     <div class="row justify-between">
@@ -10,7 +10,7 @@
     </div>
     <q-field :error="error" :error-label="errorLabel">
       <template v-if="type === 'file'">
-        <div class="row input-file-container" :class="{'borders': borders || forModal}">
+        <div class="row input-file-container" :class="{'borders': borders || inModal}">
           <div class="col full-width">
             <span class="input-file-empty" v-if="!value">Pas de document</span>
             <template v-else>{{ (value && value.name) ? value.name : value }}</template>
@@ -42,7 +42,7 @@
           :readOnly="readOnly"
           :rows="rows"
           :suffix="suffix"
-          :class="{'borders': borders || forModal}"
+          :class="{'borders': borders || inModal}"
         />
       </template>
     </q-field>
@@ -70,7 +70,7 @@ export default {
     borders: { type: Boolean, default: false },
     requiredField: { type: Boolean, default: false },
     name: String,
-    forModal: { type: Boolean, default: false },
+    inModal: { type: Boolean, default: false },
     last: { type: Boolean, default: false },
   },
   methods: {

@@ -15,7 +15,7 @@
         <template slot="title">
           Ajouter un <span class="text-weight-bold">document</span>
         </template>
-        <document-upload forModal :natureOptions="documentNatureOptions" v-model="newDocument"
+        <document-upload inModal :natureOptions="documentNatureOptions" v-model="newDocument"
           ref="documentUploadForm" @valid="formValid = $event">
         </document-upload>
         <template slot="footer">

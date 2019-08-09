@@ -1,11 +1,11 @@
 <template>
   <div>
-    <ni-select :forModal="forModal" caption="Type *" :value="formValue.nature" :options="natureOptions"
+    <ni-select :inModal="inModal" caption="Type *" :value="formValue.nature" :options="natureOptions"
       @blur="onBlur('nature')" @input="update('nature', $event)"
       :error="$v.formValue.nature.$error" :errorLabel="getErrorLabel('nature')" />
-    <ni-datetime-picker :inModal="forModal" caption="Date *" :value="formValue.date"
+    <ni-datetime-picker :inModal="inModal" caption="Date *" :value="formValue.date"
       @blur="onBlur()" @input="update('date', $event)" />
-    <ni-input :forModal="forModal" caption="Document *" type="file"
+    <ni-input :inModal="inModal" caption="Document *" type="file"
       :value="formValue.file" @input="onBlur('file'); update('file', $event)"
       :error="$v.formValue.file.$error" :errorLabel="getErrorLabel('file')" />
   </div>
@@ -30,7 +30,7 @@ export default {
   },
   props: {
     natureOptions: { type: Array, default: () => [] },
-    forModal: { type: Boolean, default: false },
+    inModal: { type: Boolean, default: false },
     value: null,
   },
   data () {
