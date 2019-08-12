@@ -19,7 +19,7 @@ export const planningActionMixin = {
     addSavedTerms (endPath) {
       if (this.$q.localStorage.has(`lastSearch${endPath}`) && this.$q.localStorage.get.item(`lastSearch${endPath}`).length > 0) {
         const lastSearch = JSON.parse(this.$q.localStorage.get.item(`lastSearch${endPath}`));
-        this.$refs.planningManager.restoreFilter(lastSearch);
+        if (this.$refs.planningManager) this.$refs.planningManager.restoreFilter(lastSearch);
       }
     },
     setInternalHours () {

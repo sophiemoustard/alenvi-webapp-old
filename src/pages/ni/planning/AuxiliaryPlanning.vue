@@ -193,7 +193,7 @@ export default {
         this.addSavedTerms('Auxiliaries');
       } else {
         const userSector = this.filters.find(filter => filter.type === SECTOR && filter._id === this.mainUser.sector);
-        if (userSector) this.$refs.planningManager.restoreFilter([userSector.label]);
+        if (userSector && this.$refs.planningManager) this.$refs.planningManager.restoreFilter([userSector.label]);
       }
     },
     // Refresh data
