@@ -23,14 +23,14 @@
           :error="validations.dates.$error" @blur="validations.dates.$touch" disable-end-date />
       </template>
       <template v-if="newEvent.type === INTERVENTION">
-        <ni-select for-modal caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions"
+        <ni-select in-modal caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions"
           :error="validations.customer.$error" required-field @blur="validations.customer.$touch"
           @input="toggleServiceSelection"/>
-        <ni-select for-modal caption="Service" v-model="newEvent.subscription" :error="validations.subscription.$error"
+        <ni-select in-modal caption="Service" v-model="newEvent.subscription" :error="validations.subscription.$error"
           :options="customerSubscriptionsOptions(newEvent.customer)" required-field @blur="validations.subscription.$touch" />
       </template>
       <template v-if="newEvent.type === ABSENCE">
-        <ni-select for-modal caption="Nature" v-model="newEvent.absenceNature" :options="absenceNatureOptions"
+        <ni-select in-modal caption="Nature" v-model="newEvent.absenceNature" :options="absenceNatureOptions"
           :error="validations.absenceNature.$error" required-field @blur="validations.absenceNature.$touch"
           @input="resetAbsenceType" />
         <template v-if="newEvent.absenceNature === DAILY">
@@ -39,7 +39,7 @@
           <ni-datetime-picker caption="Date de fin" v-model="newEvent.dates.endDate" type="date" required-field inModal
             :error="validations.dates.endDate.$error" @blur="validations.dates.endDate.$touch"
             :min="newEvent.dates.startDate" />
-          <ni-select for-modal caption="Type d'absence" v-model="newEvent.absence" :options="absenceOptions"
+          <ni-select in-modal caption="Type d'absence" v-model="newEvent.absence" :options="absenceOptions"
             :error="validations.absence.$error" required-field @blur="validations.absence.$touch" />
           <ni-file-uploader v-if="newEvent.absence && newEvent.absence === ILLNESS" caption="Justificatif d'absence"
             path="attachment" :entity="newEvent" alt="justificatif absence" name="proofOfAbsence" :url="docsUploadUrl"
@@ -49,22 +49,22 @@
         <template v-if="newEvent.absenceNature === HOURLY">
           <ni-datetime-range caption="Dates et heures de l'évènement" v-model="newEvent.dates" required-field
             disable-end-date :error="validations.dates.$error" @blur="validations.dates.$touch" />
-          <ni-select for-modal caption="Type d'absence" v-model="newEvent.absence" :options="absenceOptions"
+          <ni-select in-modal caption="Type d'absence" v-model="newEvent.absence" :options="absenceOptions"
             :error="validations.absence.$error" required-field @blur="validations.absence.$touch" disable />
         </template>
       </template>
       <template v-if="newEvent.type === INTERNAL_HOUR">
-        <ni-select for-modal caption="Type d'heure interne" v-model="newEvent.internalHour" :options="internalHourOptions"
+        <ni-select in-modal caption="Type d'heure interne" v-model="newEvent.internalHour" :options="internalHourOptions"
           required-field :error="validations.internalHour.$error" @blur="validations.internalHour.$touch" />
       </template>
       <template v-if="newEvent.type !== ABSENCE">
-        <ni-select for-modal caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency"
+        <ni-select in-modal caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency"
           :options="repetitionOptions" required-field @blur="validations.repetition.frequency.$touch" :disable="!isRepetitionAllowed" />
       </template>
       <template v-if="newEvent.type === INTERNAL_HOUR">
         <ni-search-address v-model="newEvent.address" :error-label="addressError" @blur="validations.address.$touch" :error="validations.address.$error" inModal />
       </template>
-      <ni-input for-modal v-model="newEvent.misc" caption="Notes" />
+      <ni-input in-modal v-model="newEvent.misc" caption="Notes" />
     </div>
     <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary"
       @click="createEvent" :disable="disableCreationButton" icon-right="add" />

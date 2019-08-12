@@ -29,15 +29,15 @@
               <q-icon name="clear" @click.native="newContractModal = false" /></span>
           </div>
         </div>
-        <ni-select for-modal caption="Statut" :error="$v.newContract.status.$error" :options="statusOptions" v-model="newContract.status"
+        <ni-select in-modal caption="Statut" :error="$v.newContract.status.$error" :options="statusOptions" v-model="newContract.status"
           @blur="$v.newContract.status.$touch" separator required-field @input="resetContract" />
-        <ni-select for-modal v-if="newContract.status === CUSTOMER_CONTRACT" caption="Bénéficiaire" :error="$v.newContract.customer.$error"
+        <ni-select in-modal v-if="newContract.status === CUSTOMER_CONTRACT" caption="Bénéficiaire" :error="$v.newContract.customer.$error"
           :options="customerOptions" v-model="newContract.customer" @blur="$v.newContract.customer.$touch" separator
           required-field />
-        <ni-input for-modal v-if="newContract.status === COMPANY_CONTRACT" caption="Volume horaire hebdomadaire" :error="$v.newContract.weeklyHours.$error"
+        <ni-input in-modal v-if="newContract.status === COMPANY_CONTRACT" caption="Volume horaire hebdomadaire" :error="$v.newContract.weeklyHours.$error"
           type="number" v-model="newContract.weeklyHours" @blur="$v.newContract.weeklyHours.$touch" suffix="hr"
           required-field />
-        <ni-input for-modal caption="Taux horaire" :error="$v.newContract.grossHourlyRate.$error" type="number" v-model="newContract.grossHourlyRate"
+        <ni-input in-modal caption="Taux horaire" :error="$v.newContract.grossHourlyRate.$error" type="number" v-model="newContract.grossHourlyRate"
           @blur="$v.newContract.grossHourlyRate.$touch" suffix="€" required-field />
         <ni-datetime-picker caption="Date d'effet" :error="$v.newContract.startDate.$error" v-model="newContract.startDate"
           in-modal required-field />
@@ -63,10 +63,10 @@
               <q-icon name="clear" @click.native="newContractVersionModal = false" /></span>
           </div>
         </div>
-        <ni-input for-modal v-if="selectedContract.status === COMPANY_CONTRACT" caption="Volume horaire hebdomadaire"
+        <ni-input in-modal v-if="selectedContract.status === COMPANY_CONTRACT" caption="Volume horaire hebdomadaire"
           :error="$v.newContractVersion.weeklyHours.$error" v-model="newContractVersion.weeklyHours" type="number"
           @blur="$v.newContractVersion.weeklyHours.$touch" suffix="hr" required-field />
-        <ni-input for-modal caption="Taux horaire" :error="$v.newContractVersion.grossHourlyRate.$error"
+        <ni-input in-modal caption="Taux horaire" :error="$v.newContractVersion.grossHourlyRate.$error"
           v-model="newContractVersion.grossHourlyRate" type="number" suffix="€" required-field
           @blur="$v.newContractVersion.grossHourlyRate.$touch" />
         <ni-datetime-picker caption="Date d'effet" :error="$v.newContractVersion.startDate.$error" v-model="newContractVersion.startDate"
@@ -97,9 +97,9 @@
           required-field @blur="$v.endContract.endNotificationDate.$touch" :error="$v.endContract.endNotificationDate.$error" />
         <ni-datetime-picker caption="Date de fin de contrat" v-model="endContract.endDate" :min="minEndContractDate"
           in-modal required-field @blur="$v.endContract.endDate.$touch" :error="$v.endContract.endDate.$error" />
-        <ni-select for-modal caption="Motif" :options="endContractReasons" v-model="endContract.endReason" required-field
+        <ni-select in-modal caption="Motif" :options="endContractReasons" v-model="endContract.endReason" required-field
           @blur="$v.endContract.endReason.$touch" :error="$v.endContract.endReason.$error" @input="resetOtherMisc" />
-        <ni-input for-modal caption="Autres" v-if="endContract.endReason === OTHER" v-model="endContract.otherMisc"
+        <ni-input in-modal caption="Autres" v-if="endContract.endReason === OTHER" v-model="endContract.otherMisc"
           required-field @blur="$v.endContract.otherMisc.$touch" :error="$v.endContract.otherMisc.$error" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Mettre fin au contrat" icon-right="clear" color="primary"

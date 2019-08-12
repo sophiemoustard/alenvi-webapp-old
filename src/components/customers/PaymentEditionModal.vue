@@ -9,12 +9,12 @@
           <span><q-icon name="clear" @click.native="resetForm" /></span>
         </div>
       </div>
-      <ni-input for-modal caption="Bénéficiaire" :value="customerFullname" required-field read-only />
-      <ni-input for-modal caption="Client" v-model="selectedClientName" required-field read-only />
-      <ni-input for-modal :caption="`Montant du ${editionModalNature}`" suffix="€" type="number"
+      <ni-input in-modal caption="Bénéficiaire" :value="customerFullname" required-field read-only />
+      <ni-input in-modal caption="Client" v-model="selectedClientName" required-field read-only />
+      <ni-input in-modal :caption="`Montant du ${editionModalNature}`" suffix="€" type="number"
         v-model="editedPayment.netInclTaxes" required-field :error="validations.netInclTaxes.$error"
         @blur="validations.netInclTaxes.$touch" :error-label="netInclTaxesError" />
-      <ni-select for-modal :caption="`Type du ${editionModalNature}`" v-model="editedPayment.type" :options="paymentOptions"
+      <ni-select in-modal :caption="`Type du ${editionModalNature}`" v-model="editedPayment.type" :options="paymentOptions"
         required-field @blur="validations.type.$touch" :error="validations.type.$error" />
       <ni-datetime-picker :caption="`Date du ${editionModalNature}`" v-model="editedPayment.date"
         :error="validations.date.$error" @blur="validations.date.$touch" in-modal type="date" required-field />

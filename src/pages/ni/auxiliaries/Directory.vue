@@ -50,15 +50,15 @@
               <q-icon name="clear" @click.native="auxiliaryCreationModal = false" /></span>
           </div>
         </div>
-        <ni-select for-modal v-model="newUser.identity.title" :options="civilityOptions"
+        <ni-select in-modal v-model="newUser.identity.title" :options="civilityOptions"
           caption="Civilité" />
-        <ni-input for-modal v-model="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error"
+        <ni-input in-modal v-model="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error"
           caption="Nom" @blur="$v.newUser.identity.lastname.$touch" required-field />
-        <ni-input for-modal v-model="newUser.identity.firstname" :error="$v.newUser.identity.firstname.$error"
+        <ni-input in-modal v-model="newUser.identity.firstname" :error="$v.newUser.identity.firstname.$error"
           caption="Prénom" @blur="$v.newUser.identity.firstname.$touch" required-field />
-        <ni-input for-modal v-model="newUser.mobilePhone" :error="$v.newUser.mobilePhone.$error" required-field
+        <ni-input in-modal v-model="newUser.mobilePhone" :error="$v.newUser.mobilePhone.$error" required-field
           caption="Numéro de téléphone" @blur="$v.newUser.mobilePhone.$touch" :error-label="mobilePhoneError" />
-        <ni-input for-modal v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email" @blur="$v.newUser.local.email.$touch"
+        <ni-input in-modal v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email" @blur="$v.newUser.local.email.$touch"
           :error-label="emailError" required-field />
         <ni-search-address v-model="newUser.contact.address" color="white" inverted-light @blur="$v.newUser.contact.address.$touch"
           error-label="Adresse non valide" :error="$v.newUser.contact.address.$error" in-modal />

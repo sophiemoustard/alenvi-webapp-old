@@ -151,7 +151,7 @@
               <q-icon name="clear" @click.native="newInternalHourModal = false" /></span>
           </div>
         </div>
-        <ni-input for-modal caption="Nom" v-model="newInternalHour.name" :error="$v.newInternalHour.name.$error"
+        <ni-input in-modal caption="Nom" v-model="newInternalHour.name" :error="$v.newInternalHour.name.$error"
           @blur="$v.newInternalHour.name.$touch" required-field />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer l'heure interne" icon-right="add" color="primary"
@@ -170,7 +170,7 @@
               <q-icon name="clear" @click.native="sectorCreationModal = false" /></span>
           </div>
         </div>
-        <ni-input for-modal caption="Nom" v-model="newSector.name" :error="$v.newSector.name.$error"
+        <ni-input in-modal caption="Nom" v-model="newSector.name" :error="$v.newSector.name.$error"
           :error-label="nameError($v.newSector)" @blur="$v.newSector.name.$touch" required-field />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter une équipe" icon-right="add" color="primary"
@@ -189,7 +189,7 @@
               <q-icon name="clear" @click.native="sectorEditionModal = false" /></span>
           </div>
         </div>
-        <ni-input for-modal caption="Nom" v-model="editedSector.name" :error="$v.editedSector.name.$error"
+        <ni-input in-modal caption="Nom" v-model="editedSector.name" :error="$v.editedSector.name.$error"
           :error-label="nameError($v.editedSector)" required-field />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Editer l'équipe" icon-right="add" color="primary"

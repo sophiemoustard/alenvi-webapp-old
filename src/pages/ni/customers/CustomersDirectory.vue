@@ -45,11 +45,11 @@
               <q-icon name="clear" @click.native="opened = false" /></span>
           </div>
         </div>
-        <ni-select for-modal v-model="newCustomer.identity.title" :error="$v.newCustomer.identity.title.$error" :options="civilityOptions"
+        <ni-select in-modal v-model="newCustomer.identity.title" :error="$v.newCustomer.identity.title.$error" :options="civilityOptions"
           caption="Civilité" @blur="$v.newCustomer.identity.title.$touch" required-field />
-        <ni-input for-modal v-model="newCustomer.identity.lastname" :error="$v.newCustomer.identity.lastname.$error"
+        <ni-input in-modal v-model="newCustomer.identity.lastname" :error="$v.newCustomer.identity.lastname.$error"
           caption="Nom" @blur="$v.newCustomer.identity.lastname.$touch" required-field />
-        <ni-input for-modal v-model="newCustomer.identity.firstname" caption="Prénom" />
+        <ni-input in-modal v-model="newCustomer.identity.firstname" caption="Prénom" />
         <div class="row margin-input last">
           <ni-search-address v-model="newCustomer.contact.address" @blur="$v.newCustomer.contact.address.$touch"
             :error="$v.newCustomer.contact.address.$error" :error-label="addressError" in-modal required-field />

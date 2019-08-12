@@ -49,8 +49,8 @@
             <span><q-icon name="clear" @click.native="opened = false" /></span>
           </div>
         </div>
-        <ni-select for-modal caption="Modèle" :options="typeMessageOptions" v-model="typeMessage" required-field />
-        <ni-input for-modal caption="Message" v-model="messageComp" type="textarea" :rows="7" required-field />
+        <ni-select in-modal caption="Modèle" :options="typeMessageOptions" v-model="typeMessage" required-field />
+        <ni-input in-modal caption="Message" v-model="messageComp" type="textarea" :rows="7" required-field />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary"
         :loading="loading" @click.native="sendMessage" />
