@@ -142,7 +142,7 @@ const routes = [
         component: () => import('pages/ni/exports/DataExports'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['exports:edit'],
+          permissions: ['exports:read'],
           parent: 'exports',
         },
       },
@@ -152,7 +152,7 @@ const routes = [
         component: () => import('pages/ni/exports/HistoryExports'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['exports:edit'],
+          permissions: ['exports:read'],
           parent: 'exports',
         },
       },
