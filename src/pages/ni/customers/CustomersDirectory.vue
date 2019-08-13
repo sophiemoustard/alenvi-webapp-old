@@ -138,7 +138,16 @@ export default {
           sortable: true,
           format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : 'N/A',
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
-          style: 'width: 170px',
+          style: 'width: 85px',
+        },
+        {
+          name: 'firstIntervention',
+          label: '1ère intervention',
+          field: 'firstIntervention',
+          align: 'left',
+          sortable: false,
+          format: (value) => value && value.startDate ? this.$moment(value.startDate).format('DD/MM/YYYY') : '',
+          style: 'width: 85px',
         },
         {
           name: 'info',
@@ -226,6 +235,7 @@ export default {
             },
             startDate: customer.createdAt,
             isActive: customer.isActive,
+            firstIntervention: customer.firstIntervention,
           }
           if (customer.isActive) {
             formattedCustomer.missingInfo = customerProfileValidation(customer).error !== null;
