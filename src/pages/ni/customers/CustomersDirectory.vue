@@ -9,18 +9,20 @@
           inverted-light />
       </div>
       <div class="col-xs-12 col-md-2 row justify-end">
-        <q-toggle v-model="activeCustomers" color="primary" label="Actifs" />
+        <q-toggle v-model="onlyClients" color="primary" label="Clients" />
       </div>
     </div>
-    <q-table :data="filteredCustomers" :columns="columns" row-key="name" binary-state-sort :rows-per-page-options="[15, 25, 35]"
-      :pagination.sync="pagination" :loading="tableLoading" class="people-list q-pa-sm">
-      <q-tr slot="body" slot-scope="props" :props="props" :class="['datatable-row', { 'datatable-row-inactive': !props.row.isActive }]"
-        @click.native="goToCustomerProfile(props.row.customer._id)">
+    <q-table :data="filteredCustomers" :columns="columns" row-key="name" binary-state-sort
+      :rows-per-page-options="[15, 25, 35]" :pagination.sync="pagination" :loading="tableLoading"
+      :visible-columns="['fullName', 'createdAt', 'firstIntervention', 'info', 'client']" class="people-list q-pa-sm">
+      <q-tr slot="body" slot-scope="props" :props="props"
+        :class="['datatable-row', { 'datatable-row-inactive': !props.row.isActive }]"
+        @click.native="goToCustomerProfile(props.row._id)">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
-          <q-item v-if="col.name === 'name'">
-            <q-item-main :label="col.value.name" />
+          <q-item v-if="col.name === 'fullName'">
+            <q-item-main :label="col.value" />
           </q-item>
-          <template v-else-if="col.name === 'active'">
+          <template v-else-if="col.name === 'client'">
             <div :class="{ activeDot: col.value, inactiveDot: !col.value }"></div>
           </template>
           <template v-else-if="col.name === 'info'">
@@ -45,8 +47,8 @@
               <q-icon name="clear" @click.native="opened = false" /></span>
           </div>
         </div>
-        <ni-select in-modal v-model="newCustomer.identity.title" :error="$v.newCustomer.identity.title.$error" :options="civilityOptions"
-          caption="Civilité" @blur="$v.newCustomer.identity.title.$touch" required-field />
+        <ni-select in-modal v-model="newCustomer.identity.title" :error="$v.newCustomer.identity.title.$error"
+          :options="civilityOptions" caption="Civilité" @blur="$v.newCustomer.identity.title.$touch" required-field />
         <ni-input in-modal v-model="newCustomer.identity.lastname" :error="$v.newCustomer.identity.lastname.$error"
           caption="Nom" @blur="$v.newCustomer.identity.lastname.$touch" required-field />
         <ni-input in-modal v-model="newCustomer.identity.firstname" caption="Prénom" />
@@ -55,8 +57,8 @@
             :error="$v.newCustomer.contact.address.$error" :error-label="addressError" in-modal required-field />
         </div>
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary" :loading="loading"
-        @click="submit" />
+      <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary"
+        :loading="loading" @click="submit" />
     </q-modal>
   </q-page>
 </template>
@@ -109,20 +111,26 @@ export default {
       },
       customersList: [],
       searchStr: '',
-      activeCustomers: true,
+      onlyClients: false,
       pagination: {
-        sortBy: 'startDate',
+        sortBy: 'createdAt',
         descending: true,
         page: 1,
         rowsPerPage: 15,
       },
       columns: [
         {
-          name: 'name',
+          name: '_id',
+          label: '',
+          required: false,
+        },
+        {
+          name: 'fullName',
           label: 'Nom',
-          field: row => row.customer,
+          field: row => row.identity ? row.identity.fullName : null,
           align: 'left',
           sortable: true,
+          format: value => value || '',
           sort: (a, b) => {
             const aArr = a.name.split(' ');
             const bArr = b.name.split(' ');
@@ -131,9 +139,9 @@ export default {
           style: 'width: 350px',
         },
         {
-          name: 'startDate',
+          name: 'createdAt',
           label: 'Depuis le...',
-          field: 'startDate',
+          field: 'createdAt',
           align: 'left',
           sortable: true,
           format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : 'N/A',
@@ -159,9 +167,9 @@ export default {
           style: 'width: 30px',
         },
         {
-          name: 'active',
-          label: 'Actif',
-          field: 'isActive',
+          name: 'client',
+          label: 'Client',
+          field: 'firstIntervention',
           align: 'right',
           sortable: false,
           style: 'width: 30px',
@@ -193,14 +201,11 @@ export default {
     currentUser () {
       return this.$store.getters['main/user'];
     },
-    activeCustomerList () {
-      if (this.activeCustomers) {
-        return this.customersList.filter(customer => customer.isActive);
-      }
-      return this.customersList.filter(customer => !customer.isActive);
+    clientsCustomerList () {
+      return this.onlyClients ? this.customersList.filter(customer => customer.firstIntervention) : this.customersList;
     },
     filteredCustomers () {
-      return this.activeCustomerList.filter(customer => customer.customer.name.match(new RegExp(this.searchStr, 'i')));
+      return this.clientsCustomerList.filter(customer => customer.identity.fullName.match(new RegExp(this.searchStr, 'i')));
     },
     zipCodeError () {
       if (!this.$v.newCustomer.contact.address.zipCode.required) {
@@ -228,19 +233,10 @@ export default {
       try {
         const customers = await this.$customers.showAll();
         this.customersList = customers.map((customer) => {
-          const formattedCustomer = {
-            customer: {
-              _id: customer._id,
-              name: customer.identity.firstname ? `${customer.identity.firstname} ${customer.identity.lastname}` : customer.identity.lastname,
-            },
-            startDate: customer.createdAt,
-            isActive: customer.isActive,
-            firstIntervention: customer.firstIntervention,
-          }
-          if (customer.isActive) {
-            formattedCustomer.missingInfo = customerProfileValidation(customer).error !== null;
-          }
-          return formattedCustomer;
+          return {
+            ...customer,
+            ...(customer.firstIntervention && { missingInfo: customerProfileValidation(customer).error !== null }),
+          };
         });
         this.tableLoading = false;
       } catch (e) {
