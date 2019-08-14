@@ -88,7 +88,7 @@
       </template>
     </div>
     <div v-if="editedEvent.type === INTERVENTION" class="customer-info">
-      <div class="row items-center">
+      <div class="row items-center no-wrap">
         <div v-if="customerAddress" class="customer-address">{{ customerAddress }}</div>
         <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect" />
       </div>
