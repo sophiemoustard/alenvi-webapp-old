@@ -1,5 +1,5 @@
 <template>
-  <div class="items-center row justify-center planning-navigation">
+  <div class="items-center row justify-center planning-navigation col-10">
     <div class="planning-month col-7" @click="datimeModal = !datimeModal">
       <span class="capitalize">{{ timelineTitle }}</span>
       <q-icon name="arrow_drop_down" />

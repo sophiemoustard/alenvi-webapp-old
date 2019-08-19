@@ -7,7 +7,7 @@
           @click="toggleAllSectors" :color="displayAllSectors ? 'primary' : ''" />
       </div>
       <div class="col-xs-12 col-md-7 row planning-timeline">
-        <planning-navigation class="col-10" :timelineTitle="timelineTitle()" :targetDate="targetDate" :type="PLANNING"
+        <planning-navigation :timelineTitle="timelineTitle()" :targetDate="targetDate" :type="PLANNING"
           @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
           @goToWeek="goToWeek" />
         <q-btn v-if="!isCustomerPlanning" class="planning-view" size="md" icon="playlist_play" flat round
