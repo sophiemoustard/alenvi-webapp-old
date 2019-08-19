@@ -73,6 +73,7 @@ import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../../componen
 import { customerProfileValidation } from '../../../helpers/customerProfileValidation.js';
 import { REQUIRED_LABEL } from '../../../data/constants';
 import { validationMixin } from '../../../mixins/validationMixin.js';
+import { formatIdentity } from '../../../helpers/utils';
 
 export default {
   name: 'CustomersDirectory',
@@ -126,10 +127,9 @@ export default {
         {
           name: 'fullName',
           label: 'Nom',
-          field: row => row.identity ? row.identity.fullName : null,
+          field: row => row.identity ? row.identity.fullName : '',
           align: 'left',
           sortable: true,
-          format: value => value || '',
           sort: (a, b) => {
             const aArr = a.name.split(' ');
             const bArr = b.name.split(' ');
@@ -234,6 +234,10 @@ export default {
         this.customersList = customers.map((customer) => {
           return {
             ...customer,
+            identity: {
+              ...customer.identity,
+              fullName: formatIdentity(customer.identity, 'FL'),
+            },
             ...(customer.firstIntervention && { missingInfo: customerProfileValidation(customer).error !== null }),
           };
         });
