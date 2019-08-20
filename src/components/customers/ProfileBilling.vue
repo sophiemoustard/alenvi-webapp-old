@@ -108,7 +108,7 @@ export default {
     // Billing dates
     setBillingDates () {
       this.billingDates.endDate = this.$moment().endOf('d').toISOString();
-      this.billingDates.startDate = this.$moment().subtract(6, 'M').startOf('d').toISOString();
+      this.billingDates.startDate = this.$moment().subtract(2, 'M').startOf('M').toISOString();
     },
     // Compute balances
     getEndBalance (documents, tpp) {

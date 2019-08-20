@@ -604,9 +604,6 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables';
 
-  .q-layout-page
-    padding-top: 20px;
-
   .modal-subtitle
     justify-content: flex-end;
     display: flex;

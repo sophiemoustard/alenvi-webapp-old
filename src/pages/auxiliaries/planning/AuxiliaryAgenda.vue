@@ -8,9 +8,11 @@
             @input="updateAuxiliary" ref="auxiliarySelect" :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
             :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`" />
         </div>
-        <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
-          @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :viewMode="viewMode" @updateViewMode="updateViewMode"
-          :type="AGENDA" />
+        <div class="col-xs-12 col-md-7">
+          <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
+            @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :viewMode="viewMode" @updateViewMode="updateViewMode"
+            :type="AGENDA" />
+        </div>
       </div>
       <agenda :events="filteredEvents" :days="days" :personKey="personKey" @createEvent="openCreationModal" @editEvent="openEditionModal" />
     </div>
@@ -254,9 +256,6 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables';
-
-  .q-layout-page
-    padding-top: 20px;
 
   .auxiliary-name
     .q-if-inverted

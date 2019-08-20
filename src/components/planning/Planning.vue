@@ -6,12 +6,16 @@
         <q-btn v-if="!isCustomerPlanning && isCoach" flat round :icon="displayAllSectors ? 'arrow_forward' : 'people'"
           @click="toggleAllSectors" :color="displayAllSectors ? 'primary' : ''" />
       </div>
-      <div class="col-xs-12 col-md-7 row planning-timeline">
-        <planning-navigation class="col-10" :timelineTitle="timelineTitle()" :targetDate="targetDate" :type="PLANNING"
-          @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
-          @goToWeek="goToWeek" />
-        <q-btn v-if="!isCustomerPlanning" class="planning-view" size="md" icon="playlist_play" flat round
-          @click="toggleHistory" :color="displayHistory ? 'primary' : ''" />
+      <div class="col-xs-12 col-md-7">
+        <div class="row full-width justify-between">
+          <div class="col-10">
+            <planning-navigation :timelineTitle="timelineTitle()" :targetDate="targetDate" :type="PLANNING"
+              @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
+              @goToWeek="goToWeek" />
+          </div>
+          <q-btn v-if="!isCustomerPlanning" class="planning-view" size="md" icon="playlist_play" flat round
+            @click="toggleHistory" :color="displayHistory ? 'primary' : ''" />
+        </div>
       </div>
     </div>
     <div class="planning-container full-width">
