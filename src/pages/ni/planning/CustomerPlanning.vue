@@ -404,10 +404,9 @@ export default {
         this.loading = true;
         const payload = this.getPayload(this.newEvent);
 
-        const hasConflicts = await this.hasConflicts(payload);
-        if (hasConflicts) {
+        if (!this.isCreationAllowed(payload)) {
           this.$v.editedEvent.$reset();
-          return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
+          return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
         }
 
         await this.$events.create(payload);
@@ -441,11 +440,10 @@ export default {
         this.loading = true;
         const payload = this.getPayload(this.editedEvent);
 
-        const hasConflicts = await this.hasConflicts(payload);
-        if (hasConflicts) {
+        if (this.hasConflicts(payload)) {
           this.loading = false;
           this.$v.editedEvent.$reset();
-          return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
+          return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
         }
 
         delete payload.customer;
@@ -481,9 +479,8 @@ export default {
         };
         if (draggedObject.auxiliary) payload.auxiliary = draggedObject.auxiliary._id;
 
-        const hasConflicts = await this.hasConflicts(payload);
-        if (hasConflicts) {
-          return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
+        if (this.hasConflicts(payload)) {
+          return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
         }
 
         await this.$events.updateById(draggedObject._id, payload);

@@ -135,6 +135,11 @@ export const planningActionMixin = {
 
       return payload;
     },
+    isCreationAllowed (event) {
+      if (event.type === ABSENCE) return true;
+
+      return !this.hasConflicts(event);
+    },
     hasConflicts (scheduledEvent) {
       if (!scheduledEvent.auxiliary) return false;
 
@@ -160,7 +165,7 @@ export const planningActionMixin = {
         this.loading = true;
         const payload = this.getCreationPayload(this.newEvent);
 
-        if (this.hasConflicts(payload)) {
+        if (!this.isCreationAllowed(payload)) {
           return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
         }
 
@@ -277,9 +282,9 @@ export const planningActionMixin = {
         this.loading = true;
         const payload = this.getEditionPayload(this.editedEvent);
 
-        if (!payload.isCancelled && this.hasConflicts(payload)) {
+        if (this.hasConflicts(payload)) {
           this.$v.editedEvent.$reset();
-          return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
+          return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
         }
         delete payload._id;
         await this.$events.updateById(this.editedEvent._id, payload);
