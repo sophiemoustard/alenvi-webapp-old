@@ -65,7 +65,7 @@ export default {
           component: ProfileContracts,
         },
         {
-          label: 'Paye',
+          label: 'Paie',
           name: 'pays',
           default: false,
           component: ProfilePay,
