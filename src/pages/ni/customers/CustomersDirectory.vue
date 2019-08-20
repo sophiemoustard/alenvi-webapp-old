@@ -238,7 +238,7 @@ export default {
               ...customer.identity,
               fullName: formatIdentity(customer.identity, 'FL'),
             },
-            ...(customer.firstIntervention && { missingInfo: customerProfileValidation(customer).error !== null }),
+            missingInfo: customerProfileValidation(customer).error !== null,
           };
         });
         this.tableLoading = false;
