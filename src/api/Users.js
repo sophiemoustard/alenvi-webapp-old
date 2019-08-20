@@ -66,22 +66,14 @@ export default {
     const tasks = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/${userId}/tasks`);
     return tasks.data.data.tasks;
   },
-  async addPayDocument (user, file, nature, date) {
+  async addPayDocument (user, formData) {
     const urlPrefix = `${process.env.API_HOSTNAME}/users/${user._id}`;
     const url = `${urlPrefix}/gdrive/${user.administrative.driveFolder.driveId}/upload`;
-    const form = new FormData();
     const headers = {
       'content-type': 'multipart/form-data',
     };
-    const now = (new Date()).toISOString();
 
-    form.append('nature', nature);
-    form.append('date', date.toISOString());
-    form.append('payDocuments', file);
-    form.append('Content-Type', file.type || 'application/octet-stream');
-    form.append('fileName', `pay-document-${now}`);
-
-    const document = await alenviAxios.post(url, form, { headers: headers });
+    const document = await alenviAxios.post(url, formData, { headers: headers });
 
     return document.data.data;
   },

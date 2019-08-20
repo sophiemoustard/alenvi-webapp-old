@@ -4,9 +4,9 @@
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Documents</p>
       </div>
-      <document-list class="full-width" :documents="payDocuments" @delete="deletePayDocument"
+      <pay-document-list class="full-width" :documents="payDocuments" @delete="deletePayDocument"
         :natureOptions="documentNatureOptions" :disable="loading">
-      </document-list>
+      </pay-document-list>
 
       <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add"
         label="Ajouter un document" @click="documentUpload = true" :disable="loading" />
@@ -15,9 +15,9 @@
         <template slot="title">
           Ajouter un <span class="text-weight-bold">document</span>
         </template>
-        <document-upload inModal :natureOptions="documentNatureOptions" v-model="newDocument"
+        <ni-document-upload inModal :natureOptions="documentNatureOptions" v-model="newDocument"
           ref="documentUploadForm" @valid="formValid = $event">
-        </document-upload>
+        </ni-document-upload>
         <template slot="footer">
           <q-btn no-caps class="full-width modal-btn" label="Ajouter le document" icon-right="add"
             color="primary" :loading="loading" @click="createDocument" />
@@ -33,22 +33,22 @@ import { mapGetters } from 'vuex';
 import get from 'lodash/get';
 
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../popup/notify';
-import { DOCUMENT_NATURES } from '../../data/constants';
+import { PAY_DOCUMENT_NATURES } from '../../data/constants';
 import Modal from '../../components/Modal';
 import DocumentUpload from '../../components/documents/DocumentUpload';
-import DocumentList from '../../components/documents/DocumentList';
+import PayDocumentList from '../../components/documents/PayDocumentList';
 
 export default {
   name: 'ProfilePay',
   components: {
-    'document-upload': DocumentUpload,
-    'document-list': DocumentList,
+    'ni-document-upload': DocumentUpload,
+    'pay-document-list': PayDocumentList,
     'ni-modal': Modal,
   },
   data () {
     return {
       documentUpload: false,
-      documentNatureOptions: DOCUMENT_NATURES,
+      documentNatureOptions: PAY_DOCUMENT_NATURES,
       loading: false,
       newDocument: null,
       formValid: false,
@@ -56,17 +56,26 @@ export default {
   },
   computed: {
     ...mapGetters({
-      userProfile: 'rh/getUserProfile',
-      mainUser: 'main/user',
+      user: 'rh/getUserProfile',
     }),
-    user () {
-      return this.userProfile ? this.userProfile : this.mainUser;
-    },
     payDocuments () {
       return get(this.user, 'administrative.payDocuments') || [];
     },
   },
   methods: {
+    formatDocumentPayload () {
+      const { file, nature, date } = this.newDocument;
+      const form = new FormData();
+      const now = (new Date()).toISOString();
+
+      form.append('nature', nature);
+      form.append('date', date.toISOString());
+      form.append('payDocuments', file);
+      form.append('Content-Type', file.type || 'application/octet-stream');
+      form.append('fileName', `pay-document-${now}`);
+
+      return form;
+    },
     async createDocument () {
       const isValid = await this.$refs.documentUploadForm.validate();
       if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
@@ -74,8 +83,7 @@ export default {
       this.loading = true;
 
       try {
-        const { file, nature, date } = this.newDocument;
-        await this.$users.addPayDocument(this.user, file, nature, date);
+        await this.$users.addPayDocument(this.user, this.formatDocumentPayload());
 
         this.documentUpload = false;
         this.$refs.documentUploadForm.reset();

@@ -16,7 +16,7 @@
       </q-td>
     </q-table>
     <div v-if="documentsSorted.length === 0" class="q-px-md q-my-sm">
-      <span class="no-document">Aucun documents</span>
+      <span class="no-document">Aucun document</span>
     </div>
   </div>
 </template>
@@ -27,10 +27,15 @@ import moment from 'moment';
 import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
 
+import { PAY_DOCUMENT_NATURES } from '../../data/constants';
+
 export default {
-  name: 'DocumentList',
+  name: 'PayDocumentList',
   data () {
+    const payDocumentNaturesKeyedByValue = keyBy(PAY_DOCUMENT_NATURES, 'value');
+
     return {
+      documentNatureLabels: mapValues(payDocumentNaturesKeyedByValue, 'label'),
       columns: [
         {
           name: 'nature',
@@ -44,7 +49,7 @@ export default {
           label: 'Date',
           align: 'left',
           field: 'date',
-          format: value => value ? moment(value).format('DD/MM/YY') : '',
+          format: value => value ? moment(value).format('DD/MM/YYYY') : '',
         },
         {
           name: 'actions',
@@ -57,17 +62,12 @@ export default {
   },
   props: {
     documents: { type: Array, default: null },
-    natureOptions: { type: Array, default: () => {} },
     disable: { type: Boolean, default: false },
   },
   computed: {
     documentsSorted () {
       if (!this.documents) return [];
       return [...this.documents].sort((d1, d2) => d1.date > d2.date);
-    },
-    documentNatureLabels () {
-      const keyedByValue = keyBy(this.natureOptions, 'value');
-      return mapValues(keyedByValue, 'label');
     },
   },
   methods: {
