@@ -162,11 +162,20 @@ export const planningActionMixin = {
         this.$v.newEvent.$touch();
         if (this.$v.newEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
 
+        if (this.newEvent.type === ABSENCE) {
+          await this.$q.dialog({
+            title: 'Confirmation',
+            message: 'Les interventions en conflit seront passer en à affecter et les autres evenements seront supprimés. Es tu sûr de vouloir créer cette absence ?',
+            ok: 'OK',
+            cancel: 'Annuler',
+          });
+        }
+
         this.loading = true;
         const payload = this.getCreationPayload(this.newEvent);
 
         if (!this.isCreationAllowed(payload)) {
-          return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
+          return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
         }
 
         await this.$events.create(payload);
@@ -176,6 +185,7 @@ export const planningActionMixin = {
         this.resetCreationForm(false);
         NotifyPositive('Évènement créé');
       } catch (e) {
+        if (e.message === '') return NotifyPositive('Création annulée');
         console.error(e);
         if (e.data && e.data.statusCode === 422) return NotifyNegative('La creation de cet evenement n\'est pas autorisée');
         NotifyNegative('Erreur lors de la création de l\'évènement');
@@ -376,7 +386,7 @@ export const planningActionMixin = {
       try {
         await this.$q.dialog({
           title: 'Confirmation',
-          message: 'Etes-vous sûr de vouloir supprimer cet évènement ?',
+          message: 'Es-tu sûr de vouloir supprimer cet évènement ?',
           ok: 'OK',
           cancel: 'Annuler',
         });
