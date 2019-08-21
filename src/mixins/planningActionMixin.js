@@ -141,7 +141,7 @@ export const planningActionMixin = {
       return !this.hasConflicts(event);
     },
     hasConflicts (scheduledEvent) {
-      if (!scheduledEvent.auxiliary) return false;
+      if (!scheduledEvent.auxiliary || scheduledEvent.isCancelled) return false;
 
       const auxiliaryEvents = this.getAuxiliaryEventsBetweenDates(scheduledEvent.auxiliary, scheduledEvent.startDate, scheduledEvent.endDate);
       return auxiliaryEvents.some(ev => {
