@@ -225,7 +225,7 @@ export const WEEKS_PER_MONTH = (52 / 12);
 // PAY DOCUMENT NATURE
 export const PAYSLIP = 'payslip';
 export const CERTIFICATE = 'certificate';
-export const DOCUMENT_NATURES = [
+export const PAY_DOCUMENT_NATURES = [
   { label: 'Bulletin de paie', value: PAYSLIP },
   { label: 'Attestation', value: CERTIFICATE },
   { label: 'Autre', value: OTHER },
