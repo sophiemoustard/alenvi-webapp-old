@@ -137,6 +137,7 @@ export const planningActionMixin = {
     },
     isCreationAllowed (event) {
       if (event.type === ABSENCE) return true;
+      if (event.type === INTERVENTION && event.repetition && event.repetition.frequency !== NEVER) return true;
 
       return !this.hasConflicts(event);
     },
@@ -165,7 +166,7 @@ export const planningActionMixin = {
         if (this.newEvent.type === ABSENCE) {
           await this.$q.dialog({
             title: 'Confirmation',
-            message: 'Les interventions en conflit seront passer en à affecter et les autres evenements seront supprimés. Es tu sûr de vouloir créer cette absence ?',
+            message: 'Les interventions en conflit seront passées en à affecter et les autres évènements seront supprimés. Es-tu sûr(e) de vouloir créer cette absence ?',
             ok: 'OK',
             cancel: 'Annuler',
           });
@@ -386,7 +387,7 @@ export const planningActionMixin = {
       try {
         await this.$q.dialog({
           title: 'Confirmation',
-          message: 'Es-tu sûr de vouloir supprimer cet évènement ?',
+          message: 'Es-tu sûr(e) de vouloir supprimer cet évènement ?',
           ok: 'OK',
           cancel: 'Annuler',
         });
