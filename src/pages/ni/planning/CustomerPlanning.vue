@@ -102,7 +102,7 @@ import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
 import Planning from '../../../components/planning/Planning.vue';
 import { planningModalMixin } from '../../../mixins/planningModalMixin';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
-import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify.js';
+import { NotifyWarning, NotifyNegative } from '../../../components/popup/notify.js';
 import { INTERVENTION, DEFAULT_AVATAR, NEVER, AUXILIARY, PLANNING_REFERENT, CUSTOMER_CONTRACT, COMPANY_CONTRACT, CUSTOMER, SECTOR, AUXILIARY_ROLES } from '../../../data/constants';
 import { mapGetters, mapActions } from 'vuex';
 import { formatIdentity } from '../../../helpers/utils';
@@ -368,60 +368,6 @@ export default {
       };
       this.creationModal = true;
     },
-    getPayload (event) {
-      const isEdition = !!event._id;
-      let payload = { ...this.$_.omit(event, ['dates', '__v']) };
-      payload = this.$_.pickBy(payload);
-
-      const customer = this.customers.find(cus => cus._id === event.customer);
-      if (customer) {
-        const subscription = customer.subscriptions.find(sub => sub._id === event.subscription);
-        if (subscription && subscription.service) payload.status = subscription.service.type;
-      }
-
-      if (event.auxiliary) {
-        const auxiliary = this.auxiliaries.find(aux => aux._id === event.auxiliary);
-        payload.sector = auxiliary.sector._id;
-      }
-
-      payload.startDate = this.$moment(event.dates.startDate).hours(event.dates.startHour.split(':')[0])
-        .minutes(event.dates.startHour.split(':')[1]).toISOString();
-      payload.endDate = this.$moment(event.dates.endDate).hours(event.dates.endHour.split(':')[0])
-        .minutes(event.dates.endHour.split(':')[1]).toISOString();
-
-      if (event.cancel && Object.keys(event.cancel).length === 0) delete payload.cancel;
-      if (event.cancel && Object.keys(event.cancel).length === 0) delete payload.attachment;
-      if (event.shouldUpdateRepetition) delete payload.misc;
-      if (isEdition) delete payload.repetition;
-
-      return payload;
-    },
-    async createEvent () {
-      try {
-        this.$v.newEvent.$touch();
-        if (this.$v.newEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        this.loading = true;
-        const payload = this.getPayload(this.newEvent);
-
-        if (!this.isCreationAllowed(payload)) {
-          this.$v.editedEvent.$reset();
-          return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
-        }
-
-        await this.$events.create(payload);
-
-        await this.refresh();
-        this.creationModal = false;
-        NotifyPositive('Évènement créé');
-      } catch (e) {
-        console.error(e);
-        if (e.data && e.data.statusCode === 422) return NotifyNegative('La creation de cet evenement n\'est pas autorisée');
-        NotifyNegative('Erreur lors de la création de l\'évènement');
-      } finally {
-        this.loading = false
-      }
-    },
     // Event edition
     openEditionModal ({ eventId, rowId }) {
       const rowEvents = this.getRowEvents(rowId);
@@ -431,127 +377,6 @@ export default {
       this.formatEditedEvent(event);
 
       this.editionModal = true;
-    },
-    async updateEvent () {
-      try {
-        this.$v.editedEvent.$touch();
-        if (this.$v.editedEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        this.loading = true;
-        const payload = this.getPayload(this.editedEvent);
-
-        if (this.hasConflicts(payload)) {
-          this.loading = false;
-          this.$v.editedEvent.$reset();
-          return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
-        }
-
-        delete payload.customer;
-        delete payload.type;
-        delete payload._id
-        await this.$events.updateById(this.editedEvent._id, payload);
-        await this.refresh();
-
-        this.editionModal = false;
-        this.resetEditionForm();
-        NotifyPositive('Évènement modifié');
-      } catch (e) {
-        console.error(e);
-        if (e.data && e.data.statusCode === 422) return NotifyNegative('Cette modification n\'est pas autorisée');
-        NotifyNegative('Erreur lors de l\'édition de l\'évènement');
-      } finally {
-        this.loading = false;
-      }
-    },
-    async updateEventOnDrop (vEvent) {
-      try {
-        const { toDay, target, draggedObject } = vEvent;
-
-        if (target._id !== draggedObject.customer._id) return NotifyNegative('Impossible de modifier le bénéficiaire de l\'intervention');
-
-        const daysBetween = this.$moment(draggedObject.endDate).diff(this.$moment(draggedObject.startDate), 'days');
-        const payload = {
-          startDate: this.$moment(toDay).hours(this.$moment(draggedObject.startDate).hours())
-            .minutes(this.$moment(draggedObject.startDate).minutes()).toISOString(),
-          endDate: this.$moment(toDay).add(daysBetween, 'days').hours(this.$moment(draggedObject.endDate).hours())
-            .minutes(this.$moment(draggedObject.endDate).minutes()).toISOString(),
-          sector: draggedObject.sector,
-        };
-        if (draggedObject.auxiliary) payload.auxiliary = draggedObject.auxiliary._id;
-
-        if (this.hasConflicts(payload)) {
-          return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
-        }
-
-        await this.$events.updateById(draggedObject._id, payload);
-        await this.refresh();
-
-        NotifyPositive('Évènement modifié');
-      } catch (e) {
-        console.error(e);
-        if (e.data && e.data.statusCode === 422) return NotifyNegative('Cette modification n\'est pas autorisée');
-        NotifyNegative('Erreur lors de l\'édition de l\'évènement');
-      }
-    },
-    // Event deletion
-    async deleteEvent () {
-      try {
-        await this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Etes-vous sûr de vouloir supprimer cet évènement ?',
-          ok: 'OK',
-          cancel: 'Annuler',
-        });
-
-        this.loading = true
-        await this.$events.deleteById(this.editedEvent._id);
-        await this.refresh();
-
-        this.editionModal = false;
-        this.resetEditionForm();
-        NotifyPositive('Évènement supprimé.');
-      } catch (e) {
-        if (e.message === '') return NotifyPositive('Suppression annulée');
-        NotifyNegative('Erreur lors de la suppression de l\'événement.');
-      } finally {
-        this.loading = false
-      }
-    },
-    async deleteEventRepetition () {
-      try {
-        const shouldDeleteRepetition = await this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Supprimer l\'événement périodique',
-          ok: 'OK',
-          cancel: 'Annuler',
-          options: {
-            type: 'radio',
-            model: false,
-            items: [
-              { label: 'Supprimer uniquement cet évenement', value: false },
-              { label: 'Supprimer cet évenement et tous les suivants', value: true },
-            ],
-          },
-        });
-
-        this.loading = true
-        if (shouldDeleteRepetition) {
-          await this.$events.deleteRepetition(this.editedEvent._id);
-          await this.refresh();
-        } else {
-          await this.$events.deleteById(this.editedEvent._id);
-          await this.refresh();
-        }
-
-        this.editionModal = false;
-        this.resetEditionForm();
-        NotifyPositive('Évènement supprimé.');
-      } catch (e) {
-        if (e.message === '') return NotifyPositive('Suppression annulée');
-        NotifyNegative('Erreur lors de la suppression de l\'événement.');
-      } finally {
-        this.loading = false
-      }
     },
     async getSectorCustomers (sectors) {
       return sectors.length === 0 ? [] : this.$customers.showAllBySector({
