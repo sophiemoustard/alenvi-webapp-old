@@ -16,7 +16,7 @@
       <div :class="[customer ? 'col-xs-12': 'col-xs-6', 'pl-lg', 'col-md-6', 'profile-info-item']">
         <div class="row items-center">
           <div class="row items-center justify-center on-left" style="width: 17px; height: 17px">
-            <div :class="[{ activeDot: user.isActive, inactiveDot: !user.isActive }]" />
+            <div :class="[{ activeDot: user.firstIntervention, inactiveDot: !user.firstIntervention }]" />
           </div>
           <div>{{ userStatus }}</div>
         </div>
@@ -93,8 +93,7 @@ export default {
       user: 'rh/getUserProfile',
     }),
     userStatus () {
-      if (this.user.isActive) return 'Profil actif';
-      return 'Profil inactif'
+      return this.user.firstIntervention ? 'Client' : 'Prospect';
     },
     userStartDate () {
       if (this.user.createdAt) return this.$moment(this.user.createdAt).format('DD/MM/YY');
