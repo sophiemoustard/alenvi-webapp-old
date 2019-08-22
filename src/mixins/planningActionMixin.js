@@ -159,23 +159,34 @@ export const planningActionMixin = {
             this.$moment(startDate).isBetween(event.startDate, event.endDate, 'minutes', '[)')
         });
     },
+    async notifyCreation () {
+      if (this.newEvent.type === ABSENCE) {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Les interventions en conflit avec l\'absence seront passées en à affecter et les autres évènements seront supprimés. Es-tu sûr(e) de vouloir créer cette absence ?',
+          ok: 'OK',
+          cancel: 'Annuler',
+        });
+      }
+
+      if (this.newEvent.auxiliary && this.$_.get(this.newEvent, 'repetition.frequency', '') !== NEVER) {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Les interventions de la répétition en conflit avec les évènements existants seront passées en à affecter. Es-tu sûr(e) de vouloir créer cette repetition ?',
+          ok: 'OK',
+          cancel: 'Annuler',
+        });
+      }
+    },
     async createEvent () {
       try {
         this.$v.newEvent.$touch();
         if (this.$v.newEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        if (this.newEvent.type === ABSENCE) {
-          await this.$q.dialog({
-            title: 'Confirmation',
-            message: 'Les interventions en conflit seront passées en à affecter et les autres évènements seront supprimés. Es-tu sûr(e) de vouloir créer cette absence ?',
-            ok: 'OK',
-            cancel: 'Annuler',
-          });
-        }
+        await this.notifyCreation();
 
         this.loading = true;
         const payload = this.getCreationPayload(this.newEvent);
-
         if (!this.isCreationAllowed(payload)) {
           return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
         }
