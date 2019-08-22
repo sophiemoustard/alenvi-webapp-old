@@ -135,8 +135,14 @@ export const planningActionMixin = {
 
       return payload;
     },
+    isCreationAllowed (event) {
+      if (event.type === ABSENCE) return true;
+      if (event.type === INTERVENTION && event.repetition && event.repetition.frequency !== NEVER) return true;
+
+      return !this.hasConflicts(event);
+    },
     hasConflicts (scheduledEvent) {
-      if (!scheduledEvent.auxiliary) return false;
+      if (!scheduledEvent.auxiliary || scheduledEvent.isCancelled) return false;
 
       const auxiliaryEvents = this.getAuxiliaryEventsBetweenDates(scheduledEvent.auxiliary, scheduledEvent.startDate, scheduledEvent.endDate);
       return auxiliaryEvents.some(ev => {
@@ -157,11 +163,20 @@ export const planningActionMixin = {
         this.$v.newEvent.$touch();
         if (this.$v.newEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
 
+        if (this.newEvent.type === ABSENCE) {
+          await this.$q.dialog({
+            title: 'Confirmation',
+            message: 'Les interventions en conflit seront passées en à affecter et les autres évènements seront supprimés. Es-tu sûr(e) de vouloir créer cette absence ?',
+            ok: 'OK',
+            cancel: 'Annuler',
+          });
+        }
+
         this.loading = true;
         const payload = this.getCreationPayload(this.newEvent);
 
-        if (this.hasConflicts(payload)) {
-          return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
+        if (!this.isCreationAllowed(payload)) {
+          return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
         }
 
         await this.$events.create(payload);
@@ -171,6 +186,7 @@ export const planningActionMixin = {
         this.resetCreationForm(false);
         NotifyPositive('Évènement créé');
       } catch (e) {
+        if (e.message === '') return NotifyPositive('Création annulée');
         console.error(e);
         if (e.data && e.data.statusCode === 422) return NotifyNegative('La creation de cet evenement n\'est pas autorisée');
         NotifyNegative('Erreur lors de la création de l\'évènement');
@@ -277,9 +293,9 @@ export const planningActionMixin = {
         this.loading = true;
         const payload = this.getEditionPayload(this.editedEvent);
 
-        if (!payload.isCancelled && this.hasConflicts(payload)) {
+        if (this.hasConflicts(payload)) {
           this.$v.editedEvent.$reset();
-          return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
+          return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
         }
         delete payload._id;
         await this.$events.updateById(this.editedEvent._id, payload);
@@ -371,7 +387,7 @@ export const planningActionMixin = {
       try {
         await this.$q.dialog({
           title: 'Confirmation',
-          message: 'Etes-vous sûr de vouloir supprimer cet évènement ?',
+          message: 'Es-tu sûr(e) de vouloir supprimer cet évènement ?',
           ok: 'OK',
           cancel: 'Annuler',
         });
