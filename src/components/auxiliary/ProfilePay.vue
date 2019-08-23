@@ -29,14 +29,16 @@
 
 <script>
 import { mapGetters } from 'vuex';
-
 import get from 'lodash/get';
+import snakeCase from 'lodash/snakeCase';
 
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../popup/notify';
-import { PAY_DOCUMENT_NATURES } from '../../data/constants';
+import { PAY_DOCUMENT_NATURES, OTHER } from '../../data/constants';
 import Modal from '../../components/Modal';
 import DocumentUpload from '../../components/documents/DocumentUpload';
 import PayDocumentList from '../../components/documents/PayDocumentList';
+import PayDocuments from '../../api/PayDocuments';
+import { formatIdentity } from '../../helpers/utils';
 
 export default {
   name: 'ProfilePay',
@@ -52,57 +54,79 @@ export default {
       loading: false,
       newDocument: null,
       formValid: false,
+      payDocuments: [],
     };
   },
   computed: {
     ...mapGetters({
       user: 'rh/getUserProfile',
     }),
-    payDocuments () {
-      return get(this.user, 'administrative.payDocuments') || [];
+    driveFolder () {
+      return get(this.user, 'administrative.driveFolder.driveId');
     },
+  },
+  async mounted () {
+    await this.getDocuments();
   },
   methods: {
     formatDocumentPayload () {
       const { file, nature, date } = this.newDocument;
       const form = new FormData();
-      const now = (new Date()).toISOString();
+      const formattedDate = this.$moment(date).format('DD-MM-YYYY-HHmm');
+      const documentOption = this.documentNatureOptions.find(option => option.value === this.newDocument.nature);
+      const fileName = documentOption && this.newDocument.nature !== OTHER
+        ? snakeCase(`${documentOption.label} ${formattedDate} ${formatIdentity(this.user.identity, 'FL')}`)
+        : snakeCase(`document_paie_${formattedDate}`);
 
       form.append('nature', nature);
       form.append('date', date.toISOString());
-      form.append('payDocuments', file);
-      form.append('Content-Type', file.type || 'application/octet-stream');
-      form.append('fileName', `pay-document-${now}`);
+      form.append('payDoc', file);
+      form.append('mimeType', file.type || 'application/octet-stream');
+      form.append('fileName', fileName);
+      form.append('driveFolderId', this.driveFolder);
+      form.append('user', this.user._id);
 
       return form;
     },
     async createDocument () {
+      if (!this.driveFolder) NotifyNegative('Dossier Google Drive manquant.')
       const isValid = await this.$refs.documentUploadForm.validate();
       if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
       this.loading = true;
 
       try {
-        await this.$users.addPayDocument(this.user, this.formatDocumentPayload());
+        await PayDocuments.create(this.formatDocumentPayload());
 
         this.documentUpload = false;
         this.$refs.documentUploadForm.reset();
         NotifyPositive('Document sauvegardé');
 
-        await this.$store.dispatch('rh/getUserProfile', { userId: this.user._id });
+        await this.getDocuments();
       } catch (e) {
+        console.error(e);
         NotifyNegative("Erreur lors de l'envoi du document");
       }
 
       this.loading = false;
     },
+    async getDocuments () {
+      try {
+        this.payDocuments = await PayDocuments.list({ user: this.user._id });
+      } catch (e) {
+        this.payDocuments = [];
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération des documents');
+      }
+    },
     async deletePayDocument (payDocument) {
       this.loading = true;
       try {
-        await this.$users.deletePayDocument(this.user._id, payDocument._id);
+        await PayDocuments.remove(payDocument._id);
         NotifyPositive('Document supprimé');
-        await this.$store.dispatch('rh/getUserProfile', { userId: this.user._id });
+        await this.getDocuments();
       } catch (e) {
+        console.error(e);
         NotifyNegative('Erreur lors de la suppression du document');
       }
       this.loading = false;
