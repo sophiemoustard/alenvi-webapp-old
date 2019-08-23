@@ -3,7 +3,7 @@ import { alenviAxios } from './ressources/alenviAxios'
 
 export default {
   async create (formData) {
-    await alenviAxios.post(`${process.env.API_HOSTNAME}/paydocuments`, formData, { headers: { 'Content-Type': formData.get('Content-Type') } });
+    await alenviAxios.post(`${process.env.API_HOSTNAME}/paydocuments`, formData);
   },
   async list (params) {
     const payDocumentsRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/paydocuments`, { params });
