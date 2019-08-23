@@ -172,7 +172,7 @@ export const planningActionMixin = {
       if (this.newEvent.auxiliary && this.$_.get(this.newEvent, 'repetition.frequency', '') !== NEVER) {
         await this.$q.dialog({
           title: 'Confirmation',
-          message: 'Les interventions de la répétition en conflit avec les évènements existants seront passées en à affecter. Es-tu sûr(e) de vouloir créer cette repetition ?',
+          message: 'Les interventions de la répétition en conflit avec les évènements existants seront passées en à affecter. Es-tu sûr(e) de vouloir créer cette répétition ?',
           ok: 'OK',
           cancel: 'Annuler',
         });
@@ -346,9 +346,9 @@ export const planningActionMixin = {
         const { toDay, target, draggedObject } = vEvent;
 
         if (this.personKey === CUSTOMER && target._id !== draggedObject.customer._id) {
-          return NotifyNegative('Impossible de modifier le bénéficiaire de l\'intervention');
+          return NotifyNegative('Impossible de modifier le bénéficiaire de l\'intervention.');
         } else {
-          if (target.type === SECTOR && draggedObject.type !== INTERVENTION) return NotifyNegative('Cette modification n\'est pas autorisée');
+          if (target.type === SECTOR && draggedObject.type !== INTERVENTION) return NotifyNegative('Cette modification n\'est pas autorisée.');
           if ([ABSENCE, UNAVAILABILITY].includes(draggedObject.type) && draggedObject.auxiliary._id !== target._id) {
             return NotifyNegative('Impossible de modifier l\'auxiliaire de cet évènement.');
           }
