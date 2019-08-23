@@ -81,7 +81,7 @@ export default {
       form.append('nature', nature);
       form.append('date', date.toISOString());
       form.append('payDoc', file);
-      form.append('Content-Type', file.type || 'application/octet-stream');
+      form.append('mimeType', file.type || 'application/octet-stream');
       form.append('fileName', fileName);
       form.append('driveFolderId', this.driveFolder);
       form.append('user', this.user._id);
