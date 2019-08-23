@@ -12,6 +12,7 @@ import {
   PLANNING_VIEW_START_HOUR,
   PLANNING_VIEW_END_HOUR,
   SECTOR,
+  CUSTOMER,
 } from '../data/constants';
 
 export const planningActionMixin = {
@@ -158,23 +159,34 @@ export const planningActionMixin = {
             this.$moment(startDate).isBetween(event.startDate, event.endDate, 'minutes', '[)')
         });
     },
+    async notifyCreation () {
+      if (this.newEvent.type === ABSENCE) {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Les interventions en conflit avec l\'absence seront passées en à affecter et les autres évènements seront supprimés. Es-tu sûr(e) de vouloir créer cette absence ?',
+          ok: 'OK',
+          cancel: 'Annuler',
+        });
+      }
+
+      if (this.newEvent.auxiliary && this.$_.get(this.newEvent, 'repetition.frequency', '') !== NEVER) {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Les interventions de la répétition en conflit avec les évènements existants seront passées en à affecter. Es-tu sûr(e) de vouloir créer cette répétition ?',
+          ok: 'OK',
+          cancel: 'Annuler',
+        });
+      }
+    },
     async createEvent () {
       try {
         this.$v.newEvent.$touch();
         if (this.$v.newEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        if (this.newEvent.type === ABSENCE) {
-          await this.$q.dialog({
-            title: 'Confirmation',
-            message: 'Les interventions en conflit seront passées en à affecter et les autres évènements seront supprimés. Es-tu sûr(e) de vouloir créer cette absence ?',
-            ok: 'OK',
-            cancel: 'Annuler',
-          });
-        }
+        await this.notifyCreation();
 
         this.loading = true;
         const payload = this.getCreationPayload(this.newEvent);
-
         if (!this.isCreationAllowed(payload)) {
           return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
         }
@@ -275,15 +287,8 @@ export const planningActionMixin = {
       if (event.cancel && Object.keys(event.cancel).length === 0) delete payload.cancel;
       if (event.attachment && Object.keys(event.attachment).length === 0) delete payload.attachment;
       if (event.shouldUpdateRepetition) delete payload.misc;
-      delete payload.customer;
-      delete payload.repetition;
-      delete payload.staffingLeft;
-      delete payload.staffingWidth;
-      delete payload.staffingTop;
-      delete payload.staffingHeight;
-      delete payload.type;
 
-      return payload;
+      return this.$_.omit(payload, ['customer', 'repetition', 'staffingLeft', 'staffingWidth', 'staffingTop', 'staffingHeight', 'type']);
     },
     async updateEvent () {
       try {
@@ -299,11 +304,11 @@ export const planningActionMixin = {
         }
         delete payload._id;
         await this.$events.updateById(this.editedEvent._id, payload);
-        NotifyPositive('Évènement modifié');
 
         await this.refresh();
         this.editionModal = false;
         this.resetEditionForm();
+        NotifyPositive('Évènement modifié');
       } catch (e) {
         console.error(e)
         if (e.data && e.data.statusCode === 422) {
@@ -325,7 +330,10 @@ export const planningActionMixin = {
       };
 
       if (target.type === SECTOR) payload.sector = target._id;
-      else {
+      else if (this.personKey === CUSTOMER) {
+        payload.auxiliary = draggedObject.auxiliary._id;
+        payload.sector = draggedObject.sector;
+      } else {
         payload.auxiliary = target._id;
         const auxiliary = this.auxiliaries.find(aux => aux._id === target._id);
         payload.sector = auxiliary.sector._id;
@@ -337,9 +345,13 @@ export const planningActionMixin = {
       try {
         const { toDay, target, draggedObject } = vEvent;
 
-        if (target.type === SECTOR && draggedObject.type !== INTERVENTION) return NotifyNegative('Cette modification n\'est pas autorisée');
-        if ([ABSENCE, UNAVAILABILITY].includes(draggedObject.type) && draggedObject.auxiliary._id !== target._id) {
-          return NotifyNegative('Impossible de modifier l\'auxiliaire de cet évènement.');
+        if (this.personKey === CUSTOMER && target._id !== draggedObject.customer._id) {
+          return NotifyNegative('Impossible de modifier le bénéficiaire de l\'intervention.');
+        } else {
+          if (target.type === SECTOR && draggedObject.type !== INTERVENTION) return NotifyNegative('Cette modification n\'est pas autorisée.');
+          if ([ABSENCE, UNAVAILABILITY].includes(draggedObject.type) && draggedObject.auxiliary._id !== target._id) {
+            return NotifyNegative('Impossible de modifier l\'auxiliaire de cet évènement.');
+          }
         }
 
         const payload = this.getDragAndDropPayload(toDay, target, draggedObject);
