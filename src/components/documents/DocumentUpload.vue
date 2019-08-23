@@ -1,13 +1,13 @@
 <template>
   <div>
     <ni-select :inModal="inModal" caption="Type" required-field :value="formValue.nature" :options="natureOptions"
-      @blur="onBlur('nature')" @input="update('nature', $event)"
-      :error="$v.formValue.nature.$error" :errorLabel="getErrorLabel('nature')" />
+      @blur="onBlur('nature')" @input="update('nature', $event)" :error="$v.formValue.nature.$error"
+      :errorLabel="getErrorLabel('nature')" />
     <ni-datetime-picker :inModal="inModal" caption="Date" required-field :value="formValue.date"
-      @blur="onBlur()" @input="update('date', $event)" />
-    <ni-input :inModal="inModal" caption="Document" required-field type="file"
-      :value="formValue.file" @input="onBlur('file'); update('file', $event)"
-      :error="$v.formValue.file.$error" :errorLabel="getErrorLabel('file')" />
+      @input="update('date', $event)" />
+    <ni-input :inModal="inModal" caption="Document" required-field type="file" :value="formValue.file"
+      @input="onBlur('file'); update('file', $event)" :error="$v.formValue.file.$error"
+      :errorLabel="getErrorLabel('file')" />
   </div>
 </template>
 
@@ -62,8 +62,10 @@ export default {
     async update (field, value) {
       this.formValue[field] = value;
       this.$emit('input', this.formValue);
-      await this.waitForFormValidation(this.$v.formValue[field]);
-      this.$emit('valid', !this.$v.formValue.$invalid);
+      if (this.$v.formValue[field]) {
+        await this.waitForFormValidation(this.$v.formValue[field]);
+        this.$emit('valid', !this.$v.formValue.$invalid);
+      }
     },
     getErrorLabel (field) {
       const validation = this.$v.formValue[field];
