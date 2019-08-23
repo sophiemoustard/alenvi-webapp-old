@@ -71,18 +71,18 @@ export const formatIdentity = (identity, format) => {
       firstname = (identity.firstname || '').trim();
       lastname = (identity.lastname || '').trim().toUpperCase();
 
-      return `${firstname} ${lastname}`;
+      return firstname ? `${firstname} ${lastname}` : lastname;
     case 'fL':
       firstname = (identity.firstname || '').trim();
       firstname = firstname ? `${firstname.slice(0, 1).toUpperCase()}. ` : '';
       lastname = (identity.lastname || '').trim().toUpperCase();
 
-      return `${firstname} ${lastname}`;
+      return firstname ? `${firstname} ${lastname}` : lastname;
     case 'Fl':
       firstname = `${(identity.firstname || '').trim()} `;
       lastname = identity.lastname ? ` ${identity.lastname.trim().slice(0, 1).toUpperCase()}.` : '';
 
-      return `${firstname} ${lastname}`;
+      return firstname ? `${firstname} ${lastname}` : lastname;
     case 'Lf':
       firstname = (identity.firstname || '').trim();
       firstname = firstname ? `${firstname.slice(0, 1).toUpperCase()}. ` : '';

@@ -127,13 +127,14 @@ export default {
         {
           name: 'fullName',
           label: 'Nom',
-          field: row => row.identity ? row.identity.fullName : '',
+          field: 'identity',
+          format: value => value ? value.fullName : '',
           align: 'left',
           sortable: true,
           sort: (a, b) => {
-            const aArr = a.name.split(' ');
-            const bArr = b.name.split(' ');
-            return aArr[aArr.length - 1].toLowerCase() < bArr[bArr.length - 1].toLowerCase() ? -1 : 1
+            const aLastname = a.lastname;
+            const bLastname = b.lastname;
+            return aLastname.toLowerCase() < bLastname.toLowerCase() ? -1 : 1
           },
           style: 'width: 350px',
         },
