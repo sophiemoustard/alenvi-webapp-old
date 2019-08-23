@@ -107,7 +107,6 @@ export default {
         contact: {
           address: { fullAddress: '' },
         },
-        isActive: true,
       },
       customersList: [],
       searchStr: '',
@@ -262,7 +261,6 @@ export default {
         contact: {
           address: { fullAddress: '' },
         },
-        isActive: true,
       };
     },
     async submit () {
