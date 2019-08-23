@@ -30,13 +30,15 @@
 <script>
 import { mapGetters } from 'vuex';
 import get from 'lodash/get';
+import snakeCase from 'lodash/snakeCase';
 
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../popup/notify';
-import { PAY_DOCUMENT_NATURES } from '../../data/constants';
+import { PAY_DOCUMENT_NATURES, OTHER } from '../../data/constants';
 import Modal from '../../components/Modal';
 import DocumentUpload from '../../components/documents/DocumentUpload';
 import PayDocumentList from '../../components/documents/PayDocumentList';
 import PayDocuments from '../../api/PayDocuments';
+import { formatIdentity } from '../../helpers/utils';
 
 export default {
   name: 'ProfilePay',
@@ -70,13 +72,17 @@ export default {
     formatDocumentPayload () {
       const { file, nature, date } = this.newDocument;
       const form = new FormData();
-      const now = this.$moment(date).format('DD-MM-YYYY-HHmm');
+      const formattedDate = this.$moment(date).format('DD-MM-YYYY-HHmm');
+      const documentOption = this.documentNatureOptions.find(option => option.value === this.newDocument.nature);
+      const fileName = documentOption && this.newDocument.nature !== OTHER
+        ? snakeCase(`${documentOption.label} ${formattedDate} ${formatIdentity(this.user.identity, 'FL')}`)
+        : snakeCase(`document_paie_${formattedDate}`);
 
       form.append('nature', nature);
       form.append('date', date.toISOString());
       form.append('payDoc', file);
       form.append('Content-Type', file.type || 'application/octet-stream');
-      form.append('fileName', `document-paie-${now}`);
+      form.append('fileName', fileName);
       form.append('driveFolderId', this.driveFolder);
       form.append('user', this.user._id);
 
