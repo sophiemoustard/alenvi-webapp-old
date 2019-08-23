@@ -1070,7 +1070,6 @@ export default {
     },
     async sendWelcomingEmail () {
       await this.$email.sendWelcome({
-        sender: { email: 'support@alenvi.io' },
         receiver: {
           email: this.newHelper.local.email,
           password: this.newHelper.local.password,
