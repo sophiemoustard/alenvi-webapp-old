@@ -3,7 +3,6 @@ import { Cookies } from 'quasar'
 import qs from 'qs'
 
 import alenvi from '../../helpers/alenvi'
-import ogustToken from '../../helpers/getOgustToken'
 import redirect from '../../router/redirect'
 
 const instance = axios.create({
@@ -12,7 +11,7 @@ const instance = axios.create({
 
 instance.interceptors.request.use(async function (config) {
   // Ignore routes that don't need automatic token
-  if (!config.url.match(/ogust/i) && config.url.match(/users\/authenticate/i)) {
+  if (config.url.match(/users\/authenticate/i)) {
     return config;
   }
   if (!Cookies.get('alenvi_token')) {
@@ -28,10 +27,6 @@ instance.interceptors.request.use(async function (config) {
   }
   // Headers for request only to API (alenvi)
   config.headers.common['x-access-token'] = Cookies.get('alenvi_token');
-  if (config.url.match(/ogust/i) || config.url.match(/calendar\/events/i)) {
-    const token = await ogustToken.getOgustToken(Cookies.get('alenvi_token'));
-    config.headers.common['x-ogust-token'] = token;
-  }
   return config;
 }, function (err) {
   return Promise.reject(err);

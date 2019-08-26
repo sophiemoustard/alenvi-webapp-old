@@ -17,7 +17,6 @@ module.exports = function (ctx) {
       'features',
       'lodash',
       'moment',
-      'ogust',
       'resize',
       'roles',
       'sectors',

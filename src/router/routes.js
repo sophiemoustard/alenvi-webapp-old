@@ -263,7 +263,7 @@ const routes = [
         },
       },
       {
-        path: 'auxiliaries/paye',
+        path: 'auxiliaries/pay',
         name: 'profile salaries',
         component: () => import('pages/auxiliaries/administrative/Salaries'),
         meta: {

@@ -1,14 +1,14 @@
 <template>
   <div>
     <div class="q-mb-xl">
-      <div class="row justify-between items-baseline">
+      <div v-if="!isAuxiliary" class="row justify-between items-baseline">
         <p class="text-weight-bold">Documents</p>
       </div>
       <pay-document-list class="full-width" :documents="payDocuments" @delete="deletePayDocument"
-        :natureOptions="documentNatureOptions" :disable="loading">
+        :natureOptions="documentNatureOptions" :disable="loading" :is-auxiliary="isAuxiliary">
       </pay-document-list>
 
-      <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add"
+      <q-btn v-if="!isAuxiliary" class="fixed fab-custom" no-caps rounded color="primary" icon="add"
         label="Ajouter un document" @click="documentUpload = true" :disable="loading" />
 
       <ni-modal v-model="documentUpload" @hide="$refs.documentUploadForm.reset()">
@@ -33,7 +33,7 @@ import get from 'lodash/get';
 import snakeCase from 'lodash/snakeCase';
 
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../popup/notify';
-import { PAY_DOCUMENT_NATURES, OTHER } from '../../data/constants';
+import { PAY_DOCUMENT_NATURES, OTHER, AUXILIARY_ROLES, COACH_ROLES } from '../../data/constants';
 import Modal from '../../components/Modal';
 import DocumentUpload from '../../components/documents/DocumentUpload';
 import PayDocumentList from '../../components/documents/PayDocumentList';
@@ -59,10 +59,17 @@ export default {
   },
   computed: {
     ...mapGetters({
-      user: 'rh/getUserProfile',
+      mainUser: 'main/user',
     }),
+    userProfile () {
+      if (AUXILIARY_ROLES.includes(this.mainUser.role.name)) return this.mainUser;
+      if (COACH_ROLES.includes(this.mainUser.role.name)) return this.$store.getters['rh/getUserProfile'];
+    },
+    isAuxiliary () {
+      return AUXILIARY_ROLES.includes(this.mainUser.role.name);
+    },
     driveFolder () {
-      return get(this.user, 'administrative.driveFolder.driveId');
+      return get(this.userProfile, 'administrative.driveFolder.driveId');
     },
   },
   async mounted () {
@@ -75,7 +82,7 @@ export default {
       const formattedDate = this.$moment(date).format('DD-MM-YYYY-HHmm');
       const documentOption = this.documentNatureOptions.find(option => option.value === this.newDocument.nature);
       const fileName = documentOption && this.newDocument.nature !== OTHER
-        ? snakeCase(`${documentOption.label} ${formattedDate} ${formatIdentity(this.user.identity, 'FL')}`)
+        ? snakeCase(`${documentOption.label} ${formattedDate} ${formatIdentity(this.userProfile.identity, 'FL')}`)
         : snakeCase(`document_paie_${formattedDate}`);
 
       form.append('nature', nature);
@@ -84,7 +91,7 @@ export default {
       form.append('mimeType', file.type || 'application/octet-stream');
       form.append('fileName', fileName);
       form.append('driveFolderId', this.driveFolder);
-      form.append('user', this.user._id);
+      form.append('user', this.userProfile._id);
 
       return form;
     },
@@ -112,7 +119,7 @@ export default {
     },
     async getDocuments () {
       try {
-        this.payDocuments = await PayDocuments.list({ user: this.user._id });
+        this.payDocuments = await PayDocuments.list({ user: this.userProfile._id });
       } catch (e) {
         this.payDocuments = [];
         console.error(e);
