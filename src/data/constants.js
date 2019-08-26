@@ -100,6 +100,7 @@ export const AUXILIARY = 'auxiliary';
 export const HELPER = 'helper';
 export const PLANNING_REFERENT = 'planningReferent';
 export const AUXILIARY_ROLES = [AUXILIARY, PLANNING_REFERENT];
+export const ADMIN_ROLES = [ADMIN, COACH];
 
 // PLANNING
 export const THREE_DAYS_VIEW = '3days';
