@@ -32,6 +32,7 @@ import {
   DEFAULT_AVATAR,
   CANCELLATION_OPTIONS,
   CANCELLATION_REASONS,
+  OTHER,
 } from '../data/constants';
 
 export const planningModalMixin = {
@@ -54,6 +55,7 @@ export const planningModalMixin = {
       ILLNESS,
       DAILY,
       HOURLY,
+      OTHER,
       absenceNatureOptions: ABSENCE_NATURES,
       cancellationConditions: CANCELLATION_OPTIONS,
       cancellationReasons: CANCELLATION_REASONS,
@@ -77,7 +79,8 @@ export const planningModalMixin = {
         case ABSENCE:
           if (this.newEvent.absenceNature === DAILY) {
             return !this.newEvent.auxiliary || !this.newEvent.absence || !this.newEvent.dates.startDate ||
-              !this.newEvent.dates.endDate || !this.newEvent.absenceNature;
+              !this.newEvent.dates.endDate || !this.newEvent.absenceNature ||
+              (this.newEvent.absence === OTHER && !this.newEvent.misc);
           }
 
           return !this.newEvent.auxiliary || !this.newEvent.absence || !this.newEvent.dates.startDate ||
@@ -100,7 +103,8 @@ export const planningModalMixin = {
         case ABSENCE:
           if (this.editedEvent.absenceNature === DAILY) {
             return !this.editedEvent.auxiliary || !this.editedEvent.absence || !this.editedEvent.dates.startDate ||
-              !this.editedEvent.dates.endDate || !this.editedEvent.absenceNature;
+              !this.editedEvent.dates.endDate || !this.editedEvent.absenceNature ||
+              (this.editedEvent.absence === OTHER && !this.editedEvent.misc)
           }
 
           return !this.editedEvent.auxiliary || !this.editedEvent.absence || !this.editedEvent.dates.startDate ||

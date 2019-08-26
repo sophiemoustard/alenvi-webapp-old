@@ -72,7 +72,8 @@
         </template>
       </template>
       <ni-input in-modal v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes"
-        :disable="isDisabled" />
+        :disable="isDisabled" @blur="validations.misc.$touch" :error="validations.misc.$error"
+        :required-field="editedEvent.type === ABSENCE && editedEvent.absence === OTHER" />
       <template v-if="editedEvent.type === INTERVENTION && !editedEvent.shouldUpdateRepetition && !isDisabled">
         <div class="row q-mb-md light-checkbox">
           <q-checkbox v-model="editedEvent.isCancelled" label="Annuler l'évènement" @input="toggleCancellationForm" />

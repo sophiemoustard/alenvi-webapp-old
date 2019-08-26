@@ -28,7 +28,7 @@ import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryE
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
 import Planning from '../../../components/planning/Planning.vue';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
-import { INTERVENTION, NEVER, PERSON, AUXILIARY, ABSENCE, DAILY, HOURLY, INTERNAL_HOUR, ILLNESS, SECTOR, AUXILIARY_ROLES } from '../../../data/constants';
+import { INTERVENTION, NEVER, PERSON, AUXILIARY, ABSENCE, DAILY, HOURLY, INTERNAL_HOUR, ILLNESS, SECTOR, AUXILIARY_ROLES, OTHER } from '../../../data/constants';
 import { mapGetters, mapActions } from 'vuex';
 import { NotifyNegative, NotifyWarning } from '../../../components/popup/notify';
 
@@ -96,6 +96,7 @@ export default {
           driveId: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absence === ILLNESS),
           link: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absence === ILLNESS),
         },
+        misc: { required: requiredIf(item => item.type === ABSENCE && item.absence === OTHER) },
       },
       editedEvent: {
         dates: {
@@ -119,6 +120,7 @@ export default {
           condition: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
           reason: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
         },
+        misc: { required: requiredIf(item => item.type === ABSENCE && item.absence === OTHER) },
       },
     };
   },
