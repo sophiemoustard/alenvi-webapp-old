@@ -33,7 +33,7 @@ import get from 'lodash/get';
 import snakeCase from 'lodash/snakeCase';
 
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../popup/notify';
-import { PAY_DOCUMENT_NATURES, OTHER, AUXILIARY_ROLES, ADMIN_ROLES } from '../../data/constants';
+import { PAY_DOCUMENT_NATURES, OTHER, AUXILIARY_ROLES, COACH_ROLES } from '../../data/constants';
 import Modal from '../../components/Modal';
 import DocumentUpload from '../../components/documents/DocumentUpload';
 import PayDocumentList from '../../components/documents/PayDocumentList';
@@ -63,7 +63,7 @@ export default {
     }),
     userProfile () {
       if (AUXILIARY_ROLES.includes(this.mainUser.role.name)) return this.mainUser;
-      if (ADMIN_ROLES.includes(this.mainUser.role.name)) return this.$store.getters['rh/getUserProfile'];
+      if (COACH_ROLES.includes(this.mainUser.role.name)) return this.$store.getters['rh/getUserProfile'];
     },
     isAuxiliary () {
       return AUXILIARY_ROLES.includes(this.mainUser.role.name);
