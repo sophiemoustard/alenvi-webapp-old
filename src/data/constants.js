@@ -191,9 +191,6 @@ export const THIRD_PARTY_PAYER = 'ThirdPartyPayer';
 // PAY
 export const PAY = 'pay';
 
-// FINAL PAY
-export const FINAL_PAY = 'finalpay';
-
 // EXPORTS
 export const SERVICE = 'service';
 export const SUBSCRIPTION = 'subscription';
@@ -212,8 +209,7 @@ export const EXPORT_HISTORY_TYPES = [
   { label: 'Factures', value: BILL },
   { label: 'Paiements', value: PAYMENT },
   { label: 'Absences', value: ABSENCE },
-  { label: 'Paies', value: PAY },
-  { label: 'Soldes tout compte', value: FINAL_PAY },
+  { label: 'Paies et soldes tout compte', value: PAY },
 ];
 
 // ORIGINS
