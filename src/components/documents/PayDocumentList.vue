@@ -9,7 +9,7 @@
               <q-icon name="file download" color="grey" />
             </a>
           </q-btn>
-          <q-btn flat round small color="grey" icon="delete" class="q-mx-sm" :disable="disable"
+          <q-btn v-if="!isAuxiliary" flat round small color="grey" icon="delete" class="q-mx-sm" :disable="disable"
             @click="removeDocument(documents[props.row.__index])">
           </q-btn>
         </div>
@@ -61,12 +61,14 @@ export default {
       pagination: {
         sortBy: 'date',
         descending: true,
+        rowsPerPage: 0,
       },
     };
   },
   props: {
     documents: { type: Array, default: null },
     disable: { type: Boolean, default: false },
+    isAuxiliary: { type: Boolean, default: false },
   },
   methods: {
     async removeDocument (document) {
