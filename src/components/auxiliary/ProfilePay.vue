@@ -33,7 +33,7 @@ import get from 'lodash/get';
 import snakeCase from 'lodash/snakeCase';
 
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../popup/notify';
-import { PAY_DOCUMENT_NATURES, OTHER, AUXILIARY_ROLES } from '../../data/constants';
+import { PAY_DOCUMENT_NATURES, OTHER, AUXILIARY_ROLES, ADMIN_ROLES } from '../../data/constants';
 import Modal from '../../components/Modal';
 import DocumentUpload from '../../components/documents/DocumentUpload';
 import PayDocumentList from '../../components/documents/PayDocumentList';
@@ -59,17 +59,17 @@ export default {
   },
   computed: {
     ...mapGetters({
-      userProfile: 'rh/getUserProfile',
       mainUser: 'main/user',
     }),
-    currentUser () {
-      return this.userProfile ? this.userProfile : this.mainUser;
+    userProfile () {
+      if (AUXILIARY_ROLES.includes(this.mainUser.role.name)) return this.mainUser;
+      if (ADMIN_ROLES.includes(this.mainUser.role.name)) return this.$store.getters['rh/getUserProfile'];
     },
     isAuxiliary () {
       return AUXILIARY_ROLES.includes(this.mainUser.role.name);
     },
     driveFolder () {
-      return get(this.currentUser, 'administrative.driveFolder.driveId');
+      return get(this.userProfile, 'administrative.driveFolder.driveId');
     },
   },
   async mounted () {
@@ -82,7 +82,7 @@ export default {
       const formattedDate = this.$moment(date).format('DD-MM-YYYY-HHmm');
       const documentOption = this.documentNatureOptions.find(option => option.value === this.newDocument.nature);
       const fileName = documentOption && this.newDocument.nature !== OTHER
-        ? snakeCase(`${documentOption.label} ${formattedDate} ${formatIdentity(this.currentUser.identity, 'FL')}`)
+        ? snakeCase(`${documentOption.label} ${formattedDate} ${formatIdentity(this.userProfile.identity, 'FL')}`)
         : snakeCase(`document_paie_${formattedDate}`);
 
       form.append('nature', nature);
@@ -91,7 +91,7 @@ export default {
       form.append('mimeType', file.type || 'application/octet-stream');
       form.append('fileName', fileName);
       form.append('driveFolderId', this.driveFolder);
-      form.append('user', this.currentUser._id);
+      form.append('user', this.userProfile._id);
 
       return form;
     },
@@ -119,7 +119,7 @@ export default {
     },
     async getDocuments () {
       try {
-        this.payDocuments = await PayDocuments.list({ user: this.currentUser._id });
+        this.payDocuments = await PayDocuments.list({ user: this.userProfile._id });
       } catch (e) {
         this.payDocuments = [];
         console.error(e);
