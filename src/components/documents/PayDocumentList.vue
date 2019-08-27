@@ -4,12 +4,12 @@
       class="q-pa-sm large-table">
       <q-td slot="body-cell-actions" slot-scope="props" :props="props">
         <div class="row justify-center table-actions">
-          <q-btn flat round small :disabled="!props.row.file.link" class="q-mx-sm" :disable="disable">
+          <q-btn flat round small color="primary" :disabled="!props.row.file.link" class="q-mx-sm" :disable="disable">
             <a :href="props.row.file.link || false" target="_blank">
-              <q-icon name="file download" color="grey" />
+              <q-icon name="file download" color="primary" />
             </a>
           </q-btn>
-          <q-btn v-if="!isAuxiliary" flat round small color="grey" icon="delete" class="q-mx-sm" :disable="disable"
+          <q-btn v-if="!isAuxiliary" flat round small color="primary" icon="delete" class="q-mx-sm" :disable="disable"
             @click="removeDocument(documents[props.row.__index])">
           </q-btn>
         </div>
