@@ -137,7 +137,6 @@ export const planningActionMixin = {
       return payload;
     },
     isCreationAllowed (event) {
-      if (event.type === ABSENCE) return true;
       if (event.type === INTERVENTION && event.repetition && event.repetition.frequency !== NEVER) return true;
 
       return !this.hasConflicts(event);
@@ -145,18 +144,21 @@ export const planningActionMixin = {
     hasConflicts (scheduledEvent) {
       if (!scheduledEvent.auxiliary || scheduledEvent.isCancelled) return false;
 
-      const auxiliaryEvents = this.getAuxiliaryEventsBetweenDates(scheduledEvent.auxiliary, scheduledEvent.startDate, scheduledEvent.endDate);
+      const auxiliaryEvents = scheduledEvent.type !== ABSENCE
+        ? this.getAuxiliaryEventsBetweenDates(scheduledEvent.auxiliary, scheduledEvent.startDate, scheduledEvent.endDate)
+        : this.getAuxiliaryEventsBetweenDates(scheduledEvent.auxiliary, scheduledEvent.startDate, scheduledEvent.endDate, ABSENCE);
       return auxiliaryEvents.some(ev => {
         if ((scheduledEvent._id && scheduledEvent._id === ev._id) || ev.isCancelled) return false;
         return this.$moment(scheduledEvent.startDate).isBetween(ev.startDate, ev.endDate, 'minutes', '[]') ||
           this.$moment(ev.startDate).isBetween(scheduledEvent.startDate, scheduledEvent.endDate, 'minutes', '[]');
       });
     },
-    getAuxiliaryEventsBetweenDates (auxiliaryId, startDate, endDate) {
+    getAuxiliaryEventsBetweenDates (auxiliaryId, startDate, endDate, type) {
       return this.getRowEvents(auxiliaryId)
         .filter(event => {
-          return this.$moment(event.startDate).isBetween(startDate, endDate, 'minutes', '[)') ||
-            this.$moment(startDate).isBetween(event.startDate, event.endDate, 'minutes', '[)')
+          return (this.$moment(event.startDate).isBetween(startDate, endDate, 'minutes', '[)') ||
+            this.$moment(startDate).isBetween(event.startDate, event.endDate, 'minutes', '[)')) &&
+            (!type || type === event.type)
         });
     },
     async notifyCreation () {
