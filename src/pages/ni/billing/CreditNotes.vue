@@ -557,7 +557,10 @@ export default {
       return creditNoteEvents.map(eventId => {
         const cnEvent = this.creditNoteEvents.find(ev => ev.eventId === eventId);
 
-        return this.$_.pick(cnEvent, ['eventId', 'auxiliary', 'startDate', 'endDate', 'bills', 'serviceName']);
+        const event = this.$_.pick(cnEvent, ['eventId', 'auxiliary', 'startDate', 'endDate', 'bills', 'serviceName']);
+        if (cnEvent.bills.surcharges) event.bills.surcharges = cnEvent.bills.surcharges.map(sur => this.$_.omit(sur, '_id'));
+
+        return event;
       });
     },
     formatPayloadWithLinkedEvents (creditNote, customer) {
