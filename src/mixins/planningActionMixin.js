@@ -165,7 +165,7 @@ export const planningActionMixin = {
       if (this.newEvent.type === ABSENCE) {
         await this.$q.dialog({
           title: 'Confirmation',
-          message: 'Les interventions en conflit avec l\'absence seront passées en à affecter et les autres évènements seront supprimés. Es-tu sûr(e) de vouloir créer cette absence ?',
+          message: 'Les interventions en conflit avec l\'absence seront passées en à affecter et les heures internes et indispo seront supprimées. Es-tu sûr(e) de vouloir créer cette absence ?',
           ok: 'OK',
           cancel: 'Annuler',
         });
