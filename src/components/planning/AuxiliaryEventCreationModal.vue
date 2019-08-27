@@ -62,9 +62,11 @@
           :options="repetitionOptions" required-field @blur="validations.repetition.frequency.$touch" :disable="!isRepetitionAllowed" />
       </template>
       <template v-if="newEvent.type === INTERNAL_HOUR">
-        <ni-search-address v-model="newEvent.address" :error-label="addressError" @blur="validations.address.$touch" :error="validations.address.$error" inModal />
+        <ni-search-address v-model="newEvent.address" :error-label="addressError" @blur="validations.address.$touch"
+          :error="validations.address.$error" inModal />
       </template>
-      <ni-input in-modal v-model="newEvent.misc" caption="Notes" />
+      <ni-input in-modal v-model="newEvent.misc" caption="Notes" @blur="validations.misc.$touch"
+        :error="validations.misc.$error" :required-field="newEvent.type === ABSENCE && newEvent.absence === OTHER" />
     </div>
     <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary"
       @click="createEvent" :disable="disableCreationButton" icon-right="add" />
