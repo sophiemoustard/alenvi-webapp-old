@@ -2,6 +2,7 @@
   <q-page class="neutral-background q-pb-xl">
     <div class="title-padding">
       <h4>Absences</h4>
+      <ni-date-range v-model="dates" @input="refresh" borderless :error.sync="datesHasError" />
     </div>
     <q-table :data="absences" :columns="columns" binary-state-sort :pagination.sync="pagination" class="q-pa-sm">
       <q-tr slot="body" slot-scope="props" :props="props">
@@ -36,6 +37,7 @@
 </template>
 
 <script>
+import DateRange from '../../../components/form/DateRange';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
 import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES, HOURLY } from '../../../data/constants';
@@ -49,6 +51,7 @@ export default {
   name: 'Absences',
   metaInfo: { title: 'Absences' },
   components: {
+    'ni-date-range': DateRange,
     'ni-billing-pagination': BillingPagination,
     'ni-auxiliary-event-edition-modal': AuxiliaryEventEditionModal,
   },
@@ -137,6 +140,11 @@ export default {
           label: '',
         },
       ],
+      dates: {
+        startDate: this.$moment().startOf('M').toISOString(),
+        endDate: this.$moment().endOf('M').toISOString(),
+      },
+      datesHasError: false,
     };
   },
   validations () {
@@ -162,7 +170,8 @@ export default {
   methods: {
     async refresh () {
       try {
-        this.absences = await this.$events.list({ type: ABSENCE });
+        if (this.datesHasError) return;
+        this.absences = await this.$events.list({ type: ABSENCE, startDate: this.dates.startDate, endDate: this.dates.endDate });
       } catch (e) {
         this.absences = [];
         console.error(e);
