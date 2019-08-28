@@ -73,19 +73,19 @@ export default {
         {
           name: 'auxiliary',
           label: 'Auxiliaire',
-          field: 'auxiliary',
-          format: value => formatIdentity(value.identity, 'Fl'),
+          field: row => formatIdentity(row.auxiliary.identity, 'Fl'),
           align: 'left',
+          sortable: true,
         },
         {
           name: 'nature',
           label: 'Nature',
-          field: 'absenceNature',
-          format: value => {
-            const nature = ABSENCE_NATURES.find(abs => abs.value === value);
+          field: row => {
+            const nature = ABSENCE_NATURES.find(abs => abs.value === row.absenceNature);
             return nature ? nature.label : '';
           },
           align: 'left',
+          sortable: true,
         },
         {
           name: 'startDate',
@@ -93,6 +93,7 @@ export default {
           field: 'startDate',
           format: value => this.$moment(value).format('DD/MM/YYYY'),
           align: 'center',
+          sortable: true,
         },
         {
           name: 'startHour',
@@ -107,6 +108,7 @@ export default {
           field: 'endDate',
           format: value => this.$moment(value).format('DD/MM/YYYY'),
           align: 'center',
+          sortable: true,
         },
         {
           name: 'endHour',
@@ -124,12 +126,12 @@ export default {
         {
           name: 'type',
           label: 'Type',
-          field: 'absence',
-          format: value => {
-            const type = ABSENCE_TYPES.find(abs => abs.value === value);
+          field: row => {
+            const type = ABSENCE_TYPES.find(abs => abs.value === row.absence);
             return type ? type.label : '';
           },
           align: 'left',
+          sortable: true,
         },
         {
           name: 'attachment',
