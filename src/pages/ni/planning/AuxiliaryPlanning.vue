@@ -236,7 +236,7 @@ export default {
     },
     async getCustomers () {
       try {
-        this.customers = await this.$customers.showAll({ subscriptions: true });
+        this.customers = await this.$customers.listWithSubscriptions();
       } catch (e) {
         console.error(e);
         this.customers = [];
