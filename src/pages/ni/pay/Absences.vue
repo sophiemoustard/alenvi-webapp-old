@@ -40,11 +40,11 @@
 import DateRange from '../../../components/form/DateRange';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
-import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES, HOURLY } from '../../../data/constants';
+import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES, HOURLY, DAILY } from '../../../data/constants';
 import BillingPagination from '../../../components/table/BillingPagination';
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
-import { formatIdentity } from '../../../helpers/utils';
+import { formatIdentity, formatHours } from '../../../helpers/utils';
 import { NotifyWarning } from '../../../components/popup/notify';
 
 export default {
@@ -116,6 +116,12 @@ export default {
           align: 'center',
         },
         {
+          name: 'duration',
+          label: 'Durée',
+          field: row => this.getAbsenceDuration(row),
+          align: 'center',
+        },
+        {
           name: 'type',
           label: 'Type',
           field: 'absence',
@@ -168,6 +174,20 @@ export default {
     await this.refresh();
   },
   methods: {
+    getAbsenceDuration (absence) {
+      if (absence.absenceNature === DAILY) {
+        const range = Array.from(this.$moment().range(absence.startDate, absence.endDate).by('days'));
+        let count = 0;
+        for (const day of range) {
+          if (day.startOf('d').isBusinessDay()) count += 1; // startOf('day') is necessery to check fr holidays in business day
+        }
+
+        return `${count}j`;
+      };
+
+      const duration = this.$moment(absence.endDate).diff(absence.startDate, 'm') / 60;
+      return formatHours(duration);
+    },
     async refresh () {
       try {
         if (this.datesHasError) return;
