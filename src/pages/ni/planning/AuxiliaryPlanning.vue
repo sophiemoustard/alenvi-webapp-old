@@ -126,8 +126,7 @@ export default {
   },
   async mounted () {
     try {
-      await this.fillFilter(AUXILIARY);
-      await this.getCustomers();
+      await Promise.all([this.fillFilter(AUXILIARY), this.getCustomers()]);
       this.initFilters();
       this.setInternalHours();
     } catch (e) {

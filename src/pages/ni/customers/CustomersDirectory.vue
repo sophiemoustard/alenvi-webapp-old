@@ -230,7 +230,7 @@ export default {
   methods: {
     async getCustomersList () {
       try {
-        const customers = await this.$customers.showAll();
+        const customers = await this.$customers.list();
         this.customersList = customers.map((customer) => {
           return {
             ...customer,

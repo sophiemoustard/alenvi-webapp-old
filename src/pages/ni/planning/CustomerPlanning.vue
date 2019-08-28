@@ -379,7 +379,7 @@ export default {
       this.editionModal = true;
     },
     async getSectorCustomers (sectors) {
-      return sectors.length === 0 ? [] : this.$customers.showAllBySector({
+      return sectors.length === 0 ? [] : this.$customers.listBySector({
         startDate: this.$moment(this.startOfWeekAsString).toDate(),
         endDate: this.endOfWeek.toDate(),
         sector: JSON.stringify(sectors),

@@ -1,7 +1,7 @@
 import { alenviAxios } from './ressources/alenviAxios'
 
 export default {
-  async showAll (params) {
+  async list (params) {
     const customersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/customers`, { params });
     return customersRaw.data.data.customers;
   },
@@ -9,15 +9,15 @@ export default {
     const customersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/customers/subscriptions`, { params });
     return customersRaw.data.data.customers;
   },
-  async showAllBySector (params) {
+  async listBySector (params) {
     const customersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/customers/sectors`, { params });
     return customersRaw.data.data.customers;
   },
-  async showAllWithBilledEvents (params) {
+  async listWithBilledEvents (params) {
     const customersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/customers/billed-events`, { params });
     return customersRaw.data.data.customers;
   },
-  async showAllWithCustomerContractSubscriptions () {
+  async listWithCustomerContractSubscriptions () {
     const customersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/customers/customer-contract-subscriptions`);
     return customersRaw.data.data.customers;
   },
