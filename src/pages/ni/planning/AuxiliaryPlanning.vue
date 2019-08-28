@@ -127,7 +127,6 @@ export default {
   async mounted () {
     try {
       await this.fillFilter(AUXILIARY);
-      await this.getEventHistories();
       await this.getCustomers();
       this.initFilters();
       this.setInternalHours();
