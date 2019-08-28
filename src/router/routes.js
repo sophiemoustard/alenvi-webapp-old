@@ -232,7 +232,7 @@ const routes = [
         component: () => import('pages/auxiliaries/team/TeamDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: 'users:read',
+          permissions: 'users:list',
           parent: 'team',
         },
       },
@@ -242,7 +242,7 @@ const routes = [
         component: () => import('pages/auxiliaries/customers/AuxiliaryCustomersDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: 'users:read',
+          permissions: 'users:list',
           parent: 'benef',
         },
       },
@@ -253,7 +253,7 @@ const routes = [
         component: () => import('pages/auxiliaries/customers/CustomerInfo'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: 'users:read',
+          permissions: 'users:list',
         },
       },
       {
@@ -289,10 +289,9 @@ const routes = [
         path: 'auxiliaries/info',
         name: 'auxiliary personal info',
         component: () => import('pages/auxiliaries/administrative/Info'),
-        props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: 'users:read',
+          permissions: 'users:list',
           parent: 'administrative',
         },
       },
