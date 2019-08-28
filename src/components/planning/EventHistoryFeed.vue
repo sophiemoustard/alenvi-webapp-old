@@ -7,7 +7,12 @@
       </div>
     </div>
     <q-scroll-area>
-      <ni-event-history v-for="history in eventHistories" :key="history._id" :history="history" />
+      <template v-if="eventHistories.length !== 0">
+        <ni-event-history v-for="history in eventHistories" :key="history._id" :history="history" />
+      </template>
+      <div v-else class="loading">
+        <q-spinner />
+      </div>
     </q-scroll-area>
   </div>
 </template>
@@ -33,7 +38,7 @@ export default {
   },
   methods: {
     close () {
-      this.$emit('update:displayHistory', false);
+      this.$emit('toggleHistory');
     },
   },
 }
@@ -57,5 +62,11 @@ export default {
   .history-title
     margin: 10px 2px;
     padding: 5px;
+
+  .loading
+    width: 100%
+    display: flex;
+    justify-content: center;
+    margin: 10px 0;
 
 </style>

@@ -4,7 +4,7 @@
       @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop"
       :filteredSectors="filteredSectors" :can-edit="canEditEvent" :personKey="personKey"
       @toggleAllSectors="toggleAllSectors" :eventHistories="eventHistories" ref="planningManager"
-      :displayAllSectors="displayAllSectors" />
+      :displayAllSectors="displayAllSectors" @toggleHistory="toggleHistory" />
 
     <!-- Event creation modal -->
     <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
@@ -135,8 +135,8 @@ export default {
     }
   },
   watch: {
-    elementToAdd (val) {
-      this.addElementToFilter(val);
+    async elementToAdd (val) {
+      await this.addElementToFilter(val);
     },
     elementToRemove (val) {
       this.removeElementFromFilter(val);
@@ -195,6 +195,11 @@ export default {
         const userSector = this.filters.find(filter => filter.type === SECTOR && filter._id === this.mainUser.sector);
         if (userSector && this.$refs.planningManager) this.$refs.planningManager.restoreFilter([userSector.label]);
       }
+    },
+    // History
+    async toggleHistory (displayHistory) {
+      if (displayHistory) await this.getEventHistories();
+      else this.eventHistories = [];
     },
     // Refresh data
     async toggleAllSectors (search) {
