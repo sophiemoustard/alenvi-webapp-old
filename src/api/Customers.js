@@ -34,10 +34,6 @@ export default {
   async removeHelper (params) {
     return alenviAxios.delete(`${process.env.API_HOSTNAME}/customers/${params._id}/helpers/${params.helperId}`);
   },
-  async getSubscriptions (id) {
-    const subscriptions = await alenviAxios.get(`${process.env.API_HOSTNAME}/customers/${id}/subscriptions`);
-    return subscriptions.data.data.subscriptions;
-  },
   async addSubscription (id, data) {
     return alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${id}/subscriptions`, data);
   },
@@ -76,10 +72,6 @@ export default {
   },
   async updateCertificates (id, payload) {
     return alenviAxios.put(`${process.env.API_HOSTNAME}/customers/${id}/certificates`, payload);
-  },
-  async getFundings (id) {
-    const subscriptions = await alenviAxios.get(`${process.env.API_HOSTNAME}/customers/${id}/fundings`);
-    return subscriptions.data.data.fundings;
   },
   async addFunding (id, payload) {
     return alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${id}/fundings`, payload);
