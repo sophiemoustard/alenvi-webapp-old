@@ -213,9 +213,6 @@ export default {
       }
     },
     async refresh () {
-      await Promise.all([this.refreshEvents(), this.getEventHistories()]);
-    },
-    async refreshEvents () {
       try {
         let params = {
           startDate: this.$moment(this.startOfWeekAsString).toDate(),
@@ -291,7 +288,7 @@ export default {
       this.editionModal = true;
     },
     // Filter
-    addElementToFilter (el) {
+    async addElementToFilter (el) {
       if (el.type === SECTOR) {
         this.filteredSectors.push(el);
         const auxBySector = this.filters.filter(aux => aux.sector && aux.sector._id === el._id);
@@ -300,12 +297,12 @@ export default {
             this.auxiliaries.push(auxBySector[i]);
           }
         }
-        this.refresh();
+        await this.refresh();
       } else { // el = auxiliary
         if (!this.filteredAuxiliaries.some(aux => aux._id === el._id)) this.filteredAuxiliaries.push(el);
         if (!this.auxiliaries.some(aux => aux._id === el._id)) {
           this.auxiliaries.push(el);
-          this.refresh();
+          await this.refresh();
         }
       }
     },
