@@ -40,7 +40,7 @@ import Agenda from '../../../components/Agenda';
 import PlanningNavigation from '../../../components/planning/PlanningNavigation';
 import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryEventCreationModal';
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
-import { DEFAULT_AVATAR, INTERVENTION, NEVER, AGENDA, WEEK_VIEW, THREE_DAYS_VIEW, ABSENCE, DAILY, HOURLY, INTERNAL_HOUR, ILLNESS, AUXILIARY, UNKNOWN_AVATAR } from '../../../data/constants';
+import { DEFAULT_AVATAR, INTERVENTION, NEVER, AGENDA, WEEK_VIEW, THREE_DAYS_VIEW, ABSENCE, DAILY, HOURLY, INTERNAL_HOUR, ILLNESS, AUXILIARY, UNKNOWN_AVATAR, OTHER } from '../../../data/constants';
 import { planningTimelineMixin } from '../../../mixins/planningTimelineMixin';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { NotifyWarning } from '../../../components/popup/notify';
@@ -118,6 +118,7 @@ export default {
           driveId: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absence === ILLNESS),
           link: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absence === ILLNESS),
         },
+        misc: { required: requiredIf(item => item.type === ABSENCE && item.absence === OTHER) },
       },
       editedEvent: {
         dates: {
@@ -141,6 +142,7 @@ export default {
           condition: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
           reason: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
         },
+        misc: { required: requiredIf(item => item.type === ABSENCE && item.absence === OTHER) },
       },
     };
   },
@@ -194,7 +196,7 @@ export default {
     },
     async getCustomers () {
       try {
-        this.customers = await this.$customers.showAll({ subscriptions: true });
+        this.customers = await this.$customers.listWithSubscriptions();
       } catch (e) {
         this.customers = [];
       }

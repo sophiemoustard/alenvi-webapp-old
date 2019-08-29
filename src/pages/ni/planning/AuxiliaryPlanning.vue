@@ -4,7 +4,7 @@
       @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop"
       :filteredSectors="filteredSectors" :can-edit="canEditEvent" :personKey="personKey"
       @toggleAllSectors="toggleAllSectors" :eventHistories="eventHistories" ref="planningManager"
-      :displayAllSectors="displayAllSectors" />
+      :displayAllSectors="displayAllSectors" @toggleHistory="toggleHistory" />
 
     <!-- Event creation modal -->
     <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
@@ -126,9 +126,7 @@ export default {
   },
   async mounted () {
     try {
-      await this.fillFilter(AUXILIARY);
-      await this.getEventHistories();
-      await this.getCustomers();
+      await Promise.all([this.fillFilter(AUXILIARY), this.getCustomers()]);
       this.initFilters();
       this.setInternalHours();
     } catch (e) {
@@ -137,8 +135,8 @@ export default {
     }
   },
   watch: {
-    elementToAdd (val) {
-      this.addElementToFilter(val);
+    async elementToAdd (val) {
+      await this.addElementToFilter(val);
     },
     elementToRemove (val) {
       this.removeElementFromFilter(val);
@@ -198,6 +196,11 @@ export default {
         if (userSector && this.$refs.planningManager) this.$refs.planningManager.restoreFilter([userSector.label]);
       }
     },
+    // History
+    async toggleHistory (displayHistory) {
+      if (displayHistory) await this.getEventHistories();
+      else this.eventHistories = [];
+    },
     // Refresh data
     async toggleAllSectors (search) {
       this.displayAllSectors = !this.displayAllSectors;
@@ -215,9 +218,6 @@ export default {
       }
     },
     async refresh () {
-      await Promise.all([this.refreshEvents(), this.getEventHistories()]);
-    },
-    async refreshEvents () {
       try {
         let params = {
           startDate: this.$moment(this.startOfWeekAsString).toDate(),
@@ -237,7 +237,7 @@ export default {
     },
     async getCustomers () {
       try {
-        this.customers = await this.$customers.showAll({ subscriptions: true });
+        this.customers = await this.$customers.listWithSubscriptions();
       } catch (e) {
         console.error(e);
         this.customers = [];
@@ -293,7 +293,7 @@ export default {
       this.editionModal = true;
     },
     // Filter
-    addElementToFilter (el) {
+    async addElementToFilter (el) {
       if (el.type === SECTOR) {
         this.filteredSectors.push(el);
         const auxBySector = this.filters.filter(aux => aux.sector && aux.sector._id === el._id);
@@ -302,12 +302,12 @@ export default {
             this.auxiliaries.push(auxBySector[i]);
           }
         }
-        this.refresh();
+        await this.refresh();
       } else { // el = auxiliary
         if (!this.filteredAuxiliaries.some(aux => aux._id === el._id)) this.filteredAuxiliaries.push(el);
         if (!this.auxiliaries.some(aux => aux._id === el._id)) {
           this.auxiliaries.push(el);
-          this.refresh();
+          await this.refresh();
         }
       }
     },

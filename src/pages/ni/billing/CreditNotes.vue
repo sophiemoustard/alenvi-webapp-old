@@ -418,7 +418,7 @@ export default {
     async refreshCustomersOptions () {
       try {
         this.customersOptions = [];
-        const customers = await this.$customers.showAllWithBilledEvents();
+        const customers = await this.$customers.listWithBilledEvents();
         for (let i = 0, l = customers.length; i < l; i++) {
           this.customersOptions.push({
             subscriptions: customers[i].subscriptions,

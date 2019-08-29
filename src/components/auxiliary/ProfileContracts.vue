@@ -259,7 +259,7 @@ export default {
     },
     async getCustomersWithCustomerContractSubscriptions () {
       try {
-        this.customers = await this.$customers.showAllWithCustomerContractSubscriptions();
+        this.customers = await this.$customers.listWithCustomerContractSubscriptions();
       } catch (e) {
         this.customerOptions = [];
         console.error(e);

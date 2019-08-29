@@ -77,7 +77,7 @@ export default {
     async getCustomersList () {
       try {
         this.tableLoading = true;
-        const customers = await this.$customers.showAll();
+        const customers = await this.$customers.list();
         this.customersList = customers.map(customer => ({
           identity: { ...customer.identity, fullName: formatIdentity(customer.identity, 'FL') },
           customerId: customer._id,

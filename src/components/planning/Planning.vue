@@ -87,7 +87,7 @@
       </table>
     </div>
     <q-page-sticky expand position="right">
-      <ni-event-history-feed v-if="displayHistory" :eventHistories="eventHistories" :displayHistory.sync="displayHistory" />
+      <ni-event-history-feed v-if="displayHistory" :eventHistories="eventHistories" @toggleHistory="toggleHistory" />
     </q-page-sticky>
   </div>
 </template>
@@ -248,6 +248,7 @@ export default {
     toggleHistory () {
       if (this.persons.length === 0) return;
       this.displayHistory = !this.displayHistory;
+      this.$emit('toggleHistory', this.displayHistory);
     },
     // Drag & drop
     drag (event) {
