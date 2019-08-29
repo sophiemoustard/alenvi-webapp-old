@@ -97,8 +97,6 @@
 </template>
 
 <script>
-import { required, requiredIf } from 'vuelidate/lib/validators';
-import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
 import Planning from '../../../components/planning/Planning.vue';
 import { planningModalMixin } from '../../../mixins/planningModalMixin';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
@@ -155,41 +153,6 @@ export default {
     isRepetitionAllowed (value) {
       if (!value) this.newEvent.repetition.frequency = NEVER;
     },
-  },
-  validations () {
-    return {
-      newEvent: {
-        type: { required },
-        dates: {
-          startDate: { required },
-          endDate: { required },
-        },
-        auxiliary: { required },
-        customer: { required },
-        subscription: { required },
-        address: { fullAddress: { frAddress } },
-        repetition: {
-          frequency: { required },
-        },
-      },
-      editedEvent: {
-        dates: {
-          startDate: { required },
-          endDate: { required },
-        },
-        sector: { required },
-        customer: { required },
-        subscription: { required },
-        address: { fullAddress: { frAddress } },
-        repetition: {
-          frequency: { required },
-        },
-        cancel: {
-          condition: { required: requiredIf((item, parent) => parent && parent.isCancelled) },
-          reason: { required: requiredIf((item, parent) => parent && parent.isCancelled) },
-        },
-      },
-    };
   },
   computed: {
     ...mapGetters({
