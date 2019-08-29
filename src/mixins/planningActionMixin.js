@@ -141,6 +141,11 @@ export const planningActionMixin = {
 
       return !this.hasConflicts(event);
     },
+    isEditionAllowed (event, type) {
+      if (event.shouldUpdateRepetition && type === INTERVENTION) return true;
+
+      return !this.hasConflicts(event);
+    },
     hasConflicts (scheduledEvent) {
       if (!scheduledEvent.auxiliary || scheduledEvent.isCancelled) return false;
 
@@ -300,7 +305,7 @@ export const planningActionMixin = {
         this.loading = true;
         const payload = this.getEditionPayload(this.editedEvent);
 
-        if (this.hasConflicts(payload)) {
+        if (!this.isEditionAllowed(payload, this.editedEvent.type)) {
           this.$v.editedEvent.$reset();
           return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
         }
@@ -357,7 +362,7 @@ export const planningActionMixin = {
         }
 
         const payload = this.getDragAndDropPayload(toDay, target, draggedObject);
-        if (this.hasConflicts(payload)) {
+        if (!this.isEditionAllowed(payload, draggedObject.type)) {
           return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
         }
 
