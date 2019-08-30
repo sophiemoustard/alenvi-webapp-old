@@ -201,19 +201,20 @@ export const planningActionMixin = {
     isCreationAllowed (event) {
       if (event.type === INTERVENTION && event.repetition && event.repetition.frequency !== NEVER) return true;
 
-      return !this.hasConflicts(event);
+      return !this.hasConflicts(event, event.type);
     },
-    isEditionAllowed (event, type) {
-      if (event.shouldUpdateRepetition && type === INTERVENTION) return true;
+    isEditionAllowed (event, eventType) {
+      if (event.shouldUpdateRepetition && eventType === INTERVENTION) return true;
 
-      return !this.hasConflicts(event);
+      return !this.hasConflicts(event, eventType);
     },
-    hasConflicts (scheduledEvent) {
+    hasConflicts (scheduledEvent, eventType) {
       if (!scheduledEvent.auxiliary || scheduledEvent.isCancelled) return false;
 
-      const auxiliaryEvents = scheduledEvent.type !== ABSENCE
+      const auxiliaryEvents = eventType !== ABSENCE
         ? this.getAuxiliaryEventsBetweenDates(scheduledEvent.auxiliary, scheduledEvent.startDate, scheduledEvent.endDate)
         : this.getAuxiliaryEventsBetweenDates(scheduledEvent.auxiliary, scheduledEvent.startDate, scheduledEvent.endDate, ABSENCE);
+
       return auxiliaryEvents.some(ev => {
         if ((scheduledEvent._id && scheduledEvent._id === ev._id) || ev.isCancelled) return false;
         return this.$moment(scheduledEvent.startDate).isBetween(ev.startDate, ev.endDate, 'minutes', '[]') ||
