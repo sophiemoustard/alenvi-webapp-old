@@ -17,6 +17,7 @@ import {
   CUSTOMER,
   OTHER,
   HOURLY,
+  UNJUSTIFIED,
 } from '../data/constants';
 
 export const planningActionMixin = {
@@ -47,8 +48,8 @@ export const planningActionMixin = {
           frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
         },
         attachment: {
-          driveId: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absence === ILLNESS),
-          link: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absence === ILLNESS),
+          driveId: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && [ILLNESS, UNJUSTIFIED].includes(parent.absence)) },
+          link: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && [ILLNESS, UNJUSTIFIED].includes(parent.absence)) },
         },
         misc: { required: requiredIf(item => item.type === ABSENCE && item.absence === OTHER) },
       },
@@ -69,6 +70,10 @@ export const planningActionMixin = {
         address: { fullAddress: { frAddress } },
         repetition: {
           frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
+        },
+        attachment: {
+          driveId: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && [ILLNESS, UNJUSTIFIED].includes(parent.absence)) },
+          link: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && [ILLNESS, UNJUSTIFIED].includes(parent.absence)) },
         },
         cancel: {
           condition: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },

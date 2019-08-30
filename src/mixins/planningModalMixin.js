@@ -53,6 +53,7 @@ export const planningModalMixin = {
       INTERNAL_HOUR,
       NEVER,
       ILLNESS,
+      UNJUSTIFIED,
       DAILY,
       HOURLY,
       OTHER,
@@ -80,7 +81,8 @@ export const planningModalMixin = {
           if (this.newEvent.absenceNature === DAILY) {
             return !this.newEvent.auxiliary || !this.newEvent.absence || !this.newEvent.dates.startDate ||
               !this.newEvent.dates.endDate || !this.newEvent.absenceNature ||
-              (this.newEvent.absence === OTHER && !this.newEvent.misc);
+              (this.newEvent.absence === OTHER && !this.newEvent.misc) ||
+              ([UNJUSTIFIED, ILLNESS].includes(this.newEvent.absence) && !this.newEvent.attachment.link);
           }
 
           return !this.newEvent.auxiliary || !this.newEvent.absence || !this.newEvent.dates.startDate ||
@@ -104,7 +106,8 @@ export const planningModalMixin = {
           if (this.editedEvent.absenceNature === DAILY) {
             return !this.editedEvent.auxiliary || !this.editedEvent.absence || !this.editedEvent.dates.startDate ||
               !this.editedEvent.dates.endDate || !this.editedEvent.absenceNature ||
-              (this.editedEvent.absence === OTHER && !this.editedEvent.misc)
+              (this.editedEvent.absence === OTHER && !this.editedEvent.misc) ||
+              ([UNJUSTIFIED, ILLNESS].includes(this.editedEvent.absence) && !this.editedEvent.attachment.link);
           }
 
           return !this.editedEvent.auxiliary || !this.editedEvent.absence || !this.editedEvent.dates.startDate ||
