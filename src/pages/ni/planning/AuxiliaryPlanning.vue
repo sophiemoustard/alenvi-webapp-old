@@ -4,7 +4,7 @@
       @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop"
       :filteredSectors="filteredSectors" :can-edit="canEditEvent" :personKey="personKey"
       @toggleAllSectors="toggleAllSectors" :eventHistories="eventHistories" ref="planningManager"
-      :displayAllSectors="displayAllSectors" @toggleHistory="toggleHistory" />
+      :displayAllSectors="displayAllSectors" @toggleHistory="toggleHistory" :displayHistory="displayHistory" />
 
     <!-- Event creation modal -->
     <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
@@ -262,6 +262,7 @@ export default {
         this.eventHistories = this.eventHistories.filter(history =>
           !history.sectors.includes(el._id) ||
             this.filteredAuxiliaries.some(filteredAux => history.auxiliaries.map(aux => aux._id).includes(filteredAux._id)));
+        if (this.eventHistories.length === 0) this.displayHistory = false;
       } else { // el = auxiliary
         this.filteredAuxiliaries = this.filteredAuxiliaries.filter(auxiliary => auxiliary._id !== el._id);
         if (this.filteredSectors.some(sector => sector._id === el.sector._id)) return;
@@ -269,6 +270,7 @@ export default {
         this.eventHistories = this.eventHistories.filter(history =>
           !history.auxiliaries.map(aux => aux._id).includes(el._id) ||
             this.filteredAuxiliaries.some(filteredAux => history.auxiliaries.map(aux => aux._id).includes(filteredAux._id)));
+        if (this.eventHistories.length === 0) this.displayHistory = false;
       }
     },
   },
