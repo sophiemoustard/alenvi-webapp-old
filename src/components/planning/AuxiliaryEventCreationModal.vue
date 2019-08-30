@@ -41,7 +41,7 @@
             :min="newEvent.dates.startDate" />
           <ni-select in-modal caption="Type d'absence" v-model="newEvent.absence" :options="absenceOptions"
             :error="validations.absence.$error" required-field @blur="validations.absence.$touch" />
-          <ni-file-uploader v-if="newEvent.absence && [ILLNESS, UNJUSTIFIED].includes(newEvent.absence)" caption="Justificatif d'absence"
+          <ni-file-uploader v-if="newEvent.absence && [ILLNESS, WORK_ACCIDENT].includes(newEvent.absence)" caption="Justificatif d'absence"
             path="attachment" :entity="newEvent" alt="justificatif absence" name="proofOfAbsence" :url="docsUploadUrl"
             @uploaded="documentUploaded" :additionalValue="additionalValue" required-field withBorders
             @delete="deleteDocument(newEvent.attachment.driveId)" :disable="!selectedAuxiliary._id" />

@@ -17,7 +17,7 @@ import {
   CUSTOMER,
   OTHER,
   HOURLY,
-  UNJUSTIFIED,
+  WORK_ACCIDENT,
 } from '../data/constants';
 
 export const planningActionMixin = {
@@ -48,8 +48,8 @@ export const planningActionMixin = {
           frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
         },
         attachment: {
-          driveId: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && [ILLNESS, UNJUSTIFIED].includes(parent.absence)) },
-          link: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && [ILLNESS, UNJUSTIFIED].includes(parent.absence)) },
+          driveId: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && [ILLNESS, WORK_ACCIDENT].includes(parent.absence)) },
+          link: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && [ILLNESS, WORK_ACCIDENT].includes(parent.absence)) },
         },
         misc: { required: requiredIf(item => item.type === ABSENCE && item.absence === OTHER) },
       },
@@ -72,8 +72,8 @@ export const planningActionMixin = {
           frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
         },
         attachment: {
-          driveId: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && [ILLNESS, UNJUSTIFIED].includes(parent.absence)) },
-          link: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && [ILLNESS, UNJUSTIFIED].includes(parent.absence)) },
+          driveId: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && [ILLNESS, WORK_ACCIDENT].includes(parent.absence)) },
+          link: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && [ILLNESS, WORK_ACCIDENT].includes(parent.absence)) },
         },
         cancel: {
           condition: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
