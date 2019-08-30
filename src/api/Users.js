@@ -23,7 +23,7 @@ export default {
     return userRaw.data.data.user;
   },
   async create (data) {
-    const newUser = await axios.post(`${process.env.API_HOSTNAME}/users`, data);
+    const newUser = await alenviAxios.post(`${process.env.API_HOSTNAME}/users`, data);
     return newUser.data.data.user;
   },
   async deleteById (id) {
