@@ -135,6 +135,7 @@ export default {
     personKey: { type: String, default: 'auxiliary' },
     canEdit: { type: Function, default: () => {} },
     displayAllSectors: { type: Boolean, default: false },
+    displayHistory: { type: Boolean, default: false },
     eventHistories: { type: Array, default: () => [] },
   },
   data () {
@@ -150,7 +151,6 @@ export default {
       distanceMatrix: [],
       hourWidth: 100 / 12,
       UNKNOWN_AVATAR,
-      displayHistory: false,
     }
   },
   beforeDestroy () {
@@ -247,8 +247,7 @@ export default {
     // History
     toggleHistory () {
       if (this.persons.length === 0) return;
-      this.displayHistory = !this.displayHistory;
-      this.$emit('toggleHistory', this.displayHistory);
+      this.$emit('toggleHistory', !this.displayHistory);
     },
     // Drag & drop
     drag (event) {
