@@ -62,6 +62,7 @@ export default {
       personKey: AUXILIARY,
       displayAllSectors: false,
       eventHistories: [],
+      displayHistory: false,
     };
   },
   async mounted () {
@@ -138,6 +139,7 @@ export default {
     },
     // History
     async toggleHistory (displayHistory) {
+      this.displayHistory = displayHistory;
       if (displayHistory) await this.getEventHistories();
       else this.eventHistories = [];
     },
@@ -170,6 +172,7 @@ export default {
         }
 
         this.events = await this.$events.list(params);
+        if (this.displayHistory) await this.getEventHistories();
       } catch (e) {
         console.error(e);
         this.events = [];
