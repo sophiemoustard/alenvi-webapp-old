@@ -22,6 +22,7 @@ import {
   DAILY,
   HOURLY,
   ILLNESS,
+  WORK_ACCIDENT,
   CUSTOMER_CONTRACT,
   COMPANY_CONTRACT,
   ADMIN,
@@ -53,6 +54,8 @@ export const planningModalMixin = {
       INTERNAL_HOUR,
       NEVER,
       ILLNESS,
+      WORK_ACCIDENT,
+      UNJUSTIFIED,
       DAILY,
       HOURLY,
       OTHER,
@@ -80,7 +83,8 @@ export const planningModalMixin = {
           if (this.newEvent.absenceNature === DAILY) {
             return !this.newEvent.auxiliary || !this.newEvent.absence || !this.newEvent.dates.startDate ||
               !this.newEvent.dates.endDate || !this.newEvent.absenceNature ||
-              (this.newEvent.absence === OTHER && !this.newEvent.misc);
+              (this.newEvent.absence === OTHER && !this.newEvent.misc) ||
+              ([WORK_ACCIDENT, ILLNESS].includes(this.newEvent.absence) && !this.newEvent.attachment.link);
           }
 
           return !this.newEvent.auxiliary || !this.newEvent.absence || !this.newEvent.dates.startDate ||
@@ -104,7 +108,8 @@ export const planningModalMixin = {
           if (this.editedEvent.absenceNature === DAILY) {
             return !this.editedEvent.auxiliary || !this.editedEvent.absence || !this.editedEvent.dates.startDate ||
               !this.editedEvent.dates.endDate || !this.editedEvent.absenceNature ||
-              (this.editedEvent.absence === OTHER && !this.editedEvent.misc)
+              (this.editedEvent.absence === OTHER && !this.editedEvent.misc) ||
+              ([WORK_ACCIDENT, ILLNESS].includes(this.editedEvent.absence) && !this.editedEvent.attachment.link);
           }
 
           return !this.editedEvent.auxiliary || !this.editedEvent.absence || !this.editedEvent.dates.startDate ||
