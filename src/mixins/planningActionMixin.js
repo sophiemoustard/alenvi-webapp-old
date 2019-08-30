@@ -1,3 +1,5 @@
+import { required, requiredIf } from 'vuelidate/lib/validators';
+import { frAddress } from '../helpers/vuelidateCustomVal.js';
 import { NotifyWarning, NotifyNegative, NotifyPositive } from '../components/popup/notify';
 import {
   INTERNAL_HOUR,
@@ -13,9 +15,69 @@ import {
   PLANNING_VIEW_END_HOUR,
   SECTOR,
   CUSTOMER,
+  OTHER,
+  HOURLY,
 } from '../data/constants';
 
 export const planningActionMixin = {
+  validations () {
+    return {
+      newEvent: {
+        type: { required },
+        dates: {
+          startDate: { required },
+          endDate: { required: requiredIf((item, parent) => parent && (parent.type !== ABSENCE || parent.absenceNature === DAILY)) },
+          startHour: { required: requiredIf((item, parent) => parent && (parent.type === ABSENCE && parent.absenceNature === HOURLY)) },
+          endHour: { required: requiredIf((item, parent) => parent && (parent.type === ABSENCE && parent.absenceNature === HOURLY)) },
+        },
+        auxiliary: { required: requiredIf((item) => item.type !== INTERVENTION) },
+        sector: { required },
+        customer: { required: requiredIf((item) => item.type === INTERVENTION) },
+        subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
+        internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
+        absence: { required: requiredIf((item) => item.type === ABSENCE) },
+        absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
+        address: {
+          zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
+          street: { required: requiredIf(item => item && !!item.fullAddress) },
+          city: { required: requiredIf(item => item && !!item.fullAddress) },
+          fullAddress: { frAddress },
+        },
+        repetition: {
+          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
+        },
+        attachment: {
+          driveId: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absence === ILLNESS),
+          link: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absence === ILLNESS),
+        },
+        misc: { required: requiredIf(item => item.type === ABSENCE && item.absence === OTHER) },
+      },
+      editedEvent: {
+        dates: {
+          startDate: { required },
+          endDate: { required },
+          startHour: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absenceNature === HOURLY) },
+          endHour: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absenceNature === HOURLY) },
+        },
+        auxiliary: { required: requiredIf((item) => item.type !== INTERVENTION) },
+        sector: { required },
+        customer: { required: requiredIf((item) => item.type === INTERVENTION) },
+        subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
+        internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
+        absence: { required: requiredIf((item) => item.type === ABSENCE) },
+        absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
+        address: { fullAddress: { frAddress } },
+        repetition: {
+          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
+        },
+        cancel: {
+          condition: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
+          reason: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
+        },
+        misc: { required: requiredIf(item => item.type === ABSENCE && item.absence === OTHER) },
+      },
+    };
+  },
   methods: {
     addSavedTerms (endPath) {
       if (this.$q.localStorage.has(`lastSearch${endPath}`) && this.$q.localStorage.get.item(`lastSearch${endPath}`).length > 0) {
