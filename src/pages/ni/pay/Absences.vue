@@ -38,9 +38,7 @@
 
 <script>
 import DateRange from '../../../components/form/DateRange';
-import { required, requiredIf } from 'vuelidate/lib/validators';
-import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
-import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES, HOURLY, DAILY } from '../../../data/constants';
+import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES, DAILY } from '../../../data/constants';
 import BillingPagination from '../../../components/table/BillingPagination';
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
@@ -61,6 +59,7 @@ export default {
       events: [],
       loading: false,
       absences: [],
+      auxiliaries: [],
       editedEvent: {},
       editionModal: false,
       selectedAuxiliary: { picture: {}, identity: { lastname: '' } },
@@ -155,23 +154,6 @@ export default {
       datesHasError: false,
     };
   },
-  validations () {
-    return {
-      editedEvent: {
-        dates: {
-          startDate: { required },
-          endDate: { required },
-          startHour: { required: requiredIf((item, parent) => parent && parent.absenceNature === HOURLY) },
-          endHour: { required: requiredIf((item, parent) => parent && parent.absenceNature === HOURLY) },
-        },
-        auxiliary: { required },
-        sector: { required },
-        absence: { required },
-        absenceNature: { required },
-        address: { fullAddress: { frAddress } },
-      },
-    };
-  },
   async mounted () {
     await this.refresh();
   },
@@ -194,8 +176,10 @@ export default {
       try {
         if (this.datesHasError) return;
         this.absences = await this.$events.list({ type: ABSENCE, startDate: this.dates.startDate, endDate: this.dates.endDate });
+        this.auxiliaries = await this.$users.showAllActive();
       } catch (e) {
         this.absences = [];
+        this.auxiliaries = [];
         console.error(e);
       }
     },
