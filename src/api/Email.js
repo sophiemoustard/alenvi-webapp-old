@@ -10,8 +10,4 @@ export default {
     const mail = await axios.post(`${process.env.API_HOSTNAME}/email/sendChangePasswordOk`, data, { headers: { 'x-access-token': token } });
     return mail;
   },
-  async sendAuxiliaryWelcome (data, token) {
-    const mail = await axios.post(`${process.env.API_HOSTNAME}/email/sendAuxiliaryWelcome`, data, { headers: { 'x-access-token': token } });
-    return mail;
-  },
 }

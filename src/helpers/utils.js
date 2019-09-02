@@ -62,34 +62,21 @@ export const formatPrice = (val) => {
 };
 
 export const formatIdentity = (identity, format) => {
-  if (!identity) return '';
+  const formatLower = format.toLowerCase();
+  const values = [];
 
-  let firstname;
-  let lastname;
-  switch (format) {
-    case 'FL':
-      firstname = (identity.firstname || '').trim();
-      lastname = (identity.lastname || '').trim().toUpperCase();
+  for (let i = 0; i < format.length; ++i) {
+    let value;
+    if (formatLower[i] === 'f') value = (identity.firstname || '').trim();
+    else if (formatLower[i] === 'l') value = (identity.lastname || '').trim().toUpperCase();
 
-      return `${firstname} ${lastname}`;
-    case 'fL':
-      firstname = (identity.firstname || '').trim();
-      firstname = firstname ? `${firstname.slice(0, 1).toUpperCase()}. ` : '';
-      lastname = (identity.lastname || '').trim().toUpperCase();
+    if (!value) continue;
 
-      return `${firstname} ${lastname}`;
-    case 'Fl':
-      firstname = `${(identity.firstname || '').trim()} `;
-      lastname = identity.lastname ? ` ${identity.lastname.trim().slice(0, 1).toUpperCase()}.` : '';
-
-      return `${firstname} ${lastname}`;
-    case 'Lf':
-      firstname = (identity.firstname || '').trim();
-      firstname = firstname ? `${firstname.slice(0, 1).toUpperCase()}. ` : '';
-      lastname = (identity.lastname || '').trim().toUpperCase();
-
-      return `${lastname} ${firstname}`;
+    if (formatLower[i] === format[i]) value = `${value.charAt(0).toUpperCase()}.`;
+    values.push(value);
   }
+
+  return values.join(' ');
 };
 
 export const formatHours = (value, digits = 2) => {

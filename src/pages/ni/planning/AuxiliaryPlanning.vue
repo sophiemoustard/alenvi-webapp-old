@@ -3,7 +3,8 @@
     <ni-planning-manager :events="events" :persons="activeAuxiliaries" @updateStartOfWeek="updateStartOfWeek"
       @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop"
       :filteredSectors="filteredSectors" :can-edit="canEditEvent" :personKey="personKey"
-      :displayAllSectors.sync="displayAllSectors" :eventHistories="eventHistories" />
+      @toggleAllSectors="toggleAllSectors" :eventHistories="eventHistories" ref="planningManager"
+      :displayAllSectors="displayAllSectors" @toggleHistory="toggleHistory" :displayHistory="displayHistory" />
 
     <!-- Event creation modal -->
     <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
@@ -20,14 +21,12 @@
 </template>
 
 <script>
-import { required, requiredIf } from 'vuelidate/lib/validators';
-import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
 import ChipsAutocomplete from '../../../components/ChipsAutocomplete';
 import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryEventCreationModal';
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
 import Planning from '../../../components/planning/Planning.vue';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
-import { INTERVENTION, NEVER, PERSON, AUXILIARY, ABSENCE, DAILY, HOURLY, INTERNAL_HOUR, ILLNESS, SECTOR } from '../../../data/constants';
+import { INTERVENTION, NEVER, PERSON, AUXILIARY, SECTOR, AUXILIARY_ROLES } from '../../../data/constants';
 import { mapGetters, mapActions } from 'vuex';
 import { NotifyNegative, NotifyWarning } from '../../../components/popup/notify';
 
@@ -52,6 +51,7 @@ export default {
       // Filters
       filteredSectors: [],
       filteredAuxiliaries: [],
+      savedSearch: [],
       // Event creation
       newEvent: {},
       creationModal: false,
@@ -62,69 +62,13 @@ export default {
       personKey: AUXILIARY,
       displayAllSectors: false,
       eventHistories: [],
-    };
-  },
-  validations () {
-    return {
-      newEvent: {
-        type: { required },
-        dates: {
-          startDate: { required },
-          endDate: { required: requiredIf((item, parent) => parent && (parent.type !== ABSENCE || parent.absenceNature === DAILY)) },
-          startHour: { required: requiredIf((item, parent) => parent && (parent.type === ABSENCE && parent.absenceNature === HOURLY)) },
-          endHour: { required: requiredIf((item, parent) => parent && (parent.type === ABSENCE && parent.absenceNature === HOURLY)) },
-        },
-        auxiliary: { required: requiredIf((item) => item.type !== INTERVENTION) },
-        sector: { required },
-        customer: { required: requiredIf((item) => item.type === INTERVENTION) },
-        subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
-        internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
-        absence: { required: requiredIf((item) => item.type === ABSENCE) },
-        absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
-        address: {
-          zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
-          street: { required: requiredIf(item => item && !!item.fullAddress) },
-          city: { required: requiredIf(item => item && !!item.fullAddress) },
-          fullAddress: { frAddress },
-        },
-        repetition: {
-          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
-        },
-        attachment: {
-          driveId: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absence === ILLNESS),
-          link: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absence === ILLNESS),
-        },
-      },
-      editedEvent: {
-        dates: {
-          startDate: { required },
-          endDate: { required },
-          startHour: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absenceNature === HOURLY) },
-          endHour: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absenceNature === HOURLY) },
-        },
-        auxiliary: { required: requiredIf((item) => item.type !== INTERVENTION) },
-        sector: { required },
-        customer: { required: requiredIf((item) => item.type === INTERVENTION) },
-        subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
-        internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
-        absence: { required: requiredIf((item) => item.type === ABSENCE) },
-        absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
-        address: { fullAddress: { frAddress } },
-        repetition: {
-          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
-        },
-        cancel: {
-          condition: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
-          reason: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
-        },
-      },
+      displayHistory: false,
     };
   },
   async mounted () {
     try {
-      await this.fillFilter(AUXILIARY);
-      await this.getEventHistories();
-      await this.getCustomers();
+      await Promise.all([this.fillFilter(AUXILIARY), this.getCustomers()]);
+      this.initFilters();
       this.setInternalHours();
     } catch (e) {
       console.error(e);
@@ -132,31 +76,19 @@ export default {
     }
   },
   watch: {
-    getElemAdded (val) {
-      this.handleElemAddedToFilter(val);
+    async elementToAdd (val) {
+      await this.addElementToFilter(val);
     },
-    getElemRemoved (val) {
-      this.handleElemRemovedFromFilter(val);
-    },
-    async displayAllSectors (value) {
-      if (!value) {
-        this.auxiliaries = [];
-        this.filteredSectors = [];
-        this.events = [];
-      } else {
-        this.filteredAuxiliaries = [];
-        this.auxiliaries = this.getFilter.filter(fil => fil.type === PERSON);
-        this.filteredSectors = this.getFilter.filter(fil => fil.type === SECTOR);
-        await this.refresh();
-      }
+    elementToRemove (val) {
+      this.removeElementFromFilter(val);
     },
   },
   computed: {
     ...mapGetters({
-      getUser: 'main/user',
-      getFilter: 'planning/getFilter',
-      getElemAdded: 'planning/getElemAdded',
-      getElemRemoved: 'planning/getElemRemoved',
+      mainUser: 'main/user',
+      filters: 'planning/getFilters',
+      elementToAdd: 'planning/getElementToAdd',
+      elementToRemove: 'planning/getElementToRemove',
     }),
     selectedAuxiliary () {
       if (this.creationModal && this.newEvent.auxiliary) {
@@ -196,11 +128,38 @@ export default {
       this.days = Array.from(range.by('days'));
       if (this.auxiliaries && this.auxiliaries.length) await this.refresh();
     },
-    // Refresh data
-    async refresh () {
-      await Promise.all([this.refreshEvents(), this.getEventHistories()]);
+    // Filters
+    initFilters () {
+      if (!AUXILIARY_ROLES.includes(this.mainUser.role.name)) {
+        this.addSavedTerms('Auxiliaries');
+      } else {
+        const userSector = this.filters.find(filter => filter.type === SECTOR && filter._id === this.mainUser.sector);
+        if (userSector && this.$refs.planningManager) this.$refs.planningManager.restoreFilter([userSector.label]);
+      }
     },
-    async refreshEvents () {
+    // History
+    async toggleHistory (displayHistory) {
+      this.displayHistory = displayHistory;
+      if (displayHistory) await this.getEventHistories();
+      else this.eventHistories = [];
+    },
+    // Refresh data
+    async toggleAllSectors (search) {
+      this.displayAllSectors = !this.displayAllSectors;
+      if (!this.displayAllSectors) {
+        this.auxiliaries = [];
+        this.filteredSectors = [];
+        this.events = [];
+        this.$refs.planningManager.restoreFilter(this.savedSearch);
+      } else {
+        this.savedSearch = search;
+        this.filteredAuxiliaries = [];
+        this.auxiliaries = this.filters.filter(fil => fil.type === PERSON);
+        this.filteredSectors = this.filters.filter(fil => fil.type === SECTOR);
+        await this.refresh();
+      }
+    },
+    async refresh () {
       try {
         let params = {
           startDate: this.$moment(this.startOfWeekAsString).toDate(),
@@ -213,6 +172,7 @@ export default {
         }
 
         this.events = await this.$events.list(params);
+        if (this.displayHistory) await this.getEventHistories();
       } catch (e) {
         console.error(e);
         this.events = [];
@@ -220,7 +180,7 @@ export default {
     },
     async getCustomers () {
       try {
-        this.customers = await this.$customers.showAll({ subscriptions: true });
+        this.customers = await this.$customers.listWithSubscriptions();
       } catch (e) {
         console.error(e);
         this.customers = [];
@@ -276,25 +236,25 @@ export default {
       this.editionModal = true;
     },
     // Filter
-    handleElemAddedToFilter (el) {
+    async addElementToFilter (el) {
       if (el.type === SECTOR) {
         this.filteredSectors.push(el);
-        const auxBySector = this.getFilter.filter(aux => aux.sector && aux.sector._id === el._id);
+        const auxBySector = this.filters.filter(aux => aux.sector && aux.sector._id === el._id);
         for (let i = 0, l = auxBySector.length; i < l; i++) {
           if (!this.auxiliaries.some(aux => auxBySector[i]._id === aux._id)) {
             this.auxiliaries.push(auxBySector[i]);
           }
         }
-        this.refresh();
+        await this.refresh();
       } else { // el = auxiliary
         if (!this.filteredAuxiliaries.some(aux => aux._id === el._id)) this.filteredAuxiliaries.push(el);
         if (!this.auxiliaries.some(aux => aux._id === el._id)) {
           this.auxiliaries.push(el);
-          this.refresh();
+          await this.refresh();
         }
       }
     },
-    handleElemRemovedFromFilter (el) {
+    removeElementFromFilter (el) {
       if (el.type === SECTOR) {
         this.filteredSectors = this.filteredSectors.filter(sec => sec._id !== el._id);
         this.auxiliaries = this.auxiliaries.filter(auxiliary =>
@@ -302,6 +262,7 @@ export default {
         this.eventHistories = this.eventHistories.filter(history =>
           !history.sectors.includes(el._id) ||
             this.filteredAuxiliaries.some(filteredAux => history.auxiliaries.map(aux => aux._id).includes(filteredAux._id)));
+        if (this.eventHistories.length === 0) this.displayHistory = false;
       } else { // el = auxiliary
         this.filteredAuxiliaries = this.filteredAuxiliaries.filter(auxiliary => auxiliary._id !== el._id);
         if (this.filteredSectors.some(sector => sector._id === el.sector._id)) return;
@@ -309,6 +270,7 @@ export default {
         this.eventHistories = this.eventHistories.filter(history =>
           !history.auxiliaries.map(aux => aux._id).includes(el._id) ||
             this.filteredAuxiliaries.some(filteredAux => history.auxiliaries.map(aux => aux._id).includes(filteredAux._id)));
+        if (this.eventHistories.length === 0) this.displayHistory = false;
       }
     },
   },

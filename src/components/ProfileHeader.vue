@@ -16,9 +16,9 @@
       <div :class="[customer ? 'col-xs-12': 'col-xs-6', 'pl-lg', 'col-md-6', 'profile-info-item']">
         <div class="row items-center">
           <div class="row items-center justify-center on-left" style="width: 17px; height: 17px">
-            <div :class="[{ activeDot: user.isActive, inactiveDot: !user.isActive }]" />
+            <div :class="[{ activeDot: userActivity.active, inactiveDot: !userActivity.active }]" />
           </div>
-          <div>{{ userStatus }}</div>
+          <div>{{ userActivity.status }}</div>
         </div>
         <div class="row items-center">
           <q-icon name="restore" class="on-left" size="1rem" />
@@ -49,8 +49,8 @@
             <span><q-icon name="clear" @click.native="opened = false" /></span>
           </div>
         </div>
-        <ni-modal-select caption="Modèle" :options="typeMessageOptions" v-model="typeMessage" required-field />
-        <ni-modal-input caption="Message" v-model="messageComp" type="textarea" :rows="7" required-field />
+        <ni-select in-modal caption="Modèle" :options="typeMessageOptions" v-model="typeMessage" required-field />
+        <ni-input in-modal caption="Message" v-model="messageComp" type="textarea" :rows="7" required-field />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary"
         :loading="loading" @click.native="sendMessage" />
@@ -61,18 +61,21 @@
 <script>
 import { mapGetters } from 'vuex';
 import randomize from 'randomatic';
-import ModalInput from './form/ModalInput.vue';
-import ModalSelect from './form/ModalSelect.vue';
+import NiInput from './form/Input';
+import NiSelect from './form/Select';
 import { NotifyPositive, NotifyNegative } from './popup/notify';
 import { DEFAULT_AVATAR } from '../data/constants';
 
 export default {
   name: 'ProfileHeader',
   components: {
-    'ni-modal-input': ModalInput,
-    'ni-modal-select': ModalSelect,
+    'ni-input': NiInput,
+    'ni-select': NiSelect,
   },
-  props: ['profileId', 'customer'],
+  props: {
+    customer: { type: Boolean, default: false },
+    profileId: String,
+  },
   data () {
     return {
       loading: false,
@@ -92,9 +95,17 @@ export default {
       currentUser: 'main/user',
       user: 'rh/getUserProfile',
     }),
-    userStatus () {
-      if (this.user.isActive) return 'Profil actif';
-      return 'Profil inactif'
+    userActivity () {
+      if (this.customer) {
+        return {
+          status: this.user.firstIntervention ? 'Client' : 'Prospect',
+          active: !!this.user.firstIntervention,
+        }
+      }
+      return {
+        status: this.user.isActive ? 'Profil Actif' : 'Profil Inactif',
+        active: this.user.isActive,
+      }
     },
     userStartDate () {
       if (this.user.createdAt) return this.$moment(this.user.createdAt).format('DD/MM/YY');

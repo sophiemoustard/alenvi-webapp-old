@@ -37,8 +37,8 @@
 <script>
 import pathologies from '../../../data/pathologies';
 import { followUpMixin } from '../../../mixins/followUpMixin.js';
-import Input from '../../../components/form/Input.vue';
-import Select from '../../../components/form/Select.vue';
+import Input from '../../../components/form/Input';
+import Select from '../../../components/form/Select';
 import { formatIdentity } from '../../../helpers/utils';
 
 export default {

@@ -1,3 +1,5 @@
+import { required, requiredIf } from 'vuelidate/lib/validators';
+import { frAddress } from '../helpers/vuelidateCustomVal.js';
 import { NotifyWarning, NotifyNegative, NotifyPositive } from '../components/popup/notify';
 import {
   INTERNAL_HOUR,
@@ -12,10 +14,82 @@ import {
   PLANNING_VIEW_START_HOUR,
   PLANNING_VIEW_END_HOUR,
   SECTOR,
+  CUSTOMER,
+  OTHER,
+  HOURLY,
+  WORK_ACCIDENT,
 } from '../data/constants';
 
 export const planningActionMixin = {
+  validations () {
+    return {
+      newEvent: {
+        type: { required },
+        dates: {
+          startDate: { required },
+          endDate: { required: requiredIf((item, parent) => parent && (parent.type !== ABSENCE || parent.absenceNature === DAILY)) },
+          startHour: { required: requiredIf((item, parent) => parent && (parent.type === ABSENCE && parent.absenceNature === HOURLY)) },
+          endHour: { required: requiredIf((item, parent) => parent && (parent.type === ABSENCE && parent.absenceNature === HOURLY)) },
+        },
+        auxiliary: { required: requiredIf((item) => item.type !== INTERVENTION) },
+        sector: { required },
+        customer: { required: requiredIf((item) => item.type === INTERVENTION) },
+        subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
+        internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
+        absence: { required: requiredIf((item) => item.type === ABSENCE) },
+        absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
+        address: {
+          zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
+          street: { required: requiredIf(item => item && !!item.fullAddress) },
+          city: { required: requiredIf(item => item && !!item.fullAddress) },
+          fullAddress: { frAddress },
+        },
+        repetition: {
+          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
+        },
+        attachment: {
+          driveId: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && [ILLNESS, WORK_ACCIDENT].includes(parent.absence)) },
+          link: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && [ILLNESS, WORK_ACCIDENT].includes(parent.absence)) },
+        },
+        misc: { required: requiredIf(item => item.type === ABSENCE && item.absence === OTHER) },
+      },
+      editedEvent: {
+        dates: {
+          startDate: { required },
+          endDate: { required },
+          startHour: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absenceNature === HOURLY) },
+          endHour: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absenceNature === HOURLY) },
+        },
+        auxiliary: { required: requiredIf((item) => item.type !== INTERVENTION) },
+        sector: { required },
+        customer: { required: requiredIf((item) => item.type === INTERVENTION) },
+        subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
+        internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
+        absence: { required: requiredIf((item) => item.type === ABSENCE) },
+        absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
+        address: { fullAddress: { frAddress } },
+        repetition: {
+          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
+        },
+        attachment: {
+          driveId: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && [ILLNESS, WORK_ACCIDENT].includes(parent.absence)) },
+          link: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && [ILLNESS, WORK_ACCIDENT].includes(parent.absence)) },
+        },
+        cancel: {
+          condition: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
+          reason: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
+        },
+        misc: { required: requiredIf(item => item.type === ABSENCE && item.absence === OTHER) },
+      },
+    };
+  },
   methods: {
+    addSavedTerms (endPath) {
+      if (this.$q.localStorage.has(`lastSearch${endPath}`) && this.$q.localStorage.get.item(`lastSearch${endPath}`).length > 0) {
+        const lastSearch = JSON.parse(this.$q.localStorage.get.item(`lastSearch${endPath}`));
+        if (this.$refs.planningManager) this.$refs.planningManager.restoreFilter(lastSearch);
+      }
+    },
     setInternalHours () {
       const user = this.$store.getters['main/user'];
       if (user && user.company && user.company.rhConfig && user.company.rhConfig.internalHours) {
@@ -129,33 +203,67 @@ export const planningActionMixin = {
 
       return payload;
     },
-    hasConflicts (scheduledEvent) {
-      if (!scheduledEvent.auxiliary) return false;
+    isCreationAllowed (event) {
+      if (event.type === INTERVENTION && event.repetition && event.repetition.frequency !== NEVER) return true;
 
-      const auxiliaryEvents = this.getAuxiliaryEventsBetweenDates(scheduledEvent.auxiliary, scheduledEvent.startDate, scheduledEvent.endDate);
+      return !this.hasConflicts(event, event.type);
+    },
+    isEditionAllowed (event, eventType) {
+      if (event.shouldUpdateRepetition && eventType === INTERVENTION) return true;
+
+      return !this.hasConflicts(event, eventType);
+    },
+    hasConflicts (scheduledEvent, eventType) {
+      if (!scheduledEvent.auxiliary || scheduledEvent.isCancelled) return false;
+
+      const auxiliaryEvents = eventType !== ABSENCE
+        ? this.getAuxiliaryEventsBetweenDates(scheduledEvent.auxiliary, scheduledEvent.startDate, scheduledEvent.endDate)
+        : this.getAuxiliaryEventsBetweenDates(scheduledEvent.auxiliary, scheduledEvent.startDate, scheduledEvent.endDate, ABSENCE);
+
       return auxiliaryEvents.some(ev => {
         if ((scheduledEvent._id && scheduledEvent._id === ev._id) || ev.isCancelled) return false;
         return this.$moment(scheduledEvent.startDate).isBetween(ev.startDate, ev.endDate, 'minutes', '[]') ||
           this.$moment(ev.startDate).isBetween(scheduledEvent.startDate, scheduledEvent.endDate, 'minutes', '[]');
       });
     },
-    getAuxiliaryEventsBetweenDates (auxiliaryId, startDate, endDate) {
+    getAuxiliaryEventsBetweenDates (auxiliaryId, startDate, endDate, type) {
       return this.getRowEvents(auxiliaryId)
         .filter(event => {
-          return this.$moment(event.startDate).isBetween(startDate, endDate, 'minutes', '[)') ||
-            this.$moment(startDate).isBetween(event.startDate, event.endDate, 'minutes', '[)')
+          return (this.$moment(event.startDate).isBetween(startDate, endDate, 'minutes', '[)') ||
+            this.$moment(startDate).isBetween(event.startDate, event.endDate, 'minutes', '[)')) &&
+            (!type || type === event.type)
         });
+    },
+    async notifyCreation () {
+      if (this.newEvent.type === ABSENCE) {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Les interventions en conflit avec l\'absence seront passées en à affecter et les heures internes et indispo seront supprimées. Es-tu sûr(e) de vouloir créer cette absence ?',
+          ok: 'OK',
+          cancel: 'Annuler',
+        });
+      }
+
+      if (this.newEvent.auxiliary && this.$_.get(this.newEvent, 'repetition.frequency', '') !== NEVER) {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Les interventions de la répétition en conflit avec les évènements existants seront passées en à affecter. Es-tu sûr(e) de vouloir créer cette répétition ?',
+          ok: 'OK',
+          cancel: 'Annuler',
+        });
+      }
     },
     async createEvent () {
       try {
         this.$v.newEvent.$touch();
         if (this.$v.newEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
 
+        await this.notifyCreation();
+
         this.loading = true;
         const payload = this.getCreationPayload(this.newEvent);
-
-        if (this.hasConflicts(payload)) {
-          return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
+        if (!this.isCreationAllowed(payload)) {
+          return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
         }
 
         await this.$events.create(payload);
@@ -165,6 +273,7 @@ export const planningActionMixin = {
         this.resetCreationForm(false);
         NotifyPositive('Évènement créé');
       } catch (e) {
+        if (e.message === '') return NotifyPositive('Création annulée');
         console.error(e);
         if (e.data && e.data.statusCode === 422) return NotifyNegative('La creation de cet evenement n\'est pas autorisée');
         NotifyNegative('Erreur lors de la création de l\'évènement');
@@ -253,15 +362,8 @@ export const planningActionMixin = {
       if (event.cancel && Object.keys(event.cancel).length === 0) delete payload.cancel;
       if (event.attachment && Object.keys(event.attachment).length === 0) delete payload.attachment;
       if (event.shouldUpdateRepetition) delete payload.misc;
-      delete payload.customer;
-      delete payload.repetition;
-      delete payload.staffingLeft;
-      delete payload.staffingWidth;
-      delete payload.staffingTop;
-      delete payload.staffingHeight;
-      delete payload.type;
 
-      return payload;
+      return this.$_.omit(payload, ['customer', 'repetition', 'staffingLeft', 'staffingWidth', 'staffingTop', 'staffingHeight', 'type']);
     },
     async updateEvent () {
       try {
@@ -271,17 +373,17 @@ export const planningActionMixin = {
         this.loading = true;
         const payload = this.getEditionPayload(this.editedEvent);
 
-        if (!payload.isCancelled && this.hasConflicts(payload)) {
+        if (!this.isEditionAllowed(payload, this.editedEvent.type)) {
           this.$v.editedEvent.$reset();
-          return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
+          return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
         }
         delete payload._id;
         await this.$events.updateById(this.editedEvent._id, payload);
-        NotifyPositive('Évènement modifié');
 
-        this.refresh();
+        await this.refresh();
         this.editionModal = false;
         this.resetEditionForm();
+        NotifyPositive('Évènement modifié');
       } catch (e) {
         console.error(e)
         if (e.data && e.data.statusCode === 422) {
@@ -303,7 +405,10 @@ export const planningActionMixin = {
       };
 
       if (target.type === SECTOR) payload.sector = target._id;
-      else {
+      else if (this.personKey === CUSTOMER) {
+        payload.auxiliary = draggedObject.auxiliary._id;
+        payload.sector = draggedObject.sector;
+      } else {
         payload.auxiliary = target._id;
         const auxiliary = this.auxiliaries.find(aux => aux._id === target._id);
         payload.sector = auxiliary.sector._id;
@@ -315,13 +420,17 @@ export const planningActionMixin = {
       try {
         const { toDay, target, draggedObject } = vEvent;
 
-        if (target.type === SECTOR && draggedObject.type !== INTERVENTION) return NotifyNegative('Cette modification n\'est pas autorisée');
-        if ([ABSENCE, UNAVAILABILITY].includes(draggedObject.type) && draggedObject.auxiliary._id !== target._id) {
-          return NotifyNegative('Impossible de modifier l\'auxiliaire de cet évènement.');
+        if (this.personKey === CUSTOMER && target._id !== draggedObject.customer._id) {
+          return NotifyNegative('Impossible de modifier le bénéficiaire de l\'intervention.');
+        } else {
+          if (target.type === SECTOR && draggedObject.type !== INTERVENTION) return NotifyNegative('Cette modification n\'est pas autorisée.');
+          if ([ABSENCE, UNAVAILABILITY].includes(draggedObject.type) && draggedObject.auxiliary._id !== target._id) {
+            return NotifyNegative('Impossible de modifier l\'auxiliaire de cet évènement.');
+          }
         }
 
         const payload = this.getDragAndDropPayload(toDay, target, draggedObject);
-        if (this.hasConflicts(payload)) {
+        if (!this.isEditionAllowed(payload, draggedObject.type)) {
           return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
         }
 
@@ -365,7 +474,7 @@ export const planningActionMixin = {
       try {
         await this.$q.dialog({
           title: 'Confirmation',
-          message: 'Etes-vous sûr de vouloir supprimer cet évènement ?',
+          message: 'Es-tu sûr(e) de vouloir supprimer cet évènement ?',
           ok: 'OK',
           cancel: 'Annuler',
         });

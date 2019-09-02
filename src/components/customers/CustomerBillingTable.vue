@@ -11,16 +11,26 @@
     <q-tr v-if="Object.keys(documents).length > 0" slot="body" slot-scope="props" :props="props">
       <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
         <template v-if="col.name === 'document'">
-          <div :class="{'download': canDownloadBill(props.row)}"
-            v-if="props.row.type === BILL"
-            @click="canDownloadBill(props.row) && downloadBillPdf(props.row._id, props.row.billNumber)">
-            Facture {{ props.row.billNumber || 'tiers' }}
-          </div>
-          <div :class="{'download': canDownloadCreditNote(props.row)}"
-            v-else-if="props.row.type === CREDIT_NOTE"
-            @click="canDownloadCreditNote(props.row) && downloadCreditNotePdf(props.row._id, props.row.number)">
-            Avoir {{ props.row.number }}
-          </div>
+          <template v-if="props.row.type === BILL">
+            <div :class="{'download': canDownloadBill(props.row)}">
+              <a v-if="props.row.driveFile && props.row.driveFile.link" :href="props.row.driveFile.link" target="_blank">
+                Facture {{ props.row.billNumber || 'tiers' }}
+              </a>
+              <div v-else @click="downloadBillPdf(props.row)">
+                Facture {{ props.row.billNumber || 'tiers' }}
+              </div>
+            </div>
+          </template>
+          <template  v-else-if="props.row.type === CREDIT_NOTE">
+            <div :class="{'download': canDownloadCreditNote(props.row)}">
+              <a v-if="props.row.driveFile && props.row.driveFile.link" :href="props.row.driveFile.link" target="_blank">
+                Avoir {{ props.row.number }}
+              </a>
+              <div v-else @click="downloadCreditNotePdf(props.row)">
+                Avoir {{ props.row.number }}
+              </div>
+            </div>
+          </template>
           <div v-else>{{ getPaymentTitle(props.row) }}</div>
         </template>
         <template v-else-if="col.name === 'balance'">
@@ -154,10 +164,13 @@ export default {
     openEditionModal (payment) {
       this.$emit('openEditionModal', payment);
     },
-    async downloadBillPdf (billId, number) {
+    async downloadBillPdf (bill) {
       try {
-        const pdf = await this.$bills.getPDF(billId);
-        await downloadPdf(pdf, `${number}.pdf`);
+        if (!this.canDownloadBill(bill)) return;
+
+        const pdf = await this.$bills.getPDF(bill._id);
+        await downloadPdf(pdf, `${bill.billNumber}.pdf`);
+
         NotifyPositive('Facture téléchargée');
       } catch (e) {
         console.error(e);
@@ -165,19 +178,22 @@ export default {
       }
     },
     canDownloadBill (bill) {
-      return bill.billNumber && bill.origin === COMPANI;
+      return (bill.billNumber && bill.origin === COMPANI) || (bill.driveFile && bill.driveFile.link);
     },
     canDownloadCreditNote (creditNote) {
-      return creditNote.number && creditNote.origin === COMPANI;
+      return (creditNote.number && creditNote.origin === COMPANI) || (creditNote.driveFile && creditNote.driveFile.link);
     },
-    async downloadCreditNotePdf (creditNoteId, number) {
+    async downloadCreditNotePdf (creditNote) {
       try {
-        const pdf = await this.$creditNotes.getPDF(creditNoteId);
-        await downloadPdf(pdf, `${number}.pdf`);
-        NotifyPositive('Facture téléchargée');
+        if (!this.canDownloadCreditNote(creditNote)) return;
+
+        const pdf = await this.$creditNotes.getPDF(creditNote._id);
+        await downloadPdf(pdf, `${creditNote.number}.pdf`);
+
+        NotifyPositive('Avoir téléchargé');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Impossible de télécharger la facture');
+        NotifyNegative('Impossible de télécharger l\'avoir');
       }
     },
   },

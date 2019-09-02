@@ -6,9 +6,11 @@
           <img :src="getAvatar()" class="avatar">
           <div>{{ customer.identity | formatIdentity('FL') }}</div>
         </div>
-        <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
-          @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :viewMode="viewMode" @updateViewMode="updateViewMode"
-          :type="AGENDA" />
+        <div class="col-xs-12 col-md-7">
+          <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
+            @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :viewMode="viewMode" @updateViewMode="updateViewMode"
+            :type="AGENDA" />
+        </div>
       </div>
       <agenda :events="events" :days="days" :personKey="personKey" />
     </div>
@@ -88,11 +90,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-  @import '~variables';
-
-  .q-layout-page
-    padding-top: 20px;
-
-</style>

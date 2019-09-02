@@ -5,11 +5,11 @@
         <p class="text-weight-bold">{{ this.customer.identity | formatIdentity('FL') }}</p>
         <ni-date-range v-model="billingDates" @input="refresh" :error.sync="billingDatesHasError" />
       </div>
-      <div v-if="user.role.name === HELPER && !loading" class="message">
+      <div v-if="user.role.name === HELPER && !tableLoading" class="message">
         Si vous souhaitez obtenir une facture non disponible sur cette page, adressez un email à support@alenvi.io.
       </div>
-      <ni-customer-billing-table v-if="!loading" :documents="customerBillingDocuments" :billingDates="billingDates"
-        :displayActions="user.role.name === ADMIN || user.role.name === COACH" @openEditionModal="openEditionModal"
+      <ni-customer-billing-table v-if="!tableLoading" :documents="customerBillingDocuments" :billingDates="billingDates"
+        :displayActions="user.role.name === ADMIN" @openEditionModal="openEditionModal"
         :type="CUSTOMER" :startBalance="getStartBalance()" :endBalance="getEndBalance(customerBillingDocuments)" />
       <div v-if="user.role.name === ADMIN || user.role.name === COACH" align="right">
         <q-btn class="add-payment" label="Ajouter un réglement" @click="openPaymentCreationModal(customer)"
@@ -19,7 +19,7 @@
     <template v-for="(tpp, index) in Object.keys(tppBillingDocuments)">
       <div class="q-pa-sm q-mb-lg" :key="index">
         <p class="text-weight-bold">{{ tpp }}</p>
-        <ni-customer-billing-table v-if="!loading" :documents="tppBillingDocuments[tpp]" :billingDates="billingDates"
+        <ni-customer-billing-table v-if="!tableLoading" :documents="tppBillingDocuments[tpp]" :billingDates="billingDates"
           :displayActions="user.role.name === ADMIN || user.role.name === COACH" @openEditionModal="openEditionModal"
           :type="THIRD_PARTY_PAYER" :startBalance="getStartBalance(tpp)"
           :endBalance="getEndBalance(tppBillingDocuments[tpp], tpp)" />
@@ -33,12 +33,12 @@
     <!-- Payment creation modal -->
     <ni-payment-creation-modal :newPayment="newPayment" :validations="$v.newPayment" :selectedClientName="selectedClientName"
       @createPayment="createPayment" :creationModal="paymentCreationModal" :selectedCustomer="selectedCustomer"
-      :loading="loading" @resetForm="resetPaymentCreationModal" />
+      :loading="modalLoading" @resetForm="resetPaymentCreationModal" />
 
     <!-- Payment edition modal -->
     <ni-payment-edition-modal :editedPayment="editedPayment" :validations="$v.editedPayment" :selectedClientName="selectedClientName"
       @updatePayment="updatePayment" :editionModal="paymentEditionModal" :selectedCustomer="selectedCustomer"
-      :loading="loading" @resetForm="resetPaymentEditionModal" />
+      :loading="modalLoading" @resetForm="resetPaymentEditionModal" />
   </div>
 </template>
 
@@ -64,7 +64,8 @@ export default {
   mixins: [paymentMixin],
   data () {
     return {
-      loading: true,
+      modalLoading: false,
+      tableLoading: false,
       paymentEditionModal: false,
       customerBillingDocuments: [],
       tppBillingDocuments: {},
@@ -107,7 +108,7 @@ export default {
     // Billing dates
     setBillingDates () {
       this.billingDates.endDate = this.$moment().endOf('d').toISOString();
-      this.billingDates.startDate = this.$moment().subtract(6, 'M').startOf('d').toISOString();
+      this.billingDates.startDate = this.$moment().subtract(2, 'M').startOf('M').toISOString();
     },
     // Compute balances
     getEndBalance (documents, tpp) {
@@ -156,13 +157,13 @@ export default {
     async refresh () {
       if (this.billingDatesHasError) return;
 
-      this.loading = true;
+      this.tableLoading = true;
       this.customerBillingDocuments = [];
       this.tppBillingDocuments = {};
       await Promise.all([this.getBills(), this.getCreditNotes(), this.getPayments(), this.getCustomerBalance()]);
       this.computeCustomerBalance();
       this.computeTppBalances();
-      this.loading = false;
+      this.tableLoading = false;
     },
     async getCustomerBalance () {
       try {
@@ -229,7 +230,7 @@ export default {
     // Payments
     async createPayment () {
       try {
-        this.loading = true;
+        this.modalLoading = true;
         this.$v.newPayment.$touch();
         if (this.$v.newPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
 
@@ -242,7 +243,7 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la création du règlement');
       } finally {
-        this.loading = false;
+        this.modalLoading = false;
       }
     },
     openEditionModal (payment) {
@@ -266,7 +267,7 @@ export default {
     },
     async updatePayment () {
       try {
-        this.loading = true;
+        this.modalLoading = true;
         this.$v.editedPayment.$touch();
         if (this.$v.editedPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
 
@@ -278,7 +279,7 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la création du règlement');
       } finally {
-        this.loading = false;
+        this.modalLoading = false;
       }
     },
   },

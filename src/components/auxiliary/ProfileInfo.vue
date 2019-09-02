@@ -71,7 +71,7 @@
           @blur="updateUser('identity.birthCountry')" />
         <ni-input caption="Département de naissance" :error="$v.user.identity.birthState.$error"
           :error-label="birthStateError" v-model="user.identity.birthState" @blur="updateUser('identity.birthState')"
-          @focus="saveTmp('identity.birthState')" :displayInput="this.user.identity.birthCountry === 'FR'" />
+          @focus="saveTmp('identity.birthState')" :hidden="this.user.identity.birthCountry !== 'FR'" />
         <ni-input caption="Ville de naissance" :error="$v.user.identity.birthCity.$error"
           v-model="user.identity.birthCity" @focus="saveTmp('identity.birthCity')"
           @blur="updateUser('identity.birthCity')" />
@@ -308,8 +308,8 @@ import nationalities from '../../data/nationalities.js';
 import countries from '../../data/countries.js';
 import { AUXILIARY, PLANNING_REFERENT, TRANSPORT_OPTIONS, REQUIRED_LABEL } from '../../data/constants.js';
 import SelectSector from '../form/SelectSector';
-import Input from '../form/Input.vue';
-import Select from '../form/Select.vue';
+import Input from '../form/Input';
+import Select from '../form/Select';
 import FileUploader from '../form/FileUploader.vue';
 import MultipleFilesUploader from '../form/MultipleFilesUploader.vue';
 import DatetimePicker from '../form/DatetimePicker.vue';

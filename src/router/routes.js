@@ -42,7 +42,7 @@ const routes = [
         component: () => import('pages/ni/config/RhConfig'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['config:edit'],
+          permissions: 'config:edit',
           parent: 'configuration',
         },
       },
@@ -52,7 +52,7 @@ const routes = [
         component: () => import('pages/ni/config/CustomersConfig'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['config:edit'],
+          permissions: 'config:edit',
           parent: 'configuration',
         },
       },
@@ -62,7 +62,7 @@ const routes = [
         component: () => import('pages/ni/config/TagConfig'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['config:edit'],
+          permissions: 'config:edit',
           parent: 'configuration',
         },
       },
@@ -72,7 +72,7 @@ const routes = [
         component: () => import('pages/ni/billing/ToBill'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['billing:edit'],
+          permissions: 'billing:edit',
           parent: 'billing',
         },
       },
@@ -82,7 +82,7 @@ const routes = [
         component: () => import('pages/ni/billing/CreditNotes'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['billing:edit'],
+          permissions: 'billing:edit',
           parent: 'billing',
         },
       },
@@ -92,7 +92,7 @@ const routes = [
         component: () => import('pages/ni/billing/ClientsBalances'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['billing:edit'],
+          permissions: 'billing:edit',
           parent: 'billing',
         },
       },
@@ -102,7 +102,7 @@ const routes = [
         component: () => import('pages/ni/billing/DebitsArchive'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['billing:edit'],
+          permissions: 'billing:edit',
           parent: 'billing',
         },
       },
@@ -112,7 +112,7 @@ const routes = [
         component: () => import('pages/ni/pay/ToPay'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['pay:edit'],
+          permissions: 'pay:edit',
           parent: 'pay',
         },
       },
@@ -122,7 +122,7 @@ const routes = [
         component: () => import('pages/ni/pay/ContractEnds'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['pay:edit'],
+          permissions: 'pay:edit',
           parent: 'pay',
         },
       },
@@ -132,7 +132,7 @@ const routes = [
         component: () => import('pages/ni/pay/Absences'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['pay:edit'],
+          permissions: 'pay:edit',
           parent: 'pay',
         },
       },
@@ -142,7 +142,7 @@ const routes = [
         component: () => import('pages/ni/exports/DataExports'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['exports:edit'],
+          permissions: 'exports:read',
           parent: 'exports',
         },
       },
@@ -152,7 +152,7 @@ const routes = [
         component: () => import('pages/ni/exports/HistoryExports'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['exports:edit'],
+          permissions: 'exports:read',
           parent: 'exports',
         },
       },
@@ -162,7 +162,7 @@ const routes = [
         component: () => import('pages/ni/auxiliaries/Directory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['users:list'],
+          permissions: 'users:edit',
           parent: 'administrative',
         },
       },
@@ -173,13 +173,7 @@ const routes = [
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: [
-            {
-              name: 'profiles:edit',
-              when: (paramsId, cookieId) => paramsId === cookieId,
-            },
-            'profiles:edit:user',
-          ],
+          permissions: 'users:edit',
           parent: 'administrative',
         },
       },
@@ -189,7 +183,7 @@ const routes = [
         component: () => import('pages/ni/customers/CustomersDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['profiles:read'],
+          permissions: 'users:edit',
           parent: 'benef',
         },
       },
@@ -200,7 +194,7 @@ const routes = [
         component: () => import('pages/ni/customers/Profile'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['profiles:read'],
+          permissions: 'users:edit',
           parent: 'benef',
         },
       },
@@ -210,7 +204,7 @@ const routes = [
         component: () => import('pages/ni/planning/AuxiliaryPlanning'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['planning:read'],
+          permissions: 'planning:read',
         },
       },
       {
@@ -219,7 +213,7 @@ const routes = [
         component: () => import('pages/ni/planning/CustomerPlanning'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['profiles:read'],
+          permissions: 'planning:read',
         },
       },
       // Auxiliary view routes
@@ -229,7 +223,7 @@ const routes = [
         component: () => import('pages/auxiliaries/planning/AuxiliaryAgenda'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['planning:read'],
+          permissions: 'planning:read',
         },
       },
       {
@@ -238,7 +232,7 @@ const routes = [
         component: () => import('pages/auxiliaries/team/TeamDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['profiles:read'],
+          permissions: 'users:list',
           parent: 'team',
         },
       },
@@ -248,7 +242,7 @@ const routes = [
         component: () => import('pages/auxiliaries/customers/AuxiliaryCustomersDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['profiles:read'],
+          permissions: 'users:list',
           parent: 'benef',
         },
       },
@@ -259,16 +253,16 @@ const routes = [
         component: () => import('pages/auxiliaries/customers/CustomerInfo'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['profiles:read'],
+          permissions: 'users:list',
         },
       },
       {
-        path: 'auxiliaries/paye',
+        path: 'auxiliaries/pay',
         name: 'profile salaries',
         component: () => import('pages/auxiliaries/administrative/Salaries'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['profiles:read'],
+          permissions: 'pay:read',
           parent: 'administrative',
         },
       },
@@ -278,7 +272,6 @@ const routes = [
         component: () => import('pages/auxiliaries/administrative/Documents'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['profiles:read'],
           parent: 'administrative',
         },
       },
@@ -288,24 +281,17 @@ const routes = [
         component: () => import('pages/auxiliaries/administrative/Contracts'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['profiles:read'],
+          permissions: 'contracts:read',
           parent: 'administrative',
         },
       },
       {
-        path: 'auxiliaries/:id',
+        path: 'auxiliaries/info',
         name: 'auxiliary personal info',
         component: () => import('pages/auxiliaries/administrative/Info'),
-        props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: [
-            {
-              name: 'profiles:edit',
-              when: (paramsId, cookieId) => paramsId === cookieId,
-            },
-            'profiles:edit:user',
-          ],
+          permissions: 'users:list',
           parent: 'administrative',
         },
       },
@@ -347,9 +333,11 @@ const routes = [
         path: ':id/account',
         name: 'account info',
         component: () => import('pages/AccountInfo'),
+        beforeEnter (to, from, next) {
+          return to.params.id === Cookies.get('user_id') ? next() : next('/401');
+        },
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: ['profiles:read', 'profiles:edit'],
         },
       },
     ],

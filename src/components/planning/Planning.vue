@@ -6,12 +6,16 @@
         <q-btn v-if="!isCustomerPlanning && isCoach" flat round :icon="displayAllSectors ? 'arrow_forward' : 'people'"
           @click="toggleAllSectors" :color="displayAllSectors ? 'primary' : ''" />
       </div>
-      <div class="col-xs-12 col-md-7 row planning-timeline">
-        <planning-navigation class="col-10" :timelineTitle="timelineTitle()" :targetDate="targetDate" :type="PLANNING"
-          @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
-          @goToWeek="goToWeek" />
-        <q-btn v-if="!isCustomerPlanning" class="planning-view" size="md" icon="playlist_play" flat round
-          @click="toggleHistory" :color="displayHistory ? 'primary' : ''" />
+      <div class="col-xs-12 col-md-7">
+        <div class="row full-width justify-between">
+          <div class="col-10">
+            <planning-navigation :timelineTitle="timelineTitle()" :targetDate="targetDate" :type="PLANNING"
+              @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
+              @goToWeek="goToWeek" />
+          </div>
+          <q-btn v-if="!isCustomerPlanning" class="planning-view" size="md" icon="playlist_play" flat round
+            @click="toggleHistory" :color="displayHistory ? 'primary' : ''" />
+        </div>
       </div>
     </div>
     <div class="planning-container full-width">
@@ -35,63 +39,55 @@
           </th>
         </thead>
         <tbody>
-          <template v-if="!isCustomerPlanning && filteredSectors.length > 0">
-            <tr v-for="sector in filteredSectors" :key="sector._id" class="to-assign person-row">
+          <template v-for="sectorId in Object.keys(personsGroupedBySector)">
+            <tr v-if="!isCustomerPlanning && getSector(sectorId)" :key="sectorId" class="to-assign person-row">
               <td valign="top">
                 <div class="person-inner-cell">
                   <div :class="[!staffingView && 'q-mb-md', 'chip-container']">
                     <img :src="UNKNOWN_AVATAR" class="avatar" >
                   </div>
-                  <div class="person-name overflow-hidden">{{ sector.label }}</div>
+                  <div class="person-name overflow-hidden">{{ getSector(sectorId).label }}</div>
                 </div>
               </td>
-              <td @drop="drop(day, sector)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
-                valign="top" @click="createEvent({ dayIndex, sectorId: sector._id })" class="planning-background">
-                <template v-for="hourIndex in 5">
-                  <div class="line" :style="{ left: `${(hourIndex * hourWidth * 2)}%` }"
-                    :key="`hour_${hourIndex}`" />
-                </template>
-                <template v-for="(event, eventIndex) in getCellEvents(sector, days[dayIndex])">
-                  <ni-planning-event-cell :event="event" :display-staffing-view="staffingView && !isCustomerPlanning"
-                    :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canEdit" :person-key="personKey" />
-                </template>
+              <td @drop="drop(day, getSector(sectorId))" @dragover.prevent v-for="(day, dayIndex) in days" valign="top"
+                :key="dayIndex" @click="createEvent({ dayIndex, sectorId })" class="planning-background">
+                <div v-for="hourIndex in 5" class="line" :style="{ left: `${(hourIndex * hourWidth * 2)}%` }"
+                  :key="`hour_${hourIndex}`" />
+                <ni-planning-event-cell v-for="(event, eventIndex) in getCellEvents(sectorId, days[dayIndex])"
+                  :event="event" :display-staffing-view="staffingView && !isCustomerPlanning" :person-key="personKey"
+                  :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canEdit" />
+              </td>
+            </tr>
+            <tr class="person-row" v-for="person in personsGroupedBySector[sectorId]" :key="person._id">
+              <td valign="top">
+                <div class="person-inner-cell">
+                  <div :class="[!staffingView && 'q-mb-md']">
+                    <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person"
+                      :events="getPersonEvents(person)" />
+                    <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)"
+                      :startOfWeekAsString="startOfWeek.toISOString()" :dm="distanceMatrix" />
+                  </div>
+                  <div class="person-name overflow-hidden-nowrap">
+                    <template v-if="isCustomerPlanning">{{ person.identity | formatIdentity('fL') }}</template>
+                    <template v-else>{{ person.identity | formatIdentity('Fl') }}</template>
+                  </div>
+                </div>
+              </td>
+              <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
+                valign="top" @click="createEvent({ dayIndex, person })" class="planning-background">
+                <div v-for="hourIndex in hours.length" class="line" :key="`hour_${hourIndex}`"
+                  :style="{ left: `${(hourIndex * hourWidth * 2)}%` }" />
+                <ni-planning-event-cell v-for="(event, eventIndex) in getCellEvents(person._id, days[dayIndex])"
+                  :event="event" :display-staffing-view="staffingView && !isCustomerPlanning" :person-key="personKey"
+                  :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canEdit" />
               </td>
             </tr>
           </template>
-          <tr class="person-row" v-for="(person, index) in persons" :key="index">
-            <td valign="top">
-              <div class="person-inner-cell">
-                <div :class="[!staffingView && 'q-mb-md']">
-                  <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person"
-                    :events="getPersonEvents(person)" />
-                  <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)"
-                    :startOfWeekAsString="startOfWeek.toISOString()" :dm="distanceMatrix" />
-                </div>
-                <div v-if="isCustomerPlanning" class="person-name overflow-hidden-nowrap">
-                  {{ person.identity | formatIdentity('fL') }}
-                </div>
-                <div v-else class="person-name overflow-hidden-nowrap">
-                  {{ person.identity | formatIdentity('Fl') }}
-                </div>
-              </div>
-            </td>
-            <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
-              valign="top" @click="createEvent({ dayIndex, person })" class="planning-background">
-              <template v-for="hourIndex in hours.length">
-                <div class="line" :style="{ left: `${(hourIndex * hourWidth * 2)}%` }"
-                  :key="`hour_${hourIndex}`" />
-              </template>
-              <template v-for="(event, eventIndex) in getCellEvents(person, days[dayIndex])">
-                <ni-planning-event-cell :event="event" :display-staffing-view="staffingView && !isCustomerPlanning"
-                  :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canEdit" :person-key="personKey" />
-              </template>
-            </td>
-          </tr>
         </tbody>
       </table>
     </div>
     <q-page-sticky expand position="right">
-      <ni-event-history-feed v-if="displayHistory" :eventHistories="eventHistories" :displayHistory.sync="displayHistory" />
+      <ni-event-history-feed v-if="displayHistory" :eventHistories="eventHistories" @toggleHistory="toggleHistory" />
     </q-page-sticky>
   </div>
 </template>
@@ -119,6 +115,7 @@ import { planningEventMixin } from '../../mixins/planningEventMixin';
 import PlanningNavigation from './PlanningNavigation.vue';
 import distanceMatrix from '../../api/DistanceMatrix';
 import { formatIdentity } from '../../helpers/utils';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'PlanningManager',
@@ -138,6 +135,7 @@ export default {
     personKey: { type: String, default: 'auxiliary' },
     canEdit: { type: Function, default: () => {} },
     displayAllSectors: { type: Boolean, default: false },
+    displayHistory: { type: Boolean, default: false },
     eventHistories: { type: Array, default: () => [] },
   },
   data () {
@@ -153,11 +151,10 @@ export default {
       distanceMatrix: [],
       hourWidth: 100 / 12,
       UNKNOWN_AVATAR,
-      displayHistory: false,
     }
   },
   beforeDestroy () {
-    if (!AUXILIARY_ROLES.includes(this.getUser.role.name)) {
+    if (!AUXILIARY_ROLES.includes(this.mainUser.role.name)) {
       if (!this.isCustomerPlanning) {
         this.$q.localStorage.set('lastSearchAuxiliaries', JSON.stringify(this.terms));
       } else {
@@ -170,35 +167,30 @@ export default {
     this.getTimelineHours();
     if (!this.isCustomerPlanning) await this.getDistanceMatrix();
   },
-  watch: {
-    // Initial filter getter
-    getFilter (val) {
-      if (val.length > 0) {
-        if (!AUXILIARY_ROLES.includes(this.getUser.role.name)) {
-          if (!this.isCustomerPlanning) this.addSavedTerms('Auxiliaries');
-          else this.addSavedTerms('Customers');
-        } else {
-          const userSector = this.getFilter.find(filter => filter.type === SECTOR && filter._id === this.getUser.sector);
-          if (userSector) this.$refs.refFilter.add(userSector.label);
-        }
-      }
-    },
-  },
   computed: {
-    getFilter () {
-      return this.$store.getters['planning/getFilter'];
-    },
-    getUser () {
-      return this.$store.getters['main/user'];
-    },
+    ...mapGetters({
+      mainUser: 'main/user',
+      filters: 'planning/getFilters',
+    }),
     isCoach () {
-      return [COACH, ADMIN].includes(this.getUser.role.name);
+      return [COACH, ADMIN].includes(this.mainUser.role.name);
+    },
+    personsGroupedBySector () {
+      return this.$_.groupBy(this.persons, 'sector._id');
     },
   },
   methods: {
     toggleAllSectors () {
-      this.$emit('update:displayAllSectors', !this.displayAllSectors);
+      this.$emit('toggleAllSectors', this.terms);
       this.terms = [];
+    },
+    getSector (sectorId) {
+      return this.filteredSectors.find(s => s._id === sectorId);
+    },
+    restoreFilter (terms) {
+      for (let term of terms) {
+        setTimeout(() => this.$refs.refFilter.add(term), 100);
+      }
     },
     getTimelineHours () {
       const range = this.$moment.range(this.$moment().hours(STAFFING_VIEW_START_HOUR).minutes(0), this.$moment().hours(STAFFING_VIEW_END_HOUR).minutes(0));
@@ -218,8 +210,8 @@ export default {
 
       return (!rowEvents || !rowEvents.events) ? [] : rowEvents.events;
     },
-    getCellEvents (cell, day) {
-      return this.getRowEvents(cell._id)
+    getCellEvents (cellId, day) {
+      return this.getRowEvents(cellId)
         .filter(event =>
           this.$moment(day).isBetween(event.startDate, event.endDate, 'day', '[]') &&
           (!this.staffingView || !event.isCancelled)
@@ -255,7 +247,7 @@ export default {
     // History
     toggleHistory () {
       if (this.persons.length === 0) return;
-      this.displayHistory = !this.displayHistory;
+      this.$emit('toggleHistory', !this.displayHistory);
     },
     // Drag & drop
     drag (event) {
@@ -306,14 +298,6 @@ export default {
     },
     editEvent (eventId) {
       this.$emit('editEvent', eventId);
-    },
-    addSavedTerms (endPath) {
-      if (this.$q.localStorage.has(`lastSearch${endPath}`) && this.$q.localStorage.get.item(`lastSearch${endPath}`).length > 0) {
-        const lastSearch = JSON.parse(this.$q.localStorage.get.item(`lastSearch${endPath}`));
-        for (let i = 0, l = lastSearch.length; i < l; i++) {
-          setTimeout(() => this.$refs.refFilter.add(lastSearch[i]), 1);
-        }
-      }
     },
   },
   filters: {
