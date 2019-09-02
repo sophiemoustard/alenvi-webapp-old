@@ -38,8 +38,6 @@
 
 <script>
 import DateRange from '../../../components/form/DateRange';
-// import { required, requiredIf } from 'vuelidate/lib/validators';
-// import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
 import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES, DAILY } from '../../../data/constants';
 import BillingPagination from '../../../components/table/BillingPagination';
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
