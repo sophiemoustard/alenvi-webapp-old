@@ -2,7 +2,7 @@
   <q-page class="neutral-background">
     <ni-planning-manager :events="events" :persons="customers" :personKey="personKey" :can-edit="canEditEvent"
       @updateStartOfWeek="updateStartOfWeek" @editEvent="openEditionModal" @createEvent="openCreationModal"
-      @onDrop="updateEventOnDrop"  />
+      @onDrop="updateEventOnDrop" ref="planningManager" />
 
     <!-- Event creation modal -->
     <q-modal v-if="Object.keys(newEvent).length !== 0" v-model="creationModal" content-classes="modal-container-md"
@@ -20,16 +20,16 @@
         </div>
         <ni-datetime-range caption="Dates et heures de l'intervention" v-model="newEvent.dates" required-field
           disable-end-date />
-        <ni-modal-select caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions"
+        <ni-select in-modal caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions"
           :error="$v.newEvent.auxiliary.$error" required-field @blur="$v.newEvent.auxiliary.$touch"
           @input="toggleServiceSelection(newEvent.customer)" />
-        <ni-modal-select caption="Service" v-model="newEvent.subscription" :error="$v.newEvent.subscription.$error"
+        <ni-select in-modal caption="Service" v-model="newEvent.subscription" :error="$v.newEvent.subscription.$error"
           :options="customerSubscriptionsOptions(newEvent.customer)" required-field
           @blur="$v.newEvent.subscription.$touch" />
-        <ni-modal-select caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency"
+        <ni-select in-modal caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency"
           :options="repetitionOptions" required-field @blur="$v.newEvent.repetition.frequency.$touch"
           :disable="!isRepetitionAllowed" />
-        <ni-modal-input v-model="newEvent.misc" caption="Notes" />
+        <ni-input in-modal v-model="newEvent.misc" caption="Notes" />
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary"
         @click="createEvent" :disable="disableCreationButton" icon-right="add" />
@@ -56,10 +56,10 @@
         </div>
         <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" disable-end-date
           :disable="isDisabled" />
-        <ni-modal-select caption="Auxiliaire" v-model="editedEvent.auxiliary" :options="auxiliariesOptions"
+        <ni-select in-modal caption="Auxiliaire" v-model="editedEvent.auxiliary" :options="auxiliariesOptions"
           :error="$v.editedEvent.sector.$error" required-field :disable="isDisabled"
           @blur="$v.editedEvent.sector.$touch" />
-        <ni-modal-select caption="Service" v-model="editedEvent.subscription" required-field :disable="isDisabled"
+        <ni-select in-modal caption="Service" v-model="editedEvent.subscription" required-field :disable="isDisabled"
           :options="customerSubscriptionsOptions(editedEvent.customer._id)"
           :error="$v.editedEvent.subscription.$error" @blur="$v.editedEvent.subscription.$touch" />
         <template v-if="isRepetition(editedEvent) && !isDisabled">
@@ -68,24 +68,24 @@
               @input="toggleRepetition" />
           </div>
         </template>
-        <ni-modal-input v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes"
+        <ni-input in-modal v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes"
           :disable="isDisabled" />
         <template v-if="!editedEvent.shouldUpdateRepetition && !isDisabled">
           <div class="row q-mb-md light-checkbox">
             <q-checkbox v-model="editedEvent.isCancelled" label="Annuler l'évènement" @input="toggleCancellationForm" />
           </div>
           <div class="row justify-between">
-            <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.condition" caption="Conditions"
+            <ni-select in-modal v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.condition" caption="Conditions"
               :options="cancellationConditions" required-field @blur="$v.editedEvent.cancel.condition.$touch"
               class="col-6 cancel" />
-            <ni-modal-select v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.reason" caption="Motif"
+            <ni-select in-modal v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.reason" caption="Motif"
               :options="cancellationReasons" required-field @blur="$v.editedEvent.cancel.reason.$touch"
               class="col-6 cancel" />
           </div>
         </template>
       </div>
       <div class="customer-info">
-        <div class="row items-center">
+        <div class="row items-center no-wrap">
         <div v-if="customerAddress" class="customer-address">{{ customerAddress }}</div>
           <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect" />
         </div>
@@ -97,13 +97,11 @@
 </template>
 
 <script>
-import { required, requiredIf } from 'vuelidate/lib/validators';
-import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
 import Planning from '../../../components/planning/Planning.vue';
 import { planningModalMixin } from '../../../mixins/planningModalMixin';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
-import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify.js';
-import { INTERVENTION, DEFAULT_AVATAR, NEVER, AUXILIARY, PLANNING_REFERENT, CUSTOMER_CONTRACT, COMPANY_CONTRACT, CUSTOMER, SECTOR } from '../../../data/constants';
+import { NotifyWarning, NotifyNegative } from '../../../components/popup/notify.js';
+import { INTERVENTION, DEFAULT_AVATAR, NEVER, AUXILIARY, PLANNING_REFERENT, CUSTOMER_CONTRACT, COMPANY_CONTRACT, CUSTOMER, SECTOR, AUXILIARY_ROLES } from '../../../data/constants';
 import { mapGetters, mapActions } from 'vuex';
 import { formatIdentity } from '../../../helpers/utils';
 
@@ -132,68 +130,36 @@ export default {
       editedEvent: {},
       editionModal: false,
       personKey: CUSTOMER,
+      sectorCustomers: [],
     };
   },
   async mounted () {
     try {
       await this.fillFilter(CUSTOMER);
       await this.getAuxiliaries();
+      this.initFilters();
     } catch (e) {
       console.error(e);
       NotifyNegative('Erreur lors de la récupération des personnes');
     }
   },
   watch: {
-    getElemAdded (val) {
-      this.handleElemAddedToFilter(val);
+    elementToAdd (val) {
+      this.addElementToFilter(val);
     },
-    getElemRemoved (val) {
-      this.handleElemRemovedFromFilter(val);
+    elementToRemove (val) {
+      this.removeElementFromFilter(val);
     },
     isRepetitionAllowed (value) {
       if (!value) this.newEvent.repetition.frequency = NEVER;
     },
   },
-  validations () {
-    return {
-      newEvent: {
-        type: { required },
-        dates: {
-          startDate: { required },
-          endDate: { required },
-        },
-        auxiliary: { required },
-        customer: { required },
-        subscription: { required },
-        address: { fullAddress: { frAddress } },
-        repetition: {
-          frequency: { required },
-        },
-      },
-      editedEvent: {
-        dates: {
-          startDate: { required },
-          endDate: { required },
-        },
-        sector: { required },
-        customer: { required },
-        subscription: { required },
-        address: { fullAddress: { frAddress } },
-        repetition: {
-          frequency: { required },
-        },
-        cancel: {
-          condition: { required: requiredIf((item, parent) => parent && parent.isCancelled) },
-          reason: { required: requiredIf((item, parent) => parent && parent.isCancelled) },
-        },
-      },
-    };
-  },
   computed: {
     ...mapGetters({
-      getFilter: 'planning/getFilter',
-      getElemAdded: 'planning/getElemAdded',
-      getElemRemoved: 'planning/getElemRemoved',
+      mainUser: 'main/user',
+      filters: 'planning/getFilters',
+      elementToAdd: 'planning/getElementToAdd',
+      elementToRemove: 'planning/getElementToRemove',
     }),
     endOfWeek () {
       return this.$moment(this.startOfWeekAsString).endOf('w');
@@ -293,19 +259,27 @@ export default {
 
       return customerContracts.some(contract => !contract.endDate && contract.versions.some(version => version.isActive));
     },
-    // Refresh data
+    // Filters
+    initFilters () {
+      if (!AUXILIARY_ROLES.includes(this.mainUser.role.name)) {
+        this.addSavedTerms('Customers');
+      } else {
+        const userSector = this.filters.find(filter => filter.type === SECTOR && filter._id === this.mainUser.sector);
+        if (userSector && this.$refs.planningManager) this.$refs.planningManager.restoreFilter([userSector.label]);
+      }
+    },
+    // Refresh
     async refreshCustomers () {
       this.customers = [];
-      let customersBySector = [];
       try {
-        customersBySector = await this.getCustomersBySectors(this.filteredSectors);
+        this.sectorCustomers = await this.getSectorCustomers(this.filteredSectors);
       } catch (e) {
-        customersBySector = []
+        this.sectorCustomers = []
       }
 
-      for (let i = 0, l = customersBySector.length; i < l; i++) {
-        if (!this.customers.some(cus => customersBySector[i]._id === cus._id)) {
-          this.customers.push(customersBySector[i]);
+      for (let i = 0, l = this.sectorCustomers.length; i < l; i++) {
+        if (!this.customers.some(cus => this.sectorCustomers[i]._id === cus._id)) {
+          this.customers.push(this.sectorCustomers[i]);
         }
       }
       if (this.filteredCustomers.length !== 0) {
@@ -357,61 +331,6 @@ export default {
       };
       this.creationModal = true;
     },
-    getPayload (event) {
-      const isEdition = !!event._id;
-      let payload = { ...this.$_.omit(event, ['dates', '__v']) };
-      payload = this.$_.pickBy(payload);
-
-      const customer = this.customers.find(cus => cus._id === event.customer);
-      if (customer) {
-        const subscription = customer.subscriptions.find(sub => sub._id === event.subscription);
-        if (subscription && subscription.service) payload.status = subscription.service.type;
-      }
-
-      if (event.auxiliary) {
-        const auxiliary = this.auxiliaries.find(aux => aux._id === event.auxiliary);
-        payload.sector = auxiliary.sector._id;
-      }
-
-      payload.startDate = this.$moment(event.dates.startDate).hours(event.dates.startHour.split(':')[0])
-        .minutes(event.dates.startHour.split(':')[1]).toISOString();
-      payload.endDate = this.$moment(event.dates.endDate).hours(event.dates.endHour.split(':')[0])
-        .minutes(event.dates.endHour.split(':')[1]).toISOString();
-
-      if (event.cancel && Object.keys(event.cancel).length === 0) delete payload.cancel;
-      if (event.cancel && Object.keys(event.cancel).length === 0) delete payload.attachment;
-      if (event.shouldUpdateRepetition) delete payload.misc;
-      if (isEdition) delete payload.repetition;
-
-      return payload;
-    },
-    async createEvent () {
-      try {
-        this.$v.newEvent.$touch();
-        if (this.$v.newEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        this.loading = true;
-        const payload = this.getPayload(this.newEvent);
-
-        const hasConflicts = await this.hasConflicts(payload);
-        if (hasConflicts) {
-          this.$v.editedEvent.$reset();
-          return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
-        }
-
-        await this.$events.create(payload);
-
-        await this.refresh();
-        this.creationModal = false;
-        NotifyPositive('Évènement créé');
-      } catch (e) {
-        console.error(e);
-        if (e.data && e.data.statusCode === 422) return NotifyNegative('La creation de cet evenement n\'est pas autorisée');
-        NotifyNegative('Erreur lors de la création de l\'évènement');
-      } finally {
-        this.loading = false
-      }
-    },
     // Event edition
     openEditionModal ({ eventId, rowId }) {
       const rowEvents = this.getRowEvents(rowId);
@@ -422,163 +341,42 @@ export default {
 
       this.editionModal = true;
     },
-    async updateEvent () {
-      try {
-        this.$v.editedEvent.$touch();
-        if (this.$v.editedEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        this.loading = true;
-        const payload = this.getPayload(this.editedEvent);
-
-        const hasConflicts = await this.hasConflicts(payload);
-        if (hasConflicts) {
-          this.loading = false;
-          this.$v.editedEvent.$reset();
-          return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
-        }
-
-        delete payload.customer;
-        delete payload.type;
-        delete payload._id
-        await this.$events.updateById(this.editedEvent._id, payload);
-        await this.refresh();
-
-        this.editionModal = false;
-        this.resetEditionForm();
-        NotifyPositive('Évènement modifié');
-      } catch (e) {
-        console.error(e);
-        if (e.data && e.data.statusCode === 422) return NotifyNegative('Cette modification n\'est pas autorisée');
-        NotifyNegative('Erreur lors de l\'édition de l\'évènement');
-      } finally {
-        this.loading = false;
-      }
-    },
-    async updateEventOnDrop (vEvent) {
-      try {
-        const { toDay, target, draggedObject } = vEvent;
-
-        if (target._id !== draggedObject.customer._id) return NotifyNegative('Impossible de modifier le bénéficiaire de l\'intervention');
-
-        const daysBetween = this.$moment(draggedObject.endDate).diff(this.$moment(draggedObject.startDate), 'days');
-        const payload = {
-          startDate: this.$moment(toDay).hours(this.$moment(draggedObject.startDate).hours())
-            .minutes(this.$moment(draggedObject.startDate).minutes()).toISOString(),
-          endDate: this.$moment(toDay).add(daysBetween, 'days').hours(this.$moment(draggedObject.endDate).hours())
-            .minutes(this.$moment(draggedObject.endDate).minutes()).toISOString(),
-          sector: draggedObject.sector,
-        };
-        if (draggedObject.auxiliary) payload.auxiliary = draggedObject.auxiliary._id;
-
-        const hasConflicts = await this.hasConflicts(payload);
-        if (hasConflicts) {
-          return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire');
-        }
-
-        await this.$events.updateById(draggedObject._id, payload);
-        await this.refresh();
-
-        NotifyPositive('Évènement modifié');
-      } catch (e) {
-        console.error(e);
-        if (e.data && e.data.statusCode === 422) return NotifyNegative('Cette modification n\'est pas autorisée');
-        NotifyNegative('Erreur lors de l\'édition de l\'évènement');
-      }
-    },
-    // Event deletion
-    async deleteEvent () {
-      try {
-        await this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Etes-vous sûr de vouloir supprimer cet évènement ?',
-          ok: 'OK',
-          cancel: 'Annuler',
-        });
-
-        this.loading = true
-        await this.$events.deleteById(this.editedEvent._id);
-        await this.refresh();
-
-        this.editionModal = false;
-        this.resetEditionForm();
-        NotifyPositive('Évènement supprimé.');
-      } catch (e) {
-        if (e.message === '') return NotifyPositive('Suppression annulée');
-        NotifyNegative('Erreur lors de la suppression de l\'événement.');
-      } finally {
-        this.loading = false
-      }
-    },
-    async deleteEventRepetition () {
-      try {
-        const shouldDeleteRepetition = await this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Supprimer l\'événement périodique',
-          ok: 'OK',
-          cancel: 'Annuler',
-          options: {
-            type: 'radio',
-            model: false,
-            items: [
-              { label: 'Supprimer uniquement cet évenement', value: false },
-              { label: 'Supprimer cet évenement et tous les suivants', value: true },
-            ],
-          },
-        });
-
-        this.loading = true
-        if (shouldDeleteRepetition) {
-          await this.$events.deleteRepetition(this.editedEvent._id);
-          await this.refresh();
-        } else {
-          await this.$events.deleteById(this.editedEvent._id);
-          await this.refresh();
-        }
-
-        this.editionModal = false;
-        this.resetEditionForm();
-        NotifyPositive('Évènement supprimé.');
-      } catch (e) {
-        if (e.message === '') return NotifyPositive('Suppression annulée');
-        NotifyNegative('Erreur lors de la suppression de l\'événement.');
-      } finally {
-        this.loading = false
-      }
-    },
-    async getCustomersBySectors (sectors) {
-      return sectors.length === 0 ? [] : this.$customers.showAllBySector({
+    async getSectorCustomers (sectors) {
+      return sectors.length === 0 ? [] : this.$customers.listBySector({
         startDate: this.$moment(this.startOfWeekAsString).toDate(),
         endDate: this.endOfWeek.toDate(),
         sector: JSON.stringify(sectors),
       });
     },
     // Filter
-    async handleElemAddedToFilter (el) {
+    async addElementToFilter (el) {
       if (el.type === SECTOR) {
         this.filteredSectors.push(el._id);
-        const customersBySector = await this.getCustomersBySectors(this.filteredSectors);
-        for (let i = 0, l = customersBySector.length; i < l; i++) {
-          if (!this.customers.some(cus => customersBySector[i]._id === cus._id)) {
-            this.customers.push(customersBySector[i]);
+        this.sectorCustomers = await this.getSectorCustomers(this.filteredSectors);
+        for (let i = 0, l = this.sectorCustomers.length; i < l; i++) {
+          if (!this.customers.some(cus => this.sectorCustomers[i]._id === cus._id)) {
+            this.customers.push(this.sectorCustomers[i]);
           }
         }
         await this.refresh();
       } else { // el = customer
+        if (!this.filteredCustomers.some(cust => cust._id === el._id)) this.filteredCustomers.push(el);
         if (!this.customers.some(cust => cust._id === el._id)) {
-          this.filteredCustomers.push(el);
           this.customers.push(el);
           await this.refresh();
         }
       }
     },
-    async handleElemRemovedFromFilter (el) {
+    async removeElementFromFilter (el) {
       if (el.type === SECTOR) {
         this.filteredSectors = this.filteredSectors.filter(sec => sec !== el._id);
         await this.refreshCustomers();
-        await await this.refresh();
+        await this.refresh();
       } else {
         this.filteredCustomers = this.filteredCustomers.filter(cus => cus._id !== el._id);
-        this.customers = this.customers.filter(customer => customer._id !== el._id);
+        if (!this.sectorCustomers.some(cus => cus._id === el._id)) {
+          this.customers = this.customers.filter(customer => customer._id !== el._id);
+        }
       }
     },
   },
@@ -590,9 +388,6 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables';
-
-  .q-layout-page
-    padding-top: 20px;
 
   .modal-subtitle
     justify-content: flex-end;

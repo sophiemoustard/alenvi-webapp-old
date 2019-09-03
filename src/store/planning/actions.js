@@ -11,7 +11,7 @@ export const fillFilter = async ({ commit }, roleToSearch) => {
   let elems = [];
   rawPromises.push(Sectors.showAll({ company: store.getters['main/user'].company._id }));
   if (roleToSearch === AUXILIARY) rawPromises.push(Users.showAll({ role: [AUXILIARY, PLANNING_REFERENT] }));
-  else rawPromises.push(Customers.showAll({ subscriptions: true }));
+  else rawPromises.push(Customers.listWithSubscriptions());
 
   const filterPromises = await Promise.all(rawPromises);
   const sectors = filterPromises[0];
@@ -30,5 +30,5 @@ export const fillFilter = async ({ commit }, roleToSearch) => {
     elems.push({ label: value, value: value, ...persons[i], type: PERSON });
   }
 
-  commit('setFilter', elems);
+  commit('setFilters', elems);
 }

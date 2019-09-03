@@ -1,8 +1,8 @@
 import SelectSector from '../components/form/SelectSector';
 import DatetimePicker from '../components/form/DatetimePicker.vue';
 import DatetimeRange from '../components/form/DatetimeRange.vue';
-import ModalSelect from '../components/form/ModalSelect';
-import ModalInput from '../components/form/ModalInput';
+import NiSelect from '../components/form/Select';
+import NiInput from '../components/form/Input';
 import SearchAddress from '../components/form/SearchAddress';
 import FileUploader from '../components/form/FileUploader';
 import { formatIdentity } from '../helpers/utils';
@@ -22,6 +22,7 @@ import {
   DAILY,
   HOURLY,
   ILLNESS,
+  WORK_ACCIDENT,
   CUSTOMER_CONTRACT,
   COMPANY_CONTRACT,
   ADMIN,
@@ -32,6 +33,7 @@ import {
   DEFAULT_AVATAR,
   CANCELLATION_OPTIONS,
   CANCELLATION_REASONS,
+  OTHER,
 } from '../data/constants';
 
 export const planningModalMixin = {
@@ -39,8 +41,8 @@ export const planningModalMixin = {
     'ni-select-sector': SelectSector,
     'ni-datetime-picker': DatetimePicker,
     'ni-search-address': SearchAddress,
-    'ni-modal-select': ModalSelect,
-    'ni-modal-input': ModalInput,
+    'ni-select': NiSelect,
+    'ni-input': NiInput,
     'ni-file-uploader': FileUploader,
     'ni-datetime-range': DatetimeRange,
   },
@@ -52,8 +54,11 @@ export const planningModalMixin = {
       INTERNAL_HOUR,
       NEVER,
       ILLNESS,
+      WORK_ACCIDENT,
+      UNJUSTIFIED,
       DAILY,
       HOURLY,
+      OTHER,
       absenceNatureOptions: ABSENCE_NATURES,
       cancellationConditions: CANCELLATION_OPTIONS,
       cancellationReasons: CANCELLATION_REASONS,
@@ -61,7 +66,7 @@ export const planningModalMixin = {
     };
   },
   computed: {
-    getUser () {
+    mainUser () {
       return this.$store.getters['main/user'];
     },
     absenceOptions () {
@@ -77,7 +82,9 @@ export const planningModalMixin = {
         case ABSENCE:
           if (this.newEvent.absenceNature === DAILY) {
             return !this.newEvent.auxiliary || !this.newEvent.absence || !this.newEvent.dates.startDate ||
-              !this.newEvent.dates.endDate || !this.newEvent.absenceNature;
+              !this.newEvent.dates.endDate || !this.newEvent.absenceNature ||
+              (this.newEvent.absence === OTHER && !this.newEvent.misc) ||
+              ([WORK_ACCIDENT, ILLNESS].includes(this.newEvent.absence) && !this.newEvent.attachment.link);
           }
 
           return !this.newEvent.auxiliary || !this.newEvent.absence || !this.newEvent.dates.startDate ||
@@ -100,7 +107,9 @@ export const planningModalMixin = {
         case ABSENCE:
           if (this.editedEvent.absenceNature === DAILY) {
             return !this.editedEvent.auxiliary || !this.editedEvent.absence || !this.editedEvent.dates.startDate ||
-              !this.editedEvent.dates.endDate || !this.editedEvent.absenceNature;
+              !this.editedEvent.dates.endDate || !this.editedEvent.absenceNature ||
+              (this.editedEvent.absence === OTHER && !this.editedEvent.misc) ||
+              ([WORK_ACCIDENT, ILLNESS].includes(this.editedEvent.absence) && !this.editedEvent.attachment.link);
           }
 
           return !this.editedEvent.auxiliary || !this.editedEvent.absence || !this.editedEvent.dates.startDate ||
@@ -186,7 +195,7 @@ export const planningModalMixin = {
       return this.$_.get(this.editedEvent, 'customer.contact.address.fullAddress', '');
     },
     customerProfileRedirect () {
-      return this.getUser.role.name === COACH || this.getUser.role.name === ADMIN
+      return this.mainUser.role.name === COACH || this.mainUser.role.name === ADMIN
         ? { name: 'customers profile', params: { id: this.editedEvent.customer._id } }
         : { name: 'profile customers info', params: { customerId: this.editedEvent.customer._id } };
     },

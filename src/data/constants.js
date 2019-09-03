@@ -23,6 +23,22 @@ export const SURCHARGES = {
   'custom': 'Personnalisée',
 };
 
+// CONTRACTS
+export const OTHER = 'other';
+export const END_CONTRACT_REASONS = [
+  { label: 'Rupture période d’essai employeur', value: 'employer_trial_period_termination' },
+  { label: 'Rupture période d’essai salarié', value: 'employee_trial_period_termination' },
+  { label: 'Démission', value: 'resignation' },
+  { label: 'Licenciement faute grave', value: 'serious_misconduct_layoff' },
+  { label: 'Licenciement faute lourde', value: 'gross_fault_layoff' },
+  { label: 'Licenciement autre motif', value: 'other_reason_layoff' },
+  { label: 'Mutation', value: 'mutation' },
+  { label: 'Rupture conventionnelle', value: 'contractual_termination' },
+  { label: 'Fin de stage', value: 'internship_end' },
+  { label: 'Fin de contrat CDD', value: 'cdd_end' },
+  { label: 'Autres', value: OTHER },
+];
+
 // EVENTS
 export const INTERVENTION = 'intervention';
 export const ABSENCE = 'absence';
@@ -31,9 +47,6 @@ export const INTERNAL_HOUR = 'internalHour';
 export const ILLNESS = 'illness';
 export const UNJUSTIFIED = 'unjustified absence';
 export const PAID_LEAVE = 'leave';
-export const WEDDING = 'wedding';
-export const BIRTH = 'birth';
-export const DEATH = 'death';
 export const WORK_ACCIDENT = 'work accident';
 export const ABSENCE_TYPES = [
   { label: 'Congé', value: PAID_LEAVE },
@@ -41,10 +54,8 @@ export const ABSENCE_TYPES = [
   { label: 'Congé maternité', value: 'maternity leave' },
   { label: 'Maladie', value: ILLNESS },
   { label: 'Absence injustifiée', value: UNJUSTIFIED },
-  { label: 'Mariage', value: WEDDING },
-  { label: 'Naissance', value: BIRTH },
-  { label: 'Décès', value: DEATH },
   { label: 'Accident du travail', value: WORK_ACCIDENT },
+  { label: 'Autre', value: OTHER },
 ];
 export const EDITION = 'edition';
 export const DELETION = 'deletion';
@@ -100,6 +111,7 @@ export const AUXILIARY = 'auxiliary';
 export const HELPER = 'helper';
 export const PLANNING_REFERENT = 'planningReferent';
 export const AUXILIARY_ROLES = [AUXILIARY, PLANNING_REFERENT];
+export const COACH_ROLES = [ADMIN, COACH];
 
 // PLANNING
 export const THREE_DAYS_VIEW = '3days';
@@ -134,22 +146,6 @@ export const TRANSPORT_OPTIONS = [
 ];
 export const TRANSIT = 'transit';
 export const DRIVING = 'driving';
-
-// CONTRACTS
-export const OTHER = 'other';
-export const END_CONTRACT_REASONS = [
-  { label: 'Rupture période d’essai employeur', value: 'employer_trial_period_termination' },
-  { label: 'Rupture période d’essai salarié', value: 'employee_trial_period_termination' },
-  { label: 'Démission', value: 'resignation' },
-  { label: 'Licenciement faute grave', value: 'serious_misconduct_layoff' },
-  { label: 'Licenciement faute lourde', value: 'gross_fault_layoff' },
-  { label: 'Licenciement autre motif', value: 'other_reason_layoff' },
-  { label: 'Mutation', value: 'mutation' },
-  { label: 'Rupture conventionnelle', value: 'contractual_termination' },
-  { label: 'Fin de stage', value: 'internship_end' },
-  { label: 'Fin de contrat CDD', value: 'cdd_end' },
-  { label: 'Autres', value: OTHER },
-];
 
 export const REQUIRED_LABEL = 'Champ requis';
 export const CUSTOMER_CONTRACT = 'contract_with_customer';
@@ -190,9 +186,6 @@ export const THIRD_PARTY_PAYER = 'ThirdPartyPayer';
 // PAY
 export const PAY = 'pay';
 
-// FINAL PAY
-export const FINAL_PAY = 'finalpay';
-
 // EXPORTS
 export const SERVICE = 'service';
 export const SUBSCRIPTION = 'subscription';
@@ -211,8 +204,7 @@ export const EXPORT_HISTORY_TYPES = [
   { label: 'Factures', value: BILL },
   { label: 'Paiements', value: PAYMENT },
   { label: 'Absences', value: ABSENCE },
-  { label: 'Paies', value: PAY },
-  { label: 'Soldes tout compte', value: FINAL_PAY },
+  { label: 'Paies et soldes tout compte', value: PAY },
 ];
 
 // ORIGINS
@@ -221,3 +213,12 @@ export const THIRD_PARTY = 'third_party';
 export const OGUST = 'ogust';
 
 export const WEEKS_PER_MONTH = (52 / 12);
+
+// PAY DOCUMENT NATURE
+export const PAYSLIP = 'payslip';
+export const CERTIFICATE = 'certificate';
+export const PAY_DOCUMENT_NATURES = [
+  { label: 'Bulletin de paie', value: PAYSLIP },
+  { label: 'Attestation', value: CERTIFICATE },
+  { label: 'Autre', value: OTHER },
+];

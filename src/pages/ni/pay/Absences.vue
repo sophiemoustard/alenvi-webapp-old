@@ -2,6 +2,7 @@
   <q-page class="neutral-background q-pb-xl">
     <div class="title-padding">
       <h4>Absences</h4>
+      <ni-date-range v-model="dates" @input="refresh" borderless :error.sync="datesHasError" />
     </div>
     <q-table :data="absences" :columns="columns" binary-state-sort :pagination.sync="pagination" class="q-pa-sm">
       <q-tr slot="body" slot-scope="props" :props="props">
@@ -36,19 +37,19 @@
 </template>
 
 <script>
-import { required, requiredIf } from 'vuelidate/lib/validators';
-import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
-import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES, HOURLY } from '../../../data/constants';
+import DateRange from '../../../components/form/DateRange';
+import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES, DAILY } from '../../../data/constants';
 import BillingPagination from '../../../components/table/BillingPagination';
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
-import { formatIdentity } from '../../../helpers/utils';
+import { formatIdentity, formatHours } from '../../../helpers/utils';
 import { NotifyWarning } from '../../../components/popup/notify';
 
 export default {
   name: 'Absences',
   metaInfo: { title: 'Absences' },
   components: {
+    'ni-date-range': DateRange,
     'ni-billing-pagination': BillingPagination,
     'ni-auxiliary-event-edition-modal': AuxiliaryEventEditionModal,
   },
@@ -58,6 +59,7 @@ export default {
       events: [],
       loading: false,
       absences: [],
+      auxiliaries: [],
       editedEvent: {},
       editionModal: false,
       selectedAuxiliary: { picture: {}, identity: { lastname: '' } },
@@ -70,19 +72,19 @@ export default {
         {
           name: 'auxiliary',
           label: 'Auxiliaire',
-          field: 'auxiliary',
-          format: value => formatIdentity(value.identity, 'FL'),
+          field: row => formatIdentity(row.auxiliary.identity, 'Fl'),
           align: 'left',
+          sortable: true,
         },
         {
           name: 'nature',
           label: 'Nature',
-          field: 'absenceNature',
-          format: value => {
-            const nature = ABSENCE_NATURES.find(abs => abs.value === value);
+          field: row => {
+            const nature = ABSENCE_NATURES.find(abs => abs.value === row.absenceNature);
             return nature ? nature.label : '';
           },
           align: 'left',
+          sortable: true,
         },
         {
           name: 'startDate',
@@ -90,6 +92,7 @@ export default {
           field: 'startDate',
           format: value => this.$moment(value).format('DD/MM/YYYY'),
           align: 'center',
+          sortable: true,
         },
         {
           name: 'startHour',
@@ -104,6 +107,7 @@ export default {
           field: 'endDate',
           format: value => this.$moment(value).format('DD/MM/YYYY'),
           align: 'center',
+          sortable: true,
         },
         {
           name: 'endHour',
@@ -113,14 +117,20 @@ export default {
           align: 'center',
         },
         {
+          name: 'duration',
+          label: 'Durée',
+          field: row => this.getAbsenceDuration(row),
+          align: 'center',
+        },
+        {
           name: 'type',
           label: 'Type',
-          field: 'absence',
-          format: value => {
-            const type = ABSENCE_TYPES.find(abs => abs.value === value);
+          field: row => {
+            const type = ABSENCE_TYPES.find(abs => abs.value === row.absence);
             return type ? type.label : '';
           },
           align: 'left',
+          sortable: true,
         },
         {
           name: 'attachment',
@@ -137,34 +147,39 @@ export default {
           label: '',
         },
       ],
-    };
-  },
-  validations () {
-    return {
-      editedEvent: {
-        dates: {
-          startDate: { required },
-          endDate: { required },
-          startHour: { required: requiredIf((item, parent) => parent && parent.absenceNature === HOURLY) },
-          endHour: { required: requiredIf((item, parent) => parent && parent.absenceNature === HOURLY) },
-        },
-        auxiliary: { required },
-        sector: { required },
-        absence: { required },
-        absenceNature: { required },
-        address: { fullAddress: { frAddress } },
+      dates: {
+        startDate: this.$moment().startOf('M').toISOString(),
+        endDate: this.$moment().endOf('M').toISOString(),
       },
+      datesHasError: false,
     };
   },
   async mounted () {
     await this.refresh();
   },
   methods: {
+    getAbsenceDuration (absence) {
+      if (absence.absenceNature === DAILY) {
+        const range = Array.from(this.$moment().range(absence.startDate, absence.endDate).by('days'));
+        let count = 0;
+        for (const day of range) {
+          if (day.startOf('d').isBusinessDay()) count += 1; // startOf('day') is necessery to check fr holidays in business day
+        }
+
+        return `${count}j`;
+      };
+
+      const duration = this.$moment(absence.endDate).diff(absence.startDate, 'm') / 60;
+      return formatHours(duration);
+    },
     async refresh () {
       try {
-        this.absences = await this.$events.list({ type: ABSENCE });
+        if (this.datesHasError) return;
+        this.absences = await this.$events.list({ type: ABSENCE, startDate: this.dates.startDate, endDate: this.dates.endDate });
+        this.auxiliaries = await this.$users.showAllActive();
       } catch (e) {
         this.absences = [];
+        this.auxiliaries = [];
         console.error(e);
       }
     },

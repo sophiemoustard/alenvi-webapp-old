@@ -1,5 +1,5 @@
 <template>
-  <div class="items-center row justify-center planning-navigation">
+  <div class="items-center row justify-around">
     <div class="planning-month col-7" @click="datimeModal = !datimeModal">
       <span class="capitalize">{{ timelineTitle }}</span>
       <q-icon name="arrow_drop_down" />
@@ -7,13 +7,13 @@
         <q-datetime-picker minimal @input="goToWeek" :value="targetDate" />
       </q-popover>
     </div>
-    <div class="row planning-actions col-5">
+    <div class="planning-actions col-5">
       <q-btn icon="chevron_left" flat round @click="goToPreviousWeek()"></q-btn>
       <q-btn icon="chevron_right" flat round @click="goToNextWeek()"></q-btn>
       <q-btn icon="today" flat round @click="goToToday"></q-btn>
       <template v-if="$q.platform.is.mobile && isAgenda">
-        <q-btn class="col-2 planning-view" sizs="sm" flat v-if="!isThreeDaysView" label="3J" @click="updateViewMode(THREE_DAYS_VIEW)" />
-        <q-btn class="col-2 planning-view" sizs="sm" flat v-else label="7J" @click="updateViewMode(WEEK_VIEW)" />
+        <q-btn class="planning-view" sizs="sm" flat v-if="!isThreeDaysView" label="3J" @click="updateViewMode(THREE_DAYS_VIEW)" />
+        <q-btn class="planning-view" sizs="sm" flat v-else label="7J" @click="updateViewMode(WEEK_VIEW)" />
       </template>
     </div>
   </div>
@@ -71,10 +71,6 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables';
-
-  .planning-navigation
-    display: flex
-    justify-content: space-around;
 
   .planning-history-button
     display: flex;

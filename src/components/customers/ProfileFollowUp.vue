@@ -21,8 +21,8 @@
 </template>
 
 <script>
-import Input from '../form/Input.vue';
-import Select from '../form/Select.vue';
+import Input from '../form/Input';
+import Select from '../form/Select';
 import pathologies from '../../data/pathologies';
 import { followUpMixin } from '../../mixins/followUpMixin.js';
 

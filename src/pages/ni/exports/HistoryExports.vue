@@ -29,7 +29,7 @@ export default {
     return {
       exportTypeOptions: EXPORT_HISTORY_TYPES,
       type: WORKING_EVENT,
-      dateRange: { startDate: this.$moment().subtract(1, 'year').toISOString(), endDate: this.$moment().toISOString() },
+      dateRange: { startDate: this.$moment().startOf('M').toISOString(), endDate: this.$moment().endOf('M').toISOString() },
       dateRangeHasError: false,
     }
   },

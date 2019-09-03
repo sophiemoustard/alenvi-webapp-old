@@ -31,7 +31,7 @@ Router.beforeEach(async (to, from, next) => {
         if (store.state.main.refreshState) {
           await store.dispatch('main/getUser', Cookies.get('user_id'));
         }
-        if (await checkPermission(to, store.getters['main/user'])) {
+        if (checkPermission(to, store.getters['main/user'])) {
           store.commit('main/changeRefreshState', false);
           next();
         } else {
@@ -44,7 +44,7 @@ Router.beforeEach(async (to, from, next) => {
       if (store.state.main.refreshState) {
         await store.dispatch('main/getUser', Cookies.get('user_id'));
       }
-      if (await checkPermission(to, store.getters['main/user'])) {
+      if (checkPermission(to, store.getters['main/user'])) {
         store.commit('main/changeRefreshState', false);
         next();
       } else {

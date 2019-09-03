@@ -49,13 +49,14 @@ export default {
         {
           name: 'name',
           label: 'Nom',
-          field: 'name',
+          field: 'identity',
+          format: value => value ? value.fullName : '',
           align: 'left',
           sortable: true,
           sort: (a, b) => {
-            const aArr = a.split(' ');
-            const bArr = b.split(' ');
-            return aArr[aArr.length - 1].toLowerCase() < bArr[bArr.length - 1].toLowerCase() ? -1 : 1
+            const aLastname = a.lastname;
+            const bLastname = b.lastname;
+            return aLastname.toLowerCase() < bLastname.toLowerCase() ? -1 : 1
           },
         },
       ],
@@ -69,15 +70,18 @@ export default {
       return this.$store.getters['main/user'];
     },
     filteredUsers () {
-      return this.customersList.filter(customer => customer.name.match(new RegExp(this.searchStr, 'i')));
+      return this.customersList.filter(customer => customer.identity.fullName.match(new RegExp(this.searchStr, 'i')));
     },
   },
   methods: {
     async getCustomersList () {
       try {
         this.tableLoading = true;
-        const customers = await this.$customers.showAll();
-        this.customersList = customers.map(customer => ({ name: formatIdentity(customer.identity, 'FL'), customerId: customer._id }));
+        const customers = await this.$customers.list();
+        this.customersList = customers.map(customer => ({
+          identity: { ...customer.identity, fullName: formatIdentity(customer.identity, 'FL') },
+          customerId: customer._id,
+        }));
         this.tableLoading = false;
       } catch (e) {
         this.tableLoading = false;

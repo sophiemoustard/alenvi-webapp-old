@@ -1,5 +1,5 @@
 export default {
-  filter: [],
-  elemAdded: '',
-  elemRemoved: '',
+  filters: [],
+  elementToAdd: '',
+  elementToRemove: '',
 };
