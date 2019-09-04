@@ -14,7 +14,9 @@ export default ({ app, router, Vue }) => {
     holidayFormat: 'YYYY-MM-DD HH:mm:ss',
     workingWeekdays: [1, 2, 3, 4, 5, 6],
   });
-  moment.tz.setDefault('Europe/Paris');
+
+  // Destroys performance. Do we even need it?
+  // moment.tz.setDefault('Europe/Paris');
 
   Vue.prototype.$moment = momentRange;
 }
