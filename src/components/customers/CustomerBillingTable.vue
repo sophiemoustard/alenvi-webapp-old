@@ -45,7 +45,7 @@
           <div v-else>{{ col.value }}</div>
         </template>
         <template v-else-if="col.name === 'actions'">
-          <q-btn v-if="displayActions && paymentTypes.includes(props.row.type)" flat small color="grey" icon="edit"
+          <q-btn v-if="displayActions && paymentTypes.includes(props.row.type)" flat dense color="grey" icon="edit"
             @click="openEditionModal(props.row)" />
         </template>
         <template v-else>{{ col.value }}</template>
