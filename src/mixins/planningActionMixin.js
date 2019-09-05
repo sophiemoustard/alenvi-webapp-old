@@ -334,7 +334,7 @@ export const planningActionMixin = {
           user: this.$store.getters['main/user'],
           auxiliarySectorEvent: event.sector,
           permissions: [
-            { name: 'planning:edit:user', rule: 'isInSameSector' },
+            { name: 'events:edit', rule: 'isInSameSector' },
           ],
         });
       }
@@ -344,8 +344,8 @@ export const planningActionMixin = {
         auxiliaryIdEvent: event.auxiliary._id,
         auxiliarySectorEvent: event.sector,
         permissions: [
-          { name: 'planning:edit:user', rule: 'isInSameSector' },
-          { name: 'planning:edit', rule: 'isOwner' },
+          { name: 'events:edit', rule: 'isInSameSector' },
+          { rule: 'isOwner' },
         ],
       });
     },
