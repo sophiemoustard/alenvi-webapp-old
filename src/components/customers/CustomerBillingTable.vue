@@ -14,10 +14,10 @@
           <template v-if="props.row.type === BILL">
             <div :class="{'download': canDownloadBill(props.row)}">
               <a v-if="props.row.driveFile && props.row.driveFile.link" :href="props.row.driveFile.link" target="_blank">
-                Facture {{ props.row.billNumber || 'tiers' }}
+                Facture {{ props.row.number || 'tiers' }}
               </a>
               <div v-else @click="downloadBillPdf(props.row)">
-                Facture {{ props.row.billNumber || 'tiers' }}
+                Facture {{ props.row.number || 'tiers' }}
               </div>
             </div>
           </template>
@@ -169,7 +169,7 @@ export default {
         if (!this.canDownloadBill(bill)) return;
 
         const pdf = await this.$bills.getPDF(bill._id);
-        await downloadPdf(pdf, `${bill.billNumber}.pdf`);
+        await downloadPdf(pdf, `${bill.number}.pdf`);
 
         NotifyPositive('Facture téléchargée');
       } catch (e) {
@@ -178,7 +178,7 @@ export default {
       }
     },
     canDownloadBill (bill) {
-      return (bill.billNumber && bill.origin === COMPANI) || (bill.driveFile && bill.driveFile.link);
+      return (bill.number && bill.origin === COMPANI) || (bill.driveFile && bill.driveFile.link);
     },
     canDownloadCreditNote (creditNote) {
       return (creditNote.number && creditNote.origin === COMPANI) || (creditNote.driveFile && creditNote.driveFile.link);
