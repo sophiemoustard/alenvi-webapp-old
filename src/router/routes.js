@@ -302,7 +302,6 @@ const routes = [
         component: () => import('pages/customers/CustomerAgenda'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: 'events:read',
         },
       },
       {
