@@ -202,7 +202,7 @@ export const EXPORT_TYPES = [
 export const EXPORT_HISTORY_TYPES = [
   { label: 'Interventions et heures internes', value: WORKING_EVENT },
   { label: 'Factures', value: BILL },
-  { label: 'Paiements', value: PAYMENT },
+  { label: 'Paiements et remboursements', value: PAYMENT },
   { label: 'Absences', value: ABSENCE },
   { label: 'Paies et soldes tout compte', value: PAY },
 ];
