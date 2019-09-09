@@ -223,26 +223,6 @@ export default {
       if (this.filteredSectors.length !== 0 || this.filteredCustomers.length !== 0) await this.refreshCustomers();
       if (this.customers.length !== 0) await this.refresh();
     },
-    hasCustomerContractOnEvent (auxiliary, selectedDay) {
-      if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
-      if (!auxiliary.contracts.some(contract => contract.status === CUSTOMER_CONTRACT)) return false;
-      const customerContracts = auxiliary.contracts.filter(contract => contract.status === CUSTOMER_CONTRACT);
-
-      return customerContracts.some(contract => {
-        return this.$moment(contract.startDate).isSameOrBefore(selectedDay) &&
-          (!contract.endDate || this.$moment(contract.endDate).isAfter(selectedDay));
-      });
-    },
-    hasCompanyContractOnEvent (auxiliary, selectedDay) {
-      if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
-      if (!auxiliary.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
-      const companyContracts = auxiliary.contracts.filter(contract => contract.status === COMPANY_CONTRACT);
-
-      return companyContracts.some(contract => {
-        return this.$moment(contract.startDate).isSameOrBefore(selectedDay) &&
-          (!contract.endDate || this.$moment(contract.endDate).isAfter(selectedDay));
-      });
-    },
     isCompanyContractValidForRepetition (aux) {
       if (!aux.contracts.length === 0) return false;
       if (!aux.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
