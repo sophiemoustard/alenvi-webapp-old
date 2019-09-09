@@ -1,8 +1,8 @@
 <template>
-  <div :class="[{ 'highlight': hasActiveCompanyContractOnEvent },  'full-width', 'row', 'relative-position', 'chip-container']"
+  <div :class="[{ 'highlight': hasCompanyContractOnEvent },  'full-width', 'row', 'relative-position', 'chip-container']"
     @click="openIndicatorsModal">
     <img :src="getAvatar(person.picture)" class="avatar">
-    <q-chip v-if="hasActiveCompanyContractOnEvent" :class="['absolute-center', { 'busy': isBusy }]" small text-color="white">
+    <q-chip v-if="hasCompanyContractOnEvent" :class="['absolute-center', { 'busy': isBusy }]" small text-color="white">
       <q-spinner-dots v-if="loading" />
       <span v-else class="chip-indicator">{{ ratio.weeklyHours }}h / {{ ratio.contractHours }}</span>
     </q-chip>
@@ -110,16 +110,16 @@ export default {
     selectedEvents () {
       return this.selectedTab === WEEK_STATS ? this.events : this.monthEvents;
     },
-    hasActiveCompanyContractOnEvent () {
+    hasCompanyContractOnEvent () {
       if (!this.person.contracts || this.person.contracts.length === 0) return false;
       if (!this.person.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
       const companyContracts = this.person.contracts.filter(contract => contract.status === COMPANY_CONTRACT);
 
       return companyContracts.some(contract => {
         return (this.$moment(contract.startDate).isSameOrBefore(this.endOfWeek) &&
-          ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(this.endOfWeek))) ||
+          (!contract.endDate || this.$moment(contract.endDate).isAfter(this.endOfWeek))) ||
           (this.$moment(contract.startDate).isSameOrBefore(this.startOfWeekAsString) &&
-          ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(this.startOfWeekAsString)));
+          (!contract.endDate || this.$moment(contract.endDate).isAfter(this.startOfWeekAsString)));
       });
     },
     companyContracts () {
@@ -127,17 +127,17 @@ export default {
     },
   },
   async mounted () {
-    if (!this.hasActiveCompanyContractOnEvent) return;
+    if (!this.hasCompanyContractOnEvent) return;
     await this.getRatio();
     this.distanceMatrix = this.$_.cloneDeep(this.dm);
   },
   watch: {
     async selectedEvents () {
-      if (!this.hasActiveCompanyContractOnEvent) return;
+      if (!this.hasCompanyContractOnEvent) return;
       await this.computeIndicators();
     },
     async events () {
-      if (!this.hasActiveCompanyContractOnEvent) return;
+      if (!this.hasCompanyContractOnEvent) return;
       this.selectedTab = WEEK_STATS;
       await this.getRatio();
     },
@@ -164,7 +164,7 @@ export default {
       }
     },
     async openIndicatorsModal () {
-      if (!this.hasActiveCompanyContractOnEvent) return;
+      if (!this.hasCompanyContractOnEvent) return;
       try {
         this.monthEvents = await this.$events.list({
           startDate: this.$moment(this.startOfWeekAsString).startOf('month').toDate(),

@@ -70,7 +70,7 @@
           v-model="newContractVersion.grossHourlyRate" type="number" suffix="€" required-field
           @blur="$v.newContractVersion.grossHourlyRate.$touch" />
         <ni-datetime-picker caption="Date d'effet" :error="$v.newContractVersion.startDate.$error" v-model="newContractVersion.startDate"
-          :min="getMinimalStartDate(selectedContract)" in-modal required-field />
+          :min="newVersionMinStartDate" in-modal required-field />
         <div class="row margin-input last">
           <div class="col-12">
             <q-checkbox v-model="shouldBeSigned" label="Signature en ligne" />
@@ -95,7 +95,7 @@
         </div>
         <ni-datetime-picker caption="Date de notification" v-model="endContract.endNotificationDate" in-modal
           required-field @blur="$v.endContract.endNotificationDate.$touch" :error="$v.endContract.endNotificationDate.$error" />
-        <ni-datetime-picker caption="Date de fin de contrat" v-model="endContract.endDate" :min="minEndContractDate"
+        <ni-datetime-picker caption="Date de fin de contrat" v-model="endContract.endDate" :min="contractMinEndDate"
           in-modal required-field @blur="$v.endContract.endDate.$touch" :error="$v.endContract.endDate.$error" />
         <ni-select in-modal caption="Motif" :options="endContractReasons" v-model="endContract.endReason" required-field
           @blur="$v.endContract.endReason.$touch" :error="$v.endContract.endReason.$error" @input="resetOtherMisc" />
@@ -147,7 +147,7 @@ export default {
       COACH,
       endContractReasons: END_CONTRACT_REASONS,
       contracts: [],
-      selectedContract: {},
+      selectedContract: { versions: [] },
       newContract: {
         status: '',
         customer: '',
@@ -163,7 +163,7 @@ export default {
       CUSTOMER_CONTRACT,
       COMPANY_CONTRACT,
       customers: [],
-      contractVisibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractEmpty', 'contractSigned', 'isActive'],
+      contractVisibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractEmpty', 'contractSigned'],
     }
   },
   validations () {
@@ -211,24 +211,23 @@ export default {
       }
       return false;
     },
-    hasActiveContract () {
+    hasCompanyContract () {
       if (this.contracts.length === 0) return false;
       for (let i = 0; i < this.contracts.length; i++) {
-        const activeVersion = this.contracts[i].versions.find(version => version.isActive);
-        if (this.contracts[i].status === COMPANY_CONTRACT && activeVersion) return true;
+        if (this.contracts[i].status === COMPANY_CONTRACT && !this.contracts[i].endDate) return true;
       }
 
       return false;
     },
     statusOptions () {
-      if (!this.hasActiveContract) return CONTRACT_STATUS_OPTIONS;
+      if (!this.hasCompanyContract) return CONTRACT_STATUS_OPTIONS;
 
       return CONTRACT_STATUS_OPTIONS.filter(option => option.value === CUSTOMER_CONTRACT);
     },
-    minEndContractDate () {
+    contractMinEndDate () {
       if (this.endContractModal) {
-        const activeVersion = this.getActiveVersion(this.endContract.contract);
-        return this.$moment(activeVersion.startDate).add(1, 'day').toISOString();
+        const lastVersion = this.endContract.contract.versions[this.endContract.contract.versions.length - 1];
+        return this.$moment(lastVersion.startDate).add(1, 'day').toISOString();
       }
       return '';
     },
@@ -247,16 +246,16 @@ export default {
         redirectDecline: `${process.env.COMPANI_HOSTNAME}/docsigned?signed=false`,
       }
     },
+    newVersionMinStartDate () {
+      const lastVersion = this.selectedContract.versions[this.selectedContract.versions.length - 1];
+      return lastVersion ? this.$moment(lastVersion.startDate).toISOString() : '';
+    },
   },
   async mounted () {
     await this.refreshContracts();
     await this.getCustomersWithCustomerContractSubscriptions();
   },
   methods: {
-    getMinimalStartDate (contract) {
-      const activeVersion = this.getActiveVersion(contract);
-      return activeVersion ? this.$moment(activeVersion.startDate).toISOString() : '';
-    },
     async getCustomersWithCustomerContractSubscriptions () {
       try {
         this.customers = await this.$customers.listWithCustomerContractSubscriptions();

@@ -134,7 +134,7 @@ export const planningModalMixin = {
         return EVENT_TYPES.filter(type => type.value === INTERVENTION);
       }
 
-      if (this.selectedAuxiliary && !this.selectedAuxiliary.hasActiveCompanyContractOnEvent) {
+      if (this.selectedAuxiliary && !this.selectedAuxiliary.hasCompanyContractOnEvent) {
         return EVENT_TYPES.filter(type => type.value !== INTERNAL_HOUR);
       }
 
@@ -158,7 +158,7 @@ export const planningModalMixin = {
       if (!this.selectedAuxiliary.contracts) return [];
 
       let customers = this.customers;
-      if (this.selectedAuxiliary && !this.selectedAuxiliary.hasActiveCompanyContractOnEvent) {
+      if (this.selectedAuxiliary && !this.selectedAuxiliary.hasCompanyContractOnEvent) {
         const auxiliaryCustomers = [];
         for (const contract of this.selectedAuxiliary.contracts) {
           if (contract.customer && !auxiliaryCustomers.includes(contract.customer)) auxiliaryCustomers.push(contract.customer);
@@ -220,8 +220,8 @@ export const planningModalMixin = {
 
       let subscriptions = selectedCustomer.subscriptions;
       if (this.selectedAuxiliary._id) {
-        if (!this.selectedAuxiliary.hasActiveCustomerContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== CUSTOMER_CONTRACT);
-        if (!this.selectedAuxiliary.hasActiveCompanyContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== COMPANY_CONTRACT);
+        if (!this.selectedAuxiliary.hasCustomerContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== CUSTOMER_CONTRACT);
+        if (!this.selectedAuxiliary.hasCompanyContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== COMPANY_CONTRACT);
       }
 
       return subscriptions.map(sub => ({
