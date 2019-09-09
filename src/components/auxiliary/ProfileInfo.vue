@@ -2,7 +2,7 @@
   <div v-if="isLoaded">
     <div v-if="!isAuxiliary" class="row gutter-profile q-mb-xl">
       <div class="col-xs-12 col-md-6">
-        <p class="input-caption">Communauté</p>
+        <p class="input-caption">Équipe</p>
         <ni-select-sector v-model="user.sector" @blur="updateUser('sector')" @focus="saveTmp('sector')"
           :company-id="mainUser.company._id" />
       </div>
