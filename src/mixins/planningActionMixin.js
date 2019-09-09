@@ -96,7 +96,7 @@ export const planningActionMixin = {
         this.internalHours = user.company.rhConfig.internalHours;
       }
     },
-    hasActiveCustomerContractOnEvent (auxiliary, startDate, endDate = startDate) {
+    hasCustomerContractOnEvent (auxiliary, startDate, endDate = startDate) {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
       if (!auxiliary.contracts.some(contract => contract.status === CUSTOMER_CONTRACT)) return false;
 
@@ -104,10 +104,10 @@ export const planningActionMixin = {
 
       return customerContracts.some(contract => {
         return this.$moment(contract.startDate).isSameOrBefore(endDate) &&
-          ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isSameOrAfter(startDate));
+          (!contract.endDate || this.$moment(contract.endDate).isSameOrAfter(startDate));
       });
     },
-    hasActiveCompanyContractOnEvent (auxiliary, startDate, endDate = startDate) {
+    hasCompanyContractOnEvent (auxiliary, startDate, endDate = startDate) {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
       if (!auxiliary.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
 
@@ -115,7 +115,7 @@ export const planningActionMixin = {
 
       return companyContracts.some(contract => {
         return this.$moment(contract.startDate).isSameOrBefore(endDate) &&
-          ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(startDate));
+          (!contract.endDate || this.$moment(contract.endDate).isAfter(startDate));
       });
     },
     getRowEvents (rowId) {
@@ -125,10 +125,10 @@ export const planningActionMixin = {
     },
     // Event creation
     canCreateEvent (person, selectedDay) {
-      const hasActiveCustomerContractOnEvent = this.hasActiveCustomerContractOnEvent(person, selectedDay);
-      const hasActiveCompanyContractOnEvent = this.hasActiveCompanyContractOnEvent(person, selectedDay);
+      const hasCustomerContractOnEvent = this.hasCustomerContractOnEvent(person, selectedDay);
+      const hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(person, selectedDay);
 
-      return hasActiveCustomerContractOnEvent || hasActiveCompanyContractOnEvent;
+      return hasCustomerContractOnEvent || hasCompanyContractOnEvent;
     },
     resetCreationForm ({ partialReset, type = INTERVENTION }) {
       this.$v.newEvent.$reset();

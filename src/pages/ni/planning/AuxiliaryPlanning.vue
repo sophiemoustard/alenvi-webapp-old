@@ -93,23 +93,23 @@ export default {
     selectedAuxiliary () {
       if (this.creationModal && this.newEvent.auxiliary) {
         const aux = this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
-        const hasActiveCustomerContractOnEvent = this.hasActiveCustomerContractOnEvent(aux, this.newEvent.dates.startDate);
-        const hasActiveCompanyContractOnEvent = this.hasActiveCompanyContractOnEvent(aux, this.newEvent.dates.startDate);
+        const hasCustomerContractOnEvent = this.hasCustomerContractOnEvent(aux, this.newEvent.dates.startDate);
+        const hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(aux, this.newEvent.dates.startDate);
 
-        return { ...aux, hasActiveCustomerContractOnEvent, hasActiveCompanyContractOnEvent };
+        return { ...aux, hasCustomerContractOnEvent, hasCompanyContractOnEvent };
       }
       if (this.editionModal && this.editedEvent.auxiliary) {
         const aux = this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
-        const hasActiveCustomerContractOnEvent = this.hasActiveCustomerContractOnEvent(aux, this.editedEvent.dates.startDate);
-        const hasActiveCompanyContractOnEvent = this.hasActiveCompanyContractOnEvent(aux, this.editedEvent.dates.startDate);
+        const hasCustomerContractOnEvent = this.hasCustomerContractOnEvent(aux, this.editedEvent.dates.startDate);
+        const hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(aux, this.editedEvent.dates.startDate);
 
-        return { ...aux, hasActiveCustomerContractOnEvent, hasActiveCompanyContractOnEvent };
+        return { ...aux, hasCustomerContractOnEvent, hasCompanyContractOnEvent };
       }
       return { picture: {}, identity: { lastname: '' } };
     },
     activeAuxiliaries () {
-      return this.auxiliaries.filter(aux => this.hasActiveCustomerContractOnEvent(aux, this.$moment(this.startOfWeekAsString), this.endOfWeek) ||
-        this.hasActiveCompanyContractOnEvent(aux, this.$moment(this.startOfWeekAsString), this.endOfWeek));
+      return this.auxiliaries.filter(aux => this.hasCustomerContractOnEvent(aux, this.$moment(this.startOfWeekAsString), this.endOfWeek) ||
+        this.hasCompanyContractOnEvent(aux, this.$moment(this.startOfWeekAsString), this.endOfWeek));
     },
     endOfWeek () {
       return this.$moment(this.startOfWeekAsString).endOf('w');

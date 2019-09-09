@@ -175,19 +175,19 @@ export default {
     selectedAuxiliary () {
       if (this.creationModal && this.newEvent.auxiliary) {
         const aux = this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
-        const hasActiveCustomerContractOnEvent = this.hasActiveCustomerContractOnEvent(aux, this.newEvent.dates.startDate);
-        const hasActiveCompanyContractOnEvent = this.hasActiveCompanyContractOnEvent(aux, this.newEvent.dates.startDate);
+        const hasCustomerContractOnEvent = this.hasCustomerContractOnEvent(aux, this.newEvent.dates.startDate);
+        const hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(aux, this.newEvent.dates.startDate);
         const isCustomerContractValidForRepetition = this.isCustomerContractValidForRepetition(aux);
         const isCompanyContractValidForRepetition = this.isCompanyContractValidForRepetition(aux);
 
-        return { ...aux, hasActiveCustomerContractOnEvent, hasActiveCompanyContractOnEvent, isCustomerContractValidForRepetition, isCompanyContractValidForRepetition };
+        return { ...aux, hasCustomerContractOnEvent, hasCompanyContractOnEvent, isCustomerContractValidForRepetition, isCompanyContractValidForRepetition };
       }
       if (this.editionModal && this.editedEvent.auxiliary) {
         const aux = this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
-        const hasActiveCustomerContractOnEvent = this.hasActiveCustomerContractOnEvent(aux, this.editedEvent.dates.startDate);
-        const hasActiveCompanyContractOnEvent = this.hasActiveCompanyContractOnEvent(aux, this.editedEvent.dates.startDate);
+        const hasCustomerContractOnEvent = this.hasCustomerContractOnEvent(aux, this.editedEvent.dates.startDate);
+        const hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(aux, this.editedEvent.dates.startDate);
 
-        return { ...aux, hasActiveCustomerContractOnEvent, hasActiveCompanyContractOnEvent };
+        return { ...aux, hasCustomerContractOnEvent, hasCompanyContractOnEvent };
       }
       return { picture: {}, identity: { lastname: '' } };
     },
@@ -206,7 +206,7 @@ export default {
       return true;
     },
     activeAuxiliaries () {
-      return this.auxiliaries.filter(aux => this.hasActiveCompanyContractOnEvent(aux, this.days[0]) || this.hasActiveCustomerContractOnEvent(aux, this.days[0]));
+      return this.auxiliaries.filter(aux => this.hasCompanyContractOnEvent(aux, this.days[0]) || this.hasCustomerContractOnEvent(aux, this.days[0]));
     },
   },
   methods: {
@@ -223,24 +223,24 @@ export default {
       if (this.filteredSectors.length !== 0 || this.filteredCustomers.length !== 0) await this.refreshCustomers();
       if (this.customers.length !== 0) await this.refresh();
     },
-    hasActiveCustomerContractOnEvent (auxiliary, selectedDay) {
+    hasCustomerContractOnEvent (auxiliary, selectedDay) {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
       if (!auxiliary.contracts.some(contract => contract.status === CUSTOMER_CONTRACT)) return false;
       const customerContracts = auxiliary.contracts.filter(contract => contract.status === CUSTOMER_CONTRACT);
 
       return customerContracts.some(contract => {
         return this.$moment(contract.startDate).isSameOrBefore(selectedDay) &&
-          ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(selectedDay));
+          (!contract.endDate || this.$moment(contract.endDate).isAfter(selectedDay));
       });
     },
-    hasActiveCompanyContractOnEvent (auxiliary, selectedDay) {
+    hasCompanyContractOnEvent (auxiliary, selectedDay) {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
       if (!auxiliary.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
       const companyContracts = auxiliary.contracts.filter(contract => contract.status === COMPANY_CONTRACT);
 
       return companyContracts.some(contract => {
         return this.$moment(contract.startDate).isSameOrBefore(selectedDay) &&
-          ((!contract.endDate && contract.versions.some(version => version.isActive)) || this.$moment(contract.endDate).isAfter(selectedDay));
+          (!contract.endDate || this.$moment(contract.endDate).isAfter(selectedDay));
       });
     },
     isCompanyContractValidForRepetition (aux) {
@@ -249,7 +249,7 @@ export default {
       const companyContracts = aux.contracts.filter(ctr => ctr.status === COMPANY_CONTRACT);
       if (companyContracts.length === 0) return false;
 
-      return companyContracts.some(contract => !contract.endDate && contract.versions.some(version => version.isActive));
+      return companyContracts.some(contract => !contract.endDate);
     },
     isCustomerContractValidForRepetition (aux) {
       if (aux.contracts.length === 0) return false;
@@ -257,7 +257,7 @@ export default {
       const customerContracts = aux.contracts.filter(ctr => ctr.customer === this.newEvent.customer);
       if (customerContracts.length === 0) return false;
 
-      return customerContracts.some(contract => !contract.endDate && contract.versions.some(version => version.isActive));
+      return customerContracts.some(contract => !contract.endDate);
     },
     // Filters
     initFilters () {

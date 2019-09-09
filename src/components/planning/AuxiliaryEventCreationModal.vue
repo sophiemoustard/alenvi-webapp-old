@@ -115,7 +115,7 @@ export default {
       const companyContracts = this.selectedAuxiliary.contracts.filter(contract => contract.status === COMPANY_CONTRACT);
       if (!companyContracts || companyContracts.length === 0) return false;
 
-      return companyContracts.some(contract => !contract.endDate && contract.versions.some(version => version.isActive));
+      return companyContracts.some(contract => !contract.endDate);
     },
     isCustomerContractValidForRepetition () {
       if (!this.selectedAuxiliary.contracts || this.selectedAuxiliary.contracts.length === 0) return false;
@@ -123,7 +123,7 @@ export default {
       const correspContracts = this.selectedAuxiliary.contracts.find(ctr => ctr.customer === this.newEvent.customer);
       if (!correspContracts) return false;
 
-      return correspContracts.some(contract => !contract.endDate && contract.versions.some(version => version.isActive));
+      return correspContracts.some(contract => !contract.endDate);
     },
     isRepetitionAllowed () {
       if (!this.newEvent.auxiliary) return true;
@@ -143,7 +143,7 @@ export default {
   },
   watch: {
     selectedAuxiliary (value) {
-      if (!this.selectedAuxiliary.hasActiveCompanyContractOnEvent && this.newEvent.type === INTERNAL_HOUR) this.newEvent.type = INTERVENTION;
+      if (!this.selectedAuxiliary.hasCompanyContractOnEvent && this.newEvent.type === INTERNAL_HOUR) this.newEvent.type = INTERVENTION;
     },
     isRepetitionAllowed (value) {
       if (!value) this.newEvent.repetition.frequency = NEVER;
