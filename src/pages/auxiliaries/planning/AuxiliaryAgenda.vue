@@ -151,7 +151,11 @@ export default {
       const can = this.$can({
         user: this.currentUser,
         auxiliaryIdEvent: this.selectedAuxiliary._id,
-        permissions: ['events:edit', { rule: 'isOwner' }],
+        permissions: [
+          'events:edit',
+          { name: 'events:sector:edit', rule: 'isInSameSector' },
+          { name: 'events:own:edit', rule: 'isOwner' },
+        ],
       });
       if (!can) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
 
