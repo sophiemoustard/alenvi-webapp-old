@@ -1,9 +1,10 @@
 <template>
   <div>
     <div class="row">
-      <ni-contracts v-if="contracts" :contracts="contracts" :user="getUser" @openVersionCreation="openVersionCreationModal"
-        @openEndContract="openEndContractModal" @refresh="refreshContracts" :columns="contractVisibleColumns" display-actions display-uploader
-        :personKey="COACH" @refreshWithTimeout="refreshContractsWithTimeout" />
+      <ni-contracts v-if="contracts" :contracts="contracts" :user="getUser" @openEndContract="openEndContractModal"
+        @openVersionEdition="openVersionEditionModal" @openVersionCreation="openVersionCreationModal" :personKey="COACH"
+        @refresh="refreshContracts" :columns="contractVisibleColumns" display-actions display-uploader
+        @refreshWithTimeout="refreshContractsWithTimeout" />
       <q-btn :disable="!hasBasicInfo" class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat"
         @click="openCreationModal" />
       <div v-if="!hasBasicInfo" class="missingBasicInfo">
@@ -81,6 +82,25 @@
         @click="createVersion" />
     </q-modal>
 
+    <!-- Edition modal -->
+    <q-modal v-model="versionEditionModal" content-classes="modal-container-sm" @hide="resetVersionEditionModal">
+      <div class="modal-padding">
+        <div class="row justify-between items-baseline">
+          <div class="col-11">
+            <h5>Modifier le <span class="text-weight-bold">contrat</span></h5>
+          </div>
+          <div class="col-1 cursor-pointer modal-btn-close">
+            <span><q-icon name="clear" @click.native="versionEditionModal = false" /></span>
+          </div>
+        </div>
+        <ni-input in-modal caption="Volume horaire hebdomadaire"  type="number" suffix="€" required-field
+          v-model="editedVersion.weeklyHours" :error="$v.editedVersion.weeklyHours.$error"
+          @blur="$v.editedVersion.weeklyHours.$touch" />
+      </div>
+      <q-btn no-caps class="full-width modal-btn" label="Modifier le contrat" icon-right="add" color="primary"
+        :loading="loading" @click="editVersion" />
+    </q-modal>
+
     <!-- End contract modal -->
     <q-modal v-model="endContractModal" content-classes="modal-container-sm" @hide="resetEndContractModal">
       <div class="modal-padding">
@@ -132,22 +152,17 @@ export default {
   },
   data () {
     return {
-      loading: false,
-      shouldBeSigned: true,
-      newContractModal: false,
-      newContractVersionModal: false,
-      endContractModal: false,
-      endContract: {
-        endDate: '',
-        endNotificationDate: '',
-        endReason: '',
-        contract: {},
-      },
       OTHER,
       COACH,
-      endContractReasons: END_CONTRACT_REASONS,
       contracts: [],
-      selectedContract: { versions: [] },
+      loading: false,
+      CUSTOMER_CONTRACT,
+      COMPANY_CONTRACT,
+      customers: [],
+      contractVisibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractEmpty', 'contractSigned', 'actions'],
+      // New contract
+      shouldBeSigned: true,
+      newContractModal: false,
       newContract: {
         status: '',
         customer: '',
@@ -155,27 +170,38 @@ export default {
         startDate: '',
         grossHourlyRate: '',
       },
+      // New version
+      newContractVersionModal: false,
       newContractVersion: {
         weeklyHours: '',
         startDate: '',
         grossHourlyRate: '',
       },
-      CUSTOMER_CONTRACT,
-      COMPANY_CONTRACT,
-      customers: [],
-      contractVisibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractEmpty', 'contractSigned'],
+      // Edited version
+      versionEditionModal: false,
+      editedVersion: {
+        contactId: '',
+        versionId: '',
+        weeklyHours: '',
+      },
+      // End contract
+      endContractModal: false,
+      endContract: {
+        endDate: '',
+        endNotificationDate: '',
+        endReason: '',
+        contract: {},
+      },
+      endContractReasons: END_CONTRACT_REASONS,
+      selectedContract: { versions: [] },
     }
   },
   validations () {
     return {
       newContract: {
         status: { required },
-        customer: { required: requiredIf((item) => {
-          return item.status === CUSTOMER_CONTRACT;
-        }) },
-        weeklyHours: { required: requiredIf((item) => {
-          return item.status === COMPANY_CONTRACT;
-        }) },
+        customer: { required: requiredIf((item) => item.status === CUSTOMER_CONTRACT) },
+        weeklyHours: { required: requiredIf((item) => item.status === COMPANY_CONTRACT) },
         startDate: { required },
         grossHourlyRate: { required },
       },
@@ -184,13 +210,14 @@ export default {
         startDate: { required },
         grossHourlyRate: { required },
       },
+      editedVersion: {
+        weeklyHours: this.selectedContract.status === CUSTOMER_CONTRACT ? {} : { required },
+      },
       endContract: {
         endNotificationDate: { required },
         endDate: { required },
         endReason: { required },
-        otherMisc: { required: requiredIf((item) => {
-          return item.endReason === OTHER;
-        }) },
+        otherMisc: { required: requiredIf((item) => item.endReason === OTHER) },
       },
     }
   },
@@ -408,6 +435,19 @@ export default {
         this.loading = false;
       }
     },
+    // Contract edition
+    openVersionEditionModal ({ contract, versionId }) {
+      this.editedVersion.contractId = contract._id;
+      this.editedVersion.versionId = versionId;
+      this.selectedContract = contract;
+      this.versionEditionModal = true;
+    },
+    resetVersionEditionModal () {
+      this.versionEditionModal = false;
+      this.editedVersion = {};
+      this.$v.editedVersion.$reset();
+    },
+    editVersion () {},
     // End contract
     async openEndContractModal (contract) {
       this.endContract.contract = contract;
