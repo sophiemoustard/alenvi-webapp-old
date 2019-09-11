@@ -152,8 +152,9 @@ export default {
         user: this.currentUser,
         auxiliaryIdEvent: this.selectedAuxiliary._id,
         permissions: [
-          'planning:create:user',
-          { name: 'planning:create', rule: 'isOwner' },
+          { name: 'events:edit' },
+          { name: 'events:sector:edit', rule: 'isInSameSector' },
+          { name: 'events:own:edit', rule: 'isOwner' },
         ],
       });
       if (!can) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
