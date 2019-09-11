@@ -26,8 +26,6 @@
         <ni-search-address v-model="customer.contact.address" color="white" inverted-light
           :error-label="addressError" :error="$v.customer.contact.address.$error"
           @focus="saveTmp('contact.address.fullAddress')" @blur="updateUser('contact.address')" />
-        <ni-input caption="Code porte" v-model="customer.contact.doorCode" @focus="saveTmp('contact.doorCode')"
-          @blur="updateUser('contact.doorCode')" />
       </div>
     </div>
     <div class="q-mb-xl">
