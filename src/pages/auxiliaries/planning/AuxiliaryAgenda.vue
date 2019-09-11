@@ -152,7 +152,7 @@ export default {
         user: this.currentUser,
         auxiliaryIdEvent: this.selectedAuxiliary._id,
         permissions: [
-          'events:edit',
+          { name: 'events:edit' },
           { name: 'events:sector:edit', rule: 'isInSameSector' },
           { name: 'events:own:edit', rule: 'isOwner' },
         ],
