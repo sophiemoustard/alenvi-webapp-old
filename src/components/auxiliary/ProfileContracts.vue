@@ -325,6 +325,46 @@ export default {
       this.newContract.grossHourlyRate = '';
       this.$v.newContract.$reset();
     },
+    async getContractCreationPayload () {
+      const payload = {
+        startDate: this.newContract.startDate,
+        status: this.newContract.status,
+        user: this.newContract.user,
+        versions: [{
+          startDate: this.newContract.startDate,
+          grossHourlyRate: this.newContract.grossHourlyRate,
+        }],
+      };
+      if (this.newContract.status === CUSTOMER_CONTRACT) payload.customer = this.newContract.customer;
+      if (this.newContract.status === COMPANY_CONTRACT) payload.versions[0].weeklyHours = this.newContract.weeklyHours;
+
+      if (this.shouldBeSigned) {
+        payload.signature = {
+          ...this.esignRedirection,
+          templateId: this.userCompany.rhConfig.templates[this.$_.camelCase(this.newContract.status)].driveId,
+          meta: { type: this.newContract.status, auxiliaryDriveId: this.getUser.administrative.driveFolder.driveId },
+          fields: generateContractFields(
+            this.newContract.status,
+            { user: this.getUser, contract: this.newContract, initialContractStartDate: this.newContract.startDate }
+          ),
+        };
+
+        if (this.newContract.status === CUSTOMER_CONTRACT) {
+          const helpers = await this.$users.showAll({ customers: this.newContract.customer });
+          const currentCustomer = helpers[0].customers.find(cus => cus._id === this.newContract.customer);
+          payload.signature.signers = this.generateContractSigners({ name: helpers[0].identity.lastname, email: helpers[0].local.email });
+          payload.signature.title = `${translate[this.newContract.status]} - ${currentCustomer.identity.lastname}`;
+          payload.signature.meta.customerDriveId = currentCustomer.driveFolder.driveId;
+        } else {
+          payload.signature.signers = this.generateContractSigners(
+            { name: `${this.mainUser.identity.firstname} ${this.mainUser.identity.lastname}`, email: this.mainUser.local.email }
+          );
+          payload.signature.title = `${translate[this.newContract.status]} - ${this.userFullName}`;
+        }
+      }
+
+      return this.$_.pickBy(payload);
+    },
     async createContract () {
       try {
         const templates = this.userCompany.rhConfig.templates;
@@ -335,39 +375,11 @@ export default {
         if (this.$v.newContract.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        let payload = {
-          startDate: this.newContract.startDate,
-          status: this.newContract.status,
-          user: this.newContract.user,
-          ...(this.newContract.status === CUSTOMER_CONTRACT && { customer: this.newContract.customer }),
-          versions: [{
-            startDate: this.newContract.startDate,
-            grossHourlyRate: this.newContract.grossHourlyRate,
-            ...(this.newContract.status === COMPANY_CONTRACT && { weeklyHours: this.newContract.weeklyHours }),
-          }],
-        };
+        const payload = await this.getContractCreationPayload();
 
-        if (this.shouldBeSigned) {
-          payload.signature = {
-            ...this.esignRedirection,
-            templateId: this.userCompany.rhConfig.templates[this.$_.camelCase(this.newContract.status)].driveId,
-            meta: { type: this.newContract.status, auxiliaryDriveId: this.getUser.administrative.driveFolder.driveId },
-            fields: generateContractFields(this.newContract.status, { user: this.getUser, contract: this.newContract, initialContractStartDate: this.newContract.startDate }),
-          };
-          if (this.newContract.status === CUSTOMER_CONTRACT) {
-            const helpers = await this.$users.showAll({ customers: this.newContract.customer });
-            const currentCustomer = helpers[0].customers.find(cus => cus._id === this.newContract.customer);
-            payload.signature.signers = this.generateContractSigners({ name: helpers[0].identity.lastname, email: helpers[0].local.email });
-            payload.signature.title = `${translate[this.newContract.status]} - ${currentCustomer.identity.lastname}`;
-            payload.signature.meta.customerDriveId = currentCustomer.driveFolder.driveId;
-          } else {
-            payload.signature.signers = this.generateContractSigners({ name: `${this.mainUser.identity.firstname} ${this.mainUser.identity.lastname}`, email: this.mainUser.local.email });
-            payload.signature.title = `${translate[this.newContract.status]} - ${this.userFullName}`;
-          }
-        }
-
-        await this.$contracts.create(this.$_.pickBy(payload));
+        await this.$contracts.create(payload);
         await this.refreshContracts();
+
         this.resetContractCreationModal();
         NotifyPositive('Contrat créé');
       } catch (e) {
@@ -392,6 +404,37 @@ export default {
       this.$v.newVersion.$reset();
       this.shouldBeSigned = true;
     },
+    async getVersionCreationPayload () {
+      const payload = { ...this.newVersion };
+      delete payload.contractId;
+
+      if (this.shouldBeSigned) {
+        const versionMix = { ...this.selectedContract, ...this.newVersion };
+        payload.signature = {
+          ...this.esignRedirection,
+          templateId: this.userCompany.rhConfig.templates[`${this.$_.camelCase(versionMix.status)}Version`].driveId,
+          meta: { type: versionMix.status, auxiliaryDriveId: this.getUser.administrative.driveFolder.driveId },
+          fields: generateContractFields(
+            versionMix.status,
+            { user: this.getUser, contract: versionMix, initialContractStartDate: this.selectedContract.startDate }
+          ),
+        };
+
+        if (versionMix.status === CUSTOMER_CONTRACT) {
+          const helpers = await this.$users.showAll({ customers: versionMix.customer._id });
+          payload.signature.signers = this.generateContractSigners({ name: helpers[0].identity.lastname, email: helpers[0].local.email });
+          payload.signature.title = `Avenant au ${translate[versionMix.status]} - ${versionMix.customer.identity.lastname}`;
+          payload.signature.meta.customerDriveId = versionMix.customer.driveFolder.driveId;
+        } else {
+          payload.signature.signers = this.generateContractSigners(
+            { name: `${this.mainUser.identity.firstname} ${this.mainUser.identity.lastname}`, email: this.mainUser.local.email }
+          );
+          payload.signature.title = `Avenant au ${translate[versionMix.status]} - ${this.userFullName}`;
+        }
+      }
+
+      return this.$_.pickBy(payload);
+    },
     async createVersion () {
       try {
         const templates = this.userCompany.rhConfig.templates;
@@ -402,30 +445,11 @@ export default {
         if (this.$v.newVersion.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        const contractId = this.newVersion.contractId;
-        delete this.newVersion.contractId;
-        const payload = this.newVersion;
-        if (this.shouldBeSigned) {
-          const VersionMix = { ...this.selectedContract, ...this.newVersion };
-          payload.signature = {
-            ...this.esignRedirection,
-            templateId: this.userCompany.rhConfig.templates[`${this.$_.camelCase(VersionMix.status)}Version`].driveId,
-            meta: { type: VersionMix.status, auxiliaryDriveId: this.getUser.administrative.driveFolder.driveId },
-            fields: generateContractFields(VersionMix.status, { user: this.getUser, contract: VersionMix, initialContractStartDate: this.selectedContract.startDate }),
-          };
-          if (VersionMix.status === CUSTOMER_CONTRACT) {
-            const helpers = await this.$users.showAll({ customers: VersionMix.customer._id });
-            payload.signature.signers = this.generateContractSigners({ name: helpers[0].identity.lastname, email: helpers[0].local.email });
-            payload.signature.title = `Avenant au ${translate[VersionMix.status]} - ${VersionMix.customer.identity.lastname}`;
-            payload.signature.meta.customerDriveId = VersionMix.customer.driveFolder.driveId;
-          } else {
-            payload.signature.signers = this.generateContractSigners({ name: `${this.mainUser.identity.firstname} ${this.mainUser.identity.lastname}`, email: this.mainUser.local.email });
-            payload.signature.title = `Avenant au ${translate[VersionMix.status]} - ${this.userFullName}`;
-          }
-        }
+        const payload = await this.getVersionCreationPayload();
 
-        await this.$contracts.createVersion(contractId, this.$_.pickBy(payload));
+        await this.$contracts.createVersion(this.newVersion.contractId, payload);
         await this.refreshContracts();
+
         this.resetVersionCreationModal();
         NotifyPositive('Version créée');
       } catch (e) {
