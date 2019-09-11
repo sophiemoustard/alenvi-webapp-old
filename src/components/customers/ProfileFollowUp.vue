@@ -12,8 +12,8 @@
         <p class="text-weight-bold">Accompagnement</p>
       </div>
       <div class="row gutter-profile">
-        <ni-input  caption="Environnement du bénéficiaire" v-model="customer.followUp.customerEnvironment" :rows="6" type="textarea"
-          @blur="updateCustomer('followUp.customerEnvironment')" @focus="saveTmp('followUp.customerEnvironment')" />
+        <ni-input  caption="Environnement du bénéficiaire" v-model="customer.followUp.environment" :rows="6" type="textarea"
+          @blur="updateCustomer('followUp.environment')" @focus="saveTmp('followUp.environment')" />
         <ni-input  caption="Objectifs de l’accompagnement" v-model="customer.followUp.objectives" :rows="6" type="textarea"
           @blur="updateCustomer('followUp.objectives')" @focus="saveTmp('followUp.objectives')" />
         <ni-input  caption="Autres" v-model="customer.followUp.misc" :rows="1" type="textarea"
