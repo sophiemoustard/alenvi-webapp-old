@@ -53,7 +53,7 @@
     </q-modal>
 
     <!-- New version modal -->
-    <q-modal v-model="newContractVersionModal" content-classes="modal-container-sm" @hide="resetVersionCreationModal">
+    <q-modal v-model="newVersionModal" content-classes="modal-container-sm" @hide="resetVersionCreationModal">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -61,16 +61,16 @@
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
             <span>
-              <q-icon name="clear" @click.native="newContractVersionModal = false" /></span>
+              <q-icon name="clear" @click.native="newVersionModal = false" /></span>
           </div>
         </div>
         <ni-input in-modal v-if="selectedContract.status === COMPANY_CONTRACT" caption="Volume horaire hebdomadaire"
-          :error="$v.newContractVersion.weeklyHours.$error" v-model="newContractVersion.weeklyHours" type="number"
-          @blur="$v.newContractVersion.weeklyHours.$touch" suffix="hr" required-field />
-        <ni-input in-modal caption="Taux horaire" :error="$v.newContractVersion.grossHourlyRate.$error"
-          v-model="newContractVersion.grossHourlyRate" type="number" suffix="€" required-field
-          @blur="$v.newContractVersion.grossHourlyRate.$touch" />
-        <ni-datetime-picker caption="Date d'effet" :error="$v.newContractVersion.startDate.$error" v-model="newContractVersion.startDate"
+          :error="$v.newVersion.weeklyHours.$error" v-model="newVersion.weeklyHours" type="number"
+          @blur="$v.newVersion.weeklyHours.$touch" suffix="hr" required-field />
+        <ni-input in-modal caption="Taux horaire" :error="$v.newVersion.grossHourlyRate.$error"
+          v-model="newVersion.grossHourlyRate" type="number" suffix="€" required-field
+          @blur="$v.newVersion.grossHourlyRate.$touch" />
+        <ni-datetime-picker caption="Date d'effet" :error="$v.newVersion.startDate.$error" v-model="newVersion.startDate"
           :min="newVersionMinStartDate" in-modal required-field />
         <div class="row margin-input last">
           <div class="col-12">
@@ -171,8 +171,8 @@ export default {
         grossHourlyRate: '',
       },
       // New version
-      newContractVersionModal: false,
-      newContractVersion: {
+      newVersionModal: false,
+      newVersion: {
         weeklyHours: '',
         startDate: '',
         grossHourlyRate: '',
@@ -205,7 +205,7 @@ export default {
         startDate: { required },
         grossHourlyRate: { required },
       },
-      newContractVersion: {
+      newVersion: {
         weeklyHours: this.selectedContract.status === CUSTOMER_CONTRACT ? {} : { required },
         startDate: { required },
         grossHourlyRate: { required },
@@ -379,17 +379,17 @@ export default {
     },
     // Version creation
     openVersionCreationModal (contract) {
-      this.newContractVersion.grossHourlyRate = this.getUser.company.rhConfig[this.$_.camelCase(contract.status)].grossHourlyRate;
-      this.newContractVersion.contractId = contract._id;
+      this.newVersion.grossHourlyRate = this.getUser.company.rhConfig[this.$_.camelCase(contract.status)].grossHourlyRate;
+      this.newVersion.contractId = contract._id;
       this.selectedContract = contract;
       this.shouldBeSigned = this.selectedContract.status === CUSTOMER_CONTRACT;
-      this.newContractVersionModal = true;
+      this.newVersionModal = true;
     },
     resetVersionCreationModal () {
-      this.newContractVersionModal = false;
-      this.newContractVersion = {};
-      this.newContractVersion.grossHourlyRate = '';
-      this.$v.newContractVersion.$reset();
+      this.newVersionModal = false;
+      this.newVersion = {};
+      this.newVersion.grossHourlyRate = '';
+      this.$v.newVersion.$reset();
       this.shouldBeSigned = true;
     },
     async createVersion () {
@@ -398,29 +398,29 @@ export default {
         const versionStatus = `${this.$_.camelCase(this.selectedContract.status)}Version`;
         if (!templates || !templates[versionStatus] || !templates[versionStatus].driveId) return NotifyNegative('Template manquant');
 
-        this.$v.newContractVersion.$touch();
-        if (this.$v.newContractVersion.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.$v.newVersion.$touch();
+        if (this.$v.newVersion.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        const contractId = this.newContractVersion.contractId;
-        delete this.newContractVersion.contractId;
-        const payload = this.newContractVersion;
+        const contractId = this.newVersion.contractId;
+        delete this.newVersion.contractId;
+        const payload = this.newVersion;
         if (this.shouldBeSigned) {
-          const contractVersionMix = { ...this.selectedContract, ...this.newContractVersion };
+          const VersionMix = { ...this.selectedContract, ...this.newVersion };
           payload.signature = {
             ...this.esignRedirection,
-            templateId: this.userCompany.rhConfig.templates[`${this.$_.camelCase(contractVersionMix.status)}Version`].driveId,
-            meta: { type: contractVersionMix.status, auxiliaryDriveId: this.getUser.administrative.driveFolder.driveId },
-            fields: generateContractFields(contractVersionMix.status, { user: this.getUser, contract: contractVersionMix, initialContractStartDate: this.selectedContract.startDate }),
+            templateId: this.userCompany.rhConfig.templates[`${this.$_.camelCase(VersionMix.status)}Version`].driveId,
+            meta: { type: VersionMix.status, auxiliaryDriveId: this.getUser.administrative.driveFolder.driveId },
+            fields: generateContractFields(VersionMix.status, { user: this.getUser, contract: VersionMix, initialContractStartDate: this.selectedContract.startDate }),
           };
-          if (contractVersionMix.status === CUSTOMER_CONTRACT) {
-            const helpers = await this.$users.showAll({ customers: contractVersionMix.customer._id });
+          if (VersionMix.status === CUSTOMER_CONTRACT) {
+            const helpers = await this.$users.showAll({ customers: VersionMix.customer._id });
             payload.signature.signers = this.generateContractSigners({ name: helpers[0].identity.lastname, email: helpers[0].local.email });
-            payload.signature.title = `Avenant au ${translate[contractVersionMix.status]} - ${contractVersionMix.customer.identity.lastname}`;
-            payload.signature.meta.customerDriveId = contractVersionMix.customer.driveFolder.driveId;
+            payload.signature.title = `Avenant au ${translate[VersionMix.status]} - ${VersionMix.customer.identity.lastname}`;
+            payload.signature.meta.customerDriveId = VersionMix.customer.driveFolder.driveId;
           } else {
             payload.signature.signers = this.generateContractSigners({ name: `${this.mainUser.identity.firstname} ${this.mainUser.identity.lastname}`, email: this.mainUser.local.email });
-            payload.signature.title = `Avenant au ${translate[contractVersionMix.status]} - ${this.userFullName}`;
+            payload.signature.title = `Avenant au ${translate[VersionMix.status]} - ${this.userFullName}`;
           }
         }
 
