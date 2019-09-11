@@ -43,7 +43,7 @@
             </template>
             <template v-else-if="col.name === 'actions'">
               <div class="row no-wrap table-actions">
-                <q-btn flat round small color="grey" icon="edit" @click="openVersionEdition(contract, col.value)" />
+                <q-btn flat round small color="grey" icon="edit" @click="openVersionEdition(contract, props.row)" />
               </div>
             </template>
             <template v-else>{{ col.value }}</template>
@@ -198,8 +198,8 @@ export default {
     openVersionCreation (contract) {
       this.$emit('openVersionCreation', contract);
     },
-    openVersionEdition (contract, versionId) {
-      this.$emit('openVersionEdition', { contract, versionId });
+    openVersionEdition (contract, version) {
+      this.$emit('openVersionEdition', { contract, version });
     },
     openEndContract (contract) {
       this.$emit('openEndContract', contract);

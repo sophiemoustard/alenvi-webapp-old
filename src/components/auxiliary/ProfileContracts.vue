@@ -93,9 +93,9 @@
             <span><q-icon name="clear" @click.native="versionEditionModal = false" /></span>
           </div>
         </div>
-        <ni-input in-modal caption="Volume horaire hebdomadaire"  type="number" suffix="€" required-field
-          v-model="editedVersion.weeklyHours" :error="$v.editedVersion.weeklyHours.$error"
-          @blur="$v.editedVersion.weeklyHours.$touch" />
+        <ni-input in-modal caption="Taux horaire"  type="number" suffix="€" required-field
+          v-model="editedVersion.grossHourlyRate" :error="$v.editedVersion.grossHourlyRate.$error"
+          @blur="$v.editedVersion.grossHourlyRate.$touch" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Modifier le contrat" icon-right="add" color="primary"
         :loading="loading" @click="editVersion" />
@@ -182,7 +182,7 @@ export default {
       editedVersion: {
         contactId: '',
         versionId: '',
-        weeklyHours: '',
+        grossHourlyRate: '',
       },
       // End contract
       endContractModal: false,
@@ -211,7 +211,7 @@ export default {
         grossHourlyRate: { required },
       },
       editedVersion: {
-        weeklyHours: this.selectedContract.status === CUSTOMER_CONTRACT ? {} : { required },
+        grossHourlyRate: { required },
       },
       endContract: {
         endNotificationDate: { required },
@@ -376,7 +376,6 @@ export default {
 
         this.loading = true;
         const payload = await this.getContractCreationPayload();
-
         await this.$contracts.create(payload);
         await this.refreshContracts();
 
@@ -446,7 +445,6 @@ export default {
 
         this.loading = true;
         const payload = await this.getVersionCreationPayload();
-
         await this.$contracts.createVersion(this.newVersion.contractId, payload);
         await this.refreshContracts();
 
@@ -454,15 +452,18 @@ export default {
         NotifyPositive('Version créée');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création de la version du contrat');
+        NotifyNegative('Erreur lors de la création de l\'avenant');
       } finally {
         this.loading = false;
       }
     },
     // Contract edition
-    openVersionEditionModal ({ contract, versionId }) {
-      this.editedVersion.contractId = contract._id;
-      this.editedVersion.versionId = versionId;
+    openVersionEditionModal ({ contract, version }) {
+      this.editedVersion = {
+        contractId: contract._id,
+        versionId: version._id,
+        grossHourlyRate: version.grossHourlyRate,
+      };
       this.selectedContract = contract;
       this.versionEditionModal = true;
     },
@@ -471,7 +472,32 @@ export default {
       this.editedVersion = {};
       this.$v.editedVersion.$reset();
     },
-    editVersion () {},
+    getVersionEditionPayload () {
+      const payload = {};
+      if (this.editedVersion.grossHourlyRate) payload.grossHourlyRate = this.editedVersion.grossHourlyRate;
+
+      return payload;
+    },
+    async editVersion () {
+      try {
+        this.$v.editedVersion.$touch();
+        if (this.$v.editedVersion.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        this.loading = true;
+        const payload = this.getVersionEditionPayload();
+        const params = { contractId: this.editedVersion.contractId, versionId: this.editedVersion.versionId }
+        await this.$contracts.updateVersion(params, payload);
+        await this.refreshContracts();
+
+        this.resetVersionEditionModal();
+        NotifyPositive('Contrat modifié');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'edition du contrat');
+      } finally {
+        this.loading = false;
+      }
+    },
     // End contract
     async openEndContractModal (contract) {
       this.endContract.contract = contract;
