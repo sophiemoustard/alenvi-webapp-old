@@ -209,6 +209,7 @@ import NiInput from '../../../components/form/Input';
 import FileUploader from '../../../components/form/FileUploader.vue';
 import { configMixin } from '../../../mixins/configMixin';
 import { REQUIRED_LABEL } from '../../../data/constants';
+import { validationMixin } from '../../../mixins/validationMixin';
 
 export default {
   name: 'RhConfig',
@@ -218,7 +219,7 @@ export default {
     'ni-input': NiInput,
     'ni-file-uploader': FileUploader,
   },
-  mixins: [configMixin],
+  mixins: [configMixin, validationMixin],
   data () {
     return {
       MAX_INTERNAL_HOURS_NUMBER: 9,
