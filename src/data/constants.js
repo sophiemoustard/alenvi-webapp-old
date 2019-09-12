@@ -24,6 +24,7 @@ export const SURCHARGES = {
 };
 
 // CONTRACTS
+export const CONTRACT = 'contract';
 export const OTHER = 'other';
 export const END_CONTRACT_REASONS = [
   { label: 'Rupture période d’essai employeur', value: 'employer_trial_period_termination' },
@@ -205,6 +206,7 @@ export const EXPORT_HISTORY_TYPES = [
   { label: 'Paiements et remboursements', value: PAYMENT },
   { label: 'Absences', value: ABSENCE },
   { label: 'Paies et soldes tout compte', value: PAY },
+  { label: 'Contrats', value: CONTRACT },
 ];
 
 // ORIGINS
