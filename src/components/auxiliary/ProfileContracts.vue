@@ -320,9 +320,12 @@ export default {
       if (this.newContract.status === COMPANY_CONTRACT) payload.versions[0].weeklyHours = this.newContract.weeklyHours;
 
       if (this.shouldBeSigned) {
+        const template = this.newContract.status === COMPANY_CONTRACT
+          ? this.$_.get(this.userCompany, 'rhConfig.templates.contractWithCompany')
+          : this.$_.get(this.userCompany, 'rhConfig.templates.contractWithCustomer');
         payload.signature = {
           ...this.esignRedirection,
-          templateId: this.userCompany.rhConfig.templates[this.$_.camelCase(this.newContract.status)].driveId,
+          templateId: template.driveId,
           meta: { type: this.newContract.status, auxiliaryDriveId: this.getUser.administrative.driveFolder.driveId },
           fields: generateContractFields(
             this.newContract.status,
@@ -390,9 +393,12 @@ export default {
 
       if (this.shouldBeSigned) {
         const versionMix = { ...this.selectedContract, ...this.newVersion };
+        const template = this.newContract.status === COMPANY_CONTRACT
+          ? this.$_.get(this.userCompany, 'rhConfig.templates.contractWithCompanyVersion')
+          : this.$_.get(this.userCompany, 'rhConfig.templates.contractWithCustomerVersion');
         payload.signature = {
           ...this.esignRedirection,
-          templateId: this.userCompany.rhConfig.templates[`${this.$_.camelCase(versionMix.status)}Version`].driveId,
+          templateId: template.driveId,
           meta: { type: versionMix.status, auxiliaryDriveId: this.getUser.administrative.driveFolder.driveId },
           fields: generateContractFields(
             versionMix.status,
