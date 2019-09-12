@@ -76,9 +76,7 @@
       <template slot="title">
         Modifier le <span class="text-weight-bold">contrat</span>
       </template>
-      <ni-input in-modal caption="Taux horaire"  type="number" suffix="€" required-field
-        v-model="editedVersion.grossHourlyRate" :error="$v.editedVersion.grossHourlyRate.$error"
-        @blur="$v.editedVersion.grossHourlyRate.$touch" />
+        <ni-version-edition-form v-model="editedVersion" :validations="$v.editedVersion" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Modifier le contrat" icon-right="add" color="primary"
           :loading="loading" @click="editVersion" />
@@ -109,11 +107,12 @@
 
 <script>
 import { required, requiredIf } from 'vuelidate/lib/validators';
-import NiSelect from '../form/Select';
-import NiInput from '../form/Input';
-import NiDatetimePicker from '../form/DatetimePicker';
-import NiContracts from '../contracts/Contracts';
-import Modal from '../../components/Modal';
+import Select from '../form/Select';
+import Input from '../form/Input';
+import DatetimePicker from '../form/DatetimePicker';
+import Contracts from '../contracts/Contracts';
+import Modal from '../Modal';
+import VersionEditionForm from '../contracts/VersionEditionForm.vue';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../popup/notify';
 import { END_CONTRACT_REASONS, OTHER, CONTRACT_STATUS_OPTIONS, CUSTOMER_CONTRACT, COMPANY_CONTRACT, COACH } from '../../data/constants';
 import { translate } from '../../data/translate';
@@ -125,11 +124,12 @@ export default {
   name: 'ProfileContracts',
   mixins: [contractMixin],
   components: {
-    NiSelect,
-    NiInput,
-    NiDatetimePicker,
-    NiContracts,
+    'ni-select': Select,
+    'ni-input': Input,
+    'ni-datetime-picker': DatetimePicker,
+    'ni-contracts': Contracts,
     'ni-modal': Modal,
+    'ni-version-edition-form': VersionEditionForm,
   },
   data () {
     return {
