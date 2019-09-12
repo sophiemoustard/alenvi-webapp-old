@@ -1,17 +1,13 @@
 <template>
-  <q-modal ref="modal" :value="value" @input="$emit('input')"
-    @hide="$emit('hide')" :content-classes="contentClasses">
+  <q-modal ref="modal" :value="value" @input="$emit('input')" @hide="$emit('hide')" :content-classes="contentClasses">
     <div class="modal-padding">
       <div class="row justify-between items-baseline">
         <div class="col-11">
-          <h5>
-            {{ title }}
-            <slot name="title" />
-          </h5>
+          <h5>{{ title }}<slot name="title" /></h5>
         </div>
         <div class="col-1 cursor-pointer modal-btn-close">
           <span>
-            <q-icon name="clear" @click.native="$refs.modal.hide()" />
+            <q-icon name="clear" @click.native="close()" />
           </span>
         </div>
       </div>
@@ -27,7 +23,12 @@ export default {
   props: {
     value: { type: Boolean, default: false },
     contentClasses: { type: String, default: () => 'modal-container-sm' },
-    title: '',
+    title: { type: String, default: '' },
+  },
+  methods: {
+    close () {
+      this.$emit('input', false);
+    },
   },
 }
 </script>
