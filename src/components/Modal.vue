@@ -1,5 +1,6 @@
 <template>
-  <q-modal ref="modal" :value="value" @input="$emit('input')" @hide="$emit('hide')" :content-classes="contentClasses">
+  <q-modal ref="modal" :value="value" @input="$emit('input', $event)" @hide="$emit('hide', $event)"
+    :content-classes="contentClasses">
     <div class="modal-padding">
       <div class="row justify-between items-baseline">
         <div class="col-11">
@@ -7,7 +8,7 @@
         </div>
         <div class="col-1 cursor-pointer modal-btn-close">
           <span>
-            <q-icon name="clear" @click.native="close()" />
+            <q-icon name="clear" @click.native="$refs.modal.hide()" />
           </span>
         </div>
       </div>

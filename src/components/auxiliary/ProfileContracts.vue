@@ -264,11 +264,21 @@ export default {
     await this.getCustomersWithCustomerContractSubscriptions();
   },
   methods: {
+    getContractTemplate (contract) {
+      return contract.status === COMPANY_CONTRACT
+        ? this.$_.get(this.userCompany, 'rhConfig.templates.contractWithCompany')
+        : this.$_.get(this.userCompany, 'rhConfig.templates.contractWithCustomer');
+    },
+    getVersionTemplate (contract) {
+      return contract.status === COMPANY_CONTRACT
+        ? this.$_.get(this.userCompany, 'rhConfig.templates.contractWithCompanyVersion')
+        : this.$_.get(this.userCompany, 'rhConfig.templates.contractWithCustomerVersion');
+    },
     async getCustomersWithCustomerContractSubscriptions () {
       try {
         this.customers = await this.$customers.listWithCustomerContractSubscriptions();
       } catch (e) {
-        this.customerOptions = [];
+        this.customers = [];
         console.error(e);
       }
     },
@@ -293,7 +303,9 @@ export default {
     // Contract creation
     resetContract (val) {
       this.newContract.customer = '';
-      this.newContract.grossHourlyRate = this.getUser.company.rhConfig[this.$_.camelCase(val)].grossHourlyRate;
+      this.newContract.grossHourlyRate = val === COMPANY_CONTRACT
+        ? this.$_.get(this.getUser, 'company.rhConfig.contractWithCompany.grossHourlyRate')
+        : this.$_.get(this.getUser, 'company.rhConfig.contractWithCustomer.grossHourlyRate');
       this.$v.newContract.customer.$reset();
     },
     openCreationModal () {
@@ -320,9 +332,7 @@ export default {
       if (this.newContract.status === COMPANY_CONTRACT) payload.versions[0].weeklyHours = this.newContract.weeklyHours;
 
       if (this.shouldBeSigned) {
-        const template = this.newContract.status === COMPANY_CONTRACT
-          ? this.$_.get(this.userCompany, 'rhConfig.templates.contractWithCompany')
-          : this.$_.get(this.userCompany, 'rhConfig.templates.contractWithCustomer');
+        const template = this.getContractTemplate(this.newContract);
         payload.signature = {
           ...this.esignRedirection,
           templateId: template.driveId,
@@ -351,9 +361,8 @@ export default {
     },
     async createContract () {
       try {
-        const templates = this.userCompany.rhConfig.templates;
-        const contractStatus = this.$_.camelCase(this.newContract.status);
-        if (!templates || !templates[contractStatus] || !templates[contractStatus].driveId) return NotifyNegative('Template manquant');
+        const template = this.getContractTemplate(this.newContract);
+        if (!template || !template.driveId) return NotifyNegative('Template manquant');
 
         this.$v.newContract.$touch();
         if (this.$v.newContract.$error) return NotifyWarning('Champ(s) invalide(s)');
@@ -374,7 +383,9 @@ export default {
     },
     // Version creation
     openVersionCreationModal (contract) {
-      this.newVersion.grossHourlyRate = this.getUser.company.rhConfig[this.$_.camelCase(contract.status)].grossHourlyRate;
+      this.newVersion.grossHourlyRate = contract.status === COMPANY_CONTRACT
+        ? this.$_.get(this.getUser, 'company.rhConfig.contractWithCompany.grossHourlyRate')
+        : this.$_.get(this.getUser, 'company.rhConfig.contractWithCustomer.grossHourlyRate');
       this.newVersion.contractId = contract._id;
       this.selectedContract = contract;
       this.shouldBeSigned = this.selectedContract.status === CUSTOMER_CONTRACT;
@@ -393,9 +404,7 @@ export default {
 
       if (this.shouldBeSigned) {
         const versionMix = { ...this.selectedContract, ...this.newVersion };
-        const template = this.newContract.status === COMPANY_CONTRACT
-          ? this.$_.get(this.userCompany, 'rhConfig.templates.contractWithCompanyVersion')
-          : this.$_.get(this.userCompany, 'rhConfig.templates.contractWithCustomerVersion');
+        const template = this.getVersionTemplate(versionMix);
         payload.signature = {
           ...this.esignRedirection,
           templateId: template.driveId,
@@ -423,9 +432,8 @@ export default {
     },
     async createVersion () {
       try {
-        const templates = this.userCompany.rhConfig.templates;
-        const versionStatus = `${this.$_.camelCase(this.selectedContract.status)}Version`;
-        if (!templates || !templates[versionStatus] || !templates[versionStatus].driveId) return NotifyNegative('Template manquant');
+        const template = this.getVersionTemplate(this.selectedContract);
+        if (!template || !template.driveId) return NotifyNegative('Template manquant');
 
         this.$v.newVersion.$touch();
         if (this.$v.newVersion.$error) return NotifyWarning('Champ(s) invalide(s)');
