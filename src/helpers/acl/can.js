@@ -2,14 +2,11 @@ import rules from './rules';
 
 const findPermission = (right, params) => {
   return (permission) => {
-    if (typeof permission === 'object') {
-      if (typeof permission.rule === 'string') {
-        if (!rules[permission.rule]) throw new Error('[can] rule does not exist')
-        return permission.name === right.permission && right.hasAccess && rules[permission.rule](params);
-      }
-      return permission.name === right.permission;
+    if (permission.rule) {
+      if (!rules[permission.rule]) throw new Error('[can] rule does not exist')
+      return permission.name === right.permission && right.hasAccess && rules[permission.rule](params);
     }
-    return false;
+    return permission.name === right.permission;
   }
 }
 
