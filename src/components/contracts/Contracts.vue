@@ -41,6 +41,11 @@
                 <p class="no-margin">En attente de signature</p>
               </div>
             </template>
+            <template v-else-if="col.name === 'actions'">
+              <div class="row no-wrap table-actions">
+                <q-btn flat round small color="grey" icon="edit" @click="openVersionEdition(contract, props.row)" />
+              </div>
+            </template>
             <template v-else>{{ col.value }}</template>
           </q-td>
         </q-tr>
@@ -135,6 +140,11 @@ export default {
           align: 'center',
           field: (val) => val.signature ? val.signature.eversignId : '',
         },
+        {
+          name: 'actions',
+          align: 'center',
+          field: '_id',
+        },
       ],
       extensions: 'image/jpg, image/jpeg, image/gif, image/png, application/pdf',
     }
@@ -187,6 +197,9 @@ export default {
     },
     openVersionCreation (contract) {
       this.$emit('openVersionCreation', contract);
+    },
+    openVersionEdition (contract, version) {
+      this.$emit('openVersionEdition', { contract, version });
     },
     openEndContract (contract) {
       this.$emit('openEndContract', contract);
