@@ -25,7 +25,8 @@
           soir / dimanche</p>
         <div v-if="subscriptions && subscriptions.length > 0" class="row">
           <div class="col-xs-12">
-            <q-checkbox v-model="customer.subscriptionsAccepted" class="q-mr-sm" @input="confirmAgreement" />
+            <q-checkbox v-model="customer.subscriptionsAccepted" class="q-mr-sm" @input="confirmAgreement"
+              :disable="customer.subscriptionsAccepted" />
             <span style="vertical-align: middle">J'accepte les conditions d’abonnement présentées ci-dessus ainsi que
               les <a href="#cgs" @click.prevent="cgsModal = true">conditions générales de services
                 Alenvi</a>.<span class="text-weight-thin text-italic"> {{ agreement }}</span></span>
