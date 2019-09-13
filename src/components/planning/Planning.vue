@@ -278,7 +278,7 @@ export default {
           user: this.$store.getters['main/user'],
           auxiliarySectorEvent: eventInfo.sectorId,
           permissions: [
-            'events:edit',
+            { name: 'events:edit' },
             { name: 'events:sector:edit', rule: 'isInSameSector' },
           ],
         });
@@ -288,7 +288,7 @@ export default {
           auxiliaryIdEvent: eventInfo.person._id,
           auxiliarySectorEvent: eventInfo.person.sector._id,
           permissions: [
-            'events:edit',
+            { name: 'events:edit' },
             { name: 'events:sector:edit', rule: 'isInSameSector' },
             { name: 'events:own:edit', rule: 'isOwner' },
           ],
