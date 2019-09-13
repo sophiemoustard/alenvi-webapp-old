@@ -70,6 +70,6 @@ export const validHour = (value) => {
   return !!value.match(/^[0-1][0-9]:[0-5][0-9]$|^2[0-2]:[0-5][0-9]$/);
 };
 
-export const minDate = (value, parent) => {
-  return moment(value).isSameOrAfter(moment(parent.startDate));
+export const minDate = (min) => {
+  return (value) => moment(min).isSameOrBefore(value);
 };

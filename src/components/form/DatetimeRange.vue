@@ -60,7 +60,7 @@ export default {
       value: {
         startDate: { required },
         startHour: { required, validHour },
-        endDate: { required, minDate },
+        endDate: { required, minDate: minDate(this.value.startDate) },
         endHour: { required, validHour },
       },
     }
