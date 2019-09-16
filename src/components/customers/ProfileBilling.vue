@@ -8,15 +8,15 @@
       <div v-if="user.role.name === HELPER && !tableLoading" class="message">
         Si vous souhaitez obtenir une facture non disponible sur cette page, adressez un email à support@alenvi.io.
       </div>
-      <ni-customer-billing-table :documents="customerBillingDocuments" :billingDates="billingDates"
+      <ni-customer-billing-table :documents="customerDocuments" :billingDates="billingDates"
         :displayActions="user.role.name === ADMIN" @openEditionModal="openEditionModal"
-        :type="CUSTOMER" :startBalance="getStartBalance()" :endBalance="getEndBalance(customerBillingDocuments)" />
+        :type="CUSTOMER" :startBalance="getStartBalance()" :endBalance="getEndBalance(customerDocuments)" />
       <div v-if="user.role.name === ADMIN || user.role.name === COACH" align="right">
         <q-btn class="add-payment" label="Ajouter un réglement" @click="openPaymentCreationModal(customer)"
           no-caps flat color="white" icon="add" />
       </div>
     </div>
-    <div class="q-pa-sm q-mb-lg" v-for="tpp in tppBillingDocuments" :key="tpp._id">
+    <div class="q-pa-sm q-mb-lg" v-for="tpp in tppDocuments" :key="tpp._id">
       <p class="text-weight-bold">{{ tpp.name }}</p>
       <ni-customer-billing-table :documents="tpp.documents" :billingDates="billingDates"
         :displayActions="user.role.name === ADMIN || user.role.name === COACH" @openEditionModal="openEditionModal"
@@ -29,14 +29,14 @@
     </div>
 
     <!-- Payment creation modal -->
-    <ni-payment-creation-modal :newPayment="newPayment" :validations="$v.newPayment" :selectedClientName="selectedClientName"
-      @createPayment="createPayment" :creationModal="paymentCreationModal" :selectedCustomer="selectedCustomer"
-      :loading="modalLoading" @resetForm="resetPaymentCreationModal" />
+    <ni-payment-creation-modal :newPayment="newPayment" :selectedCustomer="selectedCustomer" :loading="modalLoading"
+      :selectedClientName="selectedClientName" :creationModal="paymentCreationModal" :validations="$v.newPayment"
+      @createPayment="createPayment" @resetForm="resetPaymentCreationModal" />
 
     <!-- Payment edition modal -->
-    <ni-payment-edition-modal :editedPayment="editedPayment" :validations="$v.editedPayment" :selectedClientName="selectedClientName"
-      @updatePayment="updatePayment" :editionModal="paymentEditionModal" :selectedCustomer="selectedCustomer"
-      :loading="modalLoading" @resetForm="resetPaymentEditionModal" />
+    <ni-payment-edition-modal :editedPayment="editedPayment" :validations="$v.editedPayment" :loading="modalLoading"
+      :editionModal="paymentEditionModal" :selectedCustomer="selectedCustomer" :selectedClientName="selectedClientName"
+      @updatePayment="updatePayment"  @resetForm="resetPaymentEditionModal" />
   </div>
 </template>
 
@@ -65,8 +65,8 @@ export default {
       modalLoading: false,
       tableLoading: false,
       paymentEditionModal: false,
-      customerBillingDocuments: [],
-      tppBillingDocuments: [],
+      customerDocuments: [],
+      tppDocuments: [],
       billingDates: { startDate: this.$moment().toISOString(), endDate: this.$moment().toISOString() },
       billingDatesHasError: false,
       balances: [],
@@ -84,6 +84,13 @@ export default {
     },
     user () {
       return this.$store.getters['main/user'];
+    },
+    documentQuery () {
+      return {
+        customer: this.customer._id,
+        startDate: this.billingDates.startDate,
+        endDate: this.billingDates.endDate,
+      };
     },
   },
   async mounted () {
@@ -122,10 +129,10 @@ export default {
     },
     computeCustomerBalance () {
       const customerStartBalance = this.getStartBalance();
-      this.computeIntermediateBalances(this.customerBillingDocuments, customerStartBalance, CUSTOMER)
+      this.computeIntermediateBalances(this.customerDocuments, customerStartBalance, CUSTOMER)
     },
     computeTppBalances () {
-      for (const tpp of this.tppBillingDocuments) {
+      for (const tpp of this.tppDocuments) {
         const tppStartBalance = this.getStartBalance(tpp)
         this.computeIntermediateBalances(tpp.documents, tppStartBalance, THIRD_PARTY_PAYER)
       }
@@ -175,68 +182,60 @@ export default {
     },
     async getBills () {
       try {
-        this.bills = await this.$bills.showAll({
-          customer: this.customer._id,
-          startDate: this.billingDates.startDate,
-          endDate: this.billingDates.endDate,
-        });
+        this.bills = await this.$bills.showAll(this.documentQuery);
       } catch (e) {
+        this.bills = [];
         console.error(e)
       }
     },
     async getCreditNotes () {
       try {
-        this.creditNotes = await this.$creditNotes.showAll({
-          customer: this.customer._id,
-          startDate: this.billingDates.startDate,
-          endDate: this.billingDates.endDate,
-        });
+        this.creditNotes = await this.$creditNotes.showAll(this.documentQuery);
       } catch (e) {
+        this.creditNotes = [];
         console.error(e)
       }
     },
     async getPayments () {
       try {
-        this.payments = await this.$payments.list({
-          customer: this.customer._id,
-          startDate: this.billingDates.startDate,
-          endDate: this.billingDates.endDate,
-        });
+        this.payments = await this.$payments.list(this.documentQuery);
       } catch (e) {
+        this.payments = [];
         console.error(e)
       }
     },
+    newDocumentList (document) {
+      return {
+        documents: [document],
+        name: document.client.name,
+        _id: document.client._id,
+      };
+    },
     formatDocumentList () {
-      this.customerBillingDocuments = [];
-      const tppBillingDocuments = {};
+      this.customerDocuments = [];
+      const tppDocuments = {};
 
       for (const bill of this.bills) {
         bill.type = BILL;
-        if (!bill.client) this.customerBillingDocuments.push(bill);
-        else if (bill.client._id && !tppBillingDocuments[bill.client._id]) {
-          tppBillingDocuments[bill.client._id] = {
-            documents: [bill],
-            name: bill.client.name,
-            _id: bill.client._id,
-          };
-        } else tppBillingDocuments[bill.client._id].documents.push(bill);
+        if (!bill.client) this.customerDocuments.push(bill);
+        else if (bill.client._id && !tppDocuments[bill.client._id]) tppDocuments[bill.client._id] = this.newDocumentList(bill);
+        else tppDocuments[bill.client._id].documents.push(bill);
       }
 
       for (const cd of this.creditNotes) {
         cd.type = CREDIT_NOTE;
-        if (cd.inclTaxesTpp && !tppBillingDocuments[cd.thirdPartyPayer._id]) tppBillingDocuments[cd.thirdPartyPayer._id].documents = [cd]
-        else if (cd.inclTaxesTpp && tppBillingDocuments[cd.thirdPartyPayer._id]) tppBillingDocuments[cd.thirdPartyPayer._id].documents.push(cd);
-
-        if (cd.inclTaxesCustomer) this.customerBillingDocuments.push(cd);
+        if (cd.inclTaxesCustomer) this.customerDocuments.push(cd);
+        else if (cd.inclTaxesTpp && !tppDocuments[cd.thirdPartyPayer._id]) tppDocuments[cd.client._id] = this.newDocumentList(cd);
+        else if (cd.inclTaxesTpp && tppDocuments[cd.thirdPartyPayer._id]) tppDocuments[cd.thirdPartyPayer._id].documents.push(cd);
       }
 
       for (const payment of this.payments) {
-        if (!payment.client) this.customerBillingDocuments.push(payment);
-        else if (payment.client._id && !tppBillingDocuments[payment.client._id]) tppBillingDocuments[payment.client._id].documents = [payment]
-        else tppBillingDocuments[payment.client._id].documents.push(payment);
+        if (!payment.client) this.customerDocuments.push(payment);
+        else if (payment.client._id && !tppDocuments[payment.client._id]) tppDocuments[payment.client._id] = this.newDocumentList(payment);
+        else tppDocuments[payment.client._id].documents.push(payment);
       }
 
-      this.tppBillingDocuments = Object.values(tppBillingDocuments);
+      this.tppDocuments = Object.values(tppDocuments);
     },
     // Payments
     async createPayment () {
