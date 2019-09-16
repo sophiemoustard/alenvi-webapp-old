@@ -182,7 +182,7 @@ export const PAYMENT_NATURE_OPTIONS = [
 ];
 
 // FUNDINGS
-export const THIRD_PARTY_PAYER = 'ThirdPartyPayer';
+export const THIRD_PARTY_PAYER = 'thirdPartyPayer';
 
 // PAY
 export const PAY = 'pay';

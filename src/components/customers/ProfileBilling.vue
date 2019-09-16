@@ -8,7 +8,7 @@
       <div v-if="user.role.name === HELPER && !tableLoading" class="message">
         Si vous souhaitez obtenir une facture non disponible sur cette page, adressez un email à support@alenvi.io.
       </div>
-      <ni-customer-billing-table v-if="!tableLoading" :documents="customerBillingDocuments" :billingDates="billingDates"
+      <ni-customer-billing-table :documents="customerBillingDocuments" :billingDates="billingDates"
         :displayActions="user.role.name === ADMIN" @openEditionModal="openEditionModal"
         :type="CUSTOMER" :startBalance="getStartBalance()" :endBalance="getEndBalance(customerBillingDocuments)" />
       <div v-if="user.role.name === ADMIN || user.role.name === COACH" align="right">
@@ -16,19 +16,17 @@
           no-caps flat color="white" icon="add" />
       </div>
     </div>
-    <template v-for="(tpp, index) in Object.keys(tppBillingDocuments)">
-      <div class="q-pa-sm q-mb-lg" :key="index">
-        <p class="text-weight-bold">{{ tpp }}</p>
-        <ni-customer-billing-table v-if="!tableLoading" :documents="tppBillingDocuments[tpp]" :billingDates="billingDates"
-          :displayActions="user.role.name === ADMIN || user.role.name === COACH" @openEditionModal="openEditionModal"
-          :type="THIRD_PARTY_PAYER" :startBalance="getStartBalance(tpp)"
-          :endBalance="getEndBalance(tppBillingDocuments[tpp], tpp)" />
-        <div v-if="user.role.name === ADMIN || user.role.name === COACH" align="right">
-          <q-btn class="add-payment" label="Ajouter un réglement" no-caps flat color="white" icon="add"
-            @click="openPaymentCreationModal(customer, tppBillingDocuments[tpp][0].client)"/>
-        </div>
+    <div class="q-pa-sm q-mb-lg" v-for="tpp in tppBillingDocuments" :key="tpp._id">
+      <p class="text-weight-bold">{{ tpp.name }}</p>
+      <ni-customer-billing-table :documents="tpp.documents" :billingDates="billingDates"
+        :displayActions="user.role.name === ADMIN || user.role.name === COACH" @openEditionModal="openEditionModal"
+        :type="THIRD_PARTY_PAYER" :startBalance="getStartBalance(tpp)"
+        :endBalance="getEndBalance(tpp.documents, tpp)" />
+      <div v-if="user.role.name === ADMIN || user.role.name === COACH" align="right">
+        <q-btn class="add-payment" label="Ajouter un réglement" no-caps flat color="white" icon="add"
+          @click="openPaymentCreationModal(customer, tpp.documents[0].client)"/>
       </div>
-    </template>
+    </div>
 
     <!-- Payment creation modal -->
     <ni-payment-creation-modal :newPayment="newPayment" :validations="$v.newPayment" :selectedClientName="selectedClientName"
@@ -68,7 +66,7 @@ export default {
       tableLoading: false,
       paymentEditionModal: false,
       customerBillingDocuments: [],
-      tppBillingDocuments: {},
+      tppBillingDocuments: [],
       billingDates: { startDate: this.$moment().toISOString(), endDate: this.$moment().toISOString() },
       billingDatesHasError: false,
       balances: [],
@@ -118,7 +116,7 @@ export default {
     getStartBalance (tpp = null) {
       const balance = !tpp
         ? this.balances.find(bal => bal.customer._id === this.customer._id && !bal.thirdPartyPayer)
-        : this.balances.find(bal => bal.thirdPartyPayer && bal.thirdPartyPayer.name === tpp);
+        : this.balances.find(bal => bal.thirdPartyPayer && bal.thirdPartyPayer._id === tpp);
 
       return balance ? balance.balance : 0;
     },
@@ -127,9 +125,9 @@ export default {
       this.computeIntermediateBalances(this.customerBillingDocuments, customerStartBalance, CUSTOMER)
     },
     computeTppBalances () {
-      for (const tpp of Object.keys(this.tppBillingDocuments)) {
+      for (const tpp of this.tppBillingDocuments) {
         const tppStartBalance = this.getStartBalance(tpp)
-        this.computeIntermediateBalances(this.tppBillingDocuments[tpp], tppStartBalance, THIRD_PARTY_PAYER)
+        this.computeIntermediateBalances(tpp.documents, tppStartBalance, THIRD_PARTY_PAYER)
       }
     },
     computeIntermediateBalances (docs, startBalance, type) {
@@ -158,9 +156,8 @@ export default {
       if (this.billingDatesHasError) return;
 
       this.tableLoading = true;
-      this.customerBillingDocuments = [];
-      this.tppBillingDocuments = {};
       await Promise.all([this.getBills(), this.getCreditNotes(), this.getPayments(), this.getCustomerBalance()]);
+      this.formatDocumentList();
       this.computeCustomerBalance();
       this.computeTppBalances();
       this.tableLoading = false;
@@ -178,54 +175,68 @@ export default {
     },
     async getBills () {
       try {
-        const bills = await this.$bills.showAll({
+        this.bills = await this.$bills.showAll({
           customer: this.customer._id,
           startDate: this.billingDates.startDate,
           endDate: this.billingDates.endDate,
         });
-        for (const bill of bills) {
-          bill.type = BILL;
-          if (!bill.client) this.customerBillingDocuments.push(bill);
-          else if (bill.client._id && !this.tppBillingDocuments[bill.client.name]) this.tppBillingDocuments[bill.client.name] = [bill]
-          else this.tppBillingDocuments[bill.client.name].push(bill);
-        }
       } catch (e) {
         console.error(e)
       }
     },
     async getCreditNotes () {
       try {
-        const creditNotes = await this.$creditNotes.showAll({
+        this.creditNotes = await this.$creditNotes.showAll({
           customer: this.customer._id,
           startDate: this.billingDates.startDate,
           endDate: this.billingDates.endDate,
         });
-        for (const cd of creditNotes) {
-          cd.type = CREDIT_NOTE;
-          if (cd.inclTaxesTpp && !this.tppBillingDocuments[cd.thirdPartyPayer.name]) this.tppBillingDocuments[cd.thirdPartyPayer.name] = [cd]
-          else if (cd.inclTaxesTpp && this.tppBillingDocuments[cd.thirdPartyPayer.name]) this.tppBillingDocuments[cd.thirdPartyPayer.name].push(cd);
-
-          if (cd.inclTaxesCustomer) this.customerBillingDocuments.push(cd);
-        }
       } catch (e) {
         console.error(e)
       }
     },
     async getPayments () {
       try {
-        const payments = await this.$payments.list({
+        this.payments = await this.$payments.list({
           customer: this.customer._id,
           startDate: this.billingDates.startDate,
           endDate: this.billingDates.endDate,
         });
-        for (const payment of payments) {
-          if (!payment.client) this.customerBillingDocuments.push(payment);
-          else if (payment.client._id && !this.tppBillingDocuments[payment.client.name]) this.tppBillingDocuments[payment.client.name] = [payment]
-          else this.tppBillingDocuments[payment.client.name].push(payment);
-        }
       } catch (e) {
         console.error(e)
       }
+    },
+    formatDocumentList () {
+      this.customerBillingDocuments = [];
+      const tppBillingDocuments = {};
+
+      for (const bill of this.bills) {
+        bill.type = BILL;
+        if (!bill.client) this.customerBillingDocuments.push(bill);
+        else if (bill.client._id && !tppBillingDocuments[bill.client._id]) {
+          tppBillingDocuments[bill.client._id] = {
+            documents: [bill],
+            name: bill.client.name,
+            _id: bill.client._id,
+          };
+        } else tppBillingDocuments[bill.client._id].documents.push(bill);
+      }
+
+      for (const cd of this.creditNotes) {
+        cd.type = CREDIT_NOTE;
+        if (cd.inclTaxesTpp && !tppBillingDocuments[cd.thirdPartyPayer._id]) tppBillingDocuments[cd.thirdPartyPayer._id].documents = [cd]
+        else if (cd.inclTaxesTpp && tppBillingDocuments[cd.thirdPartyPayer._id]) tppBillingDocuments[cd.thirdPartyPayer._id].documents.push(cd);
+
+        if (cd.inclTaxesCustomer) this.customerBillingDocuments.push(cd);
+      }
+
+      for (const payment of this.payments) {
+        if (!payment.client) this.customerBillingDocuments.push(payment);
+        else if (payment.client._id && !tppBillingDocuments[payment.client._id]) tppBillingDocuments[payment.client._id].documents = [payment]
+        else tppBillingDocuments[payment.client._id].documents.push(payment);
+      }
+
+      this.tppBillingDocuments = Object.values(tppBillingDocuments);
     },
     // Payments
     async createPayment () {
