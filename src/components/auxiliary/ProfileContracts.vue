@@ -270,6 +270,10 @@ export default {
       const previousVersion = this.selectedContract.versions[index - 1];
       return this.$moment(previousVersion.startDate).add(1, 'd').toISOString();
     },
+    isPreviousPayImpacted () {
+      return this.$moment().startOf('M').isAfter(this.selectedVersion.startDate) ||
+        this.$moment().startOf('M').isAfter(this.editedVersion.startDate)
+    },
   },
   async mounted () {
     await this.refreshContracts();
@@ -473,6 +477,7 @@ export default {
         startDate: version.startDate,
       };
       this.selectedContract = contract;
+      this.selectedVersion = version;
       this.versionEditionModal = true;
     },
     resetVersionEditionModal () {
@@ -482,6 +487,15 @@ export default {
     },
     async editVersion () {
       try {
+        if (this.isPreviousPayImpacted) {
+          await this.$q.dialog({
+            title: 'Confirmation',
+            message: 'Ce changement impacte une paie déjà effectuée. Vérifiez que vous ne pouvez pas créer un avenant prenant effet ce mois-ci. Confirmez-vous ce changement ?',
+            ok: true,
+            cancel: 'Annuler',
+          });
+        }
+
         this.$v.editedVersion.$touch();
         if (this.$v.editedVersion.$error) return NotifyWarning('Champ(s) invalide(s)');
 
@@ -495,6 +509,7 @@ export default {
         NotifyPositive('Contrat modifié');
       } catch (e) {
         console.error(e);
+        if (e.message === '') return NotifyPositive('Edition annulée');
         NotifyNegative('Erreur lors de l\'edition du contrat');
       } finally {
         this.loading = false;
