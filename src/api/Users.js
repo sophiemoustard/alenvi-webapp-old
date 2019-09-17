@@ -18,6 +18,14 @@ export default {
       console.error(e.response);
     }
   },
+  async showActiveForCustomer (params = null) {
+    try {
+      const usersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/activeForCustomer`, { params });
+      return usersRaw.data.data.users;
+    } catch (e) {
+      console.error(e.response);
+    }
+  },
   async getById (id) {
     const userRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/${id}`);
     return userRaw.data.data.user;
