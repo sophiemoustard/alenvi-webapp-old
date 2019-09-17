@@ -80,7 +80,7 @@
           :minStartDate="editedVersionMinStartDate" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Modifier le contrat" icon-right="add" color="primary"
-          :loading="loading" @click="editVersion" />
+          :loading="loading" @click="editVersion" :disable="!isVersionUpdated" />
       </template>
     </ni-modal>
 
@@ -177,6 +177,7 @@ export default {
       },
       endContractReasons: END_CONTRACT_REASONS,
       selectedContract: { versions: [] },
+      selectedVersion: {},
     }
   },
   validations () {
@@ -273,6 +274,10 @@ export default {
     isPreviousPayImpacted () {
       return this.$moment().startOf('M').isAfter(this.selectedVersion.startDate) ||
         this.$moment().startOf('M').isAfter(this.editedVersion.startDate)
+    },
+    isVersionUpdated () {
+      return this.selectedVersion.grossHourlyRate !== this.editedVersion.grossHourlyRate ||
+        this.$moment(this.selectedVersion.startDate).toISOString() !== this.$moment(this.editedVersion.startDate).toISOString();
     },
   },
   async mounted () {
@@ -487,6 +492,7 @@ export default {
     },
     async editVersion () {
       try {
+        if (!this.isVersionUpdated) return this.resetVersionEditionModal();
         if (this.isPreviousPayImpacted) {
           await this.$q.dialog({
             title: 'Confirmation',
