@@ -356,29 +356,7 @@ export default {
       if (this.newContract.status === COMPANY_CONTRACT) payload.versions[0].weeklyHours = this.newContract.weeklyHours;
 
       if (this.newContract.shouldBeSigned) {
-        const template = this.getContractTemplate(this.newContract);
-        payload.signature = {
-          ...this.esignRedirection,
-          templateId: template.driveId,
-          meta: { type: this.newContract.status, auxiliaryDriveId: this.getUser.administrative.driveFolder.driveId },
-          fields: generateContractFields(
-            this.newContract.status,
-            { user: this.getUser, contract: this.newContract, initialContractStartDate: this.newContract.startDate }
-          ),
-        };
-
-        if (this.newContract.status === CUSTOMER_CONTRACT) {
-          const helpers = await this.$users.showAll({ customers: this.newContract.customer });
-          const currentCustomer = helpers[0].customers.find(cus => cus._id === this.newContract.customer);
-          payload.signature.signers = this.generateContractSigners({ name: helpers[0].identity.lastname, email: helpers[0].local.email });
-          payload.signature.title = `${translate[this.newContract.status]} - ${currentCustomer.identity.lastname}`;
-          payload.signature.meta.customerDriveId = currentCustomer.driveFolder.driveId;
-        } else {
-          payload.signature.signers = this.generateContractSigners(
-            { name: `${this.mainUser.identity.firstname} ${this.mainUser.identity.lastname}`, email: this.mainUser.local.email }
-          );
-          payload.signature.title = `${translate[this.newContract.status]} - ${this.userFullName}`;
-        }
+        payload.signature = await this.getSignaturePayload(this.newContract, '');
       }
 
       return this.$_.pickBy(payload);
@@ -424,34 +402,44 @@ export default {
       };
       this.$v.newVersion.$reset();
     },
+    async getSignaturePayload (contract, title) {
+      const template = this.getVersionTemplate(contract);
+      const signature = {
+        ...this.esignRedirection,
+        templateId: template.driveId,
+        meta: { type: contract.status, auxiliaryDriveId: this.getUser.administrative.driveFolder.driveId },
+        fields: generateContractFields(
+          contract.status,
+          { user: this.getUser, contract: contract, initialContractStartDate: this.selectedContract.startDate }
+        ),
+      }
+
+      if (contract.status === CUSTOMER_CONTRACT) {
+        const helpers = await this.$users.showAll({ customers: contract.customer });
+        const currentCustomer = helpers[0].customers.find(cus => cus._id === contract.customer);
+        signature.signers = this.generateContractSigners({ name: helpers[0].identity.lastname, email: helpers[0].local.email });
+        signature.title = `${translate[contract.status]} - ${currentCustomer.identity.lastname}`;
+        signature.meta.customerDriveId = currentCustomer.driveFolder.driveId;
+      } else {
+        signature.signers = this.generateContractSigners(
+          { name: `${this.mainUser.identity.firstname} ${this.mainUser.identity.lastname}`, email: this.mainUser.local.email }
+        );
+        signature.title = `${title}${translate[contract.status]} - ${this.userFullName}`;
+      }
+
+      return signature;
+    },
     async getVersionCreationPayload () {
-      const payload = { ...this.newVersion };
+      const payload = {
+        startDate: this.newVersion.startDate,
+        grossHourlyRate: this.newVersion.grossHourlyRate,
+        weeklyHours: this.newVersion.weeklyHours,
+      };
       delete payload.contractId;
 
       if (this.newVersion.shouldBeSigned) {
         const versionMix = { ...this.selectedContract, ...this.newVersion };
-        const template = this.getVersionTemplate(versionMix);
-        payload.signature = {
-          ...this.esignRedirection,
-          templateId: template.driveId,
-          meta: { type: versionMix.status, auxiliaryDriveId: this.getUser.administrative.driveFolder.driveId },
-          fields: generateContractFields(
-            versionMix.status,
-            { user: this.getUser, contract: versionMix, initialContractStartDate: this.selectedContract.startDate }
-          ),
-        };
-
-        if (versionMix.status === CUSTOMER_CONTRACT) {
-          const helpers = await this.$users.showAll({ customers: versionMix.customer._id });
-          payload.signature.signers = this.generateContractSigners({ name: helpers[0].identity.lastname, email: helpers[0].local.email });
-          payload.signature.title = `Avenant au ${translate[versionMix.status]} - ${versionMix.customer.identity.lastname}`;
-          payload.signature.meta.customerDriveId = versionMix.customer.driveFolder.driveId;
-        } else {
-          payload.signature.signers = this.generateContractSigners(
-            { name: `${this.mainUser.identity.firstname} ${this.mainUser.identity.lastname}`, email: this.mainUser.local.email }
-          );
-          payload.signature.title = `Avenant au ${translate[versionMix.status]} - ${this.userFullName}`;
-        }
+        payload.signature = await this.getSignaturePayload(versionMix, 'Avenant au ');
       }
 
       return this.$_.pickBy(payload);
