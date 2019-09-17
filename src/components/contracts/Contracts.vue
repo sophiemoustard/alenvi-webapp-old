@@ -178,12 +178,16 @@ export default {
       NotifyNegative('Echec de l\'envoi du document');
     },
     getAdditionalFields (contract, version) {
-      return [
+      const additionalFields = [
         { name: 'fileName', value: `contrat_signe_${this.user.identity.firstname}_${this.user.identity.lastname}` },
         { name: 'contractId', value: contract._id },
         { name: 'versionId', value: version._id },
-        { name: 'type', value: contract.status },
-      ]
+        { name: 'status', value: contract.status },
+      ];
+
+      if (contract.status === CUSTOMER_CONTRACT) additionalFields.push({ name: 'customer', value: contract.customer._id });
+
+      return additionalFields;
     },
     getLastVersion (contract) {
       return this.$_.orderBy(contract.versions, ['startDate'], ['desc'])[0];
@@ -271,6 +275,8 @@ export default {
       return !!(contract.signature && contract.signature.eversignId);
     },
     shouldSignDocument (contractStatus, contractSignature) {
+      if (!contractSignature.signedBy) return true;
+
       switch (this.personKey) {
         case COACH:
           return contractStatus === COMPANY_CONTRACT && !contractSignature.signedBy.other;
