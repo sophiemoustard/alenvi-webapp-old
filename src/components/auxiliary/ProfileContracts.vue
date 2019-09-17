@@ -38,7 +38,7 @@
         v-model="newContract.startDate" in-modal required-field />
       <div class="row margin-input last">
         <div class="col-12">
-          <q-checkbox v-model="shouldBeSigned" label="Signature en ligne" />
+          <q-checkbox v-model="newContract.shouldBeSigned" label="Signature en ligne" />
         </div>
       </div>
       <template slot="footer">
@@ -62,7 +62,7 @@
         :min="newVersionMinStartDate" in-modal required-field />
       <div class="row margin-input last">
         <div class="col-12">
-          <q-checkbox v-model="shouldBeSigned" label="Signature en ligne" />
+          <q-checkbox v-model="newVersion.shouldBeSigned" label="Signature en ligne" />
         </div>
       </div>
       <template slot="footer">
@@ -144,7 +144,6 @@ export default {
       customers: [],
       contractVisibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractEmpty', 'contractSigned', 'actions'],
       // New contract
-      shouldBeSigned: true,
       newContractModal: false,
       newContract: {
         status: '',
@@ -152,6 +151,7 @@ export default {
         weeklyHours: '',
         startDate: '',
         grossHourlyRate: '',
+        shouldBeSigned: true,
       },
       // New version
       newVersionModal: false,
@@ -159,6 +159,7 @@ export default {
         weeklyHours: '',
         startDate: '',
         grossHourlyRate: '',
+        shouldBeSigned: true,
       },
       // Edited version
       versionEditionModal: false,
@@ -166,6 +167,7 @@ export default {
         contactId: '',
         versionId: '',
         grossHourlyRate: '',
+        shouldBeSigned: true,
       },
       // End contract
       endContractModal: false,
@@ -335,8 +337,14 @@ export default {
     },
     resetContractCreationModal () {
       this.newContractModal = false;
-      this.newContract = {};
-      this.newContract.grossHourlyRate = '';
+      this.newContract = {
+        status: '',
+        customer: '',
+        weeklyHours: '',
+        startDate: '',
+        grossHourlyRate: '',
+        shouldBeSigned: true,
+      };
       this.$v.newContract.$reset();
     },
     async getContractCreationPayload () {
@@ -352,7 +360,7 @@ export default {
       if (this.newContract.status === CUSTOMER_CONTRACT) payload.customer = this.newContract.customer;
       if (this.newContract.status === COMPANY_CONTRACT) payload.versions[0].weeklyHours = this.newContract.weeklyHours;
 
-      if (this.shouldBeSigned) {
+      if (this.newContract.shouldBeSigned) {
         const template = this.getContractTemplate(this.newContract);
         payload.signature = {
           ...this.esignRedirection,
@@ -409,21 +417,23 @@ export default {
         : this.$_.get(this.getUser, 'company.rhConfig.contractWithCustomer.grossHourlyRate');
       this.newVersion.contractId = contract._id;
       this.selectedContract = contract;
-      this.shouldBeSigned = this.selectedContract.status === CUSTOMER_CONTRACT;
       this.newVersionModal = true;
     },
     resetVersionCreationModal () {
       this.newVersionModal = false;
-      this.newVersion = {};
-      this.newVersion.grossHourlyRate = '';
+      this.newVersion = {
+        weeklyHours: '',
+        startDate: '',
+        grossHourlyRate: '',
+        shouldBeSigned: true,
+      };
       this.$v.newVersion.$reset();
-      this.shouldBeSigned = true;
     },
     async getVersionCreationPayload () {
       const payload = { ...this.newVersion };
       delete payload.contractId;
 
-      if (this.shouldBeSigned) {
+      if (this.newVersion.shouldBeSigned) {
         const versionMix = { ...this.selectedContract, ...this.newVersion };
         const template = this.getVersionTemplate(versionMix);
         payload.signature = {
