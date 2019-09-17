@@ -268,7 +268,7 @@ export default {
       if (!index) return '';
 
       const previousVersion = this.selectedContract.versions[index - 1];
-      return this.$moment(previousVersion.startDate).toISOString();
+      return this.$moment(previousVersion.startDate).add(1, 'd').toISOString();
     },
   },
   async mounted () {
