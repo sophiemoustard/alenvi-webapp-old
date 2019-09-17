@@ -76,7 +76,8 @@
       <template slot="title">
         Modifier le <span class="text-weight-bold">contrat</span>
       </template>
-        <ni-version-edition-form v-model="editedVersion" :validations="$v.editedVersion" />
+        <ni-version-edition-form v-model="editedVersion" :validations="$v.editedVersion"
+          :minStartDate="editedVersionMinStartDate" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Modifier le contrat" icon-right="add" color="primary"
           :loading="loading" @click="editVersion" />
@@ -106,7 +107,8 @@
 </template>
 
 <script>
-import { required, requiredIf } from 'vuelidate/lib/validators';
+import { required, requiredIf, minValue } from 'vuelidate/lib/validators';
+import { minDate } from '../../helpers/vuelidateCustomVal';
 import Select from '../form/Select';
 import Input from '../form/Input';
 import DatetimePicker from '../form/DatetimePicker';
@@ -192,7 +194,8 @@ export default {
         grossHourlyRate: { required },
       },
       editedVersion: {
-        grossHourlyRate: { required },
+        grossHourlyRate: { required, minValue: minValue(0) },
+        startDate: { required, minDate: this.editedVersionMinStartDate ? minDate(this.editedVersionMinStartDate) : '' },
       },
       endContract: {
         endNotificationDate: { required },
@@ -257,6 +260,15 @@ export default {
     newVersionMinStartDate () {
       const lastVersion = this.selectedContract.versions[this.selectedContract.versions.length - 1];
       return lastVersion ? this.$moment(lastVersion.startDate).toISOString() : '';
+    },
+    editedVersionMinStartDate () {
+      if (!this.editedVersion.versionId) return '';
+
+      const index = this.selectedContract.versions.findIndex(ver => ver._id === this.editedVersion.versionId)
+      if (!index) return '';
+
+      const previousVersion = this.selectedContract.versions[index - 1];
+      return this.$moment(previousVersion.startDate).add(1, 'd').toISOString();
     },
   },
   async mounted () {
@@ -458,6 +470,7 @@ export default {
         contractId: contract._id,
         versionId: version._id,
         grossHourlyRate: version.grossHourlyRate,
+        startDate: version.startDate,
       };
       this.selectedContract = contract;
       this.versionEditionModal = true;
@@ -467,19 +480,13 @@ export default {
       this.editedVersion = {};
       this.$v.editedVersion.$reset();
     },
-    getVersionEditionPayload () {
-      const payload = {};
-      if (this.editedVersion.grossHourlyRate) payload.grossHourlyRate = this.editedVersion.grossHourlyRate;
-
-      return payload;
-    },
     async editVersion () {
       try {
         this.$v.editedVersion.$touch();
         if (this.$v.editedVersion.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        const payload = this.getVersionEditionPayload();
+        const payload = this.$_.pick(this.editedVersion, ['grossHourlyRate', 'startDate']);
         const params = { contractId: this.editedVersion.contractId, versionId: this.editedVersion.versionId }
         await this.$contracts.updateVersion(params, payload);
         await this.refreshContracts();
