@@ -2,7 +2,7 @@
   <q-page class="neutral-background">
     <ni-planning-manager :events="events" :persons="customers" :personKey="personKey" :can-edit="canEditEvent"
       @updateStartOfWeek="updateStartOfWeek" @editEvent="openEditionModal" @createEvent="openCreationModal"
-      @onDrop="updateEventOnDrop" ref="planningManager" />
+      @onDrop="updateEventOnDrop" ref="planningManager" :customTerms="terms" />
 
     <!-- Event creation modal -->
     <q-modal v-if="Object.keys(newEvent).length !== 0" v-model="creationModal" content-classes="modal-container-md"
@@ -112,6 +112,9 @@ export default {
   components: {
     'ni-planning-manager': Planning,
   },
+  props: {
+    initialCustomer: { type: Object, default: null },
+  },
   data () {
     return {
       loading: false,
@@ -131,13 +134,20 @@ export default {
       editionModal: false,
       personKey: CUSTOMER,
       sectorCustomers: [],
+      terms: [],
     };
   },
   async mounted () {
     try {
       await this.fillFilter(CUSTOMER);
       await this.getAuxiliaries();
-      this.initFilters();
+
+      if (!this.initialCustomer) {
+        this.initFilters();
+      } else {
+        this.addElementToFilter(this.initialCustomer);
+        this.terms = [formatIdentity(this.initialCustomer.identity, 'FL')];
+      }
     } catch (e) {
       console.error(e);
       NotifyNegative('Erreur lors de la récupération des personnes');
