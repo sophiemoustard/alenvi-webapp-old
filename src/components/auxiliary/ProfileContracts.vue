@@ -163,12 +163,7 @@ export default {
       },
       // Edited version
       versionEditionModal: false,
-      editedVersion: {
-        contactId: '',
-        versionId: '',
-        grossHourlyRate: '',
-        shouldBeSigned: true,
-      },
+      editedVersion: {},
       // End contract
       endContractModal: false,
       endContract: {
@@ -490,6 +485,7 @@ export default {
         versionId: version._id,
         grossHourlyRate: version.grossHourlyRate,
         startDate: version.startDate,
+        shouldBeSigned: !!version.signature.eversignId,
       };
       this.selectedContract = contract;
       this.selectedVersion = version;
