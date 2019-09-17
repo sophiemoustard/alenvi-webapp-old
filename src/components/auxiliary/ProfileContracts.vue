@@ -273,8 +273,12 @@ export default {
         this.$moment().startOf('M').isAfter(this.editedVersion.startDate)
     },
     isVersionUpdated () {
-      return this.selectedVersion.grossHourlyRate !== this.editedVersion.grossHourlyRate ||
-        this.$moment(this.selectedVersion.startDate).toISOString() !== this.$moment(this.editedVersion.startDate).toISOString();
+      const grossHourlyRateUpdated = this.selectedVersion.grossHourlyRate !== this.editedVersion.grossHourlyRate;
+      const startDateUpdtaed = this.$moment(this.selectedVersion.startDate).toISOString() !== this.$moment(this.editedVersion.startDate).toISOString();
+      const signatureUpdated = (!!this.$_.get(this.selectedVersion, 'signature.eversignId', '') && !this.editedVersion.shouldBeSigned) ||
+        (!this.$_.get(this.selectedVersion, 'signature.eversignId', '') && this.editedVersion.shouldBeSigned)
+
+      return grossHourlyRateUpdated || startDateUpdtaed || signatureUpdated;
     },
   },
   async mounted () {
@@ -435,7 +439,6 @@ export default {
         grossHourlyRate: this.newVersion.grossHourlyRate,
         weeklyHours: this.newVersion.weeklyHours,
       };
-      delete payload.contractId;
 
       if (this.newVersion.shouldBeSigned) {
         const versionMix = { ...this.selectedContract, ...this.newVersion };
@@ -473,7 +476,7 @@ export default {
         versionId: version._id,
         grossHourlyRate: version.grossHourlyRate,
         startDate: version.startDate,
-        shouldBeSigned: !!version.signature.eversignId,
+        shouldBeSigned: !!version.signature && !!version.signature.eversignId,
       };
       this.selectedContract = contract;
       this.selectedVersion = version;
@@ -483,6 +486,20 @@ export default {
       this.versionEditionModal = false;
       this.editedVersion = {};
       this.$v.editedVersion.$reset();
+    },
+    async getVersionEditionPayload () {
+      const payload = {
+        startDate: this.editedVersion.startDate,
+        grossHourlyRate: this.editedVersion.grossHourlyRate,
+        weeklyHours: this.editedVersion.weeklyHours,
+      };
+
+      if (this.editedVersion.shouldBeSigned) {
+        const versionMix = { ...this.selectedContract, ...this.editedVersion };
+        payload.signature = await this.getSignaturePayload(versionMix, 'Avenant au ');
+      }
+
+      return this.$_.pickBy(payload);
     },
     async editVersion () {
       try {
@@ -500,7 +517,7 @@ export default {
         if (this.$v.editedVersion.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        const payload = this.$_.pick(this.editedVersion, ['grossHourlyRate', 'startDate']);
+        const payload = await this.getVersionEditionPayload();
         const params = { contractId: this.editedVersion.contractId, versionId: this.editedVersion.versionId }
         await this.$contracts.updateVersion(params, payload);
         await this.refreshContracts();
