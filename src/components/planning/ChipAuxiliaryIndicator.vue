@@ -47,6 +47,7 @@ import {
   MONTH_STATS,
   COMPANY_CONTRACT,
   DAILY,
+  FIXED,
 } from '../../data/constants.js';
 import googleMaps from '../../api/GoogleMaps';
 import { getPaidTransport } from '../../helpers/planning';
@@ -108,7 +109,12 @@ export default {
       return this.person.administrative.transportInvoice.transportType === PUBLIC_TRANSPORT ? TRANSIT : DRIVING;
     },
     selectedEvents () {
-      return this.selectedTab === WEEK_STATS ? this.events : this.monthEvents;
+      const events = this.selectedTab === WEEK_STATS ? this.events : this.monthEvents;
+
+      return events.map(ev => ({
+        ...ev,
+        hasFixedService: ev.type === INTERVENTION && this.$_.get(ev, 'subscription.service.nature') === FIXED,
+      }));
     },
     hasCompanyContractOnEvent () {
       if (!this.person.contracts || this.person.contracts.length === 0) return false;
@@ -194,6 +200,8 @@ export default {
       let weeklyInterventions = 0;
       let hoursByCustomer = {}
       for (const event of this.selectedEvents) {
+        if (event.hasFixedService) continue;
+
         const interventionTime = this.$moment(event.endDate).diff(event.startDate, 'm', true);
         if (event.type === INTERNAL_HOUR) weeklyInternalHours += interventionTime;
         if (event.type === INTERVENTION) {
@@ -216,6 +224,8 @@ export default {
         if (eventsOnDay.length <= 1) continue;
 
         for (let i = 0; i < eventsOnDay.length - 1; i++) {
+          if (eventsOnDay[i].hasFixedService || eventsOnDay[i + 1].hasFixedService) continue;
+
           const transportInfo = await this.getBreakInfoBetweenTwoEvents(eventsOnDay[i], eventsOnDay[i + 1]);
           if (transportInfo) breakInfo.push(transportInfo);
         }
