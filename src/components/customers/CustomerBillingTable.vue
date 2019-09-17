@@ -1,6 +1,6 @@
 <template>
   <q-table :data="documents" :columns="columns" binary-state-sort hide-bottom :pagination.sync="pagination"
-    class="q-mb-lg">
+    class="q-mb-lg" row-key="_id">
     <q-tr slot="top-row" slot-scope="props">
       <q-td class="bold">{{ formatDate(billingDates.startDate) }}</q-td>
       <q-td class="bold">Début de période</q-td>
