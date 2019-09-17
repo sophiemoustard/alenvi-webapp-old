@@ -2,7 +2,7 @@
   <q-page class="neutral-background">
     <ni-planning-manager :events="events" :persons="customers" :personKey="personKey" :can-edit="canEditEvent"
       @updateStartOfWeek="updateStartOfWeek" @editEvent="openEditionModal" @createEvent="openCreationModal"
-      @onDrop="updateEventOnDrop" ref="planningManager" :customTerms="terms" />
+      @onDrop="updateEventOnDrop" ref="planningManager" />
 
     <!-- Event creation modal -->
     <q-modal v-if="Object.keys(newEvent).length !== 0" v-model="creationModal" content-classes="modal-container-md"
@@ -134,20 +134,13 @@ export default {
       editionModal: false,
       personKey: CUSTOMER,
       sectorCustomers: [],
-      terms: [],
     };
   },
   async mounted () {
     try {
       await this.fillFilter(CUSTOMER);
       await this.getAuxiliaries();
-
-      if (!this.initialCustomer) {
-        this.initFilters();
-      } else {
-        this.addElementToFilter(this.initialCustomer);
-        this.terms = [formatIdentity(this.initialCustomer.identity, 'FL')];
-      }
+      this.initFilters();
     } catch (e) {
       console.error(e);
       NotifyNegative('Erreur lors de la récupération des personnes');
@@ -251,6 +244,12 @@ export default {
     },
     // Filters
     initFilters () {
+      if (this.initialCustomer) {
+        this.addElementToFilter(this.initialCustomer);
+        this.$refs.planningManager.restoreFilter([formatIdentity(this.initialCustomer.identity, 'FL')]);
+        return;
+      }
+
       if (!AUXILIARY_ROLES.includes(this.mainUser.role.name)) {
         this.addSavedTerms('Customers');
       } else {
