@@ -1,5 +1,6 @@
 <template>
-  <q-table :data="auxiliaries" :columns="columns" row-key="name" :pagination="pagination" hide-header>
+  <q-table :data="auxiliaries" :columns="columns" row-key="name" :pagination.sync="pagination" hide-header
+    :rows-per-page-options="[]">
     <q-td slot="body-cell-picture" slot-scope="props" :props="props">
       <img class="avatar" :src="props.value.link">
     </q-td>
