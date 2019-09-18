@@ -4,7 +4,7 @@
       <ni-contracts v-if="contracts" :contracts="contracts" :user="getUser" @openEndContract="openEndContractModal"
         @openVersionEdition="openVersionEditionModal" @openVersionCreation="openVersionCreationModal" :personKey="COACH"
         @refresh="refreshContracts" :columns="contractVisibleColumns" display-actions display-uploader
-        @refreshWithTimeout="refreshContractsWithTimeout" />
+        @refreshWithTimeout="refreshContractsWithTimeout" @deleteVersion="deleteVersion" />
       <q-btn :disable="!hasBasicInfo" class="fixed fab-custom" no-caps rounded color="primary" icon="add"
         label="Créer un nouveau contrat" @click="openCreationModal" />
       <div v-if="!hasBasicInfo" class="missingBasicInfo">
@@ -520,6 +520,26 @@ export default {
         NotifyNegative('Erreur lors de l\'edition du contrat');
       } finally {
         this.loading = false;
+      }
+    },
+    // Delete version
+    async deleteVersion ({ contractId, versionId }) {
+      try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Etes-vous sûr de vouloir supprimer cet avenant ?',
+          ok: 'OK',
+          cancel: 'Annuler',
+        });
+
+        await this.$contracts.deleteVersion(contractId, versionId);
+
+        await this.refreshContracts();
+        NotifyPositive('Version supprimée');
+      } catch (e) {
+        if (e.message === '') return NotifyPositive('Suppression annulée');
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression de l\'avenant');
       }
     },
     // End contract
