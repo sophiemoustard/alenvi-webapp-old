@@ -30,7 +30,7 @@
         <helper-list :helpers="helpers" />
       </div>
     </div>
-    <div class="q-mb-xl">
+    <div class="q-mb-xl" v-if="customer.firstIntervention">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Auxiliaires</p>
       </div>
@@ -74,7 +74,7 @@ export default {
   async mounted () {
     await this.getCustomer(this.userProfile._id);
     await this.getUserHelpers();
-    await this.getAuxiliaries();
+    if (this.customer.firstIntervention) await this.getAuxiliaries();
   },
   methods: {
     async getUserHelpers () {

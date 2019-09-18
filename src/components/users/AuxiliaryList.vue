@@ -1,8 +1,14 @@
 <template>
-  <q-table :data="auxiliaries" :columns="columns" row-key="name" :pagination.sync="pagination" hide-header
+  <q-table :data="auxiliaries" :columns="columns" row-key="name" :pagination.sync="pagination"
     :rows-per-page-options="[]">
-    <q-td slot="body-cell-picture" slot-scope="props" :props="props">
-      <img class="avatar" :src="props.value.link">
+    <q-td slot="body-cell-identity" slot-scope="props" :props="props">
+      <q-item>
+        <q-item-side :avatar="getAvatar(props.value.picture.link)" />
+        <q-item-main>
+          <span class="identity-block q-mr-sm">{{ props.value.identity | formatIdentity('Fl') }}</span>
+          <span class="identity-block">({{ props.value.sector.name }})</span>
+        </q-item-main>
+      </q-item>
     </q-td>
   </q-table>
 </template>
@@ -10,6 +16,7 @@
 <script>
 import moment from 'moment';
 import { formatIdentity } from '../../helpers/utils';
+import { DEFAULT_AVATAR } from '../../data/constants';
 
 export default {
   name: 'AuxiliaryList',
@@ -20,28 +27,41 @@ export default {
     return {
       columns: [
         {
-          name: 'picture',
-          align: 'left',
-          field: 'picture',
-        },
-        {
           name: 'identity',
           align: 'left',
-          field: row => `${formatIdentity(row.identity, 'Fl')} (${row.sector.name})`,
+          field: row => row,
         },
         {
           name: 'hours',
-          align: 'left',
-          field: row => `${Math.trunc(row.totalHours)}h réalisées`,
+          align: 'center',
+          label: 'Heures réalisées',
+          field: row => `${Math.trunc(row.totalHours)}h`,
         },
         {
           name: 'lastEvent',
-          align: 'left',
-          field: row => `Dernière intervention le ${moment(row.lastEvent.startDate).format('DD/MM/YYYY')}`,
+          align: 'center',
+          label: 'Dernière inter.',
+          field: row => moment(row.lastEvent.startDate).format('DD/MM/YYYY'),
         },
       ],
       pagination: { rowsPerPage: 5 },
     };
   },
+  filters: {
+    formatIdentity,
+  },
+  methods: {
+    getAvatar (link) {
+      return link || DEFAULT_AVATAR;
+    },
+  },
 }
 </script>
+
+<style lang="stylus" scoped>
+  .identity-block
+    display: inline-block;
+    font-size: 12px;
+  .q-item
+    padding: 0;
+</style>
