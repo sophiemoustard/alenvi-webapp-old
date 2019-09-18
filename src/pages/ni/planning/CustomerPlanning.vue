@@ -112,6 +112,9 @@ export default {
   components: {
     'ni-planning-manager': Planning,
   },
+  props: {
+    initialCustomer: { type: Object, default: null },
+  },
   data () {
     return {
       loading: false,
@@ -241,7 +244,9 @@ export default {
     },
     // Filters
     initFilters () {
-      if (!AUXILIARY_ROLES.includes(this.mainUser.role.name)) {
+      if (this.initialCustomer) {
+        this.$refs.planningManager.restoreFilter([formatIdentity(this.initialCustomer.identity, 'FL')]);
+      } else if (!AUXILIARY_ROLES.includes(this.mainUser.role.name)) {
         this.addSavedTerms('Customers');
       } else {
         const userSector = this.filters.find(filter => filter.type === SECTOR && filter._id === this.mainUser.sector);

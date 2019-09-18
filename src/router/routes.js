@@ -211,6 +211,7 @@ const routes = [
         path: 'ni/planning/customers',
         name: 'customers planning',
         component: () => import('pages/ni/planning/CustomerPlanning'),
+        props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: 'events:read',
