@@ -10,13 +10,9 @@
 <script>
 import moment from 'moment';
 import { formatIdentity } from '../../helpers/utils';
-import ChipAuxiliaryIndicator from '../../components/planning/ChipAuxiliaryIndicator';
 
 export default {
   name: 'AuxiliaryList',
-  components: {
-    'chip-auxiliary-indicator': ChipAuxiliaryIndicator,
-  },
   props: {
     auxiliaries: { type: Array, default: () => [] },
   },
