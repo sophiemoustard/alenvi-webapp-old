@@ -269,16 +269,14 @@ export default {
       return this.$moment(previousVersion.startDate).add(1, 'd').toISOString();
     },
     isPreviousPayImpacted () {
-      return this.$moment().startOf('M').isAfter(this.selectedVersion.startDate) ||
-        this.$moment().startOf('M').isAfter(this.editedVersion.startDate)
+      const startOfMonth = this.$moment().startOf('M');
+      return startOfMonth.isAfter(this.selectedVersion.startDate) || startOfMonth.isAfter(this.editedVersion.startDate)
     },
     isVersionUpdated () {
-      const grossHourlyRateUpdated = this.selectedVersion.grossHourlyRate !== this.editedVersion.grossHourlyRate;
-      const startDateUpdtaed = this.$moment(this.selectedVersion.startDate).toISOString() !== this.$moment(this.editedVersion.startDate).toISOString();
-      const signatureUpdated = (!!this.$_.get(this.selectedVersion, 'signature.eversignId', '') && !this.editedVersion.shouldBeSigned) ||
-        (!this.$_.get(this.selectedVersion, 'signature.eversignId', '') && this.editedVersion.shouldBeSigned)
+      if (this.selectedVersion.grossHourlyRate !== this.editedVersion.grossHourlyRate) return true;
+      if (!this.$moment(this.selectedVersion.startDate).isSame(this.editedVersion.startDate)) return true;
 
-      return grossHourlyRateUpdated || startDateUpdtaed || signatureUpdated;
+      return !!this.$_.get(this.selectedVersion, 'signature.eversignId', '') !== this.editedVersion.shouldBeSigned;
     },
   },
   async mounted () {
