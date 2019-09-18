@@ -539,6 +539,7 @@ export default {
       } catch (e) {
         if (e.message === '') return NotifyPositive('Suppression annulée');
         console.error(e);
+        if (e.status === 403) return NotifyNegative('Impossible de supprimer cet avenant');
         NotifyNegative('Erreur lors de la suppression de l\'avenant');
       }
     },
