@@ -6,7 +6,7 @@
           <q-icon v-if="isExternalUser" class="on-left cursor-pointer self-center" size="1rem" name="arrow_back"
             color="primary" @click.native="$router.go(-1)" />
           <h4>{{ user.identity.firstname }} {{ user.identity.lastname }}</h4>
-          <router-link :to="customerPlanningRouterLink" class="self-center" v-if="this.customer">
+          <router-link :to="customerPlanningRouterLink" class="self-center" v-if="customer">
             <q-icon class="on-right cursor-pointer" size="2rem" name="date range" />
           </router-link>
         </div>
