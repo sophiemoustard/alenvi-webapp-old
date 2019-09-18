@@ -358,7 +358,8 @@ export default {
       if (this.newContract.status === COMPANY_CONTRACT) payload.versions[0].weeklyHours = this.newContract.weeklyHours;
 
       if (this.newContract.shouldBeSigned) {
-        payload.signature = await this.getSignaturePayload(this.newContract, '');
+        const template = this.getContractTemplate(this.newContract);
+        payload.signature = await this.getSignaturePayload(this.newContract, '', template);
       }
 
       return this.$_.pickBy(payload);
@@ -404,8 +405,7 @@ export default {
       };
       this.$v.newVersion.$reset();
     },
-    async getSignaturePayload (contract, title) {
-      const template = this.getVersionTemplate(contract);
+    async getSignaturePayload (contract, title, template) {
       const signature = {
         ...this.esignRedirection,
         templateId: template.driveId,
@@ -435,7 +435,8 @@ export default {
       const payload = this.$_.pick(this.newVersion, ['startDate', 'grossHourlyRate', 'weeklyHours']);
       if (this.newVersion.shouldBeSigned) {
         const versionMix = { ...this.selectedContract, ...this.newVersion };
-        payload.signature = await this.getSignaturePayload(versionMix, 'Avenant au ');
+        const template = this.getVersionTemplate(versionMix);
+        payload.signature = await this.getSignaturePayload(versionMix, 'Avenant au ', template);
       }
 
       return this.$_.pickBy(payload);
@@ -484,7 +485,8 @@ export default {
       const payload = this.$_.pick(this.editedVersion, ['startDate', 'grossHourlyRate']);
       if (this.editedVersion.shouldBeSigned) {
         const versionMix = { ...this.selectedContract, ...this.editedVersion };
-        payload.signature = await this.getSignaturePayload(versionMix, 'Avenant au ');
+        const template = this.getVersionTemplate(versionMix);
+        payload.signature = await this.getSignaturePayload(versionMix, 'Avenant au ', template);
       }
 
       return this.$_.pickBy(payload);
