@@ -245,12 +245,8 @@ export default {
     // Filters
     initFilters () {
       if (this.initialCustomer) {
-        this.addElementToFilter(this.initialCustomer);
         this.$refs.planningManager.restoreFilter([formatIdentity(this.initialCustomer.identity, 'FL')]);
-        return;
-      }
-
-      if (!AUXILIARY_ROLES.includes(this.mainUser.role.name)) {
+      } else if (!AUXILIARY_ROLES.includes(this.mainUser.role.name)) {
         this.addSavedTerms('Customers');
       } else {
         const userSector = this.filters.find(filter => filter.type === SECTOR && filter._id === this.mainUser.sector);

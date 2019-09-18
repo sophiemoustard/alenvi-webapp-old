@@ -137,7 +137,6 @@ export default {
     displayAllSectors: { type: Boolean, default: false },
     displayHistory: { type: Boolean, default: false },
     eventHistories: { type: Array, default: () => [] },
-    customTerms: { type: Array, default: () => [] },
   },
   data () {
     return {
@@ -167,7 +166,6 @@ export default {
     this.updateTimeline();
     this.getTimelineHours();
     if (!this.isCustomerPlanning) await this.getDistanceMatrix();
-    if (this.customTerms) this.terms = [...this.customTerms];
   },
   computed: {
     ...mapGetters({
@@ -179,11 +177,6 @@ export default {
     },
     personsGroupedBySector () {
       return this.$_.groupBy(this.persons, 'sector._id');
-    },
-  },
-  watch: {
-    customTerms () {
-      if (this.customTerms) this.terms = [...this.customTerms];
     },
   },
   methods: {
