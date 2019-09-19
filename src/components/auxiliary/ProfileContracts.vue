@@ -529,6 +529,10 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.message === '') return NotifyPositive('Edition annulée');
+        if (e.data && e.data.statusCode === 422) {
+          this.$v.editedVersion.$reset();
+          return NotifyNegative('La date de début du contrat doit etre antérieure aux évènements de l\'auxiliaire.');
+        }
         NotifyNegative('Erreur lors de l\'edition du contrat');
       } finally {
         this.loading = false;
