@@ -41,6 +41,17 @@
                 <p class="no-margin">En attente de signature</p>
               </div>
             </template>
+            <template v-else-if="col.name === 'archives'">
+              <div class="row archives justify-center">
+                <div v-for="archive in col.value" :key="archive._id">
+                  <q-btn flat round small color="primary">
+                    <a :href="archive.link" target="_blank">
+                      <q-icon name="file download" />
+                    </a>
+                  </q-btn>
+                </div>
+              </div>
+            </template>
             <template v-else-if="col.name === 'actions'">
               <div class="row no-wrap table-actions">
                 <q-btn flat round small color="grey" icon="edit" @click="openVersionEdition(contract, props.row)" />
@@ -141,6 +152,12 @@ export default {
           label: 'Contrat / Avenant',
           align: 'center',
           field: (val) => val.signature ? val.signature.eversignId : '',
+        },
+        {
+          name: 'archives',
+          label: 'Archives',
+          align: 'center',
+          field: 'auxiliaryArchives',
         },
         {
           name: 'actions',
@@ -329,4 +346,7 @@ export default {
     position: absolute
     width: 100%
     height:100%
+
+  .archives
+    display: flex;
 </style>

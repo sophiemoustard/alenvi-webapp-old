@@ -142,7 +142,7 @@ export default {
       CUSTOMER_CONTRACT,
       COMPANY_CONTRACT,
       customers: [],
-      contractVisibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractEmpty', 'contractSigned', 'actions'],
+      contractVisibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractEmpty', 'contractSigned', 'archives', 'actions'],
       // New contract
       newContractModal: false,
       newContract: {
