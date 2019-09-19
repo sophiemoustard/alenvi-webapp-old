@@ -81,6 +81,7 @@ export default {
       try {
         this.helpers = await this.$users.showAll({ customers: this.userProfile._id });
       } catch (e) {
+        this.helpers = [];
         NotifyNegative('Erreur lors de la récupération des aidants');
       }
     },
@@ -88,6 +89,7 @@ export default {
       try {
         this.customerFollowUp = await this.$stats.getCustomerFollowUp({ customer: this.customer._id });
       } catch (e) {
+        this.customerFollowUp = [];
         NotifyNegative('Erreur lors de la récupération des auxiliaires');
       }
     },
