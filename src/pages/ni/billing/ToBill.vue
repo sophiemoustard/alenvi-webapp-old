@@ -225,7 +225,7 @@ export default {
         if (!this.hasSelectedRows) return;
         const bills = this.selected.map(row => ({
           ...this.$_.omit(row, ['__index']),
-          customerBills: row.customerBills.bills.map(bill => ({ ...bill, shouldBeSent: !!shouldBeSent[0] })),
+          shouldBeSent: !!shouldBeSent,
         }));
         await this.$bills.create({ bills });
         NotifyPositive('Clients facturés');
