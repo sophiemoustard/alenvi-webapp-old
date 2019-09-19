@@ -42,7 +42,7 @@
               </div>
             </template>
             <template v-else-if="col.name === 'archives'">
-              <div class="row archives">
+              <div class="row archives justify-center">
                 <div v-for="archive in col.value" :key="archive._id">
                   <q-btn flat round small color="primary">
                     <a :href="archive.link" target="_blank">
