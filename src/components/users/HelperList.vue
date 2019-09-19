@@ -39,3 +39,11 @@ export default {
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+  /deep/ .q-table
+    & th
+      padding: 0
+    & td
+      padding: 0
+</style>
