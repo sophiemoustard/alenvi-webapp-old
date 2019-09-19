@@ -1,12 +1,12 @@
 <template>
   <q-page padding class="neutral-background">
-    <div v-if="userProfile">
+    <div v-if="customer">
       <div class="row items-center col-xs-12 header-margin">
         <div>
           <q-icon class="on-left cursor-pointer self-center" size="1rem" name="arrow_back" color="primary"
             @click.native="$router.go(-1)" />
         </div>
-        <h4 class="no-margin">{{ userProfile.identity | formatIdentity('FL') }}</h4>
+        <h4 class="no-margin">{{ customer.identity | formatIdentity('FL') }}</h4>
       </div>
       <profile-follow-up />
     </div>
@@ -29,7 +29,7 @@ export default {
     title: 'Fiche bénéficiaire',
   },
   computed: {
-    userProfile () {
+    customer () {
       return this.$store.getters['rh/getUserProfile'];
     },
   },

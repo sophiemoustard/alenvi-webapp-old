@@ -6,7 +6,7 @@
     </div>
     <q-field :error="error" :error-label="errorLabel">
       <q-search :value="value.fullAddress" inverted-light color="white" placeholder=" " no-icon @input="update"
-        @blur="blurEvent" @focus="focusEvent" :class="{'borders': inModal}">
+        @blur="blurEvent" @focus="focusEvent" :class="{'borders': inModal}" disable>
         <q-autocomplete @search="searchAddress" @selected="selectedAddress" @show="showEvent" />
       </q-search>
     </q-field>
@@ -25,6 +25,7 @@ export default {
     error: { type: Boolean, default: false },
     inModal: { type: Boolean, default: false },
     requiredField: { type: Boolean, default: false },
+    disable: { type: Boolean, default: false },
   },
   data () {
     return {
