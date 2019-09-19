@@ -21,11 +21,12 @@
     <div class="planning-container full-width">
       <table style="width: 100%" :class="[staffingView ? 'staffing' : 'non-staffing', 'planning-table']">
         <thead>
-          <th>
+          <th :class="{ 'bottom-border': persons.length > 0 }">
             <q-btn v-if="!isCustomerPlanning" flat round icon="view_week" :color="staffingView ? 'primary' : ''"
               @click="staffingView = !staffingView" />
           </th>
-          <th class="capitalize" v-for="(day, index) in daysHeader" :key="index">
+          <th class="capitalize" :class="{ 'bottom-border': persons.length > 0 }" :key="index"
+            v-for="(day, index) in daysHeader">
             <div class="row justify-center items-baseline days-header">
               <div class="days-name q-mr-md">{{ day.name }}</div>
               <div :class="['days-number', { 'current-day': isCurrentDay(day.moment) }]">{{ day.number }}</div>
@@ -351,12 +352,6 @@ export default {
         margin: 0;
         position: absolute;
         z-index: -1;
-
-  .planning-hour
-    position: absolute;
-    color: $light-grey;
-    font-size: 12px;
-    bottom: -3px;
 
   .non-staffing
     .planning-background
