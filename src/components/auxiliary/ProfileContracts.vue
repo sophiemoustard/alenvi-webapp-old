@@ -304,8 +304,20 @@ export default {
     },
     async refreshContracts () {
       try {
-        const contracts = await this.$contracts.list({ user: this.getUser._id });
-        this.contracts = contracts;
+        this.contracts = await this.$contracts.list({ user: this.getUser._id });
+        const promises = [];
+        for (const contract of this.contracts) {
+          const version = contract.versions[contract.versions.length - 1];
+          promises.push(this.$events.list({ status: contract.status, auxiliary: contract.user._id, startDate: version.startDate }));
+        }
+
+        const events = await Promise.all(promises);
+        for (let i = 0, l = events.length; i < l; i++) {
+          this.contracts[i].versions = this.contracts[i].versions.map((version, index) => {
+            if (index !== this.contracts[i].versions.length - 1) return { ...version, canBeDeleted: false };
+            return { ...version, canBeDeleted: events[i].length === 0 };
+          })
+        }
       } catch (e) {
         this.contracts = [];
         console.error(e);
