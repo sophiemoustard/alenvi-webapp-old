@@ -1,6 +1,6 @@
 <template>
   <q-table :data="followUp" :columns="columns" row-key="name" :pagination.sync="pagination"
-    :rows-per-page-options="[]">
+    :rows-per-page-options="[]" class="table-fixed">
     <q-td slot="body-cell-identity" slot-scope="props" :props="props">
       <q-item>
         <q-item-side :avatar="props.value.picture.link | getAvatar" />
@@ -62,4 +62,6 @@ export default {
     font-size: 12px;
   .q-item
     padding: 0;
+  .table-fixed >>> table
+    table-layout: fixed;
 </style>
