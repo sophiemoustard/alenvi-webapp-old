@@ -1,9 +1,9 @@
 <template>
-  <q-table :data="auxiliaries" :columns="columns" row-key="name" :pagination.sync="pagination"
+  <q-table :data="followUp" :columns="columns" row-key="name" :pagination.sync="pagination"
     :rows-per-page-options="[]">
     <q-td slot="body-cell-identity" slot-scope="props" :props="props">
       <q-item>
-        <q-item-side :avatar="getAvatar(props.value.picture.link)" />
+        <q-item-side :avatar="props.value.picture.link | getAvatar" />
         <q-item-main>
           <span class="identity-block q-mr-sm">{{ props.value.identity | formatIdentity('Fl') }}</span>
           <span class="identity-block">({{ props.value.sector.name }})</span>
@@ -19,9 +19,9 @@ import { formatIdentity } from '../../helpers/utils';
 import { DEFAULT_AVATAR } from '../../data/constants';
 
 export default {
-  name: 'AuxiliaryList',
+  name: 'CustomerFollowUp',
   props: {
-    auxiliaries: { type: Array, default: () => [] },
+    followUp: { type: Array, default: () => [] },
   },
   data () {
     return {
@@ -49,8 +49,6 @@ export default {
   },
   filters: {
     formatIdentity,
-  },
-  methods: {
     getAvatar (link) {
       return link || DEFAULT_AVATAR;
     },

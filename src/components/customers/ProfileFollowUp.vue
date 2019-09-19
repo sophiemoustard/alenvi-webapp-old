@@ -35,7 +35,7 @@
         <p class="text-weight-bold">Auxiliaires</p>
       </div>
       <div>
-        <auxiliary-list :auxiliaries="auxiliaries" />
+        <customer-follow-up :follow-up="customerFollowUp" />
       </div>
     </div>
   </div>
@@ -45,7 +45,7 @@
 import Input from '../form/Input';
 import Select from '../form/Select';
 import HelperList from '../users/HelperList';
-import AuxiliaryList from '../users/AuxiliaryList';
+import CustomerFollowUp from '../stats/CustomerFollowUp';
 import { followUpMixin } from '../../mixins/followUpMixin.js';
 import { NotifyNegative } from '../popup/notify.js';
 
@@ -54,7 +54,7 @@ export default {
     'ni-input': Input,
     'ni-select': Select,
     'helper-list': HelperList,
-    'auxiliary-list': AuxiliaryList,
+    'customer-follow-up': CustomerFollowUp,
   },
   mixins: [followUpMixin],
   data () {
@@ -63,7 +63,7 @@ export default {
       customer: { followUp: {} },
       tmpInput: '',
       helpers: [],
-      auxiliaries: [],
+      customerFollowUp: [],
     };
   },
   computed: {
@@ -74,7 +74,7 @@ export default {
   async mounted () {
     await this.getCustomer(this.userProfile._id);
     await this.getUserHelpers();
-    if (this.customer.firstIntervention) await this.getAuxiliaries();
+    if (this.customer.firstIntervention) await this.getCustomerFollowUp();
   },
   methods: {
     async getUserHelpers () {
@@ -84,9 +84,9 @@ export default {
         NotifyNegative('Erreur lors de la récupération des aidants');
       }
     },
-    async getAuxiliaries () {
+    async getCustomerFollowUp () {
       try {
-        this.auxiliaries = await this.$users.showActiveForCustomer({ customer: this.userProfile._id });
+        this.customerFollowUp = await this.$stats.getCustomerFollowUp({ customer: this.customer._id });
       } catch (e) {
         NotifyNegative('Erreur lors de la récupération des auxiliaires');
       }
