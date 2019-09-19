@@ -4,7 +4,7 @@
       <ni-contracts v-if="contracts" :contracts="contracts" :user="getUser" @openEndContract="openEndContractModal"
         @openVersionEdition="openVersionEditionModal" @openVersionCreation="openVersionCreationModal" :personKey="COACH"
         @refresh="refreshContracts" :columns="contractVisibleColumns" display-actions display-uploader
-        @refreshWithTimeout="refreshContractsWithTimeout" />
+        @refreshWithTimeout="refreshContractsWithTimeout" @deleteVersion="deleteVersion" />
       <q-btn :disable="!hasBasicInfo" class="fixed fab-custom" no-caps rounded color="primary" icon="add"
         label="Créer un nouveau contrat" @click="openCreationModal" />
       <div v-if="!hasBasicInfo" class="missingBasicInfo">
@@ -304,8 +304,20 @@ export default {
     },
     async refreshContracts () {
       try {
-        const contracts = await this.$contracts.list({ user: this.getUser._id });
-        this.contracts = contracts;
+        this.contracts = await this.$contracts.list({ user: this.getUser._id });
+        const promises = [];
+        for (const contract of this.contracts) {
+          const version = contract.versions[contract.versions.length - 1];
+          promises.push(this.$events.list({ status: contract.status, auxiliary: contract.user._id, startDate: version.startDate }));
+        }
+
+        const events = await Promise.all(promises);
+        for (let i = 0, l = events.length; i < l; i++) {
+          this.contracts[i].versions = this.contracts[i].versions.map((version, index) => {
+            if (index !== this.contracts[i].versions.length - 1) return { ...version, canBeDeleted: false };
+            return { ...version, canBeDeleted: events[i].length === 0 };
+          })
+        }
       } catch (e) {
         this.contracts = [];
         console.error(e);
@@ -520,6 +532,27 @@ export default {
         NotifyNegative('Erreur lors de l\'edition du contrat');
       } finally {
         this.loading = false;
+      }
+    },
+    // Delete version
+    async deleteVersion ({ contractId, versionId }) {
+      try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Etes-vous sûr de vouloir supprimer cet avenant ?',
+          ok: 'OK',
+          cancel: 'Annuler',
+        });
+
+        await this.$contracts.deleteVersion(contractId, versionId);
+
+        await this.refreshContracts();
+        NotifyPositive('Version supprimée');
+      } catch (e) {
+        if (e.message === '') return NotifyPositive('Suppression annulée');
+        console.error(e);
+        if (e.status === 403) return NotifyNegative('Impossible de supprimer cet avenant');
+        NotifyNegative('Erreur lors de la suppression de l\'avenant');
       }
     },
     // End contract

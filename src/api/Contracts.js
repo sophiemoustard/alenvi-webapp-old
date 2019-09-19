@@ -22,4 +22,7 @@ export default {
     const contract = await alenviAxios.post(`${process.env.API_HOSTNAME}/contracts/${contractId}/versions`, payload);
     return contract.data.data.contract;
   },
+  async deleteVersion (contractId, versionId) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/contracts/${contractId}/versions/${versionId}`);
+  },
 };

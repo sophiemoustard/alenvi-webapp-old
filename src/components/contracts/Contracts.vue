@@ -44,6 +44,8 @@
             <template v-else-if="col.name === 'actions'">
               <div class="row no-wrap table-actions">
                 <q-btn flat round small color="grey" icon="edit" @click="openVersionEdition(contract, props.row)" />
+                <q-btn v-if="!props.row.endDate" flat round small color="grey" icon="delete"
+                  :disable="!props.row.canBeDeleted" @click="deleteVersion(contract._id, props.row._id)" />
               </div>
             </template>
             <template v-else>{{ col.value }}</template>
@@ -204,6 +206,9 @@ export default {
     },
     openVersionEdition (contract, version) {
       this.$emit('openVersionEdition', { contract, version });
+    },
+    deleteVersion (contractId, versionId) {
+      this.$emit('deleteVersion', { contractId, versionId });
     },
     openEndContract (contract) {
       this.$emit('openEndContract', contract);
