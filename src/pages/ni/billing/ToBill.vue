@@ -210,15 +210,23 @@ export default {
     },
     async createBills () {
       try {
-        await this.$q.dialog({
+        const shouldBeSent = await this.$q.dialog({
           title: 'Confirmation',
           message: 'Cette opération est définitive. Confirmez-vous ?',
           ok: 'Oui',
           cancel: 'Non',
+          options: {
+            type: 'checkbox',
+            model: [true],
+            items: [{ label: 'Envoyer par email', value: true, color: 'primary' }],
+          },
         });
 
         if (!this.hasSelectedRows) return;
-        const bills = this.selected.map(row => this.$_.omit(row, ['__index']));
+        const bills = this.selected.map(row => ({
+          ...this.$_.omit(row, ['__index']),
+          customerBills: row.customerBills.bills.map(bill => ({ ...bill, shouldBeSent: !!shouldBeSent[0] })),
+        }));
         await this.$bills.create({ bills });
         NotifyPositive('Clients facturés');
         await this.getDraftBills();
