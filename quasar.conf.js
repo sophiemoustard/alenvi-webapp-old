@@ -21,6 +21,7 @@ module.exports = function (ctx) {
       'roles',
       'sectors',
       'services',
+      'stats',
       'surcharges',
       'thirdPartyPayers',
       'twilio',

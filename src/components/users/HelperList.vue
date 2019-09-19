@@ -18,7 +18,7 @@ export default {
           name: 'identity',
           label: 'Identité',
           align: 'left',
-          field: row => formatIdentity(row.identity, 'FL'),
+          field: row => formatIdentity(row.identity, 'LF'),
         },
         {
           name: 'email',
