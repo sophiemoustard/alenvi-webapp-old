@@ -753,9 +753,7 @@ export default {
         NotifyPositive('Document supprimé');
       } catch (e) {
         console.error(e);
-        if (e.message === '') {
-          return NotifyPositive('Suppression annulée');
-        }
+        if (e.message === '') return NotifyPositive('Suppression annulée');
         NotifyNegative('Erreur lors de la suppression du document');
       }
     },

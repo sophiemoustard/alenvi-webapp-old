@@ -5,6 +5,9 @@
       @blur="validations.grossHourlyRate.$touch" />
     <ni-datetime-picker caption="Date d'effet" v-model="value.startDate" :min="minStartDate"
       in-modal required-field @blur="validations.startDate.$touch" :error="validations.startDate.$error" />
+    <div class="margin-input last">
+      <q-checkbox v-model="value.shouldBeSigned" label="Signature en ligne" />
+    </div>
   </div>
 </template>
 

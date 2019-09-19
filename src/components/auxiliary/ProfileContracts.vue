@@ -38,7 +38,7 @@
         v-model="newContract.startDate" in-modal required-field />
       <div class="row margin-input last">
         <div class="col-12">
-          <q-checkbox v-model="shouldBeSigned" label="Signature en ligne" />
+          <q-checkbox v-model="newContract.shouldBeSigned" label="Signature en ligne" />
         </div>
       </div>
       <template slot="footer">
@@ -62,7 +62,7 @@
         :min="newVersionMinStartDate" in-modal required-field />
       <div class="row margin-input last">
         <div class="col-12">
-          <q-checkbox v-model="shouldBeSigned" label="Signature en ligne" />
+          <q-checkbox v-model="newVersion.shouldBeSigned" label="Signature en ligne" />
         </div>
       </div>
       <template slot="footer">
@@ -80,7 +80,7 @@
           :minStartDate="editedVersionMinStartDate" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Modifier le contrat" icon-right="add" color="primary"
-          :loading="loading" @click="editVersion" />
+          :loading="loading" @click="editVersion" :disable="!isVersionUpdated" />
       </template>
     </ni-modal>
 
@@ -144,7 +144,6 @@ export default {
       customers: [],
       contractVisibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractEmpty', 'contractSigned', 'actions'],
       // New contract
-      shouldBeSigned: true,
       newContractModal: false,
       newContract: {
         status: '',
@@ -152,6 +151,7 @@ export default {
         weeklyHours: '',
         startDate: '',
         grossHourlyRate: '',
+        shouldBeSigned: true,
       },
       // New version
       newVersionModal: false,
@@ -159,14 +159,11 @@ export default {
         weeklyHours: '',
         startDate: '',
         grossHourlyRate: '',
+        shouldBeSigned: true,
       },
       // Edited version
       versionEditionModal: false,
-      editedVersion: {
-        contactId: '',
-        versionId: '',
-        grossHourlyRate: '',
-      },
+      editedVersion: {},
       // End contract
       endContractModal: false,
       endContract: {
@@ -177,6 +174,7 @@ export default {
       },
       endContractReasons: END_CONTRACT_REASONS,
       selectedContract: { versions: [] },
+      selectedVersion: {},
     }
   },
   validations () {
@@ -270,6 +268,16 @@ export default {
       const previousVersion = this.selectedContract.versions[index - 1];
       return this.$moment(previousVersion.startDate).add(1, 'd').toISOString();
     },
+    isPreviousPayImpacted () {
+      const startOfMonth = this.$moment().startOf('M');
+      return startOfMonth.isAfter(this.selectedVersion.startDate) || startOfMonth.isAfter(this.editedVersion.startDate)
+    },
+    isVersionUpdated () {
+      if (this.selectedVersion.grossHourlyRate !== this.editedVersion.grossHourlyRate) return true;
+      if (!this.$moment(this.selectedVersion.startDate).isSame(this.editedVersion.startDate)) return true;
+
+      return !!this.$_.get(this.selectedVersion, 'signature.eversignId') !== this.editedVersion.shouldBeSigned;
+    },
   },
   async mounted () {
     await this.refreshContracts();
@@ -326,8 +334,14 @@ export default {
     },
     resetContractCreationModal () {
       this.newContractModal = false;
-      this.newContract = {};
-      this.newContract.grossHourlyRate = '';
+      this.newContract = {
+        status: '',
+        customer: '',
+        weeklyHours: '',
+        startDate: '',
+        grossHourlyRate: '',
+        shouldBeSigned: true,
+      };
       this.$v.newContract.$reset();
     },
     async getContractCreationPayload () {
@@ -343,30 +357,9 @@ export default {
       if (this.newContract.status === CUSTOMER_CONTRACT) payload.customer = this.newContract.customer;
       if (this.newContract.status === COMPANY_CONTRACT) payload.versions[0].weeklyHours = this.newContract.weeklyHours;
 
-      if (this.shouldBeSigned) {
+      if (this.newContract.shouldBeSigned) {
         const template = this.getContractTemplate(this.newContract);
-        payload.signature = {
-          ...this.esignRedirection,
-          templateId: template.driveId,
-          meta: { type: this.newContract.status, auxiliaryDriveId: this.getUser.administrative.driveFolder.driveId },
-          fields: generateContractFields(
-            this.newContract.status,
-            { user: this.getUser, contract: this.newContract, initialContractStartDate: this.newContract.startDate }
-          ),
-        };
-
-        if (this.newContract.status === CUSTOMER_CONTRACT) {
-          const helpers = await this.$users.showAll({ customers: this.newContract.customer });
-          const currentCustomer = helpers[0].customers.find(cus => cus._id === this.newContract.customer);
-          payload.signature.signers = this.generateContractSigners({ name: helpers[0].identity.lastname, email: helpers[0].local.email });
-          payload.signature.title = `${translate[this.newContract.status]} - ${currentCustomer.identity.lastname}`;
-          payload.signature.meta.customerDriveId = currentCustomer.driveFolder.driveId;
-        } else {
-          payload.signature.signers = this.generateContractSigners(
-            { name: `${this.mainUser.identity.firstname} ${this.mainUser.identity.lastname}`, email: this.mainUser.local.email }
-          );
-          payload.signature.title = `${translate[this.newContract.status]} - ${this.userFullName}`;
-        }
+        payload.signature = await this.getSignaturePayload(this.newContract, '', template);
       }
 
       return this.$_.pickBy(payload);
@@ -400,44 +393,50 @@ export default {
         : this.$_.get(this.getUser, 'company.rhConfig.contractWithCustomer.grossHourlyRate');
       this.newVersion.contractId = contract._id;
       this.selectedContract = contract;
-      this.shouldBeSigned = this.selectedContract.status === CUSTOMER_CONTRACT;
       this.newVersionModal = true;
     },
     resetVersionCreationModal () {
       this.newVersionModal = false;
-      this.newVersion = {};
-      this.newVersion.grossHourlyRate = '';
+      this.newVersion = {
+        weeklyHours: '',
+        startDate: '',
+        grossHourlyRate: '',
+        shouldBeSigned: true,
+      };
       this.$v.newVersion.$reset();
-      this.shouldBeSigned = true;
+    },
+    async getSignaturePayload (contract, title, template) {
+      const signature = {
+        ...this.esignRedirection,
+        templateId: template.driveId,
+        meta: { type: contract.status, auxiliaryDriveId: this.getUser.administrative.driveFolder.driveId },
+        fields: generateContractFields(
+          contract.status,
+          { user: this.getUser, contract: contract, initialContractStartDate: this.selectedContract.startDate }
+        ),
+      }
+
+      if (contract.status === CUSTOMER_CONTRACT) {
+        const helpers = await this.$users.showAll({ customers: contract.customer });
+        const currentCustomer = helpers[0].customers.find(cus => cus._id === contract.customer);
+        signature.signers = this.generateContractSigners({ name: helpers[0].identity.lastname, email: helpers[0].local.email });
+        signature.title = `${translate[contract.status]} - ${currentCustomer.identity.lastname}`;
+        signature.meta.customerDriveId = currentCustomer.driveFolder.driveId;
+      } else {
+        signature.signers = this.generateContractSigners(
+          { name: `${this.mainUser.identity.firstname} ${this.mainUser.identity.lastname}`, email: this.mainUser.local.email }
+        );
+        signature.title = `${title}${translate[contract.status]} - ${this.userFullName}`;
+      }
+
+      return signature;
     },
     async getVersionCreationPayload () {
-      const payload = { ...this.newVersion };
-      delete payload.contractId;
-
-      if (this.shouldBeSigned) {
+      const payload = this.$_.pick(this.newVersion, ['startDate', 'grossHourlyRate', 'weeklyHours']);
+      if (this.newVersion.shouldBeSigned) {
         const versionMix = { ...this.selectedContract, ...this.newVersion };
         const template = this.getVersionTemplate(versionMix);
-        payload.signature = {
-          ...this.esignRedirection,
-          templateId: template.driveId,
-          meta: { type: versionMix.status, auxiliaryDriveId: this.getUser.administrative.driveFolder.driveId },
-          fields: generateContractFields(
-            versionMix.status,
-            { user: this.getUser, contract: versionMix, initialContractStartDate: this.selectedContract.startDate }
-          ),
-        };
-
-        if (versionMix.status === CUSTOMER_CONTRACT) {
-          const helpers = await this.$users.showAll({ customers: versionMix.customer._id });
-          payload.signature.signers = this.generateContractSigners({ name: helpers[0].identity.lastname, email: helpers[0].local.email });
-          payload.signature.title = `Avenant au ${translate[versionMix.status]} - ${versionMix.customer.identity.lastname}`;
-          payload.signature.meta.customerDriveId = versionMix.customer.driveFolder.driveId;
-        } else {
-          payload.signature.signers = this.generateContractSigners(
-            { name: `${this.mainUser.identity.firstname} ${this.mainUser.identity.lastname}`, email: this.mainUser.local.email }
-          );
-          payload.signature.title = `Avenant au ${translate[versionMix.status]} - ${this.userFullName}`;
-        }
+        payload.signature = await this.getSignaturePayload(versionMix, 'Avenant au ', template);
       }
 
       return this.$_.pickBy(payload);
@@ -471,8 +470,10 @@ export default {
         versionId: version._id,
         grossHourlyRate: version.grossHourlyRate,
         startDate: version.startDate,
+        shouldBeSigned: !!version.signature && !!version.signature.eversignId,
       };
       this.selectedContract = contract;
+      this.selectedVersion = version;
       this.versionEditionModal = true;
     },
     resetVersionEditionModal () {
@@ -480,13 +481,33 @@ export default {
       this.editedVersion = {};
       this.$v.editedVersion.$reset();
     },
+    async getVersionEditionPayload () {
+      const payload = this.$_.pick(this.editedVersion, ['startDate', 'grossHourlyRate']);
+      if (this.editedVersion.shouldBeSigned) {
+        const versionMix = { ...this.selectedContract, ...this.editedVersion };
+        const template = this.getVersionTemplate(versionMix);
+        payload.signature = await this.getSignaturePayload(versionMix, 'Avenant au ', template);
+      }
+
+      return this.$_.pickBy(payload);
+    },
     async editVersion () {
       try {
+        if (!this.isVersionUpdated) return this.resetVersionEditionModal();
+        if (this.isPreviousPayImpacted) {
+          await this.$q.dialog({
+            title: 'Confirmation',
+            message: 'Ce changement impacte une paie déjà effectuée. Vérifiez que vous ne pouvez pas créer un avenant prenant effet ce mois-ci. Confirmez-vous ce changement ?',
+            ok: true,
+            cancel: 'Annuler',
+          });
+        }
+
         this.$v.editedVersion.$touch();
         if (this.$v.editedVersion.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        const payload = this.$_.pick(this.editedVersion, ['grossHourlyRate', 'startDate']);
+        const payload = await this.getVersionEditionPayload();
         const params = { contractId: this.editedVersion.contractId, versionId: this.editedVersion.versionId }
         await this.$contracts.updateVersion(params, payload);
         await this.refreshContracts();
@@ -495,6 +516,7 @@ export default {
         NotifyPositive('Contrat modifié');
       } catch (e) {
         console.error(e);
+        if (e.message === '') return NotifyPositive('Edition annulée');
         NotifyNegative('Erreur lors de l\'edition du contrat');
       } finally {
         this.loading = false;
