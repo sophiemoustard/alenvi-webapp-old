@@ -7,6 +7,12 @@
       <div class="row gutter-profile">
         <ni-input caption="Accès / codes" v-model="customer.contact.accessCodes" @focus="saveTmp('contact.accessCodes')"
           @blur="updateCustomer('contact.accessCodes')" />
+        <ni-input v-if="isAuxiliary" caption="Téléphone" type="tel" :error="$v.customer.contact.phone.$error"
+          error-label="Numéro de téléphone non valide" v-model.trim="customer.contact.phone"
+          @focus="saveTmp('contact.phone')" @blur="updateCustomer('contact.phone')" />
+      </div>
+      <div class="row gutter-profile">
+        <ni-search-address v-if="isAuxiliary" v-model="customer.contact.address" color="white" disable />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -46,29 +52,49 @@ import Input from '../form/Input';
 import Select from '../form/Select';
 import HelperList from '../users/HelperList';
 import CustomerFollowUp from '../stats/CustomerFollowUp';
-import { followUpMixin } from '../../mixins/followUpMixin.js';
 import { NotifyNegative } from '../popup/notify.js';
+import { AUXILIARY_ROLES } from '../../data/constants';
+import SearchAddress from '../form/SearchAddress';
+import { extend } from '../../helpers/utils.js';
+import { customerMixin } from '../../mixins/customerMixin.js';
+import { validationMixin } from '../../mixins/validationMixin.js';
+import { frPhoneNumber } from '../../helpers/vuelidateCustomVal';
 
 export default {
+  name: 'ProfileFollowUp',
   components: {
     'ni-input': Input,
     'ni-select': Select,
     'helper-list': HelperList,
     'customer-follow-up': CustomerFollowUp,
+    'ni-search-address': SearchAddress,
   },
-  mixins: [followUpMixin],
+  mixins: [customerMixin, validationMixin],
   data () {
     return {
       isLoaded: false,
-      customer: { followUp: {} },
+      customer: { followUp: {}, contact: {} },
       tmpInput: '',
       helpers: [],
       customerFollowUp: [],
     };
   },
+  validations: {
+    customer: {
+      contact: {
+        phone: { frPhoneNumber },
+      },
+    },
+  },
   computed: {
     userProfile () {
       return this.$store.getters['rh/getUserProfile'];
+    },
+    currentUser () {
+      return this.$store.getters['main/user'];
+    },
+    isAuxiliary () {
+      return AUXILIARY_ROLES.includes(this.currentUser.role.name);
     },
   },
   async mounted () {
@@ -92,6 +118,24 @@ export default {
         this.customerFollowUp = [];
         NotifyNegative('Erreur lors de la récupération des auxiliaires');
       }
+    },
+    async getCustomer (customerId) {
+      try {
+        const customer = await this.$customers.getById(customerId);
+        this.mergeCustomer(customer);
+        this.isLoaded = true;
+        this.$v.customer.$touch();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors du chargement des données');
+      }
+    },
+    mergeCustomer (value = null) {
+      const args = [this.customer, value];
+      this.customer = Object.assign({}, extend(true, ...args));
+    },
+    saveTmp (path) {
+      this.tmpInput = this.$_.get(this.customer, path);
     },
   },
 }
