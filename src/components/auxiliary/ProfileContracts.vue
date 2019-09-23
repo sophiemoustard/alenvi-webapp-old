@@ -421,7 +421,7 @@ export default {
       const signature = {
         ...this.esignRedirection,
         templateId: template.driveId,
-        meta: { type: contract.status, auxiliaryDriveId: this.getUser.administrative.driveFolder.driveId },
+        meta: { status: contract.status, auxiliaryDriveId: this.getUser.administrative.driveFolder.driveId },
         fields: generateContractFields(
           contract.status,
           { user: this.getUser, contract: contract, initialContractStartDate: this.selectedContract.startDate }
