@@ -315,7 +315,7 @@ export default {
         for (let i = 0, l = events.length; i < l; i++) {
           this.contracts[i].versions = this.contracts[i].versions.map((version, index) => {
             if (index !== this.contracts[i].versions.length - 1) return { ...version, canBeDeleted: false };
-            return { ...version, canBeDeleted: events[i].length === 0 };
+            return { ...version, canBeDeleted: index !== 0 || events[i].length === 0 };
           })
         }
       } catch (e) {
