@@ -54,7 +54,6 @@
 </template>
 
 <script>
-import { date } from 'quasar'
 import { required, email, sameAs, minLength } from 'vuelidate/lib/validators';
 
 import CompaniHeader from '../../components/CompaniHeader';
@@ -129,10 +128,11 @@ export default {
           email: this.user.alenvi.local.email.toLowerCase(),
           password: this.user.alenvi.local.password,
         });
-        this.$q.cookies.set('alenvi_token', user.data.data.token, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV !== 'development' });
-        this.$q.cookies.set('alenvi_token_expires_in', user.data.data.expiresIn, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV !== 'development' });
+        const expiresInDays = parseInt(user.data.data.expiresIn / 3600 / 24, 10) >= 1 ? parseInt(user.data.data.expiresIn / 3600 / 24, 10) : 1;
+        this.$q.cookies.set('alenvi_token', user.data.data.token, { path: '/', expires: expiresInDays, secure: process.env.NODE_ENV !== 'development' });
+        this.$q.cookies.set('alenvi_token_expires_in', user.data.data.expiresIn, { path: '/', expires: expiresInDays, secure: process.env.NODE_ENV !== 'development' });
         this.$q.cookies.set('refresh_token', user.data.data.refreshToken, { path: '/', expires: 365, secure: process.env.NODE_ENV !== 'development' });
-        this.$q.cookies.set('user_id', user.data.data.user._id, { path: '/', expires: date.addToDate(new Date(), { seconds: user.data.data.expiresIn }), secure: process.env.NODE_ENV !== 'development' });
+        this.$q.cookies.set('user_id', user.data.data.user._id, { path: '/', expires: expiresInDays, secure: process.env.NODE_ENV !== 'development' });
         await this.$store.dispatch('main/getUser', this.$q.cookies.get('user_id'));
         if (this.$q.platform.is.desktop) {
           this.$store.commit('main/setToggleDrawer', true);
@@ -140,7 +140,7 @@ export default {
         if (this.$route.query.from) {
           return this.$router.replace({ path: this.$route.query.from });
         }
-        this.$router.replace({ name: 'personal info', params: { id: this.$q.cookies.get('user_id') } });
+        this.$router.replace({ name: 'auxiliary personal info', params: { id: this.$q.cookies.get('user_id') } });
       } catch (e) {
         console.error(e);
         NotifyNegative('Echec de la mise à jour de l\'utilisateur');
