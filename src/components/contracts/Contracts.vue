@@ -53,9 +53,9 @@
               </div>
             </template>
             <template v-else-if="col.name === 'actions'">
-              <div v-if="!props.row.endDate" class="row no-wrap table-actions">
+              <div v-if="!contract.endDate" class="row no-wrap table-actions">
                 <q-btn flat round small color="grey" icon="edit" @click="openVersionEdition(contract, props.row)" />
-                <q-btn flat round small color="grey" icon="delete"
+                <q-btn v-if="!props.row.endDate" flat round small color="grey" icon="delete"
                   :disable="!props.row.canBeDeleted" @click="deleteVersion(contract._id, props.row._id)" />
               </div>
             </template>
