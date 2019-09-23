@@ -53,7 +53,7 @@
               </div>
             </template>
             <template v-else-if="col.name === 'actions'">
-              <div class="row no-wrap table-actions">
+              <div v-if="!contract.endDate" class="row no-wrap table-actions contract-actions">
                 <q-btn flat round small color="grey" icon="edit" @click="openVersionEdition(contract, props.row)" />
                 <q-btn v-if="!props.row.endDate" flat round small color="grey" icon="delete"
                   :disable="!props.row.canBeDeleted" @click="deleteVersion(contract._id, props.row._id)" />
@@ -64,7 +64,7 @@
         </q-tr>
       </q-table>
       <q-card-actions align="end">
-        <template v-if="displayActions">
+        <template v-if="displayActions && !contract.endDate">
           <q-btn flat no-caps color="primary" icon="add" label="Ajouter un avenant"
             @click="openVersionCreation(contract)" />
           <q-btn flat no-caps color="grey-6" icon="clear" label="Mettre fin au contrat"
@@ -349,4 +349,7 @@ export default {
 
   .archives
     display: flex;
+
+  .contract-actions
+    justify-content: normal !important
 </style>
