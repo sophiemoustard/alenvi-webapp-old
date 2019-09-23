@@ -72,7 +72,7 @@ const routes = [
         component: () => import('pages/ni/billing/ToBill'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: 'billing:edit',
+          permissions: 'bills:edit',
           parent: 'billing',
         },
       },
@@ -82,7 +82,7 @@ const routes = [
         component: () => import('pages/ni/billing/CreditNotes'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: 'billing:edit',
+          permissions: 'bills:edit',
           parent: 'billing',
         },
       },
@@ -92,7 +92,7 @@ const routes = [
         component: () => import('pages/ni/billing/ClientsBalances'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: 'billing:edit',
+          permissions: 'bills:edit',
           parent: 'billing',
         },
       },
@@ -102,7 +102,7 @@ const routes = [
         component: () => import('pages/ni/billing/DebitsArchive'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: 'billing:edit',
+          permissions: 'bills:edit',
           parent: 'billing',
         },
       },
