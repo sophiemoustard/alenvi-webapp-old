@@ -151,6 +151,7 @@ export default {
       const can = this.$can({
         user: this.currentUser,
         auxiliaryIdEvent: this.selectedAuxiliary._id,
+        auxiliarySectorEvent: this.selectedAuxiliary.sector,
         permissions: [
           { name: 'events:edit' },
           { name: 'events:sector:edit', rule: 'isInSameSector' },
