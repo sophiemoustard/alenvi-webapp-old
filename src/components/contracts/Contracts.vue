@@ -41,9 +41,22 @@
                 <p class="no-margin">En attente de signature</p>
               </div>
             </template>
-            <template v-else-if="col.name === 'isActive'">
-              <div class="row justify-center table-actions">
-                <q-checkbox :disable="col.value || (props.row && 'endDate' in props.row)" :value="col.value" @input="updateContractActivity($event, contract, props.row, index)" />
+            <template v-else-if="col.name === 'archives'">
+              <div class="row archives justify-center">
+                <div v-for="archive in col.value" :key="archive._id">
+                  <q-btn flat round small color="primary">
+                    <a :href="archive.link" target="_blank">
+                      <q-icon name="file download" />
+                    </a>
+                  </q-btn>
+                </div>
+              </div>
+            </template>
+            <template v-else-if="col.name === 'actions'">
+              <div v-if="!contract.endDate" class="row no-wrap table-actions contract-actions">
+                <q-btn flat round small color="grey" icon="edit" @click="openVersionEdition(contract, props.row)" />
+                <q-btn v-if="!props.row.endDate" flat round small color="grey" icon="delete"
+                  :disable="!props.row.canBeDeleted" @click="deleteVersion(contract._id, props.row._id)" />
               </div>
             </template>
             <template v-else>{{ col.value }}</template>
@@ -51,10 +64,10 @@
         </q-tr>
       </q-table>
       <q-card-actions align="end">
-        <template v-if="displayActions">
-          <q-btn v-if="getActiveVersion(contract)" flat no-caps color="primary" icon="add" label="Ajouter un avenant"
+        <template v-if="displayActions && !contract.endDate">
+          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un avenant"
             @click="openVersionCreation(contract)" />
-          <q-btn v-if="getActiveVersion(contract)" flat no-caps color="grey-6" icon="clear" label="Mettre fin au contrat"
+          <q-btn flat no-caps color="grey-6" icon="clear" label="Mettre fin au contrat"
             @click="openEndContract(contract)" />
         </template>
       </q-card-actions>
@@ -75,7 +88,7 @@
 import { Cookies } from 'quasar';
 import { contractMixin } from '../../mixins/contractMixin.js';
 import { CONTRACT_STATUS_OPTIONS, CUSTOMER_CONTRACT, COACH, CUSTOMER, AUXILIARY, COMPANY_CONTRACT } from '../../data/constants.js';
-import { NotifyPositive, NotifyNegative } from '../../components/popup/notify.js';
+import { NotifyNegative } from '../../components/popup/notify.js';
 import { downloadDocxFile } from '../../helpers/downloadFile';
 import { generateContractFields } from '../../helpers/generateContractFields';
 import { formatIdentity } from '../../helpers/utils';
@@ -141,10 +154,15 @@ export default {
           field: (val) => val.signature ? val.signature.eversignId : '',
         },
         {
-          name: 'isActive',
-          label: 'Actif',
+          name: 'archives',
+          label: 'Archives',
           align: 'center',
-          field: 'isActive',
+          field: 'auxiliaryArchives',
+        },
+        {
+          name: 'actions',
+          align: 'center',
+          field: '_id',
         },
       ],
       extensions: 'image/jpg, image/jpeg, image/gif, image/png, application/pdf',
@@ -179,12 +197,16 @@ export default {
       NotifyNegative('Echec de l\'envoi du document');
     },
     getAdditionalFields (contract, version) {
-      return [
+      const additionalFields = [
         { name: 'fileName', value: `contrat_signe_${this.user.identity.firstname}_${this.user.identity.lastname}` },
         { name: 'contractId', value: contract._id },
         { name: 'versionId', value: version._id },
-        { name: 'type', value: contract.status },
-      ]
+        { name: 'status', value: contract.status },
+      ];
+
+      if (contract.status === CUSTOMER_CONTRACT) additionalFields.push({ name: 'customer', value: contract.customer._id });
+
+      return additionalFields;
     },
     getLastVersion (contract) {
       return this.$_.orderBy(contract.versions, ['startDate'], ['desc'])[0];
@@ -199,6 +221,12 @@ export default {
     openVersionCreation (contract) {
       this.$emit('openVersionCreation', contract);
     },
+    openVersionEdition (contract, version) {
+      this.$emit('openVersionEdition', { contract, version });
+    },
+    deleteVersion (contractId, versionId) {
+      this.$emit('deleteVersion', { contractId, versionId });
+    },
     openEndContract (contract) {
       this.$emit('openEndContract', contract);
     },
@@ -207,59 +235,6 @@ export default {
     },
     refreshWithTimeout () {
       this.$emit('refreshWithTimeout');
-    },
-    async updateContractActivity (isActive, contract, version, contractIndex) {
-      try {
-        await this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Es-tu sûr(e) de vouloir activer ce contrat ?',
-          ok: true,
-          cancel: 'Annuler',
-        });
-        await this.updateEndDateOfPreviousVersion(contract._id, contractIndex);
-
-        const queries = { contractId: contract._id, versionId: version._id };
-        await this.$contracts.updateVersion(queries, { 'isActive': isActive });
-
-        // Update manually checkbox because it's not dynamic
-        this.sortedContracts[contractIndex].versions[version.__index].isActive = isActive;
-        await this.updatePreviousVersions(contractIndex, version._id);
-        this.refresh();
-        NotifyPositive('Activité du contrat changée');
-      } catch (e) {
-        console.error(e);
-        if (e.message !== '') {
-          NotifyNegative('Erreur lors du changement de l\'activité du contrat');
-        }
-      }
-    },
-    // Contract edition
-    async updatePreviousVersions (contractIndex, versionId) {
-      for (let i = 0, l = this.contracts[contractIndex].versions.length; i < l; i++) {
-        const contract = this.contracts[contractIndex];
-        const currentVersion = contract.versions[i];
-        if (currentVersion.isActive && currentVersion._id !== versionId) {
-          const queries = {
-            contractId: contract._id,
-            versionId: currentVersion._id,
-          };
-          await this.$contracts.updateVersion(queries, { 'isActive': false });
-          currentVersion.isActive = false;
-        }
-      }
-    },
-    async updateEndDateOfPreviousVersion (contractId, contractIndex) {
-      const lastActiveVersion = this.getActiveVersion(this.contracts[contractIndex]);
-      const lastVersion = this.getLastVersion(this.contracts[contractIndex]);
-
-      if (lastActiveVersion) {
-        const queries = {
-          contractId: contractId,
-          versionId: lastActiveVersion._id,
-        };
-        const payload = { endDate: this.$moment(lastVersion.startDate).toDate() };
-        await this.$contracts.updateVersion(queries, payload);
-      }
     },
     // Documents
     canDownload (contract, status) {
@@ -322,6 +297,8 @@ export default {
       return !!(contract.signature && contract.signature.eversignId);
     },
     shouldSignDocument (contractStatus, contractSignature) {
+      if (!contractSignature.signedBy) return true;
+
       switch (this.personKey) {
         case COACH:
           return contractStatus === COMPANY_CONTRACT && !contractSignature.signedBy.other;
@@ -369,4 +346,10 @@ export default {
     position: absolute
     width: 100%
     height:100%
+
+  .archives
+    display: flex;
+
+  .contract-actions
+    justify-content: normal !important
 </style>

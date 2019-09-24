@@ -35,7 +35,7 @@
     <q-item-separator />
     <q-collapsible ref="team" v-model="activeRoutes.team.open" collapseIcon="expand_more">
       <template slot="header">
-        <q-item-main :class="{'text-weight-bold': activeRoutes.team.highlight }" label="Equipe" />
+        <q-item-main :class="{'text-weight-bold': activeRoutes.team.highlight }" label="Équipe" />
       </template>
       <ni-menu-item name="team directory" :params="{ id: user._id }" icon="group" label="Répertoire" />
     </q-collapsible>

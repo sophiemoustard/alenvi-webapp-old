@@ -2,7 +2,7 @@
   <div v-if="isLoaded">
     <div v-if="!isAuxiliary" class="row gutter-profile q-mb-xl">
       <div class="col-xs-12 col-md-6">
-        <p class="input-caption">Communauté</p>
+        <p class="input-caption">Équipe</p>
         <ni-select-sector v-model="user.sector" @blur="updateUser('sector')" @focus="saveTmp('sector')"
           :company-id="mainUser.company._id" />
       </div>
@@ -753,9 +753,7 @@ export default {
         NotifyPositive('Document supprimé');
       } catch (e) {
         console.error(e);
-        if (e.message === '') {
-          return NotifyPositive('Suppression annulée');
-        }
+        if (e.message === '') return NotifyPositive('Suppression annulée');
         NotifyNegative('Erreur lors de la suppression du document');
       }
     },

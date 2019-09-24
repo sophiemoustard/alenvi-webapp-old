@@ -278,7 +278,8 @@ export default {
           user: this.$store.getters['main/user'],
           auxiliarySectorEvent: eventInfo.sectorId,
           permissions: [
-            { name: 'planning:create:user', rule: 'isInSameSector' },
+            { name: 'events:edit' },
+            { name: 'events:sector:edit', rule: 'isInSameSector' },
           ],
         });
       } else if (this.personKey === 'auxiliary') {
@@ -287,8 +288,9 @@ export default {
           auxiliaryIdEvent: eventInfo.person._id,
           auxiliarySectorEvent: eventInfo.person.sector._id,
           permissions: [
-            { name: 'planning:create:user', rule: 'isInSameSector' },
-            { name: 'planning:create', rule: 'isOwner' },
+            { name: 'events:edit' },
+            { name: 'events:sector:edit', rule: 'isInSameSector' },
+            { name: 'events:own:edit', rule: 'isOwner' },
           ],
         });
       }

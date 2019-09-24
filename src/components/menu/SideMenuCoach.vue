@@ -40,18 +40,18 @@
         <ni-menu-item name="debits archive" :params="{ id: user._id }" icon="mdi-archive" label="Archive prélèvements" />
       </q-collapsible>
     </template>
-    <template v-if="user.role.name === ADMIN">
-      <q-item-separator />
-      <q-collapsible ref="pay" v-model="activeRoutes.pay.open"
-        collapseIcon="expand_more">
-        <template slot="header">
-          <q-item-main :class="{'text-weight-bold': activeRoutes.pay.highlight }" label="Paie" />
-        </template>
-        <ni-menu-item name="to pay" :params="{ id: user._id }" icon="euro_symbol" label="À payer" />
-        <ni-menu-item name="contract ends" :params="{ id: user._id }" icon="description" label="Fins de contrats" />
-        <ni-menu-item name="absences" :params="{ id: user._id }" icon="calendar_today" label="Absences" />
-      </q-collapsible>
-    </template>
+    <q-item-separator />
+    <q-collapsible ref="pay" v-model="activeRoutes.pay.open"
+      collapseIcon="expand_more">
+      <template slot="header">
+        <q-item-main :class="{'text-weight-bold': activeRoutes.pay.highlight }" label="Paie" />
+      </template>
+      <ni-menu-item name="absences" :params="{ id: user._id }" icon="calendar_today" label="Absences" />
+      <template v-if="user.role.name === ADMIN">
+        <ni-menu-item name="contract ends" :params="{ id: user._id }" icon="description" label="STC" />
+        <ni-menu-item name="to pay" :params="{ id: user._id }" icon="euro_symbol" label="Paie mensuelle" />
+      </template>
+    </q-collapsible>
     <q-item-separator />
     <q-collapsible ref="exports" v-model="activeRoutes.exports.open" collapseIcon="expand_more">
       <template slot="header">
