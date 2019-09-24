@@ -34,7 +34,7 @@
         @blur="$v.newContract.weeklyHours.$touch" suffix="hr" required-field />
       <ni-input in-modal caption="Taux horaire" :error="$v.newContract.grossHourlyRate.$error" type="number"
         v-model="newContract.grossHourlyRate" @blur="$v.newContract.grossHourlyRate.$touch" suffix="€" required-field />
-      <ni-datetime-picker caption="Date d'effet" :error="$v.newContract.startDate.$error"
+      <ni-datetime-picker caption="Date d'effet" :error="$v.newContract.startDate.$error" :min="companyContractMinStartDate"
         v-model="newContract.startDate" in-modal required-field />
       <div class="row margin-input last">
         <div class="col-12">
@@ -121,6 +121,7 @@ import { translate } from '../../data/translate';
 import { contractMixin } from '../../mixins/contractMixin.js';
 import { generateContractFields } from '../../helpers/generateContractFields.js';
 import { formatIdentity } from '../../helpers/utils';
+import moment from 'moment';
 
 export default {
   name: 'ProfileContracts',
@@ -228,10 +229,25 @@ export default {
 
       return false;
     },
+    getLastCompanyContractEndingDate () {
+      if (this.contracts.length === 0) return null;
+      const sortedContracts = [...this.contracts].sort((a, b) => b.startDate - a.startDate);
+      for (let i = 0; i < sortedContracts.length; i++) {
+        if (sortedContracts[i].status === COMPANY_CONTRACT && sortedContracts[i].endDate && this.$moment(sortedContracts[i].endDate).isAfter(moment(), 'd')) {
+          return sortedContracts[i].endDate;
+        }
+      }
+    },
     statusOptions () {
       if (!this.hasCompanyContract) return CONTRACT_STATUS_OPTIONS;
 
       return CONTRACT_STATUS_OPTIONS.filter(option => option.value === CUSTOMER_CONTRACT);
+    },
+    companyContractMinStartDate () {
+      if (this.getLastCompanyContractEndingDate) {
+        return this.$moment(this.getLastCompanyContractEndingDate).add(1, 'd').toISOString();
+      }
+      return '';
     },
     contractMinEndDate () {
       if (this.endContractModal) {
