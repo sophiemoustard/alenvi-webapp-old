@@ -34,7 +34,7 @@
         @blur="$v.newContract.weeklyHours.$touch" suffix="hr" required-field />
       <ni-input in-modal caption="Taux horaire" :error="$v.newContract.grossHourlyRate.$error" type="number"
         v-model="newContract.grossHourlyRate" @blur="$v.newContract.grossHourlyRate.$touch" suffix="€" required-field />
-      <ni-datetime-picker caption="Date d'effet" :error="$v.newContract.startDate.$error"
+      <ni-datetime-picker caption="Date d'effet" :error="$v.newContract.startDate.$error" :min="companyContractMinStartDate"
         v-model="newContract.startDate" in-modal required-field />
       <div class="row margin-input last">
         <div class="col-12">
@@ -232,6 +232,16 @@ export default {
       if (!this.hasCompanyContract) return CONTRACT_STATUS_OPTIONS;
 
       return CONTRACT_STATUS_OPTIONS.filter(option => option.value === CUSTOMER_CONTRACT);
+    },
+    companyContractMinStartDate () {
+      if (this.contracts.length === 0) return '';
+      const endedCompanyContract = this.contracts
+        .filter(contract => contract.status === COMPANY_CONTRACT && contract.endDate)
+        .sort((a, b) => b.startDate - a.startDate);
+
+      if (endedCompanyContract.length === 0) return '';
+
+      return this.$moment(endedCompanyContract[0].endDate).add(1, 'd').toISOString();
     },
     contractMinEndDate () {
       if (this.endContractModal) {
