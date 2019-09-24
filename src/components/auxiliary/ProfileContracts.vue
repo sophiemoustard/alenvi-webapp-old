@@ -121,7 +121,6 @@ import { translate } from '../../data/translate';
 import { contractMixin } from '../../mixins/contractMixin.js';
 import { generateContractFields } from '../../helpers/generateContractFields.js';
 import { formatIdentity } from '../../helpers/utils';
-import moment from 'moment';
 
 export default {
   name: 'ProfileContracts',
@@ -229,25 +228,20 @@ export default {
 
       return false;
     },
-    getLastCompanyContractEndingDate () {
-      if (this.contracts.length === 0) return null;
-      const sortedContracts = [...this.contracts].sort((a, b) => b.startDate - a.startDate);
-      for (let i = 0; i < sortedContracts.length; i++) {
-        if (sortedContracts[i].status === COMPANY_CONTRACT && sortedContracts[i].endDate && this.$moment(sortedContracts[i].endDate).isAfter(moment(), 'd')) {
-          return sortedContracts[i].endDate;
-        }
-      }
-    },
     statusOptions () {
       if (!this.hasCompanyContract) return CONTRACT_STATUS_OPTIONS;
 
       return CONTRACT_STATUS_OPTIONS.filter(option => option.value === CUSTOMER_CONTRACT);
     },
     companyContractMinStartDate () {
-      if (this.getLastCompanyContractEndingDate) {
-        return this.$moment(this.getLastCompanyContractEndingDate).add(1, 'd').toISOString();
-      }
-      return '';
+      if (this.contracts.length === 0) return '';
+      const endedCompanyContract = this.contracts
+        .filter(contract => contract.status === COMPANY_CONTRACT && contract.endDate)
+        .sort((a, b) => b.startDate - a.startDate);
+
+      if (endedCompanyContract.length === 0) return '';
+
+      return this.$moment(endedCompanyContract[0].endDate).add(1, 'd').toISOString();
     },
     contractMinEndDate () {
       if (this.endContractModal) {
