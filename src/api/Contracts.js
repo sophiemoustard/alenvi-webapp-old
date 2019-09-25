@@ -2,8 +2,8 @@ import { alenviAxios } from './ressources/alenviAxios';
 
 export default {
   // Contracts
-  async create (data) {
-    const contact = await alenviAxios.post(`${process.env.API_HOSTNAME}/contracts`, data);
+  async create (payload) {
+    const contact = await alenviAxios.post(`${process.env.API_HOSTNAME}/contracts`, payload);
     return contact.data.data.contract;
   },
   async update (contractId, payload) {
@@ -14,12 +14,15 @@ export default {
     return contracts.data.data.contracts;
   },
   // Contracts version
-  async updateVersion (queries, data) {
-    const contract = await alenviAxios.put(`${process.env.API_HOSTNAME}/contracts/${queries.contractId}/versions/${queries.versionId}`, data);
+  async updateVersion (params, payload) {
+    const contract = await alenviAxios.put(`${process.env.API_HOSTNAME}/contracts/${params.contractId}/versions/${params.versionId}`, payload);
     return contract.data.data.contract;
   },
-  async createVersion (contractId, data) {
-    const contract = await alenviAxios.post(`${process.env.API_HOSTNAME}/contracts/${contractId}/versions`, data);
+  async createVersion (contractId, payload) {
+    const contract = await alenviAxios.post(`${process.env.API_HOSTNAME}/contracts/${contractId}/versions`, payload);
     return contract.data.data.contract;
+  },
+  async deleteVersion (contractId, versionId) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/contracts/${contractId}/versions/${versionId}`);
   },
 };

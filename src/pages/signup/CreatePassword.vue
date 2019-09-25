@@ -40,7 +40,7 @@
               <q-icon v-if="$v.passwordConfirm.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.passwordConfirm.$error" :error-label="passwordConfirmError">
-              <q-input v-model="passwordConfirm" type="password" color="white" inverted-light lower-case @blur="$v.passwordConfirm.$touch()" />
+              <q-input v-model="passwordConfirm" type="password" color="white" inverted-light @blur="$v.passwordConfirm.$touch()" />
             </q-field>
           </div>
         </div>

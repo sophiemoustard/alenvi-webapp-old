@@ -114,7 +114,7 @@
         </div>
       </div>
       <div class="q-mb-xl">
-        <p class="text-weight-bold">Equipes</p>
+        <p class="text-weight-bold">Équipes</p>
         <q-card style="background: white">
           <q-table :data="sectors" :columns="sectorsColumns" hide-bottom binary-state-sort
             :pagination.sync="sectorPagination" class="table-responsive">
@@ -209,6 +209,7 @@ import NiInput from '../../../components/form/Input';
 import FileUploader from '../../../components/form/FileUploader.vue';
 import { configMixin } from '../../../mixins/configMixin';
 import { REQUIRED_LABEL } from '../../../data/constants';
+import { validationMixin } from '../../../mixins/validationMixin';
 
 export default {
   name: 'RhConfig',
@@ -218,7 +219,7 @@ export default {
     'ni-input': NiInput,
     'ni-file-uploader': FileUploader,
   },
-  mixins: [configMixin],
+  mixins: [configMixin, validationMixin],
   data () {
     return {
       MAX_INTERNAL_HOURS_NUMBER: 9,
@@ -470,7 +471,7 @@ export default {
         this.loading = true;
         this.newSector.company = this.company._id;
         await this.$sectors.create(this.newSector);
-        NotifyPositive('Equipe créée.');
+        NotifyPositive('Équipe créée.');
         this.resetCreationSectorData();
         await this.getSectors();
       } catch (e) {
@@ -497,7 +498,7 @@ export default {
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
         await this.$sectors.updateById(this.editedSector._id, { name: this.editedSector.name });
-        NotifyPositive('Equipe modifiée.');
+        NotifyPositive('Équipe modifiée.');
         this.resetEditionSectorData();
         await this.getSectors();
       } catch (e) {
@@ -523,7 +524,7 @@ export default {
 
         await this.$sectors.deleteById(sectorId);
         this.sectors.splice(cell, 1);
-        NotifyPositive('Equipe supprimée.');
+        NotifyPositive('Équipe supprimée.');
       } catch (e) {
         console.error(e);
         if (e.message === '') return NotifyPositive('Suppression annulée');

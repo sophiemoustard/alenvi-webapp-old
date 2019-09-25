@@ -65,7 +65,7 @@
         <div class="row margin-input">
           <div class="col-12">
             <div class="row justify-between">
-              <p class="input-caption required">Communauté</p>
+              <p class="input-caption required">Équipe</p>
               <q-icon v-if="$v.newUser.sector.$error" name="error_outline" color="secondary" />
             </div>
             <q-field :error="$v.newUser.sector.$error" :error-label="REQUIRED_LABEL">
@@ -195,7 +195,7 @@ export default {
         },
         {
           name: 'team',
-          label: 'Equipe',
+          label: 'Équipe',
           field: 'sector',
           align: 'left',
           sortable: true,

@@ -6,12 +6,12 @@
       </div>
       <div class="row gutter-profile">
         <ni-input caption="Prénom" v-model="customer.identity.firstname" @focus="saveTmp('identity.firstname')"
-          @blur="updateUser('identity.firstname')" />
+          @blur="updateCustomer('identity.firstname')" />
         <ni-input caption="Nom" :error="$v.customer.identity.lastname.$error" v-model="customer.identity.lastname"
-          @focus="saveTmp('identity.lastname')" @blur="updateUser('identity.lastname')" />
+          @focus="saveTmp('identity.lastname')" @blur="updateCustomer('identity.lastname')" />
         <div class="col-xs-12 col-md-6">
           <ni-datetime-picker v-model="customer.identity.birthDate" @focus="saveTmp('identity.birthDate')"
-            caption="Date de naissance" @blur="updateUser('identity.birthDate')" />
+            caption="Date de naissance" @blur="updateCustomer('identity.birthDate')" />
         </div>
       </div>
     </div>
@@ -22,12 +22,10 @@
       <div class="row gutter-profile">
         <ni-input caption="Téléphone" type="tel" :error="$v.customer.contact.phone.$error"
           error-label="Numéro de téléphone non valide" v-model.trim="customer.contact.phone"
-          @focus="saveTmp('contact.phone')" @blur="updateUser('contact.phone')" />
+          @focus="saveTmp('contact.phone')" @blur="updateCustomer('contact.phone')" />
         <ni-search-address v-model="customer.contact.address" color="white" inverted-light
           :error-label="addressError" :error="$v.customer.contact.address.$error"
-          @focus="saveTmp('contact.address.fullAddress')" @blur="updateUser('contact.address')" />
-        <ni-input caption="Code porte" v-model="customer.contact.doorCode" @focus="saveTmp('contact.doorCode')"
-          @blur="updateUser('contact.doorCode')" />
+          @focus="saveTmp('contact.address.fullAddress')" @blur="updateCustomer('contact.address')" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -94,11 +92,11 @@
       <div class="row gutter-profile q-mb-lg">
         <ni-input caption="Nom associé au compte bancaire" :error="$v.customer.payment.bankAccountOwner.$error"
           v-model="customer.payment.bankAccountOwner" @focus="saveTmp('payment.bankAccountOwner')"
-          @blur="updateUser('payment.bankAccountOwner')" />
+          @blur="updateCustomer('payment.bankAccountOwner')" />
         <ni-input caption="IBAN" :error="$v.customer.payment.iban.$error" error-label="IBAN non valide"
-          v-model="customer.payment.iban" @focus="saveTmp('payment.iban')" @blur="updateUser('payment.iban')" />
+          v-model="customer.payment.iban" @focus="saveTmp('payment.iban')" @blur="updateCustomer('payment.iban')" />
         <ni-input caption="BIC" :error="$v.customer.payment.bic.$error" error-label="BIC non valide"
-          v-model="customer.payment.bic" @focus="saveTmp('payment.bic')" @blur="updateUser('payment.bic')" />
+          v-model="customer.payment.bic" @focus="saveTmp('payment.bic')" @blur="updateCustomer('payment.bic')" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -464,16 +462,16 @@ import NiInput from '../form/Input';
 import NiSelect from '../form/Select';
 import NiOptionGroup from '../form/OptionGroup';
 import MultipleFilesUploader from '../form/MultipleFilesUploader.vue';
-import { frPhoneNumber, iban, bic, frAddress } from '../../helpers/vuelidateCustomVal';
 import DatetimePicker from '../form/DatetimePicker';
 import { downloadDocxFile } from '../../helpers/downloadFile';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
-import { validationMixin } from '../../mixins/validationMixin.js';
 import { days } from '../../data/days.js';
 import { FUNDING_FREQ_OPTIONS, NATURE_OPTIONS, FIXED, HOURLY, REQUIRED_LABEL, ONCE, HELPER } from '../../data/constants.js';
 import { financialCertificatesMixin } from '../../mixins/financialCertificatesMixin.js';
 import { fundingMixin } from '../../mixins/fundingMixin.js';
+import { validationMixin } from '../../mixins/validationMixin.js';
+import { frPhoneNumber, iban, bic, frAddress } from '../../helpers/vuelidateCustomVal';
 
 export default {
   name: 'ProfileInfo',
@@ -928,36 +926,6 @@ export default {
 
       this.$store.commit('rh/saveUserProfile', this.customer);
       this.$v.customer.$touch();
-    },
-    // Customer
-    async updateUser (path) {
-      try {
-        if (this.tmpInput === this.$_.get(this.customer, path)) return;
-        if (this.$_.get(this.$v.customer, path)) {
-          const isValid = await this.waitForValidation(this.$v.customer, path);
-          if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
-        }
-        await this.updateAlenviCustomer(path);
-
-        NotifyPositive('Modification enregistrée');
-        if (path.match(/iban/i)) this.refreshCustomer();
-
-        this.$store.commit('rh/saveUserProfile', this.customer);
-      } catch (e) {
-        console.error(e);
-        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message)
-        NotifyNegative('Erreur lors de la modification');
-      } finally {
-        this.tmpInput = '';
-      }
-    },
-    async updateAlenviCustomer (path) {
-      let value = this.$_.get(this.customer, path);
-      if (path.match(/iban/i)) value = value.split(' ').join('');
-
-      const payload = this.$_.set({}, path, value);
-      payload._id = this.userProfile._id;
-      await this.$customers.updateById(payload);
     },
     // Subscriptions
     formatCreatedSubscription () {

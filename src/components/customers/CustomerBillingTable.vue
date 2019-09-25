@@ -1,6 +1,6 @@
 <template>
   <q-table :data="documents" :columns="columns" binary-state-sort hide-bottom :pagination.sync="pagination"
-    class="q-mb-lg">
+    class="q-mb-lg" row-key="_id">
     <q-tr slot="top-row" slot-scope="props">
       <q-td class="bold">{{ formatDate(billingDates.startDate) }}</q-td>
       <q-td class="bold">Début de période</q-td>
@@ -14,10 +14,10 @@
           <template v-if="props.row.type === BILL">
             <div :class="{'download': canDownloadBill(props.row)}">
               <a v-if="props.row.driveFile && props.row.driveFile.link" :href="props.row.driveFile.link" target="_blank">
-                Facture {{ props.row.billNumber || 'tiers' }}
+                Facture {{ props.row.number || 'tiers' }}
               </a>
               <div v-else @click="downloadBillPdf(props.row)">
-                Facture {{ props.row.billNumber || 'tiers' }}
+                Facture {{ props.row.number || 'tiers' }}
               </div>
             </div>
           </template>
@@ -45,7 +45,7 @@
           <div v-else>{{ col.value }}</div>
         </template>
         <template v-else-if="col.name === 'actions'">
-          <q-btn v-if="displayActions && paymentTypes.includes(props.row.type)" flat small color="grey" icon="edit"
+          <q-btn v-if="displayActions && paymentTypes.includes(props.row.type)" flat dense color="grey" icon="edit"
             @click="openEditionModal(props.row)" />
         </template>
         <template v-else>{{ col.value }}</template>
@@ -169,7 +169,7 @@ export default {
         if (!this.canDownloadBill(bill)) return;
 
         const pdf = await this.$bills.getPDF(bill._id);
-        await downloadPdf(pdf, `${bill.billNumber}.pdf`);
+        await downloadPdf(pdf, `${bill.number}.pdf`);
 
         NotifyPositive('Facture téléchargée');
       } catch (e) {
@@ -178,7 +178,7 @@ export default {
       }
     },
     canDownloadBill (bill) {
-      return (bill.billNumber && bill.origin === COMPANI) || (bill.driveFile && bill.driveFile.link);
+      return (bill.number && bill.origin === COMPANI) || (bill.driveFile && bill.driveFile.link);
     },
     canDownloadCreditNote (creditNote) {
       return (creditNote.number && creditNote.origin === COMPANI) || (creditNote.driveFile && creditNote.driveFile.link);

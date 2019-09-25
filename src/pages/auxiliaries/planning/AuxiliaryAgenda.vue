@@ -79,7 +79,7 @@ export default {
       return this.$store.getters['main/user'];
     },
     activeAuxiliaries () {
-      return this.auxiliaries.filter(aux => this.hasActiveCompanyContractOnEvent(aux, this.days[0]) || this.hasActiveCustomerContractOnEvent(aux, this.days[0]));
+      return this.auxiliaries.filter(aux => this.hasCompanyContractOnEvent(aux, this.days[0]) || this.hasCustomerContractOnEvent(aux, this.days[0]));
     },
     auxiliariesOptions () {
       return this.activeAuxiliaries.length === 0 ? [] : this.activeAuxiliaries.map(aux => ({
@@ -151,9 +151,11 @@ export default {
       const can = this.$can({
         user: this.currentUser,
         auxiliaryIdEvent: this.selectedAuxiliary._id,
+        auxiliarySectorEvent: this.selectedAuxiliary.sector,
         permissions: [
-          'planning:create:user',
-          { name: 'planning:create', rule: 'isOwner' },
+          { name: 'events:edit' },
+          { name: 'events:sector:edit', rule: 'isInSameSector' },
+          { name: 'events:own:edit', rule: 'isOwner' },
         ],
       });
       if (!can) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
@@ -180,8 +182,8 @@ export default {
         },
       };
 
-      this.selectedAuxiliary.hasActiveCustomerContractOnEvent = this.hasActiveCustomerContractOnEvent(this.selectedAuxiliary, selectedDay);
-      this.selectedAuxiliary.hasActiveCompanyContractOnEvent = this.hasActiveCompanyContractOnEvent(this.selectedAuxiliary, selectedDay);
+      this.selectedAuxiliary.hasCustomerContractOnEvent = this.hasCustomerContractOnEvent(this.selectedAuxiliary, selectedDay);
+      this.selectedAuxiliary.hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(this.selectedAuxiliary, selectedDay);
 
       this.creationModal = true;
     },
@@ -191,8 +193,8 @@ export default {
       if (!can) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
       this.formatEditedEvent(event);
       if (event.type !== ABSENCE && this.selectedAuxiliary) {
-        this.selectedAuxiliary.hasActiveCustomerContractOnEvent = this.hasActiveCustomerContractOnEvent(this.selectedAuxiliary, event.startDate);
-        this.selectedAuxiliary.hasActiveCompanyContractOnEvent = this.hasActiveCompanyContractOnEvent(this.selectedAuxiliary, event.startDate);
+        this.selectedAuxiliary.hasCustomerContractOnEvent = this.hasCustomerContractOnEvent(this.selectedAuxiliary, event.startDate);
+        this.selectedAuxiliary.hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(this.selectedAuxiliary, event.startDate);
       }
 
       this.editionModal = true
