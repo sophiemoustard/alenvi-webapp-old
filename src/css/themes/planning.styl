@@ -52,17 +52,13 @@
   table-layout: fixed;
   border-style: hidden;
 
-  td, th
+  td
     border-left: 1px solid $light-grey;
     border-right: 1px solid $light-grey;
-
-  td
-    padding: 0px 6px 6px 6px;
-  td:first-child
-    padding: 0px 4px 4px 4px;
-  td
-    &:before
-      content: "";
+    padding: 0px 5px 5px 5px;
+  tr:not(:first-child)
+    td:before
+      content: '';
       display: block;
       width: 98%;
       border-bottom: 1px solid $light-grey;
@@ -73,7 +69,7 @@
       width: 100%
     &-name
       font-size: 1.125rem
-      color: #777777
+      color: $grey
     &-number
       font-size: 1.5rem
       font-weight: 600
@@ -86,13 +82,36 @@
 .planning
   padding-left: 30px;
   @media screen and (max-width: 1024px)
-      padding-left: 0px;
+    padding-left: 0px;
   &-container
-    z-index: 0;
     background: white;
-    padding: 5px;
+    padding: 0 5px;
     @media screen and (max-width: 767px)
       padding: 2px;
+    th
+      background-color: white;
+      position: -webkit-sticky;
+      position: sticky;
+      z-index: 10;
+      @media screen and (min-width: 768px)
+        top: 77px;
+      @media screen and (max-width: 767px)
+        top: 106px;
+      &:not(:first-child):before
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        top: 6px;
+        border-right: 1px solid $light-grey;
+    .bottom-border
+      &:after
+        content: '';
+        position: absolute;
+        left: 6px;
+        right: 6px;
+        bottom: 0;
+        border-bottom: 1px solid $light-grey;
   &-header
     font-size: 1.2em;
     position: -webkit-sticky;
@@ -127,6 +146,11 @@
       justify-content: space-around;
   &-view
     padding: 4px;
+  &-hour
+    position: absolute;
+    color: $light-grey;
+    font-size: 12px;
+    bottom: -3px;
 
 .auxiliary-name
   display: flex;
