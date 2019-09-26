@@ -381,7 +381,7 @@ export default {
 
       if (this.newContract.shouldBeSigned) {
         const template = this.getContractTemplate(this.newContract);
-        payload.signature = await this.getSignaturePayload(this.newContract, '', template);
+        payload.versions[0].signature = await this.getSignaturePayload(this.newContract, '', template);
       }
 
       return this.$_.pickBy(payload);

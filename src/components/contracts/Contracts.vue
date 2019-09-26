@@ -23,7 +23,7 @@
             </template>
             <template v-else-if="col.name === 'contractSigned'">
               <div v-if="hasToBeSignedOnline(props.row) && shouldSignDocument(contract.status, props.row.signature)">
-                <q-btn no-caps small color="primary" label="Signer" @click="openSignatureModal(props.row.signature.eversignId)" />
+                <q-btn v-if="!props.row.endDate" no-caps small color="primary" label="Signer" @click="openSignatureModal(props.row.signature.eversignId)" />
               </div>
               <div v-else-if="!getContractLink(props.row) && displayUploader && !hasToBeSignedOnline(props.row)" class="row justify-center table-actions">
                 <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :headers="headers" :url="docsUploadUrl(contract._id)"
