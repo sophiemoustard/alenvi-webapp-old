@@ -371,6 +371,12 @@ const routes = [
   { path: '/401', component: () => import('pages/401') },
   { path: '/docsigned', component: () => import('pages/DocumentSigned'), props: route => ({signed: route.query.signed}) },
   {
+    path: '/display/:filename',
+    name: 'display file',
+    component: () => import('pages/DisplayPdf'),
+    props: (route) => ({ blobUrl: route.query.blobUrl, fileName: route.params.fileName }),
+  },
+  {
     // Always leave this as last one
     path: '*',
     component: () => import('pages/404'),
