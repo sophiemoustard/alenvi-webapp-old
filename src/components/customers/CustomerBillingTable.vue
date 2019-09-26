@@ -76,7 +76,7 @@ import {
   COMPANI,
 } from '../../data/constants';
 import { NotifyNegative, NotifyPositive } from '../popup/notify.js';
-import { generateBlobUrlFromFile } from '../../helpers/downloadFile.js';
+import { generatePdfUrl } from '../../helpers/downloadFile.js';
 import { formatPrice } from '../../helpers/utils';
 
 export default {
@@ -169,11 +169,9 @@ export default {
         if (!this.canDownloadBill(bill)) return;
 
         const pdf = await this.$bills.getPDF(bill._id);
-        const url = await generateBlobUrlFromFile(pdf);
-        const routeData = this.$router.resolve({ name: 'display file', params: { filename: bill.number }, query: { blobUrl: url } });
+        const url = await generatePdfUrl(pdf);
+        const routeData = this.$router.resolve({ name: 'display file', params: { fileName: bill.number }, query: { blobUrl: url } });
         window.open(routeData.href, '_blank');
-
-        // NotifyPositive('Facture téléchargée');
       } catch (e) {
         console.error(e);
         NotifyNegative('Impossible de télécharger la facture');
@@ -190,7 +188,7 @@ export default {
         if (!this.canDownloadCreditNote(creditNote)) return;
 
         const pdf = await this.$creditNotes.getPDF(creditNote._id);
-        await generateBlobUrlFromFile(pdf, `${creditNote.number}.pdf`);
+        await generatePdfUrl(pdf, `${creditNote.number}.pdf`);
 
         NotifyPositive('Avoir téléchargé');
       } catch (e) {
