@@ -1,4 +1,5 @@
 import gdrive from '../api/GoogleDrive';
+// import redirect from '../router/redirect';
 
 export const downloadFile = (file, fileName) => {
   const url = window.URL.createObjectURL(new Blob([file.data]));
@@ -14,10 +15,7 @@ export const downloadDocxFile = async (params, data, fileName) => {
   downloadFile(file, fileName);
 };
 
-export const downloadPdf = async (pdf, filename) => {
+export const generateBlobUrlFromFile = async (pdf, filename) => {
   const blob = new Blob([pdf.data], { type: 'application/pdf' })
-  const link = document.createElement('a');
-  link.href = window.URL.createObjectURL(blob);
-  link.download = filename;
-  link.click();
+  return window.URL.createObjectURL(blob);
 };
