@@ -21,3 +21,13 @@ export const downloadPdf = async (pdf, filename) => {
   link.download = filename;
   link.click();
 };
+
+export const downloadCsv = (data, fileName) => {
+  let csvContent = '\ufeff'; // UTF16LE BOM for Microsoft Excel
+  data.forEach((rowArray) => {
+    const row = rowArray.join(';');
+    csvContent += `${row}\r\n`;
+  });
+
+  return downloadFile({ data: csvContent }, fileName);
+};

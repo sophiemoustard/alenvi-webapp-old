@@ -1,7 +1,11 @@
 <template>
   <q-page class="neutral-background q-pb-xl">
     <div class="title-padding">
-      <h4>À payer</h4>
+      <div style="display: flex">
+        <h4>À payer</h4>
+        <q-btn round flat icon="save_alt" @click="exportToCSV" color="primary" style="margin-left: 5px"
+          :disable="displayedDraftPay.length === 0" />
+      </div>
       <ni-select-sector v-model="selectedSector" allow-null-option />
     </div>
     <q-table :data="displayedDraftPay" :columns="columns" class="q-pa-sm large-table" selection="multiple"
