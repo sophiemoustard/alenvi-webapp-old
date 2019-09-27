@@ -14,9 +14,9 @@
     </div>
     <q-table :data="filteredCustomers" :columns="columns" row-key="name" binary-state-sort
       :rows-per-page-options="[15, 25, 35]" :pagination.sync="pagination" :loading="tableLoading"
-      :visible-columns="['fullName', 'createdAt', 'firstIntervention', 'info', 'client']" class="people-list q-pa-sm">
-      <q-tr slot="body" slot-scope="props" :props="props"
-        class="datatable-row" @click.native="goToCustomerProfile(props.row._id)">
+      class="people-list q-pa-sm">
+      <q-tr slot="body" slot-scope="props" :props="props" class="datatable-row"
+        @click.native="goToCustomerProfile(props.row._id)">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
           <q-item v-if="col.name === 'fullName'">
             <q-item-main :label="col.value" />
@@ -26,6 +26,10 @@
           </template>
           <template v-else-if="col.name === 'info'">
             <q-icon v-if="props.row.missingInfo" name="error" color="secondary" size="1rem" />
+          </template>
+          <template v-else-if="col.name === 'action'">
+            <q-btn :disable="!!props.row.firstIntervention" flat round size="0.8rem" color="grey" icon="delete"
+              @click.stop="deleteCustomer(col.value, props.row.__index)" />
           </template>
           <template v-else>{{ col.value }}</template>
         </q-td>
@@ -119,11 +123,6 @@ export default {
       },
       columns: [
         {
-          name: '_id',
-          label: '',
-          required: false,
-        },
-        {
           name: 'fullName',
           label: 'Nom',
           field: 'identity',
@@ -171,6 +170,12 @@ export default {
           field: 'firstIntervention',
           align: 'right',
           sortable: false,
+          style: 'width: 30px',
+        },
+        {
+          name: 'action',
+          label: '',
+          field: '_id',
           style: 'width: 30px',
         },
       ],
@@ -283,6 +288,21 @@ export default {
         NotifyNegative('Erreur lors de la création de la fiche bénéficiaire');
       } finally {
         this.loading = false;
+      }
+    },
+    async deleteCustomer (id, cell) {
+      try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Confirmez-vous la suppression ?',
+          ok: 'OK',
+          cancel: 'Annuler',
+        });
+        await this.$customers.remove(id);
+        this.customersList.splice(cell, 1);
+        NotifyPositive('Bénéficiaire supprimé.');
+      } catch (e) {
+        console.error(e);
       }
     },
   },

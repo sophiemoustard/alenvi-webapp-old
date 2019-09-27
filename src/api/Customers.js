@@ -28,6 +28,9 @@ export default {
   async create (data) {
     return alenviAxios.post(`${process.env.API_HOSTNAME}/customers`, data);
   },
+  async remove (id) {
+    return alenviAxios.delete(`${process.env.API_HOSTNAME}/customers/${id}`);
+  },
   async updateById (data) {
     return alenviAxios.put(`${process.env.API_HOSTNAME}/customers/${data._id}`, data);
   },
