@@ -164,14 +164,18 @@ export default {
     openEditionModal (payment) {
       this.$emit('openEditionModal', payment);
     },
+    generatePdfDisplayUrl (doc, docNumber) {
+      const url = generatePdfUrl(doc);
+      return this.$router.resolve({ name: 'display file', params: { fileName: docNumber }, query: { blobUrl: url } });
+    },
     async downloadBillPdf (bill) {
       const windowRef = window.open();
+
       try {
         if (!this.canDownloadBill(bill)) return;
 
         const pdf = await this.$bills.getPDF(bill._id);
-        const url = await generatePdfUrl(pdf);
-        const routeData = this.$router.resolve({ name: 'display file', params: { fileName: bill.number }, query: { blobUrl: url } });
+        const routeData = this.generatePdfDisplayUrl(pdf, bill.number);
         windowRef.location = routeData.href;
       } catch (e) {
         console.error(e);
@@ -185,11 +189,14 @@ export default {
       return (creditNote.number && creditNote.origin === COMPANI) || (creditNote.driveFile && creditNote.driveFile.link);
     },
     async downloadCreditNotePdf (creditNote) {
+      const windowRef = window.open();
+
       try {
         if (!this.canDownloadCreditNote(creditNote)) return;
 
         const pdf = await this.$creditNotes.getPDF(creditNote._id);
-        await generatePdfUrl(pdf, `${creditNote.number}.pdf`);
+        const routeData = this.generatePdfDisplayUrl(pdf, creditNote.number);
+        windowRef.location = routeData.href;
 
         NotifyPositive('Avoir téléchargé');
       } catch (e) {
