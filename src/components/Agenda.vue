@@ -2,7 +2,7 @@
   <div class="planning-container full-width full-height">
     <table style="width: 100%" class="agenda-table full-height">
       <thead style="height: 5%">
-        <th class="capitalize" v-for="(day, index) in daysHeader" :key="index">
+        <th class="capitalize bottom-border" v-for="(day, index) in daysHeader" :key="index">
           <div class="row justify-center items-baseline days-header">
             <div class="days-name q-mr-md">{{ day.name }}</div>
             <div :class="['days-number', { 'current-day': isCurrentDay(day.moment) }]">{{ day.number }}</div>
@@ -14,8 +14,10 @@
           <td v-for="(day, dayIndex) in days" :key="`day_${dayIndex}`" valign="top" @click="createEvent(dayIndex)">
             <div class="planning-background">
               <template v-if="dayIndex === 0">
-                <div class="planning-hour" v-for="(hour, hourIndex) in hours" :key="`hour_${hourIndex}`"
-                  :style="{ top: `${(hourIndex * halfHourHeight * 4) - 1.5}%` }">{{ hour.format('HH:mm') }}</div>
+                <template v-for="(hour, hourIndex) in hours">
+                  <div v-if="hourIndex !== 0" class="planning-hour" :key="`hour_${hourIndex}`"
+                    :style="{ top: `${(hourIndex * halfHourHeight * 4) - 1.5}%` }">{{ hour.format('HH:mm') }}</div>
+                </template>
               </template>
               <template v-for="(event, eventId) in getOneDayEvents(days[dayIndex])">
                 <div :style="getEventStyle(event)" :key="eventId" @click.stop="editEvent(event)"

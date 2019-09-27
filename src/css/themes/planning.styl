@@ -94,7 +94,7 @@
       position: sticky;
       z-index: 10;
       @media screen and (min-width: 768px)
-        top: 77px;
+        top: 80px;
       @media screen and (max-width: 767px)
         top: 106px;
       &:not(:first-child):before
@@ -123,6 +123,10 @@
     width: 100%;
     padding: 20px 20px 15px;
     z-index: 10;
+    @media screen and (min-width: 768px)
+      height: 80px;
+    @media screen and (max-width: 767px)
+      height: 106px;
   &-month
     display: flex;
     @media screen and (min-width: 768px)
