@@ -18,3 +18,13 @@ export const generatePdfUrl = async (pdf) => {
   const blob = new Blob([pdf.data], { type: 'application/pdf' })
   return window.URL.createObjectURL(blob);
 };
+
+export const downloadCsv = (data, fileName) => {
+  let csvContent = '\ufeff'; // UTF16LE BOM for Microsoft Excel
+  data.forEach((rowArray) => {
+    const row = rowArray.join(';');
+    csvContent += `${row}\r\n`;
+  });
+
+  return downloadFile({ data: csvContent }, fileName);
+};
