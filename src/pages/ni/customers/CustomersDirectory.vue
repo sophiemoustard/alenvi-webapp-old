@@ -16,7 +16,7 @@
       :rows-per-page-options="[15, 25, 35]" :pagination.sync="pagination" :loading="tableLoading"
       class="people-list q-pa-sm">
       <q-tr slot="body" slot-scope="props" :props="props" class="datatable-row"
-        @click.native="goToCustomerProfile(props.row.action)">
+        @click.native="goToCustomerProfile(props.row._id)">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
           <q-item v-if="col.name === 'fullName'">
             <q-item-main :label="col.value" />
