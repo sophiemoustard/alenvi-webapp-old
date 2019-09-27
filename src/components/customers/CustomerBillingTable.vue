@@ -165,13 +165,14 @@ export default {
       this.$emit('openEditionModal', payment);
     },
     async downloadBillPdf (bill) {
+      const windowRef = window.open();
       try {
         if (!this.canDownloadBill(bill)) return;
 
         const pdf = await this.$bills.getPDF(bill._id);
         const url = await generatePdfUrl(pdf);
         const routeData = this.$router.resolve({ name: 'display file', params: { fileName: bill.number }, query: { blobUrl: url } });
-        window.open(routeData.href, '_blank');
+        windowRef.location = routeData.href;
       } catch (e) {
         console.error(e);
         NotifyNegative('Impossible de télécharger la facture');
