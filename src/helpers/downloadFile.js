@@ -14,10 +14,7 @@ export const downloadDocxFile = async (params, data, fileName) => {
   downloadFile(file, fileName);
 };
 
-export const downloadPdf = async (pdf, filename) => {
+export const generatePdfUrl = async (pdf) => {
   const blob = new Blob([pdf.data], { type: 'application/pdf' })
-  const link = document.createElement('a');
-  link.href = window.URL.createObjectURL(blob);
-  link.download = filename;
-  link.click();
+  return window.URL.createObjectURL(blob);
 };
