@@ -16,7 +16,7 @@
       :rows-per-page-options="[15, 25, 35]" :pagination.sync="pagination" :loading="tableLoading"
       class="people-list q-pa-sm">
       <q-tr slot="body" slot-scope="props" :props="props" class="datatable-row"
-        @click.native="goToCustomerProfile(props.row._id)">
+        @click.native="goToCustomerProfile(props.row.action)">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
           <q-item v-if="col.name === 'fullName'">
             <q-item-main :label="col.value" />
@@ -27,7 +27,7 @@
           <template v-else-if="col.name === 'info'">
             <q-icon v-if="props.row.missingInfo" name="error" color="secondary" size="1rem" />
           </template>
-          <template v-else-if="col.name === '_id'">
+          <template v-else-if="col.name === 'action'">
             <q-btn :disable="!!props.row.firstIntervention" flat round size="0.8rem" color="grey" icon="delete"
               @click.stop="deleteCustomer(col.value, props.row.__index)" />
           </template>
@@ -173,10 +173,9 @@ export default {
           style: 'width: 30px',
         },
         {
-          name: '_id',
+          name: 'action',
           label: '',
           field: '_id',
-          required: false,
           style: 'width: 30px',
         },
       ],
