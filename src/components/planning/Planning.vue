@@ -44,8 +44,11 @@
             <tr v-if="!isCustomerPlanning && getSector(sectorId)" :key="sectorId" class="to-assign person-row">
               <td valign="top">
                 <div class="person-inner-cell">
-                  <div :class="[!staffingView && 'q-mb-md', 'chip-container']">
+                  <div :class="[!staffingView && 'q-mb-md', 'chip-container', 'full-width', 'row', 'relative-position']">
                     <img :src="UNKNOWN_AVATAR" class="avatar" >
+                    <q-chip :class="['absolute-center']" small text-color="white">
+                      <span class="chip-indicator">{{ unassignedHourCount(sectorId) }}h</span>
+                    </q-chip>
                   </div>
                   <div class="person-name overflow-hidden">{{ getSector(sectorId).label }}</div>
                 </div>
@@ -206,6 +209,15 @@ export default {
       this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
     },
     // Event display
+    unassignedHourCount (sectorId) {
+      const unassignedEvents = this.getRowEvents(sectorId);
+      let total = 0;
+      for (const event of unassignedEvents) {
+        total = this.$moment(event.endDate).diff(event.startDate, 'm', true);
+      }
+
+      return total / 60;
+    },
     getRowEvents (rowId) {
       const rowEvents = this.events.find(group => group._id === rowId);
 
