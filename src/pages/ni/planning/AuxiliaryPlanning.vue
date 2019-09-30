@@ -60,7 +60,7 @@ export default {
       // Event edition
       editedEvent: {},
       editionModal: false,
-      startOfWeekAsString: '',
+      startOfWeek: '',
       personKey: AUXILIARY,
       displayAllSectors: false,
       eventHistories: [],
@@ -110,17 +110,17 @@ export default {
       return { picture: {}, identity: { lastname: '' } };
     },
     displayedAuxiliaries () {
-      return this.auxiliaries.filter(aux => this.hasCustomerContractOnEvent(aux, this.$moment(this.startOfWeekAsString), this.endOfWeek) ||
-        this.hasCompanyContractOnEvent(aux, this.$moment(this.startOfWeekAsString), this.endOfWeek));
+      return this.auxiliaries.filter(aux => this.hasCustomerContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek) ||
+        this.hasCompanyContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek));
     },
     endOfWeek () {
-      return this.$moment(this.startOfWeekAsString).endOf('w');
+      return this.$moment(this.startOfWeek).endOf('w');
     },
     activeAuxiliaries () {
       return this.filters
         .filter(f => f.type === PERSON)
-        .filter(aux => this.hasCustomerContractOnEvent(aux, this.$moment(this.startOfWeekAsString), this.endOfWeek) ||
-          this.hasCompanyContractOnEvent(aux, this.$moment(this.startOfWeekAsString), this.endOfWeek));
+        .filter(aux => this.hasCustomerContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek) ||
+          this.hasCompanyContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek));
     },
   },
   methods: {
@@ -129,10 +129,10 @@ export default {
     }),
     // Dates
     async updateStartOfWeek (vEvent) {
-      const { startOfWeekAsString } = vEvent;
-      this.startOfWeekAsString = startOfWeekAsString;
+      const { startOfWeek } = vEvent;
+      this.startOfWeek = startOfWeek;
 
-      const range = this.$moment.range(this.startOfWeekAsString, this.$moment(this.startOfWeekAsString).add(6, 'd'));
+      const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
       this.days = Array.from(range.by('days'));
       if (this.auxiliaries && this.auxiliaries.length) await this.refresh();
     },
@@ -170,7 +170,7 @@ export default {
     async refresh () {
       try {
         let params = {
-          startDate: this.$moment(this.startOfWeekAsString).toDate(),
+          startDate: this.$moment(this.startOfWeek).toDate(),
           endDate: this.endOfWeek.toDate(),
           groupBy: AUXILIARY,
         };

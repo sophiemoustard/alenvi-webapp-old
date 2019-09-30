@@ -66,7 +66,7 @@
                     <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person"
                       :events="getPersonEvents(person)" />
                     <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)"
-                      :startOfWeekAsString="startOfWeekAsString" :dm="distanceMatrix" />
+                      :startOfWeek="startOfWeek" :dm="distanceMatrix" />
                   </div>
                   <div class="person-name overflow-hidden-nowrap">
                     <template v-if="isCustomerPlanning">{{ person.identity | formatIdentity('fL') }}</template>
@@ -144,7 +144,7 @@ export default {
       terms: [],
       loading: false,
       draggedObject: {},
-      startOfWeekAsString: this.$moment().startOf('week').toISOString(),
+      startOfWeek: this.$moment().startOf('week').toISOString(),
       days: [],
       maxDays: 7,
       staffingView: false,
@@ -202,7 +202,7 @@ export default {
     // Table
     updateTimeline () {
       this.getTimelineDays();
-      this.$emit('updateStartOfWeek', { startOfWeekAsString: this.startOfWeekAsString });
+      this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
     },
     // Event display
     getRowEvents (rowId) {

@@ -122,7 +122,7 @@ export default {
       events: [],
       customers: [],
       auxiliaries: [],
-      startOfWeekAsString: '',
+      startOfWeek: '',
       filteredSectors: [],
       filteredCustomers: [],
       DEFAULT_AVATAR,
@@ -165,7 +165,7 @@ export default {
       elementToRemove: 'planning/getElementToRemove',
     }),
     endOfWeek () {
-      return this.$moment(this.startOfWeekAsString).endOf('w');
+      return this.$moment(this.startOfWeek).endOf('w');
     },
     selectedCustomer () {
       if (this.creationModal && this.newEvent.customer !== '') return this.customers.find(cus => cus._id === this.newEvent.customer);
@@ -210,8 +210,8 @@ export default {
     },
     activeAuxiliaries () {
       return this.auxiliaries
-        .filter(aux => this.hasCustomerContractOnEvent(aux, this.$moment(this.startOfWeekAsString), this.endOfWeek) ||
-          this.hasCompanyContractOnEvent(aux, this.$moment(this.startOfWeekAsString), this.endOfWeek));
+        .filter(aux => this.hasCustomerContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek) ||
+          this.hasCompanyContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek));
     },
   },
   methods: {
@@ -220,10 +220,10 @@ export default {
     }),
     // Dates
     async updateStartOfWeek (vEvent) {
-      const { startOfWeekAsString } = vEvent;
-      this.startOfWeekAsString = startOfWeekAsString.startOf('d').toISOString();
+      const { startOfWeek } = vEvent;
+      this.startOfWeek = startOfWeek.startOf('d').toISOString();
 
-      const range = this.$moment.range(this.startOfWeekAsString, this.$moment(this.startOfWeekAsString).endOf('w'));
+      const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).endOf('w'));
       this.days = Array.from(range.by('days'));
       if (this.filteredSectors.length !== 0 || this.filteredCustomers.length !== 0) await this.refreshCustomers();
       if (this.customers.length !== 0) await this.refresh();
@@ -280,7 +280,7 @@ export default {
     async refresh () {
       try {
         this.events = await this.$events.list({
-          startDate: this.$moment(this.startOfWeekAsString).toDate(),
+          startDate: this.$moment(this.startOfWeek).toDate(),
           endDate: this.endOfWeek.toDate(),
           customer: this.customers.map(cus => cus._id),
           groupBy: CUSTOMER,
@@ -330,7 +330,7 @@ export default {
     },
     async getSectorCustomers (sectors) {
       return sectors.length === 0 ? [] : this.$customers.listBySector({
-        startDate: this.$moment(this.startOfWeekAsString).toDate(),
+        startDate: this.$moment(this.startOfWeek).toDate(),
         endDate: this.endOfWeek.toDate(),
         sector: JSON.stringify(sectors),
       });
