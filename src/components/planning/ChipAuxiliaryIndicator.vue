@@ -2,7 +2,7 @@
   <div :class="[{ 'highlight': hasCompanyContractOnEvent },  'full-width', 'row', 'relative-position', 'chip-container']"
     @click="openIndicatorsModal">
     <img :src="getAvatar(person.picture)" class="avatar">
-    <q-chip v-if="hasCompanyContractOnEvent" :class="['absolute-center', { 'busy': isBusy }]" small text-color="white">
+    <q-chip v-if="hasCompanyContractOnEvent" :class="['absolute-center', `${occupationLevel}-occupation`]" small text-color="white">
       <q-spinner-dots v-if="loading" />
       <span v-else class="chip-indicator">{{ ratio.weeklyHours }}h / {{ ratio.contractHours }}</span>
     </q-chip>
@@ -48,6 +48,10 @@ import {
   COMPANY_CONTRACT,
   DAILY,
   FIXED,
+  LOW,
+  EXTREME,
+  MAX_WEEKLY_OCCUPATION_LEVEL,
+  HIGH,
 } from '../../data/constants.js';
 import googleMaps from '../../api/GoogleMaps';
 import { getPaidTransport } from '../../helpers/planning';
@@ -85,8 +89,13 @@ export default {
     };
   },
   computed: {
-    isBusy () {
-      return this.ratio.contractHours !== 0 && this.ratio.weeklyHours >= this.ratio.contractHours;
+    occupationLevel () {
+      if (this.ratio.contractHours !== 0 && this.ratio.weeklyHours < this.ratio.contractHours) {
+        return LOW;
+      } else if (this.ratio.weeklyHours < MAX_WEEKLY_OCCUPATION_LEVEL) {
+        return HIGH;
+      }
+      return EXTREME;
     },
     endOfWeek () {
       return this.$moment(this.startOfWeekAsString).endOf('w').toISOString();

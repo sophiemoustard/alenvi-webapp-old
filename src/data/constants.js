@@ -127,6 +127,10 @@ export const STAFFING_VIEW_END_HOUR = 20;
 export const STAFFING_PERCENTAGE_BY_MINUTES = 100 / ((STAFFING_VIEW_END_HOUR - STAFFING_VIEW_START_HOUR) * 60);
 export const SECTOR = 'sector';
 export const PERSON = 'person';
+export const MAX_WEEKLY_OCCUPATION_LEVEL = 48;
+export const LOW = 'low';
+export const HIGH = 'high';
+export const EXTREME = 'extreme';
 
 // EVENT HISTORY
 export const EVENT_CREATION = 'event_creation';
