@@ -163,7 +163,7 @@ export const planningActionMixin = {
       payload = this.$_.pickBy(payload);
 
       if (event.auxiliary) {
-        const auxiliary = this.auxiliaries.find(aux => aux._id === event.auxiliary);
+        const auxiliary = this.activeAuxiliaries.find(aux => aux._id === event.auxiliary);
         payload.sector = auxiliary.sector._id;
       }
 
@@ -412,7 +412,7 @@ export const planningActionMixin = {
         payload.sector = draggedObject.sector;
       } else {
         payload.auxiliary = target._id;
-        const auxiliary = this.auxiliaries.find(aux => aux._id === target._id);
+        const auxiliary = this.activeAuxiliaries.find(aux => aux._id === target._id);
         payload.sector = auxiliary.sector._id;
       }
 

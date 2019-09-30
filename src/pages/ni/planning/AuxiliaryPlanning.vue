@@ -94,14 +94,14 @@ export default {
     }),
     selectedAuxiliary () {
       if (this.creationModal && this.newEvent.auxiliary) {
-        const aux = this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
+        const aux = this.activeAuxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
         const hasCustomerContractOnEvent = this.hasCustomerContractOnEvent(aux, this.newEvent.dates.startDate);
         const hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(aux, this.newEvent.dates.startDate);
 
         return { ...aux, hasCustomerContractOnEvent, hasCompanyContractOnEvent };
       }
       if (this.editionModal && this.editedEvent.auxiliary) {
-        const aux = this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
+        const aux = this.activeAuxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
         const hasCustomerContractOnEvent = this.hasCustomerContractOnEvent(aux, this.editedEvent.dates.startDate);
         const hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(aux, this.editedEvent.dates.startDate);
 
