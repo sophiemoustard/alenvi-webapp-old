@@ -154,7 +154,6 @@ export default {
         auxiliarySectorEvent: this.selectedAuxiliary.sector,
         permissions: [
           { name: 'events:edit' },
-          { name: 'events:sector:edit', rule: 'isInSameSector' },
           { name: 'events:own:edit', rule: 'isOwner' },
         ],
       });

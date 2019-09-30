@@ -278,10 +278,7 @@ export default {
         can = this.$can({
           user: this.$store.getters['main/user'],
           auxiliarySectorEvent: eventInfo.sectorId,
-          permissions: [
-            { name: 'events:edit' },
-            { name: 'events:sector:edit', rule: 'isInSameSector' },
-          ],
+          permissions: [{ name: 'events:edit' }],
         });
       } else if (this.personKey === 'auxiliary') {
         can = this.$can({
@@ -290,7 +287,6 @@ export default {
           auxiliarySectorEvent: eventInfo.person.sector._id,
           permissions: [
             { name: 'events:edit' },
-            { name: 'events:sector:edit', rule: 'isInSameSector' },
             { name: 'events:own:edit', rule: 'isOwner' },
           ],
         });
