@@ -209,7 +209,9 @@ export default {
       return true;
     },
     activeAuxiliaries () {
-      return this.auxiliaries.filter(aux => this.hasCompanyContractOnEvent(aux, this.days[0]) || this.hasCustomerContractOnEvent(aux, this.days[0]));
+      return this.auxiliaries
+        .filter(aux => this.hasCustomerContractOnEvent(aux, this.$moment(this.startOfWeekAsString), this.endOfWeek) ||
+          this.hasCompanyContractOnEvent(aux, this.$moment(this.startOfWeekAsString), this.endOfWeek));
     },
   },
   methods: {

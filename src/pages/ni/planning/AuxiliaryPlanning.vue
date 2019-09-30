@@ -1,6 +1,6 @@
 <template>
   <q-page class="neutral-background">
-    <ni-planning-manager :events="events" :persons="activeAuxiliaries" @updateStartOfWeek="updateStartOfWeek"
+    <ni-planning-manager :events="events" :persons="displayedAuxiliaries" @updateStartOfWeek="updateStartOfWeek"
       @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop"
       :filteredSectors="filteredSectors" :can-edit="canEditEvent" :personKey="personKey"
       @toggleAllSectors="toggleAllSectors" :eventHistories="eventHistories" ref="planningManager"
@@ -9,14 +9,16 @@
     <!-- Event creation modal -->
     <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
       :creationModal="creationModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary"
-      :activeAuxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetCreationForm" @deleteDocument="deleteDocument"
-      @documentUploaded="documentUploaded" @createEvent="createEvent" @close="closeCreationModal" />
+      :activeAuxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetCreationForm"
+      @deleteDocument="deleteDocument" @documentUploaded="documentUploaded" @createEvent="createEvent"
+      @close="closeCreationModal" />
 
     <!-- Event edition modal -->
     <ni-auxiliary-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
-      :editionModal="editionModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary" :activeAuxiliaries="activeAuxiliaries"
-      :customers="customers" @resetForm="resetEditionForm" @deleteDocument="deleteDocument" @documentUploaded="documentUploaded"
-      @updateEvent="updateEvent" @close="closeEditionModal" @deleteEvent="deleteEvent" @deleteEventRepetition="deleteEventRepetition" />
+      :editionModal="editionModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary"
+      :activeAuxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetEditionForm"
+      @deleteDocument="deleteDocument" @documentUploaded="documentUploaded" @updateEvent="updateEvent"
+      @close="closeEditionModal" @deleteEvent="deleteEvent" @deleteEventRepetition="deleteEventRepetition" />
   </q-page>
 </template>
 
@@ -107,12 +109,18 @@ export default {
       }
       return { picture: {}, identity: { lastname: '' } };
     },
-    activeAuxiliaries () {
+    displayedAuxiliaries () {
       return this.auxiliaries.filter(aux => this.hasCustomerContractOnEvent(aux, this.$moment(this.startOfWeekAsString), this.endOfWeek) ||
         this.hasCompanyContractOnEvent(aux, this.$moment(this.startOfWeekAsString), this.endOfWeek));
     },
     endOfWeek () {
       return this.$moment(this.startOfWeekAsString).endOf('w');
+    },
+    activeAuxiliaries () {
+      return this.filters
+        .filter(f => f.type === PERSON)
+        .filter(aux => this.hasCustomerContractOnEvent(aux, this.$moment(this.startOfWeekAsString), this.endOfWeek) ||
+          this.hasCompanyContractOnEvent(aux, this.$moment(this.startOfWeekAsString), this.endOfWeek));
     },
   },
   methods: {

@@ -141,8 +141,6 @@ export const planningModalMixin = {
       return EVENT_TYPES;
     },
     auxiliariesOptions () {
-      if (this.activeAuxiliaries.length === 0) return [];
-
       if (this.personKey === CUSTOMER && this.creationModal) {
         return this.activeAuxiliaries.map(aux => this.formatPersonOptions(aux));
       }

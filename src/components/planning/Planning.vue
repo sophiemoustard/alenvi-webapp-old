@@ -171,7 +171,6 @@ export default {
   computed: {
     ...mapGetters({
       mainUser: 'main/user',
-      filters: 'planning/getFilters',
     }),
     isCoach () {
       return [COACH, ADMIN].includes(this.mainUser.role.name);
