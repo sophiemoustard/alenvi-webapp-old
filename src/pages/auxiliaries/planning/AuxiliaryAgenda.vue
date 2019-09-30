@@ -56,7 +56,7 @@ export default {
   mixins: [planningTimelineMixin, planningActionMixin],
   data () {
     return {
-      startOfWeek: '',
+      startOfWeekAsString: '',
       events: [],
       height: 0,
       selectedAuxiliary: {},
@@ -96,7 +96,7 @@ export default {
   async mounted () {
     this.viewMode = this.$q.platform.is.mobile ? THREE_DAYS_VIEW : WEEK_VIEW;
     this.height = window.innerHeight;
-    this.startOfWeek = this.$moment().startOf('week');
+    this.startOfWeekAsString = this.$moment().startOf('week').toISOString();
     this.selectedAuxiliary = this.currentUser;
     this.getTimelineDays();
     await Promise.all([this.getAuxiliaries(), this.getCustomers(), this.refresh()]);
@@ -123,7 +123,7 @@ export default {
     async refresh () {
       try {
         const params = {
-          startDate: this.startOfWeek.toDate(),
+          startDate: this.startOfWeekAsString,
           endDate: this.endOfWeek().toDate(),
           auxiliary: this.selectedAuxiliary._id,
         }

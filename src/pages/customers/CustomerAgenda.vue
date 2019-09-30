@@ -35,7 +35,7 @@ export default {
   data () {
     return {
       customer: {},
-      startOfWeek: '',
+      startOfWeekAsString: '',
       events: [],
       height: 0,
       viewMode: WEEK_VIEW,
@@ -50,7 +50,7 @@ export default {
   },
   async mounted () {
     this.height = window.innerHeight;
-    this.startOfWeek = this.$moment().startOf('week');
+    this.startOfWeekAsString = this.$moment().startOf('week').toISOString();
     this.getTimelineDays();
     await this.refreshCustomer();
     await this.getEvents();
@@ -75,7 +75,7 @@ export default {
     async getEvents () {
       try {
         const params = {
-          startDate: this.startOfWeek.toDate(),
+          startDate: this.startOfWeekAsString,
           endDate: this.endOfWeek().toDate(),
           customer: this.customer._id,
         }

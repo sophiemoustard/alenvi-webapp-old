@@ -60,7 +60,7 @@ export default {
       // Event edition
       editedEvent: {},
       editionModal: false,
-      startOfWeekAsString: null,
+      startOfWeekAsString: '',
       personKey: AUXILIARY,
       displayAllSectors: false,
       eventHistories: [],
@@ -129,8 +129,8 @@ export default {
     }),
     // Dates
     async updateStartOfWeek (vEvent) {
-      const { startOfWeek } = vEvent;
-      this.startOfWeekAsString = startOfWeek.startOf('d').toISOString();
+      const { startOfWeekAsString } = vEvent;
+      this.startOfWeekAsString = startOfWeekAsString;
 
       const range = this.$moment.range(this.startOfWeekAsString, this.$moment(this.startOfWeekAsString).add(6, 'd'));
       this.days = Array.from(range.by('days'));

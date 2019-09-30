@@ -220,8 +220,8 @@ export default {
     }),
     // Dates
     async updateStartOfWeek (vEvent) {
-      const { startOfWeek } = vEvent;
-      this.startOfWeekAsString = startOfWeek.startOf('d').toISOString();
+      const { startOfWeekAsString } = vEvent;
+      this.startOfWeekAsString = startOfWeekAsString.startOf('d').toISOString();
 
       const range = this.$moment.range(this.startOfWeekAsString, this.$moment(this.startOfWeekAsString).endOf('w'));
       this.days = Array.from(range.by('days'));
