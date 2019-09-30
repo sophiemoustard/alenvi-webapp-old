@@ -26,7 +26,7 @@
         <div class="row items-center">
           <q-icon name="restore" class="on-left" size="1rem" />
           <div class="on-left">Depuis le {{ userStartDate }} ({{ userRelativeStartDate }})</div>
-          <q-icon v-if="customer" class="cursor-pointer" name="delete" color="grey" size="1rem" @click.native=deleteCustomer />
+          <ni-icon v-if="customer" name="delete" color="grey" size="1rem" :disable="!!user.firstIntervention" @click=deleteCustomer />
         </div>
       </div>
       <div v-if="!customer" class="pl-lg col-xs-6 col-md-6 row profile-info-item">
@@ -68,6 +68,7 @@ import randomize from 'randomatic';
 import NiInput from './form/Input';
 import NiSelect from './form/Select';
 import { NotifyPositive, NotifyNegative } from './popup/notify';
+import NiIcon from './Icon';
 import { DEFAULT_AVATAR } from '../data/constants';
 
 export default {
@@ -75,6 +76,7 @@ export default {
   components: {
     'ni-input': NiInput,
     'ni-select': NiSelect,
+    'ni-icon': NiIcon,
   },
   props: {
     customer: { type: Boolean, default: false },
