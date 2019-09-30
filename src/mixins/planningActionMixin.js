@@ -32,7 +32,6 @@ export const planningActionMixin = {
           endHour: { required: requiredIf((item, parent) => parent && (parent.type === ABSENCE && parent.absenceNature === HOURLY)) },
         },
         auxiliary: { required: requiredIf((item) => item.type !== INTERVENTION) },
-        sector: { required },
         customer: { required: requiredIf((item) => item.type === INTERVENTION) },
         subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
         internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
