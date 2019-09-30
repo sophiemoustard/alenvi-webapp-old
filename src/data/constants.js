@@ -91,9 +91,11 @@ export const EVERY_TWO_WEEKS = 'every_two_weeks';
 // CANCELLATION OPTIONS
 export const INVOICED_AND_PAYED = 'invoiced_and_payed';
 export const INVOICED_AND_NOT_PAYED = 'invoiced_and_not_payed';
+export const NOT_INVOICED_AND_NOT_PAID = 'not_invoiced_and_not_paid';
 export const CANCELLATION_OPTIONS = [
   { label: 'Facturée & payée', value: INVOICED_AND_PAYED },
   { label: 'Facturée & non payée', value: INVOICED_AND_NOT_PAYED },
+  { label: 'Non facturée & non payée', value: NOT_INVOICED_AND_NOT_PAID },
 ];
 
 // CANCELLATION REASONS
