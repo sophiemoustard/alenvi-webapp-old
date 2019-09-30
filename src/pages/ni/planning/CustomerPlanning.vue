@@ -165,7 +165,7 @@ export default {
       elementToRemove: 'planning/getElementToRemove',
     }),
     endOfWeek () {
-      return this.$moment(this.startOfWeek).endOf('w');
+      return this.$moment(this.startOfWeek).endOf('w').toISOString();
     },
     selectedCustomer () {
       if (this.creationModal && this.newEvent.customer !== '') return this.customers.find(cus => cus._id === this.newEvent.customer);
@@ -280,8 +280,8 @@ export default {
     async refresh () {
       try {
         this.events = await this.$events.list({
-          startDate: this.$moment(this.startOfWeek).toDate(),
-          endDate: this.endOfWeek.toDate(),
+          startDate: this.startOfWeek,
+          endDate: this.endOfWeek,
           customer: this.customers.map(cus => cus._id),
           groupBy: CUSTOMER,
         });
@@ -330,8 +330,8 @@ export default {
     },
     async getSectorCustomers (sectors) {
       return sectors.length === 0 ? [] : this.$customers.listBySector({
-        startDate: this.$moment(this.startOfWeek).toDate(),
-        endDate: this.endOfWeek.toDate(),
+        startDate: this.startOfWeek,
+        endDate: this.endOfWeek,
         sector: JSON.stringify(sectors),
       });
     },

@@ -124,7 +124,7 @@ export default {
       try {
         const params = {
           startDate: this.startOfWeek,
-          endDate: this.endOfWeek().toDate(),
+          endDate: this.endOfWeek,
           auxiliary: this.selectedAuxiliary._id,
         }
         this.events = await this.$events.list(params);

@@ -114,7 +114,7 @@ export default {
         this.hasCompanyContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek));
     },
     endOfWeek () {
-      return this.$moment(this.startOfWeek).endOf('w');
+      return this.$moment(this.startOfWeek).endOf('w').toISOString();
     },
     activeAuxiliaries () {
       return this.filters
@@ -170,8 +170,8 @@ export default {
     async refresh () {
       try {
         let params = {
-          startDate: this.$moment(this.startOfWeek).toDate(),
-          endDate: this.endOfWeek.toDate(),
+          startDate: this.startOfWeek,
+          endDate: this.endOfWeek,
           groupBy: AUXILIARY,
         };
         if (!this.displayAllSectors) {
