@@ -27,10 +27,6 @@
           <template v-else-if="col.name === 'info'">
             <q-icon v-if="props.row.missingInfo" name="error" color="secondary" size="1rem" />
           </template>
-          <template v-else-if="col.name === 'action'">
-            <q-btn :disable="!!props.row.firstIntervention" flat round size="0.8rem" color="grey" icon="delete"
-              @click.stop="deleteCustomer(col.value, props.row.__index)" />
-          </template>
           <template v-else>{{ col.value }}</template>
         </q-td>
       </q-tr>
@@ -172,12 +168,6 @@ export default {
           sortable: false,
           style: 'width: 30px',
         },
-        {
-          name: 'action',
-          label: '',
-          field: '_id',
-          style: 'width: 30px',
-        },
       ],
     }
   },
@@ -288,21 +278,6 @@ export default {
         NotifyNegative('Erreur lors de la création de la fiche bénéficiaire');
       } finally {
         this.loading = false;
-      }
-    },
-    async deleteCustomer (id, cell) {
-      try {
-        await this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Confirmez-vous la suppression ?',
-          ok: 'OK',
-          cancel: 'Annuler',
-        });
-        await this.$customers.remove(id);
-        this.customersList.splice(cell, 1);
-        NotifyPositive('Bénéficiaire supprimé.');
-      } catch (e) {
-        console.error(e);
       }
     },
   },

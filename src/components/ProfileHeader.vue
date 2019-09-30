@@ -25,7 +25,8 @@
         </div>
         <div class="row items-center">
           <q-icon name="restore" class="on-left" size="1rem" />
-          <div>Depuis le {{ userStartDate }} ({{ userRelativeStartDate }})</div>
+          <div class="on-left">Depuis le {{ userStartDate }} ({{ userRelativeStartDate }})</div>
+          <q-icon v-if="customer" class="cursor-pointer" name="delete" color="grey" size="1rem" @click.native=deleteCustomer />
         </div>
       </div>
       <div v-if="!customer" class="pl-lg col-xs-6 col-md-6 row profile-info-item">
@@ -191,6 +192,22 @@ export default {
         console.error(e);
         this.loading = false;
         NotifyNegative('Erreur lors de l\'envoi du SMS');
+      }
+    },
+    async deleteCustomer () {
+      try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Confirmez-vous la suppression ?',
+          ok: 'OK',
+          cancel: 'Annuler',
+        });
+        await this.$customers.remove(this.user._id);
+        NotifyPositive('Bénéficiaire supprimé.');
+        this.$router.push({ name: 'customers directory' });
+      } catch (e) {
+        console.error(e);
+        if (e.msg) NotifyNegative('Erreur lors de la suppression du bénéficiaire');
       }
     },
   },
