@@ -32,7 +32,6 @@ export const planningActionMixin = {
           endHour: { required: requiredIf((item, parent) => parent && (parent.type === ABSENCE && parent.absenceNature === HOURLY)) },
         },
         auxiliary: { required: requiredIf((item) => item.type !== INTERVENTION) },
-        sector: { required },
         customer: { required: requiredIf((item) => item.type === INTERVENTION) },
         subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
         internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
@@ -163,7 +162,7 @@ export const planningActionMixin = {
       payload = this.$_.pickBy(payload);
 
       if (event.auxiliary) {
-        const auxiliary = this.auxiliaries.find(aux => aux._id === event.auxiliary);
+        const auxiliary = this.activeAuxiliaries.find(aux => aux._id === event.auxiliary);
         payload.sector = auxiliary.sector._id;
       }
 
@@ -412,7 +411,7 @@ export const planningActionMixin = {
         payload.sector = draggedObject.sector;
       } else {
         payload.auxiliary = target._id;
-        const auxiliary = this.auxiliaries.find(aux => aux._id === target._id);
+        const auxiliary = this.activeAuxiliaries.find(aux => aux._id === target._id);
         payload.sector = auxiliary.sector._id;
       }
 

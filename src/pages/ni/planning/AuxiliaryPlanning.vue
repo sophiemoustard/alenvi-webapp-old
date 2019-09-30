@@ -1,6 +1,6 @@
 <template>
   <q-page class="neutral-background">
-    <ni-planning-manager :events="events" :persons="activeAuxiliaries" @updateStartOfWeek="updateStartOfWeek"
+    <ni-planning-manager :events="events" :persons="displayedAuxiliaries" @updateStartOfWeek="updateStartOfWeek"
       @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop"
       :filteredSectors="filteredSectors" :can-edit="canEditEvent" :personKey="personKey"
       @toggleAllSectors="toggleAllSectors" :eventHistories="eventHistories" ref="planningManager"
@@ -9,14 +9,16 @@
     <!-- Event creation modal -->
     <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
       :creationModal="creationModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary"
-      :activeAuxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetCreationForm" @deleteDocument="deleteDocument"
-      @documentUploaded="documentUploaded" @createEvent="createEvent" @close="closeCreationModal" />
+      :activeAuxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetCreationForm"
+      @deleteDocument="deleteDocument" @documentUploaded="documentUploaded" @createEvent="createEvent"
+      @close="closeCreationModal" />
 
     <!-- Event edition modal -->
     <ni-auxiliary-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
-      :editionModal="editionModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary" :activeAuxiliaries="activeAuxiliaries"
-      :customers="customers" @resetForm="resetEditionForm" @deleteDocument="deleteDocument" @documentUploaded="documentUploaded"
-      @updateEvent="updateEvent" @close="closeEditionModal" @deleteEvent="deleteEvent" @deleteEventRepetition="deleteEventRepetition" />
+      :editionModal="editionModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary"
+      :activeAuxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetEditionForm"
+      @deleteDocument="deleteDocument" @documentUploaded="documentUploaded" @updateEvent="updateEvent"
+      @close="closeEditionModal" @deleteEvent="deleteEvent" @deleteEventRepetition="deleteEventRepetition" />
   </q-page>
 </template>
 
@@ -58,7 +60,7 @@ export default {
       // Event edition
       editedEvent: {},
       editionModal: false,
-      startOfWeekAsString: null,
+      startOfWeek: '',
       personKey: AUXILIARY,
       displayAllSectors: false,
       eventHistories: [],
@@ -92,14 +94,14 @@ export default {
     }),
     selectedAuxiliary () {
       if (this.creationModal && this.newEvent.auxiliary) {
-        const aux = this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
+        const aux = this.activeAuxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
         const hasCustomerContractOnEvent = this.hasCustomerContractOnEvent(aux, this.newEvent.dates.startDate);
         const hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(aux, this.newEvent.dates.startDate);
 
         return { ...aux, hasCustomerContractOnEvent, hasCompanyContractOnEvent };
       }
       if (this.editionModal && this.editedEvent.auxiliary) {
-        const aux = this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
+        const aux = this.activeAuxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
         const hasCustomerContractOnEvent = this.hasCustomerContractOnEvent(aux, this.editedEvent.dates.startDate);
         const hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(aux, this.editedEvent.dates.startDate);
 
@@ -107,12 +109,18 @@ export default {
       }
       return { picture: {}, identity: { lastname: '' } };
     },
-    activeAuxiliaries () {
-      return this.auxiliaries.filter(aux => this.hasCustomerContractOnEvent(aux, this.$moment(this.startOfWeekAsString), this.endOfWeek) ||
-        this.hasCompanyContractOnEvent(aux, this.$moment(this.startOfWeekAsString), this.endOfWeek));
+    displayedAuxiliaries () {
+      return this.auxiliaries.filter(aux => this.hasCustomerContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek) ||
+        this.hasCompanyContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek));
     },
     endOfWeek () {
-      return this.$moment(this.startOfWeekAsString).endOf('w');
+      return this.$moment(this.startOfWeek).endOf('w').toISOString();
+    },
+    activeAuxiliaries () {
+      return this.filters
+        .filter(f => f.type === PERSON)
+        .filter(aux => this.hasCustomerContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek) ||
+          this.hasCompanyContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek));
     },
   },
   methods: {
@@ -122,9 +130,9 @@ export default {
     // Dates
     async updateStartOfWeek (vEvent) {
       const { startOfWeek } = vEvent;
-      this.startOfWeekAsString = startOfWeek.startOf('d').toISOString();
+      this.startOfWeek = startOfWeek;
 
-      const range = this.$moment.range(this.startOfWeekAsString, this.$moment(this.startOfWeekAsString).add(6, 'd'));
+      const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
       this.days = Array.from(range.by('days'));
       if (this.auxiliaries && this.auxiliaries.length) await this.refresh();
     },
@@ -162,8 +170,8 @@ export default {
     async refresh () {
       try {
         let params = {
-          startDate: this.$moment(this.startOfWeekAsString).toDate(),
-          endDate: this.endOfWeek.toDate(),
+          startDate: this.startOfWeek,
+          endDate: this.endOfWeek,
           groupBy: AUXILIARY,
         };
         if (!this.displayAllSectors) {

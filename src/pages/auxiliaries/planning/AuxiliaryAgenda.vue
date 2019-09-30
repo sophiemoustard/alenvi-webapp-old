@@ -5,7 +5,8 @@
         <div class="col-xs-12 col-md-5 auxiliary-name" v-if="Object.keys(selectedAuxiliary).length > 0">
           <img :src="getAvatar(selectedAuxiliary)" class="avatar">
           <q-select filter :value="selectedAuxiliary._id" color="white" inverted-light :options="auxiliariesOptions"
-            @input="updateAuxiliary" ref="auxiliarySelect" :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
+            @input="updateAuxiliary" ref="auxiliarySelect"
+            :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
             :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`" />
         </div>
         <div class="col-xs-12 col-md-7">
@@ -79,7 +80,8 @@ export default {
       return this.$store.getters['main/user'];
     },
     activeAuxiliaries () {
-      return this.auxiliaries.filter(aux => this.hasCompanyContractOnEvent(aux, this.days[0]) || this.hasCustomerContractOnEvent(aux, this.days[0]));
+      return this.auxiliaries.filter(aux => this.hasCompanyContractOnEvent(aux, this.days[0], this.days[6]) ||
+        this.hasCustomerContractOnEvent(aux, this.days[0], this.days[6]));
     },
     auxiliariesOptions () {
       return this.activeAuxiliaries.length === 0 ? [] : this.activeAuxiliaries.map(aux => ({
@@ -94,12 +96,10 @@ export default {
   async mounted () {
     this.viewMode = this.$q.platform.is.mobile ? THREE_DAYS_VIEW : WEEK_VIEW;
     this.height = window.innerHeight;
-    this.startOfWeek = this.$moment().startOf('week');
+    this.startOfWeek = this.$moment().startOf('week').toISOString();
     this.selectedAuxiliary = this.currentUser;
     this.getTimelineDays();
-    await this.getAuxiliaries();
-    await this.refresh();
-    await this.getCustomers();
+    await Promise.all([this.getAuxiliaries(), this.getCustomers(), this.refresh()]);
     this.setInternalHours();
   },
   methods: {
@@ -123,8 +123,8 @@ export default {
     async refresh () {
       try {
         const params = {
-          startDate: this.startOfWeek.toDate(),
-          endDate: this.endOfWeek().toDate(),
+          startDate: this.startOfWeek,
+          endDate: this.endOfWeek,
           auxiliary: this.selectedAuxiliary._id,
         }
         this.events = await this.$events.list(params);
@@ -134,7 +134,7 @@ export default {
     },
     async getAuxiliaries () {
       try {
-        this.auxiliaries = await this.$users.showAll({ sector: this.currentUser.sector });
+        this.auxiliaries = await this.$users.showAll();
       } catch (e) {
         this.auxiliaries = [];
       }
