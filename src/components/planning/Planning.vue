@@ -97,7 +97,7 @@
 import {
   PLANNING,
   AUXILIARY_ROLES,
-  INVOICED_AND_PAYED,
+  INVOICED_AND_PAID,
   SECTOR,
   STAFFING_VIEW_START_HOUR,
   STAFFING_VIEW_END_HOUR,
@@ -242,7 +242,7 @@ export default {
     },
     getPersonEvents (person) {
       return this.getRowEvents(person._id).filter(event =>
-        (this.isCustomerPlanning || !event.isCancelled || event.cancel.condition === INVOICED_AND_PAYED));
+        (this.isCustomerPlanning || !event.isCancelled || event.cancel.condition === INVOICED_AND_PAID));
     },
     // History
     toggleHistory () {
