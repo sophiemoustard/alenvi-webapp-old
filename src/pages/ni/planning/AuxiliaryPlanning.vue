@@ -2,7 +2,7 @@
   <q-page class="neutral-background">
     <ni-planning-manager :events="events" :persons="displayedAuxiliaries" @updateStartOfWeek="updateStartOfWeek"
       @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop"
-      :filteredSectors="filteredSectors" :can-edit="canEditEvent" :personKey="personKey"
+      :filteredSectors="filteredSectors" :can-edit="canEditEvent" :personKey="personKey" :filters="activeFilters"
       @toggleAllSectors="toggleAllSectors" :eventHistories="eventHistories" ref="planningManager"
       :displayAllSectors="displayAllSectors" @toggleHistory="toggleHistory" :displayHistory="displayHistory" />
 
@@ -23,7 +23,6 @@
 </template>
 
 <script>
-import ChipsAutocomplete from '../../../components/ChipsAutocomplete';
 import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryEventCreationModal';
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
 import Planning from '../../../components/planning/Planning.vue';
@@ -38,7 +37,6 @@ export default {
   metaInfo: { title: 'Plannnig auxiliaires' },
   components: {
     'ni-planning-manager': Planning,
-    'ni-chips-autocomplete-auxiliaries-sectors': ChipsAutocomplete,
     'ni-auxiliary-event-creation-modal': AuxiliaryEventCreationModal,
     'ni-auxiliary-event-edition-modal': AuxiliaryEventEditionModal,
   },
@@ -121,6 +119,11 @@ export default {
         .filter(f => f.type === PERSON)
         .filter(aux => this.hasCustomerContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek) ||
           this.hasCompanyContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek));
+    },
+    activeFilters () {
+      return this.filters
+        .filter(f => f.type === SECTOR || this.hasCustomerContractOnEvent(f, this.$moment(this.startOfWeek), this.endOfWeek) ||
+          this.hasCompanyContractOnEvent(f, this.$moment(this.startOfWeek), this.endOfWeek));
     },
   },
   methods: {

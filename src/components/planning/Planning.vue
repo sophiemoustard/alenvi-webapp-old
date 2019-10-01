@@ -2,7 +2,7 @@
   <div :class="[{ 'planning': !toggleDrawer }]">
     <div class="row items-center planning-header">
       <div class="col-xs-12 col-md-5 planning-search">
-        <ni-chips-autocomplete ref="refFilter" v-model="terms" :disable="displayAllSectors" />
+        <ni-chips-autocomplete ref="refFilter" v-model="terms" :disable="displayAllSectors" :filters="filters" />
         <q-btn v-if="!isCustomerPlanning && isCoach" flat round :icon="displayAllSectors ? 'arrow_forward' : 'people'"
           @click="toggleAllSectors" :color="displayAllSectors ? 'primary' : ''" />
       </div>
@@ -141,6 +141,7 @@ export default {
     displayAllSectors: { type: Boolean, default: false },
     displayHistory: { type: Boolean, default: false },
     eventHistories: { type: Array, default: () => [] },
+    filters: { type: Array, default: () => [] },
   },
   data () {
     return {
