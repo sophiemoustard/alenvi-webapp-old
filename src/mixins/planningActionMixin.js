@@ -80,7 +80,9 @@ export const planningActionMixin = {
           condition: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
           reason: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
         },
-        misc: { required: requiredIf(item => item.type === ABSENCE && item.absence === OTHER) },
+        misc: {
+          required: requiredIf((item) => (item.type === ABSENCE && item.absence === OTHER) || item.isCancelled),
+        },
       },
     };
   },
