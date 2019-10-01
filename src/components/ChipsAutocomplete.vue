@@ -14,17 +14,15 @@ export default {
   props: {
     value: { type: Array, default: () => [] },
     disable: { type: Boolean, default: false },
+    filters: { type: Array, default: () => [] },
   },
   data () {
     return {
-      searchIcon: [{
-        icon: 'search',
-      }],
+      searchIcon: [{ icon: 'search' }],
     }
   },
   computed: {
     ...mapGetters({
-      filters: 'planning/getFilters',
       elementToAdd: 'planning/getElementToAdd',
     }),
   },
