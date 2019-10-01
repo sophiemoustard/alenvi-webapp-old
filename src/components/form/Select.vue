@@ -1,14 +1,17 @@
 <template>
   <div :class="{ 'col-xs-12 col-md-6': !inModal, 'margin-input full-width': inModal, last: last }">
-    <div class="row justify-between">
+    <div v-if="caption" class="row justify-between">
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
-    <q-field :error="error" :error-label="errorLabel">
+    <q-field v-if="qField" :error="error" :error-label="errorLabel">
       <q-select :value="value" color="white" inverted-light :options="options" :filter="filter"
         :filter-placeholder="filterPlaceholder" :clearable="clearable" :multiple="multiple"
         :class="{'borders': inModal}" :disable="disable" @focus="onFocus" @blur="onBlur" @input="update" />
     </q-field>
+    <q-select v-else :value="value" color="white" inverted-light :options="options" :filter="filter"
+      :filter-placeholder="filterPlaceholder" :clearable="clearable" :multiple="multiple"
+      :class="{'borders': inModal}" :disable="disable" @focus="onFocus" @blur="onBlur" @input="update" />
   </div>
 </template>
 
@@ -31,6 +34,7 @@ export default {
     disable: { type: Boolean, default: false },
     clearable: { type: Boolean, default: false },
     multiple: { type: Boolean, default: false },
+    qField: { type: Boolean, default: true },
   },
   methods: {
     onFocus () {
