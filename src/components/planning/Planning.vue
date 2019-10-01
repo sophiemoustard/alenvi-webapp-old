@@ -213,7 +213,7 @@ export default {
       const unassignedEvents = this.getRowEvents(sectorId);
       let total = 0;
       for (const event of unassignedEvents) {
-        total = this.$moment(event.endDate).diff(event.startDate, 'm', true);
+        total += this.$moment(event.endDate).diff(event.startDate, 'm', true);
       }
 
       return total / 60;
