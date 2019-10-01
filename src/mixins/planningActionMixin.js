@@ -1,3 +1,4 @@
+import { validationMixin } from './validationMixin'
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { frAddress } from '../helpers/vuelidateCustomVal.js';
 import { NotifyWarning, NotifyNegative, NotifyPositive } from '../components/popup/notify';
@@ -21,6 +22,7 @@ import {
 } from '../data/constants';
 
 export const planningActionMixin = {
+  mixins: [validationMixin],
   validations () {
     return {
       newEvent: {
@@ -78,7 +80,9 @@ export const planningActionMixin = {
           condition: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
           reason: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
         },
-        misc: { required: requiredIf(item => item.type === ABSENCE && item.absence === OTHER) },
+        misc: {
+          required: requiredIf((item) => (item.type === ABSENCE && item.absence === OTHER) || item.isCancelled),
+        },
       },
     };
   },
@@ -255,7 +259,8 @@ export const planningActionMixin = {
     async createEvent () {
       try {
         this.$v.newEvent.$touch();
-        if (this.$v.newEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
+        const isValid = await this.waitForFormValidation(this.$v.newEvent);
+        if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         await this.notifyCreation();
 
@@ -364,8 +369,9 @@ export const planningActionMixin = {
     },
     async updateEvent () {
       try {
-        this.$v.editedEvent.$touch();
-        if (this.$v.editedEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
+        await this.$v.editedEvent.$touch();
+        const isValid = await this.waitForFormValidation(this.$v.editedEvent);
+        if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         const payload = this.getEditionPayload(this.editedEvent);

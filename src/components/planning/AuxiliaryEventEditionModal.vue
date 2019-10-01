@@ -73,7 +73,7 @@
       </template>
       <ni-input in-modal v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes"
         :disable="isDisabled" @blur="validations.misc.$touch" :error="validations.misc.$error"
-        :required-field="editedEvent.type === ABSENCE && editedEvent.absence === OTHER" />
+        :required-field="isMiscRequired" />
       <template v-if="editedEvent.type === INTERVENTION && !editedEvent.shouldUpdateRepetition && !isDisabled">
         <div class="row q-mb-md light-checkbox">
           <q-checkbox v-model="editedEvent.isCancelled" label="Annuler l'évènement" @input="toggleCancellationForm" />
@@ -100,7 +100,7 @@
 </template>
 
 <script>
-import { INTERVENTION, AUXILIARY } from '../../data/constants';
+import { INTERVENTION, AUXILIARY, ABSENCE, OTHER } from '../../data/constants';
 import { planningModalMixin } from '../../mixins/planningModalMixin';
 import { formatIdentity } from '../../helpers/utils';
 
@@ -141,6 +141,9 @@ export default {
       return this.selectedAuxiliary.identity
         ? formatIdentity(this.selectedAuxiliary.identity, 'FL')
         : 'À affecter';
+    },
+    isMiscRequired () {
+      return (this.editedEvent.type === ABSENCE && this.editedEvent.absence === OTHER) || this.editedEvent.isCancelled;
     },
   },
   methods: {

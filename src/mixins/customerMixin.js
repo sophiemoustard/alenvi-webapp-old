@@ -21,7 +21,6 @@ export const customerMixin = {
     async updateCustomer (path) {
       try {
         if (this.tmpInput === this.$_.get(this.customer, path)) return;
-        console.log(this.$_.get(this.$v.customer, path));
         if (this.$_.get(this.$v.customer, path)) {
           const isValid = await this.waitForValidation(this.$v.customer, path);
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');

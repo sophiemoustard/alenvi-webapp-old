@@ -118,8 +118,10 @@ export const planningModalMixin = {
           const shouldDisableButton = (this.personKey === CUSTOMER && !this.editedEvent.sector) ||
             !this.editedEvent.subscription || !this.editedEvent.dates.startDate ||
             !this.editedEvent.dates.endDate || !this.editedEvent.dates.startHour || !this.editedEvent.dates.endHour;
-          if (this.editedEvent.isCancelled) return shouldDisableButton || !this.editedEvent.cancel.condition || !this.editedEvent.cancel.reason;
-          else return shouldDisableButton;
+          if (this.editedEvent.isCancelled) {
+            return shouldDisableButton || !this.editedEvent.cancel.condition || !this.editedEvent.cancel.reason ||
+              !this.editedEvent.misc;
+          } else return shouldDisableButton;
         case INTERNAL_HOUR:
           return !this.editedEvent.auxiliary || !this.editedEvent.dates.startDate || !this.editedEvent.dates.endDate ||
             !this.editedEvent.internalHour || !this.editedEvent.dates.startHour || !this.editedEvent.dates.endHour;
