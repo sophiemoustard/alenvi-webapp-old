@@ -23,7 +23,6 @@
 </template>
 
 <script>
-import ChipsAutocomplete from '../../../components/ChipsAutocomplete';
 import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryEventCreationModal';
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
 import Planning from '../../../components/planning/Planning.vue';
@@ -38,7 +37,6 @@ export default {
   metaInfo: { title: 'Plannnig auxiliaires' },
   components: {
     'ni-planning-manager': Planning,
-    'ni-chips-autocomplete-auxiliaries-sectors': ChipsAutocomplete,
     'ni-auxiliary-event-creation-modal': AuxiliaryEventCreationModal,
     'ni-auxiliary-event-edition-modal': AuxiliaryEventEditionModal,
   },
