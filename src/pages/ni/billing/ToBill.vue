@@ -1,11 +1,20 @@
 <template>
   <q-page class="neutral-background q-pb-xl">
-    <div class="title-padding">
-      <h4>À facturer</h4>
-      <ni-date-range v-model="billingDates" @input="getDraftBills" borderless
-        :error.sync="billingDatesHasError" />
+    <div class="title-padding row items-center">
+      <div class="col-xs-4">
+        <h4>À facturer</h4>
+      </div>
+      <div class="col-xs-8 row items-center justify-around">
+        <div class="col-xs-5">
+          <ni-select :options="toBillOptions" v-model="toBillOption" separator :q-field="false" />
+        </div>
+        <div class="col-xs-5">
+          <ni-date-range v-model="billingDates" @input="getDraftBills" borderless
+            :error.sync="billingDatesHasError" :q-field="false" />
+        </div>
+      </div>
     </div>
-    <q-table :data="draftBills" :columns="columns" row-key="customerId" binary-state-sort :loading="tableLoading"
+    <q-table :data="filteredAndOrderedDraftBills" :columns="columns" row-key="customerId" binary-state-sort :loading="tableLoading"
       :pagination.sync="pagination" separator="none" selection="multiple" :selected.sync="selected"
       class="q-pa-sm large-table">
       <q-tr slot="header" slot-scope="props">
@@ -41,9 +50,11 @@
 </template>
 
 <script>
+import orderBy from 'lodash/orderBy';
 import DateRange from '../../../components/form/DateRange';
 import ToBillRow from '../../../components/table/ToBillRow';
 import BillingPagination from '../../../components/table/BillingPagination';
+import Select from '../../../components/form/Select';
 import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
 import { billingMixin } from '../../../mixins/billingMixin.js';
 import { formatPrice, formatIdentity } from '../../../helpers/utils';
@@ -58,14 +69,14 @@ export default {
     'ni-to-bill-row': ToBillRow,
     'ni-date-range': DateRange,
     'ni-billing-pagination': BillingPagination,
+    'ni-select': Select,
   },
   data () {
     return {
       tableLoading: false,
       pagination: {
         rowsPerPage: 0,
-        sortBy: 'customer',
-        ascending: true,
+        sortBy: null,
       },
       billingDates: {
         startDate: null,
@@ -132,6 +143,12 @@ export default {
           align: 'center',
         },
       ],
+      toBillOptions: [
+        { label: 'Tous', value: 0 },
+        { label: 'Sans tiers payeur', value: 1 },
+        { label: 'Avec tiers payeur', value: 2 },
+      ],
+      toBillOption: 0,
     }
   },
   computed: {
@@ -155,6 +172,18 @@ export default {
         return `Facturer ${formatPrice(total)}`;
       }
       return 'Facturer';
+    },
+    filteredAndOrderedDraftBills () {
+      const orderedByCustomerDraftBills = orderBy(this.draftBills, (row) => row.customer.identity.lastname.toLowerCase(), ['asc']);
+      if (this.toBillOption === 1) return orderedByCustomerDraftBills.filter(draft => !draft.thirdPartyPayerBills);
+      if (this.toBillOption === 2) {
+        return orderBy(
+          this.draftBills.filter(draft => draft.thirdPartyPayerBills),
+          (row) => row.thirdPartyPayerBills[0].bills[0].thirdPartyPayer.name.toLowerCase(),
+          ['asc']
+        );
+      }
+      return orderedByCustomerDraftBills;
     },
   },
   async mounted () {
