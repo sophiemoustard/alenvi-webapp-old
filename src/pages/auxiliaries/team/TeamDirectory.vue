@@ -1,6 +1,6 @@
 <template>
   <q-page class="neutral-background" padding>
-    <div class="row items-center directory-header">
+    <div class="row">
       <div class="col-xs-12 col-md-6">
         <h4>Répertoire</h4>
       </div>

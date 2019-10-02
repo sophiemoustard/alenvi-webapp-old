@@ -1,10 +1,10 @@
 <template>
   <q-page class="neutral-background" padding>
-    <div class="row items-center directory-header">
+    <div class="row">
       <div class="col-xs-12 col-md-4">
         <h4>Bénéficiaires</h4>
       </div>
-      <div class="col-xs-12 col-md-5 margin-bottom-mobile">
+      <div class="col-xs-12 col-md-5">
         <q-search class="no-border input-search" v-model="searchStr" placeholder="Rechercher un bénéficiaire" color="white" inverted-light />
       </div>
     </div>
@@ -97,10 +97,6 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables'
-
-  .margin-bottom-mobile
-    @media (max-width: 767px)
-      margin-bottom: 20px
 
   .justify-end-custom
     justify-content: flex-end
