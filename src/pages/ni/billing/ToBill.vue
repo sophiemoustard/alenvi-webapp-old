@@ -1,14 +1,14 @@
 <template>
   <q-page class="neutral-background q-pb-xl">
     <div class="title-padding row items-start">
-      <div class="col-xs-4">
+      <div class="col-xs-12 col-md-4">
         <h4>À facturer</h4>
       </div>
-      <div class="col-xs-8 row justify-around">
-        <div class="col-xs-5">
+      <div class="col-xs-12 col-md-8 row justify-around">
+        <div class="col-xs-12 col-md-5">
           <ni-select :options="toBillOptions" v-model="toBillOption" separator />
         </div>
-        <div class="col-xs-5">
+        <div class="col-xs-12 col-md-5">
           <ni-date-range v-model="billingDates" @input="getDraftBills" borderless :error.sync="billingDatesHasError" />
         </div>
       </div>
