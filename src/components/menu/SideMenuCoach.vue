@@ -11,6 +11,7 @@
         <q-item-main :class="{'text-weight-bold': activeRoutes.administrative.highlight }" label="Administratif" />
       </template>
       <ni-menu-item name="administrative directory" icon="contacts" label="Répertoire auxiliaires" />
+      <ni-menu-item name="staff register" icon="contacts" label="Registre unique du personnel" />
     </q-collapsible>
     <q-item-separator />
     <q-collapsible ref="planning" v-model="activeRoutes.planning.open" collapseIcon="expand_more">
