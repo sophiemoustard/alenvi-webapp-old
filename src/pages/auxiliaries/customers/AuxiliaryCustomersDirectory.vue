@@ -1,16 +1,10 @@
 <template>
   <q-page class="neutral-background" padding>
-    <div class="row">
-      <div class="col-xs-12 col-md-4">
-        <h4>Bénéficiaires</h4>
-      </div>
-      <div class="col-xs-12 col-md-5">
-        <q-search class="no-border input-search" v-model="searchStr" placeholder="Rechercher un bénéficiaire" color="white" inverted-light />
-      </div>
-    </div>
-    <q-table :data="filteredUsers" :columns="columns" row-key="name" :rows-per-page-options="[]" :pagination.sync="pagination" :loading="tableLoading"
-      class="people-list">
-      <q-tr slot="body" slot-scope="props" :props="props" class="datatable-row" @click.native="goToCustomerProfile(props.row.customerId)">
+    <ni-directory-header title="Bénéficiaires" :search="searchStr" />
+    <q-table :data="filteredUsers" :columns="columns" row-key="name" :rows-per-page-options="[]"
+      :pagination.sync="pagination" :loading="tableLoading" class="people-list">
+      <q-tr slot="body" slot-scope="props" :props="props" class="datatable-row"
+        @click.native="goToCustomerProfile(props.row.customerId)">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
           <template>{{ col.value }}</template>
         </q-td>
@@ -22,16 +16,18 @@
 <script>
 import { AUXILIARY } from '../../../data/constants.js';
 import { formatIdentity } from '../../../helpers/utils';
+import DirectoryHeader from '../../../components/DirectoryHeader';
 
 export default {
+  name: 'AuxiliaryCustomersDirectory',
   props: {
-    role: {
-      type: String,
-      default: AUXILIARY,
-    },
+    role: { type: String, default: AUXILIARY },
   },
   metaInfo: {
     title: 'Bénéficiaires',
+  },
+  components: {
+    'ni-directory-header': DirectoryHeader,
   },
   data () {
     return {
