@@ -17,7 +17,7 @@
                 Facture {{ props.row.number || 'tiers' }}
               </a>
               <div v-else>
-                <a :href="getPdfUrl(props.row._id, 'bills')" target="_blank">Facture {{ props.row.number || 'tiers' }}</a>
+                <a :href="$bills.getPDFUrl(props.row._id)" target="_blank">Facture {{ props.row.number || 'tiers' }}</a>
               </div>
             </div>
           </template>
@@ -27,7 +27,7 @@
                 Avoir {{ props.row.number }}
               </a>
               <div v-else>
-                <a :href="getPdfUrl(props.row._id, 'creditNotes')" target="_blank">Avoir {{ props.row.number }}</a>
+                <a :href="$creditNotes.getPDFUrl(props.row._id)" target="_blank">Avoir {{ props.row.number }}</a>
               </div>
             </div>
           </template>
@@ -62,7 +62,6 @@
 </template>
 
 <script>
-import { Cookies } from 'quasar';
 import {
   CREDIT_NOTE,
   BILL,
@@ -162,9 +161,6 @@ export default {
     },
     openEditionModal (payment) {
       this.$emit('openEditionModal', payment);
-    },
-    getPdfUrl (docId, type) {
-      return `${process.env.API_HOSTNAME}/${type}/${docId}/pdfs?x-access-token=${Cookies.get('alenvi_token')}`;
     },
     canDownloadBill (bill) {
       return (bill.number && bill.origin === COMPANI) || (bill.driveFile && bill.driveFile.link);

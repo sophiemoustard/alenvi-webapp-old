@@ -1,3 +1,4 @@
+import { Cookies } from 'quasar';
 import { alenviAxios } from './ressources/alenviAxios';
 
 export default {
@@ -12,10 +13,7 @@ export default {
     const bills = await alenviAxios.get(`${process.env.API_HOSTNAME}/bills`, { params });
     return bills.data.data.bills;
   },
-  async getPDF (id) {
-    return alenviAxios.get(
-      `${process.env.API_HOSTNAME}/bills/${id}/pdfs`,
-      { responseType: 'arraybuffer', headers: { 'Accept': 'application/pdf' } }
-    );
+  getPDFUrl (id) {
+    return `${process.env.API_HOSTNAME}/bills/${id}/pdfs?x-access-token=${Cookies.get('alenvi_token')}`;
   },
 }

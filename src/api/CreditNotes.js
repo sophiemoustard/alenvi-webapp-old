@@ -1,4 +1,5 @@
-import { alenviAxios } from './ressources/alenviAxios'
+import { Cookies } from 'quasar';
+import { alenviAxios } from './ressources/alenviAxios';
 
 export default {
   async showAll (params) {
@@ -16,10 +17,7 @@ export default {
   async remove (id) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/creditNotes/${id}`);
   },
-  async getPDF (id) {
-    return alenviAxios.get(
-      `${process.env.API_HOSTNAME}/creditNotes/${id}/pdfs`,
-      { responseType: 'arraybuffer', headers: { 'Accept': 'application/pdf' } }
-    );
+  getPDFUrl (id) {
+    return `${process.env.API_HOSTNAME}/creditNotes/${id}/pdfs?x-access-token=${Cookies.get('alenvi_token')}`;
   },
 }
