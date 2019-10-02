@@ -1,25 +1,22 @@
 <template>
-  <q-page class="neutral-background" padding>
-    <div class="row items-center directory-header">
-      <div class="col-xs-12 col-md-7">
-        <h4 class="no-margin">Registre unique du personnel</h4>
+  <q-page class="neutral-background q-pb-xl">
+    <div class="title-padding">
+      <div style="display: flex">
+        <h4>Registre unique du personnel</h4>
       </div>
     </div>
-    <q-table :data="staffRegister" :columns="columns" row-key="name" binary-state-sort :rows-per-page-options="[15, 25, 35]"
-      :pagination.sync="pagination" :loading="tableLoading" class="people-list q-pa-sm">
-      <q-tr slot="body" slot-scope="props" :props="props" class="datatable-row">
+    <q-table :data="staffRegister" :columns="columns" row-key="_id" binary-state-sort :rows-per-page-options="[15, 25, 35]"
+      :pagination.sync="pagination" :loading="tableLoading" class="q-pa-sm large-table">
+      <q-tr slot="body" slot-scope="props" :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
-          <template v-if="col.name ==='idCardRecto' && col.value !== 'N/A'">
-            <a v-bind:href= "col.value"> lien </a>
-          </template>
-          <template v-else-if="col.name ==='idCardVerso' && col.value !== 'N/A'">
-            <a v-bind:href= "col.value"> lien </a>
-          </template>
-          <template v-else-if="col.name ==='residencePermitRecto' && col.value !== 'N/A'">
-            <a v-bind:href= "col.value"> lien </a>
-          </template>
-          <template v-else-if="col.name ==='residencePermitVerso' && col.value !== 'N/A'">
-            <a v-bind:href= "col.value"> lien </a>
+          <template v-if="col.name ==='idCardOrResidencePermitRecto' || col.name ==='idCardOrResidencePermitVerso'">
+              <div  class="row justify-center table-actions">
+                <q-btn flat round small color="primary">
+                  <a :href="col.value" target="_blank">
+                    <q-icon name="file download" />
+                  </a>
+                </q-btn>
+              </div>
           </template>
           <template v-else>{{ col.value }}</template>
         </q-td>
@@ -33,7 +30,7 @@ export default {
   data () {
     return {
       staffRegister: [],
-      tableLoading: true,
+      tableLoading: false,
       pagination: {
         sortBy: 'hiringDate',
         descending: true,
@@ -44,9 +41,14 @@ export default {
         {
           name: 'name',
           label: 'Nom',
-          field: row => row.fullname,
+          field: row => row.user.identity.lastname,
           align: 'left',
-          style: 'width: 450px',
+        },
+        {
+          name: 'firstname',
+          label: 'Prénom',
+          field: row => row.user.identity.firstname,
+          align: 'left',
         },
         {
           name: 'birthDate',
@@ -54,35 +56,30 @@ export default {
           field: row => row.user.identity.birthDate,
           align: 'left',
           format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : 'Non renseignée',
-          style: 'width: 170px',
         },
         {
           name: 'gender',
           label: 'Sexe',
           field: row => row.user.identity.title,
           align: 'left',
-          style: 'width: 450px',
         },
         {
           name: 'nationality',
           label: 'Nationalité',
           field: row => row.user.identity.nationality,
           align: 'left',
-          style: 'width: 450px',
         },
         {
           name: 'job',
           label: 'Emploi',
           field: row => 'Auxiliaire de vie',
           align: 'left',
-          style: 'width: 450px',
         },
         {
           name: 'contract',
           label: 'Type de contrat',
           field: row => 'CDI',
           align: 'left',
-          style: 'width: 450px',
         },
         {
           name: 'hiringDate',
@@ -90,7 +87,6 @@ export default {
           field: 'startDate',
           align: 'left',
           format: (value) => this.$moment(value).format('DD/MM/YYYY'),
-          style: 'width: 170px',
         },
         {
           name: 'endDate',
@@ -98,50 +94,30 @@ export default {
           field: row => row.endDate,
           align: 'left',
           format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : 'N/A',
-          style: 'width: 170px',
         },
         {
-          name: 'idCardRecto',
-          label: 'Recto carte d\'identité',
-          field: row => row.user.administrative.idCardRecto ? row.user.administrative.idCardRecto.link : 'N/A',
+          name: 'idCardOrResidencePermitRecto',
+          label: 'Carte d\'identité/Titre de séjour Recto',
+          field: row => this.$_.has(row, 'user.administrative.idCardRecto.link') ? this.$_.get(row, 'user.administrative.idCardRecto.link') : this.$_.get(row, 'user.administrative.residencePermitRecto.link'),
           align: 'left',
-          style: 'width: 170px',
         },
         {
-          name: 'idCardVerso',
-          label: 'Verso carte d\'identité',
-          field: row => row.user.administrative.idCardVerso ? row.user.administrative.idCardVerso.link : 'N/A',
+          name: 'idCardOrResidencePermitVerso',
+          label: 'Carte d\'identité/Titre de séjour Verso',
+          field: row => this.$_.has(row, 'user.administrative.idCardVerso.link') ? this.$_.get(row, 'user.administrative.idCardVerso.link') : this.$_.get(row, 'user.administrative.residencePermitVerso.link'),
           align: 'left',
-          style: 'width: 170px',
-        },
-        {
-          name: 'residencePermitRecto',
-          label: 'Recto titre de séjour',
-          field: row => row.user.administrative.residencePermitRecto ? row.user.administrative.residencePermitRecto.link : 'N/A',
-          align: 'left',
-          style: 'width: 170px',
-        },
-        {
-          name: 'residencePermitVerso',
-          label: 'Verso titre de séjour',
-          field: row => row.user.administrative.residencePermitVerso ? row.user.administrative.residencePermitVerso.link : 'N/A',
-          align: 'left',
-          style: 'width: 170px',
         },
       ],
     }
   },
-  mounted () {
-    this.getStaffRegister();
+  async mounted () {
+    await this.getStaffRegister();
   },
   methods: {
     async getStaffRegister () {
       try {
-        const staffRegister = await this.$contracts.getStaffRegister();
-        this.staffRegister = staffRegister.map((auxiliary) => {
-          auxiliary.fullname = `${auxiliary.user.identity.firstname} ${auxiliary.user.identity.lastname}`;
-          return auxiliary;
-        });
+        this.tableLoading = true;
+        this.staffRegister = await this.$contracts.getStaffRegister();
         this.tableLoading = false;
       } catch (e) {
         console.error(e);
