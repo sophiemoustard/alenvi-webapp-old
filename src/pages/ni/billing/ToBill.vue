@@ -4,7 +4,7 @@
       <div class="col-xs-4">
         <h4>À facturer</h4>
       </div>
-      <div class="col-xs-8 row items-center justify-around">
+      <div class="col-xs-8 row justify-around">
         <div class="col-xs-5">
           <ni-select :options="toBillOptions" v-model="toBillOption" separator />
         </div>
