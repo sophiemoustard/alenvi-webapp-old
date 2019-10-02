@@ -1,13 +1,21 @@
 <template>
   <q-page class="neutral-background q-pb-xl">
-    <div class="title-padding">
-      <h4>À facturer</h4>
-      <ni-date-range v-model="billingDates" @input="getDraftBills" borderless
-        :error.sync="billingDatesHasError" />
+    <div class="title-padding row items-start">
+      <div class="col-xs-12 col-md-4">
+        <h4>À facturer</h4>
+      </div>
+      <div class="col-xs-12 col-md-8 row justify-around">
+        <div class="col-xs-12 col-md-5">
+          <ni-select :options="toBillOptions" v-model="toBillOption" separator />
+        </div>
+        <div class="col-xs-12 col-md-5">
+          <ni-date-range v-model="billingDates" @input="getDraftBills" borderless :error.sync="billingDatesHasError" />
+        </div>
+      </div>
     </div>
-    <q-table :data="draftBills" :columns="columns" row-key="customerId" binary-state-sort :loading="tableLoading"
-      :pagination.sync="pagination" separator="none" selection="multiple" :selected.sync="selected"
-      class="q-pa-sm large-table">
+    <q-table :data="filteredAndOrderedDraftBills" :columns="columns" row-key="customerId" binary-state-sort
+      :loading="tableLoading" :pagination.sync="pagination" separator="none" selection="multiple"
+      :selected.sync="selected" class="q-pa-sm large-table">
       <q-tr slot="header" slot-scope="props">
         <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
         <q-th auto-width>
@@ -20,7 +28,9 @@
           @discount:input="computeTotalAmount(props.row.customerBills)" :index="index" :bill.sync="bill"
           display-checkbox />
         <q-tr v-if="props.row.customerBills.bills.length > 1" :props="props">
-          <q-td colspan="10"><div class="text-right">Total :</div></q-td>
+          <q-td colspan="10">
+            <div class="text-right">Total :</div>
+          </q-td>
           <q-td colspan="1" align="center">{{ formatPrice(props.row.customerBills.total) }}</q-td>
           <q-td colspan="1" />
         </q-tr>
@@ -33,7 +43,7 @@
         </template>
       </template>
       <ni-billing-pagination slot="bottom" slot-scope="props" :props="props" :pagination.sync="pagination"
-        :data="draftBills"/>
+        :data="filteredAndOrderedDraftBills" />
     </q-table>
     <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
       :label="totalToBillLabel" @click="createBills" />
@@ -41,9 +51,12 @@
 </template>
 
 <script>
+import orderBy from 'lodash/orderBy';
+import get from 'lodash/get';
 import DateRange from '../../../components/form/DateRange';
 import ToBillRow from '../../../components/table/ToBillRow';
 import BillingPagination from '../../../components/table/BillingPagination';
+import Select from '../../../components/form/Select';
 import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
 import { billingMixin } from '../../../mixins/billingMixin.js';
 import { formatPrice, formatIdentity } from '../../../helpers/utils';
@@ -58,15 +71,12 @@ export default {
     'ni-to-bill-row': ToBillRow,
     'ni-date-range': DateRange,
     'ni-billing-pagination': BillingPagination,
+    'ni-select': Select,
   },
   data () {
     return {
       tableLoading: false,
-      pagination: {
-        rowsPerPage: 0,
-        sortBy: 'customer',
-        ascending: true,
-      },
+      pagination: { rowsPerPage: 0 },
       billingDates: {
         startDate: null,
         endDate: null,
@@ -132,6 +142,12 @@ export default {
           align: 'center',
         },
       ],
+      toBillOptions: [
+        { label: 'Tous', value: 0 },
+        { label: 'Sans tiers payeur', value: 1 },
+        { label: 'Avec tiers payeur', value: 2 },
+      ],
+      toBillOption: 0,
     }
   },
   computed: {
@@ -155,6 +171,18 @@ export default {
         return `Facturer ${formatPrice(total)}`;
       }
       return 'Facturer';
+    },
+    filteredAndOrderedDraftBills () {
+      const orderedByCustomerDraftBills = orderBy(this.draftBills, (row) => get(row, 'customer.identity.lastname', '').toLowerCase(), ['asc']);
+      if (this.toBillOption === 1) return orderedByCustomerDraftBills.filter(draft => !draft.thirdPartyPayerBills);
+      if (this.toBillOption === 2) {
+        return orderBy(
+          orderedByCustomerDraftBills.filter(draft => draft.thirdPartyPayerBills),
+          (row) => get(row, 'thirdPartyPayerBills[0].bills[0].thirdPartyPayer.name', '').toLowerCase(),
+          ['asc']
+        );
+      }
+      return orderedByCustomerDraftBills;
     },
   },
   async mounted () {
