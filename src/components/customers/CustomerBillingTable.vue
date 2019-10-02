@@ -16,8 +16,8 @@
               <a v-if="props.row.driveFile && props.row.driveFile.link" :href="props.row.driveFile.link" target="_blank">
                 Facture {{ props.row.number || 'tiers' }}
               </a>
-              <div v-else @click="downloadBillPdf(props.row)">
-                Facture {{ props.row.number || 'tiers' }}
+              <div v-else>
+                <a :href="getPdfUrl(props.row._id, 'bills')" target="_blank">Facture {{ props.row.number || 'tiers' }}</a>
               </div>
             </div>
           </template>
@@ -26,8 +26,8 @@
               <a v-if="props.row.driveFile && props.row.driveFile.link" :href="props.row.driveFile.link" target="_blank">
                 Avoir {{ props.row.number }}
               </a>
-              <div v-else @click="downloadCreditNotePdf(props.row)">
-                Avoir {{ props.row.number }}
+              <div v-else>
+                <a :href="getPdfUrl(props.row._id, 'creditNotes')" target="_blank">Avoir {{ props.row.number }}</a>
               </div>
             </div>
           </template>
@@ -62,6 +62,7 @@
 </template>
 
 <script>
+import { Cookies } from 'quasar';
 import {
   CREDIT_NOTE,
   BILL,
@@ -75,8 +76,6 @@ import {
   PAYMENT,
   COMPANI,
 } from '../../data/constants';
-import { NotifyNegative, NotifyPositive } from '../popup/notify.js';
-import { generatePdfUrl } from '../../helpers/downloadFile.js';
 import { formatPrice } from '../../helpers/utils';
 
 export default {
@@ -164,45 +163,14 @@ export default {
     openEditionModal (payment) {
       this.$emit('openEditionModal', payment);
     },
-    generatePdfDisplayUrl (doc, docNumber) {
-      const url = generatePdfUrl(doc);
-      return this.$router.resolve({ name: 'display file', params: { fileName: docNumber }, query: { blobUrl: url } });
-    },
-    async downloadBillPdf (bill) {
-      const windowRef = window.open();
-
-      try {
-        if (!this.canDownloadBill(bill)) return;
-
-        const pdf = await this.$bills.getPDF(bill._id);
-        const routeData = this.generatePdfDisplayUrl(pdf, bill.number);
-        windowRef.location = routeData.href;
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Impossible de télécharger la facture');
-      }
+    getPdfUrl (docId, type) {
+      return `${process.env.API_HOSTNAME}/${type}/${docId}/pdfs?x-access-token=${Cookies.get('alenvi_token')}`;
     },
     canDownloadBill (bill) {
       return (bill.number && bill.origin === COMPANI) || (bill.driveFile && bill.driveFile.link);
     },
     canDownloadCreditNote (creditNote) {
       return (creditNote.number && creditNote.origin === COMPANI) || (creditNote.driveFile && creditNote.driveFile.link);
-    },
-    async downloadCreditNotePdf (creditNote) {
-      const windowRef = window.open();
-
-      try {
-        if (!this.canDownloadCreditNote(creditNote)) return;
-
-        const pdf = await this.$creditNotes.getPDF(creditNote._id);
-        const routeData = this.generatePdfDisplayUrl(pdf, creditNote.number);
-        windowRef.location = routeData.href;
-
-        NotifyPositive('Avoir téléchargé');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Impossible de télécharger l\'avoir');
-      }
     },
   },
 }
