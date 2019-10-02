@@ -1,18 +1,15 @@
 <template>
   <q-page class="neutral-background q-pb-xl">
-    <div class="title-padding row items-start">
-      <div class="col-xs-12 col-md-4">
-        <h4>À facturer</h4>
-      </div>
-      <div class="col-xs-12 col-md-8 row justify-around">
-        <div class="col-xs-12 col-md-5">
+    <ni-title-header title="À facturer">
+      <template slot="content">
+        <div class="col-xs-12 col-md-5 on-left">
           <ni-select :options="toBillOptions" v-model="toBillOption" separator />
         </div>
         <div class="col-xs-12 col-md-5">
           <ni-date-range v-model="billingDates" @input="getDraftBills" borderless :error.sync="billingDatesHasError" />
         </div>
-      </div>
-    </div>
+      </template>
+    </ni-title-header>
     <q-table :data="filteredAndOrderedDraftBills" :columns="columns" row-key="customerId" binary-state-sort
       :loading="tableLoading" :pagination.sync="pagination" separator="none" selection="multiple"
       :selected.sync="selected" class="q-pa-sm large-table">
@@ -57,6 +54,7 @@ import DateRange from '../../../components/form/DateRange';
 import ToBillRow from '../../../components/table/ToBillRow';
 import BillingPagination from '../../../components/table/BillingPagination';
 import Select from '../../../components/form/Select';
+import TitleHeader from '../../../components/TitleHeader';
 import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
 import { billingMixin } from '../../../mixins/billingMixin.js';
 import { formatPrice, formatIdentity } from '../../../helpers/utils';
@@ -72,6 +70,7 @@ export default {
     'ni-date-range': DateRange,
     'ni-billing-pagination': BillingPagination,
     'ni-select': Select,
+    'ni-title-header': TitleHeader,
   },
   data () {
     return {
