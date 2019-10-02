@@ -185,6 +185,11 @@ export default {
       return orderedByCustomerDraftBills;
     },
   },
+  watch: {
+    filteredAndOrderedDraftBills () {
+      this.selected = [];
+    },
+  },
   async mounted () {
     this.setBillingDates();
     await this.getDraftBills();
