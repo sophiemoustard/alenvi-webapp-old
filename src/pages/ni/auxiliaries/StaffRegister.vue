@@ -26,6 +26,8 @@
 </template>
 
 <script>
+import nationalities from '../../../data/nationalities.js';
+
 export default {
   data () {
     return {
@@ -41,32 +43,32 @@ export default {
         {
           name: 'name',
           label: 'Nom',
-          field: row => row.user.identity.lastname,
+          field: row => this.$_.get(row, 'user.identity.lastname').toUpperCase(),
           align: 'left',
         },
         {
           name: 'firstname',
           label: 'Prénom',
-          field: row => row.user.identity.firstname,
+          field: row => this.$_.get(row, 'user.identity.firstname'),
           align: 'left',
         },
         {
           name: 'birthDate',
           label: 'Date de naissance',
-          field: row => row.user.identity.birthDate,
+          field: row => this.$_.get(row, 'user.identity.birthDate'),
           align: 'left',
           format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : 'Non renseignée',
         },
         {
           name: 'gender',
-          label: 'Sexe',
-          field: row => row.user.identity.title,
+          label: 'Civilité',
+          field: row => this.$_.get(row, 'user.identity.title'),
           align: 'left',
         },
         {
           name: 'nationality',
           label: 'Nationalité',
-          field: row => row.user.identity.nationality,
+          field: row => nationalities[this.$_.get(row, 'user.identity.nationality')],
           align: 'left',
         },
         {
@@ -79,7 +81,7 @@ export default {
           name: 'contract',
           label: 'Type de contrat',
           field: row => 'CDI',
-          align: 'left',
+          align: 'center',
         },
         {
           name: 'hiringDate',
@@ -93,19 +95,21 @@ export default {
           label: 'Date de fin',
           field: row => row.endDate,
           align: 'left',
-          format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : 'N/A',
+          format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : '',
         },
         {
           name: 'idCardOrResidencePermitRecto',
-          label: 'Carte d\'identité/Titre de séjour Recto',
+          label: 'Titre de séjour/Identité (R)',
           field: row => this.$_.has(row, 'user.administrative.idCardRecto.link') ? this.$_.get(row, 'user.administrative.idCardRecto.link') : this.$_.get(row, 'user.administrative.residencePermitRecto.link'),
           align: 'left',
+          style: 'width: 105px',
         },
         {
           name: 'idCardOrResidencePermitVerso',
-          label: 'Carte d\'identité/Titre de séjour Verso',
+          label: 'Titre de séjour/Identité (V)',
           field: row => this.$_.has(row, 'user.administrative.idCardVerso.link') ? this.$_.get(row, 'user.administrative.idCardVerso.link') : this.$_.get(row, 'user.administrative.residencePermitVerso.link'),
           align: 'left',
+          style: 'width: 105px',
         },
       ],
     }
