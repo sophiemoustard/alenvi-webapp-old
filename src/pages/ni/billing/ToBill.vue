@@ -42,7 +42,7 @@
         </template>
       </template>
       <ni-billing-pagination slot="bottom" slot-scope="props" :props="props" :pagination.sync="pagination"
-        :data="draftBills"/>
+        :data="filteredAndOrderedDraftBills"/>
     </q-table>
     <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
       :label="totalToBillLabel" @click="createBills" />
