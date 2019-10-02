@@ -51,6 +51,7 @@
 
 <script>
 import orderBy from 'lodash/orderBy';
+import get from 'lodash/get';
 import DateRange from '../../../components/form/DateRange';
 import ToBillRow from '../../../components/table/ToBillRow';
 import BillingPagination from '../../../components/table/BillingPagination';
@@ -74,10 +75,7 @@ export default {
   data () {
     return {
       tableLoading: false,
-      pagination: {
-        rowsPerPage: 0,
-        sortBy: null,
-      },
+      pagination: { rowsPerPage: 0 },
       billingDates: {
         startDate: null,
         endDate: null,
@@ -174,12 +172,12 @@ export default {
       return 'Facturer';
     },
     filteredAndOrderedDraftBills () {
-      const orderedByCustomerDraftBills = orderBy(this.draftBills, (row) => row.customer.identity.lastname.toLowerCase(), ['asc']);
+      const orderedByCustomerDraftBills = orderBy(this.draftBills, (row) => get(row, 'customer.identity.lastname', '').toLowerCase(), ['asc']);
       if (this.toBillOption === 1) return orderedByCustomerDraftBills.filter(draft => !draft.thirdPartyPayerBills);
       if (this.toBillOption === 2) {
         return orderBy(
-          this.draftBills.filter(draft => draft.thirdPartyPayerBills),
-          (row) => row.thirdPartyPayerBills[0].bills[0].thirdPartyPayer.name.toLowerCase(),
+          orderedByCustomerDraftBills.filter(draft => draft.thirdPartyPayerBills),
+          (row) => get(row, 'thirdPartyPayerBills[0].bills[0].thirdPartyPayer.name', '').toLowerCase(),
           ['asc']
         );
       }
