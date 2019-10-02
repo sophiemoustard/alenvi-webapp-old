@@ -1,22 +1,21 @@
 <template>
   <q-page class="neutral-background q-pb-xl">
-    <div class="title-padding row items-center">
+    <div class="title-padding row items-start">
       <div class="col-xs-4">
         <h4>À facturer</h4>
       </div>
       <div class="col-xs-8 row items-center justify-around">
         <div class="col-xs-5">
-          <ni-select :options="toBillOptions" v-model="toBillOption" separator :q-field="false" />
+          <ni-select :options="toBillOptions" v-model="toBillOption" separator />
         </div>
         <div class="col-xs-5">
-          <ni-date-range v-model="billingDates" @input="getDraftBills" borderless
-            :error.sync="billingDatesHasError" :q-field="false" />
+          <ni-date-range v-model="billingDates" @input="getDraftBills" borderless :error.sync="billingDatesHasError" />
         </div>
       </div>
     </div>
-    <q-table :data="filteredAndOrderedDraftBills" :columns="columns" row-key="customerId" binary-state-sort :loading="tableLoading"
-      :pagination.sync="pagination" separator="none" selection="multiple" :selected.sync="selected"
-      class="q-pa-sm large-table">
+    <q-table :data="filteredAndOrderedDraftBills" :columns="columns" row-key="customerId" binary-state-sort
+      :loading="tableLoading" :pagination.sync="pagination" separator="none" selection="multiple"
+      :selected.sync="selected" class="q-pa-sm large-table">
       <q-tr slot="header" slot-scope="props">
         <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
         <q-th auto-width>
@@ -29,7 +28,9 @@
           @discount:input="computeTotalAmount(props.row.customerBills)" :index="index" :bill.sync="bill"
           display-checkbox />
         <q-tr v-if="props.row.customerBills.bills.length > 1" :props="props">
-          <q-td colspan="10"><div class="text-right">Total :</div></q-td>
+          <q-td colspan="10">
+            <div class="text-right">Total :</div>
+          </q-td>
           <q-td colspan="1" align="center">{{ formatPrice(props.row.customerBills.total) }}</q-td>
           <q-td colspan="1" />
         </q-tr>
@@ -42,7 +43,7 @@
         </template>
       </template>
       <ni-billing-pagination slot="bottom" slot-scope="props" :props="props" :pagination.sync="pagination"
-        :data="filteredAndOrderedDraftBills"/>
+        :data="filteredAndOrderedDraftBills" />
     </q-table>
     <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
       :label="totalToBillLabel" @click="createBills" />

@@ -4,7 +4,7 @@
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="hasError" name="error_outline" color="secondary" />
     </div>
-    <q-field v-if="qField" :error="hasError" :error-label="errorMessage">
+    <q-field :error="hasError" :error-label="errorMessage">
       <div class="date-container" :class="{ borderless: borderless }">
         <div class="date-item">
           <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item"
@@ -17,17 +17,6 @@
         </div>
       </div>
     </q-field>
-    <div v-else class="date-container" :class="{ borderless: borderless }">
-      <div class="date-item">
-        <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item"
-          @blur="blurDateHandler" @error="setFieldError('startDate', $event)" />
-      </div>
-      <p class="delimiter">-</p>
-      <div class="date-item">
-        <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
-          @blur="blurDateHandler" :min="value.startDate" @error="setFieldError('endDate', $event)" />
-      </div>
-    </div>
   </div>
 </template>
 
@@ -45,7 +34,6 @@ export default {
     value: { type: Object, default: function () { return { startDate: this.$moment().startOf('d').toISOString(), endDate: this.$moment().endOf('d').toISOString() } } },
     requiredField: { type: Boolean, default: false },
     borderless: { type: Boolean, default: false },
-    qField: { type: Boolean, default: true },
   },
   data () {
     return {
