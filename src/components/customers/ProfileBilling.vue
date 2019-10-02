@@ -123,7 +123,7 @@ export default {
     getStartBalance (tpp = null) {
       const balance = !tpp
         ? this.balances.find(bal => bal.customer._id === this.customer._id && !bal.thirdPartyPayer)
-        : this.balances.find(bal => bal.thirdPartyPayer && bal.thirdPartyPayer._id === tpp);
+        : this.balances.find(bal => bal.thirdPartyPayer && bal.thirdPartyPayer._id === tpp._id);
 
       return balance ? balance.balance : 0;
     },
