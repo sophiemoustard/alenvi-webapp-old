@@ -11,6 +11,7 @@
         <q-item-main :class="{'text-weight-bold': activeRoutes.administrative.highlight }" label="Administratif" />
       </template>
       <ni-menu-item name="administrative directory" icon="contacts" label="Répertoire auxiliaires" />
+      <ni-menu-item v-if="isAdmin" name="staff register" icon="view_headline" label="Registre unique du personnel" />
     </q-collapsible>
     <q-item-separator />
     <q-collapsible ref="planning" v-model="activeRoutes.planning.open" collapseIcon="expand_more">
@@ -27,7 +28,7 @@
       </template>
       <ni-menu-item name="customers directory" icon="contacts" label="Répertoire bénéficiaires" />
     </q-collapsible>
-    <template v-if="user.role.name === ADMIN">
+    <template v-if="isAdmin">
       <q-item-separator />
       <q-collapsible ref="billing" v-model="activeRoutes.billing.open"
         collapseIcon="expand_more">
@@ -47,7 +48,7 @@
         <q-item-main :class="{'text-weight-bold': activeRoutes.pay.highlight }" label="Paie" />
       </template>
       <ni-menu-item name="absences" :params="{ id: user._id }" icon="calendar_today" label="Absences" />
-      <template v-if="user.role.name === ADMIN">
+      <template v-if="isAdmin">
         <ni-menu-item name="contract ends" :params="{ id: user._id }" icon="description" label="STC" />
         <ni-menu-item name="to pay" :params="{ id: user._id }" icon="euro_symbol" label="Paie mensuelle" />
       </template>
@@ -60,7 +61,7 @@
       <ni-menu-item name="data" :params="{ id: user._id }" icon="list_alt" label="Données" />
       <ni-menu-item name="history" :params="{ id: user._id }" icon="history" label="Historique" />
     </q-collapsible>
-    <template v-if="user.role.name === ADMIN">
+    <template v-if="isAdmin">
       <q-item-separator />
       <q-collapsible ref="configuration" v-model="activeRoutes.configuration.open"
         collapseIcon="expand_more">
@@ -129,6 +130,11 @@ export default {
   },
   mounted () {
     this.collapsibleOpening();
+  },
+  computed: {
+    isAdmin () {
+      return this.user.role.name === ADMIN;
+    },
   },
 }
 </script>

@@ -167,6 +167,17 @@ const routes = [
         },
       },
       {
+        path: 'ni/auxiliaries/staff-register',
+        name: 'staff register',
+        component: () => import('pages/ni/auxiliaries/StaffRegister'),
+        props: true,
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'contracts:read:user',
+          parent: 'administrative',
+        },
+      },
+      {
         path: 'ni/auxiliaries/:id',
         name: 'personal info',
         component: () => import('pages/ni/auxiliaries/PersonalInfo'),
