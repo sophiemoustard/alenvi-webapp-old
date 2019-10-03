@@ -129,7 +129,7 @@ export default {
         this.formatContractList(contractsList);
         this.contractsLoading = false;
       } catch (e) {
-        this.$contracts = [];
+        this.contracts = [];
         this.contractsLoading = false;
         console.error(e);
       }
@@ -139,7 +139,7 @@ export default {
       const startDate = this.$moment(this.dates.startDate);
       const endDate = this.$moment(this.dates.endDate);
       contractsList.forEach(contract => {
-        const versions = contract.versions;
+        const { versions } = contract;
         if (this.isContractEnding(contract, startDate, endDate)) {
           const lastVersion = versions[versions.length - 1];
           const versionToDisplay = {
