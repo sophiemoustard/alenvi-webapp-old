@@ -1,4 +1,5 @@
 import moment from 'moment';
+import get from 'lodash/get';
 import { formatPrice, formatIdentity, formatHours } from '../helpers/utils';
 import { END_CONTRACT_REASONS, SURCHARGES } from '../data/constants';
 import { downloadCsv } from '../helpers/downloadFile';
@@ -12,7 +13,8 @@ export const payMixin = {
           label: 'Auxiliaire',
           align: 'left',
           field: 'auxiliary',
-          format: value => value ? formatIdentity(value.identity, 'FL') : '',
+          format: value => value ? formatIdentity(value.identity, 'LF') : '',
+          sort: (a, b) => formatIdentity(a.identity, 'LF').localeCompare(formatIdentity(b.identity, 'LF')),
         },
         {
           name: 'sector',
@@ -20,6 +22,7 @@ export const payMixin = {
           align: 'left',
           field: 'auxiliary',
           format: value => value && value.sector ? value.sector.name : '',
+          sort: (a, b) => get(a, 'sector.name', '').localeCompare(get(b, 'sector.name', '')),
         },
         {
           name: 'startDate',
@@ -27,6 +30,7 @@ export const payMixin = {
           align: 'left',
           field: 'startDate',
           format: value => value ? this.$moment(value).format('DD/MM/YYYY') : '',
+          sort: (a, b) => new Date(a) - new Date(b),
         },
         {
           name: 'endNotificationDate',
@@ -128,6 +132,7 @@ export const payMixin = {
           align: 'center',
           field: 'mutual',
           format: value => value ? 'Oui' : 'Non',
+          sort: (a, b) => a === b ? 0 : a ? -1 : 1,
         },
         {
           name: 'transport',
