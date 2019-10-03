@@ -1,6 +1,6 @@
 <template>
   <q-page class="neutral-background" padding>
-    <ni-directory-header title="Bénéficiaires" :search="searchStr" />
+    <ni-directory-header title="Bénéficiaires" @updateSearch="updateSearch" />
     <q-table :data="filteredUsers" :columns="columns" row-key="name" :rows-per-page-options="[]"
       :pagination.sync="pagination" :loading="tableLoading" class="people-list">
       <q-tr slot="body" slot-scope="props" :props="props" class="datatable-row"
@@ -70,6 +70,9 @@ export default {
     },
   },
   methods: {
+    updateSearch (value) {
+      this.searchStr = value;
+    },
     async getCustomersList () {
       try {
         this.tableLoading = true;

@@ -1,7 +1,7 @@
 <template>
   <q-page class="neutral-background" padding>
-    <ni-directory-header title="Répertoire auxiliaires" :search="searchStr" toggleLabel="Actifs"
-      :toggle="activeUsers" display-toggle />
+    <ni-directory-header title="Répertoire auxiliaires" toggleLabel="Actifs" :toggle="activeUsers" display-toggle
+      @updateSearch="updateSearch" />
     <q-table :data="filteredUsers" :columns="columns" row-key="name" binary-state-sort :rows-per-page-options="[15, 25, 35]"
       :pagination.sync="pagination" :loading="tableLoading" class="people-list q-pa-sm">
       <q-tr slot="body" slot-scope="props" :props="props" :class="['datatable-row', { 'datatable-row-inactive': !props.row.isActive }]"
@@ -281,6 +281,9 @@ export default {
     },
   },
   methods: {
+    updateSearch (value) {
+      this.searchStr = value;
+    },
     getHiringDate (user) {
       let hiringDate = null;
       if (user.contracts && user.contracts.length > 0) {

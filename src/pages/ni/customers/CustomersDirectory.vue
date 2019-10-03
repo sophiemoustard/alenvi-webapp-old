@@ -1,7 +1,7 @@
 <template>
   <q-page class="neutral-background" padding>
-    <ni-directory-header title="Répertoire bénéficiaires" :search="searchStr" searchPlaceholder="Rechercher un profil"
-      toggleLabel="Clients" :toggle="onlyClients" display-toggle />
+    <ni-directory-header title="Répertoire bénéficiaires" toggleLabel="Clients" :toggle="onlyClients" display-toggle
+      @updateSearch="updateSearch" />
     <q-table :data="filteredCustomers" :columns="columns" row-key="name" binary-state-sort
       :rows-per-page-options="[15, 25, 35]" :pagination.sync="pagination" :loading="tableLoading"
       class="people-list q-pa-sm">
@@ -215,6 +215,9 @@ export default {
     },
   },
   methods: {
+    updateSearch (value) {
+      this.searchStr = value;
+    },
     async getCustomersList () {
       try {
         const customers = await this.$customers.list();

@@ -1,6 +1,6 @@
 <template>
   <q-page class="neutral-background" padding>
-    <ni-directory-header title="Répertoire" :search="searchStr" />
+    <ni-directory-header title="Répertoire" @updateSearch="updateSearch" />
     <q-table :data="filteredUsers" :columns="columns" row-key="name" :rows-per-page-options="[15, 25, 35]"
       :pagination.sync="pagination" :loading="tableLoading" class="people-list">
       <q-tr slot="body" slot-scope="props" :props="props" class="datatable-team-row">
@@ -81,6 +81,9 @@ export default {
     },
   },
   methods: {
+    updateSearch (value) {
+      this.searchStr = value;
+    },
     async getUserList () {
       try {
         const users = await this.$users.showAllActive({ role: [AUXILIARY, PLANNING_REFERENT] });
