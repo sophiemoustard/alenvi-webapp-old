@@ -1,15 +1,13 @@
 <template>
   <q-page class="neutral-background q-pb-xl">
     <div class="title-padding">
-      <div style="display: flex">
-        <h4>Registre unique du personnel</h4>
-      </div>
+      <h4>Registre unique du personnel</h4>
     </div>
     <q-table :data="staffRegister" :columns="columns" row-key="_id" binary-state-sort :rows-per-page-options="[15, 25, 35]"
-      :pagination.sync="pagination" :loading="tableLoading" class="q-pa-sm large-table">
+      :pagination.sync="pagination" :loading="tableLoading" class="q-pa-sm">
       <q-tr slot="body" slot-scope="props" :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
-          <template v-if="col.name ==='idCardOrResidencePermitRecto' || col.name ==='idCardOrResidencePermitVerso'">
+          <template v-if="col.name.match('idCardOrResidencePermit') && col.value !==''">
               <div  class="row justify-center table-actions">
                 <q-btn flat round small color="primary">
                   <a :href="col.value" target="_blank">
@@ -34,7 +32,7 @@ export default {
       staffRegister: [],
       tableLoading: false,
       pagination: {
-        sortBy: 'hiringDate',
+        sortBy: 'startDate',
         descending: true,
         page: 1,
         rowsPerPage: 15,
@@ -84,7 +82,7 @@ export default {
           align: 'center',
         },
         {
-          name: 'hiringDate',
+          name: 'startDate',
           label: 'Date de début',
           field: 'startDate',
           align: 'left',
@@ -93,7 +91,7 @@ export default {
         {
           name: 'endDate',
           label: 'Date de fin',
-          field: row => row.endDate,
+          field: 'endDate',
           align: 'left',
           format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : '',
         },
@@ -126,6 +124,7 @@ export default {
       } catch (e) {
         console.error(e);
         this.tableLoading = false;
+        this.staffRegister = [];
       }
     },
   },
