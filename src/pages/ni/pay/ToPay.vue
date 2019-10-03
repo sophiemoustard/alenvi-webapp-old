@@ -6,14 +6,16 @@
           :disable="displayedDraftPay.length === 0" />
       </template>
       <template slot="content">
-        <div class="col-xs-12 col-md-6 on-left">
+        <div class="col-xs-12">
           <div class="row items-baseline justify-end">
-            <div class="on-left">Trier par</div>
-            <ni-select :options="sortOptions" v-model="sortOption" separator />
+            <div class="on-left responsive-sort responsive-margin-bottom">Trier par</div>
+            <div class="col-xs-12 col-md-5 responsive-margin-bottom">
+              <q-select class="on-left" color="white" inverted-light :options="sortOptions" v-model="sortOption" separator />
+            </div>
+            <div class="col-xs-12 col-md-5">
+              <ni-select-sector v-model="selectedSector" allow-null-option />
+            </div>
           </div>
-        </div>
-        <div class="col-xs-12 col-md-4">
-          <ni-select-sector v-model="selectedSector" allow-null-option />
         </div>
       </template>
     </ni-title-header>
@@ -214,3 +216,12 @@ export default {
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+  @media screen and (max-width: 767px)
+    .responsive
+      &-margin-bottom
+        margin-bottom: 5px
+      &-sort
+        width: 100%
+</style>
