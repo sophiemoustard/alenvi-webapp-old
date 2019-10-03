@@ -4,7 +4,7 @@
       <h4>Registre unique du personnel</h4>
     </div>
     <q-table :data="staffRegister" :columns="columns" row-key="_id" binary-state-sort :rows-per-page-options="[15, 25, 35]"
-      :pagination.sync="pagination" :loading="tableLoading" class="q-pa-sm">
+      :pagination.sync="pagination" :loading="tableLoading" class="q-pa-sm large-table">
       <q-tr slot="body" slot-scope="props" :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
           <template v-if="col.name.match('idCardOrResidencePermit') && col.value !==''">
