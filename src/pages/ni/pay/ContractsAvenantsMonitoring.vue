@@ -1,9 +1,12 @@
 <template>
   <q-page class="neutral-background q-pb-xl">
-    <div class="title-padding">
-      <h4>Suivi Contrats/Avenants</h4>
-      <ni-date-range v-model="dates" @input="refresh" borderless :error.sync="datesHasError" />
-    </div>
+    <ni-title-header title="Suivi Contrats/Avenants">
+      <template slot="content">
+        <div class="col-xs-12 col-md-5">
+        <ni-date-range v-model="dates" @input="refresh" borderless :error.sync="datesHasError" />
+        </div>
+      </template>
+    </ni-title-header>
     <q-table :data="contracts" :columns="columns" binary-state-sort :pagination.sync="pagination" class="q-pa-smn large-table">
       <q-tr slot="body" slot-scope="props" :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
@@ -27,11 +30,14 @@
 <script>
 import DateRange from '../../../components/form/DateRange';
 import BillingPagination from '../../../components/table/BillingPagination';
+import TitleHeader from '../../../components/TitleHeader';
+import {formatIdentity} from '../../../helpers/utils';
 
 export default {
   components: {
     'ni-date-range': DateRange,
     'ni-billing-pagination': BillingPagination,
+    'ni-title-header': TitleHeader,
   },
   data () {
     return {
@@ -53,16 +59,9 @@ export default {
       },
       columns: [
         {
-          name: 'lastname',
-          label: 'Nom',
-          field: row => this.$_.get(row, 'user.identity.lastname', '').toUpperCase(),
-          align: 'left',
-          sortable: true,
-        },
-        {
-          name: 'firstname',
-          label: 'Prénom',
-          field: row => this.$_.get(row, 'user.identity.firstname', ''),
+          name: 'auxiliary',
+          label: 'Auxiliaire',
+          field: row => formatIdentity(row.user.identity, 'Fl'),
           align: 'left',
           sortable: true,
         },
