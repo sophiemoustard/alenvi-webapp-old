@@ -1,17 +1,7 @@
 <template>
   <q-page class="neutral-background" padding>
-    <div class="row items-center directory-header">
-      <div class="col-xs-12 col-md-5">
-        <h4 class="no-margin">Répertoire auxiliaires</h4>
-      </div>
-      <div class="col-xs-12 col-md-5">
-        <q-search class="no-border input-search" v-model="searchStr" placeholder="Rechercher un profil" color="white"
-          inverted-light />
-      </div>
-      <div class="col-xs-12 col-md-2 row justify-end">
-        <q-toggle v-model="activeUsers" color="primary" label="Actifs" />
-      </div>
-    </div>
+    <ni-directory-header title="Répertoire auxiliaires" toggleLabel="Actifs" :toggle="activeUsers" display-toggle
+      @updateSearch="updateSearch" />
     <q-table :data="filteredUsers" :columns="columns" row-key="name" binary-state-sort :rows-per-page-options="[15, 25, 35]"
       :pagination.sync="pagination" :loading="tableLoading" class="people-list q-pa-sm">
       <q-tr slot="body" slot-scope="props" :props="props" :class="['datatable-row', { 'datatable-row-inactive': !props.row.isActive }]"
@@ -95,6 +85,7 @@ import SelectSector from '../../../components/form/SelectSector';
 import NiInput from '../../../components/form/Input';
 import NiSelect from '../../../components/form/Select';
 import SearchAddress from '../../../components/form/SearchAddress';
+import DirectoryHeader from '../../../components/DirectoryHeader';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../../../components/popup/notify.js';
 import { DEFAULT_AVATAR, AUXILIARY, PLANNING_REFERENT, REQUIRED_LABEL } from '../../../data/constants';
 import { validationMixin } from '../../../mixins/validationMixin.js';
@@ -106,6 +97,7 @@ export default {
     'ni-input': NiInput,
     'ni-select': NiSelect,
     'ni-search-address': SearchAddress,
+    'ni-directory-header': DirectoryHeader,
   },
   mixins: [validationMixin],
   data () {
@@ -289,6 +281,9 @@ export default {
     },
   },
   methods: {
+    updateSearch (value) {
+      this.searchStr = value;
+    },
     getHiringDate (user) {
       let hiringDate = null;
       if (user.contracts && user.contracts.length > 0) {
