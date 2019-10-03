@@ -122,6 +122,7 @@ export default {
       sortOptions: [
         { label: 'Auxiliaire', value: 'auxiliary' },
         { label: 'Équipe', value: 'sector' },
+        { label: 'Début', value: 'startDate' },
         { label: 'Heures contrat', value: 'contractHours' },
         { label: 'Heures travaillées', value: 'workedHours' },
         { label: 'Solde heures', value: 'hoursBalance' },
