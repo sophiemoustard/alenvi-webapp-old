@@ -55,7 +55,7 @@ export default {
           label: 'Date de naissance',
           field: row => this.$_.get(row, 'user.identity.birthDate', ''),
           align: 'left',
-          format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : 'Non renseignée',
+          format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : '',
         },
         {
           name: 'gender',
