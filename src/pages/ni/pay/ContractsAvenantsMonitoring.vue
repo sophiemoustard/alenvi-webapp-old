@@ -4,14 +4,14 @@
       <h4>Suivi Contrats/Avenants</h4>
       <ni-date-range v-model="dates" @input="refresh" borderless :error.sync="datesHasError" />
     </div>
-    <q-table :data="contracts" :columns="columns" binary-state-sort :pagination.sync="pagination" class="q-pa-sm">
+    <q-table :data="contracts" :columns="columns" binary-state-sort :pagination.sync="pagination" class="q-pa-smn large-table">
       <q-tr slot="body" slot-scope="props" :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
           <template v-if="col.name==='actions'">
-            <div v-if="!contracts.endDate" class="row no-wrap table-actions contract-actions">
-              <q-btn flat round small color="grey" icon="remove_red_eye" @click="goToUserContractPage(col.value)" />
-              <q-btn flat round small color="grey" icon="edit" />
-            </div>
+          <div class="row no-wrap table-actions contract-actions">
+            <q-btn flat round small color="grey" icon="remove_red_eye" @click="goToUserContractPage(col.value)" />
+            <q-btn flat round small color="grey" icon="edit" />
+          </div>
           </template>
           <template v-else>
             {{ col.value }}
@@ -27,7 +27,6 @@
 <script>
 import DateRange from '../../../components/form/DateRange';
 import BillingPagination from '../../../components/table/BillingPagination';
-import {formatIdentity} from '../../../helpers/utils';
 
 export default {
   components: {
@@ -36,6 +35,10 @@ export default {
   },
   data () {
     return {
+      name: 'ContractsAvenantsMonitoring',
+      metaInfo: {
+        title: 'Suivi Contrats/Avenants',
+      },
       dates: {
         startDate: this.$moment().startOf('M').toISOString(),
         endDate: this.$moment().endOf('M').toISOString(),
@@ -50,9 +53,16 @@ export default {
       },
       columns: [
         {
-          name: 'auxiliary',
-          label: 'Auxiliaire',
-          field: row => formatIdentity(row.user.identity, 'Fl'),
+          name: 'lastname',
+          label: 'Nom',
+          field: row => this.$_.get(row, 'user.identity.lastname', '').toUpperCase(),
+          align: 'left',
+          sortable: true,
+        },
+        {
+          name: 'firstname',
+          label: 'Prénom',
+          field: row => this.$_.get(row, 'user.identity.firstname', ''),
           align: 'left',
           sortable: true,
         },
@@ -117,30 +127,48 @@ export default {
         this.contractsLoading = true;
         if (this.datesHasError) return;
         const contractsList = await this.$contracts.list({ startDate: this.dates.startDate, endDate: this.dates.endDate });
-        this.contracts = [];
-        const startDate = this.$moment(this.dates.startDate);
-        const endDate = this.$moment(this.dates.endDate);
-        contractsList.forEach(contract => {
-          const versions = contract.versions;
-          for (var idx = 0; idx < versions.length; idx++) {
-            const version = versions[idx];
-            const versionStartDate = this.$moment(version.startDate);
-            const versionEndDate = this.$moment(version.endDate);
-            if ((versionStartDate.isAfter(startDate) && versionStartDate.isBefore(endDate)) ||
-            (versionEndDate.isAfter(startDate) && versionEndDate.isBefore(endDate))) {
-              const versionToDisplay = version;
-              versionToDisplay.user = contract.user;
-              versionToDisplay.type = idx ? 'Avenant' : 'Contrat';
-              this.contracts.push(versionToDisplay);
-            }
-          }
-        });
+        this.formatContractList(contractsList);
         this.contractsLoading = false;
       } catch (e) {
         this.$contracts = [];
         this.contractsLoading = false;
         console.error(e);
       }
+    },
+    formatContractList (contractsList) {
+      this.contracts = [];
+      const startDate = this.$moment(this.dates.startDate);
+      const endDate = this.$moment(this.dates.endDate);
+      contractsList.forEach(contract => {
+        const versions = contract.versions;
+        if (this.isContractEnding(contract, startDate, endDate)) {
+          const lastVersion = versions[versions.length - 1];
+          const versionToDisplay = {
+            ...lastVersion,
+            user: contract.user,
+            type: 'Contrat',
+          }
+          this.contracts.push(versionToDisplay);
+        }
+        for (let idx = 0; idx < versions.length; idx++) {
+          const version = versions[idx];
+          const versionStartDate = this.$moment(version.startDate);
+          if ((versionStartDate.isSameOrAfter(startDate) && versionStartDate.isSameOrBefore(endDate))) {
+            const versionToDisplay = {
+              ...version,
+              user: contract.user,
+              type: idx ? 'Avenant' : 'Contrat',
+            }
+            this.contracts.push(versionToDisplay);
+          }
+        }
+      });
+    },
+    isContractEnding (contract, startDate, endDate) {
+      const contractEndDate = this.$moment(contract.endDate);
+      const lastVersionStartDate = this.$moment(contract.startDate);
+      return (contractEndDate.isSameOrAfter(startDate) && contractEndDate.isSameOrBefore(endDate)) &&
+        (lastVersionStartDate.isSameOrBefore(startDate) && lastVersionStartDate.isSameOrAfter(endDate));
     },
     goToUserContractPage (user) {
       this.$router.push({ name: 'personal info', params: { id: user._id, defaultTab: 'contracts' } });
