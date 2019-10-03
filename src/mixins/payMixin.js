@@ -132,6 +132,7 @@ export const payMixin = {
           align: 'center',
           field: 'mutual',
           format: value => value ? 'Oui' : 'Non',
+          sort: (a, b) => a === b ? 0 : a ? -1 : 1,
         },
         {
           name: 'transport',
