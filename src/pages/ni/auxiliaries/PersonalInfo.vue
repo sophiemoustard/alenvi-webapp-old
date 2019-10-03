@@ -20,7 +20,10 @@ import ProfilePay from '../../../components/auxiliary/ProfilePay';
 import { AUXILIARY, PLANNING_REFERENT } from '../../../data/constants.js';
 
 export default {
-  props: ['id'],
+  props: {
+    id: {type: String},
+    defaultTab: { type: String, default: () => 'info' },
+  },
   components: {
     ProfileHeader,
     ProfileTabs,
@@ -47,27 +50,27 @@ export default {
         {
           label: 'Infos personnelles',
           name: 'info',
-          default: true,
+          default: this.defaultTab === 'info',
           component: ProfileInfo,
           notification: 'profiles',
         },
         {
           label: 'Tâches',
           name: 'tasks',
-          default: false,
+          default: this.defaultTab === 'tasks',
           component: ProfileTasks,
           notification: 'tasks',
         },
         {
           label: 'Contrats',
           name: 'contracts',
-          default: false,
+          default: this.defaultTab === 'contracts',
           component: ProfileContracts,
         },
         {
           label: 'Paie',
           name: 'pays',
-          default: false,
+          default: this.defaultTab === 'pays',
           component: ProfilePay,
         },
       ],

@@ -9,7 +9,7 @@
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
           <template v-if="col.name==='actions'">
             <div v-if="!contracts.endDate" class="row no-wrap table-actions contract-actions">
-              <q-btn flat round small color="grey" icon="remove_red_eye" />
+              <q-btn flat round small color="grey" icon="remove_red_eye" @click="goToUserContractPage(col.value)" />
               <q-btn flat round small color="grey" icon="edit" />
             </div>
           </template>
@@ -60,6 +60,7 @@ export default {
           name: 'team',
           label: 'Equipe',
           align: 'left',
+          field: row => this.$_.get(row, 'user.sector.name', ''),
           sortable: true,
         },
         {
@@ -102,6 +103,7 @@ export default {
         {
           name: 'actions',
           align: 'center',
+          field: 'user',
         },
       ],
     }
@@ -139,6 +141,9 @@ export default {
         this.contractsLoading = false;
         console.error(e);
       }
+    },
+    goToUserContractPage (user) {
+      this.$router.push({ name: 'personal info', params: { id: user._id, defaultTab: 'contracts' } });
     },
   },
 }
