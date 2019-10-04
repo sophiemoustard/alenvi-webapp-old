@@ -127,6 +127,16 @@ const routes = [
         },
       },
       {
+        path: 'ni/pay/contract-monitoring',
+        name: 'contract monitoring',
+        component: () => import('pages/ni/pay/ContractMonitoring'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'contracts:edit',
+          parent: 'pay',
+        },
+      },
+      {
         path: 'ni/pay/absences',
         name: 'absences',
         component: () => import('pages/ni/pay/Absences'),
