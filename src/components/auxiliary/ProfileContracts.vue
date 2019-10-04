@@ -72,7 +72,7 @@
     </ni-modal>
 
     <!-- Edition modal -->
-    <ni-version-edition-modal :isOpened="versionEditionModal" :editedVersion="editedVersion" :loading="loading"
+    <version-edition-modal :isOpened="versionEditionModal" :editedVersion="editedVersion" :loading="loading"
       :validations="$v.editedVersion" :minStartDate="editedVersionMinStartDate" :isVersionUpdated="isVersionUpdated()"
       @hide="resetVersionEditionModal" @editVersion="editVersion"/>
 
@@ -121,7 +121,7 @@ export default {
     'ni-datetime-picker': DatetimePicker,
     'ni-contracts': Contracts,
     'ni-modal': Modal,
-    'ni-version-edition-modal': VersionEditionModal,
+    'version-edition-modal': VersionEditionModal,
   },
   data () {
     return {
@@ -240,15 +240,6 @@ export default {
         value: cus._id,
       }));
     },
-    userFullName () {
-      return `${this.getUser.identity.firstname} ${this.getUser.identity.lastname}`;
-    },
-    esignRedirection () {
-      return {
-        redirect: `${process.env.COMPANI_HOSTNAME}/docsigned?signed=true`,
-        redirectDecline: `${process.env.COMPANI_HOSTNAME}/docsigned?signed=false`,
-      }
-    },
     newVersionMinStartDate () {
       const lastVersion = this.selectedContract.versions[this.selectedContract.versions.length - 1];
       return lastVersion ? this.$moment(lastVersion.startDate).toISOString() : '';
@@ -301,15 +292,6 @@ export default {
         this.contracts = [];
         console.error(e);
       }
-    },
-    generateContractSigners (signer) {
-      const signers = [{
-        id: '1',
-        name: this.userFullName,
-        email: this.getUser.local.email,
-      }];
-      signers.push({ id: `${signers.length + 1}`, name: signer.name, email: signer.email });
-      return signers;
     },
     // Contract creation
     resetContract (val) {

@@ -3,7 +3,7 @@
     <ni-title-header title="Suivi Contrats/Avenants">
       <template slot="content">
         <div class="col-xs-12 col-md-5">
-        <ni-date-range v-model="dates" @input="refresh" borderless :error.sync="datesHasError" />
+        <ni-date-range v-model="dates" @input="refreshContracts" borderless :error.sync="datesHasError" />
         </div>
       </template>
     </ni-title-header>
@@ -59,6 +59,7 @@ export default {
         startDate: this.$moment().startOf('M').toISOString(),
         endDate: this.$moment().endOf('M').toISOString(),
       },
+      getUser: {},
       contractsList: [],
       versionsList: [],
       datesHasError: false,
@@ -129,10 +130,18 @@ export default {
     }
   },
   async mounted () {
-    await this.refresh();
+    await this.refreshContracts();
+  },
+  computed: {
+    mainUser () {
+      return this.$store.getters['main/user'];
+    },
+    userCompany () {
+      return this.mainUser.company;
+    },
   },
   methods: {
-    async refresh () {
+    async refreshContracts () {
       try {
         this.contractsLoading = true;
         if (this.datesHasError) return;
@@ -157,10 +166,12 @@ export default {
       this.selectedContract = this.contractsList.find(contract => contract._id === version.contractId);
       this.selectedVersion = version;
       this.versionEditionModal = true;
+      this.getUser = version.user;
     },
     formatContractList () {
       const startDate = this.$moment(this.dates.startDate);
       const endDate = this.$moment(this.dates.endDate);
+      this.versionsList = [];
 
       this.contractsList.forEach(contract => {
         const { versions } = contract;

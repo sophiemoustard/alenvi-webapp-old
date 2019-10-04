@@ -41,8 +41,26 @@ export const contractMixin = {
       const previousVersion = this.selectedContract.versions[index - 1];
       return this.$moment(previousVersion.startDate).add(1, 'd').toISOString();
     },
+    userFullName () {
+      return `${this.getUser.identity.firstname} ${this.getUser.identity.lastname}`;
+    },
+    esignRedirection () {
+      return {
+        redirect: `${process.env.COMPANI_HOSTNAME}/docsigned?signed=true`,
+        redirectDecline: `${process.env.COMPANI_HOSTNAME}/docsigned?signed=false`,
+      }
+    },
   },
   methods: {
+    generateContractSigners (signer) {
+      const signers = [{
+        id: '1',
+        name: this.userFullName,
+        email: this.getUser.local.email,
+      }];
+      signers.push({ id: `${signers.length + 1}`, name: signer.name, email: signer.email });
+      return signers;
+    },
     resetVersionEditionModal () {
       this.versionEditionModal = false;
       this.editedVersion = {};
