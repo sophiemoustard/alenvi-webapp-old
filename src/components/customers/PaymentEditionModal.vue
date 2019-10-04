@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="editionModal" content-classes="modal-container-md" @hide="resetForm">
+  <ni-modal :value="editionModal" @hide="resetForm">
     <template slot="title">
       <h5>Editer le <span class="text-weight-bold">{{ editionModalNature }}</span></h5>
     </template>

@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="creationModal" content-classes="modal-container-md" @hide="resetForm">
+  <ni-modal :value="creationModal" @hide="resetForm">
     <template slot="title">
       <h5>Ajouter un <span class="text-weight-bold">{{ creationModalNature }}</span></h5>
     </template>
