@@ -27,6 +27,10 @@
 import nationalities from '../../../data/nationalities.js';
 
 export default {
+  name: 'StaffRegister',
+  metaInfo: {
+    title: 'Registre unique du personnel',
+  },
   data () {
     return {
       staffRegister: [],

@@ -34,6 +34,10 @@ import TitleHeader from '../../../components/TitleHeader';
 import {formatIdentity} from '../../../helpers/utils';
 
 export default {
+  name: 'ContractMonitoring',
+  metaInfo: {
+    title: 'Suivi Contrats/Avenants',
+  },
   components: {
     'ni-date-range': DateRange,
     'ni-billing-pagination': BillingPagination,
@@ -41,10 +45,6 @@ export default {
   },
   data () {
     return {
-      name: 'ContractsAvenantsMonitoring',
-      metaInfo: {
-        title: 'Suivi Contrats/Avenants',
-      },
       dates: {
         startDate: this.$moment().startOf('M').toISOString(),
         endDate: this.$moment().endOf('M').toISOString(),
@@ -61,7 +61,7 @@ export default {
         {
           name: 'auxiliary',
           label: 'Auxiliaire',
-          field: row => formatIdentity(row.user.identity, 'Fl'),
+          field: row => formatIdentity(row.user.identity, 'LF'),
           align: 'left',
           sortable: true,
         },
@@ -138,26 +138,27 @@ export default {
       this.contracts = [];
       const startDate = this.$moment(this.dates.startDate);
       const endDate = this.$moment(this.dates.endDate);
+
       contractsList.forEach(contract => {
         const { versions } = contract;
         for (let idx = 0; idx < versions.length; idx++) {
           const version = versions[idx];
           const versionStartDate = this.$moment(version.startDate);
-          let isInInterval = (versionStartDate.isSameOrAfter(startDate) && versionStartDate.isSameOrBefore(endDate));
-          let typeContract = idx ? 'Avenant' : 'Contrat';
+          let isInInterval = versionStartDate.isBetween(startDate, endDate, 'day', '[]');
+          let contractType = idx ? 'Avenant' : 'Contrat';
           if (idx === versions.length - 1 && version.endDate) {
             const versionEndDate = this.$moment(version.endDate);
-            const isEndDateInInterval = versionEndDate.isSameOrAfter(startDate) && versionEndDate.isSameOrBefore(endDate);
+            const isEndDateInInterval = versionEndDate.isBetween(startDate, endDate, 'day', '[]');
             if (isEndDateInInterval) {
               isInInterval = true;
-              typeContract = 'Contract';
+              contractType = 'Contract';
             }
           }
           if (isInInterval) {
             const versionToDisplay = {
               ...version,
               user: contract.user,
-              type: typeContract,
+              type: contractType,
             }
             this.contracts.push(versionToDisplay);
           }

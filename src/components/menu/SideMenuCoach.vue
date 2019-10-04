@@ -47,8 +47,8 @@
       <template slot="header">
         <q-item-main :class="{'text-weight-bold': activeRoutes.pay.highlight }" label="Paie" />
       </template>
-      <ni-menu-item name="contracts avenants monitoring" icon="insert_drive_file" label="Suivi Contracts/Avenants" />
-      <ni-menu-item name="absences" :params="{ id: user._id }" icon="calendar_today" label="Absences" />
+      <ni-menu-item name="contract monitoring" icon="insert_drive_file" label="Suivi Contracts/Avenants" />
+      <ni-menu-item name="absences" icon="calendar_today" label="Absences" />
       <template v-if="isAdmin">
         <ni-menu-item name="contract ends" icon="description" label="STC" />
         <ni-menu-item name="to pay" :params="{ id: user._id }" icon="euro_symbol" label="Paie mensuelle" />
