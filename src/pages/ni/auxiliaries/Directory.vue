@@ -12,12 +12,12 @@
             <q-item-main :label="col.value.name" />
           </q-item>
           <template v-else-if="col.name === 'profileErrors'">
-            <q-icon v-if="notificationsProfiles[props.row.auxiliary._id] && props.row.isActive" name="error" color="secondary"
-              size="1rem" />
+            <q-icon v-if="notificationsProfiles[props.row.auxiliary._id] && props.row.isActive" name="error"
+              color="secondary" size="1rem" />
           </template>
           <template v-else-if="col.name === 'tasksErrors'">
-            <q-icon v-if="notificationsTasks[props.row.auxiliary._id] && props.row.isActive" name="error" color="secondary"
-              size="1rem" />
+            <q-icon v-if="notificationsTasks[props.row.auxiliary._id] && props.row.isActive" name="error"
+              color="secondary" size="1rem" />
           </template>
           <template v-else-if="col.name === 'active'">
             <div :class="{ activeDot: col.value, inactiveDot: !col.value }"></div>
@@ -26,52 +26,49 @@
         </q-td>
       </q-tr>
     </q-table>
-    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une personne" @click="auxiliaryCreationModal = true" />
+    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une personne"
+      @click="auxiliaryCreationModal = true" />
 
     <!-- User creation modal -->
-    <q-modal v-model="auxiliaryCreationModal" @hide="resetForm" content-classes="modal-container-sm">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-8">
-            <h5>Créer une nouvelle <span class="text-weight-bold">fiche auxiliaire</span></h5>
+    <ni-modal v-model="auxiliaryCreationModal" @hide="resetForm">
+      <template slot="title">
+        <h5>Créer une nouvelle <span class="text-weight-bold">fiche auxiliaire</span></h5>
+      </template>
+
+      <ni-select in-modal v-model="newUser.identity.title" :options="civilityOptions" caption="Civilité" />
+      <ni-input in-modal v-model="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error" caption="Nom"
+        @blur="$v.newUser.identity.lastname.$touch" required-field />
+      <ni-input in-modal v-model="newUser.identity.firstname" :error="$v.newUser.identity.firstname.$error"
+        caption="Prénom" @blur="$v.newUser.identity.firstname.$touch" required-field />
+      <ni-input in-modal v-model="newUser.mobilePhone" :error="$v.newUser.mobilePhone.$error" required-field
+        caption="Numéro de téléphone" @blur="$v.newUser.mobilePhone.$touch" :error-label="mobilePhoneError" />
+      <ni-input in-modal v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email"
+        @blur="$v.newUser.local.email.$touch" :error-label="emailError" required-field />
+      <ni-search-address v-model="newUser.contact.address" color="white" inverted-light
+        @blur="$v.newUser.contact.address.$touch" error-label="Adresse non valide"
+        :error="$v.newUser.contact.address.$error" in-modal />
+      <div class="row margin-input">
+        <div class="col-12">
+          <div class="row justify-between">
+            <p class="input-caption required">Équipe</p>
+            <q-icon v-if="$v.newUser.sector.$error" name="error_outline" color="secondary" />
           </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span>
-              <q-icon name="clear" @click.native="auxiliaryCreationModal = false" /></span>
-          </div>
-        </div>
-        <ni-select in-modal v-model="newUser.identity.title" :options="civilityOptions"
-          caption="Civilité" />
-        <ni-input in-modal v-model="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error"
-          caption="Nom" @blur="$v.newUser.identity.lastname.$touch" required-field />
-        <ni-input in-modal v-model="newUser.identity.firstname" :error="$v.newUser.identity.firstname.$error"
-          caption="Prénom" @blur="$v.newUser.identity.firstname.$touch" required-field />
-        <ni-input in-modal v-model="newUser.mobilePhone" :error="$v.newUser.mobilePhone.$error" required-field
-          caption="Numéro de téléphone" @blur="$v.newUser.mobilePhone.$touch" :error-label="mobilePhoneError" />
-        <ni-input in-modal v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email" @blur="$v.newUser.local.email.$touch"
-          :error-label="emailError" required-field />
-        <ni-search-address v-model="newUser.contact.address" color="white" inverted-light @blur="$v.newUser.contact.address.$touch"
-          error-label="Adresse non valide" :error="$v.newUser.contact.address.$error" in-modal />
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption required">Équipe</p>
-              <q-icon v-if="$v.newUser.sector.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.newUser.sector.$error" :error-label="REQUIRED_LABEL">
-              <ni-select-sector v-model="newUser.sector" @blur="$v.newUser.sector.$touch" in-modal :company-id="company._id" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input last">
-          <div class="col-12">
-            <q-checkbox v-model="sendWelcomeMsg" label="Envoyer SMS d'accueil" />
-          </div>
+          <q-field :error="$v.newUser.sector.$error" :error-label="REQUIRED_LABEL">
+            <ni-select-sector v-model="newUser.sector" @blur="$v.newUser.sector.$touch" in-modal
+              :company-id="company._id" />
+          </q-field>
         </div>
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary" :loading="loading"
-        @click="submit" />
-    </q-modal>
+      <div class="row margin-input last">
+        <div class="col-12">
+          <q-checkbox v-model="sendWelcomeMsg" label="Envoyer SMS d'accueil" />
+        </div>
+      </div>
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary"
+          :loading="loading" @click="submit" />
+      </template>
+    </ni-modal>
   </q-page>
 </template>
 
@@ -82,10 +79,11 @@ import { frPhoneNumber, frAddress } from '../../../helpers/vuelidateCustomVal';
 import { userProfileValidation } from '../../../helpers/userProfileValidation';
 import { taskValidation } from '../../../helpers/taskValidation';
 import SelectSector from '../../../components/form/SelectSector';
-import NiInput from '../../../components/form/Input';
-import NiSelect from '../../../components/form/Select';
+import Input from '../../../components/form/Input';
+import Select from '../../../components/form/Select';
 import SearchAddress from '../../../components/form/SearchAddress';
 import DirectoryHeader from '../../../components/DirectoryHeader';
+import Modal from '../../../components/Modal';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../../../components/popup/notify.js';
 import { DEFAULT_AVATAR, AUXILIARY, PLANNING_REFERENT, REQUIRED_LABEL } from '../../../data/constants';
 import { validationMixin } from '../../../mixins/validationMixin.js';
@@ -94,10 +92,11 @@ export default {
   name: 'Directory',
   components: {
     'ni-select-sector': SelectSector,
-    'ni-input': NiInput,
-    'ni-select': NiSelect,
+    'ni-input': Input,
+    'ni-select': Select,
     'ni-search-address': SearchAddress,
     'ni-directory-header': DirectoryHeader,
+    'ni-modal': Modal,
   },
   mixins: [validationMixin],
   data () {
