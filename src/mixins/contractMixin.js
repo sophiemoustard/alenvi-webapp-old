@@ -10,6 +10,12 @@ export const contractMixin = {
   data () {
     return {
       timeout: null,
+      // Edited version
+      versionEditionModal: false,
+      editedVersion: {},
+      loading: false,
+      selectedContract: { versions: [] },
+      selectedVersion: {},
     }
   },
   validations () {
@@ -25,7 +31,23 @@ export const contractMixin = {
       },
     }
   },
+  computed: {
+    editedVersionMinStartDate () {
+      if (!this.editedVersion.versionId) return '';
+
+      const index = this.selectedContract.versions.findIndex(ver => ver._id === this.editedVersion.versionId)
+      if (!index) return '';
+
+      const previousVersion = this.selectedContract.versions[index - 1];
+      return this.$moment(previousVersion.startDate).add(1, 'd').toISOString();
+    },
+  },
   methods: {
+    resetVersionEditionModal () {
+      this.versionEditionModal = false;
+      this.editedVersion = {};
+      this.$v.editedVersion.$reset();
+    },
     isVersionUpdated () {
       if (this.selectedVersion.grossHourlyRate !== this.editedVersion.grossHourlyRate) return true;
       if (!this.$moment(this.selectedVersion.startDate).isSame(this.editedVersion.startDate)) return true;

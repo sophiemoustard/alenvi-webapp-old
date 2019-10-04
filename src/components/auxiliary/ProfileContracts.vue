@@ -128,7 +128,6 @@ export default {
       OTHER,
       COACH,
       contracts: [],
-      loading: false,
       CUSTOMER_CONTRACT,
       COMPANY_CONTRACT,
       customers: [],
@@ -151,9 +150,6 @@ export default {
         grossHourlyRate: '',
         shouldBeSigned: true,
       },
-      // Edited version
-      versionEditionModal: false,
-      editedVersion: {},
       // End contract
       endContractModal: false,
       endContract: {
@@ -163,8 +159,6 @@ export default {
         contract: {},
       },
       endContractReasons: END_CONTRACT_REASONS,
-      selectedContract: { versions: [] },
-      selectedVersion: {},
     }
   },
   validations () {
@@ -258,15 +252,6 @@ export default {
     newVersionMinStartDate () {
       const lastVersion = this.selectedContract.versions[this.selectedContract.versions.length - 1];
       return lastVersion ? this.$moment(lastVersion.startDate).toISOString() : '';
-    },
-    editedVersionMinStartDate () {
-      if (!this.editedVersion.versionId) return '';
-
-      const index = this.selectedContract.versions.findIndex(ver => ver._id === this.editedVersion.versionId)
-      if (!index) return '';
-
-      const previousVersion = this.selectedContract.versions[index - 1];
-      return this.$moment(previousVersion.startDate).add(1, 'd').toISOString();
     },
     isPreviousPayImpacted () {
       const startOfMonth = this.$moment().startOf('M');
@@ -455,11 +440,6 @@ export default {
       this.selectedContract = contract;
       this.selectedVersion = version;
       this.versionEditionModal = true;
-    },
-    resetVersionEditionModal () {
-      this.versionEditionModal = false;
-      this.editedVersion = {};
-      this.$v.editedVersion.$reset();
     },
     // Delete version
     async deleteVersion ({ contractId, versionId }) {
