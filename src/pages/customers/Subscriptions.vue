@@ -35,19 +35,21 @@
       </div>
       <div class="q-mb-lg">
         <p class="title">Justificatifs APA ou autres financements</p>
-        <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement" @uploaded="documentUploaded"
-          name="financialCertificates" collapsible-label="Ajouter un justificatif" :user-profile="customer"
-          :url="docsUploadUrl" @delete="deleteDocument($event)" additional-fields-name="financialCertificate" />
+        <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement"
+          @uploaded="documentUploaded" name="financialCertificates" collapsible-label="Ajouter un justificatif"
+          :user-profile="customer" :url="docsUploadUrl" @delete="deleteDocument($event)"
+          additional-fields-name="financialCertificate" />
       </div>
       <div class="q-mb-lg">
         <p class="title">Paiement</p>
         <div class="row gutter-profile">
-          <ni-input caption="Nom associé au compte bancaire" v-model="customer.payment.bankAccountOwner" :error="$v.customer.payment.bankAccountOwner.$error"
-            @focus="saveTmp('payment.bankAccountOwner')" @blur="updateCustomer('payment.bankAccountOwner')" />
-          <ni-input caption="IBAN" v-model="customer.payment.iban" :error="$v.customer.payment.iban.$error" :error-label="ibanError"
-            @focus="saveTmp('payment.iban')" @blur="updateCustomer('payment.iban')" />
-          <ni-input caption="BIC" v-model="customer.payment.bic" :error="$v.customer.payment.bic.$error" :error-label="bicError"
-            @focus="saveTmp('payment.bic')" @blur="updateCustomer('payment.bic')" />
+          <ni-input caption="Nom associé au compte bancaire" v-model="customer.payment.bankAccountOwner"
+            :error="$v.customer.payment.bankAccountOwner.$error" @focus="saveTmp('payment.bankAccountOwner')"
+            @blur="updateCustomer('payment.bankAccountOwner')" />
+          <ni-input caption="IBAN" v-model="customer.payment.iban" :error="$v.customer.payment.iban.$error"
+            :error-label="ibanError" @focus="saveTmp('payment.iban')" @blur="updateCustomer('payment.iban')" />
+          <ni-input caption="BIC" v-model="customer.payment.bic" :error="$v.customer.payment.bic.$error"
+            :error-label="bicError" @focus="saveTmp('payment.bic')" @blur="updateCustomer('payment.bic')" />
         </div>
       </div>
       <div class="q-mb-lg">
@@ -55,12 +57,15 @@
         <p v-if="customer.payment.mandates.length === 0 || !isValidPayment">Aucun mandat.</p>
         <q-card v-if="isValidPayment && customer.payment.mandates.length > 0" class="contract-card">
           <q-table :data="customer.payment.mandates" :columns="columnsMandates" row-key="name" hide-bottom
-            :pagination.sync="pagination" :visible-columns="visibleColumnsMandates" binary-state-sort class="table-responsive">
-            <q-td slot="body-cell-rum" slot-scope="props" :props="props" :data-label="props.col.label">{{ props.value }}</q-td>
+            :pagination.sync="pagination" :visible-columns="visibleColumnsMandates" binary-state-sort
+            class="table-responsive">
+            <q-td slot="body-cell-rum" slot-scope="props" :props="props" :data-label="props.col.label">{{ props.value }}
+            </q-td>
             <q-td slot="body-cell-sign" slot-scope="props" :props="props" :data-label="props.col.label">
               <p class="no-margin" v-if="props.row.signedAt">Mandat signé le
                 {{$moment(props.row.signedAt).format('DD/MM/YYYY')}}</p>
-              <q-btn v-else-if="props.row.__index === customer.payment.mandates.length - 1" color="primary" @click="preOpenESignModal(props.row)">
+              <q-btn v-else-if="props.row.__index === customer.payment.mandates.length - 1" color="primary"
+                @click="preOpenESignModal(props.row)">
                 Signer
               </q-btn>
             </q-td>
@@ -94,50 +99,32 @@
     </q-modal>
 
     <!-- Subscription history modal -->
-    <q-modal v-model="subscriptionHistoryModal" content-classes="modal-container-sm" @hide="resetSubscriptionHistoryData">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5>Historique de la souscription <span class="text-weight-bold">{{selectedSubscription.service &&
-                selectedSubscription.service.name}}</span></h5>
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span><q-icon name="clear" @click.native="subscriptionHistoryModal = false" /></span>
-          </div>
-        </div>
-        <q-table class="q-mb-xl table-responsive" :data="selectedSubscription.versions" :columns="subscriptionHistoryColumns"
-          hide-bottom binary-state-sort :pagination.sync="paginationHistory">
-          <q-tr slot="body" slot-scope="props" :props="props">
-            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-              <template>{{ col.value }}</template>
-            </q-td>
-          </q-tr>
-        </q-table>
-      </div>
-    </q-modal>
+    <ni-modal v-model="subscriptionHistoryModal" @hide="resetSubscriptionHistoryData">
+      <template slot="title">
+        <h5>Historique de la souscription <span class="text-weight-bold">{{selectedSubscription.service &&
+          selectedSubscription.service.name}}</span></h5>
+      </template>
+      <q-table class="q-mb-xl table-responsive" :data="selectedSubscription.versions"
+        :columns="subscriptionHistoryColumns" hide-bottom binary-state-sort :pagination.sync="paginationHistory">
+        <q-tr slot="body" slot-scope="props" :props="props">
+          <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+            <template>{{ col.value }}</template>
+          </q-td>
+        </q-tr>
+      </q-table>
+    </ni-modal>
 
     <!-- Funding modal -->
-    <q-modal v-model="fundingModal" content-classes="modal-container-sm" @hide="resetFundingData">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5 class="text-weight-bold">Financement</h5>
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span><q-icon name="clear" @click.native="fundingModal = false" />
-            </span>
-          </div>
-        </div>
-        <q-table class="q-mb-xl table-grid" :data="fundingData" :columns="fundingColumns" hide-bottom binary-state-sort
-          :rows-per-page-options="[0]" :visible-columns="fundingVisibleColumns">
-          <q-tr slot="body" slot-scope="props" :props="props">
-            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-              <template>{{ col.value }}</template>
-            </q-td>
-          </q-tr>
-        </q-table>
-      </div>
-    </q-modal>
+    <ni-modal v-model="fundingModal" @hide="resetFundingData" title="Financement">
+      <q-table class="q-mb-xl table-grid" :data="fundingData" :columns="fundingColumns" hide-bottom binary-state-sort
+        :rows-per-page-options="[0]" :visible-columns="fundingVisibleColumns">
+        <q-tr slot="body" slot-scope="props" :props="props">
+          <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+            <template>{{ col.value }}</template>
+          </q-td>
+        </q-tr>
+      </q-table>
+    </ni-modal>
   </q-page>
 </template>
 
@@ -147,6 +134,7 @@ import { required } from 'vuelidate/lib/validators';
 import esign from '../../api/Esign.js';
 import Input from '../../components/form/Input';
 import MultipleFilesUploader from '../../components/form/MultipleFilesUploader.vue';
+import Modal from '../../components/Modal';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify';
 import { FIXED, REQUIRED_LABEL } from '../../data/constants';
 import { bic, iban } from '../../helpers/vuelidateCustomVal';
@@ -163,6 +151,7 @@ export default {
   components: {
     'ni-input': Input,
     'ni-multiple-files-uploader': MultipleFilesUploader,
+    'ni-modal': Modal,
   },
   mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin, fundingMixin],
   data () {
