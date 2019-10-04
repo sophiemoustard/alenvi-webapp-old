@@ -5,13 +5,16 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Plans de majoration</p>
         <q-card style="background: white">
-          <q-table :data="surcharges" :columns="surchargeColumns" hide-bottom binary-state-sort :pagination.sync="pagination" class="table-responsive">
+          <q-table :data="surcharges" :columns="surchargeColumns" hide-bottom binary-state-sort
+            :pagination.sync="pagination" class="table-responsive">
             <q-tr slot="body" slot-scope="props" :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
-                    <q-btn flat round small color="grey" icon="edit" @click.native="openSurchargeEditionModal(col.value)" />
-                    <q-btn flat round small color="grey" icon="delete" @click="deleteSurcharge(col.value, props.row.__index)" />
+                    <q-btn flat round small color="grey" icon="edit"
+                      @click.native="openSurchargeEditionModal(col.value)" />
+                    <q-btn flat round small color="grey" icon="delete"
+                      @click="deleteSurcharge(col.value, props.row.__index)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -19,22 +22,24 @@
             </q-tr>
           </q-table>
           <q-card-actions align="end">
-            <q-btn no-caps flat color="primary" icon="add" label="Ajouter un plan de majoration" @click="surchargeCreationModal = true" />
+            <q-btn no-caps flat color="primary" icon="add" label="Ajouter un plan de majoration"
+              @click="surchargeCreationModal = true" />
           </q-card-actions>
         </q-card>
       </div>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Services</p>
         <q-card style="background: white">
-          <q-table :data="services" :columns="serviceColumns" hide-bottom binary-state-sort :pagination.sync="pagination" :visible-columns="visibleColumnsServices"
-            class="table-responsive">
+          <q-table :data="services" :columns="serviceColumns" hide-bottom binary-state-sort
+            :pagination.sync="pagination" :visible-columns="visibleColumnsServices" class="table-responsive">
             <q-tr slot="body" slot-scope="props" :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
                     <q-btn flat round small color="grey" icon="history" @click="showHistory(col.value)" />
                     <q-btn flat round small color="grey" icon="edit" @click="openServiceEditionModal(col.value)" />
-                    <q-btn flat round small color="grey" icon="delete" :disable="props.row.subscriptionCount > 0" @click="deleteService(col.value, props.row.__index)" />
+                    <q-btn flat round small color="grey" icon="delete" :disable="props.row.subscriptionCount > 0"
+                      @click="deleteService(col.value, props.row.__index)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -42,7 +47,8 @@
             </q-tr>
           </q-table>
           <q-card-actions align="end">
-            <q-btn no-caps flat color="primary" icon="add" label="Ajouter un service" @click="serviceCreationModal = true" />
+            <q-btn no-caps flat color="primary" icon="add" label="Ajouter un service"
+              @click="serviceCreationModal = true" />
           </q-card-actions>
         </q-card>
       </div>
@@ -51,12 +57,12 @@
         <div class="row gutter-profile">
           <ni-input caption="Nom" v-model="company.name" @focus="saveTmp('name')" @blur="updateCompany('name')" />
           <ni-search-address v-model="company.address" color="white" inverted-light :error-label="addressError"
-            @focus="saveTmp('address.fullAddress')" @blur="updateCompany('address')" :error="$v.company.address.$error"
-          />
+            @focus="saveTmp('address.fullAddress')" @blur="updateCompany('address')"
+            :error="$v.company.address.$error" />
           <ni-input caption="Numéro ICS" v-model="company.ics" @focus="saveTmp('ics')" @blur="updateCompany('ics')" />
           <ni-input caption="Numéro RCS" v-model="company.rcs" @focus="saveTmp('rcs')" @blur="updateCompany('rcs')" />
-          <ni-input caption="IBAN" :error="$v.company.iban.$error" :error-label="ibanError"
-            v-model.trim="company.iban" @focus="saveTmp('iban')" upper-case @blur="updateCompany('iban')" />
+          <ni-input caption="IBAN" :error="$v.company.iban.$error" :error-label="ibanError" v-model.trim="company.iban"
+            @focus="saveTmp('iban')" upper-case @blur="updateCompany('iban')" />
           <ni-input caption="BIC" :error="$v.company.bic.$error" :error-label="bicError" upper-case
             v-model.trim="company.bic" @focus="saveTmp('bic')" @blur="updateCompany('bic')" />
         </div>
@@ -65,24 +71,25 @@
         <p class="text-weight-bold">Documents</p>
         <div class="row gutter-profile">
           <div class="col-xs-12 col-md-6">
-            <ni-file-uploader caption="Mandat de prélèvement" path="customersConfig.templates.debitMandate" :entity="company" alt="template mandat prelevement"
-              name="debitMandate" @delete="deleteDocument(documents.debitMandate.driveId, 'debitMandate', 'customersConfig')"
-              @uploaded="documentUploaded" :additional-value="`modele_mandat_prelevement_${company.name}`" :url="docsUploadUrl"
-            />
+            <ni-file-uploader caption="Mandat de prélèvement" path="customersConfig.templates.debitMandate"
+              :entity="company" alt="template mandat prelevement" name="debitMandate"
+              @delete="deleteDocument(documents.debitMandate.driveId, 'debitMandate', 'customersConfig')"
+              @uploaded="documentUploaded" :additional-value="`modele_mandat_prelevement_${company.name}`"
+              :url="docsUploadUrl" />
           </div>
           <div class="col-xs-12 col-md-6">
-            <ni-file-uploader caption="Devis" path="customersConfig.templates.quote" :entity="company" alt="template devis"
-              name="quote" @delete="deleteDocument(documents.quote.driveId, 'quote', 'customersConfig')"
-              @uploaded="documentUploaded" :additional-value="`modele_devis_${company.name}`" :url="docsUploadUrl"
-            />
+            <ni-file-uploader caption="Devis" path="customersConfig.templates.quote" :entity="company"
+              alt="template devis" name="quote"
+              @delete="deleteDocument(documents.quote.driveId, 'quote', 'customersConfig')" @uploaded="documentUploaded"
+              :additional-value="`modele_devis_${company.name}`" :url="docsUploadUrl" />
           </div>
         </div>
       </div>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Tiers payeurs</p>
         <q-card style="background: white">
-          <q-table :data="thirdPartyPayers" :columns="thirdPartyPayersColumns" hide-bottom binary-state-sort :pagination.sync="pagination"
-            class="table-responsive">
+          <q-table :data="thirdPartyPayers" :columns="thirdPartyPayersColumns" hide-bottom binary-state-sort
+            :pagination.sync="pagination" class="table-responsive">
             <q-tr slot="body" slot-scope="props" :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
                 <template v-if="col.name === 'billingMode'">
@@ -90,8 +97,10 @@
                 </template>
                 <template v-else-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
-                    <q-btn :disable="isTppUsedInFundings(props.row.__index)" flat round small color="grey" icon="delete" @click="deleteThirdPartyPayer(col.value, props.row.__index)" />
-                    <q-btn flat round small color="grey" icon="edit" @click="openThirdPartyPayerEditionModal(col.value)" />
+                    <q-btn :disable="isTppUsedInFundings(props.row.__index)" flat round small color="grey" icon="delete"
+                      @click="deleteThirdPartyPayer(col.value, props.row.__index)" />
+                    <q-btn flat round small color="grey" icon="edit"
+                      @click="openThirdPartyPayerEditionModal(col.value)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value}}</template>
@@ -99,7 +108,8 @@
             </q-tr>
           </q-table>
           <q-card-actions align="end">
-            <q-btn no-caps flat color="primary" icon="add" label="Ajouter un tiers payeur" @click="thirdPartyPayerCreationModal = true" />
+            <q-btn no-caps flat color="primary" icon="add" label="Ajouter un tiers payeur"
+              @click="thirdPartyPayerCreationModal = true" />
           </q-card-actions>
         </q-card>
       </div>
@@ -114,207 +124,195 @@
     </div>
 
     <!-- Surcharge creation modal -->
-    <q-modal v-model="surchargeCreationModal" content-classes="modal-container-sm" @hide="resetCreationSurchargeData">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5>Créer un <span class="text-weight-bold">plan de majoration</span></h5>
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span><q-icon name="clear" @click.native="surchargeCreationModal = false" /></span>
-          </div>
-        </div>
-        <ni-input in-modal caption="Nom" v-model="newSurcharge.name" :error="$v.newSurcharge.name.$error" @blur="$v.newSurcharge.name.$touch" required-field />
-        <ni-input in-modal caption="Majoration samedi" suffix="%" type="number" v-model="newSurcharge.saturday"
-          :error="$v.newSurcharge.saturday.$error" @blur="$v.newSurcharge.saturday.$touch" />
-        <ni-input in-modal caption="Majoration dimanche" suffix="%" type="number" v-model="newSurcharge.sunday"
-          :error="$v.newSurcharge.sunday.$error" @blur="$v.newSurcharge.sunday.$touch" />
-        <ni-input in-modal caption="Majoration jour férié" suffix="%" type="number" v-model="newSurcharge.publicHoliday"
-          :error="$v.newSurcharge.publicHoliday.$error" @blur="$v.newSurcharge.publicHoliday.$touch" />
-        <ni-input in-modal caption="Majoration 25 décembre" suffix="%" type="number" v-model="newSurcharge.twentyFifthOfDecember"
-          :error="$v.newSurcharge.twentyFifthOfDecember.$error" @blur="$v.newSurcharge.twentyFifthOfDecember.$touch" />
-        <ni-input in-modal caption="Majoration 1er mai" suffix="%" type="number" v-model="newSurcharge.firstOfMay"
-          :error="$v.newSurcharge.firstOfMay.$error" @blur="$v.newSurcharge.firstOfMay.$touch" />
-        <ni-input in-modal caption="Majoration soirée" suffix="%" type="number" v-model="newSurcharge.evening"
-          :error="$v.newSurcharge.evening.$error" @blur="$v.newSurcharge.evening.$touch" />
-        <ni-datetime-picker caption="Début soirée" v-model="newSurcharge.eveningStartTime" :error="$v.newSurcharge.eveningStartTime.$error"
-          @blur="$v.newSurcharge.eveningStartTime.$touch" in-modal type="time" :disable="!newSurcharge.evening" clearable />
-        <ni-datetime-picker caption="Fin soirée" v-model="newSurcharge.eveningEndTime" :error="$v.newSurcharge.eveningEndTime.$error"
-          @blur="$v.newSurcharge.eveningEndTime.$touch" in-modal type="time" :disable="!newSurcharge.evening" clearable />
-        <ni-input in-modal caption="Majoration personnalisée" suffix="%" type="number" v-model="newSurcharge.custom"
-          :error="$v.newSurcharge.custom.$error" @blur="$v.newSurcharge.custom.$touch" />
-        <ni-datetime-picker caption="Début personnalisé" v-model="newSurcharge.customStartTime" :error="$v.newSurcharge.customStartTime.$error"
-          @blur="$v.newSurcharge.customStartTime.$touch" in-modal type="time" :disable="!newSurcharge.custom" clearable />
-        <ni-datetime-picker caption="Fin personnalisée" v-model="newSurcharge.customEndTime" :error="$v.newSurcharge.customEndTime.$error"
-          @blur="$v.newSurcharge.customEndTime.$touch" in-modal type="time" :disable="!newSurcharge.custom" clearable />
-      </div>
-      <q-btn no-caps class="full-width modal-btn" label="Créer le plan de majoration" icon-right="add" color="primary" :loading="loading" @click="createNewSurcharge"
-        :disable="$v.newSurcharge.$error || !newSurcharge.name" />
-    </q-modal>
+    <ni-modal v-model="surchargeCreationModal" @hide="resetCreationSurchargeData">
+      <template slot="title">
+        <h5>Créer un <span class="text-weight-bold">plan de majoration</span></h5>
+      </template>
+      <ni-input in-modal caption="Nom" v-model="newSurcharge.name" :error="$v.newSurcharge.name.$error"
+        @blur="$v.newSurcharge.name.$touch" required-field />
+      <ni-input in-modal caption="Majoration samedi" suffix="%" type="number" v-model="newSurcharge.saturday"
+        :error="$v.newSurcharge.saturday.$error" @blur="$v.newSurcharge.saturday.$touch" />
+      <ni-input in-modal caption="Majoration dimanche" suffix="%" type="number" v-model="newSurcharge.sunday"
+        :error="$v.newSurcharge.sunday.$error" @blur="$v.newSurcharge.sunday.$touch" />
+      <ni-input in-modal caption="Majoration jour férié" suffix="%" type="number" v-model="newSurcharge.publicHoliday"
+        :error="$v.newSurcharge.publicHoliday.$error" @blur="$v.newSurcharge.publicHoliday.$touch" />
+      <ni-input in-modal caption="Majoration 25 décembre" suffix="%" type="number"
+        v-model="newSurcharge.twentyFifthOfDecember" :error="$v.newSurcharge.twentyFifthOfDecember.$error"
+        @blur="$v.newSurcharge.twentyFifthOfDecember.$touch" />
+      <ni-input in-modal caption="Majoration 1er mai" suffix="%" type="number" v-model="newSurcharge.firstOfMay"
+        :error="$v.newSurcharge.firstOfMay.$error" @blur="$v.newSurcharge.firstOfMay.$touch" />
+      <ni-input in-modal caption="Majoration soirée" suffix="%" type="number" v-model="newSurcharge.evening"
+        :error="$v.newSurcharge.evening.$error" @blur="$v.newSurcharge.evening.$touch" />
+      <ni-datetime-picker caption="Début soirée" v-model="newSurcharge.eveningStartTime"
+        :error="$v.newSurcharge.eveningStartTime.$error" @blur="$v.newSurcharge.eveningStartTime.$touch" in-modal
+        type="time" :disable="!newSurcharge.evening" clearable />
+      <ni-datetime-picker caption="Fin soirée" v-model="newSurcharge.eveningEndTime"
+        :error="$v.newSurcharge.eveningEndTime.$error" @blur="$v.newSurcharge.eveningEndTime.$touch" in-modal
+        type="time" :disable="!newSurcharge.evening" clearable />
+      <ni-input in-modal caption="Majoration personnalisée" suffix="%" type="number" v-model="newSurcharge.custom"
+        :error="$v.newSurcharge.custom.$error" @blur="$v.newSurcharge.custom.$touch" />
+      <ni-datetime-picker caption="Début personnalisé" v-model="newSurcharge.customStartTime"
+        :error="$v.newSurcharge.customStartTime.$error" @blur="$v.newSurcharge.customStartTime.$touch" in-modal
+        type="time" :disable="!newSurcharge.custom" clearable />
+      <ni-datetime-picker caption="Fin personnalisée" v-model="newSurcharge.customEndTime"
+        :error="$v.newSurcharge.customEndTime.$error" @blur="$v.newSurcharge.customEndTime.$touch" in-modal type="time"
+        :disable="!newSurcharge.custom" clearable />
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Créer le plan de majoration" icon-right="add" color="primary"
+          :loading="loading" @click="createNewSurcharge" :disable="$v.newSurcharge.$error || !newSurcharge.name" />
+      </template>
+    </ni-modal>
 
     <!-- Surcharge edition modal -->
-    <q-modal v-model="surchargeEditionModal" content-classes="modal-container-sm" @hide="resetEditionSurchargeData">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5>Éditer le <span class="text-weight-bold">plan de majoration</span></h5>
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span><q-icon name="clear" @click.native="surchargeEditionModal = false" /></span>
-          </div>
-        </div>
-        <ni-input in-modal caption="Nom" v-model="editedSurcharge.name" :error="$v.editedSurcharge.name.$error" @blur="$v.editedSurcharge.name.$touch" required-field />
-        <ni-input in-modal caption="Majoration samedi" suffix="%" type="number" v-model="editedSurcharge.saturday"
-          :error="$v.editedSurcharge.saturday.$error" @blur="$v.editedSurcharge.saturday.$touch" />
-        <ni-input in-modal caption="Majoration dimanche" suffix="%" type="number" v-model="editedSurcharge.sunday"
-          :error="$v.editedSurcharge.sunday.$error" @blur="$v.editedSurcharge.sunday.$touch" />
-        <ni-input in-modal caption="Majoration jour férié" suffix="%" type="number" v-model="editedSurcharge.publicHoliday"
-          :error="$v.editedSurcharge.publicHoliday.$error" @blur="$v.editedSurcharge.publicHoliday.$touch" />
-        <ni-input in-modal caption="Majoration 25 décembre" suffix="%" type="number" v-model="editedSurcharge.twentyFifthOfDecember"
-          :error="$v.editedSurcharge.twentyFifthOfDecember.$error" @blur="$v.editedSurcharge.twentyFifthOfDecember.$touch" />
-        <ni-input in-modal caption="Majoration 1er mai" suffix="%" type="number" v-model="editedSurcharge.firstOfMay"
-          :error="$v.editedSurcharge.firstOfMay.$error" @blur="$v.editedSurcharge.firstOfMay.$touch" />
-        <ni-input in-modal caption="Majoration soirée" suffix="%" type="number" v-model="editedSurcharge.evening"
-          :error="$v.editedSurcharge.evening.$error" @blur="$v.editedSurcharge.evening.$touch" />
-        <ni-datetime-picker caption="Début soirée" v-model="editedSurcharge.eveningStartTime" :error="$v.editedSurcharge.eveningStartTime.$error"
-          @blur="$v.editedSurcharge.eveningStartTime.$touch" in-modal type="time" :disable="!editedSurcharge.evening" clearable />
-        <ni-datetime-picker caption="Fin soirée" v-model="editedSurcharge.eveningEndTime" :error="$v.editedSurcharge.eveningEndTime.$error"
-          @blur="$v.editedSurcharge.eveningEndTime.$touch" in-modal type="time" :disable="!editedSurcharge.evening" clearable />
-        <ni-input in-modal caption="Majoration personnalisée" suffix="%" type="number" v-model="editedSurcharge.custom"
-          :error="$v.editedSurcharge.custom.$error" @blur="$v.editedSurcharge.custom.$touch" />
-        <ni-datetime-picker caption="Début personnalisé" v-model="editedSurcharge.customStartTime" :error="$v.editedSurcharge.customStartTime.$error"
-          @blur="$v.editedSurcharge.customStartTime.$touch" in-modal type="time" :disable="!editedSurcharge.custom" clearable />
-        <ni-datetime-picker caption="Fin personnalisée" v-model="editedSurcharge.customEndTime" :error="$v.editedSurcharge.customEndTime.$error"
-          @blur="$v.editedSurcharge.customEndTime.$touch" in-modal type="time" :disable="!editedSurcharge.custom" clearable />
-      </div>
-      <q-btn no-caps class="full-width modal-btn" label="Editer le plan de majoration" icon-right="check" color="primary" :loading="loading" @click="updateSurcharge"
-        :disable="$v.editedSurcharge.$error" />
-    </q-modal>
+    <ni-modal v-model="surchargeEditionModal" @hide="resetEditionSurchargeData">
+      <template slot="title">
+        <h5>Éditer le <span class="text-weight-bold">plan de majoration</span></h5>
+      </template>
+      <ni-input in-modal caption="Nom" v-model="editedSurcharge.name" :error="$v.editedSurcharge.name.$error"
+        @blur="$v.editedSurcharge.name.$touch" required-field />
+      <ni-input in-modal caption="Majoration samedi" suffix="%" type="number" v-model="editedSurcharge.saturday"
+        :error="$v.editedSurcharge.saturday.$error" @blur="$v.editedSurcharge.saturday.$touch" />
+      <ni-input in-modal caption="Majoration dimanche" suffix="%" type="number" v-model="editedSurcharge.sunday"
+        :error="$v.editedSurcharge.sunday.$error" @blur="$v.editedSurcharge.sunday.$touch" />
+      <ni-input in-modal caption="Majoration jour férié" suffix="%" type="number"
+        v-model="editedSurcharge.publicHoliday" :error="$v.editedSurcharge.publicHoliday.$error"
+        @blur="$v.editedSurcharge.publicHoliday.$touch" />
+      <ni-input in-modal caption="Majoration 25 décembre" suffix="%" type="number"
+        v-model="editedSurcharge.twentyFifthOfDecember" :error="$v.editedSurcharge.twentyFifthOfDecember.$error"
+        @blur="$v.editedSurcharge.twentyFifthOfDecember.$touch" />
+      <ni-input in-modal caption="Majoration 1er mai" suffix="%" type="number" v-model="editedSurcharge.firstOfMay"
+        :error="$v.editedSurcharge.firstOfMay.$error" @blur="$v.editedSurcharge.firstOfMay.$touch" />
+      <ni-input in-modal caption="Majoration soirée" suffix="%" type="number" v-model="editedSurcharge.evening"
+        :error="$v.editedSurcharge.evening.$error" @blur="$v.editedSurcharge.evening.$touch" />
+      <ni-datetime-picker caption="Début soirée" v-model="editedSurcharge.eveningStartTime"
+        :error="$v.editedSurcharge.eveningStartTime.$error" @blur="$v.editedSurcharge.eveningStartTime.$touch" in-modal
+        type="time" :disable="!editedSurcharge.evening" clearable />
+      <ni-datetime-picker caption="Fin soirée" v-model="editedSurcharge.eveningEndTime"
+        :error="$v.editedSurcharge.eveningEndTime.$error" @blur="$v.editedSurcharge.eveningEndTime.$touch" in-modal
+        type="time" :disable="!editedSurcharge.evening" clearable />
+      <ni-input in-modal caption="Majoration personnalisée" suffix="%" type="number" v-model="editedSurcharge.custom"
+        :error="$v.editedSurcharge.custom.$error" @blur="$v.editedSurcharge.custom.$touch" />
+      <ni-datetime-picker caption="Début personnalisé" v-model="editedSurcharge.customStartTime"
+        :error="$v.editedSurcharge.customStartTime.$error" @blur="$v.editedSurcharge.customStartTime.$touch" in-modal
+        type="time" :disable="!editedSurcharge.custom" clearable />
+      <ni-datetime-picker caption="Fin personnalisée" v-model="editedSurcharge.customEndTime"
+        :error="$v.editedSurcharge.customEndTime.$error" @blur="$v.editedSurcharge.customEndTime.$touch" in-modal
+        type="time" :disable="!editedSurcharge.custom" clearable />
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Editer le plan de majoration" icon-right="check"
+          color="primary" :loading="loading" @click="updateSurcharge" :disable="$v.editedSurcharge.$error" />
+      </template>
+    </ni-modal>
 
     <!-- Service creation modal -->
-    <q-modal v-model="serviceCreationModal" content-classes="modal-container-sm" @hide="resetCreationServiceData">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5>Créer un <span class="text-weight-bold">service</span></h5>
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span><q-icon name="clear" @click.native="serviceCreationModal = false" /></span>
-          </div>
-        </div>
-        <ni-select in-modal caption="Type" v-model="newService.type" :error="$v.newService.type.$error" @blur="$v.newService.type.$touch"
-          :options="serviceTypeOptions" required-field />
-        <ni-input in-modal caption="Nom" v-model="newService.name" :error="$v.newService.name.$error" @blur="$v.newService.name.$touch" required-field />
-        <ni-select in-modal caption="Nature" v-model="newService.nature" :error="$v.newService.nature.$error" @blur="$v.newService.nature.$touch"
-          :options="natureOptions" required-field />
-        <ni-input in-modal caption="Prix unitaire par défaut TTC" suffix="€" type="number" v-model="newService.defaultUnitAmount"
-          :error="$v.newService.defaultUnitAmount.$error" @blur="$v.newService.defaultUnitAmount.$touch" required-field />
-        <ni-input in-modal caption="TVA" suffix="%" v-model="newService.vat" type="number" :error="$v.newService.vat.$error" @blur="$v.newService.vat.$touch"
-          error-label="La TVA doit être positive ou nulle" />
-        <ni-select in-modal v-if="newService.nature !== FIXED" caption="Plan de majoration" v-model="newService.surcharge" :options="surchargesOptions" clearable />
-        <div class="row q-mb-md">
-          <q-checkbox label="Exonération de charges" v-model="newService.exemptFromCharges" />
-        </div>
+    <ni-modal v-model="serviceCreationModal" @hide="resetCreationServiceData">
+      <template slot="title">
+        <h5>Créer un <span class="text-weight-bold">service</span></h5>
+      </template>
+      <ni-select in-modal caption="Type" v-model="newService.type" :error="$v.newService.type.$error"
+        @blur="$v.newService.type.$touch" :options="serviceTypeOptions" required-field />
+      <ni-input in-modal caption="Nom" v-model="newService.name" :error="$v.newService.name.$error"
+        @blur="$v.newService.name.$touch" required-field />
+      <ni-select in-modal caption="Nature" v-model="newService.nature" :error="$v.newService.nature.$error"
+        @blur="$v.newService.nature.$touch" :options="natureOptions" required-field />
+      <ni-input in-modal caption="Prix unitaire par défaut TTC" suffix="€" type="number"
+        v-model="newService.defaultUnitAmount" :error="$v.newService.defaultUnitAmount.$error"
+        @blur="$v.newService.defaultUnitAmount.$touch" required-field />
+      <ni-input in-modal caption="TVA" suffix="%" v-model="newService.vat" type="number"
+        :error="$v.newService.vat.$error" @blur="$v.newService.vat.$touch"
+        error-label="La TVA doit être positive ou nulle" />
+      <ni-select in-modal v-if="newService.nature !== FIXED" caption="Plan de majoration" v-model="newService.surcharge"
+        :options="surchargesOptions" clearable />
+      <div class="row q-mb-md">
+        <q-checkbox label="Exonération de charges" v-model="newService.exemptFromCharges" />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Créer le service" icon-right="add" color="primary" :loading="loading" @click="createNewService"
-        :disable="disableServiceCreationButton" />
-    </q-modal>
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Créer le service" icon-right="add" color="primary"
+          :loading="loading" @click="createNewService" :disable="disableServiceCreationButton" />
+      </template>
+    </ni-modal>
 
     <!-- Service edition modal -->
-    <q-modal v-model="serviceEditionModal" content-classes="modal-container-sm" @hide="resetEditionServiceData">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5>Éditer le <span class="text-weight-bold">service</span></h5>
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span><q-icon name="clear" @click.native="serviceEditionModal = false" /></span>
-          </div>
-        </div>
-        <ni-input in-modal caption="Nom" v-model="editedService.name" :error="$v.editedService.name.$error" @blur="$v.editedService.name.$touch"
-          required-field />
-        <ni-datetime-picker caption="Date d'effet" v-model="editedService.startDate" :error="$v.editedService.startDate.$error"
-          @blur="$v.editedService.startDate.$touch" :min="minStartDate" in-modal required-field />
-        <ni-input in-modal caption="Prix unitaire par défaut TTC" suffix="€" type="number" v-model="editedService.defaultUnitAmount"
-          :error="$v.editedService.defaultUnitAmount.$error" @blur="$v.editedService.defaultUnitAmount.$touch" required-field />
-        <ni-input in-modal caption="TVA" suffix="%" v-model="editedService.vat" type="number" :error="$v.editedService.vat.$error" @blur="$v.editedService.vat.$touch"
-          error-label="La TVA doit être positive ou nulle" />
-        <ni-select in-modal v-if="editedService.nature !== FIXED" caption="Plan de majoration" v-model="editedService.surcharge" :options="surchargesOptions" clearable />
-        <div class="row q-mb-md">
-          <q-checkbox label="Exonération de charges" v-model="editedService.exemptFromCharges" />
-        </div>
+    <ni-modal v-model="serviceEditionModal" @hide="resetEditionServiceData">
+      <template slot="title">
+        <h5>Éditer le <span class="text-weight-bold">service</span></h5>
+      </template>
+      <ni-input in-modal caption="Nom" v-model="editedService.name" :error="$v.editedService.name.$error"
+        @blur="$v.editedService.name.$touch" required-field />
+      <ni-datetime-picker caption="Date d'effet" v-model="editedService.startDate"
+        :error="$v.editedService.startDate.$error" @blur="$v.editedService.startDate.$touch" :min="minStartDate"
+        in-modal required-field />
+      <ni-input in-modal caption="Prix unitaire par défaut TTC" suffix="€" type="number"
+        v-model="editedService.defaultUnitAmount" :error="$v.editedService.defaultUnitAmount.$error"
+        @blur="$v.editedService.defaultUnitAmount.$touch" required-field />
+      <ni-input in-modal caption="TVA" suffix="%" v-model="editedService.vat" type="number"
+        :error="$v.editedService.vat.$error" @blur="$v.editedService.vat.$touch"
+        error-label="La TVA doit être positive ou nulle" />
+      <ni-select in-modal v-if="editedService.nature !== FIXED" caption="Plan de majoration"
+        v-model="editedService.surcharge" :options="surchargesOptions" clearable />
+      <div class="row q-mb-md">
+        <q-checkbox label="Exonération de charges" v-model="editedService.exemptFromCharges" />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Editer le service" icon-right="check" color="primary" :loading="loading" @click="updateService"
-        :disable="disableServiceEditionButton" />
-    </q-modal>
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Editer le service" icon-right="check" color="primary"
+          :loading="loading" @click="updateService" :disable="disableServiceEditionButton" />
+      </template>
+    </ni-modal>
 
     <!-- Service history modal -->
-    <q-modal v-model="serviceHistoryModal" content-classes="modal-container-sm" @hide="resetServiceHistoryData">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5>Historique du service <span class="text-weight-bold">{{selectedService.name}}</span></h5>
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span><q-icon name="clear" @click.native="serviceHistoryModal = false" /></span>
-          </div>
-        </div>
-        <q-table class="q-mb-xl table-responsive" :data="selectedService.versions" :columns="serviceColumns" hide-bottom binary-state-sort :pagination.sync="paginationHistory"
-          :visible-columns="visibleHistoryColumns">
-          <q-tr slot="body" slot-scope="props" :props="props">
-            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">{{ col.value }}</q-td>
-          </q-tr>
-        </q-table>
-      </div>
-    </q-modal>
+    <ni-modal v-model="serviceHistoryModal" @hide="resetServiceHistoryData">
+      <template slot="title">
+        <h5>Historique du service <span class="text-weight-bold">{{selectedService.name}}</span></h5>
+      </template>
+      <q-table class="q-mb-xl table-responsive" :data="selectedService.versions" :columns="serviceColumns" hide-bottom
+        binary-state-sort :pagination.sync="paginationHistory" :visible-columns="visibleHistoryColumns">
+        <q-tr slot="body" slot-scope="props" :props="props">
+          <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">{{ col.value }}</q-td>
+        </q-tr>
+      </q-table>
+    </ni-modal>
 
     <!-- Third party payers creation modal -->
-    <q-modal v-model="thirdPartyPayerCreationModal" content-classes="modal-container-sm" @hide="resetThirdPartyPayerEditionData">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5>Ajouter un <span class="text-weight-bold">tiers payeur</span></h5>
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span><q-icon name="clear" @click.native="thirdPartyPayerCreationModal = false" /></span>
-          </div>
-        </div>
-        <ni-input in-modal caption="Nom" v-model="newThirdPartyPayer.name" :error="$v.newThirdPartyPayer.name.$error" @blur="$v.newThirdPartyPayer.name.$touch"
-          required-field />
-        <ni-search-address v-model="newThirdPartyPayer.address" error-label="Adresse invalide" in-modal
-          @blur="$v.newThirdPartyPayer.address.$touch" :error="$v.newThirdPartyPayer.address.$error" />
-        <ni-input in-modal caption="Email" v-model.trim="newThirdPartyPayer.email" />
-        <ni-input in-modal caption="Prix unitaire TTC par défaut" suffix="€" type="number" v-model="newThirdPartyPayer.unitTTCRate"
-          :error="$v.newThirdPartyPayer.unitTTCRate.$error" error-label="Le prix unitaire doit être positif"/>
-        <ni-select in-modal v-model="newThirdPartyPayer.billingMode" :options="billingModeOptions" caption="Facturation" :filter="false" />
-      </div>
-      <q-btn no-caps class="full-width modal-btn" label="Ajouter le tiers payeur" icon-right="add" color="primary" :loading="loading"
-        @click="createNewThirdPartyPayer" />
-    </q-modal>
+    <ni-modal v-model="thirdPartyPayerCreationModal" @hide="resetThirdPartyPayerEditionData">
+      <template slot="title">
+        <h5>Ajouter un <span class="text-weight-bold">tiers payeur</span></h5>
+      </template>
+      <ni-input in-modal caption="Nom" v-model="newThirdPartyPayer.name" :error="$v.newThirdPartyPayer.name.$error"
+        @blur="$v.newThirdPartyPayer.name.$touch" required-field />
+      <ni-search-address v-model="newThirdPartyPayer.address" error-label="Adresse invalide" in-modal
+        @blur="$v.newThirdPartyPayer.address.$touch" :error="$v.newThirdPartyPayer.address.$error" />
+      <ni-input in-modal caption="Email" v-model.trim="newThirdPartyPayer.email" />
+      <ni-input in-modal caption="Prix unitaire TTC par défaut" suffix="€" type="number"
+        v-model="newThirdPartyPayer.unitTTCRate" :error="$v.newThirdPartyPayer.unitTTCRate.$error"
+        error-label="Le prix unitaire doit être positif" />
+      <ni-select in-modal v-model="newThirdPartyPayer.billingMode" :options="billingModeOptions" caption="Facturation"
+        :filter="false" />
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Ajouter le tiers payeur" icon-right="add" color="primary"
+          :loading="loading" @click="createNewThirdPartyPayer" />
+      </template>
+    </ni-modal>
 
     <!-- Third party payers edition modal -->
-    <q-modal v-model="thirdPartyPayerEditionModal" content-classes="modal-container-sm" @hide="resetThirdPartyPayerUpdateModalData">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5>Editer le <span class="text-weight-bold">tiers payeur</span></h5>
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span><q-icon name="clear" @click.native="thirdPartyPayerEditionModal = false" /></span>
-          </div>
-        </div>
-        <ni-input in-modal caption="Nom" v-model="editedThirdPartyPayer.name" :error="$v.editedThirdPartyPayer.name.$error"
-          @blur="$v.editedThirdPartyPayer.name.$touch" required-field />
-        <ni-search-address v-model="editedThirdPartyPayer.address" error-label="Adresse invalide"
-          @blur="$v.editedThirdPartyPayer.address.$touch" :error="$v.editedThirdPartyPayer.address.$error" in-modal
-          />
-        <ni-input in-modal caption="Email" v-model.trim="editedThirdPartyPayer.email" />
-        <ni-input in-modal caption="Prix unitaire TTC par défaut" suffix="€" type="number" v-model="editedThirdPartyPayer.unitTTCRate"
-          :error="$v.editedThirdPartyPayer.unitTTCRate.$error" error-label="Le prix unitaire doit être positif"/>
-        <ni-select in-modal v-model="editedThirdPartyPayer.billingMode" :options="billingModeOptions" caption="Facturation" :filter="false" />
-      </div>
-      <q-btn no-caps class="full-width modal-btn" label="Editer le tiers payeur" icon-right="check" color="primary" :loading="loading" @click="updateThirdPartyPayer" />
-    </q-modal>
+    <ni-modal v-model="thirdPartyPayerEditionModal" @hide="resetThirdPartyPayerUpdateModalData">
+      <template slot="title">
+        <h5>Editer le <span class="text-weight-bold">tiers payeur</span></h5>
+      </template>
+      <ni-input in-modal caption="Nom" v-model="editedThirdPartyPayer.name"
+        :error="$v.editedThirdPartyPayer.name.$error" @blur="$v.editedThirdPartyPayer.name.$touch" required-field />
+      <ni-search-address v-model="editedThirdPartyPayer.address" error-label="Adresse invalide"
+        @blur="$v.editedThirdPartyPayer.address.$touch" :error="$v.editedThirdPartyPayer.address.$error" in-modal />
+      <ni-input in-modal caption="Email" v-model.trim="editedThirdPartyPayer.email" />
+      <ni-input in-modal caption="Prix unitaire TTC par défaut" suffix="€" type="number"
+        v-model="editedThirdPartyPayer.unitTTCRate" :error="$v.editedThirdPartyPayer.unitTTCRate.$error"
+        error-label="Le prix unitaire doit être positif" />
+      <ni-select in-modal v-model="editedThirdPartyPayer.billingMode" :options="billingModeOptions"
+        caption="Facturation" :filter="false" />
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Editer le tiers payeur" icon-right="check" color="primary"
+          :loading="loading" @click="updateThirdPartyPayer" />
+      </template>
+    </ni-modal>
   </q-page>
 </template>
 
@@ -326,9 +324,10 @@ import CustomImg from '../../../components/form/CustomImg.vue';
 import FileUploader from '../../../components/form/FileUploader.vue';
 import { configMixin } from '../../../mixins/configMixin';
 import { validationMixin } from '../../../mixins/validationMixin.js';
-import NiInput from '../../../components/form/Input';
-import NiSelect from '../../../components/form/Select';
+import Input from '../../../components/form/Input';
+import Select from '../../../components/form/Select';
 import SearchAddress from '../../../components/form/SearchAddress.vue';
+import Modal from '../../../components/Modal';
 import { frAddress, posDecimals, positiveNumber, iban, bic } from '../../../helpers/vuelidateCustomVal';
 import { BILLING_DIRECT, BILLING_INDIRECT, REQUIRED_LABEL, CONTRACT_STATUS_OPTIONS, TWO_WEEKS, MONTH, NATURE_OPTIONS, FIXED } from '../../../data/constants.js';
 
@@ -338,10 +337,11 @@ export default {
   components: {
     'ni-custom-img': CustomImg,
     'ni-file-uploader': FileUploader,
-    'ni-input': NiInput,
-    'ni-select': NiSelect,
+    'ni-input': Input,
+    'ni-select': Select,
     'ni-search-address': SearchAddress,
     'ni-datetime-picker': DatetimePicker,
+    'ni-modal': Modal,
   },
   mixins: [configMixin, validationMixin],
   watch: {
