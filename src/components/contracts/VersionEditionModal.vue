@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="isOpened">
+  <ni-modal :value="isOpened" @hide="resetVersionEditionModal">
     <template slot="title">
       Modifier le <span class="text-weight-bold">contrat</span>
     </template>
@@ -42,6 +42,9 @@ export default {
   methods: {
     editVersion () {
       this.$emit('editVersion');
+    },
+    resetVersionEditionModal () {
+      this.$emit('hide');
     },
   },
 }
