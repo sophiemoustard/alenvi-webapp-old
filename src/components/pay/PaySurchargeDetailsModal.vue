@@ -1,37 +1,33 @@
 <template>
-  <q-modal :value="paySurchargeDetailsModal" @input="close" content-classes="modal-container-sm">
-    <div class="modal-padding">
-      <div class="row justify-between items-baseline">
-        <div class="col-11">
-          <h5>Détails des <span class="text-weight-bold">majorations</span></h5>
-        </div>
-        <div class="col-1 cursor-pointer modal-btn-close">
-          <span>
-            <q-icon name="clear" @click.native="close" /></span>
-        </div>
+  <ni-modal :value="paySurchargeDetailsModal" @input="close">
+    <template slot="title">
+      <h5>Détails des <span class="text-weight-bold">majorations</span></h5>
+    </template>
+    <div v-for="(surchargePlanDetails, surchargePlanId) in surchargeDetails" :key="surchargePlanId" class="q-mb-xl">
+      <div class="text-primary capitalize text-weight-bold q-mb-md">
+        {{ surchargePlanDetails.planName }}
       </div>
-      <div v-for="(surchargePlanDetails, surchargePlanId) in surchargeDetails" :key="surchargePlanId" class="q-mb-xl">
-        <div class="text-primary capitalize text-weight-bold q-mb-md">
-          {{ surchargePlanDetails.planName }}
+      <div v-for="(surchage, surchargeName) in getSurcharges(surchargePlanDetails)" :key="surchargeName"
+        class="surcharge-line">
+        <div class="surcharge-type q-pa-sm">
+          {{ SURCHARGES[surchargeName] }} - {{ surchage.percentage }}%
         </div>
-        <div v-for="(surchage, surchargeName) in getSurcharges(surchargePlanDetails)" :key="surchargeName"
-          class="surcharge-line">
-          <div class="surcharge-type q-pa-sm">
-            {{ SURCHARGES[surchargeName] }} - {{ surchage.percentage }}%
-          </div>
-          <div class="q-pa-sm">{{ formatHours(surchage.hours) }}</div>
-        </div>
+        <div class="q-pa-sm">{{ formatHours(surchage.hours) }}</div>
       </div>
     </div>
-  </q-modal>
+  </ni-modal>
 </template>
 
 <script>
+import Modal from '../Modal';
 import { formatHours } from '../../helpers/utils';
 import { SURCHARGES } from '../../data/constants';
 
 export default {
   name: 'PaySurchargeDetailsModal',
+  components: {
+    'ni-modal': Modal,
+  },
   data () {
     return {
       SURCHARGES,
