@@ -7,7 +7,7 @@
         </div>
       </template>
     </ni-title-header>
-    <q-table :data="contracts" :columns="columns" binary-state-sort :pagination.sync="pagination" class="q-pa-smn large-table">
+    <q-table :data="contracts" :columns="columns" binary-state-sort :pagination.sync="pagination" class="q-pa-sm large-table">
       <q-tr slot="body" slot-scope="props" :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
           <template v-if="col.name==='actions'">
