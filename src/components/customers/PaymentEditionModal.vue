@@ -1,42 +1,39 @@
 <template>
-  <q-modal :value="editionModal" content-classes="modal-container-md" @hide="resetForm">
-    <div class="modal-padding">
-      <div class="row justify-between items-baseline">
-        <div class="col-11">
-          <h5>Editer le <span class="text-weight-bold">{{ editionModalNature }}</span></h5>
-        </div>
-        <div class="col-1 cursor-pointer modal-btn-close">
-          <span><q-icon name="clear" @click.native="resetForm" /></span>
-        </div>
-      </div>
-      <ni-input in-modal caption="Bénéficiaire" :value="customerFullname" required-field read-only />
-      <ni-input in-modal caption="Client" v-model="selectedClientName" required-field read-only />
-      <ni-input in-modal :caption="`Montant du ${editionModalNature}`" suffix="€" type="number"
-        v-model="editedPayment.netInclTaxes" required-field :error="validations.netInclTaxes.$error"
-        @blur="validations.netInclTaxes.$touch" :error-label="netInclTaxesError" />
-      <ni-select in-modal :caption="`Type du ${editionModalNature}`" v-model="editedPayment.type" :options="paymentOptions"
-        required-field @blur="validations.type.$touch" :error="validations.type.$error" />
-      <ni-datetime-picker :caption="`Date du ${editionModalNature}`" v-model="editedPayment.date"
-        :error="validations.date.$error" @blur="validations.date.$touch" in-modal type="date" required-field />
-    </div>
-    <q-btn no-caps class="full-width modal-btn" :label="editionButtonLabel" icon-right="add" color="primary"
-      :loading="loading" @click="updatePayment" :disable="validations.$error || disableEditionButton" />
-  </q-modal>
+  <ni-modal :value="editionModal" content-classes="modal-container-md" @hide="resetForm">
+    <template slot="title">
+      <h5>Editer le <span class="text-weight-bold">{{ editionModalNature }}</span></h5>
+    </template>
+    <ni-input in-modal caption="Bénéficiaire" :value="customerFullname" required-field read-only />
+    <ni-input in-modal caption="Client" v-model="selectedClientName" required-field read-only />
+    <ni-input in-modal :caption="`Montant du ${editionModalNature}`" suffix="€" type="number"
+      v-model="editedPayment.netInclTaxes" required-field :error="validations.netInclTaxes.$error"
+      @blur="validations.netInclTaxes.$touch" :error-label="netInclTaxesError" />
+    <ni-select in-modal :caption="`Type du ${editionModalNature}`" v-model="editedPayment.type"
+      :options="paymentOptions" required-field @blur="validations.type.$touch" :error="validations.type.$error" />
+    <ni-datetime-picker :caption="`Date du ${editionModalNature}`" v-model="editedPayment.date"
+      :error="validations.date.$error" @blur="validations.date.$touch" in-modal type="date" required-field />
+    <template slot="footer">
+      <q-btn no-caps class="full-width modal-btn" :label="editionButtonLabel" icon-right="add" color="primary"
+        :loading="loading" @click="updatePayment" :disable="validations.$error || disableEditionButton" />
+    </template>
+  </ni-modal>
 </template>
 
 <script>
 import { REQUIRED_LABEL, PAYMENT_OPTIONS, PAYMENT_NATURE_OPTIONS } from '../../data/constants.js';
-import NiSelect from '../form/Select';
-import NiInput from '../form/Input';
+import Select from '../form/Select';
+import Input from '../form/Input';
+import Modal from '../Modal';
 import DatetimePicker from '../form/DatetimePicker';
 import { formatIdentity } from '../../helpers/utils.js';
 
 export default {
   name: 'PaymentEditionModal',
   components: {
-    'ni-select': NiSelect,
-    'ni-input': NiInput,
+    'ni-select': Select,
+    'ni-input': Input,
     'ni-datetime-picker': DatetimePicker,
+    'ni-modal': Modal,
   },
   props: {
     editedPayment: { type: Object, default: () => ({}) },
