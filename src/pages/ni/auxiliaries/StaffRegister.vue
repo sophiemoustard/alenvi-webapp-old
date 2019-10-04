@@ -51,17 +51,17 @@ export default {
           align: 'left',
         },
         {
+          name: 'gender',
+          label: 'Civilité',
+          field: row => this.$_.get(row, 'user.identity.title', ''),
+          align: 'left',
+        },
+        {
           name: 'birthDate',
           label: 'Date de naissance',
           field: row => this.$_.get(row, 'user.identity.birthDate', ''),
           align: 'left',
           format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : '',
-        },
-        {
-          name: 'gender',
-          label: 'Civilité',
-          field: row => this.$_.get(row, 'user.identity.title', ''),
-          align: 'left',
         },
         {
           name: 'nationality',
