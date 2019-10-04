@@ -132,7 +132,7 @@ const routes = [
         component: () => import('pages/ni/pay/ContractsAvenantsMonitoring'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: 'pay:edit',
+          permissions: 'contracts:edit:user',
           parent: 'pay',
         },
       },

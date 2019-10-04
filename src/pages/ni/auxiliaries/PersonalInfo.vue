@@ -21,8 +21,8 @@ import { AUXILIARY, PLANNING_REFERENT } from '../../../data/constants.js';
 
 export default {
   props: {
-    id: {type: String},
-    defaultTab: { type: String, default: () => 'info' },
+    id: { type: String },
+    defaultTab: { type: String, default: 'info' },
   },
   components: {
     ProfileHeader,

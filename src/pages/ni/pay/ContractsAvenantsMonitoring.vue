@@ -11,10 +11,10 @@
       <q-tr slot="body" slot-scope="props" :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
           <template v-if="col.name==='actions'">
-          <div class="row no-wrap table-actions contract-actions">
-            <q-btn flat round small color="grey" icon="remove_red_eye" @click="goToUserContractPage(col.value)" />
-            <q-btn flat round small color="grey" icon="edit" />
-          </div>
+            <div class="row no-wrap table-actions contract-actions">
+              <q-btn flat round small color="grey" icon="remove_red_eye" @click="goToUserContractPage(col.value)" />
+              <q-btn flat round small color="grey" icon="edit" />
+            </div>
           </template>
           <template v-else>
             {{ col.value }}
@@ -140,34 +140,29 @@ export default {
       const endDate = this.$moment(this.dates.endDate);
       contractsList.forEach(contract => {
         const { versions } = contract;
-        if (this.isContractEnding(contract, startDate, endDate)) {
-          const lastVersion = versions[versions.length - 1];
-          const versionToDisplay = {
-            ...lastVersion,
-            user: contract.user,
-            type: 'Contrat',
-          }
-          this.contracts.push(versionToDisplay);
-        }
         for (let idx = 0; idx < versions.length; idx++) {
           const version = versions[idx];
           const versionStartDate = this.$moment(version.startDate);
-          if ((versionStartDate.isSameOrAfter(startDate) && versionStartDate.isSameOrBefore(endDate))) {
+          let isInInterval = (versionStartDate.isSameOrAfter(startDate) && versionStartDate.isSameOrBefore(endDate));
+          let typeContract = idx ? 'Avenant' : 'Contrat';
+          if (idx === versions.length - 1 && version.endDate) {
+            const versionEndDate = this.$moment(version.endDate);
+            const isEndDateInInterval = versionEndDate.isSameOrAfter(startDate) && versionEndDate.isSameOrBefore(endDate);
+            if (isEndDateInInterval) {
+              isInInterval = true;
+              typeContract = 'Contract';
+            }
+          }
+          if (isInInterval) {
             const versionToDisplay = {
               ...version,
               user: contract.user,
-              type: idx ? 'Avenant' : 'Contrat',
+              type: typeContract,
             }
             this.contracts.push(versionToDisplay);
           }
         }
       });
-    },
-    isContractEnding (contract, startDate, endDate) {
-      const contractEndDate = this.$moment(contract.endDate);
-      const lastVersionStartDate = this.$moment(contract.startDate);
-      return (contractEndDate.isSameOrAfter(startDate) && contractEndDate.isSameOrBefore(endDate)) &&
-        (lastVersionStartDate.isSameOrBefore(startDate) && lastVersionStartDate.isSameOrAfter(endDate));
     },
     goToUserContractPage (user) {
       this.$router.push({ name: 'personal info', params: { id: user._id, defaultTab: 'contracts' } });
