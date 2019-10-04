@@ -302,29 +302,20 @@
     </ni-modal>
 
     <!-- Funding details modal -->
-    <q-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingDetailsModal"
-      content-classes="modal-container-sm" @hide="resetFundingDetailsData">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5>Détail du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span>
-            </h5>
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span>
-              <q-icon name="clear" @click.native="fundingDetailsModal = false" /></span>
-          </div>
-        </div>
-        <q-table class="q-mb-xl table-grid" :data="fundingDetailsData" :columns="fundingColumns" hide-bottom
-          binary-state-sort :visible-columns="fundingDetailsVisibleColumns" :rows-per-page-options="[0]">
-          <q-tr slot="body" slot-scope="props" :props="props">
-            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-              <template>{{ col.value }}</template>
-            </q-td>
-          </q-tr>
-        </q-table>
-      </div>
-    </q-modal>
+    <ni-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingDetailsModal"
+      @hide="resetFundingDetailsData">
+      <template slot="title">
+        <h5>Détail du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span></h5>
+      </template>
+      <q-table class="q-mb-xl table-grid" :data="fundingDetailsData" :columns="fundingColumns" hide-bottom
+        binary-state-sort :visible-columns="fundingDetailsVisibleColumns" :rows-per-page-options="[0]">
+        <q-tr slot="body" slot-scope="props" :props="props">
+          <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+            <template>{{ col.value }}</template>
+          </q-td>
+        </q-tr>
+      </q-table>
+    </ni-modal>
 
     <!-- Funding history modal -->
     <ni-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingHistoryModal"
