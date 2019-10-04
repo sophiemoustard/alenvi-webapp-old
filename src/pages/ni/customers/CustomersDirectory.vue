@@ -25,31 +25,24 @@
       @click="opened = true" />
 
     <!-- Customer creation modal -->
-    <q-modal v-model="opened" @hide="resetForm" content-classes="modal-container-sm">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-8">
-            <h5>Créer une nouvelle <span class="text-weight-bold">fiche bénéficiaire</span></h5>
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span>
-              <q-icon name="clear" @click.native="opened = false" /></span>
-          </div>
-        </div>
-        <ni-select in-modal v-model="newCustomer.identity.title" :error="$v.newCustomer.identity.title.$error"
-          :options="civilityOptions" caption="Civilité" @blur="$v.newCustomer.identity.title.$touch" required-field />
-        <ni-input in-modal v-model="newCustomer.identity.lastname" :error="$v.newCustomer.identity.lastname.$error"
-          caption="Nom" @blur="$v.newCustomer.identity.lastname.$touch" required-field />
-        <ni-input in-modal v-model="newCustomer.identity.firstname" caption="Prénom" />
-        <div class="row margin-input last">
-          <ni-search-address v-model="newCustomer.contact.primaryAddress" caption="Addresse principale"
-            @blur="$v.newCustomer.contact.primaryAddress.$touch" :error="$v.newCustomer.contact.primaryAddress.$error"
-            :error-label="primaryAddressError" in-modal required-field />
-        </div>
+    <ni-modal v-model="opened" @hide="resetForm">
+      <template slot="title">
+        <h5>Créer une nouvelle <span class="text-weight-bold">fiche bénéficiaire</span></h5>
+      </template>
+      <ni-select in-modal v-model="newCustomer.identity.title" :error="$v.newCustomer.identity.title.$error"
+        :options="civilityOptions" caption="Civilité" @blur="$v.newCustomer.identity.title.$touch" required-field />
+      <ni-input in-modal v-model="newCustomer.identity.lastname" :error="$v.newCustomer.identity.lastname.$error"
+        caption="Nom" @blur="$v.newCustomer.identity.lastname.$touch" required-field />
+      <ni-input in-modal v-model="newCustomer.identity.firstname" caption="Prénom" />
+      <div class="row margin-input last">
+        <ni-search-address v-model="newCustomer.contact.address" @blur="$v.newCustomer.contact.address.$touch"
+          :error="$v.newCustomer.contact.address.$error" :error-label="addressError" in-modal required-field />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary"
-        :loading="loading" @click="submit" />
-    </q-modal>
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary"
+          :loading="loading" @click="submit" />
+      </template>
+    </ni-modal>
   </q-page>
 </template>
 
@@ -61,6 +54,7 @@ import SearchAddress from '../../../components/form/SearchAddress';
 import Input from '../../../components/form/Input';
 import Select from '../../../components/form/Select';
 import DirectoryHeader from '../../../components/DirectoryHeader';
+import Modal from '../../../components/Modal';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../../components/popup/notify.js';
 import { customerProfileValidation } from '../../../helpers/customerProfileValidation.js';
 import { REQUIRED_LABEL } from '../../../data/constants';
@@ -78,6 +72,7 @@ export default {
     'ni-input': Input,
     'ni-select': Select,
     'ni-directory-header': DirectoryHeader,
+    'ni-modal': Modal,
   },
   data () {
     return {
