@@ -173,7 +173,7 @@ const routes = [
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: 'contracts:read:user',
+          permissions: 'contracts:edit',
           parent: 'administrative',
         },
       },
@@ -293,7 +293,6 @@ const routes = [
         component: () => import('pages/auxiliaries/administrative/Contracts'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: 'contracts:read',
           parent: 'administrative',
         },
       },
