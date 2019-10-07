@@ -3,17 +3,17 @@
     <ni-title-header title="Suivi Contrats/Avenants">
       <template slot="content">
         <div class="col-xs-12 col-md-5">
-        <ni-date-range v-model="dates" @input="refresh" borderless :error.sync="datesHasError" />
+        <ni-date-range v-model="dates" @input="refreshContracts" borderless :error.sync="datesHasError" />
         </div>
       </template>
     </ni-title-header>
-    <q-table :data="contracts" :columns="columns" binary-state-sort :pagination.sync="pagination" class="q-pa-sm large-table">
+    <q-table :data="versionsList" :columns="columns" binary-state-sort :pagination.sync="pagination" class="q-pa-sm large-table">
       <q-tr slot="body" slot-scope="props" :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
           <template v-if="col.name==='actions'">
             <div class="row no-wrap table-actions contract-actions">
               <q-btn flat round small color="grey" icon="remove_red_eye" @click="goToUserContractPage(col.value)" />
-              <q-btn flat round small color="grey" icon="edit" />
+              <q-btn flat round small color="grey" icon="edit" @click="openVersionEditionModal(props.row)" />
             </div>
           </template>
           <template v-else>
@@ -22,8 +22,14 @@
         </q-td>
       </q-tr>
       <ni-billing-pagination slot="bottom" slot-scope="props" :props="props" :pagination.sync="pagination"
-        :data="contracts"/>
+        :data="versionsList"/>
     </q-table>
+
+    <!-- Edition modal -->
+    <version-edition-modal :isOpened="versionEditionModal" :editedVersion="editedVersion" :loading="loading"
+      :validations="$v.editedVersion" :minStartDate="editedVersionMinStartDate" :isVersionUpdated="isVersionUpdated"
+      @hide="resetVersionEditionModal" @editVersion="editVersion"/>
+
   </q-page>
 </template>
 
@@ -31,17 +37,21 @@
 import DateRange from '../../../components/form/DateRange';
 import BillingPagination from '../../../components/table/BillingPagination';
 import TitleHeader from '../../../components/TitleHeader';
-import {formatIdentity} from '../../../helpers/utils';
+import { formatIdentity } from '../../../helpers/utils';
+import { contractMixin } from '../../../mixins/contractMixin.js';
+import VersionEditionModal from '../../../components/contracts/VersionEditionModal.vue';
 
 export default {
   name: 'ContractMonitoring',
   metaInfo: {
     title: 'Suivi Contrats/Avenants',
   },
+  mixins: [contractMixin],
   components: {
     'ni-date-range': DateRange,
     'ni-billing-pagination': BillingPagination,
     'ni-title-header': TitleHeader,
+    'version-edition-modal': VersionEditionModal,
   },
   data () {
     return {
@@ -49,8 +59,10 @@ export default {
         startDate: this.$moment().startOf('M').toISOString(),
         endDate: this.$moment().endOf('M').toISOString(),
       },
+      getUser: {},
+      contractsList: [],
+      versionsList: [],
       datesHasError: false,
-      contracts: [],
       contractsLoading: false,
       pagination: {
         rowsPerPage: 0,
@@ -118,28 +130,50 @@ export default {
     }
   },
   async mounted () {
-    await this.refresh();
+    await this.refreshContracts();
+  },
+  computed: {
+    mainUser () {
+      return this.$store.getters['main/user'];
+    },
+    userCompany () {
+      return this.mainUser.company;
+    },
   },
   methods: {
-    async refresh () {
+    async refreshContracts () {
       try {
         this.contractsLoading = true;
         if (this.datesHasError) return;
-        const contractsList = await this.$contracts.list({ startDate: this.dates.startDate, endDate: this.dates.endDate });
-        this.formatContractList(contractsList);
+        this.contractsList = await this.$contracts.list({ startDate: this.dates.startDate, endDate: this.dates.endDate });
+        this.formatContractList();
         this.contractsLoading = false;
       } catch (e) {
-        this.contracts = [];
+        this.versionsList = [];
         this.contractsLoading = false;
         console.error(e);
       }
     },
-    formatContractList (contractsList) {
-      this.contracts = [];
+    // Contract edition
+    openVersionEditionModal (version) {
+      this.editedVersion = {
+        contractId: version.contractId,
+        versionId: version._id,
+        grossHourlyRate: version.grossHourlyRate,
+        startDate: version.startDate,
+        shouldBeSigned: !!version.signature && !!version.signature.eversignId,
+      };
+      this.selectedContract = this.contractsList.find(contract => contract._id === version.contractId);
+      this.selectedVersion = version;
+      this.versionEditionModal = true;
+      this.getUser = version.user;
+    },
+    formatContractList () {
       const startDate = this.$moment(this.dates.startDate);
       const endDate = this.$moment(this.dates.endDate);
+      this.versionsList = [];
 
-      contractsList.forEach(contract => {
+      this.contractsList.forEach(contract => {
         const { versions } = contract;
         for (let idx = 0; idx < versions.length; idx++) {
           const version = versions[idx];
@@ -157,10 +191,11 @@ export default {
           if (isInInterval) {
             const versionToDisplay = {
               ...version,
+              contractId: contract._id,
               user: contract.user,
               type: contractType,
             }
-            this.contracts.push(versionToDisplay);
+            this.versionsList.push(versionToDisplay);
           }
         }
       });
