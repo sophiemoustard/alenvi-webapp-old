@@ -11,6 +11,7 @@
         <q-item-main :class="{'text-weight-bold': activeRoutes.administrative.highlight }" label="Administratif" />
       </template>
       <ni-menu-item name="administrative directory" icon="contacts" label="Répertoire auxiliaires" />
+      <ni-menu-item v-if="isAdmin" name="staff register" icon="view_headline" label="Registre unique du personnel" />
     </q-collapsible>
     <q-item-separator />
     <q-collapsible ref="planning" v-model="activeRoutes.planning.open" collapseIcon="expand_more">
@@ -27,17 +28,17 @@
       </template>
       <ni-menu-item name="customers directory" icon="contacts" label="Répertoire bénéficiaires" />
     </q-collapsible>
-    <template v-if="user.role.name === ADMIN">
+    <template v-if="isAdmin">
       <q-item-separator />
       <q-collapsible ref="billing" v-model="activeRoutes.billing.open"
         collapseIcon="expand_more">
         <template slot="header">
           <q-item-main :class="{'text-weight-bold': activeRoutes.billing.highlight }" label="Facturation" />
         </template>
-        <ni-menu-item name="to bill" :params="{ id: user._id }" icon="credit_card" label="À facturer" />
-        <ni-menu-item name="credit note" :params="{ id: user._id }" icon="mdi-credit-card-refund" label="Avoirs" />
-        <ni-menu-item name="clients balances" :params="{ id: user._id }" icon="mdi-scale-balance" label="Balances clients" />
-        <ni-menu-item name="debits archive" :params="{ id: user._id }" icon="mdi-archive" label="Archive prélèvements" />
+        <ni-menu-item name="to bill" icon="credit_card" label="À facturer" />
+        <ni-menu-item name="credit note" icon="mdi-credit-card-refund" label="Avoirs" />
+        <ni-menu-item name="clients balances" icon="mdi-scale-balance" label="Balances clients" />
+        <ni-menu-item name="debits archive" icon="mdi-archive" label="Archive prélèvements" />
       </q-collapsible>
     </template>
     <q-item-separator />
@@ -46,10 +47,11 @@
       <template slot="header">
         <q-item-main :class="{'text-weight-bold': activeRoutes.pay.highlight }" label="Paie" />
       </template>
-      <ni-menu-item name="absences" :params="{ id: user._id }" icon="calendar_today" label="Absences" />
-      <template v-if="user.role.name === ADMIN">
-        <ni-menu-item name="contract ends" :params="{ id: user._id }" icon="description" label="STC" />
-        <ni-menu-item name="to pay" :params="{ id: user._id }" icon="euro_symbol" label="Paie mensuelle" />
+      <ni-menu-item name="contract monitoring" icon="insert_drive_file" label="Suivi Contracts/Avenants" />
+      <ni-menu-item name="absences" icon="calendar_today" label="Absences" />
+      <template v-if="isAdmin">
+        <ni-menu-item name="contract ends" icon="description" label="STC" />
+        <ni-menu-item name="to pay" icon="euro_symbol" label="Paie mensuelle" />
       </template>
     </q-collapsible>
     <q-item-separator />
@@ -57,19 +59,19 @@
       <template slot="header">
         <q-item-main :class="{'text-weight-bold': activeRoutes.exports.highlight }" label="Exports" />
       </template>
-      <ni-menu-item name="data" :params="{ id: user._id }" icon="list_alt" label="Données" />
-      <ni-menu-item name="history" :params="{ id: user._id }" icon="history" label="Historique" />
+      <ni-menu-item name="data" icon="list_alt" label="Données" />
+      <ni-menu-item name="history" icon="history" label="Historique" />
     </q-collapsible>
-    <template v-if="user.role.name === ADMIN">
+    <template v-if="isAdmin">
       <q-item-separator />
       <q-collapsible ref="configuration" v-model="activeRoutes.configuration.open"
         collapseIcon="expand_more">
         <template slot="header">
           <q-item-main :class="{'text-weight-bold': activeRoutes.configuration.highlight }" label="Configuration" />
         </template>
-        <ni-menu-item name="rh config" :params="{ id: user._id }" icon="settings" label="Configuration RH" />
-        <ni-menu-item name="customers config" :params="{ id: user._id }" icon="settings" label="Configuration bénéficiaires" />
-        <ni-menu-item name="tags config" :params="{ id: user._id }" icon="list_alt" label="Tags" />
+        <ni-menu-item name="rh config" icon="settings" label="Configuration RH" />
+        <ni-menu-item name="customers config" icon="settings" label="Configuration bénéficiaires" />
+        <ni-menu-item name="tags config" icon="list_alt" label="Tags" />
       </q-collapsible>
     </template>
     <q-item-separator />
@@ -129,6 +131,11 @@ export default {
   },
   mounted () {
     this.collapsibleOpening();
+  },
+  computed: {
+    isAdmin () {
+      return this.user.role.name === ADMIN;
+    },
   },
 }
 </script>

@@ -1,9 +1,12 @@
 <template>
   <q-page class="neutral-background q-pb-xl">
-    <div class="title-padding">
-      <h4>Absences</h4>
-      <ni-date-range v-model="dates" @input="refresh" borderless :error.sync="datesHasError" />
-    </div>
+    <ni-title-header title="Absences">
+      <template slot="content">
+        <div class="col-xs-12 col-md-5">
+          <ni-date-range v-model="dates" @input="refresh" borderless :error.sync="datesHasError" />
+        </div>
+      </template>
+    </ni-title-header>
     <q-table :data="absences" :columns="columns" binary-state-sort :pagination.sync="pagination" class="q-pa-sm">
       <q-tr slot="body" slot-scope="props" :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
@@ -25,7 +28,7 @@
         </q-td>
       </q-tr>
       <ni-billing-pagination slot="bottom" slot-scope="props" :props="props" :pagination.sync="pagination"
-        :data="absences"/>
+        :data="absences" />
     </q-table>
 
     <!-- Absence edition modal -->
@@ -38,6 +41,7 @@
 
 <script>
 import DateRange from '../../../components/form/DateRange';
+import TitleHeader from '../../../components/TitleHeader';
 import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES, DAILY } from '../../../data/constants';
 import BillingPagination from '../../../components/table/BillingPagination';
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
@@ -52,6 +56,7 @@ export default {
     'ni-date-range': DateRange,
     'ni-billing-pagination': BillingPagination,
     'ni-auxiliary-event-edition-modal': AuxiliaryEventEditionModal,
+    'ni-title-header': TitleHeader,
   },
   mixins: [planningActionMixin],
   data () {

@@ -14,10 +14,17 @@ export const downloadDocxFile = async (params, data, fileName) => {
   downloadFile(file, fileName);
 };
 
-export const downloadPdf = async (pdf, filename) => {
+export const generatePdfUrl = (pdf) => {
   const blob = new Blob([pdf.data], { type: 'application/pdf' })
-  const link = document.createElement('a');
-  link.href = window.URL.createObjectURL(blob);
-  link.download = filename;
-  link.click();
+  return window.URL.createObjectURL(blob);
+};
+
+export const downloadCsv = (data, fileName) => {
+  let csvContent = '\ufeff'; // UTF16LE BOM for Microsoft Excel
+  data.forEach((rowArray) => {
+    const row = rowArray.join(';');
+    csvContent += `${row}\r\n`;
+  });
+
+  return downloadFile({ data: csvContent }, fileName);
 };

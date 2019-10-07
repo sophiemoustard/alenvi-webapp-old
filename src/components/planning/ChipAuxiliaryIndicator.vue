@@ -2,7 +2,7 @@
   <div :class="[{ 'highlight': hasCompanyContractOnEvent },  'full-width', 'row', 'relative-position', 'chip-container']"
     @click="openIndicatorsModal">
     <img :src="getAvatar(person.picture)" class="avatar">
-    <q-chip v-if="hasCompanyContractOnEvent" :class="['absolute-center', { 'busy': isBusy }]" small text-color="white">
+    <q-chip v-if="hasCompanyContractOnEvent" :class="['absolute-center', `${occupationLevel}-occupation`]" small text-color="white">
       <q-spinner-dots v-if="loading" />
       <span v-else class="chip-indicator">{{ ratio.weeklyHours }}h / {{ ratio.contractHours }}</span>
     </q-chip>
@@ -48,6 +48,10 @@ import {
   COMPANY_CONTRACT,
   DAILY,
   FIXED,
+  LOW,
+  EXTREME,
+  MAX_WEEKLY_OCCUPATION_LEVEL,
+  HIGH,
 } from '../../data/constants.js';
 import googleMaps from '../../api/GoogleMaps';
 import { getPaidTransport } from '../../helpers/planning';
@@ -60,7 +64,7 @@ export default {
   props: {
     person: { type: Object, default: () => ({ picture: { link: '' }, administrative: {}, contracts: [] }) },
     events: { type: Array, default: () => [] },
-    startOfWeekAsString: { type: String, default: '' },
+    startOfWeek: { type: String, default: '' },
     dm: { type: Array, default: () => [] },
   },
   data () {
@@ -85,18 +89,23 @@ export default {
     };
   },
   computed: {
-    isBusy () {
-      return this.ratio.contractHours !== 0 && this.ratio.weeklyHours >= this.ratio.contractHours;
+    occupationLevel () {
+      if (this.ratio.contractHours !== 0 && this.ratio.weeklyHours < this.ratio.contractHours) {
+        return LOW;
+      } else if (this.ratio.weeklyHours < MAX_WEEKLY_OCCUPATION_LEVEL) {
+        return HIGH;
+      }
+      return EXTREME;
     },
     endOfWeek () {
-      return this.$moment(this.startOfWeekAsString).endOf('w').toISOString();
+      return this.$moment(this.startOfWeek).endOf('w').toISOString();
     },
     days () {
       let range;
-      if (this.selectedTab === WEEK_STATS) range = this.$moment.range(this.startOfWeekAsString, this.endOfWeek);
+      if (this.selectedTab === WEEK_STATS) range = this.$moment.range(this.startOfWeek, this.endOfWeek);
       else {
-        const start = this.$moment(this.startOfWeekAsString).startOf('month');
-        const end = this.$moment(this.startOfWeekAsString).endOf('month');
+        const start = this.$moment(this.startOfWeek).startOf('month');
+        const end = this.$moment(this.startOfWeek).endOf('month');
         range = this.$moment.range(start, end);
       }
 
@@ -124,8 +133,8 @@ export default {
       return companyContracts.some(contract => {
         return (this.$moment(contract.startDate).isSameOrBefore(this.endOfWeek) &&
           (!contract.endDate || this.$moment(contract.endDate).isAfter(this.endOfWeek))) ||
-          (this.$moment(contract.startDate).isSameOrBefore(this.startOfWeekAsString) &&
-          (!contract.endDate || this.$moment(contract.endDate).isAfter(this.startOfWeekAsString)));
+          (this.$moment(contract.startDate).isSameOrBefore(this.startOfWeek) &&
+          (!contract.endDate || this.$moment(contract.endDate).isAfter(this.startOfWeek)));
       });
     },
     companyContracts () {
@@ -173,8 +182,8 @@ export default {
       if (!this.hasCompanyContractOnEvent) return;
       try {
         this.monthEvents = await this.$events.list({
-          startDate: this.$moment(this.startOfWeekAsString).startOf('month').toDate(),
-          endDate: this.$moment(this.startOfWeekAsString).endOf('month').toDate(),
+          startDate: this.$moment(this.startOfWeek).startOf('month').toDate(),
+          endDate: this.$moment(this.startOfWeek).endOf('month').toDate(),
           auxiliary: this.person._id,
         });
       } catch (e) {
@@ -298,7 +307,7 @@ export default {
     },
     getContractHours () {
       let contractHours = 0;
-      const contractDaysRange = Array.from(this.$moment.range(this.startOfWeekAsString, this.$moment(this.endOfWeek).subtract(1, 'd')).by('days')) // from Monday to Saturday
+      const contractDaysRange = Array.from(this.$moment.range(this.startOfWeek, this.$moment(this.endOfWeek).subtract(1, 'd')).by('days')) // from Monday to Saturday
       for (const day of contractDaysRange) {
         const absences = this.events.filter(event =>
           event.type === ABSENCE &&

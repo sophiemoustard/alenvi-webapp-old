@@ -127,6 +127,16 @@ const routes = [
         },
       },
       {
+        path: 'ni/pay/contract-monitoring',
+        name: 'contract monitoring',
+        component: () => import('pages/ni/pay/ContractMonitoring'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'contracts:edit',
+          parent: 'pay',
+        },
+      },
+      {
         path: 'ni/pay/absences',
         name: 'absences',
         component: () => import('pages/ni/pay/Absences'),
@@ -163,6 +173,17 @@ const routes = [
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: 'users:edit',
+          parent: 'administrative',
+        },
+      },
+      {
+        path: 'ni/auxiliaries/staff-register',
+        name: 'staff register',
+        component: () => import('pages/ni/auxiliaries/StaffRegister'),
+        props: true,
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'contracts:edit',
           parent: 'administrative',
         },
       },
@@ -282,7 +303,6 @@ const routes = [
         component: () => import('pages/auxiliaries/administrative/Contracts'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: 'contracts:read',
           parent: 'administrative',
         },
       },
@@ -370,6 +390,12 @@ const routes = [
   { path: '/error403Pwd', component: () => import('pages/signin/403') },
   { path: '/401', component: () => import('pages/401') },
   { path: '/docsigned', component: () => import('pages/DocumentSigned'), props: route => ({signed: route.query.signed}) },
+  {
+    path: '/display/:fileName',
+    name: 'display file',
+    component: () => import('pages/DisplayPdf'),
+    props: (route) => ({ blobUrl: route.query.blobUrl, fileName: route.params.fileName }),
+  },
   {
     // Always leave this as last one
     path: '*',

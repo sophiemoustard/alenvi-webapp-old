@@ -2,7 +2,7 @@
   <q-page class="neutral-background">
     <ni-planning-manager :events="events" :persons="customers" :personKey="personKey" :can-edit="canEditEvent"
       @updateStartOfWeek="updateStartOfWeek" @editEvent="openEditionModal" @createEvent="openCreationModal"
-      @onDrop="updateEventOnDrop" ref="planningManager" />
+      @onDrop="updateEventOnDrop" ref="planningManager" :filters="filters" />
 
     <!-- Event creation modal -->
     <q-modal v-if="Object.keys(newEvent).length !== 0" v-model="creationModal" content-classes="modal-container-md"
@@ -69,7 +69,7 @@
           </div>
         </template>
         <ni-input in-modal v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes"
-          :disable="isDisabled" />
+          :disable="isDisabled" :required-field="editedEvent.isCancelled" />
         <template v-if="!editedEvent.shouldUpdateRepetition && !isDisabled">
           <div class="row q-mb-md light-checkbox">
             <q-checkbox v-model="editedEvent.isCancelled" label="Annuler l'évènement" @input="toggleCancellationForm" />
@@ -122,7 +122,7 @@ export default {
       events: [],
       customers: [],
       auxiliaries: [],
-      startOfWeekAsString: '',
+      startOfWeek: '',
       filteredSectors: [],
       filteredCustomers: [],
       DEFAULT_AVATAR,
@@ -165,7 +165,7 @@ export default {
       elementToRemove: 'planning/getElementToRemove',
     }),
     endOfWeek () {
-      return this.$moment(this.startOfWeekAsString).endOf('w');
+      return this.$moment(this.startOfWeek).endOf('w').toISOString();
     },
     selectedCustomer () {
       if (this.creationModal && this.newEvent.customer !== '') return this.customers.find(cus => cus._id === this.newEvent.customer);
@@ -209,7 +209,9 @@ export default {
       return true;
     },
     activeAuxiliaries () {
-      return this.auxiliaries.filter(aux => this.hasCompanyContractOnEvent(aux, this.days[0]) || this.hasCustomerContractOnEvent(aux, this.days[0]));
+      return this.auxiliaries
+        .filter(aux => this.hasCustomerContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek) ||
+          this.hasCompanyContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek));
     },
   },
   methods: {
@@ -219,9 +221,9 @@ export default {
     // Dates
     async updateStartOfWeek (vEvent) {
       const { startOfWeek } = vEvent;
-      this.startOfWeekAsString = startOfWeek.startOf('d').toISOString();
+      this.startOfWeek = startOfWeek;
 
-      const range = this.$moment.range(this.startOfWeekAsString, this.$moment(this.startOfWeekAsString).endOf('w'));
+      const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).endOf('w'));
       this.days = Array.from(range.by('days'));
       if (this.filteredSectors.length !== 0 || this.filteredCustomers.length !== 0) await this.refreshCustomers();
       if (this.customers.length !== 0) await this.refresh();
@@ -278,8 +280,8 @@ export default {
     async refresh () {
       try {
         this.events = await this.$events.list({
-          startDate: this.$moment(this.startOfWeekAsString).toDate(),
-          endDate: this.endOfWeek.toDate(),
+          startDate: this.startOfWeek,
+          endDate: this.endOfWeek,
           customer: this.customers.map(cus => cus._id),
           groupBy: CUSTOMER,
         });
@@ -328,8 +330,8 @@ export default {
     },
     async getSectorCustomers (sectors) {
       return sectors.length === 0 ? [] : this.$customers.listBySector({
-        startDate: this.$moment(this.startOfWeekAsString).toDate(),
-        endDate: this.endOfWeek.toDate(),
+        startDate: this.startOfWeek,
+        endDate: this.endOfWeek,
         sector: JSON.stringify(sectors),
       });
     },

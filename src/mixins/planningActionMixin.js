@@ -1,3 +1,4 @@
+import { validationMixin } from './validationMixin'
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { frAddress } from '../helpers/vuelidateCustomVal.js';
 import { NotifyWarning, NotifyNegative, NotifyPositive } from '../components/popup/notify';
@@ -21,6 +22,7 @@ import {
 } from '../data/constants';
 
 export const planningActionMixin = {
+  mixins: [validationMixin],
   validations () {
     return {
       newEvent: {
@@ -32,7 +34,6 @@ export const planningActionMixin = {
           endHour: { required: requiredIf((item, parent) => parent && (parent.type === ABSENCE && parent.absenceNature === HOURLY)) },
         },
         auxiliary: { required: requiredIf((item) => item.type !== INTERVENTION) },
-        sector: { required },
         customer: { required: requiredIf((item) => item.type === INTERVENTION) },
         subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
         internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
@@ -79,7 +80,9 @@ export const planningActionMixin = {
           condition: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
           reason: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
         },
-        misc: { required: requiredIf(item => item.type === ABSENCE && item.absence === OTHER) },
+        misc: {
+          required: requiredIf((item) => (item.type === ABSENCE && item.absence === OTHER) || item.isCancelled),
+        },
       },
     };
   },
@@ -163,7 +166,7 @@ export const planningActionMixin = {
       payload = this.$_.pickBy(payload);
 
       if (event.auxiliary) {
-        const auxiliary = this.auxiliaries.find(aux => aux._id === event.auxiliary);
+        const auxiliary = this.activeAuxiliaries.find(aux => aux._id === event.auxiliary);
         payload.sector = auxiliary.sector._id;
       }
 
@@ -256,7 +259,8 @@ export const planningActionMixin = {
     async createEvent () {
       try {
         this.$v.newEvent.$touch();
-        if (this.$v.newEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
+        const isValid = await this.waitForFormValidation(this.$v.newEvent);
+        if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         await this.notifyCreation();
 
@@ -333,10 +337,7 @@ export const planningActionMixin = {
         return this.$can({
           user: this.$store.getters['main/user'],
           auxiliarySectorEvent: event.sector,
-          permissions: [
-            { name: 'events:edit' },
-            { name: 'events:sector:edit', rule: 'isInSameSector' },
-          ],
+          permissions: [{ name: 'events:edit' }],
         });
       }
 
@@ -346,7 +347,6 @@ export const planningActionMixin = {
         auxiliarySectorEvent: event.sector,
         permissions: [
           { name: 'events:edit' },
-          { name: 'events:sector:edit', rule: 'isInSameSector' },
           { name: 'events:own:edit', rule: 'isOwner' },
         ],
       });
@@ -369,8 +369,9 @@ export const planningActionMixin = {
     },
     async updateEvent () {
       try {
-        this.$v.editedEvent.$touch();
-        if (this.$v.editedEvent.$error) return NotifyWarning('Champ(s) invalide(s)');
+        await this.$v.editedEvent.$touch();
+        const isValid = await this.waitForFormValidation(this.$v.editedEvent);
+        if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         const payload = this.getEditionPayload(this.editedEvent);
@@ -412,7 +413,7 @@ export const planningActionMixin = {
         payload.sector = draggedObject.sector;
       } else {
         payload.auxiliary = target._id;
-        const auxiliary = this.auxiliaries.find(aux => aux._id === target._id);
+        const auxiliary = this.activeAuxiliaries.find(aux => aux._id === target._id);
         payload.sector = auxiliary.sector._id;
       }
 

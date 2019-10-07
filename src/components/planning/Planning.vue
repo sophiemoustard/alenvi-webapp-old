@@ -2,7 +2,7 @@
   <div :class="[{ 'planning': !toggleDrawer }]">
     <div class="row items-center planning-header">
       <div class="col-xs-12 col-md-5 planning-search">
-        <ni-chips-autocomplete ref="refFilter" v-model="terms" :disable="displayAllSectors" />
+        <ni-chips-autocomplete ref="refFilter" v-model="terms" :disable="displayAllSectors" :filters="filters" />
         <q-btn v-if="!isCustomerPlanning && isCoach" flat round :icon="displayAllSectors ? 'arrow_forward' : 'people'"
           @click="toggleAllSectors" :color="displayAllSectors ? 'primary' : ''" />
       </div>
@@ -21,11 +21,12 @@
     <div class="planning-container full-width">
       <table style="width: 100%" :class="[staffingView ? 'staffing' : 'non-staffing', 'planning-table']">
         <thead>
-          <th>
+          <th :class="{ 'bottom-border': persons.length > 0 }">
             <q-btn v-if="!isCustomerPlanning" flat round icon="view_week" :color="staffingView ? 'primary' : ''"
               @click="staffingView = !staffingView" />
           </th>
-          <th class="capitalize" v-for="(day, index) in daysHeader" :key="index">
+          <th class="capitalize" :class="{ 'bottom-border': persons.length > 0 }" :key="index"
+            v-for="(day, index) in daysHeader">
             <div class="row justify-center items-baseline days-header">
               <div class="days-name q-mr-md">{{ day.name }}</div>
               <div :class="['days-number', { 'current-day': isCurrentDay(day.moment) }]">{{ day.number }}</div>
@@ -43,8 +44,11 @@
             <tr v-if="!isCustomerPlanning && getSector(sectorId)" :key="sectorId" class="to-assign person-row">
               <td valign="top">
                 <div class="person-inner-cell">
-                  <div :class="[!staffingView && 'q-mb-md', 'chip-container']">
+                  <div :class="[!staffingView && 'q-mb-md', 'chip-container', 'full-width', 'row', 'relative-position']">
                     <img :src="UNKNOWN_AVATAR" class="avatar" >
+                    <q-chip :class="['absolute-center']" small text-color="white">
+                      <span class="chip-indicator">{{ unassignedHourCount(sectorId) }}h</span>
+                    </q-chip>
                   </div>
                   <div class="person-name overflow-hidden">{{ getSector(sectorId).label }}</div>
                 </div>
@@ -65,7 +69,7 @@
                     <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person"
                       :events="getPersonEvents(person)" />
                     <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)"
-                      :startOfWeekAsString="startOfWeek.toISOString()" :dm="distanceMatrix" />
+                      :startOfWeek="startOfWeek" :dm="distanceMatrix" />
                   </div>
                   <div class="person-name overflow-hidden-nowrap">
                     <template v-if="isCustomerPlanning">{{ person.identity | formatIdentity('fL') }}</template>
@@ -96,7 +100,7 @@
 import {
   PLANNING,
   AUXILIARY_ROLES,
-  INVOICED_AND_PAYED,
+  INVOICED_AND_PAID,
   SECTOR,
   STAFFING_VIEW_START_HOUR,
   STAFFING_VIEW_END_HOUR,
@@ -137,13 +141,14 @@ export default {
     displayAllSectors: { type: Boolean, default: false },
     displayHistory: { type: Boolean, default: false },
     eventHistories: { type: Array, default: () => [] },
+    filters: { type: Array, default: () => [] },
   },
   data () {
     return {
       terms: [],
       loading: false,
       draggedObject: {},
-      startOfWeek: this.$moment().startOf('week'),
+      startOfWeek: this.$moment().startOf('week').toISOString(),
       days: [],
       maxDays: 7,
       staffingView: false,
@@ -170,7 +175,6 @@ export default {
   computed: {
     ...mapGetters({
       mainUser: 'main/user',
-      filters: 'planning/getFilters',
     }),
     isCoach () {
       return [COACH, ADMIN].includes(this.mainUser.role.name);
@@ -205,6 +209,15 @@ export default {
       this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
     },
     // Event display
+    unassignedHourCount (sectorId) {
+      const unassignedEvents = this.getRowEvents(sectorId);
+      let total = 0;
+      for (const event of unassignedEvents) {
+        total += this.$moment(event.endDate).diff(event.startDate, 'm', true);
+      }
+
+      return total / 60;
+    },
     getRowEvents (rowId) {
       const rowEvents = this.events.find(group => group._id === rowId);
 
@@ -242,7 +255,7 @@ export default {
     },
     getPersonEvents (person) {
       return this.getRowEvents(person._id).filter(event =>
-        (this.isCustomerPlanning || !event.isCancelled || event.cancel.condition === INVOICED_AND_PAYED));
+        (this.isCustomerPlanning || !event.isCancelled || event.cancel.condition === INVOICED_AND_PAID));
     },
     // History
     toggleHistory () {
@@ -277,10 +290,7 @@ export default {
         can = this.$can({
           user: this.$store.getters['main/user'],
           auxiliarySectorEvent: eventInfo.sectorId,
-          permissions: [
-            { name: 'events:edit' },
-            { name: 'events:sector:edit', rule: 'isInSameSector' },
-          ],
+          permissions: [{ name: 'events:edit' }],
         });
       } else if (this.personKey === 'auxiliary') {
         can = this.$can({
@@ -289,7 +299,6 @@ export default {
           auxiliarySectorEvent: eventInfo.person.sector._id,
           permissions: [
             { name: 'events:edit' },
-            { name: 'events:sector:edit', rule: 'isInSameSector' },
             { name: 'events:own:edit', rule: 'isOwner' },
           ],
         });
@@ -351,12 +360,6 @@ export default {
         margin: 0;
         position: absolute;
         z-index: -1;
-
-  .planning-hour
-    position: absolute;
-    color: $light-grey;
-    font-size: 12px;
-    bottom: -3px;
 
   .non-staffing
     .planning-background

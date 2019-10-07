@@ -1,6 +1,6 @@
 <template>
   <div :class="{ 'col-xs-12 col-md-6': !inModal, 'margin-input full-width': inModal, last: last }">
-    <div class="row justify-between">
+    <div v-if="caption" class="row justify-between">
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>

@@ -1,15 +1,8 @@
 <template>
   <q-page class="neutral-background" padding>
-    <div class="row items-center directory-header">
-      <div class="col-xs-12 col-md-6">
-        <h4>Répertoire</h4>
-      </div>
-      <div class="col-xs-12 col-md-6">
-        <q-search class="no-border input-search" v-model="searchStr" placeholder="Rechercher un profil" color="white" inverted-light />
-      </div>
-    </div>
-    <q-table :data="filteredUsers" :columns="columns" row-key="name" :rows-per-page-options="[15, 25, 35]" :pagination.sync="pagination"
-      :loading="tableLoading" class="people-list">
+    <ni-directory-header title="Répertoire" @updateSearch="updateSearch" />
+    <q-table :data="filteredUsers" :columns="columns" row-key="name" :rows-per-page-options="[15, 25, 35]"
+      :pagination.sync="pagination" :loading="tableLoading" class="people-list">
       <q-tr slot="body" slot-scope="props" :props="props" class="datatable-team-row">
         <q-td v-for="col in props.cols"
           :key="col.name"
@@ -30,9 +23,14 @@
 
 <script>
 import { DEFAULT_AVATAR, AUXILIARY, PLANNING_REFERENT } from '../../../data/constants';
+import DirectoryHeader from '../../../components/DirectoryHeader';
 
 export default {
+  name: 'TeamDirectory',
   metaInfo: { title: 'Répertoire équipe' },
+  components: {
+    'ni-directory-header': DirectoryHeader,
+  },
   data () {
     return {
       tableLoading: true,
@@ -83,6 +81,9 @@ export default {
     },
   },
   methods: {
+    updateSearch (value) {
+      this.searchStr = value;
+    },
     async getUserList () {
       try {
         const users = await this.$users.showAllActive({ role: [AUXILIARY, PLANNING_REFERENT] });

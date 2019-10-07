@@ -12,14 +12,13 @@ export const configMixin = {
         });
         await this.$gdrive.removeFileById({ id: driveId });
         const payload = {
-          _id: this.company._id,
           [key]: {
             templates: {
               [type]: { driveId: null, link: null },
             },
           },
         };
-        await this.$companies.updateById(payload);
+        await this.$companies.updateById(this.company._id, payload);
         this.refreshCompany();
         NotifyPositive('Document supprimé');
       } catch (e) {

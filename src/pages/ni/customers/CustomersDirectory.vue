@@ -1,22 +1,12 @@
 <template>
   <q-page class="neutral-background" padding>
-    <div class="row items-center directory-header">
-      <div class="col-xs-12 col-md-5">
-        <h4 class="no-margin">Répertoire bénéficiaires</h4>
-      </div>
-      <div class="col-xs-12 col-md-5">
-        <q-search class="no-border input-search" v-model="searchStr" placeholder="Rechercher un profil" color="white"
-          inverted-light />
-      </div>
-      <div class="col-xs-12 col-md-2 row justify-end">
-        <q-toggle v-model="onlyClients" color="primary" label="Clients" />
-      </div>
-    </div>
+    <ni-directory-header title="Répertoire bénéficiaires" toggleLabel="Clients" :toggle="onlyClients" display-toggle
+      @updateSearch="updateSearch" />
     <q-table :data="filteredCustomers" :columns="columns" row-key="name" binary-state-sort
       :rows-per-page-options="[15, 25, 35]" :pagination.sync="pagination" :loading="tableLoading"
-      :visible-columns="['fullName', 'createdAt', 'firstIntervention', 'info', 'client']" class="people-list q-pa-sm">
-      <q-tr slot="body" slot-scope="props" :props="props"
-        class="datatable-row" @click.native="goToCustomerProfile(props.row._id)">
+      class="people-list q-pa-sm">
+      <q-tr slot="body" slot-scope="props" :props="props" class="datatable-row"
+        @click.native="goToCustomerProfile(props.row._id)">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
           <q-item v-if="col.name === 'fullName'">
             <q-item-main :label="col.value" />
@@ -67,8 +57,9 @@ import { required, email } from 'vuelidate/lib/validators';
 
 import { frAddress } from '../../../helpers/vuelidateCustomVal.js';
 import SearchAddress from '../../../components/form/SearchAddress';
-import NiInput from '../../../components/form/Input';
-import NiSelect from '../../../components/form/Select';
+import Input from '../../../components/form/Input';
+import Select from '../../../components/form/Select';
+import DirectoryHeader from '../../../components/DirectoryHeader';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../../components/popup/notify.js';
 import { customerProfileValidation } from '../../../helpers/customerProfileValidation.js';
 import { REQUIRED_LABEL } from '../../../data/constants';
@@ -82,9 +73,10 @@ export default {
   },
   mixins: [validationMixin],
   components: {
-    NiSearchAddress: SearchAddress,
-    NiInput,
-    NiSelect,
+    'ni-search-address': SearchAddress,
+    'ni-input': Input,
+    'ni-select': Select,
+    'ni-directory-header': DirectoryHeader,
   },
   data () {
     return {
@@ -118,11 +110,6 @@ export default {
         rowsPerPage: 15,
       },
       columns: [
-        {
-          name: '_id',
-          label: '',
-          required: false,
-        },
         {
           name: 'fullName',
           label: 'Nom',
@@ -228,6 +215,9 @@ export default {
     },
   },
   methods: {
+    updateSearch (value) {
+      this.searchStr = value;
+    },
     async getCustomersList () {
       try {
         const customers = await this.$customers.list();

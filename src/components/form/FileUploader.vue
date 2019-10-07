@@ -40,7 +40,7 @@ export default {
     name: String,
     additionalValue: String,
     entity: Object,
-    url: String,
+    url: { type: String, default: '' },
     errorLabel: { type: String, default: 'Document requis' },
     displayUpload: { type: Boolean, default: true },
     displayCaption: { type: Boolean, default: true },

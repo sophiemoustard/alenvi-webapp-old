@@ -89,11 +89,13 @@ export const EVERY_WEEK = 'every_week';
 export const EVERY_TWO_WEEKS = 'every_two_weeks';
 
 // CANCELLATION OPTIONS
-export const INVOICED_AND_PAYED = 'invoiced_and_payed';
-export const INVOICED_AND_NOT_PAYED = 'invoiced_and_not_payed';
+export const INVOICED_AND_PAID = 'invoiced_and_paid';
+export const INVOICED_AND_NOT_PAID = 'invoiced_and_not_paid';
+export const NOT_INVOICED_AND_NOT_PAID = 'not_invoiced_and_not_paid';
 export const CANCELLATION_OPTIONS = [
-  { label: 'Facturée & payée', value: INVOICED_AND_PAYED },
-  { label: 'Facturée & non payée', value: INVOICED_AND_NOT_PAYED },
+  { label: 'Facturée & payée', value: INVOICED_AND_PAID },
+  { label: 'Facturée & non payée', value: INVOICED_AND_NOT_PAID },
+  { label: 'Non facturée & non payée', value: NOT_INVOICED_AND_NOT_PAID },
 ];
 
 // CANCELLATION REASONS
@@ -127,6 +129,10 @@ export const STAFFING_VIEW_END_HOUR = 20;
 export const STAFFING_PERCENTAGE_BY_MINUTES = 100 / ((STAFFING_VIEW_END_HOUR - STAFFING_VIEW_START_HOUR) * 60);
 export const SECTOR = 'sector';
 export const PERSON = 'person';
+export const MAX_WEEKLY_OCCUPATION_LEVEL = 48;
+export const LOW = 'low';
+export const HIGH = 'high';
+export const EXTREME = 'extreme';
 
 // EVENT HISTORY
 export const EVENT_CREATION = 'event_creation';

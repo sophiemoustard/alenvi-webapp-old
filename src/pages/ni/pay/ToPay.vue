@@ -1,11 +1,26 @@
 <template>
   <q-page class="neutral-background q-pb-xl">
-    <div class="title-padding">
-      <h4>À payer</h4>
-      <ni-select-sector v-model="selectedSector" allow-null-option />
-    </div>
+    <ni-title-header title="À payer">
+      <template slot="title">
+        <q-btn round flat icon="save_alt" @click="exportToCSV" color="primary" style="margin-left: 5px"
+          :disable="displayedDraftPay.length === 0" />
+      </template>
+      <template slot="content">
+        <div class="col-xs-12">
+          <div class="row items-baseline justify-end">
+            <div class="on-left responsive-sort responsive-margin-bottom">Trier par</div>
+            <div class="col-xs-12 col-md-5 responsive-margin-bottom">
+              <q-select class="on-left" color="white" inverted-light :options="sortOptions" v-model="sortOption" separator />
+            </div>
+            <div class="col-xs-12 col-md-5">
+              <ni-select-sector v-model="selectedSector" allow-null-option />
+            </div>
+          </div>
+        </div>
+      </template>
+    </ni-title-header>
     <q-table :data="displayedDraftPay" :columns="columns" class="q-pa-sm large-table" selection="multiple"
-      row-key="auxiliaryId" :selected.sync="selected" :pagination.sync="pagination" :loading="tableLoading"
+      row-key="auxiliaryId" :selected.sync="selected" :pagination.sync="sortedPagination" :loading="tableLoading"
       :visible-columns="visibleColumns">
       <q-tr slot="header" slot-scope="props">
         <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
@@ -35,14 +50,15 @@
               @click="editField($event)" @change="setEditionField($event)" suffix="h" />
           </template>
           <template v-else-if="col.name === 'overtimeHours'">
-              <ni-editable-td :props="props.row" edited-field="overtimeHours" edition-boolean-name="overtimeHoursEdition"
-                :refName="`${props.row.auxiliaryId}Overtime`" :value="col.value" @disable="disableEditionField($event)"
-                @click="editField($event)" @change="setEditionField($event)" suffix="h" />
+            <ni-editable-td :props="props.row" edited-field="overtimeHours" edition-boolean-name="overtimeHoursEdition"
+              :refName="`${props.row.auxiliaryId}Overtime`" :value="col.value" @disable="disableEditionField($event)"
+              @click="editField($event)" @change="setEditionField($event)" suffix="h" />
           </template>
           <template v-else-if="col.name === 'additionalHours'">
-            <ni-editable-td :props="props.row" edited-field="additionalHours" edition-boolean-name="additionalHoursEdition"
-              :refName="`${props.row.auxiliaryId}Additional`" :value="col.value" @disable="disableEditionField($event)"
-              @click="editField($event)" @change="setEditionField($event)" suffix="h" />
+            <ni-editable-td :props="props.row" edited-field="additionalHours"
+              edition-boolean-name="additionalHoursEdition" :refName="`${props.row.auxiliaryId}Additional`"
+              :value="col.value" @disable="disableEditionField($event)" @click="editField($event)"
+              @change="setEditionField($event)" suffix="h" />
           </template>
           <template v-else-if="col.name === 'bonus'">
             <ni-editable-td :props="props.row" edited-field="bonus" edition-boolean-name="bonusEdition"
@@ -55,8 +71,8 @@
           <q-checkbox v-model="props.selected" />
         </q-td>
       </q-tr>
-      <ni-billing-pagination slot="bottom" slot-scope="props" :props="props" :pagination.sync="pagination"
-        :data="displayedDraftPay"/>
+      <ni-billing-pagination slot="bottom" slot-scope="props" :props="props" :pagination.sync="sortedPagination"
+        :data="displayedDraftPay" />
     </q-table>
     <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
       label="Payer" @click="createList" />
@@ -69,22 +85,26 @@
 
 <script>
 import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
+import Select from '../../../components/form/Select';
 import SelectSector from '../../../components/form/SelectSector';
 import EditableTd from '../../../components/table/EditableTd';
 import BillingPagination from '../../../components/table/BillingPagination';
 import PaySurchargeDetailsModal from '../../../components/pay/PaySurchargeDetailsModal';
+import TitleHeader from '../../../components/TitleHeader';
 import { payMixin } from '../../../mixins/payMixin';
 import { editableTdMixin } from '../../../mixins/editableTdMixin';
 
 export default {
   name: 'ToPay',
-  metaInfo: { title: 'À payer' },
+  metaInfo: { title: 'Paie mensuelle' },
   mixins: [payMixin, editableTdMixin],
   components: {
+    'ni-select': Select,
     'ni-select-sector': SelectSector,
     'ni-editable-td': EditableTd,
     'ni-billing-pagination': BillingPagination,
     'ni-pay-surcharge-details-modal': PaySurchargeDetailsModal,
+    'ni-title-header': TitleHeader,
   },
   data () {
     return {
@@ -99,11 +119,32 @@ export default {
       surchargeDetails: {},
       selectedSector: '',
       tableLoading: false,
+      sortOptions: [
+        { label: 'Auxiliaire', value: 'auxiliary' },
+        { label: 'Équipe', value: 'sector' },
+        { label: 'Début', value: 'startDate' },
+        { label: 'Heures contrat', value: 'contractHours' },
+        { label: 'Heures travaillées', value: 'workedHours' },
+        { label: 'Solde heures', value: 'hoursBalance' },
+        { label: 'Compteur', value: 'hoursCounter' },
+        { label: 'Mutuelle', value: 'mutual' },
+        { label: 'Transport', value: 'transport' },
+        { label: 'Autres frais', value: 'otherFees' },
+      ],
+      sortOption: 'auxiliary',
     };
   },
   computed: {
     hasSelectedRows () {
       return this.selected.length > 0;
+    },
+    sortedPagination: {
+      get () {
+        return { ...this.pagination, sortBy: this.sortOption, ascending: true };
+      },
+      set (newVal) {
+        return newVal;
+      },
     },
   },
   watch: {
@@ -178,8 +219,10 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  .title-padding
-    .q-select
-      width: 250px
-      height: fit-content;
+  @media screen and (max-width: 767px)
+    .responsive
+      &-margin-bottom
+        margin-bottom: 5px
+      &-sort
+        width: 100%
 </style>

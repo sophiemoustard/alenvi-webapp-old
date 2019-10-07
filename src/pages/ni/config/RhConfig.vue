@@ -344,8 +344,7 @@ export default {
 
         const value = this.$_.get(this.company, path);
         const payload = this.$_.set({}, path, value);
-        payload._id = this.company._id;
-        await this.$companies.updateById(payload);
+        await this.$companies.updateById(this.company._id, payload);
         NotifyPositive('Modification enregistrée');
         this.tmpInput = '';
       } catch (e) {
@@ -371,8 +370,7 @@ export default {
             },
           },
         };
-        payload._id = this.company._id;
-        await this.$companies.updateById(payload);
+        await this.$companies.updateById(this.company._id, payload);
         NotifyPositive('Modification enregistrée');
         this.tmpInput = '';
       } catch (e) {

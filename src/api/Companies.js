@@ -1,8 +1,8 @@
 import { alenviAxios } from './ressources/alenviAxios'
 
 export default {
-  async updateById (data) {
-    const companyRaw = await alenviAxios.put(`${process.env.API_HOSTNAME}/companies/${data._id}`, data);
+  async updateById (id, data) {
+    const companyRaw = await alenviAxios.put(`${process.env.API_HOSTNAME}/companies/${id}`, data);
     return companyRaw.data.data;
   },
   async createInternalHour (id, payload) {
