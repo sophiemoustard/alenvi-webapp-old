@@ -101,8 +101,8 @@
     <!-- Subscription history modal -->
     <ni-modal v-model="subscriptionHistoryModal" @hide="resetSubscriptionHistoryData">
       <template slot="title">
-        <h5>Historique de la souscription <span class="text-weight-bold">{{selectedSubscription.service &&
-          selectedSubscription.service.name}}</span></h5>
+        Historique de la souscription <span class="text-weight-bold">{{selectedSubscription.service &&
+          selectedSubscription.service.name}}</span>
       </template>
       <q-table class="q-mb-xl table-responsive" :data="selectedSubscription.versions"
         :columns="subscriptionHistoryColumns" hide-bottom binary-state-sort :pagination.sync="paginationHistory">

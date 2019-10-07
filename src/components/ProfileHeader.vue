@@ -46,7 +46,7 @@
     <!-- Modal envoi message -->
     <ni-modal v-model="opened">
       <template slot="title">
-        <h5>Envoyer un <span class="text-weight-bold">message</span></h5>
+        Envoyer un <span class="text-weight-bold">message</span>
       </template>
       <ni-select in-modal caption="Modèle" :options="typeMessageOptions" v-model="typeMessage" required-field />
       <ni-input in-modal caption="Message" v-model="messageComp" type="textarea" :rows="7" required-field />

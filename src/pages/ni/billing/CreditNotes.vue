@@ -24,7 +24,7 @@
     <!-- Credit note creation modal -->
     <ni-modal v-model="creditNoteCreationModal" @hide="resetCreationCreditNoteData">
       <template slot="title">
-        <h5>Créer un <span class="text-weight-bold">avoir</span></h5>
+        Créer un <span class="text-weight-bold">avoir</span>
       </template>
       <ni-select in-modal caption="Bénéficiaire" v-model="newCreditNote.customer" :options="customersOptions"
         required-field @input="getEvents" @blur="$v.newCreditNote.customer.$touch"
@@ -91,7 +91,7 @@
     <ni-modal v-if="Object.keys(editedCreditNote).length > 0" v-model="creditNoteEditionModal"
       @hide="resetEditionCreditNoteData">
       <template slot="title">
-        <h5>Editer un <span class="text-weight-bold">avoir</span></h5>
+        Editer un <span class="text-weight-bold">avoir</span>
       </template>
       <ni-input in-modal caption="Bénéficiaire" :value="formatIdentity(editedCreditNote.customer.identity, 'FL')"
         required-field disable />

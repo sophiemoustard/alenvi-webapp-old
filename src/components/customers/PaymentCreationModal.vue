@@ -1,7 +1,7 @@
 <template>
   <ni-modal :value="creationModal" @hide="resetForm">
     <template slot="title">
-      <h5>Ajouter un <span class="text-weight-bold">{{ creationModalNature }}</span></h5>
+      Ajouter un <span class="text-weight-bold">{{ creationModalNature }}</span>
     </template>
     <div class="modal-subtitle">
       <q-btn-toggle no-wrap v-model="newPayment.nature" :options="paymentNatureOptions" toggle-color="primary" />

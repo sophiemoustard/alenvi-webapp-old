@@ -230,7 +230,7 @@
     <!-- Add helper modal -->
     <ni-modal v-model="addHelper" @hide="resetHelperForm">
       <template slot="title">
-        <h5>Ajouter une <span class="text-weight-bold">personne</span></h5>
+        Ajouter une <span class="text-weight-bold">personne</span>
       </template>
       <ni-input in-modal v-model="newHelper.identity.lastname" :error="$v.newHelper.identity.lastname.$error"
         caption="Nom" @blur="$v.newHelper.identity.lastname.$touch" required-field />
@@ -246,7 +246,7 @@
     <!-- Subscription creation modal -->
     <ni-modal v-model="subscriptionCreationModal" @hide="resetCreationSubscriptionData">
       <template slot="title">
-        <h5>Ajouter une <span class="text-weight-bold">souscription</span></h5>
+        Ajouter une <span class="text-weight-bold">souscription</span>
       </template>
       <ni-select in-modal caption="Service" :options="serviceOptions" v-model="newSubscription.service"
         :error="$v.newSubscription.service.$error" @blur="$v.newSubscription.service.$touch" required-field />
@@ -268,7 +268,7 @@
     <!-- Subscription edition modal -->
     <ni-modal v-model="subscriptionEditionModal" @hide="resetEditionSubscriptionData">
       <template slot="title">
-        <h5>Editer la <span class="text-weight-bold">souscription</span></h5>
+        Editer la <span class="text-weight-bold">souscription</span>
       </template>
       <ni-input in-modal v-model="editedSubscription.unitTTCRate" :error="$v.editedSubscription.unitTTCRate.$error"
         caption="Prix unitaire TTC" @blur="$v.editedSubscription.unitTTCRate.$touch" type="number" required-field />
@@ -288,8 +288,8 @@
     <!-- Subscription history modal -->
     <ni-modal v-model="subscriptionHistoryModal" @hide="resetSubscriptionHistoryData">
       <template slot="title">
-        <h5>Historique de la souscription <span class="text-weight-bold">{{selectedSubscription.service &&
-                selectedSubscription.service.name}}</span></h5>
+        Historique de la souscription <span class="text-weight-bold">{{selectedSubscription.service &&
+                selectedSubscription.service.name}}</span>
       </template>
       <q-table class="q-mb-xl table-responsive" :data="selectedSubscription.versions"
         :columns="subscriptionHistoryColumns" hide-bottom binary-state-sort :pagination.sync="paginationHistory">
@@ -305,7 +305,7 @@
     <ni-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingDetailsModal"
       @hide="resetFundingDetailsData">
       <template slot="title">
-        <h5>Détail du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span></h5>
+        Détail du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span>
       </template>
       <q-table class="q-mb-xl table-grid" :data="fundingDetailsData" :columns="fundingColumns" hide-bottom
         binary-state-sort :visible-columns="fundingDetailsVisibleColumns" :rows-per-page-options="[0]">
@@ -321,8 +321,7 @@
     <ni-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingHistoryModal"
       @hide="resetFundingHistoryData">
       <template slot="title">
-        <h5>Historique du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span>
-        </h5>
+        Historique du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span>
       </template>
       <q-table class="q-mb-xl table-grid" :data="selectedFunding.versions" :columns="fundingColumns" hide-bottom
         binary-state-sort :pagination.sync="paginationFundingHistory" :visible-columns="fundingHistoryVisibleColumns">
@@ -337,7 +336,7 @@
     <!-- Funding creation modal -->
     <ni-modal v-model="fundingCreationModal" @hide="resetCreationFundingData">
       <template slot="title">
-        <h5>Ajouter un <span class="text-weight-bold">financement</span></h5>
+        Ajouter un <span class="text-weight-bold">financement</span>
       </template>
       <ni-select in-modal caption="Tiers payeur" :options="fundingTppOptions" v-model="newFunding.thirdPartyPayer"
         :error="$v.newFunding.thirdPartyPayer.$error" @blur="$v.newFunding.thirdPartyPayer.$touch" required-field />
@@ -379,7 +378,7 @@
     <ni-modal v-if="Object.keys(editedFunding).length > 0" v-model="fundingEditionModal"
       @hide="resetEditionFundingData">
       <template slot="title">
-        <h5>Modifier le <span class="text-weight-bold">financement</span></h5>
+        Modifier le <span class="text-weight-bold">financement</span>
       </template>
       <ni-datetime-picker v-model="editedFunding.startDate" caption="Date de début de prise en charge"
         :max="editedFundingMaxStartDate" class="last" in-modal @blur="$v.editedFunding.startDate.$touch"

@@ -126,7 +126,7 @@
     <!-- Surcharge creation modal -->
     <ni-modal v-model="surchargeCreationModal" @hide="resetCreationSurchargeData">
       <template slot="title">
-        <h5>Créer un <span class="text-weight-bold">plan de majoration</span></h5>
+        Créer un <span class="text-weight-bold">plan de majoration</span>
       </template>
       <ni-input in-modal caption="Nom" v-model="newSurcharge.name" :error="$v.newSurcharge.name.$error"
         @blur="$v.newSurcharge.name.$touch" required-field />
@@ -166,7 +166,7 @@
     <!-- Surcharge edition modal -->
     <ni-modal v-model="surchargeEditionModal" @hide="resetEditionSurchargeData">
       <template slot="title">
-        <h5>Éditer le <span class="text-weight-bold">plan de majoration</span></h5>
+        Éditer le <span class="text-weight-bold">plan de majoration</span>
       </template>
       <ni-input in-modal caption="Nom" v-model="editedSurcharge.name" :error="$v.editedSurcharge.name.$error"
         @blur="$v.editedSurcharge.name.$touch" required-field />
@@ -207,7 +207,7 @@
     <!-- Service creation modal -->
     <ni-modal v-model="serviceCreationModal" @hide="resetCreationServiceData">
       <template slot="title">
-        <h5>Créer un <span class="text-weight-bold">service</span></h5>
+        Créer un <span class="text-weight-bold">service</span>
       </template>
       <ni-select in-modal caption="Type" v-model="newService.type" :error="$v.newService.type.$error"
         @blur="$v.newService.type.$touch" :options="serviceTypeOptions" required-field />
@@ -235,7 +235,7 @@
     <!-- Service edition modal -->
     <ni-modal v-model="serviceEditionModal" @hide="resetEditionServiceData">
       <template slot="title">
-        <h5>Éditer le <span class="text-weight-bold">service</span></h5>
+        Éditer le <span class="text-weight-bold">service</span>
       </template>
       <ni-input in-modal caption="Nom" v-model="editedService.name" :error="$v.editedService.name.$error"
         @blur="$v.editedService.name.$touch" required-field />
@@ -262,7 +262,7 @@
     <!-- Service history modal -->
     <ni-modal v-model="serviceHistoryModal" @hide="resetServiceHistoryData">
       <template slot="title">
-        <h5>Historique du service <span class="text-weight-bold">{{selectedService.name}}</span></h5>
+        Historique du service <span class="text-weight-bold">{{selectedService.name}}</span>
       </template>
       <q-table class="q-mb-xl table-responsive" :data="selectedService.versions" :columns="serviceColumns" hide-bottom
         binary-state-sort :pagination.sync="paginationHistory" :visible-columns="visibleHistoryColumns">
@@ -275,7 +275,7 @@
     <!-- Third party payers creation modal -->
     <ni-modal v-model="thirdPartyPayerCreationModal" @hide="resetThirdPartyPayerEditionData">
       <template slot="title">
-        <h5>Ajouter un <span class="text-weight-bold">tiers payeur</span></h5>
+        Ajouter un <span class="text-weight-bold">tiers payeur</span>
       </template>
       <ni-input in-modal caption="Nom" v-model="newThirdPartyPayer.name" :error="$v.newThirdPartyPayer.name.$error"
         @blur="$v.newThirdPartyPayer.name.$touch" required-field />
@@ -296,7 +296,7 @@
     <!-- Third party payers edition modal -->
     <ni-modal v-model="thirdPartyPayerEditionModal" @hide="resetThirdPartyPayerUpdateModalData">
       <template slot="title">
-        <h5>Editer le <span class="text-weight-bold">tiers payeur</span></h5>
+        Editer le <span class="text-weight-bold">tiers payeur</span>
       </template>
       <ni-input in-modal caption="Nom" v-model="editedThirdPartyPayer.name"
         :error="$v.editedThirdPartyPayer.name.$error" @blur="$v.editedThirdPartyPayer.name.$touch" required-field />

@@ -1,7 +1,7 @@
 <template>
   <ni-modal :value="editionModal" @hide="resetForm">
     <template slot="title">
-      <h5>Editer le <span class="text-weight-bold">{{ editionModalNature }}</span></h5>
+      Editer le <span class="text-weight-bold">{{ editionModalNature }}</span>
     </template>
     <ni-input in-modal caption="Bénéficiaire" :value="customerFullname" required-field read-only />
     <ni-input in-modal caption="Client" v-model="selectedClientName" required-field read-only />

@@ -32,7 +32,7 @@
     <!-- User creation modal -->
     <ni-modal v-model="auxiliaryCreationModal" @hide="resetForm">
       <template slot="title">
-        <h5>Créer une nouvelle <span class="text-weight-bold">fiche auxiliaire</span></h5>
+        Créer une nouvelle <span class="text-weight-bold">fiche auxiliaire</span>
       </template>
 
       <ni-select in-modal v-model="newUser.identity.title" :options="civilityOptions" caption="Civilité" />

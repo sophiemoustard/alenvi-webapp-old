@@ -27,7 +27,7 @@
     <!-- Customer creation modal -->
     <ni-modal v-model="opened" @hide="resetForm">
       <template slot="title">
-        <h5>Créer une nouvelle <span class="text-weight-bold">fiche bénéficiaire</span></h5>
+        Créer une nouvelle <span class="text-weight-bold">fiche bénéficiaire</span>
       </template>
       <ni-select in-modal v-model="newCustomer.identity.title" :error="$v.newCustomer.identity.title.$error"
         :options="civilityOptions" caption="Civilité" @blur="$v.newCustomer.identity.title.$touch" required-field />

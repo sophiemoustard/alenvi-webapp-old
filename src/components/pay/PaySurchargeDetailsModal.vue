@@ -1,7 +1,7 @@
 <template>
   <ni-modal :value="paySurchargeDetailsModal" @input="close">
     <template slot="title">
-      <h5>Détails des <span class="text-weight-bold">majorations</span></h5>
+      Détails des <span class="text-weight-bold">majorations</span>
     </template>
     <div v-for="(surchargePlanDetails, surchargePlanId) in surchargeDetails" :key="surchargePlanId" class="q-mb-xl">
       <div class="text-primary capitalize text-weight-bold q-mb-md">

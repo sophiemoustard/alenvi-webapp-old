@@ -141,7 +141,7 @@
     <!-- Internal hour creation modal -->
     <ni-modal v-model="newInternalHourModal">
       <template slot="title">
-        <h5>Créer une <span class="text-weight-bold">heure interne</span></h5>
+        Créer une <span class="text-weight-bold">heure interne</span>
       </template>
       <ni-input in-modal caption="Nom" v-model="newInternalHour.name" :error="$v.newInternalHour.name.$error"
         @blur="$v.newInternalHour.name.$touch" required-field />
@@ -154,7 +154,7 @@
     <!-- Sector creation modal -->
     <ni-modal v-model="sectorCreationModal" @hide="resetCreationSectorData">
       <template slot="title">
-        <h5>Ajouter une <span class="text-weight-bold">équipe</span></h5>
+        Ajouter une <span class="text-weight-bold">équipe</span>
       </template>
       <ni-input in-modal caption="Nom" v-model="newSector.name" :error="$v.newSector.name.$error"
         :error-label="nameError($v.newSector)" @blur="$v.newSector.name.$touch" required-field />
@@ -167,7 +167,7 @@
     <!-- Sector edition modal -->
     <ni-modal v-model="sectorEditionModal" @hide="resetEditionSectorData">
       <template slot="title">
-        <h5>Editer l'<span class="text-weight-bold">équipe</span></h5>
+        Editer l'<span class="text-weight-bold">équipe</span>
       </template>
       <ni-input in-modal caption="Nom" v-model="editedSector.name" :error="$v.editedSector.name.$error"
         :error-label="nameError($v.editedSector)" required-field />
