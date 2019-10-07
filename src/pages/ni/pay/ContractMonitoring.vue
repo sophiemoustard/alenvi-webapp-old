@@ -27,7 +27,7 @@
 
     <!-- Edition modal -->
     <version-edition-modal :isOpened="versionEditionModal" :editedVersion="editedVersion" :loading="loading"
-      :validations="$v.editedVersion" :minStartDate="editedVersionMinStartDate" :isVersionUpdated="isVersionUpdated()"
+      :validations="$v.editedVersion" :minStartDate="editedVersionMinStartDate" :isVersionUpdated="isVersionUpdated"
       @hide="resetVersionEditionModal" @editVersion="editVersion"/>
 
   </q-page>

@@ -50,6 +50,12 @@ export const contractMixin = {
         redirectDecline: `${process.env.COMPANI_HOSTNAME}/docsigned?signed=false`,
       }
     },
+    isVersionUpdated () {
+      if (this.selectedVersion.grossHourlyRate !== this.editedVersion.grossHourlyRate) return true;
+      if (!this.$moment(this.selectedVersion.startDate).isSame(this.editedVersion.startDate)) return true;
+
+      return !!this.$_.get(this.selectedVersion, 'signature.eversignId') !== this.editedVersion.shouldBeSigned;
+    },
   },
   methods: {
     generateContractSigners (signer) {
@@ -65,12 +71,6 @@ export const contractMixin = {
       this.versionEditionModal = false;
       this.editedVersion = {};
       this.$v.editedVersion.$reset();
-    },
-    isVersionUpdated () {
-      if (this.selectedVersion.grossHourlyRate !== this.editedVersion.grossHourlyRate) return true;
-      if (!this.$moment(this.selectedVersion.startDate).isSame(this.editedVersion.startDate)) return true;
-
-      return !!this.$_.get(this.selectedVersion, 'signature.eversignId') !== this.editedVersion.shouldBeSigned;
     },
     async getSignaturePayload (contract, title, template) {
       const signature = {
