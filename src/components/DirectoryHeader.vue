@@ -8,7 +8,7 @@
         inverted-light @input="input" />
     </div>
     <div v-if="displayToggle" class="col-xs-12 col-md-2 row justify-end">
-      <q-toggle v-model="toggle" color="primary" :label="toggleLabel" />
+      <q-toggle v-model="toggleValue" color="primary" :label="toggleLabel" @input="toggle" />
     </div>
   </div>
 </template>
@@ -20,7 +20,7 @@ export default {
     title: { type: String, default: '' },
     searchPlaceholder: { type: String, default: 'Rechercher un profil' },
     toggleLabel: { type: String, default: '' },
-    toggle: { type: Boolean, default: false },
+    toggleValue: { type: Boolean, default: false },
     displayToggle: { type: Boolean, default: false },
   },
   data () {
@@ -31,6 +31,9 @@ export default {
   methods: {
     input (value) {
       this.$emit('updateSearch', value);
+    },
+    toggle (value) {
+      this.$emit('toggle', value);
     },
   },
 }
