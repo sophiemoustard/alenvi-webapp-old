@@ -7,9 +7,15 @@
       </div>
     </div>
     <q-scroll-area>
-      <template v-if="eventHistories.length !== 0">
+
+      <!-- <template v-if="eventHistories.length !== 0">
         <ni-event-history v-for="history in eventHistories" :key="history._id" :history="history" />
-      </template>
+      </template> -->
+      <dynamic-scroller v-if="eventHistories.length !== 0" :items="eventHistories" :min-item-size="10" keyField="_id">
+        <template slot-scope="{ item, index, active }">
+          <ni-event-history :index="index" :active="active" :history="item" />
+        </template>
+      </dynamic-scroller>
       <div v-else class="loading">
         <q-spinner />
       </div>
@@ -18,6 +24,7 @@
 </template>
 
 <script>
+import { DynamicScroller } from 'vue-virtual-scroller';
 import NiEventHistory from './EventHistory';
 
 export default {
@@ -35,6 +42,7 @@ export default {
   },
   components: {
     'ni-event-history': NiEventHistory,
+    dynamicScroller: DynamicScroller,
   },
   methods: {
     close () {

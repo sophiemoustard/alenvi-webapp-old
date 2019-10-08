@@ -1,5 +1,5 @@
 <template>
-  <div class="history">
+  <dynamic-scroller-item class="history" :item="history" :data-index="index" :active="active" :size-dependencies="[history.info, history.signature]">
     <div class="history-title">
       <div class="history-info">
         <div>
@@ -18,10 +18,11 @@
         <div>{{ historySignature }}</div>
       </div>
     </div>
-  </div>
+  </dynamic-scroller-item>
 </template>
 
 <script>
+import { DynamicScrollerItem } from 'vue-virtual-scroller';
 import {
   EVENT_CREATION,
   INTERNAL_HOUR,
@@ -44,8 +45,13 @@ import { formatIdentity, formatHoursWithMinutes } from '../../helpers/utils';
 
 export default {
   name: 'EventHistory',
+  components: {
+    dynamicScrollerItem: DynamicScrollerItem,
+  },
   props: {
     history: { type: Object, default: () => ({}) },
+    index: Number,
+    active: Boolean,
   },
   data () {
     return {
