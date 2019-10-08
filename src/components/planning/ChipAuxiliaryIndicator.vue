@@ -244,8 +244,8 @@ export default {
     },
     getEventAddress (event) {
       let address;
-      if (event.type === INTERVENTION && event.customer && event.customer.contact && event.customer.contact.address) {
-        address = event.customer.contact.address.fullAddress;
+      if (event.type === INTERVENTION && event.customer && event.customer.contact && event.customer.contact.primaryAddress) {
+        address = event.customer.contact.primaryAddress.fullAddress;
       } else if (event.type === INTERNAL_HOUR && event.address) address = event.address.fullAddress;
 
       return !address ? null : address;

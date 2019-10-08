@@ -371,7 +371,7 @@ export default {
           fileId: this.helper.company.customersConfig.templates.debitMandate.driveId,
           fields: {
             bankAccountOwner: this.customer.payment.bankAccountOwner || '',
-            customerAddress: this.customer.contact.address.fullAddress || '',
+            customerAddress: this.customer.contact.primaryAddress.fullAddress || '',
             ics: this.helper.company.ics || '',
             rum: data.rum || '',
             bic: this.customer.payment.bic || '',
