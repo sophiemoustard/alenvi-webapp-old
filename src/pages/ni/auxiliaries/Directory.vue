@@ -1,7 +1,7 @@
 <template>
   <q-page class="neutral-background" padding>
-    <ni-directory-header title="Répertoire auxiliaires" toggleLabel="Actifs" :toggle="activeUsers" display-toggle
-      @updateSearch="updateSearch" />
+    <ni-directory-header title="Répertoire auxiliaires" toggleLabel="Actifs" :toggleValue="activeUsers" display-toggle
+      @updateSearch="updateSearch" @toggle="activeUsers = !activeUsers" :search="searchStr" />
     <q-table :data="filteredUsers" :columns="columns" row-key="name" binary-state-sort :rows-per-page-options="[15, 25, 35]"
       :pagination.sync="pagination" :loading="tableLoading" class="people-list q-pa-sm">
       <q-tr slot="body" slot-scope="props" :props="props" :class="['datatable-row', { 'datatable-row-inactive': !props.row.isActive }]"
