@@ -23,9 +23,12 @@
         <ni-input caption="Téléphone" type="tel" :error="$v.customer.contact.phone.$error"
           error-label="Numéro de téléphone non valide" v-model.trim="customer.contact.phone"
           @focus="saveTmp('contact.phone')" @blur="updateCustomer('contact.phone')" />
-        <ni-search-address v-model="customer.contact.address" color="white" inverted-light
-          :error-label="addressError" :error="$v.customer.contact.address.$error"
-          @focus="saveTmp('contact.address.fullAddress')" @blur="updateCustomer('contact.address')" />
+        <ni-search-address v-model="customer.contact.primaryAddress" color="white" inverted-light
+          :error-label="primaryAddressError" :error="$v.customer.contact.primaryAddress.$error" caption="Addresse principale"
+          @focus="saveTmp('contact.primaryAddress.fullAddress')" @blur="updateCustomer('contact.primaryAddress')" />
+        <ni-search-address v-model="customer.contact.secondaryAddress" color="white" inverted-light
+          error-label="Adresse non valide" :error="$v.customer.contact.secondaryAddress.$error" caption="Addresse secondaire"
+          @focus="saveTmp('contact.secondaryAddress.fullAddress')" @blur="updateCustomer('contact.secondaryAddress')" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -503,7 +506,8 @@ export default {
       customer: {
         identity: {},
         contact: {
-          address: {},
+          primaryAddress: {},
+          secondaryAddress: {},
         },
         payment: {
           mandates: [],
@@ -701,8 +705,8 @@ export default {
     userProfile () {
       return this.$store.getters['rh/getUserProfile'];
     },
-    addressError () {
-      if (!this.$v.customer.contact.address.fullAddress.required) {
+    primaryAddressError () {
+      if (!this.$v.customer.contact.primaryAddress.fullAddress.required) {
         return REQUIRED_LABEL;
       }
       return 'Adresse non valide';
@@ -779,11 +783,17 @@ export default {
       },
       contact: {
         phone: { frPhoneNumber },
-        address: {
+        primaryAddress: {
           zipCode: { required },
           street: { required },
           city: { required },
           fullAddress: { required, frAddress },
+        },
+        secondaryAddress: {
+          zipCode: { required: requiredIf(item => !!item.fullAddress) },
+          street: { required: requiredIf(item => !!item.fullAddress) },
+          city: { required: requiredIf(item => !!item.fullAddress) },
+          fullAddress: { frAddress },
         },
       },
       payment: {
@@ -1100,7 +1110,7 @@ export default {
       try {
         const data = {
           bankAccountOwner: this.customer.payment.bankAccountOwner || '',
-          customerAddress: this.customer.contact.address.fullAddress,
+          customerAddress: this.customer.contact.primaryAddress.fullAddress,
           downloadDate: this.$moment(Date.now()).format('DD/MM/YYYY'),
           ics: this.company.ics,
           rum: doc.rum,
@@ -1151,7 +1161,7 @@ export default {
           quoteNumber: doc.quoteNumber,
           customerFirstname: this.customer.identity.firstname,
           customerLastname: this.customer.identity.lastname,
-          customerAddress: this.customer.contact.address.fullAddress,
+          customerAddress: this.customer.contact.primaryAddress.fullAddress,
           companyName: this.company.name,
           companyAddress: this.company.address.fullAddress,
           rcs: this.company.rcs,

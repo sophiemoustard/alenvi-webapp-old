@@ -192,7 +192,7 @@ export const planningModalMixin = {
       ];
     },
     customerAddress () {
-      return this.$_.get(this.editedEvent, 'customer.contact.address.fullAddress', '');
+      return this.$_.get(this.editedEvent, 'customer.contact.primaryAddress.fullAddress', '');
     },
     customerProfileRedirect () {
       return this.mainUser.role.name === COACH || this.mainUser.role.name === ADMIN

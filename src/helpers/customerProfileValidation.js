@@ -8,7 +8,7 @@ const customerProfileSchema = Joi.object().keys({
     lastname: Joi.string().required(),
   },
   contact: {
-    address: {
+    primaryAddress: {
       fullAddress: Joi.string().required(),
     },
   },

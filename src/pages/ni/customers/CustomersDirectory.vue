@@ -42,8 +42,9 @@
           caption="Nom" @blur="$v.newCustomer.identity.lastname.$touch" required-field />
         <ni-input in-modal v-model="newCustomer.identity.firstname" caption="Prénom" />
         <div class="row margin-input last">
-          <ni-search-address v-model="newCustomer.contact.address" @blur="$v.newCustomer.contact.address.$touch"
-            :error="$v.newCustomer.contact.address.$error" :error-label="addressError" in-modal required-field />
+          <ni-search-address v-model="newCustomer.contact.primaryAddress" caption="Addresse principale"
+            @blur="$v.newCustomer.contact.primaryAddress.$touch" :error="$v.newCustomer.contact.primaryAddress.$error"
+            :error-label="primaryAddressError" in-modal required-field />
         </div>
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary"
@@ -97,7 +98,7 @@ export default {
         },
         email: '',
         contact: {
-          address: { fullAddress: '' },
+          primaryAddress: { fullAddress: '' },
         },
       },
       customersList: [],
@@ -171,7 +172,7 @@ export default {
       },
       email: { email },
       contact: {
-        address: {
+        primaryAddress: {
           zipCode: { required },
           street: { required },
           city: { required },
@@ -194,9 +195,9 @@ export default {
       return this.clientsCustomerList.filter(customer => customer.identity.fullName.match(new RegExp(this.searchStr, 'i')));
     },
     zipCodeError () {
-      if (!this.$v.newCustomer.contact.address.zipCode.required) {
+      if (!this.$v.newCustomer.contact.primaryAddress.zipCode.required) {
         return REQUIRED_LABEL;
-      } else if (!this.$v.newCustomer.contact.address.zipCode.frZipCode || !this.$v.newCustomer.contact.address.zipCode.maxLength) {
+      } else if (!this.$v.newCustomer.contact.primaryAddress.zipCode.frZipCode || !this.$v.newCustomer.contact.primaryAddress.zipCode.maxLength) {
         return 'Code postal non valide';
       }
     },
@@ -207,8 +208,8 @@ export default {
         return 'Email non valide';
       }
     },
-    addressError () {
-      if (!this.$v.newCustomer.contact.address.fullAddress.required) {
+    primaryAddressError () {
+      if (!this.$v.newCustomer.contact.primaryAddress.fullAddress.required) {
         return REQUIRED_LABEL;
       }
       return 'Adresse non valide';
@@ -250,7 +251,7 @@ export default {
         },
         email: '',
         contact: {
-          address: { fullAddress: '' },
+          primaryAddress: { fullAddress: '' },
         },
       };
     },
