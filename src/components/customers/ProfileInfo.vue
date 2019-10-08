@@ -232,9 +232,9 @@
         <ni-input in-modal v-model="newHelper.identity.lastname" :error="$v.newHelper.identity.lastname.$error"
           caption="Nom" @blur="$v.newHelper.identity.lastname.$touch" required-field />
         <ni-input in-modal v-model="newHelper.identity.firstname" caption="Prénom" />
-        <ni-input in-modal v-model="newHelper.local.email" last :error="$v.newHelper.local.email.$error" caption="Email"
+        <ni-input in-modal v-model="newHelper.local.email" :error="$v.newHelper.local.email.$error" caption="Email"
           @blur="$v.newHelper.local.email.$touch" :error-label="emailError" required-field />
-        <ni-input in-modal v-model.trim="newHelper.mobilePhone" :error="$v.newHelper.mobilePhone.$error"
+        <ni-input in-modal v-model.trim="newHelper.mobilePhone" last :error="$v.newHelper.mobilePhone.$error"
           caption="Numéro de Téléphone" @blur="$v.newHelper.mobilePhone.$touch"
           error-label="Numéro de téléphone invalide" />
       </div>
