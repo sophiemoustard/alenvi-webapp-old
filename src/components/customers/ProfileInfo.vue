@@ -790,7 +790,10 @@ export default {
           fullAddress: { required, frAddress },
         },
         secondaryAddress: {
-          fullAddress: {frAddress},
+          zipCode: { required: requiredIf(item => !!item.fullAddress) },
+          street: { required: requiredIf(item => !!item.fullAddress) },
+          city: { required: requiredIf(item => !!item.fullAddress) },
+          fullAddress: { frAddress },
         },
       },
       payment: {
