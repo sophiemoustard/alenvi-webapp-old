@@ -1,7 +1,7 @@
 <template>
   <q-page class="neutral-background" padding>
-    <ni-directory-header title="Répertoire bénéficiaires" toggleLabel="Clients" :toggle="onlyClients" display-toggle
-      @updateSearch="updateSearch" />
+    <ni-directory-header title="Répertoire bénéficiaires" toggleLabel="Clients" :toggleValue="onlyClients" display-toggle
+      @updateSearch="updateSearch" @toggle="onlyClients = !onlyClients" :search="searchStr" />
     <q-table :data="filteredCustomers" :columns="columns" row-key="name" binary-state-sort
       :rows-per-page-options="[15, 25, 35]" :pagination.sync="pagination" :loading="tableLoading"
       class="people-list q-pa-sm">
