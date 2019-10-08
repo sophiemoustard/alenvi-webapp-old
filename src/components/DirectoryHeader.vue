@@ -5,10 +5,10 @@
     </div>
     <div :class="['col-xs-12', { 'col-md-5': displayToggle }, { 'col-md-6': !displayToggle }]">
       <q-search class="no-border input-search" :value="search" :placeholder="searchPlaceholder" color="white"
-        inverted-light @input="input" />
+        inverted-light @input="input" :debounce=0 />
     </div>
     <div v-if="displayToggle" class="col-xs-12 col-md-2 row justify-end">
-      <q-toggle v-model="toggleValue" color="primary" :label="toggleLabel" @input="toggle" />
+      <q-toggle :value="toggleValue" color="primary" :label="toggleLabel" @input="toggle" />
     </div>
   </div>
 </template>
@@ -22,11 +22,7 @@ export default {
     toggleLabel: { type: String, default: '' },
     toggleValue: { type: Boolean, default: false },
     displayToggle: { type: Boolean, default: false },
-  },
-  data () {
-    return {
-      search: '',
-    };
+    search: { type: String, default: '' },
   },
   methods: {
     input (value) {
