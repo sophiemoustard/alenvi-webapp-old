@@ -23,9 +23,6 @@ body
 h1, h2, h3, h4, h5, h6
   margin-top: 0
 
-h4
-  margin-bottom: 35px
-
   @media (max-width: 767px)
     margin-bottom: 20px !important
 
@@ -64,7 +61,10 @@ div h4:only-child
     padding: 3rem .5rem
 
 .title-padding
-  padding: 2rem 3rem 1rem
+  @media (min-width: 1025px)
+    padding: 2rem 3rem 1rem
+  @media (max-width: 767px)
+    padding: 1rem
 
 // Used in q-dialog
 .modal-message
