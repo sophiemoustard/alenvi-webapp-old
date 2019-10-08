@@ -167,6 +167,7 @@ export default {
       this.selected = [];
     },
     async period (value) {
+      this.selected = [];
       if (value) {
         this.dates = {
           startDate: this.$moment().startOf('M').toISOString(),
