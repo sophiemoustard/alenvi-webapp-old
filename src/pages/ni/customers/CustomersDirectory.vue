@@ -42,8 +42,9 @@
           caption="Nom" @blur="$v.newCustomer.identity.lastname.$touch" required-field />
         <ni-input in-modal v-model="newCustomer.identity.firstname" caption="Prénom" />
         <div class="row margin-input last">
-          <ni-search-address v-model="newCustomer.contact.primaryAddress" @blur="$v.newCustomer.contact.primaryAddress.$touch"
-            :error="$v.newCustomer.contact.primaryAddress.$error" :error-label="addressError" in-modal required-field />
+          <ni-search-address v-model="newCustomer.contact.primaryAddress" caption="Addresse principale"
+            @blur="$v.newCustomer.contact.primaryAddress.$touch" :error="$v.newCustomer.contact.primaryAddress.$error"
+            :error-label="primaryAddressError" in-modal required-field />
         </div>
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary"
@@ -207,7 +208,7 @@ export default {
         return 'Email non valide';
       }
     },
-    addressError () {
+    primaryAddressError () {
       if (!this.$v.newCustomer.contact.primaryAddress.fullAddress.required) {
         return REQUIRED_LABEL;
       }
