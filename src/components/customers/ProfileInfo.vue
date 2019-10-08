@@ -235,8 +235,11 @@
         <ni-input in-modal v-model="newHelper.identity.lastname" :error="$v.newHelper.identity.lastname.$error"
           caption="Nom" @blur="$v.newHelper.identity.lastname.$touch" required-field />
         <ni-input in-modal v-model="newHelper.identity.firstname" caption="Prénom" />
-        <ni-input in-modal v-model="newHelper.local.email" last :error="$v.newHelper.local.email.$error" caption="Email"
+        <ni-input in-modal v-model="newHelper.local.email" :error="$v.newHelper.local.email.$error" caption="Email"
           @blur="$v.newHelper.local.email.$touch" :error-label="emailError" required-field />
+        <ni-input in-modal v-model.trim="newHelper.mobilePhone" last :error="$v.newHelper.mobilePhone.$error"
+          caption="Numéro de Téléphone" @blur="$v.newHelper.mobilePhone.$touch"
+          error-label="Numéro de téléphone invalide" />
       </div>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter un aidant" icon-right="add" color="primary" :loading="loading"
         @click="submitHelper" />
@@ -539,6 +542,12 @@ export default {
           field: row => row.local ? row.local.email : '',
         },
         {
+          name: 'phone',
+          label: 'Numéro de téléphone',
+          align: 'left',
+          field: 'mobilePhone',
+        },
+        {
           name: 'startDate',
           label: 'Depuis le...',
           field: 'createdAt',
@@ -594,7 +603,10 @@ export default {
           lastname: '',
           firstname: '',
         },
-        local: { email: '' },
+        local: {
+          email: '',
+        },
+        mobilePhone: '',
       },
       newSubscription: {
         service: '',
@@ -807,6 +819,7 @@ export default {
       local: {
         email: { required, email },
       },
+      mobilePhone: { frPhoneNumber },
     },
     newSubscription: {
       service: { required },
