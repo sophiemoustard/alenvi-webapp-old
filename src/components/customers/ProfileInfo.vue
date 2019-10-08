@@ -24,8 +24,11 @@
           error-label="Numéro de téléphone non valide" v-model.trim="customer.contact.phone"
           @focus="saveTmp('contact.phone')" @blur="updateCustomer('contact.phone')" />
         <ni-search-address v-model="customer.contact.primaryAddress" color="white" inverted-light
-          :error-label="addressError" :error="$v.customer.contact.primaryAddress.$error" caption="Addresse principale"
+          :error-label="primaryAddressError" :error="$v.customer.contact.primaryAddress.$error" caption="Addresse principale"
           @focus="saveTmp('contact.primaryAddress.fullAddress')" @blur="updateCustomer('contact.primaryAddress')" />
+        <ni-search-address v-model="customer.contact.secondaryAddress" color="white" inverted-light
+          error-label="Adresse non valide" :error="$v.customer.contact.secondaryAddress.$error" caption="Addresse secondaire"
+          @focus="saveTmp('contact.secondaryAddress.fullAddress')" @blur="updateCustomer('contact.secondaryAddress')" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -504,6 +507,7 @@ export default {
         identity: {},
         contact: {
           primaryAddress: {},
+          secondaryAddress: {},
         },
         payment: {
           mandates: [],
@@ -701,7 +705,7 @@ export default {
     userProfile () {
       return this.$store.getters['rh/getUserProfile'];
     },
-    addressError () {
+    primaryAddressError () {
       if (!this.$v.customer.contact.primaryAddress.fullAddress.required) {
         return REQUIRED_LABEL;
       }
@@ -784,6 +788,9 @@ export default {
           street: { required },
           city: { required },
           fullAddress: { required, frAddress },
+        },
+        secondaryAddress: {
+          fullAddress: {frAddress},
         },
       },
       payment: {
