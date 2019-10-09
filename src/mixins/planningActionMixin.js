@@ -186,11 +186,12 @@ export const planningActionMixin = {
       }
 
       if (event.type === INTERVENTION) {
-        const customer = this.customers.find(cus => cus._id === event.customer);
+        const customer = this.customers.find(cus => cus._id === event.customer._id);
         if (customer) {
           const subscription = customer.subscriptions.find(sub => sub._id === event.subscription);
           if (subscription && subscription.service) payload.status = subscription.service.type;
         }
+        payload.customer = customer._id;
       }
 
       if (event.address) delete payload.address.location;

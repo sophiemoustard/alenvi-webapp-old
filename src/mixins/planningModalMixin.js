@@ -193,9 +193,8 @@ export const planningModalMixin = {
     },
     customerAddress () {
       const event = this.editedEvent ? this.editedEvent : this.newEvent;
-      return event.address
-        ? this.$_.get(event, 'address.fullAddress', 'Pas d\'adresse séléctionnée')
-        : this.$_.get(event, 'customer.contact.primaryAddress.fullAddress', 'Pas d\'adresse séléctionnée');
+      if (!event.address) event.address = this.$_.get(event, 'customer.contact.primaryAddress', '');
+      return event.address.fullAddress;
     },
     customerAddresses () {
       const event = this.editedEvent ? this.editedEvent : this.newEvent;
@@ -234,12 +233,15 @@ export const planningModalMixin = {
       };
     },
     // Event creation
-    customerSubscriptionsOptions (customerId) {
-      if (!customerId) return [];
-      const selectedCustomer = this.customers.find(customer => customer._id === customerId);
-      if (!selectedCustomer || !selectedCustomer.subscriptions || selectedCustomer.subscriptions.length === 0) return [];
-
+    customerSubscriptionsOptions (selectedCustomer) {
+      if (!selectedCustomer) return [];
       let subscriptions = selectedCustomer.subscriptions;
+      if (!subscriptions || subscriptions.length === 0) {
+        const cus = this.customers.find(customer => customer._id === selectedCustomer._id);
+        if (!cus) return [];
+        subscriptions = cus.subscriptions;
+      }
+
       if (this.selectedAuxiliary._id) {
         if (!this.selectedAuxiliary.hasCustomerContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== CUSTOMER_CONTRACT);
         if (!this.selectedAuxiliary.hasCompanyContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== COMPANY_CONTRACT);
@@ -261,12 +263,23 @@ export const planningModalMixin = {
     isRepetition (event) {
       return ABSENCE !== event.type && event.repetition && event.repetition.frequency !== NEVER;
     },
-    toggleServiceAndAddressSelection (customerId) {
+    chooseCustomer (customerId) {
+      const selectedCustomer = this.customers.find(customer => customer._id === customerId);
+      const customerSubscriptionsOptions = this.customerSubscriptionsOptions(selectedCustomer);
+      if (customerSubscriptionsOptions.length === 1 && this.creationModal) this.newEvent.subscription = customerSubscriptionsOptions[0].value;
+      this.newEvent.address = this.$_.get(selectedCustomer, 'contact.primaryAddress', {});
+      this.formatCustomerForEvent(selectedCustomer);
+    },
+    formatCustomerForEvent (customer) {
+      this.newEvent.customer = {
+        _id: customer._id,
+        contact: customer.contact,
+        identity: customer.identity,
+      }
+    },
+    toggleServiceSelection (customerId) {
       const customerSubscriptionsOptions = this.customerSubscriptionsOptions(customerId);
       if (customerSubscriptionsOptions.length === 1 && this.creationModal) this.newEvent.subscription = customerSubscriptionsOptions[0].value;
-
-      const selectedCustomer = this.customers.find(customer => customer._id === customerId);
-      this.newEvent.address = this.$_.get(selectedCustomer, 'contact.primaryAddress', {});
     },
     toggleAddressSelect () {
       return this.$refs['addressSelect'].show();

@@ -23,9 +23,9 @@
           :error="validations.dates.$error" @blur="validations.dates.$touch" disable-end-date />
       </template>
       <template v-if="newEvent.type === INTERVENTION">
-        <ni-select in-modal caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions"
+        <ni-select in-modal caption="Bénéficiaire" v-model="newEvent.customer._id" :options="customersOptions"
           :error="validations.customer.$error" required-field @blur="validations.customer.$touch"
-          @input="toggleServiceAndAddressSelection"/>
+          @input="chooseCustomer"/>
         <ni-select in-modal caption="Service" v-model="newEvent.subscription" :error="validations.subscription.$error"
           :options="customerSubscriptionsOptions(newEvent.customer)" required-field @blur="validations.subscription.$touch" />
       </template>
@@ -74,8 +74,7 @@
         <div v-else-if="customerAddresses.length === 1" class="customer-address">{{ customerAddress }}</div>
         <q-select v-else v-model="customerAddress" color="white" inverted-light :options="customerAddresses"
             :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAddressSelect(); }, }]"
-            :filter-placeholder="customerAddress"
-            :disable="isDisabled" ref="addressSelect" filter />
+            :filter-placeholder="customerAddress" ref="addressSelect" filter />
         <q-btn v-if="customerAddresses.length > 0" flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect" />
       </div>
     </div>
