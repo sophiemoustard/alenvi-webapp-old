@@ -54,8 +54,7 @@
         <div class="row gutter-profile">
           <ni-input caption="Montant des frais" :error="$v.company.rhConfig.feeAmount.$error"
             :error-label="nbrError('feeAmount')" type="number" v-model="company.rhConfig.feeAmount"
-            @focus="saveTmp('rhConfig.feeAmount')" suffix="€"
-            @blur="updateCompany('rhConfig.feeAmount')" />
+            @focus="saveTmp('rhConfig.feeAmount')" suffix="€" @blur="updateCompany('rhConfig.feeAmount')" />
         </div>
       </div>
       <div class="q-mb-xl">
@@ -140,61 +139,43 @@
     </div>
 
     <!-- Internal hour creation modal -->
-    <q-modal v-model="newInternalHourModal" content-classes="modal-container-sm">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5>Créer une <span class="text-weight-bold">heure interne</span></h5>
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span>
-              <q-icon name="clear" @click.native="newInternalHourModal = false" /></span>
-          </div>
-        </div>
-        <ni-input in-modal caption="Nom" v-model="newInternalHour.name" :error="$v.newInternalHour.name.$error"
-          @blur="$v.newInternalHour.name.$touch" required-field />
-      </div>
-      <q-btn no-caps class="full-width modal-btn" label="Créer l'heure interne" icon-right="add" color="primary"
-        :loading="loading" @click="createInternalHour" />
-    </q-modal>
+    <ni-modal v-model="newInternalHourModal">
+      <template slot="title">
+        Créer une <span class="text-weight-bold">heure interne</span>
+      </template>
+      <ni-input in-modal caption="Nom" v-model="newInternalHour.name" :error="$v.newInternalHour.name.$error"
+        @blur="$v.newInternalHour.name.$touch" required-field />
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Créer l'heure interne" icon-right="add" color="primary"
+          :loading="loading" @click="createInternalHour" />
+      </template>
+    </ni-modal>
 
     <!-- Sector creation modal -->
-    <q-modal v-model="sectorCreationModal" content-classes="modal-container-sm" @hide="resetCreationSectorData">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5>Ajouter une <span class="text-weight-bold">équipe</span></h5>
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span>
-              <q-icon name="clear" @click.native="sectorCreationModal = false" /></span>
-          </div>
-        </div>
-        <ni-input in-modal caption="Nom" v-model="newSector.name" :error="$v.newSector.name.$error"
-          :error-label="nameError($v.newSector)" @blur="$v.newSector.name.$touch" required-field />
-      </div>
-      <q-btn no-caps class="full-width modal-btn" label="Ajouter une équipe" icon-right="add" color="primary"
-        :disable="newSector.name === ''" :loading="loading" @click="createNewSector" />
-    </q-modal>
+    <ni-modal v-model="sectorCreationModal" @hide="resetCreationSectorData">
+      <template slot="title">
+        Ajouter une <span class="text-weight-bold">équipe</span>
+      </template>
+      <ni-input in-modal caption="Nom" v-model="newSector.name" :error="$v.newSector.name.$error"
+        :error-label="nameError($v.newSector)" @blur="$v.newSector.name.$touch" required-field />
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Ajouter une équipe" icon-right="add" color="primary"
+          :disable="newSector.name === ''" :loading="loading" @click="createNewSector" />
+      </template>
+    </ni-modal>
 
     <!-- Sector edition modal -->
-    <q-modal v-model="sectorEditionModal" content-classes="modal-container-sm" @hide="resetEditionSectorData">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5>Editer l'<span class="text-weight-bold">équipe</span></h5>
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span>
-              <q-icon name="clear" @click.native="sectorEditionModal = false" /></span>
-          </div>
-        </div>
-        <ni-input in-modal caption="Nom" v-model="editedSector.name" :error="$v.editedSector.name.$error"
-          :error-label="nameError($v.editedSector)" required-field />
-      </div>
-      <q-btn no-caps class="full-width modal-btn" label="Editer l'équipe" icon-right="add" color="primary"
-        :disable="isSameThanEditedSector" :loading="loading" @click="updateSector" />
-    </q-modal>
+    <ni-modal v-model="sectorEditionModal" @hide="resetEditionSectorData">
+      <template slot="title">
+        Editer l'<span class="text-weight-bold">équipe</span>
+      </template>
+      <ni-input in-modal caption="Nom" v-model="editedSector.name" :error="$v.editedSector.name.$error"
+        :error-label="nameError($v.editedSector)" required-field />
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Editer l'équipe" icon-right="add" color="primary"
+          :disable="isSameThanEditedSector" :loading="loading" @click="updateSector" />
+      </template>
+    </ni-modal>
   </q-page>
 </template>
 
@@ -205,8 +186,9 @@ import { required, maxValue } from 'vuelidate/lib/validators';
 import { posDecimals, sector } from '../../../helpers/vuelidateCustomVal';
 import CustomImg from '../../../components/form/CustomImg';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
-import NiInput from '../../../components/form/Input';
+import Input from '../../../components/form/Input';
 import FileUploader from '../../../components/form/FileUploader.vue';
+import Modal from '../../../components/Modal';
 import { configMixin } from '../../../mixins/configMixin';
 import { REQUIRED_LABEL } from '../../../data/constants';
 import { validationMixin } from '../../../mixins/validationMixin';
@@ -216,8 +198,9 @@ export default {
   metaInfo: { title: 'Configuration rh' },
   components: {
     'ni-custom-img': CustomImg,
-    'ni-input': NiInput,
+    'ni-input': Input,
     'ni-file-uploader': FileUploader,
+    'ni-modal': Modal,
   },
   mixins: [configMixin, validationMixin],
   data () {

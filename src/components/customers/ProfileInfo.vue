@@ -125,7 +125,8 @@
                   <q-uploader :ref="`signedMandate_${props.row._id}`" name="signedMandate" :url="docsUploadUrl"
                     extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" :headers="headers"
                     hide-underline hide-upload-button @add="uploadDocument($event, `signedMandate_${props.row._id}`)"
-                    @uploaded="refreshMandates" @fail="failMsg" :additional-fields="formatAdditionalFields(props.row)" />
+                    @uploaded="refreshMandates" @fail="failMsg"
+                    :additional-fields="formatAdditionalFields(props.row)" />
                 </div>
                 <q-btn v-else flat round small color="primary">
                   <a :href="props.row.drive.link" download target="_blank">
@@ -134,8 +135,9 @@
                 </q-btn>
               </template>
               <template v-else-if="col.name === 'signedAt'">
-                <ni-datetime-picker v-model="customer.payment.mandates[props.row.__index].signedAt" withBorders @blur="updateSignedAt(props.row)"
-                  @focus="saveTmpSignedAt(props.row.__index)" in-modal class="datetime" />
+                <ni-datetime-picker v-model="customer.payment.mandates[props.row.__index].signedAt" withBorders
+                  @blur="updateSignedAt(props.row)" @focus="saveTmpSignedAt(props.row.__index)" in-modal
+                  class="datetime" />
               </template>
               <template v-else>{{ col.value}}</template>
             </q-td>
@@ -149,12 +151,14 @@
       </div>
       <q-card>
         <q-table :data="fundings" :columns="fundingColumns" :visible-columns="fundingVisibleColumns"
-          :rows-per-page-options="[0]" row-key="name" table-style="font-size: 1rem" hide-bottom class="table-responsive">
+          :rows-per-page-options="[0]" row-key="name" table-style="font-size: 1rem" hide-bottom
+          class="table-responsive">
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
               <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions">
-                  <q-btn flat round small color="grey" icon="remove_red_eye" @click.native="showFundingDetails(col.value)" />
+                  <q-btn flat round small color="grey" icon="remove_red_eye"
+                    @click.native="showFundingDetails(col.value)" />
                   <q-btn flat round small color="grey" icon="history" @click.native="showFundingHistory(col.value)" />
                   <q-btn flat round small color="grey" icon="edit" @click.native="startFundingEdition(col.value)" />
                   <q-btn flat round small color="grey" icon="delete" @click.native="removeFunding(col.value)" />
@@ -165,16 +169,17 @@
           </q-tr>
         </q-table>
         <q-card-actions align="end">
-          <q-btn :disable="fundingSubscriptionsOptions().length === 0" flat no-caps color="primary" icon="add" label="Ajouter un financement"
-            @click="openFundingCreationModal" />
+          <q-btn :disable="fundingSubscriptionsOptions().length === 0" flat no-caps color="primary" icon="add"
+            label="Ajouter un financement" @click="openFundingCreationModal" />
         </q-card-actions>
       </q-card>
     </div>
     <div class="q-mb-lg">
       <p class="text-weight-bold">Justificatifs APA ou autres financements</p>
-      <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement" @uploaded="documentUploaded"
-        name="financialCertificates" collapsibleLabel="Ajouter un justificatif" :user-profile="customer" :url="docsUploadUrl"
-        @delete="deleteDocument($event)" additional-fields-name="financialCertificate" />
+      <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement"
+        @uploaded="documentUploaded" name="financialCertificates" collapsibleLabel="Ajouter un justificatif"
+        :user-profile="customer" :url="docsUploadUrl" @delete="deleteDocument($event)"
+        additional-fields-name="financialCertificate" />
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
@@ -182,7 +187,8 @@
       </div>
       <q-card>
         <q-table :data="customer.quotes" :columns="quoteColumns" row-key="name" table-style="font-size: 1rem"
-          hide-bottom :pagination.sync="pagination" :visible-columns="visibleQuoteColumns" binary-state-sort class="table-responsive">
+          hide-bottom :pagination.sync="pagination" :visible-columns="visibleQuoteColumns" binary-state-sort
+          class="table-responsive">
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
               <template v-if="col.name === 'emptyQuote'">
@@ -192,9 +198,10 @@
               </template>
               <template v-else-if="col.name === 'signedQuote'">
                 <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-center table-actions">
-                  <q-uploader :ref="`signedQuote_${props.row._id}`" name="signedQuote" hide-underline :url="docsUploadUrl"
-                    :headers="headers" extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
-                    hide-upload-button @add="uploadDocument($event, `signedQuote_${props.row._id}`)" @uploaded="refreshQuotes"
+                  <q-uploader :ref="`signedQuote_${props.row._id}`" name="signedQuote" hide-underline
+                    :url="docsUploadUrl" :headers="headers"
+                    extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" hide-upload-button
+                    @add="uploadDocument($event, `signedQuote_${props.row._id}`)" @uploaded="refreshQuotes"
                     @fail="failMsg" :additional-fields="[
                       { name: 'quoteId', value: props.row._id },
                       { name: 'fileName', value: `devis_signe_${customer.identity.firstname}_${customer.identity.lastname}` }
@@ -214,245 +221,194 @@
           </q-tr>
         </q-table>
         <q-card-actions align="end">
-          <q-btn :disabled="this.subscriptions.length === 0" flat no-caps color="primary" icon="add" label="Générer un devis"
-            @click="generateQuote" />
+          <q-btn :disabled="this.subscriptions.length === 0" flat no-caps color="primary" icon="add"
+            label="Générer un devis" @click="generateQuote" />
         </q-card-actions>
       </q-card>
     </div>
 
     <!-- Add helper modal -->
-    <q-modal v-model="addHelper" @hide="resetHelperForm" content-classes="modal-container-sm">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5>Ajouter une <span class="text-weight-bold">personne</span></h5>
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span>
-              <q-icon name="clear" @click.native="addHelper = false" /></span>
-          </div>
-        </div>
-        <ni-input in-modal v-model="newHelper.identity.lastname" :error="$v.newHelper.identity.lastname.$error"
-          caption="Nom" @blur="$v.newHelper.identity.lastname.$touch" required-field />
-        <ni-input in-modal v-model="newHelper.identity.firstname" caption="Prénom" />
-        <ni-input in-modal v-model="newHelper.local.email" :error="$v.newHelper.local.email.$error" caption="Email"
-          @blur="$v.newHelper.local.email.$touch" :error-label="emailError" required-field />
-        <ni-input in-modal v-model.trim="newHelper.mobilePhone" last :error="$v.newHelper.mobilePhone.$error"
-          caption="Numéro de Téléphone" @blur="$v.newHelper.mobilePhone.$touch"
-          error-label="Numéro de téléphone invalide" />
-      </div>
-      <q-btn no-caps class="full-width modal-btn" label="Ajouter un aidant" icon-right="add" color="primary" :loading="loading"
-        @click="submitHelper" />
-    </q-modal>
+    <ni-modal v-model="addHelper" @hide="resetHelperForm">
+      <template slot="title">
+        Ajouter une <span class="text-weight-bold">personne</span>
+      </template>
+      <ni-input in-modal v-model="newHelper.identity.lastname" :error="$v.newHelper.identity.lastname.$error"
+        caption="Nom" @blur="$v.newHelper.identity.lastname.$touch" required-field />
+      <ni-input in-modal v-model="newHelper.identity.firstname" caption="Prénom" />
+      <ni-input in-modal v-model="newHelper.local.email" last :error="$v.newHelper.local.email.$error" caption="Email"
+        @blur="$v.newHelper.local.email.$touch" :error-label="emailError" required-field />
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Ajouter un aidant" icon-right="add" color="primary"
+          :loading="loading" @click="submitHelper" />
+      </template>
+    </ni-modal>
 
     <!-- Subscription creation modal -->
-    <q-modal v-model="subscriptionCreationModal" @hide="resetCreationSubscriptionData" content-classes="modal-container-sm">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5>Ajouter une <span class="text-weight-bold">souscription</span></h5>
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span>
-              <q-icon name="clear" @click.native="subscriptionCreationModal = false" /></span>
-          </div>
-        </div>
-        <ni-select in-modal caption="Service" :options="serviceOptions" v-model="newSubscription.service" :error="$v.newSubscription.service.$error"
-          @blur="$v.newSubscription.service.$touch" required-field />
-        <ni-input in-modal v-model="newSubscription.unitTTCRate" :error="$v.newSubscription.unitTTCRate.$error" caption="Prix unitaire TTC"
-          @blur="$v.newSubscription.unitTTCRate.$touch" type="number" required-field />
-        <ni-input in-modal v-model="newSubscription.estimatedWeeklyVolume" :error="$v.newSubscription.estimatedWeeklyVolume.$error"
-          caption="Volume hebdomadaire estimatif" @blur="$v.newSubscription.estimatedWeeklyVolume.$touch" type="number"
-          required-field />
-        <ni-input in-modal v-if="newSubscription.service.nature !== FIXED" v-model="newSubscription.sundays" caption="Dont dimanche (h)"
-          type="number" />
-        <ni-input in-modal v-if="newSubscription.service.nature !== FIXED" v-model="newSubscription.evenings" caption="Dont soirée (h)"
-          last type="number" />
-      </div>
-      <q-btn no-caps class="full-width modal-btn" label="Ajouter une souscription" icon-right="add" color="primary"
-        :loading="loading" @click="submitSubscription" />
-    </q-modal>
+    <ni-modal v-model="subscriptionCreationModal" @hide="resetCreationSubscriptionData">
+      <template slot="title">
+        Ajouter une <span class="text-weight-bold">souscription</span>
+      </template>
+      <ni-select in-modal caption="Service" :options="serviceOptions" v-model="newSubscription.service"
+        :error="$v.newSubscription.service.$error" @blur="$v.newSubscription.service.$touch" required-field />
+      <ni-input in-modal v-model="newSubscription.unitTTCRate" :error="$v.newSubscription.unitTTCRate.$error"
+        caption="Prix unitaire TTC" @blur="$v.newSubscription.unitTTCRate.$touch" type="number" required-field />
+      <ni-input in-modal v-model="newSubscription.estimatedWeeklyVolume"
+        :error="$v.newSubscription.estimatedWeeklyVolume.$error" caption="Volume hebdomadaire estimatif"
+        @blur="$v.newSubscription.estimatedWeeklyVolume.$touch" type="number" required-field />
+      <ni-input in-modal v-if="newSubscription.service.nature !== FIXED" v-model="newSubscription.sundays"
+        caption="Dont dimanche (h)" type="number" />
+      <ni-input in-modal v-if="newSubscription.service.nature !== FIXED" v-model="newSubscription.evenings"
+        caption="Dont soirée (h)" last type="number" />
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Ajouter une souscription" icon-right="add" color="primary"
+          :loading="loading" @click="submitSubscription" />
+      </template>
+    </ni-modal>
 
     <!-- Subscription edition modal -->
-    <q-modal v-model="subscriptionEditionModal" content-classes="modal-container-sm" @hide="resetEditionSubscriptionData">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5>Editer la <span class="text-weight-bold">souscription</span></h5>
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span>
-              <q-icon name="clear" @click.native="subscriptionEditionModal = false" /></span>
-          </div>
-        </div>
-        <ni-input in-modal v-model="editedSubscription.unitTTCRate" :error="$v.editedSubscription.unitTTCRate.$error"
-          caption="Prix unitaire TTC" @blur="$v.editedSubscription.unitTTCRate.$touch" type="number" required-field />
-        <ni-input in-modal v-model="editedSubscription.estimatedWeeklyVolume" :error="$v.editedSubscription.estimatedWeeklyVolume.$error"
-          caption="Volume hebdomadaire estimatif" @blur="$v.editedSubscription.estimatedWeeklyVolume.$touch" type="number"
-          required-field />
-        <ni-input in-modal v-if="editedSubscription.nature !== FIXED" v-model="editedSubscription.sundays" caption="Dont dimanche (h)"
-          type="number" />
-        <ni-input in-modal v-if="editedSubscription.nature !== FIXED" v-model="editedSubscription.evenings"
-          caption="Dont soirée (h)" last type="number" />
-      </div>
-      <q-btn no-caps class="full-width modal-btn" label="Editer la souscription" icon-right="check" color="primary"
-        :loading="loading" @click="updateSubscription" />
-    </q-modal>
+    <ni-modal v-model="subscriptionEditionModal" @hide="resetEditionSubscriptionData">
+      <template slot="title">
+        Editer la <span class="text-weight-bold">souscription</span>
+      </template>
+      <ni-input in-modal v-model="editedSubscription.unitTTCRate" :error="$v.editedSubscription.unitTTCRate.$error"
+        caption="Prix unitaire TTC" @blur="$v.editedSubscription.unitTTCRate.$touch" type="number" required-field />
+      <ni-input in-modal v-model="editedSubscription.estimatedWeeklyVolume"
+        :error="$v.editedSubscription.estimatedWeeklyVolume.$error" caption="Volume hebdomadaire estimatif"
+        @blur="$v.editedSubscription.estimatedWeeklyVolume.$touch" type="number" required-field />
+      <ni-input in-modal v-if="editedSubscription.nature !== FIXED" v-model="editedSubscription.sundays"
+        caption="Dont dimanche (h)" type="number" />
+      <ni-input in-modal v-if="editedSubscription.nature !== FIXED" v-model="editedSubscription.evenings"
+        caption="Dont soirée (h)" last type="number" />
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Editer la souscription" icon-right="check" color="primary"
+          :loading="loading" @click="updateSubscription" />
+      </template>
+    </ni-modal>
 
     <!-- Subscription history modal -->
-    <q-modal v-model="subscriptionHistoryModal" content-classes="modal-container-sm" @hide="resetSubscriptionHistoryData">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5>Historique de la souscription <span class="text-weight-bold">{{selectedSubscription.service &&
-                selectedSubscription.service.name}}</span></h5>
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span>
-              <q-icon name="clear" @click.native="subscriptionHistoryModal = false" /></span>
-          </div>
-        </div>
-        <q-table class="q-mb-xl table-responsive" :data="selectedSubscription.versions" :columns="subscriptionHistoryColumns"
-          hide-bottom binary-state-sort :pagination.sync="paginationHistory">
-          <q-tr slot="body" slot-scope="props" :props="props">
-            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-              <template>{{ col.value }}</template>
-            </q-td>
-          </q-tr>
-        </q-table>
-      </div>
-    </q-modal>
+    <ni-modal v-model="subscriptionHistoryModal" @hide="resetSubscriptionHistoryData">
+      <template slot="title">
+        Historique de la souscription <span class="text-weight-bold">{{selectedSubscription.service &&
+                selectedSubscription.service.name}}</span>
+      </template>
+      <q-table class="q-mb-xl table-responsive" :data="selectedSubscription.versions"
+        :columns="subscriptionHistoryColumns" hide-bottom binary-state-sort :pagination.sync="paginationHistory">
+        <q-tr slot="body" slot-scope="props" :props="props">
+          <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+            <template>{{ col.value }}</template>
+          </q-td>
+        </q-tr>
+      </q-table>
+    </ni-modal>
 
     <!-- Funding details modal -->
-    <q-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingDetailsModal" content-classes="modal-container-sm"
+    <ni-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingDetailsModal"
       @hide="resetFundingDetailsData">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5>Détail du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span></h5>
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span>
-              <q-icon name="clear" @click.native="fundingDetailsModal = false" /></span>
-          </div>
-        </div>
-        <q-table class="q-mb-xl table-grid" :data="fundingDetailsData" :columns="fundingColumns" hide-bottom
-          binary-state-sort :visible-columns="fundingDetailsVisibleColumns" :rows-per-page-options="[0]">
-          <q-tr slot="body" slot-scope="props" :props="props">
-            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-              <template>{{ col.value }}</template>
-            </q-td>
-          </q-tr>
-        </q-table>
-      </div>
-    </q-modal>
+      <template slot="title">
+        Détail du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span>
+      </template>
+      <q-table class="q-mb-xl table-grid" :data="fundingDetailsData" :columns="fundingColumns" hide-bottom
+        binary-state-sort :visible-columns="fundingDetailsVisibleColumns" :rows-per-page-options="[0]">
+        <q-tr slot="body" slot-scope="props" :props="props">
+          <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+            <template>{{ col.value }}</template>
+          </q-td>
+        </q-tr>
+      </q-table>
+    </ni-modal>
 
     <!-- Funding history modal -->
-    <q-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingHistoryModal" content-classes="modal-container-sm"
+    <ni-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingHistoryModal"
       @hide="resetFundingHistoryData">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5>Historique du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span></h5>
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span>
-              <q-icon name="clear" @click.native="fundingHistoryModal = false" /></span>
-          </div>
-        </div>
-        <q-table class="q-mb-xl table-grid" :data="selectedFunding.versions" :columns="fundingColumns" hide-bottom
-          binary-state-sort :pagination.sync="paginationFundingHistory" :visible-columns="fundingHistoryVisibleColumns">
-          <q-tr slot="body" slot-scope="props" :props="props">
-            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-              <template>{{ col.value }}</template>
-            </q-td>
-          </q-tr>
-        </q-table>
-      </div>
-    </q-modal>
+      <template slot="title">
+        Historique du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span>
+      </template>
+      <q-table class="q-mb-xl table-grid" :data="selectedFunding.versions" :columns="fundingColumns" hide-bottom
+        binary-state-sort :pagination.sync="paginationFundingHistory" :visible-columns="fundingHistoryVisibleColumns">
+        <q-tr slot="body" slot-scope="props" :props="props">
+          <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+            <template>{{ col.value }}</template>
+          </q-td>
+        </q-tr>
+      </q-table>
+    </ni-modal>
 
     <!-- Funding creation modal -->
-    <q-modal v-model="fundingCreationModal" @hide="resetCreationFundingData" content-classes="modal-container-sm">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5>Ajouter un <span class="text-weight-bold">financement</span></h5>
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span>
-              <q-icon name="clear" @click.native="fundingCreationModal = false" /></span>
-          </div>
-        </div>
-        <ni-select in-modal caption="Tiers payeur" :options="fundingTppOptions" v-model="newFunding.thirdPartyPayer"
-          :error="$v.newFunding.thirdPartyPayer.$error" @blur="$v.newFunding.thirdPartyPayer.$touch" required-field />
-        <ni-select in-modal v-model="newFunding.subscription" :options="fundingSubscriptionsOptions()" caption="Souscription"
-          @blur="$v.newFunding.subscription.$touch" :error="$v.newFunding.subscription.$error" required-field />
-        <ni-datetime-picker v-model="newFunding.startDate" caption="Date de début de prise en charge"
-          in-modal @blur="$v.newFunding.startDate.$touch" :error="$v.newFunding.startDate.$error" required-field />
-        <ni-datetime-picker v-model="newFunding.endDate" :min="$moment(newFunding.startDate).add(1, 'day').toISOString()"
-          in-modal caption="Date de fin de prise en charge" />
-        <ni-input in-modal v-model="newFunding.folderNumber" caption="Numéro de dossier" />
-        <ni-select in-modal caption="Fréquence" :options="fundingFreqOptions" v-model="newFunding.frequency" @blur="$v.newFunding.frequency.$touch"
-          :error="$v.newFunding.frequency.$error" required-field />
-        <ni-select in-modal caption="Nature" :options="fundingNatureOptions" v-model="newFunding.nature" :error="$v.newFunding.nature.$error"
-          @blur="$v.newFunding.nature.$touch" required-field @input="resetFundingFrequency" />
-        <ni-input in-modal v-if="!isOneTimeFundingNature" v-model="newFunding.unitTTCRate" caption="Prix unitaire TTC"
-          type="number" @blur="$v.newFunding.unitTTCRate.$touch" :error="$v.newFunding.unitTTCRate.$error"
-          required-field />
-        <ni-input in-modal v-if="isOneTimeFundingNature" v-model="newFunding.amountTTC" caption="Montant forfaitaire TTC"
-          type="number" @blur="$v.newFunding.amountTTC.$touch" :error="$v.newFunding.amountTTC.$error" required-field />
-        <ni-input in-modal v-if="!isOneTimeFundingNature" v-model="newFunding.careHours" caption="Nb. heures prises en charge"
-          type="number" suffix="h" @blur="$v.newFunding.careHours.$touch" :error="$v.newFunding.careHours.$error"
-          required-field />
-        <ni-input in-modal v-if="!isOneTimeFundingNature" v-model="newFunding.customerParticipationRate" caption="Taux de participation du bénéficiaire"
-          type="number" suffix="%" @blur="$v.newFunding.customerParticipationRate.$touch" :error="$v.newFunding.customerParticipationRate.$error"
-          required-field />
-        <ni-option-group v-model="newFunding.careDays" :options="daysOptions" caption="Jours pris en charge" type="checkbox"
-          inline @blur="$v.newFunding.careDays.$touch" :error="$v.newFunding.careDays.$error" required-field />
-      </div>
-      <q-btn no-caps class="full-width modal-btn" label="Ajouter un financement" icon-right="add" color="primary"
-        :loading="loading" @click="submitFunding" />
-    </q-modal>
+    <ni-modal v-model="fundingCreationModal" @hide="resetCreationFundingData">
+      <template slot="title">
+        Ajouter un <span class="text-weight-bold">financement</span>
+      </template>
+      <ni-select in-modal caption="Tiers payeur" :options="fundingTppOptions" v-model="newFunding.thirdPartyPayer"
+        :error="$v.newFunding.thirdPartyPayer.$error" @blur="$v.newFunding.thirdPartyPayer.$touch" required-field />
+      <ni-select in-modal v-model="newFunding.subscription" :options="fundingSubscriptionsOptions()"
+        caption="Souscription" @blur="$v.newFunding.subscription.$touch" :error="$v.newFunding.subscription.$error"
+        required-field />
+      <ni-datetime-picker v-model="newFunding.startDate" caption="Date de début de prise en charge" in-modal
+        @blur="$v.newFunding.startDate.$touch" :error="$v.newFunding.startDate.$error" required-field />
+      <ni-datetime-picker v-model="newFunding.endDate" :min="$moment(newFunding.startDate).add(1, 'day').toISOString()"
+        in-modal caption="Date de fin de prise en charge" />
+      <ni-input in-modal v-model="newFunding.folderNumber" caption="Numéro de dossier" />
+      <ni-select in-modal caption="Fréquence" :options="fundingFreqOptions" v-model="newFunding.frequency"
+        @blur="$v.newFunding.frequency.$touch" :error="$v.newFunding.frequency.$error" required-field />
+      <ni-select in-modal caption="Nature" :options="fundingNatureOptions" v-model="newFunding.nature"
+        :error="$v.newFunding.nature.$error" @blur="$v.newFunding.nature.$touch" required-field
+        @input="resetFundingFrequency" />
+      <ni-input in-modal v-if="!isOneTimeFundingNature" v-model="newFunding.unitTTCRate" caption="Prix unitaire TTC"
+        type="number" @blur="$v.newFunding.unitTTCRate.$touch" :error="$v.newFunding.unitTTCRate.$error"
+        required-field />
+      <ni-input in-modal v-if="isOneTimeFundingNature" v-model="newFunding.amountTTC" caption="Montant forfaitaire TTC"
+        type="number" @blur="$v.newFunding.amountTTC.$touch" :error="$v.newFunding.amountTTC.$error" required-field />
+      <ni-input in-modal v-if="!isOneTimeFundingNature" v-model="newFunding.careHours"
+        caption="Nb. heures prises en charge" type="number" suffix="h" @blur="$v.newFunding.careHours.$touch"
+        :error="$v.newFunding.careHours.$error" required-field />
+      <ni-input in-modal v-if="!isOneTimeFundingNature" v-model="newFunding.customerParticipationRate"
+        caption="Taux de participation du bénéficiaire" type="number" suffix="%"
+        @blur="$v.newFunding.customerParticipationRate.$touch" :error="$v.newFunding.customerParticipationRate.$error"
+        required-field />
+      <ni-option-group v-model="newFunding.careDays" :options="daysOptions" caption="Jours pris en charge"
+        type="checkbox" inline @blur="$v.newFunding.careDays.$touch" :error="$v.newFunding.careDays.$error"
+        required-field />
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Ajouter un financement" icon-right="add" color="primary"
+          :loading="loading" @click="submitFunding" />
+      </template>
+    </ni-modal>
 
     <!-- Funding edition modal -->
-    <q-modal v-if="Object.keys(editedFunding).length > 0" v-model="fundingEditionModal" @hide="resetEditionFundingData"
-      content-classes="modal-container-sm">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5>Modifier le <span class="text-weight-bold">financement</span></h5>
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span>
-              <q-icon name="clear" @click.native="fundingEditionModal = false" /></span>
-          </div>
-        </div>
-        <ni-datetime-picker v-model="editedFunding.startDate" caption="Date de début de prise en charge" :max="editedFundingMaxStartDate"
-          class="last" in-modal @blur="$v.editedFunding.startDate.$touch" :error="$v.editedFunding.startDate.$error"
-          required-field />
-        <ni-datetime-picker v-model="editedFunding.endDate" caption="Date de fin de prise en charge" in-modal
-          :min="$moment(editedFunding.startDate).add(1, 'day').toISOString()" />
-        <ni-input in-modal v-model="editedFunding.folderNumber" caption="Numéro de dossier" />
-        <ni-select in-modal caption="Fréquence" :options="fundingFreqOptions" v-model="editedFunding.frequency" @blur="$v.editedFunding.frequency.$touch"
-          :error="$v.editedFunding.frequency.$error" required-field />
-        <ni-input in-modal v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.unitTTCRate" caption="Prix unitaire TTC"
-          type="number" @blur="$v.editedFunding.unitTTCRate.$touch" :error="$v.editedFunding.unitTTCRate.$error"
-          required-field />
-        <ni-input in-modal v-if="isOneTimeEditedFundingNature" v-model="editedFunding.amountTTC" caption="Montant forfaitaire TTC"
-          type="number" @blur="$v.editedFunding.amountTTC.$touch" :error="$v.editedFunding.amountTTC.$error"
-          required-field />
-        <ni-input in-modal v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.careHours" caption="Nb. heures prises en charge"
-          type="number" @blur="$v.editedFunding.careHours.$touch" :error="$v.editedFunding.careHours.$error"
-          required-field suffix="h" />
-        <ni-input in-modal v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.customerParticipationRate" caption="Taux de participation du bénéficiaire"
-          type="number" suffix="%" @blur="$v.editedFunding.customerParticipationRate.$touch" :error="$v.editedFunding.customerParticipationRate.$error"
-          required-field />
-        <ni-option-group v-model="editedFunding.careDays" :options="daysOptions" caption="Jours pris en charge" type="checkbox"
-          inline @blur="$v.editedFunding.careDays.$touch" :error="$v.editedFunding.careDays.$error" required-field />
-      </div>
-      <q-btn no-caps class="full-width modal-btn" label="Modifier le financement" icon-right="check" color="primary"
-        :loading="loading" @click="editFunding" />
-    </q-modal>
+    <ni-modal v-if="Object.keys(editedFunding).length > 0" v-model="fundingEditionModal"
+      @hide="resetEditionFundingData">
+      <template slot="title">
+        Modifier le <span class="text-weight-bold">financement</span>
+      </template>
+      <ni-datetime-picker v-model="editedFunding.startDate" caption="Date de début de prise en charge"
+        :max="editedFundingMaxStartDate" class="last" in-modal @blur="$v.editedFunding.startDate.$touch"
+        :error="$v.editedFunding.startDate.$error" required-field />
+      <ni-datetime-picker v-model="editedFunding.endDate" caption="Date de fin de prise en charge" in-modal
+        :min="$moment(editedFunding.startDate).add(1, 'day').toISOString()" />
+      <ni-input in-modal v-model="editedFunding.folderNumber" caption="Numéro de dossier" />
+      <ni-select in-modal caption="Fréquence" :options="fundingFreqOptions" v-model="editedFunding.frequency"
+        @blur="$v.editedFunding.frequency.$touch" :error="$v.editedFunding.frequency.$error" required-field />
+      <ni-input in-modal v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.unitTTCRate"
+        caption="Prix unitaire TTC" type="number" @blur="$v.editedFunding.unitTTCRate.$touch"
+        :error="$v.editedFunding.unitTTCRate.$error" required-field />
+      <ni-input in-modal v-if="isOneTimeEditedFundingNature" v-model="editedFunding.amountTTC"
+        caption="Montant forfaitaire TTC" type="number" @blur="$v.editedFunding.amountTTC.$touch"
+        :error="$v.editedFunding.amountTTC.$error" required-field />
+      <ni-input in-modal v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.careHours"
+        caption="Nb. heures prises en charge" type="number" @blur="$v.editedFunding.careHours.$touch"
+        :error="$v.editedFunding.careHours.$error" required-field suffix="h" />
+      <ni-input in-modal v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.customerParticipationRate"
+        caption="Taux de participation du bénéficiaire" type="number" suffix="%"
+        @blur="$v.editedFunding.customerParticipationRate.$touch"
+        :error="$v.editedFunding.customerParticipationRate.$error" required-field />
+      <ni-option-group v-model="editedFunding.careDays" :options="daysOptions" caption="Jours pris en charge"
+        type="checkbox" inline @blur="$v.editedFunding.careDays.$touch" :error="$v.editedFunding.careDays.$error"
+        required-field />
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Modifier le financement" icon-right="check" color="primary"
+          :loading="loading" @click="editFunding" />
+      </template>
+    </ni-modal>
   </div>
 </template>
 
@@ -464,11 +420,12 @@ import randomize from 'randomatic';
 import { extend, clear } from '../../helpers/utils.js';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify.js';
 import SearchAddress from '../form/SearchAddress';
-import NiInput from '../form/Input';
-import NiSelect from '../form/Select';
-import NiOptionGroup from '../form/OptionGroup';
+import Input from '../form/Input';
+import Select from '../form/Select';
+import OptionGroup from '../form/OptionGroup';
 import MultipleFilesUploader from '../form/MultipleFilesUploader.vue';
 import DatetimePicker from '../form/DatetimePicker';
+import Modal from '../Modal';
 import { downloadDocxFile } from '../../helpers/downloadFile';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
@@ -483,11 +440,12 @@ export default {
   name: 'ProfileInfo',
   components: {
     NiSearchAddress: SearchAddress,
-    NiInput,
-    NiSelect,
+    'ni-input': Input,
+    'ni-select': Select,
     'ni-datetime-picker': DatetimePicker,
-    NiOptionGroup,
+    'ni-option-group': OptionGroup,
     'ni-multiple-files-uploader': MultipleFilesUploader,
+    'ni-modal': Modal,
   },
   mixins: [
     customerMixin,
