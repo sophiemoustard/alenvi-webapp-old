@@ -292,7 +292,7 @@ export const planningActionMixin = {
         : this.$moment(date).hours()}:${this.$moment(date).minutes() || '00'}`;
     },
     formatEditedEvent (event) {
-      const { createdAt, updatedAt, startDate, endDate, isBilled, auxiliary, subscription, ...eventData } = event;
+      const { createdAt, updatedAt, startDate, endDate, isBilled, auxiliary, subscription, address, ...eventData } = event;
       const dates = {
         startDate,
         endDate,
@@ -312,6 +312,7 @@ export const planningActionMixin = {
             auxiliary: auxiliary ? auxiliary._id : '',
             subscription,
             isBilled,
+            address,
           };
           break;
         case INTERNAL_HOUR:

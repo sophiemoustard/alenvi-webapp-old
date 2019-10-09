@@ -90,7 +90,11 @@
     </div>
     <div v-if="editedEvent.type === INTERVENTION" class="customer-info">
       <div class="row items-center no-wrap">
-        <div v-if="customerAddress" class="customer-address">{{ customerAddress }}</div>
+        <div v-if="customerAddresses.length === 0" class="customer-address">Pas d'adresse pour ce bénéficiaire</div>
+        <div v-else-if="customerAddresses.length === 1" class="customer-address">{{ customerAddress }}</div>
+        <q-select v-else v-model="editedEvent.address.fullAddress" color="white" inverted-light :options="customerAddresses"
+            :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAddressSelect(); }, }]"
+            :filter-placeholder="customerAddress.fullAddress" ref="addressSelect" filter />
         <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect" />
       </div>
     </div>

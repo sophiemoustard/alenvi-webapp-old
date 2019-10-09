@@ -192,12 +192,27 @@ export const planningModalMixin = {
       ];
     },
     customerAddress () {
-      return this.$_.get(this.editedEvent, 'customer.contact.primaryAddress.fullAddress', '');
+      const event = this.editedEvent ? this.editedEvent : this.newEvent;
+      return event.address
+        ? this.$_.get(event, 'address.fullAddress', 'Pas d\'adresse séléctionnée')
+        : this.$_.get(event, 'customer.contact.primaryAddress.fullAddress', 'Pas d\'adresse séléctionnée');
+    },
+    customerAddresses () {
+      const event = this.editedEvent ? this.editedEvent : this.newEvent;
+      const addresses = [];
+      if (this.$_.has(event, 'customer.contact.primaryAddress')) {
+        addresses.push(this.formatAddressOptions(this.$_.get(event, 'customer.contact.primaryAddress.fullAddress')));
+      }
+      if (this.$_.has(event, 'customer.contact.secondaryAddress')) {
+        addresses.push(this.formatAddressOptions(this.$_.get(event, 'customer.contact.secondaryAddress.fullAddress')));
+      }
+      return addresses;
     },
     customerProfileRedirect () {
+      const event = this.editedEvent ? this.editedEvent : this.newEvent;
       return this.mainUser.role.name === COACH || this.mainUser.role.name === ADMIN
-        ? { name: 'customers profile', params: { id: this.editedEvent.customer._id } }
-        : { name: 'profile customers info', params: { customerId: this.editedEvent.customer._id } };
+        ? { name: 'customers profile', params: { id: event.customer._id } }
+        : { name: 'profile customers info', params: { customerId: event.customer._id } };
     },
   },
   methods: {
@@ -210,6 +225,12 @@ export const planningModalMixin = {
       return {
         label: formatIdentity(person.identity, 'FL'),
         value: person._id,
+      };
+    },
+    formatAddressOptions (address) {
+      return {
+        label: address,
+        value: address,
       };
     },
     // Event creation
@@ -240,9 +261,15 @@ export const planningModalMixin = {
     isRepetition (event) {
       return ABSENCE !== event.type && event.repetition && event.repetition.frequency !== NEVER;
     },
-    toggleServiceSelection (customerId) {
+    toggleServiceAndAddressSelection (customerId) {
       const customerSubscriptionsOptions = this.customerSubscriptionsOptions(customerId);
       if (customerSubscriptionsOptions.length === 1 && this.creationModal) this.newEvent.subscription = customerSubscriptionsOptions[0].value;
+
+      const selectedCustomer = this.customers.find(customer => customer._id === customerId);
+      this.newEvent.address = this.$_.get(selectedCustomer, 'contact.primaryAddress', {});
+    },
+    toggleAddressSelect () {
+      return this.$refs['addressSelect'].show();
     },
   },
 };
