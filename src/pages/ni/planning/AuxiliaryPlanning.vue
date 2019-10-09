@@ -4,7 +4,7 @@
       @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop"
       :filteredSectors="filteredSectors" :can-edit="canEditEvent" :personKey="personKey" :filters="activeFilters"
       @toggleAllSectors="toggleAllSectors" :eventHistories="eventHistories" ref="planningManager"
-      :displayAllSectors="displayAllSectors" @toggleHistory="toggleHistory" :displayHistory="displayHistory" />
+      :displayAllSectors="displayAllSectors" @toggleHistory="toggleHistory" :displayHistory="displayHistory" @updateFeeds="updateEventHistories" />
 
     <!-- Event creation modal -->
     <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
@@ -183,7 +183,7 @@ export default {
         }
 
         this.events = await this.$events.list(params);
-        if (this.displayHistory) await this.getEventHistories();
+        if (this.displayHistory) await this.updateEventHistories();
       } catch (e) {
         console.error(e);
         this.events = [];
@@ -197,12 +197,23 @@ export default {
         this.customers = [];
       }
     },
-    async getEventHistories () {
+    async getEventHistories (lastId = null) {
       try {
-        this.eventHistories = await this.$eventHistories.list({
-          sectors: this.filteredSectors.map(sector => sector._id),
-          auxiliaries: this.auxiliaries.map(aux => aux._id),
-        });
+        if (lastId) {
+          const oldEventHistories = await this.$eventHistories.list({
+            sectors: this.filteredSectors.map(sector => sector._id),
+            auxiliaries: this.auxiliaries.map(aux => aux._id),
+            lastId,
+          });
+          this.eventHistories.push(...oldEventHistories);
+          return oldEventHistories.length;
+        } else {
+          this.eventHistories = await this.$eventHistories.list({
+            sectors: this.filteredSectors.map(sector => sector._id),
+            auxiliaries: this.auxiliaries.map(aux => aux._id),
+          });
+          return this.eventHistories.length;
+        }
       } catch (e) {
         console.error(e);
         this.eventHistories = [];
@@ -283,6 +294,12 @@ export default {
             this.filteredAuxiliaries.some(filteredAux => history.auxiliaries.map(aux => aux._id).includes(filteredAux._id)));
         if (this.eventHistories.length === 0) this.displayHistory = false;
       }
+    },
+    async updateEventHistories (done) {
+      const lastId = this.eventHistories.length ? this.eventHistories[this.eventHistories.length - 1]._id : null
+      const oldEventHistoriesLength = await this.getEventHistories(lastId);
+      if (oldEventHistoriesLength) return done();
+      done(true);
     },
   },
 }
