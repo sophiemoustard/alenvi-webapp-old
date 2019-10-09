@@ -233,15 +233,12 @@ export const planningModalMixin = {
       };
     },
     // Event creation
-    customerSubscriptionsOptions (selectedCustomer) {
-      if (!selectedCustomer) return [];
-      let subscriptions = selectedCustomer.subscriptions;
-      if (!subscriptions || subscriptions.length === 0) {
-        const cus = this.customers.find(customer => customer._id === selectedCustomer._id);
-        if (!cus) return [];
-        subscriptions = cus.subscriptions;
-      }
+    customerSubscriptionsOptions (customerId) {
+      if (!customerId) return [];
+      const selectedCustomer = this.customers.find(customer => customer._id === customerId);
+      if (!selectedCustomer || !selectedCustomer.subscriptions || selectedCustomer.subscriptions.length === 0) return [];
 
+      let subscriptions = selectedCustomer.subscriptions;
       if (this.selectedAuxiliary._id) {
         if (!this.selectedAuxiliary.hasCustomerContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== CUSTOMER_CONTRACT);
         if (!this.selectedAuxiliary.hasCompanyContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== COMPANY_CONTRACT);
@@ -265,10 +262,10 @@ export const planningModalMixin = {
     },
     chooseCustomer (customerId) {
       const selectedCustomer = this.customers.find(customer => customer._id === customerId);
-      const customerSubscriptionsOptions = this.customerSubscriptionsOptions(selectedCustomer);
-      if (customerSubscriptionsOptions.length === 1 && this.creationModal) this.newEvent.subscription = customerSubscriptionsOptions[0].value;
       this.newEvent.address = this.$_.get(selectedCustomer, 'contact.primaryAddress', {});
       this.formatCustomerForEvent(selectedCustomer);
+      const customerSubscriptionsOptions = this.customerSubscriptionsOptions(this.newEvent.customer._id);
+      if (customerSubscriptionsOptions.length === 1 && this.creationModal) this.newEvent.subscription = customerSubscriptionsOptions[0].value;
     },
     formatCustomerForEvent (customer) {
       this.newEvent.customer = {

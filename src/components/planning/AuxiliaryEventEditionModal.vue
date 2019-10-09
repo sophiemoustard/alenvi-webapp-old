@@ -31,7 +31,7 @@
       <template v-if="editedEvent.type === INTERVENTION">
         <ni-select in-modal caption="Bénéficiaire" v-model="editedEvent.customer._id" :options="customersOptions"
           :error="validations.customer.$error" required-field disable />
-        <ni-select in-modal caption="Service" :options="customerSubscriptionsOptions(editedEvent.customer)"
+        <ni-select in-modal caption="Service" :options="customerSubscriptionsOptions(editedEvent.customer._id)"
           v-model="editedEvent.subscription" :error="validations.subscription.$error"
           @blur="validations.subscription.$touch" required-field :disable="isDisabled" />
       </template>
@@ -88,10 +88,9 @@
         </div>
       </template>
     </div>
-    <div v-if="editedEvent.type === INTERVENTION" class="customer-info">
+    <div v-if="editedEvent.type === INTERVENTION && customerAddresses.length > 0" class="customer-info">
       <div class="row items-center no-wrap">
-        <div v-if="customerAddresses.length === 0" class="customer-address">Pas d'adresse pour ce bénéficiaire</div>
-        <div v-else-if="customerAddresses.length === 1" class="customer-address">{{ customerAddress }}</div>
+        <div v-if="customerAddresses.length === 1" class="customer-address">{{ customerAddress }}</div>
         <q-select v-else v-model="editedEvent.address.fullAddress" color="white" inverted-light :options="customerAddresses"
             :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAddressSelect(); }, }]"
             :filter-placeholder="customerAddress.fullAddress" ref="addressSelect" filter />

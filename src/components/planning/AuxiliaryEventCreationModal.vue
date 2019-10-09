@@ -27,7 +27,7 @@
           :error="validations.customer.$error" required-field @blur="validations.customer.$touch"
           @input="chooseCustomer"/>
         <ni-select in-modal caption="Service" v-model="newEvent.subscription" :error="validations.subscription.$error"
-          :options="customerSubscriptionsOptions(newEvent.customer)" required-field @blur="validations.subscription.$touch" />
+          :options="customerSubscriptionsOptions(newEvent.customer._id)" required-field @blur="validations.subscription.$touch" />
       </template>
       <template v-if="newEvent.type === ABSENCE">
         <ni-select in-modal caption="Nature" v-model="newEvent.absenceNature" :options="absenceNatureOptions"
@@ -68,14 +68,13 @@
       <ni-input in-modal v-model="newEvent.misc" caption="Notes" @blur="validations.misc.$touch"
         :error="validations.misc.$error" :required-field="newEvent.type === ABSENCE && newEvent.absence === OTHER" />
     </div>
-    <div v-if="newEvent.type === INTERVENTION" class="customer-info">
+    <div v-if="newEvent.type === INTERVENTION && customerAddresses.length > 0" class="customer-info">
       <div class="row items-center no-wrap">
-        <div v-if="customerAddresses.length === 0" class="customer-address"></div>
-        <div v-else-if="customerAddresses.length === 1" class="customer-address">{{ customerAddress }}</div>
-        <q-select v-else v-model="customerAddress" color="white" inverted-light :options="customerAddresses"
+        <div v-if="customerAddresses.length === 1" class="customer-address">{{ customerAddress }}</div>
+        <q-select v-else v-model="newEvent.address.fullAddress" color="white" inverted-light :options="customerAddresses"
             :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAddressSelect(); }, }]"
             :filter-placeholder="customerAddress" ref="addressSelect" filter />
-        <q-btn v-if="customerAddresses.length > 0" flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect" />
+        <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect" />
       </div>
     </div>
     <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary"
