@@ -192,12 +192,12 @@ export const planningModalMixin = {
       ];
     },
     customerAddress () {
-      const event = this.editedEvent ? this.editedEvent : this.newEvent;
-      if (!event.address) event.address = this.$_.get(event, 'customer.contact.primaryAddress', '');
+      const event = this.editedEvent && this.editedEvent.address ? this.editedEvent : this.newEvent;
+      if (!(event.address && event.address.fullAddress)) event.address = this.$_.get(event, 'customer.contact.primaryAddress', '');
       return event.address.fullAddress;
     },
     customerAddresses () {
-      const event = this.editedEvent ? this.editedEvent : this.newEvent;
+      const event = this.editedEvent && this.editedEvent.customer ? this.editedEvent : this.newEvent;
       const addresses = [];
       if (this.$_.has(event, 'customer.contact.primaryAddress')) {
         addresses.push(this.formatAddressOptions(this.$_.get(event, 'customer.contact.primaryAddress.fullAddress')));
@@ -208,7 +208,7 @@ export const planningModalMixin = {
       return addresses;
     },
     customerProfileRedirect () {
-      const event = this.editedEvent ? this.editedEvent : this.newEvent;
+      const event = this.editedEvent && this.editedEvent.customer ? this.editedEvent : this.newEvent;
       return this.mainUser.role.name === COACH || this.mainUser.role.name === ADMIN
         ? { name: 'customers profile', params: { id: event.customer._id } }
         : { name: 'profile customers info', params: { customerId: event.customer._id } };

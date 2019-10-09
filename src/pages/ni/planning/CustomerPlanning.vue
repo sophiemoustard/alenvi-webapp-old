@@ -22,14 +22,23 @@
           disable-end-date />
         <ni-select in-modal caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions"
           :error="$v.newEvent.auxiliary.$error" required-field @blur="$v.newEvent.auxiliary.$touch"
-          @input="toggleServiceSelection(newEvent.customer)" />
+          @input="toggleServiceSelection(newEvent.customer._id)" />
         <ni-select in-modal caption="Service" v-model="newEvent.subscription" :error="$v.newEvent.subscription.$error"
-          :options="customerSubscriptionsOptions(newEvent.customer)" required-field
+          :options="customerSubscriptionsOptions(newEvent.customer._id)" required-field
           @blur="$v.newEvent.subscription.$touch" />
         <ni-select in-modal caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency"
           :options="repetitionOptions" required-field @blur="$v.newEvent.repetition.frequency.$touch"
           :disable="!isRepetitionAllowed" />
         <ni-input in-modal v-model="newEvent.misc" caption="Notes" />
+      </div>
+      <div v-if="newEvent.type === INTERVENTION && customerAddresses.length > 0" class="customer-info">
+        <div class="row items-center no-wrap">
+          <div v-if="customerAddresses.length === 1" class="customer-address">{{ customerAddress }}</div>
+          <q-select v-else v-model="newEvent.address.fullAddress" color="white" inverted-light :options="customerAddresses"
+              :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAddressSelect(); }, }]"
+              :filter-placeholder="customerAddress" ref="addressSelect" filter />
+          <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect" />
+        </div>
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary"
         @click="createEvent" :disable="disableCreationButton" icon-right="add" />
@@ -84,9 +93,12 @@
           </div>
         </template>
       </div>
-      <div class="customer-info">
+      <div v-if="editedEvent.type === INTERVENTION && customerAddresses.length > 0" class="customer-info">
         <div class="row items-center no-wrap">
-        <div v-if="customerAddress" class="customer-address">{{ customerAddress }}</div>
+          <div v-if="customerAddresses.length === 1" class="customer-address">{{ customerAddress }}</div>
+          <q-select v-else v-model="editedEvent.address.fullAddress" color="white" inverted-light :options="customerAddresses"
+              :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAddressSelect(); }, }]"
+              :filter-placeholder="customerAddress.fullAddress" ref="addressSelect" filter />
           <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect" />
         </div>
       </div>
@@ -168,7 +180,7 @@ export default {
       return this.$moment(this.startOfWeek).endOf('w').toISOString();
     },
     selectedCustomer () {
-      if (this.creationModal && this.newEvent.customer !== '') return this.customers.find(cus => cus._id === this.newEvent.customer);
+      if (this.creationModal && this.newEvent.customer !== '') return this.customers.find(cus => cus._id === this.newEvent.customer._id);
       if (this.editionModal && this.editedEvent.customer !== '') return this.customers.find(cus => cus._id === this.editedEvent.customer._id);
       return { picture: {}, identity: {} };
     },
@@ -301,7 +313,7 @@ export default {
         repetition: { frequency: NEVER },
         startDuration: '',
         endDuration: '',
-        customer: person._id,
+        customer: {},
         subscription: '',
         internalHour: '',
         absence: '',
@@ -316,6 +328,7 @@ export default {
           endHour: '10:00',
         },
       };
+      this.formatCustomerForEvent(person);
       this.creationModal = true;
     },
     // Event edition
