@@ -216,7 +216,8 @@ export default {
         return oldEventHistories;
       } catch (e) {
         console.error(e);
-        this.eventHistories = [];
+        if (!lastCreatedAt) this.eventHistories = [];
+        NotifyNegative("Erreur lors de la récupération du flux d'activité");
       }
     },
     // Event creation
