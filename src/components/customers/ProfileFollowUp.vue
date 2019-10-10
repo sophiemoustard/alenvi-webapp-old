@@ -12,7 +12,8 @@
           @focus="saveTmp('contact.phone')" @blur="updateCustomer('contact.phone')" />
       </div>
       <div class="row gutter-profile">
-        <ni-search-address v-if="isAuxiliary" v-model="customer.contact.primaryAddress" color="white" disable />
+        <ni-search-address v-if="isAuxiliary" caption='Adresse principale' v-model="customer.contact.primaryAddress" color="white" disable />
+        <ni-search-address v-if="isAuxiliary" caption='Adresse secondaire' v-model="customer.contact.secondaryAddress" color="white" disable />
       </div>
     </div>
     <div class="q-mb-xl">
