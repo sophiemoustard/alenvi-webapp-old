@@ -10,7 +10,7 @@
         <ni-input caption="Nom" :error="$v.customer.identity.lastname.$error" v-model="customer.identity.lastname"
           @focus="saveTmp('identity.lastname')" @blur="updateCustomer('identity.lastname')" />
         <ni-select caption="Civilité" :error="$v.customer.identity.title.$error" v-model="customer.identity.title"
-          :options="civilityOptions" @focus="saveTmp('identity.title')" @input="updateCustomer('identity.title')"
+          :options="civilityOptions" @focus="saveTmp('identity.title')" @blur="updateCustomer('identity.title')"
           required-field />
         <ni-datetime-picker v-model="customer.identity.birthDate" @focus="saveTmp('identity.birthDate')"
           caption="Date de naissance" @blur="updateCustomer('identity.birthDate')" />
