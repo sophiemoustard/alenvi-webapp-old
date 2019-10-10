@@ -1,8 +1,10 @@
+// CUSTOMER
 export const CIVILITY_OPTIONS = [
-  { label: 'Monsieur', value: 'M.' },
-  { label: 'Madame', value: 'Mme' },
-  { label: 'Monsieur / Madame', value: 'M. et Mme' },
+  { label: 'Monsieur', value: 'mr' },
+  { label: 'Madame', value: 'mrs' },
+  { label: 'Monsieur / Madame', value: 'couple' },
 ];
+
 // CUSTOMER FUNDING
 export const MONTHLY = 'monthly';
 export const ONCE = 'once';
