@@ -197,23 +197,23 @@ export default {
         this.customers = [];
       }
     },
-    async getEventHistories (lastId = null) {
+    async getEventHistories (lastCreatedAt = null) {
       try {
-        if (lastId) {
-          const oldEventHistories = await this.$eventHistories.list({
-            sectors: this.filteredSectors.map(sector => sector._id),
-            auxiliaries: this.auxiliaries.map(aux => aux._id),
-            lastId,
-          });
+        const params = {
+          sectors: this.filteredSectors.map(sector => sector._id),
+          auxiliaries: this.auxiliaries.map(aux => aux._id),
+        };
+
+        let oldEventHistories;
+        if (lastCreatedAt) {
+          oldEventHistories = await this.$eventHistories.list({ ...params, createdAt: lastCreatedAt });
           this.eventHistories.push(...oldEventHistories);
-          return oldEventHistories.length;
         } else {
-          this.eventHistories = await this.$eventHistories.list({
-            sectors: this.filteredSectors.map(sector => sector._id),
-            auxiliaries: this.auxiliaries.map(aux => aux._id),
-          });
-          return this.eventHistories.length;
+          oldEventHistories = await this.$eventHistories.list(params);
+          this.eventHistories = oldEventHistories;
         }
+
+        return oldEventHistories;
       } catch (e) {
         console.error(e);
         this.eventHistories = [];
@@ -296,9 +296,9 @@ export default {
       }
     },
     async updateEventHistories (done) {
-      const lastId = this.eventHistories.length ? this.eventHistories[this.eventHistories.length - 1]._id : null
-      const oldEventHistoriesLength = await this.getEventHistories(lastId);
-      if (oldEventHistoriesLength) return done();
+      const lastCreatedAt = this.eventHistories.length ? this.eventHistories[this.eventHistories.length - 1].createdAt : null
+      const oldEventHistories = await this.getEventHistories(lastCreatedAt);
+      if (oldEventHistories.length) return done();
       done(true);
     },
   },
