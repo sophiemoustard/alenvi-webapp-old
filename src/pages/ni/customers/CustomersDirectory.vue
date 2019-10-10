@@ -84,6 +84,7 @@ export default {
       civilityOptions: [
         { label: 'Monsieur', value: 'M.' },
         { label: 'Madame', value: 'Mme' },
+        { label: 'Monsieur / Madame', value: 'M. et Mme' },
       ],
       newCustomer: {
         identity: {
