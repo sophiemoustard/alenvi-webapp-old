@@ -106,7 +106,7 @@ export default {
       loading: false,
       auxiliaryCreationModal: false,
       sendWelcomeMsg: true,
-      civilityOptions: CIVILITY_OPTIONS,
+      civilityOptions: CIVILITY_OPTIONS.filter(opt => opt.value !== 'couple'),
       defaultNewUser: {
         identity: {
           lastname: '',
