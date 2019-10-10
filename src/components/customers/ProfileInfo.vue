@@ -76,6 +76,7 @@
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
               <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions">
+                  <q-btn flat round small color="grey" icon="edit" @click="openEditionModalHelper(col.value)" />
                   <q-btn flat round small color="grey" icon="delete" @click.native="removeHelper(col.value)" />
                 </div>
               </template>
@@ -237,9 +238,30 @@
       <ni-input in-modal v-model="newHelper.identity.firstname" caption="Prénom" />
       <ni-input in-modal v-model="newHelper.local.email" last :error="$v.newHelper.local.email.$error" caption="Email"
         @blur="$v.newHelper.local.email.$touch" :error-label="emailError" required-field />
+      <ni-input in-modal v-model.trim="newHelper.mobilePhone" last :error="$v.newHelper.mobilePhone.$error"
+          caption="Numéro de Téléphone" @blur="$v.newHelper.mobilePhone.$touch"
+          error-label="Numéro de téléphone invalide" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter un aidant" icon-right="add" color="primary"
           :loading="loading" @click="submitHelper" />
+      </template>
+    </ni-modal>
+
+    <!-- Edit helper modal -->
+    <ni-modal v-model="modifyHelper" @hide="resetModifyHelperForm">
+      <template slot="title">
+        Modifier l'<span class="text-weight-bold">aidant</span>
+      </template>
+      <ni-input in-modal v-model="editHelper.identity.lastname" :error="$v.editHelper.identity.lastname.$error"
+        caption="Nom" @blur="$v.editHelper.identity.lastname.$touch" required-field />
+      <ni-input in-modal v-model="editHelper.identity.firstname" caption="Prénom" />
+      <ni-input in-modal v-model="editHelper.local.email" caption="Email" disable />
+      <ni-input in-modal v-model.trim="editHelper.mobilePhone" last :error="$v.editHelper.mobilePhone.$error"
+          caption="Numéro de Téléphone" @blur="$v.editHelper.mobilePhone.$touch"
+          error-label="Numéro de téléphone invalide" />
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Modifier l'aidant" icon-right="add" color="primary"
+          :loading="loading" @click="submitEditedHelper" />
       </template>
     </ni-modal>
 
@@ -469,6 +491,7 @@ export default {
       days,
       loading: false,
       addHelper: false,
+      modifyHelper: false,
       subscriptionCreationModal: false,
       subscriptionEditionModal: false,
       civilityOptions: CIVILITY_OPTIONS,
@@ -567,6 +590,16 @@ export default {
       ],
       userHelpers: [],
       newHelper: {
+        identity: {
+          lastname: '',
+          firstname: '',
+        },
+        local: {
+          email: '',
+        },
+        mobilePhone: '',
+      },
+      editHelper: {
         identity: {
           lastname: '',
           firstname: '',
@@ -784,6 +817,13 @@ export default {
       },
     },
     newHelper: {
+      identity: { lastname: { required } },
+      local: {
+        email: { required, email },
+      },
+      mobilePhone: { frPhoneNumber },
+    },
+    editHelper: {
       identity: { lastname: { required } },
       local: {
         email: { required, email },
@@ -1017,6 +1057,10 @@ export default {
       this.$v.newHelper.$reset();
       this.newHelper = Object.assign({}, clear(this.newHelper));
     },
+    resetModifyHelperForm () {
+      this.$v.editHelper.$reset();
+      this.editHelper = Object.assign({}, clear(this.editHelper));
+    },
     async createAlenviHelper () {
       this.newHelper.local.password = randomize('0', 6);
       this.newHelper.customers = [this.userProfile._id];
@@ -1027,6 +1071,10 @@ export default {
       this.newHelper.identity = this.$_.pickBy(this.newHelper.identity);
       const payload = this.$_.pickBy(this.newHelper);
       await this.$users.create(payload);
+    },
+    async modifyAlenviHelper () {
+      const payload = this.editHelper;
+      await this.$users.updateById(payload);
     },
     async sendWelcomingEmail () {
       await this.$email.sendWelcome({
@@ -1056,6 +1104,39 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+    async submitEditedHelper () {
+      try {
+        this.loading = true;
+        this.$v.editHelper.$touch();
+        if (this.$v.editHelper.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        await this.modifyAlenviHelper();
+        NotifyPositive('Aidant modifié');
+        await this.getUserHelpers();
+        this.modifyHelper = false
+      } catch (e) {
+        e.response ? console.error(e.response) : console.error(e);
+        if (e && e.message === 'Invalid fields') return NotifyWarning('Champ(s) invalide(s)');
+        NotifyNegative('Erreur lors de la modification de l\'aidant');
+      } finally {
+        this.loading = false;
+      }
+    },
+    openEditionModalHelper (helperId) {
+      const helper = this.userHelpers.find(helper => helper._id === helperId);
+      this.editHelper = {
+        _id: helper._id,
+        mobilePhone: helper.mobilePhone,
+        local: {
+          email: helper.local.email,
+        },
+        identity: {
+          firstname: helper.identity.firstname,
+          lastname: helper.identity.lastname,
+        },
+      };
+      this.modifyHelper = true;
     },
     async removeHelper (helperId) {
       try {
