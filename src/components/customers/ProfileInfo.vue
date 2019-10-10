@@ -9,10 +9,11 @@
           @blur="updateCustomer('identity.firstname')" />
         <ni-input caption="Nom" :error="$v.customer.identity.lastname.$error" v-model="customer.identity.lastname"
           @focus="saveTmp('identity.lastname')" @blur="updateCustomer('identity.lastname')" />
-        <div class="col-xs-12 col-md-6">
-          <ni-datetime-picker v-model="customer.identity.birthDate" @focus="saveTmp('identity.birthDate')"
-            caption="Date de naissance" @blur="updateCustomer('identity.birthDate')" />
-        </div>
+        <ni-select caption="Civilité" :error="$v.customer.identity.title.$error" v-model="customer.identity.title"
+          :options="civilityOptions" @focus="saveTmp('identity.title')" @input="updateCustomer('identity.title')"
+          required-field />
+        <ni-datetime-picker v-model="customer.identity.birthDate" @focus="saveTmp('identity.birthDate')"
+          caption="Date de naissance" @blur="updateCustomer('identity.birthDate')" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -430,7 +431,16 @@ import { downloadDocxFile } from '../../helpers/downloadFile';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
 import { days } from '../../data/days.js';
-import { FUNDING_FREQ_OPTIONS, NATURE_OPTIONS, FIXED, HOURLY, REQUIRED_LABEL, ONCE, HELPER } from '../../data/constants.js';
+import {
+  FUNDING_FREQ_OPTIONS,
+  NATURE_OPTIONS,
+  FIXED,
+  HOURLY,
+  REQUIRED_LABEL,
+  ONCE,
+  HELPER,
+  CIVILITY_OPTIONS,
+} from '../../data/constants.js';
 import { financialCertificatesMixin } from '../../mixins/financialCertificatesMixin.js';
 import { fundingMixin } from '../../mixins/fundingMixin.js';
 import { validationMixin } from '../../mixins/validationMixin.js';
@@ -462,6 +472,7 @@ export default {
       addHelper: false,
       subscriptionCreationModal: false,
       subscriptionEditionModal: false,
+      civilityOptions: CIVILITY_OPTIONS,
       isLoaded: false,
       tmpInput: '',
       customer: {
@@ -750,6 +761,7 @@ export default {
     customer: {
       identity: {
         lastname: { required },
+        title: { required },
       },
       contact: {
         phone: { frPhoneNumber },

@@ -57,7 +57,7 @@ import DirectoryHeader from '../../../components/DirectoryHeader';
 import Modal from '../../../components/Modal';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../../components/popup/notify.js';
 import { customerProfileValidation } from '../../../helpers/customerProfileValidation.js';
-import { REQUIRED_LABEL } from '../../../data/constants';
+import { REQUIRED_LABEL, CIVILITY_OPTIONS } from '../../../data/constants';
 import { validationMixin } from '../../../mixins/validationMixin.js';
 import { formatIdentity } from '../../../helpers/utils';
 
@@ -81,11 +81,7 @@ export default {
       loading: false,
       opened: false,
       sendWelcomeMsg: true,
-      civilityOptions: [
-        { label: 'Monsieur', value: 'M.' },
-        { label: 'Madame', value: 'Mme' },
-        { label: 'Monsieur / Madame', value: 'M. et Mme' },
-      ],
+      civilityOptions: CIVILITY_OPTIONS,
       newCustomer: {
         identity: {
           title: '',
