@@ -91,7 +91,7 @@ export default {
             name: `${user.identity.firstname} ${user.identity.lastname}`,
             picture: user.picture ? user.picture.link : null,
           },
-          phone: user.mobilePhone,
+          phone: user.contact.phone,
         }));
         this.tableLoading = false;
       } catch (e) {
@@ -103,7 +103,7 @@ export default {
       return link || DEFAULT_AVATAR;
     },
     getPhoneLink (link) {
-      return link ? `tel:+33${link.split(' ').join('').substring(1)}` : '-';
+      return link ? `tel:+33${link.substring(1)}` : '-';
     },
   },
 }

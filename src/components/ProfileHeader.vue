@@ -184,7 +184,7 @@ export default {
     async sendSMS () {
       try {
         await this.$twilio.sendSMS({
-          to: `+33${this.user.mobilePhone.substring(1)}`,
+          to: `+33${this.user.contact.phone.substring(1)}`,
           body: this.messageComp,
         });
         NotifyPositive('SMS bien envoyé');

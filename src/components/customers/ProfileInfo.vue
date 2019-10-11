@@ -729,9 +729,8 @@ export default {
       local: {
         email: { required, email },
       },
-      mobilePhone: {
-        frPhoneNumber,
-        maxLength: maxLength(10),
+      contact: {
+        phone: { frPhoneNumber, maxLength: maxLength(10) },
       },
     },
     editedHelper: {
@@ -739,9 +738,8 @@ export default {
       local: {
         email: { required, email },
       },
-      mobilePhone: {
-        frPhoneNumber,
-        maxLength: maxLength(10),
+      contact: {
+        phone: { frPhoneNumber, maxLength: maxLength(10) },
       },
     },
     newSubscription: {
@@ -1031,8 +1029,8 @@ export default {
       }
     },
     openEditionModalHelper (helperId) {
-      const helper = this.userHelpers.find(helper => helper._id === helperId);
-      this.editedHelper = this.$_.pick(helper, ['_id', 'mobilePhone', 'local.email', 'identity.firstname', 'identity.lastname']);
+      const helper = this.helpers.find(helper => helper._id === helperId);
+      this.editedHelper = this.$_.pick(helper, ['_id', 'contact.phone', 'local.email', 'identity.firstname', 'identity.lastname']);
       this.openEditedHelperModal = true;
     },
     async removeHelper (helperId) {

@@ -41,8 +41,8 @@
         @blur="$v.newUser.identity.lastname.$touch" required-field />
       <ni-input in-modal v-model="newUser.identity.firstname" :error="$v.newUser.identity.firstname.$error"
         caption="Prénom" @blur="$v.newUser.identity.firstname.$touch" required-field />
-      <ni-input in-modal v-model="newUser.mobilePhone" :error="$v.newUser.mobilePhone.$error" required-field
-        caption="Numéro de téléphone" @blur="$v.newUser.mobilePhone.$touch" :error-label="mobilePhoneError" />
+      <ni-input in-modal v-model="newUser.contact.phone" :error="$v.newUser.contact.phone.$error" required-field
+        caption="Numéro de téléphone" @blur="$v.newUser.contact.phone.$touch" :error-label="mobilePhoneError" />
       <ni-input in-modal v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email"
         @blur="$v.newUser.local.email.$touch" :error-label="emailError" required-field />
       <ni-search-address v-model="newUser.contact.address" color="white" inverted-light
@@ -115,8 +115,8 @@ export default {
         },
         contact: {
           address: { fullAddress: '' },
+          phone: '',
         },
-        mobilePhone: '',
         local: { email: '', password: '' },
         company: '',
         sector: null,
@@ -209,12 +209,8 @@ export default {
         firstname: { required },
         title: { required },
       },
-      mobilePhone: {
-        required,
-        frPhoneNumber,
-        maxLength: maxLength(10),
-      },
       contact: {
+        phone: { required, frPhoneNumber, maxLength: maxLength(10) },
         address: {
           zipCode: { required: requiredIf(item => !!item.fullAddress) },
           street: { required: requiredIf(item => !!item.fullAddress) },
@@ -257,9 +253,9 @@ export default {
       return this.$store.getters['rh/getNotificationsTasks'];
     },
     mobilePhoneError () {
-      if (!this.$v.newUser.mobilePhone.required) {
+      if (!this.$v.newUser.contact.phone.required) {
         return REQUIRED_LABEL;
-      } else if (!this.$v.newUser.mobilePhone.frPhoneNumber || !this.$v.newUser.mobilePhone.maxLength) {
+      } else if (!this.$v.newUser.contact.phone.frPhoneNumber || !this.$v.newUser.contact.phone.maxLength) {
         return 'Numéro de téléphone non valide';
       }
     },
@@ -358,7 +354,7 @@ export default {
       payload.role = roles[0]._id;
       payload.company = this.company._id;
 
-      if (!payload.contact.address.fullAddress) delete payload.contact;
+      if (!payload.contact.address.fullAddress) delete payload.contact.address;
 
       return payload;
     },
@@ -376,7 +372,7 @@ export default {
       const activationDataRaw = await this.$activationCode.create({ newUserId, userEmail: this.newUser.local.email });
       const code = activationDataRaw.activationData.code;
       await this.$twilio.sendSMS({
-        to: `+33${this.newUser.mobilePhone.substring(1)}`,
+        to: `+33${this.newUser.contact.phone.substring(1)}`,
         body: `Bienvenue chez Alenvi ! :) Utilise ce code: ${code} pour pouvoir commencer ton enregistrement sur Compani avant ton intégration: ${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/enterCode :-)`,
       });
     },

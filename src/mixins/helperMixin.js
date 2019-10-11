@@ -12,12 +12,12 @@ export const helperMixin = {
       newHelper: {
         identity: { lastname: '', firstname: '' },
         local: { email: '' },
-        mobilePhone: '',
+        contact: { phone: '' },
       },
       editedHelper: {
         identity: { lastname: '', firstname: '' },
         local: { email: '' },
-        mobilePhone: '',
+        contact: { phone: '' },
       },
       helpers: [],
       helperColumns: [
@@ -43,7 +43,7 @@ export const helperMixin = {
           name: 'phone',
           label: 'Numéro de téléphone',
           align: 'left',
-          field: 'mobilePhone',
+          field: row => row.contact.phone,
           format: (value) => formatPhone(value),
         },
         {
@@ -164,7 +164,7 @@ export const helperMixin = {
     },
     openEditionModalHelper (helperId) {
       const helper = this.helpers.find(helper => helper._id === helperId);
-      this.editedHelper = this.$_.pick(helper, ['_id', 'mobilePhone', 'local.email', 'identity.firstname', 'identity.lastname']);
+      this.editedHelper = this.$_.pick(helper, ['_id', 'contact.phone', 'local.email', 'identity.firstname', 'identity.lastname']);
       this.openEditedHelperModal = true;
     },
     async removeHelper (helperId) {

@@ -87,8 +87,8 @@
           {{ groupErrors('contact').msg }}</p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="Numéro de téléphone" :error="$v.user.mobilePhone.$error" :error-label="phoneNbrError" type="tel"
-          v-model.trim="user.mobilePhone" @blur="updateUser('mobilePhone')" @focus="saveTmp('mobilePhone')" />
+        <ni-input caption="Numéro de téléphone" :error="$v.user.contact.phone.$error" :error-label="phoneNbrError" type="tel"
+          v-model.trim="user.contact.phone" @blur="updateUser('contact.phone')" @focus="saveTmp('contact.phone')" />
         <div v-if="!isAuxiliary" class="col-12 col-md-6 row items-center">
           <div class="col-xs-11">
             <ni-input ref="userEmail" :name="emailInputRef" caption="Adresse email" :error="$v.user.local.email.$error"
@@ -440,11 +440,6 @@ export default {
         picture: {
           link: { required },
         },
-        mobilePhone: {
-          required,
-          frPhoneNumber,
-          maxLength: maxLength(10),
-        },
         sector: { required },
         mentorId: { required },
         identity: {
@@ -468,6 +463,7 @@ export default {
           },
         },
         contact: {
+          phone: { required, frPhoneNumber, maxLength: maxLength(10) },
           address: {
             zipCode: { required },
             street: { required },
@@ -577,9 +573,9 @@ export default {
       }
     },
     phoneNbrError () {
-      if (!this.$v.user.mobilePhone.required) {
+      if (!this.$v.user.contact.phone.required) {
         return REQUIRED_LABEL;
-      } else if (!this.$v.user.mobilePhone.frPhoneNumber || !this.$v.user.mobilePhone.maxLength) {
+      } else if (!this.$v.user.contact.phone.frPhoneNumber || !this.$v.user.contact.phone.maxLength) {
         return 'Numéro de téléphone non valide';
       }
     },

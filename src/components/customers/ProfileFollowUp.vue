@@ -164,7 +164,7 @@ export default {
       this.tmpInput = this.$_.get(this.customer, path);
     },
     getPhoneLink (link) {
-      return link ? `tel:+33${link.split(' ').join('').substring(1)}` : '-';
+      return link ? `tel:+33${link.substring(1)}` : '-';
     },
   },
   filters: {
