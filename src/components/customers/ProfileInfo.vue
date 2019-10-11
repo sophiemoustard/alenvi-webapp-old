@@ -229,25 +229,10 @@
     </div>
 
     <!-- Add helper modal -->
-    <add-helper-modal :addHelper="addHelper" :company="company" @closed="closeAddHelperModal" @hide="resetHelperForm"/>
+    <add-helper-modal :addHelper="addHelper" :company="company" @closed="closeAddHelperModal" @hide="resetAddHelperForm"/>
 
     <!-- Edit helper modal -->
-    <ni-modal v-model="openEditedHelperModal" @hide="resetEditedHelperForm">
-      <template slot="title">
-        Modifier l'<span class="text-weight-bold">aidant</span>
-      </template>
-      <ni-input in-modal v-model="editedHelper.identity.lastname" :error="$v.editedHelper.identity.lastname.$error"
-        caption="Nom" @blur="$v.editedHelper.identity.lastname.$touch" required-field />
-      <ni-input in-modal v-model="editedHelper.identity.firstname" caption="Prénom" />
-      <ni-input in-modal v-model="editedHelper.local.email" caption="Email" disable />
-      <ni-input in-modal v-model.trim="editedHelper.mobilePhone" last :error="$v.editedHelper.mobilePhone.$error"
-          caption="Numéro de téléphone" @blur="$v.editedHelper.mobilePhone.$touch"
-          error-label="Numéro de téléphone invalide" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Modifier l'aidant" icon-right="add" color="primary"
-          :loading="loading" @click="editHelper" />
-      </template>
-    </ni-modal>
+    <edit-helper-modal :editedHelper="editedHelper" :openEditedHelperModal="openEditedHelperModal" @closed="closeEditedHelperModal" @hide="resetEditedHelperForm"/>
 
     <!-- Subscription creation modal -->
     <ni-modal v-model="subscriptionCreationModal" @hide="resetCreationSubscriptionData">
@@ -420,13 +405,14 @@
 
 <script>
 import { Cookies } from 'quasar';
-import { required, email, requiredIf } from 'vuelidate/lib/validators';
+import { required, requiredIf } from 'vuelidate/lib/validators';
 
 import { extend, clear } from '../../helpers/utils.js';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify.js';
 import SearchAddress from '../form/SearchAddress';
 import Input from '../form/Input';
 import AddHelperModal from '../form/AddHelperModal.vue';
+import EditHelperModal from '../form/EditHelperModal.vue';
 import Select from '../form/Select';
 import OptionGroup from '../form/OptionGroup';
 import MultipleFilesUploader from '../form/MultipleFilesUploader.vue';
@@ -461,6 +447,7 @@ export default {
     'ni-multiple-files-uploader': MultipleFilesUploader,
     'ni-modal': Modal,
     'add-helper-modal': AddHelperModal,
+    'edit-helper-modal': EditHelperModal,
   },
   mixins: [
     customerMixin,
@@ -481,6 +468,16 @@ export default {
       civilityOptions: CIVILITY_OPTIONS,
       isLoaded: false,
       tmpInput: '',
+      editedHelper: {
+        identity: {
+          lastname: '',
+          firstname: '',
+        },
+        local: {
+          email: '',
+        },
+        mobilePhone: '',
+      },
       customer: {
         identity: {},
         contact: {
@@ -573,16 +570,6 @@ export default {
         },
       ],
       userHelpers: [],
-      editedHelper: {
-        identity: {
-          lastname: '',
-          firstname: '',
-        },
-        local: {
-          email: '',
-        },
-        mobilePhone: '',
-      },
       newSubscription: {
         service: '',
         unitTTCRate: '',
@@ -783,13 +770,6 @@ export default {
         iban: { required, iban },
       },
     },
-    editedHelper: {
-      identity: { lastname: { required } },
-      local: {
-        email: { required, email },
-      },
-      mobilePhone: { frPhoneNumber },
-    },
     newSubscription: {
       service: { required },
       unitTTCRate: { required },
@@ -853,7 +833,11 @@ export default {
   methods: {
     async closeAddHelperModal () {
       await this.getUserHelpers();
-      this.resetHelperForm();
+      this.resetAddHelperForm();
+    },
+    async closeEditedHelperModal () {
+      await this.getUserHelpers();
+      this.openEditedHelperModal = false;
     },
     formatAdditionalFields (row) {
       return [
@@ -1017,31 +1001,12 @@ export default {
       }
     },
     // Helpers
-    resetHelperForm () {
+    resetAddHelperForm () {
       this.addHelper = false;
     },
     resetEditedHelperForm () {
-      this.$v.editedHelper.$reset();
       this.editedHelper = Object.assign({}, clear(this.editedHelper));
-    },
-    async editHelper () {
-      try {
-        this.loading = true;
-        this.$v.editedHelper.$touch();
-        if (this.$v.editedHelper.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        const payload = Object.assign({}, this.editedHelper);
-        delete payload.local;
-        await this.$users.updateById(payload);
-        NotifyPositive('Aidant modifié');
-        await this.getUserHelpers();
-        this.openEditedHelperModal = false
-      } catch (e) {
-        e.response ? console.error(e.response) : console.error(e);
-        NotifyNegative('Erreur lors de la modification de l\'aidant');
-      } finally {
-        this.loading = false;
-      }
+      this.openEditedHelperModal = false;
     },
     openEditionModalHelper (helperId) {
       const helper = this.userHelpers.find(helper => helper._id === helperId);
