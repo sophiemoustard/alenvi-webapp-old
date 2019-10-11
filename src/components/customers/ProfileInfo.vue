@@ -239,7 +239,7 @@
       <ni-input in-modal v-model="newHelper.local.email" last :error="$v.newHelper.local.email.$error" caption="Email"
         @blur="$v.newHelper.local.email.$touch" :error-label="emailError" required-field />
       <ni-input in-modal v-model.trim="newHelper.mobilePhone" last :error="$v.newHelper.mobilePhone.$error"
-          caption="Numéro de Téléphone" @blur="$v.newHelper.mobilePhone.$touch"
+          caption="Numéro de téléphone" @blur="$v.newHelper.mobilePhone.$touch"
           error-label="Numéro de téléphone invalide" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter un aidant" icon-right="add" color="primary"
@@ -257,7 +257,7 @@
       <ni-input in-modal v-model="editedHelper.identity.firstname" caption="Prénom" />
       <ni-input in-modal v-model="editedHelper.local.email" caption="Email" disable />
       <ni-input in-modal v-model.trim="editedHelper.mobilePhone" last :error="$v.editedHelper.mobilePhone.$error"
-          caption="Numéro de Téléphone" @blur="$v.editedHelper.mobilePhone.$touch"
+          caption="Numéro de téléphone" @blur="$v.editedHelper.mobilePhone.$touch"
           error-label="Numéro de téléphone invalide" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Modifier l'aidant" icon-right="add" color="primary"
