@@ -148,6 +148,7 @@ module.exports = function (ctx) {
         'QPageSticky',
         'QProgress',
         'QScrollArea',
+        'QInfiniteScroll',
       ],
       directives: [
         'Ripple',

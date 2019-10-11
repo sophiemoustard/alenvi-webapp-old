@@ -1,20 +1,22 @@
 <template>
-  <div class="history-container" :style="{ height: `${height}px`, top: `${this.top}px` }" >
+  <q-infinite-scroll inline :handler="load" class="history-container"
+    :style="{ height: `${height}px`, top: `${this.top}px` }">
     <div class="row history-title">
       <div class="col-11">Flux d'activité</div>
       <div class="col-1 cursor-pointer">
         <q-icon name="clear" size="16px" @click.native="close" />
       </div>
     </div>
-    <q-scroll-area>
-      <template v-if="eventHistories.length !== 0">
-        <ni-event-history v-for="history in eventHistories" :key="history._id" :history="history" />
-      </template>
-      <div v-else class="loading">
+    <template v-if="eventHistories.length !== 0">
+      <ni-event-history v-for="history in eventHistories" :key="history._id" :history="history" />
+      <div slot="message" class="loading">
         <q-spinner />
       </div>
-    </q-scroll-area>
-  </div>
+    </template>
+    <div v-else class="loading">
+      <q-spinner />
+    </div>
+  </q-infinite-scroll>
 </template>
 
 <script>
@@ -40,6 +42,9 @@ export default {
     close () {
       this.$emit('toggleHistory');
     },
+    load (index, done) {
+      this.$emit('updateFeeds', done);
+    },
   },
 }
 </script>
@@ -47,7 +52,7 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables';
   .history-container
-    overflow-y: scroll;
+    overflow: auto;
     background-color: $white;
     width: 300px;
     top: 60px;
@@ -56,8 +61,6 @@ export default {
     right: 0;
     position: absolute;
     box-shadow: 0 3px 5px -1px rgba(0,0,0,0.2), 0 5px 8px rgba(0,0,0,0.14), 0 1px 14px rgba(0,0,0,0.12)
-    .q-scrollarea
-      height: 100%;
 
   .history-title
     margin: 10px 2px;

@@ -91,7 +91,7 @@
       </table>
     </div>
     <q-page-sticky expand position="right">
-      <ni-event-history-feed v-if="displayHistory" :eventHistories="eventHistories" @toggleHistory="toggleHistory" />
+      <ni-event-history-feed v-if="displayHistory" :eventHistories="eventHistories" @toggleHistory="toggleHistory" @updateFeeds="$emit('updateFeeds', $event)" />
     </q-page-sticky>
   </div>
 </template>

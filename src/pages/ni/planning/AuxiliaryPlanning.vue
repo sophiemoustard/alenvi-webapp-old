@@ -4,7 +4,7 @@
       @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop"
       :filteredSectors="filteredSectors" :can-edit="canEditEvent" :personKey="personKey" :filters="activeFilters"
       @toggleAllSectors="toggleAllSectors" :eventHistories="eventHistories" ref="planningManager"
-      :displayAllSectors="displayAllSectors" @toggleHistory="toggleHistory" :displayHistory="displayHistory" />
+      :displayAllSectors="displayAllSectors" @toggleHistory="toggleHistory" :displayHistory="displayHistory" @updateFeeds="updateEventHistories" />
 
     <!-- Event creation modal -->
     <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import cloneDeep from 'lodash/cloneDeep';
 import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryEventCreationModal';
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
 import Planning from '../../../components/planning/Planning.vue';
@@ -183,7 +184,7 @@ export default {
         }
 
         this.events = await this.$events.list(params);
-        if (this.displayHistory) await this.getEventHistories();
+        if (this.displayHistory) await this.updateEventHistories();
       } catch (e) {
         console.error(e);
         this.events = [];
@@ -197,15 +198,28 @@ export default {
         this.customers = [];
       }
     },
-    async getEventHistories () {
+    async getEventHistories (lastCreatedAt = null) {
+      const eventHistoriesTmp = cloneDeep(this.eventHistories);
       try {
-        this.eventHistories = await this.$eventHistories.list({
+        const params = {
           sectors: this.filteredSectors.map(sector => sector._id),
           auxiliaries: this.auxiliaries.map(aux => aux._id),
-        });
+        };
+
+        let oldEventHistories;
+        if (lastCreatedAt) {
+          oldEventHistories = await this.$eventHistories.list({ ...params, createdAt: lastCreatedAt });
+          this.eventHistories.push(...oldEventHistories);
+        } else {
+          oldEventHistories = await this.$eventHistories.list(params);
+          this.eventHistories = oldEventHistories;
+        }
+
+        return oldEventHistories;
       } catch (e) {
         console.error(e);
-        this.eventHistories = [];
+        this.eventHistories = eventHistoriesTmp;
+        NotifyNegative("Erreur lors de la récupération du flux d'activité");
       }
     },
     // Event creation
@@ -283,6 +297,12 @@ export default {
             this.filteredAuxiliaries.some(filteredAux => history.auxiliaries.map(aux => aux._id).includes(filteredAux._id)));
         if (this.eventHistories.length === 0) this.displayHistory = false;
       }
+    },
+    async updateEventHistories (done) {
+      const lastCreatedAt = this.eventHistories.length ? this.eventHistories[this.eventHistories.length - 1].createdAt : null
+      const oldEventHistories = await this.getEventHistories(lastCreatedAt);
+      if (oldEventHistories.length) return done();
+      done(true);
     },
   },
 }
