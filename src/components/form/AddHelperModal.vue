@@ -30,9 +30,14 @@ import randomize from 'randomatic';
 import { clear } from '../../helpers/utils.js';
 
 export default {
+  name: 'AddHelperModal',
   props: {
     addHelper: { type: Boolean, default: false },
     company: { type: Object, default: () => ({}) },
+  },
+  components: {
+    'ni-input': Input,
+    'ni-modal': Modal,
   },
   data () {
     return {
@@ -49,14 +54,19 @@ export default {
       },
     }
   },
+  validations: {
+    newHelper: {
+      identity: { lastname: { required } },
+      local: {
+        email: { required, email },
+      },
+      mobilePhone: { frPhoneNumber },
+    },
+  },
   computed: {
     userProfile () {
       return this.$store.getters['rh/getUserProfile'];
     },
-  },
-  components: {
-    'ni-input': Input,
-    'ni-modal': Modal,
   },
   methods: {
     emailError () {
@@ -110,15 +120,6 @@ export default {
       this.$v.newHelper.$reset();
       this.newHelper = Object.assign({}, clear(this.newHelper));
       this.$emit('hide');
-    },
-  },
-  validations: {
-    newHelper: {
-      identity: { lastname: { required } },
-      local: {
-        email: { required, email },
-      },
-      mobilePhone: { frPhoneNumber },
     },
   },
 }

@@ -26,6 +26,7 @@ import { frPhoneNumber } from '../../helpers/vuelidateCustomVal';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify.js';
 
 export default {
+  name: 'EditHelperModal',
   props: {
     openEditedHelperModal: { type: Boolean, default: false },
     editedHelper: { type: Object, default: () => ({}) },
@@ -33,6 +34,20 @@ export default {
   components: {
     'ni-input': Input,
     'ni-modal': Modal,
+  },
+  data () {
+    return {
+      loading: false,
+    }
+  },
+  validations: {
+    editedHelper: {
+      identity: { lastname: { required } },
+      local: {
+        email: { required, email },
+      },
+      mobilePhone: { frPhoneNumber },
+    },
   },
   methods: {
     resetEditedHelperForm () {
@@ -56,20 +71,6 @@ export default {
       } finally {
         this.loading = false;
       }
-    },
-  },
-  data () {
-    return {
-      loading: false,
-    }
-  },
-  validations: {
-    editedHelper: {
-      identity: { lastname: { required } },
-      local: {
-        email: { required, email },
-      },
-      mobilePhone: { frPhoneNumber },
     },
   },
 }
