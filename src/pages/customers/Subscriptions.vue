@@ -284,25 +284,22 @@ export default {
       this.tmpInput = this.$_.get(this.customer, path);
     },
     // Customer
-    async updateAlenviCustomer (path) {
-      let value = this.$_.get(this.customer, path);
-      if (path.match(/iban/i)) value = value.split(' ').join('');
-
-      const payload = this.$_.set({}, path, value);
-      payload._id = this.customer._id;
-      await this.$customers.updateById(payload);
-    },
     async updateCustomer (path) {
       try {
-        if (this.tmpInput === this.$_.get(this.customer, path)) return;
+        let value = this.$_.get(this.customer, path);
+        if (this.tmpInput === value) return;
+
         this.$_.get(this.$v.customer, path).$touch();
         if (this.$_.get(this.$v.customer, path).$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await this.updateAlenviCustomer(path);
+        if (path.match(/iban/i)) value = value.split(' ').join('');
+
+        await this.$customers.updateById(this.customer._id, this.$_.set({}, path, value));
         await this.$store.dispatch('main/getUser', this.helper._id);
         await this.refreshCustomer();
         NotifyPositive('Modification enregistrée');
-        if (path === 'payment.iban') {
+
+        if (path.match(/iban/i)) {
           this.$v.customer.payment.bic.$touch();
           if (!this.$v.customer.payment.bic.required) return NotifyWarning('Merci de renseigner votre BIC');
         }

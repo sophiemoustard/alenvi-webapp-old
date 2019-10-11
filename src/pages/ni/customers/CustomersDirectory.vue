@@ -35,8 +35,8 @@
         caption="Nom" @blur="$v.newCustomer.identity.lastname.$touch" required-field />
       <ni-input in-modal v-model="newCustomer.identity.firstname" caption="Prénom" />
       <div class="row margin-input last">
-        <ni-search-address v-model="newCustomer.contact.address" @blur="$v.newCustomer.contact.address.$touch"
-          :error="$v.newCustomer.contact.address.$error" :error-label="addressError" in-modal required-field />
+        <ni-search-address v-model="newCustomer.contact.primaryAddress" @blur="$v.newCustomer.contact.primaryAddress.$touch"
+          :error="$v.newCustomer.contact.primaryAddress.$error" :error-label="primaryAddressError" in-modal required-field />
       </div>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary"
@@ -57,7 +57,7 @@ import DirectoryHeader from '../../../components/DirectoryHeader';
 import Modal from '../../../components/Modal';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../../components/popup/notify.js';
 import { customerProfileValidation } from '../../../helpers/customerProfileValidation.js';
-import { REQUIRED_LABEL } from '../../../data/constants';
+import { REQUIRED_LABEL, CIVILITY_OPTIONS } from '../../../data/constants';
 import { validationMixin } from '../../../mixins/validationMixin.js';
 import { formatIdentity } from '../../../helpers/utils';
 
@@ -81,10 +81,7 @@ export default {
       loading: false,
       opened: false,
       sendWelcomeMsg: true,
-      civilityOptions: [
-        { label: 'Monsieur', value: 'M.' },
-        { label: 'Madame', value: 'Mme' },
-      ],
+      civilityOptions: CIVILITY_OPTIONS,
       newCustomer: {
         identity: {
           title: '',

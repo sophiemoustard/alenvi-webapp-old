@@ -20,12 +20,16 @@ export const customerMixin = {
   methods: {
     async updateCustomer (path) {
       try {
-        if (this.tmpInput === this.$_.get(this.customer, path)) return;
+        let value = this.$_.get(this.customer, path);
+        if (this.tmpInput === value) return;
         if (this.$_.get(this.$v.customer, path)) {
           const isValid = await this.waitForValidation(this.$v.customer, path);
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
-        await this.updateAlenviCustomer(path);
+
+        if (path.match(/iban/i)) value = value.split(' ').join('');
+        const payload = this.$_.set({}, path, value);
+        await this.$customers.updateById(this.userProfile._id, payload);
 
         NotifyPositive('Modification enregistrée');
         if (path.match(/iban/i)) this.refreshCustomer();
@@ -38,14 +42,6 @@ export const customerMixin = {
       } finally {
         this.tmpInput = '';
       }
-    },
-    async updateAlenviCustomer (path) {
-      let value = this.$_.get(this.customer, path);
-      if (path.match(/iban/i)) value = value.split(' ').join('');
-
-      const payload = this.$_.set({}, path, value);
-      payload._id = this.userProfile._id;
-      await this.$customers.updateById(payload);
     },
   },
 };

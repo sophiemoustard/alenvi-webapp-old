@@ -31,8 +31,8 @@ export default {
   async remove (id) {
     return alenviAxios.delete(`${process.env.API_HOSTNAME}/customers/${id}`);
   },
-  async updateById (data) {
-    return alenviAxios.put(`${process.env.API_HOSTNAME}/customers/${data._id}`, data);
+  async updateById (id, data) {
+    return alenviAxios.put(`${process.env.API_HOSTNAME}/customers/${id}`, data);
   },
   async removeHelper (params) {
     return alenviAxios.delete(`${process.env.API_HOSTNAME}/customers/${params._id}/helpers/${params.helperId}`);

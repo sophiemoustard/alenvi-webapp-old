@@ -35,7 +35,8 @@
         Créer une nouvelle <span class="text-weight-bold">fiche auxiliaire</span>
       </template>
 
-      <ni-select in-modal v-model="newUser.identity.title" :options="civilityOptions" caption="Civilité" />
+      <ni-select in-modal v-model="newUser.identity.title" :options="civilityOptions" caption="Civilité"
+        required-field :error="$v.newUser.identity.title.$error" @blur="$v.newUser.identity.title.$touch" />
       <ni-input in-modal v-model="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error" caption="Nom"
         @blur="$v.newUser.identity.lastname.$touch" required-field />
       <ni-input in-modal v-model="newUser.identity.firstname" :error="$v.newUser.identity.firstname.$error"
@@ -85,7 +86,7 @@ import SearchAddress from '../../../components/form/SearchAddress';
 import DirectoryHeader from '../../../components/DirectoryHeader';
 import Modal from '../../../components/Modal';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../../../components/popup/notify.js';
-import { DEFAULT_AVATAR, AUXILIARY, PLANNING_REFERENT, REQUIRED_LABEL } from '../../../data/constants';
+import { DEFAULT_AVATAR, AUXILIARY, PLANNING_REFERENT, REQUIRED_LABEL, CIVILITY_OPTIONS } from '../../../data/constants';
 import { validationMixin } from '../../../mixins/validationMixin.js';
 export default {
   metaInfo: { title: 'Répertoire auxiliaires' },
@@ -105,10 +106,7 @@ export default {
       loading: false,
       auxiliaryCreationModal: false,
       sendWelcomeMsg: true,
-      civilityOptions: [
-        { label: 'Monsieur', value: 'M.' },
-        { label: 'Madame', value: 'Mme' },
-      ],
+      civilityOptions: CIVILITY_OPTIONS.filter(opt => opt.value !== 'couple'),
       defaultNewUser: {
         identity: {
           lastname: '',
@@ -209,6 +207,7 @@ export default {
       identity: {
         lastname: { required },
         firstname: { required },
+        title: { required },
       },
       mobilePhone: {
         required,
@@ -359,7 +358,6 @@ export default {
       payload.role = roles[0]._id;
       payload.company = this.company._id;
 
-      if (!payload.identity.title) delete payload.identity.title;
       if (!payload.contact.address.fullAddress) delete payload.contact;
 
       return payload;
