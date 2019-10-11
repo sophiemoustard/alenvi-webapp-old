@@ -198,6 +198,7 @@ export default {
       }
     },
     async getEventHistories (lastCreatedAt = null) {
+      const eventHistoriesTmp = this.eventHistories;
       try {
         const params = {
           sectors: this.filteredSectors.map(sector => sector._id),
@@ -216,7 +217,7 @@ export default {
         return oldEventHistories;
       } catch (e) {
         console.error(e);
-        if (!lastCreatedAt) this.eventHistories = [];
+        this.eventHistories = eventHistoriesTmp;
         NotifyNegative("Erreur lors de la récupération du flux d'activité");
       }
     },

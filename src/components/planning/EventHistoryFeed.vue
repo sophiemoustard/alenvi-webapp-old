@@ -9,7 +9,7 @@
     </div>
     <template v-if="eventHistories.length !== 0">
       <ni-event-history v-for="history in eventHistories" :key="history._id" :history="history" />
-      <div class="loading">
+      <div slot="message" class="loading">
         <q-spinner />
       </div>
     </template>
