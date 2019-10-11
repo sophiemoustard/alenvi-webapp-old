@@ -229,7 +229,7 @@
     </div>
 
     <!-- Add helper modal -->
-    <add-helper-modal :addHelperParent="addHelper" :company="company" @closed="closeAddHelperModal" />
+    <add-helper-modal :addHelper="addHelper" :company="company" @closed="closeAddHelperModal" @hide="resetHelperForm"/>
 
     <!-- Edit helper modal -->
     <ni-modal v-model="openEditedHelperModal" @hide="resetEditedHelperForm">
@@ -853,7 +853,7 @@ export default {
   methods: {
     async closeAddHelperModal () {
       await this.getUserHelpers();
-      this.addHelper = false
+      this.resetHelperForm();
     },
     formatAdditionalFields (row) {
       return [
@@ -1017,6 +1017,9 @@ export default {
       }
     },
     // Helpers
+    resetHelperForm () {
+      this.addHelper = false;
+    },
     resetEditedHelperForm () {
       this.$v.editedHelper.$reset();
       this.editedHelper = Object.assign({}, clear(this.editedHelper));
