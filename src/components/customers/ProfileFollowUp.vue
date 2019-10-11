@@ -32,7 +32,7 @@
         <p class="text-weight-bold">Aidants</p>
       </div>
       <q-table :data="sortedHelpers" :columns="helperColumns" row-key="name" :pagination="helperPagination"
-        hide-bottom />
+        hide-bottom :visible-columns="visibleColumns" />
     </div>
     <div class="q-mb-xl" v-if="customer.firstIntervention">
       <div class="row justify-between items-baseline">
@@ -63,6 +63,7 @@ import SearchAddress from '../form/SearchAddress';
 import { extend, formatIdentity } from '../../helpers/utils.js';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { validationMixin } from '../../mixins/validationMixin.js';
+import { helperMixin } from '../../mixins/helperMixin.js';
 import { frPhoneNumber } from '../../helpers/vuelidateCustomVal';
 
 export default {
@@ -72,13 +73,13 @@ export default {
     'ni-select': Select,
     'ni-search-address': SearchAddress,
   },
-  mixins: [customerMixin, validationMixin],
+  mixins: [customerMixin, validationMixin, helperMixin],
   data () {
     return {
       isLoaded: false,
       customer: { followUp: {}, contact: {} },
       tmpInput: '',
-      helpers: [],
+      visibleColumns: ['lastname', 'firstname', 'email', 'phone'],
       customerFollowUp: [],
       followUpColumns: [
         {
@@ -100,21 +101,6 @@ export default {
         },
       ],
       followUpPagination: { rowsPerPage: 5 },
-      helperColumns: [
-        {
-          name: 'identity',
-          label: 'Identité',
-          align: 'left',
-          field: row => formatIdentity(row.identity, 'LF'),
-        },
-        {
-          name: 'email',
-          label: 'Email',
-          align: 'left',
-          field: row => row.local.email,
-        },
-      ],
-      helperPagination: { rowsPerPage: 0 },
     };
   },
   validations: {
@@ -134,11 +120,6 @@ export default {
     isAuxiliary () {
       return AUXILIARY_ROLES.includes(this.currentUser.role.name);
     },
-    sortedHelpers () {
-      return [...this.helpers].sort((u1, u2) => {
-        return (u1.identity.lastname || '').localeCompare((u2.identity.lastname || ''));
-      });
-    },
   },
   async mounted () {
     await this.getCustomer(this.userProfile._id);
@@ -146,14 +127,6 @@ export default {
     if (this.customer.firstIntervention) await this.getCustomerFollowUp();
   },
   methods: {
-    async getUserHelpers () {
-      try {
-        this.helpers = await this.$users.showAll({ customers: this.userProfile._id });
-      } catch (e) {
-        this.helpers = [];
-        NotifyNegative('Erreur lors de la récupération des aidants');
-      }
-    },
     async getCustomerFollowUp () {
       try {
         this.customerFollowUp = await this.$stats.getCustomerFollowUp({ customer: this.customer._id });
