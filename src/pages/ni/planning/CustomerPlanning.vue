@@ -38,7 +38,7 @@
               :filter-placeholder="customerAddress(newEvent).fullAddress" readonly :options="customerAddressList(newEvent)" />
           <q-select v-else v-model="newEvent.address" color="white" inverted-light :options="customerAddressList(newEvent)"
               :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAddressSelect(); }, }]"
-              :filter-placeholder="customerAddress(newEvent)" ref="addressSelect" filter />
+              :filter-placeholder="customerAddress(newEvent)" ref="addressSelect" filter @input="onChangedAddress(selectedAddress, editedEvent)"/>
         </div>
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary"
@@ -100,7 +100,7 @@
               color="white" inverted-light :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { }, }]"
               :filter-placeholder="customerAddress(editedEvent).fullAddress" readonly :options="customerAddressList(newEvent)"/>
           <q-select v-else v-model="editedEvent.address" color="white" inverted-light
-              :options="customerAddressList(editedEvent)"
+              :options="customerAddressList(editedEvent)" @input="onChangedAddress(selectedAddress, editedEvent)"
               :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAddressSelect(); }, }]"
               :filter-placeholder="customerAddress(editedEvent).fullAddress" ref="addressSelect" filter />
           <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect(editedEvent)" />

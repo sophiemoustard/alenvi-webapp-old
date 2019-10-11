@@ -90,13 +90,13 @@
     </div>
     <div v-if="editedEvent.type === INTERVENTION && customerAddressList(editedEvent).length > 0" class="customer-info">
       <div class="row items-center no-wrap">
-        <q-select v-if="customerAddressList(editedEvent).length === 1" v-model="selectedAddress"
+        <q-select v-if="customerAddressList(editedEvent).length === 1" v-model="editedEvent.address.fullAddress"
             :options="customerAddressList(editedEvent)" color="white" inverted-light
             :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { }, }]"
             :filter-placeholder="customerAddress(editedEvent)" readonly/>
-        <q-select v-else v-model="selectedAddress" color="white" inverted-light :options="customerAddressList(editedEvent)"
+        <q-select v-else v-model="editedEvent.address.fullAddress" color="white" inverted-light :options="customerAddressList(editedEvent)"
             :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAddressSelect(); }, }]"
-            :filter-placeholder="customerAddress(editedEvent)" ref="addressSelect" filter />
+            :filter-placeholder="customerAddress(editedEvent)" ref="addressSelect" filter @input="onChangedAddress(editedEvent.address.fullAddress, editedEvent)"/>
         <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect(editedEvent)" />
       </div>
     </div>
@@ -122,6 +122,7 @@ export default {
     customers: { type: Array, default: () => [] },
     internalHours: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
+    selectedEvent: { type: String, default: '' },
   },
   data () {
     return {

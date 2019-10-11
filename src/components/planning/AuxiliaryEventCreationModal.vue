@@ -70,13 +70,13 @@
     </div>
     <div v-if="newEvent.type === INTERVENTION && customerAddressList(newEvent).length > 0" class="customer-info">
       <div class="row items-center no-wrap">
-        <q-select v-if="customerAddressList(newEvent).length === 1" v-model="newEvent.address" color="white"
+        <q-select v-if="customerAddressList(newEvent).length === 1" v-model="selectedAddress" color="white"
             inverted-light :options="customerAddressList(newEvent)"
             :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAddressSelect(); }, }]"
             :filter-placeholder="customerAddress(newEvent)" ref="addressSelect" filter  readonly/>
-        <q-select v-else v-model="newEvent.address.fullAddress" color="white" inverted-light :options="customerAddressList(newEvent)"
+        <q-select v-else v-model="selectedAddress" color="white" inverted-light :options="customerAddressList(newEvent)"
             :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAddressSelect(); }, }]"
-            :filter-placeholder="customerAddress(newEvent)" ref="addressSelect" filter />
+            :filter-placeholder="customerAddress(newEvent)" ref="addressSelect" filter @input="onChangedAddress(selectedAddres, newEvent)" />
       </div>
     </div>
     <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary"
@@ -104,6 +104,7 @@ export default {
   data () {
     return {
       personKey: AUXILIARY,
+      selectedAddress: '',
     };
   },
   computed: {
@@ -164,6 +165,7 @@ export default {
     selectCustomer (customerId) {
       const selectedCustomer = this.customers.find(customer => customer._id === customerId);
       this.newEvent.address = this.$_.get(selectedCustomer, 'contact.primaryAddress', {});
+      this.selectedAddress = this.newEvent.address.fullAddress;
       this.formatCustomerForEvent(selectedCustomer);
       const customerSubscriptionsOptions = this.customerSubscriptionsOptions(this.newEvent.customer._id);
       if (customerSubscriptionsOptions.length === 1 && this.creationModal) this.newEvent.subscription = customerSubscriptionsOptions[0].value;

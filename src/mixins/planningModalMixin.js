@@ -201,10 +201,10 @@ export const planningModalMixin = {
     customerAddressList (event) {
       const addresses = [];
       if (this.$_.has(event, 'customer.contact.primaryAddress')) {
-        addresses.push(this.formatAddressOptions(this.$_.get(event, 'customer.contact.primaryAddress')));
+        addresses.push(this.formatAddressOptions(this.$_.get(event, 'customer.contact.primaryAddress.fullAddress')));
       }
       if (this.$_.has(event, 'customer.contact.secondaryAddress')) {
-        addresses.push(this.formatAddressOptions(this.$_.get(event, 'customer.contact.secondaryAddress')));
+        addresses.push(this.formatAddressOptions(this.$_.get(event, 'customer.contact.secondaryAddress.fullAddress')));
       }
       return addresses;
     },
@@ -225,7 +225,7 @@ export const planningModalMixin = {
       };
     },
     formatAddressOptions (address) {
-      return { label: address.fullAddress, value: address };
+      return { label: address, value: address };
     },
     // Event creation
     customerSubscriptionsOptions (customerId) {
@@ -268,6 +268,14 @@ export const planningModalMixin = {
     },
     toggleAddressSelect () {
       return this.$refs['addressSelect'].show();
+    },
+    onChangedAddress (value, event) {
+      debugger
+      event.address = this.$_.get(event, 'customer.contact.primaryAddress.fullAddress', null) === value
+        ? this.$_.get(event, 'customer.contact.primaryAddress')
+        : this.$_.get(event, 'customer.contact.secondaryAddress.fullAddress', null) === value
+          ? this.$_.get(event, 'customer.contact.secondaryAddress')
+          : {};
     },
   },
 };
