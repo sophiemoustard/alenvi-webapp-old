@@ -5,8 +5,9 @@ const moment = require('moment');
 
 export const frPhoneNumber = (value) => {
   if (!value) return true;
-
-  return value.split(' ').join('').match(/[0]{1}[1-7]{1}[0-9]{8}/) || false;
+  const phoneNumber = value.split(' ').join('');
+  if (phoneNumber.length !== 10 || !phoneNumber.match(/[0]{1}[1-7]{1}[0-9]{8}/)) return false;
+  return true;
 };
 
 export const frZipCode = (value) => {
