@@ -63,6 +63,7 @@ export const planningModalMixin = {
       cancellationConditions: CANCELLATION_OPTIONS,
       cancellationReasons: CANCELLATION_REASONS,
       addressError: 'Adresse non valide',
+      selectedAddress: '',
     };
   },
   computed: {
@@ -200,10 +201,10 @@ export const planningModalMixin = {
     customerAddressList (event) {
       const addresses = [];
       if (this.$_.has(event, 'customer.contact.primaryAddress')) {
-        addresses.push(this.formatAddressOptions(this.$_.get(event, 'customer.contact.primaryAddress.fullAddress')));
+        addresses.push(this.formatAddressOptions(this.$_.get(event, 'customer.contact.primaryAddress')));
       }
       if (this.$_.has(event, 'customer.contact.secondaryAddress')) {
-        addresses.push(this.formatAddressOptions(this.$_.get(event, 'customer.contact.secondaryAddress.fullAddress')));
+        addresses.push(this.formatAddressOptions(this.$_.get(event, 'customer.contact.secondaryAddress')));
       }
       return addresses;
     },
@@ -224,7 +225,7 @@ export const planningModalMixin = {
       };
     },
     formatAddressOptions (address) {
-      return { label: address, value: address };
+      return { label: address.fullAddress, value: address };
     },
     // Event creation
     customerSubscriptionsOptions (customerId) {
@@ -253,13 +254,6 @@ export const planningModalMixin = {
     },
     isRepetition (event) {
       return ABSENCE !== event.type && event.repetition && event.repetition.frequency !== NEVER;
-    },
-    chooseCustomer (customerId) {
-      const selectedCustomer = this.customers.find(customer => customer._id === customerId);
-      this.newEvent.address = this.$_.get(selectedCustomer, 'contact.primaryAddress', {});
-      this.formatCustomerForEvent(selectedCustomer);
-      const customerSubscriptionsOptions = this.customerSubscriptionsOptions(this.newEvent.customer._id);
-      if (customerSubscriptionsOptions.length === 1 && this.creationModal) this.newEvent.subscription = customerSubscriptionsOptions[0].value;
     },
     formatCustomerForEvent (customer) {
       this.newEvent.customer = {

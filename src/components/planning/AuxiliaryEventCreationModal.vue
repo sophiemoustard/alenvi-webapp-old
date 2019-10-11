@@ -25,7 +25,7 @@
       <template v-if="newEvent.type === INTERVENTION">
         <ni-select in-modal caption="Bénéficiaire" v-model="newEvent.customer._id" :options="customersOptions"
           :error="validations.customer.$error" required-field @blur="validations.customer.$touch"
-          @input="chooseCustomer"/>
+          @input="selectCustomer"/>
         <ni-select in-modal caption="Service" v-model="newEvent.subscription" :error="validations.subscription.$error"
           :options="customerSubscriptionsOptions(newEvent.customer._id)" required-field @blur="validations.subscription.$touch" />
       </template>
@@ -70,7 +70,7 @@
     </div>
     <div v-if="newEvent.type === INTERVENTION && customerAddressList(newEvent).length > 0" class="customer-info">
       <div class="row items-center no-wrap">
-        <q-select v-if="customerAddressList(newEvent).length === 1" v-model="newEvent.address.fullAddress" color="white"
+        <q-select v-if="customerAddressList(newEvent).length === 1" v-model="newEvent.address" color="white"
             inverted-light :options="customerAddressList(newEvent)"
             :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAddressSelect(); }, }]"
             :filter-placeholder="customerAddress(newEvent)" ref="addressSelect" filter  readonly/>
@@ -161,6 +161,13 @@ export default {
     },
   },
   methods: {
+    selectCustomer (customerId) {
+      const selectedCustomer = this.customers.find(customer => customer._id === customerId);
+      this.newEvent.address = this.$_.get(selectedCustomer, 'contact.primaryAddress', {});
+      this.formatCustomerForEvent(selectedCustomer);
+      const customerSubscriptionsOptions = this.customerSubscriptionsOptions(this.newEvent.customer._id);
+      if (customerSubscriptionsOptions.length === 1 && this.creationModal) this.newEvent.subscription = customerSubscriptionsOptions[0].value;
+    },
     toggleAuxiliarySelect () {
       return this.$refs['auxiliarySelect'].show();
     },

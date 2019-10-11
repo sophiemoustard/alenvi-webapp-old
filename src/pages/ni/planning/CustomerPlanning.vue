@@ -33,10 +33,10 @@
       </div>
       <div v-if="newEvent.type === INTERVENTION && customerAddressList(newEvent).length > 0" class="customer-info">
         <div class="row items-center no-wrap">
-          <q-select v-if="customerAddressList(newEvent).length === 1" v-model="newEvent.address.fullAddress"
+          <q-select v-if="customerAddressList(newEvent).length === 1" v-model="newEvent.address"
               color="white" inverted-light :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { }, }]"
               :filter-placeholder="customerAddress(newEvent).fullAddress" readonly :options="customerAddressList(newEvent)" />
-          <q-select v-else v-model="newEvent.address.fullAddress" color="white" inverted-light :options="customerAddressList(newEvent)"
+          <q-select v-else v-model="newEvent.address" color="white" inverted-light :options="customerAddressList(newEvent)"
               :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAddressSelect(); }, }]"
               :filter-placeholder="customerAddress(newEvent)" ref="addressSelect" filter />
         </div>
@@ -96,10 +96,10 @@
       </div>
       <div v-if="editedEvent.type === INTERVENTION && customerAddressList(editedEvent).length > 0" class="customer-info">
         <div class="row items-center no-wrap">
-          <q-select v-if="customerAddressList(editedEvent).length === 1" v-model="editedEvent.address.fullAddress"
+          <q-select v-if="customerAddressList(editedEvent).length === 1" v-model="editedEvent.address"
               color="white" inverted-light :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { }, }]"
               :filter-placeholder="customerAddress(editedEvent).fullAddress" readonly :options="customerAddressList(newEvent)"/>
-          <q-select v-else v-model="editedEvent.address.fullAddress" color="white" inverted-light
+          <q-select v-else v-model="editedEvent.address" color="white" inverted-light
               :options="customerAddressList(editedEvent)"
               :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAddressSelect(); }, }]"
               :filter-placeholder="customerAddress(editedEvent).fullAddress" ref="addressSelect" filter />
