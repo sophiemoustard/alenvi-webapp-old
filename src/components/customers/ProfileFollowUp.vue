@@ -10,8 +10,6 @@
         <ni-input v-if="isAuxiliary" caption="Téléphone" type="tel" :error="$v.customer.contact.phone.$error"
           error-label="Numéro de téléphone non valide" v-model.trim="customer.contact.phone"
           @focus="saveTmp('contact.phone')" @blur="updateCustomer('contact.phone')" />
-      </div>
-      <div class="row gutter-profile">
         <ni-search-address v-if="isAuxiliary" caption='Adresse principale' v-model="customer.contact.primaryAddress" color="white" disable />
         <ni-search-address v-if="isAuxiliary" caption='Adresse secondaire' v-model="customer.contact.secondaryAddress" color="white" disable />
       </div>
