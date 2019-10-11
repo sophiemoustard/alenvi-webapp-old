@@ -248,20 +248,20 @@
     </ni-modal>
 
     <!-- Edit helper modal -->
-    <ni-modal v-model="modifyHelper" @hide="resetModifyHelperForm">
+    <ni-modal v-model="openEditedHelperModal" @hide="resetEditedHelperForm">
       <template slot="title">
         Modifier l'<span class="text-weight-bold">aidant</span>
       </template>
-      <ni-input in-modal v-model="editHelper.identity.lastname" :error="$v.editHelper.identity.lastname.$error"
-        caption="Nom" @blur="$v.editHelper.identity.lastname.$touch" required-field />
-      <ni-input in-modal v-model="editHelper.identity.firstname" caption="Prénom" />
-      <ni-input in-modal v-model="editHelper.local.email" caption="Email" disable />
-      <ni-input in-modal v-model.trim="editHelper.mobilePhone" last :error="$v.editHelper.mobilePhone.$error"
-          caption="Numéro de Téléphone" @blur="$v.editHelper.mobilePhone.$touch"
+      <ni-input in-modal v-model="editedHelper.identity.lastname" :error="$v.editedHelper.identity.lastname.$error"
+        caption="Nom" @blur="$v.editedHelper.identity.lastname.$touch" required-field />
+      <ni-input in-modal v-model="editedHelper.identity.firstname" caption="Prénom" />
+      <ni-input in-modal v-model="editedHelper.local.email" caption="Email" disable />
+      <ni-input in-modal v-model.trim="editedHelper.mobilePhone" last :error="$v.editedHelper.mobilePhone.$error"
+          caption="Numéro de Téléphone" @blur="$v.editedHelper.mobilePhone.$touch"
           error-label="Numéro de téléphone invalide" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Modifier l'aidant" icon-right="add" color="primary"
-          :loading="loading" @click="submitEditedHelper" />
+          :loading="loading" @click="editHelper" />
       </template>
     </ni-modal>
 
@@ -491,7 +491,7 @@ export default {
       days,
       loading: false,
       addHelper: false,
-      modifyHelper: false,
+      openEditedHelperModal: false,
       subscriptionCreationModal: false,
       subscriptionEditionModal: false,
       civilityOptions: CIVILITY_OPTIONS,
@@ -599,7 +599,7 @@ export default {
         },
         mobilePhone: '',
       },
-      editHelper: {
+      editedHelper: {
         identity: {
           lastname: '',
           firstname: '',
@@ -823,7 +823,7 @@ export default {
       },
       mobilePhone: { frPhoneNumber },
     },
-    editHelper: {
+    editedHelper: {
       identity: { lastname: { required } },
       local: {
         email: { required, email },
@@ -1057,9 +1057,9 @@ export default {
       this.$v.newHelper.$reset();
       this.newHelper = Object.assign({}, clear(this.newHelper));
     },
-    resetModifyHelperForm () {
-      this.$v.editHelper.$reset();
-      this.editHelper = Object.assign({}, clear(this.editHelper));
+    resetEditedHelperForm () {
+      this.$v.editedHelper.$reset();
+      this.editedHelper = Object.assign({}, clear(this.editedHelper));
     },
     async createAlenviHelper () {
       this.newHelper.local.password = randomize('0', 6);
@@ -1071,10 +1071,6 @@ export default {
       this.newHelper.identity = this.$_.pickBy(this.newHelper.identity);
       const payload = this.$_.pickBy(this.newHelper);
       await this.$users.create(payload);
-    },
-    async modifyAlenviHelper () {
-      const payload = this.editHelper;
-      await this.$users.updateById(payload);
     },
     async sendWelcomingEmail () {
       await this.$email.sendWelcome({
@@ -1098,26 +1094,26 @@ export default {
         this.addHelper = false
       } catch (e) {
         e.response ? console.error(e.response) : console.error(e);
-        if (e && e.message === 'Invalid fields') return NotifyWarning('Champ(s) invalide(s)');
         if (e && e.response && e.response.status === 409) return NotifyNegative('Cet email est déjà utilisé par un compte existant');
         NotifyNegative('Erreur lors de la création de l\'aidant');
       } finally {
         this.loading = false;
       }
     },
-    async submitEditedHelper () {
+    async editHelper () {
       try {
         this.loading = true;
-        this.$v.editHelper.$touch();
-        if (this.$v.editHelper.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.$v.editedHelper.$touch();
+        if (this.$v.editedHelper.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await this.modifyAlenviHelper();
+        const payload = Object.assign({}, this.editedHelper);
+        delete payload.local;
+        await this.$users.updateById(payload);
         NotifyPositive('Aidant modifié');
         await this.getUserHelpers();
-        this.modifyHelper = false
+        this.openEditedHelperModal = false
       } catch (e) {
         e.response ? console.error(e.response) : console.error(e);
-        if (e && e.message === 'Invalid fields') return NotifyWarning('Champ(s) invalide(s)');
         NotifyNegative('Erreur lors de la modification de l\'aidant');
       } finally {
         this.loading = false;
@@ -1125,18 +1121,8 @@ export default {
     },
     openEditionModalHelper (helperId) {
       const helper = this.userHelpers.find(helper => helper._id === helperId);
-      this.editHelper = {
-        _id: helper._id,
-        mobilePhone: helper.mobilePhone,
-        local: {
-          email: helper.local.email,
-        },
-        identity: {
-          firstname: helper.identity.firstname,
-          lastname: helper.identity.lastname,
-        },
-      };
-      this.modifyHelper = true;
+      this.editedHelper = this.$_.pick(helper, ['_id', 'mobilePhone', 'local.email', 'identity.firstname', 'identity.lastname']);
+      this.openEditedHelperModal = true;
     },
     async removeHelper (helperId) {
       try {
