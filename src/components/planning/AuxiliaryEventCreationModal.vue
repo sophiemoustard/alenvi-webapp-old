@@ -68,13 +68,15 @@
       <ni-input in-modal v-model="newEvent.misc" caption="Notes" @blur="validations.misc.$touch"
         :error="validations.misc.$error" :required-field="newEvent.type === ABSENCE && newEvent.absence === OTHER" />
     </div>
-    <div v-if="newEvent.type === INTERVENTION && customerAddresses.length > 0" class="customer-info">
+    <div v-if="newEvent.type === INTERVENTION && customerAddressList(newEvent).length > 0" class="customer-info">
       <div class="row items-center no-wrap">
-        <div v-if="customerAddresses.length === 1" class="customer-address">{{ customerAddress }}</div>
-        <q-select v-else v-model="newEvent.address.fullAddress" color="white" inverted-light :options="customerAddresses"
+        <q-select v-if="customerAddressList(newEvent).length === 1" v-model="newEvent.address.fullAddress" color="white"
+            inverted-light :options="customerAddressList(newEvent)"
             :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAddressSelect(); }, }]"
-            :filter-placeholder="customerAddress" ref="addressSelect" filter />
-        <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect" />
+            :filter-placeholder="customerAddress(newEvent)" ref="addressSelect" filter  readonly/>
+        <q-select v-else v-model="newEvent.address.fullAddress" color="white" inverted-light :options="customerAddressList(newEvent)"
+            :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAddressSelect(); }, }]"
+            :filter-placeholder="customerAddress(newEvent)" ref="addressSelect" filter />
       </div>
     </div>
     <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary"

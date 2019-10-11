@@ -88,13 +88,16 @@
         </div>
       </template>
     </div>
-    <div v-if="editedEvent.type === INTERVENTION && customerAddresses.length > 0" class="customer-info">
+    <div v-if="editedEvent.type === INTERVENTION && customerAddressList(editedEvent).length > 0" class="customer-info">
       <div class="row items-center no-wrap">
-        <div v-if="customerAddresses.length === 1" class="customer-address">{{ customerAddress }}</div>
-        <q-select v-else v-model="editedEvent.address.fullAddress" color="white" inverted-light :options="customerAddresses"
+        <q-select v-if="customerAddressList(editedEvent).length === 1" v-model="editedEvent.address.fullAddress"
+            :options="customerAddressList(editedEvent)" color="white" inverted-light
+            :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { }, }]"
+            :filter-placeholder="customerAddress(editedEvent).fullAddress" readonly/>
+        <q-select v-else v-model="editedEvent.address.fullAddress" color="white" inverted-light :options="customerAddressList(editedEvent)"
             :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAddressSelect(); }, }]"
-            :filter-placeholder="customerAddress.fullAddress" ref="addressSelect" filter />
-        <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect" />
+            :filter-placeholder="customerAddress(editedEvent).fullAddress" ref="addressSelect" filter />
+        <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect(editedEvent)" />
       </div>
     </div>
     <q-btn v-if="!isDisabled" class="full-width modal-btn" no-caps color="primary" :loading="loading"

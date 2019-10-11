@@ -191,13 +191,13 @@ export const planningModalMixin = {
         { label: twoWeeksRepetitionLabel, value: EVERY_TWO_WEEKS },
       ];
     },
-    customerAddress () {
-      const event = this.editedEvent && this.editedEvent.address ? this.editedEvent : this.newEvent;
+  },
+  methods: {
+    customerAddress (event) {
       if (!(event.address && event.address.fullAddress)) event.address = this.$_.get(event, 'customer.contact.primaryAddress', '');
       return event.address.fullAddress;
     },
-    customerAddresses () {
-      const event = this.editedEvent && this.editedEvent.customer ? this.editedEvent : this.newEvent;
+    customerAddressList (event) {
       const addresses = [];
       if (this.$_.has(event, 'customer.contact.primaryAddress')) {
         addresses.push(this.formatAddressOptions(this.$_.get(event, 'customer.contact.primaryAddress.fullAddress')));
@@ -207,14 +207,11 @@ export const planningModalMixin = {
       }
       return addresses;
     },
-    customerProfileRedirect () {
-      const event = this.editedEvent && this.editedEvent.customer ? this.editedEvent : this.newEvent;
+    customerProfileRedirect (event) {
       return this.mainUser.role.name === COACH || this.mainUser.role.name === ADMIN
         ? { name: 'customers profile', params: { id: event.customer._id } }
         : { name: 'profile customers info', params: { customerId: event.customer._id } };
     },
-  },
-  methods: {
     getAvatar (user) {
       if (!user || !user._id) return UNKNOWN_AVATAR;
 
@@ -227,10 +224,7 @@ export const planningModalMixin = {
       };
     },
     formatAddressOptions (address) {
-      return {
-        label: address,
-        value: address,
-      };
+      return { label: address, value: address };
     },
     // Event creation
     customerSubscriptionsOptions (customerId) {
