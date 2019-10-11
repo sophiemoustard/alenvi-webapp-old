@@ -76,6 +76,7 @@
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
               <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions">
+                  <q-btn flat round small color="grey" icon="edit" @click="openEditionModalHelper(col.value)" />
                   <q-btn flat round small color="grey" icon="delete" @click.native="removeHelper(col.value)" />
                 </div>
               </template>
@@ -237,9 +238,30 @@
       <ni-input in-modal v-model="newHelper.identity.firstname" caption="Prénom" />
       <ni-input in-modal v-model="newHelper.local.email" last :error="$v.newHelper.local.email.$error" caption="Email"
         @blur="$v.newHelper.local.email.$touch" :error-label="emailError" required-field />
+      <ni-input in-modal v-model.trim="newHelper.mobilePhone" last :error="$v.newHelper.mobilePhone.$error"
+          caption="Numéro de téléphone" @blur="$v.newHelper.mobilePhone.$touch"
+          error-label="Numéro de téléphone invalide" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter un aidant" icon-right="add" color="primary"
           :loading="loading" @click="submitHelper" />
+      </template>
+    </ni-modal>
+
+    <!-- Edit helper modal -->
+    <ni-modal v-model="openEditedHelperModal" @hide="resetEditedHelperForm">
+      <template slot="title">
+        Modifier l'<span class="text-weight-bold">aidant</span>
+      </template>
+      <ni-input in-modal v-model="editedHelper.identity.lastname" :error="$v.editedHelper.identity.lastname.$error"
+        caption="Nom" @blur="$v.editedHelper.identity.lastname.$touch" required-field />
+      <ni-input in-modal v-model="editedHelper.identity.firstname" caption="Prénom" />
+      <ni-input in-modal v-model="editedHelper.local.email" caption="Email" disable />
+      <ni-input in-modal v-model.trim="editedHelper.mobilePhone" last :error="$v.editedHelper.mobilePhone.$error"
+          caption="Numéro de téléphone" @blur="$v.editedHelper.mobilePhone.$touch"
+          error-label="Numéro de téléphone invalide" />
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Modifier l'aidant" icon-right="add" color="primary"
+          :loading="loading" @click="editHelper" />
       </template>
     </ni-modal>
 
@@ -469,6 +491,7 @@ export default {
       days,
       loading: false,
       addHelper: false,
+      openEditedHelperModal: false,
       subscriptionCreationModal: false,
       subscriptionEditionModal: false,
       civilityOptions: CIVILITY_OPTIONS,
@@ -567,6 +590,16 @@ export default {
       ],
       userHelpers: [],
       newHelper: {
+        identity: {
+          lastname: '',
+          firstname: '',
+        },
+        local: {
+          email: '',
+        },
+        mobilePhone: '',
+      },
+      editedHelper: {
         identity: {
           lastname: '',
           firstname: '',
@@ -784,6 +817,13 @@ export default {
       },
     },
     newHelper: {
+      identity: { lastname: { required } },
+      local: {
+        email: { required, email },
+      },
+      mobilePhone: { frPhoneNumber },
+    },
+    editedHelper: {
       identity: { lastname: { required } },
       local: {
         email: { required, email },
@@ -1017,6 +1057,10 @@ export default {
       this.$v.newHelper.$reset();
       this.newHelper = Object.assign({}, clear(this.newHelper));
     },
+    resetEditedHelperForm () {
+      this.$v.editedHelper.$reset();
+      this.editedHelper = Object.assign({}, clear(this.editedHelper));
+    },
     async createAlenviHelper () {
       this.newHelper.local.password = randomize('0', 6);
       this.newHelper.customers = [this.userProfile._id];
@@ -1050,12 +1094,35 @@ export default {
         this.addHelper = false
       } catch (e) {
         e.response ? console.error(e.response) : console.error(e);
-        if (e && e.message === 'Invalid fields') return NotifyWarning('Champ(s) invalide(s)');
         if (e && e.response && e.response.status === 409) return NotifyNegative('Cet email est déjà utilisé par un compte existant');
         NotifyNegative('Erreur lors de la création de l\'aidant');
       } finally {
         this.loading = false;
       }
+    },
+    async editHelper () {
+      try {
+        this.loading = true;
+        this.$v.editedHelper.$touch();
+        if (this.$v.editedHelper.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        const payload = Object.assign({}, this.editedHelper);
+        delete payload.local;
+        await this.$users.updateById(payload);
+        NotifyPositive('Aidant modifié');
+        await this.getUserHelpers();
+        this.openEditedHelperModal = false
+      } catch (e) {
+        e.response ? console.error(e.response) : console.error(e);
+        NotifyNegative('Erreur lors de la modification de l\'aidant');
+      } finally {
+        this.loading = false;
+      }
+    },
+    openEditionModalHelper (helperId) {
+      const helper = this.userHelpers.find(helper => helper._id === helperId);
+      this.editedHelper = this.$_.pick(helper, ['_id', 'mobilePhone', 'local.email', 'identity.firstname', 'identity.lastname']);
+      this.openEditedHelperModal = true;
     },
     async removeHelper (helperId) {
       try {
