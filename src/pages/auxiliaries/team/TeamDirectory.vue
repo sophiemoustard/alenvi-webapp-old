@@ -4,9 +4,7 @@
     <q-table :data="filteredUsers" :columns="columns" row-key="name" :rows-per-page-options="[15, 25, 35]"
       :pagination.sync="pagination" :loading="tableLoading" class="people-list">
       <q-tr slot="body" slot-scope="props" :props="props" class="datatable-team-row">
-        <q-td v-for="col in props.cols"
-          :key="col.name"
-          :props="props">
+        <q-td v-for="col in props.cols" :key="col.name" :props="props">
           <q-item v-if="col.name === 'name'">
             <q-item-side :avatar="getAvatar(col.value.picture)" />
             <q-item-main :label="col.value.name" />
@@ -24,6 +22,7 @@
 <script>
 import { DEFAULT_AVATAR, AUXILIARY, PLANNING_REFERENT } from '../../../data/constants';
 import DirectoryHeader from '../../../components/DirectoryHeader';
+import { formatPhone } from '../../../helpers/utils';
 
 export default {
   name: 'TeamDirectory',
@@ -63,7 +62,7 @@ export default {
           field: 'phone',
           align: 'left',
           sortable: false,
-          format: (value) => this.formatPhone(value),
+          format: (value) => formatPhone(value),
           style: 'width: 100px',
         },
       ],
@@ -102,18 +101,6 @@ export default {
     },
     getAvatar (link) {
       return link || DEFAULT_AVATAR;
-    },
-    formatPhone (phoneNumber) {
-      if (phoneNumber) {
-        phoneNumber = phoneNumber.split(' ').join('');
-        if (phoneNumber.match(/^\+.*/)) {
-          return phoneNumber.replace(/^\+33(\d{1})(\d{2})(\d{2})(\d{2})(\d{2})$/, '0$1 $2 $3 $4 $5');
-        } else if (phoneNumber.match(/^\d{10}/)) {
-          return phoneNumber.replace(/^(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/, '$1 $2 $3 $4 $5');
-        }
-        return phoneNumber;
-      }
-      return '-';
     },
     getPhoneLink (link) {
       return link ? `tel:+33${link.split(' ').join('').substring(1)}` : '-';

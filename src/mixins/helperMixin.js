@@ -1,6 +1,6 @@
 
 import randomize from 'randomatic';
-import { clear } from '../helpers/utils.js';
+import { clear, formatPhone } from '../helpers/utils.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../components/popup/notify';
 import { HELPER, REQUIRED_LABEL } from '../data/constants';
 
@@ -44,6 +44,7 @@ export const helperMixin = {
           label: 'Numéro de téléphone',
           align: 'left',
           field: 'mobilePhone',
+          format: (value) => formatPhone(value),
         },
         {
           name: 'startDate',

@@ -87,3 +87,16 @@ export const formatHours = (value, digits = 2) => {
 export const formatHoursWithMinutes = (date) => {
   return `${moment(date).hours()}h${moment(date).format('mm')}`;
 };
+
+export const formatPhone = (phoneNumber) => {
+  if (phoneNumber) {
+    phoneNumber = phoneNumber.split(' ').join('');
+    if (phoneNumber.match(/^\+.*/)) {
+      return phoneNumber.replace(/^\+33(\d{1})(\d{2})(\d{2})(\d{2})(\d{2})$/, '0$1 $2 $3 $4 $5');
+    } else if (phoneNumber.match(/^\d{10}/)) {
+      return phoneNumber.replace(/^(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/, '$1 $2 $3 $4 $5');
+    }
+    return phoneNumber;
+  }
+  return '-';
+};

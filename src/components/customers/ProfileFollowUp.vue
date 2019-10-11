@@ -32,7 +32,17 @@
         <p class="text-weight-bold">Aidants</p>
       </div>
       <q-table :data="sortedHelpers" :columns="helperColumns" row-key="name" :pagination="helperPagination"
-        hide-bottom :visible-columns="visibleColumns" />
+        hide-bottom :visible-columns="visibleColumns">
+        <q-tr slot="body" slot-scope="props" :props="props">
+          <q-td v-for="col in props.cols" :key="col.name" :props="props">
+            <template v-if="col.name === 'phone'">
+              <a v-if="col.value" class="text-primary" :href="getPhoneLink(col.value)">{{col.value}}</a>
+              <div v-else>{{ col.value }}</div>
+            </template>
+            <template v-else>{{ col.value }}</template>
+          </q-td>
+        </q-tr>
+      </q-table>
     </div>
     <div class="q-mb-xl" v-if="customer.firstIntervention">
       <div class="row justify-between items-baseline">
@@ -152,6 +162,9 @@ export default {
     },
     saveTmp (path) {
       this.tmpInput = this.$_.get(this.customer, path);
+    },
+    getPhoneLink (link) {
+      return link ? `tel:+33${link.split(' ').join('').substring(1)}` : '-';
     },
   },
   filters: {
