@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import cloneDeep from 'lodash/cloneDeep';
 import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryEventCreationModal';
 import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
 import Planning from '../../../components/planning/Planning.vue';
@@ -198,7 +199,7 @@ export default {
       }
     },
     async getEventHistories (lastCreatedAt = null) {
-      const eventHistoriesTmp = this.eventHistories;
+      const eventHistoriesTmp = cloneDeep(this.eventHistories);
       try {
         const params = {
           sectors: this.filteredSectors.map(sector => sector._id),
