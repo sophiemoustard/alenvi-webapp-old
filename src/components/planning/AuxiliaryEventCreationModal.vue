@@ -71,9 +71,9 @@
     <div v-if="newEvent.type === INTERVENTION && customerAddressList(newEvent).length > 0" class="customer-info">
       <div class="row items-center no-wrap">
         <q-select v-model="newEvent.address" color="white" inverted-light :options="customerAddressList(newEvent)"
-            :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAddressSelect(); }, }]"
-            :filter-placeholder="customerAddress(newEvent)" :read-only="customerAddressList(newEvent).length === 1"
-            ref="addressSelect" filter />
+          :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAddressSelect(); }, }]"
+          :filter-placeholder="customerAddress(newEvent)" :readonly="customerAddressList(newEvent).length === 1"
+          ref="addressSelect" filter />
       </div>
     </div>
     <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary"

@@ -199,7 +199,6 @@ export const planningActionMixin = {
         payload.customer = customer._id;
       }
 
-      if (event.address) delete payload.address.location;
       if (event.type === ABSENCE && event.absence !== ILLNESS) payload.attachment = {};
 
       return payload;
