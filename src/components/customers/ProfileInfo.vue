@@ -85,7 +85,7 @@
           </q-tr>
         </q-table>
         <q-card-actions align="end">
-          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un aidant" @click="addHelper = true" />
+          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un aidant" @click="openNewHelperModal = true" />
         </q-card-actions>
       </q-card>
     </div>
@@ -229,14 +229,12 @@
     </div>
 
     <!-- Add helper modal -->
-    <add-helper-modal :addHelper="addHelper" :company="company" :loading="loading" :validationsNewHelper="$v.newHelper"
-    :newHelper="newHelper" @submitHelper="submitHelper" @hide="resetAddHelperForm"
-    :error-label="phoneNbrError($v.newHelper)" @sendWelcomingEmail="sendWelcomingEmail"/>
+    <add-helper-modal :openNewHelperModal="openNewHelperModal" :company="company" :loading="loading" :validations="$v.newHelper"
+    :newHelper="newHelper" @submit="submitHelper" @hide="resetAddHelperForm"/>
 
     <!-- Edit helper modal -->
     <edit-helper-modal :editedHelper="editedHelper" :openEditedHelperModal="openEditedHelperModal" :loading="loading"
-    :validationsEditedHelper="$v.editedHelper" @hide="resetEditedHelperForm"
-    :error-label="phoneNbrError($v.editedHelper)" @editHelper="editHelper"/>
+    :validations="$v.editedHelper" @hide="resetEditedHelperForm" @editHelper="editHelper"/>
 
     <!-- Subscription creation modal -->
     <ni-modal v-model="subscriptionCreationModal" @hide="resetCreationSubscriptionData">
@@ -410,6 +408,7 @@
 <script>
 import { Cookies } from 'quasar';
 import { required, requiredIf, email, maxLength } from 'vuelidate/lib/validators';
+import randomize from 'randomatic';
 
 import { extend, clear } from '../../helpers/utils.js';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify.js';
@@ -432,15 +431,14 @@ import {
   FIXED,
   HOURLY,
   REQUIRED_LABEL,
-  HELPER,
   ONCE,
+  HELPER,
   CIVILITY_OPTIONS,
 } from '../../data/constants.js';
 import { financialCertificatesMixin } from '../../mixins/financialCertificatesMixin.js';
 import { fundingMixin } from '../../mixins/fundingMixin.js';
 import { validationMixin } from '../../mixins/validationMixin.js';
 import { frPhoneNumber, iban, bic, frAddress } from '../../helpers/vuelidateCustomVal';
-import randomize from 'randomatic';
 
 export default {
   name: 'ProfileInfo',
@@ -467,33 +465,13 @@ export default {
       FIXED,
       days,
       loading: false,
-      addHelper: false,
+      openNewHelperModal: false,
       openEditedHelperModal: false,
       subscriptionCreationModal: false,
       subscriptionEditionModal: false,
       civilityOptions: CIVILITY_OPTIONS,
       isLoaded: false,
       tmpInput: '',
-      newHelper: {
-        identity: {
-          lastname: '',
-          firstname: '',
-        },
-        local: {
-          email: '',
-        },
-        mobilePhone: '',
-      },
-      editedHelper: {
-        identity: {
-          lastname: '',
-          firstname: '',
-        },
-        local: {
-          email: '',
-        },
-        mobilePhone: '',
-      },
       customer: {
         identity: {},
         contact: {
@@ -586,6 +564,26 @@ export default {
         },
       ],
       userHelpers: [],
+      newHelper: {
+        identity: {
+          lastname: '',
+          firstname: '',
+        },
+        local: {
+          email: '',
+        },
+        mobilePhone: '',
+      },
+      editedHelper: {
+        identity: {
+          lastname: '',
+          firstname: '',
+        },
+        local: {
+          email: '',
+        },
+        mobilePhone: '',
+      },
       newSubscription: {
         service: '',
         unitTTCRate: '',
@@ -786,15 +784,6 @@ export default {
         iban: { required, iban },
       },
     },
-    newSubscription: {
-      service: { required },
-      unitTTCRate: { required },
-      estimatedWeeklyVolume: { required },
-    },
-    editedSubscription: {
-      unitTTCRate: { required },
-      estimatedWeeklyVolume: { required },
-    },
     newHelper: {
       identity: { lastname: { required } },
       local: {
@@ -814,6 +803,15 @@ export default {
         frPhoneNumber,
         maxLength: maxLength(10),
       },
+    },
+    newSubscription: {
+      service: { required },
+      unitTTCRate: { required },
+      estimatedWeeklyVolume: { required },
+    },
+    editedSubscription: {
+      unitTTCRate: { required },
+      estimatedWeeklyVolume: { required },
     },
     newFunding: {
       thirdPartyPayer: { required },
@@ -867,74 +865,6 @@ export default {
     this.isLoaded = true;
   },
   methods: {
-    phoneNbrError (user) {
-      if (!user.mobilePhone.required) {
-        return REQUIRED_LABEL;
-      } else if (!user.mobilePhone.frPhoneNumber || !user.mobilePhone.maxLength) {
-        return 'Numéro de téléphone non valide';
-      }
-    },
-    async sendWelcomingEmail () {
-      await this.$email.sendWelcome({
-        receiver: {
-          email: this.newHelper.local.email,
-          password: this.newHelper.local.password,
-        },
-      });
-    },
-    async createAlenviHelper () {
-      this.newHelper.local.password = randomize('0', 6);
-      this.newHelper.customers = [this.userProfile._id];
-      const roles = await this.$roles.showAll({ name: HELPER });
-      if (roles.length === 0) throw new Error('Role not found');
-      this.newHelper.role = roles[0]._id;
-      this.newHelper.company = this.company._id;
-      this.newHelper.identity = this.$_.pickBy(this.newHelper.identity);
-      const payload = this.$_.pickBy(this.newHelper);
-      await this.$users.create(payload);
-    },
-    async submitHelper () {
-      try {
-        this.loading = true;
-        this.$v.newHelper.$touch();
-        if (this.$v.newHelper.$error) return NotifyWarning('Champ(s) invalide(s)');
-        this.$v.newHelper.$reset();
-
-        await this.createAlenviHelper();
-        NotifyPositive('Aidant créé');
-        await this.sendWelcomingEmail();
-        NotifyPositive('Email envoyé');
-
-        this.newHelper = Object.assign({}, clear(this.newHelper));
-        await this.getUserHelpers();
-        this.resetAddHelperForm();
-      } catch (e) {
-        e.response ? console.error(e.response) : console.error(e);
-        if (e && e.response && e.response.status === 409) return NotifyNegative('Cet email est déjà utilisé par un compte existant');
-        NotifyNegative('Erreur lors de la création de l\'aidant');
-      } finally {
-        this.loading = false;
-      }
-    },
-    async editHelper () {
-      try {
-        this.loading = true;
-        this.$v.editedHelper.$touch();
-        if (this.$v.editedHelper.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        const payload = Object.assign({}, this.editedHelper);
-        delete payload.local;
-        await this.$users.updateById(payload);
-        NotifyPositive('Aidant modifié');
-        await this.getUserHelpers();
-        this.openEditedHelperModal = false;
-      } catch (e) {
-        e.response ? console.error(e.response) : console.error(e);
-        NotifyNegative('Erreur lors de la modification de l\'aidant');
-      } finally {
-        this.loading = false;
-      }
-    },
     formatAdditionalFields (row) {
       return [
         { name: 'mandateId', value: row._id },
@@ -1100,12 +1030,73 @@ export default {
     resetAddHelperForm () {
       this.$v.newHelper.$reset();
       this.newHelper = Object.assign({}, clear(this.newHelper));
-      this.addHelper = false;
+      this.openNewHelperModal = false;
     },
     resetEditedHelperForm () {
       this.$v.editedHelper.$reset();
       this.editedHelper = Object.assign({}, clear(this.editedHelper));
       this.openEditedHelperModal = false;
+    },
+    async createAlenviHelper () {
+      this.newHelper.local.password = randomize('0', 6);
+      this.newHelper.customers = [this.userProfile._id];
+      const roles = await this.$roles.showAll({ name: HELPER });
+      if (roles.length === 0) throw new Error('Role not found');
+      this.newHelper.role = roles[0]._id;
+      this.newHelper.company = this.company._id;
+      this.newHelper.identity = this.$_.pickBy(this.newHelper.identity);
+      const payload = this.$_.pickBy(this.newHelper);
+      await this.$users.create(payload);
+    },
+    async sendWelcomingEmail () {
+      await this.$email.sendWelcome({
+        receiver: {
+          email: this.newHelper.local.email,
+          password: this.newHelper.local.password,
+        },
+      });
+    },
+    async submitHelper () {
+      try {
+        this.loading = true;
+        this.$v.newHelper.$touch();
+        if (this.$v.newHelper.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.$v.newHelper.$reset();
+
+        await this.createAlenviHelper();
+        NotifyPositive('Aidant créé');
+        await this.sendWelcomingEmail();
+        NotifyPositive('Email envoyé');
+
+        this.newHelper = Object.assign({}, clear(this.newHelper));
+        await this.getUserHelpers();
+        this.resetAddHelperForm();
+      } catch (e) {
+        e.response ? console.error(e.response) : console.error(e);
+        if (e && e.response && e.response.status === 409) return NotifyNegative('Cet email est déjà utilisé par un compte existant');
+        NotifyNegative('Erreur lors de la création de l\'aidant');
+      } finally {
+        this.loading = false;
+      }
+    },
+    async editHelper () {
+      try {
+        this.loading = true;
+        this.$v.editedHelper.$touch();
+        if (this.$v.editedHelper.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        const payload = Object.assign({}, this.editedHelper);
+        delete payload.local;
+        await this.$users.updateById(payload);
+        NotifyPositive('Aidant modifié');
+        await this.getUserHelpers();
+        this.openEditedHelperModal = false;
+      } catch (e) {
+        e.response ? console.error(e.response) : console.error(e);
+        NotifyNegative('Erreur lors de la modification de l\'aidant');
+      } finally {
+        this.loading = false;
+      }
     },
     openEditionModalHelper (helperId) {
       const helper = this.userHelpers.find(helper => helper._id === helperId);

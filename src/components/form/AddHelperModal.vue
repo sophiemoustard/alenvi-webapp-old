@@ -1,19 +1,19 @@
 <template>
-  <ni-modal :value="addHelper" @hide="emitHide">
+  <ni-modal :value="openNewHelperModal" @hide="hide">
     <template slot="title">
       Ajouter une <span class="text-weight-bold">personne</span>
     </template>
-    <ni-input in-modal v-model="newHelper.identity.lastname" :error="validationsNewHelper.identity.lastname.$error"
-      caption="Nom" @blur="validationsNewHelper.identity.lastname.$touch" required-field />
+    <ni-input in-modal v-model="newHelper.identity.lastname" :error="validations.identity.lastname.$error"
+      caption="Nom" @blur="validations.identity.lastname.$touch" required-field />
     <ni-input in-modal v-model="newHelper.identity.firstname" caption="Prénom" />
-    <ni-input in-modal v-model="newHelper.local.email" :error="validationsNewHelper.local.email.$error" caption="Email"
-      @blur="validationsNewHelper.local.email.$touch" :error-label="emailError()" required-field />
-    <ni-input in-modal v-model.trim="newHelper.mobilePhone" last :error="validationsNewHelper.mobilePhone.$error"
-        caption="Numéro de téléphone" @blur="validationsNewHelper.mobilePhone.$touch"
-        error-label="Numéro de téléphone invalide" />
+    <ni-input in-modal v-model="newHelper.local.email" :error="validations.local.email.$error" caption="Email"
+      @blur="validations.local.email.$touch" :error-label="emailError" required-field />
+    <ni-input in-modal v-model.trim="newHelper.mobilePhone" last :error="validations.mobilePhone.$error"
+        caption="Numéro de téléphone" @blur="validations.mobilePhone.$touch"
+        :error-label="phoneNbrError" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Ajouter un aidant" icon-right="add" color="primary"
-        :loading="loading" @click="submitHelper" />
+        :loading="loading" @click="submit" />
     </template>
   </ni-modal>
 </template>
@@ -27,10 +27,10 @@ import { REQUIRED_LABEL } from '../../data/constants.js';
 export default {
   name: 'AddHelperModal',
   props: {
-    addHelper: { type: Boolean, default: false },
+    openNewHelperModal: { type: Boolean, default: false },
     newHelper: { type: Object, default: () => ({}) },
     company: { type: Object, default: () => ({}) },
-    validationsNewHelper: { type: Object, default: () => ({}) },
+    validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
   },
   components: {
@@ -38,26 +38,25 @@ export default {
     'ni-modal': Modal,
   },
   computed: {
-    userProfile () {
-      return this.$store.getters['rh/getUserProfile'];
-    },
-  },
-  methods: {
     emailError () {
-      if (!this.validationsNewHelper.local.email.required) {
+      if (!this.validations.local.email.required) {
         return REQUIRED_LABEL;
-      } else if (!this.validationsNewHelper.local.email.email) {
+      } else if (!this.validations.local.email.email) {
         return 'Email non valide';
       }
     },
-    async sendWelcomingEmail () {
-      this.$emit('sendWelcomingEmail');
+    phoneNbrError () {
+      if (!this.validations.mobilePhone.frPhoneNumber || !this.validations.mobilePhone.maxLength) {
+        return 'Numéro de téléphone non valide';
+      }
     },
-    async emitHide () {
+  },
+  methods: {
+    hide () {
       this.$emit('hide');
     },
-    async submitHelper () {
-      this.$emit('submitHelper');
+    submit () {
+      this.$emit('submit');
     },
   },
 }
