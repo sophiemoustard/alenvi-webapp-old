@@ -1030,7 +1030,8 @@ export default {
     },
     openEditionModalHelper (helperId) {
       const helper = this.helpers.find(helper => helper._id === helperId);
-      this.editedHelper = this.$_.pick(helper, ['_id', 'contact.phone', 'local.email', 'identity.firstname', 'identity.lastname']);
+      this.editedHelper = this.$_.pick(helper, ['_id', 'local.email', 'identity.firstname', 'identity.lastname']);
+      this.editedHelper.contact = { phone: helper.contact.phone || '' };
       this.openEditedHelperModal = true;
     },
     async removeHelper (helperId) {
