@@ -6,7 +6,7 @@
         <q-icon name="clear" size="16px" @click.native="close" />
       </div>
     </div>
-    <q-infinite-scroll inline :handler="load" style="height: 95%; overflow: auto;">
+    <q-infinite-scroll inline :handler="load" class="scroll-container">
       <ni-event-history v-for="history in eventHistories" :key="history._id" :history="history" />
       <div slot="message" class="loading">
         <q-spinner />
@@ -69,4 +69,7 @@ export default {
     justify-content: center
     margin: 10px 0
 
+  .scroll-container
+    height: 95%
+    overflow: auto
 </style>
