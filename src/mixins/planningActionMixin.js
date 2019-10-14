@@ -191,7 +191,7 @@ export const planningActionMixin = {
       }
 
       if (event.type === INTERVENTION) {
-        const customer = this.customers.find(cus => cus._id === event.customer._id);
+        const customer = this.customers.find(cus => cus._id === event.customer);
         if (customer) {
           const subscription = customer.subscriptions.find(sub => sub._id === event.subscription);
           if (subscription && subscription.service) payload.status = subscription.service.type;
@@ -281,6 +281,7 @@ export const planningActionMixin = {
         this.creationModal = false;
         this.resetCreationForm(false);
         NotifyPositive('Évènement créé');
+        this.loading = false;
       } catch (e) {
         if (e.message === '') return NotifyPositive('Création annulée');
         console.error(e);

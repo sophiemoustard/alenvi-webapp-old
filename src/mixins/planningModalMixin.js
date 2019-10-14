@@ -192,26 +192,41 @@ export const planningModalMixin = {
         { label: twoWeeksRepetitionLabel, value: EVERY_TWO_WEEKS },
       ];
     },
+    customerAddressList () {
+      const addresses = [];
+      if (this.$_.has(this.selectedCustomer, 'contact.primaryAddress')) {
+        addresses.push(this.formatAddressOptions(this.$_.get(this.selectedCustomer, 'contact.primaryAddress')));
+      }
+      if (this.$_.has(this.selectedCustomer, 'contact.secondaryAddress')) {
+        addresses.push(this.formatAddressOptions(this.$_.get(this.selectedCustomer, 'contact.secondaryAddress')));
+      }
+      return addresses;
+    },
+    customerProfileRedirect () {
+      return this.mainUser.role.name === COACH || this.mainUser.role.name === ADMIN
+        ? { name: 'customers profile', params: { id: this.selectedCustomer._id } }
+        : { name: 'profile customers info', params: { customerId: this.selectedCustomer._id } };
+    },
+    // Event creation
+    customerSubscriptionsOptions () {
+      if (!this.selectedCustomer || !this.selectedCustomer.subscriptions || this.selectedCustomer.subscriptions.length === 0) return [];
+
+      let subscriptions = this.selectedCustomer.subscriptions;
+      if (this.selectedAuxiliary._id) {
+        if (!this.selectedAuxiliary.hasCustomerContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== CUSTOMER_CONTRACT);
+        if (!this.selectedAuxiliary.hasCompanyContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== COMPANY_CONTRACT);
+      }
+
+      return subscriptions.map(sub => ({
+        label: sub.service.name,
+        value: sub._id,
+      }));
+    },
   },
   methods: {
     customerAddress (event) {
       if (!(event.address && event.address.fullAddress)) event.address = this.$_.get(event, 'customer.contact.primaryAddress', '');
       return event.address.fullAddress;
-    },
-    customerAddressList (event) {
-      const addresses = [];
-      if (this.$_.has(event, 'customer.contact.primaryAddress')) {
-        addresses.push(this.formatAddressOptions(this.$_.get(event, 'customer.contact.primaryAddress')));
-      }
-      if (this.$_.has(event, 'customer.contact.secondaryAddress')) {
-        addresses.push(this.formatAddressOptions(this.$_.get(event, 'customer.contact.secondaryAddress')));
-      }
-      return addresses;
-    },
-    customerProfileRedirect (event) {
-      return this.mainUser.role.name === COACH || this.mainUser.role.name === ADMIN
-        ? { name: 'customers profile', params: { id: event.customer._id } }
-        : { name: 'profile customers info', params: { customerId: event.customer._id } };
     },
     getAvatar (user) {
       if (!user || !user._id) return UNKNOWN_AVATAR;
@@ -227,23 +242,6 @@ export const planningModalMixin = {
     formatAddressOptions (address) {
       return { label: address.fullAddress, value: address };
     },
-    // Event creation
-    customerSubscriptionsOptions (customerId) {
-      if (!customerId) return [];
-      const selectedCustomer = this.customers.find(customer => customer._id === customerId);
-      if (!selectedCustomer || !selectedCustomer.subscriptions || selectedCustomer.subscriptions.length === 0) return [];
-
-      let subscriptions = selectedCustomer.subscriptions;
-      if (this.selectedAuxiliary._id) {
-        if (!this.selectedAuxiliary.hasCustomerContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== CUSTOMER_CONTRACT);
-        if (!this.selectedAuxiliary.hasCompanyContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== COMPANY_CONTRACT);
-      }
-
-      return subscriptions.map(sub => ({
-        label: sub.service.name,
-        value: sub._id,
-      }));
-    },
     // Event edition
     toggleCancellationForm (value) {
       if (!value) this.editedEvent.cancel = {};
@@ -254,13 +252,6 @@ export const planningModalMixin = {
     },
     isRepetition (event) {
       return ABSENCE !== event.type && event.repetition && event.repetition.frequency !== NEVER;
-    },
-    formatCustomerForEvent (customer) {
-      this.newEvent.customer = {
-        _id: customer._id,
-        contact: customer.contact,
-        identity: customer.identity,
-      }
     },
     toggleServiceSelection (customerId) {
       const customerSubscriptionsOptions = this.customerSubscriptionsOptions(customerId);

@@ -232,7 +232,7 @@ export default {
       this.newEvent = {
         type: INTERVENTION,
         repetition: { frequency: NEVER },
-        customer: {},
+        customer: '',
         subscription: '',
         internalHour: '',
         absence: '',
