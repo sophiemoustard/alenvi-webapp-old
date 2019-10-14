@@ -43,7 +43,7 @@ export const planningActionMixin = {
           zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
           street: { required: requiredIf(item => item && !!item.fullAddress) },
           city: { required: requiredIf(item => item && !!item.fullAddress) },
-          fullAddress: { frAddress },
+          fullAddr: this.newEvent.type === INTERNAL_HOUR ? { frAddress } : {},
         },
         repetition: {
           frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
@@ -68,7 +68,12 @@ export const planningActionMixin = {
         internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
         absence: { required: requiredIf((item) => item.type === ABSENCE) },
         absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
-        address: { fullAddress: { frAddress } },
+        address: {
+          zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
+          street: { required: requiredIf(item => item && !!item.fullAddress) },
+          city: { required: requiredIf(item => item && !!item.fullAddress) },
+          fullAddr: this.newEvent.type === INTERNAL_HOUR ? { frAddress } : {},
+        },
         repetition: {
           frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
         },
