@@ -3,13 +3,13 @@
     <template slot="title">
       Ajouter une <span class="text-weight-bold">personne</span>
     </template>
-    <ni-input in-modal v-model="newHelper.identity.lastname" :error="$v.newHelper.identity.lastname.$error"
-      caption="Nom" @blur="$v.newHelper.identity.lastname.$touch" required-field />
+    <ni-input in-modal v-model="newHelper.identity.lastname" :error="validationsNewHelper.identity.lastname.$error"
+      caption="Nom" @blur="validationsNewHelper.identity.lastname.$touch" required-field />
     <ni-input in-modal v-model="newHelper.identity.firstname" caption="Prénom" />
-    <ni-input in-modal v-model="newHelper.local.email" :error="$v.newHelper.local.email.$error" caption="Email"
-      @blur="$v.newHelper.local.email.$touch" :error-label="emailError()" required-field />
-    <ni-input in-modal v-model.trim="newHelper.mobilePhone" last :error="$v.newHelper.mobilePhone.$error"
-        caption="Numéro de téléphone" @blur="$v.newHelper.mobilePhone.$touch"
+    <ni-input in-modal v-model="newHelper.local.email" :error="validationsNewHelper.local.email.$error" caption="Email"
+      @blur="validationsNewHelper.local.email.$touch" :error-label="emailError()" required-field />
+    <ni-input in-modal v-model.trim="newHelper.mobilePhone" last :error="validationsNewHelper.mobilePhone.$error"
+        caption="Numéro de téléphone" @blur="validationsNewHelper.mobilePhone.$touch"
         error-label="Numéro de téléphone invalide" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Ajouter un aidant" icon-right="add" color="primary"
@@ -22,46 +22,20 @@
 
 import Modal from '../Modal';
 import Input from '../form/Input';
-import { REQUIRED_LABEL, HELPER } from '../../data/constants.js';
-import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify.js';
-import { required, email } from 'vuelidate/lib/validators';
-import { frPhoneNumber } from '../../helpers/vuelidateCustomVal';
-import randomize from 'randomatic';
-import { clear } from '../../helpers/utils.js';
+import { REQUIRED_LABEL } from '../../data/constants.js';
 
 export default {
   name: 'AddHelperModal',
   props: {
     addHelper: { type: Boolean, default: false },
+    newHelper: { type: Object, default: () => ({}) },
     company: { type: Object, default: () => ({}) },
+    validationsNewHelper: { type: Object, default: () => ({}) },
+    loading: { type: Boolean, default: false },
   },
   components: {
     'ni-input': Input,
     'ni-modal': Modal,
-  },
-  data () {
-    return {
-      loading: false,
-      newHelper: {
-        identity: {
-          lastname: '',
-          firstname: '',
-        },
-        local: {
-          email: '',
-        },
-        mobilePhone: '',
-      },
-    }
-  },
-  validations: {
-    newHelper: {
-      identity: { lastname: { required } },
-      local: {
-        email: { required, email },
-      },
-      mobilePhone: { frPhoneNumber },
-    },
   },
   computed: {
     userProfile () {
@@ -70,56 +44,20 @@ export default {
   },
   methods: {
     emailError () {
-      if (!this.$v.newHelper.local.email.required) {
+      if (!this.validationsNewHelper.local.email.required) {
         return REQUIRED_LABEL;
-      } else if (!this.$v.newHelper.local.email.email) {
+      } else if (!this.validationsNewHelper.local.email.email) {
         return 'Email non valide';
       }
     },
-    async createAlenviHelper () {
-      this.newHelper.local.password = randomize('0', 6);
-      this.newHelper.customers = [this.userProfile._id];
-      const roles = await this.$roles.showAll({ name: HELPER });
-      if (roles.length === 0) throw new Error('Role not found');
-      this.newHelper.role = roles[0]._id;
-      this.newHelper.company = this.company._id;
-      this.newHelper.identity = this.$_.pickBy(this.newHelper.identity);
-      const payload = this.$_.pickBy(this.newHelper);
-      await this.$users.create(payload);
-    },
     async sendWelcomingEmail () {
-      await this.$email.sendWelcome({
-        receiver: {
-          email: this.newHelper.local.email,
-          password: this.newHelper.local.password,
-        },
-      });
+      this.$emit('sendWelcomingEmail');
+    },
+    async emitHide () {
+      this.$emit('hide');
     },
     async submitHelper () {
-      try {
-        this.loading = true;
-        this.$v.newHelper.$touch();
-        if (this.$v.newHelper.$error) return NotifyWarning('Champ(s) invalide(s)');
-        this.$v.newHelper.$reset();
-
-        await this.createAlenviHelper();
-        NotifyPositive('Aidant créé');
-        await this.sendWelcomingEmail();
-        NotifyPositive('Email envoyé');
-        this.$emit('closed');
-        this.newHelper = Object.assign({}, clear(this.newHelper));
-      } catch (e) {
-        e.response ? console.error(e.response) : console.error(e);
-        if (e && e.response && e.response.status === 409) return NotifyNegative('Cet email est déjà utilisé par un compte existant');
-        NotifyNegative('Erreur lors de la création de l\'aidant');
-      } finally {
-        this.loading = false;
-      }
-    },
-    emitHide () {
-      this.$v.newHelper.$reset();
-      this.newHelper = Object.assign({}, clear(this.newHelper));
-      this.$emit('hide');
+      this.$emit('submitHelper');
     },
   },
 }

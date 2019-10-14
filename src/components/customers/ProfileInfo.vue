@@ -229,10 +229,14 @@
     </div>
 
     <!-- Add helper modal -->
-    <add-helper-modal :addHelper="addHelper" :company="company" @closed="closeAddHelperModal" @hide="resetAddHelperForm"/>
+    <add-helper-modal :addHelper="addHelper" :company="company" :loading="loading" :validationsNewHelper="$v.newHelper"
+    :newHelper="newHelper" @submitHelper="submitHelper" @hide="resetAddHelperForm"
+    @sendWelcomingEmail="sendWelcomingEmail"/>
 
     <!-- Edit helper modal -->
-    <edit-helper-modal :editedHelper="editedHelper" :openEditedHelperModal="openEditedHelperModal" @closed="closeEditedHelperModal" @hide="resetEditedHelperForm"/>
+    <edit-helper-modal :editedHelper="editedHelper" :openEditedHelperModal="openEditedHelperModal" :loading="loading"
+    :validationsEditedHelper="$v.editedHelper" @hide="resetEditedHelperForm"
+    @editHelper="editHelper"/>
 
     <!-- Subscription creation modal -->
     <ni-modal v-model="subscriptionCreationModal" @hide="resetCreationSubscriptionData">
@@ -405,7 +409,7 @@
 
 <script>
 import { Cookies } from 'quasar';
-import { required, requiredIf } from 'vuelidate/lib/validators';
+import { required, requiredIf, email } from 'vuelidate/lib/validators';
 
 import { extend, clear } from '../../helpers/utils.js';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify.js';
@@ -428,6 +432,7 @@ import {
   FIXED,
   HOURLY,
   REQUIRED_LABEL,
+  HELPER,
   ONCE,
   CIVILITY_OPTIONS,
 } from '../../data/constants.js';
@@ -435,6 +440,7 @@ import { financialCertificatesMixin } from '../../mixins/financialCertificatesMi
 import { fundingMixin } from '../../mixins/fundingMixin.js';
 import { validationMixin } from '../../mixins/validationMixin.js';
 import { frPhoneNumber, iban, bic, frAddress } from '../../helpers/vuelidateCustomVal';
+import randomize from 'randomatic';
 
 export default {
   name: 'ProfileInfo',
@@ -468,6 +474,16 @@ export default {
       civilityOptions: CIVILITY_OPTIONS,
       isLoaded: false,
       tmpInput: '',
+      newHelper: {
+        identity: {
+          lastname: '',
+          firstname: '',
+        },
+        local: {
+          email: '',
+        },
+        mobilePhone: '',
+      },
       editedHelper: {
         identity: {
           lastname: '',
@@ -779,6 +795,20 @@ export default {
       unitTTCRate: { required },
       estimatedWeeklyVolume: { required },
     },
+    newHelper: {
+      identity: { lastname: { required } },
+      local: {
+        email: { required, email },
+      },
+      mobilePhone: { frPhoneNumber },
+    },
+    editedHelper: {
+      identity: { lastname: { required } },
+      local: {
+        email: { required, email },
+      },
+      mobilePhone: { frPhoneNumber },
+    },
     newFunding: {
       thirdPartyPayer: { required },
       subscription: { required },
@@ -831,13 +861,66 @@ export default {
     this.isLoaded = true;
   },
   methods: {
-    async closeAddHelperModal () {
-      await this.getUserHelpers();
-      this.resetAddHelperForm();
+    async sendWelcomingEmail () {
+      await this.$email.sendWelcome({
+        receiver: {
+          email: this.newHelper.local.email,
+          password: this.newHelper.local.password,
+        },
+      });
     },
-    async closeEditedHelperModal () {
-      await this.getUserHelpers();
-      this.openEditedHelperModal = false;
+    async createAlenviHelper () {
+      this.newHelper.local.password = randomize('0', 6);
+      this.newHelper.customers = [this.userProfile._id];
+      const roles = await this.$roles.showAll({ name: HELPER });
+      if (roles.length === 0) throw new Error('Role not found');
+      this.newHelper.role = roles[0]._id;
+      this.newHelper.company = this.company._id;
+      this.newHelper.identity = this.$_.pickBy(this.newHelper.identity);
+      const payload = this.$_.pickBy(this.newHelper);
+      await this.$users.create(payload);
+    },
+    async submitHelper () {
+      try {
+        this.loading = true;
+        this.$v.newHelper.$touch();
+        if (this.$v.newHelper.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.$v.newHelper.$reset();
+
+        await this.createAlenviHelper();
+        NotifyPositive('Aidant créé');
+        await this.sendWelcomingEmail();
+        NotifyPositive('Email envoyé');
+
+        this.newHelper = Object.assign({}, clear(this.newHelper));
+        await this.getUserHelpers();
+        this.resetAddHelperForm();
+      } catch (e) {
+        e.response ? console.error(e.response) : console.error(e);
+        if (e && e.response && e.response.status === 409) return NotifyNegative('Cet email est déjà utilisé par un compte existant');
+        NotifyNegative('Erreur lors de la création de l\'aidant');
+      } finally {
+        this.loading = false;
+      }
+    },
+    async editHelper () {
+      try {
+        this.loading = true;
+        this.$v.editedHelper.$touch();
+        if (this.$v.editedHelper.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        const payload = Object.assign({}, this.editedHelper);
+        delete payload.local;
+        await this.$users.updateById(payload);
+        NotifyPositive('Aidant modifié');
+        await this.getUserHelpers();
+        this.openEditedHelperModal = false;
+      } catch (e) {
+        e.response ? console.error(e.response) : console.error(e);
+        NotifyNegative('Erreur lors de la modification de l\'aidant');
+      } finally {
+        this.loading = false;
+      }
     },
     formatAdditionalFields (row) {
       return [
@@ -1002,9 +1085,12 @@ export default {
     },
     // Helpers
     resetAddHelperForm () {
+      this.$v.newHelper.$reset();
+      this.newHelper = Object.assign({}, clear(this.newHelper));
       this.addHelper = false;
     },
     resetEditedHelperForm () {
+      this.$v.editedHelper.$reset();
       this.editedHelper = Object.assign({}, clear(this.editedHelper));
       this.openEditedHelperModal = false;
     },
