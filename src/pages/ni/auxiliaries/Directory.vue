@@ -74,7 +74,7 @@
 </template>
 
 <script>
-import { required, requiredIf, email, maxLength } from 'vuelidate/lib/validators';
+import { required, requiredIf, email } from 'vuelidate/lib/validators';
 import randomize from 'randomatic';
 import { frPhoneNumber, frAddress } from '../../../helpers/vuelidateCustomVal';
 import { userProfileValidation } from '../../../helpers/userProfileValidation';
@@ -210,7 +210,7 @@ export default {
         title: { required },
       },
       contact: {
-        phone: { required, frPhoneNumber, maxLength: maxLength(10) },
+        phone: { required, frPhoneNumber },
         address: {
           zipCode: { required: requiredIf(item => !!item.fullAddress) },
           street: { required: requiredIf(item => !!item.fullAddress) },

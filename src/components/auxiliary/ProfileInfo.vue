@@ -475,11 +475,7 @@ export default {
           identityDocs: { required },
           emergencyContact: {
             name: { required },
-            phoneNumber: {
-              required,
-              frPhoneNumber,
-              maxLength: maxLength(10),
-            },
+            phoneNumber: { required, frPhoneNumber },
           },
           idCardRecto: {
             driveId: {
