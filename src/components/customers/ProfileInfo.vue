@@ -85,7 +85,7 @@
           </q-tr>
         </q-table>
         <q-card-actions align="end">
-          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un aidant" @click="addHelper = true" />
+          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un aidant" @click="openNewHelperModal = true" />
         </q-card-actions>
       </q-card>
     </div>
@@ -229,41 +229,12 @@
     </div>
 
     <!-- Add helper modal -->
-    <ni-modal v-model="addHelper" @hide="resetHelperForm">
-      <template slot="title">
-        Ajouter une <span class="text-weight-bold">personne</span>
-      </template>
-      <ni-input in-modal v-model="newHelper.identity.lastname" :error="$v.newHelper.identity.lastname.$error"
-        caption="Nom" @blur="$v.newHelper.identity.lastname.$touch" required-field />
-      <ni-input in-modal v-model="newHelper.identity.firstname" caption="Prénom" />
-      <ni-input in-modal v-model="newHelper.local.email" last :error="$v.newHelper.local.email.$error" caption="Email"
-        @blur="$v.newHelper.local.email.$touch" :error-label="emailError" required-field />
-      <ni-input in-modal v-model.trim="newHelper.mobilePhone" last :error="$v.newHelper.mobilePhone.$error"
-          caption="Numéro de téléphone" @blur="$v.newHelper.mobilePhone.$touch"
-          error-label="Numéro de téléphone invalide" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Ajouter un aidant" icon-right="add" color="primary"
-          :loading="loading" @click="submitHelper" />
-      </template>
-    </ni-modal>
+    <add-helper-modal :openNewHelperModal="openNewHelperModal" :company="company" :loading="loading"
+      :validations="$v.newHelper" :newHelper="newHelper" @submit="submitHelper" @hide="resetAddHelperForm"/>
 
     <!-- Edit helper modal -->
-    <ni-modal v-model="openEditedHelperModal" @hide="resetEditedHelperForm">
-      <template slot="title">
-        Modifier l'<span class="text-weight-bold">aidant</span>
-      </template>
-      <ni-input in-modal v-model="editedHelper.identity.lastname" :error="$v.editedHelper.identity.lastname.$error"
-        caption="Nom" @blur="$v.editedHelper.identity.lastname.$touch" required-field />
-      <ni-input in-modal v-model="editedHelper.identity.firstname" caption="Prénom" />
-      <ni-input in-modal v-model="editedHelper.local.email" caption="Email" disable />
-      <ni-input in-modal v-model.trim="editedHelper.mobilePhone" last :error="$v.editedHelper.mobilePhone.$error"
-          caption="Numéro de téléphone" @blur="$v.editedHelper.mobilePhone.$touch"
-          error-label="Numéro de téléphone invalide" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Modifier l'aidant" icon-right="add" color="primary"
-          :loading="loading" @click="editHelper" />
-      </template>
-    </ni-modal>
+    <edit-helper-modal :editedHelper="editedHelper" :openEditedHelperModal="openEditedHelperModal" :loading="loading"
+      :validations="$v.editedHelper" @hide="resetEditedHelperForm" @editHelper="editHelper"/>
 
     <!-- Subscription creation modal -->
     <ni-modal v-model="subscriptionCreationModal" @hide="resetCreationSubscriptionData">
@@ -436,13 +407,15 @@
 
 <script>
 import { Cookies } from 'quasar';
-import { required, email, requiredIf } from 'vuelidate/lib/validators';
+import { required, requiredIf, email, maxLength } from 'vuelidate/lib/validators';
 import randomize from 'randomatic';
 
 import { extend, clear } from '../../helpers/utils.js';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify.js';
 import SearchAddress from '../form/SearchAddress';
 import Input from '../form/Input';
+import AddHelperModal from '../form/AddHelperModal.vue';
+import EditHelperModal from '../form/EditHelperModal.vue';
 import Select from '../form/Select';
 import OptionGroup from '../form/OptionGroup';
 import MultipleFilesUploader from '../form/MultipleFilesUploader.vue';
@@ -477,6 +450,8 @@ export default {
     'ni-option-group': OptionGroup,
     'ni-multiple-files-uploader': MultipleFilesUploader,
     'ni-modal': Modal,
+    'add-helper-modal': AddHelperModal,
+    'edit-helper-modal': EditHelperModal,
   },
   mixins: [
     customerMixin,
@@ -490,7 +465,7 @@ export default {
       FIXED,
       days,
       loading: false,
-      addHelper: false,
+      openNewHelperModal: false,
       openEditedHelperModal: false,
       subscriptionCreationModal: false,
       subscriptionEditionModal: false,
@@ -738,13 +713,6 @@ export default {
         return 'BIC non valide';
       }
     },
-    emailError () {
-      if (!this.$v.newHelper.local.email.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.newHelper.local.email.email) {
-        return 'Email non valide';
-      }
-    },
     acceptedByHelper () {
       if (this.lastSubscriptionHistory && this.customer.subscriptionsAccepted) {
         return `le ${this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} par ${this.acceptedBy}`;
@@ -821,14 +789,20 @@ export default {
       local: {
         email: { required, email },
       },
-      mobilePhone: { frPhoneNumber },
+      mobilePhone: {
+        frPhoneNumber,
+        maxLength: maxLength(10),
+      },
     },
     editedHelper: {
       identity: { lastname: { required } },
       local: {
         email: { required, email },
       },
-      mobilePhone: { frPhoneNumber },
+      mobilePhone: {
+        frPhoneNumber,
+        maxLength: maxLength(10),
+      },
     },
     newSubscription: {
       service: { required },
@@ -1053,13 +1027,15 @@ export default {
       }
     },
     // Helpers
-    resetHelperForm () {
+    resetAddHelperForm () {
       this.$v.newHelper.$reset();
       this.newHelper = Object.assign({}, clear(this.newHelper));
+      this.openNewHelperModal = false;
     },
     resetEditedHelperForm () {
       this.$v.editedHelper.$reset();
       this.editedHelper = Object.assign({}, clear(this.editedHelper));
+      this.openEditedHelperModal = false;
     },
     async createAlenviHelper () {
       this.newHelper.local.password = randomize('0', 6);
@@ -1085,13 +1061,15 @@ export default {
         this.loading = true;
         this.$v.newHelper.$touch();
         if (this.$v.newHelper.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.$v.newHelper.$reset();
 
         await this.createAlenviHelper();
         NotifyPositive('Aidant créé');
         await this.sendWelcomingEmail();
         NotifyPositive('Email envoyé');
+
         await this.getUserHelpers();
-        this.addHelper = false
+        this.openNewHelperModal = false;
       } catch (e) {
         e.response ? console.error(e.response) : console.error(e);
         if (e && e.response && e.response.status === 409) return NotifyNegative('Cet email est déjà utilisé par un compte existant');
@@ -1111,7 +1089,7 @@ export default {
         await this.$users.updateById(payload);
         NotifyPositive('Aidant modifié');
         await this.getUserHelpers();
-        this.openEditedHelperModal = false
+        this.openEditedHelperModal = false;
       } catch (e) {
         e.response ? console.error(e.response) : console.error(e);
         NotifyNegative('Erreur lors de la modification de l\'aidant');
