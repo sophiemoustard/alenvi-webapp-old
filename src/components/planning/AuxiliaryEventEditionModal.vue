@@ -135,9 +135,7 @@ export default {
     },
     docsUploadUrl () {
       const driveId = get(this.selectedAuxiliary, 'administrative.driveFolder.driveId');
-      return !this.selectedAuxiliary._id && driveId
-        ? ''
-        : this.$gdrive.getUploadUrl(driveId);
+      return driveId ? '' : this.$gdrive.getUploadUrl(driveId);
     },
     eventType () {
       return this.eventTypeOptions.filter(option => option.value === this.editedEvent.type);
