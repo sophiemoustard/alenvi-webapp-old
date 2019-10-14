@@ -102,7 +102,6 @@
 </template>
 
 <script>
-import get from 'lodash/get';
 import { INTERVENTION, AUXILIARY, ABSENCE, OTHER } from '../../data/constants';
 import { planningModalMixin } from '../../mixins/planningModalMixin';
 import { formatIdentity } from '../../helpers/utils';
@@ -134,7 +133,7 @@ export default {
       return !this.selectedAuxiliary._id ? '' : `justificatif_absence_${this.selectedAuxiliary.identity.lastname}`;
     },
     docsUploadUrl () {
-      const driveId = get(this.selectedAuxiliary, 'administrative.driveFolder.driveId');
+      const driveId = this.$_.get(this.selectedAuxiliary, 'administrative.driveFolder.driveId');
       return driveId ? '' : this.$gdrive.getUploadUrl(driveId);
     },
     eventType () {
