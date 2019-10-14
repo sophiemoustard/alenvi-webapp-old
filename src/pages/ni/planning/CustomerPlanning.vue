@@ -22,23 +22,20 @@
           disable-end-date />
         <ni-select in-modal caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions"
           :error="$v.newEvent.auxiliary.$error" required-field @blur="$v.newEvent.auxiliary.$touch"
-          @input="toggleServiceSelection(newEvent.customer._id)" />
+          @input="toggleServiceSelection(newEvent.customer)" />
         <ni-select in-modal caption="Service" v-model="newEvent.subscription" :error="$v.newEvent.subscription.$error"
-          :options="customerSubscriptionsOptions(newEvent.customer._id)" required-field
+          :options="customerSubscriptionsOptions" required-field
           @blur="$v.newEvent.subscription.$touch" />
         <ni-select in-modal caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency"
           :options="repetitionOptions" required-field @blur="$v.newEvent.repetition.frequency.$touch"
           :disable="!isRepetitionAllowed" />
         <ni-input in-modal v-model="newEvent.misc" caption="Notes" />
       </div>
-      <div v-if="newEvent.type === INTERVENTION && customerAddressList(newEvent).length > 0" class="customer-info">
+      <div v-if="newEvent.type === INTERVENTION && customerAddressList.length > 0" class="customer-info">
         <div class="row items-center no-wrap">
-          <q-select v-if="customerAddressList(newEvent).length === 1" v-model="newEvent.address"
-              color="white" inverted-light :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { }, }]"
-              :filter-placeholder="customerAddress(newEvent).fullAddress" readonly :options="customerAddressList(newEvent)" />
-          <q-select v-else v-model="newEvent.address" color="white" inverted-light :options="customerAddressList(newEvent)"
-              :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAddressSelect(); }, }]"
-              :filter-placeholder="customerAddress(newEvent)" ref="addressSelect" filter @input="onChangedAddress(selectedAddress, editedEvent)"/>
+          <q-select v-model="newEvent.address" color="white" inverted-light :options="customerAddressList"
+              :after="iconSelect" :filter-placeholder="newEvent.address.fullAddress" ref="addressSelect" filter
+              :readonly="customerAddressList.length === 1"/>
         </div>
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary"
@@ -70,7 +67,7 @@
           :error="$v.editedEvent.sector.$error" required-field :disable="isDisabled"
           @blur="$v.editedEvent.sector.$touch" />
         <ni-select in-modal caption="Service" v-model="editedEvent.subscription" required-field :disable="isDisabled"
-          :options="customerSubscriptionsOptions(editedEvent.customer._id)"
+          :options="customerSubscriptionsOptions"
           :error="$v.editedEvent.subscription.$error" @blur="$v.editedEvent.subscription.$touch" />
         <template v-if="isRepetition(editedEvent) && !isDisabled">
           <div class="row q-mb-md light-checkbox">
@@ -94,16 +91,12 @@
           </div>
         </template>
       </div>
-      <div v-if="editedEvent.type === INTERVENTION && customerAddressList(editedEvent).length > 0" class="customer-info">
+      <div v-if="editedEvent.type === INTERVENTION && customerAddressList.length > 0" class="customer-info">
         <div class="row items-center no-wrap">
-          <q-select v-if="customerAddressList(editedEvent).length === 1" v-model="editedEvent.address"
-              color="white" inverted-light :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { }, }]"
-              :filter-placeholder="customerAddress(editedEvent).fullAddress" readonly :options="customerAddressList(newEvent)"/>
-          <q-select v-else v-model="editedEvent.address" color="white" inverted-light
-              :options="customerAddressList(editedEvent)" @input="onChangedAddress(selectedAddress, editedEvent)"
-              :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAddressSelect(); }, }]"
-              :filter-placeholder="customerAddress(editedEvent).fullAddress" ref="addressSelect" filter />
-          <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect(editedEvent)" />
+          <q-select v-model="editedEvent.address" color="white" inverted-light
+              :options="customerAddressList" :readonly="customerAddressList.length === 1"
+              :after="iconSelect" :filter-placeholder="editedEvent.address.fullAddress" ref="addressSelect" filter />
+          <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect" />
         </div>
       </div>
       <q-btn v-if="!isDisabled" class="full-width modal-btn" no-caps color="primary" :loading="loading"
@@ -184,8 +177,8 @@ export default {
       return this.$moment(this.startOfWeek).endOf('w').toISOString();
     },
     selectedCustomer () {
-      if (this.creationModal && this.newEvent.customer !== '') return this.customers.find(cus => cus._id === this.newEvent.customer._id);
-      if (this.editionModal && this.editedEvent.customer !== '') return this.customers.find(cus => cus._id === this.editedEvent.customer._id);
+      if (this.creationModal && this.newEvent.customer !== '') return this.customers.find(cus => cus._id === this.newEvent.customer);
+      if (this.editionModal && this.editedEvent.customer !== '') return this.customers.find(cus => cus._id === this.editedEvent.customer);
       return { picture: {}, identity: {} };
     },
     customersOptions () {
@@ -317,11 +310,11 @@ export default {
         repetition: { frequency: NEVER },
         startDuration: '',
         endDuration: '',
-        customer: {},
+        customer: person._id,
         subscription: '',
         internalHour: '',
         absence: '',
-        address: {},
+        address: this.$_.get(person, 'contact.primaryAddress', {}),
         attachment: {},
         auxiliary: '',
         sector: '',
@@ -332,7 +325,6 @@ export default {
           endHour: '10:00',
         },
       };
-      this.formatCustomerForEvent(person);
       this.creationModal = true;
     },
     // Event edition
