@@ -231,12 +231,12 @@
     <!-- Add helper modal -->
     <add-helper-modal :addHelper="addHelper" :company="company" :loading="loading" :validationsNewHelper="$v.newHelper"
     :newHelper="newHelper" @submitHelper="submitHelper" @hide="resetAddHelperForm"
-    @sendWelcomingEmail="sendWelcomingEmail"/>
+    :error-label="phoneNbrError($v.newHelper)" @sendWelcomingEmail="sendWelcomingEmail"/>
 
     <!-- Edit helper modal -->
     <edit-helper-modal :editedHelper="editedHelper" :openEditedHelperModal="openEditedHelperModal" :loading="loading"
     :validationsEditedHelper="$v.editedHelper" @hide="resetEditedHelperForm"
-    @editHelper="editHelper"/>
+    :error-label="phoneNbrError($v.editedHelper)" @editHelper="editHelper"/>
 
     <!-- Subscription creation modal -->
     <ni-modal v-model="subscriptionCreationModal" @hide="resetCreationSubscriptionData">
@@ -409,7 +409,7 @@
 
 <script>
 import { Cookies } from 'quasar';
-import { required, requiredIf, email } from 'vuelidate/lib/validators';
+import { required, requiredIf, email, maxLength } from 'vuelidate/lib/validators';
 
 import { extend, clear } from '../../helpers/utils.js';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify.js';
@@ -800,14 +800,20 @@ export default {
       local: {
         email: { required, email },
       },
-      mobilePhone: { frPhoneNumber },
+      mobilePhone: {
+        frPhoneNumber,
+        maxLength: maxLength(10),
+      },
     },
     editedHelper: {
       identity: { lastname: { required } },
       local: {
         email: { required, email },
       },
-      mobilePhone: { frPhoneNumber },
+      mobilePhone: {
+        frPhoneNumber,
+        maxLength: maxLength(10),
+      },
     },
     newFunding: {
       thirdPartyPayer: { required },
@@ -861,6 +867,13 @@ export default {
     this.isLoaded = true;
   },
   methods: {
+    phoneNbrError (user) {
+      if (!user.mobilePhone.required) {
+        return REQUIRED_LABEL;
+      } else if (!user.mobilePhone.frPhoneNumber || !user.mobilePhone.maxLength) {
+        return 'Numéro de téléphone non valide';
+      }
+    },
     async sendWelcomingEmail () {
       await this.$email.sendWelcome({
         receiver: {
