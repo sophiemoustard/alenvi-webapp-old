@@ -74,6 +74,7 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import { ABSENCE, INTERNAL_HOUR, INTERVENTION, HOURLY, UNJUSTIFIED, CUSTOMER_CONTRACT, COMPANY_CONTRACT, NEVER, AUXILIARY } from '../../data/constants';
 import { planningModalMixin } from '../../mixins/planningModalMixin';
 
@@ -105,9 +106,10 @@ export default {
       return !this.selectedAuxiliary._id ? '' : `justificatif_absence_${this.selectedAuxiliary.identity.lastname}`;
     },
     docsUploadUrl () {
-      return !this.selectedAuxiliary._id
+      const driveId = get(this.selectedAuxiliary, 'administrative.driveFolder.driveId');
+      return !this.selectedAuxiliary._id && driveId
         ? ''
-        : `${process.env.API_HOSTNAME}/gdrive/${this.selectedAuxiliary.administrative.driveFolder.driveId}/upload`;
+        : this.$gdrive.getUploadUrl(driveId);
     },
     isCompanyContractValidForRepetition () {
       if (!this.selectedAuxiliary.contracts || this.selectedAuxiliary.contracts.length === 0) return false;

@@ -22,4 +22,7 @@ export default {
     });
     return file;
   },
+  getUploadUrl (driveId) {
+    return `${process.env.API_HOSTNAME}/gdrive/${driveId}/upload`;
+  },
 }
