@@ -6,7 +6,7 @@
         <q-icon name="clear" size="16px" @click.native="close" />
       </div>
     </div>
-    <q-infinite-scroll inline :handler="load" style="height: 100%; overflow: auto;">
+    <q-infinite-scroll inline :handler="load" style="height: 95%; overflow: auto;">
       <template v-if="eventHistories.length !== 0">
         <ni-event-history v-for="history in eventHistories" :key="history._id" :history="history" />
         <div slot="message" class="loading">
@@ -51,26 +51,27 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  @import '~variables';
+  @import '~variables'
   .history-container
-    // overflow: auto;
-    background-color: $white;
-    width: 300px;
-    top: 60px;
+    background-color: $white
+    width: 300px
+    top: 60px
     @media (max-width: 767px)
-      top: 100px;
-    right: 0;
-    position: absolute;
+      top: 100px
+    right: 0
+    position: absolute
     box-shadow: 0 3px 5px -1px rgba(0,0,0,0.2), 0 5px 8px rgba(0,0,0,0.14), 0 1px 14px rgba(0,0,0,0.12)
 
   .history-title
-    margin: 10px 2px;
-    padding: 5px;
+    margin: 10px 2px
+    padding: 5px
+    height: 5%
 
   .loading
     width: 100%
-    display: flex;
-    justify-content: center;
-    margin: 10px 0;
+    height: 30px
+    display: flex
+    justify-content: center
+    margin: 10px 0
 
 </style>
