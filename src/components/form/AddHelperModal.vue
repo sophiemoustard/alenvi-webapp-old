@@ -45,8 +45,7 @@ export default {
       }
     },
     phoneNbrError () {
-      if (!this.$_.get(this.validations, 'contact.phone.frPhoneNumber', null) ||
-        !this.$_.get(this.validations, 'contact.phone.maxLength')) {
+      if (!this.$_.get(this.validations, 'contact.phone.frPhoneNumber', null)) {
         return 'Numéro de téléphone non valide';
       }
     },
