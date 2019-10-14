@@ -4,18 +4,18 @@
       @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop"
       :filteredSectors="filteredSectors" :can-edit="canEditEvent" :personKey="personKey" :filters="activeFilters"
       @toggleAllSectors="toggleAllSectors" :eventHistories="eventHistories" ref="planningManager"
-      :displayAllSectors="displayAllSectors" @toggleHistory="toggleHistory" :displayHistory="displayHistory" @updateFeeds="updateEventHistories" />
+      :displayAllSectors="displayAllSectors" @toggleHistory="toggleHistory" :displayHistory="displayHistory"
+      @updateFeeds="updateEventHistories" />
 
     <!-- Event creation modal -->
     <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
-      :creationModal="creationModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary"
+      :creationModal="creationModal" :internalHours="internalHours" @close="closeCreationModal" :personKey="personKey"
       :activeAuxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetCreationForm"
-      @deleteDocument="deleteDocument" @documentUploaded="documentUploaded" @createEvent="createEvent"
-      @close="closeCreationModal" />
+      @deleteDocument="deleteDocument" @documentUploaded="documentUploaded" @createEvent="createEvent" />
 
     <!-- Event edition modal -->
     <ni-auxiliary-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
-      :editionModal="editionModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary"
+      :editionModal="editionModal" :internalHours="internalHours"
       :activeAuxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetEditionForm"
       @deleteDocument="deleteDocument" @documentUploaded="documentUploaded" @updateEvent="updateEvent"
       @close="closeEditionModal" @deleteEvent="deleteEvent" @deleteEventRepetition="deleteEventRepetition" />
@@ -91,23 +91,6 @@ export default {
       elementToAdd: 'planning/getElementToAdd',
       elementToRemove: 'planning/getElementToRemove',
     }),
-    selectedAuxiliary () {
-      if (this.creationModal && this.newEvent.auxiliary) {
-        const aux = this.activeAuxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
-        const hasCustomerContractOnEvent = this.hasCustomerContractOnEvent(aux, this.newEvent.dates.startDate);
-        const hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(aux, this.newEvent.dates.startDate);
-
-        return { ...aux, hasCustomerContractOnEvent, hasCompanyContractOnEvent };
-      }
-      if (this.editionModal && this.editedEvent.auxiliary) {
-        const aux = this.activeAuxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
-        const hasCustomerContractOnEvent = this.hasCustomerContractOnEvent(aux, this.editedEvent.dates.startDate);
-        const hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(aux, this.editedEvent.dates.startDate);
-
-        return { ...aux, hasCustomerContractOnEvent, hasCompanyContractOnEvent };
-      }
-      return { picture: {}, identity: { lastname: '' } };
-    },
     displayedAuxiliaries () {
       return this.auxiliaries.filter(aux => this.hasCustomerContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek) ||
         this.hasCompanyContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek));

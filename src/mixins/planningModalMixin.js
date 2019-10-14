@@ -5,6 +5,7 @@ import NiSelect from '../components/form/Select';
 import NiInput from '../components/form/Input';
 import SearchAddress from '../components/form/SearchAddress';
 import FileUploader from '../components/form/FileUploader';
+import PlanningModalHeader from '../components/planning/PlanningModalHeader';
 import { formatIdentity } from '../helpers/utils';
 import {
   INTERVENTION,
@@ -45,6 +46,7 @@ export const planningModalMixin = {
     'ni-input': NiInput,
     'ni-file-uploader': FileUploader,
     'ni-datetime-range': DatetimeRange,
+    'ni-planning-modal-header': PlanningModalHeader,
   },
   data () {
     return {
@@ -77,6 +79,9 @@ export const planningModalMixin = {
 
       return ABSENCE_TYPES;
     },
+    isCustomerPlanning () {
+      return this.personKey === CUSTOMER;
+    },
     disableCreationButton () {
       if (!this.newEvent.type) return true;
       switch (this.newEvent.type) {
@@ -91,7 +96,7 @@ export const planningModalMixin = {
           return !this.newEvent.auxiliary || !this.newEvent.absence || !this.newEvent.dates.startDate ||
             !this.newEvent.absenceNature || !this.newEvent.dates.startHour || !this.newEvent.dates.endHour;
         case INTERVENTION:
-          return (this.personKey === CUSTOMER && !this.newEvent.auxiliary) || !this.newEvent.customer ||
+          return (this.isCustomerPlanning && !this.newEvent.auxiliary) || !this.newEvent.customer ||
             !this.newEvent.subscription || !this.newEvent.dates.startDate ||
             !this.newEvent.dates.endDate || !this.newEvent.dates.startHour || !this.newEvent.dates.endHour;
         case INTERNAL_HOUR:
@@ -116,7 +121,7 @@ export const planningModalMixin = {
           return !this.editedEvent.auxiliary || !this.editedEvent.absence || !this.editedEvent.dates.startDate ||
             !this.editedEvent.absenceNature || !this.editedEvent.dates.startHour || !this.editedEvent.dates.endHour;
         case INTERVENTION:
-          const shouldDisableButton = (this.personKey === CUSTOMER && !this.editedEvent.sector) ||
+          const shouldDisableButton = (this.isCustomerPlanning && !this.editedEvent.sector) ||
             !this.editedEvent.subscription || !this.editedEvent.dates.startDate ||
             !this.editedEvent.dates.endDate || !this.editedEvent.dates.startHour || !this.editedEvent.dates.endHour;
           if (this.editedEvent.isCancelled) {
@@ -133,7 +138,7 @@ export const planningModalMixin = {
       }
     },
     eventTypeOptions () {
-      if (this.selectedAuxiliary && !this.selectedAuxiliary._id) {
+      if (this.isCustomerPlanning || (this.selectedAuxiliary && !this.selectedAuxiliary._id)) {
         return EVENT_TYPES.filter(type => type.value === INTERVENTION);
       }
 
@@ -144,7 +149,7 @@ export const planningModalMixin = {
       return EVENT_TYPES;
     },
     auxiliariesOptions () {
-      if (this.personKey === CUSTOMER && this.creationModal) {
+      if (this.isCustomerPlanning && this.creationModal) {
         return this.activeAuxiliaries.map(aux => this.formatPersonOptions(aux));
       }
 
@@ -199,18 +204,39 @@ export const planningModalMixin = {
     },
     // Event creation
     customerSubscriptionsOptions () {
-      if (!this.selectedCustomer || !this.selectedCustomer.subscriptions || this.selectedCustomer.subscriptions.length === 0) return [];
+      if (!this.selectedCustomer || !this.selectedCustomer.subscriptions ||
+        this.selectedCustomer.subscriptions.length === 0 || !this.selectedAuxiliary._id) return [];
 
       let subscriptions = this.selectedCustomer.subscriptions;
-      if (this.selectedAuxiliary._id) {
-        if (!this.selectedAuxiliary.hasCustomerContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== CUSTOMER_CONTRACT);
-        if (!this.selectedAuxiliary.hasCompanyContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== COMPANY_CONTRACT);
-      }
+      if (!this.selectedAuxiliary.hasCustomerContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== CUSTOMER_CONTRACT);
+      if (!this.selectedAuxiliary.hasCompanyContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== COMPANY_CONTRACT);
 
       return subscriptions.map(sub => ({ label: sub.service.name, value: sub._id }));
     },
   },
   methods: {
+    hasCustomerContractOnEvent (auxiliary, startDate, endDate = startDate) {
+      if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
+      if (!auxiliary.contracts.some(contract => contract.status === CUSTOMER_CONTRACT)) return false;
+
+      const customerContracts = auxiliary.contracts.filter(contract => contract.status === CUSTOMER_CONTRACT);
+
+      return customerContracts.some(contract => {
+        return this.$moment(contract.startDate).isSameOrBefore(endDate) &&
+          (!contract.endDate || this.$moment(contract.endDate).isSameOrAfter(startDate));
+      });
+    },
+    hasCompanyContractOnEvent (auxiliary, startDate, endDate = startDate) {
+      if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
+      if (!auxiliary.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
+
+      const companyContracts = auxiliary.contracts.filter(contract => contract.status === COMPANY_CONTRACT);
+
+      return companyContracts.some(contract => {
+        return this.$moment(contract.startDate).isSameOrBefore(endDate) &&
+          (!contract.endDate || this.$moment(contract.endDate).isAfter(startDate));
+      });
+    },
     iconSelect (event) {
       if (this.customerAddressList(event).length === 1) return [];
 
@@ -265,8 +291,10 @@ export const planningModalMixin = {
     isRepetition (event) {
       return ABSENCE !== event.type && event.repetition && event.repetition.frequency !== NEVER;
     },
-    toggleServiceSelection (customerId) {
-      if (this.customerSubscriptionsOptions.length === 1 && this.creationModal) this.newEvent.subscription = this.customerSubscriptionsOptions[0].value;
+    toggleServiceSelection () {
+      if (this.customerSubscriptionsOptions.length === 1 && this.creationModal) {
+        this.newEvent.subscription = this.customerSubscriptionsOptions[0].value;
+      }
     },
     toggleAddressSelect () {
       return this.$refs['addressSelect'].show();

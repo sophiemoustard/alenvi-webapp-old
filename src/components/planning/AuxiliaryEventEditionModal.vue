@@ -3,10 +3,10 @@
     @hide="resetForm()">
     <div class="modal-padding">
       <div class="row q-mb-md">
-        <div class="col-11 row auxiliary-name" v-if="selectedAuxiliary">
-          <img :src="getAvatar(selectedAuxiliary)" class="avatar">
+        <div class="col-11 row auxiliary-name" v-if="selectedPerson">
+          <img :src="getAvatar(selectedPerson)" class="avatar">
           <div class="auxiliary-name-text" v-if="[UNAVAILABILITY, ABSENCE].includes(editedEvent.type)">
-            {{ selectedAuxiliary.identity.firstname }} {{ selectedAuxiliary.identity.lastname.toUpperCase() }}
+            {{ selectedPerson.identity.firstname }} {{ selectedPerson.identity.lastname.toUpperCase() }}
           </div>
           <q-select v-else v-model="editedEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions"
             :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
@@ -62,7 +62,7 @@
           <ni-file-uploader v-if="editedEvent.absence && [ILLNESS, WORK_ACCIDENT].includes(editedEvent.absence)" path="attachment"
             caption="Justificatif d'absence" :entity="editedEvent" alt="justificatif absence" name="file"
             :url="docsUploadUrl" @uploaded="documentUploaded" :additionalValue="additionalValue" required-field
-            withBorders @delete="deleteDocument(editedEvent.attachment.driveId)" :disable="!selectedAuxiliary._id" />
+            withBorders @delete="deleteDocument(editedEvent.attachment.driveId)" :disable="!selectedPerson._id" />
         </template>
         <template v-if="editedEvent.absenceNature === HOURLY">
           <ni-datetime-range caption="Dates et heures de l'évènement" v-model="editedEvent.dates" required-field
@@ -113,7 +113,7 @@ export default {
     editedEvent: { type: Object, default: () => ({}) },
     editionModal: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
-    selectedAuxiliary: { type: Object, default: () => ({}) },
+    selectedPerson: { type: Object, default: () => ({}) },
     activeAuxiliaries: { type: Array, default: () => [] },
     customers: { type: Array, default: () => [] },
     internalHours: { type: Array, default: () => [] },
@@ -130,7 +130,7 @@ export default {
       return this.customers.find(customer => customer._id === this.editedEvent.customer);
     },
     additionalValue () {
-      return !this.selectedAuxiliary._id ? '' : `justificatif_absence_${this.selectedAuxiliary.identity.lastname}`;
+      return !this.selectedPerson._id ? '' : `justificatif_absence_${this.selectedPerson.identity.lastname}`;
     },
     docsUploadUrl () {
       const driveId = this.$_.get(this.selectedAuxiliary, 'administrative.driveFolder.driveId');
@@ -143,8 +143,8 @@ export default {
       return this.editedEvent.type === INTERVENTION && this.editedEvent.isBilled;
     },
     auxiliaryFilterPlaceholder () {
-      return this.selectedAuxiliary.identity
-        ? formatIdentity(this.selectedAuxiliary.identity, 'FL')
+      return this.selectedPerson.identity
+        ? formatIdentity(this.selectedPerson.identity, 'FL')
         : 'À affecter';
     },
     isMiscRequired () {

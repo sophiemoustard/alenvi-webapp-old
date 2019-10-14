@@ -140,8 +140,10 @@ export const planningActionMixin = {
     },
     resetCreationForm ({ partialReset, type = INTERVENTION }) {
       this.$v.newEvent.$reset();
-      if (!partialReset) this.newEvent = {};
-      else {
+      if (!partialReset) {
+        this.creationModal = false;
+        this.newEvent = {};
+      } else {
         this.newEvent = {
           type,
           dates: {

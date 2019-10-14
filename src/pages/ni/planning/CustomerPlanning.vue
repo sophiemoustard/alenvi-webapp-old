@@ -5,42 +5,9 @@
       @onDrop="updateEventOnDrop" ref="planningManager" :filters="filters" />
 
     <!-- Event creation modal -->
-    <q-modal v-if="Object.keys(newEvent).length !== 0" v-model="creationModal" content-classes="modal-container-md"
-      @hide="resetCreationForm(false)">
-      <div class="modal-padding">
-        <div class="row q-mb-md">
-          <div class="col-11 row person-name">
-            <img :src="DEFAULT_AVATAR" class="avatar">
-            <div>{{ selectedCustomer.identity | formatIdentity('FL') }}</div>
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span>
-              <q-icon name="clear" @click.native="creationModal = false" /></span>
-          </div>
-        </div>
-        <ni-datetime-range caption="Dates et heures de l'intervention" v-model="newEvent.dates" required-field
-          disable-end-date />
-        <ni-select in-modal caption="Auxiliaire" v-model="newEvent.auxiliary" :options="auxiliariesOptions"
-          :error="$v.newEvent.auxiliary.$error" required-field @blur="$v.newEvent.auxiliary.$touch"
-          @input="toggleServiceSelection(newEvent.customer)" />
-        <ni-select in-modal caption="Service" v-model="newEvent.subscription" :error="$v.newEvent.subscription.$error"
-          :options="customerSubscriptionsOptions" required-field
-          @blur="$v.newEvent.subscription.$touch" />
-        <ni-select in-modal caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency"
-          :options="repetitionOptions" required-field @blur="$v.newEvent.repetition.frequency.$touch"
-          :disable="!isRepetitionAllowed" />
-        <ni-input in-modal v-model="newEvent.misc" caption="Notes" />
-      </div>
-      <div v-if="newEvent.type === INTERVENTION && customerAddressList(newEvent).length > 0" class="customer-info">
-        <div class="row items-center no-wrap">
-          <q-select v-model="newEvent.address" color="white" inverted-light :options="customerAddressList(newEvent)"
-              :after="iconSelect(newEvent)" :filter-placeholder="newEvent.address.fullAddress" ref="addressSelect" filter
-              :readonly="customerAddressList(newEvent).length === 1"/>
-        </div>
-      </div>
-      <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary"
-        @click="createEvent" :disable="disableCreationButton" icon-right="add" />
-    </q-modal>
+    <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
+      :creationModal="creationModal" :activeAuxiliaries="activeAuxiliaries" :customers="customers"
+      :personKey="personKey" @resetForm="resetCreationForm" @createEvent="createEvent" @close="closeCreationModal" />
 
     <!-- Event edition modal -->
     <q-modal v-if="Object.keys(editedEvent).length !== 0" v-model="editionModal" content-classes="modal-container-md"
@@ -113,12 +80,14 @@ import { NotifyWarning, NotifyNegative } from '../../../components/popup/notify.
 import { INTERVENTION, DEFAULT_AVATAR, NEVER, AUXILIARY, PLANNING_REFERENT, CUSTOMER_CONTRACT, COMPANY_CONTRACT, CUSTOMER, SECTOR, AUXILIARY_ROLES } from '../../../data/constants';
 import { mapGetters, mapActions } from 'vuex';
 import { formatIdentity } from '../../../helpers/utils';
+import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryEventCreationModal';
 
 export default {
   name: 'CustomerPlanning',
   metaInfo: { title: 'Planning bénéficiaire' },
   mixins: [planningModalMixin, planningActionMixin],
   components: {
+    'ni-auxiliary-event-creation-modal': AuxiliaryEventCreationModal,
     'ni-planning-manager': Planning,
   },
   props: {

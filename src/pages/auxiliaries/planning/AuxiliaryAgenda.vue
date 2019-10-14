@@ -15,22 +15,22 @@
             :type="AGENDA" />
         </div>
       </div>
-      <agenda :events="filteredEvents" :days="days" :personKey="personKey" @createEvent="openCreationModal" @editEvent="openEditionModal" />
+      <agenda :events="filteredEvents" :days="days" :personKey="personKey" @createEvent="openCreationModal"
+        @editEvent="openEditionModal" />
     </div>
 
     <!-- Event creation modal -->
     <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
-      :creationModal="creationModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary"
-      :activeAuxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetCreationForm"
-      @deleteDocument="deleteDocument" @documentUploaded="documentUploaded" @createEvent="createEvent"
-      @close="closeCreationModal" />
+      :creationModal="creationModal" :internalHours="internalHours" :activeAuxiliaries="activeAuxiliaries"
+      :customers="customers" @resetForm="resetCreationForm" @deleteDocument="deleteDocument"
+      @documentUploaded="documentUploaded" @createEvent="createEvent" @close="closeCreationModal" />
 
     <!-- Event edition modal -->
     <ni-auxiliary-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
-      :editionModal="editionModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary"
-      :activeAuxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetEditionForm"
-      @deleteDocument="deleteDocument" @documentUploaded="documentUploaded" @updateEvent="updateEvent"
-      @close="closeEditionModal" @deleteEvent="deleteEvent" @deleteEventRepetition="deleteEventRepetition" />
+      :editionModal="editionModal" :internalHours="internalHours" :activeAuxiliaries="activeAuxiliaries"
+      :customers="customers" @resetForm="resetEditionForm" @deleteDocument="deleteDocument" @close="closeEditionModal"
+      @documentUploaded="documentUploaded" @updateEvent="updateEvent" @deleteEvent="deleteEvent"
+      @deleteEventRepetition="deleteEventRepetition" />
   </q-page>
 </template>
 
