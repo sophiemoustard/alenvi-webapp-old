@@ -7,13 +7,8 @@
       </div>
     </div>
     <q-infinite-scroll inline :handler="load" style="height: 95%; overflow: auto;">
-      <template v-if="eventHistories.length !== 0">
-        <ni-event-history v-for="history in eventHistories" :key="history._id" :history="history" />
-        <div slot="message" class="loading">
-          <q-spinner />
-        </div>
-      </template>
-      <div v-else class="loading">
+      <ni-event-history v-for="history in eventHistories" :key="history._id" :history="history" />
+      <div slot="message" class="loading">
         <q-spinner />
       </div>
     </q-infinite-scroll>
