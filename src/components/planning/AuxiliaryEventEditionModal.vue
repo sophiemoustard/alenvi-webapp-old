@@ -94,7 +94,7 @@
           :options="customerAddressList" :readonly="customerAddressList.length === 1"
           :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAddressSelect(); } }]"
           :filter-placeholder="customerAddress(editedEvent)" ref="addressSelect" filter />
-        <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect(editedEvent)" />
+        <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect" />
       </div>
     </div>
     <q-btn v-if="!isDisabled" class="full-width modal-btn" no-caps color="primary" :loading="loading"

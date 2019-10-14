@@ -298,7 +298,7 @@ export const planningActionMixin = {
         : this.$moment(date).hours()}:${this.$moment(date).minutes() || '00'}`;
     },
     formatEditedEvent (event) {
-      const { createdAt, updatedAt, startDate, endDate, isBilled, auxiliary, subscription, address, ...eventData } = event;
+      const { createdAt, updatedAt, startDate, endDate, isBilled, auxiliary, subscription, address, customer, ...eventData } = event;
       const dates = {
         startDate,
         endDate,
@@ -316,6 +316,7 @@ export const planningActionMixin = {
             ...eventData,
             dates,
             auxiliary: auxiliary ? auxiliary._id : '',
+            customer: customer ? customer._id : '',
             subscription,
             isBilled,
             address,
