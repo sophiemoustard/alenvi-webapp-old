@@ -193,8 +193,7 @@ export const planningActionMixin = {
         }
       }
 
-      if (event.address) delete payload.address.location;
-      if (event.type === ABSENCE && event.absence !== ILLNESS) payload.attachment = {};
+      if (event.type === ABSENCE && event.absence !== ILLNESS && event.absence !== WORK_ACCIDENT) payload.attachment = {};
 
       return payload;
     },
@@ -202,7 +201,7 @@ export const planningActionMixin = {
       let payload = this.getPayload(event);
 
       if (event.address && !event.address.fullAddress) delete payload.address;
-      if (event.type === ABSENCE && event.absence !== ILLNESS) payload.attachment = {};
+      if (event.type === ABSENCE && event.absence !== ILLNESS && event.absence !== WORK_ACCIDENT) payload.attachment = {};
 
       return payload;
     },

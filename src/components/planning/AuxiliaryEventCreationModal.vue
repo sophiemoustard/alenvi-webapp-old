@@ -107,7 +107,7 @@ export default {
     docsUploadUrl () {
       return !this.selectedAuxiliary._id
         ? ''
-        : `${process.env.API_HOSTNAME}/events/${this.selectedAuxiliary._id}/gdrive/${this.selectedAuxiliary.administrative.driveFolder.driveId}/upload`;
+        : `${process.env.API_HOSTNAME}/gdrive/${this.selectedAuxiliary.administrative.driveFolder.driveId}/upload`;
     },
     isCompanyContractValidForRepetition () {
       if (!this.selectedAuxiliary.contracts || this.selectedAuxiliary.contracts.length === 0) return false;
