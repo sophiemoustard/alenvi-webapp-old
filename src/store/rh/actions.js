@@ -6,13 +6,9 @@ import { taskValidation } from '../../helpers/taskValidation';
 
 export async function getUserProfile ({commit}, params) {
   try {
-    let user;
-    if (params.userId) {
-      user = await users.getById(params.userId);
-      user.mobilePhone = user.mobilePhone.split(' ').join('');
-    } else {
-      user = await customers.getById(params.customerId);
-    }
+    const user = params.userId
+      ? await users.getById(params.userId)
+      : await customers.getById(params.customerId);
     commit('saveUserProfile', user);
   } catch (e) {
     console.error(e);

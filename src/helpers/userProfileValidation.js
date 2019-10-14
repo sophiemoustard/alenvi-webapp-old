@@ -1,7 +1,6 @@
 import Joi from 'joi';
 
 const userProfileSchema = Joi.object().keys({
-  mobilePhone: Joi.string(),
   identity: Joi.object().keys({
     firstname: Joi.string().required(),
     lastname: Joi.string().required(),
@@ -13,6 +12,7 @@ const userProfileSchema = Joi.object().keys({
     socialSecurityNumber: Joi.number().required(),
   }),
   contact: Joi.object().keys({
+    phone: Joi.string(),
     address: Joi.object().keys({
       fullAddress: Joi.string().required(),
       street: Joi.string(),

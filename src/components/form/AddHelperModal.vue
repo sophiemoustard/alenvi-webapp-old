@@ -8,8 +8,8 @@
     <ni-input in-modal v-model="newHelper.identity.firstname" caption="Prénom" />
     <ni-input in-modal v-model="newHelper.local.email" :error="validations.local.email.$error" caption="Email"
       @blur="validations.local.email.$touch" :error-label="emailError" required-field />
-    <ni-input in-modal v-model.trim="newHelper.mobilePhone" last :error="validations.mobilePhone.$error"
-      caption="Numéro de téléphone" @blur="validations.mobilePhone.$touch" :error-label="phoneNbrError" />
+    <ni-input in-modal v-model.trim="newHelper.contact.phone" last :error="validations.contact.phone.$error"
+      caption="Numéro de téléphone" @blur="validations.contact.phone.$touch" :error-label="phoneNbrError" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Ajouter un aidant" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
@@ -45,7 +45,7 @@ export default {
       }
     },
     phoneNbrError () {
-      if (!this.validations.mobilePhone.frPhoneNumber || !this.validations.mobilePhone.maxLength) {
+      if (!this.$_.get(this.validations, 'contact.phone.frPhoneNumber', null)) {
         return 'Numéro de téléphone non valide';
       }
     },

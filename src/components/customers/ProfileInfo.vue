@@ -70,8 +70,8 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Aidants</p>
       <q-card>
-        <q-table :data="userHelpers" :columns="helpersColumns" row-key="name" table-style="font-size: 1rem" hide-bottom
-          class="table-responsive">
+        <q-table :data="sortedHelpers" :columns="helperColumns" row-key="name" table-style="font-size: 1rem" hide-bottom
+          class="table-responsive" :pagination="helperPagination">
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
               <template v-if="col.name === 'actions'">
@@ -407,9 +407,8 @@
 
 <script>
 import { Cookies } from 'quasar';
-import { required, requiredIf, email, maxLength } from 'vuelidate/lib/validators';
+import { required, requiredIf, email } from 'vuelidate/lib/validators';
 import randomize from 'randomatic';
-
 import { extend, clear } from '../../helpers/utils.js';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify.js';
 import SearchAddress from '../form/SearchAddress';
@@ -432,12 +431,13 @@ import {
   HOURLY,
   REQUIRED_LABEL,
   ONCE,
-  HELPER,
   CIVILITY_OPTIONS,
+  HELPER,
 } from '../../data/constants.js';
 import { financialCertificatesMixin } from '../../mixins/financialCertificatesMixin.js';
 import { fundingMixin } from '../../mixins/fundingMixin.js';
 import { validationMixin } from '../../mixins/validationMixin.js';
+import { helperMixin } from '../../mixins/helperMixin.js';
 import { frPhoneNumber, iban, bic, frAddress } from '../../helpers/vuelidateCustomVal';
 
 export default {
@@ -459,6 +459,7 @@ export default {
     financialCertificatesMixin,
     fundingMixin,
     validationMixin,
+    helperMixin,
   ],
   data () {
     return {
@@ -488,46 +489,6 @@ export default {
       subscriptions: [],
       selectedSubscription: [],
       services: [],
-      helpersColumns: [
-        {
-          name: 'lastname',
-          label: 'Nom',
-          align: 'left',
-          field: row => row.identity.lastname,
-        },
-        {
-          name: 'firstname',
-          label: 'Prénom',
-          align: 'left',
-          field: row => row.identity.firstname,
-        },
-        {
-          name: 'email',
-          label: 'Email',
-          align: 'left',
-          field: row => row.local ? row.local.email : '',
-        },
-        {
-          name: 'phone',
-          label: 'Numéro de téléphone',
-          align: 'left',
-          field: 'mobilePhone',
-        },
-        {
-          name: 'startDate',
-          label: 'Depuis le...',
-          field: 'createdAt',
-          align: 'left',
-          format: (value) => this.$moment(value).format('DD/MM/YYYY'),
-          sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
-        },
-        {
-          name: 'actions',
-          label: '',
-          align: 'left',
-          field: '_id',
-        },
-      ],
       quoteColumns: [
         {
           name: 'quoteNumber',
@@ -563,27 +524,6 @@ export default {
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
         },
       ],
-      userHelpers: [],
-      newHelper: {
-        identity: {
-          lastname: '',
-          firstname: '',
-        },
-        local: {
-          email: '',
-        },
-        mobilePhone: '',
-      },
-      editedHelper: {
-        identity: {
-          lastname: '',
-          firstname: '',
-        },
-        local: {
-          email: '',
-        },
-        mobilePhone: '',
-      },
       newSubscription: {
         service: '',
         unitTTCRate: '',
@@ -789,9 +729,8 @@ export default {
       local: {
         email: { required, email },
       },
-      mobilePhone: {
-        frPhoneNumber,
-        maxLength: maxLength(10),
+      contact: {
+        phone: { frPhoneNumber },
       },
     },
     editedHelper: {
@@ -799,9 +738,8 @@ export default {
       local: {
         email: { required, email },
       },
-      mobilePhone: {
-        frPhoneNumber,
-        maxLength: maxLength(10),
+      contact: {
+        phone: { frPhoneNumber },
       },
     },
     newSubscription: {
@@ -890,13 +828,6 @@ export default {
       this.tmpInput = this.customer.payment.mandates[index].signedAt;
     },
     // Refresh data
-    async getUserHelpers () {
-      try {
-        this.userHelpers = await this.$users.showAll({ customers: this.userProfile._id });
-      } catch (e) {
-        console.error(e);
-      }
-    },
     async getServices () {
       try {
         this.services = await this.$services.showAll({ company: this.company._id });
@@ -1098,8 +1029,9 @@ export default {
       }
     },
     openEditionModalHelper (helperId) {
-      const helper = this.userHelpers.find(helper => helper._id === helperId);
-      this.editedHelper = this.$_.pick(helper, ['_id', 'mobilePhone', 'local.email', 'identity.firstname', 'identity.lastname']);
+      const helper = this.helpers.find(helper => helper._id === helperId);
+      this.editedHelper = this.$_.pick(helper, ['_id', 'local.email', 'identity.firstname', 'identity.lastname']);
+      this.editedHelper.contact = { phone: helper.contact.phone || '' };
       this.openEditedHelperModal = true;
     },
     async removeHelper (helperId) {

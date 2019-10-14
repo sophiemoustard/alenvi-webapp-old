@@ -67,7 +67,7 @@ Si tu rencontres des difficultés, contacte dès aujourd'hui la personne qui t'a
     async sendSMS () {
       try {
         await this.$twilio.sendSMS({
-          to: `+33${this.getUser.mobilePhone.substring(1)}`,
+          to: `+33${this.getUser.contact.phone.substring(1)}`,
           body: this.message,
         });
         this.isLoading = false;
