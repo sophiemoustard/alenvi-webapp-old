@@ -67,6 +67,13 @@ export const planningModalMixin = {
     };
   },
   computed: {
+    iconSelect () {
+      if (this.customerAddressList.length === 1) {
+        return [];
+      }
+      const self = this;
+      return [{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { self.toggleAddressSelect(); } }];
+    },
     mainUser () {
       return this.$store.getters['main/user'];
     },
