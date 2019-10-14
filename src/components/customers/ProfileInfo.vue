@@ -407,7 +407,7 @@
 
 <script>
 import { Cookies } from 'quasar';
-import { required, requiredIf, email, maxLength } from 'vuelidate/lib/validators';
+import { required, requiredIf, email } from 'vuelidate/lib/validators';
 import randomize from 'randomatic';
 import { extend, clear } from '../../helpers/utils.js';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify.js';
@@ -730,7 +730,7 @@ export default {
         email: { required, email },
       },
       contact: {
-        phone: { frPhoneNumber, maxLength: maxLength(10) },
+        phone: { frPhoneNumber },
       },
     },
     editedHelper: {
@@ -739,7 +739,7 @@ export default {
         email: { required, email },
       },
       contact: {
-        phone: { frPhoneNumber, maxLength: maxLength(10) },
+        phone: { frPhoneNumber },
       },
     },
     newSubscription: {

@@ -463,7 +463,7 @@ export default {
           },
         },
         contact: {
-          phone: { required, frPhoneNumber, maxLength: maxLength(10) },
+          phone: { required, frPhoneNumber },
           address: {
             zipCode: { required },
             street: { required },
