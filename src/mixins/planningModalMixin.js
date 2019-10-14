@@ -224,10 +224,6 @@ export const planningModalMixin = {
     },
   },
   methods: {
-    customerAddress (event) {
-      if (!(event.address && event.address.fullAddress)) event.address = this.$_.get(event, 'customer.contact.primaryAddress', '');
-      return event.address.fullAddress;
-    },
     getAvatar (user) {
       if (!user || !user._id) return UNKNOWN_AVATAR;
 

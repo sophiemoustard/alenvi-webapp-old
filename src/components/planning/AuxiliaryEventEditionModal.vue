@@ -93,7 +93,7 @@
         <q-select v-model="editedEvent.address" color="white" inverted-light
           :options="customerAddressList" :readonly="customerAddressList.length === 1"
           :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAddressSelect(); } }]"
-          :filter-placeholder="customerAddress(editedEvent)" ref="addressSelect" filter />
+          :filter-placeholder="editedEvent.address.fullAddress" ref="addressSelect" filter />
         <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect" />
       </div>
     </div>
