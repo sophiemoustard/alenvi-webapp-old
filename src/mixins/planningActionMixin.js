@@ -371,7 +371,6 @@ export const planningActionMixin = {
     },
     async updateEvent () {
       try {
-        debugger
         await this.$v.editedEvent.$touch();
         const isValid = await this.waitForFormValidation(this.$v.editedEvent);
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');

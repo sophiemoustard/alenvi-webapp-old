@@ -270,7 +270,6 @@ export const planningModalMixin = {
       return this.$refs['addressSelect'].show();
     },
     onChangedAddress (value, event) {
-      debugger
       event.address = this.$_.get(event, 'customer.contact.primaryAddress.fullAddress', null) === value
         ? this.$_.get(event, 'customer.contact.primaryAddress')
         : this.$_.get(event, 'customer.contact.secondaryAddress.fullAddress', null) === value
