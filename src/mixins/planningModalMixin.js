@@ -67,13 +67,6 @@ export const planningModalMixin = {
     };
   },
   computed: {
-    iconSelect () {
-      if (this.customerAddressList.length === 1) {
-        return [];
-      }
-      const self = this;
-      return [{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { self.toggleAddressSelect(); } }];
-    },
     mainUser () {
       return this.$store.getters['main/user'];
     },
@@ -199,16 +192,6 @@ export const planningModalMixin = {
         { label: twoWeeksRepetitionLabel, value: EVERY_TWO_WEEKS },
       ];
     },
-    customerAddressList () {
-      const addresses = [];
-      if (this.$_.has(this.selectedCustomer, 'contact.primaryAddress')) {
-        addresses.push(this.formatAddressOptions(this.$_.get(this.selectedCustomer, 'contact.primaryAddress')));
-      }
-      if (this.$_.has(this.selectedCustomer, 'contact.secondaryAddress')) {
-        addresses.push(this.formatAddressOptions(this.$_.get(this.selectedCustomer, 'contact.secondaryAddress')));
-      }
-      return addresses;
-    },
     customerProfileRedirect () {
       return this.mainUser.role.name === COACH || this.mainUser.role.name === ADMIN
         ? { name: 'customers profile', params: { id: this.selectedCustomer._id } }
@@ -231,6 +214,28 @@ export const planningModalMixin = {
     },
   },
   methods: {
+    iconSelect (event) {
+      if (this.customerAddressList(event).length === 1) {
+        return [];
+      }
+      const self = this;
+      return [{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { self.toggleAddressSelect(); } }];
+    },
+    customerAddressList (event) {
+      const addresses = [];
+      if (event.address.fullAddress) {
+        addresses.push(this.formatAddressOptions(event.address));
+      }
+      const primaryAddress = this.$_.get(this.selectedCustomer, 'contact.primaryAddress', null);
+      if (primaryAddress && primaryAddress.fullAddress !== event.address.fullAddress) {
+        addresses.push(this.formatAddressOptions(primaryAddress));
+      }
+      const secondaryAddress = this.$_.get(this.selectedCustomer, 'contact.secondaryAddress', null);
+      if (secondaryAddress && secondaryAddress.fullAddress !== event.address.fullAddress) {
+        addresses.push(this.formatAddressOptions(secondaryAddress));
+      }
+      return addresses;
+    },
     getAvatar (user) {
       if (!user || !user._id) return UNKNOWN_AVATAR;
 

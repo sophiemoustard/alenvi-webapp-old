@@ -31,11 +31,11 @@
           :disable="!isRepetitionAllowed" />
         <ni-input in-modal v-model="newEvent.misc" caption="Notes" />
       </div>
-      <div v-if="newEvent.type === INTERVENTION && customerAddressList.length > 0" class="customer-info">
+      <div v-if="newEvent.type === INTERVENTION && customerAddressList(newEvent).length > 0" class="customer-info">
         <div class="row items-center no-wrap">
-          <q-select v-model="newEvent.address" color="white" inverted-light :options="customerAddressList"
-              :after="iconSelect" :filter-placeholder="newEvent.address.fullAddress" ref="addressSelect" filter
-              :readonly="customerAddressList.length === 1"/>
+          <q-select v-model="newEvent.address" color="white" inverted-light :options="customerAddressList(newEvent)"
+              :after="iconSelect(newEvent)" :filter-placeholder="newEvent.address.fullAddress" ref="addressSelect" filter
+              :readonly="customerAddressList(newEvent).length === 1"/>
         </div>
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary"
@@ -91,11 +91,11 @@
           </div>
         </template>
       </div>
-      <div v-if="editedEvent.type === INTERVENTION && customerAddressList.length > 0" class="customer-info">
+      <div v-if="editedEvent.type === INTERVENTION && customerAddressList(editedEvent).length > 0" class="customer-info">
         <div class="row items-center no-wrap">
           <q-select v-model="editedEvent.address" color="white" inverted-light
-              :options="customerAddressList" :readonly="customerAddressList.length === 1"
-              :after="iconSelect" :filter-placeholder="editedEvent.address.fullAddress" ref="addressSelect" filter />
+              :options="customerAddressList(editedEvent)" :readonly="customerAddressList(editedEvent).length === 1"
+              :after="iconSelect(editedEvent)" :filter-placeholder="editedEvent.address.fullAddress" ref="addressSelect" filter />
           <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect" />
         </div>
       </div>
