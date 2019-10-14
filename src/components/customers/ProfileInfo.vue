@@ -229,12 +229,12 @@
     </div>
 
     <!-- Add helper modal -->
-    <add-helper-modal :openNewHelperModal="openNewHelperModal" :company="company" :loading="loading" :validations="$v.newHelper"
-    :newHelper="newHelper" @submit="submitHelper" @hide="resetAddHelperForm"/>
+    <add-helper-modal :openNewHelperModal="openNewHelperModal" :company="company" :loading="loading"
+      :validations="$v.newHelper" :newHelper="newHelper" @submit="submitHelper" @hide="resetAddHelperForm"/>
 
     <!-- Edit helper modal -->
     <edit-helper-modal :editedHelper="editedHelper" :openEditedHelperModal="openEditedHelperModal" :loading="loading"
-    :validations="$v.editedHelper" @hide="resetEditedHelperForm" @editHelper="editHelper"/>
+      :validations="$v.editedHelper" @hide="resetEditedHelperForm" @editHelper="editHelper"/>
 
     <!-- Subscription creation modal -->
     <ni-modal v-model="subscriptionCreationModal" @hide="resetCreationSubscriptionData">
@@ -1068,9 +1068,8 @@ export default {
         await this.sendWelcomingEmail();
         NotifyPositive('Email envoyé');
 
-        this.newHelper = Object.assign({}, clear(this.newHelper));
         await this.getUserHelpers();
-        this.resetAddHelperForm();
+        this.openNewHelperModal = false;
       } catch (e) {
         e.response ? console.error(e.response) : console.error(e);
         if (e && e.response && e.response.status === 409) return NotifyNegative('Cet email est déjà utilisé par un compte existant');
