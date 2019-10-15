@@ -41,7 +41,7 @@
           <ni-select in-modal caption="Type d'absence" v-model="newEvent.absence" :options="absenceOptions"
             :error="validations.absence.$error" required-field @blur="validations.absence.$touch" />
           <ni-file-uploader v-if="newEvent.absence && [ILLNESS, WORK_ACCIDENT].includes(newEvent.absence)" caption="Justificatif d'absence"
-            path="attachment" :entity="newEvent" alt="justificatif absence" name="proofOfAbsence" :url="docsUploadUrl"
+            path="attachment" :entity="newEvent" alt="justificatif absence" name="file" :url="docsUploadUrl"
             @uploaded="documentUploaded" :additionalValue="additionalValue" required-field withBorders
             @delete="deleteDocument(newEvent.attachment.driveId)" :disable="!selectedAuxiliary._id" />
         </template>
@@ -111,9 +111,8 @@ export default {
       return !this.selectedAuxiliary._id ? '' : `justificatif_absence_${this.selectedAuxiliary.identity.lastname}`;
     },
     docsUploadUrl () {
-      return !this.selectedAuxiliary._id
-        ? ''
-        : `${process.env.API_HOSTNAME}/events/${this.selectedAuxiliary._id}/gdrive/${this.selectedAuxiliary.administrative.driveFolder.driveId}/upload`;
+      const driveId = this.$_.get(this.selectedAuxiliary, 'administrative.driveFolder.driveId');
+      return !driveId ? '' : this.$gdrive.getUploadUrl(driveId);
     },
     isCompanyContractValidForRepetition () {
       if (!this.selectedAuxiliary.contracts || this.selectedAuxiliary.contracts.length === 0) return false;
