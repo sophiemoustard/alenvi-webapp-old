@@ -1104,10 +1104,11 @@ export default {
       try {
         const subscriptions = this.subscriptions.map(subscription => {
           let estimatedWeeklyRate = this.computeWeeklyRate(subscription);
+          const nature = NATURE_OPTIONS.find(nat => nat.value === subscription.service.nature);
 
           return {
             serviceName: subscription.service.name,
-            serviceNature: subscription.service.nature,
+            serviceNature: nature ? nature.label : '',
             unitTTCRate: subscription.unitTTCRate ? `${this.formatNumber(subscription.unitTTCRate)}€` : '',
             weeklyVolume: subscription.estimatedWeeklyVolume,
             weeklyRate: estimatedWeeklyRate ? `${this.formatNumber(estimatedWeeklyRate)}€` : '',
