@@ -85,4 +85,7 @@ export default {
   async removeFunding (params) {
     return alenviAxios.delete(`${process.env.API_HOSTNAME}/customers/${params._id}/fundings/${params.fundingId}`);
   },
+  async deleteSecondaryAddress (params) {
+    return alenviAxios.put(`${process.env.API_HOSTNAME}/customers/${params._id}/removesecaddress`);
+  },
 }
