@@ -207,19 +207,14 @@ export const planningModalMixin = {
         if (!this.selectedAuxiliary.hasCompanyContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== COMPANY_CONTRACT);
       }
 
-      return subscriptions.map(sub => ({
-        label: sub.service.name,
-        value: sub._id,
-      }));
+      return subscriptions.map(sub => ({ label: sub.service.name, value: sub._id }));
     },
   },
   methods: {
     iconSelect (event) {
-      if (this.customerAddressList(event).length === 1) {
-        return [];
-      }
-      const self = this;
-      return [{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { self.toggleAddressSelect(); } }];
+      if (this.customerAddressList(event).length === 1) return [];
+
+      return [{ icon: 'swap_vert', class: 'select-icon pink-icon', handler: () => { this.toggleAddressSelect() } }];
     },
     customerAddressList (event) {
       const addresses = [];
@@ -231,7 +226,7 @@ export const planningModalMixin = {
         addresses.push(this.formatAddressOptions(primaryAddress));
       }
       const secondaryAddress = this.$_.get(this.selectedCustomer, 'contact.secondaryAddress', null);
-      if (secondaryAddress && secondaryAddress.fullAddress !== event.address.fullAddress) {
+      if (secondaryAddress && secondaryAddress.fullAddress !== '' && secondaryAddress.fullAddress !== event.address.fullAddress) {
         addresses.push(this.formatAddressOptions(secondaryAddress));
       }
       return addresses;

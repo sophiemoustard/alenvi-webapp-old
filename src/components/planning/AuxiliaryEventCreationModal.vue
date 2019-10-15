@@ -156,7 +156,7 @@ export default {
     isRepetitionAllowed (value) {
       if (!value) this.newEvent.repetition.frequency = NEVER;
     },
-    selectedCustomer (value) {
+    selectedCustomer () {
       this.newEvent.address = this.$_.get(this.selectedCustomer, 'contact.primaryAddress', {});
       if (this.customerSubscriptionsOptions.length === 1 && this.creationModal) this.newEvent.subscription = this.customerSubscriptionsOptions[0].value;
     },

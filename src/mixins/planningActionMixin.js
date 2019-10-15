@@ -43,7 +43,7 @@ export const planningActionMixin = {
           zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
           street: { required: requiredIf(item => item && !!item.fullAddress) },
           city: { required: requiredIf(item => item && !!item.fullAddress) },
-          fullAddr: this.newEvent.type === INTERNAL_HOUR ? { frAddress } : {},
+          fullAddress: this.newEvent.type === INTERNAL_HOUR ? { frAddress } : {},
         },
         repetition: {
           frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
@@ -72,7 +72,7 @@ export const planningActionMixin = {
           zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
           street: { required: requiredIf(item => item && !!item.fullAddress) },
           city: { required: requiredIf(item => item && !!item.fullAddress) },
-          fullAddr: this.newEvent.type === INTERNAL_HOUR ? { frAddress } : {},
+          fullAddress: this.newEvent.type === INTERNAL_HOUR ? { frAddress } : {},
         },
         repetition: {
           frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
@@ -196,7 +196,6 @@ export const planningActionMixin = {
           const subscription = customer.subscriptions.find(sub => sub._id === event.subscription);
           if (subscription && subscription.service) payload.status = subscription.service.type;
         }
-        payload.customer = customer._id;
       }
 
       if (event.type === ABSENCE && event.absence !== ILLNESS) payload.attachment = {};

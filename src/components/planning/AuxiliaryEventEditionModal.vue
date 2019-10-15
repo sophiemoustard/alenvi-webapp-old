@@ -118,7 +118,6 @@ export default {
     customers: { type: Array, default: () => [] },
     internalHours: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
-    selectedEvent: { type: String, default: '' },
   },
   data () {
     return {
