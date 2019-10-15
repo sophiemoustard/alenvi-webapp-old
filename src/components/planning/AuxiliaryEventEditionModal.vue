@@ -60,7 +60,7 @@
           <ni-select in-modal caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions"
             :error="validations.absence.$error" required-field @blur="validations.absence.$touch" />
           <ni-file-uploader v-if="editedEvent.absence && [ILLNESS, WORK_ACCIDENT].includes(editedEvent.absence)" path="attachment"
-            caption="Justificatif d'absence" :entity="editedEvent" alt="justificatif absence" name="proofOfAbsence"
+            caption="Justificatif d'absence" :entity="editedEvent" alt="justificatif absence" name="file"
             :url="docsUploadUrl" @uploaded="documentUploaded" :additionalValue="additionalValue" required-field
             withBorders @delete="deleteDocument(editedEvent.attachment.driveId)" :disable="!selectedAuxiliary._id" />
         </template>
@@ -128,7 +128,7 @@ export default {
     },
     docsUploadUrl () {
       const driveId = this.$_.get(this.selectedAuxiliary, 'administrative.driveFolder.driveId');
-      return driveId ? '' : this.$gdrive.getUploadUrl(driveId);
+      return !driveId ? '' : this.$gdrive.getUploadUrl(driveId);
     },
     eventType () {
       return this.eventTypeOptions.filter(option => option.value === this.editedEvent.type);
