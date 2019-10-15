@@ -28,7 +28,7 @@
           @focus="saveTmp('contact.primaryAddress.fullAddress')" @blur="updateCustomer('contact.primaryAddress')" />
         <ni-search-address v-model="customer.contact.secondaryAddress" color="white" inverted-light
           error-label="Adresse non valide" :error="$v.customer.contact.secondaryAddress.$error" caption="Addresse secondaire"
-          @focus="saveTmp('contact.secondaryAddress.fullAddress')" @blur="updateCustomerSecondaryAddress('contact.secondaryAddress')" />
+          @focus="saveTmp('contact.secondaryAddress.fullAddress')" @blur="updateCustomer('contact.secondaryAddress')" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -865,17 +865,6 @@ export default {
     this.isLoaded = true;
   },
   methods: {
-    async updateCustomerSecondaryAddress (path) {
-      let value = this.$_.get(this.customer, path);
-      if (value.fullAddress !== '') {
-        this.updateCustomer(path);
-        return;
-      }
-      const params = { _id: this.customer._id };
-      await this.$customers.deleteSecondaryAddress(params);
-      await this.refreshCustomer();
-      NotifyPositive('Addresse supprimée');
-    },
     formatAdditionalFields (row) {
       return [
         { name: 'mandateId', value: row._id },
