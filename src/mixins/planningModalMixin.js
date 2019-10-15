@@ -159,8 +159,8 @@ export const planningModalMixin = {
       ];
     },
     customersOptions () {
-      if (this.customers.length === 0 || !this.selectedAuxiliary) return [];
-      if (!this.selectedAuxiliary._id) return this.customers.map(cus => this.formatPersonOptions(cus)); // Unassigned event
+      if (this.customers.length === 0) return [];
+      if (!this.selectedAuxiliary || !this.selectedAuxiliary._id) return this.customers.map(cus => this.formatPersonOptions(cus)); // Unassigned event
       if (!this.selectedAuxiliary.contracts) return [];
 
       let customers = this.customers;
@@ -212,6 +212,13 @@ export const planningModalMixin = {
       if (!this.selectedAuxiliary.hasCompanyContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== COMPANY_CONTRACT);
 
       return subscriptions.map(sub => ({ label: sub.service.name, value: sub._id }));
+    },
+    additionalValue () {
+      return !this.selectedAuxiliary._id ? '' : `justificatif_absence_${this.selectedAuxiliary.identity.lastname}`;
+    },
+    docsUploadUrl () {
+      const driveId = this.$_.get(this.selectedAuxiliary, 'administrative.driveFolder.driveId');
+      return !driveId ? '' : this.$gdrive.getUploadUrl(driveId);
     },
   },
   methods: {

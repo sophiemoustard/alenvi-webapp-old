@@ -2,23 +2,12 @@
   <q-modal v-if="Object.keys(editedEvent).length !== 0" :value="editionModal" content-classes="modal-container-md"
     @hide="resetForm()">
     <div class="modal-padding">
-      <div class="row q-mb-md">
-        <div class="col-11 row auxiliary-name" v-if="selectedPerson">
-          <img :src="getAvatar(selectedPerson)" class="avatar">
-          <div class="auxiliary-name-text" v-if="[UNAVAILABILITY, ABSENCE].includes(editedEvent.type)">
-            {{ selectedPerson.identity.firstname }} {{ selectedPerson.identity.lastname.toUpperCase() }}
-          </div>
-          <q-select v-else v-model="editedEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions"
-            :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
-            :filter-placeholder="auxiliaryFilterPlaceholder"
-            :disable="isDisabled" ref="auxiliarySelect" filter />
-        </div>
-        <div class="col-1 cursor-pointer modal-btn-close">
-          <span>
-            <q-icon name="clear" @click.native="close" />
-          </span>
-        </div>
-      </div>
+      <ni-planning-modal-header v-if="isCustomerPlanning" v-model="editedEvent.customer" :selectedPerson="selectedCustomer"
+        @close="close" />
+      <ni-planning-modal-header v-else-if="[UNAVAILABILITY, ABSENCE].includes(editedEvent.type)" :options="[]"
+        v-model="editedEvent.auxiliary" :selectedPerson="selectedAuxiliary" @close="close" />
+      <ni-planning-modal-header v-else v-model="editedEvent.auxiliary" :options="auxiliariesOptions"
+        :selectedPerson="selectedAuxiliary" @close="close" />
       <div class="modal-subtitle">
         <q-btn-toggle no-wrap v-model="editedEvent.type" :options="eventType" toggle-color="primary" />
         <q-btn icon="delete" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" no-caps flat
@@ -62,7 +51,7 @@
           <ni-file-uploader v-if="editedEvent.absence && [ILLNESS, WORK_ACCIDENT].includes(editedEvent.absence)" path="attachment"
             caption="Justificatif d'absence" :entity="editedEvent" alt="justificatif absence" name="file"
             :url="docsUploadUrl" @uploaded="documentUploaded" :additionalValue="additionalValue" required-field
-            withBorders @delete="deleteDocument(editedEvent.attachment.driveId)" :disable="!selectedPerson._id" />
+            withBorders @delete="deleteDocument(editedEvent.attachment.driveId)" :disable="!selectedAuxiliary._id" />
         </template>
         <template v-if="editedEvent.absenceNature === HOURLY">
           <ni-datetime-range caption="Dates et heures de l'évènement" v-model="editedEvent.dates" required-field
@@ -113,7 +102,6 @@ export default {
     editedEvent: { type: Object, default: () => ({}) },
     editionModal: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
-    selectedPerson: { type: Object, default: () => ({}) },
     activeAuxiliaries: { type: Array, default: () => [] },
     customers: { type: Array, default: () => [] },
     internalHours: { type: Array, default: () => [] },
@@ -129,12 +117,13 @@ export default {
       if (!this.editedEvent.customer) return {};
       return this.customers.find(customer => customer._id === this.editedEvent.customer);
     },
-    additionalValue () {
-      return !this.selectedPerson._id ? '' : `justificatif_absence_${this.selectedPerson.identity.lastname}`;
-    },
-    docsUploadUrl () {
-      const driveId = this.$_.get(this.selectedAuxiliary, 'administrative.driveFolder.driveId');
-      return !driveId ? '' : this.$gdrive.getUploadUrl(driveId);
+    selectedAuxiliary () {
+      if (!this.editedEvent.auxiliary) return {};
+      const aux = this.activeAuxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
+      const hasCustomerContractOnEvent = this.hasCustomerContractOnEvent(aux, this.editedEvent.dates.startDate);
+      const hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(aux, this.editedEvent.dates.startDate);
+
+      return { ...aux, hasCustomerContractOnEvent, hasCompanyContractOnEvent };
     },
     eventType () {
       return this.eventTypeOptions.filter(option => option.value === this.editedEvent.type);
@@ -143,8 +132,8 @@ export default {
       return this.editedEvent.type === INTERVENTION && this.editedEvent.isBilled;
     },
     auxiliaryFilterPlaceholder () {
-      return this.selectedPerson.identity
-        ? formatIdentity(this.selectedPerson.identity, 'FL')
+      return this.selectedAuxiliary.identity
+        ? formatIdentity(this.selectedAuxiliary.identity, 'FL')
         : 'À affecter';
     },
     isMiscRequired () {

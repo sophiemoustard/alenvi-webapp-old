@@ -15,10 +15,10 @@
 
     <!-- Event edition modal -->
     <ni-auxiliary-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
-      :editionModal="editionModal" :internalHours="internalHours"
-      :activeAuxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetEditionForm"
-      @deleteDocument="deleteDocument" @documentUploaded="documentUploaded" @updateEvent="updateEvent"
-      @close="closeEditionModal" @deleteEvent="deleteEvent" @deleteEventRepetition="deleteEventRepetition" />
+      :editionModal="editionModal" :internalHours="internalHours" :activeAuxiliaries="activeAuxiliaries"
+      :customers="customers" @resetForm="resetEditionForm" @deleteDocument="deleteDocument" @updateEvent="updateEvent"
+      @documentUploaded="documentUploaded" @close="closeEditionModal" @deleteEvent="deleteEvent"
+      @deleteEventRepetition="deleteEventRepetition" />
   </q-page>
 </template>
 
@@ -231,17 +231,6 @@ export default {
         },
       };
       this.creationModal = true;
-    },
-    // Event edition
-    openEditionModal ({ eventId, rowId }) {
-      const rowEvents = this.getRowEvents(rowId);
-
-      const event = rowEvents.find(ev => ev._id === eventId);
-      const can = this.canEditEvent(event);
-      if (!can) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
-      this.formatEditedEvent(event);
-
-      this.editionModal = true;
     },
     // Filter
     async addElementToFilter (el) {

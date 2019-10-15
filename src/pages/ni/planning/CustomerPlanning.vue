@@ -10,84 +10,31 @@
       :personKey="personKey" @resetForm="resetCreationForm" @createEvent="createEvent" @close="closeCreationModal" />
 
     <!-- Event edition modal -->
-    <q-modal v-if="Object.keys(editedEvent).length !== 0" v-model="editionModal" content-classes="modal-container-md"
-      @hide="resetEditionForm()">
-      <div class="modal-padding">
-        <div class="row q-mb-md">
-          <div class="col-11 row person-name">
-            <img :src="DEFAULT_AVATAR" class="avatar">
-            <div>{{ selectedCustomer.identity | formatIdentity('FL') }}</div>
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span>
-              <q-icon name="clear" @click.native="editionModal = false" />
-            </span>
-          </div>
-        </div>
-        <div class="modal-subtitle">
-          <q-btn icon="delete" no-caps flat color="grey"  v-if="!isDisabled"
-            @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" />
-        </div>
-        <ni-datetime-range caption="Dates et heures de l'intervention" v-model="editedEvent.dates" disable-end-date
-          :disable="isDisabled" />
-        <ni-select in-modal caption="Auxiliaire" v-model="editedEvent.auxiliary" :options="auxiliariesOptions"
-          :error="$v.editedEvent.sector.$error" required-field :disable="isDisabled"
-          @blur="$v.editedEvent.sector.$touch" />
-        <ni-select in-modal caption="Service" v-model="editedEvent.subscription" required-field :disable="isDisabled"
-          :options="customerSubscriptionsOptions"
-          :error="$v.editedEvent.subscription.$error" @blur="$v.editedEvent.subscription.$touch" />
-        <template v-if="isRepetition(editedEvent) && !isDisabled">
-          <div class="row q-mb-md light-checkbox">
-            <q-checkbox v-model="editedEvent.shouldUpdateRepetition" label="Appliquer à la répétition"
-              @input="toggleRepetition" />
-          </div>
-        </template>
-        <ni-input in-modal v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes"
-          :disable="isDisabled" :required-field="editedEvent.isCancelled" />
-        <template v-if="!editedEvent.shouldUpdateRepetition && !isDisabled">
-          <div class="row q-mb-md light-checkbox">
-            <q-checkbox v-model="editedEvent.isCancelled" label="Annuler l'évènement" @input="toggleCancellationForm" />
-          </div>
-          <div class="row justify-between">
-            <ni-select in-modal v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.condition" caption="Conditions"
-              :options="cancellationConditions" required-field @blur="$v.editedEvent.cancel.condition.$touch"
-              class="col-6 cancel" />
-            <ni-select in-modal v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.reason" caption="Motif"
-              :options="cancellationReasons" required-field @blur="$v.editedEvent.cancel.reason.$touch"
-              class="col-6 cancel" />
-          </div>
-        </template>
-      </div>
-      <div v-if="editedEvent.type === INTERVENTION && customerAddressList(editedEvent).length > 0" class="customer-info">
-        <div class="row items-center no-wrap">
-          <q-select v-model="editedEvent.address" color="white" inverted-light
-              :options="customerAddressList(editedEvent)" :readonly="customerAddressList(editedEvent).length === 1"
-              :after="iconSelect(editedEvent)" :filter-placeholder="editedEvent.address.fullAddress" ref="addressSelect" filter />
-          <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect" />
-        </div>
-      </div>
-      <q-btn v-if="!isDisabled" class="full-width modal-btn" no-caps color="primary" :loading="loading"
-        label="Editer l'évènement" @click="updateEvent" icon-right="check" :disable="disableEditionButton" />
-    </q-modal>
+    <ni-auxiliary-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
+      :editionModal="editionModal" :activeAuxiliaries="activeAuxiliaries" :customers="customers"
+      :personKey="personKey" @resetForm="resetEditionForm" @updateEvent="updateEvent" @deleteDocument="deleteDocument"
+      @documentUploaded="documentUploaded" @close="closeEditionModal" @deleteEvent="deleteEvent"
+      @deleteEventRepetition="deleteEventRepetition" />
   </q-page>
 </template>
 
 <script>
 import Planning from '../../../components/planning/Planning.vue';
-import { planningModalMixin } from '../../../mixins/planningModalMixin';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
-import { NotifyWarning, NotifyNegative } from '../../../components/popup/notify.js';
-import { INTERVENTION, DEFAULT_AVATAR, NEVER, AUXILIARY, PLANNING_REFERENT, CUSTOMER_CONTRACT, COMPANY_CONTRACT, CUSTOMER, SECTOR, AUXILIARY_ROLES } from '../../../data/constants';
+import { NotifyNegative } from '../../../components/popup/notify.js';
+import { INTERVENTION, DEFAULT_AVATAR, NEVER, AUXILIARY, PLANNING_REFERENT, CUSTOMER, SECTOR, AUXILIARY_ROLES } from '../../../data/constants';
 import { mapGetters, mapActions } from 'vuex';
 import { formatIdentity } from '../../../helpers/utils';
 import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryEventCreationModal';
+import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
 
 export default {
   name: 'CustomerPlanning',
   metaInfo: { title: 'Planning bénéficiaire' },
-  mixins: [planningModalMixin, planningActionMixin],
+  mixins: [planningActionMixin],
   components: {
     'ni-auxiliary-event-creation-modal': AuxiliaryEventCreationModal,
+    'ni-auxiliary-event-edition-modal': AuxiliaryEventEditionModal,
     'ni-planning-manager': Planning,
   },
   props: {
@@ -125,14 +72,11 @@ export default {
     }
   },
   watch: {
-    elementToAdd (val) {
-      this.addElementToFilter(val);
+    async elementToAdd (val) {
+      await this.addElementToFilter(val);
     },
     elementToRemove (val) {
       this.removeElementFromFilter(val);
-    },
-    isRepetitionAllowed (value) {
-      if (!value) this.newEvent.repetition.frequency = NEVER;
     },
   },
   computed: {
@@ -144,47 +88,6 @@ export default {
     }),
     endOfWeek () {
       return this.$moment(this.startOfWeek).endOf('w').toISOString();
-    },
-    selectedCustomer () {
-      if (this.creationModal && this.newEvent.customer !== '') return this.customers.find(cus => cus._id === this.newEvent.customer);
-      if (this.editionModal && this.editedEvent.customer !== '') return this.customers.find(cus => cus._id === this.editedEvent.customer);
-      return { picture: {}, identity: {} };
-    },
-    customersOptions () {
-      return this.customers.map(customer => this.formatPersonOptions(customer));
-    },
-    selectedAuxiliary () {
-      if (this.creationModal && this.newEvent.auxiliary) {
-        const aux = this.auxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
-        const hasCustomerContractOnEvent = this.hasCustomerContractOnEvent(aux, this.newEvent.dates.startDate);
-        const hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(aux, this.newEvent.dates.startDate);
-        const isCustomerContractValidForRepetition = this.isCustomerContractValidForRepetition(aux);
-        const isCompanyContractValidForRepetition = this.isCompanyContractValidForRepetition(aux);
-
-        return { ...aux, hasCustomerContractOnEvent, hasCompanyContractOnEvent, isCustomerContractValidForRepetition, isCompanyContractValidForRepetition };
-      }
-      if (this.editionModal && this.editedEvent.auxiliary) {
-        const aux = this.auxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
-        const hasCustomerContractOnEvent = this.hasCustomerContractOnEvent(aux, this.editedEvent.dates.startDate);
-        const hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(aux, this.editedEvent.dates.startDate);
-
-        return { ...aux, hasCustomerContractOnEvent, hasCompanyContractOnEvent };
-      }
-      return { picture: {}, identity: { lastname: '' } };
-    },
-    isDisabled () {
-      return this.editedEvent.type === INTERVENTION && this.editedEvent.isBilled;
-    },
-    isRepetitionAllowed () {
-      if (this.newEvent.subscription !== '' && this.newEvent.auxiliary !== '') {
-        const selectedCustomer = this.customers.find(cus => cus._id === this.newEvent.customer);
-        if (!selectedCustomer) return true;
-        const selectedSubscription = selectedCustomer.subscriptions.find(sub => sub._id === this.newEvent.subscription);
-        if (!selectedSubscription) return true;
-        if (selectedSubscription.service.type === CUSTOMER_CONTRACT) return this.selectedAuxiliary.isCustomerContractValidForRepetition;
-        if (selectedSubscription.service.type === COMPANY_CONTRACT) return this.selectedAuxiliary.isCompanyContractValidForRepetition;
-      }
-      return true;
     },
     activeAuxiliaries () {
       return this.auxiliaries
@@ -205,22 +108,6 @@ export default {
       this.days = Array.from(range.by('days'));
       if (this.filteredSectors.length !== 0 || this.filteredCustomers.length !== 0) await this.refreshCustomers();
       if (this.customers.length !== 0) await this.refresh();
-    },
-    isCompanyContractValidForRepetition (aux) {
-      if (!aux.contracts.length === 0) return false;
-      if (!aux.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
-      const companyContracts = aux.contracts.filter(ctr => ctr.status === COMPANY_CONTRACT);
-      if (companyContracts.length === 0) return false;
-
-      return companyContracts.some(contract => !contract.endDate);
-    },
-    isCustomerContractValidForRepetition (aux) {
-      if (aux.contracts.length === 0) return false;
-      if (!aux.contracts.some(contract => contract.status === CUSTOMER_CONTRACT)) return false;
-      const customerContracts = aux.contracts.filter(ctr => ctr.customer === this.newEvent.customer);
-      if (customerContracts.length === 0) return false;
-
-      return customerContracts.some(contract => !contract.endDate);
     },
     // Filters
     initFilters () {
@@ -277,13 +164,11 @@ export default {
       this.newEvent = {
         type: INTERVENTION,
         repetition: { frequency: NEVER },
-        startDuration: '',
-        endDuration: '',
         customer: person._id,
         subscription: '',
         internalHour: '',
         absence: '',
-        address: this.$_.get(person, 'contact.primaryAddress', {}),
+        address: {},
         attachment: {},
         auxiliary: '',
         sector: '',
@@ -295,16 +180,6 @@ export default {
         },
       };
       this.creationModal = true;
-    },
-    // Event edition
-    openEditionModal ({ eventId, rowId }) {
-      const rowEvents = this.getRowEvents(rowId);
-      const event = rowEvents.find(ev => ev._id === eventId);
-      const can = this.canEditEvent(event);
-      if (!can) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
-      this.formatEditedEvent(event);
-
-      this.editionModal = true;
     },
     async getSectorCustomers (sectors) {
       return sectors.length === 0 ? [] : this.$customers.listBySector({

@@ -95,13 +95,6 @@ export default {
 
       return this.$moment(this.newEvent.dates.endDate).isAfter(this.$moment(this.newEvent.dates.startDate));
     },
-    additionalValue () {
-      return !this.selectedAuxiliary._id ? '' : `justificatif_absence_${this.selectedAuxiliary.identity.lastname}`;
-    },
-    docsUploadUrl () {
-      const driveId = this.$_.get(this.selectedAuxiliary, 'administrative.driveFolder.driveId');
-      return !driveId ? '' : this.$gdrive.getUploadUrl(driveId);
-    },
     isCompanyContractValidForRepetition () {
       if (!this.selectedAuxiliary.contracts || this.selectedAuxiliary.contracts.length === 0) return false;
       if (!this.selectedAuxiliary.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
@@ -120,7 +113,7 @@ export default {
     },
     isRepetitionAllowed () {
       if (!this.newEvent.auxiliary) return true;
-      if (this.newEvent.subscription !== '' && this.newEvent.customer !== '') {
+      if (this.newEvent.subscription !== '' && this.newEvent.customer !== '' && this.newEvent.auxiliary !== '') {
         if (!this.selectedCustomer.subscriptions) return true;
 
         const selectedSubscription = this.selectedCustomer.subscriptions.find(sub => sub._id === this.newEvent.subscription);
