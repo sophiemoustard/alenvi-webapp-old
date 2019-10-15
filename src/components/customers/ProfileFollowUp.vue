@@ -18,6 +18,19 @@
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
+        <p class="text-weight-bold">Référent</p>
+      </div>
+      <div class="row">
+        <img :src="getAuxiliaryAvatar(auxiliaryReferent)" class="avatar">
+        <q-select class='referent' :options="auxiliariesOptions" v-model="customer.referent"
+          @input="updateCustomer('referent')" color="white" :filter-placeholder="auxiliaryPlaceholder"
+          :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
+          ref="auxiliarySelect" @focus="saveTmp('referent')" hide-underline filter/>
+        <q-spinner v-if="loading" />
+      </div>
+    </div>
+    <div class="q-mb-xl">
+      <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Accompagnement</p>
       </div>
       <div class="row gutter-profile">
@@ -70,7 +83,7 @@
 import Input from '../form/Input';
 import Select from '../form/Select';
 import { NotifyNegative } from '../popup/notify.js';
-import { AUXILIARY_ROLES, DEFAULT_AVATAR } from '../../data/constants';
+import { AUXILIARY, PLANNING_REFERENT, AUXILIARY_ROLES, DEFAULT_AVATAR, UNKNOWN_AVATAR } from '../../data/constants';
 import SearchAddress from '../form/SearchAddress';
 import { extend, formatIdentity } from '../../helpers/utils.js';
 import { customerMixin } from '../../mixins/customerMixin.js';
@@ -88,9 +101,11 @@ export default {
   mixins: [customerMixin, validationMixin, helperMixin],
   data () {
     return {
+      auxiliaries: [],
       isLoaded: false,
-      customer: { followUp: {}, contact: {} },
+      customer: { followUp: {}, contact: {}, referent: '' },
       tmpInput: '',
+      loading: false,
       visibleColumns: ['lastname', 'firstname', 'email', 'phone'],
       customerFollowUp: [],
       followUpColumns: [
@@ -135,13 +150,52 @@ export default {
     hasSecondaryAddress () {
       return !!this.$_.get(this.customer, 'contact.secondaryAddress.fullAddress');
     },
+    auxiliariesOptions () {
+      return [
+        { label: 'Pas de référent', value: '' },
+        ...this.auxiliaries.map(aux => {
+          return {
+            label: formatIdentity(aux.identity, 'FL'),
+            value: aux._id,
+          }
+        }),
+      ];
+    },
+    auxiliaryReferent () {
+      if (!this.customer.referent) return {};
+      return this.auxiliaries.find(aux => aux._id === this.customer.referent);
+    },
+    auxiliaryPlaceholder () {
+      return (this.auxiliaryReferent && this.auxiliaryReferent.identity)
+        ? formatIdentity(this.auxiliaryReferent.identity, 'FL')
+        : 'Pas de référent';
+    },
   },
   async mounted () {
     await this.getCustomer(this.userProfile._id);
     await this.getUserHelpers();
+    await this.getAuxiliaries();
     if (this.customer.firstIntervention) await this.getCustomerFollowUp();
   },
   methods: {
+    toggleAuxiliarySelect () {
+      return this.$refs['auxiliarySelect'].show();
+    },
+    async getAuxiliaries () {
+      try {
+        this.loading = true;
+        const activeAuxiliaries = await this.$users.showAllActive({ role: [AUXILIARY, PLANNING_REFERENT] });
+        this.auxiliaries = activeAuxiliaries.filter(aux => {
+          return aux.contracts.some(contract => {
+            return !contract.endDate;
+          });
+        });
+        this.loading = false;
+      } catch (e) {
+        this.auxiliaries = [];
+        this.loading = false;
+      }
+    },
     async getCustomerFollowUp () {
       try {
         this.customerFollowUp = await this.$stats.getCustomerFollowUp({ customer: this.customer._id });
@@ -170,6 +224,11 @@ export default {
     },
     getPhoneLink (link) {
       return link ? `tel:+33${link.substring(1)}` : '-';
+    },
+    getAuxiliaryAvatar (user) {
+      if (!user || !user._id) return UNKNOWN_AVATAR;
+
+      return this.$_.get(user, 'picture.link') || DEFAULT_AVATAR;
     },
   },
   filters: {

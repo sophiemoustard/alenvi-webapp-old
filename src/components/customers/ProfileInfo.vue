@@ -409,8 +409,13 @@
 import { Cookies } from 'quasar';
 import { required, requiredIf, email } from 'vuelidate/lib/validators';
 import randomize from 'randomatic';
+<<<<<<< HEAD
 import { extend, clear } from '../../helpers/utils.js';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../popup/notify.js';
+=======
+import { clear } from '../../helpers/utils.js';
+import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify.js';
+>>>>>>> COM-705 beginning of adding referent
 import SearchAddress from '../form/SearchAddress';
 import Input from '../form/Input';
 import AddHelperModal from '../form/AddHelperModal.vue';
@@ -789,13 +794,6 @@ export default {
       }) },
     },
   },
-  watch: {
-    userProfile (value) {
-      if (!this.$_.isEqual(value, this.customer)) {
-        this.mergeUser(value);
-      }
-    },
-  },
   async mounted () {
     await this.getUserHelpers();
     await this.refreshCustomer();
@@ -816,10 +814,6 @@ export default {
       if (!service.versions || service.versions.length === 0) return {};
 
       return service.versions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
-    },
-    mergeUser (value = null) {
-      const args = [this.customer, value];
-      this.customer = Object.assign({}, extend(true, ...args));
     },
     saveTmp (path) {
       this.tmpInput = this.$_.get(this.customer, path)
@@ -856,8 +850,7 @@ export default {
       }
     },
     async refreshCustomer () {
-      const customer = await this.$customers.getById(this.userProfile._id);
-      this.mergeUser(customer);
+      this.customer = await this.$customers.getById(this.userProfile._id);
       await this.refreshSubscriptions();
       await this.refreshFundings();
 
