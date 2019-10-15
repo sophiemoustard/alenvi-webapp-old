@@ -10,8 +10,10 @@
         <ni-input v-if="isAuxiliary" caption="Téléphone" type="tel" :error="$v.customer.contact.phone.$error"
           error-label="Numéro de téléphone non valide" v-model.trim="customer.contact.phone"
           @focus="saveTmp('contact.phone')" @blur="updateCustomer('contact.phone')" />
-        <ni-search-address v-if="isAuxiliary" caption='Adresse principale' v-model="customer.contact.primaryAddress" color="white" disable />
-        <ni-search-address v-if="isAuxiliary && customer.contact.secondaryAddress" caption='Adresse secondaire' v-model="customer.contact.secondaryAddress" color="white" disable />
+        <ni-search-address v-if="isAuxiliary" caption='Adresse principale' v-model="customer.contact.primaryAddress"
+          color="white" disable />
+        <ni-search-address v-if="isAuxiliary && hasSecondaryAddress" caption='Adresse secondaire'
+          v-model="customer.contact.secondaryAddress" color="white" disable />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -129,6 +131,9 @@ export default {
     },
     isAuxiliary () {
       return AUXILIARY_ROLES.includes(this.currentUser.role.name);
+    },
+    hasSecondaryAddress () {
+      return !!this.$_.get(this.customer, 'contact.secondaryAddress.fullAddress');
     },
   },
   async mounted () {
