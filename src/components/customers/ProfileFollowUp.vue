@@ -23,9 +23,9 @@
       <div class="row">
         <img :src="getAuxiliaryAvatar(auxiliaryReferent)" class="avatar">
         <q-select class='referent' :options="auxiliariesOptions" v-model="customer.referent"
-          @input="updateCustomer('referent')" color="white" :filter-placeholder="auxiliaryPlaceholder"
           :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
-          ref="auxiliarySelect" @focus="saveTmp('referent')" hide-underline filter/>
+          ref="auxiliarySelect" @focus="saveTmp('referent')" hide-underline filter  color="white"
+          :filter-placeholder="auxiliaryPlaceholder" @input="updateCustomer('referent')"/>
         <q-spinner v-if="loading" />
       </div>
     </div>
@@ -248,5 +248,6 @@ export default {
     padding: 0;
   .table-fixed >>> table
     table-layout: fixed;
-
+  .referent
+    padding-left: 10px;
 </style>
