@@ -218,17 +218,26 @@ export const planningModalMixin = {
     },
     customerAddressList (event) {
       const addresses = [];
-      if (event.address.fullAddress) {
-        addresses.push(this.formatAddressOptions(event.address));
-      }
+
       const primaryAddress = this.$_.get(this.selectedCustomer, 'contact.primaryAddress', null);
-      if (primaryAddress && primaryAddress.fullAddress !== event.address.fullAddress) {
+      if (event.address.fullAddress && primaryAddress && primaryAddress.fullAddress === event.address.fullAddress) {
+        addresses.push(this.formatAddressOptions(event.address));
+      } else if (primaryAddress) {
         addresses.push(this.formatAddressOptions(primaryAddress));
       }
+
       const secondaryAddress = this.$_.get(this.selectedCustomer, 'contact.secondaryAddress', null);
-      if (secondaryAddress && secondaryAddress.fullAddress !== '' && secondaryAddress.fullAddress !== event.address.fullAddress) {
+      if (event.address.fullAddress && secondaryAddress && secondaryAddress.fullAddress === event.address.fullAddress) {
+        addresses.push(this.formatAddressOptions(event.address));
+      } else if (secondaryAddress && secondaryAddress.fullAddress !== '') {
         addresses.push(this.formatAddressOptions(secondaryAddress));
       }
+
+      if (event.address.fullAddress && primaryAddress && primaryAddress.fullAddress !== event.address.fullAddress &&
+      secondaryAddress && secondaryAddress.fullAddress !== event.address.fullAddress) {
+        addresses.push(this.formatAddressOptions(event.address));
+      }
+
       return addresses;
     },
     getAvatar (user) {
