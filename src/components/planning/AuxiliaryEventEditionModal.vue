@@ -29,9 +29,9 @@
           :disable="isDisabled" :error="validations.dates.$error" @blur="validations.dates.$touch" disable-end-date />
       </template>
       <template v-if="editedEvent.type === INTERVENTION">
-        <ni-select in-modal caption="Bénéficiaire" v-model="editedEvent.customer._id" :options="customersOptions"
+        <ni-select in-modal caption="Bénéficiaire" v-model="editedEvent.customer" :options="customersOptions"
           :error="validations.customer.$error" required-field disable />
-        <ni-select in-modal caption="Service" :options="customerSubscriptionsOptions(editedEvent.customer._id)"
+        <ni-select in-modal caption="Service" :options="customerSubscriptionsOptions"
           v-model="editedEvent.subscription" :error="validations.subscription.$error"
           @blur="validations.subscription.$touch" required-field :disable="isDisabled" />
       </template>
@@ -88,9 +88,11 @@
         </div>
       </template>
     </div>
-    <div v-if="editedEvent.type === INTERVENTION" class="customer-info">
+    <div v-if="editedEvent.type === INTERVENTION && customerAddressList(editedEvent).length > 0" class="customer-info">
       <div class="row items-center no-wrap">
-        <div v-if="customerAddress" class="customer-address">{{ customerAddress }}</div>
+        <q-select v-model="editedEvent.address" color="white" inverted-light
+          :options="customerAddressList(editedEvent)" :readonly="customerAddressList(editedEvent).length === 1"
+          :after="iconSelect(editedEvent)" :filter-placeholder="editedEvent.address.fullAddress" ref="addressSelect" filter />
         <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect" />
       </div>
     </div>
@@ -123,6 +125,10 @@ export default {
     };
   },
   computed: {
+    selectedCustomer () {
+      if (!this.editedEvent.customer) return {};
+      return this.customers.find(customer => customer._id === this.editedEvent.customer);
+    },
     additionalValue () {
       return !this.selectedAuxiliary._id ? '' : `justificatif_absence_${this.selectedAuxiliary.identity.lastname}`;
     },

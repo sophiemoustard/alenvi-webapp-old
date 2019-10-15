@@ -43,7 +43,7 @@ export const planningActionMixin = {
           zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
           street: { required: requiredIf(item => item && !!item.fullAddress) },
           city: { required: requiredIf(item => item && !!item.fullAddress) },
-          fullAddress: { frAddress },
+          fullAddress: this.newEvent.type === INTERNAL_HOUR ? { frAddress } : {},
         },
         repetition: {
           frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
@@ -68,7 +68,12 @@ export const planningActionMixin = {
         internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
         absence: { required: requiredIf((item) => item.type === ABSENCE) },
         absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
-        address: { fullAddress: { frAddress } },
+        address: {
+          zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
+          street: { required: requiredIf(item => item && !!item.fullAddress) },
+          city: { required: requiredIf(item => item && !!item.fullAddress) },
+          fullAddress: this.newEvent.type === INTERNAL_HOUR ? { frAddress } : {},
+        },
         repetition: {
           frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
         },
@@ -193,7 +198,6 @@ export const planningActionMixin = {
         }
       }
 
-      if (event.address) delete payload.address.location;
       if (event.type === ABSENCE && event.absence !== ILLNESS) payload.attachment = {};
 
       return payload;
@@ -276,6 +280,7 @@ export const planningActionMixin = {
         this.creationModal = false;
         this.resetCreationForm(false);
         NotifyPositive('Évènement créé');
+        this.loading = false;
       } catch (e) {
         if (e.message === '') return NotifyPositive('Création annulée');
         console.error(e);
@@ -292,7 +297,7 @@ export const planningActionMixin = {
         : this.$moment(date).hours()}:${this.$moment(date).minutes() || '00'}`;
     },
     formatEditedEvent (event) {
-      const { createdAt, updatedAt, startDate, endDate, isBilled, auxiliary, subscription, ...eventData } = event;
+      const { createdAt, updatedAt, startDate, endDate, isBilled, auxiliary, subscription, address, customer, ...eventData } = event;
       const dates = {
         startDate,
         endDate,
@@ -310,8 +315,10 @@ export const planningActionMixin = {
             ...eventData,
             dates,
             auxiliary: auxiliary ? auxiliary._id : '',
+            customer: customer ? customer._id : '',
             subscription,
             isBilled,
+            address,
           };
           break;
         case INTERNAL_HOUR:

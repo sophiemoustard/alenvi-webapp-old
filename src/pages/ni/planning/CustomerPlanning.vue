@@ -24,12 +24,19 @@
           :error="$v.newEvent.auxiliary.$error" required-field @blur="$v.newEvent.auxiliary.$touch"
           @input="toggleServiceSelection(newEvent.customer)" />
         <ni-select in-modal caption="Service" v-model="newEvent.subscription" :error="$v.newEvent.subscription.$error"
-          :options="customerSubscriptionsOptions(newEvent.customer)" required-field
+          :options="customerSubscriptionsOptions" required-field
           @blur="$v.newEvent.subscription.$touch" />
         <ni-select in-modal caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency"
           :options="repetitionOptions" required-field @blur="$v.newEvent.repetition.frequency.$touch"
           :disable="!isRepetitionAllowed" />
         <ni-input in-modal v-model="newEvent.misc" caption="Notes" />
+      </div>
+      <div v-if="newEvent.type === INTERVENTION && customerAddressList(newEvent).length > 0" class="customer-info">
+        <div class="row items-center no-wrap">
+          <q-select v-model="newEvent.address" color="white" inverted-light :options="customerAddressList(newEvent)"
+              :after="iconSelect(newEvent)" :filter-placeholder="newEvent.address.fullAddress" ref="addressSelect" filter
+              :readonly="customerAddressList(newEvent).length === 1"/>
+        </div>
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary"
         @click="createEvent" :disable="disableCreationButton" icon-right="add" />
@@ -60,7 +67,7 @@
           :error="$v.editedEvent.sector.$error" required-field :disable="isDisabled"
           @blur="$v.editedEvent.sector.$touch" />
         <ni-select in-modal caption="Service" v-model="editedEvent.subscription" required-field :disable="isDisabled"
-          :options="customerSubscriptionsOptions(editedEvent.customer._id)"
+          :options="customerSubscriptionsOptions"
           :error="$v.editedEvent.subscription.$error" @blur="$v.editedEvent.subscription.$touch" />
         <template v-if="isRepetition(editedEvent) && !isDisabled">
           <div class="row q-mb-md light-checkbox">
@@ -84,9 +91,11 @@
           </div>
         </template>
       </div>
-      <div class="customer-info">
+      <div v-if="editedEvent.type === INTERVENTION && customerAddressList(editedEvent).length > 0" class="customer-info">
         <div class="row items-center no-wrap">
-        <div v-if="customerAddress" class="customer-address">{{ customerAddress }}</div>
+          <q-select v-model="editedEvent.address" color="white" inverted-light
+              :options="customerAddressList(editedEvent)" :readonly="customerAddressList(editedEvent).length === 1"
+              :after="iconSelect(editedEvent)" :filter-placeholder="editedEvent.address.fullAddress" ref="addressSelect" filter />
           <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect" />
         </div>
       </div>
@@ -169,7 +178,7 @@ export default {
     },
     selectedCustomer () {
       if (this.creationModal && this.newEvent.customer !== '') return this.customers.find(cus => cus._id === this.newEvent.customer);
-      if (this.editionModal && this.editedEvent.customer !== '') return this.customers.find(cus => cus._id === this.editedEvent.customer._id);
+      if (this.editionModal && this.editedEvent.customer !== '') return this.customers.find(cus => cus._id === this.editedEvent.customer);
       return { picture: {}, identity: {} };
     },
     customersOptions () {
@@ -305,7 +314,7 @@ export default {
         subscription: '',
         internalHour: '',
         absence: '',
-        address: {},
+        address: this.$_.get(person, 'contact.primaryAddress', {}),
         attachment: {},
         auxiliary: '',
         sector: '',

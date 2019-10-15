@@ -24,10 +24,9 @@
       </template>
       <template v-if="newEvent.type === INTERVENTION">
         <ni-select in-modal caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions"
-          :error="validations.customer.$error" required-field @blur="validations.customer.$touch"
-          @input="toggleServiceSelection"/>
+          :error="validations.customer.$error" required-field @blur="validations.customer.$touch"/>
         <ni-select in-modal caption="Service" v-model="newEvent.subscription" :error="validations.subscription.$error"
-          :options="customerSubscriptionsOptions(newEvent.customer)" required-field @blur="validations.subscription.$touch" />
+          :options="customerSubscriptionsOptions" required-field @blur="validations.subscription.$touch" />
       </template>
       <template v-if="newEvent.type === ABSENCE">
         <ni-select in-modal caption="Nature" v-model="newEvent.absenceNature" :options="absenceNatureOptions"
@@ -57,7 +56,7 @@
         <ni-select in-modal caption="Type d'heure interne" v-model="newEvent.internalHour" :options="internalHourOptions"
           required-field :error="validations.internalHour.$error" @blur="validations.internalHour.$touch" />
       </template>
-      <template v-if="newEvent.type !== ABSENCE">
+      <template v-if="newEvent.type !== ABSENCE && newEvent.repetition">
         <ni-select in-modal caption="Répétition de l'évènement" v-model="newEvent.repetition.frequency"
           :options="repetitionOptions" required-field @blur="validations.repetition.frequency.$touch" :disable="!isRepetitionAllowed" />
       </template>
@@ -67,6 +66,13 @@
       </template>
       <ni-input in-modal v-model="newEvent.misc" caption="Notes" @blur="validations.misc.$touch"
         :error="validations.misc.$error" :required-field="newEvent.type === ABSENCE && newEvent.absence === OTHER" />
+    </div>
+    <div v-if="newEvent.type === INTERVENTION && customerAddressList(newEvent).length > 0" class="customer-info">
+      <div class="row items-center no-wrap">
+        <q-select v-model="newEvent.address" color="white" inverted-light :options="customerAddressList(newEvent)"
+          :after="iconSelect(newEvent)" :filter-placeholder="newEvent.address.fullAddress"
+          :readonly="customerAddressList(newEvent).length === 1" ref="addressSelect" filter />
+      </div>
     </div>
     <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary"
       @click="createEvent" :disable="disableCreationButton" icon-right="add" />
@@ -127,18 +133,20 @@ export default {
     },
     isRepetitionAllowed () {
       if (!this.newEvent.auxiliary) return true;
-
       if (this.newEvent.subscription !== '' && this.newEvent.customer !== '') {
-        const selectedCustomer = this.customers.find(cus => cus._id === this.newEvent.customer);
-        if (!selectedCustomer) return true;
+        if (!this.selectedCustomer.subscriptions) return true;
 
-        const selectedSubscription = selectedCustomer.subscriptions.find(sub => sub._id === this.newEvent.subscription);
+        const selectedSubscription = this.selectedCustomer.subscriptions.find(sub => sub._id === this.newEvent.subscription);
         if (!selectedSubscription) return true;
         if (selectedSubscription.service.type === COMPANY_CONTRACT) return this.isCompanyContractValidForRepetition;
         if (selectedSubscription.service.type === CUSTOMER_CONTRACT) return this.isCustomerContractValidForRepetition;
       }
 
       return true;
+    },
+    selectedCustomer () {
+      if (!this.newEvent.customer) return {};
+      return this.customers.find(customer => customer._id === this.newEvent.customer);
     },
   },
   watch: {
@@ -147,6 +155,10 @@ export default {
     },
     isRepetitionAllowed (value) {
       if (!value) this.newEvent.repetition.frequency = NEVER;
+    },
+    selectedCustomer () {
+      this.newEvent.address = this.$_.get(this.selectedCustomer, 'contact.primaryAddress', {});
+      if (this.customerSubscriptionsOptions.length === 1 && this.creationModal) this.newEvent.subscription = this.customerSubscriptionsOptions[0].value;
     },
   },
   methods: {
