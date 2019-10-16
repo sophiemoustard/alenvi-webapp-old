@@ -136,7 +136,6 @@ module.exports = function (ctx) {
         'QChip',
         'QPageSticky',
         'QProgress',
-        'QScrollArea',
         'QInfiniteScroll',
       ],
       directives: [
