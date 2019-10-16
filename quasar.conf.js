@@ -126,7 +126,6 @@ module.exports = function (ctx) {
         'QModal',
         'QModalLayout',
         'QAutocomplete',
-        'QInnerLoading',
         'QAjaxBar',
         'QStepper',
         'QStep',
