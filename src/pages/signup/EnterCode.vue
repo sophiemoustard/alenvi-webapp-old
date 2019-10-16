@@ -1,7 +1,7 @@
 <template>
   <div>
     <compani-header />
-    <div class="col-12 row justify-center layout-padding neutral-background" style="min-height: 100vh">
+    <div class="row justify-center layout-padding neutral-background" style="min-height: 100vh">
       <div>
         <div class="row margin-input">
           <div class="col-12">
@@ -12,7 +12,7 @@
           </div>
         </div>
         <div class="row justify-center">
-          <q-btn class="full-width btn-submit" @click="submit" color="primary" :disable="!code" big>Envoyer</q-btn>
+          <q-btn @click="submit" color="primary" :disable="!code" big>Envoyer</q-btn>
         </div>
       </div>
     </div>
@@ -58,9 +58,6 @@ export default {
 
 <style lang="stylus" scoped>
   @import '~variables'
-
-  .btn-submit
-    border-radius: 0
 
   .q-if
     font-size: 24px
