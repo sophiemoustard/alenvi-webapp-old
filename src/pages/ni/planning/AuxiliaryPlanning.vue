@@ -8,24 +8,24 @@
       @updateFeeds="updateEventHistories" />
 
     <!-- Event creation modal -->
-    <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
+    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
       :creationModal="creationModal" :internalHours="internalHours" @close="closeCreationModal" :personKey="personKey"
       :activeAuxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetCreationForm"
       @deleteDocument="deleteDocument" @documentUploaded="documentUploaded" @createEvent="createEvent" />
 
     <!-- Event edition modal -->
-    <ni-auxiliary-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
+    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
       :editionModal="editionModal" :internalHours="internalHours" :activeAuxiliaries="activeAuxiliaries"
       :customers="customers" @resetForm="resetEditionForm" @deleteDocument="deleteDocument" @updateEvent="updateEvent"
       @documentUploaded="documentUploaded" @close="closeEditionModal" @deleteEvent="deleteEvent"
-      @deleteEventRepetition="deleteEventRepetition" />
+      @deleteEventRepetition="deleteEventRepetition" :personKey="personKey" />
   </q-page>
 </template>
 
 <script>
 import cloneDeep from 'lodash/cloneDeep';
-import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryEventCreationModal';
-import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
+import EventCreationModal from '../../../components/planning/EventCreationModal';
+import EventEditionModal from '../../../components/planning/EventEditionModal';
 import Planning from '../../../components/planning/Planning.vue';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { INTERVENTION, NEVER, PERSON, AUXILIARY, SECTOR, AUXILIARY_ROLES } from '../../../data/constants';
@@ -38,8 +38,8 @@ export default {
   metaInfo: { title: 'Plannnig auxiliaires' },
   components: {
     'ni-planning-manager': Planning,
-    'ni-auxiliary-event-creation-modal': AuxiliaryEventCreationModal,
-    'ni-auxiliary-event-edition-modal': AuxiliaryEventEditionModal,
+    'ni-event-creation-modal': EventCreationModal,
+    'ni-event-edition-modal': EventEditionModal,
   },
   data () {
     return {

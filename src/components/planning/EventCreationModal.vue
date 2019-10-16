@@ -77,7 +77,7 @@ import { ABSENCE, INTERNAL_HOUR, INTERVENTION, HOURLY, UNJUSTIFIED, CUSTOMER_CON
 import { planningModalMixin } from '../../mixins/planningModalMixin';
 
 export default {
-  name: 'AuxiliaryEventCreationModal',
+  name: 'EventCreationModal',
   mixins: [planningModalMixin],
   props: {
     newEvent: { type: Object, default: () => ({}) },

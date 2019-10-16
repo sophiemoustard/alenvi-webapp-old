@@ -91,12 +91,12 @@
 </template>
 
 <script>
-import { INTERVENTION, AUXILIARY, ABSENCE, OTHER } from '../../data/constants';
+import { INTERVENTION, ABSENCE, OTHER } from '../../data/constants';
 import { planningModalMixin } from '../../mixins/planningModalMixin';
 import { formatIdentity } from '../../helpers/utils';
 
 export default {
-  name: 'AuxiliaryEventEditionModal',
+  name: 'EventEditionModal',
   mixins: [planningModalMixin],
   props: {
     editedEvent: { type: Object, default: () => ({}) },
@@ -106,11 +106,7 @@ export default {
     customers: { type: Array, default: () => [] },
     internalHours: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
-  },
-  data () {
-    return {
-      personKey: AUXILIARY,
-    };
+    personKey: { type: String, default: () => '' },
   },
   computed: {
     selectedCustomer () {

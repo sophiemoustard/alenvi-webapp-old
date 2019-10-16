@@ -20,25 +20,25 @@
     </div>
 
     <!-- Event creation modal -->
-    <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
+    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
       :creationModal="creationModal" :internalHours="internalHours" :activeAuxiliaries="activeAuxiliaries"
-      :customers="customers" @resetForm="resetCreationForm" @deleteDocument="deleteDocument"
+      :customers="customers" @resetForm="resetCreationForm" @deleteDocument="deleteDocument" :personKey="personKey"
       @documentUploaded="documentUploaded" @createEvent="createEvent" @close="closeCreationModal" />
 
     <!-- Event edition modal -->
-    <ni-auxiliary-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
+    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
       :editionModal="editionModal" :internalHours="internalHours" :activeAuxiliaries="activeAuxiliaries"
       :customers="customers" @resetForm="resetEditionForm" @deleteDocument="deleteDocument" @close="closeEditionModal"
       @documentUploaded="documentUploaded" @updateEvent="updateEvent" @deleteEvent="deleteEvent"
-      @deleteEventRepetition="deleteEventRepetition" />
+      @deleteEventRepetition="deleteEventRepetition" :personKey="personKey" />
   </q-page>
 </template>
 
 <script>
 import Agenda from '../../../components/Agenda';
 import PlanningNavigation from '../../../components/planning/PlanningNavigation';
-import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryEventCreationModal';
-import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
+import EventCreationModal from '../../../components/planning/EventCreationModal';
+import EventEditionModal from '../../../components/planning/EventEditionModal';
 import { DEFAULT_AVATAR, INTERVENTION, NEVER, AGENDA, WEEK_VIEW, THREE_DAYS_VIEW, ABSENCE, AUXILIARY, UNKNOWN_AVATAR } from '../../../data/constants';
 import { planningTimelineMixin } from '../../../mixins/planningTimelineMixin';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
@@ -50,8 +50,8 @@ export default {
   components: {
     'agenda': Agenda,
     'planning-navigation': PlanningNavigation,
-    'ni-auxiliary-event-creation-modal': AuxiliaryEventCreationModal,
-    'ni-auxiliary-event-edition-modal': AuxiliaryEventEditionModal,
+    'ni-event-creation-modal': EventCreationModal,
+    'ni-event-edition-modal': EventEditionModal,
   },
   mixins: [planningTimelineMixin, planningActionMixin],
   data () {

@@ -7,7 +7,8 @@
         </div>
       </template>
     </ni-title-header>
-    <q-table :data="absences" :columns="columns" binary-state-sort :pagination.sync="pagination" class="q-pa-sm">
+    <q-table :data="absences" :columns="columns" binary-state-sort :pagination.sync="pagination"
+      class="q-pa-sm large-table">
       <q-tr slot="body" slot-scope="props" :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
           <template v-if="col.name === 'actions'">
@@ -32,8 +33,8 @@
     </q-table>
 
     <!-- Absence edition modal -->
-    <ni-auxiliary-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
-      :editionModal="editionModal" :selectedAuxiliary="selectedAuxiliary" :auxiliaries="[selectedAuxiliary]"
+    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
+      :editionModal="editionModal" :personKey="personKey" :activeAuxiliaries="activeAuxiliaries"
       @resetForm="resetEditionForm" @deleteDocument="deleteDocument" @documentUploaded="documentUploaded"
       @updateEvent="updateEvent" @close="closeEditionModal" @deleteEvent="deleteEvent" />
   </q-page>
@@ -42,9 +43,9 @@
 <script>
 import DateRange from '../../../components/form/DateRange';
 import TitleHeader from '../../../components/TitleHeader';
-import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES, DAILY } from '../../../data/constants';
+import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES, DAILY, AUXILIARY } from '../../../data/constants';
 import BillingPagination from '../../../components/table/BillingPagination';
-import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
+import EventEditionModal from '../../../components/planning/EventEditionModal';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { formatIdentity, formatHours } from '../../../helpers/utils';
 import { NotifyWarning } from '../../../components/popup/notify';
@@ -55,12 +56,13 @@ export default {
   components: {
     'ni-date-range': DateRange,
     'ni-billing-pagination': BillingPagination,
-    'ni-auxiliary-event-edition-modal': AuxiliaryEventEditionModal,
+    'ni-event-edition-modal': EventEditionModal,
     'ni-title-header': TitleHeader,
   },
   mixins: [planningActionMixin],
   data () {
     return {
+      personKey: AUXILIARY,
       events: [],
       loading: false,
       absences: [],
@@ -162,6 +164,11 @@ export default {
   async mounted () {
     await this.refresh();
   },
+  computed: {
+    activeAuxiliaries () {
+      return [this.selectedAuxiliary];
+    },
+  },
   methods: {
     getAbsenceDuration (absence) {
       if (absence.absenceNature === DAILY) {
@@ -200,6 +207,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-</style>

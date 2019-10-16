@@ -5,12 +5,12 @@
       @onDrop="updateEventOnDrop" ref="planningManager" :filters="filters" />
 
     <!-- Event creation modal -->
-    <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
+    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
       :creationModal="creationModal" :activeAuxiliaries="activeAuxiliaries" :customers="customers"
       :personKey="personKey" @resetForm="resetCreationForm" @createEvent="createEvent" @close="closeCreationModal" />
 
     <!-- Event edition modal -->
-    <ni-auxiliary-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
+    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
       :editionModal="editionModal" :activeAuxiliaries="activeAuxiliaries" :customers="customers"
       :personKey="personKey" @resetForm="resetEditionForm" @updateEvent="updateEvent" @deleteDocument="deleteDocument"
       @documentUploaded="documentUploaded" @close="closeEditionModal" @deleteEvent="deleteEvent"
@@ -25,16 +25,16 @@ import { NotifyNegative } from '../../../components/popup/notify.js';
 import { INTERVENTION, DEFAULT_AVATAR, NEVER, AUXILIARY, PLANNING_REFERENT, CUSTOMER, SECTOR, AUXILIARY_ROLES } from '../../../data/constants';
 import { mapGetters, mapActions } from 'vuex';
 import { formatIdentity } from '../../../helpers/utils';
-import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryEventCreationModal';
-import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
+import EventCreationModal from '../../../components/planning/EventCreationModal';
+import EventEditionModal from '../../../components/planning/EventEditionModal';
 
 export default {
   name: 'CustomerPlanning',
   metaInfo: { title: 'Planning bénéficiaire' },
   mixins: [planningActionMixin],
   components: {
-    'ni-auxiliary-event-creation-modal': AuxiliaryEventCreationModal,
-    'ni-auxiliary-event-edition-modal': AuxiliaryEventEditionModal,
+    'ni-event-creation-modal': EventCreationModal,
+    'ni-event-edition-modal': EventEditionModal,
     'ni-planning-manager': Planning,
   },
   props: {
