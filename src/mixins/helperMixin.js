@@ -41,7 +41,7 @@ export const helperMixin = {
         },
         {
           name: 'phone',
-          label: 'Numéro de téléphone',
+          label: 'Téléphone',
           align: 'left',
           field: row => row.contact.phone,
           format: (value) => formatPhone(value),

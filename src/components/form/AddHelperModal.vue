@@ -9,7 +9,7 @@
     <ni-input in-modal v-model="newHelper.local.email" :error="validations.local.email.$error" caption="Email"
       @blur="validations.local.email.$touch" :error-label="emailError" required-field />
     <ni-input in-modal v-model.trim="newHelper.contact.phone" last :error="validations.contact.phone.$error"
-      caption="Numéro de téléphone" @blur="validations.contact.phone.$touch" :error-label="phoneNbrError" />
+      caption="Téléphone" @blur="validations.contact.phone.$touch" :error-label="phoneNbrError" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Ajouter un aidant" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
