@@ -2,20 +2,10 @@
   <q-modal v-if="Object.keys(newEvent).length !== 0" :value="creationModal" content-classes="modal-container-md"
     @hide="resetForm(false)">
     <div class="modal-padding">
-      <div class="row q-mb-md">
-        <div class="col-11 row auxiliary-name">
-          <img :src="getAvatar(selectedAuxiliary)" class="avatar">
-          <q-select filter v-model="newEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions"
-            :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
-            :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`"
-            ref="auxiliarySelect" />
-        </div>
-        <div class="col-1 cursor-pointer modal-btn-close">
-          <span>
-            <q-icon name="clear" @click.native="close" />
-          </span>
-        </div>
-      </div>
+      <ni-planning-modal-header v-if="isCustomerPlanning" v-model="newEvent.customer" :selectedPerson="selectedCustomer"
+        @close="close" />
+      <ni-planning-modal-header v-else v-model="newEvent.auxiliary" :options="auxiliariesOptions"
+        :selectedPerson="selectedAuxiliary" @close="close" />
       <q-btn-toggle no-wrap v-model="newEvent.type" toggle-color="primary" :options="eventTypeOptions"
         @input="resetForm(true, newEvent.type)" />
       <template v-if="newEvent.type !== ABSENCE">
@@ -23,7 +13,10 @@
           :error="validations.dates.$error" @blur="validations.dates.$touch" disable-end-date />
       </template>
       <template v-if="newEvent.type === INTERVENTION">
-        <ni-select in-modal caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions"
+        <ni-select v-if="isCustomerPlanning" in-modal caption="Auxiliaire" v-model="newEvent.auxiliary"
+          :options="auxiliariesOptions" :error="validations.auxiliary.$error" required-field
+          @blur="validations.auxiliary.$touch" @input="toggleServiceSelection(newEvent.customer)" />
+        <ni-select v-else in-modal caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions"
           :error="validations.customer.$error" required-field @blur="validations.customer.$touch"/>
         <ni-select in-modal caption="Service" v-model="newEvent.subscription" :error="validations.subscription.$error"
           :options="customerSubscriptionsOptions" required-field @blur="validations.subscription.$touch" />
@@ -80,39 +73,27 @@
 </template>
 
 <script>
-import { ABSENCE, INTERNAL_HOUR, INTERVENTION, HOURLY, UNJUSTIFIED, CUSTOMER_CONTRACT, COMPANY_CONTRACT, NEVER, AUXILIARY } from '../../data/constants';
+import { ABSENCE, INTERNAL_HOUR, INTERVENTION, HOURLY, UNJUSTIFIED, CUSTOMER_CONTRACT, COMPANY_CONTRACT, NEVER } from '../../data/constants';
 import { planningModalMixin } from '../../mixins/planningModalMixin';
 
 export default {
-  name: 'AuxiliaryEventCreationModal',
+  name: 'EventCreationModal',
   mixins: [planningModalMixin],
   props: {
     newEvent: { type: Object, default: () => ({}) },
     creationModal: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
-    selectedAuxiliary: { type: Object, default: () => ({}) },
     activeAuxiliaries: { type: Array, default: () => [] },
     customers: { type: Array, default: () => [] },
     internalHours: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
-  },
-  data () {
-    return {
-      personKey: AUXILIARY,
-    };
+    personKey: { type: String, default: () => '' },
   },
   computed: {
     isEndDurationRequired () {
       if (this.newEvent.type !== ABSENCE) return false;
 
       return this.$moment(this.newEvent.dates.endDate).isAfter(this.$moment(this.newEvent.dates.startDate));
-    },
-    additionalValue () {
-      return !this.selectedAuxiliary._id ? '' : `justificatif_absence_${this.selectedAuxiliary.identity.lastname}`;
-    },
-    docsUploadUrl () {
-      const driveId = this.$_.get(this.selectedAuxiliary, 'administrative.driveFolder.driveId');
-      return !driveId ? '' : this.$gdrive.getUploadUrl(driveId);
     },
     isCompanyContractValidForRepetition () {
       if (!this.selectedAuxiliary.contracts || this.selectedAuxiliary.contracts.length === 0) return false;
@@ -132,7 +113,7 @@ export default {
     },
     isRepetitionAllowed () {
       if (!this.newEvent.auxiliary) return true;
-      if (this.newEvent.subscription !== '' && this.newEvent.customer !== '') {
+      if (this.newEvent.subscription !== '' && this.newEvent.customer !== '' && this.newEvent.auxiliary !== '') {
         if (!this.selectedCustomer.subscriptions) return true;
 
         const selectedSubscription = this.selectedCustomer.subscriptions.find(sub => sub._id === this.newEvent.subscription);
@@ -144,8 +125,16 @@ export default {
       return true;
     },
     selectedCustomer () {
-      if (!this.newEvent.customer) return {};
+      if (!this.newEvent.customer) return { identity: {} };
       return this.customers.find(customer => customer._id === this.newEvent.customer);
+    },
+    selectedAuxiliary () {
+      if (!this.newEvent.auxiliary) return { identity: {} };
+      const aux = this.activeAuxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
+      const hasCustomerContractOnEvent = this.hasCustomerContractOnEvent(aux, this.newEvent.dates.startDate);
+      const hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(aux, this.newEvent.dates.startDate);
+
+      return { ...aux, hasCustomerContractOnEvent, hasCompanyContractOnEvent };
     },
   },
   watch: {
@@ -161,9 +150,6 @@ export default {
     },
   },
   methods: {
-    toggleAuxiliarySelect () {
-      return this.$refs['auxiliarySelect'].show();
-    },
     close () {
       this.$emit('close');
     },

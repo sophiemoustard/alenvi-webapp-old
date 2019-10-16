@@ -33,17 +33,17 @@ export const planningActionMixin = {
           startHour: { required: requiredIf((item, parent) => parent && (parent.type === ABSENCE && parent.absenceNature === HOURLY)) },
           endHour: { required: requiredIf((item, parent) => parent && (parent.type === ABSENCE && parent.absenceNature === HOURLY)) },
         },
-        auxiliary: { required: requiredIf((item) => item.type !== INTERVENTION) },
-        customer: { required: requiredIf((item) => item.type === INTERVENTION) },
-        subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
-        internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
-        absence: { required: requiredIf((item) => item.type === ABSENCE) },
-        absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
+        auxiliary: { required: requiredIf((item) => item && item.type !== INTERVENTION) },
+        customer: { required: requiredIf((item) => item && item.type === INTERVENTION) },
+        subscription: { required: requiredIf((item) => item && item.type === INTERVENTION) },
+        internalHour: { required: requiredIf((item) => item && item.type === INTERNAL_HOUR) },
+        absence: { required: requiredIf((item) => item && item.type === ABSENCE) },
+        absenceNature: { required: requiredIf((item) => item && item.type === ABSENCE) },
         address: {
           zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
           street: { required: requiredIf(item => item && !!item.fullAddress) },
           city: { required: requiredIf(item => item && !!item.fullAddress) },
-          fullAddress: this.newEvent.type === INTERNAL_HOUR ? { frAddress } : {},
+          fullAddress: this.newEvent && this.newEvent.type === INTERNAL_HOUR ? { frAddress } : {},
         },
         repetition: {
           frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
@@ -52,7 +52,7 @@ export const planningActionMixin = {
           driveId: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && [ILLNESS, WORK_ACCIDENT].includes(parent.absence)) },
           link: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && [ILLNESS, WORK_ACCIDENT].includes(parent.absence)) },
         },
-        misc: { required: requiredIf(item => item.type === ABSENCE && item.absence === OTHER) },
+        misc: { required: requiredIf(item => item && item.type === ABSENCE && item.absence === OTHER) },
       },
       editedEvent: {
         dates: {
@@ -61,18 +61,18 @@ export const planningActionMixin = {
           startHour: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absenceNature === HOURLY) },
           endHour: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absenceNature === HOURLY) },
         },
-        auxiliary: { required: requiredIf((item) => item.type !== INTERVENTION) },
+        auxiliary: { required: requiredIf((item) => item && item.type !== INTERVENTION) },
         sector: { required },
-        customer: { required: requiredIf((item) => item.type === INTERVENTION) },
-        subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
-        internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
-        absence: { required: requiredIf((item) => item.type === ABSENCE) },
-        absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
+        customer: { required: requiredIf((item) => item && item.type === INTERVENTION) },
+        subscription: { required: requiredIf((item) => item && item.type === INTERVENTION) },
+        internalHour: { required: requiredIf((item) => item && item.type === INTERNAL_HOUR) },
+        absence: { required: requiredIf((item) => item && item.type === ABSENCE) },
+        absenceNature: { required: requiredIf((item) => item && item.type === ABSENCE) },
         address: {
           zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
           street: { required: requiredIf(item => item && !!item.fullAddress) },
           city: { required: requiredIf(item => item && !!item.fullAddress) },
-          fullAddress: this.newEvent.type === INTERNAL_HOUR ? { frAddress } : {},
+          fullAddress: this.editedEvent && this.editedEvent.type === INTERNAL_HOUR ? { frAddress } : {},
         },
         repetition: {
           frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
@@ -86,7 +86,7 @@ export const planningActionMixin = {
           reason: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
         },
         misc: {
-          required: requiredIf((item) => (item.type === ABSENCE && item.absence === OTHER) || item.isCancelled),
+          required: requiredIf((item) => item && ((item.type === ABSENCE && item.absence === OTHER) || item.isCancelled)),
         },
       },
     };
@@ -140,21 +140,16 @@ export const planningActionMixin = {
     },
     resetCreationForm ({ partialReset, type = INTERVENTION }) {
       this.$v.newEvent.$reset();
-      if (!partialReset) this.newEvent = {};
-      else {
+      if (!partialReset) {
+        this.creationModal = false;
+        this.newEvent = {};
+      } else {
         this.newEvent = {
+          ...this.newEvent,
           type,
-          dates: {
-            startDate: partialReset ? this.newEvent.dates.startDate : '',
-            startHour: partialReset ? this.newEvent.dates.startHour : '',
-            endDate: partialReset ? this.newEvent.dates.endDate : '',
-            endHour: partialReset ? this.newEvent.dates.endHour : '',
-          },
           repetition: { frequency: NEVER },
-          auxiliary: partialReset ? this.newEvent.auxiliary : '',
           customer: '',
           subscription: '',
-          sector: partialReset ? this.newEvent.sector : '',
           internalHour: '',
           absence: '',
           address: {},
@@ -291,6 +286,16 @@ export const planningActionMixin = {
       }
     },
     // Event edition
+    openEditionModal ({ eventId, rowId }) {
+      const rowEvents = this.getRowEvents(rowId);
+
+      const event = rowEvents.find(ev => ev._id === eventId);
+      const can = this.canEditEvent(event);
+      if (!can) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
+      this.formatEditedEvent(event);
+
+      this.editionModal = true;
+    },
     formatHour (date) {
       return `${this.$moment(date).hours() < 10
         ? `0${this.$moment(date).hours()}`

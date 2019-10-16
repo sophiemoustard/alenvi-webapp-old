@@ -2,23 +2,12 @@
   <q-modal v-if="Object.keys(editedEvent).length !== 0" :value="editionModal" content-classes="modal-container-md"
     @hide="resetForm()">
     <div class="modal-padding">
-      <div class="row q-mb-md">
-        <div class="col-11 row auxiliary-name" v-if="selectedAuxiliary">
-          <img :src="getAvatar(selectedAuxiliary)" class="avatar">
-          <div class="auxiliary-name-text" v-if="[UNAVAILABILITY, ABSENCE].includes(editedEvent.type)">
-            {{ selectedAuxiliary.identity.firstname }} {{ selectedAuxiliary.identity.lastname.toUpperCase() }}
-          </div>
-          <q-select v-else v-model="editedEvent.auxiliary" color="white" inverted-light :options="auxiliariesOptions"
-            :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
-            :filter-placeholder="auxiliaryFilterPlaceholder"
-            :disable="isDisabled" ref="auxiliarySelect" filter />
-        </div>
-        <div class="col-1 cursor-pointer modal-btn-close">
-          <span>
-            <q-icon name="clear" @click.native="close" />
-          </span>
-        </div>
-      </div>
+      <ni-planning-modal-header v-if="isCustomerPlanning" v-model="editedEvent.customer" :selectedPerson="selectedCustomer"
+        @close="close" />
+      <ni-planning-modal-header v-else-if="[UNAVAILABILITY, ABSENCE].includes(editedEvent.type)" :options="[]"
+        v-model="editedEvent.auxiliary" :selectedPerson="selectedAuxiliary" @close="close" />
+      <ni-planning-modal-header v-else v-model="editedEvent.auxiliary" :options="auxiliariesOptions"
+        :selectedPerson="selectedAuxiliary" @close="close" />
       <div class="modal-subtitle">
         <q-btn-toggle no-wrap v-model="editedEvent.type" :options="eventType" toggle-color="primary" />
         <q-btn icon="delete" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" no-caps flat
@@ -102,39 +91,35 @@
 </template>
 
 <script>
-import { INTERVENTION, AUXILIARY, ABSENCE, OTHER } from '../../data/constants';
+import { INTERVENTION, ABSENCE, OTHER } from '../../data/constants';
 import { planningModalMixin } from '../../mixins/planningModalMixin';
 import { formatIdentity } from '../../helpers/utils';
 
 export default {
-  name: 'AuxiliaryEventEditionModal',
+  name: 'EventEditionModal',
   mixins: [planningModalMixin],
   props: {
     editedEvent: { type: Object, default: () => ({}) },
     editionModal: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
-    selectedAuxiliary: { type: Object, default: () => ({}) },
     activeAuxiliaries: { type: Array, default: () => [] },
     customers: { type: Array, default: () => [] },
     internalHours: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
-  },
-  data () {
-    return {
-      personKey: AUXILIARY,
-    };
+    personKey: { type: String, default: () => '' },
   },
   computed: {
     selectedCustomer () {
       if (!this.editedEvent.customer) return {};
       return this.customers.find(customer => customer._id === this.editedEvent.customer);
     },
-    additionalValue () {
-      return !this.selectedAuxiliary._id ? '' : `justificatif_absence_${this.selectedAuxiliary.identity.lastname}`;
-    },
-    docsUploadUrl () {
-      const driveId = this.$_.get(this.selectedAuxiliary, 'administrative.driveFolder.driveId');
-      return !driveId ? '' : this.$gdrive.getUploadUrl(driveId);
+    selectedAuxiliary () {
+      if (!this.editedEvent.auxiliary) return {};
+      const aux = this.activeAuxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
+      const hasCustomerContractOnEvent = this.hasCustomerContractOnEvent(aux, this.editedEvent.dates.startDate);
+      const hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(aux, this.editedEvent.dates.startDate);
+
+      return { ...aux, hasCustomerContractOnEvent, hasCompanyContractOnEvent };
     },
     eventType () {
       return this.eventTypeOptions.filter(option => option.value === this.editedEvent.type);
