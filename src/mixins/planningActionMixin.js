@@ -145,18 +145,11 @@ export const planningActionMixin = {
         this.newEvent = {};
       } else {
         this.newEvent = {
+          ...this.newEvent,
           type,
-          dates: {
-            startDate: partialReset ? this.newEvent.dates.startDate : '',
-            startHour: partialReset ? this.newEvent.dates.startHour : '',
-            endDate: partialReset ? this.newEvent.dates.endDate : '',
-            endHour: partialReset ? this.newEvent.dates.endHour : '',
-          },
           repetition: { frequency: NEVER },
-          auxiliary: partialReset ? this.newEvent.auxiliary : '',
           customer: '',
           subscription: '',
-          sector: partialReset ? this.newEvent.sector : '',
           internalHour: '',
           absence: '',
           address: {},
