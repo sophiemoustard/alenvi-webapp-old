@@ -3,12 +3,12 @@
     <div class="col-11 row person-name">
       <img :src="avatar" class="avatar">
       <div class="displayed-name" v-if="options.length === 0">{{ selectedPerson.identity | formatIdentity('FL') }}</div>
-      <q-select v-else filter v-model="selected" color="white" inverted-light :options="options"
+      <q-select v-else filter :value="value" color="white" inverted-light :options="options"
         :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { $refs['personSelect'].show() } }]"
         :filter-placeholder="placeholder" ref="personSelect" @input="$emit('input', $event)" />
     </div>
     <div class="col-1 cursor-pointer modal-btn-close">
-      <span><q-icon name="clear" @click.native="close" /></span>
+      <span><q-icon name="clear" @click.native="$emit('close')" /></span>
     </div>
   </div>
 </template>
@@ -24,14 +24,6 @@ export default {
     options: { type: Array, default: () => [] },
     selectedPerson: { type: Object, default: () => ({}) },
   },
-  data () {
-    return {
-      selected: null,
-    };
-  },
-  mounted () {
-    this.selected = this.value;
-  },
   computed: {
     avatar () {
       return (!this.selectedPerson || !this.selectedPerson._id)
@@ -43,16 +35,6 @@ export default {
     },
     placeholder () {
       return `${this.selectedPerson.identity.firstname} ${this.selectedPerson.identity.lastname}`;
-    },
-  },
-  watch: {
-    value () {
-      this.selected = this.value;
-    },
-  },
-  methods: {
-    close () {
-      this.$emit('close');
     },
   },
   filters: {
