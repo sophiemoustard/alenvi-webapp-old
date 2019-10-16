@@ -265,6 +265,7 @@ export default {
   async mounted () {
     await this.refreshCustomer();
     await this.checkMandates();
+    window.userpilot.track('test');
   },
   methods: {
     async refreshCustomer () {
@@ -337,6 +338,7 @@ export default {
           };
           await this.$customers.addSubscriptionHistory(this.customer._id, payload);
           await this.refreshCustomer();
+          window.userpilot.track('new_subscription');
           NotifyPositive('Abonnement validé');
         }
       } catch (e) {

@@ -7,6 +7,7 @@ import routes from './routes'
 import alenvi from '../helpers/alenvi'
 import store from '../store/index'
 import { checkPermission } from '../helpers/checkPermission'
+import { identifyUser } from '../helpers/userpilot'
 
 Vue.use(VueRouter)
 Vue.use(VueMeta);
@@ -25,6 +26,7 @@ const Router = new VueRouter({
 })
 
 Router.beforeEach(async (to, from, next) => {
+  window.userpilot.reload();
   if (to.meta.cookies) {
     if (!Cookies.get('alenvi_token') || !Cookies.get('user_id')) {
       if (await alenvi.refreshAlenviCookies()) {
@@ -33,6 +35,7 @@ Router.beforeEach(async (to, from, next) => {
         }
         if (checkPermission(to, store.getters['main/user'])) {
           store.commit('main/changeRefreshState', false);
+          identifyUser(store.getters['main/user']);
           next();
         } else {
           next('/401');
@@ -46,6 +49,7 @@ Router.beforeEach(async (to, from, next) => {
       }
       if (checkPermission(to, store.getters['main/user'])) {
         store.commit('main/changeRefreshState', false);
+        identifyUser(store.getters['main/user']);
         next();
       } else {
         next('/401');
