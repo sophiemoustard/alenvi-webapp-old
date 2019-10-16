@@ -252,6 +252,4 @@ export default {
     padding: 0;
   .table-fixed >>> table
     table-layout: fixed;
-  .referent
-    padding-left: 10px;
 </style>
