@@ -50,7 +50,7 @@ export default {
   },
   name: 'Authentication',
   components: {
-    CompaniHeader,
+    'compani-header': CompaniHeader,
   },
   data () {
     return {

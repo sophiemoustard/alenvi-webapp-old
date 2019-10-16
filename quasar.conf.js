@@ -110,7 +110,6 @@ module.exports = function (ctx) {
         'QCard',
         'QCardTitle',
         'QCardMain',
-        'QCardSeparator',
         'QCardActions',
         'QCheckbox',
         'QRadio',

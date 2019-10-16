@@ -1,24 +1,32 @@
 <template>
-  <div class="row justify-center layout-padding">
-    <q-card style="width: 500px">
-      <q-card-title>
-        Entre le code à 4 chiffres que tu as reçu par SMS
-      </q-card-title>
-      <q-card-separator />
-      <q-card-main class="row justify-center layout-padding">
-        <q-input v-model="code" v-mask="'####'" type="tel" inverted-light color="white" align="center" autofocus />
-      </q-card-main>
-      <q-card-actions class="row justify-center">
-        <q-btn class="full-width btn-submit" @click="submit" color="primary" :disable="!code" big>Envoyer</q-btn>
-      </q-card-actions>
-    </q-card>
+  <div>
+    <compani-header />
+    <div class="col-12 row justify-center layout-padding neutral-background" style="min-height: 100vh">
+      <div>
+        <div class="row margin-input">
+          <div class="col-12">
+            <div class="row justify-between">
+              <p class="input-caption">Entre le code à 4 chiffres que tu as reçu par SMS</p>
+            </div>
+            <q-input v-model="code" v-mask="'####'" type="tel" inverted-light color="white" align="center" autofocus />
+          </div>
+        </div>
+        <div class="row justify-center">
+          <q-btn class="full-width btn-submit" @click="submit" color="primary" :disable="!code" big>Envoyer</q-btn>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
+import CompaniHeader from '../../components/CompaniHeader';
 import { NotifyNegative } from '../../components/popup/notify';
 
 export default {
+  components: {
+    'compani-header': CompaniHeader,
+  },
   data () {
     return {
       code: '',
