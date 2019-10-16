@@ -23,14 +23,10 @@
       <div class="row">
         <img :src="getAuxiliaryAvatar(auxiliaryReferent)" class="avatar">
         <q-select class='referent' :options="auxiliariesOptions" v-model="customer.referent"
+          @input="updateCustomer('referent')" color="white" :filter-placeholder="auxiliaryPlaceholder"
           :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
-<<<<<<< HEAD
-          ref="auxiliarySelect" @focus="saveTmp('referent')" hide-underline filter  color="white"
-          :filter-placeholder="auxiliaryPlaceholder" @input="updateCustomer('referent')"/>
+          ref="auxiliarySelect" @focus="saveTmp('referent')" hide-underline filter/>
         <q-spinner v-if="loading" />
-=======
-          :filter-placeholder="auxiliaryPlaceholder" ref="auxiliarySelect" @focus="saveTmp('referent')" filter/>
->>>>>>> COM-705 only active auxiliaries and fix some display issues
       </div>
     </div>
     <div class="q-mb-xl">
