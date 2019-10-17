@@ -22,11 +22,10 @@
       </div>
       <div class="row">
         <img :src="getAuxiliaryAvatar(auxiliaryReferent)" class="avatar">
-        <q-select class='referent' :options="auxiliariesOptions" v-model="customer.referent"
-          @input="updateCustomer('referent')" color="white" :filter-placeholder="auxiliaryPlaceholder"
+        <q-select class='referent' :options="auxiliariesOptions" v-model="auxiliaryReferent"
+          @input="updateAuxiliaryReferent()" color="white" :filter-placeholder="auxiliaryPlaceholder"
           :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
-          ref="auxiliarySelect" @focus="saveTmp('referent')" hide-underline filter/>
-        <q-spinner v-if="loading" />
+          ref="auxiliarySelect" hide-underline filter @focus="saveTmp('referent')"/>
       </div>
     </div>
     <div class="q-mb-xl">
@@ -106,6 +105,7 @@ export default {
       customer: { followUp: {}, contact: {}, referent: '' },
       tmpInput: '',
       loading: false,
+      auxiliaryReferent: '',
       visibleColumns: ['lastname', 'firstname', 'email', 'phone'],
       customerFollowUp: [],
       followUpColumns: [
@@ -151,19 +151,22 @@ export default {
       return !!this.$_.get(this.customer, 'contact.secondaryAddress.fullAddress');
     },
     auxiliariesOptions () {
-      return [
+      const auxiliariesOptions = [
         { label: 'Pas de référent', value: '' },
         ...this.auxiliaries.map(aux => {
           return {
             label: formatIdentity(aux.identity, 'FL'),
-            value: aux._id,
+            value: aux,
           }
         }),
       ];
-    },
-    auxiliaryReferent () {
-      if (!this.customer.referent) return {};
-      return this.auxiliaries.find(aux => aux._id === this.customer.referent);
+      if (!this.auxiliaries.length && this.auxiliaryReferent) {
+        auxiliariesOptions.push({
+          label: formatIdentity(this.auxiliaryReferent.identity, 'FL'),
+          value: this.auxiliaryReferent,
+        });
+      }
+      return auxiliariesOptions;
     },
     auxiliaryPlaceholder () {
       return (this.auxiliaryReferent && this.auxiliaryReferent.identity)
@@ -183,11 +186,10 @@ export default {
       try {
         this.loading = true;
         const activeAuxiliaries = await this.$users.showAllActive({ role: [AUXILIARY, PLANNING_REFERENT] });
-        this.auxiliaries = activeAuxiliaries.filter(aux => {
-          return aux.contracts.some(contract => {
-            return !contract.endDate;
-          });
-        });
+        this.auxiliaries = activeAuxiliaries.filter(aux => aux.contracts.some(c => !c.endDate));
+        if (this.customer.referent) {
+          this.auxiliaryReferent = activeAuxiliaries.find(aux => aux._id === this.customer.referent);
+        }
         this.loading = false;
       } catch (e) {
         this.auxiliaries = [];
@@ -205,6 +207,10 @@ export default {
     async getCustomer (customerId) {
       try {
         const customer = await this.$customers.getById(customerId);
+        if (customer.referent) {
+          this.auxiliaryReferent = customer.referent;
+          customer.referent = customer.referent._id;
+        }
         this.mergeCustomer(customer);
         this.isLoaded = true;
         this.$v.customer.$touch();
@@ -218,10 +224,23 @@ export default {
       this.customer = Object.assign({}, extend(true, ...args));
     },
     saveTmp (path) {
-      this.tmpInput = this.$_.get(this.customer, path);
+      if (path === 'referent') {
+        this.tmpInput = this.auxiliaryReferent._id;
+      } else {
+        this.tmpInput = this.$_.get(this.customer, path);
+      }
     },
     getPhoneLink (link) {
       return link ? `tel:+33${link.substring(1)}` : '-';
+    },
+    updateAuxiliaryReferent () {
+      if (this.auxiliaryReferent._id) {
+        this.customer.referent = this.auxiliaryReferent._id;
+      } else {
+        this.customer.referent = '';
+      }
+
+      this.updateCustomer('referent');
     },
     getAuxiliaryAvatar (user) {
       if (!user || !user._id) return UNKNOWN_AVATAR;
