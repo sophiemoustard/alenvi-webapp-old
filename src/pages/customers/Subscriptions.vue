@@ -265,7 +265,6 @@ export default {
   async mounted () {
     await this.refreshCustomer();
     await this.checkMandates();
-    window.userpilot.track('test');
   },
   methods: {
     async refreshCustomer () {
@@ -290,17 +289,19 @@ export default {
         let value = this.$_.get(this.customer, path);
         if (this.tmpInput === value) return;
 
+        const isIban = path === 'payment.iban';
         this.$_.get(this.$v.customer, path).$touch();
         if (this.$_.get(this.$v.customer, path).$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        if (path.match(/iban/i)) value = value.split(' ').join('');
+        if (isIban) value = value.split(' ').join('');
 
         await this.$customers.updateById(this.customer._id, this.$_.set({}, path, value));
         await this.$store.dispatch('main/getUser', this.helper._id);
         await this.refreshCustomer();
+        if (isIban) window.userpilot.track('iban_ok');
         NotifyPositive('Modification enregistrée');
 
-        if (path.match(/iban/i)) {
+        if (isIban) {
           this.$v.customer.payment.bic.$touch();
           if (!this.$v.customer.payment.bic.required) return NotifyWarning('Merci de renseigner votre BIC');
         }
@@ -338,7 +339,7 @@ export default {
           };
           await this.$customers.addSubscriptionHistory(this.customer._id, payload);
           await this.refreshCustomer();
-          window.userpilot.track('new_subscription');
+          window.userpilot.track('subscriptions_accepted');
           NotifyPositive('Abonnement validé');
         }
       } catch (e) {
