@@ -48,8 +48,6 @@ export default {
   /deep/.q-popover
     transform: translateY(2px);
     width: 120px;
-    /deep/.q-datetime-day-active
-      background-color: $primary !important;
 
   .underline
     border-bottom: 2px solid $primary;
