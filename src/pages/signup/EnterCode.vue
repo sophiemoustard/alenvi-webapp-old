@@ -1,24 +1,32 @@
 <template>
-  <div class="row justify-center layout-padding">
-    <q-card style="width: 500px">
-      <q-card-title>
-        Entre le code à 4 chiffres que tu as reçu par SMS
-      </q-card-title>
-      <q-card-separator />
-      <q-card-main class="row justify-center layout-padding">
-        <q-input v-model="code" v-mask="'####'" type="tel" inverted-light color="white" align="center" autofocus />
-      </q-card-main>
-      <q-card-actions class="row justify-center">
-        <q-btn class="full-width btn-submit" @click="submit" color="primary" :disable="!code" big>Envoyer</q-btn>
-      </q-card-actions>
-    </q-card>
+  <div>
+    <compani-header />
+    <div class="row justify-center layout-padding neutral-background" style="min-height: 100vh">
+      <div>
+        <div class="row margin-input">
+          <div class="col-12">
+            <div class="row justify-between">
+              <p class="input-caption">Entre le code à 4 chiffres que tu as reçu par SMS</p>
+            </div>
+            <q-input v-model="code" v-mask="'####'" type="tel" inverted-light color="white" align="center" autofocus />
+          </div>
+        </div>
+        <div class="row justify-center">
+          <q-btn @click="submit" color="primary" :disable="!code" big>Envoyer</q-btn>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
+import CompaniHeader from '../../components/CompaniHeader';
 import { NotifyNegative } from '../../components/popup/notify';
 
 export default {
+  components: {
+    'compani-header': CompaniHeader,
+  },
   data () {
     return {
       code: '',
@@ -47,32 +55,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-  @import '~variables'
-
-  .btn-submit
-    border-radius: 0
-
-  .q-if
-    font-size: 24px
-
-  .custom-input
-    height: 60px
-    @media (max-width: 321px)
-      height: 50px
-
-  .q-if-inverted
-    padding: 0
-
-  .q-card-actions
-    padding: 0
-
-  /deep/ .q-if
-    & input.q-input-target
-      height: 60px
-      line-height: 60px
-      @media (max-width: 321px)
-        height: 50px
-        line-height: 50px
-</style>
