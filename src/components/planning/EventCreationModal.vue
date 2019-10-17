@@ -129,7 +129,7 @@ export default {
       return this.customers.find(customer => customer._id === this.newEvent.customer);
     },
     selectedAuxiliary () {
-      if (!this.newEvent.auxiliary) return { identity: {} };
+      if (!this.newEvent.auxiliary || !this.activeAuxiliaries.length) return { identity: {} };
       const aux = this.activeAuxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
       const hasCustomerContractOnEvent = this.hasCustomerContractOnEvent(aux, this.newEvent.dates.startDate);
       const hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(aux, this.newEvent.dates.startDate);
