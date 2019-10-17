@@ -619,7 +619,7 @@ export default {
   async mounted () {
     const user = await this.$users.getById(this.currentUser._id);
     this.mergeUser(user);
-    await this.getAuxiliaryRoles();
+    if (!this.isAuxiliary) await this.getAuxiliaryRoles();
     this.$v.user.$touch();
     this.isLoaded = true;
   },

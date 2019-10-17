@@ -13,37 +13,12 @@
               <span class="text-weight-bold">choisir un mot de passe</span></p>
           </div>
         </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Email</p>
-              <q-icon v-if="$v.user.alenvi.local.email.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-input v-model.trim="user.alenvi.local.email" color="white" inverted-light lower-case @blur="$v.user.alenvi.local.email.$touch()" />
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Mot de passe</p>
-              <q-icon v-if="$v.user.alenvi.local.password.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.user.alenvi.local.password.$error" :error-label="passwordError">
-              <q-input v-model="user.alenvi.local.password" type="password" color="white" inverted-light @blur="$v.user.alenvi.local.password.$touch()" />
-            </q-field>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Confirmation mot de passe</p>
-              <q-icon v-if="$v.passwordConfirm.$error" name="error_outline" color="secondary" />
-            </div>
-            <q-field :error="$v.passwordConfirm.$error" :error-label="passwordConfirmError">
-              <q-input v-model="passwordConfirm" type="password" color="white" inverted-light @blur="$v.passwordConfirm.$touch()" />
-            </q-field>
-          </div>
-        </div>
+        <ni-input v-model="user.local.email" caption="Email" @blur="$v.user.local.email.$touch()"
+          :error="$v.user.local.email.$error" />
+        <ni-input v-model="user.local.password" caption="Mot de passe" type="password" :error-label="passwordError"
+          @blur="$v.user.local.password.$touch()" :error="$v.user.local.password.$error" />
+        <ni-input v-model="passwordConfirm" caption="Confirmation mot de passe" type="password"
+          @blur="$v.passwordConfirm.$touch()" :error="$v.passwordConfirm.$error" :error-label="passwordConfirmError" />
         <div class="row justify-center">
           <q-btn no-caps class="signup-btn" label="Créer mon compte" icon-right="arrow_forward" color="primary"
             :loading="loading" @click="submit" />
@@ -57,27 +32,24 @@
 import { required, email, sameAs, minLength } from 'vuelidate/lib/validators';
 
 import CompaniHeader from '../../components/CompaniHeader';
+import Input from '../../components/form/Input';
 import { NotifyNegative } from '../../components/popup/notify';
 import { REQUIRED_LABEL } from '../../data/constants';
 
 export default {
   name: 'CreatePassword',
   components: {
-    CompaniHeader,
+    'compani-header': CompaniHeader,
+    'ni-input': Input,
   },
   data () {
     return {
       loading: false,
       alenviToken: '',
       user: {
-        alenvi: {
-          _id: '',
-          local: {
-            email: '',
-            password: '',
-          },
-          isConfirmed: '',
-        },
+        _id: '',
+        local: { email: '', password: '' },
+        isConfirmed: '',
       },
       passwordConfirm: '',
     }
@@ -85,61 +57,57 @@ export default {
   validations () {
     return {
       user: {
-        alenvi: {
-          local: {
-            email: { required, email },
-            password: { required, minLength: minLength(4) },
-          },
+        local: {
+          email: { required, email },
+          password: { required, minLength: minLength(4) },
         },
       },
-      passwordConfirm: { required, sameAsPassword: sameAs(() => this.user.alenvi.local.password) },
+      passwordConfirm: { required, sameAsPassword: sameAs(() => this.user.local.password) },
     }
   },
   mounted () {
-    this.user.alenvi.local.email = this.$q.cookies.get('signup_userEmail');
-    this.user.alenvi._id = this.$q.cookies.get('signup_userId');
+    this.user.local.email = this.$q.cookies.get('signup_userEmail');
+    this.user._id = this.$q.cookies.get('signup_userId');
     this.alenviToken = this.$q.cookies.get('signup_token');
   },
   computed: {
     passwordError () {
-      if (!this.$v.user.alenvi.local.password.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.user.alenvi.local.password.minLength) {
-        return 'Mot de passe trop court';
-      }
+      if (!this.$v.user.local.password.required) return REQUIRED_LABEL;
+      else if (!this.$v.user.local.password.minLength) return 'Mot de passe trop court';
     },
     passwordConfirmError () {
-      if (!this.$v.passwordConfirm.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.passwordConfirm.sameAs) {
-        return 'Le mot de passe doit être identique';
-      }
+      if (!this.$v.passwordConfirm.required) return REQUIRED_LABEL;
+      else if (!this.$v.passwordConfirm.sameAs) return 'Le mot de passe doit être identique';
+    },
+    secure () {
+      return process.env.NODE_ENV !== 'development';
     },
   },
   methods: {
     async submit () {
       try {
-        this.user.alenvi.isConfirmed = true;
-        await this.$users.updateById(this.user.alenvi, this.alenviToken);
+        this.user.isConfirmed = true;
+        await this.$users.updateById(this.user, this.alenviToken);
         this.$q.cookies.remove('signup_token', { path: '/' });
         this.$q.cookies.remove('signup_userId', { path: '/' });
         this.$q.cookies.remove('signup_userEmail', { path: '/' });
         const user = await this.$axios.post(`${process.env.API_HOSTNAME}/users/authenticate`, {
-          email: this.user.alenvi.local.email.toLowerCase(),
-          password: this.user.alenvi.local.password,
+          email: this.user.local.email.toLowerCase(),
+          password: this.user.local.password,
         });
-        const expiresInDays = parseInt(user.data.data.expiresIn / 3600 / 24, 10) >= 1 ? parseInt(user.data.data.expiresIn / 3600 / 24, 10) : 1;
-        this.$q.cookies.set('alenvi_token', user.data.data.token, { path: '/', expires: expiresInDays, secure: process.env.NODE_ENV !== 'development' });
-        this.$q.cookies.set('alenvi_token_expires_in', user.data.data.expiresIn, { path: '/', expires: expiresInDays, secure: process.env.NODE_ENV !== 'development' });
-        this.$q.cookies.set('refresh_token', user.data.data.refreshToken, { path: '/', expires: 365, secure: process.env.NODE_ENV !== 'development' });
-        this.$q.cookies.set('user_id', user.data.data.user._id, { path: '/', expires: expiresInDays, secure: process.env.NODE_ENV !== 'development' });
+
+        const expiresInDays = parseInt(user.data.data.expiresIn / 3600 / 24, 10) >= 1
+          ? parseInt(user.data.data.expiresIn / 3600 / 24, 10)
+          : 1;
+        this.$q.cookies.set('alenvi_token', user.data.data.token, { path: '/', expires: expiresInDays, secure: this.secure });
+        this.$q.cookies.set('alenvi_token_expires_in', user.data.data.expiresIn, { path: '/', expires: expiresInDays, secure: this.secure });
+        this.$q.cookies.set('refresh_token', user.data.data.refreshToken, { path: '/', expires: 365, secure: this.secure });
+        this.$q.cookies.set('user_id', user.data.data.user._id, { path: '/', expires: expiresInDays, secure: this.secure });
         await this.$store.dispatch('main/getUser', this.$q.cookies.get('user_id'));
-        if (this.$q.platform.is.desktop) {
-          this.$store.commit('main/setToggleDrawer', true);
-        }
-        if (this.$route.query.from) {
-          return this.$router.replace({ path: this.$route.query.from });
-        }
+
+        if (this.$q.platform.is.desktop) this.$store.commit('main/setToggleDrawer', true);
+
+        if (this.$route.query.from) return this.$router.replace({ path: this.$route.query.from });
         this.$router.replace({ name: 'auxiliary personal info', params: { id: this.$q.cookies.get('user_id') } });
       } catch (e) {
         console.error(e);
