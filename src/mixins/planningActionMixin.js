@@ -58,8 +58,8 @@ export const planningActionMixin = {
         dates: {
           startDate: { required },
           endDate: { required },
-          startHour: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absenceNature === HOURLY) },
-          endHour: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absenceNature === HOURLY) },
+          startHour: { required: requiredIf(() => this.editedEvent && this.editedEvent.type === ABSENCE && this.editedEvent.absenceNature === HOURLY) },
+          endHour: { required: requiredIf(() => this.editedEvent && this.editedEvent.type === ABSENCE && this.editedEvent.absenceNature === HOURLY) },
         },
         auxiliary: { required: requiredIf((item) => item && item.type !== INTERVENTION) },
         sector: { required },
@@ -74,16 +74,13 @@ export const planningActionMixin = {
           city: { required: requiredIf(item => item && !!item.fullAddress) },
           fullAddress: this.editedEvent && this.editedEvent.type === INTERNAL_HOUR ? { frAddress } : {},
         },
-        repetition: {
-          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
-        },
         attachment: {
-          driveId: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && [ILLNESS, WORK_ACCIDENT].includes(parent.absence)) },
-          link: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && [ILLNESS, WORK_ACCIDENT].includes(parent.absence)) },
+          driveId: { required: requiredIf(() => this.editedEvent && this.editedEvent.type === ABSENCE && [ILLNESS, WORK_ACCIDENT].includes(this.editedEvent.absence)) },
+          link: { required: requiredIf(() => this.editedEvent && this.editedEvent.type === ABSENCE && [ILLNESS, WORK_ACCIDENT].includes(this.editedEvent.absence)) },
         },
         cancel: {
-          condition: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
-          reason: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
+          condition: { required: requiredIf(() => this.editedEvent && this.editedEvent.type === INTERVENTION && this.editedEvent.isCancelled) },
+          reason: { required: requiredIf(() => this.editedEvent && this.editedEvent.type === INTERVENTION && this.editedEvent.isCancelled) },
         },
         misc: {
           required: requiredIf((item) => item && ((item.type === ABSENCE && item.absence === OTHER) || item.isCancelled)),
