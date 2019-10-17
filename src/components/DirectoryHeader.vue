@@ -34,3 +34,8 @@ export default {
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+  .q-option
+    font-size: 14px
+</style>

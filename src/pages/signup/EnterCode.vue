@@ -55,29 +55,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-  @import '~variables'
-
-  .q-if
-    font-size: 24px
-
-  .custom-input
-    height: 60px
-    @media (max-width: 321px)
-      height: 50px
-
-  .q-if-inverted
-    padding: 0
-
-  .q-card-actions
-    padding: 0
-
-  /deep/ .q-if
-    & input.q-input-target
-      height: 60px
-      line-height: 60px
-      @media (max-width: 321px)
-        height: 50px
-        line-height: 50px
-</style>

@@ -271,11 +271,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-  @import '~variables'
-
-  /deep/ .q-option .q-option-label
-    font-size: 14px
-
-</style>

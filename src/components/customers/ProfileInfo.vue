@@ -410,7 +410,7 @@ import { Cookies } from 'quasar';
 import { required, requiredIf, email } from 'vuelidate/lib/validators';
 import randomize from 'randomatic';
 import { extend, clear } from '../../helpers/utils.js';
-import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify.js';
+import { NotifyPositive, NotifyWarning, NotifyNegative } from '../popup/notify.js';
 import SearchAddress from '../form/SearchAddress';
 import Input from '../form/Input';
 import AddHelperModal from '../form/AddHelperModal.vue';
@@ -1318,12 +1318,6 @@ export default {
 
   .q-checkbox
     font-size: 12px
-
-  /deep/ .q-option-inner
-    margin-right: 5px
-
-  /deep/ .q-option.inline > .q-option-inner
-    margin-right: 0px
 
   /deep/ i.q-checkbox-icon
     opacity: 1 !important
