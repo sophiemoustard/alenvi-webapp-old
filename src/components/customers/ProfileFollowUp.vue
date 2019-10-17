@@ -172,9 +172,7 @@ export default {
     },
   },
   async mounted () {
-    await this.getCustomer(this.userProfile._id);
-    await this.getUserHelpers();
-    await this.getAuxiliaries();
+    await Promise.all([this.getCustomer(this.userProfile._id), this.getUserHelpers(), this.getAuxiliaries()])
     if (this.customer.firstIntervention) await this.getCustomerFollowUp();
   },
   methods: {
