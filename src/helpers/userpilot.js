@@ -12,7 +12,7 @@ export const identifyUser = (user) => {
       created_at: user.createdAt,
       role: get(user, 'role.name', ''),
       payment: get(user, 'customers[0].payment.iban') && get(user, 'customers[0].payment.bic') ? 'yes' : 'no',
-      signedMandate: mandates && !mandates.length ? 'no' : mandates[mandates.length - 1].signedAt ? 'yes' : 'no',
+      signedMandate: mandates && mandates.length ? mandates[mandates.length - 1].signedAt ? 'yes' : 'no' : 'no',
       subscriptionsAccepted: get(user, 'customers[0].subscriptionsAccepted') ? 'yes' : 'no',
     }
   );
