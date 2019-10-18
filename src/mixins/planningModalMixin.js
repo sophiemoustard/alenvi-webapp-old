@@ -263,8 +263,7 @@ export const planningModalMixin = {
       }
 
       const secondaryAddress = this.$_.get(this.selectedCustomer, 'contact.secondaryAddress', null);
-      const isCustomerSecondaryAddressDefined = secondaryAddress && secondaryAddress.fullAddress &&
-        secondaryAddress.fullAddress !== ''
+      const isCustomerSecondaryAddressDefined = secondaryAddress && secondaryAddress.fullAddress;
       if (event.address.fullAddress && secondaryAddress && secondaryAddress.fullAddress === event.address.fullAddress) {
         addresses.push(this.formatAddressOptions(event.address));
       } else if (isCustomerSecondaryAddressDefined) {
