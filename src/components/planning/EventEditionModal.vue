@@ -70,10 +70,10 @@
         <div class="row justify-between">
           <ni-select in-modal v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.condition" caption="Conditions"
             :options="cancellationConditions" required-field @blur="validations.cancel.condition.$touch"
-            class="col-6 cancel" />
+            class="col-6 cancel" :error="validations.cancel.condition.$error" />
           <ni-select in-modal v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.reason" caption="Motif"
             :options="cancellationReasons" required-field @blur="validations.cancel.reason.$touch"
-            class="col-6 cancel" />
+            class="col-6 cancel" :error="validations.cancel.reason.$error" />
         </div>
       </template>
     </div>
@@ -91,7 +91,7 @@
 </template>
 
 <script>
-import { INTERVENTION, ABSENCE, OTHER } from '../../data/constants';
+import { INTERVENTION, ABSENCE, OTHER, NEVER } from '../../data/constants';
 import { planningModalMixin } from '../../mixins/planningModalMixin';
 import { formatIdentity } from '../../helpers/utils';
 
@@ -139,6 +139,25 @@ export default {
   methods: {
     toggleAuxiliarySelect () {
       return this.$refs['auxiliarySelect'].show();
+    },
+    toggleCancellationForm (value) {
+      if (!value) this.editedEvent.cancel = {};
+      else {
+        this.validations.misc.$touch();
+        this.validations.cancel.$touch();
+      }
+    },
+    toggleRepetition () {
+      this.editedEvent.cancel = {};
+      this.editedEvent.isCancelled = false;
+    },
+    toggleServiceSelection () {
+      if (this.customerSubscriptionsOptions.length === 1 && this.creationModal) {
+        this.newEvent.subscription = this.customerSubscriptionsOptions[0].value;
+      }
+    },
+    isRepetition (event) {
+      return ABSENCE !== event.type && event.repetition && event.repetition.frequency !== NEVER;
     },
     close () {
       this.$emit('close');

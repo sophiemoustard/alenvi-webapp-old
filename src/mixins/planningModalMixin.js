@@ -287,22 +287,6 @@ export const planningModalMixin = {
     formatAddressOptions (address) {
       return { label: address.fullAddress, value: address };
     },
-    // Event edition
-    toggleCancellationForm (value) {
-      if (!value) this.editedEvent.cancel = {};
-    },
-    toggleRepetition () {
-      this.editedEvent.cancel = {};
-      this.editedEvent.isCancelled = false;
-    },
-    isRepetition (event) {
-      return ABSENCE !== event.type && event.repetition && event.repetition.frequency !== NEVER;
-    },
-    toggleServiceSelection () {
-      if (this.customerSubscriptionsOptions.length === 1 && this.creationModal) {
-        this.newEvent.subscription = this.customerSubscriptionsOptions[0].value;
-      }
-    },
     toggleAddressSelect () {
       return this.$refs['addressSelect'].show();
     },
