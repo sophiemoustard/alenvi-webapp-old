@@ -275,6 +275,10 @@ export default {
 
         this.$store.commit('rh/saveUserProfile', this.customer);
         this.$v.customer.$touch();
+        if (this.$_.get(this.customer, 'payment.bic') && this.$_.get(this.customer, 'payment.iban')) {
+          window.userpilot.track('payment_ok');
+          window.userpilot.identify(this.$store.getters['main/user']._id, { payment: 'yes' });
+        }
       } catch (e) {
         console.error(e);
         this.customer = {};
@@ -298,8 +302,6 @@ export default {
         await this.$customers.updateById(this.customer._id, this.$_.set({}, path, value));
         await this.$store.dispatch('main/getUser', this.helper._id);
         await this.refreshCustomer();
-        if (isIban) window.userpilot.track('iban_ok');
-        window.userpilot.identify(this.$store.getters['main/user']._id, { iban: 'yes' });
         NotifyPositive('Modification enregistrée');
 
         if (isIban) {
@@ -398,6 +400,7 @@ export default {
           const hasSigned = await this.hasSignedDoc(mandate.everSignId);
           if (hasSigned) {
             this.$customers.saveSignedDoc({ _id: this.customer._id, mandateId: mandate._id });
+            window.userpilot.track('mandate_ok');
             window.userpilot.identify(this.$store.getters['main/user']._id, { signedMandate: 'yes' });
           }
         }

@@ -58,6 +58,7 @@ Router.beforeEach(async (to, from, next) => {
     }
   } else {
     identifyUser(store.getters['main/user'])
+    window.userpilot.reload();
     next();
   }
 });
