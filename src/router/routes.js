@@ -373,7 +373,6 @@ const routes = [
     },
   },
   { path: '/enterCode', component: () => import('pages/signup/EnterCode') },
-  { path: '/messenger', component: () => import('pages/signup/ChooseMessengerPlatform') },
   {
     path: '/createPassword',
     component: () => import('pages/signup/CreatePassword'),
