@@ -7,6 +7,7 @@ import routes from './routes'
 import alenvi from '../helpers/alenvi'
 import store from '../store/index'
 import { checkPermission } from '../helpers/checkPermission'
+import { identifyUser } from '../helpers/userpilot';
 
 Vue.use(VueRouter)
 Vue.use(VueMeta);
@@ -33,6 +34,8 @@ Router.beforeEach(async (to, from, next) => {
         }
         if (checkPermission(to, store.getters['main/user'])) {
           store.commit('main/changeRefreshState', false);
+          identifyUser(store.getters['main/user'])
+          window.userpilot.reload();
           next();
         } else {
           next('/401');
@@ -46,12 +49,16 @@ Router.beforeEach(async (to, from, next) => {
       }
       if (checkPermission(to, store.getters['main/user'])) {
         store.commit('main/changeRefreshState', false);
+        identifyUser(store.getters['main/user'])
+        window.userpilot.reload();
         next();
       } else {
         next('/401');
       }
     }
   } else {
+    identifyUser(store.getters['main/user'])
+    window.userpilot.reload();
     next();
   }
 });
