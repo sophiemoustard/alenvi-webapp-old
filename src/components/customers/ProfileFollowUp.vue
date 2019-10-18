@@ -18,6 +18,18 @@
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
+        <p class="text-weight-bold">Référent</p>
+      </div>
+      <div class="row">
+        <img :src="auxiliaryAvatar" class="avatar">
+        <q-select class='referent' :options="auxiliariesOptions" v-model="customer.referent._id"
+          @input="updateCustomer('referent')" color="white" :filter-placeholder="auxiliaryPlaceholder"
+          :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
+          ref="auxiliarySelect" hide-underline filter @focus="saveTmp('referent')" :disable="loading"/>
+      </div>
+    </div>
+    <div class="q-mb-xl">
+      <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Accompagnement</p>
       </div>
       <div class="row gutter-profile">
@@ -70,7 +82,7 @@
 import Input from '../form/Input';
 import Select from '../form/Select';
 import { NotifyNegative } from '../popup/notify.js';
-import { AUXILIARY_ROLES, DEFAULT_AVATAR } from '../../data/constants';
+import { AUXILIARY, PLANNING_REFERENT, AUXILIARY_ROLES, DEFAULT_AVATAR, UNKNOWN_AVATAR } from '../../data/constants';
 import SearchAddress from '../form/SearchAddress';
 import { extend, formatIdentity } from '../../helpers/utils.js';
 import { customerMixin } from '../../mixins/customerMixin.js';
@@ -88,9 +100,11 @@ export default {
   mixins: [customerMixin, validationMixin, helperMixin],
   data () {
     return {
+      auxiliaries: [],
       isLoaded: false,
       customer: { followUp: {}, contact: {} },
       tmpInput: '',
+      loading: false,
       visibleColumns: ['lastname', 'firstname', 'email', 'phone'],
       customerFollowUp: [],
       followUpColumns: [
@@ -123,6 +137,13 @@ export default {
     },
   },
   computed: {
+    auxiliaryAvatar () {
+      let auxiliaryPicture;
+      if (this.customer.referent.picture) {
+        auxiliaryPicture = this.customer.referent.picture;
+      }
+      return this.getAuxiliaryAvatar(auxiliaryPicture);
+    },
     userProfile () {
       return this.$store.getters['rh/getUserProfile'];
     },
@@ -135,13 +156,50 @@ export default {
     hasSecondaryAddress () {
       return !!this.$_.get(this.customer, 'contact.secondaryAddress.fullAddress');
     },
+    auxiliariesOptions () {
+      const auxiliariesOptions = [{ label: 'Pas de référent', value: '' }];
+      if (this.auxiliaries.length) {
+        auxiliariesOptions.push(...this.auxiliaries.map(aux => ({
+          label: formatIdentity(aux.identity, 'FL'),
+          value: aux._id,
+        })));
+      } else if (this.customer.referent._id) {
+        auxiliariesOptions.push({
+          label: formatIdentity(this.customer.referent.identity, 'FL'),
+          value: this.customer.referent._id,
+        });
+      }
+
+      return auxiliariesOptions;
+    },
+    auxiliaryPlaceholder () {
+      return (this.customer.referent.identity)
+        ? formatIdentity(this.customer.referent.identity, 'FL')
+        : 'Pas de référent';
+    },
   },
   async mounted () {
-    await this.getCustomer(this.userProfile._id);
-    await this.getUserHelpers();
+    await Promise.all([this.refreshCustomer(), this.getUserHelpers(), this.getAuxiliaries()])
     if (this.customer.firstIntervention) await this.getCustomerFollowUp();
   },
   methods: {
+    getAuxiliaryAvatar (picture) {
+      return picture ? this.$_.get(picture, 'link') || DEFAULT_AVATAR : UNKNOWN_AVATAR;
+    },
+    toggleAuxiliarySelect () {
+      return this.$refs['auxiliarySelect'].show();
+    },
+    async getAuxiliaries () {
+      try {
+        this.loading = true;
+        const activeAuxiliaries = await this.$users.showAllActive({ role: [AUXILIARY, PLANNING_REFERENT] });
+        this.auxiliaries = activeAuxiliaries.filter(aux => aux.contracts.some(c => !c.endDate));
+        this.loading = false;
+      } catch (e) {
+        this.auxiliaries = [];
+        this.loading = false;
+      }
+    },
     async getCustomerFollowUp () {
       try {
         this.customerFollowUp = await this.$stats.getCustomerFollowUp({ customer: this.customer._id });
@@ -150,10 +208,12 @@ export default {
         NotifyNegative('Erreur lors de la récupération des auxiliaires');
       }
     },
-    async getCustomer (customerId) {
+    async refreshCustomer () {
       try {
-        const customer = await this.$customers.getById(customerId);
+        this.customer.referent = { _id: '' };
+        const customer = await this.$customers.getById(this.userProfile._id);
         this.mergeCustomer(customer);
+        this.$store.commit('rh/saveUserProfile', this.customer);
         this.isLoaded = true;
         this.$v.customer.$touch();
       } catch (e) {
@@ -166,7 +226,7 @@ export default {
       this.customer = Object.assign({}, extend(true, ...args));
     },
     saveTmp (path) {
-      this.tmpInput = this.$_.get(this.customer, path);
+      this.tmpInput = path === 'referent' ? this.$_.get(this.customer, 'referent._id', '') : this.$_.get(this.customer, path);
     },
     getPhoneLink (link) {
       return link ? `tel:+33${link.substring(1)}` : '-';
@@ -189,5 +249,4 @@ export default {
     padding: 0;
   .table-fixed >>> table
     table-layout: fixed;
-
 </style>
