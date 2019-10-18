@@ -26,7 +26,6 @@ const Router = new VueRouter({
 })
 
 Router.beforeEach(async (to, from, next) => {
-  window.userpilot.reload();
   if (to.meta.cookies) {
     if (!Cookies.get('alenvi_token') || !Cookies.get('user_id')) {
       if (await alenvi.refreshAlenviCookies()) {
@@ -36,6 +35,7 @@ Router.beforeEach(async (to, from, next) => {
         if (checkPermission(to, store.getters['main/user'])) {
           store.commit('main/changeRefreshState', false);
           identifyUser(store.getters['main/user'])
+          window.userpilot.reload();
           next();
         } else {
           next('/401');
@@ -50,6 +50,7 @@ Router.beforeEach(async (to, from, next) => {
       if (checkPermission(to, store.getters['main/user'])) {
         store.commit('main/changeRefreshState', false);
         identifyUser(store.getters['main/user'])
+        window.userpilot.reload();
         next();
       } else {
         next('/401');

@@ -299,6 +299,7 @@ export default {
         await this.$store.dispatch('main/getUser', this.helper._id);
         await this.refreshCustomer();
         if (isIban) window.userpilot.track('iban_ok');
+        window.userpilot.identify(this.$store.getters['main/user']._id, { iban: 'yes' });
         NotifyPositive('Modification enregistrée');
 
         if (isIban) {
@@ -339,7 +340,8 @@ export default {
           };
           await this.$customers.addSubscriptionHistory(this.customer._id, payload);
           await this.refreshCustomer();
-          window.userpilot.track('subscriptions_accepted');
+          window.userpilot.track('subscriptions_ok');
+          window.userpilot.identify(this.$store.getters['main/user']._id, { subscriptionsAccepted: 'yes' });
           NotifyPositive('Abonnement validé');
         }
       } catch (e) {
@@ -396,6 +398,7 @@ export default {
           const hasSigned = await this.hasSignedDoc(mandate.everSignId);
           if (hasSigned) {
             this.$customers.saveSignedDoc({ _id: this.customer._id, mandateId: mandate._id });
+            window.userpilot.identify(this.$store.getters['main/user']._id, { signedMandate: 'yes' });
           }
         }
         await this.refreshCustomer();
