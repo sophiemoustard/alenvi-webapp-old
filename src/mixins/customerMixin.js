@@ -26,13 +26,12 @@ export const customerMixin = {
           const isValid = await this.waitForValidation(this.$v.customer, path);
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
-
-        if (path.match(/iban/i)) value = value.split(' ').join('');
+        if (path === 'payment.iban') value = value.split(' ').join('');
         const payload = this.$_.set({}, path, value);
         await this.$customers.updateById(this.userProfile._id, payload);
 
         NotifyPositive('Modification enregistrée');
-        if (path.match(/iban/i) || path.match(/referent/i)) this.refreshCustomer();
+        if (path === 'payment.iban' || path === 'referent') this.refreshCustomer();
 
         this.$store.commit('rh/saveUserProfile', this.customer);
       } catch (e) {
