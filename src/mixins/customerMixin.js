@@ -20,7 +20,7 @@ export const customerMixin = {
   methods: {
     async updateCustomer (path) {
       try {
-        let value = this.$_.get(this.customer, path);
+        let value = path === 'referent' ? this.$_.get(this.customer, 'referent._id', '') : this.$_.get(this.customer, path);
         if (this.tmpInput === value) return;
         if (this.$_.get(this.$v.customer, path)) {
           const isValid = await this.waitForValidation(this.$v.customer, path);
@@ -32,7 +32,7 @@ export const customerMixin = {
         await this.$customers.updateById(this.userProfile._id, payload);
 
         NotifyPositive('Modification enregistrée');
-        if (path.match(/iban/i)) this.refreshCustomer();
+        if (path.match(/iban/i) || path.match(/referent/i)) this.refreshCustomer();
 
         this.$store.commit('rh/saveUserProfile', this.customer);
       } catch (e) {
@@ -40,7 +40,7 @@ export const customerMixin = {
         if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message)
         NotifyNegative('Erreur lors de la modification');
       } finally {
-        this.tmpInput = '';
+        this.tmpInput = null;
       }
     },
   },

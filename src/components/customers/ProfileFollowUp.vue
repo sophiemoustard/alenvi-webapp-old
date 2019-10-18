@@ -21,11 +21,11 @@
         <p class="text-weight-bold">Référent</p>
       </div>
       <div class="row">
-        <img :src="getAuxiliaryAvatar(auxiliaryReferent)" class="avatar">
-        <q-select class='referent' :options="auxiliariesOptions" v-model="auxiliaryReferent"
-          @input="updateAuxiliaryReferent()" color="white" :filter-placeholder="auxiliaryPlaceholder"
+        <img :src="auxiliaryAvatar" class="avatar">
+        <q-select class='referent' :options="auxiliariesOptions" v-model="customer.referent._id"
+          @input="updateCustomer('referent')" color="white" :filter-placeholder="auxiliaryPlaceholder"
           :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
-          ref="auxiliarySelect" hide-underline filter @focus="saveTmp('referent')"/>
+          ref="auxiliarySelect" hide-underline filter @focus="saveTmp('referent')" :disable="loading"/>
       </div>
     </div>
     <div class="q-mb-xl">
@@ -87,8 +87,10 @@ import SearchAddress from '../form/SearchAddress';
 import { extend, formatIdentity } from '../../helpers/utils.js';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { validationMixin } from '../../mixins/validationMixin.js';
+import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
 import { helperMixin } from '../../mixins/helperMixin.js';
 import { frPhoneNumber } from '../../helpers/vuelidateCustomVal';
+import { fundingMixin } from '../../mixins/fundingMixin.js';
 
 export default {
   name: 'ProfileFollowUp',
@@ -97,15 +99,14 @@ export default {
     'ni-select': Select,
     'ni-search-address': SearchAddress,
   },
-  mixins: [customerMixin, validationMixin, helperMixin],
+  mixins: [customerMixin, validationMixin, helperMixin, subscriptionMixin, fundingMixin],
   data () {
     return {
       auxiliaries: [],
       isLoaded: false,
-      customer: { followUp: {}, contact: {}, referent: '' },
+      customer: { followUp: {}, contact: {}, referent: {_id: ''} },
       tmpInput: '',
       loading: false,
-      auxiliaryReferent: '',
       visibleColumns: ['lastname', 'firstname', 'email', 'phone'],
       customerFollowUp: [],
       followUpColumns: [
@@ -138,6 +139,13 @@ export default {
     },
   },
   computed: {
+    auxiliaryAvatar () {
+      let auxiliaryPicture;
+      if (this.customer.referent.picture) {
+        auxiliaryPicture = this.customer.referent.picture;
+      }
+      return this.getAuxiliaryAvatar(auxiliaryPicture);
+    },
     userProfile () {
       return this.$store.getters['rh/getUserProfile'];
     },
@@ -153,24 +161,23 @@ export default {
     auxiliariesOptions () {
       const auxiliariesOptions = [
         { label: 'Pas de référent', value: '' },
-        ...this.auxiliaries.map(aux => {
-          return {
-            label: formatIdentity(aux.identity, 'FL'),
-            value: aux,
-          }
-        }),
       ];
-      if (!this.auxiliaries.length && this.auxiliaryReferent) {
+      if (this.auxiliaries.length) {
+        auxiliariesOptions.push(...this.auxiliaries.map(aux => ({
+          label: formatIdentity(aux.identity, 'FL'),
+          value: aux._id,
+        })));
+      } else if (this.customer.referent._id) {
         auxiliariesOptions.push({
-          label: formatIdentity(this.auxiliaryReferent.identity, 'FL'),
-          value: this.auxiliaryReferent,
+          label: formatIdentity(this.customer.referent.identity, 'FL'),
+          value: this.customer.referent._id,
         });
       }
       return auxiliariesOptions;
     },
     auxiliaryPlaceholder () {
-      return (this.auxiliaryReferent && this.auxiliaryReferent.identity)
-        ? formatIdentity(this.auxiliaryReferent.identity, 'FL')
+      return (this.customer.referent.identity)
+        ? formatIdentity(this.customer.referent.identity, 'FL')
         : 'Pas de référent';
     },
   },
@@ -179,6 +186,19 @@ export default {
     if (this.customer.firstIntervention) await this.getCustomerFollowUp();
   },
   methods: {
+    getAuxiliaryAvatar (picture) {
+      return picture ? this.$_.get(picture, 'link') || DEFAULT_AVATAR : UNKNOWN_AVATAR;
+    },
+    async refreshCustomer () {
+      this.customer.referent = { _id: '' };
+      const customer = await this.$customers.getById(this.userProfile._id);
+      this.mergeCustomer(customer);
+      await this.refreshSubscriptions();
+      await this.refreshFundings();
+
+      this.$store.commit('rh/saveUserProfile', this.customer);
+      this.$v.customer.$touch();
+    },
     toggleAuxiliarySelect () {
       return this.$refs['auxiliarySelect'].show();
     },
@@ -187,9 +207,6 @@ export default {
         this.loading = true;
         const activeAuxiliaries = await this.$users.showAllActive({ role: [AUXILIARY, PLANNING_REFERENT] });
         this.auxiliaries = activeAuxiliaries.filter(aux => aux.contracts.some(c => !c.endDate));
-        if (this.customer.referent) {
-          this.auxiliaryReferent = activeAuxiliaries.find(aux => aux._id === this.customer.referent);
-        }
         this.loading = false;
       } catch (e) {
         this.auxiliaries = [];
@@ -207,10 +224,6 @@ export default {
     async getCustomer (customerId) {
       try {
         const customer = await this.$customers.getById(customerId);
-        if (customer.referent) {
-          this.auxiliaryReferent = customer.referent;
-          customer.referent = customer.referent._id;
-        }
         this.mergeCustomer(customer);
         this.isLoaded = true;
         this.$v.customer.$touch();
@@ -224,28 +237,10 @@ export default {
       this.customer = Object.assign({}, extend(true, ...args));
     },
     saveTmp (path) {
-      if (path === 'referent') {
-        this.tmpInput = this.auxiliaryReferent._id;
-      } else {
-        this.tmpInput = this.$_.get(this.customer, path);
-      }
+      this.tmpInput = path === 'referent' ? this.$_.get(this.customer, 'referent._id', '') : this.$_.get(this.customer, path);
     },
     getPhoneLink (link) {
       return link ? `tel:+33${link.substring(1)}` : '-';
-    },
-    updateAuxiliaryReferent () {
-      if (this.auxiliaryReferent._id) {
-        this.customer.referent = this.auxiliaryReferent._id;
-      } else {
-        this.customer.referent = '';
-      }
-
-      this.updateCustomer('referent');
-    },
-    getAuxiliaryAvatar (user) {
-      if (!user || !user._id) return UNKNOWN_AVATAR;
-
-      return this.$_.get(user, 'picture.link') || DEFAULT_AVATAR;
     },
   },
   filters: {
