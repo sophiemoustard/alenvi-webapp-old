@@ -61,8 +61,6 @@ export default {
     'ni-modal': Modal,
   },
   data () {
-    const payDocumentNaturesKeyedByValue = this.$_.keyBy(PAY_DOCUMENT_NATURES, 'value');
-
     return {
       documentUpload: false,
       documentNatureOptions: PAY_DOCUMENT_NATURES,
@@ -70,7 +68,6 @@ export default {
       newDocument: null,
       formValid: false,
       payDocuments: [],
-      documentNatureLabels: this.$_.mapValues(payDocumentNaturesKeyedByValue, 'label'),
       columns: [
         {
           name: 'nature',
@@ -104,6 +101,11 @@ export default {
     ...mapGetters({
       mainUser: 'main/user',
     }),
+    documentNatureLabels () {
+      const payDocumentNaturesKeyedByValue = this.$_.keyBy(PAY_DOCUMENT_NATURES, 'value');
+
+      return this.$_.mapValues(payDocumentNaturesKeyedByValue, 'label');
+    },
     userProfile () {
       if (AUXILIARY_ROLES.includes(this.mainUser.role.name)) return this.mainUser;
       if (COACH_ROLES.includes(this.mainUser.role.name)) return this.$store.getters['rh/getUserProfile'];
