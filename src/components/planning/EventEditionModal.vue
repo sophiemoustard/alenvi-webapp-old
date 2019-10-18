@@ -79,7 +79,7 @@
     </div>
     <div v-if="editedEvent.type === INTERVENTION && customerAddressList(editedEvent).length > 0" class="customer-info">
       <div class="row items-center no-wrap">
-        <q-select class="testitest" v-model="editedEvent.address" color="white" inverted-light @input="deleteClassFocus()"
+        <q-select v-model="editedEvent.address" color="white" inverted-light @input="deleteClassFocus()"
           :options="customerAddressList(editedEvent)" :readonly="customerAddressList(editedEvent).length === 1"
           :after="iconSelect(editedEvent)" :filter-placeholder="editedEvent.address.fullAddress" ref="addressSelect" filter />
         <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect" />
