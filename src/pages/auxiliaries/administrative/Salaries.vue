@@ -2,7 +2,7 @@
   <q-page padding class="neutral-background">
     <div v-if="currentUser">
       <h4>Documents de paie</h4>
-      <ni-profile-pay />
+      <profile-pay />
     </div>
   </q-page>
 </template>
@@ -14,7 +14,7 @@ import ProfilePay from '../../../components/auxiliary/ProfilePay';
 export default {
   props: ['id'],
   components: {
-    'ni-profile-pay': ProfilePay,
+    'profile-pay': ProfilePay,
   },
   metaInfo: {
     title: 'Documents de paie',
