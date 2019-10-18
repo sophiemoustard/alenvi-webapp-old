@@ -409,13 +409,8 @@
 import { Cookies } from 'quasar';
 import { required, requiredIf, email } from 'vuelidate/lib/validators';
 import randomize from 'randomatic';
-<<<<<<< HEAD
-import { extend, clear } from '../../helpers/utils.js';
-import { NotifyPositive, NotifyWarning, NotifyNegative } from '../popup/notify.js';
-=======
 import { clear } from '../../helpers/utils.js';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify.js';
->>>>>>> COM-705 beginning of adding referent
 import SearchAddress from '../form/SearchAddress';
 import Input from '../form/Input';
 import AddHelperModal from '../form/AddHelperModal.vue';
