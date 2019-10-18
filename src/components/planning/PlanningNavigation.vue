@@ -20,14 +20,10 @@
 </template>
 
 <script>
-import Select from '../form/Select';
 import { AGENDA, PLANNING, THREE_DAYS_VIEW, WEEK_VIEW } from '../../data/constants';
 
 export default {
   name: 'PlanningNavigation',
-  components: {
-    'ni-select': Select,
-  },
   props: {
     timelineTitle: { type: String, default: '' },
     targetDate: { type: String },
