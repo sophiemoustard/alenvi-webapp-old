@@ -63,7 +63,7 @@
     <div v-if="newEvent.type === INTERVENTION && customerAddressList(newEvent).length > 0" class="customer-info">
       <div class="row items-center no-wrap">
         <q-select v-model="newEvent.address" color="white" inverted-light :options="customerAddressList(newEvent)"
-          :after="iconSelect(newEvent)" :filter-placeholder="newEvent.address.fullAddress" @input="deleteClassFocus()"
+          :after="iconSelect(newEvent)" :filter-placeholder="newEvent.address.fullAddress" @input="deleteClassFocus"
           :readonly="customerAddressList(newEvent).length === 1" ref="addressSelect" filter />
       </div>
     </div>
@@ -150,9 +150,6 @@ export default {
     },
   },
   methods: {
-    deleteClassFocus () {
-      this.$refs['addressSelect'].$el.className = this.$refs['addressSelect'].$el.className.replace('q-if-focused ', '');
-    },
     close () {
       this.$emit('close');
     },
