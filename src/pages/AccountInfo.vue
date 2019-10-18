@@ -6,10 +6,10 @@
         error-label="Email invalide." @blur="$v.user.credentials.email.$touch" />
       <ni-input v-model.trim="user.credentials.password" :error="$v.user.credentials.password.$error"
         caption="Nouveau mot de passe" error-label="Le mot de passe doit contenir entre 6 et 20 caractères."
-        @blur="$v.user.credentials.password.$touch" />
+        @blur="$v.user.credentials.password.$touch" type="password" />
       <ni-input v-model.trim="user.credentials.passwordConfirm" :error="$v.user.credentials.passwordConfirm.$error"
         caption="Confirmation mot de passe" error-label="Le mot de passe entré et la confirmation sont différents."
-        @blur="$v.user.credentials.passwordConfirm.$touch" />
+        @blur="$v.user.credentials.passwordConfirm.$touch" type="password" />
       <div class="row justify-center">
         <q-btn big @click="updateUser()" color="primary" :disabled="$v.user.$invalid">Modifier</q-btn>
       </div>
