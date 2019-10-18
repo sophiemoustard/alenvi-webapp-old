@@ -87,10 +87,8 @@ import SearchAddress from '../form/SearchAddress';
 import { extend, formatIdentity } from '../../helpers/utils.js';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { validationMixin } from '../../mixins/validationMixin.js';
-import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
 import { helperMixin } from '../../mixins/helperMixin.js';
 import { frPhoneNumber } from '../../helpers/vuelidateCustomVal';
-import { fundingMixin } from '../../mixins/fundingMixin.js';
 
 export default {
   name: 'ProfileFollowUp',
@@ -99,12 +97,12 @@ export default {
     'ni-select': Select,
     'ni-search-address': SearchAddress,
   },
-  mixins: [customerMixin, validationMixin, helperMixin, subscriptionMixin, fundingMixin],
+  mixins: [customerMixin, validationMixin, helperMixin],
   data () {
     return {
       auxiliaries: [],
       isLoaded: false,
-      customer: { followUp: {}, contact: {}, referent: {_id: ''} },
+      customer: { followUp: {}, contact: {} },
       tmpInput: '',
       loading: false,
       visibleColumns: ['lastname', 'firstname', 'email', 'phone'],
@@ -159,9 +157,7 @@ export default {
       return !!this.$_.get(this.customer, 'contact.secondaryAddress.fullAddress');
     },
     auxiliariesOptions () {
-      const auxiliariesOptions = [
-        { label: 'Pas de référent', value: '' },
-      ];
+      const auxiliariesOptions = [{ label: 'Pas de référent', value: '' }];
       if (this.auxiliaries.length) {
         auxiliariesOptions.push(...this.auxiliaries.map(aux => ({
           label: formatIdentity(aux.identity, 'FL'),
@@ -173,6 +169,7 @@ export default {
           value: this.customer.referent._id,
         });
       }
+
       return auxiliariesOptions;
     },
     auxiliaryPlaceholder () {
@@ -182,22 +179,12 @@ export default {
     },
   },
   async mounted () {
-    await Promise.all([this.getCustomer(this.userProfile._id), this.getUserHelpers(), this.getAuxiliaries()])
+    await Promise.all([this.refreshCustomer(), this.getUserHelpers(), this.getAuxiliaries()])
     if (this.customer.firstIntervention) await this.getCustomerFollowUp();
   },
   methods: {
     getAuxiliaryAvatar (picture) {
       return picture ? this.$_.get(picture, 'link') || DEFAULT_AVATAR : UNKNOWN_AVATAR;
-    },
-    async refreshCustomer () {
-      this.customer.referent = { _id: '' };
-      const customer = await this.$customers.getById(this.userProfile._id);
-      this.mergeCustomer(customer);
-      await this.refreshSubscriptions();
-      await this.refreshFundings();
-
-      this.$store.commit('rh/saveUserProfile', this.customer);
-      this.$v.customer.$touch();
     },
     toggleAuxiliarySelect () {
       return this.$refs['auxiliarySelect'].show();
@@ -221,10 +208,12 @@ export default {
         NotifyNegative('Erreur lors de la récupération des auxiliaires');
       }
     },
-    async getCustomer (customerId) {
+    async refreshCustomer () {
       try {
-        const customer = await this.$customers.getById(customerId);
+        this.customer.referent = { _id: '' };
+        const customer = await this.$customers.getById(this.userProfile._id);
         this.mergeCustomer(customer);
+        this.$store.commit('rh/saveUserProfile', this.customer);
         this.isLoaded = true;
         this.$v.customer.$touch();
       } catch (e) {
