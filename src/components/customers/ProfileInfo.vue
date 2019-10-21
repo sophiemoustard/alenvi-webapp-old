@@ -5,9 +5,9 @@
         <p class="text-weight-bold">Identité</p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="Prénom" v-model="customer.identity.firstname" @focus="saveTmp('identity.firstname')"
+        <ni-input caption="Prénom" v-model.trim="customer.identity.firstname" @focus="saveTmp('identity.firstname')"
           @blur="updateCustomer('identity.firstname')" />
-        <ni-input caption="Nom" :error="$v.customer.identity.lastname.$error" v-model="customer.identity.lastname"
+        <ni-input caption="Nom" :error="$v.customer.identity.lastname.$error" v-model.trim="customer.identity.lastname"
           @focus="saveTmp('identity.lastname')" @blur="updateCustomer('identity.lastname')" />
         <ni-select caption="Civilité" :error="$v.customer.identity.title.$error" v-model="customer.identity.title"
           :options="civilityOptions" @focus="saveTmp('identity.title')" @blur="updateCustomer('identity.title')" />

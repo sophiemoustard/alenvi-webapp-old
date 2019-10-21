@@ -37,9 +37,9 @@
 
       <ni-select in-modal v-model="newUser.identity.title" :options="civilityOptions" caption="Civilité"
         required-field :error="$v.newUser.identity.title.$error" @blur="$v.newUser.identity.title.$touch" />
-      <ni-input in-modal v-model="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error" caption="Nom"
+      <ni-input in-modal v-model.trim="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error" caption="Nom"
         @blur="$v.newUser.identity.lastname.$touch" required-field />
-      <ni-input in-modal v-model="newUser.identity.firstname" :error="$v.newUser.identity.firstname.$error"
+      <ni-input in-modal v-model.trim="newUser.identity.firstname" :error="$v.newUser.identity.firstname.$error"
         caption="Prénom" @blur="$v.newUser.identity.firstname.$touch" required-field />
       <ni-input in-modal v-model="newUser.contact.phone" :error="$v.newUser.contact.phone.$error" required-field
         caption="Numéro de téléphone" @blur="$v.newUser.contact.phone.$touch" :error-label="mobilePhoneError" />
