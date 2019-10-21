@@ -79,7 +79,7 @@
     </div>
     <div v-if="editedEvent.type === INTERVENTION && customerAddressList(editedEvent).length > 0" class="customer-info">
       <div class="row items-center no-wrap">
-        <q-select v-model="editedEvent.address" color="white" inverted-light
+        <q-select v-model="editedEvent.address" color="white" inverted-light @input="deleteClassFocus"
           :options="customerAddressList(editedEvent)" :readonly="customerAddressList(editedEvent).length === 1"
           :after="iconSelect(editedEvent)" :filter-placeholder="editedEvent.address.fullAddress" ref="addressSelect" filter />
         <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect" />
@@ -114,7 +114,7 @@ export default {
       return this.customers.find(customer => customer._id === this.editedEvent.customer);
     },
     selectedAuxiliary () {
-      if (!this.editedEvent.auxiliary) return {};
+      if (!this.editedEvent.auxiliary || !this.activeAuxiliaries.length) return { identity: {} };
       const aux = this.activeAuxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
       const hasCustomerContractOnEvent = this.hasCustomerContractOnEvent(aux, this.editedEvent.dates.startDate);
       const hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(aux, this.editedEvent.dates.startDate);
