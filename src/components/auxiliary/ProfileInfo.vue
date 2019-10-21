@@ -56,9 +56,9 @@
           groupErrors('identity').msg }}</p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="Prénom" :error="$v.user.identity.firstname.$error" v-model="user.identity.firstname"
+        <ni-input caption="Prénom" :error="$v.user.identity.firstname.$error" v-model.trim="user.identity.firstname"
           @blur="updateUser('identity.firstname')" @focus="saveTmp('identity.firstname')" />
-        <ni-input caption="Nom" :error="$v.user.identity.lastname.$error" v-model="user.identity.lastname"
+        <ni-input caption="Nom" :error="$v.user.identity.lastname.$error" v-model.trim="user.identity.lastname"
           @blur="updateUser('identity.lastname')" @focus="saveTmp('identity.lastname')" />
         <ni-select caption="Nationalité" :error="$v.user.identity.nationality.$error" :options="nationalitiesOptions"
           v-model="user.identity.nationality" @focus="saveTmp('identity.nationality')"
