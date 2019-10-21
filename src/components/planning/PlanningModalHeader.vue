@@ -2,9 +2,7 @@
   <div class="row q-mb-md">
     <div class="col-11 row person-name">
       <img :src="avatar" class="avatar">
-      <div class="person-name-text" v-if="options.length === 0">
-        {{ selectedPerson.identity | formatIdentity('FL') }}
-      </div>
+      <div class="person-name-text" v-if="options.length === 0">{{ formattedIdentity }}</div>
       <q-select v-else filter :value="value" color="white" inverted-light :options="options"
         :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { $refs['personSelect'].show() } }]"
         :filter-placeholder="placeholder" ref="personSelect" @input="$emit('input', $event)" />
@@ -27,6 +25,9 @@ export default {
     selectedPerson: { type: Object, default: () => ({}) },
   },
   computed: {
+    formattedIdentity () {
+      return formatIdentity(this.selectedPerson.identity, 'FL');
+    },
     personName () {
       return this.selectedPerson.identity ? formatIdentity(this.selectedPerson.identity, 'FL') : 'À affecter';
     },
@@ -39,13 +40,12 @@ export default {
       return [{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { this.$refs['personSelect'].show() } }]
     },
     placeholder () {
-      return (this.selectedPerson.identity)
-        ? `${this.selectedPerson.identity.firstname} ${this.selectedPerson.identity.lastname}`
+      const firstname = this.$_.get(this.selectedPerson, 'identity.firstname');
+      const lastname = this.$_.get(this.selectedPerson, 'identity.lastname');
+      return (firstname && lastname)
+        ? `${firstname} ${lastname}`
         : 'À affecter';
     },
-  },
-  filters: {
-    formatIdentity,
   },
 }
 </script>
