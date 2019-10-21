@@ -151,11 +151,6 @@ export default {
       this.editedEvent.cancel = {};
       this.editedEvent.isCancelled = false;
     },
-    toggleServiceSelection () {
-      if (this.customerSubscriptionsOptions.length === 1 && this.creationModal) {
-        this.newEvent.subscription = this.customerSubscriptionsOptions[0].value;
-      }
-    },
     isRepetition (event) {
       return ABSENCE !== event.type && event.repetition && event.repetition.frequency !== NEVER;
     },

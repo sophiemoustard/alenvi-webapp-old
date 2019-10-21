@@ -150,6 +150,11 @@ export default {
     },
   },
   methods: {
+    toggleServiceSelection () {
+      if (this.customerSubscriptionsOptions.length === 1 && this.creationModal) {
+        this.newEvent.subscription = this.customerSubscriptionsOptions[0].value;
+      }
+    },
     close () {
       this.$emit('close');
     },
