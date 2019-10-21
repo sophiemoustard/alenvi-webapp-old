@@ -210,7 +210,7 @@ export default {
     },
     async refreshCustomer () {
       try {
-        this.customer.referent = { _id: '' };
+        if (this.$_.get(this.customer, 'referent._id', '') === '') this.customer.referent = { _id: '' };
         const customer = await this.$customers.getById(this.userProfile._id);
         this.mergeCustomer(customer);
         this.$store.commit('rh/saveUserProfile', this.customer);
