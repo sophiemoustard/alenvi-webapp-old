@@ -205,12 +205,13 @@ export const planningModalMixin = {
     // Event creation
     customerSubscriptionsOptions () {
       if (!this.selectedCustomer || !this.selectedCustomer.subscriptions ||
-        this.selectedCustomer.subscriptions.length === 0 || !this.selectedAuxiliary._id) return [];
+        this.selectedCustomer.subscriptions.length === 0) return [];
 
       let subscriptions = this.selectedCustomer.subscriptions;
-      if (!this.selectedAuxiliary.hasCustomerContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== CUSTOMER_CONTRACT);
-      if (!this.selectedAuxiliary.hasCompanyContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== COMPANY_CONTRACT);
-
+      if (this.selectedAuxiliary._id) {
+        if (!this.selectedAuxiliary.hasCustomerContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== CUSTOMER_CONTRACT);
+        if (!this.selectedAuxiliary.hasCompanyContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== COMPANY_CONTRACT);
+      }
       return subscriptions.map(sub => ({ label: sub.service.name, value: sub._id }));
     },
     additionalValue () {
