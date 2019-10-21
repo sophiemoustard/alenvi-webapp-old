@@ -15,7 +15,7 @@
       <template v-if="newEvent.type === INTERVENTION">
         <ni-select v-if="isCustomerPlanning" in-modal caption="Auxiliaire" v-model="newEvent.auxiliary"
           :options="auxiliariesOptions" :error="validations.auxiliary.$error" required-field
-          @blur="validations.auxiliary.$touch" @input="toggleServiceSelection(newEvent.customer)" />
+          @blur="validations.auxiliary.$touch" @input="toggleServiceSelection()" />
         <ni-select v-else in-modal caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions"
           :error="validations.customer.$error" required-field @blur="validations.customer.$touch"/>
         <ni-select in-modal caption="Service" v-model="newEvent.subscription" :error="validations.subscription.$error"
@@ -150,6 +150,11 @@ export default {
     },
   },
   methods: {
+    toggleServiceSelection () {
+      if (this.customerSubscriptionsOptions.length === 1 && this.creationModal) {
+        this.newEvent.subscription = this.customerSubscriptionsOptions[0].value;
+      }
+    },
     close () {
       this.$emit('close');
     },
