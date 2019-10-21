@@ -392,7 +392,7 @@ export default {
         for (const mandate of mandates) {
           const hasSigned = await this.hasSignedDoc(mandate.everSignId);
           if (hasSigned) {
-            this.$customers.saveSignedDoc({ _id: this.customer._id, mandateId: mandate._id });
+            await this.$customers.saveSignedDoc({ _id: this.customer._id, mandateId: mandate._id });
           }
         }
         await this.refreshCustomer();
