@@ -36,9 +36,6 @@ export default {
         ? UNKNOWN_AVATAR
         : this.$_.get(this.selectedPerson, 'picture.link') || DEFAULT_AVATAR;
     },
-    selectIcon () {
-      return [{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { this.$refs['personSelect'].show() } }]
-    },
     placeholder () {
       const firstname = this.$_.get(this.selectedPerson, 'identity.firstname');
       const lastname = this.$_.get(this.selectedPerson, 'identity.lastname');
