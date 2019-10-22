@@ -142,14 +142,10 @@
       </div>
       <div class="row gutter-profile items-stretch">
         <div class="col-xs-12">
-          <div class="row justify-between">
-            <p v-if="isAuxiliary" class="input-caption">Merci de nous indiquer le type de document d'identité que tu
-              possèdes.</p>
-          </div>
-          <q-field :error="$v.user.administrative.identityDocs.$error" :error-label="requiredLabel">
-            <q-option-group color="primary" v-model="user.administrative.identityDocs"
-              @input="updateUser('administrative.identityDocs')" :options="identityDocsOptions" />
-          </q-field>
+          <ni-option-group :display-caption="isAuxiliary" v-model="user.administrative.identityDocs" type="radio"
+            :options="identityDocsOptions" :error="$v.user.administrative.identityDocs.$error"
+            caption="Merci de nous indiquer le type de document d'identité que tu possèdes."  required-field
+            :error-label="requiredLabel" @input="updateUser('administrative.identityDocs')" />
         </div>
         <div v-if="user.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Carte d'identité (recto)" path="administrative.idCardRecto" alt="cni recto"
@@ -258,15 +254,10 @@
       </div>
       <div class="row gutter-profile-x">
         <div class="col-xs-12">
-          <div v-if="isAuxiliary" class="row justify-between">
-            <p class="input-caption">Par quel moyen comptes-tu te rendre au travail ?</p>
-            <q-icon v-if="$v.user.administrative.transportInvoice.transportType.$error" name="error_outline"
-              color="secondary" />
-          </div>
-          <q-field :error="$v.user.administrative.transportInvoice.transportType.$error" :error-label="requiredLabel">
-            <q-option-group color="primary" v-model="user.administrative.transportInvoice.transportType"
-              :options="transportOptions" @input="updateUser('administrative.transportInvoice.transportType')" />
-          </q-field>
+          <ni-option-group :display-caption="isAuxiliary" v-model="user.administrative.transportInvoice.transportType"
+            :options="transportOptions" caption="Par quel moyen comptes-tu te rendre au travail ?" type="radio"
+            :error-label="requiredLabel" :error="$v.user.administrative.transportInvoice.transportType.$error"
+            required-field @input="updateUser('administrative.transportInvoice.transportType')" />
         </div>
         <div v-if="user.administrative.transportInvoice.transportType === 'public'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Merci de nous transmettre ton justificatif d'abonnement"
@@ -310,6 +301,7 @@ import { AUXILIARY, PLANNING_REFERENT, TRANSPORT_OPTIONS, REQUIRED_LABEL } from 
 import SelectSector from '../form/SelectSector';
 import Input from '../form/Input';
 import Select from '../form/Select';
+import OptionGroup from '../form/OptionGroup';
 import FileUploader from '../form/FileUploader.vue';
 import MultipleFilesUploader from '../form/MultipleFilesUploader.vue';
 import DatetimePicker from '../form/DatetimePicker.vue';
@@ -330,6 +322,7 @@ export default {
     'ni-multiple-files-uploader': MultipleFilesUploader,
     'ni-datetime-picker': DatetimePicker,
     'ni-search-address': SearchAddress,
+    'ni-option-group': OptionGroup,
   },
   data () {
     return {
@@ -626,7 +619,7 @@ export default {
   async mounted () {
     const user = await this.$users.getById(this.currentUser._id);
     this.mergeUser(user);
-    await this.getAuxiliaryRoles();
+    if (!this.isAuxiliary) await this.getAuxiliaryRoles();
     this.$v.user.$touch();
     this.isLoaded = true;
   },

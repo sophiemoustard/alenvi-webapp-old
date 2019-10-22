@@ -373,7 +373,6 @@ const routes = [
     },
   },
   { path: '/enterCode', component: () => import('pages/signup/EnterCode') },
-  { path: '/messenger', component: () => import('pages/signup/ChooseMessengerPlatform') },
   {
     path: '/createPassword',
     component: () => import('pages/signup/CreatePassword'),
@@ -402,13 +401,5 @@ const routes = [
     component: () => import('pages/404'),
   },
 ];
-
-// Always leave this as last one
-if (process.env.MODE !== 'ssr') {
-  routes.push({
-    path: '*',
-    component: () => import('pages/Error404.vue'),
-  });
-}
 
 export default routes;

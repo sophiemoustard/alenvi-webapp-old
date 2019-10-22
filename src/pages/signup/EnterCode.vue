@@ -3,14 +3,7 @@
     <compani-header />
     <div class="row justify-center layout-padding neutral-background" style="min-height: 100vh">
       <div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Entre le code à 4 chiffres que tu as reçu par SMS</p>
-            </div>
-            <q-input v-model="code" v-mask="'####'" type="tel" inverted-light color="white" align="center" autofocus />
-          </div>
-        </div>
+        <ni-input v-model="code" type="tel" autofocus caption="Entre le code à 4 chiffres que tu as reçu par SMS" />
         <div class="row justify-center">
           <q-btn @click="submit" color="primary" :disable="!code" big>Envoyer</q-btn>
         </div>

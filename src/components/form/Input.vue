@@ -18,11 +18,11 @@
           </i>
         </div>
       </template>
-
       <template v-else>
         <q-input :ref="name" :value="value" color="white" inverted-light @focus="onFocus" @blur="onBlur"
           @input="update" :upper-case="upperCase" :lower-case="lowerCase" :type="type" :disable="disable"
-          :readOnly="readOnly" :rows="rows" :suffix="suffix" :class="{'borders': borders || inModal}" />
+          :readOnly="readOnly" :rows="rows" :suffix="suffix" :class="{'borders': borders || inModal}"
+          @keyup.enter="$emit('keyup.enter')" />
       </template>
     </q-field>
   </div>
@@ -51,6 +51,7 @@ export default {
     name: String,
     inModal: { type: Boolean, default: false },
     last: { type: Boolean, default: false },
+    autofocus: { type: Boolean, default: false },
   },
   methods: {
     onBlur (event) {

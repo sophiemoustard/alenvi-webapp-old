@@ -1,5 +1,5 @@
 <template>
-  <q-select :value="value" color="white" :error="myError" inverted-light :stack-label="stackLabel" ref="selectSector"
+  <q-select :value="value" color="white" :error="myError" inverted-light ref="selectSector"
     @change="updateSector" :options="sectors" @blur="blurHandler" @focus="focusHandler" filter
     filter-placeholder="Rechercher" separator :class="{border: inModal}" :company-id="companyId" />
 </template>
@@ -10,7 +10,6 @@ export default {
   name: 'SelectSector',
   props: {
     value: String,
-    stackLabel: String,
     myError: { type: String, default: null },
     inModal: { type: Boolean, default: false },
     companyId: String,

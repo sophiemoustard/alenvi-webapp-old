@@ -1,15 +1,8 @@
 <template>
   <div class="profile-tabs">
     <q-tabs align="justify" color="transparent" text-color="primary">
-       <q-tab
-        v-for="(tab, index) in tabsContent"
-        :key="index"
-        slot="title"
-        :label="tab.label"
-        :default="tab.default"
-        :name="tab.name"
-        :alert="tab.notification && notifications[tab.notification][profileId] ? notifications[tab.notification][profileId] : false"
-        />
+      <q-tab v-for="(tab, index) in tabsContent" :key="index" slot="title" :label="tab.label"
+        :default="tab.default" :name="tab.name" :alert="alert(tab)" />
       <q-tab-pane class="no-border" v-for="(tab, index) in tabsContent" :key="index" :name="tab.name">
         <!-- Dynamic component loading  -->
         <component :is="tab.component" />
@@ -25,6 +18,13 @@ export default {
   computed: {
     notifications () {
       return this.$store.getters['rh/getNotifications'];
+    },
+  },
+  methods: {
+    alert (tab) {
+      return tab.notification && this.notifications[tab.notification][this.profileId]
+        ? this.notifications[tab.notification][this.profileId]
+        : false
     },
   },
 }

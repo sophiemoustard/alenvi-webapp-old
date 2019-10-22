@@ -1,7 +1,7 @@
 <template>
   <div :class="['row', 'margin-input', { last: last }]">
     <div class="col-12">
-      <div class="row justify-between">
+      <div v-if="displayCaption" class="row justify-between">
         <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
         <q-icon v-if="error" name="error_outline" color="secondary" />
       </div>
@@ -29,6 +29,7 @@ export default {
     options: Array,
     type: String,
     inline: { type: Boolean, default: false },
+    displayCaption: { type: Boolean, default: true },
   },
   methods: {
     inputHandler (value) {
