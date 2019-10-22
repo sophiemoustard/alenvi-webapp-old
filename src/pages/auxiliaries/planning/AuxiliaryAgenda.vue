@@ -2,12 +2,11 @@
   <q-page class="neutral-background" :style="{ height: height }">
     <div :class="[{ 'planning': !toggleDrawer, 'full-height' : true }]">
       <div class="row items-center planning-header">
-        <div class="col-xs-12 col-md-5 auxiliary-name" v-if="Object.keys(selectedAuxiliary).length > 0">
+        <div class="col-xs-12 col-md-5 person-name" v-if="Object.keys(selectedAuxiliary).length > 0">
           <img :src="getAvatar(selectedAuxiliary)" class="avatar">
           <q-select filter :value="selectedAuxiliary._id" color="white" inverted-light :options="auxiliariesOptions"
-            @input="updateAuxiliary" ref="auxiliarySelect"
-            :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { toggleAuxiliarySelect(); }, }]"
-            :filter-placeholder="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname}`" />
+            @input="updateAuxiliary" ref="personSelect" :filter-placeholder="placeholder"
+            :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { $refs['personSelect'].show() } }]" />
         </div>
         <div class="col-xs-12 col-md-7">
           <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
@@ -43,6 +42,7 @@ import { DEFAULT_AVATAR, INTERVENTION, NEVER, AGENDA, WEEK_VIEW, THREE_DAYS_VIEW
 import { planningTimelineMixin } from '../../../mixins/planningTimelineMixin';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { NotifyWarning } from '../../../components/popup/notify';
+import { formatIdentity } from '../../../helpers/utils';
 
 export default {
   name: 'AuxiliaryAgenda',
@@ -76,6 +76,10 @@ export default {
     };
   },
   computed: {
+    placeholder () {
+      if (!this.selectedAuxiliary.identity) return '';
+      return formatIdentity(this.selectedAuxiliary.identity, 'FL');
+    },
     currentUser () {
       return this.$store.getters['main/user'];
     },
@@ -84,10 +88,12 @@ export default {
         this.hasCustomerContractOnEvent(aux, this.days[0], this.days[6]));
     },
     auxiliariesOptions () {
-      return this.activeAuxiliaries.length === 0 ? [] : this.activeAuxiliaries.map(aux => ({
-        label: `${aux.identity.firstname || ''} ${aux.identity.lastname}`,
-        value: aux._id,
-      }));
+      return this.activeAuxiliaries.length === 0
+        ? [{ label: this.placeholder, value: this.selectedAuxiliary._id }]
+        : this.activeAuxiliaries.map(aux => ({
+          label: `${aux.identity.firstname || ''} ${aux.identity.lastname}`,
+          value: aux._id,
+        }));
     },
     filteredEvents () {
       return this.events.filter(ev => !ev.isCancelled);
@@ -107,9 +113,6 @@ export default {
       if (!aux || !aux._id) return UNKNOWN_AVATAR;
 
       return aux.picture && aux.picture.link ? aux.picture.link : DEFAULT_AVATAR;
-    },
-    toggleAuxiliarySelect () {
-      return this.$refs['auxiliarySelect'].show();
     },
     async updateAuxiliary (auxiliaryId) {
       this.selectedAuxiliary = this.auxiliaries.find(aux => aux._id === auxiliaryId);
@@ -205,7 +208,7 @@ export default {
 <style lang="stylus" scoped>
   @import '~variables';
 
-  .auxiliary-name
+  .person-name
     .q-if-inverted
       background-color: $grey-3 !important;
 
