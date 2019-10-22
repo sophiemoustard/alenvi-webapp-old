@@ -2,18 +2,14 @@
   <q-page class="neutral-background" padding>
     <h4>Mon compte</h4>
     <div class="center-account">
-      <p class="input-caption">Email</p>
-      <q-field class="margin-input" :error="$v.user.credentials.email.$error" error-label="Email invalide.">
-        <q-input v-model.trim="user.credentials.email" @blur="$v.user.credentials.email.$touch" inverted-light color="white" />
-      </q-field>
-      <p class="input-caption">Nouveau mot de passe</p>
-      <q-field class="margin-input" :error="$v.user.credentials.password.$error" error-label="Le mot de passe doit contenir entre 6 et 20 caractères.">
-        <q-input type="password" v-model.trim="user.credentials.password" @blur="$v.user.credentials.password.$touch" inverted-light color="white" />
-      </q-field>
-      <p class="input-caption">Confirmation mot de passe</p>
-      <q-field class="margin-input last" :error="$v.user.credentials.passwordConfirm.$error" error-label="Le mot de passe entré et la confirmation sont différents.">
-        <q-input type="password" v-model.trim="user.credentials.passwordConfirm" @blur="$v.user.credentials.passwordConfirm.$touch" inverted-light color="white" />
-      </q-field>
+      <ni-input v-model.trim="user.credentials.email" caption="Email" :error="$v.user.credentials.email.$error"
+        error-label="Email invalide." @blur="$v.user.credentials.email.$touch" />
+      <ni-input v-model.trim="user.credentials.password" :error="$v.user.credentials.password.$error"
+        caption="Nouveau mot de passe" error-label="Le mot de passe doit contenir entre 6 et 20 caractères."
+        @blur="$v.user.credentials.password.$touch" type="password" />
+      <ni-input v-model.trim="user.credentials.passwordConfirm" :error="$v.user.credentials.passwordConfirm.$error"
+        caption="Confirmation mot de passe" error-label="Le mot de passe entré et la confirmation sont différents."
+        @blur="$v.user.credentials.passwordConfirm.$touch" type="password" />
       <div class="row justify-center">
         <q-btn big @click="updateUser()" color="primary" :disabled="$v.user.$invalid">Modifier</q-btn>
       </div>
@@ -28,10 +24,14 @@
 <script>
 import { required, email, sameAs, minLength, maxLength } from 'vuelidate/lib/validators';
 import { NotifyPositive, NotifyNegative } from '../components/popup/notify';
+import Input from '../components/form/Input';
 
 export default {
   metaInfo: {
     title: 'Mon compte',
+  },
+  components: {
+    'ni-input': Input,
   },
   data () {
     return {

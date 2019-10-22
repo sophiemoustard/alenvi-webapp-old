@@ -1,30 +1,25 @@
 <template>
-  <q-modal :value="creationModal" content-classes="modal-container-md" @hide="resetForm">
-    <div class="modal-padding">
-      <div class="row justify-between items-baseline">
-        <div class="col-11">
-          <h5>Ajouter un <span class="text-weight-bold">{{ creationModalNature }}</span></h5>
-        </div>
-        <div class="col-1 cursor-pointer modal-btn-close">
-          <span><q-icon name="clear" @click.native="resetForm" /></span>
-        </div>
-      </div>
-      <div class="modal-subtitle">
-        <q-btn-toggle no-wrap v-model="newPayment.nature" :options="paymentNatureOptions" toggle-color="primary" />
-      </div>
-      <ni-input in-modal caption="Bénéficiaire" :value="customerFullname" required-field read-only />
-      <ni-input in-modal caption="Client" v-model="selectedClientName" required-field read-only />
-      <ni-input in-modal :caption="`Montant du ${creationModalNature}`" suffix="€" type="number"
-        v-model="newPayment.netInclTaxes" required-field :error="validations.netInclTaxes.$error"
-        @blur="validations.netInclTaxes.$touch" :error-label="netInclTaxesError" />
-      <ni-select in-modal :caption="`Type du ${creationModalNature}`" v-model="newPayment.type" :options="paymentOptions"
-        required-field @blur="validations.type.$touch" :error="validations.type.$error" />
-      <ni-datetime-picker :caption="`Date du ${creationModalNature}`" v-model="newPayment.date"
-        :error="validations.date.$error" @blur="validations.date.$touch" in-modal type="date" required-field />
+  <ni-modal :value="creationModal" @hide="resetForm">
+    <template slot="title">
+      Ajouter un <span class="text-weight-bold">{{ creationModalNature }}</span>
+    </template>
+    <div class="modal-subtitle">
+      <q-btn-toggle no-wrap v-model="newPayment.nature" :options="paymentNatureOptions" toggle-color="primary" />
     </div>
-    <q-btn no-caps class="full-width modal-btn" :label="creationButtonLabel" icon-right="add" color="primary"
-      :loading="loading" @click="createPayment" :disable="validations.$error || disableCreationButton" />
-  </q-modal>
+    <ni-input in-modal caption="Bénéficiaire" :value="customerFullname" required-field read-only />
+    <ni-input in-modal caption="Client" v-model="selectedClientName" required-field read-only />
+    <ni-input in-modal :caption="`Montant du ${creationModalNature}`" suffix="€" type="number"
+      v-model="newPayment.netInclTaxes" required-field :error="validations.netInclTaxes.$error"
+      @blur="validations.netInclTaxes.$touch" :error-label="netInclTaxesError" />
+    <ni-select in-modal :caption="`Type du ${creationModalNature}`" v-model="newPayment.type" :options="paymentOptions"
+      required-field @blur="validations.type.$touch" :error="validations.type.$error" />
+    <ni-datetime-picker :caption="`Date du ${creationModalNature}`" v-model="newPayment.date"
+      :error="validations.date.$error" @blur="validations.date.$touch" in-modal type="date" required-field />
+    <template slot="footer">
+      <q-btn no-caps class="full-width modal-btn" :label="creationButtonLabel" icon-right="add" color="primary"
+        :loading="loading" @click="createPayment" :disable="validations.$error || disableCreationButton" />
+    </template>
+  </ni-modal>
 </template>
 
 <script>
@@ -32,6 +27,7 @@ import { REQUIRED_LABEL, PAYMENT_OPTIONS, PAYMENT_NATURE_OPTIONS } from '../../d
 import NiSelect from '../form/Select';
 import NiInput from '../form/Input';
 import DatetimePicker from '../form/DatetimePicker';
+import Modal from '../Modal';
 import { formatIdentity } from '../../helpers/utils.js';
 
 export default {
@@ -40,6 +36,7 @@ export default {
     'ni-select': NiSelect,
     'ni-input': NiInput,
     'ni-datetime-picker': DatetimePicker,
+    'ni-modal': Modal,
   },
   props: {
     newPayment: { type: Object, default: () => ({}) },

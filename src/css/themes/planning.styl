@@ -156,7 +156,7 @@
     font-size: 12px;
     bottom: -3px;
 
-.auxiliary-name
+.person-name
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -174,7 +174,14 @@
     line-height: normal
   .q-icon
     display: none;
-
+  
+.customer-info
+  .q-icon
+    display: none;
+  .q-btn
+    margin-left: auto;
+    .q-icon
+      display: flex !important;
 
 .avatar
   @media screen and (max-width: 1024px)
@@ -190,11 +197,3 @@
       border: none;
   &-address
     margin-right: 6px
-
-.person-name
-  font-size: 1.3rem;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  div
-    margin-left: 5px;

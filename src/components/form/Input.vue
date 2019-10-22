@@ -1,9 +1,5 @@
 <template>
-  <div v-if="!hidden" :class="{
-    'col-xs-12 col-md-6': !inModal,
-    'margin-input full-width': inModal,
-    last: last
-    }">
+  <div v-if="!hidden" :class="{ 'col-xs-12 col-md-6': !inModal, 'margin-input full-width': inModal, last: last }">
     <div class="row justify-between">
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
@@ -15,35 +11,18 @@
             <span class="input-file-empty" v-if="!value">Pas de document</span>
             <template v-else>{{ (value && value.name) ? value.name : value }}</template>
           </div>
-          <i aria-hidden="true"
-            class="q-icon on-right material-icons self-center material-icons relative-position">
+          <i aria-hidden="true" class="q-icon on-right material-icons self-center material-icons relative-position">
             add
-            <input ref="inputFile" type="file" @input="updateInputFile"
-              class="input-file absolute-full cursor-pointer"
-              @blur="onBlur"
-            >
+            <input ref="inputFile" type="file" @input="updateInputFile" class="input-file absolute-full cursor-pointer"
+              @blur="onBlur" >
           </i>
         </div>
       </template>
-
       <template v-else>
-        <q-input
-          :ref="name"
-          :value="value"
-          color="white"
-          inverted-light
-          @focus="onFocus"
-          @blur="onBlur"
-          @input="update"
-          :upper-case="upperCase"
-          :lower-case="lowerCase"
-          :type="type"
-          :disable="disable"
-          :readOnly="readOnly"
-          :rows="rows"
-          :suffix="suffix"
-          :class="{'borders': borders || inModal}"
-        />
+        <q-input :ref="name" :value="value" color="white" inverted-light @focus="onFocus" @blur="onBlur"
+          @input="update" :upper-case="upperCase" :lower-case="lowerCase" :type="type" :disable="disable"
+          :readOnly="readOnly" :rows="rows" :suffix="suffix" :class="{'borders': borders || inModal}"
+          @keyup.enter="$emit('keyup.enter')" />
       </template>
     </q-field>
   </div>
@@ -72,6 +51,7 @@ export default {
     name: String,
     inModal: { type: Boolean, default: false },
     last: { type: Boolean, default: false },
+    autofocus: { type: Boolean, default: false },
   },
   methods: {
     onBlur (event) {

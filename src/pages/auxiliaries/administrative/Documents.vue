@@ -2,11 +2,7 @@
   <q-page padding class="neutral-background">
     <h4>Documents</h4>
     <p v-if="documents.length == 0">Aucun document disponible</p>
-    <q-table
-      :data="documents"
-      :columns="columns"
-      row-key="name"
-      hide-bottom>
+    <q-table :data="documents" :columns="columns" row-key="name" hide-bottom>
         <q-td slot="body-cell-title" slot-scope="props" :props="props">
           {{ props.value }}
         </q-td>
@@ -91,16 +87,6 @@ export default {
   & td
     padding: 8px 12px
     font-size: 16px
-    & .q-item
-      min-height: 30px
-      padding: 0
-      &-main
-        flex: 0 1 auto
-      & .q-item-side
-        min-width: 30px
-        max-height: 30px
-      & .q-item-section + .q-item-section
-        margin-left: 20px
   &-container
     & .q-table-bottom
       padding-left: 12px

@@ -25,30 +25,24 @@
       @click="opened = true" />
 
     <!-- Customer creation modal -->
-    <q-modal v-model="opened" @hide="resetForm" content-classes="modal-container-sm">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-8">
-            <h5>Créer une nouvelle <span class="text-weight-bold">fiche bénéficiaire</span></h5>
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span>
-              <q-icon name="clear" @click.native="opened = false" /></span>
-          </div>
-        </div>
-        <ni-select in-modal v-model="newCustomer.identity.title" :error="$v.newCustomer.identity.title.$error"
-          :options="civilityOptions" caption="Civilité" @blur="$v.newCustomer.identity.title.$touch" required-field />
-        <ni-input in-modal v-model="newCustomer.identity.lastname" :error="$v.newCustomer.identity.lastname.$error"
-          caption="Nom" @blur="$v.newCustomer.identity.lastname.$touch" required-field />
-        <ni-input in-modal v-model="newCustomer.identity.firstname" caption="Prénom" />
-        <div class="row margin-input last">
-          <ni-search-address v-model="newCustomer.contact.address" @blur="$v.newCustomer.contact.address.$touch"
-            :error="$v.newCustomer.contact.address.$error" :error-label="addressError" in-modal required-field />
-        </div>
+    <ni-modal v-model="opened" @hide="resetForm">
+      <template slot="title">
+        Créer une nouvelle <span class="text-weight-bold">fiche bénéficiaire</span>
+      </template>
+      <ni-select in-modal v-model="newCustomer.identity.title" :error="$v.newCustomer.identity.title.$error"
+        :options="civilityOptions" caption="Civilité" @blur="$v.newCustomer.identity.title.$touch" required-field />
+      <ni-input in-modal v-model.trim="newCustomer.identity.lastname" :error="$v.newCustomer.identity.lastname.$error"
+        caption="Nom" @blur="$v.newCustomer.identity.lastname.$touch" required-field />
+      <ni-input in-modal v-model.trim="newCustomer.identity.firstname" caption="Prénom" />
+      <div class="row margin-input last">
+        <ni-search-address v-model="newCustomer.contact.primaryAddress" @blur="$v.newCustomer.contact.primaryAddress.$touch"
+          :error="$v.newCustomer.contact.primaryAddress.$error" :error-label="primaryAddressError" in-modal required-field />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary"
-        :loading="loading" @click="submit" />
-    </q-modal>
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary"
+          :loading="loading" @click="submit" />
+      </template>
+    </ni-modal>
   </q-page>
 </template>
 
@@ -60,9 +54,10 @@ import SearchAddress from '../../../components/form/SearchAddress';
 import Input from '../../../components/form/Input';
 import Select from '../../../components/form/Select';
 import DirectoryHeader from '../../../components/DirectoryHeader';
+import Modal from '../../../components/Modal';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../../components/popup/notify.js';
 import { customerProfileValidation } from '../../../helpers/customerProfileValidation.js';
-import { REQUIRED_LABEL } from '../../../data/constants';
+import { REQUIRED_LABEL, CIVILITY_OPTIONS } from '../../../data/constants';
 import { validationMixin } from '../../../mixins/validationMixin.js';
 import { formatIdentity } from '../../../helpers/utils';
 
@@ -77,6 +72,7 @@ export default {
     'ni-input': Input,
     'ni-select': Select,
     'ni-directory-header': DirectoryHeader,
+    'ni-modal': Modal,
   },
   data () {
     return {
@@ -85,10 +81,7 @@ export default {
       loading: false,
       opened: false,
       sendWelcomeMsg: true,
-      civilityOptions: [
-        { label: 'Monsieur', value: 'M.' },
-        { label: 'Madame', value: 'Mme' },
-      ],
+      civilityOptions: CIVILITY_OPTIONS,
       newCustomer: {
         identity: {
           title: '',
@@ -97,7 +90,7 @@ export default {
         },
         email: '',
         contact: {
-          address: { fullAddress: '' },
+          primaryAddress: { fullAddress: '' },
         },
       },
       customersList: [],
@@ -171,7 +164,7 @@ export default {
       },
       email: { email },
       contact: {
-        address: {
+        primaryAddress: {
           zipCode: { required },
           street: { required },
           city: { required },
@@ -194,9 +187,9 @@ export default {
       return this.clientsCustomerList.filter(customer => customer.identity.fullName.match(new RegExp(this.searchStr, 'i')));
     },
     zipCodeError () {
-      if (!this.$v.newCustomer.contact.address.zipCode.required) {
+      if (!this.$v.newCustomer.contact.primaryAddress.zipCode.required) {
         return REQUIRED_LABEL;
-      } else if (!this.$v.newCustomer.contact.address.zipCode.frZipCode || !this.$v.newCustomer.contact.address.zipCode.maxLength) {
+      } else if (!this.$v.newCustomer.contact.primaryAddress.zipCode.frZipCode || !this.$v.newCustomer.contact.primaryAddress.zipCode.maxLength) {
         return 'Code postal non valide';
       }
     },
@@ -207,8 +200,8 @@ export default {
         return 'Email non valide';
       }
     },
-    addressError () {
-      if (!this.$v.newCustomer.contact.address.fullAddress.required) {
+    primaryAddressError () {
+      if (!this.$v.newCustomer.contact.primaryAddress.fullAddress.required) {
         return REQUIRED_LABEL;
       }
       return 'Adresse non valide';
@@ -250,7 +243,7 @@ export default {
         },
         email: '',
         contact: {
-          address: { fullAddress: '' },
+          primaryAddress: { fullAddress: '' },
         },
       };
     },
@@ -278,11 +271,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-  @import '~variables'
-
-  /deep/ .q-option .q-option-label
-    font-size: 14px
-
-</style>

@@ -8,7 +8,6 @@
 </template>
 
 <script>
-
 import ProfileHeader from '../../../components/ProfileHeader';
 import ProfileTabs from '../../../components/ProfileTabs';
 import ProfileFollowUp from '../../../components/customers/ProfileFollowUp';

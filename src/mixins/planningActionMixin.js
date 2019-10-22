@@ -33,17 +33,17 @@ export const planningActionMixin = {
           startHour: { required: requiredIf((item, parent) => parent && (parent.type === ABSENCE && parent.absenceNature === HOURLY)) },
           endHour: { required: requiredIf((item, parent) => parent && (parent.type === ABSENCE && parent.absenceNature === HOURLY)) },
         },
-        auxiliary: { required: requiredIf((item) => item.type !== INTERVENTION) },
-        customer: { required: requiredIf((item) => item.type === INTERVENTION) },
-        subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
-        internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
-        absence: { required: requiredIf((item) => item.type === ABSENCE) },
-        absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
+        auxiliary: { required: requiredIf((item) => item && item.type !== INTERVENTION) },
+        customer: { required: requiredIf((item) => item && item.type === INTERVENTION) },
+        subscription: { required: requiredIf((item) => item && item.type === INTERVENTION) },
+        internalHour: { required: requiredIf((item) => item && item.type === INTERNAL_HOUR) },
+        absence: { required: requiredIf((item) => item && item.type === ABSENCE) },
+        absenceNature: { required: requiredIf((item) => item && item.type === ABSENCE) },
         address: {
           zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
           street: { required: requiredIf(item => item && !!item.fullAddress) },
           city: { required: requiredIf(item => item && !!item.fullAddress) },
-          fullAddress: { frAddress },
+          fullAddress: this.newEvent && this.newEvent.type === INTERNAL_HOUR ? { frAddress } : {},
         },
         repetition: {
           frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
@@ -52,36 +52,38 @@ export const planningActionMixin = {
           driveId: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && [ILLNESS, WORK_ACCIDENT].includes(parent.absence)) },
           link: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && [ILLNESS, WORK_ACCIDENT].includes(parent.absence)) },
         },
-        misc: { required: requiredIf(item => item.type === ABSENCE && item.absence === OTHER) },
+        misc: { required: requiredIf(item => item && item.type === ABSENCE && item.absence === OTHER) },
       },
       editedEvent: {
         dates: {
           startDate: { required },
           endDate: { required },
-          startHour: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absenceNature === HOURLY) },
-          endHour: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && parent.absenceNature === HOURLY) },
+          startHour: { required: requiredIf(() => this.editedEvent && this.editedEvent.type === ABSENCE && this.editedEvent.absenceNature === HOURLY) },
+          endHour: { required: requiredIf(() => this.editedEvent && this.editedEvent.type === ABSENCE && this.editedEvent.absenceNature === HOURLY) },
         },
-        auxiliary: { required: requiredIf((item) => item.type !== INTERVENTION) },
+        auxiliary: { required: requiredIf((item) => item && item.type !== INTERVENTION) },
         sector: { required },
-        customer: { required: requiredIf((item) => item.type === INTERVENTION) },
-        subscription: { required: requiredIf((item) => item.type === INTERVENTION) },
-        internalHour: { required: requiredIf((item) => item.type === INTERNAL_HOUR) },
-        absence: { required: requiredIf((item) => item.type === ABSENCE) },
-        absenceNature: { required: requiredIf((item) => item.type === ABSENCE) },
-        address: { fullAddress: { frAddress } },
-        repetition: {
-          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
+        customer: { required: requiredIf((item) => item && item.type === INTERVENTION) },
+        subscription: { required: requiredIf((item) => item && item.type === INTERVENTION) },
+        internalHour: { required: requiredIf((item) => item && item.type === INTERNAL_HOUR) },
+        absence: { required: requiredIf((item) => item && item.type === ABSENCE) },
+        absenceNature: { required: requiredIf((item) => item && item.type === ABSENCE) },
+        address: {
+          zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
+          street: { required: requiredIf(item => item && !!item.fullAddress) },
+          city: { required: requiredIf(item => item && !!item.fullAddress) },
+          fullAddress: this.editedEvent && this.editedEvent.type === INTERNAL_HOUR ? { frAddress } : {},
         },
         attachment: {
-          driveId: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && [ILLNESS, WORK_ACCIDENT].includes(parent.absence)) },
-          link: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && [ILLNESS, WORK_ACCIDENT].includes(parent.absence)) },
+          driveId: { required: requiredIf(() => this.editedEvent && this.editedEvent.type === ABSENCE && [ILLNESS, WORK_ACCIDENT].includes(this.editedEvent.absence)) },
+          link: { required: requiredIf(() => this.editedEvent && this.editedEvent.type === ABSENCE && [ILLNESS, WORK_ACCIDENT].includes(this.editedEvent.absence)) },
         },
         cancel: {
-          condition: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
-          reason: { required: requiredIf((item, parent) => parent && parent.type === INTERVENTION && parent.isCancelled) },
+          condition: { required: requiredIf(() => this.editedEvent && this.editedEvent.type === INTERVENTION && this.editedEvent.isCancelled) },
+          reason: { required: requiredIf(() => this.editedEvent && this.editedEvent.type === INTERVENTION && this.editedEvent.isCancelled) },
         },
         misc: {
-          required: requiredIf((item) => (item.type === ABSENCE && item.absence === OTHER) || item.isCancelled),
+          required: requiredIf((item) => item && ((item.type === ABSENCE && item.absence === OTHER) || item.isCancelled)),
         },
       },
     };
@@ -135,21 +137,16 @@ export const planningActionMixin = {
     },
     resetCreationForm ({ partialReset, type = INTERVENTION }) {
       this.$v.newEvent.$reset();
-      if (!partialReset) this.newEvent = {};
-      else {
+      if (!partialReset) {
+        this.creationModal = false;
+        this.newEvent = {};
+      } else {
         this.newEvent = {
+          ...this.newEvent,
           type,
-          dates: {
-            startDate: partialReset ? this.newEvent.dates.startDate : '',
-            startHour: partialReset ? this.newEvent.dates.startHour : '',
-            endDate: partialReset ? this.newEvent.dates.endDate : '',
-            endHour: partialReset ? this.newEvent.dates.endHour : '',
-          },
           repetition: { frequency: NEVER },
-          auxiliary: partialReset ? this.newEvent.auxiliary : '',
           customer: '',
           subscription: '',
-          sector: partialReset ? this.newEvent.sector : '',
           internalHour: '',
           absence: '',
           address: {},
@@ -193,7 +190,6 @@ export const planningActionMixin = {
         }
       }
 
-      if (event.address) delete payload.address.location;
       if (event.type === ABSENCE && event.absence !== ILLNESS && event.absence !== WORK_ACCIDENT) payload.attachment = {};
 
       return payload;
@@ -276,6 +272,7 @@ export const planningActionMixin = {
         this.creationModal = false;
         this.resetCreationForm(false);
         NotifyPositive('Évènement créé');
+        this.loading = false;
       } catch (e) {
         if (e.message === '') return NotifyPositive('Création annulée');
         console.error(e);
@@ -286,13 +283,23 @@ export const planningActionMixin = {
       }
     },
     // Event edition
+    openEditionModal ({ eventId, rowId }) {
+      const rowEvents = this.getRowEvents(rowId);
+
+      const event = rowEvents.find(ev => ev._id === eventId);
+      const can = this.canEditEvent(event);
+      if (!can) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
+      this.formatEditedEvent(event);
+
+      this.editionModal = true;
+    },
     formatHour (date) {
       return `${this.$moment(date).hours() < 10
         ? `0${this.$moment(date).hours()}`
         : this.$moment(date).hours()}:${this.$moment(date).minutes() || '00'}`;
     },
     formatEditedEvent (event) {
-      const { createdAt, updatedAt, startDate, endDate, isBilled, auxiliary, subscription, ...eventData } = event;
+      const { createdAt, updatedAt, startDate, endDate, isBilled, auxiliary, subscription, address, customer, ...eventData } = event;
       const dates = {
         startDate,
         endDate,
@@ -310,8 +317,10 @@ export const planningActionMixin = {
             ...eventData,
             dates,
             auxiliary: auxiliary ? auxiliary._id : '',
+            customer: customer ? customer._id : '',
             subscription,
             isBilled,
+            address,
           };
           break;
         case INTERNAL_HOUR:

@@ -243,12 +243,7 @@ export default {
       this.breakInfo = breakInfo;
     },
     getEventAddress (event) {
-      let address;
-      if (event.type === INTERVENTION && event.customer && event.customer.contact && event.customer.contact.address) {
-        address = event.customer.contact.address.fullAddress;
-      } else if (event.type === INTERNAL_HOUR && event.address) address = event.address.fullAddress;
-
-      return !address ? null : address;
+      return event.address && (event.type === INTERVENTION || event.type === INTERNAL_HOUR) ? event.address.fullAddress : null;
     },
     async getTransportDuration (origins, destinations) {
       let distanceMatrix = this.distanceMatrix

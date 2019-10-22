@@ -91,7 +91,7 @@
       </table>
     </div>
     <q-page-sticky expand position="right">
-      <ni-event-history-feed v-if="displayHistory" :eventHistories="eventHistories" @toggleHistory="toggleHistory" />
+      <ni-event-history-feed v-if="displayHistory" :eventHistories="eventHistories" @toggleHistory="toggleHistory" @updateFeeds="$emit('updateFeeds', $event)" />
     </q-page-sticky>
   </div>
 </template>
@@ -107,6 +107,7 @@ import {
   UNKNOWN_AVATAR,
   COACH,
   ADMIN,
+  NOT_INVOICED_AND_NOT_PAID,
 } from '../../data/constants';
 import { NotifyNegative, NotifyWarning } from '../popup/notify';
 import NiChipAuxiliaryIndicator from './ChipAuxiliaryIndicator';
@@ -210,7 +211,7 @@ export default {
     },
     // Event display
     unassignedHourCount (sectorId) {
-      const unassignedEvents = this.getRowEvents(sectorId);
+      const unassignedEvents = this.getPersonEvents({ _id: sectorId });
       let total = 0;
       for (const event of unassignedEvents) {
         total += this.$moment(event.endDate).diff(event.startDate, 'm', true);
@@ -254,8 +255,11 @@ export default {
       return dayEvent;
     },
     getPersonEvents (person) {
-      return this.getRowEvents(person._id).filter(event =>
-        (this.isCustomerPlanning || !event.isCancelled || event.cancel.condition === INVOICED_AND_PAID));
+      if (this.isCustomerPlanning) {
+        return this.getRowEvents(person._id).filter(event => !event.isCancelled || event.cancel.condition !== NOT_INVOICED_AND_NOT_PAID);
+      }
+
+      return this.getRowEvents(person._id).filter(event => !event.isCancelled || event.cancel.condition === INVOICED_AND_PAID);
     },
     // History
     toggleHistory () {

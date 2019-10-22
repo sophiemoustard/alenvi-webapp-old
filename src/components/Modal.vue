@@ -4,7 +4,7 @@
     <div class="modal-padding">
       <div class="row justify-between items-baseline">
         <div class="col-11">
-          <h5>{{ title }}<slot name="title" /></h5>
+          <h5 :class="{ 'text-weight-bold': !!title }">{{ title }}<slot name="title" /></h5>
         </div>
         <div class="col-1 cursor-pointer modal-btn-close">
           <span>

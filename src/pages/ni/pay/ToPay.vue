@@ -9,11 +9,14 @@
         <div class="col-xs-12">
           <div class="row items-baseline justify-end">
             <div class="on-left responsive-sort responsive-margin-bottom">Trier par</div>
-            <div class="col-xs-12 col-md-5 responsive-margin-bottom">
+            <div class="col-xs-12 col-md-3 responsive-margin-bottom">
               <q-select class="on-left" color="white" inverted-light :options="sortOptions" v-model="sortOption" separator />
             </div>
-            <div class="col-xs-12 col-md-5">
-              <ni-select-sector v-model="selectedSector" allow-null-option />
+            <div class="col-xs-12 col-md-3 responsive-margin-bottom">
+              <ni-select-sector class="on-left" v-model="selectedSector" allow-null-option />
+            </div>
+            <div class="col-xs-12 col-md-3 responsive-margin-bottom">
+              <q-select class="on-left" color="white" inverted-light :options="periodOptions" v-model="period" separator />
             </div>
           </div>
         </div>
@@ -109,7 +112,6 @@ export default {
   data () {
     return {
       draftPay: [],
-      displayedDraftPay: [],
       selected: [],
       pagination: { rowsPerPage: 0 },
       visibleColumns: ['auxiliary', 'sector', 'startDate', 'endDate', 'contractHours', 'workedHours', 'notSurchargedAndExempt', 'surchargedAndExempt',
@@ -131,6 +133,15 @@ export default {
         { label: 'Transport', value: 'transport' },
         { label: 'Autres frais', value: 'otherFees' },
       ],
+      period: 1,
+      periodOptions: [
+        { label: 'Mois en cours', value: 1 },
+        { label: 'Mois précédent', value: 0 },
+      ],
+      dates: {
+        startDate: this.$moment().startOf('M').toISOString(),
+        endDate: this.$moment().endOf('M').toISOString(),
+      },
       sortOption: 'auxiliary',
     };
   },
@@ -146,26 +157,41 @@ export default {
         return newVal;
       },
     },
+    displayedDraftPay () {
+      if (this.selectedSector === '') return [...this.draftPay];
+      return this.draftPay.filter(dp => dp.auxiliary.sector._id === this.selectedSector);
+    },
   },
   watch: {
     selectedSector (value) {
-      if (value === '') this.displayedDraftPay = [...this.draftPay];
-      else this.displayedDraftPay = this.draftPay.filter(dp => dp.auxiliary.sector._id === value);
       this.selected = [];
+    },
+    async period (value) {
+      this.selected = [];
+      if (value) {
+        this.dates = {
+          startDate: this.$moment().startOf('M').toISOString(),
+          endDate: this.$moment().endOf('M').toISOString(),
+        }
+      } else {
+        this.dates = {
+          startDate: this.$moment().subtract(1, 'M').startOf('M').toISOString(),
+          endDate: this.$moment().subtract(1, 'M').endOf('M').toISOString(),
+        }
+      }
+      await this.refreshDraftPay();
     },
   },
   async mounted () {
-    this.tableLoading = true;
     await this.refreshDraftPay();
-    this.tableLoading = false;
   },
   methods: {
     async refreshDraftPay () {
       try {
-        const draftPay = await this.$pay.getDraftPay({
-          startDate: this.$moment().startOf('M').toISOString(),
-          endDate: this.$moment().endOf('M').toISOString(),
-        });
+        this.tableLoading = true;
+        this.draftPay = [];
+
+        const draftPay = await this.$pay.getDraftPay(this.dates);
         this.draftPay = draftPay.map(dp => ({
           ...dp,
           hoursCounterEdition: false,
@@ -173,11 +199,12 @@ export default {
           additionalHoursEdition: false,
           bonusEdition: false,
         }));
-        this.displayedDraftPay = [...this.draftPay];
       } catch (e) {
         NotifyNegative('Impossible de récupérer les payes');
         this.draftPay = [];
         console.error(e);
+      } finally {
+        this.tableLoading = false;
       }
     },
     // Surcharge modal
@@ -205,6 +232,7 @@ export default {
 
         const pay = this.selected.map(row => this.formatPayload(row));
         await this.$pay.createList(pay);
+
         NotifyPositive('Fiches de paie crées');
         await this.refreshDraftPay();
         this.selected = [];

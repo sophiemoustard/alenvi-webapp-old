@@ -4,13 +4,28 @@
       <div v-if="!isAuxiliary" class="row justify-between items-baseline">
         <p class="text-weight-bold">Documents</p>
       </div>
-      <pay-document-list class="full-width" :documents="payDocuments" @delete="deletePayDocument"
-        :natureOptions="documentNatureOptions" :disable="loading" :is-auxiliary="isAuxiliary">
-      </pay-document-list>
-
+      <q-table :data="payDocuments" :columns="columns" hide-bottom :pagination="pagination"
+        class="q-pa-sm large-table">
+        <q-td slot="body-cell-actions" slot-scope="props" :props="props">
+          <div class="row justify-center table-actions">
+            <q-btn flat round small color="primary" :disabled="!props.row.file.link" class="q-mx-sm" :disable="loading">
+              <a :href="props.row.file.link || false" target="_blank">
+                <q-icon name="file download" color="primary" />
+              </a>
+            </q-btn>
+            <q-btn v-if="!isAuxiliary" flat round small color="primary" icon="delete" class="q-mx-sm" :disable="loading"
+              @click="deletePayDocument(payDocuments[props.row.__index])">
+            </q-btn>
+          </div>
+        </q-td>
+      </q-table>
+      <div v-if="payDocuments.length === 0" class="q-px-md q-my-sm">
+        <span class="no-document">Aucun document</span>
+      </div>
       <q-btn v-if="!isAuxiliary" class="fixed fab-custom" no-caps rounded color="primary" icon="add"
         label="Ajouter un document" @click="documentUpload = true" :disable="loading" />
 
+      <!-- Document upload modal -->
       <ni-modal v-model="documentUpload" @hide="$refs.documentUploadForm.reset()">
         <template slot="title">
           Ajouter un <span class="text-weight-bold">document</span>
@@ -36,7 +51,6 @@ import { NotifyPositive, NotifyWarning, NotifyNegative } from '../popup/notify';
 import { PAY_DOCUMENT_NATURES, OTHER, AUXILIARY_ROLES, COACH_ROLES } from '../../data/constants';
 import Modal from '../../components/Modal';
 import DocumentUpload from '../../components/documents/DocumentUpload';
-import PayDocumentList from '../../components/documents/PayDocumentList';
 import PayDocuments from '../../api/PayDocuments';
 import { formatIdentity } from '../../helpers/utils';
 
@@ -44,7 +58,6 @@ export default {
   name: 'ProfilePay',
   components: {
     'ni-document-upload': DocumentUpload,
-    'pay-document-list': PayDocumentList,
     'ni-modal': Modal,
   },
   data () {
@@ -55,12 +68,44 @@ export default {
       newDocument: null,
       formValid: false,
       payDocuments: [],
+      columns: [
+        {
+          name: 'nature',
+          label: 'Type',
+          align: 'left',
+          field: 'nature',
+          format: value => this.documentNatureLabels[value],
+        },
+        {
+          name: 'date',
+          label: 'Date',
+          align: 'left',
+          field: 'date',
+          format: value => value ? this.$moment(value).format('DD/MM/YYYY') : '',
+        },
+        {
+          name: 'actions',
+          label: '',
+          align: 'left',
+          field: row => row,
+        },
+      ],
+      pagination: {
+        sortBy: 'date',
+        descending: true,
+        rowsPerPage: 0,
+      },
     };
   },
   computed: {
     ...mapGetters({
       mainUser: 'main/user',
     }),
+    documentNatureLabels () {
+      const payDocumentNaturesKeyedByValue = this.$_.keyBy(PAY_DOCUMENT_NATURES, 'value');
+
+      return this.$_.mapValues(payDocumentNaturesKeyedByValue, 'label');
+    },
     userProfile () {
       if (AUXILIARY_ROLES.includes(this.mainUser.role.name)) return this.mainUser;
       if (COACH_ROLES.includes(this.mainUser.role.name)) return this.$store.getters['rh/getUserProfile'];
@@ -129,6 +174,13 @@ export default {
     async deletePayDocument (payDocument) {
       this.loading = true;
       try {
+        await this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
+          ok: true,
+          cancel: 'Annuler',
+        });
+
         await PayDocuments.remove(payDocument._id);
         NotifyPositive('Document supprimé');
         await this.getDocuments();

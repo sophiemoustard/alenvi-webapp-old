@@ -1,13 +1,15 @@
 import moment from 'moment';
 
-import { COMPANY_CONTRACT, WEEKS_PER_MONTH } from '../data/constants';
+import { COMPANY_CONTRACT, WEEKS_PER_MONTH, CIVILITY_OPTIONS } from '../data/constants';
 import nationalities from '../data/nationalities';
 
 export const generateContractFields = (type, data) => {
   if (type === COMPANY_CONTRACT) {
     const monthlyHours = Number.parseFloat(data.contract.weeklyHours * WEEKS_PER_MONTH).toFixed(1);
+    const civility = CIVILITY_OPTIONS.find(opt => opt.value === data.user.identity.title);
+
     return {
-      auxiliaryTitle: data.user.identity.title,
+      auxiliaryTitle: civility ? civility.label : '',
       auxiliaryFirstname: data.user.identity.firstname,
       auxiliaryLastname: data.user.identity.lastname,
       auxiliaryAddress: data.user.contact.address.fullAddress,

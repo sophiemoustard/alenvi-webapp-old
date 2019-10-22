@@ -22,139 +22,142 @@
       @click="creditNoteCreationModal = true" />
 
     <!-- Credit note creation modal -->
-    <q-modal v-model="creditNoteCreationModal" content-classes="modal-container-md" @hide="resetCreationCreditNoteData">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5>Créer un <span class="text-weight-bold">avoir</span></h5>
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span><q-icon name="clear" @click.native="creditNoteCreationModal = false" /></span>
-          </div>
-        </div>
-        <ni-select in-modal caption="Bénéficiaire" v-model="newCreditNote.customer" :options="customersOptions"
-          required-field @input="getEvents" @blur="$v.newCreditNote.customer.$touch"
-          :error="$v.newCreditNote.customer.$error" />
-        <ni-select in-modal caption="Tiers payeur" v-model="newCreditNote.thirdPartyPayer" :options="thirdPartyPayerOptions"
-          required-field @input="getEvents" :disable="thirdPartyPayerOptions.length === 0" clearable />
-        <ni-datetime-picker caption="Date de l'avoir" v-model="newCreditNote.date" :error="$v.newCreditNote.date.$error"
-          @blur="$v.newCreditNote.date.$touch" in-modal type="date" required-field />
-        <div class="row q-mb-md light">
-          <q-toggle v-model="hasLinkedEvents" label="Lié à des interventions ?" />
-        </div>
-        <!-- Has linked events -->
-        <template v-if="hasLinkedEvents">
-          <ni-datetime-picker caption="Début période concernée" v-model="newCreditNote.startDate"
-            :error="$v.newCreditNote.startDate.$error" @blur="$v.newCreditNote.startDate.$touch" in-modal type="date"
-            :disable="!hasLinkedEvents" @input="getEvents" required-field />
-          <ni-datetime-picker caption="Fin période concernée" v-model="newCreditNote.endDate"
-            :error="$v.newCreditNote.endDate.$error" @blur="$v.newCreditNote.endDate.$touch" in-modal type="date"
-            :disable="!hasLinkedEvents" @input="getEvents" required-field />
-          <template v-if="creditNoteEvents.length > 0">
-            <ni-option-group v-model="newCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
-              type="checkbox" required-field inline />
-          </template>
-          <div v-if="newCreditNote.customer && newCreditNote.startDate && newCreditNote.endDate && creditNoteEvents.length === 0"
-            class="light warning">
-            <p>{{ eventsNotFoundMessage }}</p>
-          </div>
-          <div class="row justify-between items-baseline">
-            <div class="col-6 light">
-              <p v-if="newCreditNote.exclTaxesCustomer">Montant HT bénéficiaire : {{ formatPrice(newCreditNote.exclTaxesCustomer) }}</p>
-              <p v-if="newCreditNote.exclTaxesTpp">Montant HT tiers-payeur : {{ formatPrice(newCreditNote.exclTaxesTpp) }}</p>
-            </div>
-            <div class="col-6 light">
-              <p v-if="newCreditNote.inclTaxesCustomer">Montant TTC bénéficiaire : {{ formatPrice(newCreditNote.inclTaxesCustomer) }}</p>
-              <p v-if="newCreditNote.inclTaxesTpp">Montant TTC tiers-payeur : {{ formatPrice(newCreditNote.inclTaxesTpp) }}</p>
-            </div>
-          </div>
-        </template>
-        <!-- Hasn't linked event -->
-        <template v-else>
-          <ni-select in-modal caption="Souscription concernée" :options="subscriptionsOptions"
-            v-model="newCreditNote.subscription" :disable="!hasLinkedEvents && !newCreditNote.customer" required-field
-            :error="$v.newCreditNote.subscription.$error" @blur="$v.newCreditNote.subscription.$touch" />
-          <ni-input in-modal v-if="!newCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€" type="number"
-            v-model="newCreditNote.inclTaxesCustomer" required-field :error="$v.newCreditNote.inclTaxesCustomer.$error"
-            @blur="$v.newCreditNote.inclTaxesCustomer.$touch" :error-label="inclTaxesError" />
-          <ni-input in-modal v-if="newCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€" type="number"
-            v-model="newCreditNote.inclTaxesTpp" required-field :error="$v.newCreditNote.inclTaxesTpp.$error"
-            @blur="$v.newCreditNote.inclTaxesTpp.$touch" :error-label="inclTaxesError" />
-        </template>
+    <ni-modal v-model="creditNoteCreationModal" @hide="resetCreationCreditNoteData">
+      <template slot="title">
+        Créer un <span class="text-weight-bold">avoir</span>
+      </template>
+      <ni-select in-modal caption="Bénéficiaire" v-model="newCreditNote.customer" :options="customersOptions"
+        required-field @input="getEvents" @blur="$v.newCreditNote.customer.$touch"
+        :error="$v.newCreditNote.customer.$error" />
+      <ni-select in-modal caption="Tiers payeur" v-model="newCreditNote.thirdPartyPayer"
+        :options="thirdPartyPayerOptions" required-field @input="getEvents"
+        :disable="thirdPartyPayerOptions.length === 0" clearable />
+      <ni-datetime-picker caption="Date de l'avoir" v-model="newCreditNote.date" :error="$v.newCreditNote.date.$error"
+        @blur="$v.newCreditNote.date.$touch" in-modal type="date" required-field />
+      <div class="row q-mb-md light">
+        <q-toggle v-model="hasLinkedEvents" label="Lié à des interventions ?" />
       </div>
-      <q-btn no-caps class="full-width modal-btn" label="Créer l'avoir" icon-right="add" color="primary"
-        :loading="loading" @click="createNewCreditNote" :disable="$v.newCreditNote.$error ||disableCreationButton" />
-    </q-modal>
+      <!-- Has linked events -->
+      <template v-if="hasLinkedEvents">
+        <ni-datetime-picker caption="Début période concernée" v-model="newCreditNote.startDate"
+          :error="$v.newCreditNote.startDate.$error" @blur="$v.newCreditNote.startDate.$touch" in-modal type="date"
+          :disable="!hasLinkedEvents" @input="getEvents" required-field />
+        <ni-datetime-picker caption="Fin période concernée" v-model="newCreditNote.endDate"
+          :error="$v.newCreditNote.endDate.$error" @blur="$v.newCreditNote.endDate.$touch" in-modal type="date"
+          :disable="!hasLinkedEvents" @input="getEvents" required-field />
+        <template v-if="creditNoteEvents.length > 0">
+          <ni-option-group v-model="newCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
+            type="checkbox" required-field inline />
+        </template>
+        <div
+          v-if="newCreditNote.customer && newCreditNote.startDate && newCreditNote.endDate && creditNoteEvents.length === 0"
+          class="light warning">
+          <p>{{ eventsNotFoundMessage }}</p>
+        </div>
+        <div class="row justify-between items-baseline">
+          <div class="col-6 light">
+            <p v-if="newCreditNote.exclTaxesCustomer">Montant HT bénéficiaire :
+              {{ formatPrice(newCreditNote.exclTaxesCustomer) }}</p>
+            <p v-if="newCreditNote.exclTaxesTpp">Montant HT tiers-payeur : {{ formatPrice(newCreditNote.exclTaxesTpp) }}
+            </p>
+          </div>
+          <div class="col-6 light">
+            <p v-if="newCreditNote.inclTaxesCustomer">Montant TTC bénéficiaire :
+              {{ formatPrice(newCreditNote.inclTaxesCustomer) }}</p>
+            <p v-if="newCreditNote.inclTaxesTpp">Montant TTC tiers-payeur :
+              {{ formatPrice(newCreditNote.inclTaxesTpp) }}</p>
+          </div>
+        </div>
+      </template>
+      <!-- Hasn't linked event -->
+      <template v-else>
+        <ni-select in-modal caption="Souscription concernée" :options="subscriptionsOptions"
+          v-model="newCreditNote.subscription" :disable="!hasLinkedEvents && !newCreditNote.customer" required-field
+          :error="$v.newCreditNote.subscription.$error" @blur="$v.newCreditNote.subscription.$touch" />
+        <ni-input in-modal v-if="!newCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€" type="number"
+          v-model="newCreditNote.inclTaxesCustomer" required-field :error="$v.newCreditNote.inclTaxesCustomer.$error"
+          @blur="$v.newCreditNote.inclTaxesCustomer.$touch" :error-label="inclTaxesError" />
+        <ni-input in-modal v-if="newCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€" type="number"
+          v-model="newCreditNote.inclTaxesTpp" required-field :error="$v.newCreditNote.inclTaxesTpp.$error"
+          @blur="$v.newCreditNote.inclTaxesTpp.$touch" :error-label="inclTaxesError" />
+      </template>
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Créer l'avoir" icon-right="add" color="primary"
+          :loading="loading" @click="createNewCreditNote" :disable="$v.newCreditNote.$error ||disableCreationButton" />
+      </template>
+    </ni-modal>
 
     <!-- Credit note edition modal -->
-    <q-modal v-if="Object.keys(editedCreditNote).length > 0" v-model="creditNoteEditionModal"
-      content-classes="modal-container-md" @hide="resetEditionCreditNoteData">
-      <div class="modal-padding">
+    <ni-modal v-if="Object.keys(editedCreditNote).length > 0" v-model="creditNoteEditionModal"
+      @hide="resetEditionCreditNoteData">
+      <template slot="title">
+        Editer un <span class="text-weight-bold">avoir</span>
+      </template>
+      <ni-input in-modal caption="Bénéficiaire" :value="formatIdentity(editedCreditNote.customer.identity, 'FL')"
+        required-field disable />
+      <ni-input in-modal v-if="editedCreditNote.thirdPartyPayer" caption="Tiers payeur"
+        v-model="editedCreditNote.thirdPartyPayer.name" required-field disable />
+      <ni-datetime-picker caption="Date de l'avoir" v-model="editedCreditNote.date" in-modal type="date" required-field
+        :error="$v.editedCreditNote.date.$error" @blur="$v.editedCreditNote.date.$touch" />
+      <!-- Has linked events -->
+      <template v-if="hasLinkedEvents">
+        <ni-datetime-picker caption="Début période concernée" v-model="editedCreditNote.startDate" in-modal type="date"
+          :disable="!editedCreditNote.events" @input="getEvents" required-field
+          :error="$v.editedCreditNote.startDate.$error" @blur="$v.editedCreditNote.startDate.$touch" />
+        <ni-datetime-picker caption="Fin période concernée" v-model="editedCreditNote.endDate" in-modal type="date"
+          :disable="!editedCreditNote.events" @input="getEvents" required-field
+          :error="$v.editedCreditNote.endDate.$error" @blur="$v.editedCreditNote.endDate.$touch" />
+        <template v-if="creditNoteEvents.length > 0">
+          <ni-option-group v-model="editedCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
+            type="checkbox" required-field inline />
+        </template>
+        <div
+          v-if="editedCreditNote.customer && editedCreditNote.startDate && editedCreditNote.endDate && creditNoteEvents.length === 0"
+          class="light warning">
+          <p>{{ eventsNotFoundMessage }}</p>
+        </div>
         <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5>Editer un <span class="text-weight-bold">avoir</span></h5>
+          <div class="col-6 light">
+            <p v-if="editedCreditNote.exclTaxesCustomer">Montant HT bénéficiaire :
+              {{ formatPrice(editedCreditNote.exclTaxesCustomer) }}</p>
+            <p v-if="editedCreditNote.exclTaxesTpp">Montant HT tiers-payeur :
+              {{ formatPrice(editedCreditNote.exclTaxesTpp) }}</p>
           </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span><q-icon name="clear" @click.native="creditNoteEditionModal = false" /></span>
+          <div class="col-6 light">
+            <p v-if="editedCreditNote.inclTaxesCustomer">Montant TTC bénéficiaire :
+              {{ formatPrice(editedCreditNote.inclTaxesCustomer) }}</p>
+            <p v-if="editedCreditNote.inclTaxesTpp">Montant TTC tiers-payeur :
+              {{ formatPrice(editedCreditNote.inclTaxesTpp) }}</p>
           </div>
         </div>
-        <ni-input in-modal caption="Bénéficiaire" :value="formatIdentity(editedCreditNote.customer.identity, 'FL')" required-field disable />
-        <ni-input in-modal v-if="editedCreditNote.thirdPartyPayer" caption="Tiers payeur"
-          v-model="editedCreditNote.thirdPartyPayer.name" required-field disable />
-        <ni-datetime-picker caption="Date de l'avoir" v-model="editedCreditNote.date" in-modal type="date"
-          required-field :error="$v.editedCreditNote.date.$error" @blur="$v.editedCreditNote.date.$touch" />
-        <!-- Has linked events -->
-        <template v-if="hasLinkedEvents">
-          <ni-datetime-picker caption="Début période concernée" v-model="editedCreditNote.startDate" in-modal
-            type="date" :disable="!editedCreditNote.events" @input="getEvents" required-field
-            :error="$v.editedCreditNote.startDate.$error" @blur="$v.editedCreditNote.startDate.$touch" />
-          <ni-datetime-picker caption="Fin période concernée" v-model="editedCreditNote.endDate" in-modal type="date"
-            :disable="!editedCreditNote.events" @input="getEvents" required-field
-            :error="$v.editedCreditNote.endDate.$error" @blur="$v.editedCreditNote.endDate.$touch" />
-          <template v-if="creditNoteEvents.length > 0">
-            <ni-option-group v-model="editedCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
-              type="checkbox" required-field inline />
-          </template>
-          <div v-if="editedCreditNote.customer && editedCreditNote.startDate && editedCreditNote.endDate && creditNoteEvents.length === 0"
-            class="light warning">
-            <p>{{ eventsNotFoundMessage }}</p>
-          </div>
-          <div class="row justify-between items-baseline">
-            <div class="col-6 light">
-              <p v-if="editedCreditNote.exclTaxesCustomer">Montant HT bénéficiaire : {{ formatPrice(editedCreditNote.exclTaxesCustomer) }}</p>
-              <p v-if="editedCreditNote.exclTaxesTpp">Montant HT tiers-payeur : {{ formatPrice(editedCreditNote.exclTaxesTpp) }}</p>
-            </div>
-            <div class="col-6 light">
-              <p v-if="editedCreditNote.inclTaxesCustomer">Montant TTC bénéficiaire : {{ formatPrice(editedCreditNote.inclTaxesCustomer) }}</p>
-              <p v-if="editedCreditNote.inclTaxesTpp">Montant TTC tiers-payeur : {{ formatPrice(editedCreditNote.inclTaxesTpp) }}</p>
-            </div>
-          </div>
-        </template>
-        <!-- Hasn't linked event -->
-        <template v-else>
-          <ni-select in-modal caption="Souscription concernée" v-model="editedCreditNote.subscription"
-            :options="subscriptionsOptions" :disable="!hasLinkedEvents && !editedCreditNote.customer" required-field
-            :error="$v.editedCreditNote.subscription.$error" @blur="$v.editedCreditNote.subscription.$touch" />
-          <ni-input in-modal v-if="!editedCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€" type="number"
-            v-model="editedCreditNote.inclTaxesCustomer" :error="$v.editedCreditNote.inclTaxesCustomer.$error"
-            @blur="$v.editedCreditNote.inclTaxesCustomer.$touch" :error-label="inclTaxesError" required-field />
-          <ni-input in-modal v-if="editedCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€"
-            v-model="editedCreditNote.inclTaxesTpp" required-field :error="$v.editedCreditNote.inclTaxesTpp.$error"
-            @blur="$v.editedCreditNote.inclTaxesTpp.$touch" :error-label="inclTaxesError" type="number" />
-        </template>
-      </div>
-      <q-btn no-caps class="full-width modal-btn" label="Editer l'avoir" icon-right="add" color="primary"
-        :loading="loading" @click="updateCreditNote" :disable="$v.editedCreditNote.$error || disableEditionButton" />
-    </q-modal>
+      </template>
+      <!-- Hasn't linked event -->
+      <template v-else>
+        <ni-select in-modal caption="Souscription concernée" v-model="editedCreditNote.subscription"
+          :options="subscriptionsOptions" :disable="!hasLinkedEvents && !editedCreditNote.customer" required-field
+          :error="$v.editedCreditNote.subscription.$error" @blur="$v.editedCreditNote.subscription.$touch" />
+        <ni-input in-modal v-if="!editedCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€" type="number"
+          v-model="editedCreditNote.inclTaxesCustomer" :error="$v.editedCreditNote.inclTaxesCustomer.$error"
+          @blur="$v.editedCreditNote.inclTaxesCustomer.$touch" :error-label="inclTaxesError" required-field />
+        <ni-input in-modal v-if="editedCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€"
+          v-model="editedCreditNote.inclTaxesTpp" required-field :error="$v.editedCreditNote.inclTaxesTpp.$error"
+          @blur="$v.editedCreditNote.inclTaxesTpp.$touch" :error-label="inclTaxesError" type="number" />
+      </template>
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Editer l'avoir" icon-right="add" color="primary"
+          :loading="loading" @click="updateCreditNote" :disable="$v.editedCreditNote.$error || disableEditionButton" />
+      </template>
+    </ni-modal>
   </q-page>
 </template>
 
 <script>
 import DatetimePicker from '../../../components/form/DatetimePicker';
 import DateRange from '../../../components/form/DateRange';
-import NiInput from '../../../components/form/Input';
-import NiSelect from '../../../components/form/Select';
+import Input from '../../../components/form/Input';
+import Select from '../../../components/form/Select';
 import OptionGroup from '../../../components/form/OptionGroup';
+import Modal from '../../../components/Modal';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { positiveNumber } from '../../../helpers/vuelidateCustomVal.js';
 import { formatPrice, getLastVersion, formatIdentity } from '../../../helpers/utils.js';
@@ -168,10 +171,11 @@ export default {
   },
   components: {
     'ni-datetime-picker': DatetimePicker,
-    'ni-input': NiInput,
-    'ni-select': NiSelect,
+    'ni-input': Input,
+    'ni-select': Select,
     'ni-date-range': DateRange,
     'ni-option-group': OptionGroup,
+    'ni-modal': Modal,
   },
   data () {
     return {

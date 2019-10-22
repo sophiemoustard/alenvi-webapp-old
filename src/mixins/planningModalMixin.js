@@ -5,6 +5,7 @@ import NiSelect from '../components/form/Select';
 import NiInput from '../components/form/Input';
 import SearchAddress from '../components/form/SearchAddress';
 import FileUploader from '../components/form/FileUploader';
+import PlanningModalHeader from '../components/planning/PlanningModalHeader';
 import { formatIdentity } from '../helpers/utils';
 import {
   INTERVENTION,
@@ -45,6 +46,7 @@ export const planningModalMixin = {
     'ni-input': NiInput,
     'ni-file-uploader': FileUploader,
     'ni-datetime-range': DatetimeRange,
+    'ni-planning-modal-header': PlanningModalHeader,
   },
   data () {
     return {
@@ -63,6 +65,7 @@ export const planningModalMixin = {
       cancellationConditions: CANCELLATION_OPTIONS,
       cancellationReasons: CANCELLATION_REASONS,
       addressError: 'Adresse non valide',
+      selectedAddress: '',
     };
   },
   computed: {
@@ -75,6 +78,9 @@ export const planningModalMixin = {
       }
 
       return ABSENCE_TYPES;
+    },
+    isCustomerPlanning () {
+      return this.personKey === CUSTOMER;
     },
     disableCreationButton () {
       if (!this.newEvent.type) return true;
@@ -90,7 +96,7 @@ export const planningModalMixin = {
           return !this.newEvent.auxiliary || !this.newEvent.absence || !this.newEvent.dates.startDate ||
             !this.newEvent.absenceNature || !this.newEvent.dates.startHour || !this.newEvent.dates.endHour;
         case INTERVENTION:
-          return (this.personKey === CUSTOMER && !this.newEvent.auxiliary) || !this.newEvent.customer ||
+          return (this.isCustomerPlanning && !this.newEvent.auxiliary) || !this.newEvent.customer ||
             !this.newEvent.subscription || !this.newEvent.dates.startDate ||
             !this.newEvent.dates.endDate || !this.newEvent.dates.startHour || !this.newEvent.dates.endHour;
         case INTERNAL_HOUR:
@@ -115,7 +121,7 @@ export const planningModalMixin = {
           return !this.editedEvent.auxiliary || !this.editedEvent.absence || !this.editedEvent.dates.startDate ||
             !this.editedEvent.absenceNature || !this.editedEvent.dates.startHour || !this.editedEvent.dates.endHour;
         case INTERVENTION:
-          const shouldDisableButton = (this.personKey === CUSTOMER && !this.editedEvent.sector) ||
+          const shouldDisableButton = (this.isCustomerPlanning && !this.editedEvent.sector) ||
             !this.editedEvent.subscription || !this.editedEvent.dates.startDate ||
             !this.editedEvent.dates.endDate || !this.editedEvent.dates.startHour || !this.editedEvent.dates.endHour;
           if (this.editedEvent.isCancelled) {
@@ -132,7 +138,7 @@ export const planningModalMixin = {
       }
     },
     eventTypeOptions () {
-      if (this.selectedAuxiliary && !this.selectedAuxiliary._id) {
+      if (this.isCustomerPlanning || (this.selectedAuxiliary && !this.selectedAuxiliary._id)) {
         return EVENT_TYPES.filter(type => type.value === INTERVENTION);
       }
 
@@ -143,7 +149,7 @@ export const planningModalMixin = {
       return EVENT_TYPES;
     },
     auxiliariesOptions () {
-      if (this.personKey === CUSTOMER && this.creationModal) {
+      if (this.isCustomerPlanning && this.creationModal) {
         return this.activeAuxiliaries.map(aux => this.formatPersonOptions(aux));
       }
 
@@ -153,8 +159,8 @@ export const planningModalMixin = {
       ];
     },
     customersOptions () {
-      if (this.customers.length === 0 || !this.selectedAuxiliary) return [];
-      if (!this.selectedAuxiliary._id) return this.customers.map(cus => this.formatPersonOptions(cus)); // Unassigned event
+      if (this.customers.length === 0) return [];
+      if (!this.selectedAuxiliary || !this.selectedAuxiliary._id) return this.customers.map(cus => this.formatPersonOptions(cus)); // Unassigned event
       if (!this.selectedAuxiliary.contracts) return [];
 
       let customers = this.customers;
@@ -191,16 +197,91 @@ export const planningModalMixin = {
         { label: twoWeeksRepetitionLabel, value: EVERY_TWO_WEEKS },
       ];
     },
-    customerAddress () {
-      return this.$_.get(this.editedEvent, 'customer.contact.address.fullAddress', '');
-    },
     customerProfileRedirect () {
       return this.mainUser.role.name === COACH || this.mainUser.role.name === ADMIN
-        ? { name: 'customers profile', params: { id: this.editedEvent.customer._id } }
-        : { name: 'profile customers info', params: { customerId: this.editedEvent.customer._id } };
+        ? { name: 'customers profile', params: { id: this.selectedCustomer._id } }
+        : { name: 'profile customers info', params: { customerId: this.selectedCustomer._id } };
+    },
+    // Event creation
+    customerSubscriptionsOptions () {
+      if (!this.selectedCustomer || !this.selectedCustomer.subscriptions ||
+        this.selectedCustomer.subscriptions.length === 0) return [];
+
+      let subscriptions = this.selectedCustomer.subscriptions;
+      if (this.selectedAuxiliary._id) {
+        if (!this.selectedAuxiliary.hasCustomerContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== CUSTOMER_CONTRACT);
+        if (!this.selectedAuxiliary.hasCompanyContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== COMPANY_CONTRACT);
+      }
+      return subscriptions.map(sub => ({ label: sub.service.name, value: sub._id }));
+    },
+    additionalValue () {
+      return !this.selectedAuxiliary._id ? '' : `justificatif_absence_${this.selectedAuxiliary.identity.lastname}`;
+    },
+    docsUploadUrl () {
+      const driveId = this.$_.get(this.selectedAuxiliary, 'administrative.driveFolder.driveId');
+      return !driveId ? '' : this.$gdrive.getUploadUrl(driveId);
     },
   },
   methods: {
+    deleteClassFocus () {
+      this.$refs['addressSelect'].$el.className = this.$refs['addressSelect'].$el.className.replace('q-if-focused ', '');
+    },
+    hasCustomerContractOnEvent (auxiliary, startDate, endDate = startDate) {
+      if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
+      if (!auxiliary.contracts.some(contract => contract.status === CUSTOMER_CONTRACT)) return false;
+
+      const customerContracts = auxiliary.contracts.filter(contract => contract.status === CUSTOMER_CONTRACT);
+
+      return customerContracts.some(contract => {
+        return this.$moment(contract.startDate).isSameOrBefore(endDate) &&
+          (!contract.endDate || this.$moment(contract.endDate).isSameOrAfter(startDate));
+      });
+    },
+    hasCompanyContractOnEvent (auxiliary, startDate, endDate = startDate) {
+      if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
+      if (!auxiliary.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
+
+      const companyContracts = auxiliary.contracts.filter(contract => contract.status === COMPANY_CONTRACT);
+
+      return companyContracts.some(contract => {
+        return this.$moment(contract.startDate).isSameOrBefore(endDate) &&
+          (!contract.endDate || this.$moment(contract.endDate).isAfter(startDate));
+      });
+    },
+    iconSelect (event) {
+      if (this.customerAddressList(event).length === 1) return [];
+
+      return [{ icon: 'swap_vert', class: 'select-icon pink-icon', handler: () => { this.toggleAddressSelect() } }];
+    },
+    customerAddressList (event) {
+      const addresses = [];
+
+      const primaryAddress = this.$_.get(this.selectedCustomer, 'contact.primaryAddress', null);
+      if (event.address.fullAddress && primaryAddress && primaryAddress.fullAddress === event.address.fullAddress) {
+        addresses.push(this.formatAddressOptions(event.address));
+      } else if (primaryAddress) {
+        addresses.push(this.formatAddressOptions(primaryAddress));
+      }
+
+      const secondaryAddress = this.$_.get(this.selectedCustomer, 'contact.secondaryAddress', null);
+      const isCustomerSecondaryAddressDefined = secondaryAddress && secondaryAddress.fullAddress;
+      if (event.address.fullAddress && secondaryAddress && secondaryAddress.fullAddress === event.address.fullAddress) {
+        addresses.push(this.formatAddressOptions(event.address));
+      } else if (isCustomerSecondaryAddressDefined) {
+        addresses.push(this.formatAddressOptions(secondaryAddress));
+      }
+
+      const eventAddressIsNotCustomerPrimaryAddress = event.address.fullAddress && primaryAddress &&
+        primaryAddress.fullAddress !== event.address.fullAddress;
+      const eventAddressIsNotCustomerSecondaryAddress = isCustomerSecondaryAddressDefined &&
+        secondaryAddress.fullAddress !== event.address.fullAddress;
+      if (eventAddressIsNotCustomerPrimaryAddress &&
+        (eventAddressIsNotCustomerSecondaryAddress || !isCustomerSecondaryAddressDefined)) {
+        addresses.push(this.formatAddressOptions(event.address));
+      }
+
+      return addresses;
+    },
     getAvatar (user) {
       if (!user || !user._id) return UNKNOWN_AVATAR;
 
@@ -212,37 +293,11 @@ export const planningModalMixin = {
         value: person._id,
       };
     },
-    // Event creation
-    customerSubscriptionsOptions (customerId) {
-      if (!customerId) return [];
-      const selectedCustomer = this.customers.find(customer => customer._id === customerId);
-      if (!selectedCustomer || !selectedCustomer.subscriptions || selectedCustomer.subscriptions.length === 0) return [];
-
-      let subscriptions = selectedCustomer.subscriptions;
-      if (this.selectedAuxiliary._id) {
-        if (!this.selectedAuxiliary.hasCustomerContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== CUSTOMER_CONTRACT);
-        if (!this.selectedAuxiliary.hasCompanyContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== COMPANY_CONTRACT);
-      }
-
-      return subscriptions.map(sub => ({
-        label: sub.service.name,
-        value: sub._id,
-      }));
+    formatAddressOptions (address) {
+      return { label: address.fullAddress, value: address };
     },
-    // Event edition
-    toggleCancellationForm (value) {
-      if (!value) this.editedEvent.cancel = {};
-    },
-    toggleRepetition () {
-      this.editedEvent.cancel = {};
-      this.editedEvent.isCancelled = false;
-    },
-    isRepetition (event) {
-      return ABSENCE !== event.type && event.repetition && event.repetition.frequency !== NEVER;
-    },
-    toggleServiceSelection (customerId) {
-      const customerSubscriptionsOptions = this.customerSubscriptionsOptions(customerId);
-      if (customerSubscriptionsOptions.length === 1 && this.creationModal) this.newEvent.subscription = customerSubscriptionsOptions[0].value;
+    toggleAddressSelect () {
+      return this.$refs['addressSelect'].show();
     },
   },
 };

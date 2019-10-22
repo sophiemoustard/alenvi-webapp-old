@@ -3,8 +3,8 @@
     <div class="row col-xs-12 q-mb-md">
       <div :class="[customer ? 'col-xs-12': 'col-xs-8', 'row', 'items-baseline', 'col-md-10']">
         <div class="row items-center">
-          <q-icon v-if="isExternalUser" class="on-left cursor-pointer" size="1rem" name="arrow_back"
-            color="primary" @click.native="$router.go(-1)" />
+          <q-icon v-if="isExternalUser" class="on-left cursor-pointer" size="1rem" name="arrow_back" color="primary"
+            @click.native="$router.go(-1)" />
           <h4>{{ user.identity.firstname }} {{ user.identity.lastname }}</h4>
           <router-link :to="customerPlanningRouterLink" v-if="customer">
             <q-icon class="on-right cursor-pointer" size="1.2rem" name="date range" />
@@ -26,7 +26,8 @@
         <div class="row items-center">
           <q-icon name="restore" class="on-left" size="1rem" />
           <div class="on-left">Depuis le {{ userStartDate }} ({{ userRelativeStartDate }})</div>
-          <ni-icon v-if="customer" name="delete" color="grey" size="1rem" :disable="!!user.firstIntervention" @click=deleteCustomer />
+          <ni-icon v-if="customer" name="delete" color="grey" size="1rem" :disable="!!user.firstIntervention"
+            @click=deleteCustomer />
         </div>
       </div>
       <div v-if="!customer" class="pl-lg col-xs-6 col-md-6 row profile-info-item">
@@ -43,40 +44,37 @@
     </div>
 
     <!-- Modal envoi message -->
-    <q-modal v-model="opened" content-classes="modal-container-sm">
-      <div class="modal-padding">
-        <div class="row justify-between items-baseline">
-          <div class="col-8">
-            <h5>Envoyer un <span class="text-weight-bold">message</span></h5>
-          </div>
-          <div class="col-1 cursor-pointer modal-btn-close">
-            <span><q-icon name="clear" @click.native="opened = false" /></span>
-          </div>
-        </div>
-        <ni-select in-modal caption="Modèle" :options="typeMessageOptions" v-model="typeMessage" required-field />
-        <ni-input in-modal caption="Message" v-model="messageComp" type="textarea" :rows="7" required-field />
-      </div>
-      <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary"
-        :loading="loading" @click.native="sendMessage" />
-    </q-modal>
+    <ni-modal v-model="opened">
+      <template slot="title">
+        Envoyer un <span class="text-weight-bold">message</span>
+      </template>
+      <ni-select in-modal caption="Modèle" :options="typeMessageOptions" v-model="typeMessage" required-field />
+      <ni-input in-modal caption="Message" v-model="messageComp" type="textarea" :rows="7" required-field />
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary"
+          :loading="loading" @click.native="sendMessage" />
+      </template>
+    </ni-modal>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
 import randomize from 'randomatic';
-import NiInput from './form/Input';
-import NiSelect from './form/Select';
+import Input from './form/Input';
+import Select from './form/Select';
+import Modal from './Modal';
 import { NotifyPositive, NotifyNegative } from './popup/notify';
-import NiIcon from './Icon';
+import Icon from './Icon';
 import { DEFAULT_AVATAR } from '../data/constants';
 
 export default {
   name: 'ProfileHeader',
   components: {
-    'ni-input': NiInput,
-    'ni-select': NiSelect,
-    'ni-icon': NiIcon,
+    'ni-input': Input,
+    'ni-select': Select,
+    'ni-icon': Icon,
+    'ni-modal': Modal,
   },
   props: {
     customer: { type: Boolean, default: false },
@@ -186,7 +184,7 @@ export default {
     async sendSMS () {
       try {
         await this.$twilio.sendSMS({
-          to: `+33${this.user.mobilePhone.substring(1)}`,
+          to: `+33${this.user.contact.phone.substring(1)}`,
           body: this.messageComp,
         });
         NotifyPositive('SMS bien envoyé');

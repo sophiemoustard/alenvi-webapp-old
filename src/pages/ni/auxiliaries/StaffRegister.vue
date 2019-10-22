@@ -25,6 +25,7 @@
 
 <script>
 import nationalities from '../../../data/nationalities.js';
+import { CIVILITY_OPTIONS } from '../../../data/constants';
 
 export default {
   name: 'StaffRegister',
@@ -57,7 +58,10 @@ export default {
         {
           name: 'gender',
           label: 'Civilité',
-          field: row => this.$_.get(row, 'user.identity.title', ''),
+          field: row => {
+            const option = CIVILITY_OPTIONS.find(opt => opt.value === this.$_.get(row, 'user.identity.title'));
+            return option ? option.label : ''
+          },
           align: 'left',
         },
         {

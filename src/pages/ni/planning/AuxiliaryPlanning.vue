@@ -4,27 +4,28 @@
       @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop"
       :filteredSectors="filteredSectors" :can-edit="canEditEvent" :personKey="personKey" :filters="activeFilters"
       @toggleAllSectors="toggleAllSectors" :eventHistories="eventHistories" ref="planningManager"
-      :displayAllSectors="displayAllSectors" @toggleHistory="toggleHistory" :displayHistory="displayHistory" />
+      :displayAllSectors="displayAllSectors" @toggleHistory="toggleHistory" :displayHistory="displayHistory"
+      @updateFeeds="updateEventHistories" />
 
     <!-- Event creation modal -->
-    <ni-auxiliary-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
-      :creationModal="creationModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary"
+    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
+      :creationModal="creationModal" :internalHours="internalHours" @close="closeCreationModal" :personKey="personKey"
       :activeAuxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetCreationForm"
-      @deleteDocument="deleteDocument" @documentUploaded="documentUploaded" @createEvent="createEvent"
-      @close="closeCreationModal" />
+      @deleteDocument="deleteDocument" @documentUploaded="documentUploaded" @createEvent="createEvent" />
 
     <!-- Event edition modal -->
-    <ni-auxiliary-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
-      :editionModal="editionModal" :internalHours="internalHours" :selectedAuxiliary="selectedAuxiliary"
-      :activeAuxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetEditionForm"
-      @deleteDocument="deleteDocument" @documentUploaded="documentUploaded" @updateEvent="updateEvent"
-      @close="closeEditionModal" @deleteEvent="deleteEvent" @deleteEventRepetition="deleteEventRepetition" />
+    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
+      :editionModal="editionModal" :internalHours="internalHours" :activeAuxiliaries="activeAuxiliaries"
+      :customers="customers" @resetForm="resetEditionForm" @deleteDocument="deleteDocument" @updateEvent="updateEvent"
+      @documentUploaded="documentUploaded" @close="closeEditionModal" @deleteEvent="deleteEvent"
+      @deleteEventRepetition="deleteEventRepetition" :personKey="personKey" />
   </q-page>
 </template>
 
 <script>
-import AuxiliaryEventCreationModal from '../../../components/planning/AuxiliaryEventCreationModal';
-import AuxiliaryEventEditionModal from '../../../components/planning/AuxiliaryEventEditionModal';
+import cloneDeep from 'lodash/cloneDeep';
+import EventCreationModal from '../../../components/planning/EventCreationModal';
+import EventEditionModal from '../../../components/planning/EventEditionModal';
 import Planning from '../../../components/planning/Planning.vue';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { INTERVENTION, NEVER, PERSON, AUXILIARY, SECTOR, AUXILIARY_ROLES } from '../../../data/constants';
@@ -37,8 +38,8 @@ export default {
   metaInfo: { title: 'Plannnig auxiliaires' },
   components: {
     'ni-planning-manager': Planning,
-    'ni-auxiliary-event-creation-modal': AuxiliaryEventCreationModal,
-    'ni-auxiliary-event-edition-modal': AuxiliaryEventEditionModal,
+    'ni-event-creation-modal': EventCreationModal,
+    'ni-event-edition-modal': EventEditionModal,
   },
   data () {
     return {
@@ -90,23 +91,6 @@ export default {
       elementToAdd: 'planning/getElementToAdd',
       elementToRemove: 'planning/getElementToRemove',
     }),
-    selectedAuxiliary () {
-      if (this.creationModal && this.newEvent.auxiliary) {
-        const aux = this.activeAuxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
-        const hasCustomerContractOnEvent = this.hasCustomerContractOnEvent(aux, this.newEvent.dates.startDate);
-        const hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(aux, this.newEvent.dates.startDate);
-
-        return { ...aux, hasCustomerContractOnEvent, hasCompanyContractOnEvent };
-      }
-      if (this.editionModal && this.editedEvent.auxiliary) {
-        const aux = this.activeAuxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
-        const hasCustomerContractOnEvent = this.hasCustomerContractOnEvent(aux, this.editedEvent.dates.startDate);
-        const hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(aux, this.editedEvent.dates.startDate);
-
-        return { ...aux, hasCustomerContractOnEvent, hasCompanyContractOnEvent };
-      }
-      return { picture: {}, identity: { lastname: '' } };
-    },
     displayedAuxiliaries () {
       return this.auxiliaries.filter(aux => this.hasCustomerContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek) ||
         this.hasCompanyContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek));
@@ -183,7 +167,7 @@ export default {
         }
 
         this.events = await this.$events.list(params);
-        if (this.displayHistory) await this.getEventHistories();
+        if (this.displayHistory) await this.updateEventHistories();
       } catch (e) {
         console.error(e);
         this.events = [];
@@ -197,15 +181,28 @@ export default {
         this.customers = [];
       }
     },
-    async getEventHistories () {
+    async getEventHistories (lastCreatedAt = null) {
+      const eventHistoriesTmp = cloneDeep(this.eventHistories);
       try {
-        this.eventHistories = await this.$eventHistories.list({
+        const params = {
           sectors: this.filteredSectors.map(sector => sector._id),
           auxiliaries: this.auxiliaries.map(aux => aux._id),
-        });
+        };
+
+        let oldEventHistories;
+        if (lastCreatedAt) {
+          oldEventHistories = await this.$eventHistories.list({ ...params, createdAt: lastCreatedAt });
+          this.eventHistories.push(...oldEventHistories);
+        } else {
+          oldEventHistories = await this.$eventHistories.list(params);
+          this.eventHistories = oldEventHistories;
+        }
+
+        return oldEventHistories;
       } catch (e) {
         console.error(e);
-        this.eventHistories = [];
+        this.eventHistories = eventHistoriesTmp;
+        NotifyNegative("Erreur lors de la récupération du flux d'activité");
       }
     },
     // Event creation
@@ -234,17 +231,6 @@ export default {
         },
       };
       this.creationModal = true;
-    },
-    // Event edition
-    openEditionModal ({ eventId, rowId }) {
-      const rowEvents = this.getRowEvents(rowId);
-
-      const event = rowEvents.find(ev => ev._id === eventId);
-      const can = this.canEditEvent(event);
-      if (!can) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
-      this.formatEditedEvent(event);
-
-      this.editionModal = true;
     },
     // Filter
     async addElementToFilter (el) {
@@ -283,6 +269,12 @@ export default {
             this.filteredAuxiliaries.some(filteredAux => history.auxiliaries.map(aux => aux._id).includes(filteredAux._id)));
         if (this.eventHistories.length === 0) this.displayHistory = false;
       }
+    },
+    async updateEventHistories (done) {
+      const lastCreatedAt = this.eventHistories.length ? this.eventHistories[this.eventHistories.length - 1].createdAt : null
+      const oldEventHistories = await this.getEventHistories(lastCreatedAt);
+      if (oldEventHistories.length) return done();
+      done(true);
     },
   },
 }

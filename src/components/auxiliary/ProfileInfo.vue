@@ -56,9 +56,9 @@
           groupErrors('identity').msg }}</p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="Prénom" :error="$v.user.identity.firstname.$error" v-model="user.identity.firstname"
+        <ni-input caption="Prénom" :error="$v.user.identity.firstname.$error" v-model.trim="user.identity.firstname"
           @blur="updateUser('identity.firstname')" @focus="saveTmp('identity.firstname')" />
-        <ni-input caption="Nom" :error="$v.user.identity.lastname.$error" v-model="user.identity.lastname"
+        <ni-input caption="Nom" :error="$v.user.identity.lastname.$error" v-model.trim="user.identity.lastname"
           @blur="updateUser('identity.lastname')" @focus="saveTmp('identity.lastname')" />
         <ni-select caption="Nationalité" :error="$v.user.identity.nationality.$error" :options="nationalitiesOptions"
           v-model="user.identity.nationality" @focus="saveTmp('identity.nationality')"
@@ -87,8 +87,8 @@
           {{ groupErrors('contact').msg }}</p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="Numéro de téléphone" :error="$v.user.mobilePhone.$error" :error-label="phoneNbrError" type="tel"
-          v-model.trim="user.mobilePhone" @blur="updateUser('mobilePhone')" @focus="saveTmp('mobilePhone')" />
+        <ni-input caption="Numéro de téléphone" :error="$v.user.contact.phone.$error" :error-label="phoneNbrError" type="tel"
+          v-model.trim="user.contact.phone" @blur="updateUser('contact.phone')" @focus="saveTmp('contact.phone')" />
         <div v-if="!isAuxiliary" class="col-12 col-md-6 row items-center">
           <div class="col-xs-11">
             <ni-input ref="userEmail" :name="emailInputRef" caption="Adresse email" :error="$v.user.local.email.$error"
@@ -142,14 +142,10 @@
       </div>
       <div class="row gutter-profile items-stretch">
         <div class="col-xs-12">
-          <div class="row justify-between">
-            <p v-if="isAuxiliary" class="input-caption">Merci de nous indiquer le type de document d'identité que tu
-              possèdes.</p>
-          </div>
-          <q-field :error="$v.user.administrative.identityDocs.$error" :error-label="requiredLabel">
-            <q-option-group color="primary" v-model="user.administrative.identityDocs"
-              @input="updateUser('administrative.identityDocs')" :options="identityDocsOptions" />
-          </q-field>
+          <ni-option-group :display-caption="isAuxiliary" v-model="user.administrative.identityDocs" type="radio"
+            :options="identityDocsOptions" :error="$v.user.administrative.identityDocs.$error"
+            caption="Merci de nous indiquer le type de document d'identité que tu possèdes."  required-field
+            :error-label="requiredLabel" @input="updateUser('administrative.identityDocs')" />
         </div>
         <div v-if="user.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Carte d'identité (recto)" path="administrative.idCardRecto" alt="cni recto"
@@ -258,15 +254,10 @@
       </div>
       <div class="row gutter-profile-x">
         <div class="col-xs-12">
-          <div v-if="isAuxiliary" class="row justify-between">
-            <p class="input-caption">Par quel moyen comptes-tu te rendre au travail ?</p>
-            <q-icon v-if="$v.user.administrative.transportInvoice.transportType.$error" name="error_outline"
-              color="secondary" />
-          </div>
-          <q-field :error="$v.user.administrative.transportInvoice.transportType.$error" :error-label="requiredLabel">
-            <q-option-group color="primary" v-model="user.administrative.transportInvoice.transportType"
-              :options="transportOptions" @input="updateUser('administrative.transportInvoice.transportType')" />
-          </q-field>
+          <ni-option-group :display-caption="isAuxiliary" v-model="user.administrative.transportInvoice.transportType"
+            :options="transportOptions" caption="Par quel moyen comptes-tu te rendre au travail ?" type="radio"
+            :error-label="requiredLabel" :error="$v.user.administrative.transportInvoice.transportType.$error"
+            required-field @input="updateUser('administrative.transportInvoice.transportType')" />
         </div>
         <div v-if="user.administrative.transportInvoice.transportType === 'public'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Merci de nous transmettre ton justificatif d'abonnement"
@@ -310,6 +301,7 @@ import { AUXILIARY, PLANNING_REFERENT, TRANSPORT_OPTIONS, REQUIRED_LABEL } from 
 import SelectSector from '../form/SelectSector';
 import Input from '../form/Input';
 import Select from '../form/Select';
+import OptionGroup from '../form/OptionGroup';
 import FileUploader from '../form/FileUploader.vue';
 import MultipleFilesUploader from '../form/MultipleFilesUploader.vue';
 import DatetimePicker from '../form/DatetimePicker.vue';
@@ -330,6 +322,7 @@ export default {
     'ni-multiple-files-uploader': MultipleFilesUploader,
     'ni-datetime-picker': DatetimePicker,
     'ni-search-address': SearchAddress,
+    'ni-option-group': OptionGroup,
   },
   data () {
     return {
@@ -440,11 +433,6 @@ export default {
         picture: {
           link: { required },
         },
-        mobilePhone: {
-          required,
-          frPhoneNumber,
-          maxLength: maxLength(10),
-        },
         sector: { required },
         mentorId: { required },
         identity: {
@@ -468,6 +456,7 @@ export default {
           },
         },
         contact: {
+          phone: { required, frPhoneNumber },
           address: {
             zipCode: { required },
             street: { required },
@@ -479,11 +468,7 @@ export default {
           identityDocs: { required },
           emergencyContact: {
             name: { required },
-            phoneNumber: {
-              required,
-              frPhoneNumber,
-              maxLength: maxLength(10),
-            },
+            phoneNumber: { required, frPhoneNumber },
           },
           idCardRecto: {
             driveId: {
@@ -577,9 +562,9 @@ export default {
       }
     },
     phoneNbrError () {
-      if (!this.$v.user.mobilePhone.required) {
+      if (!this.$v.user.contact.phone.required) {
         return REQUIRED_LABEL;
-      } else if (!this.$v.user.mobilePhone.frPhoneNumber || !this.$v.user.mobilePhone.maxLength) {
+      } else if (!this.$v.user.contact.phone.frPhoneNumber || !this.$v.user.contact.phone.maxLength) {
         return 'Numéro de téléphone non valide';
       }
     },
@@ -634,7 +619,7 @@ export default {
   async mounted () {
     const user = await this.$users.getById(this.currentUser._id);
     this.mergeUser(user);
-    await this.getAuxiliaryRoles();
+    if (!this.isAuxiliary) await this.getAuxiliaryRoles();
     this.$v.user.$touch();
     this.isLoaded = true;
   },
