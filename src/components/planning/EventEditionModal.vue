@@ -18,7 +18,10 @@
           :disable="isDisabled" :error="validations.dates.$error" @blur="validations.dates.$touch" disable-end-date />
       </template>
       <template v-if="editedEvent.type === INTERVENTION">
-        <ni-select in-modal caption="Bénéficiaire" v-model="editedEvent.customer" :options="customersOptions"
+        <ni-select v-if="isCustomerPlanning" in-modal caption="Auxiliaire" v-model="editedEvent.auxiliary"
+          :options="auxiliariesOptions" :error="validations.auxiliary.$error" required-field
+          @blur="validations.auxiliary.$touch" />
+        <ni-select v-else in-modal caption="Bénéficiaire" v-model="editedEvent.customer" :options="customersOptions"
           :error="validations.customer.$error" required-field disable />
         <ni-select in-modal caption="Service" :options="customerSubscriptionsOptions"
           v-model="editedEvent.subscription" :error="validations.subscription.$error"
