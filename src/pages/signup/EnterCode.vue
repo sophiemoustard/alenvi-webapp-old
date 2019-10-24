@@ -14,11 +14,13 @@
 
 <script>
 import CompaniHeader from '../../components/CompaniHeader';
+import Input from '../../components/form/Input';
 import { NotifyNegative } from '../../components/popup/notify';
 
 export default {
   components: {
     'compani-header': CompaniHeader,
+    'ni-input': Input,
   },
   data () {
     return {
