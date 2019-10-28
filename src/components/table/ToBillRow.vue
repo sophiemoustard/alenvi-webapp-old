@@ -80,7 +80,7 @@ export default {
       return bill.thirdPartyPayer.name.length > 35 ? `${bill.thirdPartyPayer.name.substring(0, 35)}...` : bill.thirdPartyPayer.name;
     },
     getExclTaxesDiscount (bill) {
-      return bill.discount / (1 + bill.vat);
+      return bill.discount / (1 + bill.vat / 100);
     },
     getNetExclTaxes (bill) {
       return bill.exclTaxes - this.getExclTaxesDiscount(bill);
