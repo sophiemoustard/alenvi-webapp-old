@@ -325,7 +325,7 @@ export const planningActionMixin = {
           break;
         case INTERNAL_HOUR:
           const internalHour = event.internalHour._id;
-          this.editedEvent = { address: {}, shouldUpdateRepetition: false, ...eventData, auxiliary: auxiliary._id, internalHour, dates };
+          this.editedEvent = { address: address || {}, shouldUpdateRepetition: false, ...eventData, auxiliary: auxiliary._id, internalHour, dates };
           break;
         case ABSENCE:
           this.editedEvent = {
