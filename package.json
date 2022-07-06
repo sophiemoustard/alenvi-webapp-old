@@ -27,7 +27,7 @@
     "joi": "^13.6.0",
     "jszip": "^2.6.1",
     "jszip-utils": "0.0.2",
-    "moment": "^2.22.2",
+    "moment": "^2.29.4",
     "moment-business-days": "^1.0.6",
     "moment-range": "^4.0.1",
     "qs": "^6.6.0",
