@@ -25,7 +25,7 @@
     "ibantools": "^2.0.0",
     "iframe-resizer": "^3.6.3",
     "joi": "^13.6.0",
-    "jszip": "^2.6.1",
+    "jszip": "^2.7.0",
     "jszip-utils": "0.0.2",
     "moment": "^2.22.2",
     "moment-business-days": "^1.0.6",
